@@ -1,12 +1,18 @@
 import type { Metadata } from "next";
 
 import { BlogIndex } from "@/components/sections/blog/blog-index";
+import { getAllBlogPosts } from "@/lib/blog";
 
 export const metadata: Metadata = {
   title: "Blog",
-  description: "FSS articles on SDK implementation, adoption, and platform scaling.",
+  description: "MDX articles on SDK implementation, lead generation strategy, and product infrastructure execution.",
+  alternates: {
+    canonical: "/blog",
+  },
 };
 
-export default function BlogPage() {
-  return <BlogIndex />;
+export default async function BlogPage() {
+  const posts = await getAllBlogPosts();
+
+  return <BlogIndex posts={posts} />;
 }
