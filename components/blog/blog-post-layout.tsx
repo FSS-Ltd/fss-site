@@ -43,9 +43,13 @@ export function BlogPostLayout({ post, children }: BlogPostLayoutProps) {
 
         <footer className="mt-12 border-t border-border-soft/35 pt-6">
           <p className="text-sm text-text-subtle">
-            Looking for implementation support?{" "}
+            Explore implementation resources in{" "}
+            <Link href="/resources" className="text-brand-primary hover:underline">
+              the resource library
+            </Link>
+            , or{" "}
             <Link href="/contact" className="text-brand-primary hover:underline">
-              Talk to FSS
+              talk to FSS
             </Link>
             .
           </p>
