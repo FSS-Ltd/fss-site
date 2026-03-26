@@ -69,7 +69,7 @@ export function LeadCaptureForm({ ctaLabel = "Request demo" }: LeadCaptureFormPr
         {isSubmitting ? "Sending..." : ctaLabel}
       </Button>
       {isSubmitSuccessful ? (
-        <p className="text-sm text-emerald-300">Thanks, we will follow up shortly.</p>
+        <p className="text-sm text-brand-primary">Thanks, we will follow up shortly.</p>
       ) : null}
     </form>
   );

@@ -9,7 +9,7 @@ type SiteShellProps = {
 
 export function SiteShell({ children }: SiteShellProps) {
   return (
-    <div className="relative flex min-h-screen flex-col overflow-x-hidden bg-[#050608] text-white">
+    <div className="relative flex min-h-screen flex-col overflow-x-hidden bg-background text-foreground">
       <SiteHeader />
       <main className="flex-1">{children}</main>
       <SiteFooter />

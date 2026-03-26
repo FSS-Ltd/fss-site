@@ -13,9 +13,12 @@ export function ResourceLibrary() {
       />
       <div className="mt-10 grid gap-4 md:grid-cols-3">
         {leadMagnets.map((resource) => (
-          <article key={resource.slug} className="rounded-2xl border border-white/10 bg-white/5 p-6">
-            <h2 className="text-lg font-semibold text-white">{resource.title}</h2>
-            <p className="mt-3 text-sm text-zinc-400">{resource.description}</p>
+          <article
+            key={resource.slug}
+            className="rounded-2xl border border-border-soft/70 bg-surface-1/78 p-6 shadow-[inset_0_1px_0_rgba(140,180,220,0.08)]"
+          >
+            <h2 className="text-lg font-semibold text-foreground">{resource.title}</h2>
+            <p className="mt-3 text-sm text-text-muted">{resource.description}</p>
             <ButtonLink href="/contact" variant="secondary" className="mt-6 w-full">
               {resource.ctaLabel}
             </ButtonLink>

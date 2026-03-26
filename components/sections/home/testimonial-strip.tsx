@@ -21,19 +21,22 @@ const testimonials = [
 
 export function TestimonialStrip() {
   return (
-    <Section>
+    <Section className="pt-14">
       <SectionHeading
         align="center"
         eyebrow="Social proof"
         title="Trusted by teams that ship quickly"
         description="Feedback from teams using FSS to streamline delivery and improve integration quality."
       />
-      <div className="mt-10 grid gap-4 lg:grid-cols-3">
+      <div className="mt-11 grid gap-4 lg:grid-cols-3">
         {testimonials.map((item) => (
-          <blockquote key={item.author} className="rounded-2xl border border-white/10 bg-white/5 p-5">
-            <p className="text-sm leading-relaxed text-zinc-300">“{item.quote}”</p>
-            <footer className="mt-4 text-xs text-zinc-500">
-              <p className="font-semibold text-zinc-200">{item.author}</p>
+          <blockquote
+            key={item.author}
+            className="rounded-2xl border border-border-soft/70 bg-surface-1/78 p-5 shadow-[inset_0_1px_0_rgba(140,180,220,0.08)]"
+          >
+            <p className="text-sm leading-relaxed text-text-muted">“{item.quote}”</p>
+            <footer className="mt-4 text-xs text-text-subtle">
+              <p className="font-semibold text-foreground">{item.author}</p>
               <p>{item.role}</p>
             </footer>
           </blockquote>

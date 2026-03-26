@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${spaceGrotesk.variable} h-full`}>
-      <body className="min-h-full bg-[#050608] font-sans text-white antialiased">
+      <body className="min-h-full bg-background font-sans text-foreground antialiased">
         <SiteShell>{children}</SiteShell>
       </body>
     </html>
