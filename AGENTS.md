@@ -40,6 +40,7 @@ Primary goals:
 There is no complex product login system in scope unless explicitly requested.
 
 Use `Mockup.webp` as the primary visual reference for UI direction, layout feel, spacing, hierarchy, and overall presentation.  
+Use `FSS.png` as the primary brand reference for colours. Derive the site palette from it and apply those colours consistently across the UI.
 When implementing UI, actively compare your work against `Mockup.webp` and aim for a close visual match in:
 
 - layout structure
@@ -55,6 +56,48 @@ Do not copy blindly if something in the mockup conflicts with good responsivenes
 Match the spirit and quality of the mockup while keeping the implementation production-ready.
 
 ---
+
+## Brand Rules
+
+Use `FSS.png` as the primary brand reference for colour direction.
+
+When implementing the UI:
+
+- inspect `FSS.png` and derive the core brand palette from it
+- use those colours consistently across the site
+- prioritise the primary brand colours for:
+  - buttons
+  - links
+  - highlights
+  - icons
+  - section accents
+  - CTA backgrounds or borders where appropriate
+- use softer tints/shades of the brand colours for:
+  - subtle backgrounds
+  - hover states
+  - badges
+  - callout panels
+  - supporting UI accents
+
+Do not guess random colours if they are not aligned with `FSS.png`.
+
+Use `Mockup.webp` for layout and UI structure, and use `FSS.png` for brand colour styling.
+
+If exact colours are not yet defined as tokens:
+
+- sample the closest visually dominant colours from `FSS.png`
+- create a small reusable colour system from them
+- apply the palette consistently across all components
+
+The implementation should feel:
+
+- on-brand
+- polished
+- consistent
+- modern
+- visually aligned with both `Mockup.webp` and `FSS.png`
+
+Do not introduce unrelated accent colours unless clearly justified by the design.
 
 ## Core Engineering Principles
 
