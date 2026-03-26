@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local guidance and design reference files
+Mockup.webp
+AGENTS.md
+CLAUDE.md
