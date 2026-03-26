@@ -18,18 +18,3 @@ export type Testimonial = {
   author: string;
   role: string;
 };
-
-export type BlogPostSummary = {
-  slug: string;
-  title: string;
-  excerpt: string;
-  publishedAt: string;
-  readMinutes: number;
-};
-
-export type LeadMagnet = {
-  slug: string;
-  title: string;
-  description: string;
-  ctaLabel: string;
-};
