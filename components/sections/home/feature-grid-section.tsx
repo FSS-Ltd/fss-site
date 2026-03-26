@@ -29,13 +29,13 @@ const featureItems = [
 
 export function FeatureGridSection() {
   return (
-    <Section>
+    <Section className="pb-14 sm:pb-16">
       <SectionHeading
         eyebrow="Why FSS"
         title="A maintainable SDK foundation for fast product teams"
         description="The architecture emphasizes clarity, reliability, and repeatable delivery from launch to scale."
       />
-      <div className="mt-10 grid gap-4 sm:grid-cols-2">
+      <div className="mt-11 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {featureItems.map((feature) => (
           <Card key={feature.title} title={feature.title} description={feature.description} icon={feature.icon} />
         ))}
