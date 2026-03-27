@@ -27,6 +27,9 @@ export function HeroSection() {
             <ButtonLink href="/resources" variant="secondary" size="lg">
               Explore resources
             </ButtonLink>
+            <ButtonLink href="/blog" variant="ghost" size="lg">
+              Read the blog
+            </ButtonLink>
           </div>
         </div>
         <div className="relative mx-auto w-full max-w-md rounded-[2rem] border border-border-strong/80 bg-gradient-to-b from-brand-secondary/35 to-surface-1 p-6 shadow-[0_30px_90px_-45px_rgba(89,200,230,0.8)]">

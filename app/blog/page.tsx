@@ -4,10 +4,18 @@ import { BlogIndex } from "@/components/sections/blog/blog-index";
 import { getAllBlogPosts } from "@/lib/blog";
 
 export const metadata: Metadata = {
-  title: "Blog",
-  description: "MDX articles on SDK implementation, lead generation strategy, and product infrastructure execution.",
+  title: "SDK Implementation Blog",
+  description:
+    "Read practical FSS insights on SDK rollout, technical content strategy, and lead generation execution.",
   alternates: {
     canonical: "/blog",
+  },
+  openGraph: {
+    title: "FSS Blog",
+    description:
+      "Read practical FSS insights on SDK rollout, technical content strategy, and lead generation execution.",
+    url: "/blog",
+    type: "website",
   },
 };
 

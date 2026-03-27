@@ -1,7 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { FormField } from "@/components/forms/form-field";
@@ -16,7 +17,8 @@ import {
 } from "@/lib/forms/lead-capture";
 
 type LeadMagnetCaptureFormProps = {
-  resourceSlug: string;
+  resourceSlug?: string;
+  sourceContext: string;
   ctaLabel?: string;
   redirectPath?: string;
   submitter?: (payload: LeadCapturePayload) => Promise<LeadCaptureResult>;
@@ -24,11 +26,14 @@ type LeadMagnetCaptureFormProps = {
 
 export function LeadMagnetCaptureForm({
   resourceSlug,
+  sourceContext,
   ctaLabel = "Get resource",
   redirectPath,
   submitter = submitLeadCapture,
 }: LeadMagnetCaptureFormProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const {
     handleSubmit,
@@ -47,13 +52,18 @@ export function LeadMagnetCaptureForm({
   });
 
   const onSubmit = async (values: LeadMagnetCaptureValues) => {
+    setSubmitError(null);
+
     const result = await submitter({
       ...values,
       challenge: values.challenge?.trim() || undefined,
+      sourceContext,
+      sourcePath: pathname || "/",
       resourceSlug,
     });
 
     if (!result.ok) {
+      setSubmitError(result.errorMessage ?? "Something went wrong. Please try again.");
       return;
     }
 
@@ -111,6 +121,7 @@ export function LeadMagnetCaptureForm({
       <Button className="mt-2 w-full" type="submit" disabled={isSubmitting}>
         {isSubmitting ? "Submitting..." : ctaLabel}
       </Button>
+      {submitError ? <p className="text-sm text-rose-300">{submitError}</p> : null}
       {!redirectPath && isSubmitSuccessful ? (
         <p className="text-sm text-brand-primary">Thanks, your request has been received.</p>
       ) : null}

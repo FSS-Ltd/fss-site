@@ -4,10 +4,18 @@ import { ResourceLibrary } from "@/components/sections/resources/resource-librar
 import { getAllResources } from "@/lib/resources";
 
 export const metadata: Metadata = {
-  title: "Resources",
-  description: "Lead magnets and implementation resources for evaluation, rollout, and stakeholder alignment.",
+  title: "Lead Magnets and Resources",
+  description:
+    "Download conversion-focused FSS resources for SDK planning, rollout readiness, and go-to-market execution.",
   alternates: {
     canonical: "/resources",
+  },
+  openGraph: {
+    title: "FSS Resources",
+    description:
+      "Download conversion-focused FSS resources for SDK planning, rollout readiness, and go-to-market execution.",
+    url: "/resources",
+    type: "website",
   },
 };
 

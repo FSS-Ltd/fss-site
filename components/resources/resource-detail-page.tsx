@@ -1,4 +1,5 @@
 import { compileMDX } from "next-mdx-remote/rsc";
+import Link from "next/link";
 
 import type { ResourceItem, ResourceMeta } from "@/lib/types/resource";
 
@@ -46,6 +47,17 @@ export async function ResourceDetailPage({ resource, relatedResources }: Resourc
           <p className="mt-3 max-w-2xl text-sm text-text-muted">
             FSS resources are built from real rollout playbooks and customer onboarding engagements. They are designed
             to reduce implementation uncertainty and help teams move from planning to execution quickly.
+          </p>
+          <p className="mt-3 text-sm text-text-subtle">
+            Looking for more context? Read implementation guidance in our{" "}
+            <Link href="/blog" className="text-brand-primary hover:underline">
+              blog
+            </Link>{" "}
+            or{" "}
+            <Link href="/contact" className="text-brand-primary hover:underline">
+              talk to FSS
+            </Link>
+            .
           </p>
         </section>
 
