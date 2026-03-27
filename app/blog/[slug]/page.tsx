@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { ArticleSchema } from "@/components/seo/article-schema";
 import { BlogPostPage } from "@/components/sections/blog/blog-post-page";
 import { getAllBlogPosts, getBlogPostBySlug, getRelatedPosts } from "@/lib/blog";
 
@@ -38,6 +39,8 @@ export async function generateMetadata({ params }: BlogPostRouteProps): Promise<
       url: `/blog/${post.meta.slug}`,
       images: [post.meta.coverImage],
       publishedTime: post.meta.publishDate,
+      authors: [post.meta.author],
+      section: post.meta.category,
       tags: post.meta.tags,
     },
     twitter: {
@@ -59,5 +62,10 @@ export default async function BlogPostRoute({ params }: BlogPostRouteProps) {
 
   const relatedPosts = await getRelatedPosts(post.meta, 2);
 
-  return <BlogPostPage post={post} relatedPosts={relatedPosts} />;
+  return (
+    <>
+      <ArticleSchema post={post.meta} />
+      <BlogPostPage post={post} relatedPosts={relatedPosts} />
+    </>
+  );
 }

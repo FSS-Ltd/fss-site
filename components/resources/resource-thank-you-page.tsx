@@ -33,7 +33,15 @@ export function ResourceThankYouPage({ resource }: ResourceThankYouPageProps) {
             </ButtonLink>
           </div>
           <p className="mt-6 text-sm text-text-subtle">
-            Want to review this page again? <Link href={resourcePath} className="text-brand-primary hover:underline">Go back to resource</Link>.
+            Want to review this page again?{" "}
+            <Link href={resourcePath} className="text-brand-primary hover:underline">
+              Go back to resource
+            </Link>
+            . You can also browse our{" "}
+            <Link href="/blog" className="text-brand-primary hover:underline">
+              latest blog articles
+            </Link>
+            .
           </p>
         </section>
       </Container>

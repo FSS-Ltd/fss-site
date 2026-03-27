@@ -5,5 +5,11 @@ type LeadCaptureFormProps = {
 };
 
 export function LeadCaptureForm({ ctaLabel = "Request demo" }: LeadCaptureFormProps) {
-  return <LeadMagnetCaptureForm resourceSlug="contact-request" ctaLabel={ctaLabel} />;
+  return (
+    <LeadMagnetCaptureForm
+      resourceSlug="contact-request"
+      sourceContext="contact-page"
+      ctaLabel={ctaLabel}
+    />
+  );
 }

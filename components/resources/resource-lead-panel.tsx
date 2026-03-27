@@ -18,6 +18,7 @@ export function ResourceLeadPanel({ resource }: ResourceLeadPanelProps) {
       <div className="mt-5">
         <LeadMagnetCaptureForm
           resourceSlug={resource.slug}
+          sourceContext={"resource:" + resource.slug}
           ctaLabel={resource.ctaLabel}
           redirectPath={redirectPath}
         />
