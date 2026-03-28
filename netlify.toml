@@ -3,6 +3,8 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  # NEXT_PUBLIC_* values are intentionally public and rendered into output.
+  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SITE_URL"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
