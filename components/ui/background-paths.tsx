@@ -1,9 +1,19 @@
 "use client";
 
+// Durations are pre-computed once at module load so SSR and client
+// produce the same values — avoiding a hydration mismatch.
+
 import { motion } from "motion/react";
 
+const PATH_COUNT = 36;
+
+const durations = Array.from(
+  { length: PATH_COUNT },
+  () => 20 + Math.random() * 10,
+);
+
 function FloatingPaths({ position }: { position: number }) {
-  const paths = Array.from({ length: 36 }, (_, i) => ({
+  const paths = Array.from({ length: PATH_COUNT }, (_, i) => ({
     id: i,
     d: `M-${380 - i * 5 * position} -${189 + i * 6}C-${
       380 - i * 5 * position
@@ -37,7 +47,7 @@ function FloatingPaths({ position }: { position: number }) {
               pathOffset: [0, 1, 0],
             }}
             transition={{
-              duration: 20 + Math.random() * 10,
+              duration: durations[path.id],
               repeat: Number.POSITIVE_INFINITY,
               ease: "linear",
             }}
