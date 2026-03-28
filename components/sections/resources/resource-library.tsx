@@ -56,7 +56,7 @@ export function ResourceLibrary({ resources }: ResourceLibraryProps) {
             Free Strategic Resources
           </span>
           <h1 className="mx-auto mt-6 max-w-3xl text-balance text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl">
-            Modernize Your Organization's Software with Confidence
+            Modernize Your Organization&apos;s Software with Confidence
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-text-muted">
             Practical guides and playbooks for business leaders, school administrators, and

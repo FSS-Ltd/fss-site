@@ -1,31 +1,49 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
+import { ZodError } from "zod";
 
-import { leadMagnetCaptureSchema } from "@/lib/forms/lead-capture";
-
-const leadApiSchema = leadMagnetCaptureSchema.extend({
-  sourceContext: z.string().min(1),
-  sourcePath: z.string().min(1),
-  resourceSlug: z.string().optional(),
-});
+import { leadSubmissionSchema } from "@/lib/forms/lead-capture";
+import { processLeadSubmission } from "@/lib/server/lead-submission";
 
 export async function POST(request: Request) {
   try {
     const payload = await request.json();
-    const parsed = leadApiSchema.parse(payload);
+    const parsed = leadSubmissionSchema.parse(payload);
+    const result = await processLeadSubmission(parsed);
 
-    // Placeholder for future provider integrations (CRM, email, webhook).
+    if (!result.ok) {
+      return NextResponse.json(
+        {
+          ok: false,
+          errorMessage: result.errorMessage ?? "Unable to submit right now. Please try again.",
+        },
+        { status: 500 },
+      );
+    }
+
     return NextResponse.json({
       ok: true,
-      leadId: `api-${parsed.resourceSlug ?? "general"}-${Date.now()}`,
+      leadId: result.leadId,
+      emailWarning: result.emailWarning ?? false,
     });
-  } catch {
+  } catch (error) {
+    console.error("Lead API route validation/orchestration error.", { error });
+
+    if (error instanceof ZodError) {
+      return NextResponse.json(
+        {
+          ok: false,
+          errorMessage: "Invalid submission payload.",
+        },
+        { status: 400 },
+      );
+    }
+
     return NextResponse.json(
       {
         ok: false,
-        errorMessage: "Invalid lead submission payload.",
+        errorMessage: "Unable to process your request right now.",
       },
-      { status: 400 },
+      { status: 500 },
     );
   }
 }
