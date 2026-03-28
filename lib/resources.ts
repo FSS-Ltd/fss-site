@@ -8,6 +8,30 @@ import type { ResourceFrontmatter, ResourceItem, ResourceMeta } from "@/lib/type
 
 const RESOURCES_CONTENT_DIR = path.join(process.cwd(), "content", "resources");
 
+const resourceDeliverySchema = z
+  .object({
+    type: z.enum(["direct_download", "internal_asset_page", "external_link", "email_later"]),
+    url: z.string().min(1).optional(),
+    label: z.string().min(1).optional(),
+    notes: z.string().min(1).optional(),
+    fileName: z.string().min(1).optional(),
+    accessInstructions: z.string().min(1).optional(),
+  })
+  .superRefine((delivery, ctx) => {
+    const requiresUrl =
+      delivery.type === "direct_download" ||
+      delivery.type === "internal_asset_page" ||
+      delivery.type === "external_link";
+
+    if (requiresUrl && !delivery.url) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "delivery.url is required for this delivery type.",
+        path: ["url"],
+      });
+    }
+  });
+
 const resourceFrontmatterSchema = z.object({
   slug: z.string().min(1),
   title: z.string().min(1),
@@ -23,6 +47,7 @@ const resourceFrontmatterSchema = z.object({
   thankYouMessage: z.string().min(1),
   seoTitle: z.string().min(1),
   seoDescription: z.string().min(1),
+  delivery: resourceDeliverySchema,
 });
 
 function parseFrontmatter(frontmatter: unknown): ResourceFrontmatter {

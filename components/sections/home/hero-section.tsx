@@ -1,47 +1,73 @@
-import Image from "next/image";
+import { Building2, Church, GraduationCap, Handshake } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
+import { BackgroundPaths } from "@/components/ui/background-paths";
 import { ButtonLink } from "@/components/ui/button";
+import { GlowCard } from "@/components/ui/spotlight-card";
 import { Section } from "@/components/ui/section";
+
+type CategoryCard = {
+  icon: LucideIcon;
+  label: string;
+  sub: string;
+  iconColor: string;
+};
+
+const categoryCards: CategoryCard[] = [
+  { icon: Building2,     label: "Enterprise", sub: "Robust ERP & CRM",      iconColor: "text-brand-primary" },
+  { icon: GraduationCap, label: "Education",  sub: "LMS & Admin",            iconColor: "text-brand-accent" },
+  { icon: Church,        label: "Religious",  sub: "Member Management",       iconColor: "text-[#b5c7e8]" },
+  { icon: Handshake,     label: "Non-Profit", sub: "Custom Dashboards",       iconColor: "text-[#b7c6f2]" },
+];
 
 export function HeroSection() {
   return (
-    <Section className="relative overflow-hidden pb-12 pt-14 sm:pb-16 sm:pt-18 lg:pb-20 lg:pt-24">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(89,200,230,0.18),transparent_36%),radial-gradient(circle_at_82%_0%,rgba(38,61,103,0.5),transparent_42%)]" />
-      <div className="relative grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+    <Section className="relative overflow-hidden pb-12 pt-14 sm:pb-16 sm:pt-20 lg:pb-20 lg:pt-28">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(111,212,238,0.12),transparent_36%),radial-gradient(circle_at_82%_0%,rgba(23,31,51,0.7),transparent_42%)]" />
+      <BackgroundPaths />
+
+      <div className="relative grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
         <div className="space-y-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-brand-primary">Product infrastructure</p>
-          <h1 className="max-w-xl text-balance text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-[3.5rem] lg:leading-[1.06]">
-            Empower your product with our{" "}
+          <span className="inline-flex items-center rounded-full border border-brand-primary/20 bg-brand-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-widest text-brand-primary">
+            Digital Craftsmanship
+          </span>
+
+          <h1 className="max-w-xl text-balance text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl lg:text-[3.5rem] lg:leading-[1.08]">
+            Custom Software for{" "}
             <span className="bg-gradient-to-r from-brand-primary to-brand-accent bg-clip-text text-transparent">
-              versatile SDK
+              Business
             </span>
+            , Schools, and Churches
           </h1>
+
           <p className="max-w-lg text-lg leading-8 text-text-muted">
-            A scalable SDK foundation that helps engineering teams launch faster, reduce integration debt, and keep
-            product delivery predictable.
+            We build unshakeable digital foundations with reliable technology solutions tailored
+            to your unique mission and operational needs.
           </p>
+
           <div className="flex flex-wrap items-center gap-4">
             <ButtonLink href="/contact" variant="primary" size="lg">
-              Start building
+              Get a Quote
             </ButtonLink>
-            <ButtonLink href="/resources" variant="secondary" size="lg">
-              Explore resources
-            </ButtonLink>
-            <ButtonLink href="/blog" variant="ghost" size="lg">
-              Read the blog
+            <ButtonLink href="/#services" variant="secondary" size="lg">
+              Our Services
             </ButtonLink>
           </div>
         </div>
-        <div className="relative mx-auto w-full max-w-md rounded-[2rem] border border-border-strong/80 bg-gradient-to-b from-brand-secondary/35 to-surface-1 p-6 shadow-[0_30px_90px_-45px_rgba(89,200,230,0.8)]">
-          <div className="pointer-events-none absolute -inset-px rounded-[2rem] border border-brand-primary/20" />
-          <Image
-            src="/FSS_V2.png"
-            alt="FSS 3D product visual"
-            width={420}
-            height={420}
-            className="h-auto w-full object-contain"
-            priority
-          />
+
+        <div className="relative hidden lg:block">
+          <div className="pointer-events-none absolute -inset-4 rounded-full bg-brand-primary/10 blur-3xl" />
+          <GlowCard customSize className="p-6 shadow-2xl">
+            <div className="grid grid-cols-2 gap-3">
+              {categoryCards.map((card) => (
+                <GlowCard key={card.label} customSize className="p-5">
+                  <card.icon className={`mb-2 size-6 ${card.iconColor}`} aria-hidden="true" />
+                  <h4 className="font-bold text-foreground">{card.label}</h4>
+                  <p className="mt-0.5 text-xs text-text-subtle">{card.sub}</p>
+                </GlowCard>
+              ))}
+            </div>
+          </GlowCard>
         </div>
       </div>
     </Section>

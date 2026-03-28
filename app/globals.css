@@ -1,18 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --background: #060911;
-  --foreground: #eef6ff;
-  --brand-primary: #59c8e6;
-  --brand-accent: #1b9fbe;
-  --brand-secondary: #263d67;
-  --surface-1: #101827;
-  --surface-2: #141f30;
-  --border-soft: #1f3047;
-  --border-strong: #2b4766;
-  --text-muted: #9ba8ba;
-  --text-subtle: #7d8ca0;
-  --cta-text: #021016;
+  --background: #0b1326;
+  --foreground: #dae2fd;
+  --brand-primary: #6fd4ee;
+  --brand-accent: #2d9db6;
+  --brand-secondary: #171f33;
+  --surface-1: #131b2e;
+  --surface-2: #222a3d;
+  --surface-3: #2d3449;
+  --border-soft: #2a3545;
+  --border-strong: #3e494c;
+  --text-muted: #bdc8cc;
+  --text-subtle: #879396;
+  --cta-text: #003640;
 }
 
 @theme inline {
@@ -28,13 +29,14 @@
   --color-text-muted: var(--text-muted);
   --color-text-subtle: var(--text-subtle);
   --color-cta-text: var(--cta-text);
+  --color-surface-3: var(--surface-3);
   --font-sans: var(--font-space-grotesk);
 }
 
 body {
   background:
-    radial-gradient(circle at 75% 2%, color-mix(in oklab, var(--brand-primary) 18%, transparent) 0, transparent 36%),
-    radial-gradient(circle at 20% 0%, color-mix(in oklab, var(--brand-secondary) 46%, transparent) 0, transparent 42%),
+    radial-gradient(circle at 75% 2%, color-mix(in oklab, var(--brand-primary) 12%, transparent) 0, transparent 36%),
+    radial-gradient(circle at 20% 0%, color-mix(in oklab, var(--brand-accent) 20%, transparent) 0, transparent 42%),
     var(--background);
   color: var(--foreground);
 }

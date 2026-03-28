@@ -1,4 +1,5 @@
 import { LeadCaptureForm } from "@/components/forms/lead-capture-form";
+import { GlowCard } from "@/components/ui/spotlight-card";
 import { Section } from "@/components/ui/section";
 import { SectionHeading } from "@/components/ui/section-heading";
 
@@ -11,9 +12,9 @@ export function ContactHero() {
           title="Plan your integration with the FSS team"
           description="Share your current setup and goals. We will send a practical implementation plan and next steps."
         />
-        <div className="rounded-2xl border border-border-strong/70 bg-surface-1/78 p-6 shadow-[inset_0_1px_0_rgba(140,180,220,0.08)]">
+        <GlowCard customSize className="p-6">
           <LeadCaptureForm ctaLabel="Request integration plan" />
-        </div>
+        </GlowCard>
       </div>
     </Section>
   );
