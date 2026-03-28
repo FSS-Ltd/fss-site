@@ -1,4 +1,3 @@
-import { GlowCard } from "@/components/ui/spotlight-card";
 import { Section } from "@/components/ui/section";
 import { SectionHeading } from "@/components/ui/section-heading";
 
@@ -25,24 +24,27 @@ const steps = [
   },
 ];
 
-export function HowItWorksSection() {
+export function ServicesProcess() {
   return (
-    <Section className="pt-12">
+    <Section>
       <SectionHeading
         align="center"
         eyebrow="Our Process"
         title="How We Work"
         description="A disciplined four-stage approach that keeps every project on track, on budget, and built to last."
       />
-      <ol className="mt-11 grid gap-4 md:grid-cols-4">
+      <ol className="relative mt-11 grid gap-4 md:grid-cols-4">
+        <li className="pointer-events-none hidden md:block absolute left-0 top-10 w-full px-[10%]">
+          <div className="h-px w-full bg-border-soft/40" />
+        </li>
         {steps.map((step) => (
-          <GlowCard key={step.title} customSize className="p-6 text-center" as="li">
-            <div className="mx-auto mb-5 flex size-16 items-center justify-center rounded-full border-4 border-surface-2 bg-surface-1 font-extrabold text-lg text-brand-primary">
+          <li key={step.title} className="relative flex flex-col items-center text-center px-4">
+            <div className="relative z-10 mb-5 flex size-20 items-center justify-center rounded-full border-4 border-surface-2 bg-surface-1 font-extrabold text-xl text-brand-primary">
               {step.number}
             </div>
             <h3 className="text-lg font-bold text-foreground">{step.title}</h3>
             <p className="mt-2 text-sm leading-6 text-text-muted">{step.description}</p>
-          </GlowCard>
+          </li>
         ))}
       </ol>
     </Section>

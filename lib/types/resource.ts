@@ -1,3 +1,18 @@
+export type ResourceDeliveryType =
+  | "direct_download"
+  | "internal_asset_page"
+  | "external_link"
+  | "email_later";
+
+export type ResourceDelivery = {
+  type: ResourceDeliveryType;
+  url?: string;
+  label?: string;
+  notes?: string;
+  fileName?: string;
+  accessInstructions?: string;
+};
+
 export type ResourceFrontmatter = {
   slug: string;
   title: string;
@@ -13,6 +28,7 @@ export type ResourceFrontmatter = {
   thankYouMessage: string;
   seoTitle: string;
   seoDescription: string;
+  delivery: ResourceDelivery;
 };
 
 export type ResourceMeta = ResourceFrontmatter;

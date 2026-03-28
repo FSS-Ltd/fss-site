@@ -1,3 +1,4 @@
+import { AboutSection } from "@/components/sections/home/about-section";
 import { FeatureGridSection } from "@/components/sections/home/feature-grid-section";
 import { HeroSection } from "@/components/sections/home/hero-section";
 import { HomeCtaSection } from "@/components/sections/home/home-cta-section";
@@ -11,6 +12,7 @@ export function HomePage() {
       <HeroSection />
       <TrustStrip />
       <FeatureGridSection />
+      <AboutSection />
       <HowItWorksSection />
       <TestimonialStrip />
       <HomeCtaSection />

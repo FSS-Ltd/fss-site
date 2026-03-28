@@ -19,8 +19,8 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-        <ButtonLink href="/contact" size="default" variant="secondary">
-          Book a demo
+        <ButtonLink href="/contact" size="default" variant="primary">
+          Get a Quote
         </ButtonLink>
       </Container>
     </header>

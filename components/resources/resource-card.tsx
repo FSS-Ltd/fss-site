@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { ResourceMeta } from "@/lib/types/resource";
 
 import { ButtonLink } from "@/components/ui/button";
+import { GlowCard } from "@/components/ui/spotlight-card";
 
 type ResourceCardProps = {
   resource: ResourceMeta;
@@ -13,15 +14,17 @@ export function ResourceCard({ resource }: ResourceCardProps) {
   const resourceHref = "/resources/" + resource.slug;
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-border-soft/45 bg-surface-1/72 shadow-[inset_0_1px_0_rgba(140,180,220,0.06)]">
+    <GlowCard customSize className="flex flex-col p-0" as="article">
       <Link className="block" href={resourceHref}>
-        <Image
-          src={resource.coverImage}
-          alt=""
-          width={900}
-          height={540}
-          className="h-44 w-full object-cover"
-        />
+        <div className="overflow-hidden rounded-t-2xl">
+          <Image
+            src={resource.coverImage}
+            alt=""
+            width={900}
+            height={540}
+            className="h-44 w-full object-cover"
+          />
+        </div>
       </Link>
       <div className="space-y-4 p-6">
         <p className="text-xs uppercase tracking-[0.15em] text-text-subtle">
@@ -37,6 +40,6 @@ export function ResourceCard({ resource }: ResourceCardProps) {
           {resource.ctaLabel}
         </ButtonLink>
       </div>
-    </article>
+    </GlowCard>
   );
 }

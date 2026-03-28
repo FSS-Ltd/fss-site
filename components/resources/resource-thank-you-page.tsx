@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import type { ResourceMeta } from "@/lib/types/resource";
 
+import { ResourceDeliveryPanel } from "@/components/resources/resource-delivery-panel";
 import { ButtonLink } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 
@@ -21,9 +22,7 @@ export function ResourceThankYouPage({ resource }: ResourceThankYouPageProps) {
             Request received
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-base text-text-muted">{resource.thankYouMessage}</p>
-          <p className="mx-auto mt-3 max-w-xl text-sm text-text-subtle">
-            Next step: our team will review your submission and send delivery instructions for this {resource.format.toLowerCase()}.
-          </p>
+          <ResourceDeliveryPanel resource={resource} />
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <ButtonLink href="/resources" variant="primary">
               Browse more resources

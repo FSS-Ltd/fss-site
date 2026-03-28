@@ -1,11 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
+import { format } from "date-fns";
 
 import type { BlogPostMeta } from "@/lib/types/blog";
 
 import { ButtonLink } from "@/components/ui/button";
-
-import { format } from "date-fns";
+import { GlowCard } from "@/components/ui/spotlight-card";
 
 type BlogPostCardProps = {
   post: BlogPostMeta;
@@ -13,15 +13,17 @@ type BlogPostCardProps = {
 
 export function BlogPostCard({ post }: BlogPostCardProps) {
   return (
-    <article className="overflow-hidden rounded-2xl border border-border-soft/45 bg-surface-1/72 shadow-[inset_0_1px_0_rgba(140,180,220,0.06)]">
+    <GlowCard customSize className="flex flex-col p-0" as="article">
       <Link className="block" href={`/blog/${post.slug}`}>
-        <Image
-          src={post.coverImage}
-          alt=""
-          width={900}
-          height={540}
-          className="h-48 w-full object-cover"
-        />
+        <div className="overflow-hidden rounded-t-2xl">
+          <Image
+            src={post.coverImage}
+            alt=""
+            width={900}
+            height={540}
+            className="h-48 w-full object-cover"
+          />
+        </div>
       </Link>
       <div className="p-6">
         <p className="text-xs uppercase tracking-[0.15em] text-text-subtle">
@@ -47,6 +49,6 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
           Read article
         </ButtonLink>
       </div>
-    </article>
+    </GlowCard>
   );
 }
