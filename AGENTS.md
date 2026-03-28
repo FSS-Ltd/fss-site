@@ -460,9 +460,48 @@ Do not use inaccessible div soup when semantic elements fit better.
 
 ---
 
+## Git Workflow
+
+### 18) Always work in small, focused branches
+
+Every piece of work starts from `main` and lives on its own branch. Never mix unrelated changes on the same branch.
+
+**Branch lifecycle — follow this order every time:**
+
+1. Pull latest `main`
+2. Create a branch scoped to the work: `feat/`, `fix/`, `chore/`, `refactor/`
+3. Do only work that belongs to that branch — nothing else
+4. When the sprint/task is done: push, raise a PR, merge to `main`
+5. Delete the branch, pull `main`, repeat
+
+**Branch naming:**
+
+```
+feat/hero-spotlight-card
+fix/glow-card-event-listeners
+chore/remove-unused-folders
+refactor/globals-css-cleanup
+```
+
+**PR rules:**
+
+- One concern per PR — no bundling unrelated changes
+- PR title must describe exactly what changed and why
+- Keep diffs small and reviewable — if a PR is getting large, split it
+- Never push directly to `main`
+
+**What breaks this rule (never do):**
+
+- Fixing a bug while adding a feature on the same branch
+- Committing style cleanup alongside a new component
+- Leaving a branch open across multiple unrelated sprints
+- Raising a PR with "misc fixes" or vague titles
+
+---
+
 ## Folder / Structure Expectations
 
-### 18) Organise by responsibility
+### 19) Organise by responsibility
 
 Prefer a structure similar to this unless the project already defines another pattern:
 
