@@ -25,9 +25,13 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   robots: {
-    index: true,
-    follow: true,
-    googleBot: { index: true, follow: true, "max-snippet": -1 },
+    index: siteConfig.allowSearchIndexing,
+    follow: siteConfig.allowSearchIndexing,
+    googleBot: {
+      index: siteConfig.allowSearchIndexing,
+      follow: siteConfig.allowSearchIndexing,
+      "max-snippet": siteConfig.allowSearchIndexing ? -1 : 0,
+    },
   },
   openGraph: {
     title: siteConfig.title,

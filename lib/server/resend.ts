@@ -22,7 +22,7 @@ function isValidReplyTo(value: string): boolean {
 
 export async function sendResendEmail(params: SendResendEmailParams): Promise<string> {
   const replyTo = params.replyTo?.trim();
-  const shouldIncludeReplyTo = Boolean(replyTo) && isValidReplyTo(replyTo);
+  const shouldIncludeReplyTo = replyTo ? isValidReplyTo(replyTo) : false;
 
   if (replyTo && !shouldIncludeReplyTo) {
     console.warn("Resend reply-to is invalid. Sending email without reply-to header.");
