@@ -5,11 +5,17 @@ import { JsonLd } from "@/components/seo/json-ld";
 export function RootSchema() {
   const organizationSchema = {
     "@context": "https://schema.org",
-    "@type": "Organization",
+    "@type": "ProfessionalService",
     name: siteConfig.name,
     url: siteConfig.url,
     email: siteConfig.supportEmail,
     logo: siteConfig.url + "/FSS.png",
+    description: siteConfig.description,
+    areaServed: {
+      "@type": "Country",
+      name: "United Kingdom",
+    },
+    sameAs: [siteConfig.social.linkedin],
   };
 
   const websiteSchema = {

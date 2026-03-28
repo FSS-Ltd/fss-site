@@ -3,16 +3,16 @@ import type { Metadata } from "next";
 import { ContactHero } from "@/components/sections/contact/contact-hero";
 
 export const metadata: Metadata = {
-  title: "Contact FSS",
+  title: "Book a Discovery Call | Custom Software Development UK",
   description:
-    "Talk to the FSS team about SDK implementation strategy, rollout planning, and integration support.",
+    "Talk to the Faithful Software Solutions team about your operational software needs. We work with UK charities, schools, churches and businesses to scope and deliver bespoke software.",
   alternates: {
     canonical: "/contact",
   },
   openGraph: {
-    title: "Contact FSS",
+    title: "Book a Discovery Call | Faithful Software Solutions",
     description:
-      "Talk to the FSS team about SDK implementation strategy, rollout planning, and integration support.",
+      "Tell us about the operational problem you need to solve. We will outline a practical approach and next steps.",
     url: "/contact",
     type: "website",
   },

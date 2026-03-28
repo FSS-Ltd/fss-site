@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { BreadcrumbSchema } from "@/components/seo/breadcrumb-schema";
 import { ResourceDetailPage } from "@/components/resources/resource-detail-page";
 import { getAllResources, getRelatedResources, getResourceBySlug } from "@/lib/resources";
 
@@ -59,5 +60,16 @@ export default async function ResourceRoutePage({ params }: ResourceRouteProps) 
 
   const relatedResources = await getRelatedResources(resource.meta, 2);
 
-  return <ResourceDetailPage resource={resource} relatedResources={relatedResources} />;
+  return (
+    <>
+      <BreadcrumbSchema
+        items={[
+          { name: "Home", path: "/" },
+          { name: "Resources", path: "/resources" },
+          { name: resource.meta.title, path: `/resources/${resource.meta.slug}` },
+        ]}
+      />
+      <ResourceDetailPage resource={resource} relatedResources={relatedResources} />
+    </>
+  );
 }
