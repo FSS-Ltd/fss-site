@@ -83,9 +83,9 @@ export async function ResourceDetailPage({ resource, relatedResources }: Resourc
             <GlowCard customSize className="relative p-8" as="blockquote">
               <Quote className="absolute right-6 top-5 size-10 text-brand-primary/15" aria-hidden="true" />
               <p className="relative z-10 italic leading-relaxed text-text-muted">
-                "Faithful Software Solutions understood our unique needs as a large school
+                &ldquo;Faithful Software Solutions understood our unique needs as a large school
                 district. Their architectural approach to modernization saved us months of
-                downtime and secured our student data beyond industry standards."
+                downtime and secured our student data beyond industry standards.&rdquo;
               </p>
               <footer className="mt-6 flex items-center gap-3">
                 <div className="size-10 rounded-full bg-surface-2" />
@@ -101,9 +101,9 @@ export async function ResourceDetailPage({ resource, relatedResources }: Resourc
             <GlowCard customSize className="relative p-8" as="blockquote">
               <Quote className="absolute right-6 top-5 size-10 text-brand-primary/15" aria-hidden="true" />
               <p className="relative z-10 italic leading-relaxed text-text-muted">
-                "Modernizing a legacy financial system is high-stakes. The strategy outlined in
+                &ldquo;Modernizing a legacy financial system is high-stakes. The strategy outlined in
                 this guide was exactly what we needed to move toward a cloud-native architecture
-                without risking our core business data."
+                without risking our core business data.&rdquo;
               </p>
               <footer className="mt-6 flex items-center gap-3">
                 <div className="size-10 rounded-full bg-surface-2" />

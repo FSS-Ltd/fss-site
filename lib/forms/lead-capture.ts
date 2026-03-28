@@ -10,11 +10,13 @@ export const leadMagnetCaptureSchema = z.object({
 
 export type LeadMagnetCaptureValues = z.infer<typeof leadMagnetCaptureSchema>;
 
-export type LeadCapturePayload = LeadMagnetCaptureValues & {
-  sourceContext: string;
-  sourcePath: string;
-  resourceSlug?: string;
-};
+export const leadSubmissionSchema = leadMagnetCaptureSchema.extend({
+  sourceContext: z.string().min(1),
+  sourcePath: z.string().min(1),
+  resourceSlug: z.string().optional(),
+});
+
+export type LeadCapturePayload = z.infer<typeof leadSubmissionSchema>;
 
 export type LeadCaptureResult = {
   ok: boolean;
@@ -27,7 +29,7 @@ type LeadSubmissionProvider = "netlify" | "api";
 const NETLIFY_FORM_NAME = "fss-lead-capture";
 
 function getLeadSubmissionProvider(): LeadSubmissionProvider {
-  return (process.env.NEXT_PUBLIC_LEAD_SUBMISSION_PROVIDER as LeadSubmissionProvider) || "netlify";
+  return (process.env.NEXT_PUBLIC_LEAD_SUBMISSION_PROVIDER as LeadSubmissionProvider) || "api";
 }
 
 function toFormUrlEncoded(payload: LeadCapturePayload): string {
