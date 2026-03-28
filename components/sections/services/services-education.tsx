@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { GraduationCap, Wifi } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -29,7 +30,14 @@ export function ServicesEducation() {
   return (
     <Section>
       <div className="grid gap-12 md:grid-cols-2 items-center">
-        <div className="aspect-video rounded-xl border border-border-soft/40 bg-gradient-to-br from-surface-2 to-brand-accent/20" />
+        <div className="relative aspect-video overflow-hidden rounded-xl border border-border-soft/40">
+          <Image
+            src="/images/illustrations/services-education.svg"
+            alt="LMS portal dashboard illustration"
+            fill
+            className="object-cover"
+          />
+        </div>
         <div className="space-y-6">
           <h2 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
             Education &amp; LMS Infrastructure

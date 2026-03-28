@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 540" fill="none">
+  <rect width="900" height="540" fill="#0d1424"/>
+
+  <!-- Background glow -->
+  <radialGradient id="g2" cx="70%" cy="60%" r="50%">
+    <stop offset="0%" stop-color="#6fd4ee" stop-opacity="0.10"/>
+    <stop offset="100%" stop-color="#6fd4ee" stop-opacity="0"/>
+  </radialGradient>
+  <rect width="900" height="540" fill="url(#g2)"/>
+
+  <!-- Grid lines -->
+  <line x1="0" y1="135" x2="900" y2="135" stroke="#1a2540" stroke-width="1"/>
+  <line x1="0" y1="270" x2="900" y2="270" stroke="#1a2540" stroke-width="1"/>
+  <line x1="0" y1="405" x2="900" y2="405" stroke="#1a2540" stroke-width="1"/>
+  <line x1="225" y1="0" x2="225" y2="540" stroke="#1a2540" stroke-width="1"/>
+  <line x1="450" y1="0" x2="450" y2="540" stroke="#1a2540" stroke-width="1"/>
+  <line x1="675" y1="0" x2="675" y2="540" stroke="#1a2540" stroke-width="1"/>
+
+  <!-- Matrix grid visual -->
+  <rect x="460" y="110" width="360" height="310" rx="14" fill="#0f1a2e" stroke="#1e2f4d" stroke-width="1.5"/>
+
+  <!-- Matrix header -->
+  <rect x="460" y="110" width="360" height="44" rx="14" fill="#131d33"/>
+  <rect x="460" y="138" width="360" height="16" fill="#131d33"/>
+  <text x="640" y="138" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#6fd4ee" font-weight="bold" letter-spacing="1">PRIORITISATION MATRIX</text>
+
+  <!-- Column headers -->
+  <text x="530" y="172" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#4a6890">IMPACT</text>
+  <text x="640" y="172" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#4a6890">EFFORT</text>
+  <text x="750" y="172" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#4a6890">RISK</text>
+  <line x1="484" y1="180" x2="796" y2="180" stroke="#1e2f4d" stroke-width="1"/>
+
+  <!-- Row 1 -->
+  <rect x="484" y="192" width="180" height="7" rx="3.5" fill="#3a5080" opacity="0.6"/>
+  <rect x="510" y="192" width="0" height="0"/>
+  <rect x="514" y="188" width="32" height="14" rx="7" fill="#6fd4ee" opacity="0.2"/>
+  <text x="530" y="199" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6fd4ee">High</text>
+  <rect x="624" y="188" width="32" height="14" rx="7" fill="#3a5080" opacity="0.3"/>
+  <text x="640" y="199" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#4a6890">Med</text>
+  <rect x="734" y="188" width="32" height="14" rx="7" fill="#3a5080" opacity="0.2"/>
+  <text x="750" y="199" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#4a6890">Low</text>
+
+  <!-- Row 2 -->
+  <rect x="484" y="220" width="160" height="7" rx="3.5" fill="#3a5080" opacity="0.5"/>
+  <rect x="514" y="216" width="32" height="14" rx="7" fill="#6fd4ee" opacity="0.2"/>
+  <text x="530" y="227" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6fd4ee">High</text>
+  <rect x="624" y="216" width="32" height="14" rx="7" fill="#6fd4ee" opacity="0.2"/>
+  <text x="640" y="227" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6fd4ee">High</text>
+  <rect x="734" y="216" width="32" height="14" rx="7" fill="#3a5080" opacity="0.2"/>
+  <text x="750" y="227" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#4a6890">Med</text>
+
+  <!-- Row 3 -->
+  <rect x="484" y="248" width="140" height="7" rx="3.5" fill="#3a5080" opacity="0.4"/>
+  <rect x="514" y="244" width="32" height="14" rx="7" fill="#3a5080" opacity="0.3"/>
+  <text x="530" y="255" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#4a6890">Med</text>
+  <rect x="624" y="244" width="32" height="14" rx="7" fill="#3a5080" opacity="0.2"/>
+  <text x="640" y="255" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#4a6890">Low</text>
+  <rect x="734" y="244" width="32" height="14" rx="7" fill="#6fd4ee" opacity="0.15"/>
+  <text x="750" y="255" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6fd4ee">High</text>
+
+  <line x1="484" y1="270" x2="796" y2="270" stroke="#1e2f4d" stroke-width="1"/>
+
+  <!-- Score gauge -->
+  <text x="640" y="300" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#4a6890" font-weight="bold">INVESTMENT SCORE</text>
+  <rect x="520" y="314" width="240" height="8" rx="4" fill="#1a2540"/>
+  <rect x="520" y="314" width="168" height="8" rx="4" fill="#6fd4ee" opacity="0.6"/>
+  <text x="640" y="342" text-anchor="middle" font-family="sans-serif" font-size="22" fill="#6fd4ee" font-weight="800">7.2 / 10</text>
+  <text x="640" y="362" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#4a6890">Recommended for investment</text>
+
+  <line x1="484" y1="378" x2="796" y2="378" stroke="#1e2f4d" stroke-width="1"/>
+
+  <!-- Bottom of matrix -->
+  <rect x="520" y="390" width="100" height="18" rx="9" fill="#6fd4ee" opacity="0.1"/>
+  <text x="570" y="403" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6fd4ee">ROI Positive</text>
+
+  <!-- Left side text -->
+  <text x="60" y="140" font-family="sans-serif" font-size="13" fill="#6fd4ee" font-weight="bold" letter-spacing="2">STRATEGY · FRAMEWORK PDF</text>
+  <text x="60" y="200" font-family="sans-serif" font-size="32" font-weight="800" fill="#ffffff">Software</text>
+  <text x="60" y="244" font-family="sans-serif" font-size="32" font-weight="800" fill="#ffffff">Investment</text>
+  <text x="60" y="288" font-family="sans-serif" font-size="32" font-weight="800" fill="#ffffff">Framework</text>
+
+  <rect x="60" y="316" width="3" height="70" rx="1.5" fill="#6fd4ee" opacity="0.5"/>
+  <text x="74" y="338" font-family="sans-serif" font-size="13" fill="#6aa8c8">Evaluate, prioritise,</text>
+  <text x="74" y="358" font-family="sans-serif" font-size="13" fill="#6aa8c8">and de-risk software</text>
+  <text x="74" y="378" font-family="sans-serif" font-size="13" fill="#6aa8c8">investments.</text>
+
+  <!-- Bottom bar -->
+  <rect x="0" y="480" width="900" height="60" fill="#0a1020" opacity="0.9"/>
+  <rect x="0" y="480" width="900" height="1" fill="#1e2f4d"/>
+  <text x="60" y="516" font-family="sans-serif" font-size="12" fill="#3a5080">Faithful Software Solutions · faithfulsoftware.dev</text>
+</svg>

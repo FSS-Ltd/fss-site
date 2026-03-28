@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 540" fill="none">
+  <rect width="900" height="540" fill="#0d1424"/>
+
+  <!-- Subtle grid -->
+  <line x1="0" y1="90" x2="900" y2="90" stroke="#1a2540" stroke-width="1"/>
+  <line x1="0" y1="180" x2="900" y2="180" stroke="#1a2540" stroke-width="1"/>
+  <line x1="0" y1="270" x2="900" y2="270" stroke="#1a2540" stroke-width="1"/>
+  <line x1="0" y1="360" x2="900" y2="360" stroke="#1a2540" stroke-width="1"/>
+  <line x1="0" y1="450" x2="900" y2="450" stroke="#1a2540" stroke-width="1"/>
+  <line x1="150" y1="0" x2="150" y2="540" stroke="#1a2540" stroke-width="1"/>
+  <line x1="300" y1="0" x2="300" y2="540" stroke="#1a2540" stroke-width="1"/>
+  <line x1="450" y1="0" x2="450" y2="540" stroke="#1a2540" stroke-width="1"/>
+  <line x1="600" y1="0" x2="600" y2="540" stroke="#1a2540" stroke-width="1"/>
+  <line x1="750" y1="0" x2="750" y2="540" stroke="#1a2540" stroke-width="1"/>
+
+  <!-- Glow orb -->
+  <radialGradient id="glow2" cx="30%" cy="70%" r="50%">
+    <stop offset="0%" stop-color="#6fd4ee" stop-opacity="0.12"/>
+    <stop offset="100%" stop-color="#6fd4ee" stop-opacity="0"/>
+  </radialGradient>
+  <rect width="900" height="540" fill="url(#glow2)"/>
+
+  <!-- Funnel / pipeline visual -->
+  <!-- Stage 1: Content -->
+  <rect x="60" y="170" width="140" height="200" rx="10" fill="#131d33" stroke="#1e2f4d" stroke-width="1.5"/>
+  <rect x="80" y="192" width="100" height="8" rx="4" fill="#3a5080" opacity="0.8"/>
+  <rect x="80" y="210" width="80" height="6" rx="3" fill="#3a5080" opacity="0.5"/>
+  <rect x="80" y="224" width="90" height="6" rx="3" fill="#3a5080" opacity="0.5"/>
+  <rect x="80" y="238" width="70" height="6" rx="3" fill="#3a5080" opacity="0.4"/>
+  <rect x="80" y="260" width="100" height="6" rx="3" fill="#3a5080" opacity="0.3"/>
+  <rect x="80" y="274" width="85" height="6" rx="3" fill="#3a5080" opacity="0.3"/>
+  <rect x="80" y="310" width="60" height="22" rx="6" fill="#6fd4ee" opacity="0.15"/>
+  <text x="110" y="326" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6fd4ee">Article</text>
+  <text x="130" y="165" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#4a6890" font-weight="bold">CONTENT</text>
+
+  <!-- Arrow 1 -->
+  <path d="M 210 270 L 255 270" stroke="#6fd4ee" stroke-width="1.5" marker-end="url(#arr)" opacity="0.6"/>
+  <defs>
+    <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L6,3 z" fill="#6fd4ee" opacity="0.6"/>
+    </marker>
+  </defs>
+
+  <!-- Stage 2: SEO + CTA -->
+  <rect x="260" y="190" width="140" height="160" rx="10" fill="#131d33" stroke="#1e2f4d" stroke-width="1.5"/>
+  <text x="330" y="215" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6fd4ee" font-weight="bold">SEO</text>
+  <rect x="278" y="228" width="104" height="6" rx="3" fill="#3a5080" opacity="0.5"/>
+  <rect x="278" y="242" width="80" height="6" rx="3" fill="#3a5080" opacity="0.4"/>
+  <rect x="278" y="270" width="80" height="22" rx="6" fill="#6fd4ee" opacity="0.2"/>
+  <text x="318" y="286" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6fd4ee">CTA</text>
+  <text x="330" y="184" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#4a6890" font-weight="bold">OPTIMISE</text>
+
+  <!-- Arrow 2 -->
+  <path d="M 410 270 L 455 270" stroke="#6fd4ee" stroke-width="1.5" marker-end="url(#arr)" opacity="0.6"/>
+
+  <!-- Stage 3: Lead Capture -->
+  <rect x="460" y="210" width="140" height="120" rx="10" fill="#131d33" stroke="#6fd4ee" stroke-width="1.5" opacity="0.7"/>
+  <text x="530" y="235" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6fd4ee" font-weight="bold">LEAD FORM</text>
+  <rect x="478" y="248" width="104" height="24" rx="5" fill="#1a2e4a"/>
+  <rect x="478" y="280" width="104" height="24" rx="5" fill="#1a2e4a"/>
+  <rect x="490" y="316" width="80" height="8" rx="4" fill="#6fd4ee" opacity="0.3"/>
+  <text x="530" y="204" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#4a6890" font-weight="bold">CONVERT</text>
+
+  <!-- Arrow 3 -->
+  <path d="M 610 270 L 655 270" stroke="#6fd4ee" stroke-width="1.5" marker-end="url(#arr)" opacity="0.6"/>
+
+  <!-- Stage 4: Pipeline -->
+  <rect x="660" y="230" width="120" height="80" rx="10" fill="#0f1a2e" stroke="#6fd4ee" stroke-width="2"/>
+  <text x="720" y="258" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#6fd4ee" font-weight="bold">PIPELINE</text>
+  <circle cx="700" cy="286" r="5" fill="#6fd4ee" opacity="0.7"/>
+  <circle cx="720" cy="286" r="5" fill="#6fd4ee" opacity="0.5"/>
+  <circle cx="740" cy="286" r="5" fill="#6fd4ee" opacity="0.3"/>
+  <text x="720" y="224" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#4a6890" font-weight="bold">QUALIFY</text>
+
+  <!-- Bottom bar -->
+  <rect x="0" y="480" width="900" height="60" fill="#0a1020" opacity="0.8"/>
+  <rect x="0" y="480" width="900" height="1" fill="#1e2f4d"/>
+  <rect x="60" y="496" width="90" height="24" rx="12" fill="#6fd4ee" opacity="0.12"/>
+  <text x="105" y="513" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#6fd4ee" font-weight="bold" letter-spacing="1">GROWTH</text>
+
+  <!-- Title -->
+  <text x="60" y="72" font-family="sans-serif" font-size="26" font-weight="800" fill="#ffffff">Technical Content</text>
+  <text x="60" y="106" font-family="sans-serif" font-size="26" font-weight="800" fill="#6fd4ee">Into Qualified Pipeline</text>
+</svg>

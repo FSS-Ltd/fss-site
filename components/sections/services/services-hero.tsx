@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import { Section } from "@/components/ui/section";
 
 export function ServicesHero() {
@@ -18,7 +20,14 @@ export function ServicesHero() {
             communities.
           </p>
         </div>
-        <div className="aspect-video rounded-xl border border-border-soft/40 bg-gradient-to-br from-surface-2 to-brand-accent/30" />
+        <div className="relative aspect-video overflow-hidden rounded-xl border border-border-soft/40">
+          <Image
+            src="/images/illustrations/services-hero.svg"
+            alt="Isometric software architecture illustration"
+            fill
+            className="object-cover"
+          />
+        </div>
       </div>
     </Section>
   );

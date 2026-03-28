@@ -1,9 +1,11 @@
+import Image from "next/image";
+
 import { Section } from "@/components/ui/section";
 
 const stats = [
-  { value: "12+", label: "Years Experience" },
-  { value: "200+", label: "Projects Delivered" },
-  { value: "98%", label: "Client Retention" },
+  { value: "2025", label: "Founded" },
+  { value: "6+", label: "Years Engineering" },
+  { value: "UK", label: "Based & Operated" },
 ];
 
 export function AboutSection() {
@@ -11,8 +13,12 @@ export function AboutSection() {
     <Section id="about" className="border-y border-border-soft/30 bg-surface-1/60">
       <div className="grid gap-16 md:grid-cols-2 md:items-center">
         <div className="relative aspect-video overflow-hidden rounded-xl shadow-2xl">
-          <div className="h-full w-full bg-gradient-to-br from-surface-2 to-brand-secondary/40" />
-          <div className="pointer-events-none absolute inset-0 bg-brand-primary/10 mix-blend-multiply rounded-xl" />
+          <Image
+            src="/images/illustrations/about-mission.svg"
+            alt="FSS service ecosystem diagram"
+            fill
+            className="object-cover"
+          />
         </div>
 
         <div className="space-y-6">
