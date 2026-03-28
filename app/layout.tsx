@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Space_Grotesk } from "next/font/google";
 
-import { NetlifyFormRegistry } from "@/components/forms/netlify-form-registry";
 import { SiteShell } from "@/components/layout/site-shell";
 import { RootSchema } from "@/components/seo/root-schema";
 import { siteConfig } from "@/lib/site-config";
@@ -53,7 +52,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en-GB" className={`${spaceGrotesk.variable} h-full`}>
       <body className="min-h-full bg-background font-sans text-foreground antialiased">
         <RootSchema />
-        <NetlifyFormRegistry />
         <SiteShell>{children}</SiteShell>
       </body>
     </html>
