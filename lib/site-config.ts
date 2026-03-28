@@ -1,5 +1,7 @@
-// TODO: Replace siteUrl with the production domain before going live.
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://faithfulsoftwaresolutions.co.uk";
+import { getDeploymentContext, isPreviewDeployment, resolveSiteUrl } from "@/lib/config/site-url";
+
+const siteUrl = resolveSiteUrl();
+const previewDeployment = isPreviewDeployment();
 
 export const siteConfig = {
   name: "Faithful Software Solutions",
@@ -8,6 +10,9 @@ export const siteConfig = {
   description:
     "Bespoke software development for UK charities, schools, churches and businesses. Custom ERP, portals, dashboards and workflow automation built around your operational needs.",
   url: siteUrl,
+  deploymentContext: getDeploymentContext(),
+  isPreviewDeployment: previewDeployment,
+  allowSearchIndexing: !previewDeployment,
   supportEmail: "hello@faithfulsoftwaresolutions.co.uk",
   social: {
     linkedin: "https://www.linkedin.com/company/faithful-software-solutions",

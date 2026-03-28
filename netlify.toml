@@ -1,0 +1,22 @@
+[build]
+  command = "pnpm build"
+
+[build.environment]
+  NODE_VERSION = "20"
+  # NEXT_PUBLIC_* values are intentionally public and rendered into output.
+  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SITE_URL"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[functions]
+  node_bundler = "esbuild"
+
+[context.production.environment]
+  NEXT_PUBLIC_LEAD_SUBMISSION_PROVIDER = "api"
+
+[context.deploy-preview.environment]
+  NEXT_PUBLIC_LEAD_SUBMISSION_PROVIDER = "api"
+
+[context.branch-deploy.environment]
+  NEXT_PUBLIC_LEAD_SUBMISSION_PROVIDER = "api"

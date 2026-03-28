@@ -1,5 +1,7 @@
 import "server-only";
 
+import { resolveSiteUrl } from "@/lib/config/site-url";
+
 function readRequiredEnv(name: string): string {
   const value = process.env[name];
 
@@ -28,7 +30,7 @@ export function getLeadServerEnv() {
     resendFromEmail: readRequiredEnv("RESEND_FROM_EMAIL"),
     resendReplyToEmail: readRequiredEnv("RESEND_REPLY_TO_EMAIL"),
     leadNotificationEmail: readRequiredEnv("LEAD_NOTIFICATION_EMAIL"),
-    siteUrl: readRequiredEnv("NEXT_PUBLIC_SITE_URL"),
+    siteUrl: resolveSiteUrl(),
     hubspotChallengeProperty: readOptionalEnv("HUBSPOT_CHALLENGE_PROPERTY"),
     hubspotSourceContextProperty: readOptionalEnv("HUBSPOT_SOURCE_CONTEXT_PROPERTY"),
     hubspotSourcePathProperty: readOptionalEnv("HUBSPOT_SOURCE_PATH_PROPERTY"),

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Space_Grotesk } from "next/font/google";
 
-import { NetlifyFormRegistry } from "@/components/forms/netlify-form-registry";
 import { SiteShell } from "@/components/layout/site-shell";
 import { RootSchema } from "@/components/seo/root-schema";
 import { siteConfig } from "@/lib/site-config";
@@ -25,9 +24,13 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   robots: {
-    index: true,
-    follow: true,
-    googleBot: { index: true, follow: true, "max-snippet": -1 },
+    index: siteConfig.allowSearchIndexing,
+    follow: siteConfig.allowSearchIndexing,
+    googleBot: {
+      index: siteConfig.allowSearchIndexing,
+      follow: siteConfig.allowSearchIndexing,
+      "max-snippet": siteConfig.allowSearchIndexing ? -1 : 0,
+    },
   },
   openGraph: {
     title: siteConfig.title,
@@ -49,7 +52,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en-GB" className={`${spaceGrotesk.variable} h-full`}>
       <body className="min-h-full bg-background font-sans text-foreground antialiased">
         <RootSchema />
-        <NetlifyFormRegistry />
         <SiteShell>{children}</SiteShell>
       </body>
     </html>
