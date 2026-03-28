@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { ArticleSchema } from "@/components/seo/article-schema";
+import { BreadcrumbSchema } from "@/components/seo/breadcrumb-schema";
 import { BlogPostPage } from "@/components/sections/blog/blog-post-page";
 import { getAllBlogPosts, getBlogPostBySlug, getRelatedPosts } from "@/lib/blog";
 
@@ -65,6 +66,13 @@ export default async function BlogPostRoute({ params }: BlogPostRouteProps) {
   return (
     <>
       <ArticleSchema post={post.meta} />
+      <BreadcrumbSchema
+        items={[
+          { name: "Home", path: "/" },
+          { name: "Blog", path: "/blog" },
+          { name: post.meta.title, path: `/blog/${post.meta.slug}` },
+        ]}
+      />
       <BlogPostPage post={post} relatedPosts={relatedPosts} />
     </>
   );

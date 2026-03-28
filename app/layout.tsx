@@ -24,12 +24,18 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-snippet": -1 },
+  },
   openGraph: {
     title: siteConfig.title,
     description: siteConfig.description,
     url: siteConfig.url,
-    siteName: siteConfig.name,
+    siteName: siteConfig.fullName,
     type: "website",
+    locale: "en_GB",
   },
   twitter: {
     card: "summary_large_image",
@@ -40,7 +46,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} h-full`}>
+    <html lang="en-GB" className={`${spaceGrotesk.variable} h-full`}>
       <body className="min-h-full bg-background font-sans text-foreground antialiased">
         <RootSchema />
         <NetlifyFormRegistry />

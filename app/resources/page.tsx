@@ -4,16 +4,16 @@ import { ResourceLibrary } from "@/components/sections/resources/resource-librar
 import { getAllResources } from "@/lib/resources";
 
 export const metadata: Metadata = {
-  title: "Lead Magnets and Resources",
+  title: "Free Software Strategy Guides for UK Charities, Schools and Businesses",
   description:
-    "Download conversion-focused FSS resources for SDK planning, rollout readiness, and go-to-market execution.",
+    "Download free practical guides on custom software planning, portal development and digital modernisation. Built for UK charity leaders, school administrators and business owners.",
   alternates: {
     canonical: "/resources",
   },
   openGraph: {
-    title: "FSS Resources",
+    title: "Free Software Strategy Guides | Faithful Software Solutions",
     description:
-      "Download conversion-focused FSS resources for SDK planning, rollout readiness, and go-to-market execution.",
+      "Practical guides on custom software planning, portal development and digital modernisation for UK charities, schools and businesses.",
     url: "/resources",
     type: "website",
   },

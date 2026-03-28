@@ -3,16 +3,16 @@ import type { Metadata } from "next";
 import { HomePage } from "@/components/sections/home/home-page";
 
 export const metadata: Metadata = {
-  title: "Product Infrastructure SDK",
+  title: "Custom Software Development Company UK for Complex Operations",
   description:
-    "FSS helps product and engineering teams ship SDK integrations faster with a maintainable rollout framework.",
+    "Faithful Software Solutions builds bespoke software for UK charities, schools, churches and businesses. Custom ERP, portals, dashboards and workflow automation — built around your operational needs, not off-the-shelf limitations.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "FSS Product Infrastructure SDK",
+    title: "Custom Software Development Company UK | Faithful Software Solutions",
     description:
-      "FSS helps product and engineering teams ship SDK integrations faster with a maintainable rollout framework.",
+      "Bespoke software built for real operational problems. Custom ERP, portals, dashboards and workflow automation for UK charities, schools, churches and businesses.",
     url: "/",
     type: "website",
   },

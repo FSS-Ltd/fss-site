@@ -4,16 +4,16 @@ import { BlogIndex } from "@/components/sections/blog/blog-index";
 import { getAllBlogPosts } from "@/lib/blog";
 
 export const metadata: Metadata = {
-  title: "SDK Implementation Blog",
+  title: "Software Development Insights for UK Businesses, Charities and Schools",
   description:
-    "Read practical FSS insights on SDK rollout, technical content strategy, and lead generation execution.",
+    "Practical articles on bespoke software strategy, portal development, workflow automation and digital modernisation for UK charities, schools and SMEs.",
   alternates: {
     canonical: "/blog",
   },
   openGraph: {
-    title: "FSS Blog",
+    title: "Software Development Insights | Faithful Software Solutions Blog",
     description:
-      "Read practical FSS insights on SDK rollout, technical content strategy, and lead generation execution.",
+      "Practical articles on bespoke software strategy, portal development, workflow automation and digital modernisation for UK organisations.",
     url: "/blog",
     type: "website",
   },
