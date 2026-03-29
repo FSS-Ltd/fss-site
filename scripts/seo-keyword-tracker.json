@@ -1,0 +1,149 @@
+{
+  "version": 1,
+  "keywords": [
+    {
+      "id": "custom-software-dev-uk",
+      "keyword": "custom software development company UK",
+      "pageTitle": "Custom Software Development Company in the UK for Complex Operations",
+      "target": "SMEs, charities, schools, founders",
+      "cta": "Book a discovery call",
+      "pageType": "service page",
+      "category": "Custom Software",
+      "tags": ["Custom Software Development", "UK", "Bespoke Software"],
+      "coveredBySlug": null,
+      "coveredAt": null
+    },
+    {
+      "id": "bespoke-software-dev-uk",
+      "keyword": "bespoke software development UK",
+      "pageTitle": "Bespoke Software Development for Real Operational Problems",
+      "target": "SMEs and service businesses replacing spreadsheets or fragmented tools",
+      "cta": "Request a consultation",
+      "pageType": "service page",
+      "category": "Bespoke Software",
+      "tags": ["Bespoke Software Development", "UK", "SME"],
+      "coveredBySlug": null,
+      "coveredAt": null
+    },
+    {
+      "id": "custom-portal-dev-uk",
+      "keyword": "custom portal development UK",
+      "pageTitle": "Custom Portal Development for Schools, Charities and Service Businesses",
+      "target": "organisations needing client, parent, or donor portals",
+      "cta": "Discuss your portal idea",
+      "pageType": "service page",
+      "category": "Portal Development",
+      "tags": ["Custom Portal Development", "UK", "Portals", "Client Portal"],
+      "coveredBySlug": null,
+      "coveredAt": null
+    },
+    {
+      "id": "dashboard-dev-company-uk",
+      "keyword": "dashboard development company UK",
+      "pageTitle": "Dashboard Development for Better Operational Visibility",
+      "target": "operations-led SMEs and nonprofits",
+      "cta": "See if a dashboard will solve it",
+      "pageType": "service page",
+      "category": "Dashboard Development",
+      "tags": ["Dashboard Development", "UK", "Operational Reporting", "Data Visibility"],
+      "coveredBySlug": null,
+      "coveredAt": null
+    },
+    {
+      "id": "workflow-automation-uk-smes",
+      "keyword": "workflow automation UK for SMEs",
+      "pageTitle": "Custom Workflow Automation for UK SMEs",
+      "target": "service businesses and growing SMEs",
+      "cta": "Automate a manual process",
+      "pageType": "use-case page",
+      "category": "Workflow Automation",
+      "tags": ["Workflow Automation", "UK", "SME", "Process Automation"],
+      "coveredBySlug": null,
+      "coveredAt": null
+    },
+    {
+      "id": "custom-workflow-management",
+      "keyword": "custom workflow management software",
+      "pageTitle": "Custom Workflow Management Software for Service Organisations",
+      "target": "SMEs, charities, and service organisations",
+      "cta": "Plan a workflow system",
+      "pageType": "service page",
+      "category": "Workflow Management",
+      "tags": ["Workflow Management", "Custom Software", "Operations", "UK"],
+      "coveredBySlug": null,
+      "coveredAt": null
+    },
+    {
+      "id": "software-modernisation-uk",
+      "keyword": "software modernisation UK",
+      "pageTitle": "Software Modernisation Services for Legacy Systems",
+      "target": "firms with ageing platforms",
+      "cta": "Assess your system",
+      "pageType": "service page",
+      "category": "Software Modernisation",
+      "tags": ["Software Modernisation", "UK", "Legacy Systems", "System Upgrade"],
+      "coveredBySlug": null,
+      "coveredAt": null
+    },
+    {
+      "id": "legacy-system-migration-uk",
+      "keyword": "legacy system migration UK",
+      "pageTitle": "Legacy System Migration and Modernisation",
+      "target": "organisations stuck on old tools",
+      "cta": "Plan a safe migration",
+      "pageType": "migration page",
+      "category": "Legacy Migration",
+      "tags": ["Legacy System Migration", "UK", "System Modernisation", "Data Migration"],
+      "coveredBySlug": null,
+      "coveredAt": null
+    },
+    {
+      "id": "mvp-development-uk",
+      "keyword": "MVP development UK",
+      "pageTitle": "MVP Development for Founders Who Need to Validate Fast",
+      "target": "founders and startups",
+      "cta": "Scope your MVP",
+      "pageType": "service page",
+      "category": "MVP Development",
+      "tags": ["MVP Development", "UK", "Startups", "Founders", "Product Development"],
+      "coveredBySlug": null,
+      "coveredAt": null
+    },
+    {
+      "id": "mvp-development-cost-uk",
+      "keyword": "MVP development cost UK",
+      "pageTitle": "How Much Does MVP Development Cost in the UK?",
+      "target": "founders and startups researching budget",
+      "cta": "Get a ballpark estimate",
+      "pageType": "pricing guide",
+      "category": "MVP Development",
+      "tags": ["MVP Development Cost", "UK", "Pricing", "Founders", "Software Budget"],
+      "coveredBySlug": null,
+      "coveredAt": null
+    },
+    {
+      "id": "churchsuite-alternatives",
+      "keyword": "church suite alternatives",
+      "pageTitle": "ChurchSuite Alternatives for Churches That Need More Than Admin",
+      "target": "churches and faith charities",
+      "cta": "Compare options",
+      "pageType": "alternatives page",
+      "category": "Faith & Church Software",
+      "tags": ["ChurchSuite Alternatives", "Church Software", "Faith Organisations", "Church Management"],
+      "coveredBySlug": null,
+      "coveredAt": null
+    },
+    {
+      "id": "custom-software-charities-uk",
+      "keyword": "custom software for charities UK",
+      "pageTitle": "Custom Software for UK Charities and Faith Organisations",
+      "target": "charity ops leads and trustees",
+      "cta": "Talk to a charity software specialist",
+      "pageType": "sector solution page",
+      "category": "Charity Software",
+      "tags": ["Charity Software", "UK", "Nonprofits", "Faith Organisations", "Charity Tech"],
+      "coveredBySlug": null,
+      "coveredAt": null
+    }
+  ]
+}
