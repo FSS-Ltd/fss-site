@@ -112,6 +112,19 @@ async function researchSerp(keyword: string, client: Anthropic): Promise<string>
   console.log(`  Researching SERP for: "${keyword}"...`);
 
   type MessageParam = { role: "user" | "assistant"; content: unknown };
+  type SerpTool = { type: "web_search_20250305"; name: "web_search" };
+  type SerpResponseBlock = { type: string; id?: string; text?: string };
+  type SerpResponse = { stop_reason: string | null; content: SerpResponseBlock[] };
+  type SerpCreateParams = {
+    model: "claude-opus-4-6";
+    max_tokens: number;
+    betas: ["web-search-2025-03-05"];
+    tools: [SerpTool];
+    messages: MessageParam[];
+  };
+  type SerpCreateFn = (params: SerpCreateParams) => Promise<SerpResponse>;
+
+  const createBetaMessage = (client.beta.messages as unknown as { create: SerpCreateFn }).create;
   const messages: MessageParam[] = [
     {
       role: "user",
@@ -130,7 +143,7 @@ Be concise. This brief will be used to write a competing blog post.`,
     },
   ];
 
-  let response = await (client.beta.messages as { create: Function }).create({
+  let response = await createBetaMessage({
     model: "claude-opus-4-6",
     max_tokens: 1024,
     betas: ["web-search-2025-03-05"],
@@ -154,7 +167,7 @@ Be concise. This brief will be used to write a competing blog post.`,
       })),
     });
 
-    response = await (client.beta.messages as { create: Function }).create({
+    response = await createBetaMessage({
       model: "claude-opus-4-6",
       max_tokens: 1024,
       betas: ["web-search-2025-03-05"],
