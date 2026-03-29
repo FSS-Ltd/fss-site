@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { MobileNav } from "@/components/layout/mobile-nav";
 import { ButtonLink } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { mainNavItems } from "@/lib/navigation";
@@ -19,9 +20,10 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-        <ButtonLink href="/contact" size="default" variant="primary">
+        <ButtonLink className="hidden md:inline-flex" href="/contact" size="default" variant="primary">
           Get a Quote
         </ButtonLink>
+        <MobileNav items={mainNavItems} />
       </Container>
     </header>
   );

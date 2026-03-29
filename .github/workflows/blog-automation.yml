@@ -1,0 +1,137 @@
+name: Blog Post Automation
+
+on:
+  schedule:
+    # 08:00 UTC on Tuesdays
+    - cron: "0 8 * * 2"
+    # 08:00 UTC on Fridays
+    - cron: "0 8 * * 5"
+  # Allow manual trigger for testing
+  workflow_dispatch:
+
+concurrency:
+  group: blog-automation
+  # Never cancel a running generation — let it finish and update the tracker
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    name: Generate Blog Post
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate blog post
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: pnpm generate-blog-post
+
+      - name: Check for generated files
+        id: check
+        run: |
+          if git status --porcelain | grep -q '^'; then
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "No files were generated (all keywords may be covered)."
+          fi
+
+      - name: Commit and open pull request
+        if: steps.check.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Read the most recently covered keyword from the tracker
+          KEYWORD_ID=$(node --input-type=module << 'EOF'
+            import { readFileSync } from 'fs';
+            const tracker = JSON.parse(readFileSync('./scripts/seo-keyword-tracker.json', 'utf8'));
+            const covered = tracker.keywords
+              .filter(k => k.coveredAt !== null)
+              .sort((a, b) => b.coveredAt.localeCompare(a.coveredAt));
+            console.log(covered[0].id);
+          EOF
+          )
+
+          KEYWORD_PHRASE=$(node --input-type=module << EOF
+            import { readFileSync } from 'fs';
+            const tracker = JSON.parse(readFileSync('./scripts/seo-keyword-tracker.json', 'utf8'));
+            const entry = tracker.keywords.find(k => k.id === '${KEYWORD_ID}');
+            console.log(entry.keyword);
+          EOF
+          )
+
+          PAGE_TITLE=$(node --input-type=module << EOF
+            import { readFileSync } from 'fs';
+            const tracker = JSON.parse(readFileSync('./scripts/seo-keyword-tracker.json', 'utf8'));
+            const entry = tracker.keywords.find(k => k.id === '${KEYWORD_ID}');
+            console.log(entry.pageTitle);
+          EOF
+          )
+
+          POST_SLUG=$(node --input-type=module << EOF
+            import { readFileSync } from 'fs';
+            const tracker = JSON.parse(readFileSync('./scripts/seo-keyword-tracker.json', 'utf8'));
+            const entry = tracker.keywords.find(k => k.id === '${KEYWORD_ID}');
+            console.log(entry.coveredBySlug);
+          EOF
+          )
+
+          DATE=$(date +%Y-%m-%d)
+          RANDOM_SUFFIX=$(node -e "console.log(Math.random().toString(36).slice(2,6))")
+          BRANCH="content/blog-${KEYWORD_ID}-${DATE}-${RANDOM_SUFFIX}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add content/blog/ public/images/covers/ scripts/seo-keyword-tracker.json
+          git commit -m "content: auto-generate post for ${KEYWORD_ID}"
+          git push origin "$BRANCH"
+
+          gh pr create \
+            --title "Blog: ${PAGE_TITLE}" \
+            --body "## Auto-generated blog post
+
+**Keyword ID:** \`${KEYWORD_ID}\`
+**Keyword phrase:** ${KEYWORD_PHRASE}
+**Post slug:** \`${POST_SLUG}\`
+**Generated on:** ${DATE}
+
+---
+
+### Review checklist
+
+Before merging, please verify:
+
+- [ ] Read the full post for tone and brand voice — problem-first, no hype, UK English
+- [ ] Confirm there are no invented statistics or fabricated case studies
+- [ ] The \`<CtaBlock>\` is present and points to \`/contact\`
+- [ ] The \`<Callout>\` placement makes sense in context
+- [ ] Frontmatter fields look correct (title, seoTitle ≤60 chars, seoDescription ≤160 chars, tags)
+- [ ] The SVG cover at \`public/images/covers/${KEYWORD_ID}.svg\` renders acceptably
+- [ ] The post will render at \`/blog/${POST_SLUG}\` after merge
+
+> Generated automatically by the blog automation workflow.
+> To reject: close this PR and reset \`coveredBySlug\` to \`null\` for \`${KEYWORD_ID}\` in \`scripts/seo-keyword-tracker.json\`." \
+            --base main \
+            --head "$BRANCH"
