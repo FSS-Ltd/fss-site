@@ -54,9 +54,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="min-h-full bg-background font-sans text-foreground antialiased">
         <RootSchema />
         <SiteShell>{children}</SiteShell>
-        <GoogleAnalytics
-          measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "G-KZ7H3DMCSY"}
-        />
+        <GoogleAnalytics />
       </body>
     </html>
   );
