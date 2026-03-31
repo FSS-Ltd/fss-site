@@ -108,30 +108,34 @@ jobs:
           git commit -m "content: auto-generate post for ${KEYWORD_ID}"
           git push origin "$BRANCH"
 
+          cat > /tmp/blog-pr-body.md << EOF
+          ## Auto-generated blog post
+
+          **Keyword ID:** \`${KEYWORD_ID}\`
+          **Keyword phrase:** ${KEYWORD_PHRASE}
+          **Post slug:** \`${POST_SLUG}\`
+          **Generated on:** ${DATE}
+
+          ---
+
+          ### Review checklist
+
+          Before merging, please verify:
+
+          - [ ] Read the full post for tone and brand voice - problem-first, no hype, UK English
+          - [ ] Confirm there are no invented statistics or fabricated case studies
+          - [ ] The \`<CtaBlock>\` is present and points to \`/contact\`
+          - [ ] The \`<Callout>\` placement makes sense in context
+          - [ ] Frontmatter fields look correct (title, seoTitle <=60 chars, seoDescription <=160 chars, tags)
+          - [ ] The SVG cover at \`public/images/covers/${KEYWORD_ID}.svg\` renders acceptably
+          - [ ] The post will render at \`/blog/${POST_SLUG}\` after merge
+
+          > Generated automatically by the blog automation workflow.
+          > To reject: close this PR and reset \`coveredBySlug\` and \`coveredAt\` to \`null\` for \`${KEYWORD_ID}\` in \`scripts/seo-keyword-tracker.json\`.
+          EOF
+
           gh pr create \
             --title "Blog: ${PAGE_TITLE}" \
-            --body "## Auto-generated blog post
-
-**Keyword ID:** \`${KEYWORD_ID}\`
-**Keyword phrase:** ${KEYWORD_PHRASE}
-**Post slug:** \`${POST_SLUG}\`
-**Generated on:** ${DATE}
-
----
-
-### Review checklist
-
-Before merging, please verify:
-
-- [ ] Read the full post for tone and brand voice — problem-first, no hype, UK English
-- [ ] Confirm there are no invented statistics or fabricated case studies
-- [ ] The \`<CtaBlock>\` is present and points to \`/contact\`
-- [ ] The \`<Callout>\` placement makes sense in context
-- [ ] Frontmatter fields look correct (title, seoTitle ≤60 chars, seoDescription ≤160 chars, tags)
-- [ ] The SVG cover at \`public/images/covers/${KEYWORD_ID}.svg\` renders acceptably
-- [ ] The post will render at \`/blog/${POST_SLUG}\` after merge
-
-> Generated automatically by the blog automation workflow.
-> To reject: close this PR and reset \`coveredBySlug\` to \`null\` for \`${KEYWORD_ID}\` in \`scripts/seo-keyword-tracker.json\`." \
+            --body-file /tmp/blog-pr-body.md \
             --base main \
             --head "$BRANCH"
