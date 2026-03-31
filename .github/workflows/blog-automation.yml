@@ -42,7 +42,18 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Check required secrets
+        id: secrets
+        run: |
+          if [ -z "${{ secrets.ANTHROPIC_API_KEY }}" ]; then
+            echo "has_api_key=false" >> "$GITHUB_OUTPUT"
+            echo "::warning title=Blog automation skipped::Missing ANTHROPIC_API_KEY secret. Add it in GitHub repo settings."
+          else
+            echo "has_api_key=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Generate blog post
+        if: steps.secrets.outputs.has_api_key == 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: pnpm generate-blog-post
@@ -50,7 +61,10 @@ jobs:
       - name: Check for generated files
         id: check
         run: |
-          if git status --porcelain | grep -q '^'; then
+          if [ "${{ steps.secrets.outputs.has_api_key }}" != "true" ]; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "Skipping generation because ANTHROPIC_API_KEY is not configured."
+          elif git status --porcelain | grep -q '^'; then
             echo "has_changes=true" >> "$GITHUB_OUTPUT"
           else
             echo "has_changes=false" >> "$GITHUB_OUTPUT"
