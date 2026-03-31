@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk } from "next/font/google";
 
 import { SiteShell } from "@/components/layout/site-shell";
+import { GoogleAnalytics } from "@/components/seo/google-analytics";
 import { RootSchema } from "@/components/seo/root-schema";
 import { siteConfig } from "@/lib/site-config";
 
@@ -53,6 +54,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="min-h-full bg-background font-sans text-foreground antialiased">
         <RootSchema />
         <SiteShell>{children}</SiteShell>
+        <GoogleAnalytics
+          measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "G-KZ7H3DMCSY"}
+        />
       </body>
     </html>
   );
