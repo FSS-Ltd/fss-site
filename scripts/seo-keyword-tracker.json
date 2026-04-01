@@ -9,9 +9,13 @@
       "cta": "Book a discovery call",
       "pageType": "service page",
       "category": "Custom Software",
-      "tags": ["Custom Software Development", "UK", "Bespoke Software"],
-      "coveredBySlug": null,
-      "coveredAt": null
+      "tags": [
+        "Custom Software Development",
+        "UK",
+        "Bespoke Software"
+      ],
+      "coveredBySlug": "custom-software-development-company-in-the-uk-for-complex-operations",
+      "coveredAt": "2026-04-04"
     },
     {
       "id": "bespoke-software-dev-uk",
@@ -21,7 +25,11 @@
       "cta": "Request a consultation",
       "pageType": "service page",
       "category": "Bespoke Software",
-      "tags": ["Bespoke Software Development", "UK", "SME"],
+      "tags": [
+        "Bespoke Software Development",
+        "UK",
+        "SME"
+      ],
       "coveredBySlug": null,
       "coveredAt": null
     },
@@ -33,7 +41,12 @@
       "cta": "Discuss your portal idea",
       "pageType": "service page",
       "category": "Portal Development",
-      "tags": ["Custom Portal Development", "UK", "Portals", "Client Portal"],
+      "tags": [
+        "Custom Portal Development",
+        "UK",
+        "Portals",
+        "Client Portal"
+      ],
       "coveredBySlug": null,
       "coveredAt": null
     },
@@ -45,7 +58,12 @@
       "cta": "See if a dashboard will solve it",
       "pageType": "service page",
       "category": "Dashboard Development",
-      "tags": ["Dashboard Development", "UK", "Operational Reporting", "Data Visibility"],
+      "tags": [
+        "Dashboard Development",
+        "UK",
+        "Operational Reporting",
+        "Data Visibility"
+      ],
       "coveredBySlug": null,
       "coveredAt": null
     },
@@ -57,7 +75,12 @@
       "cta": "Automate a manual process",
       "pageType": "use-case page",
       "category": "Workflow Automation",
-      "tags": ["Workflow Automation", "UK", "SME", "Process Automation"],
+      "tags": [
+        "Workflow Automation",
+        "UK",
+        "SME",
+        "Process Automation"
+      ],
       "coveredBySlug": null,
       "coveredAt": null
     },
@@ -69,7 +92,12 @@
       "cta": "Plan a workflow system",
       "pageType": "service page",
       "category": "Workflow Management",
-      "tags": ["Workflow Management", "Custom Software", "Operations", "UK"],
+      "tags": [
+        "Workflow Management",
+        "Custom Software",
+        "Operations",
+        "UK"
+      ],
       "coveredBySlug": null,
       "coveredAt": null
     },
@@ -81,7 +109,12 @@
       "cta": "Assess your system",
       "pageType": "service page",
       "category": "Software Modernisation",
-      "tags": ["Software Modernisation", "UK", "Legacy Systems", "System Upgrade"],
+      "tags": [
+        "Software Modernisation",
+        "UK",
+        "Legacy Systems",
+        "System Upgrade"
+      ],
       "coveredBySlug": null,
       "coveredAt": null
     },
@@ -93,7 +126,12 @@
       "cta": "Plan a safe migration",
       "pageType": "migration page",
       "category": "Legacy Migration",
-      "tags": ["Legacy System Migration", "UK", "System Modernisation", "Data Migration"],
+      "tags": [
+        "Legacy System Migration",
+        "UK",
+        "System Modernisation",
+        "Data Migration"
+      ],
       "coveredBySlug": null,
       "coveredAt": null
     },
@@ -105,7 +143,13 @@
       "cta": "Scope your MVP",
       "pageType": "service page",
       "category": "MVP Development",
-      "tags": ["MVP Development", "UK", "Startups", "Founders", "Product Development"],
+      "tags": [
+        "MVP Development",
+        "UK",
+        "Startups",
+        "Founders",
+        "Product Development"
+      ],
       "coveredBySlug": null,
       "coveredAt": null
     },
@@ -117,7 +161,13 @@
       "cta": "Get a ballpark estimate",
       "pageType": "pricing guide",
       "category": "MVP Development",
-      "tags": ["MVP Development Cost", "UK", "Pricing", "Founders", "Software Budget"],
+      "tags": [
+        "MVP Development Cost",
+        "UK",
+        "Pricing",
+        "Founders",
+        "Software Budget"
+      ],
       "coveredBySlug": null,
       "coveredAt": null
     },
@@ -129,7 +179,12 @@
       "cta": "Compare options",
       "pageType": "alternatives page",
       "category": "Faith & Church Software",
-      "tags": ["ChurchSuite Alternatives", "Church Software", "Faith Organisations", "Church Management"],
+      "tags": [
+        "ChurchSuite Alternatives",
+        "Church Software",
+        "Faith Organisations",
+        "Church Management"
+      ],
       "coveredBySlug": null,
       "coveredAt": null
     },
@@ -141,7 +196,13 @@
       "cta": "Talk to a charity software specialist",
       "pageType": "sector solution page",
       "category": "Charity Software",
-      "tags": ["Charity Software", "UK", "Nonprofits", "Faith Organisations", "Charity Tech"],
+      "tags": [
+        "Charity Software",
+        "UK",
+        "Nonprofits",
+        "Faith Organisations",
+        "Charity Tech"
+      ],
       "coveredBySlug": null,
       "coveredAt": null
     }

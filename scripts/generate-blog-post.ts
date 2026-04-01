@@ -6,17 +6,24 @@
  * matching SVG cover, and writes both to the repository.
  *
  * Run with: pnpm generate-blog-post
- * Requires: ANTHROPIC_API_KEY in environment
+ * Provider selection:
+ * - BLOG_GENERATION_PROVIDER=api uses Anthropic API (requires ANTHROPIC_API_KEY)
+ * - BLOG_GENERATION_PROVIDER=claude-cli uses local Claude CLI authentication
+ * - if unset, defaults to API when ANTHROPIC_API_KEY is present; otherwise claude-cli
  */
 
 import Anthropic from "@anthropic-ai/sdk";
+import { execFile } from "node:child_process";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { promisify } from "node:util";
 
 import matter from "gray-matter";
 import { z } from "zod";
 
 import { generateCoverSvg } from "./generate-cover";
+
+const execFileAsync = promisify(execFile);
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -38,12 +45,22 @@ type KeywordTracker = {
   keywords: KeywordEntry[];
 };
 
+type GenerationProvider = "api" | "claude-cli";
+
 // ── Schema — mirrors lib/blog.ts exactly, plus tighter SEO length guards ──
+
+function normalizePublishDateInput(value: unknown): unknown {
+  if (value instanceof Date) {
+    return value.toISOString().slice(0, 10);
+  }
+
+  return value;
+}
 
 const blogFrontmatterSchema = z.object({
   title: z.string().min(1),
   excerpt: z.string().min(1),
-  publishDate: z.string().min(1),
+  publishDate: z.preprocess(normalizePublishDateInput, z.string().min(1)),
   author: z.string().min(1),
   category: z.string().min(1),
   tags: z.array(z.string().min(1)).min(1),
@@ -74,6 +91,15 @@ async function saveTracker(tracker: KeywordTracker): Promise<void> {
 
 function pickNextKeyword(tracker: KeywordTracker): KeywordEntry | null {
   return tracker.keywords.find((k) => k.coveredBySlug === null) ?? null;
+}
+
+function resolveGenerationProvider(): GenerationProvider {
+  const preferred = process.env.BLOG_GENERATION_PROVIDER;
+  if (preferred === "api" || preferred === "claude-cli") {
+    return preferred;
+  }
+
+  return process.env.ANTHROPIC_API_KEY ? "api" : "claude-cli";
 }
 
 // ── Slug helpers ───────────────────────────────────────────────────────────
@@ -322,6 +348,32 @@ async function generatePostWithClaude(entry: KeywordEntry, today: string): Promi
   return block.text;
 }
 
+async function generatePostWithLocalClaudeCli(entry: KeywordEntry, today: string): Promise<string> {
+  const prompt = buildUserPrompt(entry, today, "SERP research unavailable for local Claude CLI mode.");
+
+  try {
+    const { stdout } = await execFileAsync(
+      "claude",
+      [
+        "--print",
+        "--output-format",
+        "text",
+        "--system-prompt",
+        SYSTEM_PROMPT,
+        prompt,
+      ],
+      { maxBuffer: 10 * 1024 * 1024 },
+    );
+
+    return stdout.trim();
+  } catch (error) {
+    const stderr = typeof error === "object" && error && "stderr" in error ? error.stderr : "";
+    const hint =
+      "Local Claude CLI generation failed. Ensure you are authenticated (try `claude auth login` or `claude setup-token`).";
+    throw new Error(`${hint}${stderr ? `\n${String(stderr)}` : ""}`);
+  }
+}
+
 // ── MDX parsing and validation ─────────────────────────────────────────────
 
 function stripCodeFence(raw: string): string {
@@ -354,6 +406,7 @@ function validateMdx(
 async function main(): Promise<void> {
   console.log("Loading keyword tracker...");
   const tracker = await loadTracker();
+  const generationProvider = resolveGenerationProvider();
 
   const entry = pickNextKeyword(tracker);
   if (!entry) {
@@ -361,15 +414,21 @@ async function main(): Promise<void> {
     process.exit(0);
   }
 
-  const today = new Date().toISOString().slice(0, 10);
+  const scheduledDate = new Date();
+  scheduledDate.setUTCDate(scheduledDate.getUTCDate() + 3);
+  const today = scheduledDate.toISOString().slice(0, 10);
+  console.log(`Generation provider: ${generationProvider}`);
   console.log(`Generating post for keyword: "${entry.keyword}" (${entry.id})`);
   console.log(`Publish date: ${today}`);
 
   let rawMdx: string;
   try {
-    rawMdx = await generatePostWithClaude(entry, today);
+    rawMdx =
+      generationProvider === "api"
+        ? await generatePostWithClaude(entry, today)
+        : await generatePostWithLocalClaudeCli(entry, today);
   } catch (err) {
-    console.error("Claude API call failed:", err);
+    console.error("Blog generation failed:", err);
     process.exit(1);
   }
 

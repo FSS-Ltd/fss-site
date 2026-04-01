@@ -9,10 +9,18 @@ import type { BlogFrontmatter, BlogPost, BlogPostMeta } from "@/lib/types/blog";
 
 const BLOG_CONTENT_DIR = path.join(process.cwd(), "content", "blog");
 
+function normalizePublishDateInput(value: unknown): unknown {
+  if (value instanceof Date) {
+    return value.toISOString().slice(0, 10);
+  }
+
+  return value;
+}
+
 const blogFrontmatterSchema = z.object({
   title: z.string().min(1),
   excerpt: z.string().min(1),
-  publishDate: z.string().min(1),
+  publishDate: z.preprocess(normalizePublishDateInput, z.string().min(1)),
   author: z.string().min(1),
   category: z.string().min(1),
   tags: z.array(z.string().min(1)).min(1),
@@ -24,6 +32,11 @@ const blogFrontmatterSchema = z.object({
 
 function parseFrontmatter(frontmatter: unknown): BlogFrontmatter {
   return blogFrontmatterSchema.parse(frontmatter);
+}
+
+function isPublished(publishDate: string): boolean {
+  const today = new Date().toISOString().slice(0, 10);
+  return publishDate <= today;
 }
 
 function sortByPublishDateDesc(posts: BlogPostMeta[]): BlogPostMeta[] {
@@ -71,7 +84,8 @@ export async function getAllBlogPosts(): Promise<BlogPostMeta[]> {
     }),
   );
 
-  return sortByPublishDateDesc(posts);
+  const published = posts.filter((post) => isPublished(post.publishDate));
+  return sortByPublishDateDesc(published);
 }
 
 export async function getFeaturedBlogPosts(): Promise<BlogPostMeta[]> {
@@ -86,6 +100,9 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
     const source = await fs.readFile(sourcePath, "utf8");
     const { data, content } = matter(source);
     const frontmatter = parseFrontmatter(data);
+    if (!isPublished(frontmatter.publishDate)) {
+      return null;
+    }
 
     return {
       meta: buildPostMeta(slug, content, frontmatter),
