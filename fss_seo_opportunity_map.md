@@ -81,25 +81,25 @@ This cluster matters because it captures the actual business problem behind the 
 
 ## E. Fastest Wins
 
-1. custom software development company UK — page title: Custom Software Development Company in the UK for Complex Operations — target: SMEs, charities, schools, founders — CTA: Book a discovery call — why it could win: broad enough to capture vendor-seeking demand, but you can differentiate with strategic, premium, problem-led copy. [web:6][web:10][web:15]
+1. custom software development company UK - page title: Custom Software Development Company in the UK for Complex Operations - target: SMEs, charities, schools, founders - CTA: Book a discovery call - why it could win: broad enough to capture vendor-seeking demand, but you can differentiate with strategic, premium, problem-led copy. [web:6][web:10][web:15]
 
-2. bespoke software development UK — page title: Bespoke Software Development for Real Operational Problems — target: buyers replacing spreadsheets or fragmented tools — CTA: Request a consultation — why it could win: direct commercial intent with room for differentiation from generic agencies. [web:4][web:10][web:13]
+2. bespoke software development UK - page title: Bespoke Software Development for Real Operational Problems - target: buyers replacing spreadsheets or fragmented tools - CTA: Request a consultation - why it could win: direct commercial intent with room for differentiation from generic agencies. [web:4][web:10][web:13]
 
-3. custom portal development UK — page title: Custom Portal Development for Schools, Charities and Service Businesses — target: organisations needing client, parent, or donor portals — CTA: Discuss your portal idea — why it could win: clear service fit and strong project value. [web:2][web:3][web:22]
+3. custom portal development UK - page title: Custom Portal Development for Schools, Charities and Service Businesses - target: organisations needing client, parent, or donor portals - CTA: Discuss your portal idea - why it could win: clear service fit and strong project value. [web:2][web:3][web:22]
 
-4. dashboard development company UK — page title: Dashboard Development for Better Operational Visibility — target: operations-led SMEs and nonprofits — CTA: See if a dashboard will solve it — why it could win: high pain, high clarity, easy to qualify. [web:2][web:10]
+4. dashboard development company UK - page title: Dashboard Development for Better Operational Visibility - target: operations-led SMEs and nonprofits - CTA: See if a dashboard will solve it - why it could win: high pain, high clarity, easy to qualify. [web:2][web:10]
 
-5. workflow automation UK for SMEs — page title: Custom Workflow Automation for UK SMEs — target: service businesses and growing SMEs — CTA: Automate a manual process — why it could win: direct match to manual bottlenecks and budgeted efficiency projects. [web:4][web:26]
+5. workflow automation UK for SMEs - page title: Custom Workflow Automation for UK SMEs - target: service businesses and growing SMEs - CTA: Automate a manual process - why it could win: direct match to manual bottlenecks and budgeted efficiency projects. [web:4][web:26]
 
-6. software modernisation UK — page title: Software Modernisation Services for Legacy Systems — target: firms with ageing platforms — CTA: Assess your system — why it could win: urgent pain plus higher-ticket work. [web:10]
+6. software modernisation UK - page title: Software Modernisation Services for Legacy Systems - target: firms with ageing platforms - CTA: Assess your system - why it could win: urgent pain plus higher-ticket work. [web:10]
 
-7. legacy system migration UK — page title: Legacy System Migration and Modernisation — target: organisations stuck on old tools — CTA: Plan a safe migration — why it could win: migration is a strong commissioning trigger. [web:10][web:3]
+7. legacy system migration UK - page title: Legacy System Migration and Modernisation - target: organisations stuck on old tools - CTA: Plan a safe migration - why it could win: migration is a strong commissioning trigger. [web:10][web:3]
 
-8. MVP development UK — page title: MVP Development for Founders Who Need to Validate Fast — target: founders and startups — CTA: Scope your MVP — why it could win: very clear vendor-selection intent. [web:8][web:29]
+8. MVP development UK - page title: MVP Development for Founders Who Need to Validate Fast - target: founders and startups - CTA: Scope your MVP - why it could win: very clear vendor-selection intent. [web:8][web:29]
 
-9. church suite alternatives — page title: ChurchSuite Alternatives for Churches That Need More Than Admin — target: churches and faith charities — CTA: Compare options — why it could win: existing demand plus a strong bespoke/software-fit angle. [web:11][web:17][web:20]
+9. church suite alternatives - page title: ChurchSuite Alternatives for Churches That Need More Than Admin - target: churches and faith charities - CTA: Compare options - why it could win: existing demand plus a strong bespoke/software-fit angle. [web:11][web:17][web:20]
 
-10. custom software for charities UK — page title: Custom Software for UK Charities and Faith Organisations — target: charity ops leads and trustees — CTA: Talk to a charity software specialist — why it could win: a direct fit to your faith/charity positioning with high lead quality. [web:3][web:19]
+10. custom software for charities UK - page title: Custom Software for UK Charities and Faith Organisations - target: charity ops leads and trustees - CTA: Talk to a charity software specialist - why it could win: a direct fit to your faith/charity positioning with high lead quality. [web:3][web:19]
 
 ## F. Keywords to Avoid
 

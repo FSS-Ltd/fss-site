@@ -46,8 +46,13 @@ type KeywordTracker = {
 };
 
 type GenerationProvider = "api" | "claude-cli";
+type GenerationOptions = {
+  publishDate: string;
+  ctaHref: string;
+  ctaLabel?: string;
+};
 
-// ── Schema — mirrors lib/blog.ts exactly, plus tighter SEO length guards ──
+// ── Schema - mirrors lib/blog.ts exactly, plus tighter SEO length guards ──
 
 function normalizePublishDateInput(value: unknown): unknown {
   if (value instanceof Date) {
@@ -55,6 +60,39 @@ function normalizePublishDateInput(value: unknown): unknown {
   }
 
   return value;
+}
+
+function trimToMaxLength(value: string, max: number): string {
+  if (value.length <= max) {
+    return value;
+  }
+
+  const sliced = value.slice(0, max);
+  const lastSpace = sliced.lastIndexOf(" ");
+  const cutoff = lastSpace > Math.floor(max * 0.6) ? lastSpace : max;
+  return sliced.slice(0, cutoff).trim().replace(/[.,;:!?-]+$/, "");
+}
+
+function normalizeFrontmatterInput(frontmatter: unknown): unknown {
+  if (!frontmatter || typeof frontmatter !== "object") {
+    return frontmatter;
+  }
+
+  const normalized = { ...(frontmatter as Record<string, unknown>) };
+
+  if (typeof normalized.seoTitle === "string") {
+    normalized.seoTitle = trimToMaxLength(removeEmDashes(normalized.seoTitle), 60);
+  }
+
+  if (typeof normalized.seoDescription === "string") {
+    normalized.seoDescription = trimToMaxLength(removeEmDashes(normalized.seoDescription), 160);
+  }
+
+  return normalized;
+}
+
+function removeEmDashes(text: string): string {
+  return text.replace(/\u2014/g, "-");
 }
 
 const blogFrontmatterSchema = z.object({
@@ -100,6 +138,45 @@ function resolveGenerationProvider(): GenerationProvider {
   }
 
   return process.env.ANTHROPIC_API_KEY ? "api" : "claude-cli";
+}
+
+function resolveGenerationOptions(): GenerationOptions {
+  const forcedDate = process.env.BLOG_FORCE_PUBLISH_DATE;
+  const defaultScheduledDate = new Date();
+  defaultScheduledDate.setUTCDate(defaultScheduledDate.getUTCDate() + 3);
+  const publishDate = forcedDate || defaultScheduledDate.toISOString().slice(0, 10);
+
+  return {
+    publishDate,
+    ctaHref: process.env.BLOG_CTA_HREF || "/contact",
+    ctaLabel: process.env.BLOG_CTA_LABEL || undefined,
+  };
+}
+
+function enforceCtaBlock(content: string, ctaHref: string, ctaLabel?: string): string {
+  if (!/<CtaBlock[\s\S]*?\/>/.test(content)) {
+    throw new Error("Generated content is missing required <CtaBlock />.");
+  }
+
+  return content.replace(/<CtaBlock([\s\S]*?)\/>/, (_fullMatch, attrs) => {
+    let updatedAttrs = String(attrs);
+
+    if (/href="[^"]*"/.test(updatedAttrs)) {
+      updatedAttrs = updatedAttrs.replace(/href="[^"]*"/, `href="${ctaHref}"`);
+    } else {
+      updatedAttrs = `${updatedAttrs} href="${ctaHref}"`;
+    }
+
+    if (ctaLabel) {
+      if (/ctaLabel="[^"]*"/.test(updatedAttrs)) {
+        updatedAttrs = updatedAttrs.replace(/ctaLabel="[^"]*"/, `ctaLabel="${ctaLabel}"`);
+      } else {
+        updatedAttrs = `${updatedAttrs} ctaLabel="${ctaLabel}"`;
+      }
+    }
+
+    return `<CtaBlock${updatedAttrs} />`;
+  });
 }
 
 // ── Slug helpers ───────────────────────────────────────────────────────────
@@ -211,7 +288,8 @@ Be concise. This brief will be used to write a competing blog post.`,
 
 // ── Claude API ─────────────────────────────────────────────────────────────
 
-const SYSTEM_PROMPT = `
+function buildSystemPrompt(ctaHref: string): string {
+  return `
 You are a senior content strategist writing blog posts for Faithful Software Solutions Ltd (FSS),
 a UK bespoke software consultancy founded in 2025. FSS builds custom portals, dashboards,
 workflow automation, MVPs, and legacy system migrations for charities, faith organisations,
@@ -226,19 +304,20 @@ BRAND VOICE RULES:
 - UK English throughout (organisation, customise, recognise, licence, optimise, etc.)
 - Be direct. Do not pad. Every sentence should earn its place.
 - Do not mention FSS by name until the final CTA block.
+- Do not use em dashes. Use commas, full stops, or parentheses instead.
 
 TARGET BUYER PROFILE:
 - Bottom-of-funnel: vendor selection, comparison, pricing research, or migration intent.
 - They know they have a problem. They are evaluating solutions, not being educated from scratch.
 - They are a CTO, ops director, charity CEO, founder, or school business manager.
 
-OUTPUT FORMAT — MANDATORY:
+OUTPUT FORMAT - MANDATORY:
 Respond with a complete MDX file and nothing else.
 Start immediately with the YAML frontmatter opening delimiter ---.
 Do not include any explanation, preamble, commentary, or code fences outside the MDX itself.
 Do not wrap the output in backtick fences. Output raw MDX directly.
 
-FRONTMATTER SCHEMA — all fields required, exact types:
+FRONTMATTER SCHEMA - all fields required, exact types:
 ---
 title: <string>
 excerpt: <1–2 sentence summary, plain text, no interior quotes>
@@ -261,14 +340,21 @@ MDX BODY RULES:
 - Include exactly 1–2 <Callout title="..."> blocks with a meaningful operational insight.
   Callout format: <Callout title="Tip title">Body text here.</Callout>
 - Include exactly 1 <CtaBlock> block, placed after the penultimate body section.
-  CtaBlock format: <CtaBlock title="..." body="..." href="/contact" ctaLabel="..." />
-- Link to /contact at least once using standard markdown link syntax.
+  CtaBlock format: <CtaBlock title="..." body="..." href="${ctaHref}" ctaLabel="..." />
+- Ensure the <CtaBlock> href is exactly "${ctaHref}".
 - Do not use any HTML tags other than <Callout> and <CtaBlock>.
 - Do not use raw HTML elements like <div>, <span>, <br>, <strong>, <em>.
   Use markdown equivalents (**bold**, *italic*) instead.
 `.trim();
+}
 
-function buildUserPrompt(entry: KeywordEntry, today: string, serpBrief: string): string {
+function buildUserPrompt(
+  entry: KeywordEntry,
+  publishDate: string,
+  serpBrief: string,
+  ctaHref: string,
+  ctaLabel?: string,
+): string {
   return `
 Write a blog post targeting the following BOFU keyword opportunity.
 
@@ -276,8 +362,10 @@ PRIMARY KEYWORD: ${entry.keyword}
 RECOMMENDED PAGE TITLE: ${entry.pageTitle}
 TARGET AUDIENCE: ${entry.target}
 RECOMMENDED CTA TEXT: ${entry.cta}
+CTA HREF: ${ctaHref}
+${ctaLabel ? `CTA LABEL OVERRIDE: ${ctaLabel}` : ""}
 PAGE TYPE: ${entry.pageType}
-PUBLISH DATE: ${today}
+PUBLISH DATE: ${publishDate}
 COVER IMAGE PATH: /images/covers/${entry.id}.svg
 BLOG CATEGORY: ${entry.category}
 SUGGESTED TAGS (you may add up to 2 more, keep total under 6): ${entry.tags.join(", ")}
@@ -293,15 +381,15 @@ Use the SERP brief above to:
 - Answer the PAA questions if they are relevant and BOFU
 - Choose a headline angle that stands out from what is already ranking
 
-CONTENT STRUCTURE — follow this order:
+CONTENT STRUCTURE - follow this order:
 1. Opening paragraph: name the specific operational friction the target audience is experiencing.
    Make it recognisable. Avoid generic statements.
-2. ## What good looks like — explain what an effective solution achieves for this audience.
+2. ## What good looks like - explain what an effective solution achieves for this audience.
    No product names. Focus on outcomes and operational clarity.
-3. ## What to look for in a supplier — 3–5 practical criteria a decision-maker should use
+3. ## What to look for in a supplier - 3–5 practical criteria a decision-maker should use
    when evaluating vendors. Frame around the buyer's risk, not seller capabilities.
 4. One <Callout> here with a practical insight the reader can act on immediately.
-5. <CtaBlock> driving to /contact with a low-friction prompt matching the recommended CTA text.
+5. <CtaBlock> driving to ${ctaHref} with a low-friction prompt matching the recommended CTA text.
 6. Closing paragraph: one or two sentences reinforcing the next step and the cost of inaction.
 
 HARD RULES:
@@ -313,7 +401,7 @@ HARD RULES:
 `.trim();
 }
 
-async function generatePostWithClaude(entry: KeywordEntry, today: string): Promise<string> {
+async function generatePostWithClaude(entry: KeywordEntry, options: GenerationOptions): Promise<string> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     throw new Error("ANTHROPIC_API_KEY environment variable is not set");
@@ -336,8 +424,19 @@ async function generatePostWithClaude(entry: KeywordEntry, today: string): Promi
   const message = await client.messages.create({
     model: "claude-opus-4-6",
     max_tokens: 4096,
-    system: SYSTEM_PROMPT,
-    messages: [{ role: "user", content: buildUserPrompt(entry, today, serpBrief) }],
+    system: buildSystemPrompt(options.ctaHref),
+    messages: [
+      {
+        role: "user",
+        content: buildUserPrompt(
+          entry,
+          options.publishDate,
+          serpBrief,
+          options.ctaHref,
+          options.ctaLabel,
+        ),
+      },
+    ],
   });
 
   const block = message.content[0];
@@ -348,8 +447,17 @@ async function generatePostWithClaude(entry: KeywordEntry, today: string): Promi
   return block.text;
 }
 
-async function generatePostWithLocalClaudeCli(entry: KeywordEntry, today: string): Promise<string> {
-  const prompt = buildUserPrompt(entry, today, "SERP research unavailable for local Claude CLI mode.");
+async function generatePostWithLocalClaudeCli(
+  entry: KeywordEntry,
+  options: GenerationOptions,
+): Promise<string> {
+  const prompt = buildUserPrompt(
+    entry,
+    options.publishDate,
+    "SERP research unavailable for local Claude CLI mode.",
+    options.ctaHref,
+    options.ctaLabel,
+  );
 
   try {
     const { stdout } = await execFileAsync(
@@ -359,7 +467,7 @@ async function generatePostWithLocalClaudeCli(entry: KeywordEntry, today: string
         "--output-format",
         "text",
         "--system-prompt",
-        SYSTEM_PROMPT,
+        buildSystemPrompt(options.ctaHref),
         prompt,
       ],
       { maxBuffer: 10 * 1024 * 1024 },
@@ -381,23 +489,25 @@ function stripCodeFence(raw: string): string {
   return raw
     .replace(/^```(?:mdx)?\s*\n/, "")
     .replace(/\n```\s*$/, "")
+    .replace(/\u2014/g, "-")
     .trim();
 }
 
 function validateMdx(
   raw: string,
   entryId: string,
+  options: GenerationOptions,
 ): { slug: string; validatedMdx: string } {
   const cleaned = stripCodeFence(raw);
   const { data, content } = matter(cleaned);
-
-  const parsed = blogFrontmatterSchema.parse(data);
+  const parsed = blogFrontmatterSchema.parse(normalizeFrontmatterInput(data));
 
   const slug = titleToSlug(parsed.title);
   // Force the coverImage to match the entry id regardless of what Claude generated
   parsed.coverImage = `/images/covers/${entryId}.svg`;
 
-  const reconstructed = matter.stringify(content, parsed);
+  const contentWithCta = enforceCtaBlock(content, options.ctaHref, options.ctaLabel);
+  const reconstructed = matter.stringify(contentWithCta, parsed);
   return { slug, validatedMdx: reconstructed };
 }
 
@@ -407,26 +517,25 @@ async function main(): Promise<void> {
   console.log("Loading keyword tracker...");
   const tracker = await loadTracker();
   const generationProvider = resolveGenerationProvider();
+  const generationOptions = resolveGenerationOptions();
 
   const entry = pickNextKeyword(tracker);
   if (!entry) {
-    console.log("All keywords covered — nothing to generate.");
+    console.log("All keywords covered - nothing to generate.");
     process.exit(0);
   }
 
-  const scheduledDate = new Date();
-  scheduledDate.setUTCDate(scheduledDate.getUTCDate() + 3);
-  const today = scheduledDate.toISOString().slice(0, 10);
   console.log(`Generation provider: ${generationProvider}`);
+  console.log(`CTA href: ${generationOptions.ctaHref}`);
   console.log(`Generating post for keyword: "${entry.keyword}" (${entry.id})`);
-  console.log(`Publish date: ${today}`);
+  console.log(`Publish date: ${generationOptions.publishDate}`);
 
   let rawMdx: string;
   try {
     rawMdx =
       generationProvider === "api"
-        ? await generatePostWithClaude(entry, today)
-        : await generatePostWithLocalClaudeCli(entry, today);
+        ? await generatePostWithClaude(entry, generationOptions)
+        : await generatePostWithLocalClaudeCli(entry, generationOptions);
   } catch (err) {
     console.error("Blog generation failed:", err);
     process.exit(1);
@@ -435,7 +544,7 @@ async function main(): Promise<void> {
   let slug: string;
   let validatedMdx: string;
   try {
-    ({ slug, validatedMdx } = validateMdx(rawMdx, entry.id));
+    ({ slug, validatedMdx } = validateMdx(rawMdx, entry.id, generationOptions));
   } catch (err) {
     const debugPath = path.join(DEBUG_DIR, `debug-output-${entry.id}.mdx`);
     await fs.writeFile(debugPath, rawMdx, "utf8");
@@ -462,7 +571,7 @@ async function main(): Promise<void> {
 
   const idx = tracker.keywords.findIndex((k) => k.id === entry.id);
   tracker.keywords[idx].coveredBySlug = uniqueSlug;
-  tracker.keywords[idx].coveredAt = today;
+  tracker.keywords[idx].coveredAt = generationOptions.publishDate;
   await saveTracker(tracker);
   console.log(`Tracker updated: ${entry.id} → ${uniqueSlug}`);
 }

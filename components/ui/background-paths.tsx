@@ -1,7 +1,7 @@
 "use client";
 
 // Durations are pre-computed once at module load so SSR and client
-// produce the same values — avoiding a hydration mismatch.
+// produce the same values - avoiding a hydration mismatch.
 
 import { motion } from "motion/react";
 

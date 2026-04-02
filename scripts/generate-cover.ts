@@ -86,14 +86,14 @@ function pricingMotif(): string {
   <rect x="60" y="175" width="220" height="190" rx="12" fill="#131d33" stroke="#1e2f4d" stroke-width="1.5"/>
   <rect x="80" y="198" width="80" height="8" rx="4" fill="#3a5080" opacity="0.7"/>
   <rect x="80" y="224" width="60" height="28" rx="6" fill="#1a2e4a"/>
-  <text x="110" y="244" text-anchor="middle" font-family="monospace" font-size="14" fill="#7a98c0" font-weight="bold">£ — £</text>
+  <text x="110" y="244" text-anchor="middle" font-family="monospace" font-size="14" fill="#7a98c0" font-weight="bold">£ - £</text>
   <rect x="80" y="266" width="160" height="7" rx="3.5" fill="#3a5080" opacity="0.4"/>
   <rect x="80" y="282" width="140" height="7" rx="3.5" fill="#3a5080" opacity="0.35"/>
   <rect x="80" y="298" width="120" height="7" rx="3.5" fill="#3a5080" opacity="0.3"/>
   <rect x="340" y="155" width="220" height="230" rx="12" fill="#0f1a2e" stroke="#6fd4ee" stroke-width="2"/>
   <rect x="360" y="177" width="100" height="8" rx="4" fill="#6fd4ee" opacity="0.9"/>
   <rect x="360" y="202" width="70" height="32" rx="6" fill="#1a2e4a"/>
-  <text x="395" y="225" text-anchor="middle" font-family="monospace" font-size="14" fill="#6fd4ee" font-weight="bold">££ — £££</text>
+  <text x="395" y="225" text-anchor="middle" font-family="monospace" font-size="14" fill="#6fd4ee" font-weight="bold">££ - £££</text>
   <rect x="360" y="248" width="160" height="7" rx="3.5" fill="#6fd4ee" opacity="0.3"/>
   <rect x="360" y="264" width="140" height="7" rx="3.5" fill="#3a5080" opacity="0.5"/>
   <rect x="360" y="280" width="160" height="7" rx="3.5" fill="#3a5080" opacity="0.4"/>
