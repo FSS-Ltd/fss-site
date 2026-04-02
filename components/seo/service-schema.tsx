@@ -24,7 +24,7 @@ const services = [
   {
     name: "Workflow Automation",
     description:
-      "Automate repetitive manual processes — approvals, notifications, data entry, reporting — so your team can focus on higher-value work.",
+      "Automate repetitive manual processes - approvals, notifications, data entry, reporting - so your team can focus on higher-value work.",
     serviceType: "Process Automation",
   },
   {

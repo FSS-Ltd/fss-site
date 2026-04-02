@@ -8,7 +8,7 @@ const principles = [
     borderHover: "hover:border-brand-primary/20",
     title: "Built to Last",
     description:
-      "We write software designed for longevity — clean architecture, documented decisions, and code that the next engineer can actually understand and extend.",
+      "We write software designed for longevity - clean architecture, documented decisions, and code that the next engineer can actually understand and extend.",
   },
   {
     eyebrow: "Transparent",
@@ -24,7 +24,7 @@ const principles = [
     borderHover: "hover:border-[#b5c7e8]/20",
     title: "Engineered With Care",
     description:
-      "Every system we build — whether for a school, a church, or an enterprise — gets the same architectural precision and attention to operational reliability.",
+      "Every system we build - whether for a school, a church, or an enterprise - gets the same architectural precision and attention to operational reliability.",
   },
 ];
 

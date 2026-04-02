@@ -17,7 +17,7 @@ interface GlowCardProps {
   as?: GlowTag;
 }
 
-// All mounted card elements — updated by the single shared listener below.
+// All mounted card elements - updated by the single shared listener below.
 const mountedCards = new Set<HTMLElement>();
 
 function syncPointer(e: PointerEvent) {

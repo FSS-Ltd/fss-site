@@ -5,7 +5,7 @@ import { HomePage } from "@/components/sections/home/home-page";
 export const metadata: Metadata = {
   title: "Custom Software Development Company UK for Complex Operations",
   description:
-    "Faithful Software Solutions builds bespoke software for UK charities, schools, churches and businesses. Custom ERP, portals, dashboards and workflow automation — built around your operational needs, not off-the-shelf limitations.",
+    "Faithful Software Solutions builds bespoke software for UK charities, schools, churches and businesses. Custom ERP, portals, dashboards and workflow automation - built around your operational needs, not off-the-shelf limitations.",
   alternates: {
     canonical: "/",
   },
