@@ -305,6 +305,8 @@ BRAND VOICE RULES:
 - Be direct. Do not pad. Every sentence should earn its place.
 - Do not mention FSS by name until the final CTA block.
 - Do not use em dashes. Use commas, full stops, or parentheses instead.
+- Do not use the phrases "lead magnet", "lead magnets", or "SEO-focused" in public-facing copy.
+- Prefer neutral phrasing like "resource", "guide", and "discoverability".
 
 TARGET BUYER PROFILE:
 - Bottom-of-funnel: vendor selection, comparison, pricing research, or migration intent.
