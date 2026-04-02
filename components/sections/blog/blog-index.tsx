@@ -15,12 +15,12 @@ export function BlogIndex({ posts }: BlogIndexProps) {
       <SectionHeading
         eyebrow="Blog"
         title="Insights for product, engineering, and growth teams"
-        description="SEO-focused MDX publishing with practical guidance for product infrastructure teams."
+        description="Practical MDX publishing with guidance for product infrastructure teams."
       />
       <p className="mt-4 max-w-2xl text-sm text-text-subtle">
         Looking for implementation assets? Explore{" "}
         <Link href="/resources" className="text-brand-primary hover:underline">
-          lead magnets and resources
+          our resource library
         </Link>
         .
       </p>
