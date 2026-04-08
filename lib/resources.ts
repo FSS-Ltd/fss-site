@@ -32,6 +32,11 @@ const resourceDeliverySchema = z
     }
   });
 
+const resourceUsageStepSchema = z.object({
+  title: z.string().min(1),
+  description: z.string().min(1),
+});
+
 const resourceFrontmatterSchema = z.object({
   slug: z.string().min(1),
   title: z.string().min(1),
@@ -47,6 +52,8 @@ const resourceFrontmatterSchema = z.object({
   thankYouMessage: z.string().min(1),
   seoTitle: z.string().min(1),
   seoDescription: z.string().min(1),
+  usageSectionTitle: z.string().min(1).optional(),
+  usageSteps: z.array(resourceUsageStepSchema).min(2).max(4).optional(),
   delivery: resourceDeliverySchema,
 });
 

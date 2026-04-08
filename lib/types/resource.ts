@@ -13,6 +13,11 @@ export type ResourceDelivery = {
   accessInstructions?: string;
 };
 
+export type ResourceUsageStep = {
+  title: string;
+  description: string;
+};
+
 export type ResourceFrontmatter = {
   slug: string;
   title: string;
@@ -28,6 +33,8 @@ export type ResourceFrontmatter = {
   thankYouMessage: string;
   seoTitle: string;
   seoDescription: string;
+  usageSectionTitle?: string;
+  usageSteps?: ResourceUsageStep[];
   delivery: ResourceDelivery;
 };
 
