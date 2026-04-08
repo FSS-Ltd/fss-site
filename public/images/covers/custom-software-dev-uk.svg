@@ -1,40 +1,66 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 540" fill="none">
-  <rect width="900" height="540" fill="#0d1424"/>
-  <line x1="0" y1="108" x2="900" y2="108" stroke="#1a2540" stroke-width="1"/>
-  <line x1="0" y1="216" x2="900" y2="216" stroke="#1a2540" stroke-width="1"/>
-  <line x1="0" y1="324" x2="900" y2="324" stroke="#1a2540" stroke-width="1"/>
-  <line x1="0" y1="432" x2="900" y2="432" stroke="#1a2540" stroke-width="1"/>
-  <line x1="180" y1="0" x2="180" y2="540" stroke="#1a2540" stroke-width="1"/>
-  <line x1="360" y1="0" x2="360" y2="540" stroke="#1a2540" stroke-width="1"/>
-  <line x1="540" y1="0" x2="540" y2="540" stroke="#1a2540" stroke-width="1"/>
-  <line x1="720" y1="0" x2="720" y2="540" stroke="#1a2540" stroke-width="1"/>
-  <radialGradient id="glow-custom-software-dev-uk" cx="70%" cy="25%" r="45%">
-    <stop offset="0%" stop-color="#6fd4ee" stop-opacity="0.16"/>
-    <stop offset="100%" stop-color="#6fd4ee" stop-opacity="0"/>
+  <rect width="900" height="540" fill="#0d1424" />
+
+  <radialGradient id="glow-custom" cx="72%" cy="26%" r="52%">
+    <stop offset="0%" stop-color="#6fd4ee" stop-opacity="0.2" />
+    <stop offset="100%" stop-color="#6fd4ee" stop-opacity="0" />
   </radialGradient>
-  <rect width="900" height="540" fill="url(#glow-custom-software-dev-uk)"/>
-  
-  <rect x="80" y="180" width="200" height="160" rx="12" fill="#131d33" stroke="#1e2f4d" stroke-width="1.5"/>
-  <rect x="100" y="204" width="80" height="8" rx="4" fill="#6fd4ee" opacity="0.9"/>
-  <rect x="100" y="222" width="140" height="7" rx="3.5" fill="#3a5080" opacity="0.6"/>
-  <rect x="100" y="238" width="110" height="7" rx="3.5" fill="#3a5080" opacity="0.5"/>
-  <rect x="100" y="254" width="120" height="7" rx="3.5" fill="#3a5080" opacity="0.4"/>
-  <rect x="100" y="290" width="90" height="7" rx="3.5" fill="#6fd4ee" opacity="0.25"/>
-  <rect x="100" y="308" width="130" height="7" rx="3.5" fill="#3a5080" opacity="0.35"/>
-  <line x1="290" y1="260" x2="340" y2="260" stroke="#6fd4ee" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.5"/>
-  <rect x="345" y="200" width="200" height="120" rx="12" fill="#131d33" stroke="#3a6ea8" stroke-width="1.5"/>
-  <rect x="365" y="222" width="60" height="8" rx="4" fill="#6fd4ee" opacity="0.7"/>
-  <rect x="365" y="240" width="140" height="7" rx="3.5" fill="#3a5080" opacity="0.5"/>
-  <rect x="365" y="256" width="120" height="7" rx="3.5" fill="#3a5080" opacity="0.4"/>
-  <rect x="365" y="274" width="100" height="7" rx="3.5" fill="#3a5080" opacity="0.3"/>
-  <line x1="555" y1="260" x2="605" y2="260" stroke="#6fd4ee" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.5"/>
-  <rect x="610" y="220" width="200" height="80" rx="12" fill="#0f1a2e" stroke="#6fd4ee" stroke-width="2"/>
-  <circle cx="700" cy="260" r="18" fill="#131d33" stroke="#6fd4ee" stroke-width="2"/>
-  <text x="700" y="265" text-anchor="middle" font-family="monospace" font-size="10" fill="#6fd4ee" font-weight="bold">BUILD</text>
-  <rect x="0" y="480" width="900" height="60" fill="#0a1020" opacity="0.8"/>
-  <rect x="0" y="480" width="900" height="1" fill="#1e2f4d"/>
-  <rect x="60" y="496" width="144" height="24" rx="12" fill="#6fd4ee" opacity="0.12"/>
-  <text x="132" y="513" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#6fd4ee" font-weight="bold" letter-spacing="1">CUSTOM SOFTWARE</text>
+  <rect width="900" height="540" fill="url(#glow-custom)" />
+
+  <line x1="0" y1="108" x2="900" y2="108" stroke="#1a2540" stroke-width="1" />
+  <line x1="0" y1="216" x2="900" y2="216" stroke="#1a2540" stroke-width="1" />
+  <line x1="0" y1="324" x2="900" y2="324" stroke="#1a2540" stroke-width="1" />
+  <line x1="0" y1="432" x2="900" y2="432" stroke="#1a2540" stroke-width="1" />
+  <line x1="180" y1="0" x2="180" y2="540" stroke="#1a2540" stroke-width="1" />
+  <line x1="360" y1="0" x2="360" y2="540" stroke="#1a2540" stroke-width="1" />
+  <line x1="540" y1="0" x2="540" y2="540" stroke="#1a2540" stroke-width="1" />
+  <line x1="720" y1="0" x2="720" y2="540" stroke="#1a2540" stroke-width="1" />
+
   <text x="60" y="72" font-family="sans-serif" font-size="26" font-weight="800" fill="#ffffff">Custom Software Development Company in</text>
   <text x="60" y="106" font-family="sans-serif" font-size="26" font-weight="800" fill="#6fd4ee">the UK for Complex Operations</text>
+
+  <rect x="66" y="160" width="768" height="256" rx="18" fill="#0f1a2e" stroke="#1e2f4d" stroke-width="1.6" />
+  <rect x="66" y="160" width="768" height="46" rx="18" fill="#131d33" />
+  <rect x="66" y="188" width="768" height="18" fill="#131d33" />
+  <circle cx="98" cy="183" r="7" fill="#2c3f63" />
+  <circle cx="121" cy="183" r="7" fill="#2c3f63" />
+  <circle cx="144" cy="183" r="7" fill="#2c3f63" />
+  <text x="450" y="187" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#6fd4ee" font-weight="bold" letter-spacing="1">COMPLEX OPERATIONS ARCHITECTURE</text>
+
+  <rect x="98" y="226" width="210" height="160" rx="12" fill="#111f35" stroke="#2a4266" />
+  <text x="118" y="248" font-family="sans-serif" font-size="10" fill="#6fd4ee" font-weight="bold">DATA SOURCES</text>
+  <rect x="118" y="264" width="170" height="10" rx="5" fill="#3a5080" opacity="0.55" />
+  <rect x="118" y="283" width="150" height="10" rx="5" fill="#3a5080" opacity="0.55" />
+  <rect x="118" y="302" width="180" height="10" rx="5" fill="#3a5080" opacity="0.55" />
+  <rect x="118" y="336" width="88" height="24" rx="12" fill="#6fd4ee" opacity="0.14" />
+  <text x="162" y="352" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6fd4ee" font-weight="bold">LEGACY</text>
+  <rect x="214" y="336" width="88" height="24" rx="12" fill="#6fd4ee" opacity="0.14" />
+  <text x="258" y="352" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6fd4ee" font-weight="bold">SaaS</text>
+
+  <rect x="346" y="226" width="210" height="160" rx="12" fill="#111f35" stroke="#2a4266" />
+  <text x="366" y="248" font-family="sans-serif" font-size="10" fill="#6fd4ee" font-weight="bold">CUSTOM WORKFLOW CORE</text>
+  <rect x="366" y="266" width="170" height="10" rx="5" fill="#6fd4ee" opacity="0.52" />
+  <rect x="366" y="285" width="160" height="10" rx="5" fill="#6fd4ee" opacity="0.46" />
+  <rect x="366" y="304" width="180" height="10" rx="5" fill="#6fd4ee" opacity="0.4" />
+  <line x1="366" y1="330" x2="536" y2="330" stroke="#1e2f4d" />
+  <rect x="366" y="340" width="72" height="22" rx="11" fill="#6fd4ee" opacity="0.16" />
+  <text x="402" y="355" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6fd4ee" font-weight="bold">RULES</text>
+  <rect x="446" y="340" width="72" height="22" rx="11" fill="#6fd4ee" opacity="0.16" />
+  <text x="482" y="355" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6fd4ee" font-weight="bold">LOGIC</text>
+
+  <rect x="594" y="226" width="210" height="160" rx="12" fill="#111f35" stroke="#2a4266" />
+  <text x="614" y="248" font-family="sans-serif" font-size="10" fill="#6fd4ee" font-weight="bold">DELIVERY OUTCOMES</text>
+  <rect x="614" y="265" width="170" height="10" rx="5" fill="#3a5080" opacity="0.58" />
+  <rect x="614" y="284" width="150" height="10" rx="5" fill="#3a5080" opacity="0.58" />
+  <rect x="614" y="303" width="160" height="10" rx="5" fill="#3a5080" opacity="0.58" />
+  <rect x="614" y="336" width="170" height="24" rx="12" fill="#6fd4ee" opacity="0.14" />
+  <text x="699" y="352" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6fd4ee" font-weight="bold">AUTOMATED OPS</text>
+
+  <path d="M308 306 C325 306 331 306 346 306" stroke="#6fd4ee" stroke-width="2" stroke-dasharray="4 4" opacity="0.8" />
+  <path d="M556 306 C573 306 579 306 594 306" stroke="#6fd4ee" stroke-width="2" stroke-dasharray="4 4" opacity="0.8" />
+
+  <rect x="0" y="480" width="900" height="60" fill="#0a1020" opacity="0.85" />
+  <rect x="0" y="480" width="900" height="1" fill="#1e2f4d" />
+  <rect x="60" y="496" width="170" height="24" rx="12" fill="#6fd4ee" opacity="0.12" />
+  <text x="145" y="513" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#6fd4ee" font-weight="bold" letter-spacing="1">CUSTOM SOFTWARE</text>
 </svg>

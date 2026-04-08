@@ -7,7 +7,8 @@
     "dev:turbo": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "eslint && npm run lint:covers",
+    "lint:covers": "tsx scripts/validate-blog-covers.ts",
     "generate-blog-post": "tsx scripts/generate-blog-post.ts"
   },
   "dependencies": {
