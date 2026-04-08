@@ -1,4 +1,4 @@
-import { Check, Quote } from "lucide-react";
+import { Check } from "lucide-react";
 import { compileMDX } from "next-mdx-remote/rsc";
 import Link from "next/link";
 
@@ -25,6 +25,15 @@ export async function ResourceDetailPage({ resource, relatedResources }: Resourc
 
   const redirectPath = "/resources/" + resource.meta.slug + "/thank-you";
   const deliveryPromise = getDeliveryPromise(resource.meta);
+  const usageSectionTitle = resource.meta.usageSectionTitle ?? "How Teams Use This Resource";
+  const usageSteps =
+    resource.meta.usageSteps ??
+    resource.meta.benefits.slice(0, 3).map((benefit, index) => ({
+      title: `Step ${index + 1}`,
+      description: benefit,
+    }));
+  const usageGridClass =
+    usageSteps.length >= 3 ? "mt-10 grid gap-6 px-6 md:grid-cols-2 xl:grid-cols-3 sm:px-8" : "mt-10 grid gap-6 px-6 md:grid-cols-2 sm:px-8";
 
   return (
     <div className="py-14 sm:py-20 lg:py-24">
@@ -74,47 +83,19 @@ export async function ResourceDetailPage({ resource, relatedResources }: Resourc
 
         <section className="mt-20 rounded-2xl bg-surface-1/60 py-14 sm:py-16">
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-foreground sm:text-3xl">
-              Trusted by Institutional Leaders
-            </h2>
+            <h2 className="text-2xl font-bold text-foreground sm:text-3xl">{usageSectionTitle}</h2>
             <div className="mx-auto mt-3 h-1 w-16 rounded-full bg-brand-primary" />
           </div>
-          <div className="mt-10 grid gap-6 px-6 md:grid-cols-2 sm:px-8">
-            <GlowCard customSize className="relative p-8" as="blockquote">
-              <Quote className="absolute right-6 top-5 size-10 text-brand-primary/15" aria-hidden="true" />
-              <p className="relative z-10 italic leading-relaxed text-text-muted">
-                &ldquo;Faithful Software Solutions understood our unique needs as a large school
-                district. Their architectural approach to modernization saved us months of
-                downtime and secured our student data beyond industry standards.&rdquo;
-              </p>
-              <footer className="mt-6 flex items-center gap-3">
-                <div className="size-10 rounded-full bg-surface-2" />
-                <div>
-                  <p className="font-bold text-foreground">Dr. Sarah Jenkins</p>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-brand-primary">
-                    Superintendent, Lincoln Education Group
-                  </p>
-                </div>
-              </footer>
-            </GlowCard>
-
-            <GlowCard customSize className="relative p-8" as="blockquote">
-              <Quote className="absolute right-6 top-5 size-10 text-brand-primary/15" aria-hidden="true" />
-              <p className="relative z-10 italic leading-relaxed text-text-muted">
-                &ldquo;Modernizing a legacy financial system is high-stakes. The strategy outlined in
-                this guide was exactly what we needed to move toward a cloud-native architecture
-                without risking our core business data.&rdquo;
-              </p>
-              <footer className="mt-6 flex items-center gap-3">
-                <div className="size-10 rounded-full bg-surface-2" />
-                <div>
-                  <p className="font-bold text-foreground">Marcus Thorne</p>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-brand-primary">
-                    CEO, Thorne Enterprise Logistics
-                  </p>
-                </div>
-              </footer>
-            </GlowCard>
+          <div className={usageGridClass}>
+            {usageSteps.map((step, index) => (
+              <GlowCard key={step.title + index} customSize className="p-6">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-primary">
+                  Step {index + 1}
+                </p>
+                <h3 className="mt-3 text-xl font-bold text-foreground">{step.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-text-muted">{step.description}</p>
+              </GlowCard>
+            ))}
           </div>
         </section>
 
