@@ -4,7 +4,7 @@ import { getAllBlogPosts } from "@/lib/blog";
 import { getAllResources } from "@/lib/resources";
 import { siteConfig } from "@/lib/site-config";
 
-export const revalidate = 60 * 60;
+export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = siteConfig.url;
@@ -43,7 +43,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  const [posts, resources] = await Promise.all([getAllBlogPosts(), getAllResources()]);
+  const [posts, resources] = await Promise.all([
+    getAllBlogPosts(),
+    getAllResources(),
+  ]);
 
   const blogRoutes: MetadataRoute.Sitemap = posts.map((post) => ({
     url: `${baseUrl}/blog/${post.slug}`,
