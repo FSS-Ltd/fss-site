@@ -2,12 +2,31 @@ import type { NextConfig } from "next";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+const cspReportOnly = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "object-src 'none'",
+  "frame-ancestors 'none'",
+  "img-src 'self' data: blob: https://www.googletagmanager.com https://www.google-analytics.com",
+  "style-src 'self' 'unsafe-inline'",
+  "font-src 'self' data:",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com",
+  "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com",
+].join("; ");
+
 const securityHeaders = [
   { key: "X-Frame-Options", value: "SAMEORIGIN" },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+  { key: "Content-Security-Policy-Report-Only", value: cspReportOnly },
 ];
+
+const hstsHeader = {
+  key: "Strict-Transport-Security",
+  value: "max-age=63072000; includeSubDomains",
+};
 
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
@@ -20,6 +39,16 @@ const nextConfig: NextConfig = {
       {
         source: "/(.*)",
         headers: securityHeaders,
+      },
+      {
+        source: "/(.*)",
+        has: [
+          {
+            type: "host",
+            value: "(faithfulsoftware.dev|www.faithfulsoftware.dev)",
+          },
+        ],
+        headers: [hstsHeader],
       },
     ];
   },

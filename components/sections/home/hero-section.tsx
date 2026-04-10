@@ -23,8 +23,10 @@ const categoryCards: CategoryCard[] = [
 export function HeroSection() {
   return (
     <Section className="relative overflow-hidden pb-12 pt-14 sm:pb-16 sm:pt-20 lg:pb-20 lg:pt-28">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(111,212,238,0.12),transparent_36%),radial-gradient(circle_at_82%_0%,rgba(23,31,51,0.7),transparent_42%)]" />
-      <BackgroundPaths />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-brand-primary/6 to-transparent" />
+      <div className="hidden md:block">
+        <BackgroundPaths />
+      </div>
 
       <div className="relative grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
         <div className="space-y-8">
@@ -32,15 +34,15 @@ export function HeroSection() {
             Digital Craftsmanship
           </span>
 
-          <h1 className="max-w-xl text-balance text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl lg:text-[3.5rem] lg:leading-[1.08]">
+          <h1 className="max-w-xl font-[ui-sans-serif] text-3xl font-extrabold tracking-tight text-foreground sm:text-5xl lg:text-[3.5rem] lg:leading-[1.08]">
             Custom Software for{" "}
-            <span className="bg-gradient-to-r from-brand-primary to-brand-accent bg-clip-text text-transparent">
+            <span className="text-brand-primary">
               Business
             </span>
             , Schools, and Churches
           </h1>
 
-          <p className="max-w-lg text-lg leading-8 text-text-muted">
+          <p className="max-w-md font-[ui-sans-serif] text-sm leading-6 text-text-muted sm:max-w-lg sm:text-lg sm:leading-8">
             We build unshakeable digital foundations with reliable technology solutions tailored
             to your unique mission and operational needs.
           </p>
@@ -62,7 +64,7 @@ export function HeroSection() {
               {categoryCards.map((card) => (
                 <GlowCard key={card.label} customSize className="p-5">
                   <card.icon className={`mb-2 size-6 ${card.iconColor}`} aria-hidden="true" />
-                  <h4 className="font-bold text-foreground">{card.label}</h4>
+                  <p className="font-bold text-foreground">{card.label}</p>
                   <p className="mt-0.5 text-xs text-text-subtle">{card.sub}</p>
                 </GlowCard>
               ))}

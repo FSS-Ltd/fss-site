@@ -1,9 +1,5 @@
-"use client";
-
 // Durations are pre-computed once at module load so SSR and client
 // produce the same values - avoiding a hydration mismatch.
-
-import { motion } from "motion/react";
 
 const PATH_COUNT = 36;
 
@@ -34,24 +30,28 @@ function FloatingPaths({ position }: { position: number }) {
         aria-hidden="true"
       >
         {paths.map((path) => (
-          <motion.path
+          <path
             key={path.id}
             d={path.d}
             stroke="currentColor"
             strokeWidth={path.width}
             strokeOpacity={0.04 + path.id * 0.015}
-            initial={{ pathLength: 0.3, opacity: 0.6 }}
-            animate={{
-              pathLength: 1,
-              opacity: [0.3, 0.6, 0.3],
-              pathOffset: [0, 1, 0],
-            }}
-            transition={{
-              duration: durations[path.id],
-              repeat: Number.POSITIVE_INFINITY,
-              ease: "linear",
-            }}
-          />
+            strokeDasharray="6 14"
+          >
+            <animate
+              attributeName="stroke-dashoffset"
+              from="0"
+              to="220"
+              dur={`${durations[path.id]}s`}
+              repeatCount="indefinite"
+            />
+            <animate
+              attributeName="opacity"
+              values="0.25;0.6;0.25"
+              dur={`${Math.max(12, durations[path.id] * 0.7)}s`}
+              repeatCount="indefinite"
+            />
+          </path>
         ))}
       </svg>
     </div>
