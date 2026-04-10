@@ -1,11 +1,4 @@
-"use client";
-
-import {
-  useEffect,
-  useRef,
-  type CSSProperties,
-  type ReactNode,
-} from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import { cn } from "@/lib/utils/cn";
 
@@ -38,141 +31,7 @@ const sizeMap: Record<GlowCardSize, string> = {
   lg: "w-80 h-96",
 };
 
-// Global manager: one pointer loop and only visible / hovered cards are updated.
-const mountedCards = new Set<HTMLElement>();
-const visibleCards = new Set<HTMLElement>();
-let activeCardCount = 0;
-let pointerListener: ((event: PointerEvent) => void) | null = null;
-let pointerLeaveListener: (() => void) | null = null;
-let windowBlurListener: (() => void) | null = null;
-let intersectionObserver: IntersectionObserver | null = null;
-let frameId: number | null = null;
-let pointerX = 0;
-let pointerY = 0;
-let hoveredCard: HTMLElement | null = null;
-
 type GlowCardStyle = CSSProperties & Record<`--${string}`, string | number>;
-
-function applyPointerToCard(card: HTMLElement) {
-  card.style.setProperty("--x", pointerX.toFixed(2));
-  card.style.setProperty("--y", pointerY.toFixed(2));
-  card.style.setProperty("--xp", (pointerX / window.innerWidth).toFixed(3));
-  card.style.setProperty("--yp", (pointerY / window.innerHeight).toFixed(3));
-}
-
-function syncPointerFrame() {
-  frameId = null;
-
-  if (hoveredCard && mountedCards.has(hoveredCard)) {
-    applyPointerToCard(hoveredCard);
-    return;
-  }
-
-  for (const card of visibleCards) {
-    applyPointerToCard(card);
-  }
-}
-
-function isFinePointerDevice() {
-  return !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
-
-function ensureObserver() {
-  if (intersectionObserver) {
-    return intersectionObserver;
-  }
-
-  intersectionObserver = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        const target = entry.target as HTMLElement;
-        if (!mountedCards.has(target)) {
-          continue;
-        }
-
-        if (entry.isIntersecting) {
-          visibleCards.add(target);
-        } else {
-          visibleCards.delete(target);
-          if (hoveredCard === target) {
-            hoveredCard = null;
-          }
-        }
-      }
-    },
-    { threshold: 0.01 },
-  );
-
-  return intersectionObserver;
-}
-
-function registerListeners() {
-  if (pointerListener || !isFinePointerDevice()) {
-    return;
-  }
-
-  pointerListener = (event: PointerEvent) => {
-    pointerX = event.clientX;
-    pointerY = event.clientY;
-
-    if (frameId === null) {
-      frameId = window.requestAnimationFrame(syncPointerFrame);
-    }
-  };
-
-  pointerLeaveListener = () => {
-    pointerX = window.innerWidth / 2;
-    pointerY = window.innerHeight / 2;
-
-    if (frameId === null) {
-      frameId = window.requestAnimationFrame(syncPointerFrame);
-    }
-  };
-
-  windowBlurListener = () => {
-    hoveredCard = null;
-  };
-
-  window.addEventListener("pointermove", pointerListener, { passive: true });
-  window.addEventListener("pointerleave", pointerLeaveListener, { passive: true });
-  window.addEventListener("blur", windowBlurListener);
-}
-
-function unregisterListeners() {
-  if (!pointerListener) {
-    return;
-  }
-
-  window.removeEventListener("pointermove", pointerListener);
-  pointerListener = null;
-
-  if (pointerLeaveListener) {
-    window.removeEventListener("pointerleave", pointerLeaveListener);
-    pointerLeaveListener = null;
-  }
-
-  if (frameId !== null) {
-    window.cancelAnimationFrame(frameId);
-    frameId = null;
-  }
-
-  if (windowBlurListener) {
-    window.removeEventListener("blur", windowBlurListener);
-    windowBlurListener = null;
-  }
-
-  hoveredCard = null;
-}
-
-function detachObserver() {
-  if (!intersectionObserver) {
-    return;
-  }
-
-  intersectionObserver.disconnect();
-  intersectionObserver = null;
-  visibleCards.clear();
-}
 
 export function GlowCard({
   children,
@@ -184,54 +43,6 @@ export function GlowCard({
   customSize = false,
   as: Tag = "div",
 }: GlowCardProps) {
-  const cardRef = useRef<HTMLElement | null>(null);
-
-  useEffect(() => {
-    const element = cardRef.current;
-    if (!element || !isFinePointerDevice()) {
-      return;
-    }
-
-    activeCardCount += 1;
-    mountedCards.add(element);
-    registerListeners();
-    ensureObserver().observe(element);
-
-    const onEnter = () => {
-      hoveredCard = element;
-      visibleCards.add(element);
-    };
-
-    const onLeave = () => {
-      if (hoveredCard === element) {
-        hoveredCard = null;
-      }
-    };
-
-    element.addEventListener("pointerenter", onEnter, { passive: true });
-    element.addEventListener("pointerleave", onLeave, { passive: true });
-
-    return () => {
-      element.removeEventListener("pointerenter", onEnter);
-      element.removeEventListener("pointerleave", onLeave);
-      intersectionObserver?.unobserve(element);
-      mountedCards.delete(element);
-      visibleCards.delete(element);
-
-      if (hoveredCard === element) {
-        hoveredCard = null;
-      }
-
-      activeCardCount -= 1;
-
-      if (activeCardCount <= 0) {
-        activeCardCount = 0;
-        unregisterListeners();
-        detachObserver();
-      }
-    };
-  }, []);
-
   const { base, spread } = glowColorMap[glowColor];
   const inlineStyles: GlowCardStyle = {
     "--x": 0,
@@ -276,9 +87,6 @@ export function GlowCard({
 
   return (
     <Tag
-      ref={(element: HTMLElement | null) => {
-        cardRef.current = element;
-      }}
       data-glow
       style={inlineStyles}
       className={cn(
