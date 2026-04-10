@@ -3,6 +3,14 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 
+type IdleWindow = Window & {
+  requestIdleCallback?: (
+    callback: IdleRequestCallback,
+    options?: IdleRequestOptions,
+  ) => number;
+  cancelIdleCallback?: (handle: number) => void;
+};
+
 function canAnimateGlow() {
   if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
     return false;
@@ -129,6 +137,7 @@ export function GlowPointerProvider() {
     let idleCallbackId: number | null = null;
     let timeoutId: number | null = null;
     let started = false;
+    const idleWindow = window as IdleWindow;
 
     const startController = () => {
       if (started) {
@@ -148,21 +157,21 @@ export function GlowPointerProvider() {
       once: true,
     });
 
-    if ("requestIdleCallback" in window) {
-      idleCallbackId = window.requestIdleCallback(startController, { timeout: 2500 });
+    if (typeof idleWindow.requestIdleCallback === "function") {
+      idleCallbackId = idleWindow.requestIdleCallback(startController, { timeout: 2500 });
     } else {
-      timeoutId = window.setTimeout(startController, 1500);
+      timeoutId = globalThis.setTimeout(startController, 1500);
     }
 
     return () => {
       window.removeEventListener("pointermove", startOnFirstInteraction);
 
-      if (idleCallbackId !== null && "cancelIdleCallback" in window) {
-        window.cancelIdleCallback(idleCallbackId);
+      if (idleCallbackId !== null && typeof idleWindow.cancelIdleCallback === "function") {
+        idleWindow.cancelIdleCallback(idleCallbackId);
       }
 
       if (timeoutId !== null) {
-        window.clearTimeout(timeoutId);
+        globalThis.clearTimeout(timeoutId);
       }
 
       controllerCleanup?.();
