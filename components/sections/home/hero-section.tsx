@@ -42,7 +42,7 @@ export function HeroSection() {
             , Schools, and Churches
           </h1>
 
-          <p className="max-w-lg text-base leading-7 text-text-muted sm:text-lg sm:leading-8">
+          <p className="max-w-md font-[ui-sans-serif] text-sm leading-6 text-text-muted sm:max-w-lg sm:text-lg sm:leading-8">
             We build unshakeable digital foundations with reliable technology solutions tailored
             to your unique mission and operational needs.
           </p>
