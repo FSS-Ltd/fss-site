@@ -3,14 +3,6 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 
-type IdleWindow = Window & {
-  requestIdleCallback?: (
-    callback: IdleRequestCallback,
-    options?: IdleRequestOptions,
-  ) => number;
-  cancelIdleCallback?: (handle: number) => void;
-};
-
 function canAnimateGlow() {
   if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
     return false;
@@ -134,10 +126,7 @@ export function GlowPointerProvider() {
     }
 
     let controllerCleanup: (() => void) | null = null;
-    let idleCallbackId: number | null = null;
-    let timeoutId: ReturnType<typeof globalThis.setTimeout> | null = null;
     let started = false;
-    const idleWindow = window as IdleWindow;
 
     const startController = () => {
       if (started) {
@@ -156,23 +145,18 @@ export function GlowPointerProvider() {
       passive: true,
       once: true,
     });
-
-    if (typeof idleWindow.requestIdleCallback === "function") {
-      idleCallbackId = idleWindow.requestIdleCallback(startController, { timeout: 2500 });
-    } else {
-      timeoutId = globalThis.setTimeout(startController, 1500);
-    }
+    window.addEventListener("pointerdown", startOnFirstInteraction, {
+      passive: true,
+      once: true,
+    });
+    window.addEventListener("keydown", startOnFirstInteraction, { once: true });
+    window.addEventListener("focusin", startOnFirstInteraction, { once: true });
 
     return () => {
       window.removeEventListener("pointermove", startOnFirstInteraction);
-
-      if (idleCallbackId !== null && typeof idleWindow.cancelIdleCallback === "function") {
-        idleWindow.cancelIdleCallback(idleCallbackId);
-      }
-
-      if (timeoutId !== null) {
-        globalThis.clearTimeout(timeoutId);
-      }
+      window.removeEventListener("pointerdown", startOnFirstInteraction);
+      window.removeEventListener("keydown", startOnFirstInteraction);
+      window.removeEventListener("focusin", startOnFirstInteraction);
 
       controllerCleanup?.();
     };
