@@ -135,7 +135,7 @@ export function GlowPointerProvider() {
 
     let controllerCleanup: (() => void) | null = null;
     let idleCallbackId: number | null = null;
-    let timeoutId: number | null = null;
+    let timeoutId: ReturnType<typeof globalThis.setTimeout> | null = null;
     let started = false;
     const idleWindow = window as IdleWindow;
 
