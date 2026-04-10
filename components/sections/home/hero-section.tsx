@@ -24,7 +24,9 @@ export function HeroSection() {
   return (
     <Section className="relative overflow-hidden pb-12 pt-14 sm:pb-16 sm:pt-20 lg:pb-20 lg:pt-28">
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-brand-primary/6 to-transparent" />
-      <BackgroundPaths />
+      <div className="hidden md:block">
+        <BackgroundPaths />
+      </div>
 
       <div className="relative grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
         <div className="space-y-8">
