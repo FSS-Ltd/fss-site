@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
 import { useState } from "react";
 
 import { ButtonLink } from "@/components/ui/button";
@@ -11,6 +10,21 @@ import { cn } from "@/lib/utils/cn";
 type MobileNavProps = {
   items: NavItem[];
 };
+
+function MobileMenuIcon({ open }: { open: boolean }) {
+  return open ? (
+    <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24">
+      <path d="M18 6 6 18" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
+      <path d="m6 6 12 12" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
+    </svg>
+  ) : (
+    <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24">
+      <path d="M4 5h16" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
+      <path d="M4 12h16" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
+      <path d="M4 19h16" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
+    </svg>
+  );
+}
 
 export function MobileNav({ items }: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,7 +39,7 @@ export function MobileNav({ items }: MobileNavProps) {
         onClick={() => setIsOpen((current) => !current)}
         type="button"
       >
-        {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        <MobileMenuIcon open={isOpen} />
       </button>
 
       <div
@@ -51,7 +65,10 @@ export function MobileNav({ items }: MobileNavProps) {
             onClick={() => setIsOpen(false)}
             type="button"
           >
-            <X className="h-4 w-4" />
+            <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
+              <path d="M18 6 6 18" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
+              <path d="m6 6 12 12" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
+            </svg>
           </button>
         </div>
 

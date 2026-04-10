@@ -9,7 +9,9 @@
     "start": "next start",
     "lint": "eslint && npm run lint:covers",
     "lint:covers": "tsx scripts/validate-blog-covers.ts",
-    "generate-blog-post": "tsx scripts/generate-blog-post.ts"
+    "generate-blog-post": "tsx scripts/generate-blog-post.ts",
+    "perf:budget:homepage": "node scripts/check-homepage-budget.mjs",
+    "perf:lighthouse:mobile": "lhci autorun --config=.lighthouserc.mobile.json"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -20,7 +22,6 @@
     "date-fns": "^4.1.0",
     "gray-matter": "^4.0.3",
     "lucide-react": "^1.7.0",
-    "motion": "^12.38.0",
     "next": "16.2.1",
     "next-mdx-remote": "^6.0.0",
     "react": "19.2.4",
@@ -36,6 +37,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@lhci/cli": "^0.15.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.1",
     "prettier": "^3.8.1",
@@ -44,5 +46,11 @@
     "tsx": "^4.19.0",
     "typescript": "^5"
   },
+  "browserslist": [
+    "chrome 111",
+    "edge 111",
+    "firefox 111",
+    "safari 16.4"
+  ],
   "packageManager": "pnpm@9.7.0+sha512.dc09430156b427f5ecfc79888899e1c39d2d690f004be70e05230b72cb173d96839587545d09429b55ac3c429c801b4dc3c0e002f653830a420fa2dd4e3cf9cf"
 }

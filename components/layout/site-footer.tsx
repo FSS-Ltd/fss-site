@@ -1,4 +1,3 @@
-import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 import { Container } from "@/components/ui/container";
@@ -31,7 +30,7 @@ export function SiteFooter() {
           </div>
 
           <div className="space-y-4">
-            <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">Solutions</h4>
+            <p className="text-xs font-bold uppercase tracking-widest text-foreground">Solutions</p>
             <ul className="space-y-3">
               {footerSolutions.map((item) => (
                 <li key={item.label}>
@@ -47,7 +46,7 @@ export function SiteFooter() {
           </div>
 
           <div className="space-y-4">
-            <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">Company</h4>
+            <p className="text-xs font-bold uppercase tracking-widest text-foreground">Company</p>
             <ul className="space-y-3">
               {footerCompany.map((item) => (
                 <li key={item.label}>
@@ -63,7 +62,7 @@ export function SiteFooter() {
           </div>
 
           <div className="col-span-2 md:col-span-1 space-y-4">
-            <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">Newsletter</h4>
+            <p className="text-xs font-bold uppercase tracking-widest text-foreground">Newsletter</p>
             <p className="text-sm text-text-muted">Stay updated with our latest tech insights.</p>
             <div className="flex">
               <input
@@ -76,7 +75,10 @@ export function SiteFooter() {
                 aria-label="Subscribe"
                 className="flex items-center justify-center rounded-r bg-brand-primary px-4 py-2 text-cta-text hover:brightness-110 transition"
               >
-                <ArrowRight className="size-4" />
+                <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 24 24">
+                  <path d="M5 12h14" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
+                  <path d="m13 6 6 6-6 6" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
+                </svg>
               </button>
             </div>
           </div>

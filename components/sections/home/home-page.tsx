@@ -9,11 +9,21 @@ export function HomePage() {
   return (
     <>
       <HeroSection />
-      <FeatureGridSection />
-      <AboutSection />
-      <HowItWorksSection />
-      <TestimonialStrip />
-      <HomeCtaSection />
+      <div style={{ contentVisibility: "auto", containIntrinsicSize: "880px" }}>
+        <FeatureGridSection />
+      </div>
+      <div style={{ contentVisibility: "auto", containIntrinsicSize: "760px" }}>
+        <AboutSection />
+      </div>
+      <div style={{ contentVisibility: "auto", containIntrinsicSize: "840px" }}>
+        <HowItWorksSection />
+      </div>
+      <div style={{ contentVisibility: "auto", containIntrinsicSize: "640px" }}>
+        <TestimonialStrip />
+      </div>
+      <div style={{ contentVisibility: "auto", containIntrinsicSize: "620px" }}>
+        <HomeCtaSection />
+      </div>
     </>
   );
 }
