@@ -8,7 +8,7 @@ This repo is set up for a simple, safe CI/CD model where GitHub validates change
 - Open pull requests into `main` (no direct feature pushes to `main`).
 - GitHub Actions runs lint + build on PRs.
 - Netlify creates deploy previews for PRs.
-- Production deploys from `main` only.
+- Production deploys from `main` only through `.github/workflows/netlify-deploy.yml`.
 
 ## Netlify configuration in repo
 
@@ -76,9 +76,9 @@ If `NEXT_PUBLIC_SITE_URL` is not set (common for previews), the app falls back t
 
 This avoids preview URLs competing with production SEO.
 
-## GitHub Actions (validation only)
+## GitHub Actions
 
-Workflow: `.github/workflows/ci.yml`
+Validation workflow: `.github/workflows/ci.yml`
 
 Runs on:
 
@@ -91,7 +91,19 @@ Checks:
 - `pnpm lint`
 - `pnpm build`
 
-Netlify remains the deployment system.
+Production deploy workflow: `.github/workflows/netlify-deploy.yml`
+
+Runs on:
+
+- pushes to `main`
+- manual dispatch
+
+Required GitHub repository secrets:
+
+- `NETLIFY_AUTH_TOKEN`
+- `NETLIFY_SITE_ID`
+
+The workflow deploys to the configured Netlify site with `netlify-cli deploy --build --prod`, which uses the build settings in `netlify.toml`.
 
 ## Manual setup checklist
 
