@@ -1,4 +1,11 @@
-import { ArrowRight, BrainCircuit, FileLock2, Gauge, Network, ShieldCheck } from "lucide-react";
+import {
+  ArrowRight,
+  BrainCircuit,
+  FileLock2,
+  Gauge,
+  Network,
+  ShieldCheck,
+} from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 import { AiDeploymentQuiz } from "@/components/sections/ai-questionnaire/ai-deployment-quiz";
@@ -39,7 +46,14 @@ const insights: Insight[] = [
   },
 ];
 
-const sectors = ["Law firms", "Clinics", "Hospitals", "Finance teams", "Charities", "Service businesses"];
+const sectors = [
+  "Law firms",
+  "Clinics",
+  "Hospitals",
+  "Finance teams",
+  "Charities",
+  "Service businesses",
+];
 
 export const aiQuestionnaireFaqs: Faq[] = [
   {
@@ -75,19 +89,19 @@ export function AiQuestionnairePage() {
   return (
     <>
       <Section className="relative overflow-hidden pb-14 pt-14 sm:pb-20 sm:pt-20 lg:pb-24 lg:pt-28">
-        <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+        <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div className="space-y-8">
-            <span className="inline-flex items-center rounded-full border border-brand-primary/25 bg-brand-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-brand-primary">
+            <span className="inline-flex items-center rounded-full border border-brand-primary/25 bg-brand-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-widest text-brand-primary">
               Private AI decision tool
             </span>
             <div className="space-y-6">
-              <h1 className="max-w-4xl text-balance text-4xl font-semibold tracking-tight text-foreground sm:text-6xl lg:text-[4.65rem] lg:leading-[0.98]">
+              <h1 className="max-w-4xl text-balance text-4xl font-semibold tracking-tight text-foreground sm:text-6xl lg:leading-tight">
                 Should your business use local AI or cloud AI?
               </h1>
               <p className="max-w-2xl text-pretty text-lg leading-8 text-text-muted sm:text-xl sm:leading-9">
-                Answer seven questions and get a practical recommendation for local, cloud, or
-                hybrid AI based on data sensitivity, compliance pressure, speed, budget, and
-                workflow value.
+                Answer seven questions and get a practical recommendation for
+                local, cloud, or hybrid AI based on data sensitivity, compliance
+                pressure, speed, budget, and workflow value.
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
@@ -102,7 +116,7 @@ export function AiQuestionnairePage() {
               {sectors.map((sector) => (
                 <span
                   key={sector}
-                  className="rounded-full border border-border-soft bg-surface-2/55 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-text-muted"
+                  className="rounded-full border border-border-soft bg-surface-2/55 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-text-muted"
                 >
                   {sector}
                 </span>
@@ -114,7 +128,7 @@ export function AiQuestionnairePage() {
             <div className="space-y-8">
               <div className="flex items-center justify-between gap-5">
                 <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-primary">
+                  <p className="text-sm font-semibold uppercase tracking-widest text-brand-primary">
                     AI route
                   </p>
                   <h2 className="mt-2 text-3xl font-semibold tracking-tight text-foreground">
@@ -138,16 +152,22 @@ export function AiQuestionnairePage() {
                   >
                     <div>
                       <p className="font-semibold text-foreground">{label}</p>
-                      <p className="mt-1 text-sm text-text-muted">{description}</p>
+                      <p className="mt-1 text-sm text-text-muted">
+                        {description}
+                      </p>
                     </div>
-                    <ShieldCheck className="size-5 shrink-0 text-brand-primary" aria-hidden="true" />
+                    <ShieldCheck
+                      className="size-5 shrink-0 text-brand-primary"
+                      aria-hidden="true"
+                    />
                   </div>
                 ))}
               </div>
 
               <p className="text-sm leading-6 text-text-muted">
-                FSS designs private AI agents and internal workflows that cut admin while keeping
-                sensitive information under the right level of control.
+                FSS designs private AI agents and internal workflows that cut
+                admin while keeping sensitive information under the right level
+                of control.
               </p>
             </div>
           </GlowCard>
@@ -164,7 +184,9 @@ export function AiQuestionnairePage() {
               <h2 className="text-xl font-semibold tracking-tight text-foreground">
                 {insight.title}
               </h2>
-              <p className="mt-3 text-sm leading-6 text-text-muted">{insight.description}</p>
+              <p className="mt-3 text-sm leading-6 text-text-muted">
+                {insight.description}
+              </p>
             </GlowCard>
           ))}
         </div>
@@ -172,22 +194,23 @@ export function AiQuestionnairePage() {
 
       <Section id="questionnaire">
         <div className="mb-10 max-w-3xl space-y-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-primary">
+          <p className="text-xs font-semibold uppercase tracking-widest text-brand-primary">
             Find your AI route
           </p>
           <h2 className="text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-5xl">
             A practical decision before anyone buys the wrong AI tool.
           </h2>
           <p className="text-pretty text-base leading-7 text-text-muted sm:text-lg sm:leading-8">
-            The goal is not to force every workflow into one architecture. The goal is to put the
-            right work in the right environment, then automate the admin that drains margin.
+            The goal is not to force every workflow into one architecture. The
+            goal is to put the right work in the right environment, then
+            automate the admin that drains margin.
           </p>
         </div>
         <AiDeploymentQuiz />
       </Section>
 
       <Section id="answers" className="bg-surface-1/55">
-        <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+        <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
           <SectionHeading
             eyebrow="Practical answers"
             title="Clear answers for the questions buyers already ask."
@@ -200,7 +223,9 @@ export function AiQuestionnairePage() {
                 <h2 className="text-xl font-semibold tracking-tight text-foreground">
                   {faq.question}
                 </h2>
-                <p className="mt-3 text-sm leading-6 text-text-muted">{faq.answer}</p>
+                <p className="mt-3 text-sm leading-6 text-text-muted">
+                  {faq.answer}
+                </p>
               </GlowCard>
             ))}
           </div>
@@ -208,7 +233,7 @@ export function AiQuestionnairePage() {
       </Section>
 
       <Section>
-        <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+        <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <SectionHeading
             eyebrow="Private AI Workflow Audit"
             title="Turn a recommendation into a working internal workflow."
@@ -221,7 +246,9 @@ export function AiQuestionnairePage() {
                   <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-primary text-sm font-bold text-cta-text">
                     {index + 1}
                   </span>
-                  <p className="pt-1 text-sm leading-6 text-text-muted">{step}</p>
+                  <p className="pt-1 text-sm leading-6 text-text-muted">
+                    {step}
+                  </p>
                 </li>
               ))}
             </ol>

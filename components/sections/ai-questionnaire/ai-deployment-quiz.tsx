@@ -22,8 +22,8 @@ const scoreLabels: Record<AiDeploymentRecommendation, string> = {
 
 const resultAccent: Record<AiDeploymentRecommendation, string> = {
   local: "text-brand-primary",
-  cloud: "text-[#a8d8ff]",
-  hybrid: "text-[#b7c6f2]",
+  cloud: "text-foreground",
+  hybrid: "text-text-muted",
 };
 
 export function AiDeploymentQuiz() {
@@ -31,7 +31,8 @@ export function AiDeploymentQuiz() {
   const [showResult, setShowResult] = useState(false);
 
   const answeredCount = Object.keys(answers).length;
-  const allQuestionsAnswered = answeredCount === aiQuestionnaireQuestions.length;
+  const allQuestionsAnswered =
+    answeredCount === aiQuestionnaireQuestions.length;
   const result = useMemo(() => calculateAiRecommendation(answers), [answers]);
 
   const selectAnswer = (questionId: string, optionId: string) => {
@@ -48,11 +49,11 @@ export function AiDeploymentQuiz() {
   };
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.78fr)] lg:items-start">
+    <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
       <GlowCard customSize className="p-5 sm:p-7">
         <div className="flex flex-col gap-4 border-b border-border-soft/70 pb-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-primary">
+            <p className="text-xs font-semibold uppercase tracking-widest text-brand-primary">
               Decision questionnaire
             </p>
             <h2 className="mt-2 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
@@ -68,8 +69,9 @@ export function AiDeploymentQuiz() {
           {aiQuestionnaireQuestions.map((question, questionIndex) => (
             <fieldset key={question.id} className="space-y-4">
               <legend className="space-y-2">
-                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-text-subtle">
-                  {question.eyebrow} {String(questionIndex + 1).padStart(2, "0")}
+                <span className="text-xs font-semibold uppercase tracking-widest text-text-subtle">
+                  {question.eyebrow}{" "}
+                  {String(questionIndex + 1).padStart(2, "0")}
                 </span>
                 <span className="block text-lg font-semibold text-foreground">
                   {question.question}
@@ -151,7 +153,12 @@ export function AiDeploymentQuiz() {
                   <ShieldCheck className="size-5" aria-hidden="true" />
                 </span>
                 <div>
-                  <p className={cn("text-sm font-semibold uppercase tracking-[0.18em]", resultAccent[result.recommendation])}>
+                  <p
+                    className={cn(
+                      "text-sm font-semibold uppercase tracking-widest",
+                      resultAccent[result.recommendation],
+                    )}
+                  >
                     {scoreLabels[result.recommendation]} recommendation
                   </p>
                   <h3 className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
@@ -160,39 +167,62 @@ export function AiDeploymentQuiz() {
                 </div>
               </div>
 
-              <p className="text-base leading-7 text-text-muted">{result.summary}</p>
+              <p className="text-base leading-7 text-text-muted">
+                {result.summary}
+              </p>
 
               <div className="grid grid-cols-3 gap-2">
                 {Object.entries(result.score).map(([key, value]) => (
-                  <div key={key} className="rounded-xl border border-border-soft bg-surface-2/55 p-3">
-                    <p className="text-xs uppercase tracking-[0.16em] text-text-subtle">
+                  <div
+                    key={key}
+                    className="rounded-xl border border-border-soft bg-surface-2/55 p-3"
+                  >
+                    <p className="text-xs uppercase tracking-widest text-text-subtle">
                       {scoreLabels[key as AiDeploymentRecommendation]}
                     </p>
-                    <p className="mt-1 text-xl font-semibold text-foreground">{value}</p>
+                    <p className="mt-1 text-xl font-semibold text-foreground">
+                      {value}
+                    </p>
                   </div>
                 ))}
               </div>
 
               <ul className="space-y-3">
                 {result.bullets.map((bullet) => (
-                  <li key={bullet} className="flex gap-3 text-sm leading-6 text-text-muted">
-                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-brand-primary" aria-hidden="true" />
+                  <li
+                    key={bullet}
+                    className="flex gap-3 text-sm leading-6 text-text-muted"
+                  >
+                    <CheckCircle2
+                      className="mt-0.5 size-4 shrink-0 text-brand-primary"
+                      aria-hidden="true"
+                    />
                     {bullet}
                   </li>
                 ))}
               </ul>
 
               <div className="space-y-3 rounded-xl border border-border-soft bg-background/35 p-4">
-                <p className="text-sm font-semibold text-foreground">Best fit</p>
-                <p className="text-sm leading-6 text-text-muted">{result.bestFit}</p>
+                <p className="text-sm font-semibold text-foreground">
+                  Best fit
+                </p>
+                <p className="text-sm leading-6 text-text-muted">
+                  {result.bestFit}
+                </p>
               </div>
 
               <div className="space-y-3 rounded-xl border border-brand-primary/25 bg-brand-primary/10 p-4">
-                <p className="text-sm font-semibold text-foreground">Risk note</p>
-                <p className="text-sm leading-6 text-text-muted">{result.riskNote}</p>
+                <p className="text-sm font-semibold text-foreground">
+                  Risk note
+                </p>
+                <p className="text-sm leading-6 text-text-muted">
+                  {result.riskNote}
+                </p>
               </div>
 
-              <p className="text-sm leading-6 text-text-muted">{result.ctaNote}</p>
+              <p className="text-sm leading-6 text-text-muted">
+                {result.ctaNote}
+              </p>
             </div>
           ) : (
             <div className="space-y-5">
@@ -200,7 +230,7 @@ export function AiDeploymentQuiz() {
                 <ShieldCheck className="size-5" aria-hidden="true" />
               </span>
               <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-primary">
+                <p className="text-sm font-semibold uppercase tracking-widest text-brand-primary">
                   Your result
                 </p>
                 <h3 className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
@@ -208,8 +238,9 @@ export function AiDeploymentQuiz() {
                 </h3>
               </div>
               <p className="text-sm leading-6 text-text-muted">
-                The recommendation weighs data sensitivity, compliance pressure, control needs,
-                infrastructure capacity, system access, and speed.
+                The recommendation weighs data sensitivity, compliance pressure,
+                control needs, infrastructure capacity, system access, and
+                speed.
               </p>
             </div>
           )}
@@ -218,15 +249,15 @@ export function AiDeploymentQuiz() {
         {showResult && result ? (
           <GlowCard customSize className="p-5 sm:p-6">
             <div className="mb-5 space-y-2">
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-primary">
+              <p className="text-sm font-semibold uppercase tracking-widest text-brand-primary">
                 Private AI Workflow Audit
               </p>
               <h3 className="text-2xl font-semibold tracking-tight text-foreground">
                 Turn the recommendation into a workflow map.
               </h3>
               <p className="text-sm leading-6 text-text-muted">
-                Share your details and FSS will outline where local, cloud, or hybrid AI can
-                reduce admin without weakening data control.
+                Share your details and FSS will outline where local, cloud, or
+                hybrid AI can reduce admin without weakening data control.
               </p>
             </div>
             <LeadMagnetCaptureForm
