@@ -1,7 +1,7 @@
 // Durations are pre-computed once at module load so SSR and client
 // produce the same values - avoiding a hydration mismatch.
 
-const PATH_COUNT = 36;
+const PATH_COUNT = 16;
 
 const durations = Array.from(
   { length: PATH_COUNT },
