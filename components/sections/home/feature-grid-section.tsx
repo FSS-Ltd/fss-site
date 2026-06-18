@@ -1,4 +1,5 @@
-import { BarChart3, BookOpen, Church, Lightbulb } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, BarChart3, BookOpen, BrainCircuit, Church, Lightbulb } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 import { GlowCard } from "@/components/ui/spotlight-card";
@@ -14,6 +15,8 @@ type Service = {
   tags: string[];
   tagColor: string;
   span: string;
+  href?: string;
+  ctaLabel?: string;
 };
 
 const services: Service[] = [
@@ -41,6 +44,19 @@ const services: Service[] = [
   },
   {
     number: "03",
+    icon: BrainCircuit,
+    iconColor: "text-brand-accent",
+    title: "Local AI Readiness",
+    description:
+      "A practical route for deciding whether sensitive workflows should use local AI, cloud AI, or a hybrid model before data is exposed to the wrong tools.",
+    tags: ["Private AI", "Workflow Audit", "Data Control"],
+    tagColor: "text-brand-accent",
+    span: "md:col-span-6",
+    href: "/ai-deployment-questionnaire",
+    ctaLabel: "Find out more",
+  },
+  {
+    number: "04",
     icon: Church,
     iconColor: "text-[#b5c7e8]",
     title: "Religious Tech",
@@ -51,7 +67,7 @@ const services: Service[] = [
     span: "md:col-span-2",
   },
   {
-    number: "04",
+    number: "05",
     icon: Lightbulb,
     iconColor: "text-brand-accent",
     title: "Custom Organizational Apps",
@@ -84,6 +100,15 @@ export function FeatureGridSection() {
             </div>
             <h3 className="mb-3 text-xl font-bold text-foreground">{service.title}</h3>
             <p className="text-sm leading-relaxed text-text-muted">{service.description}</p>
+            {service.href && service.ctaLabel && (
+              <Link
+                className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-accent transition hover:text-brand-primary"
+                href={service.href}
+              >
+                {service.ctaLabel}
+                <ArrowRight className="size-4" aria-hidden="true" />
+              </Link>
+            )}
             {service.tags.length > 0 && (
               <div className="mt-5 flex flex-wrap gap-2">
                 {service.tags.map((tag) => (
