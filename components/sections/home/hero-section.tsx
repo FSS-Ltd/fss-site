@@ -16,15 +16,9 @@ const categoryCards: CategoryCard[] = [
 
 export function HeroSection() {
   return (
-    <Section className="relative overflow-hidden pb-12 pt-14 sm:pb-16 sm:pt-20 lg:pb-20 lg:pt-28">
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-brand-primary/6 to-transparent" />
-
+    <Section className="relative overflow-hidden pb-12 pt-10 sm:pb-16 sm:pt-16 lg:pb-20 lg:pt-24">
       <div className="relative grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-        <div className="space-y-8">
-          <span className="inline-flex items-center rounded-full border border-brand-primary/20 bg-brand-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-widest text-brand-primary">
-            Digital Craftsmanship
-          </span>
-
+        <div className="space-y-6">
           <h1 className="max-w-xl font-[ui-sans-serif] text-3xl font-extrabold tracking-tight text-foreground sm:text-5xl lg:text-[3.5rem] lg:leading-[1.08]">
             Custom Software for{" "}
             <span className="text-brand-primary">
@@ -32,6 +26,10 @@ export function HeroSection() {
             </span>
             , Schools, and Churches
           </h1>
+
+          <p className="text-xs font-bold uppercase tracking-widest text-brand-primary">
+            Digital Craftsmanship
+          </p>
 
           <p className="max-w-md font-[ui-sans-serif] text-sm leading-6 text-text-muted sm:max-w-lg sm:text-lg sm:leading-8">
             We build unshakeable digital foundations with reliable technology solutions tailored
