@@ -34,7 +34,6 @@
   --color-text-subtle: var(--text-subtle);
   --color-cta-text: var(--cta-text);
   --color-surface-3: var(--surface-3);
-  --font-sans: var(--font-space-grotesk);
 }
 
 body {

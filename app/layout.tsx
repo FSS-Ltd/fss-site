@@ -1,19 +1,11 @@
 import type { Metadata } from "next";
-import { Space_Grotesk } from "next/font/google";
 
 import { SiteShell } from "@/components/layout/site-shell";
 import { AnalyticsLoader } from "@/components/seo/analytics-loader";
 import { RootSchema } from "@/components/seo/root-schema";
-import { GlowPointerProvider } from "@/components/ui/glow-pointer-provider";
 import { siteConfig } from "@/lib/site-config";
 
 import "./globals.css";
-
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
-  subsets: ["latin"],
-  display: "optional",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -51,9 +43,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en-GB" className={`${spaceGrotesk.variable} h-full`}>
+    <html lang="en-GB" className="h-full">
       <body className="min-h-full bg-background font-sans text-foreground antialiased">
-        <GlowPointerProvider />
         <RootSchema />
         <SiteShell>{children}</SiteShell>
         <AnalyticsLoader />

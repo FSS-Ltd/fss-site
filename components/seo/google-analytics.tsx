@@ -1,20 +1,14 @@
-"use client";
-
 import Script from "next/script";
 
 type GoogleAnalyticsProps = {
-  measurementId?: string;
+  measurementId: string;
   strategy?: "afterInteractive" | "lazyOnload";
 };
 
 export function GoogleAnalytics({
-  measurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID,
+  measurementId,
   strategy = "lazyOnload",
 }: GoogleAnalyticsProps) {
-  if (!measurementId) {
-    return null;
-  }
-
   return (
     <>
       <Script
