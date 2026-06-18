@@ -15,6 +15,8 @@ jobs:
     name: Deploy to Netlify
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      HAS_NETLIFY_SECRETS: ${{ secrets.NETLIFY_AUTH_TOKEN != '' && secrets.NETLIFY_SITE_ID != '' }}
 
     steps:
       - name: Checkout repository
@@ -32,7 +34,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Skip CLI deploy when Netlify secrets are not configured
+        if: env.HAS_NETLIFY_SECRETS != 'true'
+        run: echo "Skipping Netlify CLI deploy because NETLIFY_AUTH_TOKEN or NETLIFY_SITE_ID is not configured."
+
       - name: Deploy production site
+        if: env.HAS_NETLIFY_SECRETS == 'true'
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
