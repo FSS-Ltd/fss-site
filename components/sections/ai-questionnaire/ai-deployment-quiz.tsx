@@ -5,7 +5,6 @@ import { useMemo, useState } from "react";
 
 import { LeadMagnetCaptureForm } from "@/components/forms/lead-magnet-capture-form";
 import { Button } from "@/components/ui/button";
-import { GlowCard } from "@/components/ui/spotlight-card";
 import {
   aiQuestionnaireQuestions,
   calculateAiRecommendation,
@@ -21,9 +20,9 @@ const scoreLabels: Record<AiDeploymentRecommendation, string> = {
 };
 
 const resultAccent: Record<AiDeploymentRecommendation, string> = {
-  local: "text-brand-primary",
-  cloud: "text-foreground",
-  hybrid: "text-text-muted",
+  local: "text-[#0f7a83]",
+  cloud: "text-[#0a1a2e]",
+  hybrid: "text-[#56657a]",
 };
 
 export function AiDeploymentQuiz() {
@@ -50,17 +49,20 @@ export function AiDeploymentQuiz() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
-      <GlowCard customSize className="p-5 sm:p-7">
-        <div className="flex flex-col gap-4 border-b border-border-soft/70 pb-5 sm:flex-row sm:items-center sm:justify-between">
+      <div
+        data-lift-light
+        className="rounded-[22px] border border-[rgba(10,26,46,.08)] bg-white p-5 shadow-[0_40px_90px_-55px_rgba(10,26,46,.45)] sm:p-7"
+      >
+        <div className="flex flex-col gap-4 border-b border-[rgba(10,26,46,.08)] pb-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-brand-primary">
+            <p className="font-mono text-xs uppercase tracking-[0.14em] text-[#0f7a83]">
               Decision questionnaire
             </p>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+            <h2 className="mt-2 text-2xl font-semibold text-[#0a1a2e] sm:text-3xl">
               Local AI or cloud AI?
             </h2>
           </div>
-          <p className="rounded-full border border-border-soft bg-surface-2/70 px-4 py-2 text-sm text-text-muted">
+          <p className="rounded-full border border-[rgba(10,26,46,.1)] bg-[#f7f8f9] px-4 py-2 text-sm text-[#56657a]">
             {answeredCount} of {aiQuestionnaireQuestions.length} answered
           </p>
         </div>
@@ -69,11 +71,11 @@ export function AiDeploymentQuiz() {
           {aiQuestionnaireQuestions.map((question, questionIndex) => (
             <fieldset key={question.id} className="space-y-4">
               <legend className="space-y-2">
-                <span className="text-xs font-semibold uppercase tracking-widest text-text-subtle">
+                <span className="font-mono text-xs uppercase tracking-[0.14em] text-[#7b8798]">
                   {question.eyebrow}{" "}
                   {String(questionIndex + 1).padStart(2, "0")}
                 </span>
-                <span className="block text-lg font-semibold text-foreground">
+                <span className="block text-lg font-semibold text-[#0a1a2e]">
                   {question.question}
                 </span>
               </legend>
@@ -88,10 +90,10 @@ export function AiDeploymentQuiz() {
                       type="button"
                       aria-pressed={selected}
                       className={cn(
-                        "group rounded-xl border p-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                        "group rounded-xl border p-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#14989e]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
                         selected
-                          ? "border-brand-primary bg-brand-primary/12 text-foreground"
-                          : "border-border-soft bg-surface-2/45 text-text-muted hover:border-brand-primary/60 hover:bg-surface-2/70",
+                          ? "border-[#14989e] bg-[rgba(20,152,158,.1)] text-[#0a1a2e]"
+                          : "border-[rgba(10,26,46,.1)] bg-[#f7f8f9] text-[#56657a] hover:border-[rgba(20,152,158,.45)] hover:bg-white",
                       )}
                       onClick={() => selectAnswer(question.id, option.id)}
                     >
@@ -100,18 +102,18 @@ export function AiDeploymentQuiz() {
                           className={cn(
                             "mt-1 flex size-5 shrink-0 items-center justify-center rounded-full border",
                             selected
-                              ? "border-brand-primary bg-brand-primary text-cta-text"
-                              : "border-border-strong text-transparent group-hover:border-brand-primary",
+                              ? "border-[#14989e] bg-[#14989e] text-[#fff]"
+                              : "border-[rgba(10,26,46,.24)] text-transparent group-hover:border-[#14989e]",
                           )}
                           aria-hidden="true"
                         >
                           <CheckCircle2 className="size-3.5" />
                         </span>
                         <span>
-                          <span className="block text-sm font-semibold text-foreground">
+                          <span className="block text-sm font-semibold text-[#0a1a2e]">
                             {option.label}
                           </span>
-                          <span className="mt-1 block text-sm leading-6 text-text-muted">
+                          <span className="mt-1 block text-sm leading-6 text-[#56657a]">
                             {option.description}
                           </span>
                         </span>
@@ -124,7 +126,7 @@ export function AiDeploymentQuiz() {
           ))}
         </div>
 
-        <div className="mt-8 flex flex-col gap-3 border-t border-border-soft/70 pt-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-8 flex flex-col gap-3 border-t border-[rgba(10,26,46,.08)] pt-5 sm:flex-row sm:items-center sm:justify-between">
           <Button
             type="button"
             disabled={!allQuestionsAnswered}
@@ -135,21 +137,21 @@ export function AiDeploymentQuiz() {
           </Button>
           <button
             type="button"
-            className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-text-muted transition hover:text-brand-primary"
+            className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-[#56657a] transition hover:text-[#0f7a83]"
             onClick={resetQuiz}
           >
             <RotateCcw className="size-4" aria-hidden="true" />
             Reset answers
           </button>
         </div>
-      </GlowCard>
+      </div>
 
       <div className="space-y-5 lg:sticky lg:top-24">
-        <GlowCard customSize className="p-5 sm:p-6">
+        <div className="rounded-[22px] border border-[rgba(10,26,46,.08)] bg-white p-5 shadow-[0_40px_90px_-55px_rgba(10,26,46,.45)] sm:p-6">
           {showResult && result ? (
             <div className="space-y-6" aria-live="polite">
               <div className="flex items-start gap-3">
-                <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-brand-primary/12 text-brand-primary">
+                <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-[rgba(20,152,158,.12)] text-[#0f7a83]">
                   <ShieldCheck className="size-5" aria-hidden="true" />
                 </span>
                 <div>
@@ -161,13 +163,13 @@ export function AiDeploymentQuiz() {
                   >
                     {scoreLabels[result.recommendation]} recommendation
                   </p>
-                  <h3 className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
+                  <h3 className="mt-2 text-2xl font-semibold text-[#0a1a2e]">
                     {result.title}
                   </h3>
                 </div>
               </div>
 
-              <p className="text-base leading-7 text-text-muted">
+              <p className="text-base leading-7 text-[#56657a]">
                 {result.summary}
               </p>
 
@@ -175,12 +177,12 @@ export function AiDeploymentQuiz() {
                 {Object.entries(result.score).map(([key, value]) => (
                   <div
                     key={key}
-                    className="rounded-xl border border-border-soft bg-surface-2/55 p-3"
+                    className="rounded-xl border border-[rgba(10,26,46,.08)] bg-[#f7f8f9] p-3"
                   >
-                    <p className="text-xs uppercase tracking-widest text-text-subtle">
+                    <p className="font-mono text-xs uppercase tracking-[0.12em] text-[#7b8798]">
                       {scoreLabels[key as AiDeploymentRecommendation]}
                     </p>
-                    <p className="mt-1 text-xl font-semibold text-foreground">
+                    <p className="mt-1 text-xl font-semibold text-[#0a1a2e]">
                       {value}
                     </p>
                   </div>
@@ -191,10 +193,10 @@ export function AiDeploymentQuiz() {
                 {result.bullets.map((bullet) => (
                   <li
                     key={bullet}
-                    className="flex gap-3 text-sm leading-6 text-text-muted"
+                    className="flex gap-3 text-sm leading-6 text-[#56657a]"
                   >
                     <CheckCircle2
-                      className="mt-0.5 size-4 shrink-0 text-brand-primary"
+                      className="mt-0.5 size-4 shrink-0 text-[#0f7a83]"
                       aria-hidden="true"
                     />
                     {bullet}
@@ -202,60 +204,58 @@ export function AiDeploymentQuiz() {
                 ))}
               </ul>
 
-              <div className="space-y-3 rounded-xl border border-border-soft bg-background/35 p-4">
-                <p className="text-sm font-semibold text-foreground">
-                  Best fit
-                </p>
-                <p className="text-sm leading-6 text-text-muted">
+              <div className="space-y-3 rounded-xl border border-[rgba(10,26,46,.08)] bg-[#f7f8f9] p-4">
+                <p className="text-sm font-semibold text-[#0a1a2e]">Best fit</p>
+                <p className="text-sm leading-6 text-[#56657a]">
                   {result.bestFit}
                 </p>
               </div>
 
-              <div className="space-y-3 rounded-xl border border-brand-primary/25 bg-brand-primary/10 p-4">
-                <p className="text-sm font-semibold text-foreground">
+              <div className="space-y-3 rounded-xl border border-[rgba(20,152,158,.25)] bg-[rgba(20,152,158,.1)] p-4">
+                <p className="text-sm font-semibold text-[#0a1a2e]">
                   Risk note
                 </p>
-                <p className="text-sm leading-6 text-text-muted">
+                <p className="text-sm leading-6 text-[#56657a]">
                   {result.riskNote}
                 </p>
               </div>
 
-              <p className="text-sm leading-6 text-text-muted">
+              <p className="text-sm leading-6 text-[#56657a]">
                 {result.ctaNote}
               </p>
             </div>
           ) : (
             <div className="space-y-5">
-              <span className="flex size-11 items-center justify-center rounded-full bg-brand-primary/12 text-brand-primary">
+              <span className="flex size-11 items-center justify-center rounded-full bg-[rgba(20,152,158,.12)] text-[#0f7a83]">
                 <ShieldCheck className="size-5" aria-hidden="true" />
               </span>
               <div>
-                <p className="text-sm font-semibold uppercase tracking-widest text-brand-primary">
+                <p className="font-mono text-sm font-semibold uppercase tracking-[0.14em] text-[#0f7a83]">
                   Your result
                 </p>
-                <h3 className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
+                <h3 className="mt-2 text-2xl font-semibold text-[#0a1a2e]">
                   Answer the questions to reveal the safest AI route.
                 </h3>
               </div>
-              <p className="text-sm leading-6 text-text-muted">
+              <p className="text-sm leading-6 text-[#56657a]">
                 The recommendation weighs data sensitivity, compliance pressure,
                 control needs, infrastructure capacity, system access, and
                 speed.
               </p>
             </div>
           )}
-        </GlowCard>
+        </div>
 
         {showResult && result ? (
-          <GlowCard customSize className="p-5 sm:p-6">
+          <div className="rounded-[22px] border border-[rgba(10,26,46,.08)] bg-white p-5 shadow-[0_40px_90px_-55px_rgba(10,26,46,.45)] sm:p-6">
             <div className="mb-5 space-y-2">
-              <p className="text-sm font-semibold uppercase tracking-widest text-brand-primary">
+              <p className="font-mono text-sm font-semibold uppercase tracking-[0.14em] text-[#0f7a83]">
                 Private AI Workflow Audit
               </p>
-              <h3 className="text-2xl font-semibold tracking-tight text-foreground">
+              <h3 className="text-2xl font-semibold text-[#0a1a2e]">
                 Turn the recommendation into a workflow map.
               </h3>
-              <p className="text-sm leading-6 text-text-muted">
+              <p className="text-sm leading-6 text-[#56657a]">
                 Share your details and FSS will outline where local, cloud, or
                 hybrid AI can reduce admin without weakening data control.
               </p>
@@ -265,7 +265,7 @@ export function AiDeploymentQuiz() {
               sourceContext="ai-deployment-questionnaire"
               ctaLabel="Request a Private AI Workflow Audit"
             />
-          </GlowCard>
+          </div>
         ) : null}
       </div>
     </div>

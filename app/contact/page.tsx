@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { ContactHero } from "@/components/sections/contact/contact-hero";
+import { RedesignPage } from "@/components/redesign/design-page";
 
 export const metadata: Metadata = {
   title: "Book a Discovery Call | Custom Software Development UK",
@@ -19,5 +19,5 @@ export const metadata: Metadata = {
 };
 
 export default function ContactPage() {
-  return <ContactHero />;
+  return <RedesignPage name="contact" />;
 }

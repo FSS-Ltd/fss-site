@@ -1,99 +1,168 @@
-import Link from "next/link";
+import Image from "next/image";
 
-import { Container } from "@/components/ui/container";
-import { siteConfig } from "@/lib/site-config";
-
-const footerSolutions = [
-  { label: "Business Solutions", href: "/#services" },
-  { label: "Education Systems", href: "/#services" },
-  { label: "Religious Tech", href: "/#services" },
-  { label: "Non-Profit Support", href: "/#services" },
-];
-
-const footerCompany = [
-  { label: "About Us", href: "/#about" },
-  { label: "Case Studies", href: "/#case-studies" },
-  { label: "Blog", href: "/blog" },
-  { label: "Contact Us", href: "/contact" },
-];
+const sitemapLinks = [
+  { label: "Services", href: "/services" },
+  { label: "Work", href: "/#work" },
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
+] as const;
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-border-soft/30 bg-background pt-16 pb-8">
-      <Container>
-        <div className="grid grid-cols-2 gap-10 md:grid-cols-4">
-          <div className="col-span-2 md:col-span-1 space-y-4">
-            <p className="font-semibold text-foreground">{siteConfig.name}</p>
-            <p className="text-sm leading-relaxed text-text-muted max-w-xs">
-              Precision engineering for businesses, schools, and churches. Reliable technology since 2012.
+    <footer
+      style={{
+        background: "#07182e",
+        color: "#9fb1c6",
+        padding: "clamp(56px,7vw,84px) 28px 36px",
+        borderTop: "1px solid rgba(255,255,255,.07)",
+      }}
+    >
+      <div style={{ maxWidth: "1180px", margin: "0 auto" }}>
+        <div
+          data-foot-grid
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1.4fr 1fr 1fr",
+            gap: "40px",
+            paddingBottom: "48px",
+            borderBottom: "1px solid rgba(255,255,255,.08)",
+          }}
+        >
+          <div style={{ maxWidth: "340px" }}>
+            <Image
+              alt="FSS"
+              height={316}
+              src="/redesign/brand/fss-monogram-white.png"
+              style={{
+                height: "34px",
+                width: "auto",
+                display: "block",
+                marginBottom: "20px",
+              }}
+              width={709}
+            />
+            <p style={{ margin: 0, fontSize: "14.5px", lineHeight: 1.6 }}>
+              Engineering clarity out of complexity. Bespoke software, apps and
+              private AI — built faithfully, in the UK.
             </p>
-          </div>
-
-          <div className="space-y-4">
-            <p className="text-xs font-bold uppercase tracking-widest text-foreground">Solutions</p>
-            <ul className="space-y-3">
-              {footerSolutions.map((item) => (
-                <li key={item.label}>
-                  <Link
-                    href={item.href}
-                    className="text-sm text-text-muted transition hover:text-brand-primary"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="space-y-4">
-            <p className="text-xs font-bold uppercase tracking-widest text-foreground">Company</p>
-            <ul className="space-y-3">
-              {footerCompany.map((item) => (
-                <li key={item.label}>
-                  <Link
-                    href={item.href}
-                    className="text-sm text-text-muted transition hover:text-brand-primary"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="col-span-2 md:col-span-1 space-y-4">
-            <p className="text-xs font-bold uppercase tracking-widest text-foreground">Newsletter</p>
-            <p className="text-sm text-text-muted">Stay updated with our latest tech insights.</p>
-            <div className="flex">
-              <input
-                type="email"
-                placeholder="Email address"
-                className="w-full rounded-l border border-border-strong/50 bg-surface-1 px-4 py-2 text-sm text-foreground placeholder:text-text-subtle focus:border-brand-primary focus:outline-none"
+            <a
+              href="mailto:info@faithfulsoftware.dev"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "9px",
+                marginTop: "22px",
+                fontSize: "14.5px",
+                fontWeight: 500,
+                color: "#e9eef5",
+                borderBottom: "1px solid rgba(255,255,255,.2)",
+                paddingBottom: "3px",
+              }}
+            >
+              <span
+                style={{
+                  width: "6px",
+                  height: "6px",
+                  borderRadius: "50%",
+                  background: "#14989e",
+                }}
               />
-              <button
-                type="button"
-                aria-label="Subscribe"
-                className="flex items-center justify-center rounded-r bg-brand-primary px-4 py-2 text-cta-text hover:brightness-110 transition"
+              info@faithfulsoftware.dev
+            </a>
+          </div>
+
+          <div>
+            <p
+              style={{
+                margin: "0 0 18px",
+                fontFamily: "'Geist Mono','JetBrains Mono',monospace",
+                fontSize: "11px",
+                letterSpacing: ".14em",
+                color: "#5d7088",
+              }}
+            >
+              SITEMAP
+            </p>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "13px",
+                fontSize: "14.5px",
+              }}
+            >
+              {sitemapLinks.map((item) => (
+                <a
+                  data-foot
+                  href={item.href}
+                  key={item.href}
+                  style={{ transition: "color .2s" }}
+                >
+                  {item.label}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p
+              style={{
+                margin: "0 0 18px",
+                fontFamily: "'Geist Mono','JetBrains Mono',monospace",
+                fontSize: "11px",
+                letterSpacing: ".14em",
+                color: "#5d7088",
+              }}
+            >
+              CONNECT
+            </p>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "13px",
+                fontSize: "14.5px",
+              }}
+            >
+              <a
+                href="https://www.linkedin.com/company/faithful-software-solutions-ltd"
+                data-foot
+                style={{ transition: "color .2s" }}
               >
-                <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 24 24">
-                  <path d="M5 12h14" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
-                  <path d="m13 6 6 6-6 6" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
-                </svg>
-              </button>
+                LinkedIn ↗
+              </a>
+              <a href="/contact" data-foot style={{ transition: "color .2s" }}>
+                Start a project
+              </a>
             </div>
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-border-soft/30 pt-8 md:flex-row">
-          <p className="text-xs text-text-subtle">
-            © {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
-          </p>
-          <div className="flex gap-6 text-xs font-bold uppercase tracking-widest text-text-subtle">
-            <Link href="/privacy" className="hover:text-foreground transition">Privacy Policy</Link>
-            <Link href="/terms" className="hover:text-foreground transition">Terms of Service</Link>
-          </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "20px",
+            flexWrap: "wrap",
+            paddingTop: "26px",
+          }}
+        >
+          <span style={{ fontSize: "13px", color: "#5d7088" }}>
+            © 2026 Faithful Software Solutions Ltd. All rights reserved.
+          </span>
+          <span
+            style={{
+              fontFamily: "'Geist Mono','JetBrains Mono',monospace",
+              fontSize: "11px",
+              letterSpacing: ".1em",
+              color: "#5d7088",
+            }}
+          >
+            FAITHFUL · SOFTWARE · SOLUTIONS
+          </span>
         </div>
-      </Container>
+      </div>
     </footer>
   );
 }

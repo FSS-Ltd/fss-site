@@ -10,9 +10,6 @@ import type { LucideIcon } from "lucide-react";
 
 import { AiDeploymentQuiz } from "@/components/sections/ai-questionnaire/ai-deployment-quiz";
 import { ButtonLink } from "@/components/ui/button";
-import { GlowCard } from "@/components/ui/spotlight-card";
-import { Section } from "@/components/ui/section";
-import { SectionHeading } from "@/components/ui/section-heading";
 
 type Insight = {
   icon: LucideIcon;
@@ -88,23 +85,29 @@ const processSteps = [
 export function AiQuestionnairePage() {
   return (
     <>
-      <Section className="relative overflow-hidden pb-14 pt-14 sm:pb-20 sm:pt-20 lg:pb-24 lg:pt-28">
-        <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-          <div className="space-y-8">
-            <span className="inline-flex items-center rounded-full border border-brand-primary/25 bg-brand-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-widest text-brand-primary">
-              Private AI decision tool
-            </span>
-            <div className="space-y-6">
-              <h1 className="max-w-4xl text-balance text-4xl font-semibold tracking-tight text-foreground sm:text-6xl lg:leading-tight">
-                Should your business use local AI or cloud AI?
-              </h1>
-              <p className="max-w-2xl text-pretty text-lg leading-8 text-text-muted sm:text-xl sm:leading-9">
-                Answer seven questions and get a practical recommendation for
-                local, cloud, or hybrid AI based on data sensitivity, compliance
-                pressure, speed, budget, and workflow value.
-              </p>
+      <section className="relative overflow-hidden bg-[#f2f3f5] px-7 pb-20 pt-[138px]">
+        <canvas
+          data-hero-canvas
+          className="pointer-events-none absolute inset-0 h-full w-full opacity-70"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(10,26,46,.026)_1px,transparent_1px),linear-gradient(90deg,rgba(10,26,46,.026)_1px,transparent_1px)] bg-[length:64px_64px] [mask-image:radial-gradient(120%_90%_at_42%_12%,#000,transparent_76%)]" />
+        <div className="relative mx-auto grid max-w-[1180px] gap-10 lg:grid-cols-[1.05fr_.95fr] lg:items-center">
+          <div>
+            <div className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-[rgba(10,26,46,.12)] bg-white/60 py-1.5 pr-3.5 pl-2.5">
+              <span className="h-2 w-2 rounded-full bg-[#14989e] shadow-[0_0_0_4px_rgba(20,152,158,.18)]" />
+              <span className="font-mono text-[11px] font-medium tracking-[0.12em] text-[#41506a]">
+                PRIVATE AI DECISION TOOL
+              </span>
             </div>
-            <div className="flex flex-wrap items-center gap-3">
+            <h1 className="max-w-[880px] text-[clamp(40px,6vw,78px)] leading-[.99] font-bold text-[#0a1a2e]">
+              Should your business use local AI or cloud AI?
+            </h1>
+            <p className="mt-7 max-w-[590px] text-[clamp(16px,1.6vw,20px)] leading-[1.6] text-[#46566c]">
+              Answer seven questions and get a practical recommendation for
+              local, cloud, or hybrid AI based on data sensitivity, control,
+              compliance, speed, and workflow value.
+            </p>
+            <div className="mt-9 flex flex-wrap items-center gap-3">
               <ButtonLink href="#questionnaire" size="lg" className="gap-2">
                 Start the questionnaire <ArrowRight className="size-4" />
               </ButtonLink>
@@ -112,11 +115,11 @@ export function AiQuestionnairePage() {
                 Read the guidance
               </ButtonLink>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="mt-8 flex flex-wrap gap-2">
               {sectors.map((sector) => (
                 <span
                   key={sector}
-                  className="rounded-full border border-border-soft bg-surface-2/55 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-text-muted"
+                  className="rounded-md bg-[rgba(20,152,158,.08)] px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.06em] text-[#0f7a83]"
                 >
                   {sector}
                 </span>
@@ -124,19 +127,28 @@ export function AiQuestionnairePage() {
             </div>
           </div>
 
-          <GlowCard customSize className="p-5 sm:p-7">
-            <div className="space-y-8">
-              <div className="flex items-center justify-between gap-5">
+          <div
+            data-spot
+            data-reveal
+            className="fss-card relative overflow-hidden rounded-[20px] border border-[rgba(10,26,46,.1)] bg-white p-8 opacity-0 transition-[opacity,transform,border-color] duration-700 ease-out"
+            style={{ transform: "translateY(26px)" }}
+          >
+            <div
+              data-glow
+              className="pointer-events-none absolute inset-0 rounded-[inherit] opacity-0 transition-opacity duration-300"
+            />
+            <div className="relative">
+              <div className="mb-9 flex items-center justify-between gap-5">
                 <div>
-                  <p className="text-sm font-semibold uppercase tracking-widest text-brand-primary">
-                    AI route
+                  <p className="font-mono text-xs tracking-[0.14em] text-[#0f7a83]">
+                    AI ROUTE
                   </p>
-                  <h2 className="mt-2 text-3xl font-semibold tracking-tight text-foreground">
+                  <h2 className="mt-3 text-[clamp(26px,3vw,36px)] leading-[1.06] font-semibold text-[#0a1a2e]">
                     Control where risk lives.
                   </h2>
                 </div>
-                <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-brand-primary/12 text-brand-primary">
-                  <BrainCircuit className="size-6" aria-hidden="true" />
+                <span className="flex size-14 shrink-0 items-center justify-center rounded-[18px] border border-[rgba(20,152,158,.25)] bg-[rgba(20,152,158,.1)] text-[#0f7a83]">
+                  <BrainCircuit className="size-7" aria-hidden="true" />
                 </span>
               </div>
 
@@ -148,111 +160,167 @@ export function AiQuestionnairePage() {
                 ].map(([label, description]) => (
                   <div
                     key={label}
-                    className="flex items-center justify-between gap-4 rounded-2xl border border-border-soft bg-surface-2/55 p-4"
+                    className="flex items-center justify-between gap-4 rounded-[14px] border border-[rgba(10,26,46,.08)] bg-[#f7f8f9] p-4"
                   >
                     <div>
-                      <p className="font-semibold text-foreground">{label}</p>
-                      <p className="mt-1 text-sm text-text-muted">
+                      <p className="font-semibold text-[#0a1a2e]">{label}</p>
+                      <p className="mt-1 text-sm leading-6 text-[#56657a]">
                         {description}
                       </p>
                     </div>
                     <ShieldCheck
-                      className="size-5 shrink-0 text-brand-primary"
+                      className="size-5 shrink-0 text-[#0f7a83]"
                       aria-hidden="true"
                     />
                   </div>
                 ))}
               </div>
 
-              <p className="text-sm leading-6 text-text-muted">
+              <p className="mt-7 text-sm leading-6 text-[#56657a]">
                 FSS designs private AI agents and internal workflows that cut
                 admin while keeping sensitive information under the right level
                 of control.
               </p>
             </div>
-          </GlowCard>
+          </div>
         </div>
-      </Section>
+      </section>
 
-      <Section className="bg-surface-1/55">
-        <div className="grid gap-5 md:grid-cols-3">
+      <section className="bg-[#f2f3f5] px-7 py-[clamp(70px,8vw,110px)]">
+        <div className="mx-auto grid max-w-[1180px] gap-5 md:grid-cols-3">
           {insights.map((insight) => (
-            <GlowCard key={insight.title} customSize className="p-6">
-              <div className="mb-5 flex size-11 items-center justify-center rounded-xl bg-brand-primary/10 text-brand-primary">
+            <article
+              key={insight.title}
+              data-lift-light
+              data-reveal
+              className="rounded-[18px] border border-[rgba(10,26,46,.08)] bg-white p-7 opacity-0 transition-[opacity,transform,border-color,box-shadow] duration-700 ease-out"
+              style={{ transform: "translateY(26px)" }}
+            >
+              <div className="mb-6 flex size-11 items-center justify-center rounded-[14px] bg-[rgba(20,152,158,.1)] text-[#0f7a83]">
                 <insight.icon className="size-5" aria-hidden="true" />
               </div>
-              <h2 className="text-xl font-semibold tracking-tight text-foreground">
+              <h2 className="text-xl font-semibold text-[#0a1a2e]">
                 {insight.title}
               </h2>
-              <p className="mt-3 text-sm leading-6 text-text-muted">
+              <p className="mt-3 text-sm leading-6 text-[#56657a]">
                 {insight.description}
               </p>
-            </GlowCard>
+            </article>
           ))}
         </div>
-      </Section>
+      </section>
 
-      <Section id="questionnaire">
-        <div className="mb-10 max-w-3xl space-y-5">
-          <p className="text-xs font-semibold uppercase tracking-widest text-brand-primary">
-            Find your AI route
-          </p>
-          <h2 className="text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-5xl">
-            A practical decision before anyone buys the wrong AI tool.
-          </h2>
-          <p className="text-pretty text-base leading-7 text-text-muted sm:text-lg sm:leading-8">
-            The goal is not to force every workflow into one architecture. The
-            goal is to put the right work in the right environment, then
-            automate the admin that drains margin.
-          </p>
+      <section
+        id="questionnaire"
+        className="bg-[#f2f3f5] px-7 py-[clamp(80px,10vw,130px)]"
+      >
+        <div className="mx-auto max-w-[1180px]">
+          <div
+            data-reveal
+            className="mb-10 max-w-[760px] opacity-0 transition-[opacity,transform] duration-700 ease-out"
+            style={{ transform: "translateY(26px)" }}
+          >
+            <p className="font-mono text-xs tracking-[0.14em] text-[#0f7a83]">
+              FIND YOUR AI ROUTE
+            </p>
+            <h2 className="mt-4 text-[clamp(30px,4.4vw,52px)] leading-[1.04] font-semibold text-[#0a1a2e]">
+              A practical decision before anyone buys the wrong AI tool.
+            </h2>
+            <p className="mt-5 text-base leading-7 text-[#56657a] sm:text-lg sm:leading-8">
+              The goal is not to force every workflow into one architecture. The
+              goal is to put the right work in the right environment, then
+              automate the admin that drains margin.
+            </p>
+          </div>
+          <AiDeploymentQuiz />
         </div>
-        <AiDeploymentQuiz />
-      </Section>
+      </section>
 
-      <Section id="answers" className="bg-surface-1/55">
-        <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
-          <SectionHeading
-            eyebrow="Practical answers"
-            title="Clear answers for the questions buyers already ask."
-            description="These are the practical decision points behind local, cloud, and hybrid AI for firms that cannot afford careless data handling."
-          />
+      <section
+        id="answers"
+        className="bg-[#0a1a2e] px-7 py-[clamp(80px,10vw,130px)] text-[#e9eef5]"
+      >
+        <div className="mx-auto grid max-w-[1180px] gap-10 lg:grid-cols-[.9fr_1.1fr] lg:items-start">
+          <div
+            data-reveal
+            className="opacity-0 transition-[opacity,transform] duration-700 ease-out"
+            style={{ transform: "translateY(26px)" }}
+          >
+            <p className="font-mono text-xs tracking-[0.14em] text-[#46c7d8]">
+              PRACTICAL ANSWERS
+            </p>
+            <h2 className="mt-4 text-[clamp(30px,4.4vw,52px)] leading-[1.04] font-semibold">
+              Clear answers for the questions buyers already ask.
+            </h2>
+            <p className="mt-5 text-base leading-7 text-[#9fb1c6]">
+              These are the decision points behind local, cloud, and hybrid AI
+              for firms that cannot afford careless data handling.
+            </p>
+          </div>
 
           <div className="grid gap-4">
             {aiQuestionnaireFaqs.map((faq) => (
-              <GlowCard key={faq.question} customSize className="p-5">
-                <h2 className="text-xl font-semibold tracking-tight text-foreground">
-                  {faq.question}
-                </h2>
-                <p className="mt-3 text-sm leading-6 text-text-muted">
-                  {faq.answer}
-                </p>
-              </GlowCard>
+              <article
+                key={faq.question}
+                data-spot
+                data-reveal
+                className="fss-card relative overflow-hidden rounded-[18px] border border-white/10 bg-white/[.035] p-6 opacity-0 transition-[opacity,transform,border-color] duration-700 ease-out"
+                style={{ transform: "translateY(26px)" }}
+              >
+                <div
+                  data-glow
+                  className="pointer-events-none absolute inset-0 rounded-[inherit] opacity-0 transition-opacity duration-300"
+                />
+                <div className="relative">
+                  <h3 className="text-xl font-semibold text-[#fff]">
+                    {faq.question}
+                  </h3>
+                  <p className="mt-3 text-sm leading-6 text-[#9fb1c6]">
+                    {faq.answer}
+                  </p>
+                </div>
+              </article>
             ))}
           </div>
         </div>
-      </Section>
+      </section>
 
-      <Section>
-        <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-          <SectionHeading
-            eyebrow="Private AI Workflow Audit"
-            title="Turn a recommendation into a working internal workflow."
-            description="FSS maps the data, risk, users, approvals, and profit leaks before building the first local, cloud, or hybrid AI workflow."
-          />
-          <GlowCard customSize className="p-5 sm:p-7">
+      <section className="bg-[#f2f3f5] px-7 py-[clamp(80px,10vw,130px)]">
+        <div className="mx-auto grid max-w-[1180px] gap-10 lg:grid-cols-[1.1fr_.9fr] lg:items-center">
+          <div
+            data-reveal
+            className="opacity-0 transition-[opacity,transform] duration-700 ease-out"
+            style={{ transform: "translateY(26px)" }}
+          >
+            <p className="font-mono text-xs tracking-[0.14em] text-[#0f7a83]">
+              PRIVATE AI WORKFLOW AUDIT
+            </p>
+            <h2 className="mt-4 text-[clamp(30px,4.4vw,52px)] leading-[1.04] font-semibold text-[#0a1a2e]">
+              Turn a recommendation into a working internal workflow.
+            </h2>
+            <p className="mt-5 max-w-[620px] text-base leading-7 text-[#56657a]">
+              FSS maps the data, risk, users, approvals, and profit leaks before
+              building the first local, cloud, or hybrid AI workflow.
+            </p>
+          </div>
+          <div
+            data-reveal
+            className="rounded-[20px] border border-[rgba(10,26,46,.08)] bg-white p-7 opacity-0 transition-[opacity,transform] duration-700 ease-out"
+            style={{ transform: "translateY(26px)" }}
+          >
             <ol className="space-y-4">
               {processSteps.map((step, index) => (
                 <li key={step} className="flex gap-4">
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-primary text-sm font-bold text-cta-text">
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[rgba(20,152,158,.12)] font-mono text-xs text-[#0f7a83] ring-1 ring-[rgba(20,152,158,.35)]">
                     {index + 1}
                   </span>
-                  <p className="pt-1 text-sm leading-6 text-text-muted">
+                  <p className="pt-1 text-sm leading-6 text-[#56657a]">
                     {step}
                   </p>
                 </li>
               ))}
             </ol>
-            <div className="mt-7 flex flex-wrap gap-3 border-t border-border-soft/70 pt-6">
+            <div className="mt-7 flex flex-wrap gap-3 border-t border-[rgba(10,26,46,.08)] pt-6">
               <ButtonLink href="#questionnaire" className="gap-2">
                 Get your recommendation <ArrowRight className="size-4" />
               </ButtonLink>
@@ -260,9 +328,9 @@ export function AiQuestionnairePage() {
                 Talk to FSS
               </ButtonLink>
             </div>
-          </GlowCard>
+          </div>
         </div>
-      </Section>
+      </section>
     </>
   );
 }

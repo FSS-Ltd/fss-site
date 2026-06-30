@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import { FssInteractions } from "@/components/redesign/fss-interactions";
 
 type SiteShellProps = {
   children: ReactNode;
@@ -9,9 +10,13 @@ type SiteShellProps = {
 
 export function SiteShell({ children }: SiteShellProps) {
   return (
-    <div className="relative flex min-h-screen flex-col overflow-x-hidden bg-background text-foreground">
+    <div
+      id="fssroot"
+      className="relative min-h-screen overflow-x-hidden bg-[#f2f3f5] text-[#0a1a2e]"
+    >
+      <FssInteractions />
       <SiteHeader />
-      <main className="flex-1">{children}</main>
+      <main>{children}</main>
       <SiteFooter />
     </div>
   );

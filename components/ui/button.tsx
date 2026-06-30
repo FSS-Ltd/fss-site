@@ -10,10 +10,10 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          "bg-gradient-to-r from-brand-primary to-brand-accent px-5 py-2.5 text-cta-text shadow-[0_12px_30px_-16px_var(--color-brand-primary)] hover:brightness-105",
+          "bg-[#0a1a2e] px-5 py-2.5 text-[#fff] shadow-[0_20px_40px_-24px_rgba(10,26,46,.65)] hover:bg-[#102642]",
         secondary:
-          "border border-border-strong bg-surface-2 px-5 py-2.5 text-foreground hover:border-brand-primary/80 hover:bg-brand-secondary/35",
-        ghost: "px-0 py-0 text-text-muted hover:text-brand-primary",
+          "border border-[rgba(10,26,46,.14)] bg-white px-5 py-2.5 text-[#0a1a2e] hover:border-[rgba(10,26,46,.28)] hover:bg-white",
+        ghost: "px-0 py-0 text-[#0f7a83] hover:text-[#0a1a2e]",
       },
       size: {
         default: "h-10",
@@ -28,10 +28,17 @@ export const buttonVariants = cva(
 );
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+  extends
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {}
 
-export function Button({ className, variant, size, type = "button", ...props }: ButtonProps) {
+export function Button({
+  className,
+  variant,
+  size,
+  type = "button",
+  ...props
+}: ButtonProps) {
   return (
     <button
       className={cn(buttonVariants({ variant, size, className }))}
@@ -44,6 +51,16 @@ export function Button({ className, variant, size, type = "button", ...props }: 
 type ButtonLinkProps = React.ComponentProps<typeof Link> &
   VariantProps<typeof buttonVariants> & { className?: string };
 
-export function ButtonLink({ className, variant, size, ...props }: ButtonLinkProps) {
-  return <Link className={cn(buttonVariants({ variant, size, className }))} {...props} />;
+export function ButtonLink({
+  className,
+  variant,
+  size,
+  ...props
+}: ButtonLinkProps) {
+  return (
+    <Link
+      className={cn(buttonVariants({ variant, size, className }))}
+      {...props}
+    />
+  );
 }
