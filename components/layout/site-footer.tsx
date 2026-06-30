@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 const sitemapLinks = [
   { label: "Services", href: "/services" },
@@ -45,8 +46,8 @@ export function SiteFooter() {
               Engineering clarity out of complexity. Bespoke software, apps and
               private AI — built faithfully, in the UK.
             </p>
-            <a
-              href="mailto:info@faithfulsoftware.dev"
+            <Link
+              href="/contact"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -67,8 +68,8 @@ export function SiteFooter() {
                   background: "#14989e",
                 }}
               />
-              info@faithfulsoftware.dev
-            </a>
+              Start a conversation
+            </Link>
           </div>
 
           <div>

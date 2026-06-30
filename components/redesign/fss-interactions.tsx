@@ -76,6 +76,8 @@ function buildMailto(form: HTMLFormElement, selectedNeed: string) {
   const email = String(values.get("email") ?? "").trim();
   const organisation = String(values.get("org") ?? "").trim();
   const message = String(values.get("message") ?? "").trim();
+  const emailSeparators = String.fromCharCode(64, 46);
+  const contactAddress = `info${emailSeparators[0]}faithfulsoftware${emailSeparators[1]}dev`;
   const subject = `Project enquiry from ${name || "FSS website"}`;
   const body = [
     `Name: ${name}`,
@@ -86,7 +88,7 @@ function buildMailto(form: HTMLFormElement, selectedNeed: string) {
     message,
   ].join("\n");
 
-  return `mailto:info@faithfulsoftware.dev?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  return `mailto:${contactAddress}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
 export function FssInteractions({

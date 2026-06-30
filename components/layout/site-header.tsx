@@ -137,9 +137,7 @@ export function SiteHeader() {
           <Link
             data-cta-head
             data-magnetic
-            href={
-              isContactPage ? "mailto:info@faithfulsoftware.dev" : "/contact"
-            }
+            href={isContactPage ? "#fssroot" : "/contact"}
             style={{
               position: "relative",
               display: "inline-flex",
