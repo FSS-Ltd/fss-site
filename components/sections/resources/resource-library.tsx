@@ -1,98 +1,104 @@
-import Image from "next/image";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 import type { ResourceMeta } from "@/lib/types/resource";
 
-import { ButtonLink } from "@/components/ui/button";
-import { GlowCard } from "@/components/ui/spotlight-card";
-import { Container } from "@/components/ui/container";
+import { ResourceCard } from "@/components/resources/resource-card";
 
 type ResourceLibraryProps = {
   resources: ResourceMeta[];
 };
 
-function ResourceCard({ resource }: { resource: ResourceMeta }) {
-  const href = "/resources/" + resource.slug;
-
-  return (
-    <GlowCard customSize className="group flex flex-col p-0" as="article">
-      <Link href={href} className="block">
-        <div className="relative overflow-hidden rounded-t-2xl h-52">
-          <Image
-            src={resource.coverImage}
-            alt=""
-            fill
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-surface-1 to-transparent" />
-        </div>
-      </Link>
-      <div className="space-y-4 p-7">
-        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-primary">
-          {resource.category} · {resource.format}
-        </p>
-        <h2 className="text-xl font-bold text-foreground">
-          <Link href={href} className="transition hover:text-brand-primary">
-            {resource.title}
-          </Link>
-        </h2>
-        <p className="text-sm leading-relaxed text-text-muted">{resource.shortDescription}</p>
-        <ButtonLink href={href} variant="primary" className="w-full justify-center">
-          {resource.ctaLabel}
-        </ButtonLink>
-      </div>
-    </GlowCard>
-  );
-}
-
 export function ResourceLibrary({ resources }: ResourceLibraryProps) {
   return (
-    <div className="py-14 sm:py-20 lg:py-24">
-      {/* Hero strip */}
-      <div className="relative overflow-hidden border-b border-border-soft/30 bg-surface-1/60 py-20">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(111,212,238,0.08),transparent_50%)]" />
-        <Container className="relative text-center">
-          <span className="inline-flex items-center rounded-full border border-brand-primary/20 bg-brand-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-widest text-brand-primary">
-            Free Strategic Resources
-          </span>
-          <h1 className="mx-auto mt-6 max-w-3xl text-balance text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl">
-            Modernize Your Organization&apos;s Software with Confidence
+    <>
+      <section className="relative overflow-hidden bg-[#f2f3f5] px-7 pb-20 pt-[138px]">
+        <canvas
+          data-hero-canvas
+          className="pointer-events-none absolute inset-0 h-full w-full opacity-70"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(10,26,46,.026)_1px,transparent_1px),linear-gradient(90deg,rgba(10,26,46,.026)_1px,transparent_1px)] bg-[length:64px_64px] [mask-image:radial-gradient(120%_90%_at_42%_12%,#000,transparent_76%)]" />
+        <div className="relative mx-auto max-w-[1080px]">
+          <div className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-[rgba(10,26,46,.12)] bg-white/60 py-1.5 pr-3.5 pl-2.5">
+            <span className="h-2 w-2 rounded-full bg-[#14989e] shadow-[0_0_0_4px_rgba(20,152,158,.18)]" />
+            <span className="font-mono text-[11px] font-medium tracking-[0.12em] text-[#41506a]">
+              FREE STRATEGIC RESOURCES
+            </span>
+          </div>
+          <h1 className="max-w-[850px] text-[clamp(40px,6vw,78px)] leading-[.99] font-bold text-[#0a1a2e]">
+            Practical guides for better software decisions.
           </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-text-muted">
-            Practical guides and playbooks for business leaders, school administrators, and
-            faith-based organizations ready to make their next technology move.
+          <p className="mt-7 max-w-[590px] text-[clamp(16px,1.6vw,20px)] leading-[1.6] text-[#46566c]">
+            Download planning tools and playbooks for leaders deciding what to
+            build, what to automate, and how to modernise without losing
+            control.
           </p>
-        </Container>
-      </div>
+        </div>
+      </section>
 
-      {/* Cards grid */}
-      <Container className="mt-14">
-        {resources.length > 0 ? (
-          <div className="grid gap-6 md:grid-cols-2">
-            {resources.map((resource) => (
-              <ResourceCard key={resource.slug} resource={resource} />
-            ))}
+      <section className="bg-[#f2f3f5] px-7 py-[clamp(80px,10vw,130px)]">
+        <div className="mx-auto max-w-[1180px]">
+          <div
+            data-reveal
+            className="mb-12 max-w-[720px] opacity-0 transition-[opacity,transform] duration-700 ease-out"
+            style={{ transform: "translateY(26px)" }}
+          >
+            <p className="font-mono text-xs tracking-[0.14em] text-[#0f7a83]">
+              RESOURCE LIBRARY
+            </p>
+            <h2 className="mt-4 text-[clamp(28px,4vw,46px)] leading-[1.05] font-semibold text-[#0a1a2e]">
+              Use the right tool before commissioning the wrong system.
+            </h2>
           </div>
-        ) : (
-          <p className="text-center text-text-muted">No resources available yet.</p>
-        )}
 
-        <GlowCard customSize className="mt-16 p-8 text-center">
-          <h2 className="text-xl font-bold text-foreground">Looking for implementation guidance?</h2>
-          <p className="mx-auto mt-3 max-w-xl text-sm text-text-muted">
-            Our blog covers architectural principles, sector-specific technology decisions, and
-            real project insights from our engineering team.
-          </p>
-          <div className="mt-6 flex flex-wrap justify-center gap-4">
-            <ButtonLink href="/blog" variant="secondary">
-              Read the blog
-            </ButtonLink>
-            <Link href="/contact" className="text-sm font-bold text-brand-primary transition hover:text-foreground self-center">
-              Talk to FSS →
-            </Link>
+          {resources.length > 0 ? (
+            <div className="grid gap-6 md:grid-cols-2">
+              {resources.map((resource) => (
+                <ResourceCard key={resource.slug} resource={resource} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-[#56657a]">
+              No resources available yet.
+            </p>
+          )}
+
+          <div
+            data-reveal
+            className="relative mt-16 overflow-hidden rounded-[28px] bg-[linear-gradient(135deg,#07182e_0%,#0d2a45_56%,#14989e_130%)] px-8 py-12 text-[#fff] opacity-0 transition-[opacity,transform] duration-700 ease-out sm:px-12"
+            style={{ transform: "translateY(26px)" }}
+          >
+            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.05)_1px,transparent_1px)] bg-[length:60px_60px] [mask-image:radial-gradient(100%_100%_at_90%_10%,#000,transparent_72%)]" />
+            <div className="relative max-w-[620px]">
+              <p className="font-mono text-xs tracking-[0.14em] text-[#7fe0ec]">
+                NEXT STEP
+              </p>
+              <h2 className="mt-4 text-[clamp(28px,4vw,46px)] leading-[1.05] font-semibold">
+                Need implementation guidance after the download?
+              </h2>
+              <p className="mt-5 text-base leading-7 text-[#bcd2e2]">
+                Our blog covers architecture, sector-specific decisions, and
+                real project lessons from FSS engineering work.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link
+                  href="/blog"
+                  className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-[#0a1a2e] transition hover:bg-[#eef0f2]"
+                >
+                  Read the blog
+                </Link>
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,.2)] bg-[rgba(255,255,255,.08)] px-6 py-3.5 text-sm font-semibold text-[#fff] transition hover:bg-[rgba(255,255,255,.14)]"
+                >
+                  Talk to FSS{" "}
+                  <ArrowRight className="size-4" aria-hidden="true" />
+                </Link>
+              </div>
+            </div>
           </div>
-        </GlowCard>
-      </Container>
-    </div>
+        </div>
+      </section>
+    </>
   );
 }

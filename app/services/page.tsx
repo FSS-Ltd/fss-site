@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 
+import { RedesignPage } from "@/components/redesign/design-page";
 import { ServiceSchema } from "@/components/seo/service-schema";
-import { ServicesPage } from "@/components/sections/services/services-page";
 
 export const metadata: Metadata = {
-  title: "Bespoke Software Development UK | Portals, Dashboards & Workflow Automation",
+  title:
+    "Bespoke Software Development UK | Portals, Dashboards & Workflow Automation",
   description:
     "Custom software development services for UK businesses, charities and schools. We build bespoke ERP systems, client portals, operational dashboards, workflow automation and legacy system migrations.",
   alternates: {
@@ -23,7 +24,7 @@ export default function Page() {
   return (
     <>
       <ServiceSchema />
-      <ServicesPage />
+      <RedesignPage name="services" />
     </>
   );
 }

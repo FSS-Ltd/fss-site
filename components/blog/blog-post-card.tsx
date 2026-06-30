@@ -1,11 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { format } from "date-fns";
+import { ArrowRight } from "lucide-react";
 
 import type { BlogPostMeta } from "@/lib/types/blog";
-
-import { ButtonLink } from "@/components/ui/button";
-import { GlowCard } from "@/components/ui/spotlight-card";
 
 type BlogPostCardProps = {
   post: BlogPostMeta;
@@ -13,42 +11,53 @@ type BlogPostCardProps = {
 
 export function BlogPostCard({ post }: BlogPostCardProps) {
   return (
-    <GlowCard customSize className="flex flex-col p-0" as="article">
+    <article
+      data-lift-light
+      className="group overflow-hidden rounded-[18px] border border-[rgba(10,26,46,.08)] bg-white transition-[border-color,box-shadow,transform] duration-300"
+    >
       <Link className="block" href={`/blog/${post.slug}`}>
-        <div className="overflow-hidden rounded-t-2xl">
+        <div className="relative h-52 overflow-hidden bg-[#eef0f2]">
           <Image
             src={post.coverImage}
             alt=""
-            width={900}
-            height={540}
-            className="h-48 w-full object-cover"
+            fill
+            sizes="(min-width: 768px) 50vw, 100vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
+          <div className="absolute inset-0 bg-gradient-to-t from-white/45 to-transparent" />
         </div>
       </Link>
-      <div className="p-6">
-        <p className="text-xs uppercase tracking-[0.15em] text-text-subtle">
-          {format(new Date(post.publishDate), "MMM d, yyyy")} • {post.readingMinutes} min read
+      <div className="p-6 sm:p-7">
+        <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#0f7a83]">
+          {format(new Date(post.publishDate), "MMM d, yyyy")} /{" "}
+          {post.readingMinutes} min read
         </p>
-        <h2 className="mt-3 text-xl font-semibold text-foreground">
-          <Link className="transition hover:text-brand-primary" href={`/blog/${post.slug}`}>
+        <h2 className="mt-4 text-[22px] font-semibold leading-tight text-[#0a1a2e]">
+          <Link
+            className="transition hover:text-[#0f7a83]"
+            href={`/blog/${post.slug}`}
+          >
             {post.title}
           </Link>
         </h2>
-        <p className="mt-3 text-sm text-text-muted">{post.excerpt}</p>
+        <p className="mt-3 text-sm leading-6 text-[#56657a]">{post.excerpt}</p>
         <div className="mt-4 flex flex-wrap gap-2">
           {post.tags.slice(0, 3).map((tag) => (
             <span
               key={tag}
-              className="rounded-full border border-border-soft/40 bg-surface-2/60 px-2.5 py-1 text-xs text-text-muted"
+              className="rounded-md bg-[rgba(20,152,158,.08)] px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.06em] text-[#0f7a83]"
             >
               {tag}
             </span>
           ))}
         </div>
-        <ButtonLink href={`/blog/${post.slug}`} variant="ghost" className="mt-5">
-          Read article
-        </ButtonLink>
+        <Link
+          href={`/blog/${post.slug}`}
+          className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[#0f7a83] transition hover:text-[#0a1a2e]"
+        >
+          Read article <ArrowRight className="size-4" aria-hidden="true" />
+        </Link>
       </div>
-    </GlowCard>
+    </article>
   );
 }

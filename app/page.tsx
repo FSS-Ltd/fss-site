@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { HomePage } from "@/components/sections/home/home-page";
+import { RedesignPage } from "@/components/redesign/design-page";
 
 export const metadata: Metadata = {
   title: "Custom Software Development Company UK for Complex Operations",
@@ -10,7 +10,8 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "Custom Software Development Company UK | Faithful Software Solutions",
+    title:
+      "Custom Software Development Company UK | Faithful Software Solutions",
     description:
       "Bespoke software built for real operational problems. Custom ERP, portals, dashboards and workflow automation for UK charities, schools, churches and businesses.",
     url: "/",
@@ -19,5 +20,5 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <HomePage />;
+  return <RedesignPage name="home" />;
 }
