@@ -5,6 +5,7 @@ const sitemapLinks = [
   { label: "Services", href: "/services" },
   { label: "Work", href: "/#work" },
   { label: "About", href: "/about" },
+  { label: "Resources", href: "/resources" },
   { label: "Blog", href: "/blog" },
   { label: "Contact", href: "/contact" },
 ] as const;
