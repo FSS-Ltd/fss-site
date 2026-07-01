@@ -18,12 +18,26 @@ export function SiteInteractions() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const frame = window.requestAnimationFrame(() => {
+    let idleHandle: number | undefined;
+    let timeoutHandle: ReturnType<typeof globalThis.setTimeout> | undefined;
+
+    const mount = () => {
       setMounted(true);
-    });
+    };
+
+    if ("requestIdleCallback" in window) {
+      idleHandle = window.requestIdleCallback(mount, { timeout: 1400 });
+    } else {
+      timeoutHandle = globalThis.setTimeout(mount, 900);
+    }
 
     return () => {
-      window.cancelAnimationFrame(frame);
+      if (idleHandle !== undefined) {
+        window.cancelIdleCallback(idleHandle);
+      }
+      if (timeoutHandle !== undefined) {
+        globalThis.clearTimeout(timeoutHandle);
+      }
     };
   }, []);
 
