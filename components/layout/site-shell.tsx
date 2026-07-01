@@ -12,7 +12,7 @@ export function SiteShell({ children }: SiteShellProps) {
   return (
     <div
       id="fssroot"
-      className="relative min-h-screen overflow-x-hidden bg-[#f2f3f5] text-[#0a1a2e]"
+      className="relative min-h-screen bg-[#f2f3f5] text-[#0a1a2e]"
     >
       <FssInteractions />
       <SiteHeader />
