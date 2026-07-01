@@ -30,13 +30,19 @@ export function ResourceLibrary({ resources }: ResourceLibraryProps) {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-[radial-gradient(110%_70%_at_82%_-10%,rgba(70,199,216,.10),transparent_52%),#f2f3f5] px-7 pb-16 pt-[138px]">
+      <section
+        className="relative overflow-hidden px-7 pb-16 pt-[138px]"
+        style={{
+          background:
+            "radial-gradient(110% 70% at 82% -10%, rgba(70,199,216,.10), transparent 52%), #f2f3f5",
+        }}
+      >
         <canvas
           data-hero-canvas
           className="pointer-events-none absolute inset-0 h-full w-full opacity-70"
         />
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(10,26,46,.026)_1px,transparent_1px),linear-gradient(90deg,rgba(10,26,46,.026)_1px,transparent_1px)] bg-[length:64px_64px] [mask-image:radial-gradient(120%_90%_at_42%_12%,#000,transparent_76%)]" />
-        <div className="relative mx-auto grid max-w-[1180px] gap-12 lg:grid-cols-[1.02fr_.8fr] lg:items-end">
+        <div className="relative mx-auto grid max-w-[1180px] gap-12 lg:grid-cols-2 lg:items-end">
           <div>
             <div className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-[rgba(10,26,46,.12)] bg-white/60 py-1.5 pr-3.5 pl-2.5">
               <span className="h-2 w-2 rounded-full bg-[#14989e] shadow-[0_0_0_4px_rgba(20,152,158,.18)]" />
@@ -76,17 +82,31 @@ export function ResourceLibrary({ resources }: ResourceLibraryProps) {
 
           <aside
             data-reveal
-            className="relative overflow-hidden rounded-[22px] border border-[rgba(10,26,46,.09)] bg-white p-6 opacity-0 shadow-[0_40px_90px_-56px_rgba(10,26,46,.45)] transition-[opacity,transform] duration-700 ease-out sm:p-7"
-            style={{ transform: "translateY(26px)" }}
+            className="relative overflow-hidden rounded-2xl border border-[rgba(10,26,46,.09)] bg-white p-6 opacity-0 transition-[opacity,transform] duration-700 ease-out sm:p-7"
+            style={{
+              boxShadow: "0 40px 90px -56px rgba(10,26,46,.45)",
+              transform: "translateY(26px)",
+            }}
             aria-label="Resource library summary"
           >
-            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(20,152,158,.055)_1px,transparent_1px),linear-gradient(90deg,rgba(20,152,158,.055)_1px,transparent_1px)] bg-[length:34px_34px] [mask-image:radial-gradient(80%_80%_at_100%_0,#000,transparent_72%)]" />
+            <div
+              className="pointer-events-none absolute inset-0"
+              style={{
+                backgroundImage:
+                  "linear-gradient(rgba(20,152,158,.055) 1px, transparent 1px), linear-gradient(90deg, rgba(20,152,158,.055) 1px, transparent 1px)",
+                backgroundSize: "34px 34px",
+                maskImage:
+                  "radial-gradient(80% 80% at 100% 0, #000, transparent 72%)",
+                WebkitMaskImage:
+                  "radial-gradient(80% 80% at 100% 0, #000, transparent 72%)",
+              }}
+            />
             <div className="relative">
               <p className="font-mono text-[11px] tracking-[0.14em] text-[#0f7a83]">
                 LIBRARY SNAPSHOT
               </p>
               <div className="mt-6 grid gap-3">
-                <div className="flex items-start gap-3 rounded-[16px] bg-[#f7f8f9] p-4">
+                <div className="flex items-start gap-3 rounded-2xl bg-[#f7f8f9] p-4">
                   <FileText className="mt-0.5 size-5 flex-none text-[#0f7a83]" />
                   <div>
                     <p className="text-sm font-semibold text-[#0a1a2e]">
@@ -97,7 +117,7 @@ export function ResourceLibrary({ resources }: ResourceLibraryProps) {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-start gap-3 rounded-[16px] bg-[#f7f8f9] p-4">
+                <div className="flex items-start gap-3 rounded-2xl bg-[#f7f8f9] p-4">
                   <FolderOpen className="mt-0.5 size-5 flex-none text-[#0f7a83]" />
                   <div>
                     <p className="text-sm font-semibold text-[#0a1a2e]">
@@ -108,7 +128,7 @@ export function ResourceLibrary({ resources }: ResourceLibraryProps) {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-start gap-3 rounded-[16px] bg-[#0a1a2e] p-4 text-white">
+                <div className="flex items-start gap-3 rounded-2xl bg-[#0a1a2e] p-4 text-white">
                   <Download className="mt-0.5 size-5 flex-none text-[#46c7d8]" />
                   <div>
                     <p className="text-sm font-semibold">
@@ -136,7 +156,7 @@ export function ResourceLibrary({ resources }: ResourceLibraryProps) {
         <div className="mx-auto max-w-[1180px]">
           <div
             data-reveal
-            className="mb-12 grid gap-6 opacity-0 transition-[opacity,transform] duration-700 ease-out lg:grid-cols-[.85fr_1.15fr] lg:items-end"
+            className="mb-12 grid gap-6 opacity-0 transition-[opacity,transform] duration-700 ease-out lg:grid-cols-2 lg:items-end"
             style={{ transform: "translateY(26px)" }}
           >
             <div>
@@ -147,7 +167,7 @@ export function ResourceLibrary({ resources }: ResourceLibraryProps) {
                 Use the right tool before commissioning the wrong system.
               </h2>
             </div>
-            <p className="max-w-[470px] text-sm leading-7 text-[#56657a] lg:ml-auto">
+            <p className="max-w-md text-sm leading-7 text-[#56657a] lg:ml-auto">
               Each resource is built to help you make a clearer decision before
               scope, budget, or delivery pressure starts driving the project.
             </p>
@@ -167,8 +187,12 @@ export function ResourceLibrary({ resources }: ResourceLibraryProps) {
 
           <div
             data-reveal
-            className="relative mt-16 overflow-hidden rounded-[24px] bg-[linear-gradient(135deg,#07182e_0%,#0d2a45_56%,#14989e_130%)] px-8 py-12 text-[#fff] opacity-0 transition-[opacity,transform] duration-700 ease-out sm:px-12"
-            style={{ transform: "translateY(26px)" }}
+            className="relative mt-16 overflow-hidden rounded-3xl px-8 py-12 text-[#fff] opacity-0 transition-[opacity,transform] duration-700 ease-out sm:px-12"
+            style={{
+              background:
+                "linear-gradient(135deg, #07182e 0%, #0d2a45 56%, #14989e 130%)",
+              transform: "translateY(26px)",
+            }}
           >
             <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.05)_1px,transparent_1px)] bg-[length:60px_60px] [mask-image:radial-gradient(100%_100%_at_90%_10%,#000,transparent_72%)]" />
             <div className="relative max-w-[620px]">
