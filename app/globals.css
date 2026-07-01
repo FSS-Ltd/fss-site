@@ -212,11 +212,19 @@ html {
     display: none !important;
   }
 
-  #fssroot h1 span span,
+  [data-hero-grid] {
+    grid-template-columns: 1fr !important;
+    min-height: 62vh;
+  }
+
+  #fssroot main > .contents > section:first-child *,
+  #fssroot h1,
+  #fssroot h1 *,
   [data-entrance] {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
     clip-path: none !important;
+    transition: none !important;
   }
 }
