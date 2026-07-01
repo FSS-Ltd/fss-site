@@ -96,7 +96,6 @@ export function GlowCard({
         className,
       )}
     >
-      <div aria-hidden="true" data-glow-overlay />
       {children}
     </Tag>
   );

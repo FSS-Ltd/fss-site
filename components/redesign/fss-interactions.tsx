@@ -403,7 +403,7 @@ export function FssInteractions({
 
     const initCanvas = () => {
       const canvas = query<HTMLCanvasElement>(scope, "[data-hero-canvas]");
-      if (!canvas || noMotion) return;
+      if (!canvas || noMotion || window.innerWidth < 940) return;
 
       const context = canvas.getContext("2d");
       if (!context) return;
@@ -557,6 +557,13 @@ export function FssInteractions({
       if (menuButton) menuButton.style.display = narrow ? "flex" : "none";
       if (headerCta) headerCta.style.display = narrow ? "none" : "inline-flex";
       if (wordmark) wordmark.style.display = width > 1080 ? "flex" : "none";
+
+      queryAll<HTMLElement>(
+        scope,
+        "[data-hero-canvas], [data-hero-traces]",
+      ).forEach((element) => {
+        element.setAttribute("aria-hidden", "true");
+      });
 
       const heroGrid = query<HTMLElement>(scope, "[data-hero-grid]");
       if (heroGrid)
