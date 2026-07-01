@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 type FssInteractionsProps = {
   motion?: "full" | "calm" | "off";
@@ -95,6 +96,8 @@ export function FssInteractions({
   motion = "full",
   nodeDensity = 120,
 }: FssInteractionsProps) {
+  const pathname = usePathname();
+
   useEffect(() => {
     const scope = document.getElementById("fssroot") ?? document;
     const cleanups: Array<() => void> = [];
@@ -865,8 +868,12 @@ export function FssInteractions({
         done = true;
       };
 
-      window.setTimeout(check, 260);
-      window.setTimeout(check, 850);
+      const firstTimeout = window.setTimeout(check, 260);
+      const secondTimeout = window.setTimeout(check, 850);
+      cleanups.push(() => {
+        window.clearTimeout(firstTimeout);
+        window.clearTimeout(secondTimeout);
+      });
     };
 
     applyResponsive();
@@ -888,7 +895,7 @@ export function FssInteractions({
       intersectionObserver?.disconnect();
       cleanups.forEach((cleanup) => cleanup());
     };
-  }, [motion, nodeDensity]);
+  }, [motion, nodeDensity, pathname]);
 
   return null;
 }
