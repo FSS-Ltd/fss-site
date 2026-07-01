@@ -46,6 +46,7 @@ export function SiteHeader() {
       >
         <Link
           href="/"
+          prefetch={false}
           style={{
             display: "flex",
             alignItems: "center",
@@ -99,6 +100,7 @@ export function SiteHeader() {
                 data-navlink={active ? undefined : ""}
                 href={item.href}
                 key={item.href}
+                prefetch={false}
                 style={{
                   padding: "9px 14px",
                   fontSize: "14px",
@@ -139,6 +141,7 @@ export function SiteHeader() {
             data-cta-head
             data-magnetic
             href={isContactPage ? "#fssroot" : "/contact"}
+            prefetch={false}
             style={{
               position: "relative",
               display: "inline-flex",
@@ -236,6 +239,7 @@ export function SiteHeader() {
             <Link
               href={item.href}
               key={item.href}
+              prefetch={false}
               style={{
                 padding: "13px 4px",
                 fontSize: "18px",

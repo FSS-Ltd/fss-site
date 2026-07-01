@@ -3,6 +3,11 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 
+import {
+  getShowcaseLayoutState,
+  getShowcaseScrollState,
+} from "@/components/redesign/showcase-progress";
+
 type FssInteractionsProps = {
   motion?: "full" | "calm" | "off";
   nodeDensity?: number;
@@ -623,25 +628,26 @@ export function FssInteractions({
         grid.style.gridTemplateColumns = width < 620 ? "1fr" : "1fr 1fr";
       });
 
+      const showcase = query<HTMLElement>(scope, "[data-showcase]");
       const stage = query<HTMLElement>(scope, "[data-sc-stage]");
       const stageGrid = stage?.parentElement;
       const sticky = query<HTMLElement>(scope, "[data-sc-sticky]");
       const spacer = query<HTMLElement>(scope, "[data-sc-spacer]");
       const mobileVisual = query<HTMLElement>(scope, "[data-sc-mobile-visual]");
-      const mobileShowcase = width < 940;
+      const showcaseLayout = getShowcaseLayoutState(width);
 
+      if (showcase) showcase.style.minHeight = showcaseLayout.sectionMinHeight;
       if (stageGrid)
-        stageGrid.style.gridTemplateColumns = mobileShowcase
-          ? "1fr"
-          : "1fr 1fr";
-      if (stage) stage.style.display = mobileShowcase ? "none" : "block";
+        stageGrid.style.gridTemplateColumns =
+          showcaseLayout.stageGridTemplateColumns;
+      if (stage) stage.style.display = showcaseLayout.stageDisplay;
       if (sticky) {
-        sticky.style.position = mobileShowcase ? "static" : "sticky";
-        sticky.style.height = mobileShowcase ? "auto" : "100svh";
+        sticky.style.position = showcaseLayout.stickyPosition;
+        sticky.style.height = showcaseLayout.stickyHeight;
       }
-      if (spacer) spacer.style.height = mobileShowcase ? "0" : "90vh";
+      if (spacer) spacer.style.height = showcaseLayout.spacerHeight;
       if (mobileVisual)
-        mobileVisual.style.display = mobileShowcase ? "block" : "none";
+        mobileVisual.style.display = showcaseLayout.mobileVisualDisplay;
     };
 
     const updateShowcase = () => {
@@ -655,29 +661,27 @@ export function FssInteractions({
       const progress = Math.min(1, Math.max(0, -rect.top / total));
       const browser = query<HTMLElement>(scope, "[data-sc-browser]");
       const phone = query<HTMLElement>(scope, "[data-sc-phone]");
+      const features = queryAll<HTMLElement>(scope, "[data-feat]");
+      const showcaseState = getShowcaseScrollState(progress, features.length);
 
       if (browser && !noMotion) {
         browser.style.transform = `translateY(${(1 - progress) * 36}px) scale(${1.05 - progress * 0.05})`;
       }
 
       if (phone) {
-        const phoneProgress = Math.min(1, Math.max(0, (progress - 0.18) / 0.5));
+        const phoneProgress = showcaseState.phoneProgress;
         phone.style.opacity = String(phoneProgress);
         if (!noMotion)
           phone.style.transform = `translateY(${(1 - phoneProgress) * 90}px)`;
       }
 
-      const features = queryAll<HTMLElement>(scope, "[data-feat]");
       if (features.length) {
-        const activeIndex = Math.min(
-          features.length - 1,
-          Math.floor(progress * features.length),
-        );
         features.forEach((feature, index) => {
-          feature.style.opacity = index === activeIndex ? "1" : "0.4";
+          const active = index === showcaseState.activeFeatureIndex;
+          feature.style.opacity = active ? "1" : "0.4";
           const number = feature.children[0];
           if (number instanceof HTMLElement)
-            number.style.color = index === activeIndex ? "#0f7a83" : "#9fb1c6";
+            number.style.color = active ? "#0f7a83" : "#9fb1c6";
         });
       }
     };
@@ -852,6 +856,7 @@ export function FssInteractions({
     const guardTimeline = () => {
       let done = false;
       const probe =
+        query<HTMLElement>(scope, "#fssroot h1 span span") ??
         query<HTMLElement>(scope, "[data-entrance]") ??
         query<HTMLElement>(scope, "[data-reveal]");
       const check = () => {

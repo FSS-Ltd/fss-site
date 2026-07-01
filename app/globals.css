@@ -228,3 +228,20 @@ html {
     transition: none !important;
   }
 }
+
+@media (max-width: 879px) {
+  [data-nav],
+  [data-cta-head] {
+    display: none !important;
+  }
+
+  [data-menu-btn] {
+    display: flex !important;
+  }
+}
+
+@media (min-width: 1081px) {
+  [data-wordmark] {
+    display: flex !important;
+  }
+}

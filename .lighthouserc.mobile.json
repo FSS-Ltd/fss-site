@@ -2,7 +2,7 @@
   "ci": {
     "collect": {
       "numberOfRuns": 3,
-      "startServerCommand": "pnpm exec next start -p 4010",
+      "startServerCommand": "npx next start -p 4010",
       "startServerReadyPattern": "Ready",
       "url": [
         "http://127.0.0.1:4010/"

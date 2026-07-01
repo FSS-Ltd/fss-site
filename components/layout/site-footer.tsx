@@ -49,6 +49,7 @@ export function SiteFooter() {
             </p>
             <Link
               href="/contact"
+              prefetch={false}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
