@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 type FssInteractionsProps = {
   motion?: "full" | "calm" | "off";
@@ -95,6 +96,8 @@ export function FssInteractions({
   motion = "full",
   nodeDensity = 120,
 }: FssInteractionsProps) {
+  const pathname = usePathname();
+
   useEffect(() => {
     const scope = document.getElementById("fssroot") ?? document;
     const cleanups: Array<() => void> = [];
@@ -400,7 +403,7 @@ export function FssInteractions({
 
     const initCanvas = () => {
       const canvas = query<HTMLCanvasElement>(scope, "[data-hero-canvas]");
-      if (!canvas || noMotion) return;
+      if (!canvas || noMotion || window.innerWidth < 940) return;
 
       const context = canvas.getContext("2d");
       if (!context) return;
@@ -554,6 +557,13 @@ export function FssInteractions({
       if (menuButton) menuButton.style.display = narrow ? "flex" : "none";
       if (headerCta) headerCta.style.display = narrow ? "none" : "inline-flex";
       if (wordmark) wordmark.style.display = width > 1080 ? "flex" : "none";
+
+      queryAll<HTMLElement>(
+        scope,
+        "[data-hero-canvas], [data-hero-traces]",
+      ).forEach((element) => {
+        element.setAttribute("aria-hidden", "true");
+      });
 
       const heroGrid = query<HTMLElement>(scope, "[data-hero-grid]");
       if (heroGrid)
@@ -865,8 +875,12 @@ export function FssInteractions({
         done = true;
       };
 
-      window.setTimeout(check, 260);
-      window.setTimeout(check, 850);
+      const firstTimeout = window.setTimeout(check, 260);
+      const secondTimeout = window.setTimeout(check, 850);
+      cleanups.push(() => {
+        window.clearTimeout(firstTimeout);
+        window.clearTimeout(secondTimeout);
+      });
     };
 
     applyResponsive();
@@ -888,7 +902,7 @@ export function FssInteractions({
       intersectionObserver?.disconnect();
       cleanups.forEach((cleanup) => cleanup());
     };
-  }, [motion, nodeDensity]);
+  }, [motion, nodeDensity, pathname]);
 
   return null;
 }
