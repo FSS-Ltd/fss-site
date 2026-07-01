@@ -80,7 +80,7 @@ export function SiteFooter() {
                 fontFamily: "'Geist Mono','JetBrains Mono',monospace",
                 fontSize: "11px",
                 letterSpacing: ".14em",
-                color: "#5d7088",
+                color: "#8aa0b8",
               }}
             >
               SITEMAP
@@ -113,7 +113,7 @@ export function SiteFooter() {
                 fontFamily: "'Geist Mono','JetBrains Mono',monospace",
                 fontSize: "11px",
                 letterSpacing: ".14em",
-                color: "#5d7088",
+                color: "#8aa0b8",
               }}
             >
               CONNECT
@@ -150,7 +150,7 @@ export function SiteFooter() {
             paddingTop: "26px",
           }}
         >
-          <span style={{ fontSize: "13px", color: "#5d7088" }}>
+          <span style={{ fontSize: "13px", color: "#8aa0b8" }}>
             © 2026 Faithful Software Solutions Ltd. All rights reserved.
           </span>
           <span
@@ -158,7 +158,7 @@ export function SiteFooter() {
               fontFamily: "'Geist Mono','JetBrains Mono',monospace",
               fontSize: "11px",
               letterSpacing: ".1em",
-              color: "#5d7088",
+              color: "#8aa0b8",
             }}
           >
             FAITHFUL · SOFTWARE · SOLUTIONS
