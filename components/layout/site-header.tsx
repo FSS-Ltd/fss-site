@@ -15,7 +15,7 @@ const navItems = [
 
 export function SiteHeader() {
   const pathname = usePathname();
-  const isContactPage = pathname === "/contact";
+  const isStartPage = pathname === "/start";
 
   return (
     <header
@@ -141,7 +141,7 @@ export function SiteHeader() {
           <Link
             data-cta-head
             data-magnetic
-            href={isContactPage ? "#fssroot" : "/contact"}
+            href={isStartPage ? "#fssroot" : "/start"}
             prefetch={false}
             style={{
               position: "relative",
@@ -167,7 +167,7 @@ export function SiteHeader() {
                 transition: "transform .35s cubic-bezier(.2,.7,.2,1)",
               }}
             >
-              {isContactPage ? "Email us" : "Start a project"}
+              Start a project
               <span
                 style={{
                   width: "6px",
