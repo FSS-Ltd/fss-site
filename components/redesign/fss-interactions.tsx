@@ -936,25 +936,21 @@ export function FssInteractions({
 
     applyResponsive();
     bind(window, "resize", applyResponsive, cleanups);
-
-    // Everything below is independent of the synchronous layout pass above.
-    // Spread it across scheduled tasks instead of running it as one block so
-    // no single task blocks the main thread for long under CPU throttling.
-    runInStages(
-      [
-        initReveals,
-        initCounters,
-        initMenu,
-        initHovers,
-        initMagnetic,
-        initSpotlight,
-        initCanvas,
-        initScroll,
-        initContact,
-        guardTimeline,
-      ],
-      cleanups,
-    );
+    // initReveals/guardTimeline gate [data-reveal] content's opacity, so they
+    // (and the rest of this cheap setup, all sub-millisecond per profiling)
+    // stay synchronous — only initScroll's internal layout reads were ever
+    // costly enough to need spreading across scheduled tasks (see inside
+    // initScroll above).
+    initReveals();
+    initCounters();
+    initMenu();
+    initHovers();
+    initMagnetic();
+    initSpotlight();
+    initCanvas();
+    initScroll();
+    initContact();
+    guardTimeline();
 
     return () => {
       window.cancelAnimationFrame(canvasFrame);
