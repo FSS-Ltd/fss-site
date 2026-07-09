@@ -37,3 +37,13 @@ export function getLeadServerEnv() {
     hubspotResourceSlugProperty: readOptionalEnv("HUBSPOT_RESOURCE_SLUG_PROPERTY"),
   };
 }
+
+export function getIntakeServerEnv() {
+  return {
+    resendApiKey: readRequiredEnv("RESEND_API_KEY"),
+    resendFromEmail: readRequiredEnv("RESEND_FROM_EMAIL"),
+    resendReplyToEmail: readRequiredEnv("RESEND_REPLY_TO_EMAIL"),
+    leadNotificationEmail: readRequiredEnv("LEAD_NOTIFICATION_EMAIL"),
+    siteUrl: resolveSiteUrl(),
+  };
+}

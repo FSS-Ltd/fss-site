@@ -1,8 +1,3 @@
-export type NavItem = {
-  label: string;
-  href: string;
-};
-
 export type FeatureItem = {
   title: string;
   description: string;
