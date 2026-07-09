@@ -936,21 +936,31 @@ export function FssInteractions({
 
     applyResponsive();
     bind(window, "resize", applyResponsive, cleanups);
+
     // initReveals/guardTimeline gate [data-reveal] content's opacity, so they
-    // (and the rest of this cheap setup, all sub-millisecond per profiling)
-    // stay synchronous — only initScroll's internal layout reads were ever
-    // costly enough to need spreading across scheduled tasks (see inside
-    // initScroll above).
+    // run synchronously — deferring them behind requestIdleCallback pushes
+    // back when below-the-fold content becomes visible. Everything else here
+    // (hover/magnetic/spotlight wiring, the canvas particle loop, counters,
+    // menu, contact form, scroll listeners) doesn't gate visibility, and
+    // running all of it synchronously under CPU throttling is what shows up
+    // in CI as a single long main-thread task, so it stays spread across
+    // scheduled tasks.
     initReveals();
-    initCounters();
-    initMenu();
-    initHovers();
-    initMagnetic();
-    initSpotlight();
-    initCanvas();
-    initScroll();
-    initContact();
     guardTimeline();
+
+    runInStages(
+      [
+        initCounters,
+        initMenu,
+        initHovers,
+        initMagnetic,
+        initSpotlight,
+        initCanvas,
+        initScroll,
+        initContact,
+      ],
+      cleanups,
+    );
 
     return () => {
       window.cancelAnimationFrame(canvasFrame);
