@@ -59,6 +59,7 @@ export function SiteHeader() {
             alt="FSS"
             height={316}
             priority
+            sizes="60px"
             src="/redesign/brand/fss-monogram-navy.png"
             style={{ height: "26px", width: "auto", display: "block" }}
             width={709}
