@@ -42,6 +42,38 @@ function bind(
   cleanups.push(() => target.removeEventListener(type, listener, options));
 }
 
+function scheduleStep(callback: () => void): () => void {
+  if ("requestIdleCallback" in window) {
+    const handle = window.requestIdleCallback(callback, { timeout: 50 });
+    return () => window.cancelIdleCallback(handle);
+  }
+  const handle = globalThis.setTimeout(callback, 0);
+  return () => globalThis.clearTimeout(handle);
+}
+
+// Runs `steps` one per scheduled task instead of as a single synchronous
+// block, so initial setup never shows up as one long main-thread task.
+function runInStages(steps: Array<() => void>, cleanups: Array<() => void>) {
+  let cancelled = false;
+  let cancelPending: (() => void) | null = null;
+
+  const runNext = (index: number) => {
+    if (cancelled || index >= steps.length) return;
+    cancelPending = scheduleStep(() => {
+      cancelPending = null;
+      steps[index]();
+      runNext(index + 1);
+    });
+  };
+
+  runNext(0);
+
+  cleanups.push(() => {
+    cancelled = true;
+    cancelPending?.();
+  });
+}
+
 function setRevealed(element: HTMLElement) {
   element.style.opacity = "1";
   element.style.transform = "none";
@@ -733,35 +765,40 @@ export function FssInteractions({
         }
       }
 
-      const handle = () => {
+      const updateHeader = () => {
+        if (!header) return;
         const scrollY = window.scrollY || window.pageYOffset;
-        if (header) {
-          const scrolled = scrollY > 12;
-          header.style.background = scrolled
-            ? "rgba(242,243,245,.82)"
-            : "rgba(242,243,245,.55)";
-          header.style.borderBottomColor = scrolled
-            ? "rgba(10,26,46,.08)"
-            : "transparent";
-          header.style.boxShadow = scrolled
-            ? "0 10px 30px -22px rgba(10,26,46,.35)"
-            : "none";
-        }
+        const scrolled = scrollY > 12;
+        header.style.background = scrolled
+          ? "rgba(242,243,245,.82)"
+          : "rgba(242,243,245,.55)";
+        header.style.borderBottomColor = scrolled
+          ? "rgba(10,26,46,.08)"
+          : "transparent";
+        header.style.boxShadow = scrolled
+          ? "0 10px 30px -22px rgba(10,26,46,.35)"
+          : "none";
+      };
 
-        if (!noMotion) {
-          queryAll<HTMLElement>(scope, "[data-parallax]").forEach((element) => {
-            const speed =
-              Number.parseFloat(
-                element.getAttribute("data-parallax") ?? "0.08",
-              ) || 0.08;
-            const baseTransform = initialTransforms.get(element) ?? "";
-            if (scrollY < window.innerHeight * 1.5) {
-              element.style.transform =
-                `${baseTransform} translateY(${scrollY * speed}px)`.trim();
-            }
-          });
-        }
+      const updateParallax = () => {
+        if (noMotion) return;
+        const scrollY = window.scrollY || window.pageYOffset;
+        queryAll<HTMLElement>(scope, "[data-parallax]").forEach((element) => {
+          const speed =
+            Number.parseFloat(
+              element.getAttribute("data-parallax") ?? "0.08",
+            ) || 0.08;
+          const baseTransform = initialTransforms.get(element) ?? "";
+          if (scrollY < window.innerHeight * 1.5) {
+            element.style.transform =
+              `${baseTransform} translateY(${scrollY * speed}px)`.trim();
+          }
+        });
+      };
 
+      const handle = () => {
+        updateHeader();
+        updateParallax();
         updateShowcase();
         updateProcess(processLineLength);
       };
@@ -777,7 +814,16 @@ export function FssInteractions({
 
       bind(window, "scroll", onScroll, cleanups, { passive: true });
       bind(window, "resize", onScroll, cleanups);
-      handle();
+
+      // The initial paint forces layout reads (getBoundingClientRect,
+      // offsetHeight, getTotalLength) that are cheap individually but add up
+      // to a single long task if run synchronously in one go on mount. Later
+      // scroll/resize-driven updates still call `handle()` atomically so the
+      // scroll-linked visuals stay in sync frame-to-frame.
+      runInStages(
+        [updateHeader, updateParallax, updateShowcase, () => updateProcess(processLineLength)],
+        cleanups,
+      );
     };
 
     const initContact = () => {
@@ -890,16 +936,25 @@ export function FssInteractions({
 
     applyResponsive();
     bind(window, "resize", applyResponsive, cleanups);
-    initReveals();
-    initCounters();
-    initMenu();
-    initHovers();
-    initMagnetic();
-    initSpotlight();
-    initCanvas();
-    initScroll();
-    initContact();
-    guardTimeline();
+
+    // Everything below is independent of the synchronous layout pass above.
+    // Spread it across scheduled tasks instead of running it as one block so
+    // no single task blocks the main thread for long under CPU throttling.
+    runInStages(
+      [
+        initReveals,
+        initCounters,
+        initMenu,
+        initHovers,
+        initMagnetic,
+        initSpotlight,
+        initCanvas,
+        initScroll,
+        initContact,
+        guardTimeline,
+      ],
+      cleanups,
+    );
 
     return () => {
       window.cancelAnimationFrame(canvasFrame);
