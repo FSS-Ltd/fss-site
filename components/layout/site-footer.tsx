@@ -35,6 +35,7 @@ export function SiteFooter() {
             <Image
               alt="FSS"
               height={316}
+              sizes="80px"
               src="/redesign/brand/fss-monogram-white.png"
               style={{
                 height: "34px",

@@ -1,7 +1,7 @@
 {
   "ci": {
     "collect": {
-      "numberOfRuns": 3,
+      "numberOfRuns": 5,
       "startServerCommand": "npx next start -p 4010",
       "startServerReadyPattern": "Ready",
       "url": [
