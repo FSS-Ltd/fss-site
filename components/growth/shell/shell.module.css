@@ -1,0 +1,319 @@
+.shell {
+  min-height: 100svh;
+  background: #f8fafb;
+  color: #07182e;
+}
+
+.skipLink {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 100;
+  translate: 0 -150%;
+  border-radius: 6px;
+  background: #07182e;
+  padding: 10px 14px;
+  color: white;
+  font-weight: 700;
+}
+
+.skipLink:focus {
+  translate: 0;
+}
+
+.topBar {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 40;
+  display: grid;
+  min-height: 70px;
+  grid-template-columns: max-content minmax(0, 1fr) max-content;
+  align-items: center;
+  gap: 28px;
+  border-bottom: 1px solid #dce3e8;
+  background: rgb(255 255 255 / 96%);
+  padding: 0 22px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 0.95rem;
+  font-weight: 750;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.brandMark {
+  width: auto;
+  height: 28px;
+}
+
+.topNav {
+  display: flex;
+  min-width: 0;
+  height: 70px;
+  align-items: stretch;
+  justify-content: center;
+  gap: clamp(12px, 1.8vw, 32px);
+}
+
+.topNavLink {
+  position: relative;
+  display: flex;
+  align-items: center;
+  color: #2f3d55;
+  font-size: 0.89rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.topNavLink:hover,
+.topNavLink[aria-current="page"] {
+  color: #087f88;
+}
+
+.topNavLink[aria-current="page"]::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: #0b8f98;
+  content: "";
+}
+
+.accountArea {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.accountIdentity {
+  max-width: 180px;
+  overflow: hidden;
+  color: #526078;
+  font-size: 0.74rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.avatar {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: none;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #168bca, #07969d);
+  color: white;
+  font-size: 0.82rem;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+}
+
+.desktopSignOut .iconButton {
+  display: flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid #d8e0e5;
+  border-radius: 8px;
+  background: white;
+  padding: 0 10px;
+  color: #26364e;
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.sideRail {
+  position: fixed;
+  z-index: 30;
+  top: 70px;
+  bottom: 0;
+  left: 0;
+  width: 80px;
+  border-right: 1px solid #dce3e8;
+  background: white;
+}
+
+.sideNav {
+  display: flex;
+  height: 100%;
+  overflow-y: auto;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 20px 0;
+}
+
+.sideNavLink {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border-radius: 9px;
+  color: #24334b;
+}
+
+.sideNavLink:hover {
+  background: #f2f7f8;
+  color: #087f88;
+}
+
+.sideNavLink[aria-current="page"] {
+  background: #e6f3f4;
+  color: #087f88;
+}
+
+.main {
+  min-height: 100svh;
+  padding: 102px 32px 44px 112px;
+}
+
+.main:focus {
+  outline: none;
+}
+
+.integrationMenu {
+  position: relative;
+}
+
+.integrationSummary {
+  display: flex;
+  min-height: 40px;
+  cursor: pointer;
+  list-style: none;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid #d8e0e5;
+  border-radius: 8px;
+  background: white;
+  padding: 0 10px;
+  color: #26364e;
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.integrationSummary::-webkit-details-marker {
+  display: none;
+}
+
+.integrationSummary:focus-visible,
+.iconButton:focus-visible,
+.topNavLink:focus-visible,
+.sideNavLink:focus-visible {
+  outline: 3px solid #087f88;
+  outline-offset: 2px;
+}
+
+.statusDot {
+  width: 9px;
+  height: 9px;
+  flex: none;
+  border-radius: 50%;
+  background: #6f7c8f;
+}
+
+.statusDot[data-status="healthy"] {
+  background: #15803d;
+}
+
+.statusDot[data-status="attention"] {
+  background: #b45309;
+}
+
+.statusDot[data-status="disconnected"] {
+  background: #b42318;
+}
+
+.integrationPanel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: min(320px, calc(100vw - 32px));
+  border: 1px solid #d8e0e5;
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0 20px 50px rgb(7 24 46 / 16%);
+  padding: 16px;
+}
+
+.integrationHeading {
+  margin: 0 0 12px;
+  font-size: 0.88rem;
+  font-weight: 750;
+}
+
+.integrationList {
+  display: grid;
+  gap: 11px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.integrationItem {
+  display: grid;
+  grid-template-columns: 9px 88px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  font-size: 0.76rem;
+}
+
+.integrationProvider {
+  font-weight: 650;
+}
+
+.integrationMessage {
+  color: #526078;
+  text-align: right;
+}
+
+@media (max-width: 1535px) {
+  .topNav,
+  .accountIdentity {
+    display: none;
+  }
+
+  .topBar {
+    grid-template-columns: 1fr max-content;
+  }
+
+  .desktopSignOut .iconButton span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 767px) {
+  .topBar {
+    min-height: 68px;
+    padding: 0 18px;
+  }
+
+  .brand {
+    gap: 11px;
+    font-size: 1rem;
+  }
+
+  .brandMark {
+    height: 26px;
+  }
+
+  .integrationSummaryLabel,
+  .sideRail,
+  .desktopSignOut {
+    display: none;
+  }
+
+  .main {
+    padding: 92px 18px 104px;
+  }
+}
