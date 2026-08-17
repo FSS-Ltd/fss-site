@@ -3,6 +3,7 @@ import test from "node:test";
 
 import { parseResearchRunIngestion } from "./ingestion-schema";
 import { createValidResearchRunFixture as createValidFixture } from "./ingestion-schema.test-fixture";
+import { MAX_RESEARCH_BUNDLE_BYTES } from "./limits";
 
 test("accepts one complete versioned research bundle", () => {
   const parsed = parseResearchRunIngestion(createValidFixture());
@@ -10,6 +11,39 @@ test("accepts one complete versioned research bundle", () => {
   assert.equal(parsed.schemaVersion, "1.0");
   assert.equal(parsed.prospects[0]?.business.county, "Kent");
   assert.equal(parsed.prospects[0]?.prospect.fitScore, 91);
+});
+
+test("rejects a canonical bundle above the route byte ceiling", () => {
+  const fixture = createValidFixture();
+  const oversizedSection = {
+    schemaVersion: "1.0" as const,
+    summary: "Maximum escaped assessment",
+    items: Array.from({ length: 30 }, () => "\0".repeat(1000)),
+  };
+  const candidate = fixture.prospects[0];
+  const oversizedCandidate = {
+    ...candidate,
+    assessment: Object.fromEntries(
+      Object.keys(candidate.assessment).map((name) => [
+        name,
+        name === "businessGoal"
+          ? candidate.assessment.businessGoal
+          : name === "primaryCta"
+            ? candidate.assessment.primaryCta
+            : oversizedSection,
+      ]),
+    ),
+  };
+  const oversized = {
+    ...fixture,
+    prospects: Array.from({ length: 10 }, () => oversizedCandidate),
+  };
+
+  assert.ok(
+    new TextEncoder().encode(JSON.stringify(oversized)).byteLength >
+      MAX_RESEARCH_BUNDLE_BYTES,
+  );
+  assert.throws(() => parseResearchRunIngestion(oversized), /serialized size/i);
 });
 
 test("requires custom visuals to be uploaded after prospect IDs exist", () => {

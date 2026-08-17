@@ -13,6 +13,7 @@ import type {
   ResearchRunIngestion,
   WebsiteAssessmentCandidate,
 } from "./types";
+import { MAX_RESEARCH_BUNDLE_BYTES } from "./limits";
 
 const PERSONAL_MAILBOX_DOMAINS = new Set([
   "aol.com",
@@ -524,6 +525,16 @@ export const researchRunIngestionSchema: z.ZodType<ResearchRunIngestion> = z
         code: "custom",
         path: ["prospects"],
         message: "A research run must contain at least one candidate.",
+      });
+    }
+
+    const canonicalBytes = new TextEncoder().encode(
+      JSON.stringify(run),
+    ).byteLength;
+    if (canonicalBytes > MAX_RESEARCH_BUNDLE_BYTES) {
+      context.addIssue({
+        code: "custom",
+        message: "Research bundle serialized size exceeds 4 MB.",
       });
     }
   });
