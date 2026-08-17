@@ -207,9 +207,12 @@ html {
 
 @media (max-width: 939px) {
   #fssroot > header[data-header] {
-    background: rgba(242, 243, 245, 0.9) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+  }
+
+  #fssroot main > .contents > section:first-of-type {
+    contain: layout paint;
   }
 
   #fssroot main > .contents > section:nth-of-type(2) {
