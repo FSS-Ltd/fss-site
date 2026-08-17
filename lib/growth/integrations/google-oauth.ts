@@ -7,6 +7,8 @@ const GOOGLE_AUTHORIZATION_ENDPOINT =
 const GOOGLE_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token";
 const GOOGLE_USERINFO_ENDPOINT =
   "https://openidconnect.googleapis.com/v1/userinfo";
+const GOOGLE_REVOCATION_ENDPOINT = "https://oauth2.googleapis.com/revoke";
+const GOOGLE_REQUEST_TIMEOUT_MS = 10_000;
 
 export const GMAIL_AUTOMATION_SCOPES = [
   "openid",
@@ -227,4 +229,25 @@ export async function fetchGoogleIdentity(
     email: parsed.data.email,
     emailVerified: parsed.data.email_verified,
   };
+}
+
+export async function revokeGoogleOAuthToken(
+  refreshToken: string,
+  fetchImpl: FetchLike = fetch,
+): Promise<boolean> {
+  requireNonBlank(refreshToken, "Refresh token");
+
+  try {
+    const response = await fetchImpl(GOOGLE_REVOCATION_ENDPOINT, {
+      method: "POST",
+      headers: { Accept: "application/json" },
+      body: new URLSearchParams({ token: refreshToken }),
+      cache: "no-store",
+      signal: AbortSignal.timeout(GOOGLE_REQUEST_TIMEOUT_MS),
+    });
+
+    return response.ok;
+  } catch {
+    return false;
+  }
 }

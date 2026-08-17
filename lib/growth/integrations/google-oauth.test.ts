@@ -8,6 +8,7 @@ import {
   generateGoogleOAuthState,
   GMAIL_AUTOMATION_SCOPES,
   GoogleOAuthError,
+  revokeGoogleOAuthToken,
   type GoogleOAuthConfig,
 } from "./google-oauth";
 
@@ -195,4 +196,46 @@ test("rejects invalid identity responses and blank inputs", async () => {
     fetchGoogleIdentity(" ", fetchImpl),
     /Access token must not be blank/,
   );
+});
+
+test("revokes a Google refresh token with a form-encoded POST", async () => {
+  let receivedRequest: Request | undefined;
+  const fetchImpl = async (
+    input: string | URL | Request,
+    init?: RequestInit,
+  ) => {
+    receivedRequest = new Request(input, init);
+    return new Response(null, { status: 200 });
+  };
+
+  const revoked = await revokeGoogleOAuthToken("refresh-token", fetchImpl);
+
+  assert.equal(revoked, true);
+  assert.equal(receivedRequest?.url, "https://oauth2.googleapis.com/revoke");
+  assert.equal(receivedRequest?.method, "POST");
+  assert.equal(
+    receivedRequest?.headers.get("content-type"),
+    "application/x-www-form-urlencoded;charset=UTF-8",
+  );
+  assert.deepEqual(
+    Object.fromEntries(new URLSearchParams(await receivedRequest?.text())),
+    { token: "refresh-token" },
+  );
+});
+
+test("treats provider rejection and network failure as unconfirmed revocation", async () => {
+  assert.equal(
+    await revokeGoogleOAuthToken(
+      "refresh-token",
+      async () => new Response(null, { status: 400 }),
+    ),
+    false,
+  );
+  assert.equal(
+    await revokeGoogleOAuthToken("refresh-token", async () => {
+      throw new Error("provider detail");
+    }),
+    false,
+  );
+  await assert.rejects(revokeGoogleOAuthToken(" "), /must not be blank/i);
 });
