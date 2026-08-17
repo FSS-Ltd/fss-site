@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { parseTokenEncryptionKey } from "../integrations/token-crypto";
+
 const FOUNDER_EMAIL = "j.ntagengwa@faithfulsoftware.dev" as const;
 
 const postgresUrlSchema = z
@@ -23,6 +25,33 @@ const securitySecretSchema = z
     message: "Must contain at least 32 non-whitespace characters",
   });
 
+const gmailRedirectUriSchema = z
+  .string()
+  .trim()
+  .url()
+  .refine(
+    (value) => {
+      const url = new URL(value);
+      const isSecure = url.protocol === "https:";
+      const isLoopbackHttp =
+        url.protocol === "http:" &&
+        ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname);
+
+      return (
+        (isSecure || isLoopbackHttp) &&
+        url.username === "" &&
+        url.password === "" &&
+        url.pathname === "/api/integrations/gmail/callback" &&
+        url.search === "" &&
+        url.hash === ""
+      );
+    },
+    {
+      message:
+        "Must be an exact HTTPS or loopback Gmail callback URI without credentials, query, or fragment",
+    },
+  );
+
 const growthServerEnvSchema = z
   .object({
     DATABASE_URL: postgresUrlSchema,
@@ -30,6 +59,9 @@ const growthServerEnvSchema = z
     AUTH_SECRET: securitySecretSchema,
     GOOGLE_AUTH_CLIENT_ID: z.string().trim().min(1),
     GOOGLE_AUTH_CLIENT_SECRET: z.string().trim().min(1),
+    GOOGLE_GMAIL_CLIENT_ID: z.string().trim().min(1).optional(),
+    GOOGLE_GMAIL_CLIENT_SECRET: z.string().trim().min(1).optional(),
+    GOOGLE_GMAIL_REDIRECT_URI: gmailRedirectUriSchema.optional(),
     GROWTH_OS_OWNER_EMAIL: z
       .string()
       .trim()
@@ -43,6 +75,9 @@ const growthServerEnvSchema = z
     NEXT_PUBLIC_DATABASE_URL: z.undefined().optional(),
     NEXT_PUBLIC_DIRECT_DATABASE_URL: z.undefined().optional(),
     NEXT_PUBLIC_TOKEN_ENCRYPTION_KEY: z.undefined().optional(),
+    NEXT_PUBLIC_GOOGLE_GMAIL_CLIENT_ID: z.undefined().optional(),
+    NEXT_PUBLIC_GOOGLE_GMAIL_CLIENT_SECRET: z.undefined().optional(),
+    NEXT_PUBLIC_GOOGLE_GMAIL_REDIRECT_URI: z.undefined().optional(),
   })
   .transform((value) => ({
     databaseUrl: value.DATABASE_URL,
@@ -50,6 +85,9 @@ const growthServerEnvSchema = z
     authSecret: value.AUTH_SECRET,
     googleAuthClientId: value.GOOGLE_AUTH_CLIENT_ID,
     googleAuthClientSecret: value.GOOGLE_AUTH_CLIENT_SECRET,
+    googleGmailClientId: value.GOOGLE_GMAIL_CLIENT_ID,
+    googleGmailClientSecret: value.GOOGLE_GMAIL_CLIENT_SECRET,
+    googleGmailRedirectUri: value.GOOGLE_GMAIL_REDIRECT_URI,
     ownerEmail: value.GROWTH_OS_OWNER_EMAIL,
     agentHmacSecret: value.GROWTH_OS_AGENT_HMAC_SECRET,
     tokenEncryptionKey: value.TOKEN_ENCRYPTION_KEY,
@@ -62,6 +100,9 @@ export type GrowthServerEnv = {
   authSecret: string;
   googleAuthClientId: string;
   googleAuthClientSecret: string;
+  googleGmailClientId?: string;
+  googleGmailClientSecret?: string;
+  googleGmailRedirectUri?: string;
   ownerEmail: typeof FOUNDER_EMAIL;
   agentHmacSecret?: string;
   tokenEncryptionKey: string;
@@ -72,6 +113,36 @@ export function parseGrowthServerEnv(
   source: Record<string, string | undefined>,
 ): GrowthServerEnv {
   return growthServerEnvSchema.parse(source);
+}
+
+export type GmailOAuthEnv = {
+  clientId: string;
+  clientSecret: string;
+  redirectUri: string;
+  tokenEncryptionKey: string;
+};
+
+export function requireGmailOAuthEnv(env: GrowthServerEnv): GmailOAuthEnv {
+  if (
+    !env.googleGmailClientId ||
+    !env.googleGmailClientSecret ||
+    !env.googleGmailRedirectUri
+  ) {
+    throw new Error("Gmail OAuth server configuration is incomplete.");
+  }
+
+  try {
+    parseTokenEncryptionKey(env.tokenEncryptionKey);
+  } catch {
+    throw new Error("Gmail OAuth token encryption key is invalid.");
+  }
+
+  return {
+    clientId: env.googleGmailClientId,
+    clientSecret: env.googleGmailClientSecret,
+    redirectUri: env.googleGmailRedirectUri,
+    tokenEncryptionKey: env.tokenEncryptionKey.trim(),
+  };
 }
 
 export function readGrowthServerEnv(): GrowthServerEnv {
