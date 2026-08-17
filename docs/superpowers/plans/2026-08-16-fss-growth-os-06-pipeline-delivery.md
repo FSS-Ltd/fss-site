@@ -181,7 +181,7 @@ git commit -m "feat: enforce commercial stage transitions"
 
 **Files:**
 
-- Create: `app/(growth)/growth/pipeline/page.tsx`
+- Create: `app/(growth)/(dashboard)/growth/pipeline/page.tsx`
 - Create: `lib/growth/dashboard/pipeline.ts`
 - Create: `lib/growth/dashboard/pipeline.test.ts`
 - Create: `components/growth/pipeline/pipeline-board.tsx`
@@ -220,7 +220,7 @@ node --import tsx --test lib/growth/dashboard/pipeline.test.ts components/growth
 - [ ] **Step 6: Commit**
 
 ```bash
-git add -- 'app/(growth)/growth/pipeline/page.tsx' lib/growth/dashboard/pipeline.ts lib/growth/dashboard/pipeline.test.ts components/growth/pipeline
+git add -- 'app/(growth)/(dashboard)/growth/pipeline/page.tsx' lib/growth/dashboard/pipeline.ts lib/growth/dashboard/pipeline.test.ts components/growth/pipeline
 git commit -m "feat: add the commercial pipeline board"
 ```
 
@@ -228,9 +228,9 @@ git commit -m "feat: add the commercial pipeline board"
 
 **Files:**
 
-- Create: `app/(growth)/growth/deals/page.tsx`
-- Create: `app/(growth)/growth/deals/[engagementId]/page.tsx`
-- Create: `app/(growth)/growth/deals/[engagementId]/not-found.tsx`
+- Create: `app/(growth)/(dashboard)/growth/deals/page.tsx`
+- Create: `app/(growth)/(dashboard)/growth/deals/[engagementId]/page.tsx`
+- Create: `app/(growth)/(dashboard)/growth/deals/[engagementId]/not-found.tsx`
 - Create: `lib/growth/dashboard/deals.ts`
 - Create: `lib/growth/dashboard/deals.test.ts`
 - Create: `components/growth/deals/deal-list.tsx`
@@ -267,7 +267,7 @@ node --import tsx --test lib/growth/dashboard/deals.test.ts components/growth/de
 - [ ] **Step 6: Commit**
 
 ```bash
-git add -- 'app/(growth)/growth/deals' lib/growth/dashboard/deals.ts lib/growth/dashboard/deals.test.ts components/growth/deals
+git add -- 'app/(growth)/(dashboard)/growth/deals' lib/growth/dashboard/deals.ts lib/growth/dashboard/deals.test.ts components/growth/deals
 git commit -m "feat: add deal decision views"
 ```
 
@@ -275,8 +275,8 @@ git commit -m "feat: add deal decision views"
 
 **Files:**
 
-- Create: `app/(growth)/growth/clients/page.tsx`
-- Create: `app/(growth)/growth/clients/[businessId]/page.tsx`
+- Create: `app/(growth)/(dashboard)/growth/clients/page.tsx`
+- Create: `app/(growth)/(dashboard)/growth/clients/[businessId]/page.tsx`
 - Create: `lib/growth/dashboard/clients.ts`
 - Create: `lib/growth/dashboard/clients.test.ts`
 - Create: `components/growth/clients/client-list.tsx`
@@ -285,7 +285,7 @@ git commit -m "feat: add deal decision views"
 - Create: `components/growth/clients/delivery-status.test.tsx`
 - Create: `components/growth/clients/client-thank-you-review.tsx`
 - Create: `components/growth/clients/client-thank-you-review.test.tsx`
-- Create: `app/(growth)/growth/clients/[businessId]/messages/[messageId]/page.tsx`
+- Create: `app/(growth)/(dashboard)/growth/clients/[businessId]/messages/[messageId]/page.tsx`
 - Create: `app/api/growth/client-messages/[messageId]/approve-send/route.ts`
 - Create: `lib/growth/clients/client-thank-you.ts`
 - Create: `lib/growth/clients/client-thank-you.test.ts`
@@ -328,7 +328,7 @@ node --import tsx --test lib/growth/dashboard/clients.test.ts lib/growth/clients
 - [ ] **Step 8: Commit**
 
 ```bash
-git add -- 'app/(growth)/growth/clients' app/api/growth/client-messages lib/growth/dashboard/clients.ts lib/growth/dashboard/clients.test.ts lib/growth/clients components/growth/clients
+git add -- 'app/(growth)/(dashboard)/growth/clients' app/api/growth/client-messages lib/growth/dashboard/clients.ts lib/growth/dashboard/clients.test.ts lib/growth/clients components/growth/clients
 git commit -m "feat: add client delivery views"
 ```
 
@@ -340,7 +340,7 @@ git commit -m "feat: add client delivery views"
 - Create: `lib/growth/analytics/definitions.test.ts`
 - Create: `lib/growth/dashboard/analytics.ts`
 - Create: `lib/growth/dashboard/analytics.test.ts`
-- Create: `app/(growth)/growth/analytics/page.tsx`
+- Create: `app/(growth)/(dashboard)/growth/analytics/page.tsx`
 - Create: `components/growth/analytics/analytics-page.tsx`
 - Create: `components/growth/analytics/funnel-summary.tsx`
 - Create: `components/growth/analytics/revenue-summary.tsx`
@@ -390,7 +390,7 @@ node --import tsx --test lib/growth/analytics/definitions.test.ts lib/growth/das
 - [ ] **Step 6: Commit**
 
 ```bash
-git add -- lib/growth/analytics lib/growth/dashboard/analytics.ts lib/growth/dashboard/analytics.test.ts 'app/(growth)/growth/analytics/page.tsx' components/growth/analytics
+git add -- lib/growth/analytics lib/growth/dashboard/analytics.ts lib/growth/dashboard/analytics.test.ts 'app/(growth)/(dashboard)/growth/analytics/page.tsx' components/growth/analytics
 git commit -m "feat: add documented Growth OS analytics"
 ```
 

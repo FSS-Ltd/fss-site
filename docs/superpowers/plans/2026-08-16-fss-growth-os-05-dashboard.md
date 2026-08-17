@@ -80,15 +80,18 @@ git commit -m "feat: define Growth OS dashboard contracts"
 
 **Files:**
 
-- Create: `app/(growth)/growth/layout.tsx`
-- Create: `app/(growth)/growth/loading.tsx`
-- Create: `app/(growth)/growth/error.tsx`
+- Move: `app/(growth)/growth/login/` to `app/(growth)/(auth)/growth/login/`
+- Create: `app/(growth)/(dashboard)/growth/layout.tsx`
+- Create: `app/(growth)/(dashboard)/growth/loading.tsx`
+- Create: `app/(growth)/(dashboard)/growth/error.tsx`
 - Create: `components/growth/shell/growth-shell.tsx`
 - Create: `components/growth/shell/top-navigation.tsx`
 - Create: `components/growth/shell/side-navigation.tsx`
 - Create: `components/growth/shell/mobile-navigation.tsx`
 - Create: `components/growth/shell/integration-status-menu.tsx`
 - Create: `components/growth/shell/growth-shell.test.tsx`
+- Create: `lib/growth/dashboard/integration-health.ts`
+- Create: `lib/growth/db/repositories/integration-connections.ts`
 
 **Interfaces:**
 
@@ -101,7 +104,7 @@ Assert the page has one skip link, labelled navigation, current-page state, visi
 
 - [ ] **Step 2: Protect the route group in the layout**
 
-Call `requireFounder()` in the server layout. Do not rely only on middleware or hidden navigation. Fetch a bounded integration summary and pass no secrets into the shell.
+Keep the unchanged `/growth/login` URL in an unauthenticated sibling route group, then call `requireFounder()` in the dashboard server layout. Do not rely only on middleware or hidden navigation. Fetch a bounded integration summary and pass no secrets into the shell.
 
 - [ ] **Step 3: Implement the desktop shell**
 
@@ -125,7 +128,7 @@ pnpm exec tsc --noEmit
 - [ ] **Step 7: Commit**
 
 ```bash
-git add -- 'app/(growth)/growth/layout.tsx' 'app/(growth)/growth/loading.tsx' 'app/(growth)/growth/error.tsx' components/growth/shell
+git add -- 'app/(growth)/(auth)/growth/login' 'app/(growth)/(dashboard)/growth' components/growth/shell lib/growth/dashboard/integration-health.ts lib/growth/db/repositories/integration-connections.ts
 git commit -m "feat: add the founder dashboard shell"
 ```
 
@@ -138,7 +141,7 @@ git commit -m "feat: add the founder dashboard shell"
 
 **Files:**
 
-- Create: `app/(growth)/growth/page.tsx`
+- Create: `app/(growth)/(dashboard)/growth/page.tsx`
 - Create: `lib/growth/dashboard/overview.ts`
 - Create: `lib/growth/dashboard/overview.test.ts`
 - Create: `components/growth/overview/overview-page.tsx`
@@ -183,7 +186,7 @@ node --import tsx --test lib/growth/dashboard/overview.test.ts components/growth
 - [ ] **Step 7: Commit**
 
 ```bash
-git add -- 'app/(growth)/growth/page.tsx' lib/growth/dashboard/overview.ts lib/growth/dashboard/overview.test.ts components/growth/overview
+git add -- 'app/(growth)/(dashboard)/growth/page.tsx' lib/growth/dashboard/overview.ts lib/growth/dashboard/overview.test.ts components/growth/overview
 git commit -m "feat: add the Growth OS overview queue"
 ```
 
@@ -193,7 +196,7 @@ git commit -m "feat: add the Growth OS overview queue"
 
 **Files:**
 
-- Create: `app/(growth)/growth/prospects/page.tsx`
+- Create: `app/(growth)/(dashboard)/growth/prospects/page.tsx`
 - Create: `lib/growth/dashboard/prospects.ts`
 - Create: `lib/growth/dashboard/prospects.test.ts`
 - Create: `components/growth/prospects/prospect-list.tsx`
@@ -231,7 +234,7 @@ node --import tsx --test lib/growth/dashboard/prospects.test.ts components/growt
 - [ ] **Step 6: Commit**
 
 ```bash
-git add -- 'app/(growth)/growth/prospects/page.tsx' lib/growth/dashboard/prospects.ts lib/growth/dashboard/prospects.test.ts components/growth/prospects
+git add -- 'app/(growth)/(dashboard)/growth/prospects/page.tsx' lib/growth/dashboard/prospects.ts lib/growth/dashboard/prospects.test.ts components/growth/prospects
 git commit -m "feat: add searchable prospect review"
 ```
 
@@ -241,8 +244,8 @@ git commit -m "feat: add searchable prospect review"
 
 **Files:**
 
-- Create: `app/(growth)/growth/prospects/[prospectId]/page.tsx`
-- Create: `app/(growth)/growth/prospects/[prospectId]/not-found.tsx`
+- Create: `app/(growth)/(dashboard)/growth/prospects/[prospectId]/page.tsx`
+- Create: `app/(growth)/(dashboard)/growth/prospects/[prospectId]/not-found.tsx`
 - Create: `lib/growth/dashboard/prospect-detail.ts`
 - Create: `lib/growth/dashboard/prospect-detail.test.ts`
 - Create: `components/growth/prospects/prospect-detail.tsx`
@@ -281,7 +284,7 @@ node --import tsx --test lib/growth/dashboard/prospect-detail.test.ts components
 - [ ] **Step 6: Commit**
 
 ```bash
-git add -- 'app/(growth)/growth/prospects/[prospectId]' lib/growth/dashboard/prospect-detail.ts lib/growth/dashboard/prospect-detail.test.ts components/growth/prospects
+git add -- 'app/(growth)/(dashboard)/growth/prospects/[prospectId]' lib/growth/dashboard/prospect-detail.ts lib/growth/dashboard/prospect-detail.test.ts components/growth/prospects
 git commit -m "feat: add prospect evidence review"
 ```
 
@@ -294,7 +297,7 @@ git commit -m "feat: add prospect evidence review"
 
 **Files:**
 
-- Create: `app/(growth)/growth/outreach/messages/[messageId]/page.tsx`
+- Create: `app/(growth)/(dashboard)/growth/outreach/messages/[messageId]/page.tsx`
 - Create: `lib/growth/dashboard/message-review.ts`
 - Create: `lib/growth/dashboard/message-review.test.ts`
 - Create: `components/growth/outreach/message-review.tsx`
@@ -345,7 +348,7 @@ node --import tsx --test lib/growth/dashboard/message-review.test.ts components/
 - [ ] **Step 7: Commit**
 
 ```bash
-git add -- 'app/(growth)/growth/outreach/messages/[messageId]' lib/growth/dashboard/message-review.ts lib/growth/dashboard/message-review.test.ts components/growth/outreach
+git add -- 'app/(growth)/(dashboard)/growth/outreach/messages/[messageId]' lib/growth/dashboard/message-review.ts lib/growth/dashboard/message-review.test.ts components/growth/outreach
 git commit -m "feat: add founder email approval"
 ```
 
@@ -355,8 +358,8 @@ git commit -m "feat: add founder email approval"
 
 **Files:**
 
-- Create: `app/(growth)/growth/outreach/page.tsx`
-- Create: `app/(growth)/growth/outreach/sequences/[sequenceId]/page.tsx`
+- Create: `app/(growth)/(dashboard)/growth/outreach/page.tsx`
+- Create: `app/(growth)/(dashboard)/growth/outreach/sequences/[sequenceId]/page.tsx`
 - Create: `lib/growth/dashboard/outreach.ts`
 - Create: `lib/growth/dashboard/outreach.test.ts`
 - Create: `components/growth/outreach/outreach-list.tsx`
@@ -394,7 +397,7 @@ node --import tsx --test lib/growth/dashboard/outreach.test.ts components/growth
 - [ ] **Step 6: Commit**
 
 ```bash
-git add -- 'app/(growth)/growth/outreach' lib/growth/dashboard/outreach.ts lib/growth/dashboard/outreach.test.ts components/growth/outreach
+git add -- 'app/(growth)/(dashboard)/growth/outreach' lib/growth/dashboard/outreach.ts lib/growth/dashboard/outreach.test.ts components/growth/outreach
 git commit -m "feat: add outreach timeline controls"
 ```
 
@@ -407,8 +410,8 @@ git commit -m "feat: add outreach timeline controls"
 
 **Files:**
 
-- Create: `app/(growth)/growth/prospects/[prospectId]/website-strategy/page.tsx`
-- Create: `app/(growth)/growth/prospects/[prospectId]/visual/page.tsx`
+- Create: `app/(growth)/(dashboard)/growth/prospects/[prospectId]/website-strategy/page.tsx`
+- Create: `app/(growth)/(dashboard)/growth/prospects/[prospectId]/visual/page.tsx`
 - Create: `lib/growth/dashboard/website-strategy.ts`
 - Create: `lib/growth/dashboard/website-strategy.test.ts`
 - Create: `components/growth/strategy/strategy-review.tsx`
@@ -441,7 +444,7 @@ node --import tsx --test lib/growth/dashboard/website-strategy.test.ts component
 - [ ] **Step 5: Commit**
 
 ```bash
-git add -- 'app/(growth)/growth/prospects/[prospectId]/website-strategy' 'app/(growth)/growth/prospects/[prospectId]/visual' lib/growth/dashboard/website-strategy.ts lib/growth/dashboard/website-strategy.test.ts components/growth/strategy
+git add -- 'app/(growth)/(dashboard)/growth/prospects/[prospectId]/website-strategy' 'app/(growth)/(dashboard)/growth/prospects/[prospectId]/visual' lib/growth/dashboard/website-strategy.ts lib/growth/dashboard/website-strategy.test.ts components/growth/strategy
 git commit -m "feat: add website strategy review"
 ```
 
@@ -454,9 +457,9 @@ git commit -m "feat: add website strategy review"
 
 **Files:**
 
-- Create: `app/(growth)/growth/newsletter/page.tsx`
-- Create: `app/(growth)/growth/newsletter/[issueId]/page.tsx`
-- Create: `app/(growth)/growth/settings/email-templates/page.tsx`
+- Create: `app/(growth)/(dashboard)/growth/newsletter/page.tsx`
+- Create: `app/(growth)/(dashboard)/growth/newsletter/[issueId]/page.tsx`
+- Create: `app/(growth)/(dashboard)/growth/settings/email-templates/page.tsx`
 - Create: `lib/growth/dashboard/newsletter.ts`
 - Create: `lib/growth/dashboard/newsletter.test.ts`
 - Create: `components/growth/newsletter/issue-list.tsx`
@@ -495,7 +498,7 @@ node --import tsx --test lib/growth/dashboard/newsletter.test.ts components/grow
 - [ ] **Step 6: Commit**
 
 ```bash
-git add -- 'app/(growth)/growth/newsletter' 'app/(growth)/growth/settings/email-templates' lib/growth/dashboard/newsletter.ts lib/growth/dashboard/newsletter.test.ts components/growth/newsletter
+git add -- 'app/(growth)/(dashboard)/growth/newsletter' 'app/(growth)/(dashboard)/growth/settings/email-templates' lib/growth/dashboard/newsletter.ts lib/growth/dashboard/newsletter.test.ts components/growth/newsletter
 git commit -m "feat: add marketing email review views"
 ```
 
@@ -503,7 +506,7 @@ git commit -m "feat: add marketing email review views"
 
 **Files:**
 
-- Create: `app/(growth)/growth/settings/page.tsx`
+- Create: `app/(growth)/(dashboard)/growth/settings/page.tsx`
 - Create: `lib/growth/dashboard/settings.ts`
 - Create: `lib/growth/dashboard/settings.test.ts`
 - Create: `components/growth/settings/integration-health.tsx`
@@ -536,7 +539,7 @@ node --import tsx --test lib/growth/dashboard/settings.test.ts components/growth
 - [ ] **Step 5: Commit**
 
 ```bash
-git add -- 'app/(growth)/growth/settings' lib/growth/dashboard/settings.ts lib/growth/dashboard/settings.test.ts components/growth/settings
+git add -- 'app/(growth)/(dashboard)/growth/settings' lib/growth/dashboard/settings.ts lib/growth/dashboard/settings.test.ts components/growth/settings
 git commit -m "feat: add Growth OS integration settings"
 ```
 
