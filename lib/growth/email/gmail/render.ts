@@ -8,7 +8,14 @@ import {
   type GmailMessageInput,
   type RenderedGmailMessage,
 } from "./mime";
-import { isSafeEmailHtml } from "../html-policy";
+import {
+  countTextOccurrences,
+  emailHtmlVisibleText,
+  escapeEmailHtmlText,
+  hasCanonicalEmailHtmlText,
+  isSafeEmailHtml,
+  removeCanonicalEmailHtmlText,
+} from "../html-policy";
 
 const MERGE_FIELDS = ["firstName", "businessName"] as const;
 const MERGE_FIELD_PATTERN = /{{[^{}]*}}/g;
@@ -70,31 +77,6 @@ type FollowUpRenderInput = {
   mergeFields: Readonly<Record<FollowUpMergeField, string>>;
 };
 
-function countOccurrences(value: string, needle: string): number {
-  if (!needle) return 0;
-
-  let count = 0;
-  let cursor = 0;
-  while ((cursor = value.indexOf(needle, cursor)) !== -1) {
-    count += 1;
-    cursor += needle.length;
-  }
-  return count;
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-}
-
-function visibleHtmlText(value: string): string {
-  return value.replace(/<[^>]*>/g, " ");
-}
-
 function requireApprovedSnapshot(snapshot: FirstEmailCandidate): void {
   const actualWordCount = snapshot.text.trim().split(/\s+/).length;
   if (
@@ -113,15 +95,23 @@ function requireApprovedSnapshot(snapshot: FirstEmailCandidate): void {
     !/opt[ -]?out|no further emails|not hear from me/i.test(
       snapshot.optOutSentence,
     ) ||
-    !visibleHtmlText(snapshot.html).includes(snapshot.optOutSentence) ||
-    !snapshot.text.includes(snapshot.optOutSentence)
+    !hasCanonicalEmailHtmlText(snapshot.html, snapshot.optOutSentence) ||
+    countTextOccurrences(
+      emailHtmlVisibleText(snapshot.html),
+      snapshot.optOutSentence,
+    ) !== 1 ||
+    countTextOccurrences(snapshot.text, snapshot.optOutSentence) !== 1
   ) {
     throw new TypeError("First-email snapshot opt-out is invalid.");
   }
   if (
     !snapshot.conceptDisclaimer.trim() ||
-    countOccurrences(snapshot.html, snapshot.conceptDisclaimer) !== 1 ||
-    !snapshot.text.includes(snapshot.conceptDisclaimer)
+    !hasCanonicalEmailHtmlText(snapshot.html, snapshot.conceptDisclaimer) ||
+    countTextOccurrences(
+      emailHtmlVisibleText(snapshot.html),
+      snapshot.conceptDisclaimer,
+    ) !== 1 ||
+    countTextOccurrences(snapshot.text, snapshot.conceptDisclaimer) !== 1
   ) {
     throw new TypeError("First-email snapshot disclaimer is invalid.");
   }
@@ -248,11 +238,20 @@ function renderFirstEmailHtml(
   snapshot: FirstEmailCandidate,
   visual: ReturnType<typeof requireVisual>,
 ): string {
-  const bodyWithoutDisclaimer = snapshot.html
-    .replace(snapshot.conceptDisclaimer, "")
-    .replace(/<p>\s*<\/p>/i, "");
-  const image = `<p><img src="${escapeHtml(visual.url)}" alt="${escapeHtml(visual.altText)}" width="${visual.displayWidth}" height="${visual.displayHeight}"></p>`;
-  const disclaimer = `<p>${escapeHtml(snapshot.conceptDisclaimer)}</p>`;
+  const escapedDisclaimer = escapeEmailHtmlText(snapshot.conceptDisclaimer);
+  const htmlWithoutDisclaimer = removeCanonicalEmailHtmlText(
+    snapshot.html,
+    snapshot.conceptDisclaimer,
+  );
+  if (htmlWithoutDisclaimer === null) {
+    throw new TypeError("First-email snapshot disclaimer is invalid.");
+  }
+  const bodyWithoutDisclaimer = htmlWithoutDisclaimer.replace(
+    /<p>\s*<\/p>/i,
+    "",
+  );
+  const image = `<p><img src="${escapeEmailHtmlText(visual.url)}" alt="${escapeEmailHtmlText(visual.altText)}" width="${visual.displayWidth}" height="${visual.displayHeight}"></p>`;
+  const disclaimer = `<p>${escapedDisclaimer}</p>`;
 
   return `${image}${disclaimer}${bodyWithoutDisclaimer}`;
 }
@@ -335,7 +334,7 @@ function mergeTemplate(
     const value = requireMergeValue(values[field]);
     return rendered.replaceAll(
       `{{${field}}}`,
-      html ? escapeHtml(value) : value,
+      html ? escapeEmailHtmlText(value) : value,
     );
   }, template);
 }

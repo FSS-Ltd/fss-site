@@ -1,6 +1,9 @@
 import { z } from "zod";
 
-import { isSafeEmailHtml } from "../email/html-policy";
+import {
+  hasCanonicalEmailHtmlText,
+  isSafeEmailHtml,
+} from "../email/html-policy";
 import { MAX_RESEARCH_BUNDLE_BYTES } from "./limits";
 import {
   RESEARCH_REJECTION_REASON_CODES,
@@ -272,14 +275,22 @@ const firstEmailCandidateSchema: z.ZodType<FirstEmailCandidate> = z
     }
 
     for (const field of ["html", "text"] as const) {
-      if (!email[field].includes(email.optOutSentence)) {
+      const containsOptOut =
+        field === "html"
+          ? hasCanonicalEmailHtmlText(email.html, email.optOutSentence)
+          : email.text.includes(email.optOutSentence);
+      if (!containsOptOut) {
         context.addIssue({
           code: "custom",
           path: [field],
           message: `Email ${field} must contain the opt-out sentence.`,
         });
       }
-      if (!email[field].includes(email.conceptDisclaimer)) {
+      const containsDisclaimer =
+        field === "html"
+          ? hasCanonicalEmailHtmlText(email.html, email.conceptDisclaimer)
+          : email.text.includes(email.conceptDisclaimer);
+      if (!containsDisclaimer) {
         context.addIssue({
           code: "custom",
           path: [field],

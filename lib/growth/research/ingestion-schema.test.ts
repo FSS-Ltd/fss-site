@@ -14,6 +14,41 @@ test("accepts one complete versioned research bundle", () => {
   assert.equal(parsed.prospects[0]?.prospect.fitScore, 91);
 });
 
+test("accepts escaped HTML-sensitive email standards", () => {
+  const fixture = createValidFixture();
+  const candidate = fixture.prospects[0];
+  const optOutSentence =
+    "Reply opt out if R&D <isn't relevant> and you prefer no further emails.";
+  const conceptDisclaimer =
+    "Concept image for R&D <discussion> only, not a finished design.";
+  const body = candidate.firstEmail.text.split("\n\n")[0];
+  const text = `${body}\n\n${conceptDisclaimer}\n\n${optOutSentence}`;
+  const html = `<p>${body}</p><p>Concept image for R&amp;D &lt;discussion&gt; only, not a finished design.</p><p>Reply opt out if R&amp;D &lt;isn&#39;t relevant&gt; and you prefer no further emails.</p>`;
+
+  const parsed = parseResearchRunIngestion({
+    ...fixture,
+    prospects: [
+      {
+        ...candidate,
+        firstEmail: {
+          ...candidate.firstEmail,
+          html,
+          text,
+          wordCount: text.trim().split(/\s+/).length,
+          optOutSentence,
+          conceptDisclaimer,
+        },
+        visual: { ...candidate.visual, conceptDisclaimer },
+      },
+    ],
+  });
+
+  assert.equal(
+    parsed.prospects[0]?.firstEmail.conceptDisclaimer,
+    conceptDisclaimer,
+  );
+});
+
 test("accepts the redacted operator fixture", () => {
   const fixture = JSON.parse(
     readFileSync("docs/growth-os/fixtures/research-run-v1.json", "utf8"),
