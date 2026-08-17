@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 const sitemapLinks = [
@@ -32,18 +31,20 @@ export function SiteFooter() {
           }}
         >
           <div style={{ maxWidth: "340px" }}>
-            <Image
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               alt="FSS"
-              height={316}
-              sizes="80px"
-              src="/redesign/brand/fss-monogram-white.png"
+              decoding="async"
+              height={114}
+              loading="lazy"
+              src="/redesign/brand/fss-monogram-white-small.png"
               style={{
                 height: "34px",
                 width: "auto",
                 display: "block",
                 marginBottom: "20px",
               }}
-              width={709}
+              width={256}
             />
             <p style={{ margin: 0, fontSize: "14.5px", lineHeight: 1.6 }}>
               Engineering clarity out of complexity. Bespoke software, apps and

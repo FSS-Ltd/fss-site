@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 
 import {
   SiteHeaderActions,
@@ -46,14 +45,18 @@ export function SiteHeader() {
             flex: "none",
           }}
         >
-          <Image
+          {/* The dedicated 256px asset keeps the displayed logo crisp without
+              loading the client-side Next Image runtime. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             alt="FSS"
-            height={316}
-            priority
-            sizes="60px"
-            src="/redesign/brand/fss-monogram-navy.png"
+            decoding="async"
+            fetchPriority="high"
+            height={114}
+            loading="eager"
+            src="/redesign/brand/fss-monogram-navy-small.png"
             style={{ height: "26px", width: "auto", display: "block" }}
-            width={709}
+            width={256}
           />
           <span
             data-wordmark
