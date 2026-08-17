@@ -643,7 +643,10 @@ type ResearchRunIngestionResult = {
   accepted: number;
   duplicates: number;
   rejected: number;
-  prospectIds: string[];
+  acceptedProspects: Array<{
+    candidateIndex: number;
+    prospectId: string;
+  }>;
 };
 ```
 

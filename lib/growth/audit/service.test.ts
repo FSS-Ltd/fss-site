@@ -25,6 +25,7 @@ function createRecordingDb(): {
     });
     return [];
   };
+  query.json = (value: unknown) => value;
 
   // The test double implements only the tagged-query collaborator used here.
   return {
@@ -55,7 +56,7 @@ test("appends a parameterised audit event with scalar metadata", async () => {
         "insert into growth.audit_log (",
         "correlation_id, actor_type, actor_id, action,",
         "entity_type, entity_id, metadata",
-        ") values ( ?, ?, ?, ?, ?, ?, ?::jsonb )",
+        ") values ( ?, ?, ?, ?, ?, ?, ? )",
       ].join(" "),
       values: [
         "corr-1",
@@ -64,11 +65,11 @@ test("appends a parameterised audit event with scalar metadata", async () => {
         "prospect.reviewed",
         "prospect",
         "00000000-0000-0000-0000-000000000001",
-        JSON.stringify({
+        {
           fitScore: 91,
           approved: true,
           reasonCode: "manual_review",
-        }),
+        },
       ],
     },
   ]);
@@ -81,7 +82,7 @@ test("uses an empty metadata object when metadata is omitted", async () => {
 
   await appendAuditEvent(db, input);
 
-  assert.equal(queries[0]?.values.at(-1), "{}");
+  assert.deepEqual(queries[0]?.values.at(-1), {});
 });
 
 test("accepts a null reason code", async () => {
@@ -92,7 +93,7 @@ test("accepts a null reason code", async () => {
     metadata: { reasonCode: null },
   });
 
-  assert.equal(queries[0]?.values.at(-1), '{"reasonCode":null}');
+  assert.deepEqual(queries[0]?.values.at(-1), { reasonCode: null });
 });
 
 test("accepts the transaction query surface", async () => {

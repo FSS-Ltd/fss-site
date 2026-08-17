@@ -85,7 +85,7 @@ export type FirstEmailCandidate = {
 };
 
 export type EmailVisualCandidate = {
-  assetId: string | null;
+  assetId: null;
   fallbackAssetKey: string;
   altText: string;
   conceptDisclaimer: string;
@@ -123,5 +123,8 @@ export type ResearchRunIngestionResult = {
   accepted: number;
   duplicates: number;
   rejected: number;
-  prospectIds: string[];
+  acceptedProspects: Array<{
+    candidateIndex: number;
+    prospectId: string;
+  }>;
 };
