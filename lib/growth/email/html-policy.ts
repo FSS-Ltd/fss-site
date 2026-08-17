@@ -36,13 +36,13 @@ export function removeCanonicalEmailHtmlText(
 ): string | null {
   const range = canonicalEmailHtmlTextRange(html, text);
   if (!range) return null;
-  return html.slice(0, range.start) + html.slice(range.end);
+  return html.slice(0, range.from) + html.slice(range.to);
 }
 
 function canonicalEmailHtmlTextRange(
   html: string,
   text: string,
-): { start: number; end: number } | null {
+): { from: number; to: number } | null {
   if (!text) return null;
 
   const fragments = Array.from(new Set([escapeEmailHtmlText(text), text]));
@@ -59,16 +59,16 @@ function canonicalEmailHtmlTextRange(
 
 function findFragmentRange(
   html: string,
-  start: number,
-  end: number,
+  from: number,
+  to: number,
   fragments: readonly string[],
   expectedText: string,
-): { start: number; end: number } | null {
-  const segment = html.slice(start, end);
+): { from: number; to: number } | null {
+  const segment = html.slice(from, to);
   for (const fragment of fragments) {
     const offset = segment.indexOf(fragment);
     if (offset !== -1 && emailHtmlVisibleText(fragment) === expectedText) {
-      return { start: start + offset, end: start + offset + fragment.length };
+      return { from: from + offset, to: from + offset + fragment.length };
     }
   }
   return null;
