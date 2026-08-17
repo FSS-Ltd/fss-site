@@ -3,7 +3,31 @@ export type GmailProfile = {
   historyId: string;
 };
 
+export type GmailCreateDraftInput = {
+  raw: string;
+  gmailThreadId?: string;
+};
+
+export type GmailSendInput = {
+  raw: string;
+  gmailThreadId?: string;
+};
+
+export type GmailDraftResult = {
+  draftId: string;
+  messageId: string;
+  gmailThreadId: string;
+};
+
+export type GmailSendResult = {
+  messageId: string;
+  gmailThreadId: string;
+};
+
 export interface GmailClient {
+  createDraft(input: GmailCreateDraftInput): Promise<GmailDraftResult>;
+  sendDraft(draftId: string): Promise<GmailSendResult>;
+  sendMessage(input: GmailSendInput): Promise<GmailSendResult>;
   getProfile(): Promise<GmailProfile>;
 }
 
