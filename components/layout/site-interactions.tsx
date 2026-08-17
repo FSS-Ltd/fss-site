@@ -1,29 +1,27 @@
 "use client";
 
+import type { ComponentType } from "react";
 import { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
-
-const FssInteractions = dynamic(
-  () =>
-    import("@/components/redesign/fss-interactions").then(
-      (mod) => mod.FssInteractions,
-    ),
-  {
-    ssr: false,
-    loading: () => null,
-  },
-);
 
 export function SiteInteractions() {
-  const [mounted, setMounted] = useState(false);
+  const [InteractionComponent, setInteractionComponent] =
+    useState<ComponentType | null>(null);
 
   useEffect(() => {
     let mountedByActivity = false;
+    let cancelled = false;
 
     const mount = () => {
       if (mountedByActivity) return;
       mountedByActivity = true;
-      setMounted(true);
+
+      void import("@/components/redesign/fss-interactions").then(
+        ({ FssInteractions }) => {
+          if (!cancelled) {
+            setInteractionComponent(() => FssInteractions);
+          }
+        },
+      );
     };
 
     // Keep the non-critical interaction bundle out of the initial Lighthouse
@@ -35,6 +33,7 @@ export function SiteInteractions() {
     window.addEventListener("keydown", mount, { once: true });
 
     return () => {
+      cancelled = true;
       globalThis.clearTimeout(timeoutHandle);
       window.removeEventListener("scroll", mount);
       window.removeEventListener("pointerdown", mount);
@@ -42,9 +41,9 @@ export function SiteInteractions() {
     };
   }, []);
 
-  if (!mounted) {
+  if (!InteractionComponent) {
     return null;
   }
 
-  return <FssInteractions />;
+  return <InteractionComponent />;
 }
