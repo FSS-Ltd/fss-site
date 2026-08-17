@@ -7,8 +7,9 @@ import { enforceFounderDashboardAccess } from "./dashboard-access";
 test("allows a successfully authorised founder", async () => {
   let redirected = false;
 
-  await enforceFounderDashboardAccess(
-    async () => ({ actorId: "actor-id", email: "founder@example.test" }),
+  const founder = { actorId: "actor-id", email: "founder@example.test" };
+  const result = await enforceFounderDashboardAccess(
+    async () => founder,
     () => {
       redirected = true;
       throw new Error("Unexpected redirect");
@@ -16,6 +17,7 @@ test("allows a successfully authorised founder", async () => {
   );
 
   assert.equal(redirected, false);
+  assert.equal(result, founder);
 });
 
 test("redirects failed founder authorization to the login route", async () => {
