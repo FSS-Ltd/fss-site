@@ -11,6 +11,7 @@ const validEnv = {
   GOOGLE_AUTH_CLIENT_SECRET: "client-secret",
   GROWTH_OS_OWNER_EMAIL: "j.ntagengwa@faithfulsoftware.dev",
   TOKEN_ENCRYPTION_KEY: "b".repeat(32),
+  GROWTH_OS_AGENT_HMAC_SECRET: "c".repeat(32),
   GROWTH_OS_AUTOMATIONS_ENABLED: "false",
 };
 
@@ -18,6 +19,7 @@ test("accepts the complete server environment", () => {
   const result = parseGrowthServerEnv(validEnv);
 
   assert.equal(result.ownerEmail, "j.ntagengwa@faithfulsoftware.dev");
+  assert.equal(result.agentHmacSecret, "c".repeat(32));
   assert.equal(result.automationsEnabled, false);
 });
 
@@ -30,6 +32,15 @@ test("normalises the founder address and enabled flag", () => {
 
   assert.equal(result.ownerEmail, "j.ntagengwa@faithfulsoftware.dev");
   assert.equal(result.automationsEnabled, true);
+});
+
+test("keeps non-agent Growth routes bootable before agent ingestion is configured", () => {
+  const result = parseGrowthServerEnv({
+    ...validEnv,
+    GROWTH_OS_AGENT_HMAC_SECRET: undefined,
+  });
+
+  assert.equal(result.agentHmacSecret, undefined);
 });
 
 test("rejects browser-visible credentials", () => {
@@ -96,7 +107,11 @@ test("rejects non-PostgreSQL database URLs", () => {
 });
 
 test("rejects blank security credentials", () => {
-  for (const name of ["AUTH_SECRET", "TOKEN_ENCRYPTION_KEY"]) {
+  for (const name of [
+    "AUTH_SECRET",
+    "TOKEN_ENCRYPTION_KEY",
+    "GROWTH_OS_AGENT_HMAC_SECRET",
+  ]) {
     assert.throws(
       () =>
         parseGrowthServerEnv({

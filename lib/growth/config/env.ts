@@ -35,6 +35,7 @@ const growthServerEnvSchema = z
       .trim()
       .transform((value) => value.toLowerCase())
       .pipe(z.literal(FOUNDER_EMAIL)),
+    GROWTH_OS_AGENT_HMAC_SECRET: securitySecretSchema.optional(),
     TOKEN_ENCRYPTION_KEY: securitySecretSchema,
     GROWTH_OS_AUTOMATIONS_ENABLED: z
       .enum(["true", "false"])
@@ -50,6 +51,7 @@ const growthServerEnvSchema = z
     googleAuthClientId: value.GOOGLE_AUTH_CLIENT_ID,
     googleAuthClientSecret: value.GOOGLE_AUTH_CLIENT_SECRET,
     ownerEmail: value.GROWTH_OS_OWNER_EMAIL,
+    agentHmacSecret: value.GROWTH_OS_AGENT_HMAC_SECRET,
     tokenEncryptionKey: value.TOKEN_ENCRYPTION_KEY,
     automationsEnabled: value.GROWTH_OS_AUTOMATIONS_ENABLED,
   }));
@@ -61,6 +63,7 @@ export type GrowthServerEnv = {
   googleAuthClientId: string;
   googleAuthClientSecret: string;
   ownerEmail: typeof FOUNDER_EMAIL;
+  agentHmacSecret?: string;
   tokenEncryptionKey: string;
   automationsEnabled: boolean;
 };
