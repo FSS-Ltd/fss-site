@@ -314,7 +314,10 @@ const firstEmailCandidateSchema: z.ZodType<FirstEmailCandidate> = z
 
 const emailVisualCandidateSchema: z.ZodType<EmailVisualCandidate> = z
   .object({
-    assetId: z.string().uuid("Asset ID must be a UUID.").nullable(),
+    assetId: z.null({
+      message:
+        "Custom visuals must be uploaded after the research run creates prospect IDs.",
+    }),
     fallbackAssetKey: requiredText("Fallback asset key", 120),
     altText: z
       .string()

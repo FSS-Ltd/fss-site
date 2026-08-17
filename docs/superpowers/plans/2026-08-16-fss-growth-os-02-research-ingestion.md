@@ -4,7 +4,7 @@
 
 **Goal:** Accept complete weekday Codex research bundles, generated prospect visuals, evidence, website assessments, and first-email drafts through a signed, idempotent server interface.
 
-**Architecture:** The scheduled Codex task researches ten qualified Kent corporate prospects and uploads each visual to a signed asset route. It then submits one signed JSON run bundle. Vercel validates the signature and every nested object before one PostgreSQL transaction deduplicates and inserts the run.
+**Architecture:** The scheduled Codex task researches ten qualified Kent corporate prospects and submits one signed JSON run bundle with reviewed fallback selections. Vercel validates the signature and every nested object before one PostgreSQL transaction deduplicates and inserts the run. The response maps each accepted input index to its persisted prospect ID. The task then uploads each available generated visual through the signed asset route, which atomically switches that prospect's draft from fallback to canonical stored asset metadata.
 
 **Tech Stack:** Next.js Route Handlers, Zod 4, Node crypto, Supabase PostgreSQL, Vercel Blob, Sharp, Node test runner.
 
@@ -190,7 +190,9 @@ export type FirstEmailCandidate = {
 };
 
 export type EmailVisualCandidate = {
-  assetId: string | null;
+  // Initial ingestion uses the reviewed fallback. Upload the generated visual
+  // after the response provides persisted run and prospect IDs.
+  assetId: null;
   fallbackAssetKey: string;
   altText: string;
   conceptDisclaimer: string;
@@ -389,7 +391,8 @@ Cover:
 - Duplicate `externalRunId` returns the existing result
 - Duplicate company number is counted without a second business
 - Suppressed address is rejected before prospect insertion
-- Asset belongs to a different prospect or run and blocks the bundle
+- Pre-attached custom assets are rejected because persisted IDs do not exist yet
+- A post-ingestion cold-email upload atomically selects its canonical asset metadata on the draft
 - Any invalid record rolls back the whole run
 
 - [ ] **Step 2: Run tests and verify RED**
@@ -415,8 +418,8 @@ Inside one transaction:
 4. Insert or match the canonical business.
 5. Insert the contact only when its corporate status remains accepted.
 6. Insert prospect, evidence, website assessment, and agent-task snapshots.
-7. Validate the selected custom or fallback asset.
-8. Insert the first-email draft as an agent-task output for Plan 03 to materialise.
+7. Validate and snapshot the reviewed fallback asset.
+8. Insert the first-email draft as an agent-task output for Plan 03 to materialise. The signed asset route may replace the fallback selection only after these run and prospect IDs exist.
 9. Update run counts and status to `completed`.
 10. Append redacted audit events.
 
@@ -506,7 +509,7 @@ Research Kent-based local service companies and produce up to ten new, qualified
 
 For each accepted prospect, prepare a structured website assessment, FSS offer recommendation, complete 140 to 220 word first email, plain-text alternative, direct opt-out sentence, and one non-deceptive conceptual visual. The visual must not fabricate staff, premises, testimonials, reviews, or results. If image generation is unavailable, choose an approved sector fallback key.
 
-Validate the version 1.0 fixture locally, upload valid visual files, sign the final request, submit it once, and report accepted, duplicate, and rejected counts. Do not send email.
+Validate the version 1.0 fixture locally, sign the final research bundle, and submit it once. Use the returned accepted-candidate index mapping to upload each valid visual with its persisted run and prospect IDs. If a visual upload is unavailable or fails, retain the approved fallback. Report accepted, duplicate, and rejected counts. Do not send email.
 ```
 
 - [ ] **Step 3: Add a redacted fixture**

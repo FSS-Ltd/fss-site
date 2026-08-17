@@ -89,7 +89,7 @@ export async function appendAuditEvent(
       ${input.action},
       ${input.entityType},
       ${input.entityId},
-      ${JSON.stringify(metadata)}::jsonb
+      ${db.json(metadata)}
     )
   `;
 }

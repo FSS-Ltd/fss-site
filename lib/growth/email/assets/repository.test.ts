@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import type { GrowthQueryExecutor } from "../../db/types";
+import type { GrowthDb, GrowthTransaction } from "../../db/types";
 import type { PersistEmailAssetInput } from "./service";
 import {
   EmailAssetAssociationError,
@@ -15,10 +15,12 @@ type RecordedQuery = {
 };
 
 function createRecordingQuery(rows: readonly object[]): {
-  db: GrowthQueryExecutor;
+  db: GrowthDb;
   queries: RecordedQuery[];
+  transactions: { attempts: number; rollbacks: number };
 } {
   const queries: RecordedQuery[] = [];
+  const transactions = { attempts: 0, rollbacks: 0 };
   const query = async (
     strings: TemplateStringsArray,
     ...values: readonly unknown[]
@@ -29,8 +31,23 @@ function createRecordingQuery(rows: readonly object[]): {
     });
     return rows;
   };
+  const db = query as unknown as GrowthDb;
+  const transactionalDb = db as unknown as {
+    begin: <T>(
+      operation: (transaction: GrowthTransaction) => Promise<T>,
+    ) => Promise<T>;
+  };
+  transactionalDb.begin = async (operation) => {
+    transactions.attempts += 1;
+    try {
+      return await operation(query as unknown as GrowthTransaction);
+    } catch (error) {
+      transactions.rollbacks += 1;
+      throw error;
+    }
+  };
 
-  return { db: query as unknown as GrowthQueryExecutor, queries };
+  return { db, queries, transactions };
 }
 
 const RUN_ID = "d0f57e79-413f-41dc-b15f-1b609fb29db2";
@@ -72,11 +89,17 @@ test("checks the exact prospect and research-run relationship", async () => {
 });
 
 test("persists safe asset metadata only when the relationship still matches", async () => {
-  const { db, queries } = createRecordingQuery([{ id: ASSET_ID }]);
+  const { db, queries, transactions } = createRecordingQuery([
+    { id: ASSET_ID, draftUpdated: true },
+  ]);
 
   await persistEmailAssetForRun(db, asset);
 
   assert.deepEqual(queries[0]?.values, [
+    PROSPECT_ID,
+    RUN_ID,
+    "cold_first_email",
+    RUN_ID,
     ASSET_ID,
     "cold_first_email",
     asset.blobUrl,
@@ -89,18 +112,21 @@ test("persists safe asset metadata only when the relationship still matches", as
     "a".repeat(64),
     "pending",
     "agent_ingestion",
-    PROSPECT_ID,
     RUN_ID,
   ]);
   const queryText = queries[0]?.text ?? "";
   assert.match(queryText, /insert into growth\.email_assets/);
   assert.match(queryText, /from growth\.prospects p/);
   assert.match(queryText, /p\.id = \? and p\.research_run_id = \?/);
+  assert.match(queryText, /update growth\.agent_tasks/);
+  assert.match(queryText, /jsonb_build_object/);
+  assert.match(queryText, /ea\.alt_text/);
   assert.doesNotMatch(queryText, /select\s+\*/i);
+  assert.deepEqual(transactions, { attempts: 1, rollbacks: 0 });
 });
 
 test("fails persistence if the prospect leaves the referenced run", async () => {
-  const { db } = createRecordingQuery([]);
+  const { db, transactions } = createRecordingQuery([]);
 
   await assert.rejects(
     () => persistEmailAssetForRun(db, asset),
@@ -109,4 +135,5 @@ test("fails persistence if the prospect leaves the referenced run", async () => 
       return true;
     },
   );
+  assert.deepEqual(transactions, { attempts: 1, rollbacks: 1 });
 });

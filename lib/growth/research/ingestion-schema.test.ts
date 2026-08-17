@@ -12,6 +12,27 @@ test("accepts one complete versioned research bundle", () => {
   assert.equal(parsed.prospects[0]?.prospect.fitScore, 91);
 });
 
+test("requires custom visuals to be uploaded after prospect IDs exist", () => {
+  const fixture = createValidFixture();
+
+  assert.throws(
+    () =>
+      parseResearchRunIngestion({
+        ...fixture,
+        prospects: [
+          {
+            ...fixture.prospects[0],
+            visual: {
+              ...fixture.prospects[0].visual,
+              assetId: "55555555-5555-4555-8555-555555555555",
+            },
+          },
+        ],
+      }),
+    /uploaded after/i,
+  );
+});
+
 test("rejects the wrong schema version", () => {
   assert.throws(
     () =>
