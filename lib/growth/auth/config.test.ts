@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { NextRequest } from "next/server";
 
 import type { GrowthServerEnv } from "../config/env";
 import { createGrowthAuthConfig, GROWTH_GOOGLE_AUTH_SCOPES } from "./config";
@@ -18,6 +19,59 @@ const env: GrowthServerEnv = {
 test("requests only identity scopes from Google", () => {
   assert.equal(GROWTH_GOOGLE_AUTH_SCOPES, "openid email profile");
   assert.doesNotMatch(GROWTH_GOOGLE_AUTH_SCOPES, /gmail/i);
+});
+
+test("routes sign-in and authorization errors to the founder login", () => {
+  assert.deepEqual(createGrowthAuthConfig(env).pages, {
+    signIn: "/growth/login",
+    error: "/growth/login",
+  });
+});
+
+test("protects Growth OS routes with the verified founder session", async () => {
+  const authorized = createGrowthAuthConfig(env).callbacks?.authorized;
+  assert.ok(authorized);
+
+  const loginRequest = new NextRequest("https://fss.test/growth/login");
+  assert.equal(await authorized({ auth: null, request: loginRequest }), true);
+
+  const dashboardRequest = new NextRequest(
+    "https://fss.test/growth/prospects?status=new",
+  );
+  assert.equal(
+    await authorized({
+      auth: {
+        user: {
+          email: env.ownerEmail,
+          founderEmailVerified: true,
+        },
+        expires: "2026-08-18T00:00:00.000Z",
+      },
+      request: dashboardRequest,
+    }),
+    true,
+  );
+
+  const denied = await authorized({
+    auth: {
+      user: {
+        email: env.ownerEmail,
+        founderEmailVerified: false,
+      },
+      expires: "2026-08-18T00:00:00.000Z",
+    },
+    request: dashboardRequest,
+  });
+  assert.ok(denied instanceof Response);
+  assert.equal(denied.status, 307);
+  assert.equal(denied.headers.get("location"), "https://fss.test/growth/login");
+  assert.match(
+    denied.headers.get("set-cookie") ?? "",
+    /growth\.callback_path=%2Fgrowth%2Fprospects%3Fstatus%3Dnew/,
+  );
+  assert.match(denied.headers.get("set-cookie") ?? "", /HttpOnly/);
+  assert.match(denied.headers.get("set-cookie") ?? "", /SameSite=lax/i);
+  assert.match(denied.headers.get("set-cookie") ?? "", /Secure/);
 });
 
 test("allows only the verified founder OAuth profile", async () => {

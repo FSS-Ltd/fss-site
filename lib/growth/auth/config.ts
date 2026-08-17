@@ -1,8 +1,16 @@
 import type { NextAuthConfig } from "next-auth";
+import { NextResponse } from "next/server";
 import Google from "next-auth/providers/google";
 
 import type { GrowthServerEnv } from "../config/env";
 import { isAllowedFounderProfile } from "./policy";
+import {
+  GROWTH_CALLBACK_COOKIE,
+  GROWTH_COOKIE_PATH,
+  GROWTH_LOGIN_PATH,
+  isGrowthLoginPath,
+  resolveGrowthCallbackPath,
+} from "./routing";
 
 export const GROWTH_GOOGLE_AUTH_SCOPES = "openid email profile" as const;
 
@@ -18,6 +26,10 @@ export function createGrowthAuthConfig(env: GrowthAuthEnv): NextAuthConfig {
       strategy: "jwt",
       maxAge: 8 * 60 * 60,
     },
+    pages: {
+      signIn: GROWTH_LOGIN_PATH,
+      error: GROWTH_LOGIN_PATH,
+    },
     providers: [
       Google({
         clientId: env.googleAuthClientId,
@@ -32,6 +44,35 @@ export function createGrowthAuthConfig(env: GrowthAuthEnv): NextAuthConfig {
       }),
     ],
     callbacks: {
+      authorized({ auth, request }) {
+        const { pathname, search } = request.nextUrl;
+
+        if (
+          isGrowthLoginPath(pathname) ||
+          isAllowedFounderProfile(
+            {
+              email: auth?.user?.email,
+              emailVerified: auth?.user?.founderEmailVerified,
+            },
+            env.ownerEmail,
+          )
+        ) {
+          return true;
+        }
+
+        const loginUrl = new URL(GROWTH_LOGIN_PATH, request.nextUrl);
+        const response = NextResponse.redirect(loginUrl);
+        response.cookies.set({
+          name: GROWTH_CALLBACK_COOKIE,
+          value: resolveGrowthCallbackPath(`${pathname}${search}`),
+          httpOnly: true,
+          maxAge: 10 * 60,
+          path: GROWTH_COOKIE_PATH,
+          sameSite: "lax",
+          secure: request.nextUrl.protocol === "https:",
+        });
+        return response;
+      },
       async signIn({ profile }) {
         return isAllowedFounderProfile(
           {
