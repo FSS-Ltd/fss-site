@@ -507,3 +507,193 @@ test("rejects blank credentials before making a request", async () => {
   await assert.rejects(client.getProfile(), /refresh token/i);
   assert.equal(requested, false);
 });
+
+test("creates a Gmail draft from a rendered raw message", async () => {
+  const requests: Request[] = [];
+  const client = createGmailClient(config, {
+    fetch: async (input, init) => {
+      const request = new Request(input, init);
+      requests.push(request);
+      return requests.length === 1
+        ? tokenResponse("access-token")
+        : Response.json({
+            id: "draft-id",
+            message: { id: "message-id", threadId: "thread-id" },
+          });
+    },
+  });
+
+  assert.deepEqual(
+    await client.createDraft({
+      raw: "UmF3IE1JTUU",
+      gmailThreadId: "existing-thread-id",
+    }),
+    {
+      draftId: "draft-id",
+      messageId: "message-id",
+      gmailThreadId: "thread-id",
+    },
+  );
+  assert.equal(
+    requests[1]?.url,
+    "https://gmail.googleapis.com/gmail/v1/users/me/drafts",
+  );
+  assert.equal(requests[1]?.method, "POST");
+  assert.equal(requests[1]?.headers.get("accept"), "application/json");
+  assert.equal(requests[1]?.headers.get("content-type"), "application/json");
+  assert.equal(
+    requests[1]?.headers.get("authorization"),
+    "Bearer access-token",
+  );
+  assert.deepEqual(await requests[1]?.json(), {
+    message: {
+      raw: "UmF3IE1JTUU",
+      threadId: "existing-thread-id",
+    },
+  });
+});
+
+test("omits the Gmail thread ID when creating an unthreaded draft", async () => {
+  let draftRequest: Request | undefined;
+  const client = createGmailClient(config, {
+    fetch: async (input, init) => {
+      if (String(input).endsWith("/token"))
+        return tokenResponse("access-token");
+      draftRequest = new Request(input, init);
+      return Response.json({
+        id: "draft-id",
+        message: { id: "message-id", threadId: "new-thread-id" },
+      });
+    },
+  });
+
+  await client.createDraft({ raw: "UmF3IE1JTUU" });
+
+  assert.deepEqual(await draftRequest?.json(), {
+    message: { raw: "UmF3IE1JTUU" },
+  });
+});
+
+test("sends an existing Gmail draft", async () => {
+  let sendRequest: Request | undefined;
+  const client = createGmailClient(config, {
+    fetch: async (input, init) => {
+      if (String(input).endsWith("/token"))
+        return tokenResponse("access-token");
+      sendRequest = new Request(input, init);
+      return Response.json({ id: "sent-message-id", threadId: "thread-id" });
+    },
+  });
+
+  assert.deepEqual(await client.sendDraft("draft-id"), {
+    messageId: "sent-message-id",
+    gmailThreadId: "thread-id",
+  });
+  assert.equal(
+    sendRequest?.url,
+    "https://gmail.googleapis.com/gmail/v1/users/me/drafts/send",
+  );
+  assert.equal(sendRequest?.method, "POST");
+  assert.deepEqual(await sendRequest?.json(), { id: "draft-id" });
+});
+
+test("sends a rendered Gmail message directly", async () => {
+  let sendRequest: Request | undefined;
+  const client = createGmailClient(config, {
+    fetch: async (input, init) => {
+      if (String(input).endsWith("/token"))
+        return tokenResponse("access-token");
+      sendRequest = new Request(input, init);
+      return Response.json({ id: "sent-message-id", threadId: "thread-id" });
+    },
+  });
+
+  assert.deepEqual(
+    await client.sendMessage({
+      raw: "UmF3IE1JTUU",
+      gmailThreadId: "existing-thread-id",
+    }),
+    { messageId: "sent-message-id", gmailThreadId: "thread-id" },
+  );
+  assert.equal(
+    sendRequest?.url,
+    "https://gmail.googleapis.com/gmail/v1/users/me/messages/send",
+  );
+  assert.equal(sendRequest?.method, "POST");
+  assert.deepEqual(await sendRequest?.json(), {
+    raw: "UmF3IE1JTUU",
+    threadId: "existing-thread-id",
+  });
+});
+
+test("preserves the exact mutation body when refreshing after a 401", async () => {
+  const sendRequests: Request[] = [];
+  let refreshes = 0;
+  const client = createGmailClient(config, {
+    fetch: async (input, init) => {
+      const request = new Request(input, init);
+      if (request.url.endsWith("/token")) {
+        refreshes += 1;
+        return tokenResponse(`access-${refreshes}`);
+      }
+      sendRequests.push(request);
+      return sendRequests.length === 1
+        ? new Response(null, { status: 401 })
+        : Response.json({ id: "sent-message-id", threadId: "thread-id" });
+    },
+  });
+
+  await client.sendMessage({
+    raw: "UmF3IE1JTUU",
+    gmailThreadId: "existing-thread-id",
+  });
+
+  assert.equal(refreshes, 2);
+  assert.deepEqual(
+    sendRequests.map((request) => request.headers.get("authorization")),
+    ["Bearer access-1", "Bearer access-2"],
+  );
+  assert.deepEqual(
+    await Promise.all(sendRequests.map((request) => request.json())),
+    [
+      { raw: "UmF3IE1JTUU", threadId: "existing-thread-id" },
+      { raw: "UmF3IE1JTUU", threadId: "existing-thread-id" },
+    ],
+  );
+});
+
+test("rejects invalid Gmail mutation inputs and response schemas", async () => {
+  let providerRequests = 0;
+  const invalidInputClient = createGmailClient(config, {
+    fetch: async () => {
+      providerRequests += 1;
+      return tokenResponse("access-token");
+    },
+  });
+
+  await assert.rejects(
+    invalidInputClient.createDraft({ raw: "not base64url=" }),
+    TypeError,
+  );
+  await assert.rejects(invalidInputClient.createDraft({ raw: "A" }), TypeError);
+  await assert.rejects(
+    invalidInputClient.sendMessage({ raw: "A".repeat(2 * 1024 * 1024) }),
+    TypeError,
+  );
+  await assert.rejects(invalidInputClient.sendDraft(" "), TypeError);
+  assert.equal(providerRequests, 0);
+
+  const invalidResponseClient = createGmailClient(config, {
+    fetch: async (input) =>
+      String(input).endsWith("/token")
+        ? tokenResponse("access-token")
+        : Response.json({ id: "message-without-thread" }),
+  });
+  await assert.rejects(
+    invalidResponseClient.sendMessage({ raw: "UmF3IE1JTUU" }),
+    (error: unknown) =>
+      error instanceof GmailClientError &&
+      error.code === "INVALID_PROVIDER_RESPONSE" &&
+      error.message === "The Gmail provider request failed.",
+  );
+});

@@ -1,12 +1,22 @@
 import { z } from "zod";
 
-import { GmailClientError, type GmailClient, type GmailProfile } from "./types";
+import {
+  GmailClientError,
+  type GmailClient,
+  type GmailCreateDraftInput,
+  type GmailDraftResult,
+  type GmailProfile,
+  type GmailSendInput,
+  type GmailSendResult,
+} from "./types";
 
 const GOOGLE_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token";
 const GMAIL_API_BASE = "https://gmail.googleapis.com/gmail/v1/users/me";
 const REQUEST_TIMEOUT_MS = 10_000;
 const ACCESS_TOKEN_EXPIRY_SKEW_SECONDS = 60;
 const MAX_JSON_RESPONSE_BYTES = 256 * 1024;
+const MAX_RAW_MESSAGE_BYTES = 1024 * 1024;
+const MAX_RAW_MESSAGE_CHARS = Math.ceil(MAX_RAW_MESSAGE_BYTES / 3) * 4;
 const RETRYABLE_FORBIDDEN_REASONS = new Set([
   "rateLimitExceeded",
   "userRateLimitExceeded",
@@ -21,6 +31,44 @@ const tokenResponseSchema = z.object({
 const profileResponseSchema = z.object({
   emailAddress: z.string().email().max(320),
   historyId: z.string().regex(/^\d+$/).max(32),
+});
+
+const providerIdSchema = z
+  .string()
+  .min(1)
+  .max(256)
+  .refine((value) => value === value.trim());
+
+function isCanonicalRawMessage(value: string): boolean {
+  if (value.length > MAX_RAW_MESSAGE_CHARS || value.length % 4 === 1) {
+    return false;
+  }
+  const decoded = Buffer.from(value, "base64url");
+  return (
+    decoded.byteLength <= MAX_RAW_MESSAGE_BYTES &&
+    decoded.toString("base64url") === value
+  );
+}
+
+const rawMessageInputSchema = z.object({
+  raw: z
+    .string()
+    .min(1)
+    .max(MAX_RAW_MESSAGE_CHARS)
+    .regex(/^[A-Za-z0-9_-]+$/)
+    .refine(isCanonicalRawMessage),
+  gmailThreadId: providerIdSchema.optional(),
+});
+const draftResponseSchema = z.object({
+  id: providerIdSchema,
+  message: z.object({
+    id: providerIdSchema,
+    threadId: providerIdSchema,
+  }),
+});
+const sentMessageResponseSchema = z.object({
+  id: providerIdSchema,
+  threadId: providerIdSchema,
 });
 
 const providerErrorResponseSchema = z.object({
@@ -234,15 +282,22 @@ class GoogleGmailClient implements GmailClient {
     return this.refreshPromise;
   }
 
-  private async request(pathname: string): Promise<Response> {
+  private async request(
+    pathname: string,
+    init: RequestInit = {},
+  ): Promise<Response> {
+    const requestWithToken = (accessToken: CachedAccessToken) => {
+      const headers = new Headers(init.headers);
+      headers.set("Accept", "application/json");
+      headers.set("Authorization", `Bearer ${accessToken.value}`);
+      return this.fetchProvider(`${GMAIL_API_BASE}${pathname}`, {
+        ...init,
+        headers,
+      });
+    };
+
     let accessToken = await this.getFreshAccessToken();
-    let response = await this.fetchProvider(`${GMAIL_API_BASE}${pathname}`, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${accessToken.value}`,
-      },
-    });
+    let response = await requestWithToken(accessToken);
 
     if (response.status === 401) {
       await discardBody(response);
@@ -250,13 +305,7 @@ class GoogleGmailClient implements GmailClient {
         this.accessToken = undefined;
       }
       accessToken = await this.getFreshAccessToken();
-      response = await this.fetchProvider(`${GMAIL_API_BASE}${pathname}`, {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${accessToken.value}`,
-        },
-      });
+      response = await requestWithToken(accessToken);
       if (response.status === 401) {
         await discardBody(response);
         throw new GmailClientError("AUTHENTICATION_FAILED");
@@ -267,6 +316,79 @@ class GoogleGmailClient implements GmailClient {
       throw await providerError(response);
     }
     return response;
+  }
+
+  private async postJson(pathname: string, body: unknown): Promise<unknown> {
+    const response = await this.request(pathname, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    return readJson(response);
+  }
+
+  async createDraft(input: GmailCreateDraftInput): Promise<GmailDraftResult> {
+    const parsedInput = rawMessageInputSchema.safeParse(input);
+    if (!parsedInput.success) {
+      throw new TypeError("Gmail draft input is invalid.");
+    }
+    const message = {
+      raw: parsedInput.data.raw,
+      ...(parsedInput.data.gmailThreadId
+        ? { threadId: parsedInput.data.gmailThreadId }
+        : {}),
+    };
+    const parsed = draftResponseSchema.safeParse(
+      await this.postJson("/drafts", { message }),
+    );
+    if (!parsed.success) {
+      throw new GmailClientError("INVALID_PROVIDER_RESPONSE");
+    }
+    return {
+      draftId: parsed.data.id,
+      messageId: parsed.data.message.id,
+      gmailThreadId: parsed.data.message.threadId,
+    };
+  }
+
+  async sendDraft(draftId: string): Promise<GmailSendResult> {
+    const parsedDraftId = providerIdSchema.safeParse(draftId);
+    if (!parsedDraftId.success) {
+      throw new TypeError("Gmail draft ID is invalid.");
+    }
+    const parsed = sentMessageResponseSchema.safeParse(
+      await this.postJson("/drafts/send", { id: parsedDraftId.data }),
+    );
+    if (!parsed.success) {
+      throw new GmailClientError("INVALID_PROVIDER_RESPONSE");
+    }
+    return {
+      messageId: parsed.data.id,
+      gmailThreadId: parsed.data.threadId,
+    };
+  }
+
+  async sendMessage(input: GmailSendInput): Promise<GmailSendResult> {
+    const parsedInput = rawMessageInputSchema.safeParse(input);
+    if (!parsedInput.success) {
+      throw new TypeError("Gmail message input is invalid.");
+    }
+    const body = {
+      raw: parsedInput.data.raw,
+      ...(parsedInput.data.gmailThreadId
+        ? { threadId: parsedInput.data.gmailThreadId }
+        : {}),
+    };
+    const parsed = sentMessageResponseSchema.safeParse(
+      await this.postJson("/messages/send", body),
+    );
+    if (!parsed.success) {
+      throw new GmailClientError("INVALID_PROVIDER_RESPONSE");
+    }
+    return {
+      messageId: parsed.data.id,
+      gmailThreadId: parsed.data.threadId,
+    };
   }
 
   async getProfile(): Promise<GmailProfile> {
