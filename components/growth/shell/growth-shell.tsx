@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 
+import { MobileNavigation } from "./mobile-navigation";
 import { SideNavigation } from "./side-navigation";
 import styles from "./shell.module.css";
 import { TopNavigation } from "./top-navigation";
@@ -25,6 +26,7 @@ export function GrowthShellFrame({
       <main className={styles.main} id="growth-main" tabIndex={-1}>
         {children}
       </main>
+      <MobileNavigation {...navigationProps} />
     </div>
   );
 }
