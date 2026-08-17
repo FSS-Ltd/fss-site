@@ -206,6 +206,11 @@ html {
 }
 
 @media (max-width: 939px) {
+  #fssroot > header[data-header] {
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+  }
+
   #fssroot main > .contents > section:nth-of-type(2) {
     content-visibility: auto;
     contain-intrinsic-size: auto 820px;
@@ -230,6 +235,10 @@ html {
   [data-hero-grid] {
     grid-template-columns: 1fr !important;
     min-height: 62vh;
+  }
+
+  [data-hero-grid] > div:first-child {
+    contain: layout paint;
   }
 
   [data-2col] {
