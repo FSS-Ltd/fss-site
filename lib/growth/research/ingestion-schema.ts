@@ -1,19 +1,20 @@
 import { z } from "zod";
 
-import type {
-  AssessmentSectionCandidate,
-  BusinessCandidate,
-  ContactCandidate,
-  EmailVisualCandidate,
-  EvidenceCandidate,
-  FirstEmailCandidate,
-  ProspectCandidate,
-  RejectedResearchCandidate,
-  ResearchProspectCandidate,
-  ResearchRunIngestion,
-  WebsiteAssessmentCandidate,
-} from "./types";
 import { MAX_RESEARCH_BUNDLE_BYTES } from "./limits";
+import {
+  RESEARCH_REJECTION_REASON_CODES,
+  type AssessmentSectionCandidate,
+  type BusinessCandidate,
+  type ContactCandidate,
+  type EmailVisualCandidate,
+  type EvidenceCandidate,
+  type FirstEmailCandidate,
+  type ProspectCandidate,
+  type RejectedResearchCandidate,
+  type ResearchProspectCandidate,
+  type ResearchRunIngestion,
+  type WebsiteAssessmentCandidate,
+} from "./types";
 
 const PERSONAL_MAILBOX_DOMAINS = new Set([
   "aol.com",
@@ -499,7 +500,9 @@ const researchProspectCandidateSchema: z.ZodType<ResearchProspectCandidate> = z
 const rejectedResearchCandidateSchema: z.ZodType<RejectedResearchCandidate> = z
   .object({
     candidateName: requiredText("Rejected candidate name", 200),
-    reasonCode: requiredText("Rejection reason code", 120),
+    reasonCode: z.enum(RESEARCH_REJECTION_REASON_CODES, {
+      message: "A supported rejection reason code is required.",
+    }),
     sourceUrl: webUrl.optional(),
   })
   .strict();

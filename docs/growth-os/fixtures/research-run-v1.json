@@ -1,0 +1,184 @@
+{
+  "schemaVersion": "1.0",
+  "externalRunId": "dry-run-2026-08-17-0600-europe-london-v1",
+  "runDate": "2026-08-17",
+  "timezone": "Europe/London",
+  "promptVersion": "weekday-research-v1",
+  "prospects": [
+    {
+      "business": {
+        "legalName": "Harbour Heating Limited",
+        "tradingName": "Harbour Heating",
+        "companyNumber": "00000000",
+        "corporateType": "limited_company",
+        "corporateStatus": "active",
+        "sector": "Home and property services",
+        "locality": "Maidstone",
+        "county": "Kent",
+        "websiteUrl": "https://harbour-heating.test",
+        "googlePlaceId": null,
+        "googleMapsReferenceUrl": null,
+        "firstPartySourceUrl": "https://harbour-heating.test/services",
+        "verifiedAt": "2026-08-17T05:30:00.000Z"
+      },
+      "contact": {
+        "firstName": "Morgan",
+        "lastName": "Reed",
+        "roleTitle": "Director",
+        "email": "morgan@harbour-heating.test",
+        "emailSourceUrl": "https://harbour-heating.test/contact",
+        "emailVerifiedAt": "2026-08-17T05:35:00.000Z",
+        "subscriberType": "corporate",
+        "lawfulBasis": "legitimate_interests",
+        "mailboxType": "corporate"
+      },
+      "prospect": {
+        "fitScore": 88,
+        "opportunitySummary": "Service, postcode, urgency, and preferred contact details could be collected before a call-back.",
+        "recommendedOffer": "Website enquiry workflow and operational hand-off",
+        "estimatedOneOffMinPence": 450000,
+        "estimatedOneOffMaxPence": 650000,
+        "estimatedMonthlyPence": 0,
+        "nextAction": "Founder reviews the evidence, first email, and conceptual visual.",
+        "nextActionDueAt": "2026-08-17T08:00:00.000Z"
+      },
+      "evidence": [
+        {
+          "sourceType": "companies_house",
+          "sourceUrl": "https://find-and-update.company-information.service.gov.uk/company/00000000",
+          "externalReference": "00000000",
+          "claimType": "corporate_status",
+          "claimSummary": "Fixture-only active limited company verification.",
+          "observedAt": "2026-08-17T05:20:00.000Z",
+          "verifiedAt": "2026-08-17T05:20:00.000Z",
+          "retentionClass": "legal_evidence"
+        },
+        {
+          "sourceType": "first_party",
+          "sourceUrl": "https://harbour-heating.test/services",
+          "externalReference": null,
+          "claimType": "service_opportunity",
+          "claimSummary": "The fictional site routes several service enquiries through one general contact path.",
+          "observedAt": "2026-08-17T05:25:00.000Z",
+          "verifiedAt": "2026-08-17T05:25:00.000Z",
+          "retentionClass": "prospect_research"
+        }
+      ],
+      "assessment": {
+        "businessGoal": "Turn qualified local website visits into structured service enquiries.",
+        "primaryCta": "Request a call-back",
+        "sitemap": {
+          "schemaVersion": "1.0",
+          "summary": "Keep a focused service-led structure.",
+          "items": ["Home", "Services", "Service areas", "About", "Contact"]
+        },
+        "homepageSections": {
+          "schemaVersion": "1.0",
+          "summary": "Explain the service path before asking for contact details.",
+          "items": [
+            "Service promise",
+            "Service choices",
+            "Coverage",
+            "Trust",
+            "Enquiry"
+          ]
+        },
+        "conversionPlan": {
+          "schemaVersion": "1.0",
+          "summary": "Collect useful job context before the call-back.",
+          "items": [
+            "Service type",
+            "Postcode",
+            "Urgency",
+            "Preferred contact time"
+          ]
+        },
+        "localSeoPlan": {
+          "schemaVersion": "1.0",
+          "summary": "Use factual first-party service and location content.",
+          "items": [
+            "Service pages",
+            "Coverage page",
+            "Consistent business details"
+          ]
+        },
+        "trustSignals": {
+          "schemaVersion": "1.0",
+          "summary": "Present only credentials the business can verify.",
+          "items": [
+            "Company identity",
+            "Accreditations",
+            "Service process",
+            "Contact details"
+          ]
+        },
+        "technologyPlan": {
+          "schemaVersion": "1.0",
+          "summary": "Use an accessible, mobile-first enquiry flow.",
+          "items": [
+            "Server-rendered pages",
+            "Validated form",
+            "Structured hand-off"
+          ]
+        },
+        "futureOpportunities": {
+          "schemaVersion": "1.0",
+          "summary": "Add workflow connections only after the enquiry path is proven.",
+          "items": [
+            "Scheduling link",
+            "Job-system hand-off",
+            "Service reporting"
+          ]
+        },
+        "heroConcept": {
+          "schemaVersion": "1.0",
+          "summary": "Show a clear route from service need to organised response.",
+          "items": [
+            "Home-service motif",
+            "Request details",
+            "Call-back calendar"
+          ]
+        },
+        "mobileFallback": {
+          "schemaVersion": "1.0",
+          "summary": "Keep the enquiry action visible without animation.",
+          "items": [
+            "Static concept image",
+            "Short service summary",
+            "Large call-back action"
+          ]
+        },
+        "performanceBudget": {
+          "schemaVersion": "1.0",
+          "summary": "Protect speed on typical mobile connections.",
+          "items": [
+            "Compressed imagery",
+            "Minimal client JavaScript",
+            "Stable layout"
+          ]
+        }
+      },
+      "firstEmail": {
+        "subject": "A practical enquiry idea for Harbour Heating",
+        "html": "<p>Hello Morgan,</p><p>I was reviewing Harbour Heating's website and noticed that emergency call-outs, boiler servicing, and quote requests all lead visitors toward the same general contact route. That keeps the site simple, but it may leave your team asking the same questions by phone before a job can be prioritised.</p><p>FSS could shape a focused enquiry journey that asks for service type, postcode, urgency, and preferred contact time before the request reaches your team. The aim would be a clearer hand-off, not a larger system: a fast mobile form, useful confirmation for the customer, and an organised summary for whoever responds.</p><p>I have included a conceptual workflow image to make the idea concrete. This is a proposed design concept, not an existing Harbour Heating system or a claim about current results.</p><p>Would a short conversation next week be useful to test whether this fits how you handle enquiries?</p><p>If this is not relevant, reply opt out and I will send no further emails.</p><p>Regards,<br>Jean-Fidele<br>Faithful Software Solutions</p>",
+        "text": "Hello Morgan,\n\nI was reviewing Harbour Heating's website and noticed that emergency call-outs, boiler servicing, and quote requests all lead visitors toward the same general contact route. That keeps the site simple, but it may leave your team asking the same questions by phone before a job can be prioritised.\n\nFSS could shape a focused enquiry journey that asks for service type, postcode, urgency, and preferred contact time before the request reaches your team. The aim would be a clearer hand-off, not a larger system: a fast mobile form, useful confirmation for the customer, and an organised summary for whoever responds.\n\nI have included a conceptual workflow image to make the idea concrete. This is a proposed design concept, not an existing Harbour Heating system or a claim about current results.\n\nWould a short conversation next week be useful to test whether this fits how you handle enquiries?\n\nIf this is not relevant, reply opt out and I will send no further emails.\n\nRegards,\nJean-Fidele\nFaithful Software Solutions",
+        "wordCount": 168,
+        "optOutSentence": "If this is not relevant, reply opt out and I will send no further emails.",
+        "conceptDisclaimer": "This is a proposed design concept, not an existing Harbour Heating system or a claim about current results."
+      },
+      "visual": {
+        "assetId": null,
+        "fallbackAssetKey": "home-property",
+        "altText": "Concept illustration of a home, service calendar and connected digital enquiry workflow.",
+        "conceptDisclaimer": "This is a proposed design concept, not an existing Harbour Heating system or a claim about current results."
+      }
+    }
+  ],
+  "rejections": [
+    {
+      "candidateName": "Example Sole Trader",
+      "reasonCode": "personal_subscriber",
+      "sourceUrl": "https://example-sole-trader.test"
+    }
+  ]
+}
