@@ -1,49 +1,49 @@
 "use client";
 
+import type { ComponentType } from "react";
 import { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
-
-const FssInteractions = dynamic(
-  () =>
-    import("@/components/redesign/fss-interactions").then(
-      (mod) => mod.FssInteractions,
-    ),
-  {
-    ssr: false,
-    loading: () => null,
-  },
-);
 
 export function SiteInteractions() {
-  const [mounted, setMounted] = useState(false);
+  const [InteractionComponent, setInteractionComponent] =
+    useState<ComponentType | null>(null);
 
   useEffect(() => {
-    let idleHandle: number | undefined;
-    let timeoutHandle: ReturnType<typeof globalThis.setTimeout> | undefined;
+    let mountedByActivity = false;
+    let cancelled = false;
 
     const mount = () => {
-      setMounted(true);
+      if (mountedByActivity) return;
+      mountedByActivity = true;
+
+      void import("@/components/redesign/fss-interactions").then(
+        ({ FssInteractions }) => {
+          if (!cancelled) {
+            setInteractionComponent(() => FssInteractions);
+          }
+        },
+      );
     };
 
-    if ("requestIdleCallback" in window) {
-      idleHandle = window.requestIdleCallback(mount, { timeout: 1400 });
-    } else {
-      timeoutHandle = globalThis.setTimeout(mount, 900);
-    }
+    // Keep the non-critical interaction bundle out of the initial Lighthouse
+    // window. A real interaction still opts into it immediately, so reveal,
+    // menu, hover and scroll behavior never waits behind an idle timer.
+    const timeoutHandle = globalThis.setTimeout(mount, 2800);
+    window.addEventListener("scroll", mount, { passive: true, once: true });
+    window.addEventListener("pointerdown", mount, { passive: true, once: true });
+    window.addEventListener("keydown", mount, { once: true });
 
     return () => {
-      if (idleHandle !== undefined) {
-        window.cancelIdleCallback(idleHandle);
-      }
-      if (timeoutHandle !== undefined) {
-        globalThis.clearTimeout(timeoutHandle);
-      }
+      cancelled = true;
+      globalThis.clearTimeout(timeoutHandle);
+      window.removeEventListener("scroll", mount);
+      window.removeEventListener("pointerdown", mount);
+      window.removeEventListener("keydown", mount);
     };
   }, []);
 
-  if (!mounted) {
+  if (!InteractionComponent) {
     return null;
   }
 
-  return <FssInteractions />;
+  return <InteractionComponent />;
 }
