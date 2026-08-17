@@ -1,10 +1,19 @@
 import { z } from "zod";
 
 import {
+  findGmailMessageByRfcId,
+  type GmailReadContext,
+  readGmailHistoryPage,
+  readGmailMessageMetadata,
+} from "./reconciliation";
+import {
   GmailClientError,
   type GmailClient,
   type GmailCreateDraftInput,
   type GmailDraftResult,
+  type GmailHistoryInput,
+  type GmailHistoryResult,
+  type GmailMessageMetadata,
   type GmailProfile,
   type GmailSendInput,
   type GmailSendResult,
@@ -285,6 +294,7 @@ class GoogleGmailClient implements GmailClient {
   private async request(
     pathname: string,
     init: RequestInit = {},
+    context?: GmailReadContext,
   ): Promise<Response> {
     const requestWithToken = (accessToken: CachedAccessToken) => {
       const headers = new Headers(init.headers);
@@ -313,6 +323,10 @@ class GoogleGmailClient implements GmailClient {
     }
 
     if (!response.ok) {
+      if (context === "history" && response.status === 404) {
+        await discardBody(response);
+        throw new GmailClientError("HISTORY_ID_EXPIRED");
+      }
       throw await providerError(response);
     }
     return response;
@@ -325,6 +339,13 @@ class GoogleGmailClient implements GmailClient {
       body: JSON.stringify(body),
     });
     return readJson(response);
+  }
+
+  private async getJson(
+    pathname: string,
+    context?: GmailReadContext,
+  ): Promise<unknown> {
+    return readJson(await this.request(pathname, {}, context));
   }
 
   async createDraft(input: GmailCreateDraftInput): Promise<GmailDraftResult> {
@@ -389,6 +410,20 @@ class GoogleGmailClient implements GmailClient {
       messageId: parsed.data.id,
       gmailThreadId: parsed.data.threadId,
     };
+  }
+
+  async listHistory(input: GmailHistoryInput): Promise<GmailHistoryResult> {
+    return readGmailHistoryPage(this.getJson.bind(this), input);
+  }
+
+  async getMessageMetadata(messageId: string): Promise<GmailMessageMetadata> {
+    return readGmailMessageMetadata(this.getJson.bind(this), messageId);
+  }
+
+  async findByRfcMessageId(
+    rfcMessageId: string,
+  ): Promise<GmailMessageMetadata | null> {
+    return findGmailMessageByRfcId(this.getJson.bind(this), rfcMessageId);
   }
 
   async getProfile(): Promise<GmailProfile> {
