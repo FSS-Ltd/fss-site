@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import { parseResearchRunIngestion } from "./ingestion-schema";
@@ -11,6 +12,43 @@ test("accepts one complete versioned research bundle", () => {
   assert.equal(parsed.schemaVersion, "1.0");
   assert.equal(parsed.prospects[0]?.business.county, "Kent");
   assert.equal(parsed.prospects[0]?.prospect.fitScore, 91);
+});
+
+test("accepts the redacted operator fixture", () => {
+  const fixture = JSON.parse(
+    readFileSync("docs/growth-os/fixtures/research-run-v1.json", "utf8"),
+  ) as unknown;
+
+  const parsed = parseResearchRunIngestion(fixture);
+  const fixtureStrings: string[] = [];
+  JSON.stringify(fixture, (_key, value: unknown) => {
+    if (typeof value === "string") {
+      fixtureStrings.push(value);
+    }
+    return value;
+  });
+  const urls = fixtureStrings.filter((value) => /^https?:\/\//.test(value));
+  const emails = fixtureStrings.filter((value) =>
+    /^[^\s@]+@[^\s@]+$/.test(value),
+  );
+
+  assert.match(parsed.externalRunId, /^dry-run-/);
+  assert.equal(parsed.prospects[0]?.contact.email.endsWith(".test"), true);
+  assert.equal(parsed.prospects[0]?.visual.assetId, null);
+  assert.equal(
+    emails.every((email) => email.endsWith(".test")),
+    true,
+  );
+  assert.equal(
+    urls.every((value) => {
+      const hostname = new URL(value).hostname;
+      return (
+        hostname.endsWith(".test") ||
+        hostname === "find-and-update.company-information.service.gov.uk"
+      );
+    }),
+    true,
+  );
 });
 
 test("rejects a canonical bundle above the route byte ceiling", () => {
@@ -335,7 +373,7 @@ test("accepts a run containing only recorded rejections", () => {
     rejections: [
       {
         candidateName: "Example Sole Trader",
-        reasonCode: "individual_subscriber",
+        reasonCode: "personal_subscriber",
         sourceUrl: "https://example.test",
       },
     ],
@@ -343,6 +381,25 @@ test("accepts a run containing only recorded rejections", () => {
 
   assert.equal(parsed.prospects.length, 0);
   assert.equal(parsed.rejections.length, 1);
+});
+
+test("rejects an uncontrolled rejection reason code", () => {
+  const fixture = createValidFixture();
+
+  assert.throws(
+    () =>
+      parseResearchRunIngestion({
+        ...fixture,
+        prospects: [],
+        rejections: [
+          {
+            candidateName: "Unclear Example",
+            reasonCode: "miscellaneous",
+          },
+        ],
+      }),
+    /supported rejection reason code/i,
+  );
 });
 
 test("rejects an empty run with no accepted or rejected candidate", () => {

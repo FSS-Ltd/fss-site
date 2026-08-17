@@ -631,7 +631,17 @@ type ResearchRunIngestion = {
   }>;
   rejections: Array<{
     candidateName: string;
-    reasonCode: string;
+    reasonCode:
+      | "outside_kent"
+      | "ineligible_corporate_type"
+      | "inactive_company"
+      | "personal_subscriber"
+      | "uncertain_partnership"
+      | "unverifiable_work_email"
+      | "unsupported_claim"
+      | "insufficient_opportunity_evidence"
+      | "known_duplicate"
+      | "suppressed_contact";
     sourceUrl?: string;
   }>;
 };

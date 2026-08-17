@@ -91,6 +91,22 @@ export type EmailVisualCandidate = {
   conceptDisclaimer: string;
 };
 
+export const RESEARCH_REJECTION_REASON_CODES = [
+  "outside_kent",
+  "ineligible_corporate_type",
+  "inactive_company",
+  "personal_subscriber",
+  "uncertain_partnership",
+  "unverifiable_work_email",
+  "unsupported_claim",
+  "insufficient_opportunity_evidence",
+  "known_duplicate",
+  "suppressed_contact",
+] as const;
+
+export type ResearchRejectionReasonCode =
+  (typeof RESEARCH_REJECTION_REASON_CODES)[number];
+
 export type ResearchProspectCandidate = {
   business: BusinessCandidate;
   contact: ContactCandidate;
@@ -103,7 +119,7 @@ export type ResearchProspectCandidate = {
 
 export type RejectedResearchCandidate = {
   candidateName: string;
-  reasonCode: string;
+  reasonCode: ResearchRejectionReasonCode;
   sourceUrl?: string;
 };
 
