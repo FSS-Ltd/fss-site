@@ -36,6 +36,28 @@ export class IntegrationConnectionPersistenceError extends Error {
   }
 }
 
+export type ProviderRevocation = "confirmed" | "unconfirmed" | "not_required";
+
+export type StoredGmailCredential = {
+  encryptedRefreshToken: string;
+  encryptionKeyVersion: string;
+};
+
+export type DisconnectStoredGmailConnectionInput = {
+  subjectEmail: string;
+  correlationId: string;
+  actorId: string;
+  confirmProviderRevocation: (
+    credential: StoredGmailCredential,
+  ) => Promise<Exclude<ProviderRevocation, "not_required">>;
+};
+
+export type DisconnectStoredGmailConnectionResult = {
+  connectionId: string | null;
+  providerRevocation: ProviderRevocation;
+  pausedEnrollmentCount: number;
+};
+
 export async function listIntegrationConnectionHealth(
   db: GrowthQueryExecutor,
   subjectEmail: string,
@@ -127,5 +149,115 @@ export function storeConnectedGmailConnection(
     });
 
     return connectionId;
+  });
+}
+
+export function disconnectStoredGmailConnection(
+  db: GrowthDb,
+  input: DisconnectStoredGmailConnectionInput,
+): Promise<DisconnectStoredGmailConnectionResult> {
+  const subjectEmail = input.subjectEmail.trim().toLowerCase();
+  if (!subjectEmail) {
+    throw new TypeError("Gmail disconnect requires a subject email.");
+  }
+
+  return withGrowthTransaction(db, async (transaction) => {
+    const rows = await transaction<
+      Array<{
+        id: string;
+        encryptedRefreshToken: string | null;
+        encryptionKeyVersion: string | null;
+      }>
+    >`
+      select
+        ic.id,
+        ic.encrypted_refresh_token as "encryptedRefreshToken",
+        ic.encryption_key_version as "encryptionKeyVersion"
+      from growth.integration_connections ic
+      where ic.provider = 'gmail'
+        and ic.subject_email = ${subjectEmail}
+      for update
+    `;
+    const connection = rows[0];
+
+    let providerRevocation: ProviderRevocation = "not_required";
+    if (connection?.encryptedRefreshToken) {
+      providerRevocation = connection.encryptionKeyVersion
+        ? await input.confirmProviderRevocation({
+            encryptedRefreshToken: connection.encryptedRefreshToken,
+            encryptionKeyVersion: connection.encryptionKeyVersion,
+          })
+        : "unconfirmed";
+    }
+
+    if (connection) {
+      await transaction`
+        update growth.integration_connections
+        set encrypted_refresh_token = null,
+            encryption_key_version = null,
+            granted_scopes = '{}',
+            access_token_expires_at = null,
+            provider_cursor = null,
+            status = 'revoked',
+            last_synced_at = null,
+            last_error_code = case
+              when ${providerRevocation} = 'unconfirmed'
+                then 'provider_revocation_unconfirmed'
+              else null
+            end,
+            version = version + 1,
+            updated_at = now()
+        where id = ${connection.id}
+      `;
+    }
+
+    const pausedEnrollments = await transaction<Array<{ id: string }>>`
+      update growth.sequence_enrollments se
+      set status = 'paused',
+          updated_at = now()
+      where se.status = 'active'
+        and exists (
+          select 1
+          from growth.email_messages em
+          where em.sequence_enrollment_id = se.id
+            and em.channel = 'gmail'
+        )
+      returning se.id
+    `;
+
+    if (connection) {
+      await appendAuditEvent(transaction, {
+        correlationId: input.correlationId,
+        actorType: "founder",
+        actorId: input.actorId,
+        action: "integration.gmail.disconnected",
+        entityType: "integration_connection",
+        entityId: connection.id,
+        metadata: {
+          reasonCode:
+            providerRevocation === "unconfirmed"
+              ? "provider_revocation_unconfirmed"
+              : "founder_disconnect",
+        },
+      });
+    }
+
+    for (const enrollment of pausedEnrollments) {
+      await appendAuditEvent(transaction, {
+        correlationId: input.correlationId,
+        actorType: "founder",
+        actorId: input.actorId,
+        action: "sequence.paused_gmail_disconnected",
+        entityType: "sequence_enrollment",
+        entityId: enrollment.id,
+        metadata: { reasonCode: "gmail_disconnected" },
+      });
+    }
+
+    return {
+      connectionId: connection?.id ?? null,
+      providerRevocation,
+      pausedEnrollmentCount: pausedEnrollments.length,
+    };
   });
 }
