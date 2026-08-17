@@ -12,7 +12,9 @@ const files = {
   ),
   footer: readFileSync("components/layout/site-footer.tsx", "utf8"),
   fragments: readFileSync("components/redesign/design-fragments.ts", "utf8"),
-  layout: readFileSync("app/layout.tsx", "utf8"),
+  rootLayout: readFileSync("app/layout.tsx", "utf8"),
+  siteLayout: readFileSync("app/(site)/layout.tsx", "utf8"),
+  growthLayout: readFileSync("app/(growth)/layout.tsx", "utf8"),
   shell: readFileSync("components/layout/site-shell.tsx", "utf8"),
 };
 
@@ -61,9 +63,39 @@ if (/overflow-x-(hidden|clip)/.test(files.shell)) {
   );
 }
 
-if (!files.layout.includes("overflow-x-hidden")) {
+if (!files.rootLayout.includes("overflow-x-hidden")) {
   failures.push(
     "Root layout body must own horizontal overflow clipping, matching the redesign prototype.",
+  );
+}
+
+if (
+  files.rootLayout.includes("SiteShell") ||
+  files.rootLayout.includes("RootSchema") ||
+  files.rootLayout.includes("AnalyticsLoader")
+) {
+  failures.push(
+    "Root layout must stay neutral so private Growth OS routes do not inherit the public site shell or analytics.",
+  );
+}
+
+if (
+  !files.siteLayout.includes("SiteShell") ||
+  !files.siteLayout.includes("RootSchema") ||
+  !files.siteLayout.includes("AnalyticsLoader")
+) {
+  failures.push(
+    "Public routes must retain the site shell, structured data, and analytics in the site route-group layout.",
+  );
+}
+
+if (
+  files.growthLayout.includes("SiteShell") ||
+  files.growthLayout.includes("RootSchema") ||
+  files.growthLayout.includes("AnalyticsLoader")
+) {
+  failures.push(
+    "Growth OS routes must not render the public site shell, structured data, or analytics.",
   );
 }
 

@@ -3,7 +3,10 @@ import path from "node:path";
 import zlib from "node:zlib";
 
 const projectRoot = process.cwd();
-const manifestPath = path.join(projectRoot, ".next/server/app/page_client-reference-manifest.js");
+const manifestPath = path.join(
+  projectRoot,
+  ".next/server/app/(site)/page_client-reference-manifest.js",
+);
 
 const budgets = {
   maxJsRawBytes: 180 * 1024,
@@ -24,7 +27,7 @@ function readHomepageManifest() {
   }
 
   const source = fs.readFileSync(manifestPath, "utf8");
-  const markerRegex = /globalThis\.__RSC_MANIFEST\["\/page"\]\s*=\s*/;
+  const markerRegex = /globalThis\.__RSC_MANIFEST\["\/\(site\)\/page"\]\s*=\s*/;
   const markerMatch = source.match(markerRegex);
 
   if (!markerMatch || markerMatch.index === undefined) {
@@ -47,7 +50,9 @@ function collectChunkFiles(manifest) {
 
     // Webpack format can alternate [id, path, id, path].
     const looksLikeAlternatingFormat =
-      typeof chunks[0] !== "string" && chunks.length > 1 && typeof chunks[1] === "string";
+      typeof chunks[0] !== "string" &&
+      chunks.length > 1 &&
+      typeof chunks[1] === "string";
 
     if (looksLikeAlternatingFormat) {
       for (let index = 1; index < chunks.length; index += 2) {
@@ -92,21 +97,21 @@ function sizeForFile(filePath) {
 }
 
 function sumSizes(fileSizes, filter) {
-  return fileSizes
-    .filter(filter)
-    .reduce(
-      (acc, file) => {
-        acc.raw += file.raw;
-        acc.gzip += file.gzip;
-        return acc;
-      },
-      { raw: 0, gzip: 0 },
-    );
+  return fileSizes.filter(filter).reduce(
+    (acc, file) => {
+      acc.raw += file.raw;
+      acc.gzip += file.gzip;
+      return acc;
+    },
+    { raw: 0, gzip: 0 },
+  );
 }
 
 function assertBudget(name, value, max) {
   if (value > max) {
-    throw new Error(`${name} exceeded budget: ${formatBytes(value)} > ${formatBytes(max)}.`);
+    throw new Error(
+      `${name} exceeded budget: ${formatBytes(value)} > ${formatBytes(max)}.`,
+    );
   }
 }
 
@@ -124,8 +129,12 @@ try {
       `- ${file.file}: raw ${formatBytes(file.raw)}, gzip ${formatBytes(file.gzip)}`,
     );
   }
-  console.log(`JS total: raw ${formatBytes(js.raw)}, gzip ${formatBytes(js.gzip)}`);
-  console.log(`CSS total: raw ${formatBytes(css.raw)}, gzip ${formatBytes(css.gzip)}`);
+  console.log(
+    `JS total: raw ${formatBytes(js.raw)}, gzip ${formatBytes(js.gzip)}`,
+  );
+  console.log(
+    `CSS total: raw ${formatBytes(css.raw)}, gzip ${formatBytes(css.gzip)}`,
+  );
 
   assertBudget("Homepage JS raw size", js.raw, budgets.maxJsRawBytes);
   assertBudget("Homepage JS gzip size", js.gzip, budgets.maxJsGzipBytes);
