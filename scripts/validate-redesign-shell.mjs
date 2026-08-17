@@ -6,6 +6,10 @@ const files = {
     "utf8",
   ),
   header: readFileSync("components/layout/site-header.tsx", "utf8"),
+  headerNavItems: readFileSync(
+    "components/layout/site-header-nav-items.ts",
+    "utf8",
+  ),
   footer: readFileSync("components/layout/site-footer.tsx", "utf8"),
   fragments: readFileSync("components/redesign/design-fragments.ts", "utf8"),
   layout: readFileSync("app/layout.tsx", "utf8"),
@@ -29,8 +33,8 @@ if (
 }
 
 if (
-  !files.header.includes('label: "Blog"') ||
-  !files.header.includes('href: "/blog"')
+  !files.headerNavItems.includes('label: "Blog"') ||
+  !files.headerNavItems.includes('href: "/blog"')
 ) {
   failures.push("SiteHeader must expose the blog route.");
 }
