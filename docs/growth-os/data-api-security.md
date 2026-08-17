@@ -601,6 +601,9 @@ User-facing messages are safe and generic. Logs use the correlation ID, not raw 
 
 ### `POST /api/agent/research-runs`
 
+Maximum request size is 4 MB. The route enforces the limit while streaming,
+before authentication and JSON parsing.
+
 Authentication headers:
 
 - `X-FSS-Key-Id`

@@ -458,7 +458,7 @@ Use dependency injection for the verifier and service. Cover 401 missing signatu
 
 - [ ] **Step 2: Implement the thin route**
 
-The route reads the raw body once, verifies it, parses JSON, validates with Zod, calls `ingestResearchRun`, and returns the data-contract response. It creates a correlation ID and never logs the raw body.
+The route reads the raw body once with a streaming 4 MB ceiling below the Vercel Function request limit, verifies it, parses strict UTF-8 JSON, validates with Zod, calls `ingestResearchRun`, and returns the data-contract response. The schema applies the same aggregate size ceiling. The route creates a correlation ID and never logs the raw body.
 
 - [ ] **Step 3: Run the route test**
 
