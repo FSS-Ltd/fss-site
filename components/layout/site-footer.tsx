@@ -35,7 +35,7 @@ export function SiteFooter() {
             <img
               alt="FSS"
               decoding="async"
-              height={114}
+              height={57}
               loading="lazy"
               src="/redesign/brand/fss-monogram-white-small.png"
               style={{
@@ -44,7 +44,7 @@ export function SiteFooter() {
                 display: "block",
                 marginBottom: "20px",
               }}
-              width={256}
+              width={128}
             />
             <p style={{ margin: 0, fontSize: "14.5px", lineHeight: 1.6 }}>
               Engineering clarity out of complexity. Bespoke software, apps and

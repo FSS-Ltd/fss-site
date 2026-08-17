@@ -45,18 +45,18 @@ export function SiteHeader() {
             flex: "none",
           }}
         >
-          {/* The dedicated 256px asset keeps the displayed logo crisp without
+          {/* The dedicated 128px asset keeps the displayed logo crisp without
               loading the client-side Next Image runtime. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             alt="FSS"
             decoding="async"
             fetchPriority="high"
-            height={114}
+            height={57}
             loading="eager"
             src="/redesign/brand/fss-monogram-navy-small.png"
             style={{ height: "26px", width: "auto", display: "block" }}
-            width={256}
+            width={128}
           />
           <span
             data-wordmark
