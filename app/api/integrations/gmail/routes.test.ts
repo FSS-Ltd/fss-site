@@ -1,7 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { gmailRouteUnavailable } from "./runtime";
+import { parseGrowthServerEnv } from "@/lib/growth/config/env";
+
+import {
+  createGmailDisconnectRouteConfig,
+  gmailRouteUnavailable,
+} from "./runtime";
 
 const gmailEnvironmentKeys = [
   "GOOGLE_GMAIL_CLIENT_ID",
@@ -16,15 +21,18 @@ test("loads Gmail OAuth route modules without reading optional configuration", a
   for (const key of gmailEnvironmentKeys) delete process.env[key];
 
   try {
-    const [connectRoute, callbackRoute] = await Promise.all([
+    const [connectRoute, callbackRoute, disconnectRoute] = await Promise.all([
       import("./connect/route"),
       import("./callback/route"),
+      import("./disconnect/route"),
     ]);
 
     assert.equal(typeof connectRoute.GET, "function");
     assert.equal(typeof callbackRoute.GET, "function");
+    assert.equal(typeof disconnectRoute.POST, "function");
     assert.equal(connectRoute.runtime, "nodejs");
     assert.equal(callbackRoute.runtime, "nodejs");
+    assert.equal(disconnectRoute.runtime, "nodejs");
   } finally {
     for (const [key, value] of previousValues) {
       if (value === undefined) delete process.env[key];
@@ -66,4 +74,27 @@ test("returns a correlated standard error when Gmail configuration is unavailabl
   } finally {
     console.error = originalConsoleError;
   }
+});
+
+test("keeps disconnect available without Gmail OAuth client configuration", () => {
+  const encryptionKey = Buffer.alloc(32, 17);
+  const environment = parseGrowthServerEnv({
+    DATABASE_URL: "postgresql://growth.example.test/database",
+    DIRECT_DATABASE_URL: "postgresql://growth.example.test/database",
+    AUTH_SECRET: "a".repeat(32),
+    GOOGLE_AUTH_CLIENT_ID: "auth-client-id",
+    GOOGLE_AUTH_CLIENT_SECRET: "auth-client-secret",
+    GROWTH_OS_OWNER_EMAIL: "j.ntagengwa@faithfulsoftware.dev",
+    TOKEN_ENCRYPTION_KEY: encryptionKey.toString("base64"),
+    GROWTH_OS_AUTOMATIONS_ENABLED: "false",
+  });
+
+  assert.deepEqual(
+    createGmailDisconnectRouteConfig(environment, "https://example.test/app"),
+    {
+      origin: "https://example.test",
+      subjectEmail: "j.ntagengwa@faithfulsoftware.dev",
+      encryptionKey,
+    },
+  );
 });
