@@ -2,11 +2,32 @@ import { z } from "zod";
 
 const FOUNDER_EMAIL = "j.ntagengwa@faithfulsoftware.dev" as const;
 
+const postgresUrlSchema = z
+  .string()
+  .url()
+  .refine(
+    (value) => {
+      try {
+        const protocol = new URL(value).protocol;
+        return protocol === "postgres:" || protocol === "postgresql:";
+      } catch {
+        return false;
+      }
+    },
+    { message: "Must use the postgres or postgresql protocol" },
+  );
+
+const securitySecretSchema = z
+  .string()
+  .refine((value) => value.replace(/\s/g, "").length >= 32, {
+    message: "Must contain at least 32 non-whitespace characters",
+  });
+
 const growthServerEnvSchema = z
   .object({
-    DATABASE_URL: z.string().url(),
-    DIRECT_DATABASE_URL: z.string().url(),
-    AUTH_SECRET: z.string().min(32),
+    DATABASE_URL: postgresUrlSchema,
+    DIRECT_DATABASE_URL: postgresUrlSchema,
+    AUTH_SECRET: securitySecretSchema,
     GOOGLE_AUTH_CLIENT_ID: z.string().trim().min(1),
     GOOGLE_AUTH_CLIENT_SECRET: z.string().trim().min(1),
     GROWTH_OS_OWNER_EMAIL: z
@@ -14,7 +35,7 @@ const growthServerEnvSchema = z
       .trim()
       .transform((value) => value.toLowerCase())
       .pipe(z.literal(FOUNDER_EMAIL)),
-    TOKEN_ENCRYPTION_KEY: z.string().min(32),
+    TOKEN_ENCRYPTION_KEY: securitySecretSchema,
     GROWTH_OS_AUTOMATIONS_ENABLED: z
       .enum(["true", "false"])
       .transform((value) => value === "true"),

@@ -81,3 +81,29 @@ test("rejects invalid automation values", () => {
     /GROWTH_OS_AUTOMATIONS_ENABLED/,
   );
 });
+
+test("rejects non-PostgreSQL database URLs", () => {
+  for (const name of ["DATABASE_URL", "DIRECT_DATABASE_URL"]) {
+    assert.throws(
+      () =>
+        parseGrowthServerEnv({
+          ...validEnv,
+          [name]: "https://example.test/database",
+        }),
+      new RegExp(name),
+    );
+  }
+});
+
+test("rejects blank security credentials", () => {
+  for (const name of ["AUTH_SECRET", "TOKEN_ENCRYPTION_KEY"]) {
+    assert.throws(
+      () =>
+        parseGrowthServerEnv({
+          ...validEnv,
+          [name]: " ".repeat(32),
+        }),
+      new RegExp(name),
+    );
+  }
+});
