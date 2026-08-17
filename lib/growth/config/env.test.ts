@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { parseGrowthServerEnv } from "./env";
+import { parseGrowthServerEnv, requireGmailOAuthEnv } from "./env";
+
+const tokenEncryptionKey = Buffer.alloc(32, 7).toString("base64");
 
 const validEnv = {
   DATABASE_URL: "postgresql://app:secret@example.test:6543/postgres",
@@ -9,8 +11,12 @@ const validEnv = {
   AUTH_SECRET: "a".repeat(32),
   GOOGLE_AUTH_CLIENT_ID: "client-id",
   GOOGLE_AUTH_CLIENT_SECRET: "client-secret",
+  GOOGLE_GMAIL_CLIENT_ID: "gmail-client-id",
+  GOOGLE_GMAIL_CLIENT_SECRET: "gmail-client-secret",
+  GOOGLE_GMAIL_REDIRECT_URI:
+    "https://example.test/api/integrations/gmail/callback",
   GROWTH_OS_OWNER_EMAIL: "j.ntagengwa@faithfulsoftware.dev",
-  TOKEN_ENCRYPTION_KEY: "b".repeat(32),
+  TOKEN_ENCRYPTION_KEY: tokenEncryptionKey,
   GROWTH_OS_AGENT_HMAC_SECRET: "c".repeat(32),
   GROWTH_OS_AUTOMATIONS_ENABLED: "false",
 };
@@ -19,6 +25,13 @@ test("accepts the complete server environment", () => {
   const result = parseGrowthServerEnv(validEnv);
 
   assert.equal(result.ownerEmail, "j.ntagengwa@faithfulsoftware.dev");
+  assert.equal(result.googleGmailClientId, "gmail-client-id");
+  assert.equal(result.googleGmailClientSecret, "gmail-client-secret");
+  assert.equal(
+    result.googleGmailRedirectUri,
+    "https://example.test/api/integrations/gmail/callback",
+  );
+  assert.equal(result.tokenEncryptionKey, tokenEncryptionKey);
   assert.equal(result.agentHmacSecret, "c".repeat(32));
   assert.equal(result.automationsEnabled, false);
 });
@@ -43,11 +56,30 @@ test("keeps non-agent Growth routes bootable before agent ingestion is configure
   assert.equal(result.agentHmacSecret, undefined);
 });
 
+test("keeps non-Gmail Growth routes bootable before Gmail OAuth is configured", () => {
+  const result = parseGrowthServerEnv({
+    ...validEnv,
+    GOOGLE_GMAIL_CLIENT_ID: undefined,
+    GOOGLE_GMAIL_CLIENT_SECRET: undefined,
+    GOOGLE_GMAIL_REDIRECT_URI: undefined,
+    TOKEN_ENCRYPTION_KEY: "b".repeat(32),
+  });
+
+  assert.equal(result.googleGmailClientId, undefined);
+  assert.throws(
+    () => requireGmailOAuthEnv(result),
+    /configuration is incomplete/i,
+  );
+});
+
 test("rejects browser-visible credentials", () => {
   for (const name of [
     "NEXT_PUBLIC_DATABASE_URL",
     "NEXT_PUBLIC_DIRECT_DATABASE_URL",
     "NEXT_PUBLIC_TOKEN_ENCRYPTION_KEY",
+    "NEXT_PUBLIC_GOOGLE_GMAIL_CLIENT_ID",
+    "NEXT_PUBLIC_GOOGLE_GMAIL_CLIENT_SECRET",
+    "NEXT_PUBLIC_GOOGLE_GMAIL_REDIRECT_URI",
   ]) {
     assert.throws(
       () =>
@@ -80,6 +112,70 @@ test("rejects incomplete credentials", () => {
       }),
     /AUTH_SECRET/,
   );
+});
+
+test("requires a complete dedicated Gmail OAuth client at its route boundary", () => {
+  for (const name of [
+    "GOOGLE_GMAIL_CLIENT_ID",
+    "GOOGLE_GMAIL_CLIENT_SECRET",
+    "GOOGLE_GMAIL_REDIRECT_URI",
+  ]) {
+    const environment = parseGrowthServerEnv({
+      ...validEnv,
+      [name]: undefined,
+    });
+    assert.throws(() => requireGmailOAuthEnv(environment), /incomplete/i);
+  }
+
+  assert.deepEqual(requireGmailOAuthEnv(parseGrowthServerEnv(validEnv)), {
+    clientId: "gmail-client-id",
+    clientSecret: "gmail-client-secret",
+    redirectUri: "https://example.test/api/integrations/gmail/callback",
+    tokenEncryptionKey,
+  });
+});
+
+test("accepts only an exact HTTPS or loopback Gmail callback URI", () => {
+  assert.equal(
+    parseGrowthServerEnv({
+      ...validEnv,
+      GOOGLE_GMAIL_REDIRECT_URI:
+        "http://localhost:3000/api/integrations/gmail/callback",
+    }).googleGmailRedirectUri,
+    "http://localhost:3000/api/integrations/gmail/callback",
+  );
+
+  for (const value of [
+    "http://example.test/api/integrations/gmail/callback",
+    "https://example.test/api/integrations/gmail/other",
+    "https://example.test/api/integrations/gmail/callback?next=/growth",
+    "https://user:password@example.test/api/integrations/gmail/callback",
+  ]) {
+    assert.throws(
+      () =>
+        parseGrowthServerEnv({
+          ...validEnv,
+          GOOGLE_GMAIL_REDIRECT_URI: value,
+        }),
+      /GOOGLE_GMAIL_REDIRECT_URI/,
+    );
+  }
+});
+
+test("requires exactly 32 bytes of canonical base64 token key material", () => {
+  for (const value of [
+    "b".repeat(32),
+    Buffer.alloc(31, 7).toString("base64"),
+    `${tokenEncryptionKey}=`,
+  ]) {
+    assert.throws(() => {
+      const environment = parseGrowthServerEnv({
+        ...validEnv,
+        TOKEN_ENCRYPTION_KEY: value,
+      });
+      return requireGmailOAuthEnv(environment);
+    }, /token encryption key is invalid/i);
+  }
 });
 
 test("rejects invalid automation values", () => {
