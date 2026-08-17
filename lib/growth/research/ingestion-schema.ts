@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { isSafeEmailHtml } from "../email/html-policy";
 import { MAX_RESEARCH_BUNDLE_BYTES } from "./limits";
 import {
   RESEARCH_REJECTION_REASON_CODES,
@@ -45,32 +46,6 @@ function getUrlHostname(value: string): string {
 function isHttpUrl(value: string): boolean {
   const protocol = parseUrl(value)?.protocol;
   return protocol === "http:" || protocol === "https:";
-}
-
-function isSafeEmailHtml(value: string): boolean {
-  const tags = value.matchAll(/<[^>]*>/g);
-  let cursor = 0;
-
-  for (const match of tags) {
-    const index = match.index ?? 0;
-    if (/[<>]/.test(value.slice(cursor, index))) {
-      return false;
-    }
-
-    const tag = match[0];
-    const isPlainFormattingTag =
-      /^<\/?(?:a|em|li|ol|p|strong|ul)>$/i.test(tag) ||
-      /^<br\s*\/?>$/i.test(tag);
-    const anchor = tag.match(/^<a href=(["'])([^"'<>]+)\1>$/i);
-
-    if (!isPlainFormattingTag && (!anchor || !isHttpUrl(anchor[2]))) {
-      return false;
-    }
-
-    cursor = index + tag.length;
-  }
-
-  return !/[<>]/.test(value.slice(cursor));
 }
 
 function hostsAreRelated(left: string, right: string): boolean {
