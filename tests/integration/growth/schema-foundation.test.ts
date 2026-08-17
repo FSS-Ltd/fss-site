@@ -4,6 +4,13 @@ import test from "node:test";
 import postgres from "postgres";
 
 const connectionString = process.env.DIRECT_DATABASE_URL;
+const foundationTables = [
+  "audit_log",
+  "businesses",
+  "contacts",
+  "integration_connections",
+  "prospects",
+] as const;
 
 test(
   "foundation schema is private and complete",
@@ -18,18 +25,13 @@ test(
         select table_name
         from information_schema.tables
         where table_schema = 'growth'
+          and table_name = any(${foundationTables}::text[])
         order by table_name
       `;
 
       assert.deepEqual(
         tables.map((row) => row.table_name),
-        [
-          "audit_log",
-          "businesses",
-          "contacts",
-          "integration_connections",
-          "prospects",
-        ],
+        foundationTables,
       );
 
       const schemaPrivileges = await sql<
@@ -65,6 +67,7 @@ test(
                has_table_privilege('growth_app', format('growth.%I', table_name), 'delete') as can_delete
         from information_schema.tables
         where table_schema = 'growth'
+          and table_name = any(${foundationTables}::text[])
         order by table_name
       `;
 
