@@ -177,6 +177,11 @@
   outline: none;
 }
 
+.mobileNav,
+.mobileDialog {
+  display: none;
+}
+
 .integrationMenu {
   position: relative;
 }
@@ -203,6 +208,9 @@
 
 .integrationSummary:focus-visible,
 .iconButton:focus-visible,
+.signOutButton:focus-visible,
+.mobileNavLink:focus-visible,
+.mobileDialogLink:focus-visible,
 .topNavLink:focus-visible,
 .sideNavLink:focus-visible {
   outline: 3px solid #087f88;
@@ -315,5 +323,147 @@
 
   .main {
     padding: 92px 18px 104px;
+  }
+
+  .mobileNav {
+    position: fixed;
+    z-index: 50;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: grid;
+    min-height: 76px;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    border-top: 1px solid #dce3e8;
+    background: rgb(255 255 255 / 97%);
+    padding: 8px max(8px, env(safe-area-inset-right))
+      max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  }
+
+  .mobileNavLink {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border: 0;
+    background: transparent;
+    color: #536179;
+    font-size: 0.69rem;
+    font-weight: 600;
+  }
+
+  .mobileNavLink[aria-current="page"] {
+    color: #087f88;
+  }
+
+  .mobileDialog[open] {
+    position: fixed;
+    inset: auto 0 0;
+    display: block;
+    width: 100%;
+    max-width: none;
+    max-height: min(82svh, 720px);
+    overflow-y: auto;
+    border: 0;
+    border-radius: 18px 18px 0 0;
+    background: white;
+    padding: 22px 20px calc(24px + env(safe-area-inset-bottom));
+    color: #07182e;
+  }
+
+  .mobileDialog::backdrop {
+    background: rgb(7 24 46 / 48%);
+  }
+
+  .mobileDialogHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .mobileDialogHeader h2 {
+    margin: 3px 0 0;
+    font-size: 1.4rem;
+  }
+
+  .mobileDialogEyebrow,
+  .mobileAccountLabel {
+    margin: 0;
+    color: #607089;
+    font-size: 0.76rem;
+  }
+
+  .iconButton {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    border: 1px solid #d8e0e5;
+    border-radius: 8px;
+    background: white;
+    color: #07182e;
+  }
+
+  .mobileDialogLinks {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 22px;
+  }
+
+  .mobileDialogLink {
+    display: flex;
+    min-height: 48px;
+    align-items: center;
+    gap: 11px;
+    border-radius: 8px;
+    background: #f4f7f8;
+    padding: 0 13px;
+    color: #26364e;
+    font-size: 0.86rem;
+    font-weight: 650;
+  }
+
+  .mobileDialogLink[aria-current="page"] {
+    background: #e6f3f4;
+    color: #087f88;
+  }
+
+  .mobileAccount {
+    display: grid;
+    gap: 9px;
+    margin-top: 20px;
+    border-top: 1px solid #dce3e8;
+    padding-top: 18px;
+    font-size: 0.82rem;
+  }
+
+  .mobileAccount .integrationSummary {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .mobileAccount .integrationSummaryLabel {
+    display: inline;
+  }
+
+  .mobileAccount .integrationPanel {
+    position: static;
+    width: auto;
+    margin-top: 8px;
+    box-shadow: none;
+  }
+
+  .signOutButton {
+    width: 100%;
+    min-height: 42px;
+    border: 1px solid #b8c3ce;
+    border-radius: 8px;
+    background: white;
+    color: #07182e;
+    font-weight: 700;
   }
 }

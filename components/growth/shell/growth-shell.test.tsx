@@ -78,6 +78,35 @@ test("keeps the wide navigation collapsed at common laptop widths", () => {
   );
 });
 
+test("renders a keyboard-native mobile navigation dialog", () => {
+  const html = renderShell();
+
+  assert.match(html, /aria-label="Mobile dashboard"/);
+  assert.match(html, /aria-haspopup="dialog"/);
+  assert.match(html, /<dialog[^>]+aria-labelledby="growth-mobile-menu-title"/);
+  assert.match(html, /aria-label="Close navigation"/);
+});
+
+test("marks More as current when the active mobile route is in the dialog", () => {
+  const html = renderShell("/growth/deals/active-deal");
+
+  assert.match(
+    html,
+    /<button(?=[^>]*aria-current="page")(?=[^>]*aria-haspopup="dialog")[^>]*>/,
+  );
+});
+
+test("only displays mobile navigation below the phone breakpoint", () => {
+  assert.match(
+    shellCss,
+    /\.mobileNav,[\s\S]*?\.mobileDialog[\s\S]*?display: none/,
+  );
+  assert.match(
+    shellCss,
+    /@media \(max-width: 767px\)[\s\S]*?\.mobileNav[\s\S]*?display: grid/,
+  );
+});
+
 test("shows founder identity and a sign-out action", () => {
   const html = renderShell();
 
