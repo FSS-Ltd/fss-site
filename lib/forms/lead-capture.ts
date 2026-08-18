@@ -14,6 +14,8 @@ export const leadSubmissionSchema = leadMagnetCaptureSchema.extend({
   sourceContext: z.string().min(1),
   sourcePath: z.string().min(1),
   resourceSlug: z.string().optional(),
+  submissionId: z.string().uuid(),
+  newsletterOptIn: z.boolean().optional(),
 });
 
 export type LeadCapturePayload = z.infer<typeof leadSubmissionSchema>;
