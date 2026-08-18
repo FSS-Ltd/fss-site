@@ -58,6 +58,41 @@ export type DisconnectStoredGmailConnectionResult = {
   pausedEnrollmentCount: number;
 };
 
+export async function getConnectedGmailCredential(
+  db: GrowthQueryExecutor,
+  subjectEmail: string,
+): Promise<StoredGmailCredential | null> {
+  const normalisedSubjectEmail = subjectEmail.trim().toLowerCase();
+
+  if (!normalisedSubjectEmail) {
+    throw new TypeError("Gmail credential lookup requires a subject email.");
+  }
+
+  const rows = await db<
+    Array<{
+      encryptedRefreshToken: string | null;
+      encryptionKeyVersion: string | null;
+    }>
+  >`
+    select
+      ic.encrypted_refresh_token as "encryptedRefreshToken",
+      ic.encryption_key_version as "encryptionKeyVersion"
+    from growth.integration_connections ic
+    where ic.provider = 'gmail'
+      and ic.subject_email = ${normalisedSubjectEmail}
+      and ic.status = 'connected'
+  `;
+  const row = rows[0];
+  if (!row?.encryptedRefreshToken || !row.encryptionKeyVersion) {
+    return null;
+  }
+
+  return {
+    encryptedRefreshToken: row.encryptedRefreshToken,
+    encryptionKeyVersion: row.encryptionKeyVersion,
+  };
+}
+
 export async function listIntegrationConnectionHealth(
   db: GrowthQueryExecutor,
   subjectEmail: string,

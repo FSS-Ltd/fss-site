@@ -300,6 +300,10 @@ const firstEmailCandidateSchema: z.ZodType<FirstEmailCandidate> = z
     }
   });
 
+export function parseFirstEmailCandidate(value: unknown): FirstEmailCandidate {
+  return firstEmailCandidateSchema.parse(value);
+}
+
 const emailVisualCandidateSchema: z.ZodType<EmailVisualCandidate> = z
   .object({
     assetId: z.null({
