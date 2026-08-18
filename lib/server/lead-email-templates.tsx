@@ -12,6 +12,7 @@ import {
   SITE_ENQUIRY_THANK_YOU_SUBJECT,
   SiteEnquiryThankYou,
 } from "@/emails/site-enquiry-thank-you";
+import type { ResendMessage } from "@/lib/growth/integrations/resend/client";
 
 type LeadEmailTemplateContext = {
   payload: LeadCapturePayload;
@@ -44,15 +45,22 @@ export function buildInternalLeadNotificationEmail(context: LeadEmailTemplateCon
   };
 }
 
+export type SubmitterConfirmationEmail = {
+  subject: string;
+  html: string;
+  text: string;
+  category: ResendMessage["category"];
+};
+
 export async function buildSubmitterConfirmationEmail(
   context: LeadEmailTemplateContext,
-): Promise<{ subject: string; html: string }> {
+): Promise<SubmitterConfirmationEmail> {
   const { payload, siteUrl, resource } = context;
   const deliveryAction = resource ? getDeliveryAction(resource) : null;
 
   if (resource && deliveryAction) {
     const resourceUrl = new URL(deliveryAction.href, siteUrl).toString();
-    const { html } = await renderEmail({
+    const { html, text } = await renderEmail({
       templateKey: "resource-delivery",
       element: (
         <ResourceDelivery
@@ -62,12 +70,12 @@ export async function buildSubmitterConfirmationEmail(
         />
       ),
     });
-    return { subject: RESOURCE_DELIVERY_SUBJECT, html };
+    return { subject: RESOURCE_DELIVERY_SUBJECT, html, text, category: "resource-delivery" };
   }
 
-  const { html } = await renderEmail({
+  const { html, text } = await renderEmail({
     templateKey: "site-enquiry-thank-you",
     element: <SiteEnquiryThankYou firstName={payload.firstName} businessName={payload.company} />,
   });
-  return { subject: SITE_ENQUIRY_THANK_YOU_SUBJECT, html };
+  return { subject: SITE_ENQUIRY_THANK_YOU_SUBJECT, html, text, category: "site-enquiry" };
 }

@@ -34,6 +34,7 @@ export function LeadMagnetCaptureForm({
   const router = useRouter();
   const pathname = usePathname();
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [newsletterOptIn, setNewsletterOptIn] = useState(false);
 
   const {
     handleSubmit,
@@ -60,6 +61,8 @@ export function LeadMagnetCaptureForm({
       sourceContext,
       sourcePath: pathname || "/",
       resourceSlug,
+      submissionId: crypto.randomUUID(),
+      newsletterOptIn,
     });
 
     if (!result.ok) {
@@ -73,6 +76,7 @@ export function LeadMagnetCaptureForm({
     }
 
     reset();
+    setNewsletterOptIn(false);
   };
 
   return (
@@ -118,6 +122,16 @@ export function LeadMagnetCaptureForm({
         error={errors.challenge?.message}
         {...register("challenge")}
       />
+      <label className="flex items-start gap-2 text-sm text-foreground" htmlFor="newsletterOptIn">
+        <input
+          id="newsletterOptIn"
+          type="checkbox"
+          className="mt-1 h-4 w-4 rounded border-border-soft"
+          checked={newsletterOptIn}
+          onChange={(event) => setNewsletterOptIn(event.target.checked)}
+        />
+        <span>Send me occasional practical notes from FSS Field Notes.</span>
+      </label>
       <Button className="mt-2 w-full" type="submit" disabled={isSubmitting}>
         {isSubmitting ? "Submitting..." : ctaLabel}
       </Button>
