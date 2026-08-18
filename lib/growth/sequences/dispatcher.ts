@@ -46,7 +46,7 @@ function followUpIdempotencyKey(
   return `follow_up:${stepNumber}:${sequenceEnrollmentId}`;
 }
 
-function scheduledFollowUpsForFirstSend(
+export function scheduledFollowUpsForFirstSend(
   sequenceEnrollmentId: string,
   sentAt: Date,
 ) {
