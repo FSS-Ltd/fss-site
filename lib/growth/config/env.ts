@@ -71,6 +71,9 @@ const growthServerEnvSchema = z
     TOKEN_ENCRYPTION_KEY: securitySecretSchema,
     CRON_SECRET: securitySecretSchema.optional(),
     NEWSLETTER_UNSUBSCRIBE_TOKEN_SECRET: securitySecretSchema.optional(),
+    RESEND_API_KEY: z.string().trim().min(1).optional(),
+    RESEND_FROM_EMAIL: z.string().trim().min(1).optional(),
+    RESEND_REPLY_TO_EMAIL: z.string().trim().min(1).optional(),
     GROWTH_OS_AUTOMATIONS_ENABLED: z
       .enum(["true", "false"])
       .transform((value) => value === "true"),
@@ -95,6 +98,9 @@ const growthServerEnvSchema = z
     tokenEncryptionKey: value.TOKEN_ENCRYPTION_KEY,
     cronSecret: value.CRON_SECRET,
     newsletterUnsubscribeTokenSecret: value.NEWSLETTER_UNSUBSCRIBE_TOKEN_SECRET,
+    resendApiKey: value.RESEND_API_KEY,
+    resendFromEmail: value.RESEND_FROM_EMAIL,
+    resendReplyToEmail: value.RESEND_REPLY_TO_EMAIL,
     automationsEnabled: value.GROWTH_OS_AUTOMATIONS_ENABLED,
   }));
 
@@ -112,6 +118,9 @@ export type GrowthServerEnv = {
   tokenEncryptionKey: string;
   cronSecret?: string;
   newsletterUnsubscribeTokenSecret?: string;
+  resendApiKey?: string;
+  resendFromEmail?: string;
+  resendReplyToEmail?: string;
   automationsEnabled: boolean;
 };
 
@@ -153,4 +162,22 @@ export function requireGmailOAuthEnv(env: GrowthServerEnv): GmailOAuthEnv {
 
 export function readGrowthServerEnv(): GrowthServerEnv {
   return parseGrowthServerEnv(process.env);
+}
+
+export type ResendEnv = {
+  apiKey: string;
+  from: string;
+  replyTo: string;
+};
+
+export function requireResendEnv(env: GrowthServerEnv): ResendEnv {
+  if (!env.resendApiKey || !env.resendFromEmail || !env.resendReplyToEmail) {
+    throw new Error("Resend server configuration is incomplete.");
+  }
+
+  return {
+    apiKey: env.resendApiKey,
+    from: env.resendFromEmail,
+    replyTo: env.resendReplyToEmail,
+  };
 }
