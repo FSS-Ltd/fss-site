@@ -1,5 +1,5 @@
 import { withGrowthTransaction } from "../db/client";
-import type { GrowthDb } from "../db/types";
+import type { GrowthDb, GrowthQueryExecutor } from "../db/types";
 
 export type ClaimedNewsletterSend = {
   id: string;
@@ -31,6 +31,7 @@ export type RecordNewsletterSentInput = {
 
 export type FailNewsletterSendInput = {
   sendId: string;
+  newsletterIssueId: string;
   status: "retry" | "failed";
   errorCode: string;
   errorSummary: string;
@@ -38,6 +39,7 @@ export type FailNewsletterSendInput = {
 
 export type CancelNewsletterSendInput = {
   sendId: string;
+  newsletterIssueId: string;
   errorCode: string;
 };
 
@@ -62,37 +64,91 @@ export interface NewsletterDispatchRepository {
 
 /** Flips the next due (`scheduled`, `scheduled_for <= now`) issue to
  * `sending` and seeds one `newsletter_sends` row per currently subscribed
- * subscriber, atomically, so recipient selection happens at dispatch time
- * rather than from a stale audience snapshot. Returns whether an issue was
- * seeded. */
+ * subscriber, so recipient selection happens at dispatch time rather than
+ * from a stale audience snapshot. Runs in a transaction so the row lock from
+ * `for update skip locked` holds across the flip, the seed insert, and the
+ * empty-seed reconciliation below. Returns whether an issue was seeded (i.e.
+ * whether one was flipped, regardless of how many sends it got). */
 async function seedNextDueIssue(db: GrowthDb, now: Date): Promise<boolean> {
-  const rows = await db<Array<{ newsletterIssueId: string }>>`
-    with due_issue as (
+  return withGrowthTransaction(db, async (tx) => {
+    const due = await tx<Array<{ id: string }>>`
       select id
       from growth.newsletter_issues
       where status = 'scheduled' and scheduled_for <= ${now}
       order by scheduled_for asc
       for update skip locked
       limit 1
-    ),
-    flipped as (
-      update growth.newsletter_issues ni
+    `;
+    const issueId = due[0]?.id;
+    if (!issueId) return false;
+
+    await tx`
+      update growth.newsletter_issues
       set status = 'sending', updated_at = now()
-      from due_issue
-      where ni.id = due_issue.id
-      returning ni.id
-    )
-    insert into growth.newsletter_sends (
-      newsletter_issue_id, subscriber_id, idempotency_key
-    )
-    select flipped.id, ns.id, 'newsletter:' || flipped.id || ':' || ns.id
-    from flipped
-    cross join growth.newsletter_subscribers ns
-    where ns.status = 'subscribed'
-    on conflict (newsletter_issue_id, subscriber_id) do nothing
-    returning newsletter_issue_id as "newsletterIssueId"
+      where id = ${issueId}
+    `;
+
+    const inserted = await tx<Array<{ newsletterIssueId: string }>>`
+      insert into growth.newsletter_sends (
+        newsletter_issue_id, subscriber_id, idempotency_key
+      )
+      select ${issueId}, ns.id, 'newsletter:' || ${issueId} || ':' || ns.id
+      from growth.newsletter_subscribers ns
+      where ns.status = 'subscribed'
+      on conflict (newsletter_issue_id, subscriber_id) do nothing
+      returning newsletter_issue_id as "newsletterIssueId"
+    `;
+
+    // The last subscriber may have unsubscribed between schedule time and
+    // dispatch time, leaving zero sends for the just-flipped issue with
+    // nothing left to ever complete it. Resolve it immediately.
+    if (inserted.length === 0) {
+      await reconcileIssueCompletion(tx, issueId, now);
+    }
+
+    return true;
+  });
+}
+
+/** If no non-terminal `newsletter_sends` rows remain for an issue, resolves
+ * the issue out of `sending`: to `sent` if at least one send reached `sent`,
+ * otherwise to `failed` (every send ended cancelled/failed, or there were
+ * none at all). Guarded by `status = 'sending'` so it is a no-op if the
+ * issue already moved on. Must run inside the same transaction as the send
+ * update that may have made this issue's sends complete. */
+async function reconcileIssueCompletion(
+  tx: GrowthQueryExecutor,
+  newsletterIssueId: string,
+  now: Date,
+): Promise<void> {
+  const remaining = await tx<Array<{ count: string }>>`
+    select count(*)::text as count
+    from growth.newsletter_sends
+    where newsletter_issue_id = ${newsletterIssueId}
+      and status not in ('sent', 'cancelled', 'failed')
   `;
-  return rows.length > 0;
+  if (Number(remaining[0]?.count ?? 0) > 0) return;
+
+  const anySent = await tx<Array<{ exists: boolean }>>`
+    select exists(
+      select 1 from growth.newsletter_sends
+      where newsletter_issue_id = ${newsletterIssueId} and status = 'sent'
+    ) as "exists"
+  `;
+
+  if (anySent[0]?.exists) {
+    await tx`
+      update growth.newsletter_issues
+      set status = 'sent', sent_at = ${now}, updated_at = now()
+      where id = ${newsletterIssueId} and status = 'sending'
+    `;
+  } else {
+    await tx`
+      update growth.newsletter_issues
+      set status = 'failed', updated_at = now()
+      where id = ${newsletterIssueId} and status = 'sending'
+    `;
+  }
 }
 
 async function claimDueSend(
@@ -163,31 +219,39 @@ async function cancelSend(
   db: GrowthDb,
   input: CancelNewsletterSendInput,
 ): Promise<void> {
-  await db`
-    update growth.newsletter_sends
-    set status = 'cancelled',
-        lease_token = null,
-        lease_expires_at = null,
-        last_error_code = ${input.errorCode},
-        updated_at = now()
-    where id = ${input.sendId}
-  `;
+  await withGrowthTransaction(db, async (tx) => {
+    await tx`
+      update growth.newsletter_sends
+      set status = 'cancelled',
+          lease_token = null,
+          lease_expires_at = null,
+          last_error_code = ${input.errorCode},
+          updated_at = now()
+      where id = ${input.sendId}
+    `;
+
+    await reconcileIssueCompletion(tx, input.newsletterIssueId, new Date());
+  });
 }
 
 async function failSend(
   db: GrowthDb,
   input: FailNewsletterSendInput,
 ): Promise<void> {
-  await db`
-    update growth.newsletter_sends
-    set status = ${input.status},
-        lease_token = null,
-        lease_expires_at = null,
-        last_error_code = ${input.errorCode},
-        last_error_summary = ${input.errorSummary},
-        updated_at = now()
-    where id = ${input.sendId}
-  `;
+  await withGrowthTransaction(db, async (tx) => {
+    await tx`
+      update growth.newsletter_sends
+      set status = ${input.status},
+          lease_token = null,
+          lease_expires_at = null,
+          last_error_code = ${input.errorCode},
+          last_error_summary = ${input.errorSummary},
+          updated_at = now()
+      where id = ${input.sendId}
+    `;
+
+    await reconcileIssueCompletion(tx, input.newsletterIssueId, new Date());
+  });
 }
 
 async function recordSent(
@@ -206,20 +270,7 @@ async function recordSent(
       where id = ${input.sendId}
     `;
 
-    const remaining = await tx<Array<{ count: string }>>`
-      select count(*)::text as count
-      from growth.newsletter_sends
-      where newsletter_issue_id = ${input.newsletterIssueId}
-        and status not in ('sent', 'cancelled', 'failed')
-    `;
-
-    if (Number(remaining[0]?.count ?? 0) === 0) {
-      await tx`
-        update growth.newsletter_issues
-        set status = 'sent', sent_at = ${input.sentAt}, updated_at = now()
-        where id = ${input.newsletterIssueId} and status = 'sending'
-      `;
-    }
+    await reconcileIssueCompletion(tx, input.newsletterIssueId, input.sentAt);
   });
 }
 

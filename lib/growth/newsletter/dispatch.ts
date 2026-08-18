@@ -82,6 +82,7 @@ export function createNewsletterDispatcher({
       if (!recipient || recipient.status !== "subscribed") {
         await repository.cancelSend(db, {
           sendId: claimed.id,
+          newsletterIssueId: claimed.newsletterIssueId,
           errorCode: "suppressed_contact",
         });
         summary.cancelled += 1;
@@ -95,6 +96,7 @@ export function createNewsletterDispatcher({
       if (!issue || issue.status !== "sending") {
         await repository.cancelSend(db, {
           sendId: claimed.id,
+          newsletterIssueId: claimed.newsletterIssueId,
           errorCode: "issue_not_dispatchable",
         });
         summary.cancelled += 1;
@@ -110,13 +112,14 @@ export function createNewsletterDispatcher({
       ) {
         await repository.cancelSend(db, {
           sendId: claimed.id,
+          newsletterIssueId: claimed.newsletterIssueId,
           errorCode: "missing_unsubscribe_placeholder",
         });
         summary.cancelled += 1;
         continue;
       }
 
-      const { html, text } = renderRecipientSnapshot(
+      const { html, text, unsubscribeUrl } = renderRecipientSnapshot(
         issue,
         recipient.email,
         unsubscribeTokenSecret,
@@ -133,6 +136,10 @@ export function createNewsletterDispatcher({
           subject: issue.subject,
           html,
           text,
+          headers: {
+            "List-Unsubscribe": `<${unsubscribeUrl}>`,
+            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+          },
         });
         await repository.recordSent(db, {
           sendId: claimed.id,
@@ -145,6 +152,7 @@ export function createNewsletterDispatcher({
         if (error instanceof ResendClientError && error.retryable) {
           await repository.failSend(db, {
             sendId: claimed.id,
+            newsletterIssueId: claimed.newsletterIssueId,
             status: "retry",
             errorCode: error.code,
             errorSummary: error.message,
@@ -155,6 +163,7 @@ export function createNewsletterDispatcher({
           const message = error instanceof Error ? error.message : "Unknown error.";
           await repository.failSend(db, {
             sendId: claimed.id,
+            newsletterIssueId: claimed.newsletterIssueId,
             status: "failed",
             errorCode: code,
             errorSummary: message,

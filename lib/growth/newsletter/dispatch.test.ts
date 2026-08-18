@@ -309,6 +309,57 @@ test("substitutes the unsubscribe placeholder with a link that verifies back to 
   }
 });
 
+test("attaches List-Unsubscribe headers carrying the recipient's own unsubscribe link", async () => {
+  const state = createFakeState();
+  const messages: Array<Parameters<ResendGateway["send"]>[0]> = [];
+  const dispatch = createDispatch(state, {
+    resend: fakeResend({
+      send: async (message) => {
+        messages.push(message);
+        return { providerMessageId: "provider-1" };
+      },
+    }),
+  });
+
+  await dispatch(db);
+
+  const headers = messages[0]?.headers;
+  assert.ok(headers, "expected headers on the sent message");
+  assert.equal(headers?.["List-Unsubscribe-Post"], "List-Unsubscribe=One-Click");
+
+  const listUnsubscribe = headers?.["List-Unsubscribe"] ?? "";
+  const match = /^<(.+)>$/.exec(listUnsubscribe);
+  assert.ok(match, "expected List-Unsubscribe to be an angle-bracketed URL");
+  const [, tokenFromHeader] = /token=([^"&\s]+)/.exec(match![1]!) ?? [];
+  assert.ok(tokenFromHeader, "expected an unsubscribe token in the header URL");
+  const verified = verifyUnsubscribeToken(
+    decodeURIComponent(tokenFromHeader!),
+    UNSUBSCRIBE_TOKEN_SECRET,
+    NOW,
+  );
+  assert.equal(verified.ok, true);
+  assert.equal(verified.ok && verified.normalisedEmail, "reader@example.test");
+});
+
+test("cancels and fails include the newsletter issue id so the repository can reconcile it", async () => {
+  const state = createFakeState({
+    recipients: new Map([
+      [
+        "33333333-3333-4333-8333-333333333333",
+        recipient({ status: "unsubscribed" }),
+      ],
+    ]),
+  });
+  const dispatch = createDispatch(state);
+
+  await dispatch(db);
+
+  assert.equal(
+    state.cancels[0]?.newsletterIssueId,
+    "22222222-2222-4222-8222-222222222222",
+  );
+});
+
 test("cancels a claimed send whose snapshot has no unsubscribe placeholder", async () => {
   const state = createFakeState({
     issues: new Map([

@@ -66,7 +66,7 @@ export function renderRecipientSnapshot(
   recipientEmail: string,
   unsubscribeTokenSecret: string,
   siteOrigin: string,
-): { html: string; text: string } {
+): { html: string; text: string; unsubscribeUrl: string } {
   const unsubscribeUrl = buildUnsubscribeUrl(
     recipientEmail,
     unsubscribeTokenSecret,
@@ -75,6 +75,7 @@ export function renderRecipientSnapshot(
   return {
     html: snapshot.htmlSnapshot.split(UNSUBSCRIBE_URL_PLACEHOLDER).join(unsubscribeUrl),
     text: snapshot.textSnapshot.split(UNSUBSCRIBE_URL_PLACEHOLDER).join(unsubscribeUrl),
+    unsubscribeUrl,
   };
 }
 
