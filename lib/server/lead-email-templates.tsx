@@ -2,7 +2,16 @@ import "server-only";
 
 import type { LeadCapturePayload } from "@/lib/forms/lead-capture";
 import type { ResourceMeta } from "@/lib/types/resource";
-import { getDeliveryAction, getDeliveryNextStep } from "@/lib/resource-delivery";
+import { getDeliveryAction } from "@/lib/resource-delivery";
+import { renderEmail } from "@/emails/render-email";
+import {
+  RESOURCE_DELIVERY_SUBJECT,
+  ResourceDelivery,
+} from "@/emails/resource-delivery";
+import {
+  SITE_ENQUIRY_THANK_YOU_SUBJECT,
+  SiteEnquiryThankYou,
+} from "@/emails/site-enquiry-thank-you";
 
 type LeadEmailTemplateContext = {
   payload: LeadCapturePayload;
@@ -35,34 +44,30 @@ export function buildInternalLeadNotificationEmail(context: LeadEmailTemplateCon
   };
 }
 
-export function buildSubmitterConfirmationEmail(context: LeadEmailTemplateContext) {
+export async function buildSubmitterConfirmationEmail(
+  context: LeadEmailTemplateContext,
+): Promise<{ subject: string; html: string }> {
   const { payload, siteUrl, resource } = context;
-  const resourceNote = payload.resourceSlug
-    ? `We received your request for <strong>${sanitize(resource?.title ?? payload.resourceSlug)}</strong>.`
-    : "We received your request and our team will follow up shortly.";
   const deliveryAction = resource ? getDeliveryAction(resource) : null;
-  const deliveryBlock =
-    resource && deliveryAction
-      ? `
-      <p>${sanitize(getDeliveryNextStep(resource))}</p>
-      <p><a href="${sanitize(siteUrl + deliveryAction.href)}">${sanitize(deliveryAction.label)}</a></p>
-    `
-      : "";
-  const fallbackDeliveryBlock =
-    resource && !deliveryAction
-      ? `<p>${sanitize(getDeliveryNextStep(resource))}</p>`
-      : "";
 
-  return {
-    subject: "We received your request",
-    html: `
-      <h1>Thanks for reaching out to FSS</h1>
-      <p>Hi ${sanitize(payload.firstName)},</p>
-      <p>${resourceNote}</p>
-      ${deliveryBlock}
-      ${fallbackDeliveryBlock}
-      <p>If needed, you can continue exploring resources here: <a href="${sanitize(siteUrl)}/resources">Resources</a>.</p>
-      <p>- FSS Team</p>
-    `,
-  };
+  if (resource && deliveryAction) {
+    const resourceUrl = new URL(deliveryAction.href, siteUrl).toString();
+    const { html } = await renderEmail({
+      templateKey: "resource-delivery",
+      element: (
+        <ResourceDelivery
+          firstName={payload.firstName}
+          resourceTitle={resource.title}
+          resourceUrl={resourceUrl}
+        />
+      ),
+    });
+    return { subject: RESOURCE_DELIVERY_SUBJECT, html };
+  }
+
+  const { html } = await renderEmail({
+    templateKey: "site-enquiry-thank-you",
+    element: <SiteEnquiryThankYou firstName={payload.firstName} businessName={payload.company} />,
+  });
+  return { subject: SITE_ENQUIRY_THANK_YOU_SUBJECT, html };
 }

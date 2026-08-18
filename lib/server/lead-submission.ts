@@ -50,7 +50,7 @@ export async function processLeadSubmission(
       resource: resource?.meta ?? null,
     });
 
-    const submitterEmail = buildSubmitterConfirmationEmail({
+    const submitterEmail = await buildSubmitterConfirmationEmail({
       payload,
       siteUrl: env.siteUrl,
       resource: resource?.meta ?? null,

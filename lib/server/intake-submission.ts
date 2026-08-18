@@ -25,7 +25,7 @@ export async function processIntakeSubmission(
 
   try {
     const internalEmail = buildIntakeNotificationEmail({ payload, siteUrl: env.siteUrl });
-    const submitterEmail = buildIntakeSubmitterConfirmationEmail({
+    const submitterEmail = await buildIntakeSubmitterConfirmationEmail({
       payload,
       siteUrl: env.siteUrl,
     });
