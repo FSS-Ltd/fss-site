@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import { appendAuditEvent } from "../audit/service";
 import type { FounderSession } from "../auth/require-founder";
 import type { GrowthDb } from "../db/types";
+import { signUnsubscribeToken } from "../email/suppression";
 import type { ResendGateway } from "../integrations/resend/client";
 
 export type NewsletterIssueStatus =
@@ -28,7 +29,54 @@ const TERMINAL_STATUSES = new Set<NewsletterIssueStatus>([
   "failed",
   "cancelled",
 ]);
-const UNSUBSCRIBE_LINK_MARKER = "/api/newsletter/unsubscribe";
+
+/**
+ * Placeholder token that a newsletter issue's stored `html_snapshot`/
+ * `text_snapshot` must contain wherever the recipient's real unsubscribe
+ * link belongs. No issue-authoring code exists in this repo yet (Task 8 is
+ * the only component here with each recipient's real email address
+ * available at send time), so this literal string is the documented
+ * contract: whichever future issue-authoring UI builds `html_snapshot`/
+ * `text_snapshot` must emit this token, and `createFounderTestSender` /
+ * `createNewsletterDispatcher` substitute it with a real, per-recipient,
+ * HMAC-signed unsubscribe URL immediately before the message goes out over
+ * Resend (see `renderRecipientSnapshot` below). Every occurrence in both
+ * the html and text snapshot must be substituted before send.
+ */
+export const UNSUBSCRIBE_URL_PLACEHOLDER = "{{unsubscribe_url}}";
+
+/** Builds a real unsubscribe URL for one recipient, matching what
+ * app/api/newsletter/unsubscribe/route.ts expects (a `token` query param
+ * produced by signUnsubscribeToken). */
+export function buildUnsubscribeUrl(
+  email: string,
+  unsubscribeTokenSecret: string,
+  siteOrigin: string,
+): string {
+  return `${siteOrigin}/api/newsletter/unsubscribe?token=${signUnsubscribeToken(email, unsubscribeTokenSecret)}`;
+}
+
+/** Substitutes every `UNSUBSCRIBE_URL_PLACEHOLDER` occurrence in a stored
+ * issue snapshot with one recipient's real, working unsubscribe link. Used
+ * by both the founder test sender and the scheduled dispatcher so every
+ * recipient (including the founder's own test) gets a link that verifies
+ * back to their own email. */
+export function renderRecipientSnapshot(
+  snapshot: { htmlSnapshot: string; textSnapshot: string },
+  recipientEmail: string,
+  unsubscribeTokenSecret: string,
+  siteOrigin: string,
+): { html: string; text: string } {
+  const unsubscribeUrl = buildUnsubscribeUrl(
+    recipientEmail,
+    unsubscribeTokenSecret,
+    siteOrigin,
+  );
+  return {
+    html: snapshot.htmlSnapshot.split(UNSUBSCRIBE_URL_PLACEHOLDER).join(unsubscribeUrl),
+    text: snapshot.textSnapshot.split(UNSUBSCRIBE_URL_PLACEHOLDER).join(unsubscribeUrl),
+  };
+}
 
 /** draft -> ready_for_review -> approved -> scheduled -> sending -> sent,
  * with an explicit failed/cancelled escape from any non-terminal state. */
@@ -145,11 +193,14 @@ export type FounderTestSenderDependencies = {
   resend: Pick<ResendGateway, "send">;
   fromEmail: string;
   founderEmail: string;
+  unsubscribeTokenSecret: string;
+  siteOrigin: string;
   now?: () => Date;
 };
 
-/** Sends the issue's exact pending html/text snapshot to the founder address
- * only. Never touches subscriber state. */
+/** Sends the issue's pending html/text snapshot to the founder address only,
+ * with the unsubscribe placeholder substituted for a real, working link
+ * addressed to the founder. Never touches subscriber state. */
 export function createFounderTestSender(deps: FounderTestSenderDependencies) {
   const now = deps.now ?? (() => new Date());
 
@@ -162,6 +213,13 @@ export function createFounderTestSender(deps: FounderTestSenderDependencies) {
       throw new NewsletterIssueError("not_testable");
     }
 
+    const { html, text } = renderRecipientSnapshot(
+      issue,
+      deps.founderEmail,
+      deps.unsubscribeTokenSecret,
+      deps.siteOrigin,
+    );
+
     let sent: { providerMessageId: string };
     try {
       sent = await deps.resend.send({
@@ -171,8 +229,8 @@ export function createFounderTestSender(deps: FounderTestSenderDependencies) {
         to: deps.founderEmail,
         replyTo: deps.founderEmail,
         subject: issue.subject,
-        html: issue.htmlSnapshot,
-        text: issue.textSnapshot,
+        html,
+        text,
       });
     } catch {
       throw new NewsletterIssueError("send_failed");
@@ -305,8 +363,8 @@ export function createIssueScheduler(deps: IssueSchedulerDependencies) {
       throw new NewsletterIssueError("checksum_mismatch");
     }
     if (
-      !issue.htmlSnapshot.includes(UNSUBSCRIBE_LINK_MARKER) ||
-      !issue.textSnapshot.includes(UNSUBSCRIBE_LINK_MARKER)
+      !issue.htmlSnapshot.includes(UNSUBSCRIBE_URL_PLACEHOLDER) ||
+      !issue.textSnapshot.includes(UNSUBSCRIBE_URL_PLACEHOLDER)
     ) {
       throw new NewsletterIssueError("missing_unsubscribe_link");
     }

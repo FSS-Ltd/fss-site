@@ -181,3 +181,12 @@ export function requireResendEnv(env: GrowthServerEnv): ResendEnv {
     replyTo: env.resendReplyToEmail,
   };
 }
+
+export function requireNewsletterUnsubscribeTokenSecret(
+  env: GrowthServerEnv,
+): string {
+  if (!env.newsletterUnsubscribeTokenSecret) {
+    throw new Error("Newsletter unsubscribe token secret is not configured.");
+  }
+  return env.newsletterUnsubscribeTokenSecret;
+}

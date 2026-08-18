@@ -4,6 +4,7 @@ import test from "node:test";
 
 import type { FounderSession } from "../auth/require-founder";
 import type { GrowthDb } from "../db/types";
+import { verifyUnsubscribeToken } from "../email/suppression";
 import type { ResendGateway } from "../integrations/resend/client";
 import {
   canTransitionNewsletterIssue,
@@ -12,6 +13,7 @@ import {
   createIssueApproveAndScheduler,
   createIssueScheduler,
   NewsletterIssueError,
+  UNSUBSCRIBE_URL_PLACEHOLDER,
   type NewsletterIssueDependencies,
   type NewsletterIssueRow,
 } from "./issues";
@@ -28,8 +30,8 @@ function createFakeDb(): GrowthDb {
 
 const FAKE_DB = createFakeDb();
 const NOW = new Date("2026-08-19T09:00:00.000Z");
-const UNSUBSCRIBE_LINK =
-  "https://faithfulsoftwaresolutions.co.uk/api/newsletter/unsubscribe?token=abc";
+const UNSUBSCRIBE_TOKEN_SECRET = "s".repeat(32);
+const SITE_ORIGIN = "https://faithfulsoftwaresolutions.co.uk";
 
 function issueRow(overrides: Partial<NewsletterIssueRow> = {}): NewsletterIssueRow {
   return {
@@ -37,8 +39,8 @@ function issueRow(overrides: Partial<NewsletterIssueRow> = {}): NewsletterIssueR
     version: 1,
     status: "draft",
     subject: "Field Notes #1",
-    htmlSnapshot: `<html><body><p>Body</p><a href="${UNSUBSCRIBE_LINK}">Unsubscribe</a></body></html>`,
-    textSnapshot: `Body\nUnsubscribe: ${UNSUBSCRIBE_LINK}`,
+    htmlSnapshot: `<html><body><p>Body</p><a href="${UNSUBSCRIBE_URL_PLACEHOLDER}">Unsubscribe</a></body></html>`,
+    textSnapshot: `Body\nUnsubscribe: ${UNSUBSCRIBE_URL_PLACEHOLDER}`,
     testSentAt: null,
     testSentVersion: null,
     approvedAt: null,
@@ -152,6 +154,8 @@ test("sendFounderTest sends the exact pending snapshot to the founder only", asy
     resend,
     fromEmail: "newsletter@faithfulsoftware.dev",
     founderEmail: founder.email,
+    unsubscribeTokenSecret: UNSUBSCRIBE_TOKEN_SECRET,
+    siteOrigin: SITE_ORIGIN,
     now: () => NOW,
   });
 
@@ -165,10 +169,54 @@ test("sendFounderTest sends the exact pending snapshot to the founder only", asy
   assert.equal(sentMessages.length, 1);
   assert.equal(sentMessages[0]?.to, founder.email);
   assert.equal(sentMessages[0]?.replyTo, founder.email);
-  assert.equal(sentMessages[0]?.html, state.issue!.htmlSnapshot);
-  assert.equal(sentMessages[0]?.text, state.issue!.textSnapshot);
   assert.equal(state.testSends.length, 1);
   assert.equal(state.testSends[0]?.version, 1);
+});
+
+test("sendFounderTest substitutes the unsubscribe placeholder with a working link for the founder", async () => {
+  const state: FakeState = {
+    issue: issueRow({ status: "ready_for_review" }),
+    subscribedCount: 0,
+    testSends: [],
+  };
+  const sentMessages: Array<Parameters<ResendGateway["send"]>[0]> = [];
+  const resend: Pick<ResendGateway, "send"> = {
+    async send(message) {
+      sentMessages.push(message);
+      return { providerMessageId: "provider-test-1" };
+    },
+  };
+
+  const sendFounderTest = createFounderTestSender({
+    repository: createFakeRepository(state),
+    resend,
+    fromEmail: "newsletter@faithfulsoftware.dev",
+    founderEmail: founder.email,
+    unsubscribeTokenSecret: UNSUBSCRIBE_TOKEN_SECRET,
+    siteOrigin: SITE_ORIGIN,
+    now: () => NOW,
+  });
+
+  await sendFounderTest(FAKE_DB, {
+    issueId: state.issue!.id,
+    founder,
+    correlationId: "corr-1",
+  });
+
+  const sentHtml = sentMessages[0]?.html ?? "";
+  const sentText = sentMessages[0]?.text ?? "";
+  assert.equal(sentHtml.includes(UNSUBSCRIBE_URL_PLACEHOLDER), false);
+  assert.equal(sentText.includes(UNSUBSCRIBE_URL_PLACEHOLDER), false);
+
+  const [, tokenFromHtml] = /token=([^"&\s]+)/.exec(sentHtml) ?? [];
+  assert.ok(tokenFromHtml, "expected an unsubscribe token in the sent html");
+  const verified = verifyUnsubscribeToken(
+    decodeURIComponent(tokenFromHtml!),
+    UNSUBSCRIBE_TOKEN_SECRET,
+    NOW,
+  );
+  assert.equal(verified.ok, true);
+  assert.equal(verified.ok && verified.normalisedEmail, founder.email.toLowerCase());
 });
 
 test("sendFounderTest rejects an issue that no longer exists", async () => {
@@ -178,6 +226,8 @@ test("sendFounderTest rejects an issue that no longer exists", async () => {
     resend: { send: async () => ({ providerMessageId: "x" }) },
     fromEmail: "newsletter@faithfulsoftware.dev",
     founderEmail: founder.email,
+    unsubscribeTokenSecret: UNSUBSCRIBE_TOKEN_SECRET,
+    siteOrigin: SITE_ORIGIN,
     now: () => NOW,
   });
 
@@ -204,6 +254,8 @@ test("sendFounderTest rejects a terminal-status issue", async () => {
     resend: { send: async () => ({ providerMessageId: "x" }) },
     fromEmail: "newsletter@faithfulsoftware.dev",
     founderEmail: founder.email,
+    unsubscribeTokenSecret: UNSUBSCRIBE_TOKEN_SECRET,
+    siteOrigin: SITE_ORIGIN,
     now: () => NOW,
   });
 

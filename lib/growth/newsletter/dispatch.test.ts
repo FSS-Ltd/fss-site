@@ -2,8 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import type { GrowthDb } from "../db/types";
+import { verifyUnsubscribeToken } from "../email/suppression";
 import { ResendClientError, type ResendGateway } from "../integrations/resend/client";
 import { createNewsletterDispatcher } from "./dispatch";
+import { UNSUBSCRIBE_URL_PLACEHOLDER } from "./issues";
 import type {
   CancelNewsletterSendInput,
   ClaimedNewsletterSend,
@@ -16,6 +18,8 @@ import type {
 
 const NOW = new Date("2026-08-19T09:00:00.000Z");
 const db = {} as GrowthDb;
+const UNSUBSCRIBE_TOKEN_SECRET = "s".repeat(32);
+const SITE_ORIGIN = "https://faithfulsoftwaresolutions.co.uk";
 
 function claimedSend(
   overrides: Partial<ClaimedNewsletterSend> = {},
@@ -38,8 +42,8 @@ function issueSnapshot(
   return {
     status: "sending",
     subject: "Field Notes #1",
-    htmlSnapshot: "<html><body><p>Body</p></body></html>",
-    textSnapshot: "Body",
+    htmlSnapshot: `<html><body><p>Body</p><a href="${UNSUBSCRIBE_URL_PLACEHOLDER}">Unsubscribe</a></body></html>`,
+    textSnapshot: `Body\nUnsubscribe: ${UNSUBSCRIBE_URL_PLACEHOLDER}`,
     ...overrides,
   };
 }
@@ -128,6 +132,8 @@ function createDispatch(
     resend: overrides.resend ?? fakeResend(),
     fromEmail: "newsletter@faithfulsoftware.dev",
     replyToEmail: "j.ntagengwa@faithfulsoftware.dev",
+    unsubscribeTokenSecret: UNSUBSCRIBE_TOKEN_SECRET,
+    siteOrigin: SITE_ORIGIN,
     now: () => NOW,
     createLeaseToken: () => "lease-token",
   });
@@ -247,7 +253,7 @@ test("marks a permanent provider error as failed", async () => {
   assert.equal(state.fails[0]?.status, "failed");
 });
 
-test("sends the issue's exact pending snapshot with the configured reply-to", async () => {
+test("sends the issue's pending snapshot with the configured reply-to", async () => {
   const state = createFakeState();
   const messages: Array<Parameters<ResendGateway["send"]>[0]> = [];
   const dispatch = createDispatch(state, {
@@ -265,7 +271,69 @@ test("sends the issue's exact pending snapshot with the configured reply-to", as
   assert.equal(messages[0]?.to, "reader@example.test");
   assert.equal(messages[0]?.replyTo, "j.ntagengwa@faithfulsoftware.dev");
   assert.equal(messages[0]?.category, "newsletter");
-  assert.equal(messages[0]?.html, issueSnapshot().htmlSnapshot);
-  assert.equal(messages[0]?.text, issueSnapshot().textSnapshot);
   assert.equal(messages[0]?.idempotencyKey, claimedSend().idempotencyKey);
+});
+
+test("substitutes the unsubscribe placeholder with a link that verifies back to the recipient's own email", async () => {
+  const state = createFakeState();
+  const messages: Array<Parameters<ResendGateway["send"]>[0]> = [];
+  const dispatch = createDispatch(state, {
+    resend: fakeResend({
+      send: async (message) => {
+        messages.push(message);
+        return { providerMessageId: "provider-1" };
+      },
+    }),
+  });
+
+  await dispatch(db);
+
+  const sentHtml = messages[0]?.html ?? "";
+  const sentText = messages[0]?.text ?? "";
+  assert.equal(sentHtml.includes(UNSUBSCRIBE_URL_PLACEHOLDER), false);
+  assert.equal(sentText.includes(UNSUBSCRIBE_URL_PLACEHOLDER), false);
+
+  const [, tokenFromHtml] = /token=([^"&\s]+)/.exec(sentHtml) ?? [];
+  const [, tokenFromText] = /token=([^\s]+)/.exec(sentText) ?? [];
+  assert.ok(tokenFromHtml, "expected an unsubscribe token in the sent html");
+  assert.ok(tokenFromText, "expected an unsubscribe token in the sent text");
+
+  for (const rawToken of [tokenFromHtml, tokenFromText]) {
+    const verified = verifyUnsubscribeToken(
+      decodeURIComponent(rawToken!),
+      UNSUBSCRIBE_TOKEN_SECRET,
+      NOW,
+    );
+    assert.equal(verified.ok, true);
+    assert.equal(verified.ok && verified.normalisedEmail, "reader@example.test");
+  }
+});
+
+test("cancels a claimed send whose snapshot has no unsubscribe placeholder", async () => {
+  const state = createFakeState({
+    issues: new Map([
+      [
+        "22222222-2222-4222-8222-222222222222",
+        issueSnapshot({
+          htmlSnapshot: "<html><body><p>No placeholder here</p></body></html>",
+          textSnapshot: "No placeholder here",
+        }),
+      ],
+    ]),
+  });
+  const sent: unknown[] = [];
+  const dispatch = createDispatch(state, {
+    resend: fakeResend({
+      send: async (message) => {
+        sent.push(message);
+        return { providerMessageId: "provider-1" };
+      },
+    }),
+  });
+
+  const summary = await dispatch(db);
+
+  assert.equal(summary.cancelled, 1);
+  assert.equal(sent.length, 0);
+  assert.equal(state.cancels[0]?.errorCode, "missing_unsubscribe_placeholder");
 });

@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import type { GrowthDb } from "../db/types";
 import { ResendClientError, type ResendGateway } from "../integrations/resend/client";
+import { renderRecipientSnapshot, UNSUBSCRIBE_URL_PLACEHOLDER } from "./issues";
 import type { NewsletterDispatchRepository } from "./newsletter-dispatch-repository";
 
 const LEASE_DURATION_MS = 5 * 60 * 1000;
@@ -22,6 +23,8 @@ type NewsletterDispatcherDependencies = {
   resend: Pick<ResendGateway, "send">;
   fromEmail: string;
   replyToEmail: string;
+  unsubscribeTokenSecret: string;
+  siteOrigin: string;
   now?: () => Date;
   createLeaseToken?: () => string;
   maxMessagesPerRun?: number;
@@ -37,6 +40,8 @@ export function createNewsletterDispatcher({
   resend,
   fromEmail,
   replyToEmail,
+  unsubscribeTokenSecret,
+  siteOrigin,
   now = () => new Date(),
   createLeaseToken = () => randomUUID(),
   maxMessagesPerRun = DEFAULT_MAX_MESSAGES_PER_RUN,
@@ -96,6 +101,28 @@ export function createNewsletterDispatcher({
         continue;
       }
 
+      // Defence in depth alongside createIssueScheduler's scheduling-time
+      // guard: a snapshot with no unsubscribe placeholder cannot be
+      // substituted into a working per-recipient link, so refuse to send it.
+      if (
+        !issue.htmlSnapshot.includes(UNSUBSCRIBE_URL_PLACEHOLDER) ||
+        !issue.textSnapshot.includes(UNSUBSCRIBE_URL_PLACEHOLDER)
+      ) {
+        await repository.cancelSend(db, {
+          sendId: claimed.id,
+          errorCode: "missing_unsubscribe_placeholder",
+        });
+        summary.cancelled += 1;
+        continue;
+      }
+
+      const { html, text } = renderRecipientSnapshot(
+        issue,
+        recipient.email,
+        unsubscribeTokenSecret,
+        siteOrigin,
+      );
+
       try {
         const result = await resend.send({
           idempotencyKey: claimed.idempotencyKey,
@@ -104,8 +131,8 @@ export function createNewsletterDispatcher({
           to: recipient.email,
           replyTo: replyToEmail,
           subject: issue.subject,
-          html: issue.htmlSnapshot,
-          text: issue.textSnapshot,
+          html,
+          text,
         });
         await repository.recordSent(db, {
           sendId: claimed.id,

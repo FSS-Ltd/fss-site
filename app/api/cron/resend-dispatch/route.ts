@@ -1,4 +1,9 @@
-import { readGrowthServerEnv, requireResendEnv } from "@/lib/growth/config/env";
+import { resolveSiteUrl } from "@/lib/config/site-url";
+import {
+  readGrowthServerEnv,
+  requireNewsletterUnsubscribeTokenSecret,
+  requireResendEnv,
+} from "@/lib/growth/config/env";
 import { getGrowthDb } from "@/lib/growth/db/client";
 import type { GrowthDb } from "@/lib/growth/db/types";
 import { createCronRouteHandler } from "@/lib/growth/http/cron-auth";
@@ -46,6 +51,8 @@ export async function GET(request: Request): Promise<Response> {
         resend: createResendClient(resendEnv.apiKey),
         fromEmail: resendEnv.from,
         replyToEmail: resendEnv.replyTo,
+        unsubscribeTokenSecret: requireNewsletterUnsubscribeTokenSecret(env),
+        siteOrigin: resolveSiteUrl(),
       });
       return dispatch(db);
     },

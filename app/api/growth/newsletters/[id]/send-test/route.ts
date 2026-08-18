@@ -3,7 +3,11 @@ import { randomUUID } from "node:crypto";
 import { z } from "zod";
 
 import { requireFounder } from "@/lib/growth/auth/require-founder";
-import { readGrowthServerEnv, requireResendEnv } from "@/lib/growth/config/env";
+import {
+  readGrowthServerEnv,
+  requireNewsletterUnsubscribeTokenSecret,
+  requireResendEnv,
+} from "@/lib/growth/config/env";
 import { getGrowthDb } from "@/lib/growth/db/client";
 import { createResendClient } from "@/lib/growth/integrations/resend/client";
 import {
@@ -88,16 +92,19 @@ export async function POST(
     const env = readGrowthServerEnv();
     const resendEnv = requireResendEnv(env);
     const resend = createResendClient(resendEnv.apiKey);
+    const routeConfig = readMessageActionRouteConfig();
 
     const sendFounderTest = createFounderTestSender({
       repository: createPostgresNewsletterIssueDependencies(db),
       resend,
       fromEmail: resendEnv.from,
       founderEmail: env.ownerEmail,
+      unsubscribeTokenSecret: requireNewsletterUnsubscribeTokenSecret(env),
+      siteOrigin: routeConfig.origin,
     });
 
     const handler = createMessageActionHandler({
-      config: readMessageActionRouteConfig(),
+      config: routeConfig,
       authorizeFounder: requireFounder,
       bodySchema,
       createCorrelationId: randomUUID,
