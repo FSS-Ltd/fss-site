@@ -2,6 +2,13 @@ import "server-only";
 
 import type { IntakeSubmissionPayload } from "@/lib/intake/schema";
 import { intakeSteps } from "@/lib/intake/schema";
+import { renderEmail } from "@/emails/render-email";
+import {
+  SITE_ENQUIRY_THANK_YOU_SUBJECT,
+  SiteEnquiryThankYou,
+} from "@/emails/site-enquiry-thank-you";
+
+const FALLBACK_BUSINESS_NAME = "your business";
 
 type IntakeEmailTemplateContext = {
   payload: IntakeSubmissionPayload;
@@ -64,17 +71,16 @@ export function buildIntakeNotificationEmail(context: IntakeEmailTemplateContext
   };
 }
 
-export function buildIntakeSubmitterConfirmationEmail(context: IntakeEmailTemplateContext) {
-  const { payload, siteUrl } = context;
+export async function buildIntakeSubmitterConfirmationEmail(
+  context: IntakeEmailTemplateContext,
+): Promise<{ subject: string; html: string }> {
+  const { payload } = context;
+  const businessName = payload.businessName?.trim() || FALLBACK_BUSINESS_NAME;
 
-  return {
-    subject: "We received your idea",
-    html: `
-      <h1>Thanks for sharing your idea with FSS</h1>
-      <p>Hi ${sanitize(payload.firstName)},</p>
-      <p>We received your submission and will review it shortly.</p>
-      <p>- FSS Team</p>
-      <p><a href="${sanitize(siteUrl)}">${sanitize(siteUrl)}</a></p>
-    `,
-  };
+  const { html } = await renderEmail({
+    templateKey: "site-enquiry-thank-you",
+    element: <SiteEnquiryThankYou firstName={payload.firstName} businessName={businessName} />,
+  });
+
+  return { subject: SITE_ENQUIRY_THANK_YOU_SUBJECT, html };
 }
