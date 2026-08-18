@@ -360,18 +360,36 @@ function mergeTemplate(
   }, template);
 }
 
+export type RenderedFollowUpContent = {
+  subject: string;
+  html: string;
+  text: string;
+};
+
+export function renderPublishedFollowUpContent(
+  input: Omit<FollowUpRenderInput, "envelope">,
+): RenderedFollowUpContent {
+  requireTemplate(input.snapshot);
+
+  return {
+    subject: input.subject,
+    html: mergeTemplate(input.snapshot.htmlTemplate, input.mergeFields, true),
+    text: mergeTemplate(input.snapshot.textTemplate, input.mergeFields, false),
+  };
+}
+
 export function renderPublishedFollowUp(
   input: FollowUpRenderInput,
 ): RenderedGmailMessage {
   if (!input.envelope.thread) {
     throw new TypeError("A follow-up must remain in the original thread.");
   }
-  requireTemplate(input.snapshot);
+  const content = renderPublishedFollowUpContent(input);
 
   return renderGmailMime({
     ...input.envelope,
-    subject: input.subject,
-    html: mergeTemplate(input.snapshot.htmlTemplate, input.mergeFields, true),
-    text: mergeTemplate(input.snapshot.textTemplate, input.mergeFields, false),
+    subject: content.subject,
+    html: content.html,
+    text: content.text,
   });
 }
