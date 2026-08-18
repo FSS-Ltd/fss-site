@@ -70,6 +70,7 @@ const growthServerEnvSchema = z
     GROWTH_OS_AGENT_HMAC_SECRET: securitySecretSchema.optional(),
     TOKEN_ENCRYPTION_KEY: securitySecretSchema,
     CRON_SECRET: securitySecretSchema.optional(),
+    NEWSLETTER_UNSUBSCRIBE_TOKEN_SECRET: securitySecretSchema.optional(),
     GROWTH_OS_AUTOMATIONS_ENABLED: z
       .enum(["true", "false"])
       .transform((value) => value === "true"),
@@ -93,6 +94,7 @@ const growthServerEnvSchema = z
     agentHmacSecret: value.GROWTH_OS_AGENT_HMAC_SECRET,
     tokenEncryptionKey: value.TOKEN_ENCRYPTION_KEY,
     cronSecret: value.CRON_SECRET,
+    newsletterUnsubscribeTokenSecret: value.NEWSLETTER_UNSUBSCRIBE_TOKEN_SECRET,
     automationsEnabled: value.GROWTH_OS_AUTOMATIONS_ENABLED,
   }));
 
@@ -109,6 +111,7 @@ export type GrowthServerEnv = {
   agentHmacSecret?: string;
   tokenEncryptionKey: string;
   cronSecret?: string;
+  newsletterUnsubscribeTokenSecret?: string;
   automationsEnabled: boolean;
 };
 
