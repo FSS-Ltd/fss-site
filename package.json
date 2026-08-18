@@ -21,6 +21,7 @@
     "perf:lighthouse:mobile": "lhci autorun --config=.lighthouserc.mobile.json"
   },
   "dependencies": {
+    "@date-fns/tz": "^1.5.0",
     "@hookform/resolvers": "^5.2.2",
     "@mdx-js/loader": "^3.1.1",
     "@mdx-js/react": "^3.1.1",

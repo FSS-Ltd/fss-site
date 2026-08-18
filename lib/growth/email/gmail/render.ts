@@ -64,10 +64,13 @@ export type PublishedFollowUpSnapshot = {
   requiredFields: readonly FollowUpMergeField[];
 };
 
-type FirstEmailRenderInput = {
-  envelope: GmailMessageEnvelope;
+type FirstEmailContentInput = {
   snapshot: FirstEmailCandidate;
   visual: RenderableFirstEmailVisual;
+};
+
+type FirstEmailRenderInput = FirstEmailContentInput & {
+  envelope: GmailMessageEnvelope;
 };
 
 type FollowUpRenderInput = {
@@ -256,17 +259,35 @@ function renderFirstEmailHtml(
   return `${image}${disclaimer}${bodyWithoutDisclaimer}`;
 }
 
-export function renderApprovedFirstEmail(
-  input: FirstEmailRenderInput,
-): RenderedGmailMessage {
+export type ApprovedFirstEmailContent = {
+  subject: string;
+  html: string;
+  text: string;
+};
+
+export function renderApprovedFirstEmailContent(
+  input: FirstEmailContentInput,
+): ApprovedFirstEmailContent {
   requireApprovedSnapshot(input.snapshot);
   const visual = requireVisual(input.visual, input.snapshot.conceptDisclaimer);
 
-  return renderGmailMime({
-    ...input.envelope,
+  return {
     subject: input.snapshot.subject,
     text: input.snapshot.text,
     html: renderFirstEmailHtml(input.snapshot, visual),
+  };
+}
+
+export function renderApprovedFirstEmail(
+  input: FirstEmailRenderInput,
+): RenderedGmailMessage {
+  const content = renderApprovedFirstEmailContent(input);
+
+  return renderGmailMime({
+    ...input.envelope,
+    subject: content.subject,
+    text: content.text,
+    html: content.html,
   });
 }
 
@@ -339,18 +360,36 @@ function mergeTemplate(
   }, template);
 }
 
+export type RenderedFollowUpContent = {
+  subject: string;
+  html: string;
+  text: string;
+};
+
+export function renderPublishedFollowUpContent(
+  input: Omit<FollowUpRenderInput, "envelope">,
+): RenderedFollowUpContent {
+  requireTemplate(input.snapshot);
+
+  return {
+    subject: input.subject,
+    html: mergeTemplate(input.snapshot.htmlTemplate, input.mergeFields, true),
+    text: mergeTemplate(input.snapshot.textTemplate, input.mergeFields, false),
+  };
+}
+
 export function renderPublishedFollowUp(
   input: FollowUpRenderInput,
 ): RenderedGmailMessage {
   if (!input.envelope.thread) {
     throw new TypeError("A follow-up must remain in the original thread.");
   }
-  requireTemplate(input.snapshot);
+  const content = renderPublishedFollowUpContent(input);
 
   return renderGmailMime({
     ...input.envelope,
-    subject: input.subject,
-    html: mergeTemplate(input.snapshot.htmlTemplate, input.mergeFields, true),
-    text: mergeTemplate(input.snapshot.textTemplate, input.mergeFields, false),
+    subject: content.subject,
+    html: content.html,
+    text: content.text,
   });
 }
