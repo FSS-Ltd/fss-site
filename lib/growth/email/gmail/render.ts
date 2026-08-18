@@ -64,10 +64,13 @@ export type PublishedFollowUpSnapshot = {
   requiredFields: readonly FollowUpMergeField[];
 };
 
-type FirstEmailRenderInput = {
-  envelope: GmailMessageEnvelope;
+type FirstEmailContentInput = {
   snapshot: FirstEmailCandidate;
   visual: RenderableFirstEmailVisual;
+};
+
+type FirstEmailRenderInput = FirstEmailContentInput & {
+  envelope: GmailMessageEnvelope;
 };
 
 type FollowUpRenderInput = {
@@ -256,17 +259,35 @@ function renderFirstEmailHtml(
   return `${image}${disclaimer}${bodyWithoutDisclaimer}`;
 }
 
-export function renderApprovedFirstEmail(
-  input: FirstEmailRenderInput,
-): RenderedGmailMessage {
+export type ApprovedFirstEmailContent = {
+  subject: string;
+  html: string;
+  text: string;
+};
+
+export function renderApprovedFirstEmailContent(
+  input: FirstEmailContentInput,
+): ApprovedFirstEmailContent {
   requireApprovedSnapshot(input.snapshot);
   const visual = requireVisual(input.visual, input.snapshot.conceptDisclaimer);
 
-  return renderGmailMime({
-    ...input.envelope,
+  return {
     subject: input.snapshot.subject,
     text: input.snapshot.text,
     html: renderFirstEmailHtml(input.snapshot, visual),
+  };
+}
+
+export function renderApprovedFirstEmail(
+  input: FirstEmailRenderInput,
+): RenderedGmailMessage {
+  const content = renderApprovedFirstEmailContent(input);
+
+  return renderGmailMime({
+    ...input.envelope,
+    subject: content.subject,
+    text: content.text,
+    html: content.html,
   });
 }
 

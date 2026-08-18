@@ -6,8 +6,9 @@ import {
   EMAIL_ASSET_FALLBACKS,
   type EmailAssetFallbackKey,
 } from "../email/assets/fallbacks";
+import { renderGmailMime } from "../email/gmail/mime";
 import {
-  renderApprovedFirstEmail,
+  renderApprovedFirstEmailContent,
   type RenderableFirstEmailVisual,
 } from "../email/gmail/render";
 import type { GmailClient } from "../integrations/gmail/types";
@@ -249,15 +250,18 @@ export function createFirstEmailApprover({
           siteOrigin,
         );
         const messageId = createMessageId();
-        const rendered = renderApprovedFirstEmail({
-          envelope: {
-            id: messageId,
-            from: founderEmail,
-            to: draft.contactEmail,
-            replyTo: founderEmail,
-          },
+        const content = renderApprovedFirstEmailContent({
           snapshot: stored.email,
           visual,
+        });
+        const rendered = renderGmailMime({
+          id: messageId,
+          from: founderEmail,
+          to: draft.contactEmail,
+          replyTo: founderEmail,
+          subject: content.subject,
+          html: content.html,
+          text: content.text,
         });
 
         const messageStatus = input.sendMode === "queue" ? "queued" : "draft";
@@ -273,9 +277,9 @@ export function createFirstEmailApprover({
             enrollmentStatus,
             message: {
               id: messageId,
-              subjectSnapshot: stored.email.subject,
-              htmlSnapshot: stored.email.html,
-              textSnapshot: stored.email.text,
+              subjectSnapshot: content.subject,
+              htmlSnapshot: content.html,
+              textSnapshot: content.text,
               emailAssetId,
               rfcMessageId: rendered.rfcMessageId,
               idempotencyKey: `first_email:${draft.id}`,
