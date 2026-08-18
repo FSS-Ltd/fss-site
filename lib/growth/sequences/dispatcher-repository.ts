@@ -270,7 +270,10 @@ async function failMessage(
   `;
 }
 
-async function recordSent(db: GrowthDb, input: RecordSentInput): Promise<void> {
+export async function recordSent(
+  db: GrowthDb,
+  input: RecordSentInput,
+): Promise<void> {
   await withGrowthTransaction(db, async (tx) => {
     await tx`
       update growth.email_messages
