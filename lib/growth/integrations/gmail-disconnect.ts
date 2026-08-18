@@ -35,7 +35,7 @@ const defaultDependencies: GmailDisconnectDependencies = {
   disconnectStoredConnection: disconnectStoredGmailConnection,
 };
 
-function parseStoredToken(
+export function parseStoredToken(
   credential: StoredGmailCredential,
 ): StoredEncryptedToken {
   let value: unknown;
