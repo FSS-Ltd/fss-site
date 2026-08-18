@@ -1,5 +1,9 @@
 import "server-only";
 
+import { toPlainText } from "@react-email/render";
+
+import { createResendClient, type ResendMessage } from "@/lib/growth/integrations/resend/client";
+
 type SendResendEmailParams = {
   apiKey: string;
   from: string;
@@ -9,9 +13,8 @@ type SendResendEmailParams = {
   replyTo?: string;
 };
 
-type ResendSendResponse = {
-  id?: string;
-};
+const FOUNDER_REPLY_EMAIL = "j.ntagengwa@faithfulsoftware.dev";
+const LEGACY_CATEGORY: ResendMessage["category"] = "site-enquiry";
 
 function isValidReplyTo(value: string): boolean {
   const plainEmailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -20,39 +23,29 @@ function isValidReplyTo(value: string): boolean {
   return plainEmailPattern.test(value) || namedEmailPattern.test(value);
 }
 
+/**
+ * Compatibility wrapper around the typed ResendGateway (lib/growth/integrations/resend/client.ts)
+ * so existing callers can keep their current signature until they migrate to the gateway directly.
+ */
 export async function sendResendEmail(params: SendResendEmailParams): Promise<string> {
   const replyTo = params.replyTo?.trim();
-  const shouldIncludeReplyTo = replyTo ? isValidReplyTo(replyTo) : false;
+  const shouldUseProvidedReplyTo = replyTo ? isValidReplyTo(replyTo) : false;
 
-  if (replyTo && !shouldIncludeReplyTo) {
-    console.warn("Resend reply-to is invalid. Sending email without reply-to header.");
+  if (replyTo && !shouldUseProvidedReplyTo) {
+    console.warn("Resend reply-to is invalid. Falling back to the founder reply address.");
   }
 
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${params.apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: params.from,
-      to: params.to,
-      subject: params.subject,
-      html: params.html,
-      ...(shouldIncludeReplyTo ? { reply_to: replyTo } : {}),
-    }),
-  });
+  const message: ResendMessage = {
+    idempotencyKey: crypto.randomUUID(),
+    category: LEGACY_CATEGORY,
+    from: params.from,
+    to: Array.isArray(params.to) ? params.to.join(", ") : params.to,
+    replyTo: shouldUseProvidedReplyTo ? replyTo! : FOUNDER_REPLY_EMAIL,
+    subject: params.subject,
+    html: params.html,
+    text: toPlainText(params.html),
+  };
 
-  if (!response.ok) {
-    const errorBody = await response.text();
-    throw new Error(`Resend send failed (${response.status}): ${errorBody}`);
-  }
-
-  const data = (await response.json()) as ResendSendResponse;
-
-  if (!data.id) {
-    throw new Error("Resend send succeeded but no message id was returned.");
-  }
-
-  return data.id;
+  const result = await createResendClient(params.apiKey).send(message);
+  return result.providerMessageId;
 }

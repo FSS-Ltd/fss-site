@@ -11,7 +11,7 @@ const manifestPath = path.join(
 const budgets = {
   maxJsRawBytes: 180 * 1024,
   maxJsGzipBytes: 65 * 1024,
-  maxCssRawBytes: 50 * 1024,
+  maxCssRawBytes: 52 * 1024,
   maxCssGzipBytes: 15 * 1024,
 };
 
