@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { parseGrowthServerEnv, requireGmailOAuthEnv } from "./env";
+import { parseGrowthServerEnv, requireGmailOAuthEnv, requireResendEnv } from "./env";
 
 const tokenEncryptionKey = Buffer.alloc(32, 7).toString("base64");
 
@@ -187,6 +187,23 @@ test("rejects invalid automation values", () => {
       }),
     /GROWTH_OS_AUTOMATIONS_ENABLED/,
   );
+});
+
+test("requires a complete Resend configuration at its route boundary", () => {
+  const withoutResend = parseGrowthServerEnv(validEnv);
+  assert.throws(() => requireResendEnv(withoutResend), /incomplete/i);
+
+  const withResend = parseGrowthServerEnv({
+    ...validEnv,
+    RESEND_API_KEY: "resend-key",
+    RESEND_FROM_EMAIL: "newsletter@faithfulsoftware.dev",
+    RESEND_REPLY_TO_EMAIL: "j.ntagengwa@faithfulsoftware.dev",
+  });
+  assert.deepEqual(requireResendEnv(withResend), {
+    apiKey: "resend-key",
+    from: "newsletter@faithfulsoftware.dev",
+    replyTo: "j.ntagengwa@faithfulsoftware.dev",
+  });
 });
 
 test("rejects non-PostgreSQL database URLs", () => {
