@@ -33,10 +33,12 @@ function bouncedPayload(overrides: Record<string, unknown> = {}): Record<string,
   return {
     type: "email.bounced",
     created_at: "2026-08-19T09:00:00.000Z",
-    data: { email_id: "resend-message-1", to: "reader@example.test" },
+    data: { email_id: "resend-message-1", to: "reader@example.test", bounce: { type: "Permanent" } },
     ...overrides,
   };
 }
+
+type GlobalSuppressionCall = { normalisedEmail: string; reason: "bounce" | "do_not_contact"; source: string; createdBy: string };
 
 type FakeState = {
   events: Map<string, ResendDeliveryEventInput>;
@@ -47,6 +49,8 @@ type FakeState = {
   stopCalls: StopSequenceInput[];
   stopThrows?: (input: StopSequenceInput) => Error | undefined;
   auditCalls: AuditInput[];
+  globalSuppressionCalls: GlobalSuppressionCall[];
+  throwOnGlobalSuppressionOnce?: boolean;
 };
 
 function createFakeState(): FakeState {
@@ -58,12 +62,16 @@ function createFakeState(): FakeState {
     cancelCalls: [],
     stopCalls: [],
     auditCalls: [],
+    globalSuppressionCalls: [],
   };
 }
 
 function createFakeRepository(state: FakeState): ResendWebhookRepository {
   return {
-    async insertDeliveryEventIfNew(input) {
+    async hasDeliveryEvent(providerEventId) {
+      return state.events.has(providerEventId);
+    },
+    async recordDeliveryEvent(input) {
       if (state.events.has(input.providerEventId)) {
         return { inserted: false };
       }
@@ -72,6 +80,13 @@ function createFakeRepository(state: FakeState): ResendWebhookRepository {
     },
     async findSequenceEnrollmentIdsByEmail(normalisedEmail) {
       return state.enrollmentsByEmail.get(normalisedEmail) ?? [];
+    },
+    async insertGlobalSuppression(input) {
+      state.globalSuppressionCalls.push(input);
+      if (state.throwOnGlobalSuppressionOnce) {
+        state.throwOnGlobalSuppressionOnce = false;
+        throw new Error("suppression insert failed");
+      }
     },
   };
 }
@@ -224,6 +239,62 @@ test("a hard bounce records the bounce, cancels queued sends, and stops matching
   assert.equal(state.stopCalls[0]?.reason, "bounce");
   assert.equal(state.stopCalls[0]?.sequenceId, "11111111-1111-4111-8111-111111111111");
   assert.equal(state.auditCalls.length, 1);
+  assert.deepEqual(state.globalSuppressionCalls, [
+    { normalisedEmail: "reader@example.test", reason: "bounce", source: "resend_webhook", createdBy: "evt_bounce" },
+  ]);
+});
+
+test("a hard bounce with zero matching enrollments still writes a global suppression row", async () => {
+  const state = createFakeState();
+  const deps = createFakeDeps(state);
+  const parsed = parseResendWebhookPayload(bouncedPayload());
+  assert.equal(parsed.ok, true);
+  if (!parsed.ok) return;
+
+  await applyResendWebhookEvent(parsed.event, "evt_bounce", deps);
+
+  assert.equal(state.stopCalls.length, 0);
+  assert.deepEqual(state.globalSuppressionCalls, [
+    { normalisedEmail: "reader@example.test", reason: "bounce", source: "resend_webhook", createdBy: "evt_bounce" },
+  ]);
+});
+
+test("a transient bounce is recorded but does not trigger suppression", async () => {
+  const state = createFakeState();
+  const deps = createFakeDeps(state);
+  const parsed = parseResendWebhookPayload(bouncedPayload({ data: { email_id: "resend-message-1", to: "reader@example.test", bounce: { type: "Transient" } } }));
+  assert.equal(parsed.ok, true);
+  if (!parsed.ok) return;
+
+  const first = await applyResendWebhookEvent(parsed.event, "evt_transient", deps);
+  const second = await applyResendWebhookEvent(parsed.event, "evt_transient", deps);
+
+  assert.equal(first.duplicate, false);
+  assert.equal(second.duplicate, true);
+  assert.equal(state.suppressionCalls.length, 0);
+  assert.equal(state.cancelCalls.length, 0);
+  assert.equal(state.stopCalls.length, 0);
+  assert.equal(state.globalSuppressionCalls.length, 0);
+});
+
+test("a mid-fan-out failure leaves the event unrecorded so a retry re-attempts suppression", async () => {
+  const state = createFakeState();
+  state.throwOnGlobalSuppressionOnce = true;
+  const deps = createFakeDeps(state);
+  const parsed = parseResendWebhookPayload(bouncedPayload());
+  assert.equal(parsed.ok, true);
+  if (!parsed.ok) return;
+
+  await assert.rejects(() => applyResendWebhookEvent(parsed.event, "evt_bounce", deps));
+
+  assert.equal(state.events.size, 0);
+  assert.equal(state.globalSuppressionCalls.length, 1);
+
+  const result = await applyResendWebhookEvent(parsed.event, "evt_bounce", deps);
+
+  assert.equal(result.duplicate, false);
+  assert.equal(state.globalSuppressionCalls.length, 2);
+  assert.equal(state.events.size, 1);
 });
 
 test("a complaint records the complaint and stops matching sequences with do_not_contact", async () => {

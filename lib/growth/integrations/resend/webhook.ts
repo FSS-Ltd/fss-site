@@ -11,6 +11,7 @@ const KNOWN_EVENT_DATA_SCHEMA = z
   .object({
     email_id: z.string().min(1),
     to: z.union([z.string().min(1), z.array(z.string().min(1)).min(1)]),
+    bounce: z.object({ type: z.string() }).partial().optional(),
   })
   .passthrough();
 
@@ -31,8 +32,6 @@ const GENERIC_RESEND_EVENT_SCHEMA = z.object({
   created_at: z.string().min(1),
   data: KNOWN_EVENT_DATA_SCHEMA,
 });
-
-const SUPPRESSING_EVENT_TYPES = new Set(["email.bounced", "email.complained"]);
 
 export type ResendWebhookHeaders = {
   "svix-id": string | null;
@@ -76,6 +75,7 @@ export type ParsedResendWebhookEvent = {
   occurredAt: Date;
   providerMessageId: string;
   recipientNormalisedEmail: string;
+  bounceType?: string;
 };
 
 export type ParseResendWebhookPayloadResult =
@@ -102,6 +102,7 @@ export function parseResendWebhookPayload(payload: unknown): ParseResendWebhookP
       occurredAt,
       providerMessageId: parsed.data.data.email_id,
       recipientNormalisedEmail: firstRecipient(parsed.data.data.to),
+      bounceType: parsed.data.data.bounce?.type,
     },
   };
 }
@@ -115,14 +116,25 @@ export type ResendDeliveryEventInput = {
 };
 
 export type ResendWebhookRepository = {
-  /** Inserts the event keyed by `providerEventId`. `inserted: false` means
-   * the event was already applied (replay) and no side effects should run. */
-  insertDeliveryEventIfNew(
+  /** Pre-check used to gate the fan-out: true means this event was already
+   * applied (replay) and no side effects should run. */
+  hasDeliveryEvent(providerEventId: string): Promise<boolean>;
+  /** Records the event keyed by `providerEventId`, called AFTER the
+   * fan-out succeeds. `inserted: false` means a concurrent duplicate
+   * delivery raced ahead and already recorded it — harmless, since the
+   * fan-out it already ran is idempotent. */
+  recordDeliveryEvent(
     input: ResendDeliveryEventInput,
   ): Promise<{ inserted: boolean }>;
   findSequenceEnrollmentIdsByEmail(
     normalisedEmail: string,
   ): Promise<string[]>;
+  insertGlobalSuppression(input: {
+    normalisedEmail: string;
+    reason: "bounce" | "do_not_contact";
+    source: string;
+    createdBy: string;
+  }): Promise<void>;
 };
 
 export type ResendWebhookDependencies = {
@@ -141,6 +153,15 @@ function suppressionReasonForEventType(eventType: string): "bounce" | "do_not_co
   return eventType === "email.bounced" ? "bounce" : "do_not_contact";
 }
 
+/** A `Permanent` bounce or a complaint permanently suppresses the address.
+ * A `Transient`/`Undetermined`/missing-type bounce does not — it's still
+ * recorded for idempotency, it just doesn't trigger the fan-out. */
+function isSuppressingEvent(event: ParsedResendWebhookEvent): boolean {
+  if (event.type === "email.complained") return true;
+  if (event.type === "email.bounced") return event.bounceType === "Permanent";
+  return false;
+}
+
 async function applySuppression(
   event: ParsedResendWebhookEvent,
   providerEventId: string,
@@ -148,6 +169,7 @@ async function applySuppression(
 ): Promise<void> {
   const now = deps.now?.() ?? new Date();
   const email = event.recipientNormalisedEmail;
+  const reason = suppressionReasonForEventType(event.type);
 
   if (event.type === "email.bounced") {
     await recordHardBounce(email, deps.suppression, now);
@@ -157,8 +179,17 @@ async function applySuppression(
 
   await deps.cancelQueuedSendsForEmail(email, `resend_${event.type}`);
 
+  // Written unconditionally, independent of any matching Gmail enrollment —
+  // this is what protects an address with no live sequence from a future
+  // cold-outreach send (see dispatcher-repository.ts's isSuppressed).
+  await deps.repository.insertGlobalSuppression({
+    normalisedEmail: email,
+    reason,
+    source: "resend_webhook",
+    createdBy: providerEventId,
+  });
+
   const enrollmentIds = await deps.repository.findSequenceEnrollmentIdsByEmail(email);
-  const reason = suppressionReasonForEventType(event.type);
   for (const sequenceId of enrollmentIds) {
     try {
       await deps.stopSequence({
@@ -187,26 +218,30 @@ async function applySuppression(
 
 export type ApplyResendWebhookEventResult = { duplicate: boolean };
 
-/** Idempotent event application: inserts the delivery event row first, and
- * only runs suppression side effects for a genuinely new (non-replayed)
- * hard bounce or complaint event. */
+/** Idempotent event application: checks first, runs the (already-idempotent)
+ * suppression fan-out, and only records the delivery event last. This way a
+ * mid-fan-out failure leaves the event unrecorded, so a Resend retry
+ * re-attempts the fan-out instead of seeing it as already applied. */
 export async function applyResendWebhookEvent(
   event: ParsedResendWebhookEvent,
   providerEventId: string,
   deps: ResendWebhookDependencies,
 ): Promise<ApplyResendWebhookEventResult> {
-  const { inserted } = await deps.repository.insertDeliveryEventIfNew({
+  if (await deps.repository.hasDeliveryEvent(providerEventId)) {
+    return { duplicate: true };
+  }
+
+  if (isSuppressingEvent(event)) {
+    await applySuppression(event, providerEventId, deps);
+  }
+
+  await deps.repository.recordDeliveryEvent({
     providerEventId,
     eventType: event.type,
     occurredAt: event.occurredAt,
     recipientNormalisedEmail: event.recipientNormalisedEmail,
     providerMessageId: event.providerMessageId,
   });
-
-  if (!inserted) return { duplicate: true };
-  if (SUPPRESSING_EVENT_TYPES.has(event.type)) {
-    await applySuppression(event, providerEventId, deps);
-  }
 
   return { duplicate: false };
 }

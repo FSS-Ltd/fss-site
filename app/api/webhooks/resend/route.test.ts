@@ -9,12 +9,16 @@ import { createResendWebhookRouteHandler } from "./route";
 
 const NOOP_DEPS: ResendWebhookDependencies = {
   repository: {
-    async insertDeliveryEventIfNew() {
+    async hasDeliveryEvent() {
+      return false;
+    },
+    async recordDeliveryEvent() {
       return { inserted: true };
     },
     async findSequenceEnrollmentIdsByEmail() {
       return [];
     },
+    async insertGlobalSuppression() {},
   },
   suppression: {
     async findSubscriberStatusByEmail() {
@@ -113,12 +117,16 @@ test("maps an unexpected dependency error to a 500 and reports it without leakin
     deps: {
       ...NOOP_DEPS,
       repository: {
-        async insertDeliveryEventIfNew(): Promise<never> {
+        async hasDeliveryEvent(): Promise<never> {
           throw new Error("db unavailable");
+        },
+        async recordDeliveryEvent() {
+          return { inserted: true };
         },
         async findSequenceEnrollmentIdsByEmail() {
           return [];
         },
+        async insertGlobalSuppression() {},
       },
     },
     reportUnexpectedError: (error) => reported.push(error),

@@ -13,7 +13,16 @@ const TERMINAL_STATUSES = [
   "completed",
 ];
 
-async function insertDeliveryEventIfNew(
+async function hasDeliveryEvent(db: GrowthDb, providerEventId: string): Promise<boolean> {
+  const [row] = await db<Array<{ exists: boolean }>>`
+    select exists(
+      select 1 from growth.resend_delivery_events where provider_event_id = ${providerEventId}
+    ) as exists
+  `;
+  return row?.exists ?? false;
+}
+
+async function recordDeliveryEvent(
   db: GrowthDb,
   input: ResendDeliveryEventInput,
 ): Promise<{ inserted: boolean }> {
@@ -60,12 +69,25 @@ async function findSequenceEnrollmentIdsByEmail(
   return rows.map((row) => row.id);
 }
 
+async function insertGlobalSuppression(
+  db: GrowthDb,
+  input: { normalisedEmail: string; reason: "bounce" | "do_not_contact"; source: string; createdBy: string },
+): Promise<void> {
+  await db`
+    insert into growth.suppressions (normalised_email, business_id, reason, source, created_by)
+    values (${input.normalisedEmail}, null, ${input.reason}, ${input.source}, ${input.createdBy})
+    on conflict (normalised_email) do nothing
+  `;
+}
+
 export function createPostgresResendWebhookRepository(
   db: GrowthDb,
 ): ResendWebhookRepository {
   return {
-    insertDeliveryEventIfNew: (input) => insertDeliveryEventIfNew(db, input),
+    hasDeliveryEvent: (providerEventId) => hasDeliveryEvent(db, providerEventId),
+    recordDeliveryEvent: (input) => recordDeliveryEvent(db, input),
     findSequenceEnrollmentIdsByEmail: (normalisedEmail) =>
       findSequenceEnrollmentIdsByEmail(db, normalisedEmail),
+    insertGlobalSuppression: (input) => insertGlobalSuppression(db, input),
   };
 }
