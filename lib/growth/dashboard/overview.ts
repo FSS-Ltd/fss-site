@@ -266,12 +266,12 @@ async function fetchFirstEmailsTab(
       where se.prospect_id = p.id
     ) evidence on true
     left join lateral (
-      select em.id
-      from growth.email_messages em
-      where em.prospect_id = p.id
-        and em.step_number = 0
-        and em.direction = 'outbound'
-      order by em.created_at desc
+      select at.id
+      from growth.agent_tasks at
+      where at.prospect_id = p.id
+        and at.task_type = 'first_email_draft'
+        and at.status = 'completed'
+      order by at.completed_at desc
       limit 1
     ) draft on true
     where p.status = 'ready_for_email_review'
