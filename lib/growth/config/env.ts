@@ -74,6 +74,7 @@ const growthServerEnvSchema = z
     RESEND_API_KEY: z.string().trim().min(1).optional(),
     RESEND_FROM_EMAIL: z.string().trim().min(1).optional(),
     RESEND_REPLY_TO_EMAIL: z.string().trim().min(1).optional(),
+    RESEND_WEBHOOK_SECRET: securitySecretSchema.optional(),
     GROWTH_OS_AUTOMATIONS_ENABLED: z
       .enum(["true", "false"])
       .transform((value) => value === "true"),
@@ -101,6 +102,7 @@ const growthServerEnvSchema = z
     resendApiKey: value.RESEND_API_KEY,
     resendFromEmail: value.RESEND_FROM_EMAIL,
     resendReplyToEmail: value.RESEND_REPLY_TO_EMAIL,
+    resendWebhookSecret: value.RESEND_WEBHOOK_SECRET,
     automationsEnabled: value.GROWTH_OS_AUTOMATIONS_ENABLED,
   }));
 
@@ -121,6 +123,7 @@ export type GrowthServerEnv = {
   resendApiKey?: string;
   resendFromEmail?: string;
   resendReplyToEmail?: string;
+  resendWebhookSecret?: string;
   automationsEnabled: boolean;
 };
 

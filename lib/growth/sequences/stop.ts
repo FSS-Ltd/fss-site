@@ -37,11 +37,12 @@ const TERMINAL_STATUSES = new Set([
 const SUPPRESSING_REASONS = new Set<StopReason>(["do_not_contact", "bounce"]);
 
 export type GmailSyncActor = { type: "gmail_sync"; id: string };
+export type ResendWebhookActor = { type: "resend_webhook"; id: string };
 
 export type StopSequenceInput = {
   sequenceId: string;
   reason: StopReason;
-  actor: FounderSession | GmailSyncActor;
+  actor: FounderSession | GmailSyncActor | ResendWebhookActor;
   correlationId: string;
 };
 
@@ -77,7 +78,7 @@ export type InsertDoNotContactSuppressionInput = {
 
 export type AppendStopAuditInput = {
   correlationId: string;
-  actorType: "founder" | "cron";
+  actorType: "founder" | "cron" | "provider";
   actorId: string;
   sequenceId: string;
   reason: StopReason;
@@ -112,11 +113,14 @@ export class SequenceStopError extends Error {
 }
 
 function resolveActor(actor: StopSequenceInput["actor"]): {
-  actorType: "founder" | "cron";
+  actorType: "founder" | "cron" | "provider";
   actorId: string;
 } {
   if ("type" in actor && actor.type === "gmail_sync") {
     return { actorType: "cron", actorId: actor.id };
+  }
+  if ("type" in actor && actor.type === "resend_webhook") {
+    return { actorType: "provider", actorId: actor.id };
   }
   return { actorType: "founder", actorId: (actor as FounderSession).actorId };
 }
@@ -180,7 +184,7 @@ export function createSequenceStopper({
           normalisedEmail: enrollment.normalisedEmail,
           businessId: enrollment.businessId,
           reason: input.reason,
-          source: actorType === "founder" ? "founder" : "gmail_sync",
+          source: actorType === "founder" ? "founder" : actorType === "provider" ? "resend_webhook" : "gmail_sync",
           createdBy: actorId,
         });
       }

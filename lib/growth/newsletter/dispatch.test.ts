@@ -112,6 +112,9 @@ function createFakeRepository(state: FakeState): NewsletterDispatchRepository {
     async recordSent(_db, input) {
       state.sent.push(input);
     },
+    async cancelQueuedSendsForEmail() {
+      return { cancelledIssueIds: [] };
+    },
   };
 }
 
