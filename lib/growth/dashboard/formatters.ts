@@ -123,6 +123,28 @@ export function formatGrowthDateTime(value: string): string {
   return dateTimeFormatter.format(parseDate(value));
 }
 
+function londonCalendarDayNumber(date: Date): number {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    dateStyle: "short",
+    timeZone: GROWTH_TIME_ZONE,
+  }).format(date);
+  return Date.parse(`${parts}T00:00:00.000Z`);
+}
+
+export function formatGrowthRelativeDay(value: string, now: string): string {
+  const target = parseDate(value);
+  const reference = parseDate(now);
+  const diffDays = Math.round(
+    (londonCalendarDayNumber(target) - londonCalendarDayNumber(reference)) /
+      86_400_000,
+  );
+
+  if (diffDays === 0) return "Today";
+  if (diffDays === 1) return "Tomorrow";
+  if (diffDays === -1) return "Yesterday";
+  return formatGrowthDate(value);
+}
+
 export function formatGrowthCurrency(pence: number): string {
   if (!Number.isSafeInteger(pence)) {
     throw new RangeError("Growth dashboard money must use integer pence.");
