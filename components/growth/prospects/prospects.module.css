@@ -340,3 +340,255 @@
     display: flex;
   }
 }
+
+/* Prospect detail */
+
+.detailPage {
+  display: grid;
+  gap: 20px;
+}
+
+.breadcrumb {
+  color: #607089;
+  font-size: 0.84rem;
+}
+
+.breadcrumb a {
+  color: #087f88;
+}
+
+.detailHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 24px;
+}
+
+.detailHeading {
+  margin: 0;
+  color: #07182e;
+  font-size: 1.5rem;
+  font-weight: 750;
+}
+
+.detailMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 6px;
+  color: #526078;
+  font-size: 0.84rem;
+}
+
+.detailScoreRing {
+  --score: 0;
+  display: grid;
+  width: 78px;
+  height: 78px;
+  flex: none;
+  place-items: center;
+  border-radius: 50%;
+  background: conic-gradient(
+    #0b8f98 calc(var(--score) * 1%),
+    #e5ebee calc(var(--score) * 1%)
+  );
+  font-size: 1.4rem;
+  font-weight: 750;
+}
+
+.detailScoreRing::before {
+  display: grid;
+  width: 62px;
+  height: 62px;
+  place-items: center;
+  border-radius: 50%;
+  background: white;
+  color: #07182e;
+  content: attr(data-score);
+}
+
+.detailGrid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 1024px) {
+  .detailGrid {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    align-items: start;
+  }
+}
+
+.evidenceList {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.evidenceItem {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px solid #eef1f3;
+  padding-bottom: 10px;
+}
+
+.evidenceSource {
+  color: #07182e;
+  font-weight: 650;
+}
+
+.evidenceClaim {
+  display: block;
+  margin-top: 2px;
+  color: #607089;
+  font-size: 0.82rem;
+}
+
+.evidenceLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #087f88;
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+
+.contactCard {
+  display: grid;
+  gap: 4px;
+}
+
+.contactName {
+  margin: 0;
+  color: #07182e;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.contactRole {
+  margin: 0 0 6px;
+  color: #607089;
+  font-size: 0.82rem;
+}
+
+.contactField {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #3a4a63;
+  font-size: 0.86rem;
+}
+
+.actionsBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.actionButton {
+  border: 1px solid #d8e0e5;
+  border-radius: 8px;
+  background: white;
+  padding: 10px 16px;
+  color: #07182e;
+  font-size: 0.84rem;
+  font-weight: 650;
+}
+
+.actionButton[data-variant="primary"] {
+  border: none;
+  background: #0b8f98;
+  color: white;
+}
+
+.actionButton:disabled {
+  color: #b7c1cc;
+  cursor: not-allowed;
+}
+
+.actionButton:focus-visible {
+  outline: 3px solid #087f88;
+  outline-offset: 2px;
+}
+
+.actionFeedback {
+  width: 100%;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.82rem;
+}
+
+.actionFeedback[data-tone="conflict"] {
+  background: #fdf2e2;
+  color: #92600c;
+}
+
+.actionFeedback[data-tone="error"] {
+  background: #fdecec;
+  color: #b42318;
+}
+
+.actionNote {
+  width: 100%;
+  margin: 0;
+  color: #8896ab;
+  font-size: 0.78rem;
+}
+
+.readiness {
+  display: grid;
+  gap: 8px;
+}
+
+.readinessReady {
+  color: #15803d;
+  font-size: 0.86rem;
+  font-weight: 650;
+}
+
+.readinessBlocked {
+  color: #b42318;
+  font-size: 0.86rem;
+  font-weight: 650;
+}
+
+.readinessReasons {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: #8a2a20;
+  font-size: 0.8rem;
+}
+
+.inlineEmpty {
+  margin: 0;
+  color: #8896ab;
+  font-size: 0.84rem;
+}
+
+.sectionTitle {
+  margin: 0 0 10px;
+  color: #07182e;
+  font-size: 1.02rem;
+  font-weight: 750;
+}
+
+.potentialValue {
+  margin: 4px 0 0;
+  color: #07182e;
+  font-size: 1.6rem;
+  font-weight: 750;
+}
+
+.detailColumn {
+  display: grid;
+  gap: 20px;
+}
