@@ -7,6 +7,7 @@ import {
   formatGrowthDateTime,
   formatGrowthEvidenceCount,
   formatGrowthPercentage,
+  formatGrowthRelativeDay,
   formatGrowthStatusLabel,
   formatGrowthTime,
 } from "./formatters";
@@ -50,6 +51,23 @@ test("formats evidence counts with explicit empty and plural states", () => {
   assert.equal(formatGrowthEvidenceCount(0), "No evidence");
   assert.equal(formatGrowthEvidenceCount(1), "1 evidence item");
   assert.equal(formatGrowthEvidenceCount(7), "7 evidence items");
+});
+
+test("describes due dates relative to London calendar days", () => {
+  const now = "2026-08-16T20:00:00.000Z";
+
+  assert.equal(formatGrowthRelativeDay("2026-08-16T05:00:00.000Z", now), "Today");
+  assert.equal(formatGrowthRelativeDay("2026-08-17T05:00:00.000Z", now), "Tomorrow");
+  assert.equal(formatGrowthRelativeDay("2026-08-15T10:00:00.000Z", now), "Yesterday");
+  assert.equal(
+    formatGrowthRelativeDay("2026-08-20T09:00:00.000Z", now),
+    "20 Aug 2026",
+  );
+
+  assert.equal(
+    formatGrowthRelativeDay("2026-08-16T23:30:00.000Z", "2026-08-16T20:00:00.000Z"),
+    "Tomorrow",
+  );
 });
 
 test("rejects invalid formatter inputs", () => {
