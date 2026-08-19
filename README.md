@@ -46,3 +46,11 @@ Deployment model and configuration are documented in [docs/deployment.md](docs/d
 - GitHub Actions CI on PRs
 - Netlify Deploy Preview on PRs
 - Netlify production deploy from `main` only
+
+## Growth OS: Resend marketing
+
+The Growth OS backend sends requested-resource emails and founder-run
+newsletter issues through Resend, gated on explicit consent and suppression
+checks. Operating this (domain/sender setup, webhook registration, disabling
+the dispatcher, suppression recovery) is documented in
+[docs/runbooks/resend-marketing.md](docs/runbooks/resend-marketing.md).
