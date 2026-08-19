@@ -36,6 +36,18 @@ never Resend.
    land in the founder's inbox, never a noreply address.
 4. Generate a Resend API key scoped to sending only and set
    `RESEND_API_KEY`.
+5. Set `NEWSLETTER_UNSUBSCRIBE_TOKEN_SECRET` — the key used to sign every
+   unsubscribe link. **Rotating this secret silently invalidates every
+   unsubscribe link already delivered in prior emails** — anyone who
+   clicks an old link after a rotation gets a bad-token error, not an
+   unsubscribe. Rotate only when you can accept that, and never as a
+   routine action.
+6. Set `NEXT_PUBLIC_SITE_URL` to the real deployed origin and verify it
+   before any real send. `resolveSiteUrl()` (`lib/config/site-url.ts`)
+   falls back to a hardcoded production domain
+   (`https://faithfulsoftwaresolutions.co.uk`) when this is unset — a
+   misconfigured deploy produces plausible-looking but wrong unsubscribe
+   links rather than an error, so this is easy to miss.
 
 ## Webhook registration
 
@@ -55,6 +67,33 @@ never Resend.
 4. A payload with a `type` this codebase doesn't parse still returns `200`
    deliberately — Resend retries on any non-2xx response, and retrying a
    payload the parser will never accept just produces a retry storm.
+
+## Authoring a newsletter issue
+
+There is no issue-authoring UI or service in this codebase yet (that's
+Plan 05 territory). Today, seeding a `growth.newsletter_issues` row is a
+manual `insert` — whoever does it (the founder, or an operator on their
+behalf) must follow this contract:
+
+- `html_snapshot` and `text_snapshot` MUST both contain the literal token
+  `{{unsubscribe_url}}` (exported as `UNSUBSCRIBE_URL_PLACEHOLDER` in
+  `lib/growth/newsletter/issues.ts`) at least once, wherever the
+  unsubscribe link should appear. `scheduleIssue` rejects the issue with
+  `missing_unsubscribe_link` if either snapshot is missing it — dispatch
+  cannot proceed without it.
+- The placeholder is substituted per-recipient with a real, signed
+  unsubscribe URL at send time; never hand-write an unsubscribe link.
+
+## Founder-facing endpoints
+
+The runbook above refers to `sendFounderTest` / `approveIssue` /
+`scheduleIssue` as operator-facing concepts. The actual HTTP routes a
+founder calls (both require a founder session) are:
+
+- `POST /api/growth/newsletters/[id]/send-test` —
+  `app/api/growth/newsletters/[id]/send-test/route.ts`
+- `POST /api/growth/newsletters/[id]/approve-schedule` —
+  `app/api/growth/newsletters/[id]/approve-schedule/route.ts`
 
 ## Test-recipient policy
 
@@ -99,16 +138,45 @@ resubscribe an address in `bounced` or `complained` status
 
 If a founder confirms an address was wrongly suppressed (for example, a
 transient provider-side classification error, or the subscriber fixed
-their inbox), the only way to restore it today is a manual, audited
-database update:
+their inbox), the only way to restore it today is a manual database
+update — and it only works for a genuine former subscriber:
+
+**This only works if the row already carries consent evidence.**
+`newsletter_subscriber_requires_consent_evidence`
+(`supabase/migrations/20260818171234_growth_resend_marketing.sql`) forbids
+`status = 'subscribed'` unless `consented_at`, `consent_source`, and
+`consent_evidence` are all non-null. A row created by
+`upsertSuppressedStatus` (`lib/growth/newsletter/subscribers-repository.ts`)
+— the common case for an address that bounced or complained without ever
+opting in — has none of those fields set, and the update below fails with
+a bare check-constraint violation. If the address never had consent
+evidence, it cannot be restored this way; it must go through the normal
+opt-in path again (a fresh consent event) if the founder judges the
+suppression was wrong. Only restore an address this way if it already has
+consent evidence (a genuine former subscriber who later bounced).
+
+Run this as one transaction, and record it in `growth.audit_log` — this is
+a manual override with no application-level audit trail otherwise:
 
 ```sql
+begin;
+
 update growth.newsletter_subscribers
 set status = 'subscribed', unsubscribed_at = null, updated_at = now()
 where normalised_email = '<address>';
 
 delete from growth.suppressions
 where normalised_email = '<address>';
+
+insert into growth.audit_log (
+  correlation_id, actor_type, actor_id, action,
+  entity_type, entity_id, metadata
+) values (
+  gen_random_uuid(), 'founder', '<founder-email>', 'suppression_manually_cleared',
+  'newsletter_subscriber', '<address>', '{}'::jsonb
+);
+
+commit;
 ```
 
 Do this deliberately and rarely — a bounce or complaint is usually a

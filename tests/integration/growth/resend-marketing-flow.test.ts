@@ -113,6 +113,10 @@ test(
     const issueKeyB = `e2e-issue-b-${randomUUID()}`;
     let issueAId: string | undefined;
     let issueBId: string | undefined;
+    let founderTestCorrelationId: string | undefined;
+    let approveCorrelationId: string | undefined;
+    let scheduleCorrelationId: string | undefined;
+    let bounceMsgId: string | undefined;
 
     try {
       // --- Step 1: form submission persists in PostgreSQL, is idempotent,
@@ -162,10 +166,11 @@ test(
         unsubscribeTokenSecret: UNSUBSCRIBE_TOKEN_SECRET,
         siteOrigin: SITE_ORIGIN,
       });
+      founderTestCorrelationId = randomUUID();
       await sendFounderTest(sql, {
         issueId: issueAId,
         founder: FOUNDER,
-        correlationId: randomUUID(),
+        correlationId: founderTestCorrelationId,
       });
       assert.equal(founderTest.sent.length, 1);
       assert.equal(founderTest.sent[0]?.to, FOUNDER.email);
@@ -179,22 +184,24 @@ test(
       // --- Step 4: approve then schedule. scheduledFor must be in the
       // future at schedule time; the dispatcher is later run with `now`
       // pushed past it so it picks the issue up immediately. ---
+      approveCorrelationId = randomUUID();
       const approveIssue = createIssueApprover({ repository: issueRepository });
       const approved = await approveIssue(sql, {
         issueId: issueAId,
         expectedVersion: 1,
         founder: FOUNDER,
-        correlationId: randomUUID(),
+        correlationId: approveCorrelationId,
       });
 
       const scheduledFor = new Date(Date.now() + 5_000);
+      scheduleCorrelationId = randomUUID();
       const scheduleIssue = createIssueScheduler({ repository: issueRepository });
       await scheduleIssue(sql, {
         issueId: issueAId,
         expectedVersion: approved.version,
         scheduledFor,
         founder: FOUNDER,
-        correlationId: randomUUID(),
+        correlationId: scheduleCorrelationId,
       });
 
       // --- Step 5: dispatch. The subscriber gets a real, per-recipient
@@ -219,7 +226,7 @@ test(
       assert.match(sentToLeadA!.html, new RegExp(`${SITE_ORIGIN}/api/newsletter/unsubscribe\\?token=`));
 
       const [sendRow] = await sql<{ providerMessageId: string; status: string }[]>`
-        select provider_message_id as "providerMessageId", status
+        select s.provider_message_id as "providerMessageId", s.status
         from growth.newsletter_sends s
         inner join growth.newsletter_subscribers sub on sub.id = s.subscriber_id
         where sub.normalised_email = ${leadA.workEmail.toLowerCase()} and s.newsletter_issue_id = ${issueAId}
@@ -234,7 +241,7 @@ test(
         created_at: bounceTimestamp.toISOString(),
         data: { email_id: providerMessageId, to: leadA.workEmail, bounce: { type: "Permanent" } },
       });
-      const bounceMsgId = `msg_${randomUUID()}`;
+      bounceMsgId = `msg_${randomUUID()}`;
       const bounceSignature = new Webhook(WEBHOOK_SECRET).sign(bounceMsgId, bounceTimestamp, bouncePayload);
       const bounceHeaders = {
         "svix-id": bounceMsgId,
@@ -345,21 +352,34 @@ test(
       `;
       assert.equal(deliveryEventCount.count, "1", "replaying the bounce does not duplicate the delivery event");
     } finally {
-      const emails = [leadA.workEmail.toLowerCase(), leadB.workEmail.toLowerCase()];
-      if (issueBId) {
-        await sql`delete from growth.newsletter_sends where newsletter_issue_id = ${issueBId}`;
-        await sql`delete from growth.newsletter_issues where id = ${issueBId}`;
+      try {
+        const emails = [leadA.workEmail.toLowerCase(), leadB.workEmail.toLowerCase()];
+        // resend_delivery_events.newsletter_send_id references
+        // newsletter_sends(id) ON DELETE RESTRICT, so it must be cleared first.
+        await sql`delete from growth.resend_delivery_events where recipient_normalised_email = ${emails[0]}`;
+        if (issueBId) {
+          await sql`delete from growth.newsletter_sends where newsletter_issue_id = ${issueBId}`;
+          await sql`delete from growth.newsletter_issues where id = ${issueBId}`;
+        }
+        if (issueAId) {
+          await sql`delete from growth.newsletter_sends where newsletter_issue_id = ${issueAId}`;
+          await sql`delete from growth.newsletter_issues where id = ${issueAId}`;
+        }
+        await sql`delete from growth.suppressions where normalised_email = ${emails[0]}`;
+        await sql`delete from growth.newsletter_subscribers where normalised_email in ${sql(emails)}`;
+        const correlationIds = [
+          leadA.submissionId,
+          leadB.submissionId,
+          founderTestCorrelationId,
+          approveCorrelationId,
+          scheduleCorrelationId,
+          bounceMsgId,
+        ].filter((id): id is string => Boolean(id));
+        await sql`delete from growth.audit_log where correlation_id in ${sql(correlationIds)}`;
+        await sql`delete from growth.inbound_leads where submission_id in (${leadA.submissionId}, ${leadB.submissionId})`;
+      } finally {
+        await sql.end();
       }
-      if (issueAId) {
-        await sql`delete from growth.newsletter_sends where newsletter_issue_id = ${issueAId}`;
-        await sql`delete from growth.newsletter_issues where id = ${issueAId}`;
-      }
-      await sql`delete from growth.resend_delivery_events where recipient_normalised_email = ${emails[0]}`;
-      await sql`delete from growth.suppressions where normalised_email = ${emails[0]}`;
-      await sql`delete from growth.newsletter_subscribers where normalised_email in ${sql(emails)}`;
-      await sql`delete from growth.audit_log where correlation_id in (${leadA.submissionId}, ${leadB.submissionId})`;
-      await sql`delete from growth.inbound_leads where submission_id in (${leadA.submissionId}, ${leadB.submissionId})`;
-      await sql.end();
     }
   },
 );
