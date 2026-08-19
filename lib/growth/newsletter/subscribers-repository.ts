@@ -1,6 +1,23 @@
 import type { GrowthQueryExecutor } from "../db/types";
 import type { NewsletterSubscriberDependencies, NewsletterSubscriberRecord } from "./subscribers";
 
+/** Genuine upsert for a Resend bounce/complaint webhook: unlike
+ * `updateSubscriberStatus`, this must work for an email that has never
+ * been a newsletter subscriber (a cold prospect or one-off lead). */
+export async function upsertSuppressedStatus(
+  db: GrowthQueryExecutor,
+  normalisedEmail: string,
+  status: "bounced" | "complained",
+  at: Date,
+): Promise<void> {
+  await db`
+    insert into growth.newsletter_subscribers (email, status, unsubscribed_at)
+    values (${normalisedEmail}, ${status}, ${at})
+    on conflict (normalised_email) do update
+      set status = excluded.status, unsubscribed_at = excluded.unsubscribed_at, updated_at = now()
+  `;
+}
+
 type Row = {
   id: string;
   normalisedEmail: string;

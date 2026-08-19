@@ -43,6 +43,8 @@ export type CancelNewsletterSendInput = {
   errorCode: string;
 };
 
+export type CancelQueuedSendsForEmailResult = { cancelledIssueIds: string[] };
+
 export interface NewsletterDispatchRepository {
   seedNextDueIssue(db: GrowthDb, now: Date): Promise<boolean>;
   claimDueSend(
@@ -60,6 +62,11 @@ export interface NewsletterDispatchRepository {
   cancelSend(db: GrowthDb, input: CancelNewsletterSendInput): Promise<void>;
   failSend(db: GrowthDb, input: FailNewsletterSendInput): Promise<void>;
   recordSent(db: GrowthDb, input: RecordNewsletterSentInput): Promise<void>;
+  cancelQueuedSendsForEmail(
+    db: GrowthDb,
+    normalisedEmail: string,
+    errorCode: string,
+  ): Promise<CancelQueuedSendsForEmailResult>;
 }
 
 /** Flips the next due (`scheduled`, `scheduled_for <= now`) issue to
@@ -116,7 +123,7 @@ async function seedNextDueIssue(db: GrowthDb, now: Date): Promise<boolean> {
  * none at all). Guarded by `status = 'sending'` so it is a no-op if the
  * issue already moved on. Must run inside the same transaction as the send
  * update that may have made this issue's sends complete. */
-async function reconcileIssueCompletion(
+export async function reconcileIssueCompletion(
   tx: GrowthQueryExecutor,
   newsletterIssueId: string,
   now: Date,
@@ -274,6 +281,33 @@ async function recordSent(
   });
 }
 
+/** Cancels every queued/retry `newsletter_sends` row for an email address,
+ * across all issues, when a Resend webhook reports a hard bounce or
+ * complaint for that recipient. */
+async function cancelQueuedSendsForEmail(
+  db: GrowthDb,
+  normalisedEmail: string,
+  errorCode: string,
+): Promise<CancelQueuedSendsForEmailResult> {
+  return withGrowthTransaction(db, async (tx) => {
+    const rows = await tx<Array<{ id: string; newsletterIssueId: string }>>`
+      update growth.newsletter_sends s
+      set status = 'cancelled', lease_token = null, lease_expires_at = null,
+          last_error_code = ${errorCode}, updated_at = now()
+      from growth.newsletter_subscribers sub
+      where s.subscriber_id = sub.id
+        and sub.normalised_email = ${normalisedEmail}
+        and s.status in ('queued', 'retry')
+      returning s.id, s.newsletter_issue_id as "newsletterIssueId"
+    `;
+    const issueIds = [...new Set(rows.map((r) => r.newsletterIssueId))];
+    for (const issueId of issueIds) {
+      await reconcileIssueCompletion(tx, issueId, new Date());
+    }
+    return { cancelledIssueIds: issueIds };
+  });
+}
+
 export const postgresNewsletterDispatchRepository: NewsletterDispatchRepository =
   {
     seedNextDueIssue,
@@ -283,4 +317,5 @@ export const postgresNewsletterDispatchRepository: NewsletterDispatchRepository 
     cancelSend,
     failSend,
     recordSent,
+    cancelQueuedSendsForEmail,
   };
