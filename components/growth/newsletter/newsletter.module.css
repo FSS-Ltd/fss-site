@@ -1,0 +1,544 @@
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.page {
+  display: grid;
+  gap: 20px;
+}
+
+.breadcrumb {
+  color: #607089;
+  font-size: 0.84rem;
+}
+
+.breadcrumb a {
+  color: #087f88;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.headerTitles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.heading {
+  margin: 0;
+  color: #07182e;
+  font-size: 1.6rem;
+  font-weight: 750;
+}
+
+.subtitle {
+  margin: 4px 0 0;
+  color: #607089;
+  font-size: 0.92rem;
+}
+
+.card {
+  border: 1px solid #dce3e8;
+  border-radius: 12px;
+  background: white;
+  padding: 22px;
+}
+
+.sectionTitle {
+  margin: 0 0 10px;
+  color: #07182e;
+  font-size: 1.02rem;
+  font-weight: 750;
+}
+
+.grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    align-items: start;
+  }
+}
+
+.column {
+  display: grid;
+  gap: 20px;
+}
+
+.pill {
+  display: inline-block;
+  border-radius: 999px;
+  background: #e6f3f4;
+  padding: 3px 10px;
+  color: #087f88;
+  font-size: 0.74rem;
+  font-weight: 650;
+}
+
+.pill[data-tone="neutral"] {
+  background: #eef1f3;
+  color: #526078;
+}
+
+.pill[data-tone="amber"] {
+  background: #fdf2e2;
+  color: #92600c;
+}
+
+/* Issue / template list */
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  border-bottom: 1px solid #e3e9ec;
+  padding: 0 10px 8px 0;
+  color: #7c8aa0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.table td {
+  border-bottom: 1px solid #eef1f3;
+  padding: 14px 10px 14px 0;
+  vertical-align: middle;
+}
+
+.rowLink {
+  color: #07182e;
+  font-weight: 700;
+}
+
+.mobileList {
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobileCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid #eef1f3;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.mobileTitle {
+  margin: 0;
+  color: #07182e;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.mobileMeta {
+  margin: 4px 0 0;
+  color: #607089;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 767px) {
+  .table {
+    display: none;
+  }
+
+  .mobileList {
+    display: flex;
+  }
+}
+
+.emptyState {
+  padding: 40px 24px;
+  color: #526078;
+  text-align: center;
+}
+
+.errorState {
+  border: 1px solid #f3c6c1;
+  border-radius: 12px;
+  background: #fdf4f3;
+  padding: 40px 24px;
+  color: #8a2a20;
+  text-align: center;
+}
+
+.errorCorrelation {
+  margin-top: 8px;
+  color: #a56b64;
+  font-size: 0.76rem;
+}
+
+.evidenceLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #087f88;
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+
+/* Email envelope + preview (shared with issue review and template review) */
+
+.envelope {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+  border: 1px solid #eef1f3;
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.envelopeRow {
+  display: grid;
+  grid-template-columns: 90px minmax(0, 1fr);
+  gap: 10px;
+  font-size: 0.86rem;
+}
+
+.envelopeLabel {
+  color: #8896ab;
+  font-weight: 650;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  padding-top: 2px;
+}
+
+.envelopeValue {
+  color: #07182e;
+}
+
+.previewToggle {
+  display: inline-flex;
+  gap: 4px;
+  margin-bottom: 14px;
+  border: 1px solid #d8e0e5;
+  border-radius: 8px;
+  padding: 3px;
+}
+
+.previewToggleButton {
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  padding: 6px 14px;
+  color: #526078;
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+
+.previewToggleButton[aria-pressed="true"] {
+  background: #07182e;
+  color: white;
+}
+
+.previewToggleButton:focus-visible {
+  outline: 3px solid #087f88;
+  outline-offset: 2px;
+}
+
+.previewFrame {
+  border: 1px solid #eef1f3;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.previewFrame iframe {
+  display: block;
+  width: 100%;
+  min-height: 520px;
+  border: none;
+}
+
+.previewPlainText {
+  margin: 0;
+  border: 1px solid #eef1f3;
+  border-radius: 10px;
+  padding: 16px;
+  white-space: pre-wrap;
+  color: #07182e;
+  font-size: 0.86rem;
+  line-height: 1.6;
+}
+
+/* Right-rail metadata cards */
+
+.metaList {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.84rem;
+}
+
+.metaItem {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: #3a4a63;
+}
+
+.metaLabel {
+  color: #8896ab;
+}
+
+.metaValue {
+  color: #07182e;
+  font-weight: 650;
+  text-align: right;
+  word-break: break-word;
+}
+
+.checklist {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.84rem;
+}
+
+.checklistItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: #3a4a63;
+}
+
+.checklistIcon {
+  flex: none;
+  color: #15803d;
+  margin-top: 2px;
+}
+
+/* Actions */
+
+.readiness {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.readinessReady {
+  color: #15803d;
+  font-size: 0.84rem;
+  font-weight: 650;
+}
+
+.readinessBlocked {
+  color: #92600c;
+  font-size: 0.84rem;
+  font-weight: 650;
+}
+
+.readinessReasons {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: #92600c;
+  font-size: 0.8rem;
+}
+
+.actionsBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.actionButton {
+  border: 1px solid #d8e0e5;
+  border-radius: 8px;
+  background: white;
+  padding: 11px 16px;
+  color: #07182e;
+  font-size: 0.86rem;
+  font-weight: 650;
+}
+
+.actionButton[data-variant="primary"] {
+  border: none;
+  background: #0b8f98;
+  color: white;
+}
+
+.actionButton:disabled {
+  color: #b7c1cc;
+  border-color: #e3e9ec;
+  background: #f8fafb;
+  cursor: not-allowed;
+}
+
+.actionButton:focus-visible {
+  outline: 3px solid #087f88;
+  outline-offset: 2px;
+}
+
+.actionFeedback {
+  width: 100%;
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 0.82rem;
+}
+
+.actionFeedback[data-tone="conflict"] {
+  background: #fdf2e2;
+  color: #92600c;
+}
+
+.actionFeedback[data-tone="error"] {
+  background: #fdecec;
+  color: #b42318;
+}
+
+.actionFeedback[data-tone="success"] {
+  background: #e6f3f4;
+  color: #087f88;
+}
+
+.inlineForm {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+  border-top: 1px solid #eef1f3;
+  padding-top: 14px;
+}
+
+.field {
+  display: grid;
+  gap: 4px;
+}
+
+.fieldLabel {
+  color: #526078;
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.textInput {
+  border: 1px solid #d8e0e5;
+  border-radius: 8px;
+  background: white;
+  padding: 9px 10px;
+  color: #07182e;
+  font-size: 0.86rem;
+  font-family: inherit;
+}
+
+.formActions {
+  display: flex;
+  gap: 10px;
+}
+
+.dialogBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(7 24 46 / 55%);
+  padding: 20px;
+}
+
+.dialog {
+  width: min(480px, 100%);
+  border-radius: 14px;
+  background: white;
+  padding: 24px;
+}
+
+.dialogTitle {
+  margin: 0 0 6px;
+  color: #07182e;
+  font-size: 1.1rem;
+  font-weight: 750;
+}
+
+.dialogSummary {
+  display: grid;
+  gap: 6px;
+  margin: 14px 0;
+  color: #3a4a63;
+  font-size: 0.86rem;
+}
+
+.dialogActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+/* Site-email template review */
+
+.templateLayout {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 900px) {
+  .templateLayout {
+    grid-template-columns: 220px minmax(0, 1fr) 300px;
+    align-items: start;
+  }
+}
+
+.templateList {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.templateListLink {
+  display: block;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: #07182e;
+}
+
+.templateListLink[aria-current="page"] {
+  border-color: #cfe3e4;
+  background: #f2fbfb;
+}
+
+.templateListLinkKey {
+  display: block;
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+.templateListLinkStatus {
+  display: block;
+  margin-top: 2px;
+  color: #607089;
+  font-size: 0.76rem;
+}
