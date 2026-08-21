@@ -67,7 +67,7 @@ export function OverviewPage({
 
       <div className={styles.header}>
         <div>
-          <p className={styles.headerDate}>{formatGrowthDate(now)}</p>
+          <h1 className={styles.headerDate}>{formatGrowthDate(now)}</h1>
           <p className={styles.headerSubtitle}>Founder workspace</p>
         </div>
       </div>

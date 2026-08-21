@@ -54,3 +54,13 @@ newsletter issues through Resend, gated on explicit consent and suppression
 checks. Operating this (domain/sender setup, webhook registration, disabling
 the dispatcher, suppression recovery) is documented in
 [docs/runbooks/resend-marketing.md](docs/runbooks/resend-marketing.md).
+
+## Growth OS: founder dashboard
+
+`/growth` is the founder-only internal dashboard for running outreach:
+prospect research, first-email review and approval, outreach sequences,
+website-strategy review, newsletter issues, and integration
+settings/automation controls. Its architecture, mockup-fidelity checklist,
+accessibility review, and operating notes (Gmail connect/disconnect,
+pausing automation, the cron schedule) are documented in
+[docs/runbooks/founder-dashboard.md](docs/runbooks/founder-dashboard.md).
