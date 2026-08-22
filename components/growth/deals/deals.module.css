@@ -1,0 +1,535 @@
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.page {
+  display: grid;
+  gap: 20px;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.heading {
+  margin: 0;
+  color: #07182e;
+  font-size: 1.6rem;
+  font-weight: 750;
+}
+
+.subtitle {
+  margin: 4px 0 0;
+  color: #607089;
+  font-size: 0.92rem;
+}
+
+.card {
+  border: 1px solid #dce3e8;
+  border-radius: 12px;
+  background: white;
+  padding: 22px;
+}
+
+.filtersForm {
+  display: grid;
+  gap: 14px;
+}
+
+.filtersRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fieldLabel {
+  color: #526078;
+  font-size: 0.74rem;
+  font-weight: 650;
+}
+
+.textInput,
+.select {
+  border: 1px solid #d8e0e5;
+  border-radius: 8px;
+  background: white;
+  padding: 9px 10px;
+  color: #07182e;
+  font-size: 0.86rem;
+}
+
+.textInput:focus-visible,
+.select:focus-visible,
+.applyButton:focus-visible,
+.clearLink:focus-visible {
+  outline: 3px solid #087f88;
+  outline-offset: 2px;
+}
+
+.applyButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  border-radius: 8px;
+  background: #0b8f98;
+  padding: 10px 16px;
+  color: white;
+  font-size: 0.86rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.clearLink {
+  color: #607089;
+  font-size: 0.82rem;
+  font-weight: 650;
+}
+
+.resultsHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.resultCount {
+  margin: 0;
+  color: #526078;
+  font-size: 0.86rem;
+}
+
+.emptyState {
+  padding: 40px 24px;
+  color: #526078;
+  text-align: center;
+}
+
+.errorState {
+  border: 1px solid #f3c6c1;
+  border-radius: 12px;
+  background: #fdf4f3;
+  padding: 40px 24px;
+  color: #8a2a20;
+  text-align: center;
+}
+
+.errorCorrelation {
+  margin-top: 8px;
+  color: #a56b64;
+  font-size: 0.76rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  border-bottom: 1px solid #e3e9ec;
+  padding: 0 10px 8px 0;
+  color: #7c8aa0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.table td {
+  border-bottom: 1px solid #eef1f3;
+  padding: 14px 10px 14px 0;
+  vertical-align: middle;
+}
+
+.business {
+  color: #07182e;
+  font-weight: 700;
+}
+
+.sectorLocation {
+  color: #3a4a63;
+  font-size: 0.84rem;
+}
+
+.pill {
+  display: inline-block;
+  border-radius: 999px;
+  background: #e6f3f4;
+  padding: 3px 10px;
+  color: #087f88;
+  font-size: 0.74rem;
+  font-weight: 650;
+}
+
+.pill[data-tone="neutral"] {
+  background: #eef1f3;
+  color: #526078;
+}
+
+.pill[data-tone="amber"] {
+  background: #fdf2e2;
+  color: #92600c;
+}
+
+.pill[data-tone="red"] {
+  background: #fdecec;
+  color: #b42318;
+}
+
+.pill[data-tone="green"] {
+  background: #e7f6ec;
+  color: #15803d;
+}
+
+.value {
+  color: #07182e;
+  font-weight: 700;
+}
+
+.valueKind {
+  display: block;
+  margin-top: 1px;
+  color: #8896ab;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.rowLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid #087f88;
+  border-radius: 7px;
+  padding: 7px 12px;
+  color: #087f88;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.mobileList {
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobileCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid #eef1f3;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.mobileBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.paginationLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #d8e0e5;
+  border-radius: 8px;
+  padding: 9px 14px;
+  color: #07182e;
+  font-size: 0.84rem;
+  font-weight: 650;
+}
+
+.paginationLink[aria-disabled="true"] {
+  color: #b7c1cc;
+  pointer-events: none;
+}
+
+@media (max-width: 767px) {
+  .table {
+    display: none;
+  }
+
+  .mobileList {
+    display: flex;
+  }
+}
+
+/* Deal detail */
+
+.detailPage {
+  display: grid;
+  gap: 20px;
+}
+
+.breadcrumb {
+  color: #607089;
+  font-size: 0.84rem;
+}
+
+.breadcrumb a {
+  color: #087f88;
+}
+
+.detailHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.detailHeading {
+  margin: 0;
+  color: #07182e;
+  font-size: 1.5rem;
+  font-weight: 750;
+}
+
+.detailMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 6px;
+  color: #526078;
+  font-size: 0.84rem;
+}
+
+.detailGrid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 1024px) {
+  .detailGrid {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    align-items: start;
+  }
+}
+
+.sectionTitle {
+  margin: 0 0 10px;
+  color: #07182e;
+  font-size: 1.02rem;
+  font-weight: 750;
+}
+
+.contactField {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #3a4a63;
+  font-size: 0.86rem;
+}
+
+.contactName {
+  margin: 0;
+  color: #07182e;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.contactRole {
+  margin: 0 0 6px;
+  color: #607089;
+  font-size: 0.82rem;
+}
+
+.inlineEmpty {
+  margin: 0;
+  color: #8896ab;
+  font-size: 0.84rem;
+}
+
+.detailColumn {
+  display: grid;
+  gap: 20px;
+}
+
+.potentialValue {
+  margin: 4px 0 0;
+  color: #07182e;
+  font-size: 1.6rem;
+  font-weight: 750;
+}
+
+.lossReason {
+  border: 1px solid #f3c6c1;
+  border-radius: 8px;
+  background: #fdf4f3;
+  padding: 10px 12px;
+  color: #8a2a20;
+  font-size: 0.84rem;
+}
+
+.evidenceList {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.evidenceItem {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px solid #eef1f3;
+  padding-bottom: 10px;
+}
+
+.evidenceClaim {
+  display: block;
+  margin-top: 2px;
+  color: #607089;
+  font-size: 0.82rem;
+}
+
+.evidenceLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #087f88;
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+
+/* Commercial history */
+
+.historyList {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-left: 2px solid #eef1f3;
+}
+
+.historyItem {
+  position: relative;
+  padding: 0 0 16px 18px;
+}
+
+.historyItem::before {
+  position: absolute;
+  top: 3px;
+  left: -5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #0b8f98;
+  content: "";
+}
+
+.historyTransition {
+  margin: 0;
+  color: #07182e;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.historyMeta {
+  margin: 2px 0 0;
+  color: #8896ab;
+  font-size: 0.76rem;
+}
+
+.historyReason {
+  margin: 4px 0 0;
+  color: #526078;
+  font-size: 0.82rem;
+}
+
+/* Founder actions */
+
+.actionsBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.actionButton {
+  border: 1px solid #d8e0e5;
+  border-radius: 8px;
+  background: white;
+  padding: 10px 16px;
+  color: #07182e;
+  font-size: 0.84rem;
+  font-weight: 650;
+}
+
+.actionButton[data-variant="primary"] {
+  border: none;
+  background: #0b8f98;
+  color: white;
+}
+
+.actionButton:disabled {
+  color: #b7c1cc;
+  cursor: not-allowed;
+}
+
+.actionButton:focus-visible {
+  outline: 3px solid #087f88;
+  outline-offset: 2px;
+}
+
+.actionFeedback {
+  width: 100%;
+  margin: 0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.82rem;
+}
+
+.actionFeedback[data-tone="conflict"] {
+  background: #fdf2e2;
+  color: #92600c;
+}
+
+.actionFeedback[data-tone="error"] {
+  background: #fdecec;
+  color: #b42318;
+}
+
+.actionFeedback[data-tone="success"] {
+  background: #e7f6ec;
+  color: #15803d;
+}
+
+.nextActionForm {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
