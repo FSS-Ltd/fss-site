@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import type { FounderSession } from "../auth/require-founder";
+import { renderClientThankYouSnapshot } from "../clients/client-thank-you";
 import type { GrowthDb } from "../db/types";
 import { postgresEngagementTransitionRepository } from "./engagement-repository";
 import {
@@ -37,6 +38,10 @@ const deliveryTransitionInputSchema = z.object({
   expectedVersion: z.number().int().positive(),
   toStatus: z.enum(DELIVERY_STATUSES),
   reasonCode: reasonCodeSchema.optional(),
+  // Only consulted when toStatus is "complete", and only on the first such
+  // transition for the engagement (see hasClientThankYou below). Ignored
+  // otherwise.
+  includeNewsletterInvite: z.boolean().optional(),
 });
 
 export const transitionEngagementInputSchema = z
@@ -127,6 +132,24 @@ export type AppendTransitionAuditInput = {
   toState: string;
 };
 
+export type WonRecipientForThankYou = {
+  contactId: string;
+  firstName: string;
+  engagementName: string;
+  alreadySubscribed: boolean;
+};
+
+export type CreateClientThankYouInput = {
+  engagementId: string;
+  recipientContactId: string;
+  includedNewsletterInvite: boolean;
+  subjectSnapshot: string;
+  htmlSnapshot: string;
+  textSnapshot: string;
+  checksum: string;
+  createdBy: string;
+};
+
 export interface EngagementTransitionTransaction {
   lockEngagement(engagementId: string): Promise<LockedEngagement | null>;
   applyCommercialTransition(input: ApplyCommercialTransitionInput): Promise<void>;
@@ -136,6 +159,11 @@ export interface EngagementTransitionTransaction {
     prospectId: string,
   ): Promise<StopActiveOutreachResult>;
   appendTransitionAudit(input: AppendTransitionAuditInput): Promise<void>;
+  hasClientThankYou(engagementId: string): Promise<boolean>;
+  getWonRecipientForThankYou(
+    engagementId: string,
+  ): Promise<WonRecipientForThankYou | null>;
+  createClientThankYou(input: CreateClientThankYouInput): Promise<void>;
 }
 
 export interface EngagementTransitionRepository {
@@ -291,6 +319,34 @@ export function createEngagementTransitioner({
         actorId: context.founder.actorId,
         correlationId: context.correlationId,
       });
+
+      if (
+        input.toStatus === "complete" &&
+        !(await transaction.hasClientThankYou(engagement.id))
+      ) {
+        const recipient = await transaction.getWonRecipientForThankYou(
+          engagement.id,
+        );
+        if (recipient) {
+          const includeInvite =
+            Boolean(input.includeNewsletterInvite) && !recipient.alreadySubscribed;
+          const snapshot = await renderClientThankYouSnapshot({
+            firstName: recipient.firstName,
+            engagementName: recipient.engagementName,
+            includeNewsletterInvite: includeInvite,
+          });
+          await transaction.createClientThankYou({
+            engagementId: engagement.id,
+            recipientContactId: recipient.contactId,
+            includedNewsletterInvite: includeInvite,
+            subjectSnapshot: snapshot.subject,
+            htmlSnapshot: snapshot.html,
+            textSnapshot: snapshot.text,
+            checksum: snapshot.checksum,
+            createdBy: context.founder.actorId,
+          });
+        }
+      }
 
       await transaction.appendTransitionAudit({
         correlationId: context.correlationId,

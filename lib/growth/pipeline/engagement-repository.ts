@@ -109,6 +109,65 @@ function createTransaction(
         entityId: input.engagementId,
       });
     },
+
+    async hasClientThankYou(engagementId) {
+      const rows = await transaction<Array<{ exists: boolean }>>`
+        select exists (
+          select 1 from growth.client_messages where engagement_id = ${engagementId}
+        ) as exists
+      `;
+      return rows[0]?.exists === true;
+    },
+
+    async getWonRecipientForThankYou(engagementId) {
+      const rows = await transaction<
+        Array<{
+          engagementName: string;
+          contactId: string;
+          firstName: string;
+          normalisedEmail: string;
+          alreadySubscribed: boolean;
+        }>
+      >`
+        select
+          de.name as "engagementName",
+          c.id as "contactId",
+          c.first_name as "firstName",
+          c.normalised_email as "normalisedEmail",
+          exists (
+            select 1 from growth.newsletter_subscribers ns
+            where ns.normalised_email = c.normalised_email
+              and ns.status = 'subscribed'
+          ) as "alreadySubscribed"
+        from growth.delivery_engagements de
+        inner join growth.prospects p on p.id = de.prospect_id
+        inner join growth.contacts c on c.id = p.primary_contact_id
+        where de.id = ${engagementId}
+      `;
+      const row = rows[0];
+      if (!row) return null;
+      return {
+        contactId: row.contactId,
+        firstName: row.firstName,
+        engagementName: row.engagementName,
+        alreadySubscribed: row.alreadySubscribed,
+      };
+    },
+
+    async createClientThankYou(input) {
+      await transaction`
+        insert into growth.client_messages (
+          engagement_id, template_key, included_newsletter_invite,
+          recipient_contact_id, subject_snapshot, html_snapshot, text_snapshot,
+          checksum, created_by
+        ) values (
+          ${input.engagementId}, 'client-delivery-thank-you', ${input.includedNewsletterInvite},
+          ${input.recipientContactId}, ${input.subjectSnapshot}, ${input.htmlSnapshot}, ${input.textSnapshot},
+          ${input.checksum}, ${input.createdBy}
+        )
+        on conflict (engagement_id) do nothing
+      `;
+    },
   };
 }
 
