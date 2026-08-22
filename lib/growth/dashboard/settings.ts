@@ -10,6 +10,7 @@ const CRON_LABELS: Record<string, string> = {
   "/api/cron/gmail-sync": "Gmail reply sync",
   "/api/cron/outreach-dispatch": "Outreach email dispatch",
   "/api/cron/resend-dispatch": "Newsletter dispatch",
+  "/api/cron/maintenance": "Maintenance report",
 };
 
 const EVERY_N_MINUTES_PATTERN = /^\*\/(\d+) \* \* \* \*$/;

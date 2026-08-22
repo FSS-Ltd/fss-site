@@ -78,6 +78,7 @@ const growthServerEnvSchema = z
     GROWTH_OS_AUTOMATIONS_ENABLED: z
       .enum(["true", "false"])
       .transform((value) => value === "true"),
+    VERCEL_ENV: z.enum(["production", "preview", "development"]).optional(),
     NEXT_PUBLIC_DATABASE_URL: z.undefined().optional(),
     NEXT_PUBLIC_DIRECT_DATABASE_URL: z.undefined().optional(),
     NEXT_PUBLIC_TOKEN_ENCRYPTION_KEY: z.undefined().optional(),
@@ -85,6 +86,27 @@ const growthServerEnvSchema = z
     NEXT_PUBLIC_GOOGLE_GMAIL_CLIENT_SECRET: z.undefined().optional(),
     NEXT_PUBLIC_GOOGLE_GMAIL_REDIRECT_URI: z.undefined().optional(),
   })
+  .refine(
+    (value) =>
+      !(
+        value.VERCEL_ENV === "production" &&
+        value.GROWTH_OS_AUTOMATIONS_ENABLED === true
+      ) ||
+      Boolean(
+        value.GOOGLE_GMAIL_CLIENT_ID &&
+          value.GOOGLE_GMAIL_CLIENT_SECRET &&
+          value.GOOGLE_GMAIL_REDIRECT_URI &&
+          value.RESEND_API_KEY &&
+          value.RESEND_FROM_EMAIL &&
+          value.RESEND_REPLY_TO_EMAIL &&
+          value.CRON_SECRET,
+      ),
+    {
+      message:
+        "GROWTH_OS_AUTOMATIONS_ENABLED cannot be true in production without complete Gmail, Resend, and cron provider configuration",
+      path: ["GROWTH_OS_AUTOMATIONS_ENABLED"],
+    },
+  )
   .transform((value) => ({
     databaseUrl: value.DATABASE_URL,
     directDatabaseUrl: value.DIRECT_DATABASE_URL,
