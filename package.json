@@ -18,7 +18,8 @@
     "test:redesign": "node scripts/validate-redesign-shell.mjs",
     "generate-blog-post": "tsx scripts/generate-blog-post.ts",
     "perf:budget:homepage": "node scripts/check-homepage-budget.mjs",
-    "perf:lighthouse:mobile": "lhci autorun --config=.lighthouserc.mobile.json"
+    "perf:lighthouse:mobile": "lhci autorun --config=.lighthouserc.mobile.json",
+    "verify:growth-release": "tsx scripts/verify-growth-release.ts"
   },
   "dependencies": {
     "@date-fns/tz": "^1.5.0",
