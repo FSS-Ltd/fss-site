@@ -32,6 +32,14 @@ test("accepts a request with the exact bearer token", () => {
   assert.deepEqual(result, { authorized: true });
 });
 
+test("rejects a request using the wrong authorization scheme", () => {
+  const result = authorizeCronRequest(
+    requestWithHeader(`Basic ${CRON_SECRET}`),
+    CRON_SECRET,
+  );
+  assert.deepEqual(result, { authorized: false, reason: "invalid_secret" });
+});
+
 test("fails closed when the server has no cron secret configured", () => {
   const withUndefined = authorizeCronRequest(
     requestWithHeader(`Bearer ${CRON_SECRET}`),

@@ -147,12 +147,22 @@ test("buildSettingsView always reports Codex as not configured", () => {
   assert.equal(data.codexConfigured, false);
 });
 
-test("buildSettingsView lists all three cron jobs with a computed next run when automations are enabled", () => {
+test("buildSettingsView lists all four cron jobs with a label when automations are enabled", () => {
   const data = buildSettingsView(baseInput());
-  assert.equal(data.automation.crons.length, 3);
+  assert.equal(data.automation.crons.length, 4);
   for (const cron of data.automation.crons) {
-    assert.notEqual(cron.nextRunAt, null);
     assert.ok(cron.label.length > 0);
+  }
+});
+
+test("buildSettingsView computes a next run for the minute-interval crons but not the daily maintenance cron", () => {
+  const data = buildSettingsView(baseInput());
+  for (const cron of data.automation.crons) {
+    if (cron.path === "/api/cron/maintenance") {
+      assert.equal(cron.nextRunAt, null);
+    } else {
+      assert.notEqual(cron.nextRunAt, null);
+    }
   }
 });
 
