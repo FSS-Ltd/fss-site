@@ -15,6 +15,7 @@
     "test:unit": "node --import tsx --test 'lib/**/*.test.ts' 'components/**/*.test.{ts,tsx}' 'app/**/*.test.ts' 'scripts/**/*.test.ts'",
     "test:integration:growth": "node --import tsx --test 'tests/integration/growth/**/*.test.ts'",
     "test:growth": "pnpm test:unit && pnpm test:integration:growth",
+    "test": "pnpm test:growth",
     "test:redesign": "node scripts/validate-redesign-shell.mjs",
     "generate-blog-post": "tsx scripts/generate-blog-post.ts",
     "perf:budget:homepage": "node scripts/check-homepage-budget.mjs",
