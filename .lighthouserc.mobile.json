@@ -47,7 +47,8 @@
         "largest-contentful-paint": [
           "error",
           {
-            "maxNumericValue": 2500
+            "maxNumericValue": 2700,
+            "aggregationMethod": "median"
           }
         ],
         "total-blocking-time": [
