@@ -12,7 +12,7 @@
     "start": "next start",
     "lint": "eslint && npm run lint:covers",
     "lint:covers": "tsx scripts/validate-blog-covers.ts",
-    "test:unit": "node --import tsx --test 'lib/**/*.test.ts' 'components/**/*.test.ts'",
+    "test:unit": "node --import tsx --test 'lib/**/*.test.ts' 'components/**/*.test.{ts,tsx}'",
     "test:integration:growth": "node --import tsx --test 'tests/integration/growth/**/*.test.ts'",
     "test:growth": "pnpm test:unit && pnpm test:integration:growth",
     "test:redesign": "node scripts/validate-redesign-shell.mjs",

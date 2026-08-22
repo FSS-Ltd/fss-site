@@ -1,0 +1,298 @@
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.page {
+  display: grid;
+  gap: 20px;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.heading {
+  margin: 0;
+  color: #07182e;
+  font-size: 1.6rem;
+  font-weight: 750;
+}
+
+.subtitle {
+  margin: 4px 0 0;
+  color: #607089;
+  font-size: 0.92rem;
+}
+
+.summary {
+  text-align: right;
+}
+
+.summaryCount {
+  margin: 0;
+  color: #07182e;
+  font-size: 1.1rem;
+  font-weight: 750;
+}
+
+.summaryValue {
+  margin: 2px 0 0;
+  color: #526078;
+  font-size: 0.86rem;
+}
+
+.emptyState {
+  border: 1px solid #dce3e8;
+  border-radius: 12px;
+  background: white;
+  padding: 40px 24px;
+  color: #526078;
+  text-align: center;
+}
+
+.errorState {
+  border: 1px solid #f3c6c1;
+  border-radius: 12px;
+  background: #fdf4f3;
+  padding: 40px 24px;
+  color: #8a2a20;
+  text-align: center;
+}
+
+.errorCorrelation {
+  margin-top: 8px;
+  color: #a56b64;
+  font-size: 0.76rem;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 1023px) {
+  .board {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.column {
+  display: grid;
+  gap: 12px;
+  border: 1px solid #dce3e8;
+  border-radius: 12px;
+  background: #f7f9fa;
+  padding: 14px;
+}
+
+.columnHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.columnTitle {
+  margin: 0;
+  color: #07182e;
+  font-size: 0.92rem;
+  font-weight: 750;
+}
+
+.columnMeta {
+  margin: 0;
+  color: #607089;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.columnEmpty {
+  margin: 0;
+  color: #8896ab;
+  font-size: 0.84rem;
+}
+
+.cardList {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.columnMore {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #d8e0e5;
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #07182e;
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+
+.card {
+  display: grid;
+  gap: 6px;
+  border: 1px solid #eef1f3;
+  border-radius: 10px;
+  background: white;
+  padding: 12px;
+}
+
+.cardBusiness {
+  margin: 0;
+  color: #07182e;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.cardContact {
+  margin: 0;
+  color: #607089;
+  font-size: 0.78rem;
+}
+
+.cardOffer {
+  margin: 0;
+  color: #3a4a63;
+  font-size: 0.82rem;
+}
+
+.cardValue {
+  margin: 0;
+  color: #07182e;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.cardNextAction {
+  margin: 0;
+  color: #526078;
+  font-size: 0.78rem;
+}
+
+.moveGroup {
+  display: grid;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.moveButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.moveButton {
+  border: 1px solid #087f88;
+  border-radius: 7px;
+  background: white;
+  padding: 6px 10px;
+  color: #087f88;
+  font-size: 0.76rem;
+  font-weight: 650;
+}
+
+.moveButton:disabled {
+  border-color: #d8e0e5;
+  color: #b7c1cc;
+  cursor: not-allowed;
+}
+
+.moveButton:focus-visible,
+.moveButtonSecondary:focus-visible {
+  outline: 3px solid #087f88;
+  outline-offset: 2px;
+}
+
+.moveButtonSecondary {
+  border: 1px solid #d8e0e5;
+  border-radius: 7px;
+  background: white;
+  padding: 6px 10px;
+  color: #526078;
+  font-size: 0.76rem;
+  font-weight: 650;
+}
+
+.moveConfirm {
+  display: grid;
+  gap: 8px;
+  border-top: 1px dashed #d8e0e5;
+  padding-top: 8px;
+}
+
+.moveConfirmTitle {
+  margin: 0;
+  color: #07182e;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.moveValueFields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 8px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.fieldLabel {
+  color: #526078;
+  font-size: 0.72rem;
+  font-weight: 650;
+}
+
+.textInput {
+  border: 1px solid #d8e0e5;
+  border-radius: 7px;
+  background: white;
+  padding: 6px 8px;
+  color: #07182e;
+  font-size: 0.8rem;
+}
+
+.textInput:focus-visible {
+  outline: 3px solid #087f88;
+  outline-offset: 1px;
+}
+
+.moveConfirmActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.actionFeedback {
+  margin: 0;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+}
+
+.actionFeedback[data-tone="conflict"] {
+  background: #fdf2e2;
+  color: #92600c;
+}
+
+.actionFeedback[data-tone="error"] {
+  background: #fdecec;
+  color: #b42318;
+}
