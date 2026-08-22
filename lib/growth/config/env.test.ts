@@ -219,6 +219,44 @@ test("rejects non-PostgreSQL database URLs", () => {
   }
 });
 
+test("rejects production automations enabled without complete provider configuration", () => {
+  assert.throws(
+    () =>
+      parseGrowthServerEnv({
+        ...validEnv,
+        VERCEL_ENV: "production",
+        GROWTH_OS_AUTOMATIONS_ENABLED: "true",
+        CRON_SECRET: "d".repeat(32),
+        // Resend is left unconfigured.
+      }),
+    /GROWTH_OS_AUTOMATIONS_ENABLED.*provider configuration/i,
+  );
+});
+
+test("accepts production automations enabled with complete provider configuration", () => {
+  const result = parseGrowthServerEnv({
+    ...validEnv,
+    VERCEL_ENV: "production",
+    GROWTH_OS_AUTOMATIONS_ENABLED: "true",
+    CRON_SECRET: "d".repeat(32),
+    RESEND_API_KEY: "resend-key",
+    RESEND_FROM_EMAIL: "newsletter@faithfulsoftware.dev",
+    RESEND_REPLY_TO_EMAIL: "j.ntagengwa@faithfulsoftware.dev",
+  });
+
+  assert.equal(result.automationsEnabled, true);
+});
+
+test("allows preview and local environments to enable automations without full provider configuration", () => {
+  const result = parseGrowthServerEnv({
+    ...validEnv,
+    VERCEL_ENV: "preview",
+    GROWTH_OS_AUTOMATIONS_ENABLED: "true",
+  });
+
+  assert.equal(result.automationsEnabled, true);
+});
+
 test("rejects blank security credentials", () => {
   for (const name of [
     "AUTH_SECRET",
