@@ -9,11 +9,13 @@ import {
   type AppendTransitionAuditInput,
   type ApplyCommercialTransitionInput,
   type ApplyDeliveryTransitionInput,
+  type CreateClientThankYouInput,
   type EngagementTransitionRepository,
   type EngagementTransitionTransaction,
   type InsertStageEventInput,
   type LockedEngagement,
   type StopActiveOutreachResult,
+  type WonRecipientForThankYou,
 } from "./transition-engagement";
 
 const founder: FounderSession = {
@@ -46,7 +48,22 @@ type FakeState = {
   stopOutreachCalls: string[];
   stopOutreachResult: StopActiveOutreachResult;
   audits: AppendTransitionAuditInput[];
+  existingClientThankYou: boolean;
+  wonRecipient: WonRecipientForThankYou | null;
+  createdClientThankYou: CreateClientThankYouInput[];
 };
+
+function wonRecipient(
+  overrides: Partial<WonRecipientForThankYou> = {},
+): WonRecipientForThankYou {
+  return {
+    contactId: "33333333-3333-4333-8333-333333333333",
+    firstName: "Ada",
+    engagementName: "The enquiry portal build",
+    alreadySubscribed: false,
+    ...overrides,
+  };
+}
 
 function createFakeState(overrides: Partial<FakeState> = {}): FakeState {
   return {
@@ -57,6 +74,9 @@ function createFakeState(overrides: Partial<FakeState> = {}): FakeState {
     stopOutreachCalls: [],
     stopOutreachResult: { stoppedCount: 1 },
     audits: [],
+    existingClientThankYou: false,
+    wonRecipient: wonRecipient(),
+    createdClientThankYou: [],
     ...overrides,
   };
 }
@@ -95,6 +115,15 @@ function createFakeRepository(state: FakeState): EngagementTransitionRepository 
         },
         async appendTransitionAudit(input) {
           state.audits.push(input);
+        },
+        async hasClientThankYou() {
+          return state.existingClientThankYou;
+        },
+        async getWonRecipientForThankYou() {
+          return state.wonRecipient;
+        },
+        async createClientThankYou(input) {
+          state.createdClientThankYou.push(input);
         },
       };
       return operation(transaction);
@@ -403,6 +432,86 @@ test("rejects malformed request input", async () => {
       { founder, correlationId: "c" },
     ),
   );
+});
+
+test("the first transition to complete creates a pending client thank-you", async () => {
+  const state = createFakeState({
+    engagement: lockedEngagement({ stage: "won", deliveryStatus: "review", version: 7 }),
+  });
+  const transition = createTransitioner(state);
+
+  await transition(
+    db,
+    {
+      dimension: "delivery",
+      engagementId,
+      expectedVersion: 7,
+      toStatus: "complete",
+      includeNewsletterInvite: true,
+    },
+    { founder, correlationId: "c" },
+  );
+
+  assert.equal(state.createdClientThankYou.length, 1);
+  const created = state.createdClientThankYou[0];
+  assert.equal(created?.engagementId, engagementId);
+  assert.equal(created?.includedNewsletterInvite, true);
+  assert.match(created?.subjectSnapshot ?? "", /The enquiry portal build/);
+  assert.match(created?.htmlSnapshot ?? "", /<html/i);
+});
+
+test("a repeated transition to complete does not create a second thank-you", async () => {
+  const state = createFakeState({
+    engagement: lockedEngagement({ stage: "won", deliveryStatus: "review", version: 7 }),
+    existingClientThankYou: true,
+  });
+  const transition = createTransitioner(state);
+
+  await transition(
+    db,
+    { dimension: "delivery", engagementId, expectedVersion: 7, toStatus: "complete" },
+    { founder, correlationId: "c" },
+  );
+
+  assert.equal(state.createdClientThankYou.length, 0);
+});
+
+test("an already-subscribed client never gets the newsletter invite, even if requested", async () => {
+  const state = createFakeState({
+    engagement: lockedEngagement({ stage: "won", deliveryStatus: "review", version: 7 }),
+    wonRecipient: wonRecipient({ alreadySubscribed: true }),
+  });
+  const transition = createTransitioner(state);
+
+  await transition(
+    db,
+    {
+      dimension: "delivery",
+      engagementId,
+      expectedVersion: 7,
+      toStatus: "complete",
+      includeNewsletterInvite: true,
+    },
+    { founder, correlationId: "c" },
+  );
+
+  assert.equal(state.createdClientThankYou[0]?.includedNewsletterInvite, false);
+});
+
+test("no thank-you is created when there is no resolvable recipient", async () => {
+  const state = createFakeState({
+    engagement: lockedEngagement({ stage: "won", deliveryStatus: "review", version: 7 }),
+    wonRecipient: null,
+  });
+  const transition = createTransitioner(state);
+
+  await transition(
+    db,
+    { dimension: "delivery", engagementId, expectedVersion: 7, toStatus: "complete" },
+    { founder, correlationId: "c" },
+  );
+
+  assert.equal(state.createdClientThankYou.length, 0);
 });
 
 test("rejects an invalid founder context even with valid input", async () => {
