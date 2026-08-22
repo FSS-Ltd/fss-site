@@ -3,9 +3,10 @@
 Server-only configuration for the Growth OS, validated by
 `lib/growth/config/env.ts` (`parseGrowthServerEnv`). No values are recorded
 here — only where each name is set and how it is rotated. See
-`docs/runbooks/growth-os-secrets-rotation.md` for rotation mechanics once
-that runbook exists, and `docs/runbooks/growth-os-provider-setup.md` for
-first-time provider setup.
+[`docs/runbooks/growth-os-secrets-rotation.md`](./growth-os-secrets-rotation.md)
+for rotation mechanics and
+[`docs/runbooks/growth-os-provider-setup.md`](./growth-os-provider-setup.md)
+for first-time provider setup.
 
 `GROWTH_OS_AUTOMATIONS_ENABLED=true` is rejected at boot in production
 unless Gmail (`GOOGLE_GMAIL_*`), Resend (`RESEND_*`), and `CRON_SECRET` are
