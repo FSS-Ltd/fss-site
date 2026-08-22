@@ -34,6 +34,18 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Check migration policy
+        run: pnpm verify:migrations
+
+      - name: Run type check
+        run: pnpm typecheck
+
+      - name: Run unit and service integration tests
+        run: pnpm test:growth
+
+      - name: Validate redesign shell
+        run: pnpm test:redesign
+
       - name: Run lint
         run: pnpm lint
 
