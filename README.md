@@ -64,3 +64,15 @@ settings/automation controls. Its architecture, mockup-fidelity checklist,
 accessibility review, and operating notes (Gmail connect/disconnect,
 pausing automation, the cron schedule) are documented in
 [docs/runbooks/founder-dashboard.md](docs/runbooks/founder-dashboard.md).
+
+## Growth OS: pipeline and delivery
+
+`/growth/pipeline`, `/growth/deals`, `/growth/clients`, and
+`/growth/analytics` carry one prospect's commercial opportunity from
+qualification through a won deal to delivery, client, and reporting views
+without duplicating identity or losing audit history. Stage definitions,
+when to open a new opportunity instead of reopening a closed one,
+correcting a mistaken transition, pipeline-total reconciliation, the
+client delivery thank-you flow, and the boundary between agreed value and
+recognised accounting revenue are documented in
+[docs/runbooks/pipeline-delivery.md](docs/runbooks/pipeline-delivery.md).
