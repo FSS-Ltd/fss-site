@@ -14,9 +14,15 @@ all fully configured — see the "rejects production automations enabled
 without complete provider configuration" test in
 `lib/growth/config/env.test.ts`.
 
+Founder decision recorded on 25 August 2026: Growth OS uses Supabase project
+`gfeyanrriryihpcgdvqi` only. Vercel Preview must keep `DATABASE_URL` unset
+rather than receive Production database access. Database-backed Preview checks
+are therefore disabled; controlled hosted verification runs in Production with
+automations off and the least-privileged `growth_app` role.
+
 | Name | Owner | Local source | Vercel Preview | Vercel Production | Rotation | Restart required |
 | --- | --- | --- | --- | --- | --- | --- |
-| `DATABASE_URL` | Jean-Fidele | `.env.local`, Supabase transaction pooler URL | Preview-scoped Supabase branch/schema pooler URL | Production Supabase pooler URL | Rotate via Supabase connection string reset; update in Vercel first, redeploy | Yes |
+| `DATABASE_URL` | Jean-Fidele | `.env.local`, Supabase transaction pooler URL | **Do not set; database-backed Preview is disabled** | Production Supabase pooler URL | Rotate via Supabase connection string reset; update in Vercel first, redeploy | Yes |
 | `DIRECT_DATABASE_URL` | Jean-Fidele | `.env.local` or an operator's ephemeral shell, Supabase direct connection | **Do not set in Vercel** | **Do not set in Vercel** | Rotate with the administrative Supabase credential and update only approved operator environments | No runtime restart; tooling only |
 | `AUTH_SECRET` | Jean-Fidele | `.env.local`, generated locally | `<set in Vercel>` | `<set in Vercel>` | Generate a new high-entropy value, set in Vercel, redeploy; invalidates existing sessions | Yes |
 | `GOOGLE_AUTH_CLIENT_ID` | Jean-Fidele | `.env.local` | `<set in Vercel>` | `<set in Vercel>` | Rotate in Google Cloud Console, update in Vercel | Yes |
