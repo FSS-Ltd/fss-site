@@ -43,7 +43,12 @@ function authorizeAs(
   return async () =>
     resolveFounderSession(
       session
-        ? { user: { email: session.email, founderEmailVerified: session.verified } }
+        ? {
+            user: {
+              email: session.email,
+              founderEmailVerified: session.verified,
+            },
+          }
         : null,
       OWNER_EMAIL,
     );
@@ -93,7 +98,11 @@ async function seedProspectWithDraft(
     where at.prospect_id = ${prospectId} and at.task_type = 'first_email_draft'
   `;
   assert.ok(identity);
-  return { prospectId, draftTaskId: identity.draftTaskId, researchRunId: identity.researchRunId };
+  return {
+    prospectId,
+    draftTaskId: identity.draftTaskId,
+    researchRunId: identity.researchRunId,
+  };
 }
 
 async function cleanupResearchRun(
@@ -101,6 +110,15 @@ async function cleanupResearchRun(
   externalRunId: string,
 ): Promise<void> {
   await sql`delete from growth.audit_log where correlation_id like ${`${externalRunId}%`}`;
+  await sql`
+    update growth.sequence_enrollments
+    set first_message_id = null
+    where prospect_id in (
+      select p.id from growth.prospects p
+      inner join growth.research_runs rr on rr.id = p.research_run_id
+      where rr.external_run_id = ${externalRunId}
+    )
+  `;
   await sql`
     delete from growth.email_messages
     where sequence_enrollment_id in (
@@ -178,13 +196,16 @@ test(
 
       const url = `${ROUTE_ORIGIN}/api/growth/prospects/${prospectId}/do-not-contact`;
       const context = { params: Promise.resolve({ id: prospectId }) };
-      const handler = createProspectStatusTransitionRouteHandler("do_not_contact", {
-        db: sql as never,
-        config: { origin: ROUTE_ORIGIN },
-        authorizeFounder: authorizeAs({ email: OWNER_EMAIL, verified: true }),
-        createCorrelationId: randomUUID,
-        reportUnexpectedError: () => undefined,
-      });
+      const handler = createProspectStatusTransitionRouteHandler(
+        "do_not_contact",
+        {
+          db: sql as never,
+          config: { origin: ROUTE_ORIGIN },
+          authorizeFounder: authorizeAs({ email: OWNER_EMAIL, verified: true }),
+          createCorrelationId: randomUUID,
+          reportUnexpectedError: () => undefined,
+        },
+      );
 
       // Unauthenticated: no session at all.
       const unauthenticatedHandler = createProspectStatusTransitionRouteHandler(
@@ -225,7 +246,11 @@ test(
 
       // CSRF: right founder, wrong request origin.
       const wrongOrigin = await handler(
-        createRequest(url, { expectedVersion: before.version }, "https://attacker.test"),
+        createRequest(
+          url,
+          { expectedVersion: before.version },
+          "https://attacker.test",
+        ),
         context,
       );
       assert.equal(wrongOrigin.status, 400);
@@ -278,10 +303,16 @@ test(
         order by created_at desc
         limit 1
       `;
-      assert.equal(audit?.action, "prospect.status_transitioned.do_not_contact");
+      assert.equal(
+        audit?.action,
+        "prospect.status_transitioned.do_not_contact",
+      );
     } finally {
-      await cleanupResearchRun(sql, externalRunId);
-      await sql.end();
+      try {
+        await cleanupResearchRun(sql, externalRunId);
+      } finally {
+        await sql.end();
+      }
     }
   },
 );
@@ -350,8 +381,11 @@ test(
       `;
       assert.equal(enrollmentAfterPause?.status, "paused");
     } finally {
-      await cleanupResearchRun(sql, externalRunId);
-      await sql.end();
+      try {
+        await cleanupResearchRun(sql, externalRunId);
+      } finally {
+        await sql.end();
+      }
     }
   },
 );
@@ -399,8 +433,11 @@ test(
       assert.equal(redraftTask?.taskType, "first_email_redraft");
       assert.equal(redraftTask?.status, "pending");
     } finally {
-      await cleanupResearchRun(sql, externalRunId);
-      await sql.end();
+      try {
+        await cleanupResearchRun(sql, externalRunId);
+      } finally {
+        await sql.end();
+      }
     }
   },
 );
@@ -414,6 +451,7 @@ test(
     const sql = postgres(connectionString, { max: 2 });
     const issueKey = `integration-dashboard-actions-${randomUUID()}`;
     let issueId: string | undefined;
+    let subscriberId: string | undefined;
 
     function fakeResend(): {
       gateway: Pick<ResendGateway, "send">;
@@ -432,6 +470,26 @@ test(
     }
 
     try {
+      const [subscriber] = await sql<{ id: string }[]>`
+        insert into growth.newsletter_subscribers (
+          email,
+          status,
+          consent_source,
+          consent_text_version,
+          consent_evidence,
+          consented_at
+        ) values (
+          ${`${issueKey}@example.test`},
+          'subscribed',
+          'integration_test',
+          'integration-test-v1',
+          'integration test fixture',
+          now()
+        )
+        returning id
+      `;
+      subscriberId = subscriber!.id;
+
       const html = `<html><body><p>Field Notes</p><a href="${UNSUBSCRIBE_URL_PLACEHOLDER}">Unsubscribe</a></body></html>`;
       const text = `Field Notes\nUnsubscribe: ${UNSUBSCRIBE_URL_PLACEHOLDER}`;
       const [row] = await sql<{ id: string }[]>`
@@ -511,6 +569,9 @@ test(
       if (issueId) {
         await sql`delete from growth.audit_log where entity_type = 'newsletter_issue' and entity_id = ${issueId}`;
         await sql`delete from growth.newsletter_issues where id = ${issueId}`;
+      }
+      if (subscriberId) {
+        await sql`delete from growth.newsletter_subscribers where id = ${subscriberId}`;
       }
       await sql.end();
     }

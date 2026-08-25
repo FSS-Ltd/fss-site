@@ -11,25 +11,27 @@ Next.js App Router marketing site for Faithful Software Solutions Ltd.
 
 ## Local development
 
-1. Install dependencies:
+1. Use Node.js 24 (see `.node-version`) and pnpm 9.7.
+
+2. Install dependencies:
 
 ```bash
 pnpm install
 ```
 
-2. Create local env file:
+3. Create local env file:
 
 ```bash
 cp .env.example .env.local
 ```
 
-3. Start dev server:
+4. Start dev server:
 
 ```bash
 pnpm dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000).
+5. Open [http://localhost:3000](http://localhost:3000).
 
 ## Validation commands
 

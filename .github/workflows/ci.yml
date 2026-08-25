@@ -17,6 +17,24 @@ jobs:
     name: Lint and Build
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: fss_growth_test
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d fss_growth_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/fss_growth_test
+      DIRECT_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/fss_growth_test
 
     steps:
       - name: Checkout repository
@@ -28,7 +46,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           cache: "pnpm"
 
       - name: Install dependencies
@@ -40,8 +58,33 @@ jobs:
       - name: Run type check
         run: pnpm typecheck
 
-      - name: Run unit and service integration tests
-        run: pnpm test:growth
+      - name: Prepare Growth OS integration database
+        env:
+          POSTGRES_CONTAINER_ID: ${{ job.services.postgres.id }}
+        run: |
+          docker exec -i "$POSTGRES_CONTAINER_ID" \
+            psql -U postgres -d fss_growth_test -v ON_ERROR_STOP=1 <<'SQL'
+          do $$ begin
+            create role anon nologin;
+          exception when duplicate_object then null;
+          end $$;
+          do $$ begin
+            create role authenticated nologin;
+          exception when duplicate_object then null;
+          end $$;
+          do $$ begin
+            create role service_role nologin;
+          exception when duplicate_object then null;
+          end $$;
+          SQL
+          for migration in supabase/migrations/*.sql; do
+            docker exec -i "$POSTGRES_CONTAINER_ID" \
+              psql -U postgres -d fss_growth_test -v ON_ERROR_STOP=1 \
+              < "$migration"
+          done
+
+      - name: Run Growth OS tests with coverage
+        run: pnpm test:coverage:growth
 
       - name: Validate redesign shell
         run: pnpm test:redesign

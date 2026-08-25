@@ -15,6 +15,8 @@ const eslintConfig = defineConfig([
     // Supabase CLI local state:
     "supabase/.branches/**",
     "supabase/.temp/**",
+    // Local agent worktrees are separate repositories with their own build output:
+    ".claude/worktrees/**",
   ]),
 ]);
 
