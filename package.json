@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": ">=20.9.0"
+    "node": ">=20.9.0 <25"
   },
   "scripts": {
     "dev": "next dev --webpack",
@@ -13,7 +13,10 @@
     "lint": "eslint && npm run lint:covers",
     "lint:covers": "tsx scripts/validate-blog-covers.ts",
     "test:unit": "find lib components app scripts \\( -name '*.test.ts' -o -name '*.test.tsx' \\) -print0 | xargs -0 node --import tsx --test",
-    "test:integration:growth": "find tests/integration/growth -name '*.test.ts' -print0 | xargs -0 node --import tsx --test",
+    "test:integration:growth:database": "find tests/integration/growth -name '*.test.ts' ! -name 'preview-contract.test.ts' -print0 | xargs -0 node --import tsx --test --test-concurrency=1",
+    "test:integration:growth:database:ci": "tsx scripts/require-growth-database-env.ts && pnpm test:integration:growth:database",
+    "test:integration:growth:preview": "node --import tsx --test tests/integration/growth/preview-contract.test.ts",
+    "test:integration:growth": "pnpm test:integration:growth:database && pnpm test:integration:growth:preview",
     "test:growth": "pnpm test:unit && pnpm test:integration:growth",
     "test": "pnpm test:growth",
     "test:redesign": "node scripts/validate-redesign-shell.mjs",
