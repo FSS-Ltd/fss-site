@@ -36,6 +36,15 @@ test("accepts the complete server environment", () => {
   assert.equal(result.automationsEnabled, false);
 });
 
+test("keeps request-serving code bootable without the admin database URL", () => {
+  const result = parseGrowthServerEnv({
+    ...validEnv,
+    DIRECT_DATABASE_URL: undefined,
+  });
+
+  assert.equal(result.directDatabaseUrl, undefined);
+});
+
 test("normalises the founder address and enabled flag", () => {
   const result = parseGrowthServerEnv({
     ...validEnv,

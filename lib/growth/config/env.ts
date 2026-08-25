@@ -55,7 +55,7 @@ const gmailRedirectUriSchema = z
 const growthServerEnvSchema = z
   .object({
     DATABASE_URL: postgresUrlSchema,
-    DIRECT_DATABASE_URL: postgresUrlSchema,
+    DIRECT_DATABASE_URL: postgresUrlSchema.optional(),
     AUTH_SECRET: securitySecretSchema,
     GOOGLE_AUTH_CLIENT_ID: z.string().trim().min(1),
     GOOGLE_AUTH_CLIENT_SECRET: z.string().trim().min(1),
@@ -130,7 +130,7 @@ const growthServerEnvSchema = z
 
 export type GrowthServerEnv = {
   databaseUrl: string;
-  directDatabaseUrl: string;
+  directDatabaseUrl?: string;
   authSecret: string;
   googleAuthClientId: string;
   googleAuthClientSecret: string;

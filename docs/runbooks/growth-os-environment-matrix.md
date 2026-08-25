@@ -17,7 +17,7 @@ without complete provider configuration" test in
 | Name | Owner | Local source | Vercel Preview | Vercel Production | Rotation | Restart required |
 | --- | --- | --- | --- | --- | --- | --- |
 | `DATABASE_URL` | Jean-Fidele | `.env.local`, Supabase transaction pooler URL | Preview-scoped Supabase branch/schema pooler URL | Production Supabase pooler URL | Rotate via Supabase connection string reset; update in Vercel first, redeploy | Yes |
-| `DIRECT_DATABASE_URL` | Jean-Fidele | `.env.local`, Supabase direct connection | Preview-scoped direct URL, migration/maintenance tooling only | Production direct URL, migration/maintenance tooling only | Same as `DATABASE_URL` | Yes (tooling only, not the app runtime) |
+| `DIRECT_DATABASE_URL` | Jean-Fidele | `.env.local` or an operator's ephemeral shell, Supabase direct connection | **Do not set in Vercel** | **Do not set in Vercel** | Rotate with the administrative Supabase credential and update only approved operator environments | No runtime restart; tooling only |
 | `AUTH_SECRET` | Jean-Fidele | `.env.local`, generated locally | `<set in Vercel>` | `<set in Vercel>` | Generate a new high-entropy value, set in Vercel, redeploy; invalidates existing sessions | Yes |
 | `GOOGLE_AUTH_CLIENT_ID` | Jean-Fidele | `.env.local` | `<set in Vercel>` | `<set in Vercel>` | Rotate in Google Cloud Console, update in Vercel | Yes |
 | `GOOGLE_AUTH_CLIENT_SECRET` | Jean-Fidele | `.env.local` | `<set in Vercel>` | `<set in Vercel>` | Rotate in Google Cloud Console, update in Vercel | Yes |
