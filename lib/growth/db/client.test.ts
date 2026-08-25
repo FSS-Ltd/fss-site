@@ -137,7 +137,6 @@ test("creates the shared client on first access and reuses it", async () => {
 
   Object.assign(process.env, {
     DATABASE_URL: "postgresql://app@example.test:6543/postgres",
-    DIRECT_DATABASE_URL: "postgresql://admin@example.test:5432/postgres",
     AUTH_SECRET: "a".repeat(32),
     GOOGLE_AUTH_CLIENT_ID: "client-id",
     GOOGLE_AUTH_CLIENT_SECRET: "client-secret",
@@ -145,6 +144,7 @@ test("creates the shared client on first access and reuses it", async () => {
     TOKEN_ENCRYPTION_KEY: "b".repeat(32),
     GROWTH_OS_AUTOMATIONS_ENABLED: "false",
   });
+  delete process.env.DIRECT_DATABASE_URL;
 
   try {
     const { getGrowthDb } = await import("./client");
