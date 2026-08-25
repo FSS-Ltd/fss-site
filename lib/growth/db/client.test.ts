@@ -144,6 +144,7 @@ test("creates the shared client on first access and reuses it", async () => {
     TOKEN_ENCRYPTION_KEY: "b".repeat(32),
     GROWTH_OS_AUTOMATIONS_ENABLED: "false",
   });
+  delete process.env.DIRECT_DATABASE_URL;
 
   try {
     const { getGrowthDb } = await import("./client");
