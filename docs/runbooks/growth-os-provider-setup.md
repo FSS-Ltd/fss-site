@@ -126,6 +126,6 @@ human (Jean-Fidele) confirms:
   control, not a placeholder.
 - **Project reference** — `gfeyanrriryihpcgdvqi` is still the intended
   Supabase project before linking or pushing a migration.
-- **Rollback access** — Netlify access, the current DNS values, and the
-  last known-good Vercel deployment are all still available (Task 7 and
-  8's cutover and rollback runbooks depend on this).
+- **Rollback access** — the current DNS values and the last known-good
+  Vercel deployment are recorded and available (the cutover and rollback
+  runbooks depend on this).

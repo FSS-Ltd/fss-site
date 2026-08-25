@@ -1,4 +1,6 @@
-const FALLBACK_SITE_URL = "https://faithfulsoftwaresolutions.co.uk";
+const FALLBACK_SITE_URL = "https://faithfulsoftware.dev";
+
+type SiteEnvironment = Readonly<Record<string, string | undefined>>;
 
 function normalizeUrl(value: string): string {
   const trimmed = value.trim();
@@ -10,30 +12,28 @@ function normalizeUrl(value: string): string {
   return trimmed.endsWith("/") ? trimmed.slice(0, -1) : trimmed;
 }
 
-export function getDeploymentContext(env: NodeJS.ProcessEnv = process.env): string {
-  return env.CONTEXT || env.NODE_ENV || "development";
+export function getDeploymentContext(
+  env: SiteEnvironment = process.env,
+): string {
+  return env.VERCEL_ENV || env.NODE_ENV || "development";
 }
 
-export function isPreviewDeployment(env: NodeJS.ProcessEnv = process.env): boolean {
-  const context = getDeploymentContext(env);
-  return context === "deploy-preview" || context === "branch-deploy";
+export function isPreviewDeployment(
+  env: SiteEnvironment = process.env,
+): boolean {
+  return getDeploymentContext(env) === "preview";
 }
 
-export function resolveSiteUrl(env: NodeJS.ProcessEnv = process.env): string {
+export function resolveSiteUrl(env: SiteEnvironment = process.env): string {
   const configuredUrl = env.NEXT_PUBLIC_SITE_URL;
-  const netlifyPreviewUrl = env.DEPLOY_PRIME_URL;
-  const netlifySiteUrl = env.URL;
+  const vercelDeploymentUrl = env.VERCEL_URL;
 
   if (configuredUrl) {
     return normalizeUrl(configuredUrl);
   }
 
-  if (netlifyPreviewUrl) {
-    return normalizeUrl(netlifyPreviewUrl);
-  }
-
-  if (netlifySiteUrl) {
-    return normalizeUrl(netlifySiteUrl);
+  if (vercelDeploymentUrl) {
+    return normalizeUrl(`https://${vercelDeploymentUrl}`);
   }
 
   return FALLBACK_SITE_URL;

@@ -26,61 +26,9 @@ export type LeadCaptureResult = {
   errorMessage?: string;
 };
 
-type LeadSubmissionProvider = "netlify" | "api";
-
-const NETLIFY_FORM_NAME = "fss-lead-capture";
-
-function getLeadSubmissionProvider(): LeadSubmissionProvider {
-  return (process.env.NEXT_PUBLIC_LEAD_SUBMISSION_PROVIDER as LeadSubmissionProvider) || "api";
-}
-
-function toFormUrlEncoded(payload: LeadCapturePayload): string {
-  const body = new URLSearchParams();
-
-  body.set("form-name", NETLIFY_FORM_NAME);
-  body.set("firstName", payload.firstName);
-  body.set("lastName", payload.lastName);
-  body.set("workEmail", payload.workEmail);
-  body.set("company", payload.company);
-  body.set("challenge", payload.challenge ?? "");
-  body.set("sourceContext", payload.sourceContext);
-  body.set("sourcePath", payload.sourcePath);
-  body.set("resourceSlug", payload.resourceSlug ?? "");
-  body.set("bot-field", "");
-
-  return body.toString();
-}
-
-async function submitViaNetlify(payload: LeadCapturePayload): Promise<LeadCaptureResult> {
-  try {
-    const response = await fetch("/__forms.html", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: toFormUrlEncoded(payload),
-    });
-
-    if (!response.ok) {
-      return {
-        ok: false,
-        errorMessage: "We could not submit your request right now. Please try again.",
-      };
-    }
-
-    return {
-      ok: true,
-      leadId: `netlify-${Date.now()}`,
-    };
-  } catch {
-    return {
-      ok: false,
-      errorMessage: "Network error while submitting. Please try again.",
-    };
-  }
-}
-
-async function submitViaApi(payload: LeadCapturePayload): Promise<LeadCaptureResult> {
+export async function submitLeadCapture(
+  payload: LeadCapturePayload,
+): Promise<LeadCaptureResult> {
   try {
     const response = await fetch("/api/lead", {
       method: "POST",
@@ -106,14 +54,4 @@ async function submitViaApi(payload: LeadCapturePayload): Promise<LeadCaptureRes
       errorMessage: "Network error while submitting. Please try again.",
     };
   }
-}
-
-export async function submitLeadCapture(payload: LeadCapturePayload): Promise<LeadCaptureResult> {
-  const provider = getLeadSubmissionProvider();
-
-  if (provider === "api") {
-    return submitViaApi(payload);
-  }
-
-  return submitViaNetlify(payload);
 }

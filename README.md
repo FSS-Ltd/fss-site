@@ -7,7 +7,7 @@ Next.js App Router marketing site for Faithful Software Solutions Ltd.
 - Next.js App Router
 - MDX blog + resource library
 - Lead capture route (`/api/lead`) with HubSpot + Resend integration
-- Netlify deployment target (GitHub as source of truth)
+- Vercel deployment target (GitHub as source of truth)
 
 ## Local development
 
@@ -42,24 +42,18 @@ pnpm build
 
 ## Deployment
 
-Netlify remains the active production host today. Deployment model and
-configuration are documented in [docs/deployment.md](docs/deployment.md):
+Vercel is the production host. The deployment model and configuration are
+documented in [docs/deployment.md](docs/deployment.md):
 
-- Feature branches -> PRs into `main`
-- GitHub Actions CI on PRs
-- Netlify Deploy Preview on PRs
-- Netlify production deploy from `main` only
-
-A Vercel Pro release for the Growth OS is prepared but not yet live — see
-the Vercel release section below. Vercel becomes the active host only
-after an explicit founder-approved cutover; until then this section
-stays accurate as written.
+- Feature branches open pull requests into `main`.
+- GitHub Actions validates every pull request.
+- Vercel creates preview deployments for pull requests.
+- Merges to `main` create production deployments.
 
 ## Growth OS: Vercel release
 
 The Growth OS is released to Vercel Pro through a verified preview,
-explicit founder approval, and a reversible domain cutover, with
-Netlify kept available for rollback throughout an agreed window.
+explicit founder approval, and a reversible production promotion.
 Automation (Gmail sync/send, Resend dispatch, Codex research ingestion)
 starts disabled at every promotion and is enabled through two separate
 deliberate gates, never one flag flip. The MVP does not call a paid AI

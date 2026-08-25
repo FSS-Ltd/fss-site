@@ -38,13 +38,11 @@ Record here:
 
 Before making any change, record (values only, never secrets):
 
-- Active Netlify deployment URL and deployment ID.
 - Current DNS records and their TTL, for every domain/subdomain
   involved.
 - Current Vercel production deployment (if any prior one exists).
-- Current Supabase migration version (`supabase migration list
-  --linked`, or the latest applied version from
-  `supabase_migrations.schema_migrations`).
+- Current Supabase migration version (from `supabase migration list --linked`
+  or the latest applied version in `supabase_migrations.schema_migrations`).
 - Database backup status/timestamp.
 - Current automation state (`GROWTH_OS_AUTOMATIONS_ENABLED` value, which
   should already be `false`).
@@ -105,9 +103,10 @@ cron) with automations still disabled. Confirm:
 
 - No unexpected sends.
 - No repeated/looping calls to any provider.
-- Every cron route consistently reports `{ ok: true, skipped:
-  "automations_disabled" }`.
-- Netlify remains available and completely unchanged throughout.
+- Every cron route consistently reports
+  `{ ok: true, skipped: "automations_disabled" }`.
+- The prior Vercel production deployment remains available as a rollback
+  candidate throughout.
 
 ## Step 7: Enable automation in two gates
 

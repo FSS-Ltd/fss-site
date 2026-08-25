@@ -43,7 +43,6 @@ bundle:
 
 - `NEXT_PUBLIC_SITE_URL`
 - `NEXT_PUBLIC_GA_MEASUREMENT_ID`
-- `NEXT_PUBLIC_LEAD_SUBMISSION_PROVIDER`
 
 `lib/growth/config/env.ts` explicitly rejects any `NEXT_PUBLIC_*` variant of
 a server-only Growth OS name (database URLs, the token encryption key,
