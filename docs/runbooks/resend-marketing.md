@@ -45,7 +45,7 @@ never Resend.
 6. Set `NEXT_PUBLIC_SITE_URL` to the real deployed origin and verify it
    before any real send. `resolveSiteUrl()` (`lib/config/site-url.ts`)
    falls back to a hardcoded production domain
-   (`https://faithfulsoftwaresolutions.co.uk`) when this is unset — a
+   (`https://faithfulsoftware.dev`) when this is unset — a
    misconfigured deploy produces plausible-looking but wrong unsubscribe
    links rather than an error, so this is easy to miss.
 

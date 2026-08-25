@@ -4,7 +4,7 @@ Status: Ready for founder review in pull request
 Owner: Jean-Fidele Ntagengwa
 Planning date: 16 August 2026
 Runtime source of truth: Supabase PostgreSQL
-Application host: Vercel Pro after an approved cutover
+Application host: Vercel Pro
 
 ## Purpose
 
@@ -16,7 +16,7 @@ No production Growth OS code is included in this planning pull request.
 
 - The dashboard is founder-only and restricted to `j.ntagengwa@faithfulsoftware.dev`.
 - PostgreSQL is the runtime source of truth. Notion is planning and task context only.
-- The existing Netlify site remains live until a Vercel preview passes review and Jean-Fidele explicitly approves the domain cutover.
+- Vercel is the sole application host. Production changes require a reviewed preview and Jean-Fidele's explicit approval.
 - A weekday Codex scheduled task performs prospect research, analysis, first-email drafting, and visual preparation at 06:00 Europe/London.
 - The MVP does not call an OpenAI or GPT API. Paid AI APIs require a separate decision after FSS reaches GBP 5,000 MRR.
 - Gmail sends cold outreach and keeps replies in the founder's Google Workspace mailbox.
@@ -65,8 +65,8 @@ Generated review assets are under [`mockups/email-assets/`](mockups/email-assets
 3. Execute plan 01 and stop for review.
 4. Execute plans 02 through 06 one at a time, with a test and review gate after each plan.
 5. Execute plan 07 only after all functional plans pass.
-6. Keep Netlify production active throughout preview verification.
-7. Obtain explicit founder approval before the production domain moves to Vercel.
+6. Verify the Vercel preview and provider health checks.
+7. Obtain explicit founder approval before production promotion or a domain change.
 
 ## Release Gates
 

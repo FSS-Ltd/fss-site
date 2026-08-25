@@ -1,5 +1,7 @@
 import { randomUUID } from "node:crypto";
 
+import { resolveSiteUrl } from "@/lib/config/site-url";
+
 import { getGrowthDb } from "../db/client";
 import type { GrowthQueryExecutor } from "../db/types";
 import { computeIssueChecksum } from "../newsletter/issues";
@@ -362,10 +364,9 @@ const FIXTURE_FIELDS: Readonly<Record<string, string>> = {
   firstName: "Daniel",
   businessName: "Smith & Sons Plumbing Ltd",
   resourceTitle: "The Practical Process Audit Guide",
-  resourceUrl:
-    "https://faithfulsoftwaresolutions.co.uk/resources/manual-process-audit-fss",
+  resourceUrl: `${resolveSiteUrl()}/resources/manual-process-audit-fss`,
   engagementName: "the enquiry workflow rebuild",
-  newsletterOptInUrl: "https://faithfulsoftwaresolutions.co.uk/#newsletter",
+  newsletterOptInUrl: `${resolveSiteUrl()}/#newsletter`,
 };
 
 function fillTemplatePlaceholders(

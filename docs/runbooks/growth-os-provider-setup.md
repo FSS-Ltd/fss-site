@@ -60,19 +60,22 @@ for both purposes:
    Request offline access (`access_type=offline`) so the refresh token
    survives past the session.
 
-Record the exact redirect URIs for each environment — `env.ts`'s
+Record the exact redirect URIs for Production — `env.ts`'s
 `gmailRedirectUriSchema` (`lib/growth/config/env.ts`) requires an exact
 match with no query string, fragment, or embedded credentials:
 
-| Environment | Gmail redirect URI |
+| Client | Production origin / redirect URI |
 | --- | --- |
-| Local | `http://localhost:3000/api/integrations/gmail/callback` |
-| Preview | `https://<preview-deployment>.vercel.app/api/integrations/gmail/callback` |
-| Production | `https://<canonical-domain>/api/integrations/gmail/callback` |
+| Dashboard sign-in origin | `https://faithfulsoftware.dev` |
+| Dashboard sign-in redirect | `https://faithfulsoftware.dev/api/auth/callback/google` |
+| Gmail automation redirect | `https://faithfulsoftware.dev/api/integrations/gmail/callback` |
 
-The dashboard sign-in client's redirect URI is whatever Auth.js's own
-provider configuration expects — register it the same way, one entry per
-environment, in the same Google Cloud Console client.
+Do not register a Preview callback or put either client secret in Vercel
+Preview. The founder directed this release to use Production only. Local
+development may use `http://localhost:3000/api/auth/callback/google` for
+dashboard sign-in and
+`http://localhost:3000/api/integrations/gmail/callback` for Gmail, but those
+loopback callbacks must not be set in Vercel.
 
 ## Step 3: Resend
 
@@ -89,7 +92,7 @@ full explanation).
 
 1. Link the GitHub repository to the existing Vercel Pro account. Keep
    the framework preset as Next.js — no custom build command is needed.
-2. Create a private Vercel Blob store. It must produce stable public URLs
+2. Create a public Vercel Blob store. It must produce stable public URLs
    for approved email visual assets (the dashboard reports its presence
    via `BLOB_READ_WRITE_TOKEN`, see
    [`docs/runbooks/founder-dashboard.md`](./founder-dashboard.md)).
@@ -127,6 +130,6 @@ human (Jean-Fidele) confirms:
   control, not a placeholder.
 - **Project reference** — `gfeyanrriryihpcgdvqi` is still the intended
   Supabase project before linking or pushing a migration.
-- **Rollback access** — Netlify access, the current DNS values, and the
-  last known-good Vercel deployment are all still available (Task 7 and
-  8's cutover and rollback runbooks depend on this).
+- **Rollback access** — the current DNS values and the last known-good
+  Vercel deployment are recorded and available (the cutover and rollback
+  runbooks depend on this).

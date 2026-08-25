@@ -1,128 +1,58 @@
-# FSS Deployment (GitHub + Netlify)
+# FSS deployment (GitHub + Vercel)
 
-This repo is set up for a simple, safe CI/CD model where GitHub validates changes and Netlify handles deployments.
+GitHub validates changes and Vercel hosts preview and production deployments.
 
-## Branch + deploy model
+## Branch and deployment model
 
 - Feature work happens on feature branches.
-- Open pull requests into `main` (no direct feature pushes to `main`).
-- GitHub Actions runs lint + build on PRs.
-- Netlify creates deploy previews for PRs.
-- Production deploys from `main` only through `.github/workflows/netlify-deploy.yml`.
+- Changes enter `main` through reviewed pull requests.
+- GitHub Actions runs the repository's lint, tests, coverage gate, build, and
+  Lighthouse checks.
+- Vercel creates an isolated preview deployment for each pull request.
+- A merge to `main` creates a Vercel production deployment.
 
-## Netlify configuration in repo
+## Repository configuration
 
-`netlify.toml` configures:
-
-- Build command: `pnpm build`
-- Node runtime: `NODE_VERSION=20`
-- Next.js runtime plugin: `@netlify/plugin-nextjs`
-- Functions bundler: `esbuild`
-- Lead submission provider set to `api` for:
-  - production
-  - deploy previews
-  - branch deploys
-
-### Why this matters
-
-- App Router + route handlers (`app/api/*`) are handled by Netlify’s Next runtime plugin.
-- No custom redirects/rewrites file is needed for this architecture.
-- Leads flow through `/api/lead` so HubSpot + Resend logic remains server-side.
+- `vercel.json` defines the protected Growth OS cron schedules and pins
+  functions to Vercel's Paris region (`cdg1`), close to the Supabase
+  eu-west-3 database.
+- `.node-version` and `package.json#engines` keep local, CI, and Vercel builds
+  on Node.js 24.
+- `NEXT_PUBLIC_SITE_URL` is the canonical production origin. When it is unset
+  in a preview, `resolveSiteUrl()` uses Vercel's `VERCEL_URL`.
+- Public lead capture always posts to the first-party `/api/lead` route. HubSpot
+  and Resend credentials remain server-side.
 
 ## Environment variables
 
-Set these in Netlify (Site configuration -> Environment variables).
+Configure Preview and Production independently in the Vercel project. The
+authoritative ownership, scope, and rotation matrix is
+[`docs/runbooks/growth-os-environment-matrix.md`](runbooks/growth-os-environment-matrix.md).
 
-### Required (all deployed contexts)
+At minimum, the public site requires:
 
 - `HUBSPOT_ACCESS_TOKEN`
 - `RESEND_API_KEY`
 - `RESEND_FROM_EMAIL`
 - `RESEND_REPLY_TO_EMAIL`
 - `LEAD_NOTIFICATION_EMAIL`
-- `NEXT_PUBLIC_LEAD_SUBMISSION_PROVIDER=api`
+- `NEXT_PUBLIC_SITE_URL` in Production
 
-### Required (production context)
+The Growth OS adds its database, authentication, provider, signing, and cron
+variables from the environment matrix. Server-only names must never use a
+`NEXT_PUBLIC_` prefix.
 
-- `NEXT_PUBLIC_SITE_URL` (your canonical domain, e.g. `https://faithfulsoftwaresolutions.co.uk`)
+## Release checks
 
-### Optional
+Before merging a production-affecting pull request:
 
-- `HUBSPOT_CHALLENGE_PROPERTY`
-- `HUBSPOT_SOURCE_CONTEXT_PROPERTY`
-- `HUBSPOT_SOURCE_PATH_PROPERTY`
-- `HUBSPOT_RESOURCE_SLUG_PROPERTY`
-- `HUBSPOT_API_KEY` (legacy fallback alias; prefer `HUBSPOT_ACCESS_TOKEN`)
+1. Confirm all required GitHub checks and the Vercel preview pass.
+2. Complete the Growth OS preview checklist when Growth OS code or provider
+   configuration changes.
+3. Keep `GROWTH_OS_AUTOMATIONS_ENABLED=false` until the provider rollout gates
+   pass.
+4. Obtain Jean-Fidele's explicit approval for production deployment or domain
+   changes.
 
-### Netlify-provided runtime vars (automatic)
-
-Do not set these manually:
-
-- `CONTEXT`
-- `URL`
-- `DEPLOY_PRIME_URL`
-
-If `NEXT_PUBLIC_SITE_URL` is not set (common for previews), the app falls back to:
-
-1. `DEPLOY_PRIME_URL`
-2. `URL`
-3. hardcoded production fallback
-
-## SEO behavior for preview vs production
-
-- Production (`main`) can be indexed.
-- Deploy previews and branch deploys are marked `noindex,nofollow`.
-- `robots.txt` disallows crawling on preview/branch deploy contexts.
-
-This avoids preview URLs competing with production SEO.
-
-## GitHub Actions
-
-Validation workflow: `.github/workflows/ci.yml`
-
-Runs on:
-
-- PRs targeting `main`
-- pushes to `main`
-
-Checks:
-
-- `pnpm install --frozen-lockfile`
-- `pnpm lint`
-- `pnpm build`
-
-Production deploy workflow: `.github/workflows/netlify-deploy.yml`
-
-Runs on:
-
-- pushes to `main`
-- manual dispatch
-
-Required GitHub repository secrets:
-
-- `NETLIFY_AUTH_TOKEN`
-- `NETLIFY_SITE_ID`
-
-The workflow deploys to the configured Netlify site with `netlify-cli deploy --build --prod`, which uses the build settings in `netlify.toml`.
-
-## Manual setup checklist
-
-1. **GitHub**
-   - Protect `main`.
-   - Require pull requests before merge.
-   - Require CI status check (`CI / Lint and Build`) before merge.
-2. **Netlify**
-   - Connect this GitHub repo.
-   - Set production branch to `main`.
-   - Ensure Deploy Previews are enabled.
-   - Add the required environment variables above.
-3. **Resend**
-   - Verify sender domain/address used by `RESEND_FROM_EMAIL`.
-4. **HubSpot**
-   - Create optional custom contact properties if you want enriched lead context fields.
-
-## Operational assumptions / gotchas
-
-- Lead capture is API-driven (`/api/lead`), not static HTML form posting.
-- Hidden Netlify form registry exists for compatibility, but primary submission path is API.
-- If HubSpot succeeds and an email send fails, submission still completes and an `emailWarning` is returned/logged.
+Use [`docs/runbooks/growth-os-rollback.md`](runbooks/growth-os-rollback.md) to
+promote the last known-good Vercel deployment if production validation fails.

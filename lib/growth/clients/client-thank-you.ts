@@ -2,6 +2,7 @@ import { createElement } from "react";
 
 import { ClientDeliveryThankYou } from "@/emails/client-delivery-thank-you";
 import { renderEmail } from "@/emails/render-email";
+import { resolveSiteUrl } from "@/lib/config/site-url";
 
 import { appendAuditEvent } from "../audit/service";
 import type { FounderSession } from "../auth/require-founder";
@@ -16,8 +17,7 @@ const CORRELATION_ID_MAX_LENGTH = 200;
 // The site's on-site newsletter sign-up section. No signed consent-token
 // endpoint exists yet (Plan 06 does not add one) - sending this link never
 // creates consent, it only offers the client a place to opt in themselves.
-export const NEWSLETTER_OPT_IN_URL =
-  "https://faithfulsoftwaresolutions.co.uk/#newsletter";
+export const NEWSLETTER_OPT_IN_URL = `${resolveSiteUrl()}/#newsletter`;
 
 export type ClientThankYouSnapshot = {
   subject: string;

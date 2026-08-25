@@ -139,6 +139,11 @@ function createSender(state: FakeState) {
 }
 
 test("renderClientThankYouSnapshot includes the invitation only when requested", async () => {
+  assert.equal(
+    NEWSLETTER_OPT_IN_URL,
+    "https://faithfulsoftware.dev/#newsletter",
+  );
+
   const withInvite = await renderClientThankYouSnapshot({
     firstName: "Ada",
     engagementName: "the enquiry portal build",

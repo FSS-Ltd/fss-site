@@ -292,6 +292,32 @@ test("getEmailTemplateReview fills every placeholder with safe representative fi
   });
 });
 
+test("getEmailTemplateReview uses the canonical Vercel domain in URL fixtures", async () => {
+  const db = createFakeGrowthDb([
+    {
+      match: /"htmlTemplate"/,
+      rows: [
+        baseTemplateReviewRow({
+          htmlTemplate:
+            '<a href="{{resourceUrl}}">Resource</a><a href="{{newsletterOptInUrl}}">Newsletter</a>',
+          textTemplate: "{{resourceUrl}}\n{{newsletterOptInUrl}}",
+          requiredFields: ["resourceUrl", "newsletterOptInUrl"],
+        }),
+      ],
+    },
+  ]);
+
+  const result = await getEmailTemplateReview(templateId, db);
+
+  assert.equal(result.status, "ready");
+  if (result.status !== "ready") return;
+  assert.deepEqual(result.data.fixtureFields, {
+    resourceUrl:
+      "https://faithfulsoftware.dev/resources/manual-process-audit-fss",
+    newsletterOptInUrl: "https://faithfulsoftware.dev/#newsletter",
+  });
+});
+
 test("getEmailTemplateReview leaves an unrecognised placeholder as a labelled bracket rather than blank", async () => {
   const db = createFakeGrowthDb([
     {

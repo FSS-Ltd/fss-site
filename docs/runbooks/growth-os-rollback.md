@@ -1,9 +1,8 @@
 # Growth OS rollback
 
-What to do when something goes wrong during or after cutover
-([`docs/runbooks/growth-os-cutover.md`](./growth-os-cutover.md)). Netlify
-stays available and unchanged through the entire agreed rollback window
-specifically so this runbook always has somewhere safe to return to.
+What to do when something goes wrong during or after a production promotion
+([`docs/runbooks/growth-os-cutover.md`](./growth-os-cutover.md)). Vercel's
+immutable deployment history is the application rollback source.
 
 ## Rollback triggers
 
@@ -54,10 +53,9 @@ In this order:
 
 ## Application and domain rollback
 
-1. Promote the last known-good Vercel deployment (Vercel's own
-   deployment history), or, if the domain itself is implicated, return
-   DNS to the values recorded in Step 2 of the cutover runbook
-   (Netlify's production deployment).
+1. Promote the last known-good Vercel deployment from Vercel's deployment
+   history. If the domain itself is implicated, restore the last known-good
+   DNS records captured in Step 2 of the cutover runbook.
 2. Re-run the public form and canonical URL smoke checks used during
    cutover Step 4/5 against wherever traffic now lands.
 3. Confirm the Gmail OAuth redirect URI, Resend webhook destination, and
@@ -85,32 +83,10 @@ statement under pressure.
 
 ## Rollback window
 
-Keep the Netlify configuration, GitHub workflow
-(`.github/workflows/netlify-deploy.yml`), site, and access available and
-completely unchanged for at least the agreed observation period after
-cutover. A suggested minimum is seven clean days (no incident, no
-rollback triggered); Jean-Fidele sets the actual window at cutover time
-(recorded in `docs/runbooks/growth-os-cutover.md`'s Step 1).
-
-Do not make any change to Netlify's configuration during this window,
-even an apparently unrelated one — it must stay a reliable fallback, not
-a second thing that could have drifted.
-
-## Netlify retirement (separate pull request, later)
-
-Once the rollback window has passed cleanly and Jean-Fidele explicitly
-approves retirement:
-
-1. Open a **separate** pull request — never combined with the
-   production cutover commit or with any other Growth OS release work.
-2. Remove obsolete Netlify deployment automation and configuration
-   (`.github/workflows/netlify-deploy.yml`, `netlify.toml`, and any
-   Netlify-specific scripts).
-3. Update canonical hosting documentation to reflect Vercel as the sole
-   host.
-4. Confirm Vercel's own deployment history and rollback tooling are
-   sufficient on their own before removing the Netlify fallback for
-   good — this is the last check, not a formality.
+Keep the prior Vercel production deployment available for the agreed
+observation period after promotion. A suggested minimum is seven clean days
+with no incident or rollback trigger. Jean-Fidele sets the actual window at
+promotion time and records it in the cutover runbook.
 
 ## Incident record
 
