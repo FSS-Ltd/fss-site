@@ -7,7 +7,6 @@ import { createGrowthAuthConfig, GROWTH_GOOGLE_AUTH_SCOPES } from "./config";
 
 const env: GrowthServerEnv = {
   databaseUrl: "postgresql://example.test/database",
-  directDatabaseUrl: "postgresql://example.test/database",
   authSecret: "a".repeat(32),
   googleAuthClientId: "google-client-id",
   googleAuthClientSecret: "google-client-secret",

@@ -7,7 +7,6 @@ const tokenEncryptionKey = Buffer.alloc(32, 7).toString("base64");
 
 const validEnv = {
   DATABASE_URL: "postgresql://app:secret@example.test:6543/postgres",
-  DIRECT_DATABASE_URL: "postgresql://admin:secret@example.test:5432/postgres",
   AUTH_SECRET: "a".repeat(32),
   GOOGLE_AUTH_CLIENT_ID: "client-id",
   GOOGLE_AUTH_CLIENT_SECRET: "client-secret",
@@ -37,12 +36,21 @@ test("accepts the complete server environment", () => {
 });
 
 test("keeps request-serving code bootable without the admin database URL", () => {
-  const result = parseGrowthServerEnv({
-    ...validEnv,
-    DIRECT_DATABASE_URL: undefined,
-  });
+  const result = parseGrowthServerEnv(validEnv);
 
-  assert.equal(result.directDatabaseUrl, undefined);
+  assert.equal("directDatabaseUrl" in result, false);
+});
+
+test("rejects an admin database URL at the request-serving boundary", () => {
+  assert.throws(
+    () =>
+      parseGrowthServerEnv({
+        ...validEnv,
+        DIRECT_DATABASE_URL:
+          "postgresql://admin:secret@example.test:5432/postgres",
+      }),
+    /DIRECT_DATABASE_URL/,
+  );
 });
 
 test("normalises the founder address and enabled flag", () => {

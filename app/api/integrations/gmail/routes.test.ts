@@ -80,7 +80,6 @@ test("keeps disconnect available without Gmail OAuth client configuration", () =
   const encryptionKey = Buffer.alloc(32, 17);
   const environment = parseGrowthServerEnv({
     DATABASE_URL: "postgresql://growth.example.test/database",
-    DIRECT_DATABASE_URL: "postgresql://growth.example.test/database",
     AUTH_SECRET: "a".repeat(32),
     GOOGLE_AUTH_CLIENT_ID: "auth-client-id",
     GOOGLE_AUTH_CLIENT_SECRET: "auth-client-secret",

@@ -40,7 +40,10 @@ async function checkConfiguration(): Promise<
 > {
   console.log("Configuration");
   try {
-    const env = parseGrowthServerEnv(process.env);
+    const env = parseGrowthServerEnv({
+      ...process.env,
+      DIRECT_DATABASE_URL: undefined,
+    });
     ok("Server environment is valid.");
     return env;
   } catch (error) {
@@ -152,7 +155,7 @@ function checkExpectedSiteUrl(): void {
 
 async function main(): Promise<void> {
   const env = await checkConfiguration();
-  await checkMigrations(env?.directDatabaseUrl ?? process.env.DIRECT_DATABASE_URL);
+  await checkMigrations(process.env.DIRECT_DATABASE_URL);
   await checkTemplateChecksums(env?.databaseUrl ?? process.env.DATABASE_URL);
   checkAutomationFlag(env);
   checkExpectedSiteUrl();
