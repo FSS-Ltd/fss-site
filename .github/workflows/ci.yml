@@ -83,11 +83,8 @@ jobs:
               < "$migration"
           done
 
-      - name: Run unit tests
-        run: pnpm test:unit
-
-      - name: Run PostgreSQL integration tests
-        run: pnpm test:integration:growth:database:ci
+      - name: Run Growth OS tests with coverage
+        run: pnpm test:coverage:growth
 
       - name: Validate redesign shell
         run: pnpm test:redesign
