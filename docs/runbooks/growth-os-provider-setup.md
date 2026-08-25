@@ -89,7 +89,7 @@ full explanation).
 
 1. Link the GitHub repository to the existing Vercel Pro account. Keep
    the framework preset as Next.js — no custom build command is needed.
-2. Create a private Vercel Blob store. It must produce stable public URLs
+2. Create a public Vercel Blob store. It must produce stable public URLs
    for approved email visual assets (the dashboard reports its presence
    via `BLOB_READ_WRITE_TOKEN`, see
    [`docs/runbooks/founder-dashboard.md`](./founder-dashboard.md)).
