@@ -5,6 +5,8 @@ import { enforceFounderDashboardAccess } from "@/lib/growth/auth/dashboard-acces
 import { requireFounder } from "@/lib/growth/auth/require-founder";
 import { getIntegrationHealthSummary } from "@/lib/growth/dashboard/integration-health";
 
+export const dynamic = "force-dynamic";
+
 export default async function GrowthDashboardLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
