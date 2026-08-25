@@ -701,12 +701,18 @@ Resend uses provider signature verification before parsing business data. Cron r
 ### Shared Server-Only
 
 - `DATABASE_URL`
-- `DIRECT_DATABASE_URL`
 - `AUTH_SECRET`
 - `GROWTH_OS_OWNER_EMAIL`
 - `TOKEN_ENCRYPTION_KEY`
 - `CRON_SECRET`
 - `GROWTH_OS_AUTOMATIONS_ENABLED`
+
+### Operator And Migration Tooling Only
+
+- `DIRECT_DATABASE_URL`
+
+This credential is supplied ephemerally to approved operator commands. It is
+not set in Vercel and is rejected by the request-serving environment parser.
 
 ### Dashboard OAuth
 

@@ -38,7 +38,8 @@ supabase migration list --linked
 - Runtime `DATABASE_URL` uses the transaction pooler connection string.
   `DIRECT_DATABASE_URL` is limited to migration and maintenance tooling
   (`scripts/verify-growth-release.ts`, `scripts/verify-migrations.ts`,
-  `supabase` CLI commands) — never the request-serving app.
+  `supabase` CLI commands) — never set it in the Vercel project or expose it
+  to the request-serving app.
 
 ## Step 2: Separate Google OAuth clients
 

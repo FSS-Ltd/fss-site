@@ -13,7 +13,9 @@ GitHub validates changes and Vercel hosts preview and production deployments.
 
 ## Repository configuration
 
-- `vercel.json` defines the protected Growth OS cron schedules.
+- `vercel.json` defines the protected Growth OS cron schedules and pins
+  functions to Vercel's Paris region (`cdg1`), close to the Supabase
+  eu-west-3 database.
 - `.node-version` and `package.json#engines` keep local, CI, and Vercel builds
   on Node.js 24.
 - `NEXT_PUBLIC_SITE_URL` is the canonical production origin. When it is unset

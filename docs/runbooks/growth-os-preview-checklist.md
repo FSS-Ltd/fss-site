@@ -22,8 +22,8 @@ Never point an unreviewed preview at active production outreach data.
 ## Step 2: Preview-scoped Vercel variables
 
 Set (Preview environment scope only): preview URL, Gmail OAuth redirect
-URI matching the preview deployment's exact origin, `DATABASE_URL` /
-`DIRECT_DATABASE_URL` for the isolated preview database, provider test
+URI matching the preview deployment's exact origin, `DATABASE_URL` for
+the isolated preview database, provider test
 credentials, and `GROWTH_OS_AUTOMATIONS_ENABLED=false`. Confirm in the
 Vercel dashboard that no Production-scoped secret is also exposed to
 Preview — see
@@ -68,9 +68,11 @@ deliberately, one at a time, recording the result):
       founder's Google account; confirm access. Attempt sign-in with any
       other account (or an unverified session); confirm rejection.
 - [ ] **Database health and migration version are correct.** Run
-      `pnpm verify:growth-release` against the preview's environment
-      variables (or check `/growth/settings` once signed in). Confirm no
-      pending migration and no connection error.
+      `pnpm verify:growth-release` from an approved operator environment,
+      providing its ephemeral `DIRECT_DATABASE_URL` alongside the preview's
+      non-database variables (or check `/growth/settings` once signed in).
+      Never add the direct URL to Vercel. Confirm no pending migration and no
+      connection error.
 - [ ] **Signed ingestion accepts a fixture and rejects a replay.** Submit
       `docs/growth-os/fixtures/research-run-v1.json` following
       `docs/growth-os/runbooks/scheduled-research.md`'s signing steps
