@@ -1,7 +1,6 @@
 "use client";
 
 import { Menu, X } from "lucide-react";
-import Link from "next/link";
 import { useEffect, useRef } from "react";
 
 import {
@@ -16,6 +15,7 @@ import {
   type MobileDialogController,
 } from "./mobile-dialog-controller";
 import { NavigationIcon } from "./navigation-icon";
+import { GrowthNavigationLink } from "./navigation-link";
 import styles from "./shell.module.css";
 import type { ShellNavigationProps } from "./types";
 
@@ -64,7 +64,7 @@ export function MobileNavigation({
     <>
       <nav aria-label="Mobile dashboard" className={styles.mobileNav}>
         {primaryItems.map((item) => (
-          <Link
+          <GrowthNavigationLink
             aria-current={activeItem?.href === item.href ? "page" : undefined}
             className={styles.mobileNavLink}
             href={item.href}
@@ -72,7 +72,7 @@ export function MobileNavigation({
           >
             <NavigationIcon name={item.icon} />
             <span>{item.label}</span>
-          </Link>
+          </GrowthNavigationLink>
         ))}
         <button
           aria-current={isDialogRoute ? "page" : undefined}
@@ -113,7 +113,7 @@ export function MobileNavigation({
 
         <div className={styles.mobileDialogLinks}>
           {GROWTH_NAVIGATION_ITEMS.map((item) => (
-            <Link
+            <GrowthNavigationLink
               aria-current={activeItem?.href === item.href ? "page" : undefined}
               className={styles.mobileDialogLink}
               href={item.href}
@@ -124,7 +124,7 @@ export function MobileNavigation({
             >
               <NavigationIcon name={item.icon} />
               <span>{item.label}</span>
-            </Link>
+            </GrowthNavigationLink>
           ))}
         </div>
 

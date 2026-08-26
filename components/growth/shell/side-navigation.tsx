@@ -1,11 +1,10 @@
-import Link from "next/link";
-
 import {
   GROWTH_NAVIGATION_ITEMS,
   getActiveGrowthNavigationItem,
 } from "@/lib/growth/dashboard/navigation";
 
 import { NavigationIcon } from "./navigation-icon";
+import { GrowthNavigationLink } from "./navigation-link";
 import styles from "./shell.module.css";
 
 export function SideNavigation({ pathname }: { pathname: string }) {
@@ -15,7 +14,7 @@ export function SideNavigation({ pathname }: { pathname: string }) {
     <aside className={styles.sideRail}>
       <nav aria-label="Dashboard shortcuts" className={styles.sideNav}>
         {GROWTH_NAVIGATION_ITEMS.map((item) => (
-          <Link
+          <GrowthNavigationLink
             aria-current={activeItem?.href === item.href ? "page" : undefined}
             aria-label={item.accessibleLabel}
             className={styles.sideNavLink}
@@ -23,7 +22,7 @@ export function SideNavigation({ pathname }: { pathname: string }) {
             key={item.href}
           >
             <NavigationIcon name={item.icon} />
-          </Link>
+          </GrowthNavigationLink>
         ))}
       </nav>
     </aside>

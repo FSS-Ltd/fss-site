@@ -14,6 +14,7 @@ const HEALTHY_REPORT: GrowthReleaseHealth = {
     gmail: "configured",
     resend: "configured",
     blob: "configured",
+    codex: "configured",
     migrations: "unknown",
     reasons: [],
   },

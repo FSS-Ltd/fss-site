@@ -159,12 +159,17 @@ export function IntegrationHealth({ data }: { data: SettingsData }) {
         <div className={styles.card}>
           <div className={styles.cardHeader}>
             <h2 className={styles.sectionTitle}>Codex</h2>
-            <span className={styles.pill} data-tone="neutral">
-              Not configured
+            <span
+              className={styles.pill}
+              data-tone={data.codexConfigured ? undefined : "neutral"}
+            >
+              {data.codexConfigured ? "Configured" : "Not configured"}
             </span>
           </div>
           <p className={styles.guidance}>
-            No Codex ingestion integration exists in this deployment yet.
+            {data.codexConfigured
+              ? "Signed research ingestion is configured. The external weekday task is managed in Codex."
+              : "Signed research ingestion is not configured in this deployment."}
           </p>
         </div>
 

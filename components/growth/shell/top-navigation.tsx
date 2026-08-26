@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import { LogOut } from "lucide-react";
 
 import {
@@ -9,6 +8,7 @@ import {
 
 import { signOutFounder } from "./actions";
 import { IntegrationStatusMenu } from "./integration-status-menu";
+import { GrowthNavigationLink } from "./navigation-link";
 import styles from "./shell.module.css";
 import type { ShellNavigationProps } from "./types";
 
@@ -21,7 +21,7 @@ export function TopNavigation({
 
   return (
     <header className={styles.topBar}>
-      <Link className={styles.brand} href="/growth">
+      <GrowthNavigationLink className={styles.brand} href="/growth">
         <Image
           alt=""
           className={styles.brandMark}
@@ -31,18 +31,18 @@ export function TopNavigation({
           width={128}
         />
         <span>FSS Growth OS</span>
-      </Link>
+      </GrowthNavigationLink>
 
       <nav aria-label="Primary dashboard" className={styles.topNav}>
         {GROWTH_NAVIGATION_ITEMS.map((item) => (
-          <Link
+          <GrowthNavigationLink
             aria-current={activeItem?.href === item.href ? "page" : undefined}
             className={styles.topNavLink}
             href={item.href}
             key={item.href}
           >
             {item.label}
-          </Link>
+          </GrowthNavigationLink>
         ))}
       </nav>
 

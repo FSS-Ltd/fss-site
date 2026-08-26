@@ -10,6 +10,7 @@ function baseInput() {
     now,
     databaseAvailable: true,
     automationsEnabled: true,
+    codexConfigured: true,
     gmailConfigured: true,
     gmailConnection: null,
     ownerEmail: "founder@example.test",
@@ -142,9 +143,12 @@ test("buildSettingsView passes through Vercel Blob configuration", () => {
   assert.equal(notConfigured.vercelBlobConfigured, false);
 });
 
-test("buildSettingsView always reports Codex as not configured", () => {
-  const data = buildSettingsView(baseInput());
-  assert.equal(data.codexConfigured, false);
+test("buildSettingsView reports whether signed research ingestion is configured", () => {
+  assert.equal(buildSettingsView(baseInput()).codexConfigured, true);
+  assert.equal(
+    buildSettingsView({ ...baseInput(), codexConfigured: false }).codexConfigured,
+    false,
+  );
 });
 
 test("buildSettingsView lists all four cron jobs with a label when automations are enabled", () => {

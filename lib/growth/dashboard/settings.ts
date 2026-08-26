@@ -99,6 +99,7 @@ export type BuildSettingsViewInput = {
   now: Date;
   databaseAvailable: boolean;
   automationsEnabled: boolean;
+  codexConfigured: boolean;
   gmailConfigured: boolean;
   gmailConnection: GmailConnectionRow | null;
   ownerEmail: string;
@@ -143,7 +144,7 @@ export function buildSettingsView(input: BuildSettingsViewInput): SettingsData {
       replyToEmail: input.resendReplyToEmail,
     },
     vercelBlobConfigured: input.vercelBlobConfigured,
-    codexConfigured: false,
+    codexConfigured: input.codexConfigured,
     automation: {
       automationsEnabled: input.automationsEnabled,
       activeSequenceCount: input.activeSequenceCount,
@@ -205,6 +206,7 @@ export async function getSettings(
         now,
         databaseAvailable,
         automationsEnabled: env.automationsEnabled,
+        codexConfigured: Boolean(env.agentHmacSecret),
         gmailConfigured: Boolean(
           env.googleGmailClientId &&
             env.googleGmailClientSecret &&
