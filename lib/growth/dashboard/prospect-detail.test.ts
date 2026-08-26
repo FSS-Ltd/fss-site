@@ -55,6 +55,8 @@ const coreRow = {
   websitePrimaryCta: "Request a quote",
   websiteStatus: "ready",
   websiteReviewedAt: null,
+  previewStatus: "draft",
+  previewVersion: 1,
   visualBlobUrl: "https://blob.example/hero.webp",
   visualAltText: "A generated concept hero image for the plumbing business",
   visualWidth: 1200,
@@ -108,6 +110,7 @@ test("returns full detail for one prospect: business, corporate verification, co
   assert.equal(result.data.fitScore, 91);
   assert.equal(result.data.opportunitySummary, "No website, slow enquiry handling");
   assert.equal(result.data.websiteAssessment?.businessGoal, "Capture more enquiries");
+  assert.deepEqual(result.data.preview, { status: "draft", version: 1 });
   assert.equal((result.data.visualAsset?.altText.length ?? 0) > 0, true);
   assert.equal(result.data.sequence?.status, "active");
   assert.equal(result.data.evidence.length, 1);

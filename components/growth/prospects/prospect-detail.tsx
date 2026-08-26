@@ -11,6 +11,7 @@ import type { ProspectDetail as ProspectDetailData } from "@/lib/growth/dashboar
 import type { IntegrationHealth } from "@/lib/growth/dashboard/view-models";
 
 import { EvidenceList } from "./evidence-list";
+import { PreviewApproval } from "./preview-approval";
 import { ProspectActions } from "./prospect-actions";
 import styles from "./prospects.module.css";
 import { WebsiteAssessment } from "./website-assessment";
@@ -107,6 +108,15 @@ export function ProspectDetailView({
               assessment={prospect.websiteAssessment}
               prospectId={prospect.id}
             />
+            <div className="mt-6 border-t border-slate-200 pt-6">
+              <h3 className={styles.sectionTitle}>Private concept preview</h3>
+              <PreviewApproval
+                preview={prospect.preview}
+                prospectId={prospect.id}
+                prospectStatus={prospect.status}
+                prospectVersion={prospect.version}
+              />
+            </div>
           </div>
         </div>
 
