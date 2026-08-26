@@ -82,6 +82,20 @@ function createRepository(status = "ready_for_email_review") {
       status: "draft" as string,
       version: 1,
     },
+    assessment: {
+      status: "pending_review",
+      trustSignals: {
+        schemaVersion: "1.0",
+        summary: "the services page explains the work the business provides",
+        items: ["Service information"],
+      },
+      conversionPlan: {
+        schemaVersion: "1.0",
+        summary: "The enquiry route can collect the detail needed for a call-back.",
+        items: ["Problem selector", "Preferred contact time"],
+      },
+      firstPartyEvidenceUrl: "https://example.test/services",
+    },
     draft: createDraft(),
     savedSnapshots: [] as Array<Record<string, unknown>>,
     approvals: [] as Array<Record<string, unknown>>,
@@ -96,7 +110,7 @@ function createRepository(status = "ready_for_email_review") {
           return {
             prospect: state.prospect,
             preview: state.preview,
-            assessment: { status: "pending_review" },
+            assessment: state.assessment,
             draft: state.draft,
           };
         },
@@ -156,6 +170,32 @@ test("publishes a draft preview and revises only the stored first-email draft", 
   assert.equal(fake.state.sentMessages, 0);
   assert.equal(fake.state.approvals.length, 1);
   assert.equal(fake.state.audits.length, 1);
+});
+
+test("derives a historical narrative at approval without changing the original draft first", async () => {
+  const fake = createRepository();
+  delete (fake.state.draft.outputSnapshot as { emailNarrative?: unknown })
+    .emailNarrative;
+  const originalSnapshot = structuredClone(
+    fake.state.draft.outputSnapshot,
+  ) as Record<string, unknown>;
+  const approve = createProspectPreviewApprover({
+    repository: fake.repository,
+    now: () => new Date("2026-08-26T10:00:00.000Z"),
+    siteUrl: "https://faithfulsoftware.dev",
+  });
+
+  await approve({} as GrowthDb, approvalInput());
+
+  assert.equal(
+    "emailNarrative" in originalSnapshot,
+    false,
+    "the backfill path must not mutate the stored draft before approval",
+  );
+  assert.match(
+    String((fake.state.savedSnapshots[0]?.email as { text?: unknown }).text),
+    /services page explains the work/i,
+  );
 });
 
 test("rejects a terminal prospect without publishing a preview URL", async () => {

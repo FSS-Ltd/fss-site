@@ -34,6 +34,9 @@ function createTransaction(
           previewStatus: string;
           previewVersion: number;
           assessmentStatus: string;
+          trustSignals: unknown;
+          conversionPlan: unknown;
+          firstPartyEvidenceUrl: string | null;
           draftId: string;
           draftStatus: string;
           outputSnapshot: unknown;
@@ -49,6 +52,16 @@ function createTransaction(
           pp.status as "previewStatus",
           pp.version as "previewVersion",
           wa.status as "assessmentStatus",
+          wa.trust_signals as "trustSignals",
+          wa.conversion_plan as "conversionPlan",
+          (
+            select se.source_url
+            from growth.source_evidence se
+            where se.prospect_id = p.id
+              and se.source_type = 'first_party'
+            order by se.verified_at desc, se.created_at desc
+            limit 1
+          ) as "firstPartyEvidenceUrl",
           at.id as "draftId",
           at.status as "draftStatus",
           at.output_snapshot as "outputSnapshot",
@@ -88,7 +101,12 @@ function createTransaction(
           status: row.previewStatus,
           version: row.previewVersion,
         },
-        assessment: { status: row.assessmentStatus },
+        assessment: {
+          status: row.assessmentStatus,
+          trustSignals: row.trustSignals,
+          conversionPlan: row.conversionPlan,
+          firstPartyEvidenceUrl: row.firstPartyEvidenceUrl,
+        },
         draft: {
           id: row.draftId,
           prospectId: row.prospectId,

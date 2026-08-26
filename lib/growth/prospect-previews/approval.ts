@@ -12,8 +12,14 @@ import {
   type StoredFirstEmailDraft,
 } from "../sequences/first-email-draft-snapshot";
 import { postgresProspectPreviewApprovalRepository } from "./approval-repository";
-import { renderPreviewFirstEmail } from "./content";
-import { PROSPECT_PREVIEW_PUBLIC_ID_PATTERN } from "./types";
+import {
+  deriveHistoricalEmailNarrative,
+  renderPreviewFirstEmail,
+} from "./content";
+import {
+  PROSPECT_PREVIEW_PUBLIC_ID_PATTERN,
+  prospectPreviewAssessmentSectionSchema,
+} from "./types";
 
 const PROSPECT_ID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -39,6 +45,9 @@ export type LockedProspectPreviewApprovalState = {
   };
   assessment: {
     status: string;
+    trustSignals?: unknown;
+    conversionPlan?: unknown;
+    firstPartyEvidenceUrl?: string | null;
   };
   draft: StoredFirstEmailDraft;
 };
@@ -123,12 +132,42 @@ function validateRequest(input: ApproveProspectPreviewInput): void {
   }
 }
 
-function readEmailNarrative(snapshot: Record<string, unknown>): WebsiteEmailNarrative {
-  try {
-    return parseWebsiteEmailNarrative(snapshot.emailNarrative);
-  } catch {
+function readEmailNarrative(
+  snapshot: Record<string, unknown>,
+  assessment: LockedProspectPreviewApprovalState["assessment"],
+): WebsiteEmailNarrative {
+  if ("emailNarrative" in snapshot) {
+    try {
+      return parseWebsiteEmailNarrative(snapshot.emailNarrative);
+    } catch {
+      throw new ProspectPreviewApprovalError("invalid_draft");
+    }
+  }
+
+  const trustSignals = prospectPreviewAssessmentSectionSchema.safeParse(
+    assessment.trustSignals,
+  );
+  const conversionPlan = prospectPreviewAssessmentSectionSchema.safeParse(
+    assessment.conversionPlan,
+  );
+  if (
+    !trustSignals.success ||
+    !conversionPlan.success ||
+    assessment.firstPartyEvidenceUrl === undefined ||
+    assessment.firstPartyEvidenceUrl === null
+  ) {
     throw new ProspectPreviewApprovalError("invalid_draft");
   }
+
+  const narrative = deriveHistoricalEmailNarrative({
+    trustSignals: trustSignals.data,
+    conversionPlan: conversionPlan.data,
+    firstPartyEvidenceUrl: assessment.firstPartyEvidenceUrl,
+  });
+  if (narrative === null) {
+    throw new ProspectPreviewApprovalError("invalid_draft");
+  }
+  return narrative;
 }
 
 function previewUrl(siteUrl: string, publicId: string): string {
@@ -190,7 +229,10 @@ export function createProspectPreviewApprover({
         throw new ProspectPreviewApprovalError("not_publishable");
       }
 
-      const narrative = readEmailNarrative(storedDraft.snapshot);
+      const narrative = readEmailNarrative(
+        storedDraft.snapshot,
+        state.assessment,
+      );
       const email = renderPreviewFirstEmail({
         subject: storedDraft.email.subject,
         narrative,
