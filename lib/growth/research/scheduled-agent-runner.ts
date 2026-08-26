@@ -73,6 +73,7 @@ function buildAgentPrompt(
     `Read only these files: ${allowedFiles.join(", ")}.`,
     "Do not inspect AGENTS files, Nexus vault files, Codex caches or memories, Library/Application Support, browser data, Git history, or any other user files. Do not run broad filesystem searches.",
     "Use web search for permitted research. Do not use browser-control automation.",
+    "For every accepted candidate, prepare one first-party strength and two or three sourced website-journey improvements for the reviewable initial email. After founder approval, the application adds the built-example close and private preview URL; do not publish the URL or send email.",
     "Load GROWTH_OS_AGENT_HMAC_SECRET only at runtime from macOS Keychain service dev.faithfulsoftware.growth-os.agent-hmac and account growth-os-weekday-company-research. Keep it in process memory only and never print or persist it.",
     "Create any temporary bundle or helper only inside the current disposable working directory. Delete it before finishing. Never print a secret, signature, raw bundle, email address, contact name, raw URL, email copy, or assessment text.",
     "Validate the complete version 1.0 bundle against the repository contract, sign and submit the exact bytes, and retain reviewed fallback visuals when image generation is unavailable.",
