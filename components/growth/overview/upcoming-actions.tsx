@@ -1,5 +1,4 @@
 import { Clock3 } from "lucide-react";
-import Link from "next/link";
 
 import {
   formatGrowthRelativeDay,
@@ -7,6 +6,7 @@ import {
 } from "@/lib/growth/dashboard/formatters";
 import type { UpcomingAction } from "@/lib/growth/dashboard/overview";
 
+import { GrowthNavigationLink } from "../shell/navigation-link";
 import styles from "./overview.module.css";
 
 export function UpcomingActions({
@@ -25,7 +25,9 @@ export function UpcomingActions({
       </div>
 
       {actions.length === 0 ? (
-        <p className={styles.queueEmpty}>Nothing due. Check back after the next review.</p>
+        <p className={styles.queueEmpty}>
+          Nothing due. Check back after the next review.
+        </p>
       ) : (
         <ol className={styles.actionsList}>
           {actions.map((action) => (
@@ -35,9 +37,11 @@ export function UpcomingActions({
               </span>
               <div className={styles.actionBody}>
                 <p className={styles.actionTitle}>
-                  <Link href={`/growth/prospects/${action.prospectId}`}>
+                  <GrowthNavigationLink
+                    href={`/growth/prospects/${action.prospectId}`}
+                  >
                     {action.actionLabel} for {action.businessName}
-                  </Link>
+                  </GrowthNavigationLink>
                 </p>
                 <p className={styles.actionMeta}>
                   {formatGrowthStatusLabel(action.status)}

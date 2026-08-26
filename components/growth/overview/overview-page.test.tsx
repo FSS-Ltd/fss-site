@@ -1,8 +1,15 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
-import test from "node:test";
+import test, { after } from "node:test";
 
+import type Link from "next/link";
+import {
+  createElement,
+  type ComponentProps,
+  type ReactNode,
+  type Ref,
+} from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import type { OverviewViewModel } from "@/lib/growth/dashboard/overview";
@@ -19,8 +26,30 @@ require.extensions[".css"] = (module) => {
   };
 };
 
+const nextLinkModule = require("next/link") as {
+  render: (
+    props: ComponentProps<typeof Link>,
+    ref: Ref<HTMLAnchorElement>,
+  ) => ReactNode;
+};
+const originalNextLinkRender = nextLinkModule.render;
+nextLinkModule.render = ({ children, href, prefetch, ...props }, ref) =>
+  createElement(
+    "a",
+    {
+      ...props,
+      "data-prefetch": String(prefetch),
+      href: typeof href === "string" ? href : href.pathname,
+      ref,
+    },
+    children,
+  );
+
 const { OverviewPage } =
   require("./overview-page") as typeof import("./overview-page");
+after(() => {
+  nextLinkModule.render = originalNextLinkRender;
+});
 const overviewCss = readFileSync(
   new URL("./overview.module.css", import.meta.url),
   "utf8",
@@ -35,8 +64,18 @@ const healthyIntegrations: readonly IntegrationHealth[] = [
     checkedAt: NOW,
     message: "Database available",
   },
-  { provider: "gmail", status: "healthy", checkedAt: NOW, message: "Gmail connected" },
-  { provider: "cron", status: "healthy", checkedAt: NOW, message: "Automations enabled" },
+  {
+    provider: "gmail",
+    status: "healthy",
+    checkedAt: NOW,
+    message: "Gmail connected",
+  },
+  {
+    provider: "cron",
+    status: "healthy",
+    checkedAt: NOW,
+    message: "Automations enabled",
+  },
 ];
 
 const readyData: OverviewViewModel = {
@@ -156,6 +195,16 @@ test("renders the ready state with reconciled summary counts and pipeline totals
   assert.match(html, /Smith &amp; Sons Plumbing Ltd/);
 });
 
+test("does not prefetch database-backed overview destinations", () => {
+  const html = renderOverview({ status: "ready", data: readyData });
+  const growthLinks = html.match(/<a[^>]+href="\/growth[^>]*>/g) ?? [];
+
+  assert.ok(growthLinks.length > 0);
+  for (const link of growthLinks) {
+    assert.match(link, /data-prefetch="false"/);
+  }
+});
+
 test("selects the default work queue tab and shows it as the visible panel", () => {
   const html = renderOverview({ status: "ready", data: readyData });
 
@@ -183,7 +232,10 @@ test("renders an empty state when there is nothing to review", () => {
     reason: "No prospects yet. Research runs will populate your work queue.",
   });
 
-  assert.match(html, /No prospects yet\. Research runs will populate your work queue\./);
+  assert.match(
+    html,
+    /No prospects yet\. Research runs will populate your work queue\./,
+  );
   assert.doesNotMatch(html, /Work queue/);
 });
 
@@ -201,7 +253,9 @@ test("renders a safe error message with a correlation ID and no leaked detail", 
 
 test("shows an advisory when Gmail is disconnected", () => {
   const html = renderOverview({ status: "ready", data: readyData }, [
-    ...healthyIntegrations.filter((integration) => integration.provider !== "gmail"),
+    ...healthyIntegrations.filter(
+      (integration) => integration.provider !== "gmail",
+    ),
     {
       provider: "gmail",
       status: "disconnected",
@@ -215,7 +269,9 @@ test("shows an advisory when Gmail is disconnected", () => {
 
 test("shows an advisory when automations are disabled", () => {
   const html = renderOverview({ status: "ready", data: readyData }, [
-    ...healthyIntegrations.filter((integration) => integration.provider !== "cron"),
+    ...healthyIntegrations.filter(
+      (integration) => integration.provider !== "cron",
+    ),
     {
       provider: "cron",
       status: "disabled",

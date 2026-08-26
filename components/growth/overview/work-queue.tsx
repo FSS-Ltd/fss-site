@@ -1,7 +1,6 @@
 "use client";
 
 import { ArrowRight, ExternalLink } from "lucide-react";
-import Link from "next/link";
 import type { CSSProperties } from "react";
 import { useId, useState } from "react";
 
@@ -18,6 +17,7 @@ import type {
   WorkQueueTab,
 } from "@/lib/growth/dashboard/overview";
 
+import { GrowthNavigationLink } from "../shell/navigation-link";
 import styles from "./overview.module.css";
 
 type ScoreRingStyle = CSSProperties & Record<`--${string}`, string | number>;
@@ -34,8 +34,13 @@ const VIEW_ALL_HREF: Record<WorkQueueKind, string> = {
   follow_ups: "/growth/outreach",
 };
 
-function statusMeta(kind: WorkQueueKind, row: WorkQueueRow, now: string): string {
-  if (kind === "first_emails") return `Created ${formatGrowthDate(row.statusAt)}`;
+function statusMeta(
+  kind: WorkQueueKind,
+  row: WorkQueueRow,
+  now: string,
+): string {
+  if (kind === "first_emails")
+    return `Created ${formatGrowthDate(row.statusAt)}`;
   if (kind === "replies") return `Replied ${formatGrowthDate(row.statusAt)}`;
   return `Due ${formatGrowthRelativeDay(row.statusAt, now)}`;
 }
@@ -61,7 +66,11 @@ function QueueRow({
             target="_blank"
           >
             {row.websiteUrl.replace(/^https?:\/\//, "")}
-            <ExternalLink aria-hidden="true" size={11} style={{ marginLeft: 3 }} />
+            <ExternalLink
+              aria-hidden="true"
+              size={11}
+              style={{ marginLeft: 3 }}
+            />
           </a>
         )}
       </td>
@@ -87,10 +96,13 @@ function QueueRow({
         <span className={styles.queueValueUnit}>One-off</span>
       </td>
       <td>
-        <Link className={styles.rowReviewLink} href={row.reviewHref}>
+        <GrowthNavigationLink
+          className={styles.rowReviewLink}
+          href={row.reviewHref}
+        >
           Review
           <ArrowRight aria-hidden="true" size={14} strokeWidth={2} />
-        </Link>
+        </GrowthNavigationLink>
       </td>
     </>
   );
@@ -157,18 +169,24 @@ function QueuePanel({
             <span className={styles.queueValue}>
               {formatGrowthCurrency(row.potentialValuePence)}
             </span>
-            <Link className={styles.rowReviewLink} href={row.reviewHref}>
+            <GrowthNavigationLink
+              className={styles.rowReviewLink}
+              href={row.reviewHref}
+            >
               Review
-            </Link>
+            </GrowthNavigationLink>
           </li>
         ))}
       </ul>
 
       {totalCount > rows.length && (
-        <Link className={styles.viewAllLink} href={VIEW_ALL_HREF[kind]}>
+        <GrowthNavigationLink
+          className={styles.viewAllLink}
+          href={VIEW_ALL_HREF[kind]}
+        >
           View all {totalCount} {TAB_LABELS[kind].toLowerCase()}
           <ArrowRight aria-hidden="true" size={14} strokeWidth={2} />
-        </Link>
+        </GrowthNavigationLink>
       )}
     </>
   );
@@ -201,14 +219,21 @@ export function WorkQueue({
           </p>
         </div>
         {primaryReviewHref && (
-          <Link className={styles.reviewButton} href={primaryReviewHref}>
+          <GrowthNavigationLink
+            className={styles.reviewButton}
+            href={primaryReviewHref}
+          >
             Review next email
             <ArrowRight aria-hidden="true" size={15} strokeWidth={2} />
-          </Link>
+          </GrowthNavigationLink>
         )}
       </div>
 
-      <div aria-label="Work queue categories" className={styles.tabList} role="tablist">
+      <div
+        aria-label="Work queue categories"
+        className={styles.tabList}
+        role="tablist"
+      >
         {tabs.map((tab) => {
           const tabId = `${baseId}-tab-${tab.kind}`;
           const panelId = `${baseId}-panel-${tab.kind}`;
