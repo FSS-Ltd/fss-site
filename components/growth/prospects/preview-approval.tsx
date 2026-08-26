@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useState } from "react";
 
 const TERMINAL_PROSPECT_STATUSES = new Set([
@@ -133,6 +134,12 @@ export function PreviewApprovalFrame({
       >
         {pending ? "Approving preview…" : "Approve preview"}
       </button>
+      <Link
+        className="rounded-md border border-teal-700 px-3 py-2 text-sm font-semibold text-teal-800 transition hover:bg-teal-50"
+        href={`/growth/prospects/${prospectId}/preview`}
+      >
+        View concept preview
+      </Link>
       {terminal && (
         <p className="basis-full text-sm text-slate-500">
           This prospect is in a final state and cannot publish a concept.

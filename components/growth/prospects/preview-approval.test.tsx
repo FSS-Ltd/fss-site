@@ -20,6 +20,24 @@ test("offers a founder approval action for a draft preview", () => {
   assert.match(html, /private concept/);
 });
 
+test("gives the founder a private route to inspect a draft before approval", () => {
+  const html = renderToStaticMarkup(
+    <PreviewApprovalFrame
+      onSuccess={() => undefined}
+      preview={{ status: "draft", version: 1 }}
+      prospectId="11111111-1111-4111-8111-111111111111"
+      prospectVersion={3}
+      prospectStatus="ready_for_email_review"
+    />,
+  );
+
+  assert.match(
+    html,
+    /href="\/growth\/prospects\/11111111-1111-4111-8111-111111111111\/preview"/,
+  );
+  assert.match(html, />View concept preview</);
+});
+
 test("does not expose a published preview identifier in the founder UI", () => {
   const html = renderToStaticMarkup(
     <PreviewApprovalFrame

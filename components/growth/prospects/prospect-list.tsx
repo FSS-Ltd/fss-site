@@ -39,6 +39,9 @@ export function ProspectList({
             Research, qualify, and move Kent businesses into outreach.
           </p>
         </div>
+        <Link className={styles.rowLink} href="/growth/prospects/previews">
+          Review concept previews
+        </Link>
       </div>
 
       <ProspectFilters facets={data.facets} query={query} />
