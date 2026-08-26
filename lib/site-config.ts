@@ -1,4 +1,8 @@
-import { getDeploymentContext, isPreviewDeployment, resolveSiteUrl } from "@/lib/config/site-url";
+import {
+  getDeploymentContext,
+  isPreviewDeployment,
+  resolveSiteUrl,
+} from "@/lib/config/site-url";
 
 const siteUrl = resolveSiteUrl();
 const previewDeployment = isPreviewDeployment();
@@ -13,7 +17,7 @@ export const siteConfig = {
   deploymentContext: getDeploymentContext(),
   isPreviewDeployment: previewDeployment,
   allowSearchIndexing: !previewDeployment,
-  supportEmail: "hello@faithfulsoftwaresolutions.co.uk",
+  supportEmail: "hello@faithfulsoftware.dev",
   social: {
     linkedin: "https://www.linkedin.com/company/faithful-software-solutions",
   },

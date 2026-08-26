@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { AutomationControls } from "@/components/growth/settings/automation-controls";
 import { IntegrationHealth } from "@/components/growth/settings/integration-health";
 import styles from "@/components/growth/settings/settings.module.css";
@@ -10,7 +12,9 @@ export default async function SettingsPage() {
     return (
       <div className={styles.errorState} role="alert">
         <p>{result.message}</p>
-        <p className={styles.errorCorrelation}>Reference: {result.correlationId}</p>
+        <p className={styles.errorCorrelation}>
+          Reference: {result.correlationId}
+        </p>
       </div>
     );
   }
@@ -25,6 +29,10 @@ export default async function SettingsPage() {
 
       <IntegrationHealth data={result.data} />
       <AutomationControls automation={result.data.automation} />
+      <p className={styles.privacyNote}>
+        Review how Growth OS handles business contact and Gmail data in the{" "}
+        <Link href="/privacy">privacy notice</Link>.
+      </p>
     </div>
   );
 }

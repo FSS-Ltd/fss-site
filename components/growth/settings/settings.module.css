@@ -225,3 +225,16 @@
 .note strong {
   color: #07182e;
 }
+
+.privacyNote {
+  margin: 0;
+  color: #607089;
+  font-size: 0.82rem;
+}
+
+.privacyNote a {
+  color: #087f88;
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

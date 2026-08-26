@@ -1,4 +1,4 @@
-import { GoogleAnalytics } from "@/components/seo/google-analytics";
+import { AnalyticsConsentController } from "@/components/seo/analytics-consent";
 
 export function AnalyticsLoader() {
   const measurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
@@ -7,5 +7,5 @@ export function AnalyticsLoader() {
     return null;
   }
 
-  return <GoogleAnalytics measurementId={measurementId} strategy="lazyOnload" />;
+  return <AnalyticsConsentController measurementId={measurementId} />;
 }

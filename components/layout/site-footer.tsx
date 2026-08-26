@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { CookieSettingsButton } from "@/components/layout/cookie-settings-button";
+
 const sitemapLinks = [
   { label: "Services", href: "/services" },
   { label: "Work", href: "/#work" },
@@ -154,9 +156,32 @@ export function SiteFooter() {
             paddingTop: "26px",
           }}
         >
-          <span style={{ fontSize: "13px", color: "#8aa0b8" }}>
-            © 2026 Faithful Software Solutions Ltd. All rights reserved.
-          </span>
+          <div
+            aria-label="Privacy controls"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "16px",
+              flexWrap: "wrap",
+            }}
+          >
+            <span style={{ fontSize: "13px", color: "#8aa0b8" }}>
+              © 2026 Faithful Software Solutions Ltd. All rights reserved.
+            </span>
+            <Link
+              href="/privacy"
+              style={{
+                color: "#8aa0b8",
+                fontSize: "13px",
+                textDecoration: "underline",
+                textDecorationColor: "rgba(138,160,184,.45)",
+                textUnderlineOffset: "3px",
+              }}
+            >
+              Privacy
+            </Link>
+            <CookieSettingsButton />
+          </div>
           <span
             style={{
               fontFamily: "'Geist Mono','JetBrains Mono',monospace",
