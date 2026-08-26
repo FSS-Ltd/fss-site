@@ -519,27 +519,21 @@ export async function getOverviewViewModel(
   const runAt = now();
 
   try {
-    const [
-      summaryCounts,
-      followUpsDueToday,
-      lastRunDate,
-      firstEmails,
-      replies,
-      followUps,
-      pipelineStatusCounts,
-      upcomingActions,
-      sequenceHealth,
-    ] = await Promise.all([
+    const [summaryCounts, followUpsDueToday, lastRunDate] = await Promise.all([
       fetchSummaryCounts(db),
       fetchFollowUpsDueToday(db, runAt),
       fetchLastResearchRunDate(db),
+    ]);
+    const [firstEmails, replies, followUps] = await Promise.all([
       fetchFirstEmailsTab(db, runAt),
       fetchRepliesTab(db, runAt),
       fetchFollowUpsTab(db, runAt),
+    ]);
+    const [pipelineStatusCounts, upcomingActions] = await Promise.all([
       fetchPipelineStatusCounts(db),
       fetchUpcomingActions(db),
-      fetchSequenceHealth(db),
     ]);
+    const sequenceHealth = await fetchSequenceHealth(db);
 
     const workQueue = [firstEmails, replies, followUps];
     const pipeline = buildPipelineOverview(pipelineStatusCounts);
