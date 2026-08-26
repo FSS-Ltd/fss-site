@@ -101,6 +101,34 @@ test("exchanges an authorization code using a form-encoded POST", async () => {
   });
 });
 
+test("accepts Google's canonical email scope in token responses", async () => {
+  const canonicalEmailScope = "https://www.googleapis.com/auth/userinfo.email";
+  const fetchImpl = async () =>
+    Response.json({
+      access_token: "access-token",
+      expires_in: 3600,
+      refresh_token: "refresh-token",
+      scope: [
+        "openid",
+        canonicalEmailScope,
+        "https://www.googleapis.com/auth/gmail.modify",
+      ].join(" "),
+      token_type: "Bearer",
+    });
+
+  const tokens = await exchangeGoogleAuthorizationCode(
+    config,
+    "authorization-code",
+    fetchImpl,
+  );
+
+  assert.deepEqual(tokens.grantedScopes, [
+    "openid",
+    canonicalEmailScope,
+    "https://www.googleapis.com/auth/gmail.modify",
+  ]);
+});
+
 test("rejects token responses without every required scope", async () => {
   const fetchImpl = async () =>
     Response.json({

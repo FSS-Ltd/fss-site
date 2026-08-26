@@ -16,6 +16,8 @@ require.extensions[".css"] = (module) => {
 
 const { IntegrationHealth } =
   require("./integration-health") as typeof import("./integration-health");
+const { GmailOAuthNotice } =
+  require("./gmail-oauth-notice") as typeof import("./gmail-oauth-notice");
 const { AutomationControlsFrame } =
   require("./automation-controls") as typeof import("./automation-controls");
 
@@ -54,18 +56,38 @@ function baseData(overrides: Partial<SettingsData> = {}): SettingsData {
   };
 }
 
+test("GmailOAuthNotice shows safe callback feedback and ignores unknown values", () => {
+  const connected = renderToStaticMarkup(
+    <GmailOAuthNotice status="connected" />,
+  );
+  const failed = renderToStaticMarkup(
+    <GmailOAuthNotice status="provider_error" />,
+  );
+  const unknown = renderToStaticMarkup(
+    <GmailOAuthNotice status="provider-secret-detail" />,
+  );
+
+  assert.match(connected, /Gmail connected successfully/);
+  assert.match(connected, /role="status"/);
+  assert.match(failed, /Google did not return the access Growth OS requires/);
+  assert.match(failed, /role="alert"/);
+  assert.equal(unknown, "");
+});
+
 test("IntegrationHealth shows Gmail setup guidance and no scope chips or actions when not configured", () => {
   const html = renderToStaticMarkup(
-    <IntegrationHealth data={baseData({
-      gmail: {
-        configured: false,
-        status: "disconnected",
-        accountIdentity: null,
-        grantedScopes: [],
-        lastSuccessAt: null,
-        lastErrorCode: null,
-      },
-    })} />,
+    <IntegrationHealth
+      data={baseData({
+        gmail: {
+          configured: false,
+          status: "disconnected",
+          accountIdentity: null,
+          grantedScopes: [],
+          lastSuccessAt: null,
+          lastErrorCode: null,
+        },
+      })}
+    />,
   );
   assert.match(html, /GOOGLE_GMAIL_CLIENT_ID/);
   assert.doesNotMatch(html, /Connect Gmail/);

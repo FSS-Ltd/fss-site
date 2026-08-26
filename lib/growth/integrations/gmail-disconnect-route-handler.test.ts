@@ -66,7 +66,7 @@ test("disconnects Gmail for the authorised founder and redirects with success", 
   assert.equal(response.status, 303);
   assert.equal(
     response.headers.get("location"),
-    `${routeOrigin}/growth?gmail=disconnected`,
+    `${routeOrigin}/growth/settings?gmail=disconnected`,
   );
   assert.equal(response.headers.get("cache-control"), "no-store");
   assert.deepEqual(receivedInput, {
@@ -93,7 +93,7 @@ test("reports an unconfirmed provider revocation after the local disconnect", as
   assert.equal(response.status, 303);
   assert.equal(
     response.headers.get("location"),
-    `${routeOrigin}/growth?gmail=revocation_unconfirmed`,
+    `${routeOrigin}/growth/settings?gmail=revocation_unconfirmed`,
   );
 });
 
@@ -195,7 +195,7 @@ test("reports an unexpected disconnect failure by correlation only", async () =>
   assert.equal(response.status, 303);
   assert.equal(
     response.headers.get("location"),
-    `${routeOrigin}/growth?gmail=unexpected_error`,
+    `${routeOrigin}/growth/settings?gmail=unexpected_error`,
   );
   assert.deepEqual(reports, [
     { correlationId: "disconnect-correlation", error: failure },

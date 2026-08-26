@@ -16,7 +16,7 @@ export const GMAIL_OAUTH_CALLBACK_PATH =
   "/api/integrations/gmail/callback" as const;
 
 const GMAIL_OAUTH_STATE_MAX_AGE_SECONDS = 10 * 60;
-const GROWTH_HOME_PATH = "/growth";
+const GROWTH_HOME_PATH = "/growth/settings";
 const GROWTH_LOGIN_PATH = "/growth/login";
 
 export type GmailOAuthRouteConfig = {
