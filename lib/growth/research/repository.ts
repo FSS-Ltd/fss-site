@@ -1,6 +1,7 @@
 import { appendAuditEvent } from "../audit/service";
 import { withGrowthTransaction } from "../db/client";
 import type { GrowthTransaction } from "../db/types";
+import { insertDraftProspectPreviewWithRetry } from "../prospect-previews/ingestion-repository";
 import { insertCandidateDetails } from "./candidate-details";
 import type {
   ResearchIngestionRepository,
@@ -284,6 +285,10 @@ function createPostgresTransaction(
 
     insertCandidateDetails(input) {
       return insertCandidateDetails(tx, input);
+    },
+
+    insertDraftPreview(input) {
+      return insertDraftProspectPreviewWithRetry(tx, input);
     },
 
     async appendProspectAuditEvent({ externalRunId, prospectId, fitScore }) {

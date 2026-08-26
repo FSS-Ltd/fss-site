@@ -1,4 +1,5 @@
 import type { GrowthDb } from "../db/types";
+import type { StoredProspectPreviewSnapshot } from "../prospect-previews/types";
 import type {
   ResearchProspectCandidate,
   ResearchRunIngestion,
@@ -40,6 +41,11 @@ export type CompleteRunCounts = {
   rejected: number;
 };
 
+export type InsertDraftPreviewInput = {
+  prospectId: string;
+  content: StoredProspectPreviewSnapshot;
+};
+
 export type InsertCandidateDetailsInput = {
   runId: string;
   candidateIndex: number;
@@ -67,6 +73,7 @@ export interface ResearchIngestionTransaction {
     candidate: ResearchProspectCandidate;
   }): Promise<InsertedResearchCandidate>;
   insertCandidateDetails(input: InsertCandidateDetailsInput): Promise<void>;
+  insertDraftPreview(input: InsertDraftPreviewInput): Promise<void>;
   appendProspectAuditEvent(input: {
     externalRunId: string;
     prospectId: string;
