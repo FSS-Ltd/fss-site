@@ -84,6 +84,18 @@ export type FirstEmailCandidate = {
   conceptDisclaimer: string;
 };
 
+export type WebsiteEmailNarrative = {
+  openingStrength: {
+    text: string;
+    evidenceSourceUrl: string;
+    kind: "first_party_review" | "first_party_service" | "first_party_work";
+  };
+  improvements: Array<{
+    text: string;
+    evidenceSourceUrl: string;
+  }>;
+};
+
 export type EmailVisualCandidate = {
   assetId: null;
   fallbackAssetKey: string;
@@ -114,6 +126,7 @@ export type ResearchProspectCandidate = {
   evidence: EvidenceCandidate[];
   assessment: WebsiteAssessmentCandidate;
   firstEmail: FirstEmailCandidate;
+  emailNarrative: WebsiteEmailNarrative;
   visual: EmailVisualCandidate;
 };
 

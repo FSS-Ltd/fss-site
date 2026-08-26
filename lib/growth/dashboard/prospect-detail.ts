@@ -42,6 +42,11 @@ export type ProspectDetailWebsiteAssessment = {
   reviewedAt: string | null;
 };
 
+export type ProspectDetailPreview = {
+  status: string;
+  version: number;
+};
+
 export type ProspectDetailVisualAsset = {
   blobUrl: string;
   altText: string;
@@ -92,6 +97,7 @@ export type ProspectDetail = {
   business: ProspectDetailBusiness;
   contact: ProspectDetailContact | null;
   websiteAssessment: ProspectDetailWebsiteAssessment | null;
+  preview: ProspectDetailPreview | null;
   visualAsset: ProspectDetailVisualAsset | null;
   sequence: ProspectDetailSequence | null;
   evidence: readonly ProspectEvidenceItem[];
@@ -139,6 +145,8 @@ type CoreRow = {
   websitePrimaryCta: string | null;
   websiteStatus: string | null;
   websiteReviewedAt: Date | null;
+  previewStatus: string | null;
+  previewVersion: number | null;
   visualBlobUrl: string | null;
   visualAltText: string | null;
   visualWidth: number | null;
@@ -194,6 +202,8 @@ async function fetchCoreRow(
       wa.primary_cta as "websitePrimaryCta",
       wa.status as "websiteStatus",
       wa.reviewed_at as "websiteReviewedAt",
+      pp.status as "previewStatus",
+      pp.version as "previewVersion",
       ea.blob_url as "visualBlobUrl",
       ea.alt_text as "visualAltText",
       ea.width as "visualWidth",
@@ -210,6 +220,7 @@ async function fetchCoreRow(
     inner join growth.businesses b on b.id = p.business_id
     left join growth.contacts c on c.id = p.primary_contact_id
     left join growth.website_assessments wa on wa.prospect_id = p.id
+    left join growth.prospect_previews pp on pp.prospect_id = p.id
     left join lateral (
       select id, blob_url, alt_text, width, height, review_status, created_at
       from growth.email_assets
@@ -331,6 +342,11 @@ function toProspectDetail(
         }
       : null;
 
+  const preview: ProspectDetailPreview | null =
+    core.previewStatus && core.previewVersion !== null
+      ? { status: core.previewStatus, version: core.previewVersion }
+      : null;
+
   const sequence: ProspectDetailSequence | null =
     core.sequenceId && core.sequenceStatus && core.sequenceCurrentStep !== null
       ? {
@@ -371,6 +387,7 @@ function toProspectDetail(
     },
     contact,
     websiteAssessment,
+    preview,
     visualAsset,
     sequence,
     evidence,

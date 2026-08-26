@@ -1,4 +1,5 @@
 import type { GrowthDb } from "../db/types";
+import { createDraftPreviewSnapshot } from "../prospect-previews/content";
 import {
   EMAIL_ASSET_FALLBACKS,
   type EmailAssetFallbackKey,
@@ -107,6 +108,10 @@ export function createResearchRunIngester(
           visual,
           externalRunId: input.externalRunId,
           promptVersion: input.promptVersion,
+        });
+        await transaction.insertDraftPreview({
+          prospectId: inserted.prospectId,
+          content: createDraftPreviewSnapshot(candidate),
         });
         await transaction.appendProspectAuditEvent({
           externalRunId: input.externalRunId,

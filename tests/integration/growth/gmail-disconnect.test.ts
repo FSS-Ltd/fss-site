@@ -271,6 +271,7 @@ test(
           and subject_email = ${subjectEmail}
       `;
       if (prospectId) {
+        await sql`delete from growth.prospect_previews where prospect_id = ${prospectId}`;
         await sql`delete from growth.prospects where id = ${prospectId}`;
       }
       if (contactId) {

@@ -95,7 +95,11 @@ authorise sending email.
 6. For each accepted candidate, prepare the complete structured website
    assessment, FSS offer recommendation, 140 to 220 word first email, matching
    safe HTML and plain text, direct opt-out sentence, and conceptual visual
-   brief.
+   brief. Include `emailNarrative` with one factual first-party strength and
+   two or three sourced website-journey observations. A published review is
+   permitted only when it is published on the business's own site. Google Maps
+   content is never a narrative source. The application adds the preview link
+   only after individual founder approval.
 7. The visual must not fabricate staff, premises, testimonials, reviews,
    credentials, results, or an existing product. The ingestion bundle always
    uses `assetId: null` and an approved fallback key. This guarantees that a
@@ -244,3 +248,15 @@ Stop and report without submission when schema validation fails, the secret is
 missing, the application clock differs by more than five minutes, the endpoint
 is not the operator-approved environment, or evidence cannot support a safe
 candidate. Never send an email from this task.
+
+## Prospect Preview Controls
+
+Research ingestion creates a private draft preview from an accepted candidate's
+structured assessment. The scheduled researcher must not create preview source
+files, publish a preview, add a preview URL to email copy, create a provider
+draft, or send an email.
+
+The historical-preview backfill is a separate founder-operated command. It may
+run only after the preview migration and application release are approved. It
+creates draft records only; individual founder approval remains required to
+publish a route and update an email review draft.

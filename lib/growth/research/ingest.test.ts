@@ -15,6 +15,7 @@ import type {
   ResearchRunIngestion,
   ResearchRunIngestionResult,
 } from "./types";
+import type { StoredProspectPreviewSnapshot } from "../prospect-previews/types";
 
 const RUN_ID = "11111111-1111-4111-8111-111111111111";
 const BUSINESS_ID = "22222222-2222-4222-8222-222222222222";
@@ -32,6 +33,10 @@ type FakeState = {
   run: ResearchRunRecord | null;
   acceptedProspects: Array<{ candidateIndex: number; prospectId: string }>;
   visualAltTexts: string[];
+  createdDraftPreviews: Array<{
+    prospectId: string;
+    content: StoredProspectPreviewSnapshot;
+  }>;
 };
 
 function cloneState(state: FakeState): FakeState {
@@ -40,6 +45,10 @@ function cloneState(state: FakeState): FakeState {
     run: state.run === null ? null : { ...state.run },
     acceptedProspects: [...state.acceptedProspects],
     visualAltTexts: [...state.visualAltTexts],
+    createdDraftPreviews: state.createdDraftPreviews.map((preview) => ({
+      ...preview,
+      content: structuredClone(preview.content),
+    })),
   };
 }
 
@@ -52,6 +61,7 @@ function createFakeRepository(options: FakeOptions = {}): {
     run: null,
     acceptedProspects: [],
     visualAltTexts: [],
+    createdDraftPreviews: [],
   };
 
   const repository: ResearchIngestionRepository = {
@@ -106,6 +116,13 @@ function createFakeRepository(options: FakeOptions = {}): {
           });
           pending.visualAltTexts.push(input.visual.altText);
         },
+        async insertDraftPreview(input) {
+          pending.events.push("insert-preview");
+          pending.createdDraftPreviews.push({
+            prospectId: input.prospectId,
+            content: input.content,
+          });
+        },
         async appendProspectAuditEvent() {
           pending.events.push("audit-prospect");
         },
@@ -138,6 +155,7 @@ function createFakeRepository(options: FakeOptions = {}): {
       state.run = pending.run;
       state.acceptedProspects = pending.acceptedProspects;
       state.visualAltTexts = pending.visualAltTexts;
+      state.createdDraftPreviews = pending.createdDraftPreviews;
       return result;
     },
   };
@@ -186,6 +204,7 @@ test("ingests a complete candidate and draft in one transaction", async () => {
     "insert-evidence",
     "insert-assessment",
     "insert-task-draft",
+    "insert-preview",
     "audit-prospect",
     "complete-run",
     "audit-run",
@@ -193,6 +212,34 @@ test("ingests a complete candidate and draft in one transaction", async () => {
   ]);
   assert.deepEqual(state.visualAltTexts, [
     "Concept illustration of a home, service calendar and connected digital enquiry workflow.",
+  ]);
+  assert.deepEqual(state.createdDraftPreviews, [
+    {
+      prospectId: PROSPECT_ID,
+      content: {
+        schemaVersion: "1.0",
+        businessName: "Example Services",
+        sector: "Home services",
+        locality: "Maidstone",
+        businessGoal: "Turn qualified website visits into useful enquiries.",
+        primaryCta: "Request a call-back",
+        homepageSections: {
+          schemaVersion: "1.0",
+          summary: "Lead with problem and service.",
+          items: ["Evidence-backed recommendation"],
+        },
+        conversionPlan: {
+          schemaVersion: "1.0",
+          summary: "Capture job context before calls.",
+          items: ["Evidence-backed recommendation"],
+        },
+        trustSignals: {
+          schemaVersion: "1.0",
+          summary: "Present verifiable credentials.",
+          items: ["Evidence-backed recommendation"],
+        },
+      },
+    },
   ]);
 });
 

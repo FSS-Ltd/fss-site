@@ -222,6 +222,12 @@ test(
         assert.equal(singleNameSummary?.contactName, "Grace");
 
         await transaction`
+          delete from growth.prospect_previews
+          where prospect_id in (
+            select id from growth.prospects where business_id = ${business.id}
+          )
+        `;
+        await transaction`
           delete from growth.prospects where business_id = ${business.id}
         `;
         await transaction`

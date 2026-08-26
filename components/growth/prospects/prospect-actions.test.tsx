@@ -62,6 +62,7 @@ function baseProspect(overrides: Partial<ProspectDetail> = {}): ProspectDetail {
       lawfulBasis: "legitimate_interests",
     },
     websiteAssessment: null,
+    preview: null,
     visualAsset: {
       blobUrl: "https://blob.example/hero.webp",
       altText: "A generated concept hero image for the plumbing business",

@@ -87,6 +87,7 @@ export async function insertCandidateDetails(
   const outputSnapshot = {
     schemaVersion: "1.0",
     email: candidate.firstEmail,
+    emailNarrative: candidate.emailNarrative,
     visual,
   };
   await tx`

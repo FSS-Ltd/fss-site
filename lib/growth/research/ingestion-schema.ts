@@ -17,6 +17,7 @@ import {
   type RejectedResearchCandidate,
   type ResearchProspectCandidate,
   type ResearchRunIngestion,
+  type WebsiteEmailNarrative,
   type WebsiteAssessmentCandidate,
 } from "./types";
 
@@ -300,6 +301,39 @@ const firstEmailCandidateSchema: z.ZodType<FirstEmailCandidate> = z
     }
   });
 
+const websiteEmailNarrativeSchema: z.ZodType<WebsiteEmailNarrative> = z
+  .object({
+    openingStrength: z
+      .object({
+        text: requiredText("Opening strength", 1_000),
+        evidenceSourceUrl: webUrl,
+        kind: z.enum([
+          "first_party_review",
+          "first_party_service",
+          "first_party_work",
+        ]),
+      })
+      .strict(),
+    improvements: z
+      .array(
+        z
+          .object({
+            text: requiredText("Website improvement", 1_000),
+            evidenceSourceUrl: webUrl,
+          })
+          .strict(),
+      )
+      .min(2)
+      .max(3),
+  })
+  .strict();
+
+export function parseWebsiteEmailNarrative(
+  value: unknown,
+): WebsiteEmailNarrative {
+  return websiteEmailNarrativeSchema.parse(value);
+}
+
 export function parseFirstEmailCandidate(value: unknown): FirstEmailCandidate {
   return firstEmailCandidateSchema.parse(value);
 }
@@ -331,6 +365,7 @@ const researchProspectCandidateSchema: z.ZodType<ResearchProspectCandidate> = z
     evidence: z.array(evidenceCandidateSchema).min(1).max(25),
     assessment: websiteAssessmentCandidateSchema,
     firstEmail: firstEmailCandidateSchema,
+    emailNarrative: websiteEmailNarrativeSchema,
     visual: emailVisualCandidateSchema,
   })
   .strict()
@@ -471,6 +506,33 @@ const researchProspectCandidateSchema: z.ZodType<ResearchProspectCandidate> = z
           path: ["evidence", index, "sourceUrl"],
           message:
             "First-party evidence host must match the verified business host.",
+        });
+      }
+    }
+
+    const narrativeEvidence = [
+      candidate.emailNarrative.openingStrength,
+      ...candidate.emailNarrative.improvements,
+    ];
+
+    for (const [index, observation] of narrativeEvidence.entries()) {
+      const matchingEvidence = candidate.evidence.find(
+        (evidence) => evidence.sourceUrl === observation.evidenceSourceUrl,
+      );
+      if (matchingEvidence?.sourceType !== "first_party") {
+        context.addIssue({
+          code: "custom",
+          path:
+            index === 0
+              ? ["emailNarrative", "openingStrength", "evidenceSourceUrl"]
+              : [
+                  "emailNarrative",
+                  "improvements",
+                  index - 1,
+                  "evidenceSourceUrl",
+                ],
+          message:
+            "Initial-email narrative observations must use recorded first-party evidence.",
         });
       }
     }
