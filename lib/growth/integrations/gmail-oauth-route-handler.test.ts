@@ -149,7 +149,7 @@ test("rejects a mismatched or duplicated callback state before connecting", asyn
       assert.equal(connected, false);
       assert.equal(
         response.headers.get("location"),
-        "https://example.test/growth?gmail=state_error",
+        "https://example.test/growth/settings?gmail=state_error",
       );
       assert.match(
         response.headers.get("set-cookie") ?? "",
@@ -181,7 +181,7 @@ test("returns a safe callback error for a Google denial", async () => {
   assert.equal(connected, false);
   assert.equal(
     response.headers.get("location"),
-    "https://example.test/growth?gmail=provider_error",
+    "https://example.test/growth/settings?gmail=provider_error",
   );
   assert.doesNotMatch(response.headers.get("location") ?? "", /private-detail/);
 });
@@ -207,7 +207,7 @@ test("rejects a missing or duplicated authorization code", async (t) => {
       assert.equal(connected, false);
       assert.equal(
         response.headers.get("location"),
-        "https://example.test/growth?gmail=callback_error",
+        "https://example.test/growth/settings?gmail=callback_error",
       );
     });
   }
@@ -241,7 +241,7 @@ test("connects a valid callback with the founder and server-only config", async 
   });
   assert.equal(
     response.headers.get("location"),
-    "https://example.test/growth?gmail=connected",
+    "https://example.test/growth/settings?gmail=connected",
   );
   assert.match(response.headers.get("set-cookie") ?? "", /Expires=/);
 });
@@ -285,7 +285,7 @@ test("maps connection policy failures without exposing provider details", async 
 
       assert.equal(
         response.headers.get("location"),
-        `https://example.test/growth?gmail=${scenario.status}`,
+        `https://example.test/growth/settings?gmail=${scenario.status}`,
       );
       assert.doesNotMatch(
         response.headers.get("location") ?? "",
@@ -347,7 +347,7 @@ test("reports unexpected callback failures by opaque correlation only", async ()
 
   assert.equal(
     response.headers.get("location"),
-    "https://example.test/growth?gmail=unexpected_error",
+    "https://example.test/growth/settings?gmail=unexpected_error",
   );
   assert.deepEqual(reports, [
     { correlationId: "gmail-correlation-id", error: failure },

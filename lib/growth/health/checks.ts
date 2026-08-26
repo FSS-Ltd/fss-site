@@ -10,6 +10,7 @@ export type HealthCheckInput = {
   gmailConnected: boolean;
   resendConfigured: boolean;
   blobConfigured: boolean;
+  codexConfigured: boolean;
   cronLastSyncedAt: Date | null;
   cronStaleAfterMinutes: number;
   codexLastRunAt: Date | null;
@@ -26,6 +27,7 @@ export type DependencyReadiness = {
   gmail: ProviderConfigStatus;
   resend: ProviderConfigStatus;
   blob: ProviderConfigStatus;
+  codex: ProviderConfigStatus;
   migrations: MigrationStatus;
   reasons: readonly string[];
 };
@@ -69,11 +71,13 @@ export function buildHealthReport(input: HealthCheckInput): GrowthReleaseHealth 
   if (!input.gmailConfigured) dependencyReasons.push("gmail_not_configured");
   if (!input.resendConfigured) dependencyReasons.push("resend_not_configured");
   if (!input.blobConfigured) dependencyReasons.push("blob_not_configured");
+  if (!input.codexConfigured) dependencyReasons.push("codex_not_configured");
   const dependencies: DependencyReadiness = {
     status: dependencyReasons.length === 0 ? "ready" : "attention",
     gmail: input.gmailConfigured ? "configured" : "not_configured",
     resend: input.resendConfigured ? "configured" : "not_configured",
     blob: input.blobConfigured ? "configured" : "not_configured",
+    codex: input.codexConfigured ? "configured" : "not_configured",
     migrations: input.migrationStatus,
     reasons: dependencyReasons,
   };
@@ -100,19 +104,19 @@ export function buildHealthReport(input: HealthCheckInput): GrowthReleaseHealth 
     }
 
     automationStatus = automationReasons.length === 0 ? "enabled" : "blocked";
+  }
 
-    // A stale external Codex research run is informational, not blocking:
-    // it runs outside Vercel on its own schedule (see Global Constraints
-    // in the release plan) and this app has no control over its cadence.
-    if (
-      isStale(
-        input.codexLastRunAt,
-        input.now,
-        input.codexStaleAfterHours * 60 * 60 * 1000,
-      )
-    ) {
-      automationReasons.push("codex_stale");
-    }
+  // The external research task is independent of the Vercel provider-cron
+  // flag. Its freshness remains visible without changing provider-cron status.
+  if (
+    input.codexConfigured &&
+    isStale(
+      input.codexLastRunAt,
+      input.now,
+      input.codexStaleAfterHours * 60 * 60 * 1000,
+    )
+  ) {
+    automationReasons.push("codex_stale");
   }
 
   return {

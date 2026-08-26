@@ -1,11 +1,19 @@
 import Link from "next/link";
 
 import { AutomationControls } from "@/components/growth/settings/automation-controls";
+import { GmailOAuthNotice } from "@/components/growth/settings/gmail-oauth-notice";
 import { IntegrationHealth } from "@/components/growth/settings/integration-health";
 import styles from "@/components/growth/settings/settings.module.css";
 import { getSettings } from "@/lib/growth/dashboard/settings";
 
-export default async function SettingsPage() {
+type SettingsPageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function SettingsPage({
+  searchParams,
+}: SettingsPageProps) {
+  const params = await searchParams;
   const result = await getSettings();
 
   if (result.status === "error") {
@@ -26,6 +34,8 @@ export default async function SettingsPage() {
           <h1 className={styles.heading}>Settings</h1>
         </div>
       </div>
+
+      <GmailOAuthNotice status={params.gmail} />
 
       <IntegrationHealth data={result.data} />
       <AutomationControls automation={result.data.automation} />

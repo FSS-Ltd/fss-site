@@ -13,6 +13,7 @@ function baseInput(): HealthCheckInput {
     gmailConnected: true,
     resendConfigured: true,
     blobConfigured: true,
+    codexConfigured: true,
     cronLastSyncedAt: new Date("2026-08-22T11:55:00.000Z"),
     cronStaleAfterMinutes: 30,
     codexLastRunAt: new Date("2026-08-21T09:00:00.000Z"),
@@ -62,6 +63,13 @@ test("reports dependencies as attention when Vercel Blob is missing", () => {
   assert.ok(report.dependencies.reasons.includes("blob_not_configured"));
 });
 
+test("reports dependencies as attention when signed research ingestion is not configured", () => {
+  const report = buildHealthReport({ ...baseInput(), codexConfigured: false });
+  assert.equal(report.dependencies.status, "attention");
+  assert.equal(report.dependencies.codex, "not_configured");
+  assert.ok(report.dependencies.reasons.includes("codex_not_configured"));
+});
+
 test("reports automation as disabled when the automations flag is off, independent of application health", () => {
   const report = buildHealthReport(baseInput());
   assert.equal(report.application.status, "healthy");
@@ -85,6 +93,16 @@ test("notes a stale Codex research run without blocking automation readiness", (
     codexLastRunAt: new Date("2026-08-10T00:00:00.000Z"),
   });
   assert.equal(report.automation.status, "enabled");
+  assert.ok(report.automation.reasons.includes("codex_stale"));
+});
+
+test("notes a stale external research run even while provider crons are disabled", () => {
+  const report = buildHealthReport({
+    ...baseInput(),
+    automationsEnabled: false,
+    codexLastRunAt: null,
+  });
+  assert.equal(report.automation.status, "disabled");
   assert.ok(report.automation.reasons.includes("codex_stale"));
 });
 

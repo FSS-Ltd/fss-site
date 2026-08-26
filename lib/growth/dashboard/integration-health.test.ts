@@ -23,6 +23,7 @@ test("builds a fixed five-provider summary from safe connection rows", () => {
   const result = buildIntegrationHealthSummary({
     automationsEnabled: false,
     checkedAt,
+    codexConfigured: true,
     connections: rows,
     databaseAvailable: true,
   });
@@ -34,7 +35,7 @@ test("builds a fixed five-provider summary from safe connection rows", () => {
       { provider: "database", status: "healthy" },
       { provider: "gmail", status: "healthy" },
       { provider: "resend", status: "attention" },
-      { provider: "codex", status: "disabled" },
+      { provider: "codex", status: "healthy" },
       { provider: "cron", status: "disabled" },
     ],
   );
@@ -44,6 +45,7 @@ test("reports a safe degraded summary when the database is unavailable", () => {
   const result = buildIntegrationHealthSummary({
     automationsEnabled: true,
     checkedAt,
+    codexConfigured: false,
     connections: [],
     databaseAvailable: false,
   });
@@ -71,7 +73,7 @@ test("reports a safe degraded summary when the database is unavailable", () => {
       provider: "codex",
       status: "disabled",
       checkedAt: checkedAt.toISOString(),
-      message: "Codex not configured",
+      message: "Signed research ingestion not configured",
     },
     {
       provider: "cron",
@@ -81,4 +83,21 @@ test("reports a safe degraded summary when the database is unavailable", () => {
     },
   ]);
   assert.doesNotMatch(JSON.stringify(result), /password|postgres|exception/i);
+});
+
+test("reports signed research ingestion as configured without implying the external task is active", () => {
+  const result = buildIntegrationHealthSummary({
+    automationsEnabled: false,
+    checkedAt,
+    codexConfigured: true,
+    connections: [],
+    databaseAvailable: true,
+  });
+
+  assert.deepEqual(result.find(({ provider }) => provider === "codex"), {
+    provider: "codex",
+    status: "healthy",
+    checkedAt: checkedAt.toISOString(),
+    message: "Signed research ingestion configured",
+  });
 });

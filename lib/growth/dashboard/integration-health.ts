@@ -14,6 +14,7 @@ import type {
 type IntegrationSummaryInput = {
   automationsEnabled: boolean;
   checkedAt: Date;
+  codexConfigured: boolean;
   connections: readonly IntegrationConnectionHealth[];
   databaseAvailable: boolean;
 };
@@ -66,6 +67,7 @@ function health(
 export function buildIntegrationHealthSummary({
   automationsEnabled,
   checkedAt,
+  codexConfigured,
   connections,
   databaseAvailable,
 }: IntegrationSummaryInput): readonly IntegrationHealth[] {
@@ -87,7 +89,14 @@ export function buildIntegrationHealthSummary({
       databaseAvailable ? "Database available" : "Database needs attention",
     ),
     ...providerHealth,
-    health("codex", "disabled", checkedAt, "Codex not configured"),
+    health(
+      "codex",
+      codexConfigured ? "healthy" : "disabled",
+      checkedAt,
+      codexConfigured
+        ? "Signed research ingestion configured"
+        : "Signed research ingestion not configured",
+    ),
     health(
       "cron",
       automationsEnabled ? "healthy" : "disabled",
@@ -101,7 +110,8 @@ export async function getIntegrationHealthSummary(): Promise<
   readonly IntegrationHealth[]
 > {
   const checkedAt = new Date();
-  const { automationsEnabled, ownerEmail } = readGrowthServerEnv();
+  const { agentHmacSecret, automationsEnabled, ownerEmail } =
+    readGrowthServerEnv();
   let connections: readonly IntegrationConnectionHealth[] = [];
   let databaseAvailable = true;
 
@@ -117,6 +127,7 @@ export async function getIntegrationHealthSummary(): Promise<
   return buildIntegrationHealthSummary({
     automationsEnabled,
     checkedAt,
+    codexConfigured: Boolean(agentHmacSecret),
     connections,
     databaseAvailable,
   });

@@ -18,6 +18,22 @@
   font-weight: 750;
 }
 
+.oauthNotice {
+  margin: 0;
+  border: 1px solid #b8ddd9;
+  border-radius: 10px;
+  background: #e9f7f5;
+  padding: 12px 16px;
+  color: #087f88;
+  font-size: 0.86rem;
+}
+
+.oauthNotice[data-tone="error"] {
+  border-color: #f3c6c1;
+  background: #fdf4f3;
+  color: #8a2a20;
+}
+
 .subtitle {
   margin: 4px 0 0;
   color: #607089;

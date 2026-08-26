@@ -7,7 +7,7 @@ import {
 import { createApiErrorResponse } from "../http/api-error";
 import type { DisconnectGmailInput, disconnectGmail } from "./gmail-disconnect";
 
-const GROWTH_HOME_PATH = "/growth";
+const GROWTH_HOME_PATH = "/growth/settings";
 const GROWTH_LOGIN_PATH = "/growth/login";
 
 type DisconnectResult = Awaited<ReturnType<typeof disconnectGmail>>;

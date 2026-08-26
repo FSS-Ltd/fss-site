@@ -66,15 +66,17 @@ async function getGrowthReleaseHealth(): Promise<GrowthReleaseHealth> {
     const db = getGrowthDb();
     const [connections, researchRuns] = await Promise.all([
       listIntegrationConnectionHealth(db, env.ownerEmail),
-      db<Array<{ startedAt: Date | null }>>`
-        select max(started_at) as "startedAt" from growth.research_runs
+      db<Array<{ completedAt: Date | null }>>`
+        select max(completed_at) as "completedAt"
+        from growth.research_runs
+        where status = 'completed'
       `,
     ]);
 
     const gmail = connections.find((c) => c.provider === "gmail");
     gmailConnected = gmail?.status === "connected" || gmail?.status === "degraded";
     cronLastSyncedAt = gmail?.lastSyncedAt ?? null;
-    codexLastRunAt = researchRuns[0]?.startedAt ?? null;
+    codexLastRunAt = researchRuns[0]?.completedAt ?? null;
   } catch {
     databaseAvailable = false;
   }
@@ -95,6 +97,7 @@ async function getGrowthReleaseHealth(): Promise<GrowthReleaseHealth> {
       env.resendApiKey && env.resendFromEmail && env.resendReplyToEmail,
     ),
     blobConfigured: Boolean(process.env.BLOB_READ_WRITE_TOKEN),
+    codexConfigured: Boolean(env.agentHmacSecret),
     cronLastSyncedAt,
     cronStaleAfterMinutes: CRON_STALE_AFTER_MINUTES,
     codexLastRunAt,
