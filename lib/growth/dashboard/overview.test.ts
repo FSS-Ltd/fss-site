@@ -308,6 +308,38 @@ test("getOverviewViewModel returns a ready state with reconciled counts", async 
   }
 });
 
+test("getOverviewViewModel caps concurrent database reads", async () => {
+  const routes = baseRoutes();
+  let activeQueries = 0;
+  let maximumActiveQueries = 0;
+
+  const db = (async (strings: TemplateStringsArray) => {
+    const text = strings.join("?").replace(/\s+/g, " ").trim();
+    const route = routes.find(({ match }) => match.test(text));
+    if (!route) {
+      throw new Error(`No fake route matched query: ${text}`);
+    }
+
+    activeQueries += 1;
+    maximumActiveQueries = Math.max(maximumActiveQueries, activeQueries);
+    await new Promise<void>((resolve) => setImmediate(resolve));
+    activeQueries -= 1;
+
+    return route.rows;
+  }) as unknown as GrowthQueryExecutor;
+
+  const state = await getOverviewViewModel(
+    db,
+    () => new Date("2026-08-16T08:00:00.000Z"),
+  );
+
+  assert.equal(state.status, "ready");
+  assert.ok(
+    maximumActiveQueries <= 3,
+    `expected at most 3 concurrent database reads, observed ${maximumActiveQueries}`,
+  );
+});
+
 test("getOverviewViewModel keeps a bounded totalCount separate from capped rows", async () => {
   const cappedRows = Array.from({ length: 6 }, (_, index) =>
     buildFollowUpRow({
