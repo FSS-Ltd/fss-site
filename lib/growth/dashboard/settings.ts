@@ -14,29 +14,88 @@ const CRON_LABELS: Record<string, string> = {
 };
 
 const EVERY_N_MINUTES_PATTERN = /^\*\/(\d+) \* \* \* \*$/;
+const FIXED_DAILY_TIMES_PATTERN =
+  /^(\d{1,2}) (\d{1,2}(?:,\d{1,2})+) \* \* \*$/;
+const NINETY_MINUTE_SCHEDULES = [
+  "0 0,3,6,9,12,15,18,21 * * *",
+  "30 1,4,7,10,13,16,19,22 * * *",
+] as const;
 
-/** Only supports the "every N minutes" schedules this project actually uses
- * in vercel.json. Returns null for any schedule shape it can't compute. */
+/** Supports the recurring UTC schedule shapes used by this project. */
 export function computeNextCronRun(schedule: string, now: Date): Date | null {
-  const match = EVERY_N_MINUTES_PATTERN.exec(schedule);
-  if (!match) return null;
+  const intervalMatch = EVERY_N_MINUTES_PATTERN.exec(schedule);
+  if (intervalMatch) {
+    const intervalMinutes = Number(intervalMatch[1]);
+    if (!Number.isInteger(intervalMinutes) || intervalMinutes <= 0) return null;
 
-  const intervalMinutes = Number(match[1]);
-  if (!Number.isInteger(intervalMinutes) || intervalMinutes <= 0) return null;
+    const next = new Date(now);
+    next.setSeconds(0, 0);
+    const currentMinutes = next.getMinutes();
+    const minutesToAdd = intervalMinutes - (currentMinutes % intervalMinutes);
+    next.setMinutes(currentMinutes + minutesToAdd);
+    return next;
+  }
 
-  const next = new Date(now);
-  next.setSeconds(0, 0);
-  const currentMinutes = next.getMinutes();
-  const minutesToAdd = intervalMinutes - (currentMinutes % intervalMinutes);
-  next.setMinutes(currentMinutes + minutesToAdd);
-  return next;
+  const fixedTimesMatch = FIXED_DAILY_TIMES_PATTERN.exec(schedule);
+  if (!fixedTimesMatch) return null;
+
+  const minute = Number(fixedTimesMatch[1]);
+  const hours = fixedTimesMatch[2]
+    .split(",")
+    .map(Number)
+    .sort((left, right) => left - right);
+  if (
+    minute < 0 ||
+    minute > 59 ||
+    hours.some((hour) => hour < 0 || hour > 23)
+  ) {
+    return null;
+  }
+
+  for (let dayOffset = 0; dayOffset <= 1; dayOffset += 1) {
+    for (const hour of hours) {
+      const candidate = new Date(
+        Date.UTC(
+          now.getUTCFullYear(),
+          now.getUTCMonth(),
+          now.getUTCDate() + dayOffset,
+          hour,
+          minute,
+        ),
+      );
+      if (candidate > now) return candidate;
+    }
+  }
+
+  return null;
 }
 
-function describeSchedule(schedule: string): string {
+function describeSchedules(schedules: readonly string[]): string {
+  if (
+    schedules.length === NINETY_MINUTE_SCHEDULES.length &&
+    NINETY_MINUTE_SCHEDULES.every((schedule) => schedules.includes(schedule))
+  ) {
+    return "Every 90 minutes";
+  }
+
+  if (schedules.length !== 1) return schedules.join("; ");
+
+  const schedule = schedules[0];
   const match = EVERY_N_MINUTES_PATTERN.exec(schedule);
   if (!match) return schedule;
   const minutes = match[1];
   return minutes === "1" ? "Every minute" : `Every ${minutes} minutes`;
+}
+
+function getNextCronRun(
+  schedules: readonly string[],
+  now: Date,
+): Date | null {
+  const candidates = schedules
+    .map((schedule) => computeNextCronRun(schedule, now))
+    .filter((candidate): candidate is Date => candidate !== null)
+    .sort((left, right) => left.getTime() - right.getTime());
+  return candidates[0] ?? null;
 }
 
 export type GmailConnectionStatus =
@@ -114,14 +173,23 @@ export type BuildSettingsViewInput = {
  * connection string, provider error message, or recipient data — only the
  * already-safe fields callers pass in. */
 export function buildSettingsView(input: BuildSettingsViewInput): SettingsData {
-  const crons: CronJobSummary[] = cronConfig.crons.map((job) => ({
-    path: job.path,
-    label: CRON_LABELS[job.path] ?? job.path,
-    scheduleDescription: describeSchedule(job.schedule),
-    nextRunAt: input.automationsEnabled
-      ? (computeNextCronRun(job.schedule, input.now)?.toISOString() ?? null)
-      : null,
-  }));
+  const schedulesByPath = new Map<string, string[]>();
+  for (const job of cronConfig.crons) {
+    const schedules = schedulesByPath.get(job.path) ?? [];
+    schedules.push(job.schedule);
+    schedulesByPath.set(job.path, schedules);
+  }
+
+  const crons: CronJobSummary[] = Array.from(schedulesByPath).map(
+    ([path, schedules]) => ({
+      path,
+      label: CRON_LABELS[path] ?? path,
+      scheduleDescription: describeSchedules(schedules),
+      nextRunAt: input.automationsEnabled
+        ? (getNextCronRun(schedules, input.now)?.toISOString() ?? null)
+        : null,
+    }),
+  );
 
   const gmailConnected =
     input.gmailConnection !== null &&
