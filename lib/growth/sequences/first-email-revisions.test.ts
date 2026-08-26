@@ -3,6 +3,7 @@ import test from "node:test";
 
 import type { GrowthDb } from "../db/types";
 import type { FounderSession } from "../auth/require-founder";
+import { parseStoredFirstEmailDraft } from "./first-email-draft-snapshot";
 import {
   createFirstEmailDraftReviser,
   FirstEmailRevisionError,
@@ -140,6 +141,41 @@ test("stores a founder revision while preserving the agent draft and visual", as
       draftTaskId: revisionInput().draftTaskId,
     },
   ]);
+});
+
+test("parses a system revision created by prospect preview approval", () => {
+  const originalEmail = email();
+  const systemEmail = email("Preview concept email");
+  const draft = storedDraft({
+    outputSnapshot: {
+      ...(storedDraft().outputSnapshot as Record<string, unknown>),
+      email: systemEmail,
+      reviewState: "draft",
+      draftVersion: 2,
+      emailRevisions: [
+        {
+          version: 1,
+          source: "agent",
+          editorActorId: "weekday-agent-v1",
+          editedAt: "2026-08-17T06:00:00.000Z",
+          email: originalEmail,
+        },
+        {
+          version: 2,
+          source: "system",
+          editorActorId: "prospect-preview-approval",
+          editedAt: "2026-08-17T12:00:00.000Z",
+          email: systemEmail,
+        },
+      ],
+    },
+  });
+
+  const parsed = parseStoredFirstEmailDraft(draft);
+
+  assert.equal(parsed.version, 2);
+  assert.equal(parsed.revisions[1]?.source, "system");
+  assert.equal(parsed.email.subject, "Preview concept email");
 });
 
 test("appends later revisions without losing either earlier version", async () => {

@@ -50,6 +50,15 @@ const revisionRecordSchema = z.discriminatedUnion("source", [
   z
     .object({
       version: z.number().int().positive(),
+      source: z.literal("system"),
+      editorActorId: exactText(1, 200),
+      editedAt: z.iso.datetime({ offset: true }),
+      email: z.unknown(),
+    })
+    .strict(),
+  z
+    .object({
+      version: z.number().int().positive(),
       source: z.literal("founder"),
       editorActorId: z.string().regex(FOUNDER_ACTOR_ID_PATTERN),
       editedAt: z.iso.datetime({ offset: true }),
@@ -74,7 +83,7 @@ const storedOutputSnapshotSchema = z
 
 export type RevisionRecord = {
   version: number;
-  source: "agent" | "founder";
+  source: "agent" | "founder" | "system";
   editorActorId: string;
   editedAt: string;
   email: FirstEmailCandidate;

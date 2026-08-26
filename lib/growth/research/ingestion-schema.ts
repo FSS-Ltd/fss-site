@@ -328,6 +328,12 @@ const websiteEmailNarrativeSchema: z.ZodType<WebsiteEmailNarrative> = z
   })
   .strict();
 
+export function parseWebsiteEmailNarrative(
+  value: unknown,
+): WebsiteEmailNarrative {
+  return websiteEmailNarrativeSchema.parse(value);
+}
+
 export function parseFirstEmailCandidate(value: unknown): FirstEmailCandidate {
   return firstEmailCandidateSchema.parse(value);
 }
