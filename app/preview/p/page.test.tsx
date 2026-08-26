@@ -6,15 +6,13 @@ import { renderToStaticMarkup } from "react-dom/server";
 import {
   dynamic,
   generateMetadata,
-  renderProductionProspectPreviewPage,
 } from "./[publicId]/page";
+import { renderProductionProspectPreviewPage } from "@/components/prospect-previews/production-prospect-preview-page";
 
 const PUBLIC_ID = "Q2VhN4A7x6Y0-5s8V3d1K9PqRcFhZ9Xm";
 
 test("marks published opaque preview pages as dynamic and noindex", async () => {
-  const metadata = await generateMetadata({
-    params: Promise.resolve({ publicId: PUBLIC_ID }),
-  });
+  const metadata = await generateMetadata();
 
   assert.equal(dynamic, "force-dynamic");
   assert.deepEqual(metadata.robots, { index: false, follow: false });
