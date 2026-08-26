@@ -1,6 +1,6 @@
 # FSS Growth OS Planning Pack
 
-Status: Ready for founder review in pull request
+Status: Production core verified; provider automations remain founder-gated
 Owner: Jean-Fidele Ntagengwa
 Planning date: 16 August 2026
 Runtime source of truth: Supabase PostgreSQL
@@ -8,9 +8,7 @@ Application host: Vercel Pro
 
 ## Purpose
 
-This folder is the handoff package for building FSS Growth OS. It records the approved product decisions, system boundaries, data model, email rules, screen direction, and step-by-step implementation sequence.
-
-No production Growth OS code is included in this planning pull request.
+This folder is the implementation and operating handoff for FSS Growth OS. It records the approved product decisions, system boundaries, data model, email rules, screen direction, step-by-step implementation sequence, and release audit.
 
 ## Fixed Decisions
 
@@ -41,6 +39,7 @@ No production Growth OS code is included in this planning pull request.
 - [Founder dashboard](../superpowers/plans/2026-08-16-fss-growth-os-05-dashboard.md)
 - [Pipeline, deals, clients, and delivery](../superpowers/plans/2026-08-16-fss-growth-os-06-pipeline-delivery.md)
 - [Vercel migration, operations, and release](../superpowers/plans/2026-08-16-fss-growth-os-07-release.md)
+- [Production implementation and FSS standards audit](audit-2026-08-26.md)
 
 ## Approved Mockups
 

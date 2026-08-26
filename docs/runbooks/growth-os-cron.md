@@ -31,9 +31,9 @@ setting the environment variable.
 
 | Path | Schedule | Frequency | What it does |
 | --- | --- | --- | --- |
-| `/api/cron/gmail-sync` | `*/10 * * * *` | Every 10 minutes | Syncs Gmail replies into `growth.email_messages`, stops sequences on inbound reply. |
-| `/api/cron/outreach-dispatch` | `*/5 * * * *` | Every 5 minutes | Runs Gmail sync, then claims and sends due outreach messages one batch at a time. |
-| `/api/cron/resend-dispatch` | `*/5 * * * *` | Every 5 minutes | Claims and sends due newsletter issue sends through Resend. |
+| `/api/cron/gmail-sync` | `0 0,3,6,9,12,15,18,21 * * *` and `30 1,4,7,10,13,16,19,22 * * *` | Every 90 minutes | Syncs Gmail replies into `growth.email_messages`, stops sequences on inbound reply. |
+| `/api/cron/outreach-dispatch` | `0 0,3,6,9,12,15,18,21 * * *` and `30 1,4,7,10,13,16,19,22 * * *` | Every 90 minutes | Runs Gmail sync, then claims and sends due outreach messages one batch at a time. |
+| `/api/cron/resend-dispatch` | `0 0,3,6,9,12,15,18,21 * * *` and `30 1,4,7,10,13,16,19,22 * * *` | Every 90 minutes | Claims and sends due newsletter issue sends through Resend. |
 | `/api/cron/maintenance` | `17 3 * * *` | Once daily, 03:17 UTC | Builds and logs a redacted integration health report (Gmail, Resend, database, automation state). No off-peak scheduling reason beyond avoiding the top of the hour. |
 
 None of these are attached to a page route — each is its own

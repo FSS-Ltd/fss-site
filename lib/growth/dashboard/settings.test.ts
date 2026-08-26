@@ -41,6 +41,23 @@ test("computeNextCronRun returns null for a schedule shape it does not support",
   assert.equal(computeNextCronRun("0 9 * * 1-5", now), null);
 });
 
+test("computeNextCronRun resolves fixed UTC minute and hour lists", () => {
+  assert.equal(
+    computeNextCronRun(
+      "30 1,4,7,10,13,16,19,22 * * *",
+      new Date("2026-08-21T10:03:00.000Z"),
+    )?.toISOString(),
+    "2026-08-21T10:30:00.000Z",
+  );
+  assert.equal(
+    computeNextCronRun(
+      "0 0,3,6,9,12,15,18,21 * * *",
+      new Date("2026-08-21T22:31:00.000Z"),
+    )?.toISOString(),
+    "2026-08-22T00:00:00.000Z",
+  );
+});
+
 test("buildSettingsView reports Gmail as disconnected with no account identity when never connected", () => {
   const data = buildSettingsView(baseInput());
   assert.deepEqual(data.gmail, {
@@ -157,6 +174,27 @@ test("buildSettingsView lists all four cron jobs with a label when automations a
   for (const cron of data.automation.crons) {
     assert.ok(cron.label.length > 0);
   }
+});
+
+test("buildSettingsView groups each 90-minute schedule pair into one operational job", () => {
+  const data = buildSettingsView(baseInput());
+  const operationalCrons = data.automation.crons.filter(
+    (cron) => cron.path !== "/api/cron/maintenance",
+  );
+
+  assert.equal(new Set(operationalCrons.map((cron) => cron.path)).size, 3);
+  assert.deepEqual(
+    operationalCrons.map((cron) => cron.scheduleDescription),
+    ["Every 90 minutes", "Every 90 minutes", "Every 90 minutes"],
+  );
+  assert.deepEqual(
+    operationalCrons.map((cron) => cron.nextRunAt),
+    [
+      "2026-08-21T10:30:00.000Z",
+      "2026-08-21T10:30:00.000Z",
+      "2026-08-21T10:30:00.000Z",
+    ],
+  );
 });
 
 test("buildSettingsView computes a next run for the minute-interval crons but not the daily maintenance cron", () => {
