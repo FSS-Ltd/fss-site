@@ -114,6 +114,23 @@ export function createValidResearchRunFixture() {
           optOutSentence,
           conceptDisclaimer,
         },
+        emailNarrative: {
+          openingStrength: {
+            text: "The services page gives visitors a direct explanation of the work the business provides.",
+            evidenceSourceUrl: "https://example.test/services",
+            kind: "first_party_service" as const,
+          },
+          improvements: [
+            {
+              text: "The current general form could ask for the details needed before a call-back.",
+              evidenceSourceUrl: "https://example.test/services",
+            },
+            {
+              text: "The service journey could give visitors a clearer route to the next step.",
+              evidenceSourceUrl: "https://example.test/services",
+            },
+          ],
+        },
         visual: {
           assetId: null,
           fallbackAssetKey: "home-property",

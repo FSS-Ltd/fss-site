@@ -14,6 +14,37 @@ test("accepts one complete versioned research bundle", () => {
   assert.equal(parsed.prospects[0]?.prospect.fitScore, 91);
 });
 
+test("requires a source-backed initial-email narrative", () => {
+  const fixture = createValidFixture();
+  const candidate = { ...fixture.prospects[0] };
+  Reflect.deleteProperty(candidate, "emailNarrative");
+
+  assert.throws(
+    () =>
+      parseResearchRunIngestion({
+        ...fixture,
+        prospects: [candidate],
+      }),
+    /emailNarrative/i,
+  );
+});
+
+test("rejects an initial-email narrative sourced from non-first-party evidence", () => {
+  const fixture = createValidFixture();
+  const candidate = structuredClone(fixture.prospects[0]!);
+  candidate.emailNarrative.openingStrength.evidenceSourceUrl =
+    candidate.evidence[0]!.sourceUrl;
+
+  assert.throws(
+    () =>
+      parseResearchRunIngestion({
+        ...fixture,
+        prospects: [candidate],
+      }),
+    /first-party evidence/i,
+  );
+});
+
 test("accepts escaped HTML-sensitive email standards", () => {
   const fixture = createValidFixture();
   const candidate = fixture.prospects[0];

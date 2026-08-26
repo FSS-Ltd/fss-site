@@ -43,6 +43,12 @@ For each accepted candidate, produce:
   performance budget;
 - a factual first email of 140 to 220 words with matching safe HTML and plain
   text, one direct opt-out sentence, and a concept disclaimer in both versions;
+- a separate `emailNarrative` with one factual first-party strength and two or
+  three sourced website-journey improvements. Use a published review only when
+  it appears on the business's own site. Otherwise use a specific service or
+  work-quality observation. Every narrative source must be recorded first-party
+  evidence. Never use Google Maps content. The application adds the preview
+  URL and final concept paragraph only after founder preview approval;
 - one non-deceptive conceptual visual brief with useful alt text.
 
 The visual must not fabricate staff, premises, testimonials, reviews,

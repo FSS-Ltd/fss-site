@@ -166,6 +166,23 @@
         "optOutSentence": "If this is not relevant, reply opt out and I will send no further emails.",
         "conceptDisclaimer": "This is a proposed design concept, not an existing Harbour Heating system or a claim about current results."
       },
+      "emailNarrative": {
+        "openingStrength": {
+          "text": "The services page gives visitors a clear explanation of the work Harbour Heating provides.",
+          "evidenceSourceUrl": "https://harbour-heating.test/services",
+          "kind": "first_party_service"
+        },
+        "improvements": [
+          {
+            "text": "The general contact path could ask for service type, postcode, and urgency before a call-back.",
+            "evidenceSourceUrl": "https://harbour-heating.test/services"
+          },
+          {
+            "text": "The service journey could give visitors a clearer next step for each type of enquiry.",
+            "evidenceSourceUrl": "https://harbour-heating.test/services"
+          }
+        ]
+      },
       "visual": {
         "assetId": null,
         "fallbackAssetKey": "home-property",
