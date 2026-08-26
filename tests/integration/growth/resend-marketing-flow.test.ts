@@ -33,7 +33,7 @@ import {
   upsertSuppressedStatus,
 } from "../../../lib/growth/newsletter/subscribers-repository";
 import type { StoppedSequence } from "../../../lib/growth/sequences/stop";
-import { createUnsubscribeRouteHandler } from "../../../app/api/newsletter/unsubscribe/route";
+import { createUnsubscribeRouteHandler } from "../../../app/api/newsletter/unsubscribe/handler";
 import { renderEmail } from "../../../emails/render-email";
 import { SiteEnquiryThankYou } from "../../../emails/site-enquiry-thank-you";
 
@@ -47,13 +47,18 @@ const FOUNDER: FounderSession = {
   email: "j.ntagengwa@faithfulsoftware.dev",
   actorId: "e2e-founder-actor",
 };
-const WEBHOOK_SECRET = Buffer.from("resend-marketing-flow-webhook-secret").toString("base64");
+const WEBHOOK_SECRET = Buffer.from(
+  "resend-marketing-flow-webhook-secret",
+).toString("base64");
 
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-function fakeResend(): { gateway: Pick<ResendGateway, "send">; sent: Parameters<ResendGateway["send"]>[0][] } {
+function fakeResend(): {
+  gateway: Pick<ResendGateway, "send">;
+  sent: Parameters<ResendGateway["send"]>[0][];
+} {
   const sent: Parameters<ResendGateway["send"]>[0][] = [];
   return {
     sent,
@@ -130,7 +135,11 @@ test(
       const [leadRowCount] = await sql<{ count: string }[]>`
         select count(*)::text as count from growth.inbound_leads where submission_id = ${leadA.submissionId}
       `;
-      assert.equal(leadRowCount.count, "1", "a replayed submission does not duplicate the lead row");
+      assert.equal(
+        leadRowCount.count,
+        "1",
+        "a replayed submission does not duplicate the lead row",
+      );
 
       const [subscriberA] = await sql<{ status: string }[]>`
         select status from growth.newsletter_subscribers
@@ -143,7 +152,10 @@ test(
       // send in lib/server/lead-submission.ts is outside this transaction). ---
       const requestedEmail = await renderEmail({
         templateKey: "site-enquiry-thank-you",
-        element: SiteEnquiryThankYou({ firstName: leadA.firstName, businessName: leadA.businessName }),
+        element: SiteEnquiryThankYou({
+          firstName: leadA.firstName,
+          businessName: leadA.businessName,
+        }),
       });
       assert.match(requestedEmail.html, /We received your request/);
       assert.match(requestedEmail.html, new RegExp(leadA.businessName));
@@ -152,7 +164,10 @@ test(
 
       // --- Step 2: seed a newsletter_issues row directly (no authoring
       // service exists yet; see task-10-context.md). ---
-      issueAId = await insertDraftIssue(sql, { issueKey: issueKeyA, status: "ready_for_review" });
+      issueAId = await insertDraftIssue(sql, {
+        issueKey: issueKeyA,
+        status: "ready_for_review",
+      });
 
       // --- Step 3: founder test send goes to the founder only, subscriber
       // state untouched. ---
@@ -179,7 +194,11 @@ test(
         select status from growth.newsletter_subscribers
         where normalised_email = ${leadA.workEmail.toLowerCase()}
       `;
-      assert.equal(subscriberAfterTest.status, "subscribed", "the founder test never touches subscriber state");
+      assert.equal(
+        subscriberAfterTest.status,
+        "subscribed",
+        "the founder test never touches subscriber state",
+      );
 
       // --- Step 4: approve then schedule. scheduledFor must be in the
       // future at schedule time; the dispatcher is later run with `now`
@@ -195,7 +214,9 @@ test(
 
       const scheduledFor = new Date(Date.now() + 5_000);
       scheduleCorrelationId = randomUUID();
-      const scheduleIssue = createIssueScheduler({ repository: issueRepository });
+      const scheduleIssue = createIssueScheduler({
+        repository: issueRepository,
+      });
       await scheduleIssue(sql, {
         issueId: issueAId,
         expectedVersion: approved.version,
@@ -217,15 +238,31 @@ test(
         now: () => new Date(scheduledFor.getTime() + 1_000),
       });
       const dispatchSummary = await dispatchDueNewsletters(sql);
-      assert.ok(dispatchSummary.seededIssues >= 1, "at least this test's due issue was seeded");
-      assert.ok(dispatchSummary.sent >= 1, "at least this test's send went out");
+      assert.ok(
+        dispatchSummary.seededIssues >= 1,
+        "at least this test's due issue was seeded",
+      );
+      assert.ok(
+        dispatchSummary.sent >= 1,
+        "at least this test's send went out",
+      );
 
-      const sentToLeadA = dispatchResend.sent.find((message) => message.to === leadA.workEmail.toLowerCase());
+      const sentToLeadA = dispatchResend.sent.find(
+        (message) => message.to === leadA.workEmail.toLowerCase(),
+      );
       assert.ok(sentToLeadA, "the subscriber received the newsletter send");
-      assert.doesNotMatch(sentToLeadA!.html, new RegExp(escapeRegExp(UNSUBSCRIBE_URL_PLACEHOLDER)));
-      assert.match(sentToLeadA!.html, new RegExp(`${SITE_ORIGIN}/api/newsletter/unsubscribe\\?token=`));
+      assert.doesNotMatch(
+        sentToLeadA!.html,
+        new RegExp(escapeRegExp(UNSUBSCRIBE_URL_PLACEHOLDER)),
+      );
+      assert.match(
+        sentToLeadA!.html,
+        new RegExp(`${SITE_ORIGIN}/api/newsletter/unsubscribe\\?token=`),
+      );
 
-      const [sendRow] = await sql<{ providerMessageId: string; status: string }[]>`
+      const [sendRow] = await sql<
+        { providerMessageId: string; status: string }[]
+      >`
         select s.provider_message_id as "providerMessageId", s.status
         from growth.newsletter_sends s
         inner join growth.newsletter_subscribers sub on sub.id = s.subscriber_id
@@ -239,10 +276,18 @@ test(
       const bouncePayload = JSON.stringify({
         type: "email.bounced",
         created_at: bounceTimestamp.toISOString(),
-        data: { email_id: providerMessageId, to: leadA.workEmail, bounce: { type: "Permanent" } },
+        data: {
+          email_id: providerMessageId,
+          to: leadA.workEmail,
+          bounce: { type: "Permanent" },
+        },
       });
       bounceMsgId = `msg_${randomUUID()}`;
-      const bounceSignature = new Webhook(WEBHOOK_SECRET).sign(bounceMsgId, bounceTimestamp, bouncePayload);
+      const bounceSignature = new Webhook(WEBHOOK_SECRET).sign(
+        bounceMsgId,
+        bounceTimestamp,
+        bouncePayload,
+      );
       const bounceHeaders = {
         "svix-id": bounceMsgId,
         "svix-timestamp": String(Math.floor(bounceTimestamp.getTime() / 1000)),
@@ -251,26 +296,37 @@ test(
 
       const subscribersRepo = createNewsletterSubscriberRepository(sql);
       const stopSequenceStub = async (): Promise<StoppedSequence> => {
-        throw new Error("no sequence enrollment is expected for this recipient");
+        throw new Error(
+          "no sequence enrollment is expected for this recipient",
+        );
       };
       const webhookDeps: ResendWebhookDependencies = {
         repository: createPostgresResendWebhookRepository(sql),
         suppression: {
           findSubscriberStatusByEmail: async (normalisedEmail) => {
-            const record = await subscribersRepo.findSubscriberByEmail(normalisedEmail);
+            const record =
+              await subscribersRepo.findSubscriberByEmail(normalisedEmail);
             return record ? { status: record.status } : null;
           },
           upsertSuppressedStatus: (normalisedEmail, status, at) =>
             upsertSuppressedStatus(sql, normalisedEmail, status, at),
         },
         cancelQueuedSendsForEmail: (normalisedEmail, errorCode) =>
-          postgresNewsletterDispatchRepository.cancelQueuedSendsForEmail(sql, normalisedEmail, errorCode),
+          postgresNewsletterDispatchRepository.cancelQueuedSendsForEmail(
+            sql,
+            normalisedEmail,
+            errorCode,
+          ),
         stopSequence: stopSequenceStub,
         appendAuditEvent: (input) => appendAuditEvent(sql, input),
       };
 
       const bounceResult = await handleResendWebhook(
-        { rawBody: bouncePayload, headers: bounceHeaders, secret: WEBHOOK_SECRET },
+        {
+          rawBody: bouncePayload,
+          headers: bounceHeaders,
+          secret: WEBHOOK_SECRET,
+        },
         webhookDeps,
       );
       assert.deepEqual(bounceResult, { status: "applied", duplicate: false });
@@ -309,7 +365,11 @@ test(
         inner join growth.newsletter_subscribers sub on sub.id = s.subscriber_id
         where sub.normalised_email = ${leadA.workEmail.toLowerCase()} and s.newsletter_issue_id = ${issueBId}
       `;
-      assert.equal(blockedSendCount.count, "0", "the bounced recipient was never seeded a send for the new issue");
+      assert.equal(
+        blockedSendCount.count,
+        "0",
+        "the bounced recipient was never seeded a send for the new issue",
+      );
 
       // --- Step 7: unsubscribe via the real route handler and a real
       // signed token, for a still-subscribed recipient. ---
@@ -319,13 +379,18 @@ test(
       `;
       assert.equal(subscriberB.status, "subscribed");
 
-      const unsubscribeToken = signUnsubscribeToken(leadB.workEmail, UNSUBSCRIBE_TOKEN_SECRET);
+      const unsubscribeToken = signUnsubscribeToken(
+        leadB.workEmail,
+        UNSUBSCRIBE_TOKEN_SECRET,
+      );
       const unsubscribeHandler = createUnsubscribeRouteHandler({
         tokenSecret: UNSUBSCRIBE_TOKEN_SECRET,
         subscribers: subscribersRepo,
       });
       const unsubscribeResponse = await unsubscribeHandler(
-        new Request(`${SITE_ORIGIN}/api/newsletter/unsubscribe?token=${unsubscribeToken}`),
+        new Request(
+          `${SITE_ORIGIN}/api/newsletter/unsubscribe?token=${unsubscribeToken}`,
+        ),
       );
       assert.equal(unsubscribeResponse.status, 200);
 
@@ -337,7 +402,11 @@ test(
       // --- Step 8: replaying the same signed bounce event is a no-op: no
       // duplicate suppression row, no duplicate delivery event. ---
       const replayResult = await handleResendWebhook(
-        { rawBody: bouncePayload, headers: bounceHeaders, secret: WEBHOOK_SECRET },
+        {
+          rawBody: bouncePayload,
+          headers: bounceHeaders,
+          secret: WEBHOOK_SECRET,
+        },
         webhookDeps,
       );
       assert.deepEqual(replayResult, { status: "applied", duplicate: true });
@@ -345,15 +414,26 @@ test(
       const [suppressionCountAfterReplay] = await sql<{ count: string }[]>`
         select count(*)::text as count from growth.suppressions where normalised_email = ${leadA.workEmail.toLowerCase()}
       `;
-      assert.equal(suppressionCountAfterReplay.count, "1", "replaying the bounce does not duplicate the suppression");
+      assert.equal(
+        suppressionCountAfterReplay.count,
+        "1",
+        "replaying the bounce does not duplicate the suppression",
+      );
 
       const [deliveryEventCount] = await sql<{ count: string }[]>`
         select count(*)::text as count from growth.resend_delivery_events where provider_event_id = ${bounceMsgId}
       `;
-      assert.equal(deliveryEventCount.count, "1", "replaying the bounce does not duplicate the delivery event");
+      assert.equal(
+        deliveryEventCount.count,
+        "1",
+        "replaying the bounce does not duplicate the delivery event",
+      );
     } finally {
       try {
-        const emails = [leadA.workEmail.toLowerCase(), leadB.workEmail.toLowerCase()];
+        const emails = [
+          leadA.workEmail.toLowerCase(),
+          leadB.workEmail.toLowerCase(),
+        ];
         // resend_delivery_events.newsletter_send_id references
         // newsletter_sends(id) ON DELETE RESTRICT, so it must be cleared first.
         await sql`delete from growth.resend_delivery_events where recipient_normalised_email = ${emails[0]}`;

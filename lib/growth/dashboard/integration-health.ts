@@ -17,6 +17,7 @@ type IntegrationSummaryInput = {
   codexConfigured: boolean;
   connections: readonly IntegrationConnectionHealth[];
   databaseAvailable: boolean;
+  resendConfigured: boolean;
 };
 
 const connectionStatusMap: Record<
@@ -38,7 +39,7 @@ const connectionMessages: Record<IntegrationStatus, string> = {
 };
 
 function connectionHealth(
-  provider: "gmail" | "resend",
+  provider: "gmail",
   connections: readonly IntegrationConnectionHealth[],
   checkedAt: Date,
 ): IntegrationHealth {
@@ -51,7 +52,7 @@ function connectionHealth(
     provider,
     status,
     checkedAt: (connection?.lastSyncedAt ?? checkedAt).toISOString(),
-    message: `${provider === "gmail" ? "Gmail" : "Resend"} ${connectionMessages[status].toLowerCase()}`,
+    message: `Gmail ${connectionMessages[status].toLowerCase()}`,
   };
 }
 
@@ -70,16 +71,17 @@ export function buildIntegrationHealthSummary({
   codexConfigured,
   connections,
   databaseAvailable,
+  resendConfigured,
 }: IntegrationSummaryInput): readonly IntegrationHealth[] {
-  const providerHealth = databaseAvailable
-    ? [
-        connectionHealth("gmail", connections, checkedAt),
-        connectionHealth("resend", connections, checkedAt),
-      ]
-    : [
-        health("gmail", "attention", checkedAt, "Gmail status unavailable"),
-        health("resend", "attention", checkedAt, "Resend status unavailable"),
-      ];
+  const gmailHealth = databaseAvailable
+    ? connectionHealth("gmail", connections, checkedAt)
+    : health("gmail", "attention", checkedAt, "Gmail status unavailable");
+  const resendHealth = health(
+    "resend",
+    resendConfigured ? "healthy" : "disabled",
+    checkedAt,
+    resendConfigured ? "Resend configured" : "Resend not configured",
+  );
 
   return [
     health(
@@ -88,7 +90,8 @@ export function buildIntegrationHealthSummary({
       checkedAt,
       databaseAvailable ? "Database available" : "Database needs attention",
     ),
-    ...providerHealth,
+    gmailHealth,
+    resendHealth,
     health(
       "codex",
       codexConfigured ? "healthy" : "disabled",
@@ -110,8 +113,14 @@ export async function getIntegrationHealthSummary(): Promise<
   readonly IntegrationHealth[]
 > {
   const checkedAt = new Date();
-  const { agentHmacSecret, automationsEnabled, ownerEmail } =
-    readGrowthServerEnv();
+  const {
+    agentHmacSecret,
+    automationsEnabled,
+    ownerEmail,
+    resendApiKey,
+    resendFromEmail,
+    resendReplyToEmail,
+  } = readGrowthServerEnv();
   let connections: readonly IntegrationConnectionHealth[] = [];
   let databaseAvailable = true;
 
@@ -130,5 +139,8 @@ export async function getIntegrationHealthSummary(): Promise<
     codexConfigured: Boolean(agentHmacSecret),
     connections,
     databaseAvailable,
+    resendConfigured: Boolean(
+      resendApiKey && resendFromEmail && resendReplyToEmail,
+    ),
   });
 }

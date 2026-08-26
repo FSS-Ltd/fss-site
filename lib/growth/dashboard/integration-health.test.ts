@@ -6,7 +6,7 @@ import { buildIntegrationHealthSummary } from "./integration-health";
 
 const checkedAt = new Date("2026-08-17T06:00:00.000Z");
 
-test("builds a fixed five-provider summary from safe connection rows", () => {
+test("builds a fixed five-provider summary from connection and configuration state", () => {
   const rows: readonly IntegrationConnectionHealth[] = [
     {
       provider: "gmail",
@@ -26,6 +26,7 @@ test("builds a fixed five-provider summary from safe connection rows", () => {
     codexConfigured: true,
     connections: rows,
     databaseAvailable: true,
+    resendConfigured: true,
   });
 
   assert.equal(result.length, 5);
@@ -34,7 +35,7 @@ test("builds a fixed five-provider summary from safe connection rows", () => {
     [
       { provider: "database", status: "healthy" },
       { provider: "gmail", status: "healthy" },
-      { provider: "resend", status: "attention" },
+      { provider: "resend", status: "healthy" },
       { provider: "codex", status: "healthy" },
       { provider: "cron", status: "disabled" },
     ],
@@ -48,6 +49,7 @@ test("reports a safe degraded summary when the database is unavailable", () => {
     codexConfigured: false,
     connections: [],
     databaseAvailable: false,
+    resendConfigured: false,
   });
 
   assert.deepEqual(result, [
@@ -65,9 +67,9 @@ test("reports a safe degraded summary when the database is unavailable", () => {
     },
     {
       provider: "resend",
-      status: "attention",
+      status: "disabled",
       checkedAt: checkedAt.toISOString(),
-      message: "Resend status unavailable",
+      message: "Resend not configured",
     },
     {
       provider: "codex",
@@ -92,6 +94,7 @@ test("reports signed research ingestion as configured without implying the exter
     codexConfigured: true,
     connections: [],
     databaseAvailable: true,
+    resendConfigured: false,
   });
 
   assert.deepEqual(result.find(({ provider }) => provider === "codex"), {
@@ -99,5 +102,23 @@ test("reports signed research ingestion as configured without implying the exter
     status: "healthy",
     checkedAt: checkedAt.toISOString(),
     message: "Signed research ingestion configured",
+  });
+});
+
+test("reports Resend as configured without requiring an OAuth connection row", () => {
+  const result = buildIntegrationHealthSummary({
+    automationsEnabled: false,
+    checkedAt,
+    codexConfigured: true,
+    connections: [],
+    databaseAvailable: true,
+    resendConfigured: true,
+  });
+
+  assert.deepEqual(result.find(({ provider }) => provider === "resend"), {
+    provider: "resend",
+    status: "healthy",
+    checkedAt: checkedAt.toISOString(),
+    message: "Resend configured",
   });
 });

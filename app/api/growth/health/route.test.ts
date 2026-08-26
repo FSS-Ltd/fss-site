@@ -4,7 +4,7 @@ import test from "node:test";
 import { FounderAuthorizationError } from "@/lib/growth/auth/require-founder";
 import type { GrowthReleaseHealth } from "@/lib/growth/health/checks";
 
-import { createHealthRouteHandler } from "./route";
+import { createHealthRouteHandler } from "./handler";
 
 const HEALTHY_REPORT: GrowthReleaseHealth = {
   checkedAt: "2026-08-22T12:00:00.000Z",
@@ -42,7 +42,10 @@ test("rejects a request without a founder session", async () => {
 
 test("returns the health report for an authorized founder", async () => {
   const handler = createHealthRouteHandler({
-    authorizeFounder: async () => ({ email: "founder@example.test", actorId: "a" }),
+    authorizeFounder: async () => ({
+      email: "founder@example.test",
+      actorId: "a",
+    }),
     buildReport: async () => HEALTHY_REPORT,
   });
 
@@ -56,7 +59,10 @@ test("returns the health report for an authorized founder", async () => {
 
 test("responds with cache-control: no-store", async () => {
   const handler = createHealthRouteHandler({
-    authorizeFounder: async () => ({ email: "founder@example.test", actorId: "a" }),
+    authorizeFounder: async () => ({
+      email: "founder@example.test",
+      actorId: "a",
+    }),
     buildReport: async () => HEALTHY_REPORT,
   });
 
@@ -68,7 +74,10 @@ test("responds with cache-control: no-store", async () => {
 test("reports a 500 and calls the error reporter when the report build throws", async () => {
   const reported: unknown[] = [];
   const handler = createHealthRouteHandler({
-    authorizeFounder: async () => ({ email: "founder@example.test", actorId: "a" }),
+    authorizeFounder: async () => ({
+      email: "founder@example.test",
+      actorId: "a",
+    }),
     buildReport: async () => {
       throw new Error("boom");
     },

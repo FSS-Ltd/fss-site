@@ -63,6 +63,12 @@ cron schedules, release health checks, the preview checklist, the
 cutover gate, rollback, and incident response are documented in
 [docs/runbooks/](docs/runbooks/), prefixed `growth-os-*`.
 
+The weekday company researcher is launched with
+`pnpm growth:research:weekday`. It runs GPT in a disposable workspace, keeps
+its detailed trace out of task logs, submits drafts only, and prints a strict
+redacted run report. See
+[docs/growth-os/runbooks/scheduled-research.md](docs/growth-os/runbooks/scheduled-research.md).
+
 ## Growth OS: Resend marketing
 
 The Growth OS backend sends requested-resource emails and founder-run

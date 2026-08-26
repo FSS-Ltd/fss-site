@@ -7,7 +7,8 @@ import type {
   NewsletterSubscriberRecord,
 } from "@/lib/growth/newsletter/subscribers";
 
-import { createUnsubscribeRouteHandler, GET, POST } from "./route";
+import { createUnsubscribeRouteHandler } from "./handler";
+import { GET, POST } from "./route";
 
 const SECRET = "a".repeat(32);
 const NOW = new Date("2026-01-15T00:00:00Z");
@@ -16,7 +17,8 @@ function createHarness(seed: NewsletterSubscriberRecord[] = []) {
   const store = new Map(seed.map((record) => [record.normalisedEmail, record]));
 
   const dependencies: NewsletterSubscriberDependencies = {
-    findSubscriberByEmail: async (normalisedEmail) => store.get(normalisedEmail) ?? null,
+    findSubscriberByEmail: async (normalisedEmail) =>
+      store.get(normalisedEmail) ?? null,
     insertSubscriber: async () => {
       throw new Error("Not exercised by the unsubscribe route.");
     },
@@ -28,7 +30,11 @@ function createHarness(seed: NewsletterSubscriberRecord[] = []) {
       if (!existing) {
         throw new Error("Subscriber not found.");
       }
-      const updated: NewsletterSubscriberRecord = { ...existing, status, unsubscribedAt: at };
+      const updated: NewsletterSubscriberRecord = {
+        ...existing,
+        status,
+        unsubscribedAt: at,
+      };
       store.set(updated.normalisedEmail, updated);
       return updated;
     },
@@ -38,7 +44,9 @@ function createHarness(seed: NewsletterSubscriberRecord[] = []) {
 }
 
 function request(token?: string): Request {
-  const url = new URL("https://faithfulsoftwaresolutions.co.uk/api/newsletter/unsubscribe");
+  const url = new URL(
+    "https://faithfulsoftwaresolutions.co.uk/api/newsletter/unsubscribe",
+  );
   if (token !== undefined) {
     url.searchParams.set("token", token);
   }
@@ -51,7 +59,11 @@ async function bodyText(response: Response): Promise<string> {
 
 test("rejects a request with no token", async () => {
   const { dependencies } = createHarness();
-  const handler = createUnsubscribeRouteHandler({ tokenSecret: SECRET, subscribers: dependencies, now: () => NOW });
+  const handler = createUnsubscribeRouteHandler({
+    tokenSecret: SECRET,
+    subscribers: dependencies,
+    now: () => NOW,
+  });
 
   const response = await handler(request());
 
@@ -74,7 +86,11 @@ test("returns a safe response when the server has no token secret configured", a
 
 test("rejects a malformed token", async () => {
   const { dependencies } = createHarness();
-  const handler = createUnsubscribeRouteHandler({ tokenSecret: SECRET, subscribers: dependencies, now: () => NOW });
+  const handler = createUnsubscribeRouteHandler({
+    tokenSecret: SECRET,
+    subscribers: dependencies,
+    now: () => NOW,
+  });
 
   const response = await handler(request("not-a-real-token"));
 
@@ -83,8 +99,16 @@ test("rejects a malformed token", async () => {
 
 test("rejects an expired token", async () => {
   const { dependencies } = createHarness();
-  const handler = createUnsubscribeRouteHandler({ tokenSecret: SECRET, subscribers: dependencies, now: () => NOW });
-  const expiredToken = signUnsubscribeToken("ada@example.test", SECRET, new Date("2020-01-01T00:00:00Z"));
+  const handler = createUnsubscribeRouteHandler({
+    tokenSecret: SECRET,
+    subscribers: dependencies,
+    now: () => NOW,
+  });
+  const expiredToken = signUnsubscribeToken(
+    "ada@example.test",
+    SECRET,
+    new Date("2020-01-01T00:00:00Z"),
+  );
 
   const response = await handler(request(expiredToken));
 
@@ -101,7 +125,11 @@ test("unsubscribes a subscribed recipient and returns a safe confirmation", asyn
       unsubscribedAt: null,
     },
   ]);
-  const handler = createUnsubscribeRouteHandler({ tokenSecret: SECRET, subscribers: dependencies, now: () => NOW });
+  const handler = createUnsubscribeRouteHandler({
+    tokenSecret: SECRET,
+    subscribers: dependencies,
+    now: () => NOW,
+  });
   const token = signUnsubscribeToken("ada@example.test", SECRET, NOW);
 
   const response = await handler(request(token));
@@ -113,7 +141,11 @@ test("unsubscribes a subscribed recipient and returns a safe confirmation", asyn
 
 test("returns the same safe response for an unknown recipient", async () => {
   const { dependencies } = createHarness();
-  const handler = createUnsubscribeRouteHandler({ tokenSecret: SECRET, subscribers: dependencies, now: () => NOW });
+  const handler = createUnsubscribeRouteHandler({
+    tokenSecret: SECRET,
+    subscribers: dependencies,
+    now: () => NOW,
+  });
   const token = signUnsubscribeToken("nobody@example.test", SECRET, NOW);
 
   const response = await handler(request(token));
@@ -132,7 +164,11 @@ test("returns the same safe response for an already-unsubscribed recipient", asy
       unsubscribedAt: new Date("2026-01-10T00:00:00Z"),
     },
   ]);
-  const handler = createUnsubscribeRouteHandler({ tokenSecret: SECRET, subscribers: dependencies, now: () => NOW });
+  const handler = createUnsubscribeRouteHandler({
+    tokenSecret: SECRET,
+    subscribers: dependencies,
+    now: () => NOW,
+  });
   const token = signUnsubscribeToken("ada@example.test", SECRET, NOW);
 
   const response = await handler(request(token));
