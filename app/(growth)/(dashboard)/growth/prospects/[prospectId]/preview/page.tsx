@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { FounderDraftProspectPreview } from "@/components/prospect-previews/production-prospect-preview";
+import styles from "@/components/growth/prospects/prospects.module.css";
 import { getFounderDraftProspectPreview } from "@/lib/growth/prospect-previews/founder-review";
 
 type FounderDraftPreviewPageProps = {
@@ -17,9 +18,9 @@ export default async function FounderDraftPreviewPage({
 
   if (result.status === "error") {
     return (
-      <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-red-900" role="alert">
+      <div className={styles.errorState} role="alert">
         <p>{result.message}</p>
-        <p className="mt-2 text-sm text-red-700">Reference: {result.correlationId}</p>
+        <p className={styles.errorCorrelation}>Reference: {result.correlationId}</p>
       </div>
     );
   }

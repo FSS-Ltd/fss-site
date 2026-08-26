@@ -286,6 +286,90 @@
   white-space: nowrap;
 }
 
+.previewReviewPage {
+  display: grid;
+  max-width: 1024px;
+  gap: 24px;
+  margin: 0 auto;
+}
+
+.previewReviewHeader,
+.previewReviewCardHeader {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.previewReviewHeader {
+  align-items: flex-end;
+}
+
+.previewReviewCardHeader {
+  align-items: flex-start;
+}
+
+.previewReviewEyebrow {
+  margin: 0;
+  color: #087f88;
+  font-size: 0.86rem;
+  font-weight: 650;
+}
+
+.previewReviewHeading {
+  margin: 4px 0 0;
+  color: #07182e;
+  font-size: 1.875rem;
+  font-weight: 750;
+  letter-spacing: -0.025em;
+}
+
+.previewReviewDescription,
+.previewReviewCount,
+.previewReviewCardDescription {
+  margin: 0;
+  color: #526078;
+  font-size: 0.92rem;
+}
+
+.previewReviewDescription {
+  max-width: 640px;
+  margin-top: 8px;
+}
+
+.previewReviewList {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.previewReviewCard {
+  border: 1px solid #dce3e8;
+  border-radius: 16px;
+  background: white;
+  padding: 20px;
+  box-shadow: 0 1px 2px rgb(7 24 46 / 0.08);
+}
+
+.previewReviewCardHeading {
+  margin: 0;
+  color: #07182e;
+  font-size: 1.125rem;
+  font-weight: 750;
+}
+
+.previewReviewCardDescription {
+  margin-top: 4px;
+}
+
+.previewReviewApproval {
+  margin-top: 20px;
+  border-top: 1px solid #eef1f3;
+  padding-top: 20px;
+}
+
 .mobileList {
   display: none;
   flex-direction: column;

@@ -135,8 +135,18 @@ export function PreviewApprovalFrame({
         {pending ? "Approving preview…" : "Approve preview"}
       </button>
       <Link
-        className="rounded-md border border-teal-700 px-3 py-2 text-sm font-semibold text-teal-800 transition hover:bg-teal-50"
         href={`/growth/prospects/${prospectId}/preview`}
+        style={{
+          alignItems: "center",
+          border: "1px solid #087f88",
+          borderRadius: 7,
+          color: "#087f88",
+          display: "inline-flex",
+          fontSize: "0.8rem",
+          fontWeight: 700,
+          padding: "7px 12px",
+          whiteSpace: "nowrap",
+        }}
       >
         View concept preview
       </Link>
