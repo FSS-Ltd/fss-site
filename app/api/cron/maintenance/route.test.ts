@@ -3,7 +3,7 @@ import test from "node:test";
 
 import type { IntegrationHealth } from "@/lib/growth/dashboard/view-models";
 
-import { createMaintenanceRouteHandler } from "./route";
+import { createMaintenanceRouteHandler } from "./handler";
 
 const CRON_SECRET = "cron-secret-value";
 

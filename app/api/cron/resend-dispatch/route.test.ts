@@ -4,7 +4,7 @@ import test from "node:test";
 import type { GrowthDb } from "@/lib/growth/db/types";
 import type { NewsletterDispatchSummary } from "@/lib/growth/newsletter/dispatch";
 
-import { createResendDispatchRouteHandler } from "./route";
+import { createResendDispatchRouteHandler } from "./handler";
 
 const CRON_SECRET = "cron-secret-value";
 const db = {} as GrowthDb;
@@ -19,9 +19,12 @@ const EMPTY_SUMMARY: NewsletterDispatchSummary = {
 };
 
 function request(headers: Record<string, string> = {}): Request {
-  return new Request("https://faithfulsoftwaresolutions.co.uk/api/cron/resend-dispatch", {
-    headers,
-  });
+  return new Request(
+    "https://faithfulsoftwaresolutions.co.uk/api/cron/resend-dispatch",
+    {
+      headers,
+    },
+  );
 }
 
 test("rejects a request with no authorization header", async () => {

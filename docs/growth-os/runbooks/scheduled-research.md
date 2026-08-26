@@ -30,9 +30,30 @@ accepted prospect to `POST /api/agent/email-assets`.
   `docs/growth-os/prompts/weekday-research.md`.
 - The version 1.0 example in
   `docs/growth-os/fixtures/research-run-v1.json`.
+- Local Codex authentication for the isolated GPT child process.
 
 Never print the HMAC secret, signature input, raw bundle, email address, or
 contact name to a run log. Never store a secret in this repository.
+
+## Isolated Execution Boundary
+
+Run the workflow through the repository wrapper:
+
+```bash
+pnpm growth:research:weekday
+```
+
+The wrapper creates a mode `0700` workspace outside the repository, starts an
+ephemeral GPT process without user configuration or project rules, discards
+the child process's stdout and stderr, and accepts only a final response that
+matches the strict redacted-report schema. It removes the complete temporary
+workspace on success, failure, or timeout. The scheduled Codex task must invoke
+this wrapper rather than executing the research prompt directly.
+
+This boundary keeps prospect details, work emails, source URLs, draft copy,
+request bodies, signatures, and tool traces out of the visible automation log.
+The wrapper prints one redacted JSON report and exits non-zero when the child
+does not return a successful submission.
 
 ## Modes
 
@@ -208,7 +229,8 @@ Record only:
 - run date, mode, `externalRunId`, prompt version, and final outcome;
 - HTTP status and correlation ID when present;
 - accepted, duplicate, and rejected totals;
-- rejection reason-code totals and whether the target of ten was met;
+- every controlled rejection reason-code total, including zeroes, and whether
+  the target of ten was met. The reason-code totals must equal `rejected`;
 - visual generation attempted, uploaded, failed, and fallback-retained totals;
 - attempt count and safe failure class such as `timeout`, `unauthorized`,
   `invalid_bundle`, `suppressed_contact`, or `server_error`.

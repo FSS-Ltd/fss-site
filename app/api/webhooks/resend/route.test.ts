@@ -5,7 +5,7 @@ import { Webhook } from "svix";
 
 import type { ResendWebhookDependencies } from "@/lib/growth/integrations/resend/webhook";
 
-import { createResendWebhookRouteHandler } from "./route";
+import { createResendWebhookRouteHandler } from "./handler";
 
 const NOOP_DEPS: ResendWebhookDependencies = {
   repository: {
@@ -36,14 +36,20 @@ const NOOP_DEPS: ResendWebhookDependencies = {
 };
 
 function request(body: string, headers: Record<string, string> = {}): Request {
-  return new Request("https://faithfulsoftwaresolutions.co.uk/api/webhooks/resend", {
-    method: "POST",
-    body,
-    headers,
-  });
+  return new Request(
+    "https://faithfulsoftwaresolutions.co.uk/api/webhooks/resend",
+    {
+      method: "POST",
+      body,
+      headers,
+    },
+  );
 }
 
-function signedRequest(secret: string, payload: Record<string, unknown>): Request {
+function signedRequest(
+  secret: string,
+  payload: Record<string, unknown>,
+): Request {
   const body = JSON.stringify(payload);
   const timestamp = new Date();
   const svixId = "msg_test";
@@ -56,7 +62,10 @@ function signedRequest(secret: string, payload: Record<string, unknown>): Reques
 }
 
 test("returns 401 with a generic body when the secret is not configured (fails closed)", async () => {
-  const handler = createResendWebhookRouteHandler({ secret: undefined, deps: NOOP_DEPS });
+  const handler = createResendWebhookRouteHandler({
+    secret: undefined,
+    deps: NOOP_DEPS,
+  });
 
   const response = await handler(request("{}"));
   const body = await response.json();
@@ -66,7 +75,10 @@ test("returns 401 with a generic body when the secret is not configured (fails c
 });
 
 test("returns 401 with the same generic body for an unsigned or malformed request", async () => {
-  const handler = createResendWebhookRouteHandler({ secret: "a-secret", deps: NOOP_DEPS });
+  const handler = createResendWebhookRouteHandler({
+    secret: "a-secret",
+    deps: NOOP_DEPS,
+  });
 
   const response = await handler(request("not json at all"));
   const body = await response.json();

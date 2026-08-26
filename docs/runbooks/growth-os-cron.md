@@ -29,12 +29,12 @@ setting the environment variable.
 
 ## Schedules (UTC)
 
-| Path | Schedule | Frequency | What it does |
-| --- | --- | --- | --- |
-| `/api/cron/gmail-sync` | `0 0,3,6,9,12,15,18,21 * * *` and `30 1,4,7,10,13,16,19,22 * * *` | Every 90 minutes | Syncs Gmail replies into `growth.email_messages`, stops sequences on inbound reply. |
-| `/api/cron/outreach-dispatch` | `0 0,3,6,9,12,15,18,21 * * *` and `30 1,4,7,10,13,16,19,22 * * *` | Every 90 minutes | Runs Gmail sync, then claims and sends due outreach messages one batch at a time. |
-| `/api/cron/resend-dispatch` | `0 0,3,6,9,12,15,18,21 * * *` and `30 1,4,7,10,13,16,19,22 * * *` | Every 90 minutes | Claims and sends due newsletter issue sends through Resend. |
-| `/api/cron/maintenance` | `17 3 * * *` | Once daily, 03:17 UTC | Builds and logs a redacted integration health report (Gmail, Resend, database, automation state). No off-peak scheduling reason beyond avoiding the top of the hour. |
+| Path                          | Schedule                                                          | Frequency             | What it does                                                                                                                                                         |
+| ----------------------------- | ----------------------------------------------------------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/api/cron/gmail-sync`        | `0 0,3,6,9,12,15,18,21 * * *` and `30 1,4,7,10,13,16,19,22 * * *` | Every 90 minutes      | Syncs Gmail replies into `growth.email_messages`, stops sequences on inbound reply.                                                                                  |
+| `/api/cron/outreach-dispatch` | `0 0,3,6,9,12,15,18,21 * * *` and `30 1,4,7,10,13,16,19,22 * * *` | Every 90 minutes      | Runs Gmail sync, then claims and sends due outreach messages one batch at a time.                                                                                    |
+| `/api/cron/resend-dispatch`   | `0 0,3,6,9,12,15,18,21 * * *` and `30 1,4,7,10,13,16,19,22 * * *` | Every 90 minutes      | Claims and sends due newsletter issue sends through Resend.                                                                                                          |
+| `/api/cron/maintenance`       | `17 3 * * *`                                                      | Once daily, 03:17 UTC | Builds and logs a redacted integration health report (Gmail, Resend, database, automation state). No off-peak scheduling reason beyond avoiding the top of the hour. |
 
 None of these are attached to a page route — each is its own
 `app/api/cron/<name>/route.ts` on `export const runtime = "nodejs"`, so
@@ -45,7 +45,7 @@ Vercel Cron invokes it directly.
 - `outreach-dispatch` and `resend-dispatch` each claim and process **one**
   due message per invocation (`claimDueMessage` / the newsletter
   equivalent uses `for update ... skip locked limit 1`). A backlog drains
-  over successive 5-minute runs rather than in one long-running request.
+  over successive 90-minute runs rather than in one long-running request.
 - `gmail-sync` processes whatever Gmail returns for the configured
   history window in a single call; it does not paginate across multiple
   invocations.
@@ -60,7 +60,7 @@ Vercel Cron invokes it directly.
 reclaim any row stuck in `sending` past its lease expiry as part of their
 normal `where` clause (`status = 'sending' and lease_expires_at < now()`),
 atomically, on every run. A stuck lease is therefore bounded to at most
-one dispatch cycle (5 minutes) without any dedicated cleanup step — adding
+one dispatch cycle (90 minutes) without any dedicated cleanup step — adding
 one would duplicate that logic. `maintenance` does not touch leases.
 
 ## OAuth state (why there is no separate state-cleanup job)
