@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 
 import type { PublishedProspectPreview } from "@/lib/growth/prospect-previews/public-repository";
+import type { StoredProspectPreviewSnapshot } from "@/lib/growth/prospect-previews/types";
 
 type PreviewSectionProps = {
   eyebrow: string;
@@ -91,16 +92,13 @@ function PreviewSection({ eyebrow, summary, items }: PreviewSectionProps) {
   );
 }
 
-export function ProductionProspectPreview({
-  preview,
-}: {
-  preview: PublishedProspectPreview;
-}) {
-  const { content } = preview;
+type ProspectPreviewDocumentProps = {
+  content: StoredProspectPreviewSnapshot;
+};
 
+function ProspectPreviewDocument({ content }: ProspectPreviewDocumentProps) {
   return (
-    <main style={previewStyle}>
-      <article style={articleStyle}>
+    <article style={articleStyle}>
         <header style={headerStyle}>
           <p style={eyebrowStyle}>Private website concept</p>
           <p
@@ -182,7 +180,28 @@ export function ProductionProspectPreview({
           This private concept is an example of a clearer customer journey. It
           is not connected to a live service.
         </footer>
-      </article>
+    </article>
+  );
+}
+
+export function ProductionProspectPreview({
+  preview,
+}: {
+  preview: PublishedProspectPreview;
+}) {
+  return (
+    <main style={previewStyle}>
+      <ProspectPreviewDocument content={preview.content} />
     </main>
+  );
+}
+
+export function FounderDraftProspectPreview({
+  content,
+}: ProspectPreviewDocumentProps) {
+  return (
+    <section aria-label="Private concept preview" style={previewStyle}>
+      <ProspectPreviewDocument content={content} />
+    </section>
   );
 }

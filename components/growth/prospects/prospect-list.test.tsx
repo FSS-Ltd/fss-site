@@ -73,6 +73,13 @@ test("renders the ready state with a result count and business rows", () => {
   assert.match(html, /£6,500/);
 });
 
+test("gives the founder a direct route to review all concept previews", () => {
+  const html = renderList({ status: "ready", data: readyData });
+
+  assert.match(html, /href="\/growth\/prospects\/previews"/);
+  assert.match(html, />Review concept previews</);
+});
+
 test("labels every filter control so it can be operated by keyboard and screen reader", () => {
   const html = renderList({ status: "ready", data: readyData });
 
