@@ -1,0 +1,147 @@
+.panel {
+  position: fixed;
+  right: clamp(16px, 2.5vw, 36px);
+  bottom: clamp(16px, 2.5vw, 32px);
+  z-index: 100;
+  display: grid;
+  width: min(620px, calc(100vw - 32px));
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: end;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  background: #07182e;
+  box-shadow: 0 18px 60px rgba(7, 24, 46, 0.24);
+  padding: 24px;
+  color: #e9eef5;
+  animation: consentEnter 240ms ease-out;
+}
+
+.copy {
+  min-width: 0;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: #46c7d8;
+  font-family: "Geist Mono", "JetBrains Mono", monospace;
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.14em;
+}
+
+.title {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(1.05rem, 2vw, 1.2rem);
+  font-weight: 680;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.description {
+  margin: 9px 0 0;
+  color: #b7c4d3;
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.description a {
+  color: #ffffff;
+  text-decoration: underline;
+  text-decoration-color: rgba(70, 199, 216, 0.65);
+  text-underline-offset: 3px;
+}
+
+.actions {
+  display: grid;
+  min-width: 148px;
+  gap: 9px;
+}
+
+.primaryButton,
+.secondaryButton {
+  min-height: 42px;
+  border-radius: 999px;
+  padding: 10px 17px;
+  font-size: 0.8rem;
+  font-weight: 650;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease;
+}
+
+.primaryButton {
+  border: 1px solid #14989e;
+  background: #14989e;
+  color: #ffffff;
+}
+
+.secondaryButton {
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: transparent;
+  color: #e9eef5;
+}
+
+.primaryButton:hover {
+  border-color: #46c7d8;
+  background: #46c7d8;
+  color: #07182e;
+}
+
+.secondaryButton:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.primaryButton:focus-visible,
+.secondaryButton:focus-visible,
+.description a:focus-visible {
+  outline: 3px solid #46c7d8;
+  outline-offset: 3px;
+}
+
+@keyframes consentEnter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 639px) {
+  .panel {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 21px;
+  }
+
+  .actions {
+    grid-template-columns: 1fr 1fr;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 399px) {
+  .actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel {
+    animation: none;
+  }
+
+  .primaryButton,
+  .secondaryButton {
+    transition: none;
+  }
+}
