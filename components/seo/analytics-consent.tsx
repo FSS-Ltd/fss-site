@@ -9,6 +9,8 @@ import {
   useSyncExternalStore,
 } from "react";
 
+import dynamic from "next/dynamic";
+
 import { GoogleAnalytics } from "@/components/seo/google-analytics";
 import {
   ANALYTICS_CONSENT_CHANGED_EVENT,
@@ -27,7 +29,13 @@ import {
   type AnalyticsConsentChoice,
 } from "@/lib/analytics/consent";
 
-import { CookieConsentPanel } from "./cookie-consent-panel";
+const CookieConsentPanel = dynamic(
+  () =>
+    import("./cookie-consent-panel").then(
+      (module) => module.CookieConsentPanel,
+    ),
+  { ssr: false },
+);
 
 type AnalyticsConsentControllerProps = {
   measurementId: string;
