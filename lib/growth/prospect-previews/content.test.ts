@@ -50,7 +50,7 @@ test("renders a compliant first email with the source-backed narrative and previ
 
   assert.match(email.text, /One thing that came through clearly/i);
   assert.match(email.text, /A few parts of the current journey could be clearer/i);
-  assert.match(email.text, /I didn’t want to simply list concerns/i);
+  assert.match(email.text, /I didn’t want to just list off concerns/i);
   assert.match(
     email.html,
     /https:\/\/faithfulsoftware\.dev\/preview\/p\/opaque-public-id/,
