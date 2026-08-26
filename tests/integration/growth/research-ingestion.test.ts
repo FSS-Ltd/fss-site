@@ -404,6 +404,15 @@ test(
         where correlation_id like ${`${runPrefix}%`}
       `;
       await sql`
+        delete from growth.prospect_previews
+        where prospect_id in (
+          select p.id
+          from growth.prospects p
+          inner join growth.research_runs rr on rr.id = p.research_run_id
+          where rr.external_run_id like ${`${runPrefix}%`}
+        )
+      `;
+      await sql`
         delete from growth.prospects
         where research_run_id in (
           select id from growth.research_runs

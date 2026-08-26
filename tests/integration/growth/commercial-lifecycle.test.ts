@@ -139,6 +139,14 @@ async function cleanupLifecycle(sql: postgres.Sql, externalRunId: string): Promi
     where rr.external_run_id = ${externalRunId}
   `;
   await sql`
+    delete from growth.prospect_previews
+    where prospect_id in (
+      select p.id from growth.prospects p
+      inner join growth.research_runs rr on rr.id = p.research_run_id
+      where rr.external_run_id = ${externalRunId}
+    )
+  `;
+  await sql`
     delete from growth.prospects
     where research_run_id in (select id from growth.research_runs where external_run_id = ${externalRunId})
   `;
