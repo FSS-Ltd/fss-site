@@ -164,7 +164,7 @@ test("publishes a draft preview and revises only the stored first-email draft", 
   });
   assert.match(
     String((fake.state.savedSnapshots[0]?.email as { text?: unknown }).text),
-    /I didn’t want to simply list concerns/i,
+    /I didn’t want to just list off concerns/i,
   );
   assert.equal(fake.state.gmailCalls, 0);
   assert.equal(fake.state.sentMessages, 0);

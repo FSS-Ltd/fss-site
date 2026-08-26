@@ -95,11 +95,13 @@ authorise sending email.
 6. For each accepted candidate, prepare the complete structured website
    assessment, FSS offer recommendation, 140 to 220 word first email, matching
    safe HTML and plain text, direct opt-out sentence, and conceptual visual
-   brief. Include `emailNarrative` with one factual first-party strength and
-   two or three sourced website-journey observations. A published review is
+   brief. Structure the email around one factual first-party strength followed
+   by two or three sourced website-journey improvements. Include
+   `emailNarrative` with those same observations. A published review is
    permitted only when it is published on the business's own site. Google Maps
-   content is never a narrative source. The application adds the preview link
-   only after individual founder approval.
+   content is never a narrative source. After individual founder preview
+   approval, the application adds the private preview link and the built-example
+   close to the reviewable initial email.
 7. The visual must not fabricate staff, premises, testimonials, reviews,
    credentials, results, or an existing product. The ingestion bundle always
    uses `assetId: null` and an approved fallback key. This guarantees that a

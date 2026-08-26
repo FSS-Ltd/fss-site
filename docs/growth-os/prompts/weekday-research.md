@@ -42,13 +42,20 @@ For each accepted candidate, produce:
   technology, future opportunities, hero concept, mobile fallback, and
   performance budget;
 - a factual first email of 140 to 220 words with matching safe HTML and plain
-  text, one direct opt-out sentence, and a concept disclaimer in both versions;
+  text, one direct opt-out sentence, and a concept disclaimer in both versions.
+  Structure its message around one verified strength first, then two or three
+  specific website-journey improvements. Do not invent praise or use Google
+  Maps content.
 - a separate `emailNarrative` with one factual first-party strength and two or
   three sourced website-journey improvements. Use a published review only when
   it appears on the business's own site. Otherwise use a specific service or
   work-quality observation. Every narrative source must be recorded first-party
-  evidence. Never use Google Maps content. The application adds the preview
-  URL and final concept paragraph only after founder preview approval;
+  evidence. Never use Google Maps content. After founder preview approval, the
+  application builds the reviewable initial email in this order: the sourced
+  strength, the sourced improvements, then “I didn’t want to just list off
+  concerns, so I went ahead and built an example of what I believe will serve
+  you and your customers or clients better:” followed by the private preview
+  URL. The researcher must not publish that URL or send the email.
 - one non-deceptive conceptual visual brief with useful alt text.
 
 The visual must not fabricate staff, premises, testimonials, reviews,

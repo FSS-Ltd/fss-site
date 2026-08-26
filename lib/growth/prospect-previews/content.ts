@@ -53,7 +53,7 @@ export function renderPreviewFirstEmail(
       "I reviewed the website with one practical question: how does a new customer move from interest to a useful enquiry? I am sharing a private concept because the work on show deserves a clearer first step for people trying to reach you.",
       `One thing that came through clearly is ${input.narrative.openingStrength.text}. It gives visitors a useful starting point and shows there is a solid basis to build from.`,
       `A few parts of the current journey could be clearer: ${improvements}. Each point is about helping customers understand what to do next before they need to pick up the phone.`,
-      "I didn’t want to simply list concerns, so I went ahead and built an example of what I believe will serve you and your customers or clients better:",
+      "I didn’t want to just list off concerns, so I went ahead and built an example of what I believe will serve you and your customers or clients better:",
       `You can view the private concept here: ${previewUrl}`,
       input.conceptDisclaimer,
       input.optOutSentence,

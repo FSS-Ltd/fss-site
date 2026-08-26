@@ -62,6 +62,11 @@ test("runs the researcher in a disposable workspace with schema-constrained outp
     assert.ok(input.args.includes("--output-schema"));
     assert.ok(input.args.includes("--output-last-message"));
 
+    const prompt = input.args.at(-1) ?? "";
+    assert.match(prompt, /first-party strength/i);
+    assert.match(prompt, /two or three sourced website-journey improvements/i);
+    assert.match(prompt, /private preview URL/i);
+
     const schemaPath = input.args[input.args.indexOf("--output-schema") + 1];
     const reportPath =
       input.args[input.args.indexOf("--output-last-message") + 1];
