@@ -92,5 +92,10 @@ test("rejects duplicate generated package identities", () => {
 });
 
 test("does not resolve an ungenerated package from the merged manifest", () => {
-  assert.equal(getMergedProspectPreviewCompositionBySlug("marden-garage"), null);
+  assert.equal(
+    getMergedProspectPreviewCompositionBySlug(
+      "fss-preview-test-sentinel",
+    ),
+    null,
+  );
 });
