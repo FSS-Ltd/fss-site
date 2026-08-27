@@ -52,11 +52,14 @@ run this only from the approved production operator environment after the
 migration and feature configuration are live:
 
 ```bash
+pnpm growth:previews:trigger-current-ten-drafts
 pnpm growth:previews:trigger-current-ten -- --run-id current-ten-YYYY-MM-DD
 ```
 
-The command requires exactly ten eligible drafts and exits before GitHub if the
-selection differs. It cannot publish previews or modify email.
+The first command creates only missing historical draft records and returns
+aggregate counts. The second requires exactly ten eligible drafts and exits
+before GitHub if the selection differs. Neither can publish previews or modify
+email.
 
 ## Add a bespoke local proof of concept
 

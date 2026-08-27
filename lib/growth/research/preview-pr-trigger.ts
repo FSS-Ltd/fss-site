@@ -11,6 +11,9 @@ const PREVIEW_PR_ENDPOINT = new URL(
 const CURRENT_TEN_PREVIEW_PR_ENDPOINT = new URL(
   "https://faithfulsoftware.dev/api/agent/current-ten-prospect-preview-pr",
 );
+const CURRENT_TEN_DRAFT_BACKFILL_ENDPOINT = new URL(
+  "https://faithfulsoftware.dev/api/agent/current-ten-prospect-preview-drafts",
+);
 const EXTERNAL_RUN_ID_PATTERN = /^[a-z0-9][a-z0-9-]{0,199}$/;
 
 const responseSchema = z
@@ -20,6 +23,16 @@ const responseSchema = z
     generated: z.number().int().nonnegative(),
     unavailable: z.number().int().nonnegative(),
     pullRequestNumber: z.number().int().positive().nullable(),
+  })
+  .strict();
+
+const draftBackfillResponseSchema = z
+  .object({
+    status: z.enum(["backfilled", "disabled"]),
+    scanned: z.number().int().nonnegative(),
+    created: z.number().int().nonnegative(),
+    skipped: z.number().int().nonnegative(),
+    invalid: z.number().int().nonnegative(),
   })
   .strict();
 
@@ -37,6 +50,12 @@ export type TriggerScheduledPreviewPullRequestInput = {
 
 export type TriggerScheduledPreviewPullRequestResult = { ok: true } | { ok: false };
 
+export type TriggerCurrentTenDraftPreviewBackfillInput = {
+  secret: string;
+  now?: () => Date;
+  request?: PreviewPrTriggerRequest;
+};
+
 type PreviewPrTriggerTarget = {
   endpoint: URL;
   isValidRunId: (externalRunId: string) => boolean;
@@ -53,7 +72,11 @@ function validateInput(
   ) {
     throw new TypeError(target.invalidRunIdMessage);
   }
-  if (input.secret.replace(/\s/g, "").length < 32) {
+  validateSecret(input.secret);
+}
+
+function validateSecret(secret: string): void {
+  if (secret.replace(/\s/g, "").length < 32) {
     throw new TypeError("Preview-generation signing secret is invalid.");
   }
 }
@@ -78,6 +101,16 @@ async function isValidResponse(
   try {
     const parsed = responseSchema.safeParse(await response.json());
     return parsed.success && parsed.data.externalRunId === externalRunId;
+  } catch {
+    return false;
+  }
+}
+
+async function isValidDraftBackfillResponse(response: Response): Promise<boolean> {
+  if (!response.ok) return false;
+  try {
+    const parsed = draftBackfillResponseSchema.safeParse(await response.json());
+    return parsed.success && parsed.data.status === "backfilled";
   } catch {
     return false;
   }
@@ -138,4 +171,37 @@ export async function triggerCurrentTenPreviewPullRequest(
     isValidRunId: isCurrentTenPreviewBackfillRunId,
     invalidRunIdMessage: "Current-ten preview-generation run ID is invalid.",
   });
+}
+
+export async function triggerCurrentTenDraftPreviewBackfill(
+  input: TriggerCurrentTenDraftPreviewBackfillInput,
+): Promise<TriggerScheduledPreviewPullRequestResult> {
+  validateSecret(input.secret);
+  const now = (input.now ?? (() => new Date()))();
+  if (Number.isNaN(now.getTime())) {
+    throw new TypeError("Preview-generation trigger time is invalid.");
+  }
+  const timestamp = String(Math.floor(now.getTime() / 1000));
+  const request = input.request ?? ((url, init) => fetch(url, init));
+  const headers = new Headers({
+    "x-fss-key-id": AGENT_KEY_ID,
+    "x-fss-timestamp": timestamp,
+    "x-fss-signature": createSignature({
+      secret: input.secret,
+      timestamp,
+      body: "",
+    }),
+  });
+
+  try {
+    const response = await request(CURRENT_TEN_DRAFT_BACKFILL_ENDPOINT, {
+      method: "POST",
+      headers,
+    });
+    return (await isValidDraftBackfillResponse(response))
+      ? { ok: true }
+      : { ok: false };
+  } catch {
+    return { ok: false };
+  }
 }
