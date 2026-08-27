@@ -122,6 +122,7 @@ export async function listCurrentTenPreviewGenerationCandidates(
       pp.content_snapshot as content
     from growth.prospect_previews pp
     inner join growth.prospects p on p.id = pp.prospect_id
+    inner join growth.website_assessments wa on wa.prospect_id = p.id
     where pp.status = 'draft'
       and pp.generation_status = 'pending_pr'
       and pp.generation_external_run_id is null

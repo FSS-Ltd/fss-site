@@ -75,7 +75,7 @@ test("lists only pending private draft previews for a research run", async () =>
   assert.doesNotMatch(queries[0]?.text ?? "", /email|contact|company_number/i);
 });
 
-test("lists at most eleven ungenerated historical drafts for the current-ten backfill gate", async () => {
+test("lists at most eleven assessed historical drafts for the current-ten backfill gate", async () => {
   const queries: Array<{ text: string; values: readonly unknown[] }> = [];
   const candidates = await listCurrentTenPreviewGenerationCandidates(
     createFakeDb(
@@ -90,6 +90,10 @@ test("lists at most eleven ungenerated historical drafts for the current-ten bac
   assert.match(
     queries[0]?.text ?? "",
     /pp\.generation_external_run_id is null/,
+  );
+  assert.match(
+    queries[0]?.text ?? "",
+    /inner join growth\.website_assessments wa on wa\.prospect_id = p\.id/,
   );
   assert.match(queries[0]?.text ?? "", /limit 11/);
   assert.match(queries[0]?.text ?? "", /pp\.generation_status = 'pending_pr'/);
