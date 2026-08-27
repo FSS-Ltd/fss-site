@@ -3,7 +3,7 @@ import {
   validateProspectPreviewComposition,
 } from "./types";
 
-function toCompositionIdentifier(slug: string): string {
+export function getCompositionExportName(slug: string): string {
   const parts = slug.split("-");
   const [first, ...rest] = parts;
   if (!first) throw new TypeError("Prospect preview slug cannot be empty.");
@@ -15,7 +15,7 @@ export function serializeGeneratedComposition(
   value: ProspectPreviewComposition,
 ): string {
   const composition = validateProspectPreviewComposition(value);
-  const identifier = toCompositionIdentifier(composition.slug);
+  const identifier = getCompositionExportName(composition.slug);
 
   return [
     'import type { ProspectPreviewComposition } from "../types";',
