@@ -8,9 +8,29 @@ import {
 } from "./orchestrator";
 
 const CURRENT_TEN_RUN_ID_PATTERN = /^current-ten-\d{4}-\d{2}-\d{2}$/;
+const EXACT_CANDIDATE_COUNT_ERROR =
+  "Current-ten preview backfill requires exactly ten eligible drafts.";
+
+export type CurrentTenPreviewBackfillFailureCategory =
+  | "candidate_count"
+  | "github"
+  | "state_conflict"
+  | "dependency";
 
 export function isCurrentTenPreviewBackfillRunId(externalRunId: string): boolean {
   return CURRENT_TEN_RUN_ID_PATTERN.test(externalRunId);
+}
+
+export function classifyCurrentTenPreviewBackfillFailure(
+  error: unknown,
+): CurrentTenPreviewBackfillFailureCategory {
+  if (!(error instanceof Error)) return "dependency";
+  if (error.message === EXACT_CANDIDATE_COUNT_ERROR) return "candidate_count";
+  if (error.message.startsWith("GitHub preview ")) return "github";
+  if (error.message.startsWith("Preview generation state changed")) {
+    return "state_conflict";
+  }
+  return "dependency";
 }
 
 export interface CurrentTenPreviewBackfillRepository
@@ -34,7 +54,7 @@ export async function runCurrentTenPreviewBackfill(
 
   const candidates = await input.repository.listEligibleExistingCandidates();
   if (candidates.length !== 10) {
-    throw new Error("Current-ten preview backfill requires exactly ten eligible drafts.");
+    throw new Error(EXACT_CANDIDATE_COUNT_ERROR);
   }
 
   return createProspectPreviewPrRun({
