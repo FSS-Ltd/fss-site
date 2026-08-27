@@ -1,10 +1,19 @@
+import { serializeGeneratedPreviewManifest } from "./generated-files";
+import { getCompositionExportName } from "../compositions/serialize";
+
 const GITHUB_API_ORIGIN = "https://api.github.com";
 const GITHUB_REPOSITORY = "FSS-Ltd/fss-site";
 const BASE_BRANCH = "main";
+const GENERATED_MANIFEST_PATH =
+  "lib/growth/prospect-previews/compositions/manifest.ts";
 const GENERATED_BRANCH_PATTERN =
   /^generated\/prospect-previews\/\d{4}-\d{2}-\d{2}$/;
 const GENERATED_FILE_PATTERN =
   /^lib\/growth\/prospect-previews\/compositions\/(?:manifest\.ts|generated\/[a-z0-9]+(?:-[a-z0-9]+)*\.ts)$/;
+const GENERATED_SOURCE_PATH_PATTERN =
+  /^lib\/growth\/prospect-previews\/compositions\/generated\/([a-z0-9]+(?:-[a-z0-9]+)*)\.ts$/;
+const GENERATED_MANIFEST_IMPORT_PATTERN =
+  /^import \{ ([a-zA-Z][a-zA-Z0-9]*) \} from "\.\/generated\/([a-z0-9]+(?:-[a-z0-9]+)*)";$/gm;
 
 export type GitHubPreviewSourceFile = {
   path: string;
@@ -46,6 +55,12 @@ type GitHubPullRequestStateResponse = {
   number?: unknown;
   state?: unknown;
   merged_at?: unknown;
+};
+
+type GitHubContentResponse = {
+  sha?: unknown;
+  content?: unknown;
+  encoding?: unknown;
 };
 
 function createApiUrl(path: string): URL {
@@ -112,6 +127,26 @@ function parseContentSha(value: unknown): string | null {
   return typeof sha === "string" && sha.length > 0 ? sha : null;
 }
 
+function parseManifestContent(value: unknown): string | null {
+  if (typeof value !== "object" || value === null) return null;
+  const response = value as GitHubContentResponse;
+  if (typeof response.content !== "string" || response.encoding !== "base64") {
+    return null;
+  }
+
+  const encoded = response.content.replace(/\s/g, "");
+  if (
+    encoded.length === 0 ||
+    encoded.length > 250_000 ||
+    encoded.length % 4 !== 0 ||
+    !/^[a-z0-9+/]*={0,2}$/i.test(encoded)
+  ) {
+    return null;
+  }
+
+  return Buffer.from(encoded, "base64").toString("utf8");
+}
+
 function parsePullRequest(value: unknown): GitHubPreviewPullRequest | null {
   if (
     typeof value !== "object" ||
@@ -164,9 +199,91 @@ async function getContentSha(
 
   const sha = parseContentSha(await readJson(response));
   if (sha === null) {
-    throw new Error("GitHub preview content lookup returned an invalid response.");
+    throw new Error(
+      "GitHub preview content lookup returned an invalid response.",
+    );
   }
   return sha;
+}
+
+function extractGeneratedManifestSlugs(source: string): readonly string[] {
+  const slugs = new Set<string>();
+  let match: RegExpExecArray | null;
+  while ((match = GENERATED_MANIFEST_IMPORT_PATTERN.exec(source)) !== null) {
+    const [, exportName, slug] = match;
+    if (
+      !slug ||
+      exportName !== getCompositionExportName(slug) ||
+      slugs.has(slug)
+    ) {
+      throw new Error(
+        "GitHub preview manifest contains invalid generated imports.",
+      );
+    }
+    slugs.add(slug);
+  }
+
+  const remaining = source.replace(GENERATED_MANIFEST_IMPORT_PATTERN, "");
+  if (remaining.includes("./generated/")) {
+    throw new Error(
+      "GitHub preview manifest contains invalid generated imports.",
+    );
+  }
+
+  return [...slugs];
+}
+
+async function readExistingGeneratedManifestSlugs(
+  request: GitHubPreviewApiRequest,
+  headers: Headers,
+  branch: string,
+): Promise<readonly string[]> {
+  const url = createApiUrl(
+    `/contents/${getPathSegments(GENERATED_MANIFEST_PATH)}`,
+  );
+  url.searchParams.set("ref", branch);
+  const response = await request(url, { method: "GET", headers });
+  if (response.status === 404) return [];
+  if (!response.ok) throw requestFailure("manifest lookup", response.status);
+
+  const source = parseManifestContent(await readJson(response));
+  if (source === null) {
+    throw new Error(
+      "GitHub preview manifest lookup returned an invalid response.",
+    );
+  }
+  return extractGeneratedManifestSlugs(source);
+}
+
+function mergeGeneratedManifest(
+  files: readonly GitHubPreviewSourceFile[],
+  existingSlugs: readonly string[],
+): readonly GitHubPreviewSourceFile[] {
+  const manifest = files.find((file) => file.path === GENERATED_MANIFEST_PATH);
+  if (manifest === undefined) return files;
+
+  const newSlugs = files.flatMap((file) => {
+    const match = GENERATED_SOURCE_PATH_PATTERN.exec(file.path);
+    return match?.[1] ? [match[1]] : [];
+  });
+  const existing = new Set(existingSlugs);
+  if (newSlugs.some((slug) => existing.has(slug))) {
+    throw new Error(
+      "GitHub preview branch already contains a generated prospect slug.",
+    );
+  }
+
+  return files.map((file) =>
+    file.path === GENERATED_MANIFEST_PATH
+      ? {
+          ...file,
+          content: serializeGeneratedPreviewManifest([
+            ...existingSlugs,
+            ...newSlugs,
+          ]),
+        }
+      : file,
+  );
 }
 
 async function writeSourceFile(
@@ -209,11 +326,14 @@ async function findOpenPullRequest(
   url.searchParams.set("head", `FSS-Ltd:${branch}`);
   url.searchParams.set("base", BASE_BRANCH);
   const response = await request(url, { method: "GET", headers });
-  if (!response.ok) throw requestFailure("pull request lookup", response.status);
+  if (!response.ok)
+    throw requestFailure("pull request lookup", response.status);
 
   const result = await readJson(response);
   if (!Array.isArray(result)) {
-    throw new Error("GitHub preview pull request lookup returned an invalid response.");
+    throw new Error(
+      "GitHub preview pull request lookup returned an invalid response.",
+    );
   }
   const pullRequest = parsePullRequest(result[0]);
   return pullRequest === null ? null : { ...pullRequest, alreadyOpen: true };
@@ -234,7 +354,9 @@ async function createBranch(
 
   const sha = parseSha(await readJson(baseResponse));
   if (sha === null) {
-    throw new Error("GitHub preview base branch lookup returned an invalid response.");
+    throw new Error(
+      "GitHub preview base branch lookup returned an invalid response.",
+    );
   }
 
   const response = await request(createApiUrl("/git/refs"), {
@@ -262,11 +384,14 @@ async function createPullRequest(
       base: BASE_BRANCH,
     }),
   });
-  if (!response.ok) throw requestFailure("pull request creation", response.status);
+  if (!response.ok)
+    throw requestFailure("pull request creation", response.status);
 
   const pullRequest = parsePullRequest(await readJson(response));
   if (pullRequest === null) {
-    throw new Error("GitHub preview pull request creation returned an invalid response.");
+    throw new Error(
+      "GitHub preview pull request creation returned an invalid response.",
+    );
   }
   return pullRequest;
 }
@@ -277,11 +402,17 @@ export async function createGitHubPreviewPullRequest(
   validateInput(input);
   const request = input.request ?? ((url, init) => fetch(url, init));
   const headers = createHeaders(input.token);
-  const files = [...input.files].sort((left, right) =>
+  const sourceFiles = [...input.files].sort((left, right) =>
     left.path.localeCompare(right.path),
   );
 
   await createBranch(request, headers, input.branch);
+  const existingSlugs = sourceFiles.some(
+    (file) => file.path === GENERATED_MANIFEST_PATH,
+  )
+    ? await readExistingGeneratedManifestSlugs(request, headers, input.branch)
+    : [];
+  const files = mergeGeneratedManifest(sourceFiles, existingSlugs);
   for (const file of files) {
     await writeSourceFile(request, headers, input.branch, file);
   }
@@ -318,7 +449,11 @@ export async function getGitHubPreviewPullRequestState(input: {
   number: number;
   request?: GitHubPreviewApiRequest;
 }): Promise<GitHubPreviewPullRequestState> {
-  if (!input.token.trim() || !Number.isInteger(input.number) || input.number < 1) {
+  if (
+    !input.token.trim() ||
+    !Number.isInteger(input.number) ||
+    input.number < 1
+  ) {
     throw new TypeError("GitHub preview pull request lookup is invalid.");
   }
   const request = input.request ?? ((url, init) => fetch(url, init));
@@ -332,7 +467,9 @@ export async function getGitHubPreviewPullRequestState(input: {
 
   const result = parsePullRequestState(await readJson(response), input.number);
   if (result === null) {
-    throw new Error("GitHub preview pull request state lookup returned an invalid response.");
+    throw new Error(
+      "GitHub preview pull request state lookup returned an invalid response.",
+    );
   }
   return result;
 }

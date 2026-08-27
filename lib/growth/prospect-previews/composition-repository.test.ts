@@ -9,6 +9,7 @@ import {
   listPreviewGenerationCandidates,
   markPreviewCompositionUnavailable,
   markPreviewGenerationMergedDraft,
+  requeueCurrentTenUnavailablePreviewCompositions,
   recordPreviewGenerationResult,
 } from "./composition-repository";
 
@@ -111,17 +112,17 @@ test("summarises the current-ten selection state without selecting prospect data
       [
         [
           {
-          activeDrafts: 10,
-          assessedDrafts: 10,
-          pendingAssessedDrafts: 9,
-          eligibleDrafts: 8,
-          pendingPr: 8,
-          prOpen: 1,
-          mergedDraft: 0,
-          compositionUnavailable: 1,
-          published: 0,
-          withdrawn: 0,
-        },
+            activeDrafts: 10,
+            assessedDrafts: 10,
+            pendingAssessedDrafts: 9,
+            eligibleDrafts: 8,
+            pendingPr: 8,
+            prOpen: 1,
+            mergedDraft: 0,
+            compositionUnavailable: 1,
+            published: 0,
+            withdrawn: 0,
+          },
         ],
         [{ sector: "Home services", count: 1 }],
       ],
@@ -145,7 +146,10 @@ test("summarises the current-ten selection state without selecting prospect data
     unavailableSectors: [{ sector: "Home services", count: 1 }],
   });
   assert.match(queries[0]?.text ?? "", /::integer as "activeDrafts"/);
-  assert.match(queries[0]?.text ?? "", /left join growth\.website_assessments wa/);
+  assert.match(
+    queries[0]?.text ?? "",
+    /left join growth\.website_assessments wa/,
+  );
   assert.doesNotMatch(queries[0]?.text ?? "", /email|contact|company_number/i);
   assert.match(
     queries[1]?.text ?? "",
@@ -155,6 +159,29 @@ test("summarises the current-ten selection state without selecting prospect data
     queries[1]?.text ?? "",
     /business_name|email|contact|company_number/i,
   );
+});
+
+test("requeues only current-ten unavailable assessed draft compositions", async () => {
+  const queries: Array<{ text: string; values: readonly unknown[] }> = [];
+  const result = await requeueCurrentTenUnavailablePreviewCompositions(
+    createFakeDb(
+      [{ id: PREVIEW_ID }, { id: "1c5caeec-cbe0-454d-9774-14483ba3a37f" }],
+      queries,
+    ),
+  );
+
+  assert.deepEqual(result, { requeued: 2 });
+  assert.match(queries[0]?.text ?? "", /generation_status = 'pending_pr'/);
+  assert.match(queries[0]?.text ?? "", /generation_external_run_id = null/);
+  assert.match(
+    queries[0]?.text ?? "",
+    /pp\.generation_external_run_id like 'current-ten-%'/,
+  );
+  assert.match(
+    queries[0]?.text ?? "",
+    /exists \( select 1 from growth\.website_assessments wa/,
+  );
+  assert.doesNotMatch(queries[0]?.text ?? "", /email|contact|company_number/i);
 });
 
 test("records generation metadata only on its matching pending draft", async () => {

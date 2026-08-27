@@ -39,6 +39,8 @@ export type GeneratedPreviewFiles = {
   files: readonly GeneratedPreviewFile[];
 };
 
+const GENERATED_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
 function slugifyBusinessName(name: string): string {
   const slug = name
     .normalize("NFKD")
@@ -70,15 +72,22 @@ function assignSlugs(
   return slugs;
 }
 
-function serializeGeneratedManifest(
-  packages: readonly GeneratedPreviewPackage[],
+export function serializeGeneratedPreviewManifest(
+  slugs: readonly string[],
 ): string {
-  const imports = packages.map(
-    ({ slug }) =>
+  const uniqueSlugs = [...new Set(slugs)].sort((left, right) =>
+    left.localeCompare(right),
+  );
+  if (!uniqueSlugs.every((slug) => GENERATED_SLUG_PATTERN.test(slug))) {
+    throw new TypeError("Generated prospect preview manifest slug is invalid.");
+  }
+
+  const imports = uniqueSlugs.map(
+    (slug) =>
       `import { ${getCompositionExportName(slug)} } from "./generated/${slug}";`,
   );
-  const values = packages
-    .map(({ slug }) => `  ${getCompositionExportName(slug)},`)
+  const values = uniqueSlugs
+    .map((slug) => `  ${getCompositionExportName(slug)},`)
     .join("\n");
   const manifestValues = values ? `[\n${values}\n]` : "[]";
 
@@ -149,7 +158,9 @@ export function buildGeneratedPreviewFiles(
     })),
     {
       path: "lib/growth/prospect-previews/compositions/manifest.ts",
-      content: serializeGeneratedManifest(packages),
+      content: serializeGeneratedPreviewManifest(
+        packages.map(({ slug }) => slug),
+      ),
     },
   ];
 
