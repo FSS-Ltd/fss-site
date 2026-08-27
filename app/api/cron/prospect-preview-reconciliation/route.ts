@@ -16,7 +16,6 @@ export async function GET(request: Request): Promise<Response> {
   const environment = readGrowthServerEnv();
   const handler = createProspectPreviewReconciliationRouteHandler({
     cronSecret: environment.cronSecret,
-    automationsEnabled: environment.automationsEnabled,
     previewPrEnabled: environment.previewPrEnabled,
     reconcile: async () => {
       const github = requireProspectPreviewGenerationEnv(environment);

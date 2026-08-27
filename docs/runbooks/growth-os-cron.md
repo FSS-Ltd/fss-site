@@ -14,9 +14,9 @@ before any domain work:
    `CRON_SECRET` via a timing-safe comparison. Missing header, wrong
    scheme, wrong secret, or an unconfigured `CRON_SECRET` on the server
    all return a generic `401` with no indication of which check failed.
-2. If `GROWTH_OS_AUTOMATIONS_ENABLED` is `false`, returns
-   `{ ok: true, skipped: "automations_disabled" }` with a `200` and does
-   no domain work at all — including for `maintenance`, which is
+2. If its automation guard is disabled, returns a `200` with an explicit
+   skip reason (normally `{ ok: true, skipped: "automations_disabled" }`)
+   and does no domain work at all — including for `maintenance`, which is
    otherwise read-only.
 3. Only past both checks does the route's own work function run. Any
    thrown error becomes a generic `500` with no error detail in the
@@ -26,6 +26,12 @@ before any domain work:
 Vercel Cron sends the configured `CRON_SECRET` automatically once a cron
 job is attached to the project — there is nothing to wire up beyond
 setting the environment variable.
+
+The preview-reconciliation route deliberately uses
+`GROWTH_OS_PREVIEW_PR_ENABLED`, not `GROWTH_OS_AUTOMATIONS_ENABLED`, as its
+work guard. Its only writes mark a merged source package ready for founder
+approval. It cannot publish a preview or dispatch email, so leaving all email
+automation disabled does not block this review-only step.
 
 ## Schedules (UTC)
 

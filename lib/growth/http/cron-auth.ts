@@ -35,6 +35,7 @@ export function authorizeCronRequest(
 export type CronRouteConfig = {
   cronSecret: string | undefined;
   automationsEnabled: boolean;
+  disabledReason?: string;
   reportUnexpectedError?: (error: unknown) => void;
 };
 
@@ -53,7 +54,10 @@ export function createCronRouteHandler<T extends object>(
 
     if (!config.automationsEnabled) {
       return Response.json(
-        { ok: true, skipped: "automations_disabled" },
+        {
+          ok: true,
+          skipped: config.disabledReason ?? "automations_disabled",
+        },
         { status: 200, headers: { "cache-control": "no-store" } },
       );
     }
