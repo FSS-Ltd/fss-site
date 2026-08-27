@@ -1,10 +1,13 @@
 import { createProspectPreviewCompositionManifest } from "./manifest-core";
 import type { ProspectPreviewComposition } from "./types";
 import { brightFoxLettingsComposition } from "./generated/bright-fox-lettings";
+import { burfordsComposition } from "./generated/burfords";
 import { dunkleySOfDealComposition } from "./generated/dunkley-s-of-deal";
 import { evoKentRoofingComposition } from "./generated/evo-kent-roofing";
 import { fugglesBeerCafeComposition } from "./generated/fuggles-beer-cafe";
 import { hideAndFoxComposition } from "./generated/hide-and-fox";
+import { kentGarageEquipmentComposition } from "./generated/kent-garage-equipment";
+import { macknadeComposition } from "./generated/macknade";
 import { mardenGarageComposition } from "./generated/marden-garage";
 import { paperstoneComposition } from "./generated/paperstone";
 import { primelineRoofingComposition } from "./generated/primeline-roofing";
@@ -15,10 +18,13 @@ export { createProspectPreviewCompositionManifest } from "./manifest-core";
 
 const mergedProspectPreviewManifest = createProspectPreviewCompositionManifest([
   brightFoxLettingsComposition,
+  burfordsComposition,
   dunkleySOfDealComposition,
   evoKentRoofingComposition,
   fugglesBeerCafeComposition,
   hideAndFoxComposition,
+  kentGarageEquipmentComposition,
+  macknadeComposition,
   mardenGarageComposition,
   paperstoneComposition,
   primelineRoofingComposition,
