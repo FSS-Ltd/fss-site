@@ -45,6 +45,7 @@ export function createCurrentTenPreviewInventoryPostHandler(
         published: 0,
         withdrawn: 0,
       },
+      unavailableSectors: [],
     },
     run: async () => ({ status: "inventory", ...(await dependencies.run()) }),
   });

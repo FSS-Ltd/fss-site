@@ -17,6 +17,7 @@ const INVENTORY = {
     published: 0,
     withdrawn: 0,
   },
+  unavailableSectors: [{ sector: "Home services", count: 1 }],
 };
 
 function createHandler(input: {
@@ -105,6 +106,7 @@ test("does not read the database outside Production", async () => {
       published: 0,
       withdrawn: 0,
     },
+    unavailableSectors: [],
   });
   assert.equal(runCalls, 0);
 });

@@ -41,7 +41,7 @@ const content = {
 };
 
 function createFakeDb(
-  rows: readonly object[],
+  responses: readonly object[] | readonly (readonly object[])[],
   queries: Array<{ text: string; values: readonly unknown[] }>,
 ): GrowthQueryExecutor {
   return (async (
@@ -52,7 +52,10 @@ function createFakeDb(
       text: strings.join("?").replace(/\s+/g, " ").trim(),
       values,
     });
-    return rows;
+    const response = Array.isArray(responses[0])
+      ? responses[queries.length - 1]
+      : responses;
+    return response ?? [];
   }) as unknown as GrowthQueryExecutor;
 }
 
@@ -106,7 +109,8 @@ test("summarises the current-ten selection state without selecting prospect data
   const inventory = await getCurrentTenPreviewGenerationInventory(
     createFakeDb(
       [
-        {
+        [
+          {
           activeDrafts: 10,
           assessedDrafts: 10,
           pendingAssessedDrafts: 9,
@@ -118,6 +122,8 @@ test("summarises the current-ten selection state without selecting prospect data
           published: 0,
           withdrawn: 0,
         },
+        ],
+        [{ sector: "Home services", count: 1 }],
       ],
       queries,
     ),
@@ -136,10 +142,19 @@ test("summarises the current-ten selection state without selecting prospect data
       published: 0,
       withdrawn: 0,
     },
+    unavailableSectors: [{ sector: "Home services", count: 1 }],
   });
   assert.match(queries[0]?.text ?? "", /::integer as "activeDrafts"/);
   assert.match(queries[0]?.text ?? "", /left join growth\.website_assessments wa/);
   assert.doesNotMatch(queries[0]?.text ?? "", /email|contact|company_number/i);
+  assert.match(
+    queries[1]?.text ?? "",
+    /pp\.content_snapshot->>'sector' as "sector"/,
+  );
+  assert.doesNotMatch(
+    queries[1]?.text ?? "",
+    /business_name|email|contact|company_number/i,
+  );
 });
 
 test("records generation metadata only on its matching pending draft", async () => {
