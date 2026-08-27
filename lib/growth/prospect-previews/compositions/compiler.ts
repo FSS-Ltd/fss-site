@@ -6,7 +6,6 @@ import {
 } from "./types";
 
 type ProspectPreviewFamily = ProspectPreviewComposition["family"];
-type ProspectPreviewJourney = ProspectPreviewComposition["journey"];
 
 type CompositionVariant = Pick<
   ProspectPreviewComposition,
@@ -24,7 +23,7 @@ export type CompileProspectPreviewCompositionResult =
   | { status: "compiled"; composition: ProspectPreviewComposition }
   | {
       status: "unavailable";
-      reason: "unsupported_sector" | "no_unique_variant";
+      reason: "unsupported_sector" | "missing_experience_brief" | "no_unique_variant";
     };
 
 const EXTRA_VARIANTS: readonly CompositionVariant[] = [
@@ -339,59 +338,6 @@ function resolveProspectPreviewFamily(
   return null;
 }
 
-function journeyForFamily(
-  family: ProspectPreviewFamily,
-): ProspectPreviewJourney {
-  switch (family) {
-    case "automotive":
-      return {
-        type: "mot-request",
-        completionMessage: "Your preferred time is ready for a follow-up.",
-      };
-    case "property-trades":
-      return {
-        type: "quote-request",
-        completionMessage: "Your request is ready for a practical follow-up.",
-      };
-    case "hospitality":
-      return {
-        type: "table-enquiry",
-        completionMessage:
-          "Your table enquiry is ready for a considered reply.",
-      };
-    case "property":
-      return {
-        type: "valuation-request",
-        completionMessage:
-          "Your property enquiry is ready for a local follow-up.",
-      };
-    case "professional-services":
-      return {
-        type: "consultation-request",
-        completionMessage:
-          "Your consultation request is ready for a clear next step.",
-      };
-  }
-}
-
-function headlineForFamily(
-  family: ProspectPreviewFamily,
-  locality: string,
-): string {
-  switch (family) {
-    case "automotive":
-      return `Vehicle care made easier to book in ${locality}.`;
-    case "property-trades":
-      return `A clearer route to practical help in ${locality}.`;
-    case "hospitality":
-      return `A more considered first welcome in ${locality}.`;
-    case "property":
-      return `A clearer start for property decisions in ${locality}.`;
-    case "professional-services":
-      return `Professional advice with a clearer first step in ${locality}.`;
-  }
-}
-
 function orderedVariants(
   family: ProspectPreviewFamily,
   prospectId: string,
@@ -412,20 +358,28 @@ function createComposition(
   family: ProspectPreviewFamily,
   variant: CompositionVariant,
 ): ProspectPreviewComposition {
+  if (input.snapshot.schemaVersion !== "1.1") {
+    throw new TypeError("Evidence-backed preview composition requires schema version 1.1.");
+  }
+
+  const experienceBrief = input.snapshot.experienceBrief;
   const draft = {
-    schemaVersion: "1.0" as const,
+    schemaVersion: "1.1" as const,
     prospectId: input.prospectId,
     slug: input.slug,
     family,
     visualDirection: variant.visualDirection,
     heroTreatment: variant.heroTreatment,
     sectionOrder: variant.sectionOrder,
-    journey: journeyForFamily(family),
+    journey: {
+      type: "evidence-backed" as const,
+      ...experienceBrief.journey,
+    },
     copy: {
       businessName: input.snapshot.businessName,
       locality: input.snapshot.locality,
-      headline: headlineForFamily(family, input.snapshot.locality),
-      primaryCta: input.snapshot.primaryCta,
+      headline: experienceBrief.hero.statement,
+      primaryCta: experienceBrief.journey.primaryCta,
     },
     content: {
       businessGoal: input.snapshot.businessGoal,
@@ -433,6 +387,8 @@ function createComposition(
       conversionPlan: input.snapshot.conversionPlan,
       trustSignals: input.snapshot.trustSignals,
     },
+    hero: experienceBrief.hero,
+    visual: experienceBrief.visual,
   };
   const digest = buildCompositionDigest(draft);
   return { ...draft, digest };
@@ -444,6 +400,9 @@ export function compileProspectPreviewComposition(
   const family = resolveProspectPreviewFamily(input.snapshot.sector);
   if (family === null)
     return { status: "unavailable", reason: "unsupported_sector" };
+  if (input.snapshot.schemaVersion !== "1.1") {
+    return { status: "unavailable", reason: "missing_experience_brief" };
+  }
 
   for (const variant of orderedVariants(family, input.prospectId)) {
     const composition = createComposition(input, family, variant);

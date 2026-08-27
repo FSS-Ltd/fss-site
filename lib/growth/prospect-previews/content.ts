@@ -26,8 +26,7 @@ function requirePreviewUrl(value: string): string {
 export function createDraftPreviewSnapshot(
   candidate: ResearchProspectCandidate,
 ): StoredProspectPreviewSnapshot {
-  return {
-    schemaVersion: "1.0",
+  const snapshot = {
     businessName: candidate.business.tradingName ?? candidate.business.legalName,
     sector: candidate.business.sector,
     locality: candidate.business.locality,
@@ -36,6 +35,19 @@ export function createDraftPreviewSnapshot(
     homepageSections: candidate.assessment.homepageSections,
     conversionPlan: candidate.assessment.conversionPlan,
     trustSignals: candidate.assessment.trustSignals,
+  };
+
+  if (candidate.assessment.experienceBrief !== undefined) {
+    return {
+      schemaVersion: "1.1",
+      ...snapshot,
+      experienceBrief: candidate.assessment.experienceBrief,
+    };
+  }
+
+  return {
+    schemaVersion: "1.0",
+    ...snapshot,
   };
 }
 

@@ -67,6 +67,10 @@ test("runs the researcher in a disposable workspace with schema-constrained outp
     assert.match(prompt, /two or three sourced website-journey improvements/i);
     assert.match(prompt, /private preview URL/i);
     assert.match(prompt, /never call.*prospect-preview-prs/i);
+    assert.match(prompt, /version 1\.1 bundle/i);
+    assert.match(prompt, /first-party preview evidence only/i);
+    assert.match(prompt, /no AI image API/i);
+    assert.match(prompt, /prospect-preview-assets/i);
 
     const schemaPath = input.args[input.args.indexOf("--output-schema") + 1];
     const reportPath =

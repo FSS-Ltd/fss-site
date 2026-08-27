@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import type { PreviewGenerationCandidate } from "../composition-repository";
+import { withEvidenceBackedExperience } from "../test-fixtures";
 import {
   createProspectPreviewPrRun,
   type ProspectPreviewPrGenerationRepository,
@@ -9,7 +10,7 @@ import {
 
 const RUN_ID = "weekday-2026-08-27-0600-europe-london-v1";
 const NOW = new Date("2026-08-27T05:05:00.000Z");
-const candidates: readonly PreviewGenerationCandidate[] = [
+const legacyCandidates: readonly PreviewGenerationCandidate[] = [
   {
     previewId: "b7c63de7-3e17-4347-8f8a-618c1b0d09c8",
     prospectId: "3381388d-503a-4545-844d-6c29dedb2b35",
@@ -65,6 +66,13 @@ const candidates: readonly PreviewGenerationCandidate[] = [
     },
   },
 ];
+
+const candidates: readonly PreviewGenerationCandidate[] = legacyCandidates.map(
+  (candidate) => ({
+    ...candidate,
+    snapshot: withEvidenceBackedExperience(candidate.snapshot),
+  }),
+);
 
 function createRepository(): {
   repository: ProspectPreviewPrGenerationRepository;

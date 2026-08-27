@@ -1,4 +1,10 @@
+import Image from "next/image";
+
 import type { ProspectPreviewComposition } from "@/lib/growth/prospect-previews/compositions/types";
+
+function previewAssetPath(assetId: string): string {
+  return `/api/prospect-preview-assets/${assetId}`;
+}
 
 function HeroArtwork({
   treatment,
@@ -76,21 +82,51 @@ export function CompositionHero({
 }: {
   composition: ProspectPreviewComposition;
 }) {
+  const hero =
+    composition.schemaVersion === "1.1" ? composition.hero : undefined;
+  const visual =
+    composition.schemaVersion === "1.1" ? composition.visual : undefined;
+  const heroAssetId =
+    visual?.approvedHeroMediaAssetId ?? visual?.onSiteImageAssetId ?? null;
+
   return (
     <header className="grid min-h-[min(44rem,calc(100vh-4rem))] items-center gap-8 py-8 sm:py-16 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,.9fr)] lg:gap-16">
       <div>
-        <p className="m-0 text-xs font-extrabold uppercase tracking-[0.16em] text-[var(--preview-accent)]">
-          {composition.copy.businessName} · {composition.copy.locality}
-        </p>
+        {visual?.logoAssetId !== null && visual?.logoAssetId !== undefined ? (
+          <Image
+            alt={`${composition.copy.businessName} logo`}
+            className="mb-6 max-h-12 w-auto object-contain object-left"
+            height={48}
+            src={previewAssetPath(visual.logoAssetId)}
+            unoptimized
+            width={180}
+          />
+        ) : (
+          <p className="m-0 text-xs font-extrabold uppercase tracking-[0.16em] text-[var(--preview-accent)]">
+            {composition.copy.businessName} · {composition.copy.locality}
+          </p>
+        )}
         <h1 className="mt-4 max-w-[12ch] text-[clamp(3rem,8vw,6.25rem)] font-semibold tracking-[-0.065em] leading-[0.96]">
-          {composition.copy.headline}
+          {hero?.statement ?? composition.copy.headline}
         </h1>
         <p className="mt-6 max-w-2xl text-[clamp(1.05rem,2vw,1.3rem)] leading-7 text-[var(--preview-muted)]">
-          {composition.content.businessGoal}
+          {hero?.supportingStatement ?? composition.content.businessGoal}
         </p>
       </div>
-      <div className="min-h-88 overflow-hidden rounded-[2rem] border border-black/10 bg-[var(--preview-surface)] shadow-2xl shadow-black/15">
-        <HeroArtwork treatment={composition.heroTreatment} />
+      <div className="relative min-h-88 overflow-hidden rounded-[2rem] border border-black/10 bg-[var(--preview-surface)] shadow-2xl shadow-black/15">
+        {heroAssetId !== null ? (
+          <Image
+            alt={`${composition.copy.businessName} first-party visual`}
+            className="object-cover"
+            fill
+            priority
+            sizes="(min-width: 1024px) 45vw, 100vw"
+            src={previewAssetPath(heroAssetId)}
+            unoptimized
+          />
+        ) : (
+          <HeroArtwork treatment={composition.heroTreatment} />
+        )}
       </div>
     </header>
   );

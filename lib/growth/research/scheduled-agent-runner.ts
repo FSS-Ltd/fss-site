@@ -64,6 +64,8 @@ function buildAgentPrompt(
     "docs/growth-os/fixtures/research-run-v1.json",
     "lib/growth/research/ingestion-schema.ts",
     "lib/growth/research/types.ts",
+    "lib/growth/prospect-previews/experience-brief.ts",
+    "lib/growth/prospect-previews/assets/route-handler.ts",
     "lib/growth/email/assets/fallbacks.ts",
   ].map((path) => join(repositoryRoot, path));
 
@@ -77,7 +79,8 @@ function buildAgentPrompt(
     "Never call /api/agent/prospect-preview-prs or use GitHub. The trusted parent scheduler creates review pull requests only after your signed research submission succeeds.",
     "Load GROWTH_OS_AGENT_HMAC_SECRET only at runtime from macOS Keychain service dev.faithfulsoftware.growth-os.agent-hmac and account growth-os-weekday-company-research. Keep it in process memory only and never print or persist it.",
     "Create any temporary bundle or helper only inside the current disposable working directory. Delete it before finishing. Never print a secret, signature, raw bundle, email address, contact name, raw URL, email copy, or assessment text.",
-    "Validate the complete version 1.0 bundle against the repository contract, sign and submit the exact bytes, and retain reviewed fallback visuals when image generation is unavailable.",
+    "Validate the complete version 1.1 bundle against the repository contract, sign and submit the exact bytes. For every accepted candidate, collect first-party preview evidence only: logo, brand colours, real service language, and eligible on-site imagery when present. Every item needs its first-party source URL, observed timestamp, and a short evidence text. Build an evidence-backed hero statement and an explicit customer journey from that evidence. Never use Google Maps, third-party assets, or generic sector headlines in preview evidence.",
+    "No AI image API calls. After the signed research submission succeeds and returns the prospect IDs, upload only found first-party logo or on-site image files through /api/agent/prospect-preview-assets. Sign each exact multipart request with the same agent HMAC headers. Include the matching run ID, prospect ID, preview evidence ID, exact first-party source URL, asset kind, meaningful alt text, and file. Do not upload generated 3D or hero media: that remains a separate founder-approved step.",
     "Never create a Gmail draft and never send email.",
     "Return every controlled rejection reason key with an integer count, including zeroes, and make the reason counts sum exactly to the rejected total.",
     "Return only the redacted JSON run report required by the output schema. Do not wrap it in Markdown or add commentary.",

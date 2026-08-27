@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { experienceBriefSchema } from "./experience-brief";
+
 function exactText(minimum: number, maximum: number) {
   return z
     .string()
@@ -24,19 +26,39 @@ export const prospectPreviewAssessmentSectionSchema = z
   })
   .strict();
 
-export const storedProspectPreviewSnapshotSchema = z
+const storedProspectPreviewSnapshotFields = {
+  businessName: exactText(1, 200),
+  sector: exactText(1, 160),
+  locality: exactText(1, 160),
+  businessGoal: exactText(1, 2_000),
+  primaryCta: exactText(1, 500),
+  homepageSections: prospectPreviewAssessmentSectionSchema,
+  conversionPlan: prospectPreviewAssessmentSectionSchema,
+  trustSignals: prospectPreviewAssessmentSectionSchema,
+};
+
+const storedProspectPreviewSnapshotV1Schema = z
   .object({
     schemaVersion: z.literal("1.0"),
-    businessName: exactText(1, 200),
-    sector: exactText(1, 160),
-    locality: exactText(1, 160),
-    businessGoal: exactText(1, 2_000),
-    primaryCta: exactText(1, 500),
-    homepageSections: prospectPreviewAssessmentSectionSchema,
-    conversionPlan: prospectPreviewAssessmentSectionSchema,
-    trustSignals: prospectPreviewAssessmentSectionSchema,
+    ...storedProspectPreviewSnapshotFields,
   })
   .strict();
+
+const storedProspectPreviewSnapshotV11Schema = z
+  .object({
+    schemaVersion: z.literal("1.1"),
+    ...storedProspectPreviewSnapshotFields,
+    experienceBrief: experienceBriefSchema,
+  })
+  .strict();
+
+export const storedProspectPreviewSnapshotSchema = z.discriminatedUnion(
+  "schemaVersion",
+  [
+    storedProspectPreviewSnapshotV1Schema,
+    storedProspectPreviewSnapshotV11Schema,
+  ],
+);
 
 export type StoredProspectPreviewSnapshot = z.infer<
   typeof storedProspectPreviewSnapshotSchema

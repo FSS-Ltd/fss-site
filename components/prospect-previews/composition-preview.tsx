@@ -6,6 +6,7 @@ import { CompositionHero } from "./composition-modules/composition-hero";
 import { CompositionJourney } from "./composition-modules/composition-journey";
 import { CompositionOwnerCta } from "./composition-modules/composition-owner-cta";
 import { CompositionSection } from "./composition-modules/composition-section";
+import { RevealOnScroll } from "./reveal-on-scroll";
 
 type PreviewTheme = CSSProperties & {
   "--preview-background": string;
@@ -64,6 +65,20 @@ type CompositionPreviewProps = {
   mode: "public" | "review";
 };
 
+function themeForComposition(
+  composition: ProspectPreviewComposition,
+): PreviewTheme {
+  const theme = themes[composition.visualDirection];
+  if (composition.schemaVersion !== "1.1") return theme;
+
+  const [accent, background] = composition.visual.brandColors;
+  return {
+    ...theme,
+    "--preview-accent": accent ?? theme["--preview-accent"],
+    "--preview-background": background ?? theme["--preview-background"],
+  };
+}
+
 export function CompositionPreview({
   composition,
   mode,
@@ -92,11 +107,13 @@ export function CompositionPreview({
       className="min-h-screen bg-[var(--preview-background)] text-[var(--preview-ink)]"
       data-preview-family={composition.family}
       data-visual-direction={composition.visualDirection}
-      style={themes[composition.visualDirection]}
+      style={themeForComposition(composition)}
     >
       <div className="mx-auto w-full max-w-6xl px-4 py-4 sm:px-8 sm:py-8">
         {composition.sectionOrder.map((section) => (
-          <div key={section}>{sections[section]}</div>
+          <RevealOnScroll delay={section === "hero" ? 0 : 80} key={section}>
+            {sections[section]}
+          </RevealOnScroll>
         ))}
       </div>
     </main>

@@ -6,12 +6,107 @@ import { parseResearchRunIngestion } from "./ingestion-schema";
 import { createValidResearchRunFixture as createValidFixture } from "./ingestion-schema.test-fixture";
 import { MAX_RESEARCH_BUNDLE_BYTES } from "./limits";
 
+function createEvidenceBackedFixture() {
+  const fixture = createValidFixture();
+  const candidate = fixture.prospects[0]!;
+
+  return {
+    ...fixture,
+    schemaVersion: "1.1" as const,
+    prospects: [
+      {
+        ...candidate,
+        brandEvidence: [
+          {
+            id: "00000000-0000-4000-8000-000000000001",
+            kind: "service-language" as const,
+            sourceUrl: "https://example.test/services",
+            evidenceText: "MOT, servicing and repairs for local drivers.",
+            observedAt: "2026-08-17T05:25:00.000Z",
+          },
+          {
+            id: "00000000-0000-4000-8000-000000000002",
+            kind: "brand-colours" as const,
+            sourceUrl: "https://example.test",
+            evidenceText: "#19374A",
+            observedAt: "2026-08-17T05:25:00.000Z",
+          },
+        ],
+        assessment: {
+          ...candidate.assessment,
+          experienceBrief: {
+            schemaVersion: "1.1" as const,
+            hero: {
+              statement:
+                "Start your MOT, service or repair request with your registration.",
+              supportingStatement:
+                "Example Services can prepare the workshop conversation with the right vehicle details.",
+              evidenceIds: ["00000000-0000-4000-8000-000000000001"],
+            },
+            journey: {
+              title: "Get your vehicle ready for the workshop",
+              primaryCta: "Start with your registration",
+              completionMessage: "Your workshop request is ready to review.",
+              steps: [
+                {
+                  id: "vehicle",
+                  label: "Tell us about your vehicle",
+                  kind: "vehicle-registration" as const,
+                  control: "registration" as const,
+                  requiredFields: ["registration" as const],
+                  options: [],
+                },
+                {
+                  id: "review",
+                  label: "Review your request",
+                  kind: "review" as const,
+                  control: "review" as const,
+                  requiredFields: [],
+                  options: [],
+                },
+              ],
+            },
+            visual: {
+              brandColors: ["#19374A"],
+              colourEvidenceIds: ["00000000-0000-4000-8000-000000000002"],
+              logoEvidenceId: null,
+              logoAssetId: null,
+              onSiteImageEvidenceId: null,
+              onSiteImageAssetId: null,
+              approvedHeroMediaAssetId: null,
+            },
+          },
+        },
+      },
+    ],
+  };
+}
+
 test("accepts one complete versioned research bundle", () => {
   const parsed = parseResearchRunIngestion(createValidFixture());
 
   assert.equal(parsed.schemaVersion, "1.0");
   assert.equal(parsed.prospects[0]?.business.county, "Kent");
   assert.equal(parsed.prospects[0]?.prospect.fitScore, 91);
+});
+
+test("requires first-party evidence for an evidence-backed preview brief", () => {
+  const parsed = parseResearchRunIngestion(createEvidenceBackedFixture());
+
+  assert.equal(parsed.schemaVersion, "1.1");
+  assert.equal(
+    parsed.prospects[0]?.assessment.experienceBrief?.journey.steps[0]?.control,
+    "registration",
+  );
+
+  const invalid = createEvidenceBackedFixture();
+  invalid.prospects[0]!.brandEvidence[0]!.sourceUrl =
+    "https://maps.google.com/?cid=123";
+
+  assert.throws(
+    () => parseResearchRunIngestion(invalid),
+    /first-party preview evidence/i,
+  );
 });
 
 test("requires a source-backed initial-email narrative", () => {

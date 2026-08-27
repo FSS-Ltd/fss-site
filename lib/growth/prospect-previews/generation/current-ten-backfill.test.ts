@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import type { PreviewGenerationCandidate } from "../composition-repository";
+import { withEvidenceBackedExperience } from "../test-fixtures";
 import {
   classifyCurrentTenPreviewBackfillFailure,
   isCurrentTenPreviewBackfillRunId,
@@ -62,7 +63,7 @@ function candidate(index: number): PreviewGenerationCandidate {
   return {
     previewId: `${identifier}-0000-4000-8000-000000000001`,
     prospectId: `${identifier}-0000-4000-8000-000000000002`,
-    snapshot: {
+    snapshot: withEvidenceBackedExperience({
       schemaVersion: "1.0",
       businessName: `Prospect ${index}`,
       sector,
@@ -84,7 +85,7 @@ function candidate(index: number): PreviewGenerationCandidate {
         summary: "Local drivers need clear evidence before booking.",
         items: ["Explain workshop experience"],
       },
-    },
+    }),
   };
 }
 
