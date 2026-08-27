@@ -78,8 +78,10 @@ test("creates one dated pull request containing only approved preview source fil
     url: "https://github.com/FSS-Ltd/fss-site/pull/412",
     alreadyOpen: false,
   });
-  assert.equal(calls.length, 8);
-  assert.ok(calls.every((call) => call.url.origin === "https://api.github.com"));
+  assert.equal(calls.length, 9);
+  assert.ok(
+    calls.every((call) => call.url.origin === "https://api.github.com"),
+  );
   assert.ok(
     calls.every((call) =>
       call.url.pathname.startsWith("/repos/FSS-Ltd/fss-site/"),
@@ -90,19 +92,90 @@ test("creates one dated pull request containing only approved preview source fil
     ref: `refs/heads/${branch}`,
     sha: "base-sha",
   });
-  assert.equal(calls[3]?.init.method, "PUT");
-  assert.deepEqual(JSON.parse(String(calls[3]?.init.body)), {
+  assert.equal(calls[4]?.init.method, "PUT");
+  assert.deepEqual(JSON.parse(String(calls[4]?.init.body)), {
     message: "feat: add generated prospect preview compositions",
     content: Buffer.from(files[0].content).toString("base64"),
     branch,
   });
-  assert.equal(calls[3]?.init.headers instanceof Headers, true);
+  assert.equal(calls[4]?.init.headers instanceof Headers, true);
   assert.equal(
-    (calls[3]?.init.headers as Headers).get("authorization"),
+    (calls[4]?.init.headers as Headers).get("authorization"),
     `Bearer ${token}`,
   );
-  assert.equal(calls[6]?.url.searchParams.get("head"), `FSS-Ltd:${branch}`);
-  assert.equal(calls[6]?.url.searchParams.get("base"), "main");
+  assert.equal(calls[7]?.url.searchParams.get("head"), `FSS-Ltd:${branch}`);
+  assert.equal(calls[7]?.url.searchParams.get("base"), "main");
+});
+
+test("preserves existing generated manifest entries when it updates an open dated pull request", async () => {
+  const existingManifest = [
+    'import { createProspectPreviewCompositionManifest } from "./manifest-core";',
+    'import type { ProspectPreviewComposition } from "./types";',
+    'import { fugglesBeerCafeComposition } from "./generated/fuggles-beer-cafe";',
+  ].join("\n");
+  const requests: RequestCall[] = [];
+  let manifestReads = 0;
+  const result = await createGitHubPreviewPullRequest({
+    token,
+    branch,
+    title: "feat: add prospect previews for 2026-08-27",
+    body: "Review generated prospect preview compositions.",
+    files,
+    request: async (url, init) => {
+      requests.push({ url, init });
+      const method = init.method ?? "GET";
+      if (url.pathname.endsWith("/git/ref/heads/main")) {
+        return jsonResponse({ object: { sha: "base-sha" } });
+      }
+      if (url.pathname.endsWith("/git/refs")) {
+        return jsonResponse({ ref: `refs/heads/${branch}` }, 422);
+      }
+      if (method === "GET" && url.pathname.endsWith("/manifest.ts")) {
+        manifestReads += 1;
+        return manifestReads === 1
+          ? jsonResponse({
+              sha: "manifest-sha",
+              encoding: "base64",
+              content: Buffer.from(existingManifest).toString("base64"),
+            })
+          : jsonResponse({ sha: "manifest-sha" });
+      }
+      if (method === "GET" && url.pathname.includes("/contents/")) {
+        return jsonResponse({ message: "Not Found" }, 404);
+      }
+      if (method === "PUT" && url.pathname.includes("/contents/")) {
+        return jsonResponse({ content: { sha: "written" } }, 201);
+      }
+      if (url.pathname.endsWith("/pulls")) {
+        return jsonResponse([
+          {
+            number: 412,
+            html_url: "https://github.com/FSS-Ltd/fss-site/pull/412",
+          },
+        ]);
+      }
+      throw new Error(`Unexpected request: ${url}`);
+    },
+  });
+
+  assert.equal(result.alreadyOpen, true);
+  const manifestWrite = requests.find(
+    (request) =>
+      request.init.method === "PUT" &&
+      request.url.pathname.endsWith("/manifest.ts"),
+  );
+  const manifestContent = Buffer.from(
+    JSON.parse(String(manifestWrite?.init.body)).content,
+    "base64",
+  ).toString("utf8");
+  assert.match(
+    manifestContent,
+    /import \{ fugglesBeerCafeComposition \} from "\.\/generated\/fuggles-beer-cafe";/,
+  );
+  assert.match(
+    manifestContent,
+    /import \{ mardenGarageComposition \} from "\.\/generated\/marden-garage";/,
+  );
 });
 
 test("reuses a matching open dated pull request without a duplicate", async () => {

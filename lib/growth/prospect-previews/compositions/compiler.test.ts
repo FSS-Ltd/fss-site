@@ -20,7 +20,10 @@ const automotiveSnapshot: StoredProspectPreviewSnapshot = {
   conversionPlan: {
     schemaVersion: "1.0",
     summary: "Offer one clear route into the workshop.",
-    items: ["Show the next available MOT step", "Explain what happens after an enquiry"],
+    items: [
+      "Show the next available MOT step",
+      "Explain what happens after an enquiry",
+    ],
   },
   trustSignals: {
     schemaVersion: "1.0",
@@ -70,5 +73,45 @@ test("returns unavailable for an unsupported sector", () => {
     existingFingerprints: new Set(),
   });
 
-  assert.deepEqual(result, { status: "unavailable", reason: "unsupported_sector" });
+  assert.deepEqual(result, {
+    status: "unavailable",
+    reason: "unsupported_sector",
+  });
+});
+
+test("assigns professional and business services to the consultation journey", () => {
+  const composition = requireComposition(
+    compileProspectPreviewComposition({
+      prospectId: "f8ff41ea-7f74-4b81-a92c-9c6f3a4fe333",
+      slug: "example-business-services",
+      snapshot: {
+        ...automotiveSnapshot,
+        sector: "Professional and business services",
+      },
+      existingFingerprints: new Set(),
+    }),
+  );
+
+  assert.equal(composition.family, "professional-services");
+  assert.equal(composition.journey.type, "consultation-request");
+});
+
+test("supplies ten distinct property compositions for a full current-ten run", () => {
+  const fingerprints = new Set<string>();
+
+  for (let index = 0; index < 10; index += 1) {
+    const composition = requireComposition(
+      compileProspectPreviewComposition({
+        prospectId: `00000000-0000-4000-8000-${String(index + 1).padStart(12, "0")}`,
+        slug: `estate-agent-${index + 1}`,
+        snapshot: { ...automotiveSnapshot, sector: "Estate agents" },
+        existingFingerprints: fingerprints,
+      }),
+    );
+
+    assert.equal(composition.family, "property");
+    fingerprints.add(buildCompositionFingerprint(composition));
+  }
+
+  assert.equal(fingerprints.size, 10);
 });

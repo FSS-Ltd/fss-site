@@ -27,6 +27,93 @@ export type CompileProspectPreviewCompositionResult =
       reason: "unsupported_sector" | "no_unique_variant";
     };
 
+const EXTRA_VARIANTS: readonly CompositionVariant[] = [
+  {
+    visualDirection: "precision-dark",
+    heroTreatment: "ledger-grid",
+    sectionOrder: [
+      "hero",
+      "proof",
+      "case-for-change",
+      "services",
+      "journey",
+      "owner-cta",
+    ],
+  },
+  {
+    visualDirection: "warm-editorial",
+    heroTreatment: "workshop-geometry",
+    sectionOrder: [
+      "hero",
+      "locality",
+      "proof",
+      "services",
+      "journey",
+      "owner-cta",
+    ],
+  },
+  {
+    visualDirection: "calm-architectural",
+    heroTreatment: "crafted-table",
+    sectionOrder: [
+      "hero",
+      "services",
+      "case-for-change",
+      "proof",
+      "journey",
+      "owner-cta",
+    ],
+  },
+  {
+    visualDirection: "local-service",
+    heroTreatment: "property-frame",
+    sectionOrder: [
+      "hero",
+      "proof",
+      "locality",
+      "services",
+      "journey",
+      "owner-cta",
+    ],
+  },
+  {
+    visualDirection: "considered-ledger",
+    heroTreatment: "service-map",
+    sectionOrder: [
+      "hero",
+      "services",
+      "proof",
+      "case-for-change",
+      "journey",
+      "owner-cta",
+    ],
+  },
+  {
+    visualDirection: "precision-dark",
+    heroTreatment: "property-frame",
+    sectionOrder: [
+      "hero",
+      "locality",
+      "services",
+      "case-for-change",
+      "journey",
+      "owner-cta",
+    ],
+  },
+  {
+    visualDirection: "warm-editorial",
+    heroTreatment: "service-map",
+    sectionOrder: [
+      "hero",
+      "proof",
+      "services",
+      "locality",
+      "journey",
+      "owner-cta",
+    ],
+  },
+];
+
 const FAMILY_VARIANTS: Record<
   ProspectPreviewFamily,
   readonly CompositionVariant[]
@@ -35,90 +122,202 @@ const FAMILY_VARIANTS: Record<
     {
       visualDirection: "precision-dark",
       heroTreatment: "workshop-geometry",
-      sectionOrder: ["hero", "proof", "services", "journey", "locality", "owner-cta"],
+      sectionOrder: [
+        "hero",
+        "proof",
+        "services",
+        "journey",
+        "locality",
+        "owner-cta",
+      ],
     },
     {
       visualDirection: "calm-architectural",
       heroTreatment: "service-map",
-      sectionOrder: ["hero", "services", "proof", "locality", "journey", "owner-cta"],
+      sectionOrder: [
+        "hero",
+        "services",
+        "proof",
+        "locality",
+        "journey",
+        "owner-cta",
+      ],
     },
     {
       visualDirection: "local-service",
       heroTreatment: "local-silhouette",
-      sectionOrder: ["hero", "locality", "proof", "services", "journey", "owner-cta"],
+      sectionOrder: [
+        "hero",
+        "locality",
+        "proof",
+        "services",
+        "journey",
+        "owner-cta",
+      ],
     },
+    ...EXTRA_VARIANTS,
   ],
   "property-trades": [
     {
       visualDirection: "local-service",
       heroTreatment: "service-map",
-      sectionOrder: ["hero", "services", "journey", "proof", "locality", "owner-cta"],
+      sectionOrder: [
+        "hero",
+        "services",
+        "journey",
+        "proof",
+        "locality",
+        "owner-cta",
+      ],
     },
     {
       visualDirection: "warm-editorial",
       heroTreatment: "crafted-table",
-      sectionOrder: ["hero", "proof", "case-for-change", "journey", "locality", "owner-cta"],
+      sectionOrder: [
+        "hero",
+        "proof",
+        "case-for-change",
+        "journey",
+        "locality",
+        "owner-cta",
+      ],
     },
     {
       visualDirection: "precision-dark",
       heroTreatment: "local-silhouette",
-      sectionOrder: ["hero", "locality", "services", "proof", "journey", "owner-cta"],
+      sectionOrder: [
+        "hero",
+        "locality",
+        "services",
+        "proof",
+        "journey",
+        "owner-cta",
+      ],
     },
+    ...EXTRA_VARIANTS,
   ],
   hospitality: [
     {
       visualDirection: "warm-editorial",
       heroTreatment: "crafted-table",
-      sectionOrder: ["hero", "proof", "services", "journey", "locality", "owner-cta"],
+      sectionOrder: [
+        "hero",
+        "proof",
+        "services",
+        "journey",
+        "locality",
+        "owner-cta",
+      ],
     },
     {
       visualDirection: "calm-architectural",
       heroTreatment: "property-frame",
-      sectionOrder: ["hero", "locality", "services", "proof", "journey", "owner-cta"],
+      sectionOrder: [
+        "hero",
+        "locality",
+        "services",
+        "proof",
+        "journey",
+        "owner-cta",
+      ],
     },
     {
       visualDirection: "local-service",
       heroTreatment: "local-silhouette",
-      sectionOrder: ["hero", "services", "journey", "proof", "locality", "owner-cta"],
+      sectionOrder: [
+        "hero",
+        "services",
+        "journey",
+        "proof",
+        "locality",
+        "owner-cta",
+      ],
     },
+    ...EXTRA_VARIANTS,
   ],
   property: [
     {
       visualDirection: "calm-architectural",
       heroTreatment: "property-frame",
-      sectionOrder: ["hero", "locality", "proof", "journey", "services", "owner-cta"],
+      sectionOrder: [
+        "hero",
+        "locality",
+        "proof",
+        "journey",
+        "services",
+        "owner-cta",
+      ],
     },
     {
       visualDirection: "considered-ledger",
       heroTreatment: "ledger-grid",
-      sectionOrder: ["hero", "services", "case-for-change", "journey", "proof", "owner-cta"],
+      sectionOrder: [
+        "hero",
+        "services",
+        "case-for-change",
+        "journey",
+        "proof",
+        "owner-cta",
+      ],
     },
     {
       visualDirection: "warm-editorial",
       heroTreatment: "local-silhouette",
-      sectionOrder: ["hero", "proof", "locality", "services", "journey", "owner-cta"],
+      sectionOrder: [
+        "hero",
+        "proof",
+        "locality",
+        "services",
+        "journey",
+        "owner-cta",
+      ],
     },
+    ...EXTRA_VARIANTS,
   ],
   "professional-services": [
     {
       visualDirection: "considered-ledger",
       heroTreatment: "ledger-grid",
-      sectionOrder: ["hero", "proof", "case-for-change", "journey", "services", "owner-cta"],
+      sectionOrder: [
+        "hero",
+        "proof",
+        "case-for-change",
+        "journey",
+        "services",
+        "owner-cta",
+      ],
     },
     {
       visualDirection: "calm-architectural",
       heroTreatment: "property-frame",
-      sectionOrder: ["hero", "services", "proof", "locality", "journey", "owner-cta"],
+      sectionOrder: [
+        "hero",
+        "services",
+        "proof",
+        "locality",
+        "journey",
+        "owner-cta",
+      ],
     },
     {
       visualDirection: "precision-dark",
       heroTreatment: "local-silhouette",
-      sectionOrder: ["hero", "locality", "case-for-change", "proof", "journey", "owner-cta"],
+      sectionOrder: [
+        "hero",
+        "locality",
+        "case-for-change",
+        "proof",
+        "journey",
+        "owner-cta",
+      ],
     },
+    ...EXTRA_VARIANTS,
   ],
 };
 
-function resolveProspectPreviewFamily(sector: string): ProspectPreviewFamily | null {
+function resolveProspectPreviewFamily(
+  sector: string,
+): ProspectPreviewFamily | null {
   const value = sector.toLocaleLowerCase("en-GB");
 
   if (/garage|mot|vehicle|automotive|car/.test(value)) return "automotive";
@@ -129,14 +328,20 @@ function resolveProspectPreviewFamily(sector: string): ProspectPreviewFamily | n
     return "hospitality";
   }
   if (/estate|letting|property/.test(value)) return "property";
-  if (/account|legal|law|consult|financial/.test(value)) {
+  if (
+    /account|legal|law|consult|financial|professional|business services/.test(
+      value,
+    )
+  ) {
     return "professional-services";
   }
 
   return null;
 }
 
-function journeyForFamily(family: ProspectPreviewFamily): ProspectPreviewJourney {
+function journeyForFamily(
+  family: ProspectPreviewFamily,
+): ProspectPreviewJourney {
   switch (family) {
     case "automotive":
       return {
@@ -151,17 +356,20 @@ function journeyForFamily(family: ProspectPreviewFamily): ProspectPreviewJourney
     case "hospitality":
       return {
         type: "table-enquiry",
-        completionMessage: "Your table enquiry is ready for a considered reply.",
+        completionMessage:
+          "Your table enquiry is ready for a considered reply.",
       };
     case "property":
       return {
         type: "valuation-request",
-        completionMessage: "Your property enquiry is ready for a local follow-up.",
+        completionMessage:
+          "Your property enquiry is ready for a local follow-up.",
       };
     case "professional-services":
       return {
         type: "consultation-request",
-        completionMessage: "Your consultation request is ready for a clear next step.",
+        completionMessage:
+          "Your consultation request is ready for a clear next step.",
       };
   }
 }
@@ -194,7 +402,9 @@ function orderedVariants(
     0,
   );
   const start = seed % variants.length;
-  return variants.map((_, index) => variants[(start + index) % variants.length]!);
+  return variants.map(
+    (_, index) => variants[(start + index) % variants.length]!,
+  );
 }
 
 function createComposition(
@@ -232,11 +442,14 @@ export function compileProspectPreviewComposition(
   input: CompileProspectPreviewCompositionInput,
 ): CompileProspectPreviewCompositionResult {
   const family = resolveProspectPreviewFamily(input.snapshot.sector);
-  if (family === null) return { status: "unavailable", reason: "unsupported_sector" };
+  if (family === null)
+    return { status: "unavailable", reason: "unsupported_sector" };
 
   for (const variant of orderedVariants(family, input.prospectId)) {
     const composition = createComposition(input, family, variant);
-    if (!input.existingFingerprints.has(buildCompositionFingerprint(composition))) {
+    if (
+      !input.existingFingerprints.has(buildCompositionFingerprint(composition))
+    ) {
       return { status: "compiled", composition };
     }
   }

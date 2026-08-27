@@ -40,6 +40,10 @@ export type CurrentTenPreviewGenerationInventory = {
   unavailableSectors: readonly CurrentTenUnavailableSectorCount[];
 };
 
+export type RequeueCurrentTenUnavailablePreviewCompositionsResult = {
+  requeued: number;
+};
+
 export type OpenPreviewGenerationRecord = {
   previewId: string;
   prospectId: string;
@@ -290,6 +294,32 @@ export async function getCurrentTenPreviewGenerationInventory(
     },
     unavailableSectors: unavailableSectorRows,
   };
+}
+
+export async function requeueCurrentTenUnavailablePreviewCompositions(
+  db: GrowthQueryExecutor = getGrowthDb(),
+): Promise<RequeueCurrentTenUnavailablePreviewCompositionsResult> {
+  const rows = await db<Array<{ id: string }>>`
+    update growth.prospect_previews pp
+    set generation_status = 'pending_pr',
+        generation_external_run_id = null,
+        generated_at = null,
+        updated_at = now()
+    from growth.prospects p
+    where pp.prospect_id = p.id
+      and pp.status = 'draft'
+      and pp.generation_status = 'composition_unavailable'
+      and pp.generation_external_run_id like 'current-ten-%'
+      and p.status not in ('won', 'lost', 'rejected', 'suppressed')
+      and exists (
+        select 1
+        from growth.website_assessments wa
+        where wa.prospect_id = p.id
+      )
+    returning pp.id
+  `;
+
+  return { requeued: rows.length };
 }
 
 export async function recordPreviewGenerationResult(
