@@ -1,0 +1,37 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+
+import { renderToStaticMarkup } from "react-dom/server";
+
+import ProspectPreviewPage, {
+  generateMetadata,
+  generateStaticParams,
+} from "./[slug]/page";
+
+test("prerenders the twelve public-unlisted bespoke prospect slugs", () => {
+  const params = generateStaticParams();
+  const slugs: readonly string[] = params.map(({ slug }) => slug);
+
+  assert.equal(params.length, 12);
+  assert.equal(slugs.includes("macknade"), false);
+});
+
+test("resolves a merged bespoke page without a published database record", async () => {
+  const page = await ProspectPreviewPage({
+    params: Promise.resolve({ slug: "marden-garage" }),
+  });
+  const html = renderToStaticMarkup(page);
+
+  assert.match(html, /data-bespoke-prospect="marden-garage"/);
+  assert.match(html, /Vehicle registration/);
+});
+
+test("keeps bespoke pages out of search while providing page-specific metadata", async () => {
+  const metadata = await generateMetadata({
+    params: Promise.resolve({ slug: "fuggles-beer-cafe" }),
+  });
+
+  assert.match(String(metadata.title), /Beer, food and group bookings/);
+  assert.match(String(metadata.description), /Thirty beers on tap/);
+  assert.deepEqual(metadata.robots, { index: false, follow: false });
+});
