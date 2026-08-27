@@ -17,11 +17,21 @@ export type PreviewGenerationCandidate = {
   snapshot: StoredProspectPreviewSnapshot;
 };
 
+export type CurrentTenPreviewGenerationStates = {
+  pendingPr: number;
+  prOpen: number;
+  mergedDraft: number;
+  compositionUnavailable: number;
+  published: number;
+  withdrawn: number;
+};
+
 export type CurrentTenPreviewGenerationInventory = {
   activeDrafts: number;
   assessedDrafts: number;
   pendingAssessedDrafts: number;
   eligibleDrafts: number;
+  generationStates: CurrentTenPreviewGenerationStates;
 };
 
 export type OpenPreviewGenerationRecord = {
@@ -54,8 +64,11 @@ type PreviewGenerationCandidateRow = {
   content: unknown;
 };
 
-type CurrentTenPreviewGenerationInventoryRow =
-  CurrentTenPreviewGenerationInventory;
+type CurrentTenPreviewGenerationInventoryRow = Omit<
+  CurrentTenPreviewGenerationInventory,
+  "generationStates"
+> &
+  CurrentTenPreviewGenerationStates;
 
 type OpenPreviewGenerationRecordRow = OpenPreviewGenerationRecord;
 
@@ -174,7 +187,43 @@ export async function getCurrentTenPreviewGenerationInventory(
           and pp.generation_status = 'pending_pr'
           and pp.generation_external_run_id is null
           and p.status not in ('won', 'lost', 'rejected', 'suppressed')
-      )::integer as "eligibleDrafts"
+      )::integer as "eligibleDrafts",
+      count(*) filter (
+        where pp.status = 'draft'
+          and wa.prospect_id is not null
+          and pp.generation_status = 'pending_pr'
+          and p.status not in ('won', 'lost', 'rejected', 'suppressed')
+      )::integer as "pendingPr",
+      count(*) filter (
+        where pp.status = 'draft'
+          and wa.prospect_id is not null
+          and pp.generation_status = 'pr_open'
+          and p.status not in ('won', 'lost', 'rejected', 'suppressed')
+      )::integer as "prOpen",
+      count(*) filter (
+        where pp.status = 'draft'
+          and wa.prospect_id is not null
+          and pp.generation_status = 'merged_draft'
+          and p.status not in ('won', 'lost', 'rejected', 'suppressed')
+      )::integer as "mergedDraft",
+      count(*) filter (
+        where pp.status = 'draft'
+          and wa.prospect_id is not null
+          and pp.generation_status = 'composition_unavailable'
+          and p.status not in ('won', 'lost', 'rejected', 'suppressed')
+      )::integer as "compositionUnavailable",
+      count(*) filter (
+        where pp.status = 'draft'
+          and wa.prospect_id is not null
+          and pp.generation_status = 'published'
+          and p.status not in ('won', 'lost', 'rejected', 'suppressed')
+      )::integer as "published",
+      count(*) filter (
+        where pp.status = 'draft'
+          and wa.prospect_id is not null
+          and pp.generation_status = 'withdrawn'
+          and p.status not in ('won', 'lost', 'rejected', 'suppressed')
+      )::integer as "withdrawn"
     from growth.prospect_previews pp
     inner join growth.prospects p on p.id = pp.prospect_id
     left join growth.website_assessments wa on wa.prospect_id = p.id
@@ -190,7 +239,20 @@ export async function getCurrentTenPreviewGenerationInventory(
     throw new TypeError("Current-ten preview generation inventory is invalid.");
   }
 
-  return inventory;
+  return {
+    activeDrafts: inventory.activeDrafts,
+    assessedDrafts: inventory.assessedDrafts,
+    pendingAssessedDrafts: inventory.pendingAssessedDrafts,
+    eligibleDrafts: inventory.eligibleDrafts,
+    generationStates: {
+      pendingPr: inventory.pendingPr,
+      prOpen: inventory.prOpen,
+      mergedDraft: inventory.mergedDraft,
+      compositionUnavailable: inventory.compositionUnavailable,
+      published: inventory.published,
+      withdrawn: inventory.withdrawn,
+    },
+  };
 }
 
 export async function recordPreviewGenerationResult(

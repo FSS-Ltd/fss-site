@@ -111,6 +111,12 @@ test("summarises the current-ten selection state without selecting prospect data
           assessedDrafts: 10,
           pendingAssessedDrafts: 9,
           eligibleDrafts: 8,
+          pendingPr: 8,
+          prOpen: 1,
+          mergedDraft: 0,
+          compositionUnavailable: 1,
+          published: 0,
+          withdrawn: 0,
         },
       ],
       queries,
@@ -122,6 +128,14 @@ test("summarises the current-ten selection state without selecting prospect data
     assessedDrafts: 10,
     pendingAssessedDrafts: 9,
     eligibleDrafts: 8,
+    generationStates: {
+      pendingPr: 8,
+      prOpen: 1,
+      mergedDraft: 0,
+      compositionUnavailable: 1,
+      published: 0,
+      withdrawn: 0,
+    },
   });
   assert.match(queries[0]?.text ?? "", /::integer as "activeDrafts"/);
   assert.match(queries[0]?.text ?? "", /left join growth\.website_assessments wa/);

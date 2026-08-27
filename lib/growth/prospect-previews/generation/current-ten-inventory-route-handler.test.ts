@@ -9,6 +9,14 @@ const INVENTORY = {
   assessedDrafts: 10,
   pendingAssessedDrafts: 9,
   eligibleDrafts: 8,
+  generationStates: {
+    pendingPr: 8,
+    prOpen: 1,
+    mergedDraft: 0,
+    compositionUnavailable: 1,
+    published: 0,
+    withdrawn: 0,
+  },
 };
 
 function createHandler(input: {
@@ -89,6 +97,14 @@ test("does not read the database outside Production", async () => {
     assessedDrafts: 0,
     pendingAssessedDrafts: 0,
     eligibleDrafts: 0,
+    generationStates: {
+      pendingPr: 0,
+      prOpen: 0,
+      mergedDraft: 0,
+      compositionUnavailable: 0,
+      published: 0,
+      withdrawn: 0,
+    },
   });
   assert.equal(runCalls, 0);
 });
