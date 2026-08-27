@@ -35,6 +35,12 @@ supabase migration list --linked
 - `supabase db push` requires explicit approval after the diff is
   reviewed and a backup exists (Task 7's cutover gate covers this — this
   runbook only documents the linking, not authorises the push).
+- Production's `supabase_migrations.schema_migrations` history is
+  canonical. When reviewed SQL has already been applied under a different
+  version ID, rename the local migration file to the recorded remote ID
+  without changing its SQL. Do not use `migration repair` merely to hide a
+  history mismatch, because that can make `db push` replay an existing
+  schema change.
 - The merge-to-`main` workflow runs the reviewed forward migrations only
   after its validation job succeeds. Store `SUPABASE_ACCESS_TOKEN` and
   `SUPABASE_DB_PASSWORD` as GitHub Actions secrets in the `production`
