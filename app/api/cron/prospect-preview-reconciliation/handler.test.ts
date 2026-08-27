@@ -15,7 +15,6 @@ function request(headers: Record<string, string> = {}): Request {
 test("rejects unauthenticated reconciliation requests", async () => {
   const handler = createProspectPreviewReconciliationRouteHandler({
     cronSecret: CRON_SECRET,
-    automationsEnabled: true,
     previewPrEnabled: true,
     reconcile: async () => ({ merged: 0, waiting: 0, closed: 0, invalid: 0 }),
   });
@@ -25,15 +24,14 @@ test("rejects unauthenticated reconciliation requests", async () => {
   assert.equal(response.status, 401);
 });
 
-test("does not call GitHub or the database when automations are disabled", async () => {
+test("runs preview reconciliation independently of email automation state", async () => {
   let reconciliationCalls = 0;
   const handler = createProspectPreviewReconciliationRouteHandler({
     cronSecret: CRON_SECRET,
-    automationsEnabled: false,
     previewPrEnabled: true,
     reconcile: async () => {
       reconciliationCalls += 1;
-      return { merged: 0, waiting: 0, closed: 0, invalid: 0 };
+      return { merged: 1, waiting: 0, closed: 0, invalid: 0 };
     },
   });
 
@@ -44,16 +42,15 @@ test("does not call GitHub or the database when automations are disabled", async
   assert.equal(response.status, 200);
   assert.deepEqual(await response.json(), {
     ok: true,
-    skipped: "automations_disabled",
+    reconciliation: { merged: 1, waiting: 0, closed: 0, invalid: 0 },
   });
-  assert.equal(reconciliationCalls, 0);
+  assert.equal(reconciliationCalls, 1);
 });
 
 test("does not call GitHub or the database when preview PR generation is disabled", async () => {
   let reconciliationCalls = 0;
   const handler = createProspectPreviewReconciliationRouteHandler({
     cronSecret: CRON_SECRET,
-    automationsEnabled: true,
     previewPrEnabled: false,
     reconcile: async () => {
       reconciliationCalls += 1;
@@ -76,7 +73,6 @@ test("does not call GitHub or the database when preview PR generation is disable
 test("returns only merge-state counts after an authorized reconciliation", async () => {
   const handler = createProspectPreviewReconciliationRouteHandler({
     cronSecret: CRON_SECRET,
-    automationsEnabled: true,
     previewPrEnabled: true,
     reconcile: async () => ({ merged: 2, waiting: 3, closed: 1, invalid: 1 }),
   });
@@ -96,7 +92,6 @@ test("returns a redacted error response when reconciliation fails", async () => 
   const reported: unknown[] = [];
   const handler = createProspectPreviewReconciliationRouteHandler({
     cronSecret: CRON_SECRET,
-    automationsEnabled: true,
     previewPrEnabled: true,
     reconcile: async () => {
       throw new Error("GitHub token must not escape");
