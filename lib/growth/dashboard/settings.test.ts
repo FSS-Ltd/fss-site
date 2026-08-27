@@ -186,7 +186,7 @@ test("buildSettingsView lists all five cron jobs with a label when automations a
   }
 });
 
-test("buildSettingsView groups each 90-minute schedule pair into one operational job", () => {
+test("buildSettingsView shows preview reconciliation as an every-five-minute job", () => {
   const data = buildSettingsView(baseInput());
   const operationalCrons = data.automation.crons.filter(
     (cron) => cron.path !== "/api/cron/maintenance",
@@ -199,7 +199,7 @@ test("buildSettingsView groups each 90-minute schedule pair into one operational
       "Every 90 minutes",
       "Every 90 minutes",
       "Every 90 minutes",
-      "15 6 * * 1-5",
+      "Every 5 minutes",
     ],
   );
   assert.deepEqual(
@@ -208,7 +208,7 @@ test("buildSettingsView groups each 90-minute schedule pair into one operational
       "2026-08-21T10:30:00.000Z",
       "2026-08-21T10:30:00.000Z",
       "2026-08-21T10:30:00.000Z",
-      "2026-08-24T06:15:00.000Z",
+      "2026-08-21T10:05:00.000Z",
     ],
   );
 });
