@@ -68,7 +68,13 @@ export function FounderPreviewList({
             </div>
             <div className={styles.previewReviewApproval}>
               <PreviewApproval
-                preview={{ status: "draft", version: preview.previewVersion }}
+                preview={{
+                  status: "draft",
+                  version: preview.previewVersion,
+                  compositionDigest: preview.compositionDigest,
+                  generationPrNumber: preview.generationPrNumber,
+                  generationStatus: preview.generationStatus,
+                }}
                 prospectId={preview.prospectId}
                 prospectStatus={preview.prospectStatus}
                 prospectVersion={preview.prospectVersion}

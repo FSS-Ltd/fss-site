@@ -43,6 +43,9 @@ export type ProspectDetailWebsiteAssessment = {
 };
 
 export type ProspectDetailPreview = {
+  compositionDigest: string | null;
+  generationPrNumber: number | null;
+  generationStatus: string | null;
   status: string;
   version: number;
 };
@@ -146,6 +149,9 @@ type CoreRow = {
   websiteStatus: string | null;
   websiteReviewedAt: Date | null;
   previewStatus: string | null;
+  previewCompositionDigest: string | null;
+  previewGenerationPrNumber: number | null;
+  previewGenerationStatus: string | null;
   previewVersion: number | null;
   visualBlobUrl: string | null;
   visualAltText: string | null;
@@ -203,6 +209,9 @@ async function fetchCoreRow(
       wa.status as "websiteStatus",
       wa.reviewed_at as "websiteReviewedAt",
       pp.status as "previewStatus",
+      pp.composition_digest as "previewCompositionDigest",
+      pp.generation_pr_number as "previewGenerationPrNumber",
+      pp.generation_status as "previewGenerationStatus",
       pp.version as "previewVersion",
       ea.blob_url as "visualBlobUrl",
       ea.alt_text as "visualAltText",
@@ -344,7 +353,13 @@ function toProspectDetail(
 
   const preview: ProspectDetailPreview | null =
     core.previewStatus && core.previewVersion !== null
-      ? { status: core.previewStatus, version: core.previewVersion }
+      ? {
+          status: core.previewStatus,
+          version: core.previewVersion,
+          compositionDigest: core.previewCompositionDigest,
+          generationPrNumber: core.previewGenerationPrNumber,
+          generationStatus: core.previewGenerationStatus,
+        }
       : null;
 
   const sequence: ProspectDetailSequence | null =

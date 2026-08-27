@@ -20,6 +20,9 @@ test("locks approval state, publishes the preview, saves the email, and audits a
           prospectVersion: 3,
           previewId: "preview-id",
           publicId: "Q2VhN4A7x6Y0-5s8V3d1K9PqRcFhZ9Xm",
+          slug: "marden-garage",
+          compositionDigest: "a".repeat(64),
+          generationStatus: "merged_draft",
           previewStatus: "draft",
           previewVersion: 1,
           assessmentStatus: "pending_review",
@@ -72,6 +75,8 @@ test("locks approval state, publishes the preview, saves the email, and audits a
   assert.match(queries[1]?.text ?? "", /growth\.sequence_enrollments/);
   assert.match(queries[2]?.text ?? "", /version = version \+ 1/);
   assert.match(queries[3]?.text ?? "", /status = 'published'/);
+  assert.match(queries[3]?.text ?? "", /generation_status = 'published'/);
+  assert.match(queries[3]?.text ?? "", /generation_status = 'merged_draft'/);
   assert.match(queries[3]?.text ?? "", /approved_by = \?/);
   assert.match(queries[4]?.text ?? "", /set output_snapshot = \?/);
   assert.match(queries[5]?.text ?? "", /insert into growth\.audit_log/);

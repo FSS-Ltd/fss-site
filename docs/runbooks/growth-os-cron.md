@@ -1,6 +1,6 @@
 # Growth OS cron runbook
 
-Operating notes for the four Vercel Cron jobs that drive Growth OS
+Operating notes for the five Vercel Cron jobs that drive Growth OS
 automation (`vercel.json`). This is the founder's own reference, not
 end-user documentation.
 
@@ -35,6 +35,7 @@ setting the environment variable.
 | `/api/cron/outreach-dispatch` | `0 0,3,6,9,12,15,18,21 * * *` and `30 1,4,7,10,13,16,19,22 * * *` | Every 90 minutes      | Runs Gmail sync, then claims and sends due outreach messages one batch at a time.                                                                                    |
 | `/api/cron/resend-dispatch`   | `0 0,3,6,9,12,15,18,21 * * *` and `30 1,4,7,10,13,16,19,22 * * *` | Every 90 minutes      | Claims and sends due newsletter issue sends through Resend.                                                                                                          |
 | `/api/cron/maintenance`       | `17 3 * * *`                                                      | Once daily, 03:17 UTC | Builds and logs a redacted integration health report (Gmail, Resend, database, automation state). No off-peak scheduling reason beyond avoiding the top of the hour. |
+| `/api/cron/prospect-preview-reconciliation` | `15 6 * * 1-5` | Weekdays, 06:15 UTC | Reads only open source-package PR state from the exact GitHub repository and marks a digest-matching merged package ready for founder approval. It never publishes a preview or changes email. |
 
 None of these are attached to a page route — each is its own
 `app/api/cron/<name>/route.ts` on `export const runtime = "nodejs"`, so
@@ -52,6 +53,10 @@ Vercel Cron invokes it directly.
 - `maintenance` performs no batching — it is a single read of the
   integration connections table plus environment/automation state, always
   bounded and fast.
+- `prospect-preview-reconciliation` lists only draft previews with an open
+  generation PR. It records `merged_draft` only after GitHub reports a merge
+  and the checked-in package digest still matches the draft. Closed, stale, and
+  malformed records are left unpublishable.
 
 ## Lease behaviour (why there is no separate lease-expiry job)
 

@@ -179,6 +179,24 @@ html {
   }
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  .prospect-reveal[data-prospect-reveal] {
+    transition:
+      opacity 720ms cubic-bezier(0.16, 1, 0.3, 1),
+      transform 720ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .prospect-reveal[data-prospect-reveal="pending"] {
+    opacity: 0;
+    transform: translate3d(0, 26px, 0) scale(0.985);
+  }
+
+  .prospect-reveal[data-prospect-reveal="shown"] {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
 @keyframes fssDash {
   to {
     stroke-dashoffset: -44;

@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { createGitHubPreviewPullRequest } from "./github-preview-pr";
+import {
+  createGitHubPreviewPullRequest,
+  getGitHubPreviewPullRequestState,
+} from "./github-preview-pr";
 
 const token = "github-token";
 const branch = "generated/prospect-previews/2026-08-27";
@@ -173,4 +176,32 @@ test("rejects unsafe paths and branches before GitHub is contacted", async () =>
     /path/i,
   );
   assert.equal(contacted, false);
+});
+
+test("reads only the safe merged state needed for founder publication reconciliation", async () => {
+  const calls: RequestCall[] = [];
+  const result = await getGitHubPreviewPullRequestState({
+    token,
+    number: 412,
+    request: async (url, init) => {
+      calls.push({ url, init });
+      return jsonResponse({
+        number: 412,
+        state: "closed",
+        merged_at: "2026-08-27T07:00:00.000Z",
+      });
+    },
+  });
+
+  assert.deepEqual(result, {
+    number: 412,
+    state: "closed",
+    mergedAt: new Date("2026-08-27T07:00:00.000Z"),
+  });
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0]?.init.method, "GET");
+  assert.equal(
+    calls[0]?.url.toString(),
+    "https://api.github.com/repos/FSS-Ltd/fss-site/pulls/412",
+  );
 });

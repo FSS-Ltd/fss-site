@@ -3,9 +3,11 @@ import test from "node:test";
 
 import type { GrowthQueryExecutor } from "../db/types";
 import {
+  listOpenPreviewGenerationRecords,
   listCurrentTenPreviewGenerationCandidates,
   listPreviewGenerationCandidates,
   markPreviewCompositionUnavailable,
+  markPreviewGenerationMergedDraft,
   recordPreviewGenerationResult,
 } from "./composition-repository";
 
@@ -153,5 +155,61 @@ test("marks an unsupported composition unavailable without publishing or touchin
   assert.doesNotMatch(
     queries[0]?.text ?? "",
     /agent_tasks|email|contact|company_number/i,
+  );
+});
+
+test("lists only open generated previews and marks a digest-matching package merged", async () => {
+  const queries: Array<{ text: string; values: readonly unknown[] }> = [];
+  const records = await listOpenPreviewGenerationRecords(
+    createFakeDb(
+      [
+        {
+          previewId: PREVIEW_ID,
+          prospectId: PROSPECT_ID,
+          compositionDigest: "a".repeat(64),
+          pullRequestNumber: 412,
+        },
+      ],
+      queries,
+    ),
+  );
+
+  assert.deepEqual(records, [
+    {
+      previewId: PREVIEW_ID,
+      prospectId: PROSPECT_ID,
+      compositionDigest: "a".repeat(64),
+      pullRequestNumber: 412,
+    },
+  ]);
+  assert.match(queries[0]?.text ?? "", /generation_status = 'pr_open'/);
+  assert.doesNotMatch(queries[0]?.text ?? "", /email|contact|company_number/i);
+
+  const updated = await markPreviewGenerationMergedDraft(
+    { previewId: PREVIEW_ID, compositionDigest: "a".repeat(64) },
+    createFakeDb([{ id: PREVIEW_ID }], queries),
+  );
+  assert.equal(updated, true);
+  assert.match(queries[1]?.text ?? "", /generation_status = 'merged_draft'/);
+  assert.match(queries[1]?.text ?? "", /and generation_status = 'pr_open'/);
+  assert.deepEqual(queries[1]?.values, [PREVIEW_ID, "a".repeat(64)]);
+});
+
+test("rejects malformed open preview generation records", async () => {
+  await assert.rejects(
+    listOpenPreviewGenerationRecords(
+      createFakeDb(
+        [
+          {
+            previewId: PREVIEW_ID,
+            prospectId: PROSPECT_ID,
+            compositionDigest: "not-a-digest",
+            pullRequestNumber: 412,
+          },
+        ],
+        [],
+      ),
+    ),
+    { message: "Open preview generation record is invalid." },
   );
 });

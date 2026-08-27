@@ -21,6 +21,8 @@ const optOutSentence =
   "If you would rather not hear from me, reply and I will not contact you again.";
 const conceptDisclaimer =
   "This is a private concept, not a connected live service.";
+const COMPOSITION_DIGEST = "a".repeat(64);
+const PREVIEW_SLUG = "marden-garage";
 
 function words(count: number): string {
   return Array.from({ length: count }, (_, index) => `word${index}`).join(" ");
@@ -79,6 +81,9 @@ function createRepository(status = "ready_for_email_review") {
     preview: {
       id: PREVIEW_ID,
       publicId: "Q2VhN4A7x6Y0-5s8V3d1K9PqRcFhZ9Xm",
+      slug: PREVIEW_SLUG,
+      compositionDigest: COMPOSITION_DIGEST,
+      generationStatus: "merged_draft",
       status: "draft" as string,
       version: 1,
     },
@@ -136,6 +141,12 @@ function createRepository(status = "ready_for_email_review") {
   return { repository, state };
 }
 
+function resolveCurrentComposition(prospectId: string) {
+  return prospectId === PROSPECT_ID
+    ? { prospectId: PROSPECT_ID, digest: COMPOSITION_DIGEST }
+    : null;
+}
+
 function approvalInput() {
   return {
     prospectId: PROSPECT_ID,
@@ -152,6 +163,7 @@ test("publishes a draft preview and revises only the stored first-email draft", 
     repository: fake.repository,
     now: () => new Date("2026-08-26T10:00:00.000Z"),
     siteUrl: "https://faithfulsoftware.dev",
+    resolveComposition: resolveCurrentComposition,
   });
 
   const result = await approve({} as GrowthDb, approvalInput());
@@ -165,6 +177,10 @@ test("publishes a draft preview and revises only the stored first-email draft", 
   assert.match(
     String((fake.state.savedSnapshots[0]?.email as { text?: unknown }).text),
     /I didn’t want to just list off concerns/i,
+  );
+  assert.match(
+    String((fake.state.savedSnapshots[0]?.email as { text?: unknown }).text),
+    /https:\/\/faithfulsoftware\.dev\/preview\/marden-garage/,
   );
   assert.equal(fake.state.gmailCalls, 0);
   assert.equal(fake.state.sentMessages, 0);
@@ -183,6 +199,7 @@ test("derives a historical narrative at approval without changing the original d
     repository: fake.repository,
     now: () => new Date("2026-08-26T10:00:00.000Z"),
     siteUrl: "https://faithfulsoftware.dev",
+    resolveComposition: resolveCurrentComposition,
   });
 
   await approve({} as GrowthDb, approvalInput());
@@ -203,6 +220,7 @@ test("rejects a terminal prospect without publishing a preview URL", async () =>
   const approve = createProspectPreviewApprover({
     repository: fake.repository,
     siteUrl: "https://faithfulsoftware.dev",
+    resolveComposition: resolveCurrentComposition,
   });
 
   await assert.rejects(
@@ -212,4 +230,23 @@ test("rejects a terminal prospect without publishing a preview URL", async () =>
       error.code === "not_publishable",
   );
   assert.equal(fake.state.approvals.length, 0);
+});
+
+test("rejects a generic draft when its merged composition is absent or stale", async () => {
+  const fake = createRepository();
+  const approve = createProspectPreviewApprover({
+    repository: fake.repository,
+    siteUrl: "https://faithfulsoftware.dev",
+    resolveComposition: () => null,
+  });
+
+  await assert.rejects(
+    approve({} as GrowthDb, approvalInput()),
+    (error: unknown) =>
+      error instanceof ProspectPreviewApprovalError &&
+      error.code === "not_publishable",
+  );
+  assert.equal(fake.state.approvals.length, 0);
+  assert.equal(fake.state.gmailCalls, 0);
+  assert.equal(fake.state.sentMessages, 0);
 });

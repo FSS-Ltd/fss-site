@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import type { GrowthDb } from "../db/types";
-import { getPublishedProspectPreview } from "./public-repository";
+import {
+  getPublishedProspectPreview,
+  getPublishedProspectPreviewCompositionBySlug,
+} from "./public-repository";
 
 const PUBLIC_ID = "Q2VhN4A7x6Y0-5s8V3d1K9PqRcFhZ9Xm";
 const content = {
@@ -62,4 +65,71 @@ test("does not query draft-shaped public IDs", async () => {
 
   assert.equal(result, null);
   assert.equal(queries, 0);
+});
+
+test("returns a composition only when its published database digest matches the merged source", async () => {
+  const queries: Array<{ text: string; values: readonly unknown[] }> = [];
+  const db = (async (
+    strings: TemplateStringsArray,
+    ...values: readonly unknown[]
+  ) => {
+    queries.push({
+      text: strings.join("?").replace(/\s+/g, " ").trim(),
+      values,
+    });
+    return [
+      {
+        prospectId: "f0f5caeec-cbe0-454d-9774-14483ba3a37f",
+        slug: "marden-garage",
+        compositionDigest: "a".repeat(64),
+      },
+    ];
+  }) as unknown as GrowthDb;
+  const composition = {
+    prospectId: "f0f5caeec-cbe0-454d-9774-14483ba3a37f",
+    slug: "marden-garage",
+    digest: "a".repeat(64),
+  };
+
+  const result = await getPublishedProspectPreviewCompositionBySlug(
+    "marden-garage",
+    db,
+    () => composition,
+  );
+
+  assert.equal(result, composition);
+  assert.match(queries[0]?.text ?? "", /status = 'published'/);
+  assert.match(queries[0]?.text ?? "", /generation_status = 'published'/);
+  assert.deepEqual(queries[0]?.values, ["marden-garage"]);
+});
+
+test("does not expose a published slug when its merged source package is absent or stale", async () => {
+  const db = (async () => [
+    {
+      prospectId: "f0f5caeec-cbe0-454d-9774-14483ba3a37f",
+      slug: "marden-garage",
+      compositionDigest: "a".repeat(64),
+    },
+  ]) as unknown as GrowthDb;
+
+  assert.equal(
+    await getPublishedProspectPreviewCompositionBySlug(
+      "marden-garage",
+      db,
+      () => ({
+        prospectId: "f0f5caeec-cbe0-454d-9774-14483ba3a37f",
+        slug: "marden-garage",
+        digest: "b".repeat(64),
+      }),
+    ),
+    null,
+  );
+  assert.equal(
+    await getPublishedProspectPreviewCompositionBySlug(
+      "marden-garage",
+      db,
+      () => null,
+    ),
+    null,
+  );
 });

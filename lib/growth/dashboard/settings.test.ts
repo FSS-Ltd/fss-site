@@ -38,7 +38,17 @@ test("computeNextCronRun rounds up to the next N-minute boundary", () => {
 });
 
 test("computeNextCronRun returns null for a schedule shape it does not support", () => {
-  assert.equal(computeNextCronRun("0 9 * * 1-5", now), null);
+  assert.equal(computeNextCronRun("0 9 * * 1,3", now), null);
+});
+
+test("computeNextCronRun resolves a weekday UTC schedule", () => {
+  assert.equal(
+    computeNextCronRun(
+      "15 6 * * 1-5",
+      new Date("2026-08-21T10:03:00.000Z"),
+    )?.toISOString(),
+    "2026-08-24T06:15:00.000Z",
+  );
 });
 
 test("computeNextCronRun resolves fixed UTC minute and hour lists", () => {
@@ -168,9 +178,9 @@ test("buildSettingsView reports whether signed research ingestion is configured"
   );
 });
 
-test("buildSettingsView lists all four cron jobs with a label when automations are enabled", () => {
+test("buildSettingsView lists all five cron jobs with a label when automations are enabled", () => {
   const data = buildSettingsView(baseInput());
-  assert.equal(data.automation.crons.length, 4);
+  assert.equal(data.automation.crons.length, 5);
   for (const cron of data.automation.crons) {
     assert.ok(cron.label.length > 0);
   }
@@ -182,10 +192,15 @@ test("buildSettingsView groups each 90-minute schedule pair into one operational
     (cron) => cron.path !== "/api/cron/maintenance",
   );
 
-  assert.equal(new Set(operationalCrons.map((cron) => cron.path)).size, 3);
+  assert.equal(new Set(operationalCrons.map((cron) => cron.path)).size, 4);
   assert.deepEqual(
     operationalCrons.map((cron) => cron.scheduleDescription),
-    ["Every 90 minutes", "Every 90 minutes", "Every 90 minutes"],
+    [
+      "Every 90 minutes",
+      "Every 90 minutes",
+      "Every 90 minutes",
+      "15 6 * * 1-5",
+    ],
   );
   assert.deepEqual(
     operationalCrons.map((cron) => cron.nextRunAt),
@@ -193,11 +208,12 @@ test("buildSettingsView groups each 90-minute schedule pair into one operational
       "2026-08-21T10:30:00.000Z",
       "2026-08-21T10:30:00.000Z",
       "2026-08-21T10:30:00.000Z",
+      "2026-08-24T06:15:00.000Z",
     ],
   );
 });
 
-test("buildSettingsView computes a next run for the minute-interval crons but not the daily maintenance cron", () => {
+test("buildSettingsView computes a next run for operational crons but not daily maintenance", () => {
   const data = buildSettingsView(baseInput());
   for (const cron of data.automation.crons) {
     if (cron.path === "/api/cron/maintenance") {

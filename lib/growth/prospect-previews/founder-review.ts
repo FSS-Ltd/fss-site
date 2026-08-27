@@ -13,6 +13,9 @@ const PROSPECT_ID_PATTERN =
 
 export type FounderDraftProspectPreviewSummary = {
   businessName: string;
+  compositionDigest: string | null;
+  generationPrNumber: number | null;
+  generationStatus: string | null;
   previewVersion: number;
   prospectId: string;
   prospectStatus: string;
@@ -44,6 +47,9 @@ export async function getFounderDraftProspectPreviewSummaries(
     const rows = await db<FounderDraftPreviewSummaryRow[]>`
       select
         coalesce(b.trading_name, b.legal_name) as "businessName",
+        pp.composition_digest as "compositionDigest",
+        pp.generation_pr_number as "generationPrNumber",
+        pp.generation_status as "generationStatus",
         pp.version as "previewVersion",
         p.id as "prospectId",
         p.status as "prospectStatus",

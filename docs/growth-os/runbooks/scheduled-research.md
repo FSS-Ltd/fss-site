@@ -271,6 +271,12 @@ research submission with at least one accepted prospect. This requires
 merge never publish a preview or alter email. Individual founder approval is
 the only publication boundary.
 
+After a source PR merges, the protected
+`/api/cron/prospect-preview-reconciliation` job verifies the exact PR state and
+package digest before presenting that individual preview as approvable. It does
+not publish a route or update email; the founder must approve the matching
+preview from Growth OS.
+
 To create the source-only review PR for the ten historical drafts, an operator
 uses:
 

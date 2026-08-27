@@ -55,6 +55,9 @@ test("lists each draft preview with the versions required for founder approval",
     createFakeGrowthDb([
       {
         businessName: "Example Heating Ltd",
+        compositionDigest: "a".repeat(64),
+        generationPrNumber: 412,
+        generationStatus: "merged_draft",
         previewVersion: 2,
         prospectId,
         prospectStatus: "ready_for_email_review",
@@ -68,6 +71,9 @@ test("lists each draft preview with the versions required for founder approval",
     data: [
       {
         businessName: "Example Heating Ltd",
+        compositionDigest: "a".repeat(64),
+        generationPrNumber: 412,
+        generationStatus: "merged_draft",
         previewVersion: 2,
         prospectId,
         prospectStatus: "ready_for_email_review",

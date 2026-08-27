@@ -31,9 +31,21 @@ export type GitHubPreviewPullRequest = {
   alreadyOpen: boolean;
 };
 
+export type GitHubPreviewPullRequestState = {
+  number: number;
+  state: "open" | "closed";
+  mergedAt: Date | null;
+};
+
 type GitHubPullRequestResponse = {
   number?: unknown;
   html_url?: unknown;
+};
+
+type GitHubPullRequestStateResponse = {
+  number?: unknown;
+  state?: unknown;
+  merged_at?: unknown;
 };
 
 function createApiUrl(path: string): URL {
@@ -278,4 +290,49 @@ export async function createGitHubPreviewPullRequest(
   if (existing !== null) return existing;
 
   return createPullRequest(request, headers, input);
+}
+
+function parsePullRequestState(
+  value: unknown,
+  number: number,
+): GitHubPreviewPullRequestState | null {
+  if (typeof value !== "object" || value === null) return null;
+  const response = value as GitHubPullRequestStateResponse;
+  if (
+    response.number !== number ||
+    (response.state !== "open" && response.state !== "closed")
+  ) {
+    return null;
+  }
+  if (response.merged_at === null) {
+    return { number, state: response.state, mergedAt: null };
+  }
+  if (typeof response.merged_at !== "string") return null;
+  const mergedAt = new Date(response.merged_at);
+  if (Number.isNaN(mergedAt.getTime())) return null;
+  return { number, state: response.state, mergedAt };
+}
+
+export async function getGitHubPreviewPullRequestState(input: {
+  token: string;
+  number: number;
+  request?: GitHubPreviewApiRequest;
+}): Promise<GitHubPreviewPullRequestState> {
+  if (!input.token.trim() || !Number.isInteger(input.number) || input.number < 1) {
+    throw new TypeError("GitHub preview pull request lookup is invalid.");
+  }
+  const request = input.request ?? ((url, init) => fetch(url, init));
+  const response = await request(createApiUrl(`/pulls/${input.number}`), {
+    method: "GET",
+    headers: createHeaders(input.token),
+  });
+  if (!response.ok) {
+    throw requestFailure("pull request state lookup", response.status);
+  }
+
+  const result = parsePullRequestState(await readJson(response), input.number);
+  if (result === null) {
+    throw new Error("GitHub preview pull request state lookup returned an invalid response.");
+  }
+  return result;
 }

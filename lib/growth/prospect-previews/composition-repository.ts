@@ -17,6 +17,13 @@ export type PreviewGenerationCandidate = {
   snapshot: StoredProspectPreviewSnapshot;
 };
 
+export type OpenPreviewGenerationRecord = {
+  previewId: string;
+  prospectId: string;
+  compositionDigest: string;
+  pullRequestNumber: number;
+};
+
 export type RecordPreviewGenerationResultInput = {
   prospectId: string;
   slug: string;
@@ -39,6 +46,8 @@ type PreviewGenerationCandidateRow = {
   prospectId: string;
   content: unknown;
 };
+
+type OpenPreviewGenerationRecordRow = OpenPreviewGenerationRecord;
 
 function isNonEmptyTrimmedText(value: string, maximum: number): boolean {
   return value === value.trim() && value.length > 0 && value.length <= maximum;
@@ -178,5 +187,59 @@ export async function markPreviewCompositionUnavailable(
     returning id
   `;
 
+  return rows.length === 1;
+}
+
+export async function listOpenPreviewGenerationRecords(
+  db: GrowthQueryExecutor = getGrowthDb(),
+): Promise<readonly OpenPreviewGenerationRecord[]> {
+  const rows = await db<OpenPreviewGenerationRecordRow[]>`
+    select
+      pp.id as "previewId",
+      pp.prospect_id as "prospectId",
+      pp.composition_digest as "compositionDigest",
+      pp.generation_pr_number as "pullRequestNumber"
+    from growth.prospect_previews pp
+    where pp.status = 'draft'
+      and pp.generation_status = 'pr_open'
+    order by pp.generated_at asc nulls last, pp.id asc
+  `;
+
+  return rows.map((row) => {
+    if (
+      !PROSPECT_ID_PATTERN.test(row.previewId) ||
+      !PROSPECT_ID_PATTERN.test(row.prospectId) ||
+      !COMPOSITION_DIGEST_PATTERN.test(row.compositionDigest) ||
+      !Number.isInteger(row.pullRequestNumber) ||
+      row.pullRequestNumber < 1
+    ) {
+      throw new TypeError("Open preview generation record is invalid.");
+    }
+
+    return row;
+  });
+}
+
+export async function markPreviewGenerationMergedDraft(
+  input: Pick<OpenPreviewGenerationRecord, "previewId" | "compositionDigest">,
+  db: GrowthQueryExecutor = getGrowthDb(),
+): Promise<boolean> {
+  if (
+    !PROSPECT_ID_PATTERN.test(input.previewId) ||
+    !COMPOSITION_DIGEST_PATTERN.test(input.compositionDigest)
+  ) {
+    throw new TypeError("Preview merge reconciliation input is invalid.");
+  }
+
+  const rows = await db<Array<{ id: string }>>`
+    update growth.prospect_previews
+    set generation_status = 'merged_draft',
+        updated_at = now()
+    where id = ${input.previewId}
+      and status = 'draft'
+      and generation_status = 'pr_open'
+      and composition_digest = ${input.compositionDigest}
+    returning id
+  `;
   return rows.length === 1;
 }
