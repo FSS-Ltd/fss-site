@@ -3,6 +3,7 @@
 @source "../components/**/*.{ts,tsx,mdx}";
 @source "../content/**/*.{md,mdx}";
 @source "../lib/**/*.{ts,tsx}";
+@source not "../components/prospect-previews/**/*";
 
 :root {
   --background: #f2f3f5;

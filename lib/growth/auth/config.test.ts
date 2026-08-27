@@ -13,6 +13,7 @@ const env: GrowthServerEnv = {
   ownerEmail: "j.ntagengwa@faithfulsoftware.dev",
   tokenEncryptionKey: "b".repeat(32),
   automationsEnabled: false,
+  previewPrEnabled: false,
 };
 
 test("requests only identity scopes from Google", () => {

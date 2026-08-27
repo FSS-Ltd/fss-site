@@ -16,14 +16,15 @@ import {
   deriveHistoricalEmailNarrative,
   renderPreviewFirstEmail,
 } from "./content";
+import { getMergedProspectPreviewCompositionByProspectId } from "./compositions/manifest";
 import {
-  PROSPECT_PREVIEW_PUBLIC_ID_PATTERN,
   prospectPreviewAssessmentSectionSchema,
 } from "./types";
 
 const PROSPECT_ID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const FOUNDER_ACTOR_ID_PATTERN = /^[0-9a-f]{64}$/;
+const PREVIEW_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const TERMINAL_PROSPECT_STATUSES = new Set([
   "won",
   "lost",
@@ -40,6 +41,9 @@ export type LockedProspectPreviewApprovalState = {
   preview: {
     id: string;
     publicId: string;
+    slug: string | null;
+    compositionDigest: string | null;
+    generationStatus: string;
     status: string;
     version: number;
   };
@@ -170,23 +174,32 @@ function readEmailNarrative(
   return narrative;
 }
 
-function previewUrl(siteUrl: string, publicId: string): string {
-  if (!PROSPECT_PREVIEW_PUBLIC_ID_PATTERN.test(publicId)) {
+function previewUrl(siteUrl: string, slug: string): string {
+  if (!PREVIEW_SLUG_PATTERN.test(slug)) {
     throw new ProspectPreviewApprovalError("not_publishable");
   }
-  return new URL(`/preview/p/${publicId}`, siteUrl).toString();
+  return new URL(`/preview/${slug}`, siteUrl).toString();
 }
+
+type ResolvedPreviewComposition = {
+  prospectId: string;
+  digest: string;
+};
 
 type ProspectPreviewApproverDependencies = {
   repository: ProspectPreviewApprovalRepository;
   now?: () => Date;
   siteUrl?: string;
+  resolveComposition?: (
+    prospectId: string,
+  ) => ResolvedPreviewComposition | null;
 };
 
 export function createProspectPreviewApprover({
   repository,
   now = () => new Date(),
   siteUrl = resolveSiteUrl(),
+  resolveComposition = getMergedProspectPreviewCompositionByProspectId,
 }: ProspectPreviewApproverDependencies) {
   return async function approve(
     db: GrowthDb,
@@ -207,6 +220,17 @@ export function createProspectPreviewApprover({
         TERMINAL_PROSPECT_STATUSES.has(state.prospect.status) ||
         state.preview.status !== "draft" ||
         !state.assessment.status
+      ) {
+        throw new ProspectPreviewApprovalError("not_publishable");
+      }
+      const composition = resolveComposition(state.prospect.id);
+      if (
+        state.preview.generationStatus !== "merged_draft" ||
+        state.preview.slug === null ||
+        state.preview.compositionDigest === null ||
+        composition === null ||
+        composition.prospectId !== state.prospect.id ||
+        composition.digest !== state.preview.compositionDigest
       ) {
         throw new ProspectPreviewApprovalError("not_publishable");
       }
@@ -236,7 +260,7 @@ export function createProspectPreviewApprover({
       const email = renderPreviewFirstEmail({
         subject: storedDraft.email.subject,
         narrative,
-        previewUrl: previewUrl(siteUrl, state.preview.publicId),
+        previewUrl: previewUrl(siteUrl, state.preview.slug),
         optOutSentence: storedDraft.email.optOutSentence,
         conceptDisclaimer: storedDraft.email.conceptDisclaimer,
       });

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { parseTokenEncryptionKey } from "../integrations/token-crypto";
 
 const FOUNDER_EMAIL = "j.ntagengwa@faithfulsoftware.dev" as const;
+const PROSPECT_PREVIEW_REPOSITORY = "FSS-Ltd/fss-site" as const;
 
 const postgresUrlSchema = z
   .string()
@@ -78,6 +79,15 @@ const growthServerEnvSchema = z
     GROWTH_OS_AUTOMATIONS_ENABLED: z
       .enum(["true", "false"])
       .transform((value) => value === "true"),
+    GROWTH_OS_PREVIEW_PR_ENABLED: z
+      .enum(["true", "false"])
+      .optional()
+      .default("false")
+      .transform((value) => value === "true"),
+    GITHUB_PROSPECT_PREVIEW_TOKEN: z.string().trim().min(1).optional(),
+    GITHUB_PROSPECT_PREVIEW_REPOSITORY: z
+      .literal(PROSPECT_PREVIEW_REPOSITORY)
+      .optional(),
     VERCEL_ENV: z.enum(["production", "preview", "development"]).optional(),
     NEXT_PUBLIC_DATABASE_URL: z.undefined().optional(),
     NEXT_PUBLIC_DIRECT_DATABASE_URL: z.undefined().optional(),
@@ -85,6 +95,7 @@ const growthServerEnvSchema = z
     NEXT_PUBLIC_GOOGLE_GMAIL_CLIENT_ID: z.undefined().optional(),
     NEXT_PUBLIC_GOOGLE_GMAIL_CLIENT_SECRET: z.undefined().optional(),
     NEXT_PUBLIC_GOOGLE_GMAIL_REDIRECT_URI: z.undefined().optional(),
+    NEXT_PUBLIC_GITHUB_PROSPECT_PREVIEW_TOKEN: z.undefined().optional(),
   })
   .refine(
     (value) =>
@@ -107,6 +118,19 @@ const growthServerEnvSchema = z
       path: ["GROWTH_OS_AUTOMATIONS_ENABLED"],
     },
   )
+  .refine(
+    (value) =>
+      !value.GROWTH_OS_PREVIEW_PR_ENABLED ||
+      Boolean(
+        value.GITHUB_PROSPECT_PREVIEW_TOKEN &&
+          value.GITHUB_PROSPECT_PREVIEW_REPOSITORY,
+      ),
+    {
+      message:
+        "GROWTH_OS_PREVIEW_PR_ENABLED requires a restricted GitHub preview token and repository.",
+      path: ["GROWTH_OS_PREVIEW_PR_ENABLED"],
+    },
+  )
   .transform((value) => ({
     databaseUrl: value.DATABASE_URL,
     authSecret: value.AUTH_SECRET,
@@ -125,6 +149,9 @@ const growthServerEnvSchema = z
     resendReplyToEmail: value.RESEND_REPLY_TO_EMAIL,
     resendWebhookSecret: value.RESEND_WEBHOOK_SECRET,
     automationsEnabled: value.GROWTH_OS_AUTOMATIONS_ENABLED,
+    previewPrEnabled: value.GROWTH_OS_PREVIEW_PR_ENABLED,
+    githubProspectPreviewToken: value.GITHUB_PROSPECT_PREVIEW_TOKEN,
+    githubProspectPreviewRepository: value.GITHUB_PROSPECT_PREVIEW_REPOSITORY,
   }));
 
 export type GrowthServerEnv = {
@@ -145,6 +172,9 @@ export type GrowthServerEnv = {
   resendReplyToEmail?: string;
   resendWebhookSecret?: string;
   automationsEnabled: boolean;
+  previewPrEnabled: boolean;
+  githubProspectPreviewToken?: string;
+  githubProspectPreviewRepository?: typeof PROSPECT_PREVIEW_REPOSITORY;
 };
 
 export function parseGrowthServerEnv(
@@ -212,4 +242,27 @@ export function requireNewsletterUnsubscribeTokenSecret(
     throw new Error("Newsletter unsubscribe token secret is not configured.");
   }
   return env.newsletterUnsubscribeTokenSecret;
+}
+
+export type ProspectPreviewGenerationEnv = {
+  token: string;
+  repository: typeof PROSPECT_PREVIEW_REPOSITORY;
+};
+
+export function requireProspectPreviewGenerationEnv(
+  env: GrowthServerEnv,
+): ProspectPreviewGenerationEnv {
+  if (!env.previewPrEnabled) {
+    throw new Error("Prospect preview pull-request generation is disabled.");
+  }
+  if (
+    !env.githubProspectPreviewToken ||
+    env.githubProspectPreviewRepository !== PROSPECT_PREVIEW_REPOSITORY
+  ) {
+    throw new Error("Prospect preview GitHub configuration is incomplete.");
+  }
+  return {
+    token: env.githubProspectPreviewToken,
+    repository: env.githubProspectPreviewRepository,
+  };
 }

@@ -11,11 +11,14 @@ const CRON_LABELS: Record<string, string> = {
   "/api/cron/outreach-dispatch": "Outreach email dispatch",
   "/api/cron/resend-dispatch": "Newsletter dispatch",
   "/api/cron/maintenance": "Maintenance report",
+  "/api/cron/prospect-preview-reconciliation":
+    "Prospect preview reconciliation",
 };
 
 const EVERY_N_MINUTES_PATTERN = /^\*\/(\d+) \* \* \* \*$/;
 const FIXED_DAILY_TIMES_PATTERN =
   /^(\d{1,2}) (\d{1,2}(?:,\d{1,2})+) \* \* \*$/;
+const FIXED_WEEKDAY_TIME_PATTERN = /^(\d{1,2}) (\d{1,2}) \* \* 1-5$/;
 const NINETY_MINUTE_SCHEDULES = [
   "0 0,3,6,9,12,15,18,21 * * *",
   "30 1,4,7,10,13,16,19,22 * * *",
@@ -34,6 +37,29 @@ export function computeNextCronRun(schedule: string, now: Date): Date | null {
     const minutesToAdd = intervalMinutes - (currentMinutes % intervalMinutes);
     next.setMinutes(currentMinutes + minutesToAdd);
     return next;
+  }
+
+  const weekdayTimeMatch = FIXED_WEEKDAY_TIME_PATTERN.exec(schedule);
+  if (weekdayTimeMatch) {
+    const minute = Number(weekdayTimeMatch[1]);
+    const hour = Number(weekdayTimeMatch[2]);
+    if (minute < 0 || minute > 59 || hour < 0 || hour > 23) return null;
+
+    for (let dayOffset = 0; dayOffset <= 7; dayOffset += 1) {
+      const candidate = new Date(
+        Date.UTC(
+          now.getUTCFullYear(),
+          now.getUTCMonth(),
+          now.getUTCDate() + dayOffset,
+          hour,
+          minute,
+        ),
+      );
+      const day = candidate.getUTCDay();
+      if (day >= 1 && day <= 5 && candidate > now) return candidate;
+    }
+
+    return null;
   }
 
   const fixedTimesMatch = FIXED_DAILY_TIMES_PATTERN.exec(schedule);

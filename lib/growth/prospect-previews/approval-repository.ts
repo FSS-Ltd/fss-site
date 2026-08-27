@@ -31,6 +31,9 @@ function createTransaction(
           prospectVersion: number;
           previewId: string;
           publicId: string;
+          slug: string | null;
+          compositionDigest: string | null;
+          generationStatus: string;
           previewStatus: string;
           previewVersion: number;
           assessmentStatus: string;
@@ -49,6 +52,9 @@ function createTransaction(
           p.version as "prospectVersion",
           pp.id as "previewId",
           pp.public_id as "publicId",
+          pp.slug,
+          pp.composition_digest as "compositionDigest",
+          pp.generation_status as "generationStatus",
           pp.status as "previewStatus",
           pp.version as "previewVersion",
           wa.status as "assessmentStatus",
@@ -98,6 +104,9 @@ function createTransaction(
         preview: {
           id: row.previewId,
           publicId: row.publicId,
+          slug: row.slug,
+          compositionDigest: row.compositionDigest,
+          generationStatus: row.generationStatus,
           status: row.previewStatus,
           version: row.previewVersion,
         },
@@ -134,6 +143,7 @@ function createTransaction(
       const previewRows = await transaction<Array<{ id: string }>>`
         update growth.prospect_previews
         set status = 'published',
+            generation_status = 'published',
             approved_at = ${input.approvedAt},
             approved_by = ${input.approvedBy},
             withdrawn_at = null,
@@ -141,6 +151,7 @@ function createTransaction(
             updated_at = now()
         where id = ${input.previewId}
           and status = 'draft'
+          and generation_status = 'merged_draft'
           and version = ${input.expectedPreviewVersion}
         returning id
       `;

@@ -6,6 +6,8 @@ import {
   type StoredProspectPreviewSnapshot,
 } from "./types";
 
+const PREVIEW_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
 export type PublishedProspectPreview = {
   publicId: string;
   status: "published";
@@ -15,6 +17,18 @@ export type PublishedProspectPreview = {
 type PublishedPreviewRow = {
   publicId: string;
   content: unknown;
+};
+
+type PublishedCompositionRow = {
+  prospectId: string;
+  slug: string;
+  compositionDigest: string;
+};
+
+export type PublishedPreviewComposition = {
+  prospectId: string;
+  slug: string;
+  digest: string;
 };
 
 export async function getPublishedProspectPreview(
@@ -44,4 +58,39 @@ export async function getPublishedProspectPreview(
   } catch {
     return null;
   }
+}
+
+export async function getPublishedProspectPreviewCompositionBySlug<
+  TComposition extends PublishedPreviewComposition,
+>(
+  slug: string,
+  db: GrowthQueryExecutor,
+  resolveComposition: (slug: string) => TComposition | null,
+): Promise<TComposition | null> {
+  if (!PREVIEW_SLUG_PATTERN.test(slug)) return null;
+
+  const rows = await db<PublishedCompositionRow[]>`
+    select
+      prospect_id as "prospectId",
+      slug,
+      composition_digest as "compositionDigest"
+    from growth.prospect_previews
+    where slug = ${slug}
+      and status = 'published'
+      and generation_status = 'published'
+    limit 1
+  `;
+  const row = rows[0];
+  if (!row) return null;
+
+  const composition = resolveComposition(slug);
+  if (
+    composition === null ||
+    composition.prospectId !== row.prospectId ||
+    composition.slug !== row.slug ||
+    composition.digest !== row.compositionDigest
+  ) {
+    return null;
+  }
+  return composition;
 }
