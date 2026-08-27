@@ -8,8 +8,10 @@ new corporate prospects in Kent. It prepares research and first-email drafts
 for review. It never sends email.
 
 The scheduled task is external to the application. It submits a signed JSON
-bundle to `POST /api/agent/research-runs`, then may upload one mapped visual per
-accepted prospect to `POST /api/agent/email-assets`.
+bundle to `POST /api/agent/research-runs`, then may upload a found first-party
+logo or on-site image for a mapped prospect to
+`POST /api/agent/prospect-preview-assets`. It never calls an image-generation
+API and it never uploads 3D or hero media.
 
 After a successful run with accepted prospects, the trusted parent wrapper
 signs one fixed request to `POST /api/agent/prospect-preview-prs`. The
@@ -34,7 +36,7 @@ GitHub credential and must not call that endpoint.
 - `GROWTH_OS_AGENT_HMAC_SECRET` from the scheduled task's secret store.
 - The versioned prompt in
   `docs/growth-os/prompts/weekday-research.md`.
-- The version 1.0 example in
+- The version 1.1 research contract in
   `docs/growth-os/fixtures/research-run-v1.json`.
 - Local Codex authentication for the isolated GPT child process.
 
@@ -108,10 +110,12 @@ authorise sending email.
    content is never a narrative source. After individual founder preview
    approval, the application adds the private preview link and the built-example
    close to the reviewable initial email.
-7. The visual must not fabricate staff, premises, testimonials, reviews,
-   credentials, results, or an existing product. The ingestion bundle always
-   uses `assetId: null` and an approved fallback key. This guarantees that a
-   reviewable draft exists before any generated image is uploaded.
+7. Collect first-party logo, brand colour, real service-language, and eligible
+   on-site-image evidence with provenance for every preview. Derive the hero
+   statement and local-only journey from that evidence. The ingestion bundle
+   uses null source-asset fields first; only eligible found source images may be
+   uploaded after the mapped response. Do not call an image API or upload 3D or
+   hero media.
 
 ## Rejection Reason Codes
 
@@ -150,7 +154,7 @@ claims in fallback alt text.
 
 ## Validate The Bundle
 
-The JSON must match schema version `1.0`, remain below 4 MB, and use a unique,
+The JSON must match schema version `1.1`, remain below 4 MB, and use a unique,
 stable identifier in this form:
 
 ```text
@@ -197,12 +201,14 @@ exact original `prospects` array. Do not reorder, filter, or reindex that array
 between serialization and asset mapping. A duplicate retry returns the
 persisted result.
 
-## Upload Generated Visuals
+## Upload Verified Preview Assets
 
-Image upload is the second phase. For each generated image whose
+Image upload is the second phase. For each found first-party logo or on-site
+image whose
 `candidateIndex` appears in `acceptedProspects`:
 
-1. Use the returned `runId` and mapped `prospectId`.
+1. Use the returned `runId`, mapped `prospectId`, and the evidence UUID used in
+   the signed research bundle.
 2. Build the complete multipart body with its generated boundary, then capture
    the fully encoded raw bytes. Create a fresh timestamp and HMAC-SHA256 over
    `timestamp + "." + rawMultipartBody`. Send those exact bytes with the same
@@ -210,13 +216,14 @@ Image upload is the second phase. For each generated image whose
    boundary. Do not reuse the research-request signature, sign individual form
    fields, or let the HTTP client re-encode the body after signing.
 3. Submit that one signed multipart request to
-   `POST /api/agent/email-assets` with `assetKind=cold_first_email`, factual alt
-   text, a short prompt summary, and the image file.
-4. Keep the multipart request below 512 KB. JPEG, PNG, and WebP input are
-   accepted. The normalised WebP must be no more than 180 KB and use an aspect
-   ratio from 1.85:1 through 1.95:1.
-5. If generation, validation, mapping, or upload fails, do not retry with unsafe
-   metadata. Leave the reviewed fallback attached to the draft.
+   `POST /api/agent/prospect-preview-assets` with asset kind `logo` or
+   `on-site-image`, matching first-party source URL, factual alt text, and the
+   image file. The response returns only an opaque asset ID and review state.
+4. Keep the multipart request below 2 MB. JPEG, PNG, and WebP input are
+   accepted. The normalised WebP must be no more than 1 MB.
+5. If validation, mapping, or upload fails, use the typographic or abstract
+   fallback. Do not substitute stock, Google Maps, third-party, generated 3D,
+   or AI-generated imagery.
 
 Never upload a visual for a duplicate or rejected candidate.
 

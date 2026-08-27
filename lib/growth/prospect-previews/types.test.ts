@@ -44,3 +44,56 @@ test("rejects a preview snapshot containing a contact email", () => {
     /unrecognized key/i,
   );
 });
+
+test("parses a versioned evidence-backed snapshot without exposing source URLs", () => {
+  const preview = parseStoredProspectPreviewSnapshot({
+    ...validSnapshot,
+    schemaVersion: "1.1",
+    experienceBrief: {
+      schemaVersion: "1.1",
+      hero: {
+        statement: "Start your MOT, service or repair request with your registration.",
+        supportingStatement:
+          "Marden Garage can prepare the workshop conversation with the right vehicle details.",
+        evidenceIds: ["00000000-0000-4000-8000-000000000001"],
+      },
+      journey: {
+        title: "Get your vehicle ready for the workshop",
+        primaryCta: "Start with your registration",
+        completionMessage: "Your workshop request is ready to review.",
+        steps: [
+          {
+            id: "vehicle",
+            label: "Tell us about your vehicle",
+            kind: "vehicle-registration",
+            control: "registration",
+            requiredFields: ["registration"],
+            options: [],
+          },
+          {
+            id: "review",
+            label: "Review your request",
+            kind: "review",
+            control: "review",
+            requiredFields: [],
+            options: [],
+          },
+        ],
+      },
+      visual: {
+        brandColors: ["#19374A"],
+        colourEvidenceIds: ["00000000-0000-4000-8000-000000000002"],
+        logoEvidenceId: null,
+        logoAssetId: null,
+        onSiteImageEvidenceId: null,
+        onSiteImageAssetId: null,
+        approvedHeroMediaAssetId: null,
+      },
+    },
+  });
+
+  assert.equal(preview.schemaVersion, "1.1");
+  if (preview.schemaVersion === "1.1") {
+    assert.equal(preview.experienceBrief.journey.steps[0]?.control, "registration");
+  }
+});

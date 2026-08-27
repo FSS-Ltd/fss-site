@@ -8,6 +8,7 @@ import { MAX_RESEARCH_BUNDLE_BYTES } from "./limits";
 import {
   RESEARCH_REJECTION_REASON_CODES,
   type AssessmentSectionCandidate,
+  type BrandEvidenceCandidate,
   type BusinessCandidate,
   type ContactCandidate,
   type EmailVisualCandidate,
@@ -20,6 +21,7 @@ import {
   type WebsiteEmailNarrative,
   type WebsiteAssessmentCandidate,
 } from "./types";
+import { experienceBriefSchema } from "../prospect-previews/experience-brief";
 
 const PERSONAL_MAILBOX_DOMAINS = new Set([
   "aol.com",
@@ -203,6 +205,21 @@ const evidenceCandidateSchema: z.ZodType<EvidenceCandidate> = z
   })
   .strict();
 
+const brandEvidenceCandidateSchema: z.ZodType<BrandEvidenceCandidate> = z
+  .object({
+    id: z.string().uuid("Preview evidence IDs must be UUIDs."),
+    kind: z.enum([
+      "logo",
+      "brand-colours",
+      "service-language",
+      "on-site-image",
+    ]),
+    sourceUrl: webUrl,
+    evidenceText: requiredText("Preview evidence text", 2_000),
+    observedAt: instant,
+  })
+  .strict();
+
 const assessmentSectionSchema: z.ZodType<AssessmentSectionCandidate> = z
   .object({
     schemaVersion: z.enum(["1.0"], {
@@ -228,6 +245,7 @@ const websiteAssessmentCandidateSchema: z.ZodType<WebsiteAssessmentCandidate> =
       heroConcept: assessmentSectionSchema,
       mobileFallback: assessmentSectionSchema,
       performanceBudget: assessmentSectionSchema,
+      experienceBrief: experienceBriefSchema.optional(),
     })
     .strict();
 
@@ -363,6 +381,7 @@ const researchProspectCandidateSchema: z.ZodType<ResearchProspectCandidate> = z
     contact: contactCandidateSchema,
     prospect: prospectCandidateSchema,
     evidence: z.array(evidenceCandidateSchema).min(1).max(25),
+    brandEvidence: z.array(brandEvidenceCandidateSchema).max(8).optional(),
     assessment: websiteAssessmentCandidateSchema,
     firstEmail: firstEmailCandidateSchema,
     emailNarrative: websiteEmailNarrativeSchema,
@@ -510,6 +529,93 @@ const researchProspectCandidateSchema: z.ZodType<ResearchProspectCandidate> = z
       }
     }
 
+    const previewEvidence = candidate.brandEvidence ?? [];
+    const previewEvidenceIds = new Set(
+      previewEvidence.map((evidence) => evidence.id),
+    );
+    if (previewEvidenceIds.size !== previewEvidence.length) {
+      context.addIssue({
+        code: "custom",
+        path: ["brandEvidence"],
+        message: "Preview evidence identifiers must be unique.",
+      });
+    }
+
+    for (const [index, evidence] of previewEvidence.entries()) {
+      if (
+        !businessHosts.some((host) =>
+          hostsAreRelated(getUrlHostname(evidence.sourceUrl), host),
+        )
+      ) {
+        context.addIssue({
+          code: "custom",
+          path: ["brandEvidence", index, "sourceUrl"],
+          message:
+            "First-party preview evidence must use a verified business host.",
+        });
+      }
+    }
+
+    const experienceBrief = candidate.assessment.experienceBrief;
+    if (experienceBrief !== undefined) {
+      const evidenceById = new Map(
+        previewEvidence.map((evidence) => [evidence.id, evidence]),
+      );
+      const requireEvidenceKind = (
+        evidenceIds: string[],
+        allowedKinds: BrandEvidenceCandidate["kind"][],
+        path: (string | number)[],
+        label: string,
+      ) => {
+        for (const evidenceId of evidenceIds) {
+          const evidence = evidenceById.get(evidenceId);
+          if (evidence === undefined || !allowedKinds.includes(evidence.kind)) {
+            context.addIssue({
+              code: "custom",
+              path,
+              message: `${label} must reference matching first-party preview evidence.`,
+            });
+          }
+        }
+      };
+
+      requireEvidenceKind(
+        experienceBrief.hero.evidenceIds,
+        ["service-language"],
+        ["assessment", "experienceBrief", "hero", "evidenceIds"],
+        "Hero evidence",
+      );
+      requireEvidenceKind(
+        experienceBrief.visual.colourEvidenceIds,
+        ["brand-colours"],
+        ["assessment", "experienceBrief", "visual", "colourEvidenceIds"],
+        "Colour evidence",
+      );
+
+      if (experienceBrief.visual.logoEvidenceId !== null) {
+        requireEvidenceKind(
+          [experienceBrief.visual.logoEvidenceId],
+          ["logo"],
+          ["assessment", "experienceBrief", "visual", "logoEvidenceId"],
+          "Logo evidence",
+        );
+      }
+
+      if (experienceBrief.visual.onSiteImageEvidenceId !== null) {
+        requireEvidenceKind(
+          [experienceBrief.visual.onSiteImageEvidenceId],
+          ["on-site-image"],
+          [
+            "assessment",
+            "experienceBrief",
+            "visual",
+            "onSiteImageEvidenceId",
+          ],
+          "On-site image evidence",
+        );
+      }
+    }
+
     const narrativeEvidence = [
       candidate.emailNarrative.openingStrength,
       ...candidate.emailNarrative.improvements,
@@ -561,8 +667,8 @@ const rejectedResearchCandidateSchema: z.ZodType<RejectedResearchCandidate> = z
 
 export const researchRunIngestionSchema: z.ZodType<ResearchRunIngestion> = z
   .object({
-    schemaVersion: z.enum(["1.0"], {
-      message: "Research schema version must be 1.0.",
+    schemaVersion: z.enum(["1.0", "1.1"], {
+      message: "Research schema version must be 1.0 or 1.1.",
     }),
     externalRunId: requiredText("External run ID", 160),
     runDate: z.iso.date(),
@@ -581,6 +687,28 @@ export const researchRunIngestionSchema: z.ZodType<ResearchRunIngestion> = z
         path: ["prospects"],
         message: "A research run must contain at least one candidate.",
       });
+    }
+
+    if (run.schemaVersion === "1.1") {
+      for (const [candidateIndex, candidate] of run.prospects.entries()) {
+        if (candidate.brandEvidence === undefined) {
+          context.addIssue({
+            code: "custom",
+            path: ["prospects", candidateIndex, "brandEvidence"],
+            message:
+              "Evidence-backed preview research requires first-party preview evidence.",
+          });
+        }
+
+        if (candidate.assessment.experienceBrief === undefined) {
+          context.addIssue({
+            code: "custom",
+            path: ["prospects", candidateIndex, "assessment", "experienceBrief"],
+            message:
+              "Evidence-backed preview research requires an experience brief.",
+          });
+        }
+      }
     }
 
     const canonicalBytes = new TextEncoder().encode(

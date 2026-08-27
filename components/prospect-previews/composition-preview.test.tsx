@@ -9,7 +9,7 @@ import { compileProspectPreviewComposition } from "@/lib/growth/prospect-preview
 import { CompositionPreview } from "./composition-preview";
 
 const automotiveSnapshot: StoredProspectPreviewSnapshot = {
-  schemaVersion: "1.0",
+  schemaVersion: "1.1",
   businessName: "Marden Garage",
   sector: "Garage and MOT centre",
   locality: "Marden",
@@ -30,6 +30,56 @@ const automotiveSnapshot: StoredProspectPreviewSnapshot = {
     summary: "Local drivers need clear evidence before booking.",
     items: ["Explain workshop experience"],
   },
+  experienceBrief: {
+    schemaVersion: "1.1",
+    hero: {
+      statement:
+        "Start your MOT, service or repair request with your registration.",
+      supportingStatement:
+        "Marden Garage can prepare the workshop conversation with the right vehicle details.",
+      evidenceIds: ["00000000-0000-4000-8000-000000000001"],
+    },
+    journey: {
+      title: "Get your vehicle ready for the workshop",
+      primaryCta: "Start with your registration",
+      completionMessage: "Your workshop request is ready to review.",
+      steps: [
+        {
+          id: "vehicle",
+          label: "Tell us about your vehicle",
+          kind: "vehicle-registration",
+          control: "registration",
+          requiredFields: ["registration"],
+          options: [],
+        },
+        {
+          id: "service",
+          label: "What do you need help with?",
+          kind: "service-selection",
+          control: "single-select",
+          requiredFields: ["service"],
+          options: ["MOT", "Service", "Repair"],
+        },
+        {
+          id: "review",
+          label: "Review your request",
+          kind: "review",
+          control: "review",
+          requiredFields: [],
+          options: [],
+        },
+      ],
+    },
+    visual: {
+      brandColors: ["#19374A"],
+      colourEvidenceIds: ["00000000-0000-4000-8000-000000000002"],
+      logoEvidenceId: null,
+      logoAssetId: null,
+      onSiteImageEvidenceId: null,
+      onSiteImageAssetId: null,
+      approvedHeroMediaAssetId: null,
+    },
+  },
 };
 
 const hospitalitySnapshot: StoredProspectPreviewSnapshot = {
@@ -39,6 +89,38 @@ const hospitalitySnapshot: StoredProspectPreviewSnapshot = {
   locality: "Tunbridge Wells",
   businessGoal: "Make a first visit feel easy to plan.",
   primaryCta: "Plan your table enquiry",
+  experienceBrief: {
+    ...automotiveSnapshot.experienceBrief,
+    hero: {
+      statement: "Plan a first visit around the table that suits your group.",
+      supportingStatement:
+        "Fuggles Beer Cafe can start with the details that make a table enquiry useful.",
+      evidenceIds: ["00000000-0000-4000-8000-000000000001"],
+    },
+    journey: {
+      title: "Plan your table enquiry",
+      primaryCta: "Choose your table details",
+      completionMessage: "Your table enquiry is ready to review.",
+      steps: [
+        {
+          id: "visit",
+          label: "When are you hoping to visit?",
+          kind: "timing",
+          control: "single-select",
+          requiredFields: ["timing"],
+          options: ["This week", "Next week", "I am flexible"],
+        },
+        {
+          id: "review",
+          label: "Review your table enquiry",
+          kind: "review",
+          control: "review",
+          requiredFields: [],
+          options: [],
+        },
+      ],
+    },
+  },
 };
 
 function compileOrFail(
@@ -69,9 +151,8 @@ test("renders an automotive package in its configured section order", () => {
   );
 
   assert.match(markup, /Private website concept/);
-  assert.match(markup, /Request an MOT slot/);
-  assert.match(markup, /MOT request/);
-  assert.ok(markup.indexOf("Make MOT and servicing routes clear.") < markup.indexOf("Offer one clear route into the workshop."));
+  assert.match(markup, /Start your MOT, service or repair request with your registration/);
+  assert.match(markup, /prospect-reveal/);
 });
 
 test("renders the hospitality journey without automotive content", () => {
@@ -84,8 +165,8 @@ test("renders the hospitality journey without automotive content", () => {
     <CompositionPreview composition={composition} mode="public" />,
   );
 
-  assert.match(markup, /Plan your table enquiry/);
-  assert.match(markup, /Table enquiry/);
+  assert.match(markup, /Plan a first visit around the table that suits your group/);
+  assert.match(markup, /When are you hoping to visit/);
   assert.doesNotMatch(markup, /MOT request/);
   assert.doesNotMatch(markup, /Vehicle care made easier to book/);
 });

@@ -2,6 +2,11 @@ import { createHash } from "node:crypto";
 
 import { z } from "zod";
 
+import {
+  prospectPreviewHeroEvidenceSchema,
+  prospectPreviewJourneyStepSchema,
+  prospectPreviewVisualBriefSchema,
+} from "../experience-brief";
 import { prospectPreviewAssessmentSectionSchema } from "../types";
 
 const compositionText = (minimum: number, maximum: number) =>
@@ -58,7 +63,7 @@ export const previewSectionSchema = z.enum([
   "owner-cta",
 ]);
 
-export const previewJourneySchema = z.discriminatedUnion("type", [
+const legacyPreviewJourneySchema = z.discriminatedUnion("type", [
   z
     .object({
       type: z.literal("mot-request"),
@@ -91,59 +96,118 @@ export const previewJourneySchema = z.discriminatedUnion("type", [
     .strict(),
 ]);
 
-const prospectPreviewCompositionBaseSchema = z
+const evidenceBackedPreviewJourneySchema = z
   .object({
-    schemaVersion: z.literal("1.0"),
-    prospectId: z.string().uuid(),
-    slug: compositionSlugSchema,
-    family: prospectPreviewFamilySchema,
-    visualDirection: previewVisualDirectionSchema,
-    heroTreatment: previewHeroTreatmentSchema,
-    sectionOrder: z.array(previewSectionSchema).min(5).max(7),
-    journey: previewJourneySchema,
-    copy: z
-      .object({
-        businessName: compositionText(1, 200),
-        locality: compositionText(1, 160),
-        headline: compositionText(1, 300),
-        primaryCta: compositionText(1, 500),
-      })
-      .strict(),
-    content: z
-      .object({
-        businessGoal: compositionText(1, 2_000),
-        homepageSections: prospectPreviewAssessmentSectionSchema,
-        conversionPlan: prospectPreviewAssessmentSectionSchema,
-        trustSignals: prospectPreviewAssessmentSectionSchema,
-      })
-      .strict(),
+    type: z.literal("evidence-backed"),
+    title: compositionText(4, 160),
+    primaryCta: compositionText(2, 120),
+    completionMessage: compositionText(4, 220),
+    steps: z.array(prospectPreviewJourneyStepSchema).min(2).max(7),
   })
-  .strict()
-  .superRefine((value, context) => {
-    const uniqueSections = new Set(value.sectionOrder);
-    if (uniqueSections.size !== value.sectionOrder.length) {
+  .strict();
+
+const prospectPreviewCompositionFields = {
+  prospectId: z.string().uuid(),
+  slug: compositionSlugSchema,
+  family: prospectPreviewFamilySchema,
+  visualDirection: previewVisualDirectionSchema,
+  heroTreatment: previewHeroTreatmentSchema,
+  sectionOrder: z.array(previewSectionSchema).min(5).max(7),
+  copy: z
+    .object({
+      businessName: compositionText(1, 200),
+      locality: compositionText(1, 160),
+      headline: compositionText(1, 300),
+      primaryCta: compositionText(1, 500),
+    })
+    .strict(),
+  content: z
+    .object({
+      businessGoal: compositionText(1, 2_000),
+      homepageSections: prospectPreviewAssessmentSectionSchema,
+      conversionPlan: prospectPreviewAssessmentSectionSchema,
+      trustSignals: prospectPreviewAssessmentSectionSchema,
+    })
+    .strict(),
+};
+
+function validateSectionOrder(
+  value: { sectionOrder: readonly z.infer<typeof previewSectionSchema>[] },
+  context: z.RefinementCtx,
+): void {
+  const uniqueSections = new Set(value.sectionOrder);
+  if (uniqueSections.size !== value.sectionOrder.length) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Section order cannot repeat a section.",
+      path: ["sectionOrder"],
+    });
+  }
+
+  for (const requiredSection of ["hero", "journey", "owner-cta"] as const) {
+    if (!uniqueSections.has(requiredSection)) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Section order cannot repeat a section.",
+        message: `Section order must contain ${requiredSection}.`,
         path: ["sectionOrder"],
       });
     }
+  }
+}
 
-    for (const requiredSection of ["hero", "journey", "owner-cta"] as const) {
-      if (!uniqueSections.has(requiredSection)) {
-        context.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Section order must contain ${requiredSection}.`,
-          path: ["sectionOrder"],
-        });
-      }
+const prospectPreviewCompositionV1BaseSchema = z
+  .object({
+    schemaVersion: z.literal("1.0"),
+    ...prospectPreviewCompositionFields,
+    journey: legacyPreviewJourneySchema,
+  })
+  .strict()
+  .superRefine(validateSectionOrder);
+
+const prospectPreviewCompositionV11BaseSchema = z
+  .object({
+    schemaVersion: z.literal("1.1"),
+    ...prospectPreviewCompositionFields,
+    journey: evidenceBackedPreviewJourneySchema,
+    hero: prospectPreviewHeroEvidenceSchema,
+    visual: prospectPreviewVisualBriefSchema,
+  })
+  .strict()
+  .superRefine((value, context) => {
+    validateSectionOrder(value, context);
+    if (value.copy.headline !== value.hero.statement) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Evidence-backed composition headlines must use the hero statement.",
+        path: ["copy", "headline"],
+      });
+    }
+    if (value.copy.primaryCta !== value.journey.primaryCta) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Evidence-backed composition CTA must use the researched journey CTA.",
+        path: ["copy", "primaryCta"],
+      });
     }
   });
 
+const prospectPreviewCompositionBaseSchema = z.discriminatedUnion(
+  "schemaVersion",
+  [
+    prospectPreviewCompositionV1BaseSchema,
+    prospectPreviewCompositionV11BaseSchema,
+  ],
+);
+
 export const prospectPreviewCompositionSchema =
-  prospectPreviewCompositionBaseSchema.extend({
-    digest: z.string().regex(/^[a-f0-9]{64}$/),
-  });
+  z.discriminatedUnion("schemaVersion", [
+    prospectPreviewCompositionV1BaseSchema.extend({
+      digest: z.string().regex(/^[a-f0-9]{64}$/),
+    }),
+    prospectPreviewCompositionV11BaseSchema.extend({
+      digest: z.string().regex(/^[a-f0-9]{64}$/),
+    }),
+  ]);
 
 export type ProspectPreviewComposition = z.infer<
   typeof prospectPreviewCompositionSchema
@@ -152,6 +216,23 @@ export type ProspectPreviewComposition = z.infer<
 function canonicalComposition(
   value: z.output<typeof prospectPreviewCompositionBaseSchema>,
 ): z.output<typeof prospectPreviewCompositionBaseSchema> {
+  if (value.schemaVersion === "1.1") {
+    return {
+      schemaVersion: value.schemaVersion,
+      prospectId: value.prospectId,
+      slug: value.slug,
+      family: value.family,
+      visualDirection: value.visualDirection,
+      heroTreatment: value.heroTreatment,
+      sectionOrder: [...value.sectionOrder],
+      journey: value.journey,
+      copy: value.copy,
+      content: value.content,
+      hero: value.hero,
+      visual: value.visual,
+    };
+  }
+
   return {
     schemaVersion: value.schemaVersion,
     prospectId: value.prospectId,

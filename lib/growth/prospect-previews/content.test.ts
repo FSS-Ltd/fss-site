@@ -37,6 +37,83 @@ test("creates a public preview snapshot without contact or evidence data", () =>
   assert.equal("evidence" in snapshot, false);
 });
 
+test("keeps only opaque evidence references when creating an evidence-backed draft", () => {
+  const baseCandidate = createValidResearchRunFixture().prospects[0]!;
+  const candidate = {
+    ...baseCandidate,
+    brandEvidence: [
+      {
+        id: "00000000-0000-4000-8000-000000000001",
+        kind: "service-language" as const,
+        sourceUrl: "https://example.test/services",
+        evidenceText: "MOT, servicing and repairs for local drivers.",
+        observedAt: "2026-08-17T05:25:00.000Z",
+      },
+      {
+        id: "00000000-0000-4000-8000-000000000002",
+        kind: "brand-colours" as const,
+        sourceUrl: "https://example.test",
+        evidenceText: "#19374A",
+        observedAt: "2026-08-17T05:25:00.000Z",
+      },
+    ],
+    assessment: {
+      ...baseCandidate.assessment,
+      experienceBrief: {
+        schemaVersion: "1.1" as const,
+        hero: {
+          statement:
+            "Start your MOT, service or repair request with your registration.",
+          supportingStatement:
+            "Example Services can prepare the workshop conversation with the right vehicle details.",
+          evidenceIds: ["00000000-0000-4000-8000-000000000001"],
+        },
+        journey: {
+          title: "Get your vehicle ready for the workshop",
+          primaryCta: "Start with your registration",
+          completionMessage: "Your workshop request is ready to review.",
+          steps: [
+            {
+              id: "vehicle",
+              label: "Tell us about your vehicle",
+              kind: "vehicle-registration" as const,
+              control: "registration" as const,
+              requiredFields: ["registration" as const],
+              options: [],
+            },
+            {
+              id: "review",
+              label: "Review your request",
+              kind: "review" as const,
+              control: "review" as const,
+              requiredFields: [],
+              options: [],
+            },
+          ],
+        },
+        visual: {
+          brandColors: ["#19374A"],
+          colourEvidenceIds: ["00000000-0000-4000-8000-000000000002"],
+          logoEvidenceId: null,
+          logoAssetId: null,
+          onSiteImageEvidenceId: null,
+          onSiteImageAssetId: null,
+          approvedHeroMediaAssetId: null,
+        },
+      },
+    },
+  };
+
+  const snapshot = createDraftPreviewSnapshot(candidate);
+
+  assert.equal(snapshot.schemaVersion, "1.1");
+  if (snapshot.schemaVersion === "1.1") {
+    assert.equal(snapshot.experienceBrief.visual.logoAssetId, null);
+    assert.equal(snapshot.experienceBrief.hero.evidenceIds[0], "00000000-0000-4000-8000-000000000001");
+  }
+  assert.equal(JSON.stringify(snapshot).includes("https://example.test"), false);
+});
+
 test("renders a compliant first email with the source-backed narrative and preview URL", () => {
   const email = renderPreviewFirstEmail({
     subject: "A clearer first enquiry journey for Example Heating",

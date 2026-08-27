@@ -22,3 +22,12 @@ html {
     transform: translate3d(0, 0, 0) scale(1);
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .prospect-reveal,
+  .prospect-reveal[data-prospect-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

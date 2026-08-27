@@ -1,6 +1,13 @@
 import type { GrowthTransaction } from "../db/types";
 import type { InsertCandidateDetailsInput } from "./repository-types";
 
+const previewEvidenceKindByCandidateKind = {
+  logo: "logo",
+  "brand-colours": "brand_colours",
+  "service-language": "service_language",
+  "on-site-image": "on_site_image",
+} as const;
+
 export async function insertCandidateDetails(
   tx: GrowthTransaction,
   input: InsertCandidateDetailsInput,
@@ -43,6 +50,28 @@ export async function insertCandidateDetails(
     `;
   }
 
+  for (const evidence of candidate.brandEvidence ?? []) {
+    await tx`
+      insert into growth.prospect_preview_evidence (
+        id,
+        prospect_id,
+        research_run_id,
+        evidence_kind,
+        source_url,
+        evidence_text,
+        observed_at
+      ) values (
+        ${evidence.id},
+        ${inserted.prospectId},
+        ${runId},
+        ${previewEvidenceKindByCandidateKind[evidence.kind]},
+        ${evidence.sourceUrl},
+        ${evidence.evidenceText},
+        ${evidence.observedAt}
+      )
+    `;
+  }
+
   const assessment = candidate.assessment;
   await tx`
     insert into growth.website_assessments (
@@ -59,6 +88,7 @@ export async function insertCandidateDetails(
       hero_concept,
       mobile_fallback,
       performance_budget,
+      experience_brief,
       status
     ) values (
       ${inserted.prospectId},
@@ -74,6 +104,11 @@ export async function insertCandidateDetails(
       ${tx.json(assessment.heroConcept)},
       ${tx.json(assessment.mobileFallback)},
       ${tx.json(assessment.performanceBudget)},
+      ${
+        assessment.experienceBrief === undefined
+          ? null
+          : tx.json(assessment.experienceBrief)
+      },
       'pending_review'
     )
   `;

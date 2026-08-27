@@ -5,7 +5,7 @@ Run at 06:00 Europe/London on weekdays. Research Kent-based local service
 companies and produce up to ten new, qualified corporate prospects. Never send
 email.
 
-Follow `docs/growth-os/runbooks/scheduled-research.md` and the version 1.0
+Follow `docs/growth-os/runbooks/scheduled-research.md` and the version 1.1
 contract demonstrated by
 `docs/growth-os/fixtures/research-run-v1.json`. Do not use browser-control
 automation.
@@ -56,17 +56,22 @@ For each accepted candidate, produce:
   concerns, so I went ahead and built an example of what I believe will serve
   you and your customers or clients better:” followed by the private preview
   URL. The researcher must not publish that URL or send the email.
-- one non-deceptive conceptual visual brief with useful alt text.
+- a version 1.1 evidence-backed private preview brief: first-party logo, brand
+  colours, real service language, and eligible on-site imagery when available,
+  with a first-party source URL, observation time, and concise provenance text
+  for every item. The hero statement and ordered customer journey must be
+  supported by that evidence. Do not use Google Maps, stock, or third-party
+  assets.
 
-The visual must not fabricate staff, premises, testimonials, reviews,
-credentials, results, or an existing product. Do not call a paid image API. If
-approved image generation is unavailable, select the reviewed sector fallback.
-Every ingestion candidate must use `assetId: null` and an approved
-`fallbackAssetKey`.
+Do not call an image API. The email visual remains a fallback-backed conceptual
+brief. For the prospect preview, source image fields begin as `null`; only a
+found first-party logo or on-site image may be uploaded after signed research
+submission. 3D and hero media are founder-approved assets and are never
+uploaded by this workflow.
 
 ## Bundle And Submission
 
-1. Create a version `1.0` bundle with timezone `Europe/London`, a current
+1. Create a version `1.1` bundle with timezone `Europe/London`, a current
    `runDate`, prompt version `weekday-research-v1`, and this stable identifier:
 
    ```text
@@ -91,19 +96,20 @@ Every ingestion candidate must use `assetId: null` and an approved
    regenerating the timestamp and signature. Do not automatically retry 400,
    401, 413, or 422.
 6. Use the successful response's
-   `acceptedProspects: [{ candidateIndex, prospectId }]` mapping. Upload a valid
-   generated image only for a mapped candidate. `candidateIndex` is the
-   zero-based index in the exact original `prospects` array. Never reorder or
-   reindex that array before mapping. Use the returned `runId` and `prospectId`
-   at `/api/agent/email-assets` with `assetKind=cold_first_email`. Fully encode
-   each multipart body and boundary first, then sign those exact raw bytes with
-   a fresh timestamp and the same HMAC header scheme. Do not reuse the research
-   signature or allow re-encoding after signing. If generation or upload fails,
-   retain the approved fallback.
+   `acceptedProspects: [{ candidateIndex, prospectId }]` mapping. The
+   `candidateIndex` is the zero-based index in the exact original `prospects`
+   array. Never reorder or reindex that array before mapping. For found
+   first-party logo or on-site-image evidence only, submit a signed multipart
+   upload to `/api/agent/prospect-preview-assets` using the returned
+   `prospectId`, the run ID, the evidence ID you submitted, exact source URL,
+   kind, meaningful alt text, and source file. Fully encode each multipart body
+   and boundary first, then sign those exact raw bytes with a fresh timestamp.
+   Do not upload AI-generated, stock, third-party, 3D, or hero media.
 7. Report accepted, duplicate, rejected, uploaded, failed, and
    fallback-retained counts plus controlled reason-code totals. Do not report
    contact names, addresses, email copy, raw URLs, signatures, secrets, or raw
    request data.
 
-Finish after producing the drafts, optional mapped image uploads, and redacted
-run report. Do not create a Gmail draft and do not send email.
+Finish after producing the drafts, optional verified first-party preview-asset
+uploads, and redacted run report. Do not create a Gmail draft, publish a
+preview, or send email.

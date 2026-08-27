@@ -60,6 +60,14 @@ export type AssessmentSectionCandidate = {
   items: string[];
 };
 
+export type BrandEvidenceCandidate = {
+  id: string;
+  kind: "logo" | "brand-colours" | "service-language" | "on-site-image";
+  sourceUrl: string;
+  evidenceText: string;
+  observedAt: string;
+};
+
 export type WebsiteAssessmentCandidate = {
   businessGoal: string;
   primaryCta: string;
@@ -73,6 +81,7 @@ export type WebsiteAssessmentCandidate = {
   heroConcept: AssessmentSectionCandidate;
   mobileFallback: AssessmentSectionCandidate;
   performanceBudget: AssessmentSectionCandidate;
+  experienceBrief?: import("../prospect-previews/experience-brief").ExperienceBrief;
 };
 
 export type FirstEmailCandidate = {
@@ -124,6 +133,7 @@ export type ResearchProspectCandidate = {
   contact: ContactCandidate;
   prospect: ProspectCandidate;
   evidence: EvidenceCandidate[];
+  brandEvidence?: BrandEvidenceCandidate[];
   assessment: WebsiteAssessmentCandidate;
   firstEmail: FirstEmailCandidate;
   emailNarrative: WebsiteEmailNarrative;
@@ -137,7 +147,7 @@ export type RejectedResearchCandidate = {
 };
 
 export type ResearchRunIngestion = {
-  schemaVersion: "1.0";
+  schemaVersion: "1.0" | "1.1";
   externalRunId: string;
   runDate: string;
   timezone: "Europe/London";
