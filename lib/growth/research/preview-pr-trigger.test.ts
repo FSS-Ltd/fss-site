@@ -3,6 +3,7 @@ import { createHmac } from "node:crypto";
 import test from "node:test";
 
 import {
+  triggerCurrentTenDraftPreviewBackfill,
   triggerCurrentTenPreviewPullRequest,
   triggerScheduledPreviewPullRequest,
 } from "./preview-pr-trigger";
@@ -92,6 +93,62 @@ test("targets the Production-only current-ten endpoint with a dated backfill ide
     "https://faithfulsoftware.dev/api/agent/current-ten-prospect-preview-pr",
   );
   assert.equal(calls[0]?.init.body, JSON.stringify({ externalRunId: currentTenRunId }));
+});
+
+test("targets the Production-only historical draft-backfill endpoint with an empty signed body", async () => {
+  const calls: Array<{ url: URL; init: RequestInit }> = [];
+
+  const result = await triggerCurrentTenDraftPreviewBackfill({
+    secret,
+    now: () => now,
+    request: async (url, init) => {
+      calls.push({ url, init });
+      return Response.json({
+        status: "backfilled",
+        scanned: 10,
+        created: 10,
+        skipped: 0,
+        invalid: 0,
+      });
+    },
+  });
+
+  assert.deepEqual(result, { ok: true });
+  assert.equal(calls.length, 1);
+  assert.equal(
+    calls[0]?.url.toString(),
+    "https://faithfulsoftware.dev/api/agent/current-ten-prospect-preview-drafts",
+  );
+  assert.equal(calls[0]?.init.method, "POST");
+  assert.equal(calls[0]?.init.body, undefined);
+
+  const headers = calls[0]?.init.headers as Headers;
+  assert.equal(headers.get("x-fss-key-id"), "weekday-agent-v1");
+  assert.equal(headers.get("x-fss-timestamp"), "1787810625");
+  assert.equal(
+    headers.get("x-fss-signature"),
+    createHmac("sha256", secret)
+      .update("1787810625")
+      .update(".")
+      .digest("hex"),
+  );
+});
+
+test("fails closed when the historical draft-backfill endpoint is disabled", async () => {
+  const result = await triggerCurrentTenDraftPreviewBackfill({
+    secret,
+    now: () => now,
+    request: async () =>
+      Response.json({
+        status: "disabled",
+        scanned: 0,
+        created: 0,
+        skipped: 0,
+        invalid: 0,
+      }),
+  });
+
+  assert.deepEqual(result, { ok: false });
 });
 
 test("rejects a non-current-ten identifier without calling the Production endpoint", async () => {
