@@ -209,10 +209,10 @@ test("uses the researched journey for professional and business services", () =>
   assert.equal(composition.journey.type, "evidence-backed");
 });
 
-test("supplies ten distinct property compositions for a full current-ten run", () => {
+test("supplies thirteen distinct property compositions for the evidence refresh", () => {
   const fingerprints = new Set<string>();
 
-  for (let index = 0; index < 10; index += 1) {
+  for (let index = 0; index < 13; index += 1) {
     const composition = requireComposition(
       compileProspectPreviewComposition({
         prospectId: `00000000-0000-4000-8000-${String(index + 1).padStart(12, "0")}`,
@@ -226,5 +226,5 @@ test("supplies ten distinct property compositions for a full current-ten run", (
     fingerprints.add(buildCompositionFingerprint(composition));
   }
 
-  assert.equal(fingerprints.size, 10);
+  assert.equal(fingerprints.size, 13);
 });

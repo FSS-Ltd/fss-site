@@ -49,6 +49,7 @@ export interface ProspectPreviewPrGitHubClient {
     title: string;
     body: string;
     files: readonly GeneratedPreviewFile[];
+    replaceExistingSlugs: boolean;
   }): Promise<{
     number: number;
     url: string;
@@ -61,6 +62,8 @@ export type CreateProspectPreviewPrRunInput = {
   now: () => Date;
   repository: ProspectPreviewPrGenerationRepository;
   github: ProspectPreviewPrGitHubClient;
+  branchSuffix?: "evidence-refresh";
+  replaceExistingSlugs?: boolean;
 };
 
 function formatLondonDate(date: Date): string {
@@ -94,22 +97,47 @@ function validateExternalRunId(externalRunId: string): void {
   }
 }
 
-function buildPullRequestTitle(date: string): string {
-  return `feat: add prospect previews for ${date}`;
+function buildPullRequestTitle(input: {
+  date: string;
+  replaceExistingSlugs: boolean;
+}): string {
+  return input.replaceExistingSlugs
+    ? `feat: refresh prospect previews for ${input.date}`
+    : `feat: add prospect previews for ${input.date}`;
 }
 
 function buildPullRequestBody(input: {
   generated: number;
   unavailable: number;
+  replaceExistingSlugs: boolean;
 }): string {
   return [
-    "Review deterministic prospect preview compositions generated from sanitized Growth OS snapshots.",
+    input.replaceExistingSlugs
+      ? "Review replacement prospect preview compositions generated from evidence-backed Growth OS snapshots."
+      : "Review deterministic prospect preview compositions generated from sanitized Growth OS snapshots.",
     "",
     `Generated packages: ${input.generated}`,
     `Unavailable candidates: ${input.unavailable}`,
     "",
     "This pull request does not publish previews or alter email.",
   ].join("\n");
+}
+
+function validateGenerationMode(input: CreateProspectPreviewPrRunInput): void {
+  if (
+    input.replaceExistingSlugs === true &&
+    input.branchSuffix !== "evidence-refresh"
+  ) {
+    throw new TypeError(
+      "Preview replacement generation requires the evidence refresh branch.",
+    );
+  }
+  if (
+    input.branchSuffix !== undefined &&
+    input.branchSuffix !== "evidence-refresh"
+  ) {
+    throw new TypeError("Preview generation branch suffix is invalid.");
+  }
 }
 
 async function recordUnavailablePackages(
@@ -164,6 +192,7 @@ export async function createProspectPreviewPrRun(
   input: CreateProspectPreviewPrRunInput,
 ): Promise<ProspectPreviewPrRunResult> {
   validateExternalRunId(input.externalRunId);
+  validateGenerationMode(input);
   const generatedAt = input.now();
   const date = formatLondonDate(generatedAt);
   const candidates = await input.repository.listGenerationCandidates(
@@ -188,15 +217,20 @@ export async function createProspectPreviewPrRun(
     };
   }
 
-  const branch = `generated/prospect-previews/${date}`;
+  const branch = `generated/prospect-previews/${date}${
+    input.branchSuffix === undefined ? "" : `-${input.branchSuffix}`
+  }`;
+  const replaceExistingSlugs = input.replaceExistingSlugs === true;
   const pullRequest = await input.github.createPullRequest({
     branch,
-    title: buildPullRequestTitle(date),
+    title: buildPullRequestTitle({ date, replaceExistingSlugs }),
     body: buildPullRequestBody({
       generated: generated.packages.length,
       unavailable: generated.unavailable.length,
+      replaceExistingSlugs,
     }),
     files: generated.files,
+    replaceExistingSlugs,
   });
 
   await recordOpenPackages({

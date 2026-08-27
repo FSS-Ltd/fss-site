@@ -5,6 +5,7 @@ import test from "node:test";
 import {
   triggerCurrentTenDraftPreviewBackfill,
   triggerCurrentTenPreviewPullRequest,
+  triggerCurrentThirteenEvidenceRefresh,
   triggerScheduledPreviewPullRequest,
 } from "./preview-pr-trigger";
 
@@ -93,6 +94,37 @@ test("targets the Production-only current-ten endpoint with a dated backfill ide
     "https://faithfulsoftware.dev/api/agent/current-ten-prospect-preview-pr",
   );
   assert.equal(calls[0]?.init.body, JSON.stringify({ externalRunId: currentTenRunId }));
+});
+
+test("targets the Production-only thirteen-draft evidence refresh endpoint", async () => {
+  const evidenceRefreshRunId = "evidence-refresh-thirteen-2026-08-27";
+  const calls: Array<{ url: URL; init: RequestInit }> = [];
+
+  const result = await triggerCurrentThirteenEvidenceRefresh({
+    externalRunId: evidenceRefreshRunId,
+    secret,
+    now: () => now,
+    request: async (url, init) => {
+      calls.push({ url, init });
+      return Response.json({
+        externalRunId: evidenceRefreshRunId,
+        status: "created",
+        generated: 13,
+        unavailable: 0,
+        pullRequestNumber: 414,
+      });
+    },
+  });
+
+  assert.deepEqual(result, { ok: true });
+  assert.equal(
+    calls[0]?.url.toString(),
+    "https://faithfulsoftware.dev/api/agent/current-thirteen-evidence-refresh-pr",
+  );
+  assert.equal(
+    calls[0]?.init.body,
+    JSON.stringify({ externalRunId: evidenceRefreshRunId }),
+  );
 });
 
 test("targets the Production-only historical draft-backfill endpoint with an empty signed body", async () => {

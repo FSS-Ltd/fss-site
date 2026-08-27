@@ -111,6 +111,45 @@ const EXTRA_VARIANTS: readonly CompositionVariant[] = [
       "owner-cta",
     ],
   },
+  {
+    visualDirection: "precision-dark",
+    heroTreatment: "crafted-table",
+    sectionOrder: [
+      "hero",
+      "case-for-change",
+      "services",
+      "proof",
+      "journey",
+      "locality",
+      "owner-cta",
+    ],
+  },
+  {
+    visualDirection: "warm-editorial",
+    heroTreatment: "ledger-grid",
+    sectionOrder: [
+      "hero",
+      "locality",
+      "case-for-change",
+      "services",
+      "journey",
+      "proof",
+      "owner-cta",
+    ],
+  },
+  {
+    visualDirection: "calm-architectural",
+    heroTreatment: "local-silhouette",
+    sectionOrder: [
+      "hero",
+      "proof",
+      "locality",
+      "journey",
+      "case-for-change",
+      "services",
+      "owner-cta",
+    ],
+  },
 ];
 
 const FAMILY_VARIANTS: Record<

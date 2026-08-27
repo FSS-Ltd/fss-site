@@ -7,29 +7,30 @@ import {
 import { getGrowthDb } from "@/lib/growth/db/client";
 import { verifyAgentRequest } from "@/lib/growth/integrations/agent-signature";
 import {
-  listPreviewGenerationCandidates,
+  listCurrentThirteenEvidenceRefreshCandidates,
   markPreviewCompositionUnavailable,
   recordPreviewGenerationResult,
 } from "@/lib/growth/prospect-previews/composition-repository";
 import {
+  isCurrentThirteenEvidenceRefreshRunId,
+  runCurrentThirteenEvidenceRefresh,
+  type CurrentThirteenEvidenceRefreshRepository,
+} from "@/lib/growth/prospect-previews/generation/current-thirteen-evidence-refresh";
+import {
   createGitHubPreviewPullRequest,
   type GitHubPreviewSourceFile,
 } from "@/lib/growth/prospect-previews/generation/github-preview-pr";
-import {
-  createProspectPreviewPrRun,
-  type ProspectPreviewPrGenerationRepository,
-} from "@/lib/growth/prospect-previews/generation/orchestrator";
 import { createProspectPreviewPrPostHandler } from "@/lib/growth/prospect-previews/generation/route-handler";
 
 export const runtime = "nodejs";
 
 const AGENT_KEY_ID = "weekday-agent-v1";
 
-function createRepository(): ProspectPreviewPrGenerationRepository {
+function createRepository(): CurrentThirteenEvidenceRefreshRepository {
   const db = getGrowthDb();
   return {
-    listGenerationCandidates: (externalRunId) =>
-      listPreviewGenerationCandidates(externalRunId, db),
+    listEligibleEvidenceCandidates: () =>
+      listCurrentThirteenEvidenceRefreshCandidates(db),
     markCompositionUnavailable: (input) =>
       markPreviewCompositionUnavailable(
         {
@@ -58,21 +59,24 @@ function createRepository(): ProspectPreviewPrGenerationRepository {
 
 export async function POST(request: Request): Promise<Response> {
   const environment = readGrowthServerEnv();
-  const github = environment.previewPrEnabled
+  const enabled =
+    process.env.VERCEL_ENV === "production" && environment.previewPrEnabled;
+  const github = enabled
     ? requireProspectPreviewGenerationEnv(environment)
     : null;
   const handler = createProspectPreviewPrPostHandler({
     agentKeyId: AGENT_KEY_ID,
     agentHmacSecret: environment.agentHmacSecret ?? "",
-    enabled: environment.previewPrEnabled,
+    enabled,
     createCorrelationId: randomUUID,
     now: () => new Date(),
     verifyRequest: verifyAgentRequest,
+    isAllowedExternalRunId: isCurrentThirteenEvidenceRefreshRunId,
     run: (externalRunId) => {
       if (github === null) {
-        throw new Error("Preview PR generation is disabled.");
+        throw new Error("Current thirteen-draft evidence refresh is disabled.");
       }
-      return createProspectPreviewPrRun({
+      return runCurrentThirteenEvidenceRefresh({
         externalRunId,
         now: () => new Date(),
         repository: createRepository(),
@@ -90,7 +94,7 @@ export async function POST(request: Request): Promise<Response> {
       });
     },
     reportUnexpectedError: ({ correlationId, error }) => {
-      console.error("Prospect preview pull-request generation failed.", {
+      console.error("Current thirteen-draft evidence refresh failed.", {
         correlationId,
         errorName: error instanceof Error ? error.name : "UnknownError",
       });

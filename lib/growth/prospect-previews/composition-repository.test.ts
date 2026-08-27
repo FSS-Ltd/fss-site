@@ -4,6 +4,7 @@ import test from "node:test";
 import type { GrowthQueryExecutor } from "../db/types";
 import {
   getCurrentTenPreviewGenerationInventory,
+  listCurrentThirteenEvidenceRefreshCandidates,
   listOpenPreviewGenerationRecords,
   listCurrentTenPreviewGenerationCandidates,
   listPreviewGenerationCandidates,
@@ -102,6 +103,31 @@ test("lists at most eleven assessed historical drafts for the current-ten backfi
   );
   assert.match(queries[0]?.text ?? "", /limit 11/);
   assert.match(queries[0]?.text ?? "", /pp\.generation_status = 'pending_pr'/);
+  assert.doesNotMatch(queries[0]?.text ?? "", /email|contact|company_number/i);
+});
+
+test("lists at most fourteen pending evidence-backed drafts for the thirteen-draft refresh gate", async () => {
+  const queries: Array<{ text: string; values: readonly unknown[] }> = [];
+  const candidates = await listCurrentThirteenEvidenceRefreshCandidates(
+    createFakeDb(
+      [{ previewId: PREVIEW_ID, prospectId: PROSPECT_ID, content }],
+      queries,
+    ),
+  );
+
+  assert.deepEqual(candidates, [
+    { previewId: PREVIEW_ID, prospectId: PROSPECT_ID, snapshot: content },
+  ]);
+  assert.match(queries[0]?.text ?? "", /pp\.generation_external_run_id is null/);
+  assert.match(
+    queries[0]?.text ?? "",
+    /pp\.content_snapshot->>'schemaVersion' = '1\.1'/,
+  );
+  assert.match(
+    queries[0]?.text ?? "",
+    /wa\.experience_brief is not null/,
+  );
+  assert.match(queries[0]?.text ?? "", /limit 14/);
   assert.doesNotMatch(queries[0]?.text ?? "", /email|contact|company_number/i);
 });
 
