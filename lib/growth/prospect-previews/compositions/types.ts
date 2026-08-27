@@ -9,7 +9,11 @@ const compositionText = (minimum: number, maximum: number) =>
     .string()
     .min(minimum)
     .max(maximum)
-    .refine((value) => value === value.trim(), "Text cannot have outer whitespace.");
+    .refine((value) => value === value.trim(), "Text cannot have outer whitespace.")
+    .refine(
+      (value) => !/(?:https?:\/\/|\b[\w.+-]+@[\w.-]+\.[a-z]{2,}\b)/i.test(value),
+      "Text cannot include a raw URL or email address.",
+    );
 
 const compositionSlugSchema = z
   .string()

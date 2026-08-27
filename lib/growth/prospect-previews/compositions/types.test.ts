@@ -81,3 +81,15 @@ test("rejects a remote hero asset and duplicate section", () => {
     }),
   );
 });
+
+test("rejects a composition that carries a raw source URL", () => {
+  assert.throws(() =>
+    buildCompositionDigest({
+      ...compositionWithoutDigest,
+      content: {
+        ...compositionWithoutDigest.content,
+        businessGoal: "Read https://example.test/source before making an enquiry.",
+      },
+    }),
+  );
+});
