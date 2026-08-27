@@ -3,6 +3,7 @@ import test from "node:test";
 
 import type { GrowthQueryExecutor } from "../db/types";
 import {
+  getCurrentTenPreviewGenerationInventory,
   listOpenPreviewGenerationRecords,
   listCurrentTenPreviewGenerationCandidates,
   listPreviewGenerationCandidates,
@@ -97,6 +98,33 @@ test("lists at most eleven assessed historical drafts for the current-ten backfi
   );
   assert.match(queries[0]?.text ?? "", /limit 11/);
   assert.match(queries[0]?.text ?? "", /pp\.generation_status = 'pending_pr'/);
+  assert.doesNotMatch(queries[0]?.text ?? "", /email|contact|company_number/i);
+});
+
+test("summarises the current-ten selection state without selecting prospect data", async () => {
+  const queries: Array<{ text: string; values: readonly unknown[] }> = [];
+  const inventory = await getCurrentTenPreviewGenerationInventory(
+    createFakeDb(
+      [
+        {
+          activeDrafts: 10,
+          assessedDrafts: 10,
+          pendingAssessedDrafts: 9,
+          eligibleDrafts: 8,
+        },
+      ],
+      queries,
+    ),
+  );
+
+  assert.deepEqual(inventory, {
+    activeDrafts: 10,
+    assessedDrafts: 10,
+    pendingAssessedDrafts: 9,
+    eligibleDrafts: 8,
+  });
+  assert.match(queries[0]?.text ?? "", /::integer as "activeDrafts"/);
+  assert.match(queries[0]?.text ?? "", /left join growth\.website_assessments wa/);
   assert.doesNotMatch(queries[0]?.text ?? "", /email|contact|company_number/i);
 });
 

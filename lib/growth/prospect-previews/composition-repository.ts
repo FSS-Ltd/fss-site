@@ -17,6 +17,13 @@ export type PreviewGenerationCandidate = {
   snapshot: StoredProspectPreviewSnapshot;
 };
 
+export type CurrentTenPreviewGenerationInventory = {
+  activeDrafts: number;
+  assessedDrafts: number;
+  pendingAssessedDrafts: number;
+  eligibleDrafts: number;
+};
+
 export type OpenPreviewGenerationRecord = {
   previewId: string;
   prospectId: string;
@@ -46,6 +53,9 @@ type PreviewGenerationCandidateRow = {
   prospectId: string;
   content: unknown;
 };
+
+type CurrentTenPreviewGenerationInventoryRow =
+  CurrentTenPreviewGenerationInventory;
 
 type OpenPreviewGenerationRecordRow = OpenPreviewGenerationRecord;
 
@@ -136,6 +146,51 @@ export async function listCurrentTenPreviewGenerationCandidates(
     prospectId: row.prospectId,
     snapshot: parseStoredProspectPreviewSnapshot(row.content),
   }));
+}
+
+export async function getCurrentTenPreviewGenerationInventory(
+  db: GrowthQueryExecutor = getGrowthDb(),
+): Promise<CurrentTenPreviewGenerationInventory> {
+  const rows = await db<CurrentTenPreviewGenerationInventoryRow[]>`
+    select
+      count(*) filter (
+        where pp.status = 'draft'
+          and p.status not in ('won', 'lost', 'rejected', 'suppressed')
+      )::integer as "activeDrafts",
+      count(*) filter (
+        where pp.status = 'draft'
+          and wa.prospect_id is not null
+          and p.status not in ('won', 'lost', 'rejected', 'suppressed')
+      )::integer as "assessedDrafts",
+      count(*) filter (
+        where pp.status = 'draft'
+          and wa.prospect_id is not null
+          and pp.generation_status = 'pending_pr'
+          and p.status not in ('won', 'lost', 'rejected', 'suppressed')
+      )::integer as "pendingAssessedDrafts",
+      count(*) filter (
+        where pp.status = 'draft'
+          and wa.prospect_id is not null
+          and pp.generation_status = 'pending_pr'
+          and pp.generation_external_run_id is null
+          and p.status not in ('won', 'lost', 'rejected', 'suppressed')
+      )::integer as "eligibleDrafts"
+    from growth.prospect_previews pp
+    inner join growth.prospects p on p.id = pp.prospect_id
+    left join growth.website_assessments wa on wa.prospect_id = p.id
+  `;
+
+  const inventory = rows[0];
+  if (
+    inventory === undefined ||
+    !Object.values(inventory).every(
+      (count) => Number.isInteger(count) && count >= 0,
+    )
+  ) {
+    throw new TypeError("Current-ten preview generation inventory is invalid.");
+  }
+
+  return inventory;
 }
 
 export async function recordPreviewGenerationResult(
