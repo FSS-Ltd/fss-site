@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 
 const TERMINAL_PROSPECT_STATUSES = new Set([
   "won",
@@ -10,6 +10,57 @@ const TERMINAL_PROSPECT_STATUSES = new Set([
   "rejected",
   "suppressed",
 ]);
+
+const previewApprovalNoteStyle: CSSProperties = {
+  color: "#475569",
+  flexBasis: "100%",
+  fontSize: "0.875rem",
+  lineHeight: "1.5rem",
+  margin: 0,
+};
+
+const previewChangeRequestStyle: CSSProperties = {
+  borderTop: "1px solid #e2e8f0",
+  display: "grid",
+  flexBasis: "100%",
+  gap: 8,
+  paddingTop: 16,
+};
+
+const previewChangeRequestLabelStyle: CSSProperties = {
+  color: "#334155",
+  fontSize: "0.875rem",
+  fontWeight: 600,
+};
+
+const previewChangeRequestNotesStyle: CSSProperties = {
+  border: "1px solid #cbd5e1",
+  borderRadius: 6,
+  color: "#0f172a",
+  fontSize: "0.875rem",
+  lineHeight: 1.5,
+  minHeight: 96,
+  padding: "8px 12px",
+  resize: "vertical",
+  width: "100%",
+};
+
+const previewChangeRequestFeedbackStyle: CSSProperties = {
+  color: "#475569",
+  fontSize: "0.875rem",
+  margin: 0,
+};
+
+const previewChangeRequestButtonStyle: CSSProperties = {
+  background: "transparent",
+  border: "1px solid #0f766e",
+  borderRadius: 6,
+  color: "#115e59",
+  fontSize: "0.875rem",
+  fontWeight: 600,
+  padding: "8px 12px",
+  width: "fit-content",
+};
 
 export type PreviewApprovalState = {
   compositionDigest: string | null;
@@ -189,7 +240,7 @@ export function PreviewApprovalFrame({
         Approval publishes this private concept and refreshes the stored
         first-email draft. It does not create a provider draft or send email.
       </p>
-      <p className="basis-full text-sm leading-6 text-slate-600">
+      <p style={previewApprovalNoteStyle}>
         {sourcePackageStatus}
       </p>
       {feedback && (
@@ -234,31 +285,31 @@ export function PreviewApprovalFrame({
         </p>
       )}
       {canRequestChanges && (
-        <div className="basis-full space-y-2 border-t border-slate-200 pt-4">
+        <div style={previewChangeRequestStyle}>
           <label
-            className="block text-sm font-semibold text-slate-700"
             htmlFor={`preview-change-notes-${prospectId}`}
+            style={previewChangeRequestLabelStyle}
           >
             Suggest changes
           </label>
           <textarea
-            className="min-h-24 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900"
             id={`preview-change-notes-${prospectId}`}
             maxLength={2000}
             name="preview-change-notes"
             onChange={(event) => setChangeNotes(event.target.value)}
             placeholder="Describe what you would change in this concept."
+            style={previewChangeRequestNotesStyle}
             value={changeNotes}
           />
           {changeRequestFeedback && (
-            <p className="text-sm text-slate-600" role="status">
+            <p role="status" style={previewChangeRequestFeedbackStyle}>
               {changeRequestFeedback}
             </p>
           )}
           <button
-            className="rounded-md border border-teal-700 px-3 py-2 text-sm font-semibold text-teal-800 transition hover:bg-teal-50 disabled:cursor-not-allowed disabled:opacity-50"
             disabled={changeRequestPending || !changeNotes.trim()}
             onClick={requestChanges}
+            style={previewChangeRequestButtonStyle}
             type="button"
           >
             {changeRequestPending ? "Saving changes…" : "Request changes"}
