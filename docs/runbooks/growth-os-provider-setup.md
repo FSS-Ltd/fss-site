@@ -35,6 +35,14 @@ supabase migration list --linked
 - `supabase db push` requires explicit approval after the diff is
   reviewed and a backup exists (Task 7's cutover gate covers this — this
   runbook only documents the linking, not authorises the push).
+- The merge-to-`main` workflow runs the reviewed forward migrations only
+  after its validation job succeeds. Store `SUPABASE_ACCESS_TOKEN` and
+  `SUPABASE_DB_PASSWORD` as GitHub Actions secrets in the `production`
+  environment, not in Vercel. The workflow pins the permitted project
+  reference in source and fails before connecting when either secret is
+  missing. Protect the GitHub `production` environment with the founder as
+  a required reviewer so the backup and dry-run can be reviewed before the
+  migration step starts.
 - Runtime `DATABASE_URL` uses the transaction pooler connection string.
   `DIRECT_DATABASE_URL` is limited to migration and maintenance tooling
   (`scripts/verify-growth-release.ts`, `scripts/verify-migrations.ts`,
