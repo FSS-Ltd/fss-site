@@ -3,12 +3,19 @@ import test from "node:test";
 
 import type { PreviewGenerationCandidate } from "../composition-repository";
 import {
+  isCurrentTenPreviewBackfillRunId,
   runCurrentTenPreviewBackfill,
   type CurrentTenPreviewBackfillRepository,
 } from "./current-ten-backfill";
 
 const RUN_ID = "current-ten-2026-08-27";
 const NOW = new Date("2026-08-27T06:10:00.000Z");
+
+test("recognises only dated current-ten backfill identifiers", () => {
+  assert.equal(isCurrentTenPreviewBackfillRunId(RUN_ID), true);
+  assert.equal(isCurrentTenPreviewBackfillRunId("weekday-2026-08-27-0600"), false);
+  assert.equal(isCurrentTenPreviewBackfillRunId("current-ten-invalid"), false);
+});
 
 function candidate(index: number): PreviewGenerationCandidate {
   const identifier = `${index}`.padStart(8, "0");

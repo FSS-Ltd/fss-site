@@ -52,7 +52,7 @@ run this only from the approved production operator environment after the
 migration and feature configuration are live:
 
 ```bash
-pnpm growth:previews:backfill-pr -- --run-id current-ten-YYYY-MM-DD
+pnpm growth:previews:trigger-current-ten -- --run-id current-ten-YYYY-MM-DD
 ```
 
 The command requires exactly ten eligible drafts and exits before GitHub if the

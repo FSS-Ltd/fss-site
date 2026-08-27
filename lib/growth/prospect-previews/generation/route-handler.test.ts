@@ -9,6 +9,7 @@ const RUN_ID = "weekday-2026-08-27-0600-europe-london-v1";
 function createHandler(input: {
   enabled: boolean;
   verifyResult?: AgentSignatureResult;
+  isAllowedExternalRunId?: (externalRunId: string) => boolean;
   onRun?: () => void;
 }) {
   return createProspectPreviewPrPostHandler({
@@ -18,6 +19,7 @@ function createHandler(input: {
     createCorrelationId: () => "correlation-id",
     now: () => new Date("2026-08-27T06:00:00.000Z"),
     verifyRequest: () => input.verifyResult ?? { ok: true },
+    isAllowedExternalRunId: input.isAllowedExternalRunId,
     run: async (externalRunId) => {
       input.onRun?.();
       assert.equal(externalRunId, RUN_ID);
@@ -51,6 +53,27 @@ test("rejects an unsigned preview-generation trigger before it runs", async () =
   );
 
   assert.equal(response.status, 401);
+  assert.equal(runCalls, 0);
+});
+
+test("rejects a signed trigger that is not allowed by the endpoint before it runs", async () => {
+  let runCalls = 0;
+  const handler = createHandler({
+    enabled: true,
+    isAllowedExternalRunId: () => false,
+    onRun: () => {
+      runCalls += 1;
+    },
+  });
+
+  const response = await handler(
+    new Request("https://faithfulsoftware.dev/api/agent/current-ten-prospect-preview-pr", {
+      method: "POST",
+      body: JSON.stringify({ externalRunId: RUN_ID }),
+    }),
+  );
+
+  assert.equal(response.status, 422);
   assert.equal(runCalls, 0);
 });
 

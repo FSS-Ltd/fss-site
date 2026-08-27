@@ -9,6 +9,10 @@ import {
 
 const CURRENT_TEN_RUN_ID_PATTERN = /^current-ten-\d{4}-\d{2}-\d{2}$/;
 
+export function isCurrentTenPreviewBackfillRunId(externalRunId: string): boolean {
+  return CURRENT_TEN_RUN_ID_PATTERN.test(externalRunId);
+}
+
 export interface CurrentTenPreviewBackfillRepository
   extends Omit<ProspectPreviewPrGenerationRepository, "listGenerationCandidates"> {
   listEligibleExistingCandidates(): Promise<readonly PreviewGenerationCandidate[]>;
@@ -24,7 +28,7 @@ export type RunCurrentTenPreviewBackfillInput = {
 export async function runCurrentTenPreviewBackfill(
   input: RunCurrentTenPreviewBackfillInput,
 ): Promise<ProspectPreviewPrRunResult> {
-  if (!CURRENT_TEN_RUN_ID_PATTERN.test(input.externalRunId)) {
+  if (!isCurrentTenPreviewBackfillRunId(input.externalRunId)) {
     throw new TypeError("Current-ten preview backfill run ID is invalid.");
   }
 
