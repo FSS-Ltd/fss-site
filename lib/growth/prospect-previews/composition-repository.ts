@@ -26,12 +26,18 @@ export type CurrentTenPreviewGenerationStates = {
   withdrawn: number;
 };
 
+export type CurrentTenUnavailableSectorCount = {
+  sector: string;
+  count: number;
+};
+
 export type CurrentTenPreviewGenerationInventory = {
   activeDrafts: number;
   assessedDrafts: number;
   pendingAssessedDrafts: number;
   eligibleDrafts: number;
   generationStates: CurrentTenPreviewGenerationStates;
+  unavailableSectors: readonly CurrentTenUnavailableSectorCount[];
 };
 
 export type OpenPreviewGenerationRecord = {
@@ -66,9 +72,11 @@ type PreviewGenerationCandidateRow = {
 
 type CurrentTenPreviewGenerationInventoryRow = Omit<
   CurrentTenPreviewGenerationInventory,
-  "generationStates"
+  "generationStates" | "unavailableSectors"
 > &
   CurrentTenPreviewGenerationStates;
+
+type CurrentTenUnavailableSectorCountRow = CurrentTenUnavailableSectorCount;
 
 type OpenPreviewGenerationRecordRow = OpenPreviewGenerationRecord;
 
@@ -164,7 +172,8 @@ export async function listCurrentTenPreviewGenerationCandidates(
 export async function getCurrentTenPreviewGenerationInventory(
   db: GrowthQueryExecutor = getGrowthDb(),
 ): Promise<CurrentTenPreviewGenerationInventory> {
-  const rows = await db<CurrentTenPreviewGenerationInventoryRow[]>`
+  const [rows, unavailableSectorRows] = await Promise.all([
+    db<CurrentTenPreviewGenerationInventoryRow[]>`
     select
       count(*) filter (
         where pp.status = 'draft'
@@ -227,7 +236,22 @@ export async function getCurrentTenPreviewGenerationInventory(
     from growth.prospect_previews pp
     inner join growth.prospects p on p.id = pp.prospect_id
     left join growth.website_assessments wa on wa.prospect_id = p.id
-  `;
+  `,
+    db<CurrentTenUnavailableSectorCountRow[]>`
+      select
+        pp.content_snapshot->>'sector' as "sector",
+        count(*)::integer as "count"
+      from growth.prospect_previews pp
+      inner join growth.prospects p on p.id = pp.prospect_id
+      inner join growth.website_assessments wa on wa.prospect_id = p.id
+      where pp.status = 'draft'
+        and pp.generation_status = 'composition_unavailable'
+        and p.status not in ('won', 'lost', 'rejected', 'suppressed')
+      group by pp.content_snapshot->>'sector'
+      order by "count" desc, "sector" asc
+      limit 10
+    `,
+  ]);
 
   const inventory = rows[0];
   if (
@@ -237,6 +261,18 @@ export async function getCurrentTenPreviewGenerationInventory(
     )
   ) {
     throw new TypeError("Current-ten preview generation inventory is invalid.");
+  }
+
+  if (
+    !unavailableSectorRows.every(
+      (row) =>
+        typeof row.sector === "string" &&
+        isNonEmptyTrimmedText(row.sector, 120) &&
+        Number.isInteger(row.count) &&
+        row.count > 0,
+    )
+  ) {
+    throw new TypeError("Current-ten unavailable sector inventory is invalid.");
   }
 
   return {
@@ -252,6 +288,7 @@ export async function getCurrentTenPreviewGenerationInventory(
       published: inventory.published,
       withdrawn: inventory.withdrawn,
     },
+    unavailableSectors: unavailableSectorRows,
   };
 }
 
