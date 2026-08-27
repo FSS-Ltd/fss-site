@@ -37,6 +37,14 @@ export function createCurrentTenPreviewInventoryPostHandler(
       assessedDrafts: 0,
       pendingAssessedDrafts: 0,
       eligibleDrafts: 0,
+      generationStates: {
+        pendingPr: 0,
+        prOpen: 0,
+        mergedDraft: 0,
+        compositionUnavailable: 0,
+        published: 0,
+        withdrawn: 0,
+      },
     },
     run: async () => ({ status: "inventory", ...(await dependencies.run()) }),
   });
