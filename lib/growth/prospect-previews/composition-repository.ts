@@ -28,6 +28,12 @@ export type RecordPreviewGenerationResultInput = {
   generatedAt: Date;
 };
 
+export type MarkPreviewCompositionUnavailableInput = {
+  prospectId: string;
+  generationExternalRunId: string;
+  generatedAt: Date;
+};
+
 type PreviewGenerationCandidateRow = {
   previewId: string;
   prospectId: string;
@@ -97,6 +103,31 @@ export async function listPreviewGenerationCandidates(
   }));
 }
 
+export async function listCurrentTenPreviewGenerationCandidates(
+  db: GrowthQueryExecutor = getGrowthDb(),
+): Promise<readonly PreviewGenerationCandidate[]> {
+  const rows = await db<PreviewGenerationCandidateRow[]>`
+    select
+      pp.id as "previewId",
+      pp.prospect_id as "prospectId",
+      pp.content_snapshot as content
+    from growth.prospect_previews pp
+    inner join growth.prospects p on p.id = pp.prospect_id
+    where pp.status = 'draft'
+      and pp.generation_status = 'pending_pr'
+      and pp.generation_external_run_id is null
+      and p.status not in ('won', 'lost', 'rejected', 'suppressed')
+    order by pp.created_at asc, pp.id asc
+    limit 11
+  `;
+
+  return rows.map((row) => ({
+    previewId: row.previewId,
+    prospectId: row.prospectId,
+    snapshot: parseStoredProspectPreviewSnapshot(row.content),
+  }));
+}
+
 export async function recordPreviewGenerationResult(
   input: RecordPreviewGenerationResultInput,
   db: GrowthQueryExecutor = getGrowthDb(),
@@ -111,6 +142,33 @@ export async function recordPreviewGenerationResult(
         generation_pr_number = ${input.generationPrNumber},
         generation_branch = ${input.generationBranch},
         review_deployment_url = ${input.reviewDeploymentUrl},
+        generation_external_run_id = ${input.generationExternalRunId},
+        generated_at = ${input.generatedAt},
+        updated_at = now()
+    where prospect_id = ${input.prospectId}
+      and status = 'draft'
+      and generation_status = 'pending_pr'
+    returning id
+  `;
+
+  return rows.length === 1;
+}
+
+export async function markPreviewCompositionUnavailable(
+  input: MarkPreviewCompositionUnavailableInput,
+  db: GrowthQueryExecutor = getGrowthDb(),
+): Promise<boolean> {
+  if (
+    !PROSPECT_ID_PATTERN.test(input.prospectId) ||
+    !isNonEmptyTrimmedText(input.generationExternalRunId, 200) ||
+    Number.isNaN(input.generatedAt.getTime())
+  ) {
+    throw new TypeError("Preview composition unavailability input is invalid.");
+  }
+
+  const rows = await db<Array<{ id: string }>>`
+    update growth.prospect_previews
+    set generation_status = 'composition_unavailable',
         generation_external_run_id = ${input.generationExternalRunId},
         generated_at = ${input.generatedAt},
         updated_at = now()

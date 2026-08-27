@@ -11,6 +11,12 @@ The scheduled task is external to the application. It submits a signed JSON
 bundle to `POST /api/agent/research-runs`, then may upload one mapped visual per
 accepted prospect to `POST /api/agent/email-assets`.
 
+After a successful run with accepted prospects, the trusted parent wrapper
+signs one fixed request to `POST /api/agent/prospect-preview-prs`. The
+application creates or updates one dated review PR containing only sanitized
+prospect composition packages. The disposable researcher never receives a
+GitHub credential and must not call that endpoint.
+
 ## Schedule And Target Mix
 
 - Schedule: weekdays at 06:00 Europe/London.
@@ -257,6 +263,24 @@ Research ingestion creates a private draft preview from an accepted candidate's
 structured assessment. The scheduled researcher must not create preview source
 files, publish a preview, add a preview URL to email copy, create a provider
 draft, or send an email.
+
+The parent wrapper may request a dated preview-source PR only after a successful
+research submission with at least one accepted prospect. This requires
+`GROWTH_OS_PREVIEW_PR_ENABLED=true` and a restricted token for
+`FSS-Ltd/fss-site` in the trusted application environment. The PR and its
+merge never publish a preview or alter email. Individual founder approval is
+the only publication boundary.
+
+To create the source-only review PR for the ten historical drafts, an operator
+uses:
+
+```bash
+pnpm growth:previews:backfill-pr -- --run-id current-ten-YYYY-MM-DD
+```
+
+The command exits before contacting GitHub unless it finds exactly ten eligible
+historical drafts. It does not approve a preview, create a provider draft,
+change email, or send mail.
 
 The historical-preview backfill is a separate founder-operated command. It may
 run only after the preview migration and application release are approved. It

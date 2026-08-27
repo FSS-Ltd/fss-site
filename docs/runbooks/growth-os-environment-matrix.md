@@ -41,6 +41,9 @@ automations off and the least-privileged `growth_app` role.
 | `RESEND_WEBHOOK_SECRET` | Jean-Fidele | `.env.local`, optional locally | **Do not set; provider-backed Preview is disabled** | `<set in Vercel>`, matches Production webhook endpoint | Regenerate in Resend dashboard when re-registering the webhook | Yes |
 | `BLOB_READ_WRITE_TOKEN` | Jean-Fidele | `.env.local`, optional locally | **Do not set; the empty Preview store was deleted** | Vercel-issued Production token | Managed by Vercel Blob store attachment; detach/reattach to rotate | Yes |
 | `GROWTH_OS_AUTOMATIONS_ENABLED` | Jean-Fidele | `.env.local`, `false` | `false` | `false` at initial promotion, enabled only through the Task 7 two-gate rollout | Not a secret; flip via Vercel project settings | Yes |
+| `GROWTH_OS_PREVIEW_PR_ENABLED` | Jean-Fidele | `.env.local`, `false` | `false` | `false` until the source-only preview workflow is reviewed | Not a secret; flip with the GitHub token configuration | Yes |
+| `GITHUB_PROSPECT_PREVIEW_TOKEN` | Jean-Fidele | Approved local operator environment only | **Do not set** | Fine-grained token restricted to `FSS-Ltd/fss-site`, `contents: write` and `pull_requests: write` only | Revoke and recreate in GitHub, update Vercel, redeploy | Yes |
+| `GITHUB_PROSPECT_PREVIEW_REPOSITORY` | Jean-Fidele | `FSS-Ltd/fss-site` | **Do not set** | `FSS-Ltd/fss-site` exactly | Fixed allowlist, not a secret | Yes |
 
 ## Public values
 

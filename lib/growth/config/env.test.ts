@@ -1,7 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { parseGrowthServerEnv, requireGmailOAuthEnv, requireResendEnv } from "./env";
+import {
+  parseGrowthServerEnv,
+  requireGmailOAuthEnv,
+  requireProspectPreviewGenerationEnv,
+  requireResendEnv,
+} from "./env";
 
 const tokenEncryptionKey = Buffer.alloc(32, 7).toString("base64");
 
@@ -33,6 +38,49 @@ test("accepts the complete server environment", () => {
   assert.equal(result.tokenEncryptionKey, tokenEncryptionKey);
   assert.equal(result.agentHmacSecret, "c".repeat(32));
   assert.equal(result.automationsEnabled, false);
+  assert.equal(result.previewPrEnabled, false);
+});
+
+test("requires an exact restricted repository and token when preview PR generation is enabled", () => {
+  const environment = parseGrowthServerEnv({
+    ...validEnv,
+    GROWTH_OS_PREVIEW_PR_ENABLED: "true",
+    GITHUB_PROSPECT_PREVIEW_TOKEN: "github-preview-token",
+    GITHUB_PROSPECT_PREVIEW_REPOSITORY: "FSS-Ltd/fss-site",
+  });
+
+  assert.deepEqual(requireProspectPreviewGenerationEnv(environment), {
+    token: "github-preview-token",
+    repository: "FSS-Ltd/fss-site",
+  });
+});
+
+test("keeps preview PR generation disabled until its restricted credentials are configured", () => {
+  const disabled = parseGrowthServerEnv(validEnv);
+  assert.throws(
+    () => requireProspectPreviewGenerationEnv(disabled),
+    /disabled/i,
+  );
+
+  assert.throws(
+    () =>
+      parseGrowthServerEnv({
+        ...validEnv,
+        GROWTH_OS_PREVIEW_PR_ENABLED: "true",
+        GITHUB_PROSPECT_PREVIEW_TOKEN: "github-preview-token",
+      }),
+    /GROWTH_OS_PREVIEW_PR_ENABLED/i,
+  );
+  assert.throws(
+    () =>
+      parseGrowthServerEnv({
+        ...validEnv,
+        GROWTH_OS_PREVIEW_PR_ENABLED: "true",
+        GITHUB_PROSPECT_PREVIEW_TOKEN: "github-preview-token",
+        GITHUB_PROSPECT_PREVIEW_REPOSITORY: "someone-else/private-repo",
+      }),
+    /GITHUB_PROSPECT_PREVIEW_REPOSITORY/i,
+  );
 });
 
 test("keeps request-serving code bootable without the admin database URL", () => {

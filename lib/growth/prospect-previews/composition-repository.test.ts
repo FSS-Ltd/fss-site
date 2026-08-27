@@ -3,7 +3,9 @@ import test from "node:test";
 
 import type { GrowthQueryExecutor } from "../db/types";
 import {
+  listCurrentTenPreviewGenerationCandidates,
   listPreviewGenerationCandidates,
+  markPreviewCompositionUnavailable,
   recordPreviewGenerationResult,
 } from "./composition-repository";
 
@@ -71,6 +73,27 @@ test("lists only pending private draft previews for a research run", async () =>
   assert.doesNotMatch(queries[0]?.text ?? "", /email|contact|company_number/i);
 });
 
+test("lists at most eleven ungenerated historical drafts for the current-ten backfill gate", async () => {
+  const queries: Array<{ text: string; values: readonly unknown[] }> = [];
+  const candidates = await listCurrentTenPreviewGenerationCandidates(
+    createFakeDb(
+      [{ previewId: PREVIEW_ID, prospectId: PROSPECT_ID, content }],
+      queries,
+    ),
+  );
+
+  assert.deepEqual(candidates, [
+    { previewId: PREVIEW_ID, prospectId: PROSPECT_ID, snapshot: content },
+  ]);
+  assert.match(
+    queries[0]?.text ?? "",
+    /pp\.generation_external_run_id is null/,
+  );
+  assert.match(queries[0]?.text ?? "", /limit 11/);
+  assert.match(queries[0]?.text ?? "", /pp\.generation_status = 'pending_pr'/);
+  assert.doesNotMatch(queries[0]?.text ?? "", /email|contact|company_number/i);
+});
+
 test("records generation metadata only on its matching pending draft", async () => {
   const queries: Array<{ text: string; values: readonly unknown[] }> = [];
   const updated = await recordPreviewGenerationResult(
@@ -101,4 +124,34 @@ test("records generation metadata only on its matching pending draft", async () 
     PROSPECT_ID,
   ]);
   assert.doesNotMatch(queries[0]?.text ?? "", /email|contact|company_number/i);
+});
+
+test("marks an unsupported composition unavailable without publishing or touching email", async () => {
+  const queries: Array<{ text: string; values: readonly unknown[] }> = [];
+  const generatedAt = new Date("2026-08-27T06:05:00.000Z");
+
+  const updated = await markPreviewCompositionUnavailable(
+    {
+      prospectId: PROSPECT_ID,
+      generationExternalRunId: EXTERNAL_RUN_ID,
+      generatedAt,
+    },
+    createFakeDb([{ id: PREVIEW_ID }], queries),
+  );
+
+  assert.equal(updated, true);
+  assert.match(
+    queries[0]?.text ?? "",
+    /generation_status = 'composition_unavailable'/,
+  );
+  assert.match(queries[0]?.text ?? "", /and generation_status = 'pending_pr'/);
+  assert.deepEqual(queries[0]?.values, [
+    EXTERNAL_RUN_ID,
+    generatedAt,
+    PROSPECT_ID,
+  ]);
+  assert.doesNotMatch(
+    queries[0]?.text ?? "",
+    /agent_tasks|email|contact|company_number/i,
+  );
 });

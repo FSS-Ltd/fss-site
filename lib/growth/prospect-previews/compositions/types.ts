@@ -173,7 +173,8 @@ export function buildCompositionDigest(
     throw new TypeError("Prospect preview composition must be an object.");
   }
 
-  const { digest: _digest, ...draft } = value as Record<string, unknown>;
+  const draft = { ...(value as Record<string, unknown>) };
+  delete draft.digest;
   const parsed = prospectPreviewCompositionBaseSchema.parse(draft);
   return createHash("sha256")
     .update(JSON.stringify(canonicalComposition(parsed)))
