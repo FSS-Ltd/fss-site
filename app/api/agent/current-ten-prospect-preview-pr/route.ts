@@ -12,6 +12,7 @@ import {
   recordPreviewGenerationResult,
 } from "@/lib/growth/prospect-previews/composition-repository";
 import {
+  classifyCurrentTenPreviewBackfillFailure,
   isCurrentTenPreviewBackfillRunId,
   runCurrentTenPreviewBackfill,
   type CurrentTenPreviewBackfillRepository,
@@ -95,6 +96,7 @@ export async function POST(request: Request): Promise<Response> {
     reportUnexpectedError: ({ correlationId, error }) => {
       console.error("Current-ten prospect preview pull-request generation failed.", {
         correlationId,
+        failureCategory: classifyCurrentTenPreviewBackfillFailure(error),
         errorName: error instanceof Error ? error.name : "UnknownError",
       });
     },

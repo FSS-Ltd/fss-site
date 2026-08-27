@@ -3,6 +3,7 @@ import test from "node:test";
 
 import type { PreviewGenerationCandidate } from "../composition-repository";
 import {
+  classifyCurrentTenPreviewBackfillFailure,
   isCurrentTenPreviewBackfillRunId,
   runCurrentTenPreviewBackfill,
   type CurrentTenPreviewBackfillRepository,
@@ -15,6 +16,31 @@ test("recognises only dated current-ten backfill identifiers", () => {
   assert.equal(isCurrentTenPreviewBackfillRunId(RUN_ID), true);
   assert.equal(isCurrentTenPreviewBackfillRunId("weekday-2026-08-27-0600"), false);
   assert.equal(isCurrentTenPreviewBackfillRunId("current-ten-invalid"), false);
+});
+
+test("classifies current-ten failures for safe Production diagnostics", () => {
+  assert.equal(
+    classifyCurrentTenPreviewBackfillFailure(
+      new Error("Current-ten preview backfill requires exactly ten eligible drafts."),
+    ),
+    "candidate_count",
+  );
+  assert.equal(
+    classifyCurrentTenPreviewBackfillFailure(
+      new Error("GitHub preview source write failed with status 403."),
+    ),
+    "github",
+  );
+  assert.equal(
+    classifyCurrentTenPreviewBackfillFailure(
+      new Error("Preview generation state changed before the pull request was recorded."),
+    ),
+    "state_conflict",
+  );
+  assert.equal(
+    classifyCurrentTenPreviewBackfillFailure(new Error("Connection failed.")),
+    "dependency",
+  );
 });
 
 function candidate(index: number): PreviewGenerationCandidate {
