@@ -89,6 +89,7 @@ export async function POST(request: Request): Promise<Response> {
               title: input.title,
               body: input.body,
               files: input.files satisfies readonly GitHubPreviewSourceFile[],
+              replaceExistingSlugs: input.replaceExistingSlugs,
             }),
         },
       });

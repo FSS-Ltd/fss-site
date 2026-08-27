@@ -178,6 +178,126 @@ test("preserves existing generated manifest entries when it updates an open date
   );
 });
 
+test("replaces an existing generated composition only on a dedicated refresh branch", async () => {
+  const refreshBranch = "generated/prospect-previews/2026-08-27-evidence-refresh";
+  const existingManifest = [
+    'import { createProspectPreviewCompositionManifest } from "./manifest-core";',
+    'import type { ProspectPreviewComposition } from "./types";',
+    'import { fugglesBeerCafeComposition } from "./generated/fuggles-beer-cafe";',
+    'import { mardenGarageComposition } from "./generated/marden-garage";',
+  ].join("\n");
+  const refreshFiles = [
+    {
+      path: "lib/growth/prospect-previews/compositions/generated/marden-garage.ts",
+      content: "export const mardenGarage = 'refreshed';\n",
+    },
+    {
+      path: "lib/growth/prospect-previews/compositions/manifest.ts",
+      content: "export const manifest = [];\n",
+    },
+  ];
+  const requests: RequestCall[] = [];
+  let manifestReads = 0;
+
+  const result = await createGitHubPreviewPullRequest({
+    token,
+    branch: refreshBranch,
+    title: "feat: refresh prospect previews for 2026-08-27",
+    body: "Review refreshed evidence-backed prospect preview compositions.",
+    files: refreshFiles,
+    replaceExistingSlugs: true,
+    request: async (url, init) => {
+      requests.push({ url, init });
+      const method = init.method ?? "GET";
+      if (url.pathname.endsWith("/git/ref/heads/main")) {
+        return jsonResponse({ object: { sha: "base-sha" } });
+      }
+      if (url.pathname.endsWith("/git/refs")) {
+        return jsonResponse({ ref: `refs/heads/${refreshBranch}` }, 201);
+      }
+      if (method === "GET" && url.pathname.endsWith("/manifest.ts")) {
+        manifestReads += 1;
+        return manifestReads === 1
+          ? jsonResponse({
+              sha: "manifest-sha",
+              encoding: "base64",
+              content: Buffer.from(existingManifest).toString("base64"),
+            })
+          : jsonResponse({ sha: "manifest-sha" });
+      }
+      if (method === "GET" && url.pathname.includes("/contents/")) {
+        return jsonResponse({ sha: "composition-sha" });
+      }
+      if (method === "PUT" && url.pathname.includes("/contents/")) {
+        return jsonResponse({ content: { sha: "written" } }, 200);
+      }
+      if (method === "GET" && url.pathname.endsWith("/pulls")) {
+        return jsonResponse([]);
+      }
+      if (method === "POST" && url.pathname.endsWith("/pulls")) {
+        return jsonResponse(
+          {
+            number: 413,
+            html_url: "https://github.com/FSS-Ltd/fss-site/pull/413",
+          },
+          201,
+        );
+      }
+      throw new Error(`Unexpected request: ${method} ${url}`);
+    },
+  });
+
+  assert.equal(result.number, 413);
+  const manifestWrite = requests.find(
+    (request) =>
+      request.init.method === "PUT" &&
+      request.url.pathname.endsWith("/manifest.ts"),
+  );
+  const manifestContent = Buffer.from(
+    JSON.parse(String(manifestWrite?.init.body)).content,
+    "base64",
+  ).toString("utf8");
+  assert.equal(
+    (manifestContent.match(/mardenGarageComposition/g) ?? []).length,
+    2,
+  );
+  assert.match(
+    manifestContent,
+    /import \{ fugglesBeerCafeComposition \} from "\.\/generated\/fuggles-beer-cafe";/,
+  );
+  assert.deepEqual(
+    JSON.parse(
+      String(
+        requests.find(
+          (request) =>
+            request.init.method === "PUT" &&
+            request.url.pathname.endsWith("/generated/marden-garage.ts"),
+        )?.init.body,
+      ),
+    ),
+    {
+      message: "feat: add generated prospect preview compositions",
+      content: Buffer.from(refreshFiles[0]!.content).toString("base64"),
+      branch: refreshBranch,
+      sha: "composition-sha",
+    },
+  );
+});
+
+test("rejects replacing compositions on a normal daily generation branch", async () => {
+  await assert.rejects(
+    createGitHubPreviewPullRequest({
+      token,
+      branch,
+      title: "feat: refresh prospect previews for 2026-08-27",
+      body: "Review refreshed evidence-backed prospect preview compositions.",
+      files,
+      replaceExistingSlugs: true,
+    }),
+    /refresh branch/i,
+  );
+});
+
 test("reuses a matching open dated pull request without a duplicate", async () => {
   const methods: string[] = [];
   const request = async (url: URL, init: RequestInit): Promise<Response> => {

@@ -7,7 +7,9 @@ const BASE_BRANCH = "main";
 const GENERATED_MANIFEST_PATH =
   "lib/growth/prospect-previews/compositions/manifest.ts";
 const GENERATED_BRANCH_PATTERN =
-  /^generated\/prospect-previews\/\d{4}-\d{2}-\d{2}$/;
+  /^generated\/prospect-previews\/\d{4}-\d{2}-\d{2}(?:-[a-z0-9]+)*$/;
+const REFRESH_GENERATED_BRANCH_PATTERN =
+  /^generated\/prospect-previews\/\d{4}-\d{2}-\d{2}-evidence-refresh$/;
 const GENERATED_FILE_PATTERN =
   /^lib\/growth\/prospect-previews\/compositions\/(?:manifest\.ts|generated\/[a-z0-9]+(?:-[a-z0-9]+)*\.ts)$/;
 const GENERATED_SOURCE_PATH_PATTERN =
@@ -31,6 +33,7 @@ export type CreateGitHubPreviewPullRequestInput = {
   title: string;
   body: string;
   files: readonly GitHubPreviewSourceFile[];
+  replaceExistingSlugs?: boolean;
   request?: GitHubPreviewApiRequest;
 };
 
@@ -73,6 +76,20 @@ function validateInput(input: CreateGitHubPreviewPullRequestInput): void {
   }
   if (!GENERATED_BRANCH_PATTERN.test(input.branch)) {
     throw new TypeError("GitHub preview branch is invalid.");
+  }
+  if (
+    input.replaceExistingSlugs !== undefined &&
+    typeof input.replaceExistingSlugs !== "boolean"
+  ) {
+    throw new TypeError("GitHub preview replacement mode is invalid.");
+  }
+  if (
+    input.replaceExistingSlugs === true &&
+    !REFRESH_GENERATED_BRANCH_PATTERN.test(input.branch)
+  ) {
+    throw new TypeError(
+      "GitHub preview replacements require the dedicated evidence refresh branch.",
+    );
   }
   if (
     input.title.trim().length === 0 ||
@@ -258,6 +275,7 @@ async function readExistingGeneratedManifestSlugs(
 function mergeGeneratedManifest(
   files: readonly GitHubPreviewSourceFile[],
   existingSlugs: readonly string[],
+  replaceExistingSlugs: boolean,
 ): readonly GitHubPreviewSourceFile[] {
   const manifest = files.find((file) => file.path === GENERATED_MANIFEST_PATH);
   if (manifest === undefined) return files;
@@ -267,7 +285,13 @@ function mergeGeneratedManifest(
     return match?.[1] ? [match[1]] : [];
   });
   const existing = new Set(existingSlugs);
-  if (newSlugs.some((slug) => existing.has(slug))) {
+  if (new Set(newSlugs).size !== newSlugs.length) {
+    throw new Error("GitHub preview source files contain duplicate prospect slugs.");
+  }
+  if (
+    !replaceExistingSlugs &&
+    newSlugs.some((slug) => existing.has(slug))
+  ) {
     throw new Error(
       "GitHub preview branch already contains a generated prospect slug.",
     );
@@ -279,7 +303,7 @@ function mergeGeneratedManifest(
           ...file,
           content: serializeGeneratedPreviewManifest([
             ...existingSlugs,
-            ...newSlugs,
+            ...newSlugs.filter((slug) => !existing.has(slug)),
           ]),
         }
       : file,
@@ -412,7 +436,11 @@ export async function createGitHubPreviewPullRequest(
   )
     ? await readExistingGeneratedManifestSlugs(request, headers, input.branch)
     : [];
-  const files = mergeGeneratedManifest(sourceFiles, existingSlugs);
+  const files = mergeGeneratedManifest(
+    sourceFiles,
+    existingSlugs,
+    input.replaceExistingSlugs === true,
+  );
   for (const file of files) {
     await writeSourceFile(request, headers, input.branch, file);
   }

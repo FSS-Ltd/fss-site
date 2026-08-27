@@ -9,7 +9,8 @@ const PROSPECT_ID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const COMPOSITION_DIGEST_PATTERN = /^[a-f0-9]{64}$/;
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const BRANCH_PATTERN = /^generated\/prospect-previews\/\d{4}-\d{2}-\d{2}$/;
+const BRANCH_PATTERN =
+  /^generated\/prospect-previews\/\d{4}-\d{2}-\d{2}(?:-[a-z0-9]+)*$/;
 
 export type PreviewGenerationCandidate = {
   previewId: string;
@@ -164,6 +165,34 @@ export async function listCurrentTenPreviewGenerationCandidates(
       and p.status not in ('won', 'lost', 'rejected', 'suppressed')
     order by pp.created_at asc, pp.id asc
     limit 11
+  `;
+
+  return rows.map((row) => ({
+    previewId: row.previewId,
+    prospectId: row.prospectId,
+    snapshot: parseStoredProspectPreviewSnapshot(row.content),
+  }));
+}
+
+export async function listCurrentThirteenEvidenceRefreshCandidates(
+  db: GrowthQueryExecutor = getGrowthDb(),
+): Promise<readonly PreviewGenerationCandidate[]> {
+  const rows = await db<PreviewGenerationCandidateRow[]>`
+    select
+      pp.id as "previewId",
+      pp.prospect_id as "prospectId",
+      pp.content_snapshot as content
+    from growth.prospect_previews pp
+    inner join growth.prospects p on p.id = pp.prospect_id
+    inner join growth.website_assessments wa on wa.prospect_id = p.id
+    where pp.status = 'draft'
+      and pp.generation_status = 'pending_pr'
+      and pp.generation_external_run_id is null
+      and pp.content_snapshot->>'schemaVersion' = '1.1'
+      and wa.experience_brief is not null
+      and p.status not in ('won', 'lost', 'rejected', 'suppressed')
+    order by pp.created_at asc, pp.id asc
+    limit 14
   `;
 
   return rows.map((row) => ({

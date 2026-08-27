@@ -3,6 +3,7 @@ import { createHmac } from "node:crypto";
 import { z } from "zod";
 
 import { isCurrentTenPreviewBackfillRunId } from "../prospect-previews/generation/current-ten-backfill";
+import { isCurrentThirteenEvidenceRefreshRunId } from "../prospect-previews/generation/current-thirteen-evidence-refresh";
 
 const AGENT_KEY_ID = "weekday-agent-v1";
 const PREVIEW_PR_ENDPOINT = new URL(
@@ -10,6 +11,9 @@ const PREVIEW_PR_ENDPOINT = new URL(
 );
 const CURRENT_TEN_PREVIEW_PR_ENDPOINT = new URL(
   "https://faithfulsoftware.dev/api/agent/current-ten-prospect-preview-pr",
+);
+const CURRENT_THIRTEEN_EVIDENCE_REFRESH_ENDPOINT = new URL(
+  "https://faithfulsoftware.dev/api/agent/current-thirteen-evidence-refresh-pr",
 );
 const CURRENT_TEN_DRAFT_BACKFILL_ENDPOINT = new URL(
   "https://faithfulsoftware.dev/api/agent/current-ten-prospect-preview-drafts",
@@ -170,6 +174,17 @@ export async function triggerCurrentTenPreviewPullRequest(
     endpoint: CURRENT_TEN_PREVIEW_PR_ENDPOINT,
     isValidRunId: isCurrentTenPreviewBackfillRunId,
     invalidRunIdMessage: "Current-ten preview-generation run ID is invalid.",
+  });
+}
+
+export async function triggerCurrentThirteenEvidenceRefresh(
+  input: TriggerScheduledPreviewPullRequestInput,
+): Promise<TriggerScheduledPreviewPullRequestResult> {
+  return triggerPreviewPullRequest(input, {
+    endpoint: CURRENT_THIRTEEN_EVIDENCE_REFRESH_ENDPOINT,
+    isValidRunId: isCurrentThirteenEvidenceRefreshRunId,
+    invalidRunIdMessage:
+      "Current thirteen-draft evidence refresh run ID is invalid.",
   });
 }
 
