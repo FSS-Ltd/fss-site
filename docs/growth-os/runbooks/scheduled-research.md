@@ -281,12 +281,13 @@ To create the source-only review PR for the ten historical drafts, an operator
 uses:
 
 ```bash
-pnpm growth:previews:backfill-pr -- --run-id current-ten-YYYY-MM-DD
+pnpm growth:previews:trigger-current-ten -- --run-id current-ten-YYYY-MM-DD
 ```
 
-The command exits before contacting GitHub unless it finds exactly ten eligible
-historical drafts. It does not approve a preview, create a provider draft,
-change email, or send mail.
+The command signs a request to the Production-only application endpoint. That
+endpoint uses its Production database and restricted GitHub token only after it
+finds exactly ten eligible historical drafts. It does not approve a preview,
+create a provider draft, change email, or send mail.
 
 The historical-preview backfill is a separate founder-operated command. It may
 run only after the preview migration and application release are approved. It

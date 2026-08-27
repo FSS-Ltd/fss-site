@@ -25,6 +25,7 @@
     "growth:research:weekday": "tsx scripts/run-scheduled-research-agent.ts",
     "growth:previews:backfill": "tsx scripts/backfill-prospect-previews.ts",
     "growth:previews:backfill-pr": "tsx scripts/backfill-prospect-preview-pr.ts",
+    "growth:previews:trigger-current-ten": "tsx scripts/trigger-current-ten-prospect-preview-pr.ts",
     "perf:budget:homepage": "node scripts/check-homepage-budget.mjs",
     "perf:lighthouse:mobile": "lhci autorun --config=.lighthouserc.mobile.json",
     "verify:growth-release": "tsx scripts/verify-growth-release.ts",

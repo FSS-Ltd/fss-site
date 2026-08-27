@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import { createHmac } from "node:crypto";
 import test from "node:test";
 
-import { triggerScheduledPreviewPullRequest } from "./preview-pr-trigger";
+import {
+  triggerCurrentTenPreviewPullRequest,
+  triggerScheduledPreviewPullRequest,
+} from "./preview-pr-trigger";
 
 const secret = "a".repeat(32);
 const externalRunId = "weekday-2026-08-27-0600-europe-london-v1";
@@ -60,6 +63,54 @@ test("fails closed when the redacted preview-generation response is invalid", as
   });
 
   assert.deepEqual(result, { ok: false });
+});
+
+test("targets the Production-only current-ten endpoint with a dated backfill identifier", async () => {
+  const currentTenRunId = "current-ten-2026-08-27";
+  const calls: Array<{ url: URL; init: RequestInit }> = [];
+
+  const result = await triggerCurrentTenPreviewPullRequest({
+    externalRunId: currentTenRunId,
+    secret,
+    now: () => now,
+    request: async (url, init) => {
+      calls.push({ url, init });
+      return Response.json({
+        externalRunId: currentTenRunId,
+        status: "created",
+        generated: 10,
+        unavailable: 0,
+        pullRequestNumber: 413,
+      });
+    },
+  });
+
+  assert.deepEqual(result, { ok: true });
+  assert.equal(calls.length, 1);
+  assert.equal(
+    calls[0]?.url.toString(),
+    "https://faithfulsoftware.dev/api/agent/current-ten-prospect-preview-pr",
+  );
+  assert.equal(calls[0]?.init.body, JSON.stringify({ externalRunId: currentTenRunId }));
+});
+
+test("rejects a non-current-ten identifier without calling the Production endpoint", async () => {
+  let calls = 0;
+
+  await assert.rejects(
+    triggerCurrentTenPreviewPullRequest({
+      externalRunId,
+      secret,
+      now: () => now,
+      request: async () => {
+        calls += 1;
+        return Response.json({});
+      },
+    }),
+    /current-ten/i,
+  );
+
+  assert.equal(calls, 0);
 });
 
 test("rejects an invalid run identifier without calling the application", async () => {

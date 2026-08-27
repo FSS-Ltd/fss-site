@@ -2,9 +2,14 @@ import { createHmac } from "node:crypto";
 
 import { z } from "zod";
 
+import { isCurrentTenPreviewBackfillRunId } from "../prospect-previews/generation/current-ten-backfill";
+
 const AGENT_KEY_ID = "weekday-agent-v1";
 const PREVIEW_PR_ENDPOINT = new URL(
   "https://faithfulsoftware.dev/api/agent/prospect-preview-prs",
+);
+const CURRENT_TEN_PREVIEW_PR_ENDPOINT = new URL(
+  "https://faithfulsoftware.dev/api/agent/current-ten-prospect-preview-pr",
 );
 const EXTERNAL_RUN_ID_PATTERN = /^[a-z0-9][a-z0-9-]{0,199}$/;
 
@@ -32,12 +37,21 @@ export type TriggerScheduledPreviewPullRequestInput = {
 
 export type TriggerScheduledPreviewPullRequestResult = { ok: true } | { ok: false };
 
-function validateInput(input: TriggerScheduledPreviewPullRequestInput): void {
+type PreviewPrTriggerTarget = {
+  endpoint: URL;
+  isValidRunId: (externalRunId: string) => boolean;
+  invalidRunIdMessage: string;
+};
+
+function validateInput(
+  input: TriggerScheduledPreviewPullRequestInput,
+  target: PreviewPrTriggerTarget,
+): void {
   if (
-    !EXTERNAL_RUN_ID_PATTERN.test(input.externalRunId) ||
+    !target.isValidRunId(input.externalRunId) ||
     input.externalRunId !== input.externalRunId.trim()
   ) {
-    throw new TypeError("Preview-generation run ID is invalid.");
+    throw new TypeError(target.invalidRunIdMessage);
   }
   if (input.secret.replace(/\s/g, "").length < 32) {
     throw new TypeError("Preview-generation signing secret is invalid.");
@@ -69,10 +83,11 @@ async function isValidResponse(
   }
 }
 
-export async function triggerScheduledPreviewPullRequest(
+async function triggerPreviewPullRequest(
   input: TriggerScheduledPreviewPullRequestInput,
+  target: PreviewPrTriggerTarget,
 ): Promise<TriggerScheduledPreviewPullRequestResult> {
-  validateInput(input);
+  validateInput(input, target);
   const now = (input.now ?? (() => new Date()))();
   if (Number.isNaN(now.getTime())) {
     throw new TypeError("Preview-generation trigger time is invalid.");
@@ -92,7 +107,7 @@ export async function triggerScheduledPreviewPullRequest(
   const request = input.request ?? ((url, init) => fetch(url, init));
 
   try {
-    const response = await request(PREVIEW_PR_ENDPOINT, {
+    const response = await request(target.endpoint, {
       method: "POST",
       headers,
       body,
@@ -103,4 +118,24 @@ export async function triggerScheduledPreviewPullRequest(
   } catch {
     return { ok: false };
   }
+}
+
+export async function triggerScheduledPreviewPullRequest(
+  input: TriggerScheduledPreviewPullRequestInput,
+): Promise<TriggerScheduledPreviewPullRequestResult> {
+  return triggerPreviewPullRequest(input, {
+    endpoint: PREVIEW_PR_ENDPOINT,
+    isValidRunId: (externalRunId) => EXTERNAL_RUN_ID_PATTERN.test(externalRunId),
+    invalidRunIdMessage: "Preview-generation run ID is invalid.",
+  });
+}
+
+export async function triggerCurrentTenPreviewPullRequest(
+  input: TriggerScheduledPreviewPullRequestInput,
+): Promise<TriggerScheduledPreviewPullRequestResult> {
+  return triggerPreviewPullRequest(input, {
+    endpoint: CURRENT_TEN_PREVIEW_PR_ENDPOINT,
+    isValidRunId: isCurrentTenPreviewBackfillRunId,
+    invalidRunIdMessage: "Current-ten preview-generation run ID is invalid.",
+  });
 }

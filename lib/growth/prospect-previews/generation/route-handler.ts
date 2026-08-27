@@ -30,6 +30,7 @@ export type ProspectPreviewPrRouteDependencies = {
   createCorrelationId: () => string;
   now: () => Date;
   verifyRequest: (input: VerifyAgentRequestInput) => AgentSignatureResult;
+  isAllowedExternalRunId?: (externalRunId: string) => boolean;
   run: (externalRunId: string) => Promise<ProspectPreviewPrRunResult>;
   reportUnexpectedError: (input: {
     correlationId: string;
@@ -137,6 +138,13 @@ export function createProspectPreviewPrPostHandler(
 
     const externalRunId = parseRequest(rawBody);
     if (externalRunId === null) {
+      return fail(422, "invalid_request", "Preview generation request validation failed.");
+    }
+
+    if (
+      dependencies.isAllowedExternalRunId !== undefined &&
+      !dependencies.isAllowedExternalRunId(externalRunId)
+    ) {
       return fail(422, "invalid_request", "Preview generation request validation failed.");
     }
 
