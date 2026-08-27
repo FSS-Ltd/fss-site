@@ -9,8 +9,10 @@ import {
 
 const CURRENT_THIRTEEN_EVIDENCE_REFRESH_RUN_ID_PATTERN =
   /^evidence-refresh-thirteen-\d{4}-\d{2}-\d{2}$/;
-const EXACT_CANDIDATE_COUNT_ERROR =
-  "Current thirteen-draft evidence refresh requires exactly thirteen eligible drafts.";
+const MINIMUM_CANDIDATE_COUNT = 1;
+const MAXIMUM_CANDIDATE_COUNT = 13;
+const CANDIDATE_COUNT_ERROR =
+  "Current evidence refresh requires between one and thirteen eligible drafts.";
 
 export function isCurrentThirteenEvidenceRefreshRunId(
   externalRunId: string,
@@ -38,8 +40,11 @@ export async function runCurrentThirteenEvidenceRefresh(
   }
 
   const candidates = await input.repository.listEligibleEvidenceCandidates();
-  if (candidates.length !== 13) {
-    throw new Error(EXACT_CANDIDATE_COUNT_ERROR);
+  if (
+    candidates.length < MINIMUM_CANDIDATE_COUNT ||
+    candidates.length > MAXIMUM_CANDIDATE_COUNT
+  ) {
+    throw new Error(CANDIDATE_COUNT_ERROR);
   }
 
   return createProspectPreviewPrRun({

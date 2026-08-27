@@ -67,51 +67,55 @@ test("recognises only dated thirteen-draft evidence refresh identifiers", () => 
   );
 });
 
-test("creates exactly thirteen replacement packages on a dedicated source branch", async () => {
-  const candidates = Array.from({ length: 13 }, (_, index) => candidate(index + 1));
-  const calls: Array<{ branch: string; replaceExistingSlugs: boolean }> = [];
+test("creates replacement packages for all active evidence-backed drafts on a dedicated source branch", async () => {
+  for (const candidateCount of [12, 13]) {
+    const candidates = Array.from({ length: candidateCount }, (_, index) =>
+      candidate(index + 1),
+    );
+    const calls: Array<{ branch: string; replaceExistingSlugs: boolean }> = [];
 
-  const result = await runCurrentThirteenEvidenceRefresh({
-    externalRunId: RUN_ID,
-    now: () => NOW,
-    repository: createRepository(candidates),
-    github: {
-      async createPullRequest(input) {
-        calls.push({
-          branch: input.branch,
-          replaceExistingSlugs: input.replaceExistingSlugs,
-        });
-        return {
-          number: 414,
-          url: "https://github.com/FSS-Ltd/fss-site/pull/414",
-          alreadyOpen: false,
-        };
+    const result = await runCurrentThirteenEvidenceRefresh({
+      externalRunId: RUN_ID,
+      now: () => NOW,
+      repository: createRepository(candidates),
+      github: {
+        async createPullRequest(input) {
+          calls.push({
+            branch: input.branch,
+            replaceExistingSlugs: input.replaceExistingSlugs,
+          });
+          return {
+            number: 414,
+            url: "https://github.com/FSS-Ltd/fss-site/pull/414",
+            alreadyOpen: false,
+          };
+        },
       },
-    },
-  });
+    });
 
-  assert.deepEqual(result, {
-    externalRunId: RUN_ID,
-    status: "created",
-    generated: 13,
-    unavailable: 0,
-    pullRequestNumber: 414,
-  });
-  assert.deepEqual(calls, [
-    {
-      branch: "generated/prospect-previews/2026-08-27-evidence-refresh",
-      replaceExistingSlugs: true,
-    },
-  ]);
+    assert.deepEqual(result, {
+      externalRunId: RUN_ID,
+      status: "created",
+      generated: candidateCount,
+      unavailable: 0,
+      pullRequestNumber: 414,
+    });
+    assert.deepEqual(calls, [
+      {
+        branch: "generated/prospect-previews/2026-08-27-evidence-refresh",
+        replaceExistingSlugs: true,
+      },
+    ]);
+  }
 });
 
-test("fails before GitHub unless all thirteen evidence-backed drafts are ready", async () => {
+test("fails before GitHub when the active evidence refresh has no eligible drafts", async () => {
   let githubCalls = 0;
   await assert.rejects(
     runCurrentThirteenEvidenceRefresh({
       externalRunId: RUN_ID,
       now: () => NOW,
-      repository: createRepository([candidate(1)]),
+      repository: createRepository([]),
       github: {
         async createPullRequest() {
           githubCalls += 1;
@@ -119,7 +123,27 @@ test("fails before GitHub unless all thirteen evidence-backed drafts are ready",
         },
       },
     }),
-    /exactly thirteen/i,
+    /between one and thirteen/i,
+  );
+  assert.equal(githubCalls, 0);
+});
+
+test("fails before GitHub when the active evidence refresh exceeds its audited batch limit", async () => {
+  let githubCalls = 0;
+  const candidates = Array.from({ length: 14 }, (_, index) => candidate(index + 1));
+  await assert.rejects(
+    runCurrentThirteenEvidenceRefresh({
+      externalRunId: RUN_ID,
+      now: () => NOW,
+      repository: createRepository(candidates),
+      github: {
+        async createPullRequest() {
+          githubCalls += 1;
+          throw new Error("unreachable");
+        },
+      },
+    }),
+    /between one and thirteen/i,
   );
   assert.equal(githubCalls, 0);
 });
