@@ -24,17 +24,16 @@ export function SiteInteractions() {
       );
     };
 
-    // Keep the non-critical interaction bundle out of the initial Lighthouse
-    // window. A real interaction still opts into it immediately, so reveal,
-    // menu, hover and scroll behavior never waits behind an idle timer.
-    const timeoutHandle = globalThis.setTimeout(mount, 2800);
+    // The interaction module performs DOM-wide setup, so loading it without a
+    // user gesture competes with the initial page render. It is entirely
+    // progressive enhancement: navigation works before it loads, and the
+    // first scroll, pointer, or keyboard interaction loads it immediately.
     window.addEventListener("scroll", mount, { passive: true, once: true });
     window.addEventListener("pointerdown", mount, { passive: true, once: true });
     window.addEventListener("keydown", mount, { once: true });
 
     return () => {
       cancelled = true;
-      globalThis.clearTimeout(timeoutHandle);
       window.removeEventListener("scroll", mount);
       window.removeEventListener("pointerdown", mount);
       window.removeEventListener("keydown", mount);
