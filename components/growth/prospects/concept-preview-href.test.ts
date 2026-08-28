@@ -6,21 +6,10 @@ import {
   getFounderConceptPreviewHref,
 } from "./concept-preview-href";
 
-test("links generated concepts to their bespoke public route", () => {
+test("keeps drafted generated concepts inside the founder review route", () => {
   assert.equal(
     getConceptPreviewHref({
       prospectId: "11111111-1111-4111-8111-111111111111",
-      slug: "example-heating",
-    }),
-    "/preview/example-heating",
-  );
-});
-
-test("keeps pending concepts reviewable until they have a slug", () => {
-  assert.equal(
-    getConceptPreviewHref({
-      prospectId: "11111111-1111-4111-8111-111111111111",
-      slug: null,
     }),
     "/growth/prospects/11111111-1111-4111-8111-111111111111/preview",
   );
@@ -30,9 +19,18 @@ test("uses a registered bespoke source when a legacy draft has no stored slug", 
   assert.equal(
     getFounderConceptPreviewHref({
       prospectId: "11111111-1111-4111-8111-111111111111",
-      storedSlug: null,
       sourceSlug: "example-heating",
     }),
     "/preview/example-heating",
+  );
+});
+
+test("does not treat a generated database slug as a bespoke public source", () => {
+  assert.equal(
+    getFounderConceptPreviewHref({
+      prospectId: "11111111-1111-4111-8111-111111111111",
+      sourceSlug: null,
+    }),
+    "/growth/prospects/11111111-1111-4111-8111-111111111111/preview",
   );
 });

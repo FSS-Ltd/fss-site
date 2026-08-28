@@ -269,7 +269,6 @@ export function PreviewApprovalFrame({
       <Link
         href={getConceptPreviewHref({
           prospectId,
-          slug: draftPreview.slug,
         })}
         style={{
           alignItems: "center",
