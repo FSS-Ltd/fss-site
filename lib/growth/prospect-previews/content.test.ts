@@ -125,14 +125,65 @@ test("renders a compliant first email with the source-backed narrative and previ
       "This is a private concept, not a connected live service.",
   });
 
-  assert.match(email.text, /One thing that came through clearly/i);
-  assert.match(email.text, /A few parts of the current journey could be clearer/i);
+  assert.match(email.text, /One strength is/i);
+  assert.match(email.text, /The journey could be clearer/i);
   assert.match(email.text, /I didn’t want to just list off concerns/i);
   assert.match(
     email.html,
     /https:\/\/faithfulsoftware\.dev\/preview\/p\/opaque-public-id/,
   );
   assert.ok(email.wordCount >= 140 && email.wordCount <= 220);
+});
+
+test("keeps the approval email within its word limit when source narratives are verbose", () => {
+  const verboseNarrative = {
+    openingStrength: {
+      text: [
+        "the services page gives visitors a clear explanation of the work provided",
+        "and explains the different options available before they make contact",
+        "which gives the business a useful starting point for a stronger enquiry journey",
+      ].join(" "),
+      evidenceSourceUrl: "https://example.test/services",
+      kind: "first_party_service" as const,
+    },
+    improvements: [
+      {
+        text: [
+          "the general enquiry route could collect the details needed before a call-back",
+          "so the team can understand the work, urgency and location before responding",
+        ].join(" "),
+        evidenceSourceUrl: "https://example.test/services",
+      },
+      {
+        text: [
+          "the next step could be clearer for visitors who need urgent help",
+          "so they can choose the right service and provide the context required",
+        ].join(" "),
+        evidenceSourceUrl: "https://example.test/services",
+      },
+      {
+        text: [
+          "the contact route could set clear expectations about the information required",
+          "and help each request reach the person who can respond usefully",
+        ].join(" "),
+        evidenceSourceUrl: "https://example.test/services",
+      },
+    ],
+  };
+
+  const email = renderPreviewFirstEmail({
+    subject: "A clearer first enquiry journey for Example Heating",
+    narrative: verboseNarrative,
+    previewUrl: "https://faithfulsoftware.dev/preview/example-heating",
+    optOutSentence:
+      "If you would rather not hear from me, reply and I will not contact you again.",
+    conceptDisclaimer:
+      "This is a private concept, not a connected live service.",
+  });
+
+  assert.ok(email.wordCount >= 140 && email.wordCount <= 220);
+  assert.match(email.text, /the services page gives visitors/i);
+  assert.match(email.text, /the general enquiry route could collect/i);
 });
 
 test("does not invent a historical narrative without two usable observations", () => {

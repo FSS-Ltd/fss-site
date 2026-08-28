@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
+import { getConceptPreviewHref } from "@/components/growth/prospects/concept-preview-href";
 import {
   getBespokeProspectPage,
   getBespokeProspectSlugs,
 } from "@/components/prospect-previews/bespoke/registry";
 import { renderProspectCompositionPage } from "@/components/prospect-previews/composition-preview-page";
+import { enforceFounderPrivatePreviewAccess } from "@/lib/growth/auth/private-preview-access";
+import { requireFounder } from "@/lib/growth/auth/require-founder";
 import { getGrowthDb } from "@/lib/growth/db/client";
 import { getMergedProspectPreviewCompositionBySlug } from "@/lib/growth/prospect-previews/compositions/manifest";
 import { getPublishedProspectPreviewCompositionBySlug } from "@/lib/growth/prospect-previews/public-repository";
@@ -73,6 +76,12 @@ export default async function ProspectPreviewPage({
       ),
   });
   if (sourcePage) return sourcePage;
+
+  const composition = getMergedProspectPreviewCompositionBySlug(slug);
+  if (production && composition) {
+    await enforceFounderPrivatePreviewAccess(requireFounder, notFound);
+    redirect(getConceptPreviewHref({ prospectId: composition.prospectId }));
+  }
 
   notFound();
 }
