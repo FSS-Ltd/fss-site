@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import { renderToStaticMarkup } from "react-dom/server";
@@ -8,6 +9,7 @@ import {
   getBespokeProspectPage,
   getBespokeProspectSlugs,
 } from "./registry";
+import { DunkleysOfDealPage } from "./prospects/dunkley-s-of-deal";
 
 const expectedSlugs = [
   "bright-fox-lettings",
@@ -62,4 +64,42 @@ test("garage journeys ask for registration before service details", () => {
       html.indexOf("Vehicle registration") < html.indexOf("What do you need"),
     );
   }
+});
+
+test("renders Dunkley's photographic hero as an immersive scroll introduction", () => {
+  const html = renderToStaticMarkup(<DunkleysOfDealPage />);
+
+  assert.match(html, /data-dunkley-scroll-hero="true"/);
+  assert.match(html, /data-dunkley-scroll-hero-media="true"/);
+  assert.match(html, /data-dunkley-scroll-hero-copy="true"/);
+  assert.match(html, /dunkley-s-of-deal%2Fhero-v1\.png/);
+});
+
+test("keeps Dunkley's scroll transition compact before vehicle booking", () => {
+  const html = renderToStaticMarkup(<DunkleysOfDealPage />);
+  const styles = readFileSync(
+    new URL("../../../app/preview/preview.css", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(
+    styles,
+    /\[data-dunkley-scroll-hero\] \{\s+height: 145svh;/,
+  );
+  assert.match(
+    styles,
+    /\[data-dunkley-scroll-hero\] \+ #vehicle \{\s+margin-top: -100svh;/,
+  );
+  assert.match(
+    styles,
+    /\[data-dunkley-scroll-hero-frame\] \{[\s\S]*?pointer-events: none;/,
+  );
+  assert.match(
+    styles,
+    /\[data-dunkley-scroll-hero\] \{\s+height: 145svh;[\s\S]*?pointer-events: none;/,
+  );
+
+  const formIndex = html.indexOf('data-demo-form="Dunkley&#x27;s of Deal"');
+  assert.ok(formIndex > 0);
+  assert.doesNotMatch(html.slice(formIndex - 160, formIndex), /prospect-reveal/);
 });
