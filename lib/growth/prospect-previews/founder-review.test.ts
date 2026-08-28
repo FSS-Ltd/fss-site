@@ -62,6 +62,7 @@ test("lists each draft preview with the versions required for founder approval",
         prospectId,
         prospectStatus: "ready_for_email_review",
         prospectVersion: 5,
+        slug: "example-heating",
       },
     ], queries),
   );
@@ -78,10 +79,12 @@ test("lists each draft preview with the versions required for founder approval",
         prospectId,
         prospectStatus: "ready_for_email_review",
         prospectVersion: 5,
+        slug: "example-heating",
       },
     ],
   });
   assert.match(queries[0]?.text ?? "", /where pp\.status = 'draft'/);
+  assert.match(queries[0]?.text ?? "", /pp\.slug/);
   assert.doesNotMatch(queries[0]?.text ?? "", /public_id/i);
 });
 

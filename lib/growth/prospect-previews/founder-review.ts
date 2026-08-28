@@ -20,6 +20,7 @@ export type FounderDraftProspectPreviewSummary = {
   prospectId: string;
   prospectStatus: string;
   prospectVersion: number;
+  slug: string | null;
 };
 
 export type FounderDraftProspectPreview = {
@@ -50,6 +51,7 @@ export async function getFounderDraftProspectPreviewSummaries(
         pp.composition_digest as "compositionDigest",
         pp.generation_pr_number as "generationPrNumber",
         pp.generation_status as "generationStatus",
+        pp.slug,
         pp.version as "previewVersion",
         p.id as "prospectId",
         p.status as "prospectStatus",

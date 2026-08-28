@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState, type CSSProperties } from "react";
 
+import { getConceptPreviewHref } from "./concept-preview-href";
+
 const TERMINAL_PROSPECT_STATUSES = new Set([
   "won",
   "lost",
@@ -66,6 +68,7 @@ export type PreviewApprovalState = {
   compositionDigest: string | null;
   generationPrNumber: number | null;
   generationStatus: string | null;
+  slug: string | null;
   status: string;
   version: number;
 };
@@ -264,7 +267,10 @@ export function PreviewApprovalFrame({
         {pending ? "Approving preview…" : "Approve preview"}
       </button>
       <Link
-        href={`/growth/prospects/${prospectId}/preview`}
+        href={getConceptPreviewHref({
+          prospectId,
+          slug: draftPreview.slug,
+        })}
         style={{
           alignItems: "center",
           border: "1px solid #087f88",

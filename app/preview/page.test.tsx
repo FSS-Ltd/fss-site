@@ -9,16 +9,16 @@ import ProspectPreviewPage, {
   generateMetadata,
 } from "./[slug]/page";
 
-test("keeps private preview rendering dynamic so publication stays database-gated", async () => {
+test("keeps preview rendering dynamic for publication status checks", async () => {
   assert.equal(dynamic, "force-dynamic");
 });
 
 test("marks prospect preview metadata as noindex and nofollow", async () => {
   const metadata = await generateMetadata({
-    params: Promise.resolve({ slug: "ashford-auto-centre" }),
+    params: Promise.resolve({ slug: "marden-garage" }),
   });
 
-  assert.equal(metadata.title, "Ashford Auto Centre concept preview");
+  assert.equal(metadata.title, "MOT, service and repair in Marden");
   assert.deepEqual(metadata.robots, { index: false, follow: false });
 });
 
@@ -33,12 +33,13 @@ test("sends noindex response headers for every preview URL", async () => {
   ]);
 });
 
-test("renders the selected prospect composition instead of the public site shell", async () => {
+test("renders the selected bespoke concept instead of the public site shell", async () => {
   const page = await ProspectPreviewPage({
-    params: Promise.resolve({ slug: "ashford-auto-centre" }),
+    params: Promise.resolve({ slug: "marden-garage" }),
   });
   const html = renderToStaticMarkup(page);
 
-  assert.match(html, /Concept prepared for Ashford Auto Centre/i);
+  assert.match(html, /Concept prepared for Marden Garage/i);
+  assert.match(html, /Start with the vehicle/i);
   assert.doesNotMatch(html, /Faithful Software Solutions Ltd/i);
 });

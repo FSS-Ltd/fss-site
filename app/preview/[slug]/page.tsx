@@ -6,11 +6,9 @@ import {
   getBespokeProspectSlugs,
 } from "@/components/prospect-previews/bespoke/registry";
 import { renderProspectCompositionPage } from "@/components/prospect-previews/composition-preview-page";
-import { ProspectPreviewRenderer } from "@/components/prospect-previews/prospect-preview-renderer";
 import { getGrowthDb } from "@/lib/growth/db/client";
 import { getMergedProspectPreviewCompositionBySlug } from "@/lib/growth/prospect-previews/compositions/manifest";
 import { getPublishedProspectPreviewCompositionBySlug } from "@/lib/growth/prospect-previews/public-repository";
-import { getProspectPreview } from "@/lib/prospect-previews/registry";
 
 type PreviewPageProps = {
   params: Promise<{ slug: string }>;
@@ -32,9 +30,8 @@ export async function generateMetadata({
   const { slug } = await params;
   const bespokePage = getBespokeProspectPage(slug);
   const composition = getMergedProspectPreviewCompositionBySlug(slug);
-  const preview = getProspectPreview(slug);
 
-  if (!bespokePage && !composition && !preview) {
+  if (!bespokePage && !composition) {
     return {
       robots: { index: false, follow: false },
     };
@@ -43,12 +40,10 @@ export async function generateMetadata({
   return {
     title:
       bespokePage?.title ??
-      composition?.copy.businessName ??
-      preview?.seo.title,
+      composition?.copy.businessName,
     description:
       bespokePage?.description ??
-      composition?.copy.headline ??
-      preview?.seo.description,
+      composition?.copy.headline,
     robots: { index: false, follow: false },
   };
 }
@@ -79,11 +74,5 @@ export default async function ProspectPreviewPage({
   });
   if (sourcePage) return sourcePage;
 
-  if (production) notFound();
-
-  const preview = getProspectPreview(slug);
-
-  if (!preview) notFound();
-
-  return <ProspectPreviewRenderer preview={preview} />;
+  notFound();
 }
