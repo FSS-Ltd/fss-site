@@ -36,6 +36,51 @@ html {
   z-index: -1;
 }
 
+[data-evo-roof-restoration] {
+  min-height: 100svh;
+}
+
+[data-evo-roof-restoration-frame] {
+  isolation: isolate;
+  min-height: 100svh;
+  overflow: hidden;
+  position: relative;
+}
+
+[data-evo-roof-restoration-video] {
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  object-position: center;
+  position: absolute;
+  width: 100%;
+  z-index: -2;
+}
+
+[data-evo-roof-restoration-shade] {
+  background:
+    linear-gradient(90deg, rgba(10, 29, 41, 0.92) 0%, rgba(10, 29, 41, 0.67) 43%, rgba(10, 29, 41, 0.16) 75%),
+    linear-gradient(0deg, rgba(10, 29, 41, 0.74) 0%, transparent 56%);
+  inset: 0;
+  position: absolute;
+  z-index: -1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-evo-roof-restoration] {
+    height: 230svh;
+    min-height: 0;
+    position: relative;
+  }
+
+  [data-evo-roof-restoration-frame] {
+    height: 100svh;
+    min-height: 0;
+    position: sticky;
+    top: 0;
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   @supports (animation-timeline: scroll()) {
     [data-dunkley-scroll-hero] {
