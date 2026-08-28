@@ -68,7 +68,7 @@ html {
 
 @media (prefers-reduced-motion: no-preference) {
   [data-evo-roof-restoration] {
-    height: 230svh;
+    height: 420svh;
     min-height: 0;
     position: relative;
   }

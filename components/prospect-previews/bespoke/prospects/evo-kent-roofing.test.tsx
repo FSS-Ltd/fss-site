@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import { renderToStaticMarkup } from "react-dom/server";
@@ -26,5 +27,18 @@ test("renders EVO's scroll-linked 1080p roof restoration with a poster fallback"
     html,
     /prospect-previews\/bespoke\/evo-kent-roofing\/roof-restoration-v1-poster\.jpg/,
   );
+  assert.doesNotMatch(html, /<video[^>]*autoPlay/);
   assert.match(html, /A damaged roof is rebuilt layer by layer/i);
+});
+
+test("gives EVO's video a longer scroll distance without autoplay", () => {
+  const styles = readFileSync(
+    new URL("../../../../app/preview/preview.css", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(
+    styles,
+    /\[data-evo-roof-restoration\]\s*\{\s*height:\s*420svh;/,
+  );
 });
