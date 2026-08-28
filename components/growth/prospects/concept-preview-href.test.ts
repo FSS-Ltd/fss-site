@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { getConceptPreviewHref } from "./concept-preview-href";
+import {
+  getConceptPreviewHref,
+  getFounderConceptPreviewHref,
+} from "./concept-preview-href";
 
 test("links generated concepts to their bespoke public route", () => {
   assert.equal(
@@ -20,5 +23,16 @@ test("keeps pending concepts reviewable until they have a slug", () => {
       slug: null,
     }),
     "/growth/prospects/11111111-1111-4111-8111-111111111111/preview",
+  );
+});
+
+test("uses a registered bespoke source when a legacy draft has no stored slug", () => {
+  assert.equal(
+    getFounderConceptPreviewHref({
+      prospectId: "11111111-1111-4111-8111-111111111111",
+      storedSlug: null,
+      sourceSlug: "example-heating",
+    }),
+    "/preview/example-heating",
   );
 });
