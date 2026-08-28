@@ -8,16 +8,12 @@ new corporate prospects in Kent. It prepares research and first-email drafts
 for review. It never sends email.
 
 The scheduled task is external to the application. It submits a signed JSON
-bundle to `POST /api/agent/research-runs`, then may upload a found first-party
-logo or on-site image for a mapped prospect to
-`POST /api/agent/prospect-preview-assets`. It never calls an image-generation
-API and it never uploads 3D or hero media.
-
-After a successful run with accepted prospects, the trusted parent wrapper
-signs one fixed request to `POST /api/agent/prospect-preview-prs`. The
-application creates or updates one dated review PR containing only sanitized
-prospect composition packages. The disposable researcher never receives a
-GitHub credential and must not call that endpoint.
+bundle to `POST /api/agent/research-runs`, then builds one local, review-only
+bespoke preview for every accepted prospect. Each preview lives at
+`/preview/[slug]`, uses a verified official logo and a unique native
+Codex-generated hero image, and does not use the generic prospect-composition
+generator. The workflow never sends email, creates a pull request, commits,
+deploys, or publishes a preview.
 
 ## Schedule And Target Mix
 
@@ -51,17 +47,19 @@ Run the workflow through the repository wrapper:
 pnpm growth:research:weekday
 ```
 
-The wrapper creates a mode `0700` workspace outside the repository, starts an
-ephemeral GPT process without user configuration or project rules, discards
-the child process's stdout and stderr, and accepts only a final response that
-matches the strict redacted-report schema. It removes the complete temporary
-workspace on success, failure, or timeout. The scheduled Codex task must invoke
-this wrapper rather than executing the research prompt directly.
+The wrapper creates a mode `0700` directory outside the repository for the
+strict redacted report, then starts an ephemeral GPT process in the checked-out
+FSS project. The agent may work only in the expressly listed research and
+preview paths. It discards the child process's stdout and stderr, and accepts
+only a final response that matches the strict redacted-report schema. It
+removes the temporary report directory on success, failure, or timeout. The
+scheduled Codex task must invoke this wrapper rather than executing the
+research prompt directly.
 
 This boundary keeps prospect details, work emails, source URLs, draft copy,
 request bodies, signatures, and tool traces out of the visible automation log.
 The wrapper prints one redacted JSON report and exits non-zero when the child
-does not return a successful submission.
+does not submit research and complete every required bespoke preview.
 
 ## Modes
 
@@ -112,10 +110,17 @@ authorise sending email.
    close to the reviewable initial email.
 7. Collect first-party logo, brand colour, real service-language, and eligible
    on-site-image evidence with provenance for every preview. Derive the hero
-   statement and local-only journey from that evidence. The ingestion bundle
-   uses null source-asset fields first; only eligible found source images may be
-   uploaded after the mapped response. Do not call an image API or upload 3D or
-   hero media.
+   statement and local-only journey from that evidence.
+8. After the submission response identifies accepted prospects, build one
+   bespoke local preview for each accepted prospect. Use its verified official
+   logo and one native Codex-generated hero image. Build from the research
+   brief and the prospect's visual language. Do not use a generic page
+   generator, generic composition, generic 3D object, fallback image, remote
+   asset, fabricated logo, OpenAI API, or image-generation CLI. Keep the
+   preview review-only at `/preview/[slug]`, with concept chrome, noindex
+   handling, and demonstration-only interactions. If the required logo or
+   native image cannot be verified, do not substitute it: leave that preview
+   unbuilt and fail the scheduled run for retry.
 
 ## Rejection Reason Codes
 
