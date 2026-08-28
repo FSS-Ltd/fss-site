@@ -11,6 +11,7 @@ test("offers a founder approval action for a draft preview", () => {
       onSuccess={() => undefined}
       preview={{
         status: "draft",
+        slug: "example-heating",
         version: 1,
         compositionDigest: "a".repeat(64),
         generationStatus: "merged_draft",
@@ -26,12 +27,13 @@ test("offers a founder approval action for a draft preview", () => {
   assert.match(html, /private concept/);
 });
 
-test("gives the founder a private route to inspect a draft before approval", () => {
+test("gives the founder the bespoke route to inspect a draft before approval", () => {
   const html = renderToStaticMarkup(
     <PreviewApprovalFrame
       onSuccess={() => undefined}
       preview={{
         status: "draft",
+        slug: "example-heating",
         version: 1,
         compositionDigest: "a".repeat(64),
         generationStatus: "merged_draft",
@@ -45,7 +47,7 @@ test("gives the founder a private route to inspect a draft before approval", () 
 
   assert.match(
     html,
-    /href="\/growth\/prospects\/11111111-1111-4111-8111-111111111111\/preview"/,
+    /href="\/preview\/example-heating"/,
   );
   assert.match(html, />View concept preview</);
 });
@@ -56,6 +58,7 @@ test("does not expose a published preview identifier in the founder UI", () => {
       onSuccess={() => undefined}
       preview={{
         status: "published",
+        slug: "example-heating",
         version: 2,
         compositionDigest: "a".repeat(64),
         generationStatus: "published",
@@ -77,6 +80,7 @@ test("keeps approval unavailable while the source package is awaiting merge", ()
       onSuccess={() => undefined}
       preview={{
         status: "draft",
+        slug: "example-heating",
         version: 1,
         compositionDigest: "a".repeat(64),
         generationStatus: "pr_open",
@@ -98,6 +102,7 @@ test("allows feedback against the exact package while it is in review", () => {
       onSuccess={() => undefined}
       preview={{
         status: "draft",
+        slug: "example-heating",
         version: 1,
         compositionDigest: "a".repeat(64),
         generationStatus: "pr_open",

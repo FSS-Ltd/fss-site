@@ -63,12 +63,12 @@ email.
 
 ## Add a bespoke local proof of concept
 
-1. Create `config.ts` and `content.ts` in `lib/prospect-previews/prospects/<slug>/`.
+1. Create the focused page module at `components/prospect-previews/bespoke/prospects/<slug>.tsx`.
 2. Put only licensed, permissioned, or prospect-supplied files in `public/prospect-previews/<slug>/`. Reference them with `/prospect-previews/<slug>/<file>`.
-3. Choose the right shared conversion module in `components/prospect-previews/modules/`, or add a focused bespoke page at `components/prospect-previews/prospects/<slug>/`.
-4. Add the record to `lib/prospect-previews/registry.ts` and map the bespoke page in `components/prospect-previews/prospect-preview-renderer.tsx`. No router change is required.
-5. Define the selling angle, public-facing copy, sections, brand values, and owner CTA in the typed record.
-6. Add focused tests for the registry and any form or component behaviour introduced.
+3. Reuse only the shared primitives that fit the prospect, keeping the page structure and conversion journey specific to the researched business.
+4. Add the page and metadata to `components/prospect-previews/bespoke/registry.ts`. No router change is required.
+5. Define the selling angle, public-facing copy, sections, brand values, and owner CTA in the bespoke page.
+6. Add focused tests for the registry and any component behaviour introduced.
 7. Run the checks below. The route is review-only outside production. Use the
    generated prospect workflow above for a production prospect.
 

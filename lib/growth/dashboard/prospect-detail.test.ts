@@ -59,6 +59,7 @@ const coreRow = {
   previewCompositionDigest: "a".repeat(64),
   previewGenerationPrNumber: 412,
   previewGenerationStatus: "merged_draft",
+  previewSlug: "smith-and-sons-plumbing",
   previewVersion: 1,
   visualBlobUrl: "https://blob.example/hero.webp",
   visualAltText: "A generated concept hero image for the plumbing business",
@@ -108,6 +109,7 @@ test("returns full detail for one prospect: business, corporate verification, co
 
   assert.equal(result.data.business.legalName, "Smith & Sons Plumbing Ltd");
   assert.equal(result.data.business.corporateStatus, "active");
+  assert.equal(result.data.preview?.slug, "smith-and-sons-plumbing");
   assert.equal(result.data.contact?.email, "daniel@smithandsonsplumbing.co.uk");
   assert.equal(result.data.contact?.lawfulBasis, "legitimate_interests");
   assert.equal(result.data.fitScore, 91);
@@ -119,6 +121,7 @@ test("returns full detail for one prospect: business, corporate verification, co
     compositionDigest: "a".repeat(64),
     generationPrNumber: 412,
     generationStatus: "merged_draft",
+    slug: "smith-and-sons-plumbing",
   });
   assert.equal((result.data.visualAsset?.altText.length ?? 0) > 0, true);
   assert.equal(result.data.sequence?.status, "active");

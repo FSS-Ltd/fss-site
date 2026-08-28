@@ -46,6 +46,7 @@ export type ProspectDetailPreview = {
   compositionDigest: string | null;
   generationPrNumber: number | null;
   generationStatus: string | null;
+  slug: string | null;
   status: string;
   version: number;
 };
@@ -152,6 +153,7 @@ type CoreRow = {
   previewCompositionDigest: string | null;
   previewGenerationPrNumber: number | null;
   previewGenerationStatus: string | null;
+  previewSlug: string | null;
   previewVersion: number | null;
   visualBlobUrl: string | null;
   visualAltText: string | null;
@@ -212,6 +214,7 @@ async function fetchCoreRow(
       pp.composition_digest as "previewCompositionDigest",
       pp.generation_pr_number as "previewGenerationPrNumber",
       pp.generation_status as "previewGenerationStatus",
+      pp.slug as "previewSlug",
       pp.version as "previewVersion",
       ea.blob_url as "visualBlobUrl",
       ea.alt_text as "visualAltText",
@@ -359,6 +362,7 @@ function toProspectDetail(
           compositionDigest: core.previewCompositionDigest,
           generationPrNumber: core.previewGenerationPrNumber,
           generationStatus: core.previewGenerationStatus,
+          slug: core.previewSlug,
         }
       : null;
 
