@@ -47,7 +47,7 @@ const services = [
 export function KentGarageEquipmentPage() {
   return (
     <div
-      className="kgePage min-h-screen overflow-hidden"
+      className="kgePage min-h-screen"
       data-bespoke-prospect="kent-garage-equipment"
     >
       <ConceptBar businessName="Kent Garage Equipment" />

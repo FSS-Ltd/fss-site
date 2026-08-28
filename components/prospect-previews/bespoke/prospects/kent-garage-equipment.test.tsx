@@ -27,13 +27,20 @@ test("keeps the project demonstration and FSS contact route", () => {
   assert.match(html, /Plan a project/);
 });
 
-test("keeps the scene track compact and sticky", () => {
+test("keeps workshop transitions within a single extra viewport", () => {
   const styles = readFileSync(
     new URL("../../../../app/preview/preview.css", import.meta.url),
     "utf8",
   );
 
-  assert.match(styles, /\.kgeTrack \{\s+height: 280svh;/);
+  assert.match(styles, /\.kgeTrack \{\s+height: 200svh;/);
   assert.match(styles, /\.kgeViewport \{[\s\S]*?position: sticky;/);
   assert.match(styles, /\.kgeScene\[data-state="active"\] \{[\s\S]*?opacity: 1;/);
+});
+
+test("does not clip the sticky workshop hero", () => {
+  const html = renderToStaticMarkup(<KentGarageEquipmentPage />);
+
+  assert.match(html, /class="kgePage min-h-screen(?: |\")/);
+  assert.doesNotMatch(html, /class="[^\"]*kgePage[^\"]*overflow-hidden/);
 });
