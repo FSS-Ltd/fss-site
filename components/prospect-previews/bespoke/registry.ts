@@ -1,3 +1,4 @@
+import { BrightAccountingPage } from "./prospects/bright-accounting";
 import { BrightFoxLettingsPage } from "./prospects/bright-fox-lettings";
 import { BurfordsPage } from "./prospects/burfords";
 import { DunkleysOfDealPage } from "./prospects/dunkley-s-of-deal";
@@ -13,6 +14,15 @@ import { WormaldAccountantsPage } from "./prospects/wormald-accountants";
 import type { BespokeProspectPage } from "./types";
 
 export const bespokeProspectPages = {
+  "bright-accounting": {
+    Page: BrightAccountingPage,
+    businessName: "Bright Accounting Ltd",
+    title: "Bright Accounting fixed-fee accountancy in Tonbridge",
+    description:
+      "A premium fixed-fee accountancy service route for bookkeeping, VAT, tax, sole traders and limited companies.",
+    layoutSignature: "apple-led-accountancy-service-route",
+    heroSignature: "glass-deadline-ledger-command-centre",
+  },
   "bright-fox-lettings": {
     Page: BrightFoxLettingsPage,
     businessName: "Bright Fox Lettings",

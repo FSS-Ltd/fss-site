@@ -8,11 +8,12 @@ import ProspectPreviewPage, {
   generateStaticParams,
 } from "./[slug]/page";
 
-test("prerenders the twelve public-unlisted bespoke prospect slugs", () => {
+test("prerenders the thirteen public-unlisted bespoke prospect slugs", () => {
   const params = generateStaticParams();
   const slugs: readonly string[] = params.map(({ slug }) => slug);
 
-  assert.equal(params.length, 12);
+  assert.equal(params.length, 13);
+  assert.equal(slugs.includes("bright-accounting"), true);
   assert.equal(slugs.includes("macknade"), false);
 });
 
@@ -33,5 +34,21 @@ test("keeps bespoke pages out of search while providing page-specific metadata",
 
   assert.match(String(metadata.title), /Beer, food and group bookings/);
   assert.match(String(metadata.description), /Thirty beers on tap/);
+  assert.deepEqual(metadata.robots, { index: false, follow: false });
+});
+
+test("resolves the Bright Accounting bespoke page and metadata", async () => {
+  const page = await ProspectPreviewPage({
+    params: Promise.resolve({ slug: "bright-accounting" }),
+  });
+  const html = renderToStaticMarkup(page);
+  const metadata = await generateMetadata({
+    params: Promise.resolve({ slug: "bright-accounting" }),
+  });
+
+  assert.match(html, /data-bespoke-prospect="bright-accounting"/);
+  assert.match(html, /expired on 21 October 2021/i);
+  assert.match(String(metadata.title), /Bright Accounting/i);
+  assert.match(String(metadata.description), /fixed-fee/i);
   assert.deepEqual(metadata.robots, { index: false, follow: false });
 });
