@@ -67,7 +67,8 @@ export function JaguarWaterJourneyHero() {
     }
 
     let frameId = 0;
-    let smoothTime = video.currentTime;
+    let lastScrollY = window.scrollY;
+    let lastSyncTime = performance.now();
 
     const syncCopyToScroll = (progress: number) => {
       copyRefs.current.forEach((copy, index) => {
@@ -90,6 +91,10 @@ export function JaguarWaterJourneyHero() {
       frameId = 0;
       if (!Number.isFinite(video.duration) || video.duration <= 0) return;
 
+      const now = performance.now();
+      const scrollY = window.scrollY;
+      const scrollDelta = scrollY - lastScrollY;
+      const elapsed = Math.max(now - lastSyncTime, 16);
       const scrollableDistance = Math.max(
         section.offsetHeight - window.innerHeight,
         1,
@@ -99,17 +104,33 @@ export function JaguarWaterJourneyHero() {
         1,
       );
       const targetTime = video.duration * progress;
+      const timeDelta = targetTime - video.currentTime;
 
-      smoothTime += (targetTime - smoothTime) * 0.2;
       syncCopyToScroll(progress);
 
-      if (Math.abs(video.currentTime - smoothTime) > 0.01) {
-        video.currentTime = smoothTime;
+      lastScrollY = scrollY;
+      lastSyncTime = now;
+
+      if (scrollDelta < 0 || timeDelta < -0.04) {
+        video.pause();
+        if (Math.abs(timeDelta) > 0.04) video.currentTime = targetTime;
+        return;
       }
 
-      if (Math.abs(targetTime - smoothTime) > 0.005) {
-        frameId = window.requestAnimationFrame(syncVideoToScroll);
+      if (timeDelta <= 0.02) {
+        video.pause();
+        return;
       }
+
+      const velocityRate =
+        scrollDelta > 0 ? Math.min(Math.max((scrollDelta / elapsed) * 0.15, 0.25), 1.5) : 0;
+      const catchUpRate = Math.min(Math.max(timeDelta * 2.5, 0.25), 1.5);
+
+      video.playbackRate = Math.max(velocityRate, catchUpRate);
+      void video.play().catch(() => {
+        video.pause();
+      });
+      frameId = window.requestAnimationFrame(syncVideoToScroll);
     };
 
     const requestSync = () => {
