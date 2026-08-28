@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+const developmentScriptSources =
+  process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : "";
+
 const contentSecurityPolicy = [
   "default-src 'self'",
   "base-uri 'self'",
@@ -11,7 +14,7 @@ const contentSecurityPolicy = [
   "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com https://www.googletagmanager.com https://www.google-analytics.com",
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self' data:",
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com",
+  `script-src 'self' 'unsafe-inline'${developmentScriptSources} https://www.googletagmanager.com https://www.google-analytics.com`,
   "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com",
 ].join("; ");
 
