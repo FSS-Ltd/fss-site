@@ -83,6 +83,52 @@ html {
   will-change: filter, opacity, transform;
 }
 
+[data-jaguar-water-journey] {
+  min-height: 100svh;
+}
+
+[data-jaguar-water-journey-frame] {
+  background: #18130e;
+  isolation: isolate;
+  min-height: 100svh;
+  overflow: hidden;
+  position: relative;
+}
+
+[data-jaguar-water-journey-video] {
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  object-position: center;
+  position: absolute;
+  width: 100%;
+  z-index: -2;
+}
+
+[data-jaguar-water-journey-shade] {
+  background:
+    linear-gradient(90deg, rgb(22 15 9 / 86%) 0%, rgb(22 15 9 / 57%) 43%, rgb(22 15 9 / 9%) 75%),
+    linear-gradient(0deg, rgb(22 15 9 / 72%) 0%, transparent 55%);
+  inset: 0;
+  position: absolute;
+  z-index: -1;
+}
+
+[data-jaguar-water-journey-copy] {
+  bottom: clamp(10rem, 24svh, 18rem);
+  left: max(1rem, calc((100% - 88rem) / 2 + 2.5rem));
+  pointer-events: none;
+  position: absolute;
+  right: 1rem;
+  z-index: 10;
+}
+
+[data-jaguar-water-journey-copy-beat] {
+  opacity: 0;
+  position: absolute;
+  will-change: filter, opacity, transform;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   [data-evo-roof-restoration] {
     height: 420svh;
@@ -91,6 +137,19 @@ html {
   }
 
   [data-evo-roof-restoration-frame] {
+    height: 100svh;
+    min-height: 0;
+    position: sticky;
+    top: 0;
+  }
+
+  [data-jaguar-water-journey] {
+    height: 420svh;
+    min-height: 0;
+    position: relative;
+  }
+
+  [data-jaguar-water-journey-frame] {
     height: 100svh;
     min-height: 0;
     position: sticky;
@@ -190,6 +249,17 @@ html {
   }
 
   [data-evo-roof-restoration-copy-beat]:first-child {
+    display: block;
+    opacity: 1;
+    position: relative;
+    transform: none;
+  }
+
+  [data-jaguar-water-journey-copy-beat] {
+    display: none;
+  }
+
+  [data-jaguar-water-journey-copy-beat]:first-child {
     display: block;
     opacity: 1;
     position: relative;
