@@ -1,7 +1,6 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
-import { FounderDraftProspectPreview } from "@/components/prospect-previews/production-prospect-preview";
-import { CompositionPreview } from "@/components/prospect-previews/composition-preview";
+import { getFounderConceptPreviewHref } from "@/components/growth/prospects/concept-preview-href";
 import styles from "@/components/growth/prospects/prospects.module.css";
 import { getMergedProspectPreviewCompositionByProspectId } from "@/lib/growth/prospect-previews/compositions/manifest";
 import { getFounderDraftProspectPreview } from "@/lib/growth/prospect-previews/founder-review";
@@ -30,9 +29,18 @@ export default async function FounderDraftPreviewPage({
   const composition = getMergedProspectPreviewCompositionByProspectId(
     result.data.prospectId,
   );
-  if (composition) {
-    return <CompositionPreview composition={composition} mode="review" />;
+  const previewHref = getFounderConceptPreviewHref({
+    prospectId: result.data.prospectId,
+    storedSlug: result.data.slug,
+    sourceSlug: composition?.slug ?? null,
+  });
+  if (previewHref.startsWith("/preview/")) {
+    redirect(previewHref);
   }
 
-  return <FounderDraftProspectPreview content={result.data.content} />;
+  return (
+    <div className={styles.errorState} role="status">
+      <p>This prospect does not yet have a bespoke concept source.</p>
+    </div>
+  );
 }

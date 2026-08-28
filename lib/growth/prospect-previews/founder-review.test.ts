@@ -103,14 +103,19 @@ test("loads a valid draft snapshot only for a well-formed prospect ID", async ()
   const queries: Array<{ text: string; values: readonly unknown[] }> = [];
   const result = await getFounderDraftProspectPreview(
     prospectId,
-    createFakeGrowthDb([{ prospectId, content }], queries),
+    createFakeGrowthDb(
+      [{ prospectId, content, slug: "example-heating" }],
+      queries,
+    ),
   );
 
   assert.equal(result.status, "found");
   if (result.status !== "found") return;
   assert.equal(result.data.prospectId, prospectId);
   assert.equal(result.data.content.businessName, "Example Heating Ltd");
+  assert.equal(result.data.slug, "example-heating");
   assert.match(queries[0]?.text ?? "", /and pp\.status = 'draft'/);
+  assert.match(queries[0]?.text ?? "", /pp\.slug/);
   assert.deepEqual(queries[0]?.values, [prospectId]);
   assert.doesNotMatch(queries[0]?.text ?? "", /public_id/i);
 });

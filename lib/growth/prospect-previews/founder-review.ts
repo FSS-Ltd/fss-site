@@ -26,6 +26,7 @@ export type FounderDraftProspectPreviewSummary = {
 export type FounderDraftProspectPreview = {
   content: StoredProspectPreviewSnapshot;
   prospectId: string;
+  slug: string | null;
 };
 
 type FounderDraftPreviewSummaryRow = FounderDraftProspectPreviewSummary;
@@ -33,6 +34,7 @@ type FounderDraftPreviewSummaryRow = FounderDraftProspectPreviewSummary;
 type FounderDraftPreviewRow = {
   content: unknown;
   prospectId: string;
+  slug: string | null;
 };
 
 export type FounderDraftProspectPreviewResult =
@@ -90,7 +92,8 @@ export async function getFounderDraftProspectPreview(
     const rows = await db<FounderDraftPreviewRow[]>`
       select
         pp.content_snapshot as content,
-        p.id as "prospectId"
+        p.id as "prospectId",
+        pp.slug
       from growth.prospect_previews pp
       inner join growth.prospects p on p.id = pp.prospect_id
       where p.id = ${prospectId}
@@ -105,6 +108,7 @@ export async function getFounderDraftProspectPreview(
       data: {
         prospectId: row.prospectId,
         content: parseStoredProspectPreviewSnapshot(row.content),
+        slug: row.slug,
       },
     };
   } catch {
