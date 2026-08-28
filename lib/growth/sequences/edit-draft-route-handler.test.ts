@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { FounderAuthorizationError } from "../auth/require-founder";
+import { InvalidFirstEmailRevisionContentError } from "./edit-first-email";
 import { createEditDraftHandler } from "./edit-draft-route-handler";
 import { FirstEmailRevisionError } from "./first-email-revisions";
 
@@ -156,6 +157,39 @@ test("maps each revision error code to its documented HTTP status", async () => 
     );
     assert.equal((await response.json()).code, code);
   }
+});
+
+test("returns a validation error when the revised email content is invalid", async () => {
+  const handler = createHandler({
+    reviseDraft: async () => {
+      throw new InvalidFirstEmailRevisionContentError(
+        "First-email content must contain 140 to 220 words.",
+      );
+    },
+  });
+
+  const response = await handler(createRequest(validBody), context);
+
+  assert.equal(response.status, 422);
+  assert.deepEqual(await response.json(), {
+    ok: false,
+    code: "invalid_content",
+    message:
+      "The first-email content must use 140 to 220 words and retain the opt-out and concept disclaimer exactly once.",
+    correlationId: "correlation-id",
+  });
+});
+
+test("keeps unrelated type errors as server errors", async () => {
+  const handler = createHandler({
+    reviseDraft: async () => {
+      throw new TypeError("Unexpected implementation error");
+    },
+  });
+
+  const response = await handler(createRequest(validBody), context);
+
+  assert.equal(response.status, 500);
 });
 
 test("reports and maps an unexpected error to a 500", async () => {

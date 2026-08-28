@@ -9,6 +9,7 @@ import {
   reviseFirstEmailDraft,
   type ReviseFirstEmailDraftInput,
 } from "./first-email-revisions";
+import { InvalidFirstEmailRevisionContentError } from "./edit-first-email";
 import {
   createMessageActionHandler,
   type MessageActionErrorMapping,
@@ -91,6 +92,13 @@ export function createEditDraftHandler(
     mapActionError: (error) =>
       error instanceof FirstEmailRevisionError
         ? ERROR_MAPPING[error.code]
-        : null,
+        : error instanceof InvalidFirstEmailRevisionContentError
+          ? {
+              status: 422,
+              code: "invalid_content",
+              message:
+                "The first-email content must use 140 to 220 words and retain the opt-out and concept disclaimer exactly once.",
+            }
+          : null,
   });
 }
