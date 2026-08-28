@@ -37,6 +37,9 @@ const PERSONAL_MAILBOX_DOMAINS = new Set([
   "yahoo.co.uk",
 ]);
 
+const WEEKDAY_RESEARCH_RUN_ID_PATTERN =
+  /^weekday-\d{4}-\d{2}-\d{2}-0600-europe-london-v\d+(?:-correction-\d+)?$/;
+
 function parseUrl(value: string): URL | null {
   try {
     return new URL(value);
@@ -689,7 +692,11 @@ export const researchRunIngestionSchema: z.ZodType<ResearchRunIngestion> = z
       });
     }
 
-    if (run.schemaVersion === "1.1") {
+    const requiresEvidenceBackedPreview =
+      run.schemaVersion === "1.1" ||
+      WEEKDAY_RESEARCH_RUN_ID_PATTERN.test(run.externalRunId);
+
+    if (requiresEvidenceBackedPreview) {
       for (const [candidateIndex, candidate] of run.prospects.entries()) {
         if (candidate.brandEvidence === undefined) {
           context.addIssue({

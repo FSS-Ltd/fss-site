@@ -90,6 +90,19 @@ test("accepts one complete versioned research bundle", () => {
   assert.equal(parsed.prospects[0]?.prospect.fitScore, 91);
 });
 
+test("requires evidence-backed preview briefs for weekday research runs", () => {
+  const fixture = createValidFixture();
+
+  assert.throws(
+    () =>
+      parseResearchRunIngestion({
+        ...fixture,
+        externalRunId: "weekday-2026-08-28-0600-europe-london-v1",
+      }),
+    /evidence-backed preview research requires/i,
+  );
+});
+
 test("requires first-party evidence for an evidence-backed preview brief", () => {
   const parsed = parseResearchRunIngestion(createEvidenceBackedFixture());
 
