@@ -66,6 +66,23 @@ html {
   z-index: -1;
 }
 
+[data-evo-roof-restoration-copy] {
+  bottom: 4rem;
+  left: max(1.25rem, calc((100% - 80rem) / 2 + 2rem));
+  pointer-events: none;
+  position: absolute;
+  right: 1.25rem;
+  z-index: 10;
+}
+
+[data-evo-roof-restoration-copy-beat] {
+  max-width: 48rem;
+  opacity: 0;
+  position: absolute;
+  transform: translate3d(0, 1.5rem, 0);
+  will-change: opacity, transform;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   [data-evo-roof-restoration] {
     height: 420svh;
@@ -167,6 +184,17 @@ html {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  [data-evo-roof-restoration-copy-beat] {
+    display: none;
+  }
+
+  [data-evo-roof-restoration-copy-beat]:first-child {
+    display: block;
+    opacity: 1;
+    position: relative;
+    transform: none;
+  }
+
   .prospect-reveal,
   .prospect-reveal[data-prospect-reveal] {
     opacity: 1;

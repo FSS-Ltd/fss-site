@@ -21,13 +21,15 @@ test("renders EVO's scroll-linked 1080p roof restoration with a poster fallback"
   assert.doesNotMatch(rootElement[0], /overflow-hidden/);
   assert.match(
     html,
-    /prospect-previews\/bespoke\/evo-kent-roofing\/roof-restoration-v1\.mp4/,
+    /prospect-previews\/bespoke\/evo-kent-roofing\/roof-restoration-scroll-scrub-v1\.mp4/,
   );
   assert.match(
     html,
     /prospect-previews\/bespoke\/evo-kent-roofing\/roof-restoration-v1-poster\.jpg/,
   );
   assert.doesNotMatch(html, /<video[^>]*autoPlay/);
+  assert.match(html, /Clear assessments\. Straight advice\./);
+  assert.match(html, /Careful workmanship\. Roofs built to last\./);
   assert.match(html, /A damaged roof is rebuilt layer by layer/i);
 });
 

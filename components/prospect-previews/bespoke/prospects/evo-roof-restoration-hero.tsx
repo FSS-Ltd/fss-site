@@ -3,11 +3,47 @@
 import { useEffect, useRef } from "react";
 
 const videoSource =
-  "/prospect-previews/bespoke/evo-kent-roofing/roof-restoration-v1.mp4";
+  "/prospect-previews/bespoke/evo-kent-roofing/roof-restoration-scroll-scrub-v1.mp4";
 const posterSource =
   "/prospect-previews/bespoke/evo-kent-roofing/roof-restoration-v1-poster.jpg";
 
+const copyBeats = [
+  {
+    eyebrow: "EVO KENT ROOFING",
+    end: 0.33,
+    message: "Kent roofing specialists",
+    start: 0.13,
+  },
+  {
+    eyebrow: "WHAT WE STAND FOR",
+    end: 0.59,
+    message: "Clear assessments. Straight advice.",
+    start: 0.39,
+  },
+  {
+    eyebrow: "FROM FIRST TILE TO FINISH",
+    end: 0.85,
+    message: "Careful workmanship. Roofs built to last.",
+    start: 0.65,
+  },
+] as const;
+
+function getCopyBeatStyle(progress: number, start: number, end: number) {
+  const transitionProgress = 0.05;
+  const opacity = Math.min(
+    Math.max((progress - start) / transitionProgress, 0),
+    Math.max((end - progress) / transitionProgress, 0),
+    1,
+  );
+
+  return {
+    opacity,
+    translateY: (1 - opacity) * 24,
+  };
+}
+
 export function EvoRoofRestorationHero() {
+  const copyRefs = useRef<Array<HTMLDivElement | null>>([]);
   const sectionRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -24,6 +60,22 @@ export function EvoRoofRestorationHero() {
 
     let frameId = 0;
 
+    const syncCopyToScroll = (progress: number) => {
+      copyRefs.current.forEach((copy, index) => {
+        const beat = copyBeats[index];
+        if (!copy || !beat) return;
+
+        const { opacity, translateY } = getCopyBeatStyle(
+          progress,
+          beat.start,
+          beat.end,
+        );
+
+        copy.style.opacity = opacity.toString();
+        copy.style.transform = `translate3d(0, ${translateY}px, 0)`;
+      });
+    };
+
     const syncVideoToScroll = () => {
       frameId = 0;
 
@@ -38,6 +90,8 @@ export function EvoRoofRestorationHero() {
         1,
       );
       const nextTime = video.duration * progress;
+
+      syncCopyToScroll(progress);
 
       if (Math.abs(video.currentTime - nextTime) > 0.015) {
         video.currentTime = nextTime;
@@ -91,26 +145,29 @@ export function EvoRoofRestorationHero() {
             Request assessment
           </a>
         </header>
-        <div className="relative z-10 mx-auto flex min-h-[calc(100svh-5rem)] max-w-7xl items-end px-5 pb-16 pt-8 sm:px-8 sm:pb-20">
-          <div className="max-w-2xl">
-            <p className="text-xs font-black uppercase tracking-[.22em] text-sky-200">
-              Homes · Businesses · Public buildings
-            </p>
-            <h1 className="mt-6 text-5xl font-black leading-[.94] tracking-[-.055em] sm:text-7xl">
-              See the roof. Understand the work. Plan the visit.
-            </h1>
-            <p className="mt-6 max-w-xl text-lg leading-8 text-white/75">
-              Repairs and replacements across Kent, with property, urgency and
-              photo context collected before the assessment call.
-            </p>
-            <p className="mt-8 text-xs font-black uppercase tracking-[.2em] text-sky-100/80">
-              Scroll to see the roof rebuilt
-            </p>
-          </div>
+        <div aria-hidden="true" data-evo-roof-restoration-copy="true">
+          {copyBeats.map((beat, index) => (
+            <div
+              data-evo-roof-restoration-copy-beat="true"
+              key={beat.message}
+              ref={(copy) => {
+                copyRefs.current[index] = copy;
+              }}
+            >
+              <p className="text-xs font-black uppercase tracking-[.22em] text-sky-200">
+                {beat.eyebrow}
+              </p>
+              <p className="mt-5 text-5xl font-black leading-[.94] tracking-[-.055em] sm:text-7xl">
+                {beat.message}
+              </p>
+            </div>
+          ))}
         </div>
+        <h1 className="sr-only">EVO Kent Roofing</h1>
         <p className="sr-only">
           A damaged roof is rebuilt layer by layer as the viewpoint moves around
-          the house.
+          the house. Evo Kent Roofing stands for clear assessments, straight
+          advice, careful workmanship and roofs built to last.
         </p>
       </div>
     </section>
