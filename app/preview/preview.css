@@ -5,6 +5,104 @@ html {
   background: #f2f3f5;
 }
 
+[data-dunkley-scroll-hero] {
+  min-height: 100svh;
+}
+
+[data-dunkley-scroll-hero-frame] {
+  isolation: isolate;
+  min-height: 100svh;
+  overflow: hidden;
+  pointer-events: none;
+  position: relative;
+}
+
+[data-dunkley-scroll-hero-chrome] {
+  pointer-events: auto;
+}
+
+[data-dunkley-scroll-hero-media] {
+  object-fit: cover;
+  object-position: 68% center;
+  z-index: -2;
+}
+
+[data-dunkley-scroll-hero-shade] {
+  background:
+    linear-gradient(90deg, rgba(3, 6, 7, 0.94) 0%, rgba(3, 6, 7, 0.7) 38%, rgba(3, 6, 7, 0.16) 72%),
+    linear-gradient(0deg, rgba(3, 6, 7, 0.78) 0%, transparent 56%);
+  inset: 0;
+  position: absolute;
+  z-index: -1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: scroll()) {
+    [data-dunkley-scroll-hero] {
+      height: 145svh;
+      min-height: 0;
+      pointer-events: none;
+      position: relative;
+      z-index: 1;
+    }
+
+    [data-dunkley-scroll-hero] + #vehicle {
+      margin-top: -100svh;
+      position: relative;
+    }
+
+    [data-dunkley-scroll-hero-frame] {
+      height: 100svh;
+      min-height: 0;
+      position: sticky;
+      top: 0;
+    }
+
+    [data-dunkley-scroll-hero-copy] {
+      animation: dunkley-hero-copy linear both;
+      animation-range: 6vh 25vh;
+      animation-timeline: scroll(root block);
+    }
+
+    [data-dunkley-scroll-hero-media],
+    [data-dunkley-scroll-hero-shade] {
+      animation: dunkley-hero-media linear both;
+      animation-range: 28vh 45vh;
+      animation-timeline: scroll(root block);
+    }
+  }
+}
+
+@keyframes dunkley-hero-copy {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 2rem, 0);
+  }
+
+  35%,
+  65% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(0, -1.5rem, 0);
+  }
+}
+
+@keyframes dunkley-hero-media {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate3d(0, -4rem, 0) scale(0.94);
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .prospect-reveal[data-prospect-reveal] {
     transition:
