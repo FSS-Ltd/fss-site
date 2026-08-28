@@ -36,6 +36,68 @@ html {
   z-index: -1;
 }
 
+[data-evo-roof-restoration] {
+  min-height: 100svh;
+}
+
+[data-evo-roof-restoration-frame] {
+  isolation: isolate;
+  min-height: 100svh;
+  overflow: hidden;
+  position: relative;
+}
+
+[data-evo-roof-restoration-video] {
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  object-position: center;
+  position: absolute;
+  width: 100%;
+  z-index: -2;
+}
+
+[data-evo-roof-restoration-shade] {
+  background:
+    linear-gradient(90deg, rgba(10, 29, 41, 0.92) 0%, rgba(10, 29, 41, 0.67) 43%, rgba(10, 29, 41, 0.16) 75%),
+    linear-gradient(0deg, rgba(10, 29, 41, 0.74) 0%, transparent 56%);
+  inset: 0;
+  position: absolute;
+  z-index: -1;
+}
+
+[data-evo-roof-restoration-copy] {
+  bottom: clamp(11rem, 26svh, 20rem);
+  left: max(1.25rem, calc((100% - 80rem) / 2 + 2rem));
+  pointer-events: none;
+  position: absolute;
+  right: 1.25rem;
+  z-index: 10;
+}
+
+[data-evo-roof-restoration-copy-beat] {
+  max-width: 48rem;
+  opacity: 0;
+  position: absolute;
+  transform: translate3d(0, 1.5rem, 0);
+  will-change: filter, opacity, transform;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-evo-roof-restoration] {
+    height: 420svh;
+    min-height: 0;
+    position: relative;
+  }
+
+  [data-evo-roof-restoration-frame] {
+    height: 100svh;
+    min-height: 0;
+    position: sticky;
+    top: 0;
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   @supports (animation-timeline: scroll()) {
     [data-dunkley-scroll-hero] {
@@ -82,6 +144,7 @@ html {
   35%,
   65% {
     opacity: 1;
+    filter: none;
     transform: translate3d(0, 0, 0);
   }
 
@@ -122,6 +185,17 @@ html {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  [data-evo-roof-restoration-copy-beat] {
+    display: none;
+  }
+
+  [data-evo-roof-restoration-copy-beat]:first-child {
+    display: block;
+    opacity: 1;
+    position: relative;
+    transform: none;
+  }
+
   .prospect-reveal,
   .prospect-reveal[data-prospect-reveal] {
     opacity: 1;
