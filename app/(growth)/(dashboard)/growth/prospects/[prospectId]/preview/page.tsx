@@ -2,6 +2,9 @@ import { notFound, redirect } from "next/navigation";
 
 import { getFounderConceptPreviewHref } from "@/components/growth/prospects/concept-preview-href";
 import styles from "@/components/growth/prospects/prospects.module.css";
+import { getBespokeProspectPage } from "@/components/prospect-previews/bespoke/registry";
+import { CompositionPreview } from "@/components/prospect-previews/composition-preview";
+import { FounderDraftProspectPreview } from "@/components/prospect-previews/production-prospect-preview";
 import { getMergedProspectPreviewCompositionByProspectId } from "@/lib/growth/prospect-previews/compositions/manifest";
 import { getFounderDraftProspectPreview } from "@/lib/growth/prospect-previews/founder-review";
 
@@ -29,18 +32,20 @@ export default async function FounderDraftPreviewPage({
   const composition = getMergedProspectPreviewCompositionByProspectId(
     result.data.prospectId,
   );
+  const bespokePage = composition
+    ? getBespokeProspectPage(composition.slug)
+    : undefined;
   const previewHref = getFounderConceptPreviewHref({
     prospectId: result.data.prospectId,
-    storedSlug: result.data.slug,
-    sourceSlug: composition?.slug ?? null,
+    sourceSlug: bespokePage ? composition?.slug ?? null : null,
   });
   if (previewHref.startsWith("/preview/")) {
     redirect(previewHref);
   }
 
-  return (
-    <div className={styles.errorState} role="status">
-      <p>This prospect does not yet have a bespoke concept source.</p>
-    </div>
-  );
+  if (composition) {
+    return <CompositionPreview composition={composition} mode="review" />;
+  }
+
+  return <FounderDraftProspectPreview content={result.data.content} />;
 }

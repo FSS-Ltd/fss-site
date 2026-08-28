@@ -62,7 +62,7 @@ export function FounderPreviewList({
               </div>
               <Link
                 className={styles.rowLink}
-                href={getConceptPreviewHref(preview)}
+                href={getConceptPreviewHref({ prospectId: preview.prospectId })}
               >
                 View concept preview
               </Link>
