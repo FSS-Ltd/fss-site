@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import type { RedactedResearchReport } from "./redacted-run-report";
@@ -50,7 +50,7 @@ test("builds the stable weekday identifier from the London calendar date", () =>
   );
 });
 
-test("runs the researcher in a disposable workspace with schema-constrained output", () => {
+test("runs the researcher in the checked-out project with schema-constrained output", () => {
   let childWorkspace: string | null = null;
 
   const executor: ResearchAgentExecutor = (input) => {
@@ -66,11 +66,12 @@ test("runs the researcher in a disposable workspace with schema-constrained outp
     assert.match(prompt, /first-party strength/i);
     assert.match(prompt, /two or three sourced website-journey improvements/i);
     assert.match(prompt, /private preview URL/i);
-    assert.match(prompt, /never call.*prospect-preview-prs/i);
     assert.match(prompt, /version 1\.1 bundle/i);
     assert.match(prompt, /first-party preview evidence only/i);
-    assert.match(prompt, /no AI image API/i);
-    assert.match(prompt, /prospect-preview-assets/i);
+    assert.match(prompt, /fully bespoke review-only site/i);
+    assert.match(prompt, /native Codex image-generation tool/i);
+    assert.match(prompt, /fake text wordmark/i);
+    assert.match(prompt, /call \/api\/agent\/prospect-preview-prs/i);
 
     const schemaPath = input.args[input.args.indexOf("--output-schema") + 1];
     const reportPath =
@@ -81,7 +82,7 @@ test("runs the researcher in a disposable workspace with schema-constrained outp
 
     assert.equal(schema.additionalProperties, false);
     assert.equal(reportPath, input.reportPath);
-    assert.equal(input.cwd.startsWith(process.cwd()), false);
+    assert.equal(input.cwd, process.cwd());
     return submittedReport;
   };
 
@@ -94,7 +95,7 @@ test("runs the researcher in a disposable workspace with schema-constrained outp
   assert.deepEqual(result.report, submittedReport);
   assert.equal(result.succeeded, true);
   assert.notEqual(childWorkspace, null);
-  assert.equal(existsSync(childWorkspace!), false);
+  assert.equal(childWorkspace, process.cwd());
 });
 
 test("returns a redacted failure and removes the workspace when the child fails", () => {
@@ -116,5 +117,5 @@ test("returns a redacted failure and removes the workspace when the child fails"
   assert.equal(result.report.failureClass, "agent_failure");
   assert.equal(JSON.stringify(result).includes(privateValue), false);
   assert.notEqual(childWorkspace, null);
-  assert.equal(existsSync(childWorkspace!), false);
+  assert.equal(childWorkspace, process.cwd());
 });

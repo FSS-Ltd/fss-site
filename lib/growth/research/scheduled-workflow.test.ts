@@ -38,56 +38,20 @@ const successfulReport: RedactedResearchReport = {
   failureClass: null,
 };
 
-test("asks the trusted parent to create preview PRs only after a successful accepted research run", async () => {
-  let secretReads = 0;
-  const triggerRunIds: string[] = [];
-
+test("returns a successful accepted research run without invoking the retired generic preview generator", async () => {
   const result = await runScheduledResearchWorkflow({
     runResearch: () => ({ succeeded: true, report: successfulReport }),
-    readAgentSecret: () => {
-      secretReads += 1;
-      return "a".repeat(32);
-    },
-    triggerPreviewPullRequest: async (input) => {
-      triggerRunIds.push(input.externalRunId);
-      assert.equal(input.secret, "a".repeat(32));
-      return { ok: true };
-    },
   });
 
   assert.deepEqual(result, { succeeded: true, report: successfulReport });
-  assert.equal(secretReads, 1);
-  assert.deepEqual(triggerRunIds, [successfulReport.externalRunId]);
 });
 
-test("does not read the signing secret or trigger a preview PR for an empty accepted set", async () => {
-  let secretReads = 0;
-  let triggers = 0;
+test("returns an empty accepted set without creating a generic preview", async () => {
   const report = { ...successfulReport, accepted: 0 };
 
   const result = await runScheduledResearchWorkflow({
     runResearch: () => ({ succeeded: true, report }),
-    readAgentSecret: () => {
-      secretReads += 1;
-      return "a".repeat(32);
-    },
-    triggerPreviewPullRequest: async () => {
-      triggers += 1;
-      return { ok: true };
-    },
   });
 
   assert.deepEqual(result, { succeeded: true, report });
-  assert.equal(secretReads, 0);
-  assert.equal(triggers, 0);
-});
-
-test("keeps the redacted report but fails the scheduler when preview PR creation fails", async () => {
-  const result = await runScheduledResearchWorkflow({
-    runResearch: () => ({ succeeded: true, report: successfulReport }),
-    readAgentSecret: () => "a".repeat(32),
-    triggerPreviewPullRequest: async () => ({ ok: false }),
-  });
-
-  assert.deepEqual(result, { succeeded: false, report: successfulReport });
 });
