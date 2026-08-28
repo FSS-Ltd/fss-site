@@ -7,6 +7,9 @@ import type {
 } from "../research/types";
 import type { StoredProspectPreviewSnapshot } from "./types";
 
+const MAX_OPENING_STRENGTH_WORDS = 28;
+const MAX_IMPROVEMENT_WORDS = 16;
+
 type RenderPreviewFirstEmailInput = {
   subject: string;
   narrative: WebsiteEmailNarrative;
@@ -21,6 +24,31 @@ function requirePreviewUrl(value: string): string {
     throw new TypeError("Prospect preview URL must use HTTP or HTTPS.");
   }
   return url.toString();
+}
+
+function compactNarrativeText(value: string, maximumWords: number): string {
+  const words = value.trim().split(/\s+/);
+  if (words.length <= maximumWords) return value.trim();
+
+  return `${words.slice(0, maximumWords).join(" ")}…`;
+}
+
+function compactEmailNarrative(
+  narrative: WebsiteEmailNarrative,
+): WebsiteEmailNarrative {
+  return {
+    openingStrength: {
+      ...narrative.openingStrength,
+      text: compactNarrativeText(
+        narrative.openingStrength.text,
+        MAX_OPENING_STRENGTH_WORDS,
+      ),
+    },
+    improvements: narrative.improvements.map((improvement) => ({
+      ...improvement,
+      text: compactNarrativeText(improvement.text, MAX_IMPROVEMENT_WORDS),
+    })),
+  };
 }
 
 export function createDraftPreviewSnapshot(
@@ -55,21 +83,24 @@ export function renderPreviewFirstEmail(
   input: RenderPreviewFirstEmailInput,
 ): FirstEmailCandidate {
   const previewUrl = requirePreviewUrl(input.previewUrl);
-  const improvements = input.narrative.improvements
+  // The approval email has a strict 220-word maximum. Source-backed
+  // narratives may be far longer, so retain concise excerpts before rendering.
+  const narrative = compactEmailNarrative(input.narrative);
+  const improvements = narrative.improvements
     .map((improvement) => improvement.text)
     .join(". ");
 
   return createFounderFirstEmailRevision({
     subject: input.subject,
     paragraphs: [
-      "I reviewed the website with one practical question: how does a new customer move from interest to a useful enquiry? I am sharing a private concept because the work on show deserves a clearer first step for people trying to reach you.",
-      `One thing that came through clearly is ${input.narrative.openingStrength.text}. It gives visitors a useful starting point and shows there is a solid basis to build from.`,
-      `A few parts of the current journey could be clearer: ${improvements}. Each point is about helping customers understand what to do next before they need to pick up the phone.`,
+      "I reviewed the website with one practical question: how can a new customer move from interest to a useful enquiry? I am sharing a private concept that gives people a clearer first step.",
+      `One strength is ${narrative.openingStrength.text}. It gives visitors a useful starting point.`,
+      `The journey could be clearer: ${improvements}. The aim is to make the next step easier.`,
       "I didn’t want to just list off concerns, so I went ahead and built an example of what I believe will serve you and your customers or clients better:",
       `You can view the private concept here: ${previewUrl}`,
       input.conceptDisclaimer,
       input.optOutSentence,
-      "If this feels relevant, I would be glad to talk through the thinking and hear where it should reflect the way your team works.",
+      "If this feels relevant, I would be glad to talk through it.",
     ],
     retained: {
       optOutSentence: input.optOutSentence,
