@@ -73,8 +73,8 @@ export const bespokeProspectPages = {
     title: "Workshop and MOT-bay equipment",
     description:
       "Workshop design, supply, installation, training and aftercare scoped by project need.",
-    layoutSignature: "industrial-specification-grid",
-    heroSignature: "four-post-mot-lift",
+    layoutSignature: "workshop-scrollytelling-brief",
+    heroSignature: "cinematic-workshop-installation",
   },
   "marden-garage": {
     Page: MardenGaragePage,
