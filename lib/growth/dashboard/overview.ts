@@ -266,7 +266,9 @@ async function fetchFirstEmailsTab(
       where se.prospect_id = p.id
     ) evidence on true
     left join lateral (
-      select at.id
+      select
+        at.id,
+        coalesce(at.output_snapshot ->> 'reviewState', 'draft') as "reviewState"
       from growth.agent_tasks at
       where at.prospect_id = p.id
         and at.task_type = 'first_email_draft'
@@ -275,6 +277,7 @@ async function fetchFirstEmailsTab(
       limit 1
     ) draft on true
     where p.status = 'ready_for_email_review'
+      and draft."reviewState" = 'draft'
     order by p.fit_score desc, p.updated_at desc
     limit ${MAX_WORK_QUEUE_ROWS}
   `;
@@ -367,11 +370,23 @@ async function fetchSummaryCounts(
 ): Promise<SummaryCountsRow> {
   const rows = await db<SummaryCountsRow[]>`
     select
-      count(*) filter (where p.status = 'ready_for_email_review')::int
+      count(*) filter (
+        where p.status = 'ready_for_email_review'
+          and draft."reviewState" = 'draft'
+      )::int
         as "emailsWaitingForApproval",
       count(*) filter (where p.status = 'replied')::int
         as "repliesNeedingAttention"
     from growth.prospects p
+    left join lateral (
+      select coalesce(at.output_snapshot ->> 'reviewState', 'draft') as "reviewState"
+      from growth.agent_tasks at
+      where at.prospect_id = p.id
+        and at.task_type = 'first_email_draft'
+        and at.status = 'completed'
+      order by at.completed_at desc
+      limit 1
+    ) draft on true
   `;
 
   return rows[0] ?? { emailsWaitingForApproval: 0, repliesNeedingAttention: 0 };

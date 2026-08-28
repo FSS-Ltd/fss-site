@@ -13,7 +13,10 @@ import {
 
 type RecordedQuery = { text: string; values: readonly unknown[] };
 
-type FakeRoute = { match: RegExp; rows: readonly object[] };
+type FakeRoute = {
+  match: RegExp;
+  rows: readonly object[] | ((query: string) => readonly object[]);
+};
 
 function createFakeGrowthDb(routes: readonly FakeRoute[]): {
   db: GrowthQueryExecutor;
@@ -33,7 +36,7 @@ function createFakeGrowthDb(routes: readonly FakeRoute[]): {
       throw new Error(`No fake route matched query: ${text}`);
     }
 
-    return route.rows;
+    return typeof route.rows === "function" ? route.rows(text) : route.rows;
   };
 
   return { db: query as unknown as GrowthQueryExecutor, queries };
@@ -306,6 +309,40 @@ test("getOverviewViewModel returns a ready state with reconciled counts", async 
   for (const { text } of boundedQueries) {
     assert.match(text, /limit \?/);
   }
+});
+
+test("getOverviewViewModel excludes approved first-email tasks from review", async () => {
+  const awaitingReview = (query: string) =>
+    query.includes("draft.\"reviewState\" = 'draft'");
+  const { db } = createFakeGrowthDb([
+    {
+      match: /"emailsWaitingForApproval"/,
+      rows: (query) => [
+        {
+          emailsWaitingForApproval: awaitingReview(query) ? 0 : 1,
+          repliesNeedingAttention: 1,
+        },
+      ],
+    },
+    {
+      match: /"messageId"/,
+      rows: (query) => (awaitingReview(query) ? [] : [firstEmailRow]),
+    },
+    ...baseRoutes(),
+  ]);
+
+  const state = await getOverviewViewModel(
+    db,
+    () => new Date("2026-08-16T08:00:00.000Z"),
+  );
+
+  assert.equal(state.status, "ready");
+  if (state.status !== "ready") return;
+
+  const firstEmails = state.data.workQueue.find((tab) => tab.kind === "first_emails");
+  assert.equal(state.data.summary.emailsWaitingForApproval, 0);
+  assert.equal(firstEmails?.totalCount, 0);
+  assert.deepEqual(firstEmails?.rows, []);
 });
 
 test("getOverviewViewModel caps concurrent database reads", async () => {
