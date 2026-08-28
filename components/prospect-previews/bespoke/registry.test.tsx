@@ -12,6 +12,7 @@ import {
 import { DunkleysOfDealPage } from "./prospects/dunkley-s-of-deal";
 
 const expectedSlugs = [
+  "bright-accounting",
   "bright-fox-lettings",
   "burfords",
   "dunkley-s-of-deal",
@@ -26,7 +27,7 @@ const expectedSlugs = [
   "wormald-accountants",
 ] as const;
 
-test("registers exactly the twelve active bespoke prospect pages", () => {
+test("registers exactly the thirteen active bespoke prospect pages", () => {
   assert.deepEqual(
     [...getBespokeProspectSlugs()].sort(),
     [...expectedSlugs].sort(),
@@ -37,8 +38,8 @@ test("registers exactly the twelve active bespoke prospect pages", () => {
 test("every prospect owns a distinct layout and hero-scene signature", () => {
   const entries = Object.values(bespokeProspectPages);
 
-  assert.equal(new Set(entries.map((entry) => entry.layoutSignature)).size, 12);
-  assert.equal(new Set(entries.map((entry) => entry.heroSignature)).size, 12);
+  assert.equal(new Set(entries.map((entry) => entry.layoutSignature)).size, 13);
+  assert.equal(new Set(entries.map((entry) => entry.heroSignature)).size, 13);
 });
 
 test("every page renders its evidence-backed statement and a disclosed demo form", () => {
@@ -102,4 +103,23 @@ test("keeps Dunkley's scroll transition compact before vehicle booking", () => {
   const formIndex = html.indexOf('data-demo-form="Dunkley&#x27;s of Deal"');
   assert.ok(formIndex > 0);
   assert.doesNotMatch(html.slice(formIndex - 160, formIndex), /prospect-reveal/);
+});
+
+test("renders Bright Accounting as a premium evidence-led demo", () => {
+  const entry = getBespokeProspectPage("bright-accounting");
+  assert.ok(entry);
+
+  const html = renderToStaticMarkup(<entry.Page />);
+
+  assert.match(html, /data-bespoke-prospect="bright-accounting"/);
+  assert.match(html, /expired on 21 October 2021/i);
+  assert.match(html, /Bookkeeping &amp; VAT/i);
+  assert.match(html, /Personal Tax/i);
+  assert.match(html, /Sole Trader/i);
+  assert.match(html, /Limited Company/i);
+  assert.match(html, /Demonstration only/i);
+  assert.match(html, /not currently connected to.*live systems/i);
+  assert.match(html, /bright-accounting%2Fhero-ledger-v1\.webp/);
+  assert.match(html, /bright-accounting%2Fclient-desk-v1\.webp/);
+  assert.match(html, /bright-accounting%2Fdeadline-object-v1\.webp/);
 });
