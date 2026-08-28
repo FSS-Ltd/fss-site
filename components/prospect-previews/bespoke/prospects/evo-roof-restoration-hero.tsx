@@ -30,15 +30,24 @@ const copyBeats = [
 
 function getCopyBeatStyle(progress: number, start: number, end: number) {
   const transitionProgress = 0.05;
-  const opacity = Math.min(
+  const entranceProgress = Math.min(
     Math.max((progress - start) / transitionProgress, 0),
+    1,
+  );
+  const exitProgress = Math.min(
     Math.max((end - progress) / transitionProgress, 0),
     1,
   );
+  const entranceOpacity = 1 - (1 - entranceProgress) ** 3;
+  const exitOpacity = exitProgress ** 3;
+  const opacity = Math.min(entranceOpacity, exitOpacity);
+  const isEntering = entranceProgress < 1;
 
   return {
+    blur: (1 - opacity) * 8,
     opacity,
-    translateY: (1 - opacity) * 24,
+    scale: 0.96 + opacity * 0.04,
+    translateY: isEntering ? (1 - opacity) * 40 : -(1 - opacity) * 24,
   };
 }
 
@@ -65,14 +74,15 @@ export function EvoRoofRestorationHero() {
         const beat = copyBeats[index];
         if (!copy || !beat) return;
 
-        const { opacity, translateY } = getCopyBeatStyle(
+        const { blur, opacity, scale, translateY } = getCopyBeatStyle(
           progress,
           beat.start,
           beat.end,
         );
 
+        copy.style.filter = blur > 0 ? `blur(${blur.toFixed(2)}px)` : "none";
         copy.style.opacity = opacity.toString();
-        copy.style.transform = `translate3d(0, ${translateY}px, 0)`;
+        copy.style.transform = `translate3d(0, ${translateY}px, 0) scale(${scale})`;
       });
     };
 

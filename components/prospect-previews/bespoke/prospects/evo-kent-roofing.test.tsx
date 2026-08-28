@@ -43,4 +43,6 @@ test("gives EVO's video a longer scroll distance without autoplay", () => {
     styles,
     /\[data-evo-roof-restoration\]\s*\{\s*height:\s*420svh;/,
   );
+  assert.match(styles, /bottom:\s*clamp\(11rem, 26svh, 20rem\);/);
+  assert.match(styles, /will-change:\s*filter, opacity, transform;/);
 });
