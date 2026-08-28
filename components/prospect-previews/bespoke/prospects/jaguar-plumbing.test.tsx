@@ -19,5 +19,9 @@ test("renders Jaguar's scroll-linked water journey with an accessible still fall
   );
   assert.doesNotMatch(html, /<video[^>]*autoPlay/);
   assert.match(html, /A better response starts before the callout\./);
-  assert.match(html, /Jaguar Plumbing/);
+  const root = html.match(
+    /<div[^>]*data-bespoke-prospect="jaguar-plumbing"[^>]*>/,
+  );
+  assert.ok(root);
+  assert.doesNotMatch(root[0], /overflow-hidden/);
 });

@@ -59,7 +59,7 @@ const serviceAreas = [
 export function JaguarPlumbingPage() {
   return (
     <div
-      className="min-h-screen overflow-hidden bg-[#f2f2ef] text-[#121619]"
+      className="min-h-screen bg-[#f2f2ef] text-[#121619]"
       data-bespoke-prospect="jaguar-plumbing"
     >
       <ConceptBar businessName="Jaguar Plumbing" />
