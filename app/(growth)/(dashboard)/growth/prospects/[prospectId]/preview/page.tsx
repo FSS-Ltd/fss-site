@@ -1,7 +1,8 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import { FounderDraftProspectPreview } from "@/components/prospect-previews/production-prospect-preview";
 import { CompositionPreview } from "@/components/prospect-previews/composition-preview";
+import { getConceptPreviewHref } from "@/components/growth/prospects/concept-preview-href";
 import styles from "@/components/growth/prospects/prospects.module.css";
 import { getMergedProspectPreviewCompositionByProspectId } from "@/lib/growth/prospect-previews/compositions/manifest";
 import { getFounderDraftProspectPreview } from "@/lib/growth/prospect-previews/founder-review";
@@ -24,6 +25,15 @@ export default async function FounderDraftPreviewPage({
         <p>{result.message}</p>
         <p className={styles.errorCorrelation}>Reference: {result.correlationId}</p>
       </div>
+    );
+  }
+
+  if (result.data.slug !== null) {
+    redirect(
+      getConceptPreviewHref({
+        prospectId: result.data.prospectId,
+        slug: result.data.slug,
+      }),
     );
   }
 
