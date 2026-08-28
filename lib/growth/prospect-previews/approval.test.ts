@@ -68,7 +68,8 @@ function createDraft(): StoredFirstEmailDraft {
         fallbackAssetKey: "home-property",
         pathname: "/growth/email/fallbacks/home-property.webp",
         sha256: "a".repeat(64),
-        altText: "Concept showing a service enquiry moving into an organised call-back workflow.",
+        altText:
+          "Concept showing a service enquiry moving into an organised call-back workflow.",
         conceptDisclaimer,
       },
     },
@@ -96,7 +97,8 @@ function createRepository(status = "ready_for_email_review") {
       },
       conversionPlan: {
         schemaVersion: "1.0",
-        summary: "The enquiry route can collect the detail needed for a call-back.",
+        summary:
+          "The enquiry route can collect the detail needed for a call-back.",
         items: ["Problem selector", "Preferred contact time"],
       },
       firstPartyEvidenceUrl: "https://example.test/services",
@@ -184,6 +186,66 @@ test("publishes a draft preview and revises only the stored first-email draft", 
   );
   assert.equal(fake.state.gmailCalls, 0);
   assert.equal(fake.state.sentMessages, 0);
+  assert.equal(fake.state.approvals.length, 1);
+  assert.equal(fake.state.audits.length, 1);
+});
+
+test("publishes a draft preview when source-backed narratives are verbose", async () => {
+  const fake = createRepository();
+  const outputSnapshot = fake.state.draft.outputSnapshot as {
+    emailNarrative: unknown;
+  };
+  outputSnapshot.emailNarrative = {
+    openingStrength: {
+      text: [
+        "the services page gives visitors a clear explanation of the work provided",
+        "and explains the different options available before they make contact",
+        "which gives the business a useful starting point for a stronger enquiry journey",
+      ].join(" "),
+      evidenceSourceUrl: "https://example.test/services",
+      kind: "first_party_service",
+    },
+    improvements: [
+      {
+        text: [
+          "the general enquiry route could collect the details needed before a call-back",
+          "so the team can understand the work, urgency and location before responding",
+        ].join(" "),
+        evidenceSourceUrl: "https://example.test/services",
+      },
+      {
+        text: [
+          "the next step could be clearer for visitors who need urgent help",
+          "so they can choose the right service and provide the context required",
+        ].join(" "),
+        evidenceSourceUrl: "https://example.test/services",
+      },
+      {
+        text: [
+          "the contact route could set clear expectations about the information required",
+          "and help each request reach the person who can respond usefully",
+        ].join(" "),
+        evidenceSourceUrl: "https://example.test/services",
+      },
+    ],
+  };
+  const approve = createProspectPreviewApprover({
+    repository: fake.repository,
+    now: () => new Date("2026-08-26T10:00:00.000Z"),
+    siteUrl: "https://faithfulsoftware.dev",
+    resolveComposition: resolveCurrentComposition,
+  });
+
+  const result = await approve({} as GrowthDb, approvalInput());
+
+  assert.equal(result.status, "published");
+  const savedEmail = fake.state.savedSnapshots[0]?.email as
+    | { wordCount?: unknown }
+    | undefined;
+  assert.ok(savedEmail);
+  const { wordCount } = savedEmail;
+  assert.ok(typeof wordCount === "number");
+  assert.ok(wordCount >= 140 && wordCount <= 220);
   assert.equal(fake.state.approvals.length, 1);
   assert.equal(fake.state.audits.length, 1);
 });
