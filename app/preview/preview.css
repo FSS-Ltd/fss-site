@@ -115,7 +115,7 @@ html {
 }
 
 [data-jaguar-water-journey-copy] {
-  bottom: clamp(10rem, 24svh, 18rem);
+  bottom: clamp(24rem, 38svh, 30rem);
   left: max(1rem, calc((100% - 88rem) / 2 + 2.5rem));
   pointer-events: none;
   position: absolute;
@@ -144,7 +144,7 @@ html {
   }
 
   [data-jaguar-water-journey] {
-    height: 420svh;
+    height: 720svh;
     min-height: 0;
     position: relative;
   }
