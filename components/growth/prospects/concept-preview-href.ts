@@ -1,13 +1,14 @@
-type ConceptPreviewHrefInput = {
-  slug: string | null;
-};
-
-const PREVIEW_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+import {
+  resolveConceptPreviewSlug,
+  type ConceptPreviewSlugInput,
+} from "@/lib/growth/prospect-previews/preview-slugs";
 
 export function getConceptPreviewHref({
+  businessName,
   slug,
-}: ConceptPreviewHrefInput): string | null {
-  if (!slug || !PREVIEW_SLUG_PATTERN.test(slug)) return null;
+}: ConceptPreviewSlugInput): string | null {
+  const previewSlug = resolveConceptPreviewSlug({ businessName, slug });
+  if (!previewSlug) return null;
 
-  return `/preview/${slug}`;
+  return `/preview/${previewSlug}`;
 }

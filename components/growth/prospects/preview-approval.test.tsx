@@ -8,6 +8,7 @@ import { PreviewApprovalFrame } from "./preview-approval";
 test("offers a founder approval action for a draft preview", () => {
   const html = renderToStaticMarkup(
     <PreviewApprovalFrame
+      businessName="Example Heating Ltd"
       onSuccess={() => undefined}
       preview={{
         status: "draft",
@@ -24,12 +25,13 @@ test("offers a founder approval action for a draft preview", () => {
   );
 
   assert.match(html, />Approve preview<\/button>/);
-  assert.match(html, /private concept/);
+  assert.match(html, /concept was made for Example Heating Ltd/);
 });
 
 test("opens a draft concept preview by slug", () => {
   const html = renderToStaticMarkup(
     <PreviewApprovalFrame
+      businessName="Example Heating Ltd"
       onSuccess={() => undefined}
       preview={{
         status: "draft",
@@ -52,9 +54,34 @@ test("opens a draft concept preview by slug", () => {
   assert.match(html, />View concept preview</);
 });
 
+test("opens a known bespoke draft concept by business name when the stored slug is missing", () => {
+  const html = renderToStaticMarkup(
+    <PreviewApprovalFrame
+      businessName="Bright Accounting Ltd"
+      onSuccess={() => undefined}
+      preview={{
+        status: "draft",
+        slug: null,
+        version: 1,
+        compositionDigest: "a".repeat(64),
+        generationStatus: "merged_draft",
+        generationPrNumber: 412,
+      }}
+      prospectId="11111111-1111-4111-8111-111111111111"
+      prospectVersion={3}
+      prospectStatus="ready_for_email_review"
+    />,
+  );
+
+  assert.match(html, /concept was made for Bright Accounting Ltd/);
+  assert.match(html, /href="\/preview\/bright-accounting"/);
+  assert.match(html, />View concept preview</);
+});
+
 test("does not expose generated database-only preview links", () => {
   const html = renderToStaticMarkup(
     <PreviewApprovalFrame
+      businessName="Example Heating Ltd"
       onSuccess={() => undefined}
       preview={{
         status: "draft",
@@ -77,6 +104,7 @@ test("does not expose generated database-only preview links", () => {
 test("does not expose a published preview identifier in the founder UI", () => {
   const html = renderToStaticMarkup(
     <PreviewApprovalFrame
+      businessName="Example Heating Ltd"
       onSuccess={() => undefined}
       preview={{
         status: "published",
@@ -99,6 +127,7 @@ test("does not expose a published preview identifier in the founder UI", () => {
 test("keeps approval unavailable while the source package is awaiting merge", () => {
   const html = renderToStaticMarkup(
     <PreviewApprovalFrame
+      businessName="Example Heating Ltd"
       onSuccess={() => undefined}
       preview={{
         status: "draft",
@@ -121,6 +150,7 @@ test("keeps approval unavailable while the source package is awaiting merge", ()
 test("allows feedback against the exact package while it is in review", () => {
   const html = renderToStaticMarkup(
     <PreviewApprovalFrame
+      businessName="Example Heating Ltd"
       onSuccess={() => undefined}
       preview={{
         status: "draft",

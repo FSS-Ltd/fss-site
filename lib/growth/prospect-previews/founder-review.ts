@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { getGrowthDb } from "../db/client";
 import type { GrowthQueryExecutor } from "../db/types";
 import type { ViewState } from "../dashboard/view-models";
+import { resolveConceptPreviewSlug } from "./preview-slugs";
 
 const PROSPECT_ID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -20,6 +21,7 @@ export type FounderDraftProspectPreviewSummary = {
 };
 
 export type FounderDraftProspectPreviewDestination = {
+  businessName: string;
   prospectId: string;
   slug: string | null;
 };
@@ -27,6 +29,7 @@ export type FounderDraftProspectPreviewDestination = {
 type FounderDraftPreviewSummaryRow = FounderDraftProspectPreviewSummary;
 
 type FounderDraftPreviewRow = {
+  businessName: string;
   prospectId: string;
   slug: string | null;
 };
@@ -56,17 +59,24 @@ export async function getFounderDraftProspectPreviewSummaries(
       inner join growth.prospects p on p.id = pp.prospect_id
       inner join growth.businesses b on b.id = p.business_id
       where pp.status = 'draft'
-        and pp.slug is not null
       order by pp.created_at asc, pp.id asc
     `;
 
-    if (rows.length === 0) {
+    const rowsWithPreviewRoutes = rows.filter(
+      (row) =>
+        resolveConceptPreviewSlug({
+          businessName: row.businessName,
+          slug: row.slug,
+        }) !== null,
+    );
+
+    if (rowsWithPreviewRoutes.length === 0) {
       return {
         status: "empty",
         reason: "No private concept previews are awaiting approval.",
       };
     }
-    return { status: "ready", data: rows };
+    return { status: "ready", data: rowsWithPreviewRoutes };
   } catch {
     return {
       status: "error",
@@ -86,10 +96,12 @@ export async function getFounderDraftProspectPreviewDestination(
   try {
     const rows = await db<FounderDraftPreviewRow[]>`
       select
+        coalesce(b.trading_name, b.legal_name) as "businessName",
         p.id as "prospectId",
         pp.slug
       from growth.prospect_previews pp
       inner join growth.prospects p on p.id = pp.prospect_id
+      inner join growth.businesses b on b.id = p.business_id
       where p.id = ${prospectId}
         and pp.status = 'draft'
       limit 1
@@ -100,6 +112,7 @@ export async function getFounderDraftProspectPreviewDestination(
     return {
       status: "found",
       data: {
+        businessName: row.businessName,
         prospectId: row.prospectId,
         slug: row.slug,
       },

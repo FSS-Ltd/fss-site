@@ -111,6 +111,9 @@ export function ProspectDetailView({
             <div className="mt-6 border-t border-slate-200 pt-6">
               <h3 className={styles.sectionTitle}>Private concept preview</h3>
               <PreviewApproval
+                businessName={
+                  prospect.business.tradingName ?? prospect.business.legalName
+                }
                 preview={prospect.preview}
                 prospectId={prospect.id}
                 prospectStatus={prospect.status}

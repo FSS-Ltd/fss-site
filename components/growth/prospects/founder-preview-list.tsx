@@ -52,7 +52,10 @@ export function FounderPreviewList({
 
       <ul className={styles.previewReviewList} aria-label="Private concept previews">
         {state.data.map((preview) => {
-          const previewHref = getConceptPreviewHref({ slug: preview.slug });
+          const previewHref = getConceptPreviewHref({
+            businessName: preview.businessName,
+            slug: preview.slug,
+          });
 
           return (
             <li className={styles.previewReviewCard} key={preview.prospectId}>
@@ -60,7 +63,8 @@ export function FounderPreviewList({
                 <div>
                   <h2 className={styles.previewReviewCardHeading}>{preview.businessName}</h2>
                   <p className={styles.previewReviewCardDescription}>
-                    Draft website concept, ready for founder review.
+                    Private concept made for {preview.businessName}, ready for
+                    founder review.
                   </p>
                 </div>
                 {previewHref && (
@@ -71,6 +75,7 @@ export function FounderPreviewList({
               </div>
               <div className={styles.previewReviewApproval}>
                 <PreviewApproval
+                  businessName={preview.businessName}
                   preview={{
                     status: "draft",
                     version: preview.previewVersion,

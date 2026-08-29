@@ -17,9 +17,20 @@ test("opens concept previews by slug", () => {
 test("does not fall back to generated database-only preview routes", () => {
   assert.equal(
     getConceptPreviewHref({
+      businessName: "Example Heating Ltd",
       slug: null,
     }),
     null,
+  );
+});
+
+test("opens known bespoke concepts by business name when the stored slug is missing", () => {
+  assert.equal(
+    getConceptPreviewHref({
+      businessName: "Bright Accounting Ltd",
+      slug: null,
+    }),
+    "/preview/bright-accounting",
   );
 });
 
