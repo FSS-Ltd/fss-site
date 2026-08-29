@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState, type CSSProperties } from "react";
 
+import { resolveKnownBespokePreviewSlug } from "@/lib/growth/prospect-previews/preview-slugs";
+
 import { getConceptPreviewHref } from "./concept-preview-href";
 
 const TERMINAL_PROSPECT_STATUSES = new Set([
@@ -82,7 +84,38 @@ type PreviewApprovalFrameProps = {
   prospectVersion: number;
 };
 
-function describeSourcePackageStatus(preview: PreviewApprovalState): string {
+function hasReadyPreviewSource(
+  preview: PreviewApprovalState,
+  businessName: string,
+): boolean {
+  if (
+    preview.generationStatus === "merged_draft" &&
+    preview.compositionDigest !== null
+  ) {
+    return true;
+  }
+
+  const bespokeSlug = resolveKnownBespokePreviewSlug(businessName);
+  return (
+    preview.generationStatus === "composition_unavailable" &&
+    bespokeSlug !== null &&
+    (preview.slug === null || preview.slug === bespokeSlug)
+  );
+}
+
+function describeSourcePackageStatus(
+  preview: PreviewApprovalState,
+  businessName: string,
+): string {
+  const bespokeSlug = resolveKnownBespokePreviewSlug(businessName);
+  if (
+    preview.generationStatus === "composition_unavailable" &&
+    bespokeSlug !== null &&
+    (preview.slug === null || preview.slug === bespokeSlug)
+  ) {
+    return "Bespoke source package is merged and ready for approval.";
+  }
+
   switch (preview.generationStatus) {
     case "merged_draft":
       return "Source package is merged and ready for approval.";
@@ -159,15 +192,16 @@ export function PreviewApprovalFrame({
 
   const terminal = TERMINAL_PROSPECT_STATUSES.has(prospectStatus);
   const draftPreview = preview;
-  const sourcePackageReady =
-    draftPreview.generationStatus === "merged_draft" &&
-    draftPreview.compositionDigest !== null;
+  const sourcePackageReady = hasReadyPreviewSource(draftPreview, businessName);
   const canRequestChanges =
     draftPreview.compositionDigest !== null &&
     (draftPreview.generationStatus === "pr_open" ||
       draftPreview.generationStatus === "merged_draft");
 
-  const sourcePackageStatus = describeSourcePackageStatus(draftPreview);
+  const sourcePackageStatus = describeSourcePackageStatus(
+    draftPreview,
+    businessName,
+  );
   const previewHref = getConceptPreviewHref({
     businessName,
     slug: draftPreview.slug,
