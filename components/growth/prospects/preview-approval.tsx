@@ -74,6 +74,7 @@ export type PreviewApprovalState = {
 };
 
 type PreviewApprovalFrameProps = {
+  businessName: string;
   onSuccess: () => void;
   preview: PreviewApprovalState | null;
   prospectId: string;
@@ -99,6 +100,7 @@ function describeSourcePackageStatus(preview: PreviewApprovalState): string {
 }
 
 export function PreviewApprovalFrame({
+  businessName,
   onSuccess,
   preview,
   prospectId,
@@ -125,15 +127,18 @@ export function PreviewApprovalFrame({
   }
 
   if (preview.status === "published") {
-    const previewHref = getConceptPreviewHref({ slug: preview.slug });
+    const previewHref = getConceptPreviewHref({
+      businessName,
+      slug: preview.slug,
+    });
 
     return (
       <p className="text-sm leading-6 text-slate-700">
         <span className="mr-2 inline-block rounded-full bg-teal-50 px-2.5 py-1 text-xs font-semibold text-teal-700">
           Preview published
         </span>
-        The first-email
-        draft now includes the private concept link for review.
+        The first-email draft now includes the private concept link made for{" "}
+        {businessName}.
         {previewHref && (
           <>
             {" "}
@@ -163,7 +168,10 @@ export function PreviewApprovalFrame({
       draftPreview.generationStatus === "merged_draft");
 
   const sourcePackageStatus = describeSourcePackageStatus(draftPreview);
-  const previewHref = getConceptPreviewHref({ slug: draftPreview.slug });
+  const previewHref = getConceptPreviewHref({
+    businessName,
+    slug: draftPreview.slug,
+  });
 
   async function approve(): Promise<void> {
     setPending(true);
@@ -249,8 +257,9 @@ export function PreviewApprovalFrame({
   return (
     <div className="flex flex-wrap items-center gap-3">
       <p className="basis-full text-sm leading-6 text-slate-600">
-        Approval publishes this private concept and refreshes the stored
-        first-email draft. It does not create a provider draft or send email.
+        This concept was made for {businessName}. Approval publishes it and
+        refreshes the stored first-email draft. It does not create a provider
+        draft or send email.
       </p>
       <p style={previewApprovalNoteStyle}>
         {sourcePackageStatus}

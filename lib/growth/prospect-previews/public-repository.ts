@@ -3,8 +3,10 @@ import type { GrowthQueryExecutor } from "../db/types";
 import {
   PROSPECT_PREVIEW_PUBLIC_ID_PATTERN,
 } from "./types";
-
-const PREVIEW_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+import {
+  isPreviewSlug,
+  resolveConceptPreviewSlug,
+} from "./preview-slugs";
 
 type PublishedCompositionRow = {
   prospectId: string;
@@ -13,6 +15,7 @@ type PublishedCompositionRow = {
 };
 
 type PublishedPreviewSlugRow = {
+  businessName: string;
   slug: string | null;
 };
 
@@ -30,16 +33,23 @@ export async function getPublishedProspectPreviewSlug(
 
   const rows = await db<PublishedPreviewSlugRow[]>`
     select
-      slug
-    from growth.prospect_previews
-    where public_id = ${publicId}
-      and status = 'published'
-      and generation_status = 'published'
+      coalesce(b.trading_name, b.legal_name) as "businessName",
+      pp.slug
+    from growth.prospect_previews pp
+    inner join growth.prospects p on p.id = pp.prospect_id
+    inner join growth.businesses b on b.id = p.business_id
+    where pp.public_id = ${publicId}
+      and pp.status = 'published'
+      and pp.generation_status = 'published'
     limit 1
   `;
-  const slug = rows[0]?.slug;
+  const row = rows[0];
+  if (!row) return null;
 
-  return slug && PREVIEW_SLUG_PATTERN.test(slug) ? slug : null;
+  return resolveConceptPreviewSlug({
+    businessName: row.businessName,
+    slug: row.slug,
+  });
 }
 
 export async function getPublishedProspectPreviewCompositionBySlug<
@@ -49,7 +59,7 @@ export async function getPublishedProspectPreviewCompositionBySlug<
   db: GrowthQueryExecutor,
   resolveComposition: (slug: string) => TComposition | null,
 ): Promise<TComposition | null> {
-  if (!PREVIEW_SLUG_PATTERN.test(slug)) return null;
+  if (!isPreviewSlug(slug)) return null;
 
   const rows = await db<PublishedCompositionRow[]>`
     select

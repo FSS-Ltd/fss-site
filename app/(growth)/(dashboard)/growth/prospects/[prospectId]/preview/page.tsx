@@ -27,7 +27,10 @@ export default async function FounderDraftPreviewPage({
     );
   }
 
-  const previewHref = getConceptPreviewHref({ slug: result.data.slug });
+  const previewHref = getConceptPreviewHref({
+    businessName: result.data.businessName,
+    slug: result.data.slug,
+  });
   if (!previewHref) notFound();
 
   redirect(previewHref);

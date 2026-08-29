@@ -19,7 +19,7 @@ test("returns only a published slug for an opaque preview ID", async () => {
       text: strings.join("?").replace(/\s+/g, " ").trim(),
       values,
     });
-    return [{ slug: "example-heating" }];
+    return [{ businessName: "Example Heating Ltd", slug: "example-heating" }];
   }) as unknown as GrowthDb;
 
   const result = await getPublishedProspectPreviewSlug(PUBLIC_ID, db);
@@ -27,8 +27,19 @@ test("returns only a published slug for an opaque preview ID", async () => {
   assert.equal(result, "example-heating");
   assert.match(queries[0]?.text ?? "", /status = 'published'/);
   assert.match(queries[0]?.text ?? "", /generation_status = 'published'/);
+  assert.match(queries[0]?.text ?? "", /coalesce\(b\.trading_name, b\.legal_name\) as "businessName"/);
   assert.doesNotMatch(queries[0]?.text ?? "", /content_snapshot/i);
   assert.deepEqual(queries[0]?.values, [PUBLIC_ID]);
+});
+
+test("returns a known bespoke slug by business name when a published row has no stored slug", async () => {
+  const db = (async () => [
+    { businessName: "Bright Accounting Ltd", slug: null },
+  ]) as unknown as GrowthDb;
+
+  const result = await getPublishedProspectPreviewSlug(PUBLIC_ID, db);
+
+  assert.equal(result, "bright-accounting");
 });
 
 test("does not query draft-shaped public IDs", async () => {
@@ -45,8 +56,12 @@ test("does not query draft-shaped public IDs", async () => {
 });
 
 test("does not return malformed or missing published preview slugs", async () => {
-  const db = (async () => [{ slug: "../private" }]) as unknown as GrowthDb;
-  const missingSlugDb = (async () => [{ slug: null }]) as unknown as GrowthDb;
+  const db = (async () => [
+    { businessName: "Example Heating Ltd", slug: "../private" },
+  ]) as unknown as GrowthDb;
+  const missingSlugDb = (async () => [
+    { businessName: "Example Heating Ltd", slug: null },
+  ]) as unknown as GrowthDb;
 
   assert.equal(await getPublishedProspectPreviewSlug(PUBLIC_ID, db), null);
   assert.equal(await getPublishedProspectPreviewSlug(PUBLIC_ID, missingSlugDb), null);
