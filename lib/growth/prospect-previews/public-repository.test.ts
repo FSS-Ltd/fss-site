@@ -19,14 +19,23 @@ test("returns only a published slug for an opaque preview ID", async () => {
       text: strings.join("?").replace(/\s+/g, " ").trim(),
       values,
     });
-    return [{ businessName: "Example Heating Ltd", slug: "example-heating" }];
+    return [
+      {
+        businessName: "Example Heating Ltd",
+        generationStatus: "published",
+        slug: "example-heating",
+      },
+    ];
   }) as unknown as GrowthDb;
 
   const result = await getPublishedProspectPreviewSlug(PUBLIC_ID, db);
 
   assert.equal(result, "example-heating");
   assert.match(queries[0]?.text ?? "", /status = 'published'/);
-  assert.match(queries[0]?.text ?? "", /generation_status = 'published'/);
+  assert.match(
+    queries[0]?.text ?? "",
+    /generation_status in \('published', 'composition_unavailable'\)/,
+  );
   assert.match(queries[0]?.text ?? "", /coalesce\(b\.trading_name, b\.legal_name\) as "businessName"/);
   assert.doesNotMatch(queries[0]?.text ?? "", /content_snapshot/i);
   assert.deepEqual(queries[0]?.values, [PUBLIC_ID]);
@@ -34,12 +43,44 @@ test("returns only a published slug for an opaque preview ID", async () => {
 
 test("returns a known bespoke slug by business name when a published row has no stored slug", async () => {
   const db = (async () => [
-    { businessName: "Bright Accounting Ltd", slug: null },
+    {
+      businessName: "Bright Accounting Ltd",
+      generationStatus: "composition_unavailable",
+      slug: null,
+    },
   ]) as unknown as GrowthDb;
 
   const result = await getPublishedProspectPreviewSlug(PUBLIC_ID, db);
 
   assert.equal(result, "bright-accounting");
+});
+
+test("returns a bespoke slug for a published preview without generated package metadata", async () => {
+  const queries: Array<{ text: string; values: readonly unknown[] }> = [];
+  const db = (async (
+    strings: TemplateStringsArray,
+    ...values: readonly unknown[]
+  ) => {
+    queries.push({
+      text: strings.join("?").replace(/\s+/g, " ").trim(),
+      values,
+    });
+    return [
+      {
+        businessName: "Bright Accounting Ltd",
+        generationStatus: "composition_unavailable",
+        slug: "bright-accounting",
+      },
+    ];
+  }) as unknown as GrowthDb;
+
+  const result = await getPublishedProspectPreviewSlug(PUBLIC_ID, db);
+
+  assert.equal(result, "bright-accounting");
+  assert.match(
+    queries[0]?.text ?? "",
+    /generation_status in \('published', 'composition_unavailable'\)/,
+  );
 });
 
 test("does not query draft-shaped public IDs", async () => {
@@ -57,10 +98,18 @@ test("does not query draft-shaped public IDs", async () => {
 
 test("does not return malformed or missing published preview slugs", async () => {
   const db = (async () => [
-    { businessName: "Example Heating Ltd", slug: "../private" },
+    {
+      businessName: "Example Heating Ltd",
+      generationStatus: "published",
+      slug: "../private",
+    },
   ]) as unknown as GrowthDb;
   const missingSlugDb = (async () => [
-    { businessName: "Example Heating Ltd", slug: null },
+    {
+      businessName: "Example Heating Ltd",
+      generationStatus: "published",
+      slug: null,
+    },
   ]) as unknown as GrowthDb;
 
   assert.equal(await getPublishedProspectPreviewSlug(PUBLIC_ID, db), null);

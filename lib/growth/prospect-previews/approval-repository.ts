@@ -147,7 +147,7 @@ function createTransaction(
       const previewRows = await transaction<Array<{ id: string }>>`
         update growth.prospect_previews
         set status = 'published',
-            generation_status = 'published',
+            generation_status = ${input.publishedPreviewGenerationStatus},
             slug = ${input.previewSlug},
             approved_at = ${input.approvedAt},
             approved_by = ${input.approvedBy},

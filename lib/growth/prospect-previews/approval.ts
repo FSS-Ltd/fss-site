@@ -66,6 +66,7 @@ export type PublishPreviewAndSaveEmailInput = {
   previewId: string;
   expectedPreviewVersion: number;
   expectedPreviewGenerationStatus: "merged_draft" | "composition_unavailable";
+  publishedPreviewGenerationStatus: "published" | "composition_unavailable";
   previewSlug: string;
   draftTaskId: string;
   outputSnapshot: Record<string, unknown>;
@@ -194,6 +195,7 @@ type ResolvedPreviewComposition = {
 
 type ResolvedPreviewApprovalSource = {
   expectedGenerationStatus: "merged_draft" | "composition_unavailable";
+  publishedGenerationStatus: "published" | "composition_unavailable";
   slug: string;
 };
 
@@ -225,6 +227,7 @@ function resolvePreviewApprovalSource(
     ) {
       return {
         expectedGenerationStatus: "merged_draft",
+        publishedGenerationStatus: "published",
         slug: state.preview.slug,
       };
     }
@@ -237,6 +240,7 @@ function resolvePreviewApprovalSource(
 
     return {
       expectedGenerationStatus: "composition_unavailable",
+      publishedGenerationStatus: "composition_unavailable",
       slug,
     };
   }
@@ -333,6 +337,8 @@ export function createProspectPreviewApprover({
         expectedPreviewVersion: input.expectedPreviewVersion,
         expectedPreviewGenerationStatus:
           previewSource.expectedGenerationStatus,
+        publishedPreviewGenerationStatus:
+          previewSource.publishedGenerationStatus,
         previewSlug: previewSource.slug,
         draftTaskId: state.draft.id,
         outputSnapshot,
