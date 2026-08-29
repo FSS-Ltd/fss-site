@@ -1,7 +1,9 @@
-import "@/app/preview/preview.css";
+import type { ReactNode } from "react";
 
-export default function FounderProspectPreviewLayout({
+export default function FounderPreviewRedirectLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+}: {
+  children: ReactNode;
+}) {
   return children;
 }

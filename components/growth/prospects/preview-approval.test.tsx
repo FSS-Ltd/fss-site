@@ -27,7 +27,7 @@ test("offers a founder approval action for a draft preview", () => {
   assert.match(html, /private concept/);
 });
 
-test("keeps a draft preview inside the founder review route", () => {
+test("opens a draft concept preview by slug", () => {
   const html = renderToStaticMarkup(
     <PreviewApprovalFrame
       onSuccess={() => undefined}
@@ -47,9 +47,31 @@ test("keeps a draft preview inside the founder review route", () => {
 
   assert.match(
     html,
-    /href="\/growth\/prospects\/11111111-1111-4111-8111-111111111111\/preview"/,
+    /href="\/preview\/example-heating"/,
   );
   assert.match(html, />View concept preview</);
+});
+
+test("does not expose generated database-only preview links", () => {
+  const html = renderToStaticMarkup(
+    <PreviewApprovalFrame
+      onSuccess={() => undefined}
+      preview={{
+        status: "draft",
+        slug: null,
+        version: 1,
+        compositionDigest: "a".repeat(64),
+        generationStatus: "merged_draft",
+        generationPrNumber: 412,
+      }}
+      prospectId="11111111-1111-4111-8111-111111111111"
+      prospectVersion={3}
+      prospectStatus="ready_for_email_review"
+    />,
+  );
+
+  assert.doesNotMatch(html, /\/growth\/prospects\/11111111-1111-4111-8111-111111111111\/preview/);
+  assert.doesNotMatch(html, />View concept preview</);
 });
 
 test("does not expose a published preview identifier in the founder UI", () => {

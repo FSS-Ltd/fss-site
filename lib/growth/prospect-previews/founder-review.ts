@@ -3,10 +3,6 @@ import { randomUUID } from "node:crypto";
 import { getGrowthDb } from "../db/client";
 import type { GrowthQueryExecutor } from "../db/types";
 import type { ViewState } from "../dashboard/view-models";
-import {
-  parseStoredProspectPreviewSnapshot,
-  type StoredProspectPreviewSnapshot,
-} from "./types";
 
 const PROSPECT_ID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -23,8 +19,7 @@ export type FounderDraftProspectPreviewSummary = {
   slug: string | null;
 };
 
-export type FounderDraftProspectPreview = {
-  content: StoredProspectPreviewSnapshot;
+export type FounderDraftProspectPreviewDestination = {
   prospectId: string;
   slug: string | null;
 };
@@ -32,13 +27,12 @@ export type FounderDraftProspectPreview = {
 type FounderDraftPreviewSummaryRow = FounderDraftProspectPreviewSummary;
 
 type FounderDraftPreviewRow = {
-  content: unknown;
   prospectId: string;
   slug: string | null;
 };
 
 export type FounderDraftProspectPreviewResult =
-  | { status: "found"; data: FounderDraftProspectPreview }
+  | { status: "found"; data: FounderDraftProspectPreviewDestination }
   | { status: "not_found" }
   | { status: "error"; correlationId: string; message: string };
 
@@ -62,6 +56,7 @@ export async function getFounderDraftProspectPreviewSummaries(
       inner join growth.prospects p on p.id = pp.prospect_id
       inner join growth.businesses b on b.id = p.business_id
       where pp.status = 'draft'
+        and pp.slug is not null
       order by pp.created_at asc, pp.id asc
     `;
 
@@ -81,7 +76,7 @@ export async function getFounderDraftProspectPreviewSummaries(
   }
 }
 
-export async function getFounderDraftProspectPreview(
+export async function getFounderDraftProspectPreviewDestination(
   prospectId: string,
   db: GrowthQueryExecutor = getGrowthDb(),
   createCorrelationId: () => string = () => randomUUID(),
@@ -91,7 +86,6 @@ export async function getFounderDraftProspectPreview(
   try {
     const rows = await db<FounderDraftPreviewRow[]>`
       select
-        pp.content_snapshot as content,
         p.id as "prospectId",
         pp.slug
       from growth.prospect_previews pp
@@ -107,7 +101,6 @@ export async function getFounderDraftProspectPreview(
       status: "found",
       data: {
         prospectId: row.prospectId,
-        content: parseStoredProspectPreviewSnapshot(row.content),
         slug: row.slug,
       },
     };

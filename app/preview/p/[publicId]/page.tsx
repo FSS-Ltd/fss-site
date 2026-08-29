@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { renderProductionProspectPreviewPage } from "@/components/prospect-previews/production-prospect-preview-page";
+import { redirectProductionProspectPreviewPage } from "@/components/prospect-previews/production-prospect-preview-page";
 
 type ProductionPreviewPageProps = {
   params: Promise<{ publicId: string }>;
@@ -19,5 +19,5 @@ export default async function ProductionProspectPreviewPage({
   params,
 }: ProductionPreviewPageProps) {
   const { publicId } = await params;
-  return renderProductionProspectPreviewPage(publicId);
+  return redirectProductionProspectPreviewPage(publicId);
 }
