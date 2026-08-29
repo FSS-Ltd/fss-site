@@ -6,6 +6,7 @@ import {
 import {
   isPreviewSlug,
   resolveConceptPreviewSlug,
+  resolveKnownBespokePreviewSlug,
 } from "./preview-slugs";
 
 type PublishedCompositionRow = {
@@ -16,6 +17,7 @@ type PublishedCompositionRow = {
 
 type PublishedPreviewSlugRow = {
   businessName: string;
+  generationStatus: string;
   slug: string | null;
 };
 
@@ -34,17 +36,25 @@ export async function getPublishedProspectPreviewSlug(
   const rows = await db<PublishedPreviewSlugRow[]>`
     select
       coalesce(b.trading_name, b.legal_name) as "businessName",
+      pp.generation_status as "generationStatus",
       pp.slug
     from growth.prospect_previews pp
     inner join growth.prospects p on p.id = pp.prospect_id
     inner join growth.businesses b on b.id = p.business_id
     where pp.public_id = ${publicId}
       and pp.status = 'published'
-      and pp.generation_status = 'published'
+      and pp.generation_status in ('published', 'composition_unavailable')
     limit 1
   `;
   const row = rows[0];
   if (!row) return null;
+
+  if (row.generationStatus === "composition_unavailable") {
+    const bespokeSlug = resolveKnownBespokePreviewSlug(row.businessName);
+    if (bespokeSlug === null) return null;
+    if (row.slug !== null && row.slug !== bespokeSlug) return null;
+    return bespokeSlug;
+  }
 
   return resolveConceptPreviewSlug({
     businessName: row.businessName,

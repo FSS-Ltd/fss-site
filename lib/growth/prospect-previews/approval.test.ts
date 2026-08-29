@@ -129,7 +129,7 @@ function createRepository(status = "ready_for_email_review") {
         async publishPreviewAndSaveEmail(input) {
           state.preview = {
             ...state.preview,
-            generationStatus: "published",
+            generationStatus: input.publishedPreviewGenerationStatus,
             slug: input.previewSlug,
             status: "published",
             version: state.preview.version + 1,
@@ -223,13 +223,17 @@ test("publishes a registered bespoke preview without a generated composition dig
     {
       expectedPreviewGenerationStatus:
         fake.state.approvals[0]?.expectedPreviewGenerationStatus,
+      publishedPreviewGenerationStatus:
+        fake.state.approvals[0]?.publishedPreviewGenerationStatus,
       previewSlug: fake.state.approvals[0]?.previewSlug,
     },
     {
       expectedPreviewGenerationStatus: "composition_unavailable",
+      publishedPreviewGenerationStatus: "composition_unavailable",
       previewSlug: "bright-accounting",
     },
   );
+  assert.equal(fake.state.preview.generationStatus, "composition_unavailable");
 });
 
 test("publishes a draft preview when source-backed narratives are verbose", async () => {
