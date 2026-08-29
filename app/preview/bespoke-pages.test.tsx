@@ -8,11 +8,11 @@ import ProspectPreviewPage, {
   generateStaticParams,
 } from "./[slug]/page";
 
-test("prerenders the thirteen public-unlisted bespoke prospect slugs", () => {
+test("prerenders the fourteen public-unlisted bespoke prospect slugs", () => {
   const params = generateStaticParams();
   const slugs: readonly string[] = params.map(({ slug }) => slug);
 
-  assert.equal(params.length, 13);
+  assert.equal(params.length, 14);
   assert.equal(slugs.includes("bright-accounting"), true);
   assert.equal(slugs.includes("macknade"), false);
 });
