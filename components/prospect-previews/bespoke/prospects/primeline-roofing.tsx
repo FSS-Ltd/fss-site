@@ -1,15 +1,23 @@
-import { Camera, MapPin } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { Camera, ClipboardCheck, Home, ShieldCheck } from "lucide-react";
 
 import { ConceptBar, OwnerInvitation } from "../concept-chrome";
 import { DemoEnquiry } from "../demo-enquiry";
 import { RevealOnScroll } from "../../reveal-on-scroll";
+import { PrimelineRoofingHero } from "./primeline-roofing-hero";
+
+type ProofPoint = {
+  body: string;
+  icon: LucideIcon;
+  title: string;
+};
 
 const fields = [
   {
     id: "work",
     label: "What work do you need?",
     type: "select",
-    options: ["Roof repair", "Roof replacement", "New roof", "Free site visit"],
+    options: ["Roof repair", "New roof", "Flat roofing", "Slate or tile roof"],
   },
   {
     id: "property",
@@ -37,116 +45,122 @@ const fields = [
   },
 ] as const;
 
+const proofPoints: readonly ProofPoint[] = [
+  {
+    body: "New roofs, repairs, flat roofing, lead work, slate roofing, chimneys, guttering, fascias and soffits.",
+    icon: Home,
+    title: "Full roofing system",
+  },
+  {
+    body: "Free visits and written quotations make the scope clear before work starts.",
+    icon: ClipboardCheck,
+    title: "Transparent quoting",
+  },
+  {
+    body: "Fully insured work, independent approvals and an insurance-backed guarantee support the trust story.",
+    icon: ShieldCheck,
+    title: "Proof customers can check",
+  },
+];
+
 export function PrimelineRoofingPage() {
   return (
     <div
-      className="min-h-screen overflow-hidden bg-[#071126] text-white"
+      className="primelinePage min-h-screen"
       data-bespoke-prospect="primeline-roofing"
     >
-      <div className="border-b border-white/10">
-        <ConceptBar businessName="Primeline Roofing" />
-      </div>
+      <ConceptBar businessName="Primeline Roofing" />
       <main>
-        <section className="relative min-h-[88vh]">
-          <header className="mx-auto flex max-w-7xl items-center justify-between px-5 py-6 sm:px-8">
-            <span className="text-xl font-black uppercase tracking-tight">
-              PRIMELINE <span className="text-[#51a0ff]">ROOFING</span>
-            </span>
-            <a
-              className="rounded-lg bg-[#2575fc] px-5 py-3 text-sm font-black"
-              href="#visit"
-            >
-              Free site visit
-            </a>
-          </header>
-          <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 pb-24 pt-10 sm:px-8 lg:grid-cols-[.9fr_1.1fr]">
-            <RevealOnScroll className="relative z-10">
-              <p className="text-xs font-black uppercase tracking-[.25em] text-[#77b4ff]">
-                Chatham · Repair · Replace · New roof
-              </p>
-              <h1 className="mt-6 text-5xl font-black leading-[.93] tracking-[-.06em] sm:text-7xl">
-                Show the problem before the site visit.
-              </h1>
-              <p className="mt-6 max-w-xl text-lg leading-8 text-white/65">
-                Start with the work, property and urgency. A supporting photo
-                can help Primeline prepare a focused response before arranging
-                the free visit.
-              </p>
-              <a
-                className="mt-8 inline-flex items-center gap-3 rounded-lg bg-[#2575fc] px-6 py-4 text-sm font-black shadow-[0_18px_50px_-15px_#2575fc]"
-                href="#visit"
-              >
-                <Camera className="size-4" />
-                Build your roof brief
-              </a>
-            </RevealOnScroll>
-            <RevealOnScroll
-              className="relative h-[34rem] [perspective:1200px]"
-              delay={100}
-            >
-              <div className="absolute left-[5%] right-[3%] top-[6%] h-[70%] [transform:rotateY(-18deg)_rotateX(7deg)]">
-                <div className="absolute inset-x-[5%] bottom-[8%] h-[54%] bg-[#e7e9ed] shadow-[0_55px_80px_-25px_rgba(37,117,252,.45)]" />
-                <div className="absolute left-0 right-0 top-[9%] h-[52%] bg-gradient-to-br from-[#51708d] to-[#151f2c] [clip-path:polygon(0_100%,42%_0,100%_100%)]" />
-                <div className="absolute bottom-[8%] left-[15%] h-[32%] w-[22%] bg-[#88929c]" />
-                <div className="absolute bottom-[8%] right-[13%] grid grid-cols-2 gap-3">
-                  {Array.from({ length: 4 }, (_, i) => (
-                    <span className="size-12 bg-[#a8c5e0]" key={i} />
-                  ))}
-                </div>
-              </div>
-              <div className="absolute right-[1%] top-[7%] rounded-2xl border border-white/15 bg-white/10 p-5 backdrop-blur-xl">
-                <MapPin className="size-7 text-[#77b4ff]" />
-                <p className="mt-3 text-xs uppercase tracking-widest text-white/45">
-                  Visit brief
-                </p>
-                <p className="mt-1 font-black">Work · Property · Urgency</p>
-              </div>
-              <div className="absolute bottom-[3%] left-[3%] grid size-28 place-items-center rounded-full bg-[#2575fc] shadow-2xl [transform:translateZ(85px)]">
-                <Camera className="size-11" />
-              </div>
-            </RevealOnScroll>
-          </div>
-        </section>
+        <PrimelineRoofingHero />
         <RevealOnScroll
           as="section"
-          className="border-y border-white/10 bg-white/5 py-14"
+          className="px-5 py-20 text-[#071126] sm:px-8"
+          id="services"
         >
-          <div className="mx-auto grid max-w-6xl gap-8 px-5 sm:grid-cols-3 sm:px-8">
+          <div className="mx-auto max-w-7xl">
+            <p className="text-xs font-black uppercase text-[#1753a3]">
+              Roofing & Building Ltd
+            </p>
+            <div className="mt-4 grid gap-6 lg:grid-cols-[.78fr_1fr] lg:items-end">
+              <h2 className="max-w-3xl text-4xl font-black leading-[.94] tracking-normal sm:text-6xl">
+                Premium service, made easier to choose.
+              </h2>
+              <p className="max-w-2xl text-lg leading-8 text-slate-600">
+                The demo turns Primeline proof into a clearer first action:
+                pick the roofing need, share the property context and give the
+                team enough detail to prepare a focused visit.
+              </p>
+            </div>
+            <div className="mt-14 grid gap-px overflow-hidden rounded-lg border border-slate-200 bg-slate-200 md:grid-cols-3">
+              {proofPoints.map((point) => (
+                <article className="bg-white p-6 sm:p-8" key={point.title}>
+                  <point.icon
+                    aria-hidden="true"
+                    className="size-6 text-[#1753a3]"
+                  />
+                  <h3 className="mt-8 text-xl font-black tracking-tight">
+                    {point.title}
+                  </h3>
+                  <p className="mt-4 leading-7 text-slate-600">{point.body}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </RevealOnScroll>
+        <RevealOnScroll
+          as="section"
+          className="bg-[#071126] px-5 py-18 text-white sm:px-8"
+          id="proof"
+        >
+          <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-4">
             {[
-              ["01", "Choose the work"],
-              ["02", "Describe the property"],
-              ["03", "Add urgency and a photo"],
-            ].map(([n, t]) => (
-              <article key={n}>
-                <p className="font-mono text-[#51a0ff]">{n}</p>
-                <h2 className="mt-5 text-xl font-black">{t}</h2>
+              ["20+", "years of experience"],
+              ["4.97", "TrustATrader rating"],
+              ["5.0", "Google rating"],
+              ["Free", "site visit and quote"],
+            ].map(([value, label]) => (
+              <article
+                className="rounded-lg border border-white/12 bg-white/[.06] p-6"
+                key={label}
+              >
+                <p className="text-4xl font-black text-white">{value}</p>
+                <h3 className="mt-4 text-sm font-bold uppercase text-white/62">
+                  {label}
+                </h3>
               </article>
             ))}
           </div>
         </RevealOnScroll>
         <section
-          className="bg-[#f2f6fb] px-5 py-24 text-[#0b1d35] sm:px-8"
+          className="bg-[#f4f7fb] px-5 py-24 text-[#071126] sm:px-8"
           id="visit"
         >
           <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[.8fr_1.2fr]">
             <RevealOnScroll>
-              <p className="text-xs font-black uppercase tracking-[.22em] text-[#2575fc]">
-                Free site-visit route
+              <p className="text-xs font-black uppercase text-[#1753a3]">
+                Free quote route
               </p>
-              <h2 className="mt-5 text-5xl font-black tracking-[-.055em]">
-                Arrive knowing what to look for.
+              <h2 className="mt-5 text-5xl font-black tracking-normal">
+                Make the first visit more useful.
               </h2>
               <p className="mt-5 leading-7 text-slate-600">
-                The image control works locally for the demonstration. Nothing
-                is uploaded or stored.
+                A live version could send Primeline the service, property,
+                timing and photo context before a site visit is arranged.
               </p>
+              <a
+                className="mt-8 inline-flex min-h-12 items-center gap-3 rounded-lg bg-[#1753a3] px-5 py-3 text-sm font-black text-white shadow-[0_18px_44px_-22px_#1753a3] transition hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#1753a3]"
+                href="#visit"
+              >
+                <Camera aria-hidden="true" className="size-4" />
+                Prepare the roof brief
+              </a>
             </RevealOnScroll>
             <RevealOnScroll delay={80}>
               <DemoEnquiry
                 businessName="Primeline Roofing"
                 buttonLabel="Prepare site-visit request"
                 fields={fields}
-                formClassName="rounded-2xl bg-white p-6 shadow-xl sm:p-9"
+                formClassName="rounded-lg bg-white p-6 shadow-xl sm:p-9"
                 successTitle="Your site-visit brief is ready"
                 successMessage="A live version could send Primeline the work, building, urgency and photo context before the free site visit."
               />
