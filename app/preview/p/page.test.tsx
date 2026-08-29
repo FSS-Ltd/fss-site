@@ -1,15 +1,27 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { renderToStaticMarkup } from "react-dom/server";
-
 import {
   dynamic,
   generateMetadata,
 } from "./[publicId]/page";
-import { renderProductionProspectPreviewPage } from "@/components/prospect-previews/production-prospect-preview-page";
+import {
+  redirectProductionProspectPreviewPage,
+} from "@/components/prospect-previews/production-prospect-preview-page";
 
 const PUBLIC_ID = "Q2VhN4A7x6Y0-5s8V3d1K9PqRcFhZ9Xm";
+
+async function assertRedirectsTo(
+  promise: Promise<unknown>,
+  destination: string,
+): Promise<void> {
+  await assert.rejects(promise, (error: unknown) => {
+    const digest = (error as { digest?: unknown }).digest;
+    if (typeof digest !== "string") return false;
+    assert.match(digest, new RegExp(`NEXT_REDIRECT;replace;${destination};`));
+    return true;
+  });
+}
 
 test("marks published opaque preview pages as dynamic and noindex", async () => {
   const metadata = await generateMetadata();
@@ -18,46 +30,21 @@ test("marks published opaque preview pages as dynamic and noindex", async () => 
   assert.deepEqual(metadata.robots, { index: false, follow: false });
 });
 
-test("renders only the published preview provided by the data loader", async () => {
-  const page = await renderProductionProspectPreviewPage(
-    PUBLIC_ID,
-    async () => ({
-      publicId: PUBLIC_ID,
-      status: "published" as const,
-      content: {
-        schemaVersion: "1.0" as const,
-        businessName: "Example Heating Ltd",
-        sector: "Home services",
-        locality: "Canterbury",
-        businessGoal: "Turn urgent enquiries into qualified calls.",
-        primaryCta: "Request a callback",
-        homepageSections: {
-          schemaVersion: "1.0" as const,
-          summary: "A clear homepage structure.",
-          items: ["Hero section"],
-        },
-        conversionPlan: {
-          schemaVersion: "1.0" as const,
-          summary: "A simpler contact journey.",
-          items: ["Clear enquiry route"],
-        },
-        trustSignals: {
-          schemaVersion: "1.0" as const,
-          summary: "Visible local service experience.",
-          items: ["Service information"],
-        },
-      },
-    }),
+test("redirects opaque published preview URLs to their slug route", async () => {
+  await assertRedirectsTo(
+    redirectProductionProspectPreviewPage(
+      PUBLIC_ID,
+      async () => "example-heating",
+    ),
+    "/preview/example-heating",
   );
-
-  const html = renderToStaticMarkup(page);
-
-  assert.match(html, /Concept for Example Heating Ltd/);
-  assert.doesNotMatch(html, /Faithful Software Solutions Ltd/);
 });
 
-test("does not render draft or withdrawn preview IDs", async () => {
+test("does not render database-only preview IDs", async () => {
   await assert.rejects(
-    renderProductionProspectPreviewPage(PUBLIC_ID, async () => null),
+    redirectProductionProspectPreviewPage(
+      PUBLIC_ID,
+      async () => null,
+    ),
   );
 });

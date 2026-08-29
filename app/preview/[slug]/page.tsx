@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
-import { getConceptPreviewHref } from "@/components/growth/prospects/concept-preview-href";
 import {
   getBespokeProspectPage,
   getBespokeProspectSlugs,
 } from "@/components/prospect-previews/bespoke/registry";
+import { CompositionPreview } from "@/components/prospect-previews/composition-preview";
 import { renderProspectCompositionPage } from "@/components/prospect-previews/composition-preview-page";
 import { enforceFounderPrivatePreviewAccess } from "@/lib/growth/auth/private-preview-access";
 import { requireFounder } from "@/lib/growth/auth/require-founder";
@@ -80,7 +80,7 @@ export default async function ProspectPreviewPage({
   const composition = getMergedProspectPreviewCompositionBySlug(slug);
   if (production && composition) {
     await enforceFounderPrivatePreviewAccess(requireFounder, notFound);
-    redirect(getConceptPreviewHref({ prospectId: composition.prospectId }));
+    return <CompositionPreview composition={composition} mode="review" />;
   }
 
   notFound();

@@ -125,6 +125,8 @@ export function PreviewApprovalFrame({
   }
 
   if (preview.status === "published") {
+    const previewHref = getConceptPreviewHref({ slug: preview.slug });
+
     return (
       <p className="text-sm leading-6 text-slate-700">
         <span className="mr-2 inline-block rounded-full bg-teal-50 px-2.5 py-1 text-xs font-semibold text-teal-700">
@@ -132,6 +134,12 @@ export function PreviewApprovalFrame({
         </span>
         The first-email
         draft now includes the private concept link for review.
+        {previewHref && (
+          <>
+            {" "}
+            <Link href={previewHref}>View concept preview</Link>
+          </>
+        )}
       </p>
     );
   }
@@ -155,6 +163,7 @@ export function PreviewApprovalFrame({
       draftPreview.generationStatus === "merged_draft");
 
   const sourcePackageStatus = describeSourcePackageStatus(draftPreview);
+  const previewHref = getConceptPreviewHref({ slug: draftPreview.slug });
 
   async function approve(): Promise<void> {
     setPending(true);
@@ -266,24 +275,24 @@ export function PreviewApprovalFrame({
       >
         {pending ? "Approving preview…" : "Approve preview"}
       </button>
-      <Link
-        href={getConceptPreviewHref({
-          prospectId,
-        })}
-        style={{
-          alignItems: "center",
-          border: "1px solid #087f88",
-          borderRadius: 7,
-          color: "#087f88",
-          display: "inline-flex",
-          fontSize: "0.8rem",
-          fontWeight: 700,
-          padding: "7px 12px",
-          whiteSpace: "nowrap",
-        }}
-      >
-        View concept preview
-      </Link>
+      {previewHref && (
+        <Link
+          href={previewHref}
+          style={{
+            alignItems: "center",
+            border: "1px solid #087f88",
+            borderRadius: 7,
+            color: "#087f88",
+            display: "inline-flex",
+            fontSize: "0.8rem",
+            fontWeight: 700,
+            padding: "7px 12px",
+            whiteSpace: "nowrap",
+          }}
+        >
+          View concept preview
+        </Link>
+      )}
       {terminal && (
         <p className="basis-full text-sm text-slate-500">
           This prospect is in a final state and cannot publish a concept.
