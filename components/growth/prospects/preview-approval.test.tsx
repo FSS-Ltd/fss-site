@@ -78,6 +78,57 @@ test("opens a known bespoke draft concept by business name when the stored slug 
   assert.match(html, />View concept preview</);
 });
 
+test("treats a registered bespoke concept as ready for founder approval", () => {
+  const html = renderToStaticMarkup(
+    <PreviewApprovalFrame
+      businessName="Bright Accounting"
+      onSuccess={() => undefined}
+      preview={{
+        status: "draft",
+        slug: null,
+        version: 1,
+        compositionDigest: null,
+        generationStatus: "composition_unavailable",
+        generationPrNumber: null,
+      }}
+      prospectId="11111111-1111-4111-8111-111111111111"
+      prospectVersion={3}
+      prospectStatus="ready_for_email_review"
+    />,
+  );
+  const approveButton = html.match(/<button[^>]*>Approve preview<\/button>/)?.[0];
+
+  assert.ok(approveButton);
+  assert.doesNotMatch(approveButton, /disabled=/);
+  assert.match(html, /Bespoke source package is merged and ready for approval/);
+  assert.doesNotMatch(html, /needs a bespoke source package/);
+});
+
+test("keeps bespoke approval unavailable when the stored slug conflicts", () => {
+  const html = renderToStaticMarkup(
+    <PreviewApprovalFrame
+      businessName="Bright Accounting"
+      onSuccess={() => undefined}
+      preview={{
+        status: "draft",
+        slug: "other-preview",
+        version: 1,
+        compositionDigest: null,
+        generationStatus: "composition_unavailable",
+        generationPrNumber: null,
+      }}
+      prospectId="11111111-1111-4111-8111-111111111111"
+      prospectVersion={3}
+      prospectStatus="ready_for_email_review"
+    />,
+  );
+  const approveButton = html.match(/<button[^>]*>Approve preview<\/button>/)?.[0];
+
+  assert.ok(approveButton);
+  assert.match(approveButton, /disabled=/);
+  assert.match(html, /needs a bespoke source package/);
+});
+
 test("does not expose generated database-only preview links", () => {
   const html = renderToStaticMarkup(
     <PreviewApprovalFrame

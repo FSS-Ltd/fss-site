@@ -78,7 +78,12 @@ function createDraft(): StoredFirstEmailDraft {
 
 function createRepository(status = "ready_for_email_review") {
   const state = {
-    prospect: { id: PROSPECT_ID, status, version: 3 },
+    prospect: {
+      businessName: "Marden Garage",
+      id: PROSPECT_ID,
+      status,
+      version: 3,
+    },
     preview: {
       id: PREVIEW_ID,
       publicId: "Q2VhN4A7x6Y0-5s8V3d1K9PqRcFhZ9Xm",
@@ -124,6 +129,8 @@ function createRepository(status = "ready_for_email_review") {
         async publishPreviewAndSaveEmail(input) {
           state.preview = {
             ...state.preview,
+            generationStatus: "published",
+            slug: input.previewSlug,
             status: "published",
             version: state.preview.version + 1,
           };
@@ -188,6 +195,41 @@ test("publishes a draft preview and revises only the stored first-email draft", 
   assert.equal(fake.state.sentMessages, 0);
   assert.equal(fake.state.approvals.length, 1);
   assert.equal(fake.state.audits.length, 1);
+});
+
+test("publishes a registered bespoke preview without a generated composition digest", async () => {
+  const fake = createRepository();
+  Object.assign(fake.state.prospect, { businessName: "Bright Accounting" });
+  Object.assign(fake.state.preview, {
+    slug: null,
+    compositionDigest: null,
+    generationStatus: "composition_unavailable",
+  });
+  const approve = createProspectPreviewApprover({
+    repository: fake.repository,
+    now: () => new Date("2026-08-26T10:00:00.000Z"),
+    siteUrl: "https://faithfulsoftware.dev",
+    resolveComposition: () => null,
+  });
+
+  const result = await approve({} as GrowthDb, approvalInput());
+
+  assert.equal(result.status, "published");
+  assert.match(
+    String((fake.state.savedSnapshots[0]?.email as { text?: unknown }).text),
+    /https:\/\/faithfulsoftware\.dev\/preview\/bright-accounting/,
+  );
+  assert.deepEqual(
+    {
+      expectedPreviewGenerationStatus:
+        fake.state.approvals[0]?.expectedPreviewGenerationStatus,
+      previewSlug: fake.state.approvals[0]?.previewSlug,
+    },
+    {
+      expectedPreviewGenerationStatus: "composition_unavailable",
+      previewSlug: "bright-accounting",
+    },
+  );
 });
 
 test("publishes a draft preview when source-backed narratives are verbose", async () => {

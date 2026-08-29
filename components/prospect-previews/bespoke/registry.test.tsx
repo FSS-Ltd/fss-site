@@ -4,6 +4,8 @@ import test from "node:test";
 
 import { renderToStaticMarkup } from "react-dom/server";
 
+import { resolveKnownBespokePreviewSlug } from "@/lib/growth/prospect-previews/preview-slugs";
+
 import {
   bespokeProspectPages,
   getBespokeProspectPage,
@@ -41,6 +43,12 @@ test("every prospect owns a distinct layout and hero-scene signature", () => {
 
   assert.equal(new Set(entries.map((entry) => entry.layoutSignature)).size, 14);
   assert.equal(new Set(entries.map((entry) => entry.heroSignature)).size, 14);
+});
+
+test("every bespoke prospect page is recognised by the Growth OS preview resolver", () => {
+  for (const [slug, entry] of Object.entries(bespokeProspectPages)) {
+    assert.equal(resolveKnownBespokePreviewSlug(entry.businessName), slug);
+  }
 });
 
 test("every page renders its evidence-backed statement and a disclosed demo form", () => {

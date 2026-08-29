@@ -28,11 +28,9 @@ export function isPreviewSlug(slug: string): boolean {
   return PREVIEW_SLUG_PATTERN.test(slug);
 }
 
-export function resolveConceptPreviewSlug({
-  businessName,
-  slug,
-}: ConceptPreviewSlugInput): string | null {
-  if (slug && isPreviewSlug(slug)) return slug;
+export function resolveKnownBespokePreviewSlug(
+  businessName: string | null | undefined,
+): string | null {
   if (!businessName) return null;
 
   return (
@@ -40,6 +38,15 @@ export function resolveConceptPreviewSlug({
       normaliseBusinessName(businessName),
     ) ?? null
   );
+}
+
+export function resolveConceptPreviewSlug({
+  businessName,
+  slug,
+}: ConceptPreviewSlugInput): string | null {
+  if (slug && isPreviewSlug(slug)) return slug;
+
+  return resolveKnownBespokePreviewSlug(businessName);
 }
 
 function normaliseBusinessName(businessName: string): string {
