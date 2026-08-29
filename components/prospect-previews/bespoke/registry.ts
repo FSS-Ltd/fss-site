@@ -5,6 +5,7 @@ import { DunkleysOfDealPage } from "./prospects/dunkley-s-of-deal";
 import { EvoKentRoofingPage } from "./prospects/evo-kent-roofing";
 import { FugglesBeerCafePage } from "./prospects/fuggles-beer-cafe";
 import { HideAndFoxPage } from "./prospects/hide-and-fox";
+import { JaguarPlumbingPage } from "./prospects/jaguar-plumbing";
 import { KentGarageEquipmentPage } from "./prospects/kent-garage-equipment";
 import { MardenGaragePage } from "./prospects/marden-garage";
 import { PaperstonePage } from "./prospects/paperstone";
@@ -76,6 +77,15 @@ export const bespokeProspectPages = {
       "Plan a tasting-menu experience, wine pairing or exclusive hire with the detail considered early.",
     layoutSignature: "midnight-tasting-editorial",
     heroSignature: "floating-tasting-plate",
+  },
+  "jaguar-plumbing": {
+    Page: JaguarPlumbingPage,
+    businessName: "Jaguar Plumbing",
+    title: "Plumbing, heating and drainage in Dartford and Kent",
+    description:
+      "Route emergency, repair and planned plumbing, heating and drainage enquiries with useful context.",
+    layoutSignature: "premium-service-brief",
+    heroSignature: "emergency-repair-plan-control-panel",
   },
   "kent-garage-equipment": {
     Page: KentGarageEquipmentPage,
