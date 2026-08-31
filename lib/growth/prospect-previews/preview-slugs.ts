@@ -5,6 +5,7 @@ const BESPOKE_PREVIEW_SLUGS_BY_BUSINESS_NAME = new Map(
     ["Bright Accounting Ltd", "bright-accounting"],
     ["Bright Fox Lettings", "bright-fox-lettings"],
     ["Burfords", "burfords"],
+    ["Doorknobs", "doorknobs"],
     ["Dunkley's of Deal", "dunkley-s-of-deal"],
     ["Evo Kent Roofing", "evo-kent-roofing"],
     ["Fuggles Beer Cafe", "fuggles-beer-cafe"],

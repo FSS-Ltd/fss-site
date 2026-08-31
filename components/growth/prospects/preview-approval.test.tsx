@@ -78,6 +78,29 @@ test("opens a known bespoke draft concept by business name when the stored slug 
   assert.match(html, />View concept preview</);
 });
 
+test("opens Doorknobs at its bespoke concept route when the stored slug is missing", () => {
+  const html = renderToStaticMarkup(
+    <PreviewApprovalFrame
+      businessName="Doorknobs Limited"
+      onSuccess={() => undefined}
+      preview={{
+        status: "draft",
+        slug: null,
+        version: 1,
+        compositionDigest: "a".repeat(64),
+        generationStatus: "merged_draft",
+        generationPrNumber: 169,
+      }}
+      prospectId="fed7f3ad-b90c-47ce-a64f-308b7bfe847d"
+      prospectVersion={1}
+      prospectStatus="ready_for_email_review"
+    />,
+  );
+
+  assert.match(html, /href="\/preview\/doorknobs"/);
+  assert.match(html, />View concept preview</);
+});
+
 test("treats a registered bespoke concept as ready for founder approval", () => {
   const html = renderToStaticMarkup(
     <PreviewApprovalFrame

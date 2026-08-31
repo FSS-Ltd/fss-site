@@ -34,6 +34,16 @@ test("opens known bespoke concepts by business name when the stored slug is miss
   );
 });
 
+test("opens Doorknobs' bespoke concept by business name when the stored slug is missing", () => {
+  assert.equal(
+    getConceptPreviewHref({
+      businessName: "Doorknobs Limited",
+      slug: null,
+    }),
+    "/preview/doorknobs",
+  );
+});
+
 test("does not build links for malformed preview slugs", () => {
   assert.equal(
     getConceptPreviewHref({
