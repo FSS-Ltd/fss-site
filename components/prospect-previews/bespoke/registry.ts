@@ -15,6 +15,7 @@ import { PaperstonePage } from "./prospects/paperstone";
 import { PrimelineRoofingPage } from "./prospects/primeline-roofing";
 import { PriorityPointPage } from "./prospects/priority-point";
 import { SealeysWalkerJarvisPage } from "./prospects/sealeys-walker-jarvis";
+import { StaggHomesPage } from "./prospects/stagg-homes";
 import { WormaldAccountantsPage } from "./prospects/wormald-accountants";
 import type { BespokeProspectPage } from "./types";
 
@@ -171,6 +172,15 @@ export const bespokeProspectPages = {
       "Route residential, lettings, commercial and auction enquiries with the right property context.",
     layoutSignature: "yellow-property-switchboard",
     heroSignature: "dimensional-gravesend-terrace",
+  },
+  "stagg-homes": {
+    Page: StaggHomesPage,
+    businessName: "Stagg Homes",
+    title: "Owner-led property sales and lettings in Kent",
+    description:
+      "A clearer property journey with local Kent knowledge and one consistent point of contact.",
+    layoutSignature: "cinematic-owner-led-property-journey",
+    heroSignature: "scroll-linked-kent-home-walkthrough",
   },
   "wormald-accountants": {
     Page: WormaldAccountantsPage,

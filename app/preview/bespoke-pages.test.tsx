@@ -8,16 +8,17 @@ import ProspectPreviewPage, {
   generateStaticParams,
 } from "./[slug]/page";
 
-test("prerenders the eighteen public-unlisted bespoke prospect slugs", () => {
+test("prerenders the nineteen public-unlisted bespoke prospect slugs", () => {
   const params = generateStaticParams();
   const slugs: readonly string[] = params.map(({ slug }) => slug);
 
-  assert.equal(params.length, 18);
+  assert.equal(params.length, 19);
   assert.equal(slugs.includes("bridgland-roofing"), true);
   assert.equal(slugs.includes("bright-accounting"), true);
   assert.equal(slugs.includes("doorknobs"), true);
   assert.equal(slugs.includes("kemsing-motor-company"), true);
   assert.equal(slugs.includes("priority-point"), true);
+  assert.equal(slugs.includes("stagg-homes"), true);
   assert.equal(slugs.includes("macknade"), false);
 });
 

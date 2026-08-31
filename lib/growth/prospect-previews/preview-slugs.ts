@@ -20,6 +20,7 @@ const BESPOKE_PREVIEW_SLUGS_BY_BUSINESS_NAME = new Map(
     ["Primeline Roofing", "primeline-roofing"],
     ["Priority Point", "priority-point"],
     ["Sealeys Walker Jarvis", "sealeys-walker-jarvis"],
+    ["Stagg Homes", "stagg-homes"],
     ["Wormald Accountants", "wormald-accountants"],
   ].map(([businessName, slug]) => [normaliseBusinessName(businessName), slug]),
 );
