@@ -8,15 +8,32 @@ import ProspectPreviewPage, {
   generateStaticParams,
 } from "./[slug]/page";
 
-test("prerenders the sixteen public-unlisted bespoke prospect slugs", () => {
+test("prerenders the seventeen public-unlisted bespoke prospect slugs", () => {
   const params = generateStaticParams();
   const slugs: readonly string[] = params.map(({ slug }) => slug);
 
-  assert.equal(params.length, 16);
+  assert.equal(params.length, 17);
   assert.equal(slugs.includes("bright-accounting"), true);
   assert.equal(slugs.includes("doorknobs"), true);
   assert.equal(slugs.includes("kemsing-motor-company"), true);
+  assert.equal(slugs.includes("priority-point"), true);
   assert.equal(slugs.includes("macknade"), false);
+});
+
+test("resolves Priority Point's accountancy journey and metadata", async () => {
+  const page = await ProspectPreviewPage({
+    params: Promise.resolve({ slug: "priority-point" }),
+  });
+  const html = renderToStaticMarkup(page);
+  const metadata = await generateMetadata({
+    params: Promise.resolve({ slug: "priority-point" }),
+  });
+
+  assert.match(html, /data-bespoke-prospect="priority-point"/);
+  assert.match(html, /Company registration/i);
+  assert.match(String(metadata.title), /Priority Point/i);
+  assert.match(String(metadata.description), /accountancy/i);
+  assert.deepEqual(metadata.robots, { index: false, follow: false });
 });
 
 test("resolves a merged bespoke page without a published database record", async () => {

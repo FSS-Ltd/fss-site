@@ -28,11 +28,12 @@ const expectedSlugs = [
   "marden-garage",
   "paperstone",
   "primeline-roofing",
+  "priority-point",
   "sealeys-walker-jarvis",
   "wormald-accountants",
 ] as const;
 
-test("registers exactly the sixteen active bespoke prospect pages", () => {
+test("registers exactly the seventeen active bespoke prospect pages", () => {
   assert.deepEqual(
     [...getBespokeProspectSlugs()].sort(),
     [...expectedSlugs].sort(),
@@ -43,8 +44,8 @@ test("registers exactly the sixteen active bespoke prospect pages", () => {
 test("every prospect owns a distinct layout and hero-scene signature", () => {
   const entries = Object.values(bespokeProspectPages);
 
-  assert.equal(new Set(entries.map((entry) => entry.layoutSignature)).size, 16);
-  assert.equal(new Set(entries.map((entry) => entry.heroSignature)).size, 16);
+  assert.equal(new Set(entries.map((entry) => entry.layoutSignature)).size, 17);
+  assert.equal(new Set(entries.map((entry) => entry.heroSignature)).size, 17);
 });
 
 test("every bespoke prospect page is recognised by the Growth OS preview resolver", () => {
@@ -98,10 +99,7 @@ test("keeps Dunkley's scroll transition compact before vehicle booking", () => {
     "utf8",
   );
 
-  assert.match(
-    styles,
-    /\[data-dunkley-scroll-hero\] \{\s+height: 145svh;/,
-  );
+  assert.match(styles, /\[data-dunkley-scroll-hero\] \{\s+height: 145svh;/);
   assert.match(
     styles,
     /\[data-dunkley-scroll-hero\] \+ #vehicle \{\s+margin-top: -100svh;/,
@@ -117,7 +115,10 @@ test("keeps Dunkley's scroll transition compact before vehicle booking", () => {
 
   const formIndex = html.indexOf('data-demo-form="Dunkley&#x27;s of Deal"');
   assert.ok(formIndex > 0);
-  assert.doesNotMatch(html.slice(formIndex - 160, formIndex), /prospect-reveal/);
+  assert.doesNotMatch(
+    html.slice(formIndex - 160, formIndex),
+    /prospect-reveal/,
+  );
 });
 
 test("renders Bright Accounting as a premium evidence-led demo", () => {
