@@ -15,6 +15,7 @@ test("locks approval state, publishes the preview, saves the email, and audits a
     if (text.startsWith("select p.id as \"prospectId\"")) {
       return [
         {
+          businessName: "Marden Garage",
           prospectId: "prospect-id",
           prospectStatus: "ready_for_email_review",
           prospectVersion: 3,
@@ -54,6 +55,9 @@ test("locks approval state, publishes the preview, saves the email, and audits a
         expectedProspectVersion: 3,
         previewId: "preview-id",
         expectedPreviewVersion: 1,
+        expectedPreviewGenerationStatus: "merged_draft",
+        publishedPreviewGenerationStatus: "published",
+        previewSlug: "marden-garage",
         draftTaskId: "draft-id",
         outputSnapshot: { schemaVersion: "1.0", draftVersion: 2 },
         approvedAt: new Date("2026-08-26T10:00:00.000Z"),
@@ -70,14 +74,25 @@ test("locks approval state, publishes the preview, saves the email, and audits a
   );
 
   assert.equal(result?.preview.publicId, "Q2VhN4A7x6Y0-5s8V3d1K9PqRcFhZ9Xm");
+  assert.equal(result?.prospect.businessName, "Marden Garage");
   assert.match(queries[0]?.text ?? "", /growth\.prospect_previews/);
+  assert.match(queries[0]?.text ?? "", /growth\.businesses/);
   assert.match(queries[0]?.text ?? "", /for update of p, pp, wa, at$/);
   assert.match(queries[1]?.text ?? "", /growth\.sequence_enrollments/);
   assert.match(queries[2]?.text ?? "", /version = version \+ 1/);
   assert.match(queries[3]?.text ?? "", /status = 'published'/);
-  assert.match(queries[3]?.text ?? "", /generation_status = 'published'/);
-  assert.match(queries[3]?.text ?? "", /generation_status = 'merged_draft'/);
+  assert.match(queries[3]?.text ?? "", /slug = \?/);
+  assert.match(queries[3]?.text ?? "", /generation_status = \?/);
   assert.match(queries[3]?.text ?? "", /approved_by = \?/);
+  assert.deepEqual(queries[3]?.values, [
+    "published",
+    "marden-garage",
+    new Date("2026-08-26T10:00:00.000Z"),
+    "a".repeat(64),
+    "preview-id",
+    "merged_draft",
+    1,
+  ]);
   assert.match(queries[4]?.text ?? "", /set output_snapshot = \?/);
   assert.match(queries[5]?.text ?? "", /insert into growth\.audit_log/);
   assert.deepEqual(queries[5]?.values.slice(0, 6), [
@@ -87,5 +102,59 @@ test("locks approval state, publishes the preview, saves the email, and audits a
     "prospect_preview.approved",
     "prospect_preview",
     "preview-id",
+  ]);
+});
+
+test("publishes a bespoke preview without requiring generated package metadata", async () => {
+  const queries: Array<{ text: string; values: readonly unknown[] }> = [];
+  const transaction = (async (
+    strings: TemplateStringsArray,
+    ...values: readonly unknown[]
+  ) => {
+    const text = strings.join("?").replace(/\s+/g, " ").trim();
+    queries.push({ text, values });
+    if (text.startsWith("update growth.prospects")) return [{ id: "prospect-id" }];
+    if (text.startsWith("update growth.prospect_previews")) return [{ id: "preview-id" }];
+    if (text.startsWith("update growth.agent_tasks")) return [{ id: "draft-id" }];
+    return [];
+  }) as unknown as GrowthTransaction;
+  Object.assign(transaction, { json: (value: unknown) => value });
+  const db = {
+    begin: async <T>(operation: (tx: GrowthTransaction) => Promise<T>) =>
+      operation(transaction),
+  } as unknown as GrowthDb;
+
+  await postgresProspectPreviewApprovalRepository.withTransaction(
+    db,
+    async (tx) => {
+      await tx.publishPreviewAndSaveEmail({
+        prospectId: "prospect-id",
+        expectedProspectVersion: 3,
+        previewId: "preview-id",
+        expectedPreviewVersion: 1,
+        expectedPreviewGenerationStatus: "composition_unavailable",
+        publishedPreviewGenerationStatus: "composition_unavailable",
+        previewSlug: "bright-accounting",
+        draftTaskId: "draft-id",
+        outputSnapshot: { schemaVersion: "1.0", draftVersion: 2 },
+        approvedAt: new Date("2026-08-29T18:45:00.000Z"),
+        approvedBy: "a".repeat(64),
+      });
+    },
+  );
+
+  const previewUpdate = queries.find((query) =>
+    query.text.startsWith("update growth.prospect_previews"),
+  );
+  assert.match(previewUpdate?.text ?? "", /generation_status = \?/);
+  assert.doesNotMatch(previewUpdate?.text ?? "", /generation_status = 'published'/);
+  assert.deepEqual(previewUpdate?.values, [
+    "composition_unavailable",
+    "bright-accounting",
+    new Date("2026-08-29T18:45:00.000Z"),
+    "a".repeat(64),
+    "preview-id",
+    "composition_unavailable",
+    1,
   ]);
 });

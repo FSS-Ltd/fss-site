@@ -7,6 +7,7 @@ import { EvoKentRoofingPage } from "./prospects/evo-kent-roofing";
 import { FugglesBeerCafePage } from "./prospects/fuggles-beer-cafe";
 import { HideAndFoxPage } from "./prospects/hide-and-fox";
 import { JaguarPlumbingPage } from "./prospects/jaguar-plumbing";
+import { KemsingMotorCompanyPage } from "./prospects/kemsing-motor-company";
 import { KentGarageEquipmentPage } from "./prospects/kent-garage-equipment";
 import { MardenGaragePage } from "./prospects/marden-garage";
 import { PaperstonePage } from "./prospects/paperstone";
@@ -96,6 +97,15 @@ export const bespokeProspectPages = {
       "Route emergency, repair and planned plumbing, heating and drainage enquiries with useful context.",
     layoutSignature: "premium-service-brief",
     heroSignature: "emergency-repair-plan-control-panel",
+  },
+  "kemsing-motor-company": {
+    Page: KemsingMotorCompanyPage,
+    businessName: "Kemsing Motor Company",
+    title: "MOT, diagnostics and vehicle servicing in Kemsing",
+    description:
+      "Prepare an MOT, service, diagnostic or repair request with the vehicle details Kemsing Motor Company needs.",
+    layoutSignature: "precision-vehicle-assembly",
+    heroSignature: "scroll-linked-exploded-hatchback",
   },
   "kent-garage-equipment": {
     Page: KentGarageEquipmentPage,

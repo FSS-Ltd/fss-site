@@ -1,22 +1,20 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
-import {
-  getPublishedProspectPreview,
-  type PublishedProspectPreview,
-} from "@/lib/growth/prospect-previews/public-repository";
+import { getConceptPreviewHref } from "@/components/growth/prospects/concept-preview-href";
+import { getPublishedProspectPreviewSlug } from "@/lib/growth/prospect-previews/public-repository";
 
-import { ProductionProspectPreview } from "./production-prospect-preview";
-
-type PreviewLoader = (
+type PreviewSlugLoader = (
   publicId: string,
-) => Promise<PublishedProspectPreview | null>;
+) => Promise<string | null>;
 
-export async function renderProductionProspectPreviewPage(
+export async function redirectProductionProspectPreviewPage(
   publicId: string,
-  loadPreview: PreviewLoader = getPublishedProspectPreview,
+  loadPreviewSlug: PreviewSlugLoader = getPublishedProspectPreviewSlug,
 ) {
-  const preview = await loadPreview(publicId);
-  if (!preview) notFound();
+  const previewHref = getConceptPreviewHref({
+    slug: await loadPreviewSlug(publicId),
+  });
+  if (!previewHref) notFound();
 
-  return <ProductionProspectPreview preview={preview} />;
+  redirect(previewHref);
 }

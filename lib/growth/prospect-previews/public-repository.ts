@@ -1,28 +1,24 @@
 import { getGrowthDb } from "../db/client";
 import type { GrowthQueryExecutor } from "../db/types";
 import {
-  parseStoredProspectPreviewSnapshot,
   PROSPECT_PREVIEW_PUBLIC_ID_PATTERN,
-  type StoredProspectPreviewSnapshot,
 } from "./types";
-
-const PREVIEW_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-
-export type PublishedProspectPreview = {
-  publicId: string;
-  status: "published";
-  content: StoredProspectPreviewSnapshot;
-};
-
-type PublishedPreviewRow = {
-  publicId: string;
-  content: unknown;
-};
+import {
+  isPreviewSlug,
+  resolveConceptPreviewSlug,
+  resolveKnownBespokePreviewSlug,
+} from "./preview-slugs";
 
 type PublishedCompositionRow = {
   prospectId: string;
   slug: string;
   compositionDigest: string;
+};
+
+type PublishedPreviewSlugRow = {
+  businessName: string;
+  generationStatus: string;
+  slug: string | null;
 };
 
 export type PublishedPreviewComposition = {
@@ -31,33 +27,39 @@ export type PublishedPreviewComposition = {
   digest: string;
 };
 
-export async function getPublishedProspectPreview(
+export async function getPublishedProspectPreviewSlug(
   publicId: string,
   db: GrowthQueryExecutor = getGrowthDb(),
-): Promise<PublishedProspectPreview | null> {
+): Promise<string | null> {
   if (!PROSPECT_PREVIEW_PUBLIC_ID_PATTERN.test(publicId)) return null;
 
-  const rows = await db<PublishedPreviewRow[]>`
+  const rows = await db<PublishedPreviewSlugRow[]>`
     select
-      public_id as "publicId",
-      content_snapshot as "content"
-    from growth.prospect_previews
-    where public_id = ${publicId}
-      and status = 'published'
+      coalesce(b.trading_name, b.legal_name) as "businessName",
+      pp.generation_status as "generationStatus",
+      pp.slug
+    from growth.prospect_previews pp
+    inner join growth.prospects p on p.id = pp.prospect_id
+    inner join growth.businesses b on b.id = p.business_id
+    where pp.public_id = ${publicId}
+      and pp.status = 'published'
+      and pp.generation_status in ('published', 'composition_unavailable')
     limit 1
   `;
   const row = rows[0];
   if (!row) return null;
 
-  try {
-    return {
-      publicId: row.publicId,
-      status: "published",
-      content: parseStoredProspectPreviewSnapshot(row.content),
-    };
-  } catch {
-    return null;
+  if (row.generationStatus === "composition_unavailable") {
+    const bespokeSlug = resolveKnownBespokePreviewSlug(row.businessName);
+    if (bespokeSlug === null) return null;
+    if (row.slug !== null && row.slug !== bespokeSlug) return null;
+    return bespokeSlug;
   }
+
+  return resolveConceptPreviewSlug({
+    businessName: row.businessName,
+    slug: row.slug,
+  });
 }
 
 export async function getPublishedProspectPreviewCompositionBySlug<
@@ -67,7 +69,7 @@ export async function getPublishedProspectPreviewCompositionBySlug<
   db: GrowthQueryExecutor,
   resolveComposition: (slug: string) => TComposition | null,
 ): Promise<TComposition | null> {
-  if (!PREVIEW_SLUG_PATTERN.test(slug)) return null;
+  if (!isPreviewSlug(slug)) return null;
 
   const rows = await db<PublishedCompositionRow[]>`
     select

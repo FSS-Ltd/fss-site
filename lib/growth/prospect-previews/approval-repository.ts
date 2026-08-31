@@ -26,6 +26,7 @@ function createTransaction(
     async lockApprovalState(prospectId) {
       const rows = await transaction<
         Array<{
+          businessName: string;
           prospectId: string;
           prospectStatus: string;
           prospectVersion: number;
@@ -48,6 +49,7 @@ function createTransaction(
       >`
         select
           p.id as "prospectId",
+          coalesce(b.trading_name, b.legal_name) as "businessName",
           p.status as "prospectStatus",
           p.version as "prospectVersion",
           pp.id as "previewId",
@@ -73,6 +75,7 @@ function createTransaction(
           at.output_snapshot as "outputSnapshot",
           at.completed_at as "completedAt"
         from growth.prospects p
+        inner join growth.businesses b on b.id = p.business_id
         inner join growth.prospect_previews pp on pp.prospect_id = p.id
         inner join growth.website_assessments wa on wa.prospect_id = p.id
         inner join growth.agent_tasks at on (
@@ -97,6 +100,7 @@ function createTransaction(
 
       return {
         prospect: {
+          businessName: row.businessName,
           id: row.prospectId,
           status: row.prospectStatus,
           version: row.prospectVersion,
@@ -143,7 +147,8 @@ function createTransaction(
       const previewRows = await transaction<Array<{ id: string }>>`
         update growth.prospect_previews
         set status = 'published',
-            generation_status = 'published',
+            generation_status = ${input.publishedPreviewGenerationStatus},
+            slug = ${input.previewSlug},
             approved_at = ${input.approvedAt},
             approved_by = ${input.approvedBy},
             withdrawn_at = null,
@@ -151,7 +156,7 @@ function createTransaction(
             updated_at = now()
         where id = ${input.previewId}
           and status = 'draft'
-          and generation_status = 'merged_draft'
+          and generation_status = ${input.expectedPreviewGenerationStatus}
           and version = ${input.expectedPreviewVersion}
         returning id
       `;

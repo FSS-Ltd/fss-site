@@ -4,7 +4,9 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState, type CSSProperties } from "react";
 
-import { getFounderConceptPreviewHref } from "./concept-preview-href";
+import { resolveKnownBespokePreviewSlug } from "@/lib/growth/prospect-previews/preview-slugs";
+
+import { getConceptPreviewHref } from "./concept-preview-href";
 
 const TERMINAL_PROSPECT_STATUSES = new Set([
   "won",
@@ -74,6 +76,7 @@ export type PreviewApprovalState = {
 };
 
 type PreviewApprovalFrameProps = {
+  businessName: string;
   onSuccess: () => void;
   preview: PreviewApprovalState | null;
   prospectId: string;
@@ -81,7 +84,38 @@ type PreviewApprovalFrameProps = {
   prospectVersion: number;
 };
 
-function describeSourcePackageStatus(preview: PreviewApprovalState): string {
+function hasReadyPreviewSource(
+  preview: PreviewApprovalState,
+  businessName: string,
+): boolean {
+  if (
+    preview.generationStatus === "merged_draft" &&
+    preview.compositionDigest !== null
+  ) {
+    return true;
+  }
+
+  const bespokeSlug = resolveKnownBespokePreviewSlug(businessName);
+  return (
+    preview.generationStatus === "composition_unavailable" &&
+    bespokeSlug !== null &&
+    (preview.slug === null || preview.slug === bespokeSlug)
+  );
+}
+
+function describeSourcePackageStatus(
+  preview: PreviewApprovalState,
+  businessName: string,
+): string {
+  const bespokeSlug = resolveKnownBespokePreviewSlug(businessName);
+  if (
+    preview.generationStatus === "composition_unavailable" &&
+    bespokeSlug !== null &&
+    (preview.slug === null || preview.slug === bespokeSlug)
+  ) {
+    return "Bespoke source package is merged and ready for approval.";
+  }
+
   switch (preview.generationStatus) {
     case "merged_draft":
       return "Source package is merged and ready for approval.";
@@ -99,6 +133,7 @@ function describeSourcePackageStatus(preview: PreviewApprovalState): string {
 }
 
 export function PreviewApprovalFrame({
+  businessName,
   onSuccess,
   preview,
   prospectId,
@@ -125,13 +160,24 @@ export function PreviewApprovalFrame({
   }
 
   if (preview.status === "published") {
+    const previewHref = getConceptPreviewHref({
+      businessName,
+      slug: preview.slug,
+    });
+
     return (
       <p className="text-sm leading-6 text-slate-700">
         <span className="mr-2 inline-block rounded-full bg-teal-50 px-2.5 py-1 text-xs font-semibold text-teal-700">
           Preview published
         </span>
-        The first-email
-        draft now includes the private concept link for review.
+        The first-email draft now includes the private concept link made for{" "}
+        {businessName}.
+        {previewHref && (
+          <>
+            {" "}
+            <Link href={previewHref}>View concept preview</Link>
+          </>
+        )}
       </p>
     );
   }
@@ -146,15 +192,20 @@ export function PreviewApprovalFrame({
 
   const terminal = TERMINAL_PROSPECT_STATUSES.has(prospectStatus);
   const draftPreview = preview;
-  const sourcePackageReady =
-    draftPreview.generationStatus === "merged_draft" &&
-    draftPreview.compositionDigest !== null;
+  const sourcePackageReady = hasReadyPreviewSource(draftPreview, businessName);
   const canRequestChanges =
     draftPreview.compositionDigest !== null &&
     (draftPreview.generationStatus === "pr_open" ||
       draftPreview.generationStatus === "merged_draft");
 
-  const sourcePackageStatus = describeSourcePackageStatus(draftPreview);
+  const sourcePackageStatus = describeSourcePackageStatus(
+    draftPreview,
+    businessName,
+  );
+  const previewHref = getConceptPreviewHref({
+    businessName,
+    slug: draftPreview.slug,
+  });
 
   async function approve(): Promise<void> {
     setPending(true);
@@ -240,8 +291,9 @@ export function PreviewApprovalFrame({
   return (
     <div className="flex flex-wrap items-center gap-3">
       <p className="basis-full text-sm leading-6 text-slate-600">
-        Approval publishes this private concept and refreshes the stored
-        first-email draft. It does not create a provider draft or send email.
+        This concept was made for {businessName}. Approval publishes it and
+        refreshes the stored first-email draft. It does not create a provider
+        draft or send email.
       </p>
       <p style={previewApprovalNoteStyle}>
         {sourcePackageStatus}
@@ -266,25 +318,24 @@ export function PreviewApprovalFrame({
       >
         {pending ? "Approving preview…" : "Approve preview"}
       </button>
-      <Link
-        href={getFounderConceptPreviewHref({
-          prospectId,
-          sourceSlug: preview.slug,
-        })}
-        style={{
-          alignItems: "center",
-          border: "1px solid #087f88",
-          borderRadius: 7,
-          color: "#087f88",
-          display: "inline-flex",
-          fontSize: "0.8rem",
-          fontWeight: 700,
-          padding: "7px 12px",
-          whiteSpace: "nowrap",
-        }}
-      >
-        View concept preview
-      </Link>
+      {previewHref && (
+        <Link
+          href={previewHref}
+          style={{
+            alignItems: "center",
+            border: "1px solid #087f88",
+            borderRadius: 7,
+            color: "#087f88",
+            display: "inline-flex",
+            fontSize: "0.8rem",
+            fontWeight: 700,
+            padding: "7px 12px",
+            whiteSpace: "nowrap",
+          }}
+        >
+          View concept preview
+        </Link>
+      )}
       {terminal && (
         <p className="basis-full text-sm text-slate-500">
           This prospect is in a final state and cannot publish a concept.

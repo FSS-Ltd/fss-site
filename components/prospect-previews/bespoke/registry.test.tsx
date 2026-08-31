@@ -4,6 +4,8 @@ import test from "node:test";
 
 import { renderToStaticMarkup } from "react-dom/server";
 
+import { resolveKnownBespokePreviewSlug } from "@/lib/growth/prospect-previews/preview-slugs";
+
 import {
   bespokeProspectPages,
   getBespokeProspectPage,
@@ -21,6 +23,7 @@ const expectedSlugs = [
   "fuggles-beer-cafe",
   "hide-and-fox",
   "jaguar-plumbing",
+  "kemsing-motor-company",
   "kent-garage-equipment",
   "marden-garage",
   "paperstone",
@@ -29,7 +32,7 @@ const expectedSlugs = [
   "wormald-accountants",
 ] as const;
 
-test("registers exactly the fifteen active bespoke prospect pages", () => {
+test("registers exactly the sixteen active bespoke prospect pages", () => {
   assert.deepEqual(
     [...getBespokeProspectSlugs()].sort(),
     [...expectedSlugs].sort(),
@@ -40,8 +43,14 @@ test("registers exactly the fifteen active bespoke prospect pages", () => {
 test("every prospect owns a distinct layout and hero-scene signature", () => {
   const entries = Object.values(bespokeProspectPages);
 
-  assert.equal(new Set(entries.map((entry) => entry.layoutSignature)).size, 15);
-  assert.equal(new Set(entries.map((entry) => entry.heroSignature)).size, 15);
+  assert.equal(new Set(entries.map((entry) => entry.layoutSignature)).size, 16);
+  assert.equal(new Set(entries.map((entry) => entry.heroSignature)).size, 16);
+});
+
+test("every bespoke prospect page is recognised by the Growth OS preview resolver", () => {
+  for (const [slug, entry] of Object.entries(bespokeProspectPages)) {
+    assert.equal(resolveKnownBespokePreviewSlug(entry.businessName), slug);
+  }
 });
 
 test("every page renders its evidence-backed statement and a disclosed demo form", () => {
@@ -58,7 +67,11 @@ test("every page renders its evidence-backed statement and a disclosed demo form
 });
 
 test("garage journeys ask for registration before service details", () => {
-  for (const slug of ["dunkley-s-of-deal", "marden-garage"] as const) {
+  for (const slug of [
+    "dunkley-s-of-deal",
+    "kemsing-motor-company",
+    "marden-garage",
+  ] as const) {
     const entry = getBespokeProspectPage(slug);
     assert.ok(entry);
     const html = renderToStaticMarkup(<entry.Page />);
@@ -67,15 +80,6 @@ test("garage journeys ask for registration before service details", () => {
       html.indexOf("Vehicle registration") < html.indexOf("What do you need"),
     );
   }
-});
-
-test("reserves the Doorknobs bespoke registry slot and future signatures", () => {
-  const entry = getBespokeProspectPage("doorknobs");
-
-  assert.ok(entry);
-  assert.equal(entry.businessName, "Doorknobs");
-  assert.match(entry.title, /Tunbridge Wells/i);
-  assert.equal(getBespokeProspectSlugs().includes("doorknobs"), true);
 });
 
 test("renders Dunkley's photographic hero as an immersive scroll introduction", () => {

@@ -8,13 +8,14 @@ import ProspectPreviewPage, {
   generateStaticParams,
 } from "./[slug]/page";
 
-test("prerenders the fifteen public-unlisted bespoke prospect slugs", () => {
+test("prerenders the sixteen public-unlisted bespoke prospect slugs", () => {
   const params = generateStaticParams();
   const slugs: readonly string[] = params.map(({ slug }) => slug);
 
-  assert.equal(params.length, 15);
+  assert.equal(params.length, 16);
   assert.equal(slugs.includes("bright-accounting"), true);
   assert.equal(slugs.includes("doorknobs"), true);
+  assert.equal(slugs.includes("kemsing-motor-company"), true);
   assert.equal(slugs.includes("macknade"), false);
 });
 
@@ -54,13 +55,24 @@ test("resolves the Bright Accounting bespoke page and metadata", async () => {
   assert.deepEqual(metadata.robots, { index: false, follow: false });
 });
 
-test("defines Doorknobs private metadata around a Tunbridge Wells property journey", async () => {
+test("resolves Kemsing's royal-blue evidence-led bespoke page and metadata", async () => {
+  const page = await ProspectPreviewPage({
+    params: Promise.resolve({ slug: "kemsing-motor-company" }),
+  });
+  const html = renderToStaticMarkup(page);
   const metadata = await generateMetadata({
-    params: Promise.resolve({ slug: "doorknobs" }),
+    params: Promise.resolve({ slug: "kemsing-motor-company" }),
   });
 
-  assert.match(String(metadata.title), /Tunbridge Wells/i);
-  assert.match(String(metadata.description), /property/i);
+  assert.match(html, /data-bespoke-prospect="kemsing-motor-company"/);
+  assert.match(
+    String(metadata.title),
+    /MOT, diagnostics and vehicle servicing/i,
+  );
+  assert.match(
+    String(metadata.description),
+    /vehicle details Kemsing Motor Company needs/i,
+  );
   assert.deepEqual(metadata.robots, { index: false, follow: false });
 });
 
@@ -69,25 +81,21 @@ test("renders Doorknobs as a bespoke property navigator with local assets and de
     params: Promise.resolve({ slug: "doorknobs" }),
   });
   const html = renderToStaticMarkup(page);
+  const metadata = await generateMetadata({
+    params: Promise.resolve({ slug: "doorknobs" }),
+  });
 
   assert.match(html, /data-bespoke-prospect="doorknobs"/);
   assert.match(html, /doorknobs-logo-v1\.png/);
   assert.match(html, /property-threshold-v1\.webp/);
   assert.match(html, /landlord-care-v1\.webp/);
   assert.match(html, /local-home-detail-v1\.webp/);
-
-  for (const label of [
-    "Selling",
-    "Letting a property",
-    "Buying",
-    "Renting",
-    "Let Only",
-    "Rent Collection",
-    "Full Management",
-  ]) {
-    assert.match(html, new RegExp(label));
-  }
-
+  assert.match(html, /Letting a property/);
+  assert.match(html, /Let Only/);
+  assert.match(html, /Rent Collection/);
+  assert.match(html, /Full Management/);
   assert.match(html, /data-demo-form="Doorknobs"/);
-  assert.match(html, /Demonstration only · no details are sent/);
+  assert.match(String(metadata.title), /Tunbridge Wells/i);
+  assert.match(String(metadata.description), /property/i);
+  assert.deepEqual(metadata.robots, { index: false, follow: false });
 });

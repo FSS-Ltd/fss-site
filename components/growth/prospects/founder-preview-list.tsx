@@ -5,7 +5,7 @@ import type {
 } from "@/lib/growth/prospect-previews/founder-review";
 import type { ViewState } from "@/lib/growth/dashboard/view-models";
 
-import { getFounderConceptPreviewHref } from "./concept-preview-href";
+import { getConceptPreviewHref } from "./concept-preview-href";
 import { PreviewApproval } from "./preview-approval";
 import styles from "./prospects.module.css";
 
@@ -51,42 +51,47 @@ export function FounderPreviewList({
       </p>
 
       <ul className={styles.previewReviewList} aria-label="Private concept previews">
-        {state.data.map((preview) => (
-          <li className={styles.previewReviewCard} key={preview.prospectId}>
-            <div className={styles.previewReviewCardHeader}>
-              <div>
-                <h2 className={styles.previewReviewCardHeading}>{preview.businessName}</h2>
-                <p className={styles.previewReviewCardDescription}>
-                  Draft website concept, ready for founder review.
-                </p>
+        {state.data.map((preview) => {
+          const previewHref = getConceptPreviewHref({
+            businessName: preview.businessName,
+            slug: preview.slug,
+          });
+
+          return (
+            <li className={styles.previewReviewCard} key={preview.prospectId}>
+              <div className={styles.previewReviewCardHeader}>
+                <div>
+                  <h2 className={styles.previewReviewCardHeading}>{preview.businessName}</h2>
+                  <p className={styles.previewReviewCardDescription}>
+                    Private concept made for {preview.businessName}, ready for
+                    founder review.
+                  </p>
+                </div>
+                {previewHref && (
+                  <Link className={styles.rowLink} href={previewHref}>
+                    View concept preview
+                  </Link>
+                )}
               </div>
-              <Link
-                className={styles.rowLink}
-                href={getFounderConceptPreviewHref({
-                  prospectId: preview.prospectId,
-                  sourceSlug: preview.slug,
-                })}
-              >
-                View concept preview
-              </Link>
-            </div>
-            <div className={styles.previewReviewApproval}>
-              <PreviewApproval
-                preview={{
-                  status: "draft",
-                  version: preview.previewVersion,
-                  compositionDigest: preview.compositionDigest,
-                  generationPrNumber: preview.generationPrNumber,
-                  generationStatus: preview.generationStatus,
-                  slug: preview.slug,
-                }}
-                prospectId={preview.prospectId}
-                prospectStatus={preview.prospectStatus}
-                prospectVersion={preview.prospectVersion}
-              />
-            </div>
-          </li>
-        ))}
+              <div className={styles.previewReviewApproval}>
+                <PreviewApproval
+                  businessName={preview.businessName}
+                  preview={{
+                    status: "draft",
+                    version: preview.previewVersion,
+                    compositionDigest: preview.compositionDigest,
+                    generationPrNumber: preview.generationPrNumber,
+                    generationStatus: preview.generationStatus,
+                    slug: preview.slug,
+                  }}
+                  prospectId={preview.prospectId}
+                  prospectStatus={preview.prospectStatus}
+                  prospectVersion={preview.prospectVersion}
+                />
+              </div>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

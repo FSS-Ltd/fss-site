@@ -1,18 +1,14 @@
-type ConceptPreviewHrefInput = {
-  prospectId: string;
-};
+import {
+  resolveConceptPreviewSlug,
+  type ConceptPreviewSlugInput,
+} from "@/lib/growth/prospect-previews/preview-slugs";
 
 export function getConceptPreviewHref({
-  prospectId,
-}: ConceptPreviewHrefInput): string {
-  return `/growth/prospects/${prospectId}/preview`;
-}
+  businessName,
+  slug,
+}: ConceptPreviewSlugInput): string | null {
+  const previewSlug = resolveConceptPreviewSlug({ businessName, slug });
+  if (!previewSlug) return null;
 
-export function getFounderConceptPreviewHref(input: {
-  prospectId: string;
-  sourceSlug: string | null;
-}): string {
-  if (input.sourceSlug) return `/preview/${input.sourceSlug}`;
-
-  return getConceptPreviewHref({ prospectId: input.prospectId });
+  return `/preview/${previewSlug}`;
 }

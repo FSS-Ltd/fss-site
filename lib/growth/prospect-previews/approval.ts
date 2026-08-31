@@ -20,11 +20,14 @@ import { getMergedProspectPreviewCompositionByProspectId } from "./compositions/
 import {
   prospectPreviewAssessmentSectionSchema,
 } from "./types";
+import {
+  isPreviewSlug,
+  resolveKnownBespokePreviewSlug,
+} from "./preview-slugs";
 
 const PROSPECT_ID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const FOUNDER_ACTOR_ID_PATTERN = /^[0-9a-f]{64}$/;
-const PREVIEW_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const TERMINAL_PROSPECT_STATUSES = new Set([
   "won",
   "lost",
@@ -34,6 +37,7 @@ const TERMINAL_PROSPECT_STATUSES = new Set([
 
 export type LockedProspectPreviewApprovalState = {
   prospect: {
+    businessName: string;
     id: string;
     status: string;
     version: number;
@@ -61,6 +65,9 @@ export type PublishPreviewAndSaveEmailInput = {
   expectedProspectVersion: number;
   previewId: string;
   expectedPreviewVersion: number;
+  expectedPreviewGenerationStatus: "merged_draft" | "composition_unavailable";
+  publishedPreviewGenerationStatus: "published" | "composition_unavailable";
+  previewSlug: string;
   draftTaskId: string;
   outputSnapshot: Record<string, unknown>;
   approvedAt: Date;
@@ -175,7 +182,7 @@ function readEmailNarrative(
 }
 
 function previewUrl(siteUrl: string, slug: string): string {
-  if (!PREVIEW_SLUG_PATTERN.test(slug)) {
+  if (!isPreviewSlug(slug)) {
     throw new ProspectPreviewApprovalError("not_publishable");
   }
   return new URL(`/preview/${slug}`, siteUrl).toString();
@@ -186,6 +193,12 @@ type ResolvedPreviewComposition = {
   digest: string;
 };
 
+type ResolvedPreviewApprovalSource = {
+  expectedGenerationStatus: "merged_draft" | "composition_unavailable";
+  publishedGenerationStatus: "published" | "composition_unavailable";
+  slug: string;
+};
+
 type ProspectPreviewApproverDependencies = {
   repository: ProspectPreviewApprovalRepository;
   now?: () => Date;
@@ -194,6 +207,46 @@ type ProspectPreviewApproverDependencies = {
     prospectId: string,
   ) => ResolvedPreviewComposition | null;
 };
+
+function resolvePreviewApprovalSource(
+  state: LockedProspectPreviewApprovalState,
+  resolveComposition: (
+    prospectId: string,
+  ) => ResolvedPreviewComposition | null,
+): ResolvedPreviewApprovalSource | null {
+  if (
+    state.preview.generationStatus === "merged_draft" &&
+    state.preview.slug !== null &&
+    state.preview.compositionDigest !== null
+  ) {
+    const composition = resolveComposition(state.prospect.id);
+    if (
+      composition !== null &&
+      composition.prospectId === state.prospect.id &&
+      composition.digest === state.preview.compositionDigest
+    ) {
+      return {
+        expectedGenerationStatus: "merged_draft",
+        publishedGenerationStatus: "published",
+        slug: state.preview.slug,
+      };
+    }
+  }
+
+  if (state.preview.generationStatus === "composition_unavailable") {
+    const slug = resolveKnownBespokePreviewSlug(state.prospect.businessName);
+    if (slug === null) return null;
+    if (state.preview.slug !== null && state.preview.slug !== slug) return null;
+
+    return {
+      expectedGenerationStatus: "composition_unavailable",
+      publishedGenerationStatus: "composition_unavailable",
+      slug,
+    };
+  }
+
+  return null;
+}
 
 export function createProspectPreviewApprover({
   repository,
@@ -223,15 +276,11 @@ export function createProspectPreviewApprover({
       ) {
         throw new ProspectPreviewApprovalError("not_publishable");
       }
-      const composition = resolveComposition(state.prospect.id);
-      if (
-        state.preview.generationStatus !== "merged_draft" ||
-        state.preview.slug === null ||
-        state.preview.compositionDigest === null ||
-        composition === null ||
-        composition.prospectId !== state.prospect.id ||
-        composition.digest !== state.preview.compositionDigest
-      ) {
+      const previewSource = resolvePreviewApprovalSource(
+        state,
+        resolveComposition,
+      );
+      if (previewSource === null) {
         throw new ProspectPreviewApprovalError("not_publishable");
       }
 
@@ -260,7 +309,7 @@ export function createProspectPreviewApprover({
       const email = renderPreviewFirstEmail({
         subject: storedDraft.email.subject,
         narrative,
-        previewUrl: previewUrl(siteUrl, state.preview.slug),
+        previewUrl: previewUrl(siteUrl, previewSource.slug),
         optOutSentence: storedDraft.email.optOutSentence,
         conceptDisclaimer: storedDraft.email.conceptDisclaimer,
       });
@@ -286,6 +335,11 @@ export function createProspectPreviewApprover({
         expectedProspectVersion: input.expectedProspectVersion,
         previewId: state.preview.id,
         expectedPreviewVersion: input.expectedPreviewVersion,
+        expectedPreviewGenerationStatus:
+          previewSource.expectedGenerationStatus,
+        publishedPreviewGenerationStatus:
+          previewSource.publishedGenerationStatus,
+        previewSlug: previewSource.slug,
         draftTaskId: state.draft.id,
         outputSnapshot,
         approvedAt,

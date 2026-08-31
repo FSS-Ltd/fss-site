@@ -3,34 +3,52 @@ import test from "node:test";
 
 import {
   getConceptPreviewHref,
-  getFounderConceptPreviewHref,
 } from "./concept-preview-href";
 
-test("keeps drafted generated concepts inside the founder review route", () => {
+test("opens concept previews by slug", () => {
   assert.equal(
     getConceptPreviewHref({
-      prospectId: "11111111-1111-4111-8111-111111111111",
+      slug: "bright-accounting",
     }),
-    "/growth/prospects/11111111-1111-4111-8111-111111111111/preview",
+    "/preview/bright-accounting",
   );
 });
 
-test("uses a registered bespoke source when a legacy draft has no stored slug", () => {
+test("does not fall back to generated database-only preview routes", () => {
   assert.equal(
-    getFounderConceptPreviewHref({
-      prospectId: "11111111-1111-4111-8111-111111111111",
-      sourceSlug: "example-heating",
+    getConceptPreviewHref({
+      businessName: "Example Heating Ltd",
+      slug: null,
     }),
-    "/preview/example-heating",
+    null,
   );
 });
 
-test("does not treat a generated database slug as a bespoke public source", () => {
+test("opens known bespoke concepts by business name when the stored slug is missing", () => {
   assert.equal(
-    getFounderConceptPreviewHref({
-      prospectId: "11111111-1111-4111-8111-111111111111",
-      sourceSlug: null,
+    getConceptPreviewHref({
+      businessName: "Bright Accounting Ltd",
+      slug: null,
     }),
-    "/growth/prospects/11111111-1111-4111-8111-111111111111/preview",
+    "/preview/bright-accounting",
+  );
+});
+
+test("opens Doorknobs' bespoke concept by business name when the stored slug is missing", () => {
+  assert.equal(
+    getConceptPreviewHref({
+      businessName: "Doorknobs Limited",
+      slug: null,
+    }),
+    "/preview/doorknobs",
+  );
+});
+
+test("does not build links for malformed preview slugs", () => {
+  assert.equal(
+    getConceptPreviewHref({
+      slug: "../private",
+    }),
+    null,
   );
 });
