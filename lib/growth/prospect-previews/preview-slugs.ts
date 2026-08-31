@@ -10,6 +10,7 @@ const BESPOKE_PREVIEW_SLUGS_BY_BUSINESS_NAME = new Map(
     ["Fuggles Beer Cafe", "fuggles-beer-cafe"],
     ["Hide and Fox", "hide-and-fox"],
     ["Jaguar Plumbing", "jaguar-plumbing"],
+    ["Kemsing Motor Company", "kemsing-motor-company"],
     ["Kent Garage Equipment", "kent-garage-equipment"],
     ["Marden Garage", "marden-garage"],
     ["Paperstone", "paperstone"],
