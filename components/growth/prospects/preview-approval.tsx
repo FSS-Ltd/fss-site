@@ -14,6 +14,10 @@ const TERMINAL_PROSPECT_STATUSES = new Set([
   "rejected",
   "suppressed",
 ]);
+const BESPOKE_READY_GENERATION_STATUSES = new Set([
+  "pending_pr",
+  "composition_unavailable",
+]);
 
 const previewApprovalNoteStyle: CSSProperties = {
   color: "#475569",
@@ -95,25 +99,31 @@ function hasReadyPreviewSource(
     return true;
   }
 
+  return resolveReadyBespokePreviewSlug(preview, businessName) !== null;
+}
+
+function resolveReadyBespokePreviewSlug(
+  preview: PreviewApprovalState,
+  businessName: string,
+): string | null {
   const bespokeSlug = resolveKnownBespokePreviewSlug(businessName);
-  return (
-    preview.generationStatus === "composition_unavailable" &&
-    bespokeSlug !== null &&
-    (preview.slug === null || preview.slug === bespokeSlug)
-  );
+  if (
+    bespokeSlug === null ||
+    !BESPOKE_READY_GENERATION_STATUSES.has(preview.generationStatus ?? "") ||
+    (preview.slug !== null && preview.slug !== bespokeSlug)
+  ) {
+    return null;
+  }
+
+  return bespokeSlug;
 }
 
 function describeSourcePackageStatus(
   preview: PreviewApprovalState,
   businessName: string,
 ): string {
-  const bespokeSlug = resolveKnownBespokePreviewSlug(businessName);
-  if (
-    preview.generationStatus === "composition_unavailable" &&
-    bespokeSlug !== null &&
-    (preview.slug === null || preview.slug === bespokeSlug)
-  ) {
-    return "Bespoke source package is merged and ready for approval.";
+  if (resolveReadyBespokePreviewSlug(preview, businessName) !== null) {
+    return "Bespoke preview is registered and ready for approval.";
   }
 
   switch (preview.generationStatus) {

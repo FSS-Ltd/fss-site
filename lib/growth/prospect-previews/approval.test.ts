@@ -236,6 +236,49 @@ test("publishes a registered bespoke preview without a generated composition dig
   assert.equal(fake.state.preview.generationStatus, "composition_unavailable");
 });
 
+test("publishes a registered bespoke preview while generation reconciliation is pending", async () => {
+  for (const { businessName, slug } of [
+    { businessName: "PRIORITY POINT LIMITED", slug: "priority-point" },
+    { businessName: "BRIDGLAND LIMITED", slug: "bridgland-roofing" },
+  ]) {
+    const fake = createRepository();
+    Object.assign(fake.state.prospect, { businessName });
+    Object.assign(fake.state.preview, {
+      slug: null,
+      compositionDigest: null,
+      generationStatus: "pending_pr",
+    });
+    const approve = createProspectPreviewApprover({
+      repository: fake.repository,
+      now: () => new Date("2026-08-31T09:00:00.000Z"),
+      siteUrl: "https://faithfulsoftware.dev",
+      resolveComposition: () => null,
+    });
+
+    const result = await approve({} as GrowthDb, approvalInput());
+
+    assert.equal(result.status, "published");
+    assert.match(
+      String((fake.state.savedSnapshots[0]?.email as { text?: unknown }).text),
+      new RegExp(`https://faithfulsoftware\\.dev/preview/${slug}`),
+    );
+    assert.deepEqual(
+      {
+        expectedPreviewGenerationStatus:
+          fake.state.approvals[0]?.expectedPreviewGenerationStatus,
+        publishedPreviewGenerationStatus:
+          fake.state.approvals[0]?.publishedPreviewGenerationStatus,
+        previewSlug: fake.state.approvals[0]?.previewSlug,
+      },
+      {
+        expectedPreviewGenerationStatus: "pending_pr",
+        publishedPreviewGenerationStatus: "composition_unavailable",
+        previewSlug: slug,
+      },
+    );
+  }
+});
+
 test("publishes a draft preview when source-backed narratives are verbose", async () => {
   const fake = createRepository();
   const outputSnapshot = fake.state.draft.outputSnapshot as {

@@ -65,7 +65,10 @@ export type PublishPreviewAndSaveEmailInput = {
   expectedProspectVersion: number;
   previewId: string;
   expectedPreviewVersion: number;
-  expectedPreviewGenerationStatus: "merged_draft" | "composition_unavailable";
+  expectedPreviewGenerationStatus:
+    | "merged_draft"
+    | "pending_pr"
+    | "composition_unavailable";
   publishedPreviewGenerationStatus: "published" | "composition_unavailable";
   previewSlug: string;
   draftTaskId: string;
@@ -194,7 +197,10 @@ type ResolvedPreviewComposition = {
 };
 
 type ResolvedPreviewApprovalSource = {
-  expectedGenerationStatus: "merged_draft" | "composition_unavailable";
+  expectedGenerationStatus:
+    | "merged_draft"
+    | "pending_pr"
+    | "composition_unavailable";
   publishedGenerationStatus: "published" | "composition_unavailable";
   slug: string;
 };
@@ -233,13 +239,16 @@ function resolvePreviewApprovalSource(
     }
   }
 
-  if (state.preview.generationStatus === "composition_unavailable") {
+  if (
+    state.preview.generationStatus === "pending_pr" ||
+    state.preview.generationStatus === "composition_unavailable"
+  ) {
     const slug = resolveKnownBespokePreviewSlug(state.prospect.businessName);
     if (slug === null) return null;
     if (state.preview.slug !== null && state.preview.slug !== slug) return null;
 
     return {
-      expectedGenerationStatus: "composition_unavailable",
+      expectedGenerationStatus: state.preview.generationStatus,
       publishedGenerationStatus: "composition_unavailable",
       slug,
     };
