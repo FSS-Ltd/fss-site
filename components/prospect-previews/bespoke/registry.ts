@@ -7,6 +7,7 @@ import { DunkleysOfDealPage } from "./prospects/dunkley-s-of-deal";
 import { EvoKentRoofingPage } from "./prospects/evo-kent-roofing";
 import { FugglesBeerCafePage } from "./prospects/fuggles-beer-cafe";
 import { HideAndFoxPage } from "./prospects/hide-and-fox";
+import { HollisMotorsPage } from "./prospects/hollis-motors";
 import { JaguarPlumbingPage } from "./prospects/jaguar-plumbing";
 import { KemsingMotorCompanyPage } from "./prospects/kemsing-motor-company";
 import { KentGarageEquipmentPage } from "./prospects/kent-garage-equipment";
@@ -99,6 +100,15 @@ export const bespokeProspectPages = {
       "Plan a tasting-menu experience, wine pairing or exclusive hire with the detail considered early.",
     layoutSignature: "midnight-tasting-editorial",
     heroSignature: "floating-tasting-plate",
+  },
+  "hollis-motors": {
+    Page: HollisMotorsPage,
+    businessName: "Hollis Motors",
+    title: "Used cars, finance and vehicle care in Dover",
+    description:
+      "A dealership-led route for used cars, part exchange, finance, MOT, servicing and repair enquiries in Dover.",
+    layoutSignature: "premium-dealership-crossfade-gallery",
+    heroSignature: "locked-showroom-car-sequence",
   },
   "jaguar-plumbing": {
     Page: JaguarPlumbingPage,

@@ -3,7 +3,7 @@ import test from "node:test";
 
 import { resolveKnownBespokePreviewSlug } from "./preview-slugs";
 
-test("resolves Priority Point and Bridgland from legal or trading names", () => {
+test("resolves known bespoke previews from legal or trading names", () => {
   assert.equal(
     resolveKnownBespokePreviewSlug("PRIORITY POINT LIMITED"),
     "priority-point",
@@ -19,5 +19,13 @@ test("resolves Priority Point and Bridgland from legal or trading names", () => 
   assert.equal(
     resolveKnownBespokePreviewSlug("Bridgland Roofing"),
     "bridgland-roofing",
+  );
+  assert.equal(
+    resolveKnownBespokePreviewSlug("W. & G. HOLLIS LIMITED"),
+    "hollis-motors",
+  );
+  assert.equal(
+    resolveKnownBespokePreviewSlug("Hollis Motors"),
+    "hollis-motors",
   );
 });

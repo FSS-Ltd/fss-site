@@ -1725,3 +1725,430 @@ html {
     display: none;
   }
 }
+
+/* Hollis Motors dealership gallery. */
+.hollisPage {
+  --hollis-charcoal: #111214;
+  --hollis-red: #b9252a;
+}
+
+[data-hollis-showroom-gallery] {
+  background: var(--hollis-charcoal);
+  min-height: 100svh;
+  position: relative;
+}
+
+[data-hollis-showroom-frame] {
+  background: var(--hollis-charcoal);
+  isolation: isolate;
+  min-height: 100svh;
+  overflow: hidden;
+  position: relative;
+}
+
+[data-hollis-gallery-frame] {
+  inset: 0;
+  object-fit: cover;
+  object-position: center;
+  opacity: var(--hollis-gallery-opacity, 0);
+  position: absolute;
+  transition: opacity 120ms linear;
+  will-change: opacity;
+  z-index: -3;
+}
+
+[data-hollis-gallery-frame]:first-child {
+  --hollis-gallery-opacity: 1;
+}
+
+[data-hollis-gallery-shade] {
+  background:
+    linear-gradient(90deg, rgb(7 9 12 / 78%) 0%, rgb(7 9 12 / 54%) 32%, rgb(7 9 12 / 17%) 66%, rgb(7 9 12 / 6%) 100%),
+    linear-gradient(0deg, rgb(7 9 12 / 62%) 0%, transparent 44%);
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: -2;
+}
+
+.hollisHeroChrome,
+.hollisHeroCopy,
+.hollisProofDock,
+.hollisGalleryCounter {
+  left: max(1.25rem, calc((100% - 84rem) / 2 + 2rem));
+  position: absolute;
+  right: max(1.25rem, calc((100% - 84rem) / 2 + 2rem));
+  z-index: 1;
+}
+
+.hollisHeroChrome {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  top: clamp(1.25rem, 3vw, 2.25rem);
+}
+
+.hollisBrand {
+  align-items: center;
+  background: rgb(255 255 255 / 94%);
+  border-radius: 999px;
+  display: inline-flex;
+  height: 3.5rem;
+  justify-content: center;
+  padding: 0.25rem 0.65rem;
+  transition: transform 180ms ease;
+  width: 4.4rem;
+}
+
+.hollisBrand:hover {
+  transform: translate3d(0, -2px, 0);
+}
+
+.hollisBrand img {
+  height: auto;
+  width: 100%;
+}
+
+.hollisHeroNavigation {
+  align-items: center;
+  display: flex;
+  font-size: 0.85rem;
+  font-weight: 700;
+  gap: clamp(1rem, 2.8vw, 2rem);
+}
+
+.hollisHeroNavigation > a {
+  color: white;
+  text-decoration: none;
+}
+
+.hollisHeroNavigation > a:not(.hollisHeaderCta) {
+  color: rgb(255 255 255 / 76%);
+  transition: color 180ms ease;
+}
+
+.hollisHeroNavigation > a:not(.hollisHeaderCta):hover {
+  color: white;
+}
+
+.hollisHeaderCta,
+.hollisPrimaryCta,
+.hollisSecondaryCta {
+  align-items: center;
+  display: inline-flex;
+  font-weight: 800;
+  gap: 0.65rem;
+  justify-content: center;
+  text-decoration: none;
+  transition: background-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.hollisHeaderCta {
+  background: var(--hollis-red);
+  border-radius: 999px;
+  min-height: 2.9rem;
+  padding: 0.7rem 1.05rem;
+}
+
+.hollisHeaderCta:hover,
+.hollisHeaderCta:focus-visible {
+  background: #d94348;
+  transform: translate3d(0, -2px, 0);
+}
+
+.hollisHeroCopy {
+  bottom: clamp(8.5rem, 18vh, 12rem);
+  max-width: min(40rem, 58vw);
+}
+
+.hollisCopyStack {
+  min-height: clamp(21rem, 32vw, 27rem);
+  position: relative;
+}
+
+[data-hollis-copy-beat] {
+  inset: 0;
+  opacity: var(--hollis-copy-opacity, 0);
+  position: absolute;
+  transition: opacity 120ms linear;
+  will-change: opacity;
+}
+
+[data-hollis-copy-beat]:first-child {
+  --hollis-copy-opacity: 1;
+}
+
+.hollisEyebrow {
+  color: #f0a8a9;
+  font-size: 0.73rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.hollisHeroHeadline {
+  font-size: clamp(3.25rem, 6.8vw, 7.25rem);
+  font-weight: 650;
+  letter-spacing: -0.075em;
+  line-height: 0.86;
+  margin: 1.1rem 0 0;
+  max-width: 8.4ch;
+  text-wrap: balance;
+}
+
+[data-hollis-copy-tagline] {
+  font-size: clamp(3rem, 5.6vw, 6rem);
+  max-width: 11.5ch;
+}
+
+.hollisHeroSummary {
+  color: rgb(255 255 255 / 78%);
+  font-size: clamp(1rem, 1.5vw, 1.16rem);
+  line-height: 1.65;
+  margin: 1.45rem 0 0;
+  max-width: 33rem;
+}
+
+.hollisHeroCtas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 2rem;
+}
+
+.hollisPrimaryCta {
+  background: white;
+  color: #141619;
+  min-height: 3.55rem;
+  padding: 0.85rem 1.2rem 0.85rem 1.4rem;
+}
+
+.hollisPrimaryCta:hover,
+.hollisPrimaryCta:focus-visible {
+  background: var(--hollis-red);
+  color: white;
+  transform: translate3d(0, -2px, 0);
+}
+
+.hollisSecondaryCta {
+  color: white;
+  min-height: 3.55rem;
+  padding: 0.85rem 0.4rem;
+}
+
+.hollisSecondaryCta:hover,
+.hollisSecondaryCta:focus-visible {
+  color: #f0a8a9;
+  transform: translate3d(0, -2px, 0);
+}
+
+.hollisBrand:focus-visible,
+.hollisHeroNavigation > a:focus-visible,
+.hollisPrimaryCta:focus-visible,
+.hollisSecondaryCta:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 0.35rem;
+}
+
+.hollisProofDock {
+  border-top: 1px solid rgb(255 255 255 / 22%);
+  bottom: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.hollisProofDock > div {
+  align-items: center;
+  border-left: 1px solid rgb(255 255 255 / 18%);
+  display: flex;
+  gap: 0.7rem;
+  min-height: 4.6rem;
+  padding: 0.85rem 1.1rem;
+}
+
+.hollisProofDock > div:first-child {
+  border-left: 0;
+}
+
+.hollisProofDock span {
+  color: #f0a8a9;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.64rem;
+  letter-spacing: 0.08em;
+}
+
+.hollisProofDock strong {
+  font-size: 0.8rem;
+  letter-spacing: -0.01em;
+}
+
+.hollisGalleryCounter {
+  align-items: center;
+  bottom: 7rem;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.hollisGalleryCounter > span {
+  color: rgb(255 255 255 / 52%);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.hollisGalleryCounter > div {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.hollisGalleryCounter i {
+  border: 1px solid rgb(255 255 255 / 42%);
+  border-radius: 999px;
+  color: rgb(255 255 255 / 72%);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.59rem;
+  font-style: normal;
+  padding: 0.28rem 0.42rem;
+}
+
+.hollisRouteCard {
+  background: #18191c;
+  border-left: 1px solid rgb(255 255 255 / 10%);
+  min-height: 22rem;
+  transition: background-color 200ms ease, transform 200ms ease;
+}
+
+.hollisRouteCard:first-child {
+  border-left: 0;
+}
+
+.hollisRouteCard:hover {
+  background: #212226;
+  transform: translate3d(0, -6px, 0);
+}
+
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  [data-hollis-scroll-gallery] {
+    height: 400svh;
+    min-height: 0;
+  }
+
+  [data-hollis-scroll-gallery] [data-hollis-showroom-frame] {
+    height: 100svh;
+    min-height: 0;
+    position: sticky;
+    top: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  [data-hollis-gallery-shade] {
+    background:
+      linear-gradient(90deg, rgb(7 9 12 / 88%) 0%, rgb(7 9 12 / 54%) 100%),
+      linear-gradient(0deg, rgb(7 9 12 / 80%) 0%, transparent 56%);
+  }
+
+  .hollisHeroNavigation > a:not(.hollisHeaderCta),
+  .hollisGalleryCounter > span {
+    display: none;
+  }
+
+  .hollisHeaderCta {
+    font-size: 0.75rem;
+    padding-inline: 0.85rem;
+  }
+
+  .hollisHeroCopy {
+    bottom: 11.5rem;
+    max-width: min(33rem, calc(100vw - 2.5rem));
+  }
+
+  .hollisCopyStack {
+    min-height: 23rem;
+  }
+
+  .hollisHeroHeadline {
+    font-size: clamp(3rem, 14vw, 4.8rem);
+    max-width: 8.5ch;
+  }
+
+  [data-hollis-copy-tagline] {
+    font-size: clamp(2.65rem, 11.8vw, 4.1rem);
+    max-width: 12ch;
+  }
+
+  .hollisHeroSummary {
+    font-size: 0.98rem;
+    max-width: 29rem;
+  }
+
+  .hollisGalleryCounter {
+    bottom: 7.35rem;
+  }
+
+  .hollisProofDock {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hollisProofDock > div:nth-child(odd) {
+    border-left: 0;
+  }
+
+  .hollisProofDock > div {
+    border-top: 1px solid rgb(255 255 255 / 18%);
+    min-height: 3.3rem;
+    padding: 0.55rem 0.7rem;
+  }
+
+  .hollisProofDock > div:nth-child(-n + 2) {
+    border-top: 0;
+  }
+
+  .hollisProofDock strong {
+    font-size: 0.72rem;
+  }
+
+  .hollisRouteCard {
+    border-left: 0;
+    border-top: 1px solid rgb(255 255 255 / 10%);
+    min-height: 17rem;
+  }
+
+  .hollisRouteCard:first-child {
+    border-top: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-hollis-showroom-gallery] {
+    min-height: 46rem;
+  }
+
+  [data-hollis-gallery-frame] {
+    opacity: 0;
+    transition: none;
+  }
+
+  [data-hollis-gallery-frame]:first-child {
+    opacity: 1;
+  }
+
+  [data-hollis-copy-beat] {
+    opacity: 0;
+    transition: none;
+  }
+
+  [data-hollis-copy-beat]:first-child {
+    opacity: 1;
+  }
+
+  .hollisBrand,
+  .hollisHeaderCta,
+  .hollisPrimaryCta,
+  .hollisSecondaryCta,
+  .hollisRouteCard {
+    transition: none;
+  }
+}

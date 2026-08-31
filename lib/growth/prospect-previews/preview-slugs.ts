@@ -12,6 +12,8 @@ const BESPOKE_PREVIEW_SLUGS_BY_BUSINESS_NAME = new Map(
     ["Evo Kent Roofing", "evo-kent-roofing"],
     ["Fuggles Beer Cafe", "fuggles-beer-cafe"],
     ["Hide and Fox", "hide-and-fox"],
+    ["Hollis Motors", "hollis-motors"],
+    ["W. & G. Hollis Limited", "hollis-motors"],
     ["Jaguar Plumbing", "jaguar-plumbing"],
     ["Kemsing Motor Company", "kemsing-motor-company"],
     ["Kent Garage Equipment", "kent-garage-equipment"],
