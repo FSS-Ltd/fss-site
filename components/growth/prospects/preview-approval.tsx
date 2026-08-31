@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState, type CSSProperties } from "react";
 
-import { getConceptPreviewHref } from "./concept-preview-href";
+import { getFounderConceptPreviewHref } from "./concept-preview-href";
 
 const TERMINAL_PROSPECT_STATUSES = new Set([
   "won",
@@ -267,8 +267,9 @@ export function PreviewApprovalFrame({
         {pending ? "Approving preview…" : "Approve preview"}
       </button>
       <Link
-        href={getConceptPreviewHref({
+        href={getFounderConceptPreviewHref({
           prospectId,
+          sourceSlug: preview.slug,
         })}
         style={{
           alignItems: "center",

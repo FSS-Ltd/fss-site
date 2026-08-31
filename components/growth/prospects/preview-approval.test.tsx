@@ -27,7 +27,7 @@ test("offers a founder approval action for a draft preview", () => {
   assert.match(html, /private concept/);
 });
 
-test("keeps a draft preview inside the founder review route", () => {
+test("opens a source-backed draft preview at its source route", () => {
   const html = renderToStaticMarkup(
     <PreviewApprovalFrame
       onSuccess={() => undefined}
@@ -47,7 +47,7 @@ test("keeps a draft preview inside the founder review route", () => {
 
   assert.match(
     html,
-    /href="\/growth\/prospects\/11111111-1111-4111-8111-111111111111\/preview"/,
+    /href="\/preview\/example-heating"/,
   );
   assert.match(html, />View concept preview</);
 });

@@ -5,7 +5,7 @@ import type {
 } from "@/lib/growth/prospect-previews/founder-review";
 import type { ViewState } from "@/lib/growth/dashboard/view-models";
 
-import { getConceptPreviewHref } from "./concept-preview-href";
+import { getFounderConceptPreviewHref } from "./concept-preview-href";
 import { PreviewApproval } from "./preview-approval";
 import styles from "./prospects.module.css";
 
@@ -62,7 +62,10 @@ export function FounderPreviewList({
               </div>
               <Link
                 className={styles.rowLink}
-                href={getConceptPreviewHref({ prospectId: preview.prospectId })}
+                href={getFounderConceptPreviewHref({
+                  prospectId: preview.prospectId,
+                  sourceSlug: preview.slug,
+                })}
               >
                 View concept preview
               </Link>
