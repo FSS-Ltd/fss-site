@@ -1,6 +1,7 @@
 import { BrightAccountingPage } from "./prospects/bright-accounting";
 import { BrightFoxLettingsPage } from "./prospects/bright-fox-lettings";
 import { BurfordsPage } from "./prospects/burfords";
+import { DoorknobsPage } from "./prospects/doorknobs";
 import { DunkleysOfDealPage } from "./prospects/dunkley-s-of-deal";
 import { EvoKentRoofingPage } from "./prospects/evo-kent-roofing";
 import { FugglesBeerCafePage } from "./prospects/fuggles-beer-cafe";
@@ -41,6 +42,15 @@ export const bespokeProspectPages = {
       "Company secretarial, payroll, accounts production and taxation support routed by need.",
     layoutSignature: "blue-ledger-service-grid",
     heroSignature: "dimensional-client-ledger",
+  },
+  doorknobs: {
+    Page: DoorknobsPage,
+    businessName: "Doorknobs",
+    title: "Property services in Tunbridge Wells",
+    description:
+      "Choose a local property journey for selling, letting, buying or renting in Tunbridge Wells.",
+    layoutSignature: "property-threshold-navigator",
+    heroSignature: "light-through-blue-door",
   },
   "dunkley-s-of-deal": {
     Page: DunkleysOfDealPage,
