@@ -8,11 +8,12 @@ import ProspectPreviewPage, {
   generateStaticParams,
 } from "./[slug]/page";
 
-test("prerenders the seventeen public-unlisted bespoke prospect slugs", () => {
+test("prerenders the eighteen public-unlisted bespoke prospect slugs", () => {
   const params = generateStaticParams();
   const slugs: readonly string[] = params.map(({ slug }) => slug);
 
-  assert.equal(params.length, 17);
+  assert.equal(params.length, 18);
+  assert.equal(slugs.includes("bridgland-roofing"), true);
   assert.equal(slugs.includes("bright-accounting"), true);
   assert.equal(slugs.includes("doorknobs"), true);
   assert.equal(slugs.includes("kemsing-motor-company"), true);
@@ -33,6 +34,22 @@ test("resolves Priority Point's accountancy journey and metadata", async () => {
   assert.match(html, /Company registration/i);
   assert.match(String(metadata.title), /Priority Point/i);
   assert.match(String(metadata.description), /accountancy/i);
+  assert.deepEqual(metadata.robots, { index: false, follow: false });
+});
+
+test("resolves Bridgland's heritage-led roofing concept and metadata", async () => {
+  const page = await ProspectPreviewPage({
+    params: Promise.resolve({ slug: "bridgland-roofing" }),
+  });
+  const html = renderToStaticMarkup(page);
+  const metadata = await generateMetadata({
+    params: Promise.resolve({ slug: "bridgland-roofing" }),
+  });
+
+  assert.match(html, /data-bespoke-prospect="bridgland-roofing"/);
+  assert.match(html, /data-bridgland-drone-journey="true"/);
+  assert.match(String(metadata.title), /heritage roofing/i);
+  assert.match(String(metadata.description), /listed buildings/i);
   assert.deepEqual(metadata.robots, { index: false, follow: false });
 });
 

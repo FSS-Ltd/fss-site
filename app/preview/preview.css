@@ -1298,3 +1298,430 @@ html {
     transform: translateY(-50%);
   }
 }
+
+/* Bridgland Roofing scroll-scrubbed inspection drone journey. */
+.bridglandPage {
+  --bridgland-ink: #17201d;
+  --bridgland-red: #a31621;
+}
+
+[data-bridgland-drone-journey] {
+  min-height: 100svh;
+}
+
+[data-bridgland-drone-frame] {
+  background: var(--bridgland-ink);
+  isolation: isolate;
+  min-height: 100svh;
+  overflow: hidden;
+  position: relative;
+}
+
+[data-bridgland-drone-frame]::before {
+  background:
+    linear-gradient(rgb(13 21 18 / 52%), rgb(13 21 18 / 52%)),
+    url("/prospect-previews/bespoke/bridgland-roofing/hero-wide-v1.png")
+      center / cover;
+  content: "";
+  filter: blur(18px) brightness(0.58) saturate(0.72);
+  inset: -1.5rem;
+  position: absolute;
+  transform: scale(1.06);
+  z-index: -3;
+}
+
+[data-bridgland-drone-video] {
+  height: 100%;
+  inset: 0;
+  object-fit: contain;
+  object-position: center;
+  position: absolute;
+  width: 100%;
+  z-index: -2;
+}
+
+[data-bridgland-drone-shade] {
+  background:
+    linear-gradient(
+      90deg,
+      rgb(13 21 18 / 92%) 0%,
+      rgb(13 21 18 / 61%) 44%,
+      rgb(13 21 18 / 14%) 76%
+    ),
+    linear-gradient(0deg, rgb(13 21 18 / 75%) 0%, transparent 52%);
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: -1;
+}
+
+.bridglandHeroChrome {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  left: max(1.25rem, calc((100% - 84rem) / 2 + 2rem));
+  position: absolute;
+  right: max(1.25rem, calc((100% - 84rem) / 2 + 2rem));
+  top: clamp(1.25rem, 3vw, 2.25rem);
+  z-index: 10;
+}
+
+.bridglandBrand,
+.bridglandHeaderCta {
+  text-decoration: none;
+}
+
+.bridglandBrand {
+  align-items: center;
+  color: white;
+  display: inline-flex;
+  gap: 0.7rem;
+}
+
+.bridglandBrand span {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.bridglandBrand strong {
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.bridglandBrand small {
+  color: rgb(255 255 255 / 70%);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.bridglandHeaderCta {
+  align-items: center;
+  background: var(--bridgland-red);
+  border-radius: 999px;
+  color: white;
+  display: inline-flex;
+  font-size: 0.84rem;
+  font-weight: 800;
+  gap: 0.5rem;
+  min-height: 2.9rem;
+  padding: 0.7rem 1rem;
+  transition: background-color 180ms ease, transform 180ms ease;
+}
+
+.bridglandHeaderCta:hover,
+.bridglandHeaderCta:focus-visible {
+  background: #c62b36;
+  transform: translate3d(0, -2px, 0);
+}
+
+.bridglandBrand:focus-visible,
+.bridglandHeaderCta:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 0.3rem;
+}
+
+[data-bridgland-drone-copy] {
+  top: clamp(7.75rem, 16vh, 12rem);
+  left: max(1.25rem, calc((100% - 84rem) / 2 + 2rem));
+  max-width: min(36rem, 50vw);
+  position: absolute;
+  right: 1.25rem;
+  z-index: 4;
+}
+
+[data-bridgland-drone-copy-beat] {
+  position: absolute;
+  transition: opacity 220ms ease, transform 220ms ease;
+  will-change: opacity, transform;
+}
+
+.bridglandEyebrow {
+  color: #f1c9bd;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.19em;
+  text-transform: uppercase;
+}
+
+.bridglandHeadline {
+  font-size: clamp(2.8rem, 4.3vw, 4.75rem);
+  font-weight: 650;
+  letter-spacing: -0.065em;
+  line-height: 0.91;
+  margin-top: 0.9rem;
+  max-width: 9.5ch;
+  text-wrap: balance;
+}
+
+.bridglandSummary {
+  color: rgb(255 255 255 / 78%);
+  font-size: 1.08rem;
+  line-height: 1.6;
+  margin-top: 0.8rem;
+  max-width: 32rem;
+}
+
+[data-bridgland-analysis-layer] {
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  z-index: 3;
+}
+
+.bridglandAnalysisHud {
+  background: linear-gradient(90deg, rgb(12 21 18 / 88%), transparent);
+  border-left: 2px solid #e14752;
+  color: white;
+  display: grid;
+  gap: 0.32rem;
+  padding: 0.65rem 1.1rem 0.65rem 0.75rem;
+  position: absolute;
+  right: max(1.25rem, calc((100% - 84rem) / 2 + 2rem));
+  top: clamp(6.25rem, 12vh, 8.5rem);
+}
+
+.bridglandAnalysisHud::before {
+  background: repeating-linear-gradient(
+    90deg,
+    rgb(225 71 82 / 78%) 0 3px,
+    transparent 3px 6px
+  );
+  content: "";
+  height: 1px;
+  left: -5rem;
+  position: absolute;
+  top: 0;
+  width: 4.5rem;
+}
+
+.bridglandAnalysisHud span {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.bridglandAnalysisHud small {
+  color: rgb(255 255 255 / 68%);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+[data-bridgland-analysis-sweep] {
+  background: radial-gradient(
+    ellipse at center,
+    rgb(225 71 82 / 13%) 0%,
+    rgb(225 71 82 / 6%) 37%,
+    transparent 70%
+  );
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 50%;
+  height: min(54vw, 42rem);
+  left: 52%;
+  opacity: 0.68;
+  position: absolute;
+  top: 51%;
+  transform: translate3d(-50%, -50%, 0);
+  width: min(54vw, 42rem);
+}
+
+.bridglandAnalysisMarker {
+  --bridgland-link-angle: 0deg;
+  --bridgland-link-width: 4rem;
+  align-items: center;
+  display: flex;
+  gap: 0.55rem;
+  opacity: 0.35;
+  position: absolute;
+  transform: scale(0.94);
+  transform-origin: left center;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.bridglandAnalysisMarker::before {
+  background: repeating-linear-gradient(
+    90deg,
+    rgb(255 255 255 / 74%) 0 3px,
+    transparent 3px 7px
+  );
+  content: "";
+  height: 1px;
+  position: absolute;
+  right: calc(100% - 0.38rem);
+  top: 50%;
+  transform: rotate(var(--bridgland-link-angle));
+  transform-origin: right center;
+  width: var(--bridgland-link-width);
+}
+
+.bridglandAnalysisMarker[data-active="true"] {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.bridglandMarkerDot {
+  align-items: center;
+  background: rgb(15 24 20 / 78%);
+  border: 1px solid rgb(255 255 255 / 90%);
+  display: flex;
+  height: 1.25rem;
+  justify-content: center;
+  position: relative;
+  transform: rotate(45deg);
+  width: 1.25rem;
+}
+
+.bridglandMarkerDot::before {
+  border: 1px solid rgb(225 71 82 / 75%);
+  content: "";
+  inset: -0.32rem;
+  position: absolute;
+}
+
+.bridglandMarkerCore {
+  background: #e14752;
+  box-shadow: 0 0 0 4px rgb(225 71 82 / 22%);
+  height: 0.38rem;
+  width: 0.38rem;
+}
+
+.bridglandMarkerLabel {
+  background: rgb(15 24 20 / 72%);
+  border: 1px solid rgb(255 255 255 / 25%);
+  border-radius: 0.72rem;
+  display: grid;
+  gap: 0.22rem;
+  max-width: 13.5rem;
+  padding: 0.55rem 0.7rem;
+  -webkit-backdrop-filter: blur(16px) saturate(130%);
+  backdrop-filter: blur(16px) saturate(130%);
+}
+
+.bridglandMarkerLabel b {
+  font-size: 0.66rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.bridglandMarkerLabel small {
+  color: rgb(255 255 255 / 70%);
+  font-size: 0.7rem;
+  line-height: 1.25;
+}
+
+.bridglandMarkerSlate {
+  --bridgland-link-angle: -32deg;
+  --bridgland-link-width: 5.25rem;
+  left: 72%;
+  top: 26%;
+}
+
+.bridglandMarkerLeadwork {
+  --bridgland-link-angle: 28deg;
+  --bridgland-link-width: 4.5rem;
+  left: 52%;
+  top: 52%;
+}
+
+.bridglandMarkerHeritage {
+  --bridgland-link-angle: -18deg;
+  --bridgland-link-width: 6rem;
+  left: 63%;
+  top: 69%;
+}
+
+.bridglandMarkerAssessment {
+  --bridgland-link-angle: 25deg;
+  --bridgland-link-width: 4rem;
+  left: 30%;
+  top: 39%;
+}
+
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  [data-bridgland-drone-journey] {
+    height: 400svh;
+    min-height: 0;
+    position: relative;
+  }
+
+  [data-bridgland-drone-frame] {
+    height: 100svh;
+    min-height: 0;
+    position: sticky;
+    top: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .bridglandHeaderCta {
+    font-size: 0;
+    min-width: 2.9rem;
+    padding-inline: 0.7rem;
+  }
+
+  .bridglandHeaderCta svg {
+    height: 1rem;
+    width: 1rem;
+  }
+
+  [data-bridgland-drone-copy] {
+    top: 7.5rem;
+    max-width: min(34rem, calc(100vw - 2.5rem));
+  }
+
+  .bridglandHeadline {
+    font-size: clamp(2.8rem, 12vw, 4.5rem);
+    max-width: 8.8ch;
+  }
+
+  .bridglandSummary {
+    font-size: 0.96rem;
+    max-width: 30rem;
+  }
+
+  .bridglandAnalysisMarker[data-active="false"] {
+    display: none;
+  }
+
+  .bridglandMarkerSlate {
+    left: 50%;
+    top: 30%;
+  }
+
+  .bridglandAnalysisHud {
+    display: none;
+  }
+
+  [data-bridgland-analysis-sweep] {
+    height: 80vw;
+    left: 52%;
+    width: 80vw;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-bridgland-drone-video] {
+    transition: none;
+  }
+
+  [data-bridgland-drone-copy-beat] {
+    display: none;
+  }
+
+  [data-bridgland-drone-copy-beat]:first-child {
+    display: block;
+    opacity: 1;
+    transform: none;
+  }
+
+  .bridglandAnalysisMarker[data-active="false"] {
+    display: none;
+  }
+}

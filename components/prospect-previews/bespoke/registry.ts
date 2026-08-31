@@ -1,4 +1,5 @@
 import { BrightAccountingPage } from "./prospects/bright-accounting";
+import { BridglandRoofingPage } from "./prospects/bridgland-roofing";
 import { BrightFoxLettingsPage } from "./prospects/bright-fox-lettings";
 import { BurfordsPage } from "./prospects/burfords";
 import { DoorknobsPage } from "./prospects/doorknobs";
@@ -18,6 +19,15 @@ import { WormaldAccountantsPage } from "./prospects/wormald-accountants";
 import type { BespokeProspectPage } from "./types";
 
 export const bespokeProspectPages = {
+  "bridgland-roofing": {
+    Page: BridglandRoofingPage,
+    businessName: "Bridgland Roofing",
+    title: "Bridgland heritage roofing in Kent and Sussex",
+    description:
+      "A heritage-led route for roof assessments, listed buildings, traditional roofing and clear property context.",
+    layoutSignature: "heritage-roof-inspection-brief",
+    heroSignature: "scroll-scrubbed-roof-drone-analysis",
+  },
   "bright-accounting": {
     Page: BrightAccountingPage,
     businessName: "Bright Accounting Ltd",
