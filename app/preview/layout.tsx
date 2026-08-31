@@ -1,4 +1,5 @@
 import "./preview.css";
+import "./wormald-accountants.css";
 
 export default function ProspectPreviewLayout({
   children,
