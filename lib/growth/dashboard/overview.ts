@@ -10,10 +10,16 @@ import type { ViewState } from "./view-models";
 
 const TIMEZONE = "Europe/London";
 const RESEARCH_RUN_HOUR = 6;
-const MAX_WORK_QUEUE_ROWS = 6;
+export const WORK_QUEUE_PAGE_SIZE = 6;
 const MAX_UPCOMING_ACTIONS = 5;
+const MAX_WORK_QUEUE_PAGE = 1_000;
 
 export type WorkQueueKind = "first_emails" | "replies" | "follow_ups";
+
+export type WorkQueueQuery = {
+  kind: WorkQueueKind | null;
+  page: number;
+};
 
 export type WorkQueueRow = {
   prospectId: string;
@@ -77,10 +83,45 @@ export type OverviewViewModel = {
   summary: OverviewSummary;
   workQueue: readonly WorkQueueTab[];
   defaultWorkQueueTab: WorkQueueKind;
+  activeWorkQueueTab: WorkQueueKind;
+  activeWorkQueuePage: number;
   pipeline: PipelineOverview;
   upcomingActions: readonly UpcomingAction[];
   sequenceHealth: SequenceHealth;
 };
+
+type RawSearchParams = Record<string, string | readonly string[] | undefined>;
+
+function firstQueryValue(
+  value: string | readonly string[] | undefined,
+): string | undefined {
+  return typeof value === "string" ? value : value?.[0];
+}
+
+function isWorkQueueKind(value: string | undefined): value is WorkQueueKind {
+  return (
+    value === "first_emails" || value === "replies" || value === "follow_ups"
+  );
+}
+
+export function parseWorkQueueQuery(
+  searchParams: RawSearchParams,
+): WorkQueueQuery {
+  const kindValue = firstQueryValue(searchParams.workQueue);
+
+  if (!isWorkQueueKind(kindValue)) {
+    return { kind: null, page: 1 };
+  }
+
+  const pageValue = firstQueryValue(searchParams.workQueuePage);
+  const page =
+    pageValue && /^[1-9]\d*$/.test(pageValue) ? Number(pageValue) : Number.NaN;
+
+  return {
+    kind: kindValue,
+    page: Number.isSafeInteger(page) && page <= MAX_WORK_QUEUE_PAGE ? page : 1,
+  };
+}
 
 export const PIPELINE_STAGES: readonly {
   id: PipelineStageId;
@@ -244,6 +285,7 @@ function toWorkQueueTab(
 async function fetchFirstEmailsTab(
   db: GrowthQueryExecutor,
   now: Date,
+  page: number,
 ): Promise<WorkQueueTab> {
   const rows = await db<FirstEmailRow[]>`
     select
@@ -279,7 +321,8 @@ async function fetchFirstEmailsTab(
     where p.status = 'ready_for_email_review'
       and draft."reviewState" = 'draft'
     order by p.fit_score desc, p.updated_at desc
-    limit ${MAX_WORK_QUEUE_ROWS}
+    limit ${WORK_QUEUE_PAGE_SIZE}
+    offset ${(page - 1) * WORK_QUEUE_PAGE_SIZE}
   `;
 
   return toWorkQueueTab("first_emails", rows, now);
@@ -288,6 +331,7 @@ async function fetchFirstEmailsTab(
 async function fetchRepliesTab(
   db: GrowthQueryExecutor,
   now: Date,
+  page: number,
 ): Promise<WorkQueueTab> {
   const rows = await db<ReplyRow[]>`
     select
@@ -319,7 +363,8 @@ async function fetchRepliesTab(
     ) reply on true
     where p.status = 'replied'
     order by reply.received_at asc
-    limit ${MAX_WORK_QUEUE_ROWS}
+    limit ${WORK_QUEUE_PAGE_SIZE}
+    offset ${(page - 1) * WORK_QUEUE_PAGE_SIZE}
   `;
 
   return toWorkQueueTab("replies", rows, now);
@@ -328,6 +373,7 @@ async function fetchRepliesTab(
 async function fetchFollowUpsTab(
   db: GrowthQueryExecutor,
   now: Date,
+  page: number,
 ): Promise<WorkQueueTab> {
   const rows = await db<FollowUpRow[]>`
     select
@@ -357,7 +403,8 @@ async function fetchFollowUpsTab(
       and (em.scheduled_for at time zone ${TIMEZONE})::date
         <= (${now} at time zone ${TIMEZONE})::date
     order by em.scheduled_for asc
-    limit ${MAX_WORK_QUEUE_ROWS}
+    limit ${WORK_QUEUE_PAGE_SIZE}
+    offset ${(page - 1) * WORK_QUEUE_PAGE_SIZE}
   `;
 
   return toWorkQueueTab("follow_ups", rows, now);
@@ -530,6 +577,7 @@ export async function getOverviewViewModel(
   db: GrowthQueryExecutor = getGrowthDb(),
   now: () => Date = () => new Date(),
   createCorrelationId: () => string = () => randomUUID(),
+  workQueueQuery: WorkQueueQuery = { kind: null, page: 1 },
 ): Promise<ViewState<OverviewViewModel>> {
   const runAt = now();
 
@@ -540,9 +588,21 @@ export async function getOverviewViewModel(
       fetchLastResearchRunDate(db),
     ]);
     const [firstEmails, replies, followUps] = await Promise.all([
-      fetchFirstEmailsTab(db, runAt),
-      fetchRepliesTab(db, runAt),
-      fetchFollowUpsTab(db, runAt),
+      fetchFirstEmailsTab(
+        db,
+        runAt,
+        workQueueQuery.kind === "first_emails" ? workQueueQuery.page : 1,
+      ),
+      fetchRepliesTab(
+        db,
+        runAt,
+        workQueueQuery.kind === "replies" ? workQueueQuery.page : 1,
+      ),
+      fetchFollowUpsTab(
+        db,
+        runAt,
+        workQueueQuery.kind === "follow_ups" ? workQueueQuery.page : 1,
+      ),
     ]);
     const [pipelineStatusCounts, upcomingActions] = await Promise.all([
       fetchPipelineStatusCounts(db),
@@ -552,6 +612,8 @@ export async function getOverviewViewModel(
 
     const workQueue = [firstEmails, replies, followUps];
     const pipeline = buildPipelineOverview(pipelineStatusCounts);
+    const defaultWorkQueueTab = selectDefaultWorkQueueTab(workQueue);
+    const activeWorkQueueTab = workQueueQuery.kind ?? defaultWorkQueueTab;
 
     const hasAnyData =
       workQueue.some((tab) => tab.totalCount > 0) ||
@@ -575,7 +637,10 @@ export async function getOverviewViewModel(
           nextResearchRunAt: nextResearchRunAt(lastRunDate, runAt),
         },
         workQueue,
-        defaultWorkQueueTab: selectDefaultWorkQueueTab(workQueue),
+        defaultWorkQueueTab,
+        activeWorkQueueTab,
+        activeWorkQueuePage:
+          workQueueQuery.kind === activeWorkQueueTab ? workQueueQuery.page : 1,
         pipeline,
         upcomingActions,
         sequenceHealth,

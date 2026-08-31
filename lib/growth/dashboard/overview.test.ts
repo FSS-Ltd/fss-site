@@ -7,6 +7,7 @@ import {
   buildSequenceHealth,
   getOverviewViewModel,
   nextResearchRunAt,
+  parseWorkQueueQuery,
   selectDefaultWorkQueueTab,
   type WorkQueueTab,
 } from "./overview";
@@ -135,6 +136,17 @@ test("selectDefaultWorkQueueTab otherwise prefers first emails, then replies", (
       { kind: "follow_ups", totalCount: 0, rows: emptyRows },
     ]),
     "first_emails",
+  );
+});
+
+test("parses a selected queue and positive page from the overview URL", () => {
+  assert.deepEqual(
+    parseWorkQueueQuery({ workQueue: "replies", workQueuePage: "2" }),
+    { kind: "replies", page: 2 },
+  );
+  assert.deepEqual(
+    parseWorkQueueQuery({ workQueue: "not-a-queue", workQueuePage: "0" }),
+    { kind: null, page: 1 },
   );
 });
 
@@ -400,6 +412,31 @@ test("getOverviewViewModel keeps a bounded totalCount separate from capped rows"
   const followUps = state.data.workQueue.find((tab) => tab.kind === "follow_ups");
   assert.equal(followUps?.rows.length, 6);
   assert.equal(followUps?.totalCount, 9);
+});
+
+test("getOverviewViewModel offsets only the selected queue page", async () => {
+  const { db, queries } = createFakeGrowthDb(baseRoutes());
+
+  await getOverviewViewModel(
+    db,
+    () => new Date("2026-08-16T08:00:00.000Z"),
+    () => "unused-correlation-id",
+    { kind: "replies", page: 2 },
+  );
+
+  const firstEmailsQuery = queries.find(({ text }) =>
+    text.includes('"messageId"'),
+  );
+  const repliesQuery = queries.find(({ text }) =>
+    text.includes('reply.received_at as "statusAt"'),
+  );
+  const followUpsQuery = queries.find(({ text }) =>
+    text.includes("em.step_number > 0"),
+  );
+
+  assert.equal(firstEmailsQuery?.values.at(-1), 0);
+  assert.equal(repliesQuery?.values.at(-1), 6);
+  assert.equal(followUpsQuery?.values.at(-1), 0);
 });
 
 test("getOverviewViewModel reports an empty state with nothing to review", async () => {

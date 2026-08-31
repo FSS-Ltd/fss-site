@@ -145,6 +145,8 @@ const readyData: OverviewViewModel = {
     },
   ],
   defaultWorkQueueTab: "follow_ups",
+  activeWorkQueueTab: "follow_ups",
+  activeWorkQueuePage: 1,
   pipeline: {
     totalValuePence: 1_100_000,
     stages: [
@@ -192,7 +194,7 @@ test("renders the ready state with reconciled summary counts and pipeline totals
   assert.match(html, />4<\/p>/);
   assert.match(html, />Follow-ups due today<\/p>/);
   assert.match(html, /£11,000/);
-  assert.match(html, /Smith &amp; Sons Plumbing Ltd/);
+  assert.match(html, /Greenfield Ltd/);
 });
 
 test("does not prefetch database-backed overview destinations", () => {
@@ -205,11 +207,11 @@ test("does not prefetch database-backed overview destinations", () => {
   }
 });
 
-test("selects the default work queue tab and shows it as the visible panel", () => {
+test("marks the active work queue category as the current page", () => {
   const html = renderOverview({ status: "ready", data: readyData });
 
-  assert.match(html, /aria-selected="true"[^>]*>Follow-ups \(1\)/);
-  assert.match(html, /aria-selected="false"[^>]*>First emails \(6\)/);
+  assert.match(html, /aria-current="page"[^>]*>Follow-ups \(1\)/);
+  assert.doesNotMatch(html, /<caption[^>]*>First emails work queue<\/caption>/);
 });
 
 test("marks overdue follow-ups with visible text, not colour alone", () => {
@@ -224,6 +226,32 @@ test("gives the work queue table an accessible caption", () => {
 
   assert.match(html, /<caption[^>]*>Follow-ups work queue<\/caption>/);
   assert.match(html, /<th scope="col">Prospect<\/th>/);
+});
+
+test("paginates the active work queue in six-company pages", () => {
+  const pageOneRows = Array.from({ length: 6 }, (_, index) => ({
+    ...readyData.workQueue[2].rows[0],
+    businessName: `Follow-up ${index + 1}`,
+    prospectId: `follow-up-${index + 1}`,
+  }));
+  const paginatedData: OverviewViewModel = {
+    ...readyData,
+    workQueue: readyData.workQueue.map((tab) =>
+      tab.kind === "follow_ups"
+        ? { ...tab, rows: pageOneRows, totalCount: 7 }
+        : tab,
+    ),
+  };
+
+  const html = renderOverview({ status: "ready", data: paginatedData });
+
+  assert.match(html, /aria-label="Work queue pagination"/);
+  assert.match(html, /Page 1 of 2/);
+  assert.match(
+    html,
+    /href="\/growth\?workQueue=follow_ups&amp;workQueuePage=2"[^>]*>\s*Next page/,
+  );
+  assert.doesNotMatch(html, /View all 7 follow-ups/);
 });
 
 test("renders an empty state when there is nothing to review", () => {
