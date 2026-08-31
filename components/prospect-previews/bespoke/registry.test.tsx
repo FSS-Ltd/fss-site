@@ -15,6 +15,7 @@ const expectedSlugs = [
   "bright-accounting",
   "bright-fox-lettings",
   "burfords",
+  "doorknobs",
   "dunkley-s-of-deal",
   "evo-kent-roofing",
   "fuggles-beer-cafe",
@@ -28,7 +29,7 @@ const expectedSlugs = [
   "wormald-accountants",
 ] as const;
 
-test("registers exactly the fourteen active bespoke prospect pages", () => {
+test("registers exactly the fifteen active bespoke prospect pages", () => {
   assert.deepEqual(
     [...getBespokeProspectSlugs()].sort(),
     [...expectedSlugs].sort(),
@@ -39,8 +40,8 @@ test("registers exactly the fourteen active bespoke prospect pages", () => {
 test("every prospect owns a distinct layout and hero-scene signature", () => {
   const entries = Object.values(bespokeProspectPages);
 
-  assert.equal(new Set(entries.map((entry) => entry.layoutSignature)).size, 14);
-  assert.equal(new Set(entries.map((entry) => entry.heroSignature)).size, 14);
+  assert.equal(new Set(entries.map((entry) => entry.layoutSignature)).size, 15);
+  assert.equal(new Set(entries.map((entry) => entry.heroSignature)).size, 15);
 });
 
 test("every page renders its evidence-backed statement and a disclosed demo form", () => {
@@ -66,6 +67,15 @@ test("garage journeys ask for registration before service details", () => {
       html.indexOf("Vehicle registration") < html.indexOf("What do you need"),
     );
   }
+});
+
+test("reserves the Doorknobs bespoke registry slot and future signatures", () => {
+  const entry = getBespokeProspectPage("doorknobs");
+
+  assert.ok(entry);
+  assert.equal(entry.businessName, "Doorknobs");
+  assert.match(entry.title, /Tunbridge Wells/i);
+  assert.equal(getBespokeProspectSlugs().includes("doorknobs"), true);
 });
 
 test("renders Dunkley's photographic hero as an immersive scroll introduction", () => {
