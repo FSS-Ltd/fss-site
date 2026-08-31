@@ -16,6 +16,7 @@ const BESPOKE_PREVIEW_SLUGS_BY_BUSINESS_NAME = new Map(
     ["Marden Garage", "marden-garage"],
     ["Paperstone", "paperstone"],
     ["Primeline Roofing", "primeline-roofing"],
+    ["Priority Point", "priority-point"],
     ["Sealeys Walker Jarvis", "sealeys-walker-jarvis"],
     ["Wormald Accountants", "wormald-accountants"],
   ].map(([businessName, slug]) => [normaliseBusinessName(businessName), slug]),

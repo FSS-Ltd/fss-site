@@ -12,6 +12,7 @@ import { KentGarageEquipmentPage } from "./prospects/kent-garage-equipment";
 import { MardenGaragePage } from "./prospects/marden-garage";
 import { PaperstonePage } from "./prospects/paperstone";
 import { PrimelineRoofingPage } from "./prospects/primeline-roofing";
+import { PriorityPointPage } from "./prospects/priority-point";
 import { SealeysWalkerJarvisPage } from "./prospects/sealeys-walker-jarvis";
 import { WormaldAccountantsPage } from "./prospects/wormald-accountants";
 import type { BespokeProspectPage } from "./types";
@@ -142,6 +143,15 @@ export const bespokeProspectPages = {
       "Start a free site-visit request with the work, property, urgency and supporting photo context.",
     layoutSignature: "night-site-visit-flow",
     heroSignature: "blue-roof-camera",
+  },
+  "priority-point": {
+    Page: PriorityPointPage,
+    businessName: "Priority Point",
+    title: "Priority Point accountancy support in Folkestone",
+    description:
+      "Accountancy support for company registration, bookkeeping, payroll, VAT, accounts, tax and CIS, with a clearer first enquiry route.",
+    layoutSignature: "responsibility-first-business-brief",
+    heroSignature: "organised-accountancy-desk",
   },
   "sealeys-walker-jarvis": {
     Page: SealeysWalkerJarvisPage,
