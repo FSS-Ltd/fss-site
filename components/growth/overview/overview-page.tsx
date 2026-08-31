@@ -17,8 +17,12 @@ import { WorkQueue } from "./work-queue";
 function integrationAdvisory(
   integrations: readonly IntegrationHealth[],
 ): string | null {
-  const gmail = integrations.find((integration) => integration.provider === "gmail");
-  const cron = integrations.find((integration) => integration.provider === "cron");
+  const gmail = integrations.find(
+    (integration) => integration.provider === "gmail",
+  );
+  const cron = integrations.find(
+    (integration) => integration.provider === "cron",
+  );
 
   if (gmail && gmail.status !== "healthy") {
     return "Gmail is disconnected. Reconnect it in Settings before approving new emails.";
@@ -46,7 +50,9 @@ export function OverviewPage({
     return (
       <div className={styles.errorState} role="alert">
         <p>{state.message}</p>
-        <p className={styles.errorCorrelation}>Reference: {state.correlationId}</p>
+        <p className={styles.errorCorrelation}>
+          Reference: {state.correlationId}
+        </p>
       </div>
     );
   }
@@ -83,16 +89,19 @@ export function OverviewPage({
           </div>
           <div className={styles.queue}>
             <WorkQueue
-              defaultTab={state.data.defaultWorkQueueTab}
+              activeTab={state.data.activeWorkQueueTab}
+              currentPage={state.data.activeWorkQueuePage}
               now={now}
               tabs={state.data.workQueue}
             />
           </div>
-          <div className={styles.pipeline}>
-            <PipelineSummary pipeline={state.data.pipeline} />
-          </div>
-          <div className={styles.actions}>
-            <UpcomingActions actions={state.data.upcomingActions} now={now} />
+          <div className={styles.secondaryColumn}>
+            <div className={styles.pipeline}>
+              <PipelineSummary pipeline={state.data.pipeline} />
+            </div>
+            <div className={styles.actions}>
+              <UpcomingActions actions={state.data.upcomingActions} now={now} />
+            </div>
           </div>
           <div className={styles.health}>
             <SequenceHealth health={state.data.sequenceHealth} />

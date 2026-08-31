@@ -24,14 +24,29 @@
     "health";
 }
 
+.secondaryColumn {
+  display: contents;
+}
+
 @media (min-width: 1024px) {
   .page {
     grid-template-columns: minmax(0, 1fr) 340px;
     grid-template-areas:
       "strip strip"
-      "queue pipeline"
-      "health actions";
+      "queue sidebar"
+      "health sidebar";
     align-items: start;
+  }
+
+  .secondaryColumn {
+    display: grid;
+    grid-area: sidebar;
+    gap: 20px;
+  }
+
+  .secondaryColumn > .pipeline,
+  .secondaryColumn > .actions {
+    grid-area: auto;
   }
 }
 
@@ -208,19 +223,21 @@
 
 .tab {
   position: relative;
+  display: inline-flex;
   border: none;
   background: none;
   padding: 10px 2px 12px;
   color: #607089;
   font-size: 0.88rem;
   font-weight: 650;
+  text-decoration: none;
 }
 
-.tab[aria-selected="true"] {
+.tab[aria-current="page"] {
   color: #087f88;
 }
 
-.tab[aria-selected="true"]::after {
+.tab[aria-current="page"]::after {
   position: absolute;
   right: 0;
   bottom: -1px;
@@ -237,10 +254,6 @@
 
 .tabPanel {
   padding-top: 14px;
-}
-
-.tabPanel[hidden] {
-  display: none;
 }
 
 .queueEmpty {
@@ -360,16 +373,6 @@
   outline-offset: 2px;
 }
 
-.viewAllLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  margin-top: 12px;
-  color: #087f88;
-  font-size: 0.86rem;
-  font-weight: 650;
-}
-
 .queueMobileList {
   display: none;
   flex-direction: column;
@@ -388,6 +391,45 @@
 .queueMobileBody {
   flex: 1;
   min-width: 0;
+}
+
+.queuePagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid #eef1f3;
+  margin-top: 16px;
+  padding-top: 14px;
+}
+
+.queuePaginationLink {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #d8e0e5;
+  border-radius: 7px;
+  padding: 7px 10px;
+  color: #087f88;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.queuePaginationLink[aria-disabled="true"] {
+  color: #b7c1cc;
+  pointer-events: none;
+}
+
+.queuePaginationLink:focus-visible {
+  outline: 3px solid #087f88;
+  outline-offset: 2px;
+}
+
+.queuePageIndicator {
+  color: #607089;
+  font-size: 0.8rem;
+  font-weight: 650;
+  white-space: nowrap;
 }
 
 /* Pipeline */

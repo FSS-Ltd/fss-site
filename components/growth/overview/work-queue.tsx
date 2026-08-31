@@ -1,8 +1,5 @@
-"use client";
-
 import { ArrowRight, ExternalLink } from "lucide-react";
 import type { CSSProperties } from "react";
-import { useId, useState } from "react";
 
 import {
   formatGrowthCurrency,
@@ -11,7 +8,8 @@ import {
   formatGrowthRelativeDay,
   formatGrowthStatusLabel,
 } from "@/lib/growth/dashboard/formatters";
-import type {
+import {
+  WORK_QUEUE_PAGE_SIZE,
   WorkQueueKind,
   WorkQueueRow,
   WorkQueueTab,
@@ -28,12 +26,6 @@ const TAB_LABELS: Record<WorkQueueKind, string> = {
   follow_ups: "Follow-ups",
 };
 
-const VIEW_ALL_HREF: Record<WorkQueueKind, string> = {
-  first_emails: "/growth/prospects?status=ready_for_email_review",
-  replies: "/growth/prospects?status=replied",
-  follow_ups: "/growth/outreach",
-};
-
 function statusMeta(
   kind: WorkQueueKind,
   row: WorkQueueRow,
@@ -43,6 +35,16 @@ function statusMeta(
     return `Created ${formatGrowthDate(row.statusAt)}`;
   if (kind === "replies") return `Replied ${formatGrowthDate(row.statusAt)}`;
   return `Due ${formatGrowthRelativeDay(row.statusAt, now)}`;
+}
+
+function workQueueHref(kind: WorkQueueKind, page = 1): string {
+  const searchParams = new URLSearchParams({ workQueue: kind });
+
+  if (page > 1) {
+    searchParams.set("workQueuePage", String(page));
+  }
+
+  return `/growth?${searchParams}`;
 }
 
 function QueueRow({
@@ -109,10 +111,12 @@ function QueueRow({
 }
 
 function QueuePanel({
+  currentPage,
   kind,
   now,
   tab,
 }: {
+  currentPage: number;
   kind: WorkQueueKind;
   now: string;
   tab: WorkQueueTab | undefined;
@@ -179,33 +183,72 @@ function QueuePanel({
         ))}
       </ul>
 
-      {totalCount > rows.length && (
-        <GrowthNavigationLink
-          className={styles.viewAllLink}
-          href={VIEW_ALL_HREF[kind]}
-        >
-          View all {totalCount} {TAB_LABELS[kind].toLowerCase()}
-          <ArrowRight aria-hidden="true" size={14} strokeWidth={2} />
-        </GrowthNavigationLink>
-      )}
+      <QueuePagination
+        currentPage={currentPage}
+        kind={kind}
+        totalCount={totalCount}
+      />
     </>
   );
 }
 
+function QueuePagination({
+  currentPage,
+  kind,
+  totalCount,
+}: {
+  currentPage: number;
+  kind: WorkQueueKind;
+  totalCount: number;
+}) {
+  const totalPages = Math.ceil(totalCount / WORK_QUEUE_PAGE_SIZE);
+
+  if (totalPages <= 1) {
+    return null;
+  }
+
+  const onFirstPage = currentPage === 1;
+  const onLastPage = currentPage >= totalPages;
+
+  return (
+    <nav aria-label="Work queue pagination" className={styles.queuePagination}>
+      <GrowthNavigationLink
+        aria-disabled={onFirstPage}
+        className={styles.queuePaginationLink}
+        href={workQueueHref(kind, Math.max(1, currentPage - 1))}
+        tabIndex={onFirstPage ? -1 : undefined}
+      >
+        Previous page
+      </GrowthNavigationLink>
+      <span aria-live="polite" className={styles.queuePageIndicator}>
+        Page {currentPage} of {totalPages}
+      </span>
+      <GrowthNavigationLink
+        aria-disabled={onLastPage}
+        className={styles.queuePaginationLink}
+        href={workQueueHref(kind, Math.min(totalPages, currentPage + 1))}
+        tabIndex={onLastPage ? -1 : undefined}
+      >
+        Next page
+      </GrowthNavigationLink>
+    </nav>
+  );
+}
+
 export function WorkQueue({
-  defaultTab,
+  activeTab,
+  currentPage,
   now,
   tabs,
 }: {
-  defaultTab: WorkQueueKind;
+  activeTab: WorkQueueKind;
+  currentPage: number;
   now: string;
   tabs: readonly WorkQueueTab[];
 }) {
-  const [activeTab, setActiveTab] = useState<WorkQueueKind>(defaultTab);
-  const baseId = useId();
   const byKind = new Map(tabs.map((tab) => [tab.kind, tab]));
-  const defaultTabData = byKind.get(defaultTab);
-  const primaryReviewHref = defaultTabData?.rows[0]?.reviewHref;
+  const activeTabData = byKind.get(activeTab);
+  const primaryReviewHref = activeTabData?.rows[0]?.reviewHref;
 
   return (
     <section aria-labelledby="work-queue-heading" className={styles.card}>
@@ -229,52 +272,31 @@ export function WorkQueue({
         )}
       </div>
 
-      <div
-        aria-label="Work queue categories"
-        className={styles.tabList}
-        role="tablist"
-      >
+      <nav aria-label="Work queue categories" className={styles.tabList}>
         {tabs.map((tab) => {
-          const tabId = `${baseId}-tab-${tab.kind}`;
-          const panelId = `${baseId}-panel-${tab.kind}`;
           const selected = tab.kind === activeTab;
 
           return (
-            <button
-              aria-controls={panelId}
-              aria-selected={selected}
+            <GrowthNavigationLink
+              aria-current={selected ? "page" : undefined}
               className={styles.tab}
-              id={tabId}
+              href={workQueueHref(tab.kind)}
               key={tab.kind}
-              onClick={() => setActiveTab(tab.kind)}
-              role="tab"
-              tabIndex={selected ? 0 : -1}
-              type="button"
             >
               {TAB_LABELS[tab.kind]} ({tab.totalCount})
-            </button>
+            </GrowthNavigationLink>
           );
         })}
+      </nav>
+
+      <div className={styles.tabPanel}>
+        <QueuePanel
+          currentPage={currentPage}
+          kind={activeTab}
+          now={now}
+          tab={activeTabData}
+        />
       </div>
-
-      {tabs.map((tab) => {
-        const tabId = `${baseId}-tab-${tab.kind}`;
-        const panelId = `${baseId}-panel-${tab.kind}`;
-        const selected = tab.kind === activeTab;
-
-        return (
-          <div
-            aria-labelledby={tabId}
-            className={styles.tabPanel}
-            hidden={!selected}
-            id={panelId}
-            key={tab.kind}
-            role="tabpanel"
-          >
-            <QueuePanel kind={tab.kind} now={now} tab={tab} />
-          </div>
-        );
-      })}
     </section>
   );
 }
