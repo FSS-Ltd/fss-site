@@ -242,6 +242,10 @@
   color: var(--doorknobs-ink);
 }
 
+.doorknobsRouteOption[data-active="true"] small {
+  opacity: 1;
+}
+
 .doorknobsRouteNumber {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 0.73rem;
