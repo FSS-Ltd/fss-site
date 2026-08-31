@@ -2,6 +2,7 @@ const PREVIEW_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 const BESPOKE_PREVIEW_SLUGS_BY_BUSINESS_NAME = new Map(
   [
+    ["Bridgland Roofing", "bridgland-roofing"],
     ["Bright Accounting Ltd", "bright-accounting"],
     ["Bright Fox Lettings", "bright-fox-lettings"],
     ["Burfords", "burfords"],
