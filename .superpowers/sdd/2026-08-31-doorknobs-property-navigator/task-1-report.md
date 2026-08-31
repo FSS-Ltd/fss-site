@@ -46,3 +46,44 @@ These failures are assertion failures against current behavior, not module-resol
 - Scope stayed inside Task 1: tests and fixtures only, no component, stylesheet, asset, route implementation, or shared-checkout changes.
 - Failures are anchored to observable behavior in the current route and registry.
 - The changed tests establish the intended next green target for the Doorknobs bespoke implementation without importing a nonexistent page module.
+
+## Review-fix follow-up
+
+- Removed the unrelated negative-copy assertion from `app/preview/bespoke-pages.test.tsx`.
+- Relaxed the Doorknobs registry test in `components/prospect-previews/bespoke/registry.test.tsx` so it asserts observable registration presence and page-facing metadata, without prescribing exact internal description text or signature string values.
+
+Command re-run:
+
+```bash
+node --import tsx --test app/preview/bespoke-pages.test.tsx components/prospect-previews/bespoke/registry.test.tsx
+```
+
+Result: still RED as intended.
+
+Relevant output summary:
+
+```text
+not ok 1 - prerenders the fourteen public-unlisted bespoke prospect slugs
+  Expected values to be strictly equal:
+  13 !== 14
+
+not ok 4 - defines Doorknobs private metadata around a Tunbridge Wells property journey
+  The input did not match the regular expression /Tunbridge Wells/i.
+  Input: 'Doorknobs'
+
+not ok 5 - renders Doorknobs as a bespoke property navigator with local assets and demo disclosure
+  The input did not match the regular expression /data-bespoke-prospect="doorknobs"/.
+
+not ok 6 - registers exactly the fourteen active bespoke prospect pages
+  actual bespoke slugs still omit 'doorknobs'
+
+not ok 7 - every prospect owns a distinct layout and hero-scene signature
+  Expected values to be strictly equal:
+  13 !== 14
+
+not ok 8 - every page renders its evidence-backed statement and a disclosed demo form
+  getBespokeProspectPage('doorknobs') is still undefined
+
+not ok 10 - reserves the Doorknobs bespoke registry slot and future signatures
+  getBespokeProspectPage('doorknobs') is still undefined
+```
