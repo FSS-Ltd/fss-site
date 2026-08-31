@@ -8,12 +8,13 @@ import ProspectPreviewPage, {
   generateStaticParams,
 } from "./[slug]/page";
 
-test("prerenders the fourteen public-unlisted bespoke prospect slugs", () => {
+test("prerenders the fifteen public-unlisted bespoke prospect slugs", () => {
   const params = generateStaticParams();
   const slugs: readonly string[] = params.map(({ slug }) => slug);
 
-  assert.equal(params.length, 14);
+  assert.equal(params.length, 15);
   assert.equal(slugs.includes("bright-accounting"), true);
+  assert.equal(slugs.includes("kemsing-motor-company"), true);
   assert.equal(slugs.includes("macknade"), false);
 });
 
@@ -50,5 +51,26 @@ test("resolves the Bright Accounting bespoke page and metadata", async () => {
   assert.match(html, /expired on 21 October 2021/i);
   assert.match(String(metadata.title), /Bright Accounting/i);
   assert.match(String(metadata.description), /fixed-fee/i);
+  assert.deepEqual(metadata.robots, { index: false, follow: false });
+});
+
+test("resolves Kemsing's royal-blue evidence-led bespoke page and metadata", async () => {
+  const page = await ProspectPreviewPage({
+    params: Promise.resolve({ slug: "kemsing-motor-company" }),
+  });
+  const html = renderToStaticMarkup(page);
+  const metadata = await generateMetadata({
+    params: Promise.resolve({ slug: "kemsing-motor-company" }),
+  });
+
+  assert.match(html, /data-bespoke-prospect="kemsing-motor-company"/);
+  assert.match(
+    String(metadata.title),
+    /MOT, diagnostics and vehicle servicing/i,
+  );
+  assert.match(
+    String(metadata.description),
+    /vehicle details Kemsing Motor Company needs/i,
+  );
   assert.deepEqual(metadata.robots, { index: false, follow: false });
 });
