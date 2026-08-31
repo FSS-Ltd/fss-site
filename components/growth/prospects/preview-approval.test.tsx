@@ -123,8 +123,41 @@ test("treats a registered bespoke concept as ready for founder approval", () => 
 
   assert.ok(approveButton);
   assert.doesNotMatch(approveButton, /disabled=/);
-  assert.match(html, /Bespoke source package is merged and ready for approval/);
+  assert.match(html, /Bespoke preview is registered and ready for approval/);
   assert.doesNotMatch(html, /needs a bespoke source package/);
+});
+
+test("treats registered bespoke concepts as ready while generation reconciliation is pending", () => {
+  for (const { businessName, slug } of [
+    { businessName: "PRIORITY POINT LIMITED", slug: "priority-point" },
+    { businessName: "BRIDGLAND LIMITED", slug: "bridgland-roofing" },
+  ]) {
+    const html = renderToStaticMarkup(
+      <PreviewApprovalFrame
+        businessName={businessName}
+        onSuccess={() => undefined}
+        preview={{
+          status: "draft",
+          slug: null,
+          version: 1,
+          compositionDigest: null,
+          generationStatus: "pending_pr",
+          generationPrNumber: null,
+        }}
+        prospectId="11111111-1111-4111-8111-111111111111"
+        prospectVersion={3}
+        prospectStatus="ready_for_email_review"
+      />,
+    );
+    const approveButton = html.match(
+      /<button[^>]*>Approve preview<\/button>/,
+    )?.[0];
+
+    assert.ok(approveButton);
+    assert.doesNotMatch(approveButton, /disabled=/);
+    assert.match(html, new RegExp(`href="/preview/${slug}"`));
+    assert.match(html, /Bespoke preview is registered and ready for approval/);
+  }
 });
 
 test("keeps bespoke approval unavailable when the stored slug conflicts", () => {
