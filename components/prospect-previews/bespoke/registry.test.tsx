@@ -23,6 +23,7 @@ const expectedSlugs = [
   "evo-kent-roofing",
   "fuggles-beer-cafe",
   "hide-and-fox",
+  "hollis-motors",
   "jaguar-plumbing",
   "kemsing-motor-company",
   "kent-garage-equipment",
@@ -34,7 +35,7 @@ const expectedSlugs = [
   "wormald-accountants",
 ] as const;
 
-test("registers exactly the eighteen active bespoke prospect pages", () => {
+test("registers exactly the nineteen active bespoke prospect pages", () => {
   assert.deepEqual(
     [...getBespokeProspectSlugs()].sort(),
     [...expectedSlugs].sort(),
@@ -45,8 +46,8 @@ test("registers exactly the eighteen active bespoke prospect pages", () => {
 test("every prospect owns a distinct layout and hero-scene signature", () => {
   const entries = Object.values(bespokeProspectPages);
 
-  assert.equal(new Set(entries.map((entry) => entry.layoutSignature)).size, 18);
-  assert.equal(new Set(entries.map((entry) => entry.heroSignature)).size, 18);
+  assert.equal(new Set(entries.map((entry) => entry.layoutSignature)).size, 19);
+  assert.equal(new Set(entries.map((entry) => entry.heroSignature)).size, 19);
 });
 
 test("every bespoke prospect page is recognised by the Growth OS preview resolver", () => {
