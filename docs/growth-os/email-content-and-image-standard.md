@@ -8,7 +8,7 @@ Applies to: Gmail cold outreach, Resend site emails, newsletter emails, and dash
 | Message                       | Provider         | Consent position                                          | Visual treatment                                            |
 | ----------------------------- | ---------------- | --------------------------------------------------------- | ----------------------------------------------------------- |
 | Personalised first cold email | Gmail API        | Verified corporate subscriber and documented lawful basis | Text-first, one prospect-specific or approved sector visual |
-| Day 5, 11, and 20 follow-ups  | Gmail API        | Same approved corporate sequence                          | Text-only in the original thread                            |
+| Day 5, 11, and 14 follow-ups  | Gmail API        | Same approved corporate sequence                          | Text-only in the original thread                            |
 | Direct replies                | Founder in Gmail | Human conversation                                        | Manual only                                                 |
 | Site enquiry acknowledgement  | Resend           | Requested transactional message                           | Full FSS template and generated editorial visual            |
 | Resource delivery             | Resend           | Requested transactional message                           | Full FSS template and relevant generated visual             |
@@ -94,19 +94,16 @@ Jean-Fidele
 
 ### Day 11
 
-```text
-Hi {{firstName}},
+Day 11 is no longer a shared template. Once the Day 5 follow-up has been sent
+without a reply, the daily audit agent may prepare an individual SEO and AEO
+audit from public sources. The application generates a PDF with practical steps
+the business can complete without a developer, then creates a draft email
+linking to that report.
 
-One useful way to test this idea is to look at the information your team asks for on almost every first call.
+Every Day 11 audit email requires founder approval before it enters the Gmail
+queue. The shared template system must never send a generic substitute.
 
-If a customer can provide the job type, location, urgency and preferred contact method in advance, the call starts with context rather than repetition. That is the type of practical improvement FSS would design around {{businessName}}.
-
-If you would like, I can send a one-page outline of that flow.
-
-Jean-Fidele
-```
-
-### Day 20
+### Day 14
 
 ```text
 Hi {{firstName}},

@@ -18,8 +18,8 @@ const MAX_CITATIONS = 20;
 export const FOLLOW_UP_CADENCE = [
   { day: "Day 1", label: "Personalised email" },
   { day: "Day 5", label: "Short follow-up" },
-  { day: "Day 11", label: "Useful example" },
-  { day: "Day 20", label: "Close the loop" },
+  { day: "Day 11", label: "Founder-approved SEO and AEO audit" },
+  { day: "Day 14", label: "Close the loop" },
 ] as const;
 
 export type MessageReviewCitation = {
@@ -270,7 +270,10 @@ export async function getMessageReview(
   try {
     const draft = await fetchDraftRow(db, draftTaskId);
     if (!draft) {
-      return { status: "unavailable", reason: "This draft could not be found." };
+      return {
+        status: "unavailable",
+        reason: "This draft could not be found.",
+      };
     }
 
     let stored;
@@ -305,7 +308,8 @@ export async function getMessageReview(
     ) {
       return {
         status: "unavailable",
-        reason: "This email has already been reviewed and can no longer be edited here.",
+        reason:
+          "This email has already been reviewed and can no longer be edited here.",
       };
     }
 
@@ -317,7 +321,8 @@ export async function getMessageReview(
     if (!resolvedVisual) {
       return {
         status: "unavailable",
-        reason: "The generated image for this draft is missing and must be resolved before review.",
+        reason:
+          "The generated image for this draft is missing and must be resolved before review.",
       };
     }
 
@@ -330,7 +335,8 @@ export async function getMessageReview(
     } catch {
       return {
         status: "unavailable",
-        reason: "This draft's copy or image failed safety validation and cannot be reviewed as-is.",
+        reason:
+          "This draft's copy or image failed safety validation and cannot be reviewed as-is.",
       };
     }
 
@@ -338,7 +344,10 @@ export async function getMessageReview(
     if (suppressed) {
       reasons.push("This contact is suppressed and cannot be emailed.");
     }
-    if (draft.subscriberType !== "corporate" || draft.corporateStatus !== "active") {
+    if (
+      draft.subscriberType !== "corporate" ||
+      draft.corporateStatus !== "active"
+    ) {
       reasons.push("This contact is not an eligible corporate subscriber.");
     }
     if (

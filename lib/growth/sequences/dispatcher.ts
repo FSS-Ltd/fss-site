@@ -11,7 +11,7 @@ import type {
   SequenceDispatchRepository,
 } from "./dispatcher-repository";
 import {
-  FOLLOW_UP_LABELS,
+  AUTOMATED_FOLLOW_UP_LABELS,
   type FollowUpLabel,
   scheduleFollowUps,
 } from "./schedule";
@@ -21,13 +21,13 @@ const DEFAULT_MAX_MESSAGES_PER_RUN = 25;
 
 const FOLLOW_UP_TEMPLATE_KEY_BY_STEP: Record<number, string> = {
   1: "gmail_follow_up_day_5",
-  2: "gmail_follow_up_day_11",
+  // The original published key is retained while its send date moves to Day 14.
   3: "gmail_follow_up_day_20",
 };
 const STEP_BY_FOLLOW_UP_LABEL: Record<FollowUpLabel, number> = {
   day_5: 1,
   day_11: 2,
-  day_20: 3,
+  day_14: 3,
 };
 
 export type DispatchSummary = {
@@ -51,7 +51,7 @@ export function scheduledFollowUpsForFirstSend(
   sentAt: Date,
 ) {
   const scheduled = scheduleFollowUps(sentAt);
-  return FOLLOW_UP_LABELS.map((label) => {
+  return AUTOMATED_FOLLOW_UP_LABELS.map((label) => {
     const stepNumber = STEP_BY_FOLLOW_UP_LABEL[label];
     return {
       stepNumber,
@@ -132,18 +132,6 @@ async function prepareFollowUpSend(
     };
   }
 
-  const templateKey = FOLLOW_UP_TEMPLATE_KEY_BY_STEP[claimed.stepNumber];
-  const template = templateKey
-    ? await repository.getFollowUpTemplate(db, templateKey)
-    : null;
-  if (!template) {
-    return {
-      kind: "permanent_failure",
-      errorCode: "missing_template",
-      errorSummary: "The published follow-up template could not be found.",
-    };
-  }
-
   if (!context.gmailThreadId) {
     return {
       kind: "permanent_failure",
@@ -170,6 +158,59 @@ async function prepareFollowUpSend(
       kind: "permanent_failure",
       errorCode: "missing_thread",
       errorSummary: "The original subject line is unknown.",
+    };
+  }
+
+  // The second follow-up is a stored, founder-approved SEO/AEO audit draft.
+  // It is never rendered from a shared template.
+  if (claimed.stepNumber === 2) {
+    if (
+      !claimed.subjectSnapshot ||
+      !claimed.htmlSnapshot ||
+      !claimed.textSnapshot
+    ) {
+      return {
+        kind: "permanent_failure",
+        errorCode: "missing_snapshot",
+        errorSummary: "The approved SEO audit email snapshot is incomplete.",
+      };
+    }
+    const rendered = renderGmailMime({
+      id: claimed.id,
+      from: founderEmail,
+      to: context.contactEmail,
+      replyTo: founderEmail,
+      subject: claimed.subjectSnapshot,
+      html: claimed.htmlSnapshot,
+      text: claimed.textSnapshot,
+      thread: {
+        gmailThreadId: context.gmailThreadId,
+        parentMessageId: references.parentMessageId,
+        references: references.references,
+      },
+    });
+    return {
+      kind: "ready",
+      send: {
+        raw: rendered.raw,
+        gmailThreadId: rendered.gmailThreadId,
+        rfcMessageId: rendered.rfcMessageId,
+        subject: claimed.subjectSnapshot,
+        html: claimed.htmlSnapshot,
+        text: claimed.textSnapshot,
+      },
+    };
+  }
+
+  const templateKey = FOLLOW_UP_TEMPLATE_KEY_BY_STEP[claimed.stepNumber];
+  const template = templateKey
+    ? await repository.getFollowUpTemplate(db, templateKey)
+    : null;
+  if (!template) {
+    return {
+      kind: "permanent_failure",
+      errorCode: "missing_template",
+      errorSummary: "The published follow-up template could not be found.",
     };
   }
 

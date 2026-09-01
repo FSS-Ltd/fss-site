@@ -1,0 +1,198 @@
+import { z } from "zod";
+
+import { escapeEmailHtmlText, isSafeEmailHtml } from "../email/html-policy";
+
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const CONTROL_PATTERN = /[\u0000-\u001f\u007f]/;
+
+const publicUrlSchema = z
+  .string()
+  .trim()
+  .url()
+  .max(2_000)
+  .refine((value) => {
+    const url = new URL(value);
+    return (
+      (url.protocol === "http:" || url.protocol === "https:") &&
+      url.username === "" &&
+      url.password === ""
+    );
+  }, "URL must be an HTTP(S) URL without credentials.");
+
+const plainTextSchema = (minimum: number, maximum: number) =>
+  z
+    .string()
+    .trim()
+    .min(minimum)
+    .max(maximum)
+    .refine(
+      (value) => !CONTROL_PATTERN.test(value),
+      "Text contains control characters.",
+    );
+
+const auditActionSchema = z
+  .object({
+    title: plainTextSchema(3, 120),
+    instructions: plainTextSchema(20, 1_000),
+  })
+  .strict();
+
+const auditFindingSchema = z
+  .object({
+    id: z
+      .string()
+      .trim()
+      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+      .max(80),
+    severity: z.enum(["critical", "high", "medium", "low"]),
+    title: plainTextSchema(6, 160),
+    evidence: plainTextSchema(20, 1_200),
+    whyItMatters: plainTextSchema(20, 1_000),
+    actions: z.array(auditActionSchema).min(1).max(5),
+  })
+  .strict();
+
+const auditSourceSchema = z
+  .object({
+    title: plainTextSchema(3, 180),
+    url: publicUrlSchema,
+    checkedAt: z.string().datetime({ offset: true }),
+  })
+  .strict();
+
+export const seoAeoAuditSchema = z
+  .object({
+    executiveSummary: plainTextSchema(80, 2_000),
+    scores: z
+      .object({
+        technicalSeo: z.number().int().min(0).max(100),
+        onPageSeo: z.number().int().min(0).max(100),
+        localSeo: z.number().int().min(0).max(100),
+        answerEngineReadiness: z.number().int().min(0).max(100),
+      })
+      .strict(),
+    strengths: z.array(plainTextSchema(15, 500)).min(1).max(5),
+    findings: z.array(auditFindingSchema).min(4).max(12),
+    answerEngineSummary: plainTextSchema(50, 1_200),
+    sources: z.array(auditSourceSchema).min(1).max(20),
+  })
+  .strict();
+
+export const seoAuditSubmissionSchema = z
+  .object({
+    auditId: z.string().regex(UUID_PATTERN),
+    audit: seoAeoAuditSchema,
+    email: z
+      .object({
+        subject: plainTextSchema(8, 160),
+        paragraphs: z.array(plainTextSchema(20, 1_000)).min(2).max(4),
+      })
+      .strict(),
+  })
+  .strict();
+
+export type SeoAeoAudit = z.infer<typeof seoAeoAuditSchema>;
+export type SeoAuditSubmission = z.infer<typeof seoAuditSubmissionSchema>;
+
+export type StoredSeoAuditEmail = {
+  subject: string;
+  html: string;
+  text: string;
+  wordCount: number;
+};
+
+export type StoredSeoAuditDraft = {
+  schemaVersion: "1.0";
+  reviewState: "draft" | "approved";
+  version: number;
+  reportUrl: string;
+  reportSha256: string;
+  audit: SeoAeoAudit;
+  email: StoredSeoAuditEmail;
+};
+
+const storedSeoAuditDraftSchema = z
+  .object({
+    schemaVersion: z.literal("1.0"),
+    reviewState: z.enum(["draft", "approved"]),
+    version: z.number().int().positive(),
+    reportUrl: publicUrlSchema,
+    reportSha256: z.string().regex(/^[a-f0-9]{64}$/),
+    audit: seoAeoAuditSchema,
+    email: z
+      .object({
+        subject: plainTextSchema(8, 160),
+        html: z.string().min(1).max(20_000),
+        text: plainTextSchema(20, 20_000),
+        wordCount: z.number().int().positive().max(500),
+      })
+      .strict(),
+  })
+  .strict();
+
+function countWords(text: string): number {
+  return text.trim().split(/\s+/).length;
+}
+
+export function createStoredSeoAuditDraft(input: {
+  submission: SeoAuditSubmission;
+  reportUrl: string;
+  reportSha256: string;
+}): StoredSeoAuditDraft {
+  const reportUrl = publicUrlSchema.parse(input.reportUrl);
+  const reportSha256 = z
+    .string()
+    .regex(/^[a-f0-9]{64}$/)
+    .parse(input.reportSha256);
+  const paragraphs = [
+    ...input.submission.email.paragraphs,
+    `I have put the full SEO and answer-engine audit here: ${reportUrl}`,
+    "If you would rather not hear from me, reply and I will close the loop.",
+  ];
+  const text = paragraphs.join("\n\n");
+  const wordCount = countWords(text);
+  if (wordCount < 70 || wordCount > 220) {
+    throw new TypeError(
+      "SEO audit email content must contain 70 to 220 words.",
+    );
+  }
+  const html = paragraphs
+    .map((paragraph) => {
+      if (!paragraph.includes(reportUrl)) {
+        return `<p>${escapeEmailHtmlText(paragraph)}</p>`;
+      }
+      const [before, after] = paragraph.split(reportUrl);
+      return `<p>${escapeEmailHtmlText(before ?? "")}<a href="${escapeEmailHtmlText(reportUrl)}">Download the full audit (PDF)</a>${escapeEmailHtmlText(after ?? "")}</p>`;
+    })
+    .join("");
+  if (!isSafeEmailHtml(html)) {
+    throw new TypeError("SEO audit email HTML is invalid.");
+  }
+
+  return {
+    schemaVersion: "1.0",
+    reviewState: "draft",
+    version: 1,
+    reportUrl,
+    reportSha256,
+    audit: input.submission.audit,
+    email: {
+      subject: input.submission.email.subject,
+      html,
+      text,
+      wordCount,
+    },
+  };
+}
+
+export function parseStoredSeoAuditDraft(value: unknown): StoredSeoAuditDraft {
+  const parsed = storedSeoAuditDraftSchema.safeParse(value);
+  if (!parsed.success || !isSafeEmailHtml(parsed.data.email.html)) {
+    throw new TypeError("Stored SEO audit draft is invalid.");
+  }
+  if (countWords(parsed.data.email.text) !== parsed.data.email.wordCount) {
+    throw new TypeError("Stored SEO audit draft word count is invalid.");
+  }
+  return parsed.data;
+}

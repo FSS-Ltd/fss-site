@@ -154,7 +154,7 @@ function createDispatch(
   });
 }
 
-test("sends a due first email and schedules Day 5, 11, and 20 follow-ups", async () => {
+test("sends a due first email and schedules the automatic Day 5 and 14 follow-ups", async () => {
   const state = createFakeState();
   const dispatch = createDispatch(state);
 
@@ -171,10 +171,10 @@ test("sends a due first email and schedules Day 5, 11, and 20 follow-ups", async
   assert.equal(state.sent.length, 1);
   const recorded = state.sent[0]!;
   assert.equal(recorded.providerMessageId, "provider-message-1");
-  assert.equal(recorded.followUps?.length, 3);
+  assert.equal(recorded.followUps?.length, 2);
   assert.deepEqual(
     recorded.followUps?.map((followUp) => followUp.stepNumber).sort(),
-    [1, 2, 3],
+    [1, 3],
   );
 });
 
@@ -356,6 +356,53 @@ test("sends a due follow-up through its published template with merge fields and
   assert.equal(state.sent[0]?.followUps, null);
   assert.match(state.sent[0]?.htmlSnapshot ?? "", /Sam/);
   assert.match(state.sent[0]?.htmlSnapshot ?? "", /Example &amp; Sons/);
+});
+
+test("sends the founder-approved Day 11 SEO audit from its stored snapshot", async () => {
+  let sentInput: Parameters<GmailClient["sendMessage"]>[0] | undefined;
+  const state = createFakeState({
+    queue: [
+      claimedFirstEmail({
+        id: "55555555-5555-4555-8555-555555555556",
+        stepNumber: 2,
+        subjectSnapshot: "Your practical SEO audit",
+        htmlSnapshot: "<p>Download the audit.</p>",
+        textSnapshot: "Download the audit.",
+        rfcMessageId: null,
+      }),
+    ],
+    contexts: new Map([
+      [
+        "22222222-2222-4222-8222-222222222222",
+        sendContext({ gmailThreadId: "thread-1" }),
+      ],
+    ]),
+    references: new Map([
+      [
+        "22222222-2222-4222-8222-222222222222",
+        {
+          parentMessageId: "<growthos.second@faithfulsoftware.dev>",
+          references: ["<growthos.first@faithfulsoftware.dev>"],
+        },
+      ],
+    ]),
+  });
+  const dispatch = createDispatch(state, {
+    gmailClient: fakeGmailClient({
+      sendMessage: async (input) => {
+        sentInput = input;
+        return { messageId: "provider-message-3", gmailThreadId: "thread-1" };
+      },
+    }),
+  });
+
+  const summary = await dispatch(db, NOW);
+
+  assert.equal(summary.sent, 1);
+  assert.equal(sentInput?.gmailThreadId, "thread-1");
+  assert.equal(state.sent[0]?.subjectSnapshot, "Your practical SEO audit");
+  assert.equal(state.sent[0]?.htmlSnapshot, "<p>Download the audit.</p>");
+  assert.equal(state.templates.size, 0);
 });
 
 test("blocks a follow-up send when a required merge field is missing", async () => {

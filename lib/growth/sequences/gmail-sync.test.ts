@@ -401,7 +401,7 @@ test("reconciles a founder-sent provider draft through its RFC Message-ID and ac
   assert.equal(summary.reconciledDrafts, 1);
   assert.deepEqual(state.activated, ["enrollment-1"]);
   assert.equal(state.recorded[0]?.messageId, "message-1");
-  assert.equal(state.recorded[0]?.followUps?.length, 3);
+  assert.equal(state.recorded[0]?.followUps?.length, 2);
 });
 
 test("does nothing for an own message that matches no pending draft (unsent or deleted)", async () => {

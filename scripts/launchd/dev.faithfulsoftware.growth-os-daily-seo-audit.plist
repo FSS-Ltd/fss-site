@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>dev.faithfulsoftware.growth-os-daily-seo-audit</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/JeanFidele/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node</string>
+    <string>--import</string>
+    <string>tsx</string>
+    <string>scripts/run-scheduled-seo-audit-agent.ts</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>/Users/JeanFidele/The Nexus Ecosystem/Projects/fss-site</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>GROWTH_OS_CODEX_BINARY</key>
+    <string>/Applications/ChatGPT.app/Contents/Resources/codex</string>
+    <key>PATH</key>
+    <string>/Applications/ChatGPT.app/Contents/Resources:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    <key>TMPDIR</key>
+    <string>/private/tmp</string>
+  </dict>
+  <key>ProcessType</key>
+  <string>Background</string>
+  <key>StandardOutPath</key>
+  <string>/Users/JeanFidele/Library/Logs/FSS/growth-os-daily-seo-audit.stdout.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/JeanFidele/Library/Logs/FSS/growth-os-daily-seo-audit.stderr.log</string>
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key>
+    <integer>6</integer>
+    <key>Minute</key>
+    <integer>30</integer>
+  </dict>
+</dict>
+</plist>

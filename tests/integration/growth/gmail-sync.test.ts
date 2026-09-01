@@ -238,7 +238,7 @@ test(
       `;
       assert.deepEqual(
         followUps.map((row) => row.stepNumber),
-        [1, 2, 3],
+        [1, 3],
       );
     } finally {
       await cleanUp(sql, externalRunId, contactEmail, companyNumber);

@@ -258,7 +258,7 @@ test(
       `;
       assert.deepEqual(
         followUps.map((row) => row.stepNumber),
-        [1, 2, 3],
+        [1, 3],
       );
       assert.ok(followUps.every((row) => row.status === "queued"));
 

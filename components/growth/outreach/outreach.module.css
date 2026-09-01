@@ -652,3 +652,73 @@
 .rulesBox strong {
   color: #07182e;
 }
+
+/* SEO and AEO audit review */
+
+.auditSummary {
+  margin: 18px 0 0;
+  color: #3a4a63;
+  line-height: 1.6;
+}
+
+.auditSubheading {
+  margin: 24px 0 12px;
+  color: #07182e;
+  font-size: 0.92rem;
+}
+
+.auditFindings {
+  margin: 0;
+  padding-left: 22px;
+}
+
+.auditFinding {
+  margin: 0 0 18px;
+  color: #3a4a63;
+  line-height: 1.55;
+}
+
+.auditFinding p {
+  margin: 6px 0;
+}
+
+.auditFindingHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: #07182e;
+}
+
+.auditActionList {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding-left: 18px;
+}
+
+.auditDetails {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+}
+
+.auditDetails div {
+  display: grid;
+  gap: 4px;
+}
+
+.auditDetails dt {
+  color: #8896ab;
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.auditDetails dd {
+  margin: 0;
+  color: #3a4a63;
+  font-size: 0.84rem;
+  overflow-wrap: anywhere;
+}

@@ -11,13 +11,17 @@ import {
 const TIMEZONE = "Europe/London";
 const SEND_HOUR = 10;
 
-export const FOLLOW_UP_LABELS = ["day_5", "day_11", "day_20"] as const;
+export const FOLLOW_UP_LABELS = ["day_5", "day_11", "day_14"] as const;
 export type FollowUpLabel = (typeof FOLLOW_UP_LABELS)[number];
+
+// Day 11 is intentionally excluded: it is an individual SEO/AEO audit email
+// that is drafted by the daily agent and requires founder approval.
+export const AUTOMATED_FOLLOW_UP_LABELS = ["day_5", "day_14"] as const;
 
 const FOLLOW_UP_CALENDAR_OFFSETS: Record<FollowUpLabel, number> = {
   day_5: 4,
   day_11: 10,
-  day_20: 19,
+  day_14: 13,
 };
 
 function atLocalSendTime(date: TZDate): TZDate {
@@ -52,6 +56,6 @@ export function scheduleFollowUps(
   return {
     day_5: scheduleFollowUp(firstSentAt, "day_5"),
     day_11: scheduleFollowUp(firstSentAt, "day_11"),
-    day_20: scheduleFollowUp(firstSentAt, "day_20"),
+    day_14: scheduleFollowUp(firstSentAt, "day_14"),
   };
 }

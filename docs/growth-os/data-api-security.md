@@ -570,7 +570,7 @@ One transaction must:
 
 The provider send happens after this transaction. A successful provider response updates the message and schedules later steps.
 
-Follow-up labels Day 5, Day 11, and Day 20 use calendar offsets of 4, 10, and 19 days from the actual first-send timestamp. Each target is scheduled for 10:00 `Europe/London`. A Saturday or Sunday target moves forward to Monday before conversion to UTC. The MVP does not claim UK bank-holiday awareness.
+Follow-up labels Day 5, Day 11, and Day 14 use calendar offsets of 4, 10, and 13 days from the actual first-send timestamp. Day 5 and Day 14 are scheduled automatically. Day 11 is an individually generated SEO and AEO audit that enters the queue only after founder approval. Each target uses 10:00 `Europe/London`; a Saturday or Sunday target moves forward to Monday before conversion to UTC. The MVP does not claim UK bank-holiday awareness.
 
 ### Stop Wins
 
