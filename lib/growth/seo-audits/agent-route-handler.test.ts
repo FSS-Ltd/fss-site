@@ -187,3 +187,26 @@ test("rejects a submission with an invalid signature before it reaches the agent
 
   assert.equal(response.status, 401);
 });
+
+test("rejects an under-length email before it renders a report", async () => {
+  let renderAttempted = false;
+  const handler = createSeoAuditSubmissionHandler({
+    ...dependencies(),
+    renderPdf: async () => {
+      renderAttempted = true;
+      return Buffer.from("%PDF-test");
+    },
+  });
+  const submission = auditSubmission();
+  submission.email.paragraphs = [
+    "I reviewed the public pages and found a few practical opportunities.",
+    "The attached report explains where to start with the work.",
+  ];
+
+  const response = await handler(
+    signedRequest("/api/agent/seo-audits", submission),
+  );
+
+  assert.equal(response.status, 422);
+  assert.equal(renderAttempted, false);
+});

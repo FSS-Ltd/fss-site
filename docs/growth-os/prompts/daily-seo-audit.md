@@ -10,7 +10,7 @@ operating contract for review and future revisions.
   non-developer actions.
 - Submit a short, personalised email draft. The application adds the report
   link and opt-out sentence, renders the PDF, and holds the result for founder
-  approval. The agent's paragraphs must total 50 to 190 words, so the final
+  approval. The agent's paragraphs must total 80 to 160 words, so the final
   application email remains within its 70 to 220 word limit.
 - Each submission file must be raw JSON that exactly conforms to
   `seoAuditSubmissionSchema`, with no Markdown fence, commentary, or extra

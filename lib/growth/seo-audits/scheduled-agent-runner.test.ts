@@ -108,7 +108,7 @@ test("starts an isolated, schema-constrained agent that cannot send email", () =
     assert.match(prompt, /never print a business name/i);
     assert.match(prompt, /create a Gmail draft, send email, queue an email/i);
     assert.match(prompt, /exactly conforms to seoAuditSubmissionSchema/i);
-    assert.match(prompt, /50 to 190 words/i);
+    assert.match(prompt, /80 to 160 words/i);
     const schemaPath = input.args[input.args.indexOf("--output-schema") + 1];
     const schema = JSON.parse(readFileSync(schemaPath, "utf8")) as {
       additionalProperties?: boolean;
