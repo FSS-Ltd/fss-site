@@ -55,4 +55,11 @@ test("renders a non-empty downloadable PDF for a validated audit", async () => {
 
   assert.equal(pdf.subarray(0, 4).toString("ascii"), "%PDF");
   assert.ok(pdf.byteLength > 1_000);
+  const pageCount =
+    pdf.toString("latin1").match(/\/Type \/Page\b/g)?.length ?? 0;
+  assert.ok(pageCount > 0);
+  assert.ok(
+    pageCount <= 5,
+    `expected at most five pages, received ${pageCount}`,
+  );
 });

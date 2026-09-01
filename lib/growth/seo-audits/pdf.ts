@@ -52,22 +52,9 @@ function writeParagraph(document: PDFKit.PDFDocument, text: string): void {
   document.moveDown(0.8);
 }
 
-function writeFooter(document: PDFKit.PDFDocument): void {
-  document.on("pageAdded", () => {
-    document
-      .fillColor("#72809a")
-      .font("Helvetica")
-      .fontSize(8)
-      .text(
-        "Faithful Software Solutions · SEO and AEO audit",
-        PAGE_MARGIN,
-        FOOTER_Y,
-        {
-          width: CONTENT_WIDTH,
-          align: "center",
-        },
-      );
-  });
+function writeFooterOnCurrentPage(document: PDFKit.PDFDocument): void {
+  const contentX = document.x;
+  const contentY = document.y;
   document
     .fillColor("#72809a")
     .font("Helvetica")
@@ -81,6 +68,13 @@ function writeFooter(document: PDFKit.PDFDocument): void {
         align: "center",
       },
     );
+  document.x = contentX;
+  document.y = contentY;
+}
+
+function writeFooter(document: PDFKit.PDFDocument): void {
+  document.on("pageAdded", () => writeFooterOnCurrentPage(document));
+  writeFooterOnCurrentPage(document);
 }
 
 function writeScores(document: PDFKit.PDFDocument, audit: SeoAeoAudit): void {

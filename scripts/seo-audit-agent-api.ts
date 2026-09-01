@@ -20,6 +20,12 @@ const releaseResponseSchema = z
     releasedCount: z.number().int().nonnegative(),
   })
   .passthrough();
+const regenerationResponseSchema = z
+  .object({
+    ok: z.literal(true),
+    regeneratedCount: z.number().int().nonnegative(),
+  })
+  .passthrough();
 const ledgerSchema = z
   .object({ auditIds: z.array(uuidSchema).max(5) })
   .strict();
@@ -112,11 +118,29 @@ async function release(ledgerPath: string | undefined): Promise<void> {
   writeResult(releaseResponseSchema.parse(response));
 }
 
+async function regenerate(auditIds: readonly string[]): Promise<void> {
+  if (auditIds.length === 0 || auditIds.length > 5) {
+    throw new Error("One to five SEO audit IDs are required.");
+  }
+  const parsedAuditIds = z.array(uuidSchema).min(1).max(5).parse(auditIds);
+  if (new Set(parsedAuditIds).size !== parsedAuditIds.length) {
+    throw new Error("SEO audit IDs must be unique.");
+  }
+  const response = await post(
+    "/api/agent/seo-audits/regenerate-reports",
+    Buffer.from(JSON.stringify({ auditIds: parsedAuditIds }), "utf8"),
+  );
+  if (response !== null)
+    writeResult(regenerationResponseSchema.parse(response));
+}
+
 async function main(): Promise<void> {
-  const [command, argument] = process.argv.slice(2);
+  const [command, ...arguments_] = process.argv.slice(2);
+  const [argument] = arguments_;
   if (command === "claim") return claim();
   if (command === "submit") return submit(argument);
   if (command === "release") return release(argument);
+  if (command === "regenerate") return regenerate(arguments_);
   throw new Error("SEO audit agent command is invalid.");
 }
 
