@@ -14,6 +14,8 @@ import { join } from "node:path";
 
 import { z } from "zod";
 
+import { seoAuditSubmissionSchema } from "./schema";
+
 const PROMPT_VERSION = "daily-seo-audit-v1";
 const DEFAULT_TIMEOUT_MS = 45 * 60 * 1_000;
 const MAX_SUBMISSION_BYTES = 128 * 1024;
@@ -130,15 +132,37 @@ function claimSeoAuditCandidatesForAgent(input: {
   };
 }
 
+export type SeoAuditSubmissionResult =
+  | { status: "submitted" }
+  | { status: "failed"; httpStatus: number | null };
+
 export type SeoAuditSubmissionRunner = (input: {
   repositoryRoot: string;
   submissionPath: string;
-}) => boolean;
+}) => SeoAuditSubmissionResult;
+
+const agentApiFailureSchema = z
+  .object({
+    ok: z.literal(false),
+    status: z.number().int().min(400).max(599),
+  })
+  .strict();
+
+function readAgentApiFailureStatus(stdout: string): number | null {
+  try {
+    const parsed = agentApiFailureSchema.safeParse(
+      JSON.parse(stdout) as unknown,
+    );
+    return parsed.success ? parsed.data.status : null;
+  } catch {
+    return null;
+  }
+}
 
 function submitPreparedSeoAudit(input: {
   repositoryRoot: string;
   submissionPath: string;
-}): boolean {
+}): SeoAuditSubmissionResult {
   const result = spawnSync(
     process.execPath,
     [
@@ -150,11 +174,32 @@ function submitPreparedSeoAudit(input: {
     ],
     {
       cwd: input.repositoryRoot,
-      stdio: ["ignore", "ignore", "ignore"],
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
       timeout: 60_000,
     },
   );
-  return result.error === undefined && result.status === 0;
+  if (result.error === undefined && result.status === 0) {
+    return { status: "submitted" };
+  }
+  return {
+    status: "failed",
+    httpStatus: readAgentApiFailureStatus(result.stdout),
+  };
+}
+
+function isValidSeoAuditSubmissionFile(
+  submissionPath: string,
+  auditId: string,
+): boolean {
+  try {
+    const parsed = seoAuditSubmissionSchema.safeParse(
+      JSON.parse(readFileSync(submissionPath, "utf8")) as unknown,
+    );
+    return parsed.success && parsed.data.auditId === auditId;
+  } catch {
+    return false;
+  }
 }
 
 export type SeoAuditClaimReleaser = (input: {
@@ -234,7 +279,7 @@ function buildAgentPrompt(
     "Do not inspect AGENTS files, Nexus vault files, Codex caches or memories, browser data, Git history, or any other user files. Do not run broad filesystem searches.",
     `Read the candidate response from ${candidatePath}. The trusted scheduler wrapper owns candidate claims, request signing, and final submission. Do not access the Keychain, run ${join(repositoryRoot, "scripts/seo-audit-agent-api.ts")}, implement request signing, or call an application endpoint. Never request or use a database credential.`,
     "For each claimed candidate, research only publicly accessible sources. Produce a rigorous SEO and AEO audit with evidence, source URLs, clear prioritised findings, and specific steps the business can do themselves without a developer. Do not claim that unverified tools or private analytics were used.",
-    `For each completed candidate, write one strict JSON submission to ${submissionDirectory}/<auditId>.json, where <auditId> exactly matches the candidate audit ID. The wrapper validates and submits each file, then the application creates the PDF, stores it, and creates the founder-review email draft. Do not create the PDF locally, write files to the repository, create a Gmail draft, send email, queue an email, commit, deploy, or publish anything.`,
+    `For each completed candidate, write one raw JSON submission that exactly conforms to seoAuditSubmissionSchema to ${submissionDirectory}/<auditId>.json, where <auditId> exactly matches the candidate audit ID. Do not use Markdown fences or add keys beyond the schema. The email paragraphs must collectively contain 50 to 190 words because the application adds the PDF-link and opt-out paragraphs before enforcing its final 70 to 220 word email limit. The wrapper validates and submits each file, then the application creates the PDF, stores it, and creates the founder-review email draft. Do not create the PDF locally, write files to the repository, create a Gmail draft, send email, queue an email, commit, deploy, or publish anything.`,
     "In the redacted report, count each valid submission file you write as submitted; the wrapper determines the final application submission result. If one candidate fails, continue with the others and record only redacted totals. Never print a business name, website URL, contact detail, source URL, audit text, email copy, request body, signature, secret, or provider response.",
     "Return only the strict redacted JSON run report defined by the supplied schema. Do not wrap it in Markdown or add commentary.",
   ].join(" ");
@@ -349,6 +394,8 @@ export function executeScheduledSeoAuditAgent({
     }
 
     let submitted = 0;
+    let invalidSubmissionCount = 0;
+    const submissionFailureStatuses = new Set<number>();
     for (const auditId of claimed.auditIds) {
       const submissionPath = join(submissionDirectory, `${auditId}.json`);
       if (!existsSync(submissionPath)) {
@@ -360,9 +407,29 @@ export function executeScheduledSeoAuditAgent({
         submission.size === 0 ||
         submission.size > MAX_SUBMISSION_BYTES
       ) {
+        invalidSubmissionCount += 1;
         continue;
       }
-      if (submissionRunner({ repositoryRoot, submissionPath })) submitted += 1;
+      if (!isValidSeoAuditSubmissionFile(submissionPath, auditId)) {
+        invalidSubmissionCount += 1;
+        continue;
+      }
+      const outcome = submissionRunner({ repositoryRoot, submissionPath });
+      if (outcome.status === "submitted") {
+        submitted += 1;
+      } else if (outcome.httpStatus !== null) {
+        submissionFailureStatuses.add(outcome.httpStatus);
+      }
+    }
+    if (invalidSubmissionCount > 0) {
+      console.error("SEO audit wrapper rejected invalid agent submissions.", {
+        count: invalidSubmissionCount,
+      });
+    }
+    if (submissionFailureStatuses.size > 0) {
+      console.error("SEO audit submission requests failed.", {
+        httpStatuses: [...submissionFailureStatuses].sort(),
+      });
     }
     const failed = claimed.auditIds.length - submitted;
     const finalReport: RedactedSeoAuditRunReport = {
@@ -376,7 +443,9 @@ export function executeScheduledSeoAuditAgent({
       failureClass:
         failed === 0
           ? null
-          : report.failed > 0 || report.finalOutcome === "failed"
+          : invalidSubmissionCount > 0 ||
+              report.failed > 0 ||
+              report.finalOutcome === "failed"
             ? "agent_failure"
             : "submission_failure",
     };
