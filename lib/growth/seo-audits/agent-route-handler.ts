@@ -16,6 +16,7 @@ import {
   completeSeoAuditDraft,
   getSeoAuditDraftRenderContext,
   SeoAuditDraftCompletionError,
+  SeoAuditDraftPersistenceError,
   type SeoAuditCandidate,
   type SeoAuditDraftRenderContext,
 } from "./repository";
@@ -61,7 +62,16 @@ type SeoAuditSubmissionPhase =
   | "build_draft"
   | "complete_draft";
 
-function createSubmissionPhaseError(phase: SeoAuditSubmissionPhase): Error {
+function createSubmissionPhaseError(
+  phase: SeoAuditSubmissionPhase,
+  cause: unknown,
+): Error {
+  if (
+    phase === "complete_draft" &&
+    cause instanceof SeoAuditDraftPersistenceError
+  ) {
+    return cause;
+  }
   const error = new Error("SEO audit submission failed.");
   error.name = `SeoAuditSubmission${phase
     .split("_")
@@ -292,7 +302,7 @@ export function createSeoAuditSubmissionHandler(
       }
       dependencies.reportUnexpectedError({
         correlationId,
-        error: createSubmissionPhaseError(phase),
+        error: createSubmissionPhaseError(phase, error),
       });
       return failureResponse(
         500,

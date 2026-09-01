@@ -211,6 +211,22 @@ export class SeoAuditDraftCompletionError extends Error {
   }
 }
 
+type SeoAuditDraftPersistencePhase =
+  | "parse_snapshot"
+  | "lock_draft"
+  | "save_draft"
+  | "append_audit_event";
+
+export class SeoAuditDraftPersistenceError extends Error {
+  constructor(readonly phase: SeoAuditDraftPersistencePhase) {
+    super("The SEO audit draft could not be persisted.");
+    this.name = `SeoAuditDraftPersistence${phase
+      .split("_")
+      .map((segment) => segment[0]?.toUpperCase() + segment.slice(1))
+      .join("")}Error`;
+  }
+}
+
 type CompletionRow = {
   id: string;
   status: string;
@@ -228,10 +244,17 @@ export async function completeSeoAuditDraft(
   if (!UUID_PATTERN.test(input.auditId)) {
     throw new TypeError("SEO audit draft ID is invalid.");
   }
-  const stored = parseStoredSeoAuditDraft(input.outputSnapshot);
+  let stored: StoredSeoAuditDraft;
+  try {
+    stored = parseStoredSeoAuditDraft(input.outputSnapshot);
+  } catch {
+    throw new SeoAuditDraftPersistenceError("parse_snapshot");
+  }
 
-  await withGrowthTransaction(db, async (transaction) => {
-    const rows = await transaction<CompletionRow[]>`
+  let phase: SeoAuditDraftPersistencePhase = "lock_draft";
+  try {
+    await withGrowthTransaction(db, async (transaction) => {
+      const rows = await transaction<CompletionRow[]>`
       select
         audit.id,
         audit.status,
@@ -259,24 +282,25 @@ export async function completeSeoAuditDraft(
       limit 1
       for update of audit, se
     `;
-    const draft = rows[0];
-    if (!draft) throw new SeoAuditDraftCompletionError("not_found");
-    if (
-      draft.status !== "claimed" ||
-      draft.claimExpiresAt === null ||
-      draft.claimExpiresAt < now
-    ) {
-      throw new SeoAuditDraftCompletionError("claim_expired");
-    }
-    if (
-      draft.sequenceStatus !== "active" ||
-      !draft.day5FollowUpSent ||
-      draft.hasInboundReply
-    ) {
-      throw new SeoAuditDraftCompletionError("not_eligible");
-    }
+      const draft = rows[0];
+      if (!draft) throw new SeoAuditDraftCompletionError("not_found");
+      if (
+        draft.status !== "claimed" ||
+        draft.claimExpiresAt === null ||
+        draft.claimExpiresAt < now
+      ) {
+        throw new SeoAuditDraftCompletionError("claim_expired");
+      }
+      if (
+        draft.sequenceStatus !== "active" ||
+        !draft.day5FollowUpSent ||
+        draft.hasInboundReply
+      ) {
+        throw new SeoAuditDraftCompletionError("not_eligible");
+      }
 
-    await transaction`
+      phase = "save_draft";
+      await transaction`
       update growth.seo_audit_drafts
       set status = 'draft',
           claim_expires_at = null,
@@ -288,16 +312,26 @@ export async function completeSeoAuditDraft(
       where id = ${input.auditId}
         and status = 'claimed'
     `;
-    await appendAuditEvent(transaction, {
-      correlationId: input.auditId,
-      actorType: "agent",
-      actorId: "seo-audit-agent-v1",
-      action: "seo_audit.draft_created",
-      entityType: "seo_audit_draft",
-      entityId: input.auditId,
-      metadata: { reasonCode: "after_day_5_follow_up" },
+      phase = "append_audit_event";
+      await appendAuditEvent(transaction, {
+        correlationId: input.auditId,
+        actorType: "agent",
+        actorId: "seo-audit-agent-v1",
+        action: "seo_audit.draft_created",
+        entityType: "seo_audit_draft",
+        entityId: input.auditId,
+        metadata: { reasonCode: "after_day_5_follow_up" },
+      });
     });
-  });
+  } catch (error) {
+    if (
+      error instanceof SeoAuditDraftCompletionError ||
+      error instanceof SeoAuditDraftPersistenceError
+    ) {
+      throw error;
+    }
+    throw new SeoAuditDraftPersistenceError(phase);
+  }
 }
 
 export type SeoAuditApprovalErrorCode =
