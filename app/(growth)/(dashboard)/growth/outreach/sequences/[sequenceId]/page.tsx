@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { SequenceControls } from "@/components/growth/outreach/sequence-controls";
+import { SequenceSeoAudit } from "@/components/growth/outreach/sequence-seo-audit";
 import { SequenceTimeline } from "@/components/growth/outreach/sequence-timeline";
 import styles from "@/components/growth/outreach/outreach.module.css";
 import {
@@ -41,7 +42,8 @@ export default async function SequenceDetailPage({
     <div className={styles.page}>
       <p className={styles.breadcrumb}>
         <Link href="/growth/outreach">Outreach</Link> /{" "}
-        <Link href="/growth/outreach">Active sequences</Link> / {data.businessName}
+        <Link href="/growth/outreach">Active sequences</Link> /{" "}
+        {data.businessName}
       </p>
 
       <div className={styles.header}>
@@ -77,7 +79,9 @@ export default async function SequenceDetailPage({
           </div>
           <div>
             <p className={styles.statLabel}>Status</p>
-            <span className={styles.pill}>{formatGrowthStatusLabel(data.status)}</span>
+            <span className={styles.pill}>
+              {formatGrowthStatusLabel(data.status)}
+            </span>
           </div>
         </div>
       </div>
@@ -90,18 +94,24 @@ export default async function SequenceDetailPage({
           </div>
 
           <div className={styles.rulesBox}>
-            <ShieldCheck aria-hidden="true" size={20} style={{ flex: "none" }} />
+            <ShieldCheck
+              aria-hidden="true"
+              size={20}
+              style={{ flex: "none" }}
+            />
             <div>
               <strong>Sequence rules</strong>
               <p>
-                Replies, opt-outs, bounces and manual pauses stop all
-                remaining emails.
+                Replies, opt-outs, bounces and manual pauses stop all remaining
+                emails.
               </p>
             </div>
           </div>
         </div>
 
         <div className={styles.column}>
+          <SequenceSeoAudit audit={data.seoAudit} />
+
           <SequenceControls detail={data} />
 
           <div className={styles.card}>

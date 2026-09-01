@@ -131,6 +131,6 @@ test("shows the sequence timing helper text beside the send action", () => {
   const html = render(baseMessage());
   assert.match(
     html,
-    /Sending starts the approved Day 1, 5, 11 and 20 sequence\./,
+    /Sending starts the approved Day 1, 5, 11 and 14 sequence\./,
   );
 });
