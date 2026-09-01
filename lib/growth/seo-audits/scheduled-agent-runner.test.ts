@@ -33,6 +33,7 @@ test("starts an isolated, schema-constrained agent that cannot send email", () =
     assert.ok(input.args.includes("--ephemeral"));
     assert.ok(input.args.includes("--output-schema"));
     const prompt = input.args.at(-1) ?? "";
+    assert.match(prompt, /https:\/\/faithfulsoftware\.dev/);
     assert.match(prompt, /seo-audits\/claim/i);
     assert.match(prompt, /never request or use a database credential/i);
     assert.match(prompt, /do not create the PDF locally/i);

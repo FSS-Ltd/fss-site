@@ -108,7 +108,7 @@ function buildAgentPrompt(
   ].map((path) => join(repositoryRoot, path));
 
   return [
-    "Run the founder-controlled daily SEO and answer-engine audit workflow for the Growth OS in submit mode.",
+    "Run the founder-controlled daily SEO and answer-engine audit workflow for the Growth OS in submit mode against https://faithfulsoftware.dev.",
     `Use the stable external run ID ${externalRunId}.`,
     `Use only these project paths: ${allowedFiles.join(", ")}.`,
     "Do not inspect AGENTS files, Nexus vault files, Codex caches or memories, browser data, Git history, or any other user files. Do not run broad filesystem searches.",
