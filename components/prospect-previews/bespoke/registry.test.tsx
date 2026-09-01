@@ -32,6 +32,7 @@ const expectedSlugs = [
   "primeline-roofing",
   "priority-point",
   "sealeys-walker-jarvis",
+  "stagg-homes",
   "wormald-accountants",
 ] as const;
 

@@ -19,6 +19,7 @@ test("prerenders the nineteen public-unlisted bespoke prospect slugs", () => {
   assert.equal(slugs.includes("kemsing-motor-company"), true);
   assert.equal(slugs.includes("hollis-motors"), true);
   assert.equal(slugs.includes("priority-point"), true);
+  assert.equal(slugs.includes("stagg-homes"), true);
   assert.equal(slugs.includes("macknade"), false);
 });
 
