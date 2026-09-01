@@ -36,7 +36,7 @@ const expectedSlugs = [
   "wormald-accountants",
 ] as const;
 
-test("registers exactly the nineteen active bespoke prospect pages", () => {
+test("registers every active bespoke prospect page", () => {
   assert.deepEqual(
     [...getBespokeProspectSlugs()].sort(),
     [...expectedSlugs].sort(),
@@ -47,8 +47,14 @@ test("registers exactly the nineteen active bespoke prospect pages", () => {
 test("every prospect owns a distinct layout and hero-scene signature", () => {
   const entries = Object.values(bespokeProspectPages);
 
-  assert.equal(new Set(entries.map((entry) => entry.layoutSignature)).size, 19);
-  assert.equal(new Set(entries.map((entry) => entry.heroSignature)).size, 19);
+  assert.equal(
+    new Set(entries.map((entry) => entry.layoutSignature)).size,
+    expectedSlugs.length,
+  );
+  assert.equal(
+    new Set(entries.map((entry) => entry.heroSignature)).size,
+    expectedSlugs.length,
+  );
 });
 
 test("every bespoke prospect page is recognised by the Growth OS preview resolver", () => {

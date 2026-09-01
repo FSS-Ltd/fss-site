@@ -3,24 +3,18 @@ import test from "node:test";
 
 import { renderToStaticMarkup } from "react-dom/server";
 
+import { getBespokeProspectSlugs } from "@/components/prospect-previews/bespoke/registry";
+
 import ProspectPreviewPage, {
   generateMetadata,
   generateStaticParams,
 } from "./[slug]/page";
 
-test("prerenders the nineteen public-unlisted bespoke prospect slugs", () => {
+test("prerenders every public-unlisted bespoke prospect slug", () => {
   const params = generateStaticParams();
   const slugs: readonly string[] = params.map(({ slug }) => slug);
 
-  assert.equal(params.length, 19);
-  assert.equal(slugs.includes("bridgland-roofing"), true);
-  assert.equal(slugs.includes("bright-accounting"), true);
-  assert.equal(slugs.includes("doorknobs"), true);
-  assert.equal(slugs.includes("kemsing-motor-company"), true);
-  assert.equal(slugs.includes("hollis-motors"), true);
-  assert.equal(slugs.includes("priority-point"), true);
-  assert.equal(slugs.includes("stagg-homes"), true);
-  assert.equal(slugs.includes("macknade"), false);
+  assert.deepEqual(slugs, getBespokeProspectSlugs());
 });
 
 test("resolves Priority Point's accountancy journey and metadata", async () => {
