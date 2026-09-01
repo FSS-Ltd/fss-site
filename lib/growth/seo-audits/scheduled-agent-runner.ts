@@ -45,6 +45,7 @@ type SeoAuditAgentExecutionInput = {
   args: readonly string[];
   cwd: string;
   reportPath: string;
+  claimLedgerPath: string;
   timeoutMs: number;
 };
 
@@ -59,6 +60,10 @@ function runRedactedSeoAuditChild(
     cwd: input.cwd,
     stdio: ["ignore", "ignore", "ignore"],
     timeout: input.timeoutMs,
+    env: {
+      ...process.env,
+      GROWTH_OS_SEO_AUDIT_CLAIM_LEDGER_PATH: input.claimLedgerPath,
+    },
   });
   if (result.error !== undefined || result.status !== 0) {
     throw new Error("SEO audit agent did not complete successfully.");
@@ -68,12 +73,39 @@ function runRedactedSeoAuditChild(
   );
 }
 
+export type SeoAuditClaimReleaser = (input: {
+  repositoryRoot: string;
+  claimLedgerPath: string;
+}) => void;
+
+function releaseIncompleteSeoAuditClaims(input: {
+  repositoryRoot: string;
+  claimLedgerPath: string;
+}): void {
+  spawnSync(
+    process.execPath,
+    [
+      "--import",
+      "tsx",
+      "scripts/seo-audit-agent-api.ts",
+      "release",
+      input.claimLedgerPath,
+    ],
+    {
+      cwd: input.repositoryRoot,
+      stdio: ["ignore", "ignore", "ignore"],
+      timeout: 30_000,
+    },
+  );
+}
+
 type ExecuteScheduledSeoAuditAgentInput = {
   now?: Date;
   repositoryRoot: string;
   codexBinary?: string;
   timeoutMs?: number;
   executor?: SeoAuditAgentExecutor;
+  claimReleaser?: SeoAuditClaimReleaser;
 };
 
 export type ScheduledSeoAuditAgentResult = {
@@ -105,15 +137,17 @@ function buildAgentPrompt(
     "docs/growth-os/prompts/daily-seo-audit.md",
     "docs/growth-os/runbooks/scheduled-seo-audits.md",
     "lib/growth/seo-audits/schema.ts",
+    "lib/growth/seo-audits/local-agent-client.ts",
+    "scripts/seo-audit-agent-api.ts",
   ].map((path) => join(repositoryRoot, path));
+  const apiScript = join(repositoryRoot, "scripts/seo-audit-agent-api.ts");
 
   return [
     "Run the founder-controlled daily SEO and answer-engine audit workflow for the Growth OS in submit mode against https://faithfulsoftware.dev.",
     `Use the stable external run ID ${externalRunId}.`,
     `Use only these project paths: ${allowedFiles.join(", ")}.`,
     "Do not inspect AGENTS files, Nexus vault files, Codex caches or memories, browser data, Git history, or any other user files. Do not run broad filesystem searches.",
-    "Load GROWTH_OS_AGENT_HMAC_SECRET only at runtime from macOS Keychain service dev.faithfulsoftware.growth-os.agent-hmac and account growth-os-daily-seo-audit. Keep it in process memory only and never print or persist it.",
-    "Use the signed POST /api/agent/seo-audits/claim endpoint described in the runbook to claim at most three candidates. The application, not you, owns database access. Never request or use a database credential.",
+    `Use only the supplied local API client at ${apiScript} for application calls. First run \"pnpm tsx ${apiScript} claim\" to claim at most three candidates. For each completed audit, write the strict JSON submission to a private temporary file outside the repository, then run \"pnpm tsx ${apiScript} submit <temporary-file>\". Do not implement request signing, read the Keychain, or call an application endpoint another way. The application, not you, owns database access. Never request or use a database credential.`,
     "For each claimed candidate, research only publicly accessible sources. Produce a rigorous SEO and AEO audit with evidence, source URLs, clear prioritised findings, and specific steps the business can do themselves without a developer. Do not claim that unverified tools or private analytics were used.",
     "Submit one strict JSON bundle per successfully audited candidate to POST /api/agent/seo-audits. The application creates the PDF, stores it, and creates the founder-review email draft. Do not create the PDF locally, write files to the repository, create a Gmail draft, send email, queue an email, commit, deploy, or publish anything.",
     "If no candidates are available, return finalOutcome no_candidates. If one candidate fails, continue with the others and record only redacted totals. Never print a business name, website URL, contact detail, source URL, audit text, email copy, request body, signature, secret, or provider response.",
@@ -140,18 +174,24 @@ export function executeScheduledSeoAuditAgent({
   codexBinary = "codex",
   timeoutMs = DEFAULT_TIMEOUT_MS,
   executor = runRedactedSeoAuditChild,
+  claimReleaser = releaseIncompleteSeoAuditClaims,
 }: ExecuteScheduledSeoAuditAgentInput): ScheduledSeoAuditAgentResult {
   let workspace: string | null = null;
+  let releaseClaims = false;
   try {
     workspace = mkdtempSync(join(tmpdir(), "fss-seo-audit-"));
     chmodSync(workspace, 0o700);
     const schemaPath = join(workspace, "redacted-report.schema.json");
     const reportPath = join(workspace, "redacted-report.json");
+    const claimLedgerPath = join(workspace, "claimed-audit-ids.json");
     writeFileSync(
       schemaPath,
       JSON.stringify(z.toJSONSchema(redactedSeoAuditRunReportSchema)),
       { mode: 0o600 },
     );
+    writeFileSync(claimLedgerPath, JSON.stringify({ auditIds: [] }), {
+      mode: 0o600,
+    });
 
     const externalRunId = buildDailySeoAuditExternalRunId(now);
     const report = executor({
@@ -180,6 +220,7 @@ export function executeScheduledSeoAuditAgent({
       ],
       cwd: repositoryRoot,
       reportPath,
+      claimLedgerPath,
       timeoutMs,
     });
 
@@ -187,12 +228,21 @@ export function executeScheduledSeoAuditAgent({
       report.externalRunId !== externalRunId ||
       report.promptVersion !== PROMPT_VERSION
     ) {
+      releaseClaims = true;
       return { succeeded: false, report: buildFailureReport(now) };
     }
+    releaseClaims = report.finalOutcome === "failed" || report.failed > 0;
     return { succeeded: report.finalOutcome !== "failed", report };
   } catch {
+    releaseClaims = true;
     return { succeeded: false, report: buildFailureReport(now) };
   } finally {
+    if (workspace !== null && releaseClaims) {
+      claimReleaser({
+        repositoryRoot,
+        claimLedgerPath: join(workspace, "claimed-audit-ids.json"),
+      });
+    }
     if (workspace !== null) rmSync(workspace, { recursive: true, force: true });
   }
 }

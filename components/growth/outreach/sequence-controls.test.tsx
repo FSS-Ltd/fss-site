@@ -40,6 +40,7 @@ function baseDetail(
     estimatedOneOffMaxPence: 600_000,
     timeline: [],
     threadHealth: { deliveredCount: 1, repliedCount: 0, lastGmailSyncAt: null },
+    seoAudit: { state: "not_started" },
     ...overrides,
   };
 }

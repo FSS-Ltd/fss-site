@@ -2,12 +2,15 @@ import { createHash } from "node:crypto";
 
 import { z } from "zod";
 
-import {
-  verifyAgentRequest,
-  type VerifyAgentRequestInput,
-} from "../integrations/agent-signature";
-
 import { renderSeoAuditPdf } from "./pdf";
+import {
+  AgentRequestTooLargeError,
+  failureResponse,
+  isAuthenticatedAgentRequest,
+  jsonResponse,
+  parseRawAgentJson,
+  readRawAgentBody,
+} from "./agent-request";
 import {
   claimSeoAuditCandidates,
   completeSeoAuditDraft,
@@ -24,11 +27,6 @@ import {
 import type { SeoAuditBlobStorage } from "./blob";
 import type { GrowthDb } from "../db/types";
 
-const AGENT_KEY_ID_HEADER = "x-fss-key-id";
-const AGENT_TIMESTAMP_HEADER = "x-fss-timestamp";
-const AGENT_SIGNATURE_HEADER = "x-fss-signature";
-const MAX_AGENT_BODY_BYTES = 128 * 1024;
-
 const claimRequestSchema = z
   .object({ limit: z.number().int().min(1).max(5) })
   .strict();
@@ -44,9 +42,6 @@ export type SeoAuditAgentRouteDependencies = {
     correlationId: string;
     error: unknown;
   }) => void;
-  verifyRequest?: (
-    input: VerifyAgentRequestInput,
-  ) => ReturnType<typeof verifyAgentRequest>;
   claimCandidates?: (limit: number, now: Date) => Promise<SeoAuditCandidate[]>;
   getRenderContext?: (
     auditId: string,
@@ -59,62 +54,6 @@ export type SeoAuditAgentRouteDependencies = {
     now: Date,
   ) => Promise<void>;
 };
-
-class RequestTooLargeError extends Error {}
-
-function response(body: unknown, status: number): Response {
-  return Response.json(body, {
-    status,
-    headers: {
-      "cache-control": "no-store",
-      "x-content-type-options": "nosniff",
-    },
-  });
-}
-
-function failure(
-  status: number,
-  code: string,
-  message: string,
-  correlationId: string,
-): Response {
-  return response({ ok: false, code, message, correlationId }, status);
-}
-
-async function readRawBody(request: Request): Promise<Uint8Array> {
-  const declaredLength = request.headers.get("content-length");
-  if (
-    declaredLength !== null &&
-    /^\d+$/.test(declaredLength) &&
-    Number(declaredLength) > MAX_AGENT_BODY_BYTES
-  ) {
-    throw new RequestTooLargeError();
-  }
-  const body = new Uint8Array(await request.arrayBuffer());
-  if (body.byteLength > MAX_AGENT_BODY_BYTES) throw new RequestTooLargeError();
-  return body;
-}
-
-function authenticate(
-  request: Request,
-  rawBody: Uint8Array,
-  dependencies: SeoAuditAgentRouteDependencies,
-): boolean {
-  const verify = dependencies.verifyRequest ?? verifyAgentRequest;
-  return verify({
-    rawBody,
-    keyId: request.headers.get(AGENT_KEY_ID_HEADER),
-    timestamp: request.headers.get(AGENT_TIMESTAMP_HEADER),
-    signature: request.headers.get(AGENT_SIGNATURE_HEADER),
-    now: dependencies.now(),
-    configuredKeyId: dependencies.agentKeyId,
-    secret: dependencies.agentHmacSecret,
-  }).ok;
-}
-
-function parseJson(rawBody: Uint8Array): unknown {
-  return JSON.parse(Buffer.from(rawBody).toString("utf8")) as unknown;
-}
 
 function candidateResponse(candidate: SeoAuditCandidate) {
   return {
@@ -135,10 +74,10 @@ export function createSeoAuditClaimHandler(
     const correlationId = dependencies.createCorrelationId();
     let rawBody: Uint8Array;
     try {
-      rawBody = await readRawBody(request);
+      rawBody = await readRawAgentBody(request);
     } catch (error) {
-      if (error instanceof RequestTooLargeError) {
-        return failure(
+      if (error instanceof AgentRequestTooLargeError) {
+        return failureResponse(
           413,
           "payload_too_large",
           "Request body exceeds 128 KB.",
@@ -146,15 +85,15 @@ export function createSeoAuditClaimHandler(
         );
       }
       dependencies.reportUnexpectedError({ correlationId, error });
-      return failure(
+      return failureResponse(
         400,
         "invalid_body",
         "Unable to read the request body.",
         correlationId,
       );
     }
-    if (!authenticate(request, rawBody, dependencies)) {
-      return failure(
+    if (!isAuthenticatedAgentRequest(request, rawBody, dependencies)) {
+      return failureResponse(
         401,
         "unauthorized",
         "Request authentication failed.",
@@ -164,9 +103,9 @@ export function createSeoAuditClaimHandler(
 
     let parsedBody: unknown;
     try {
-      parsedBody = parseJson(rawBody);
+      parsedBody = parseRawAgentJson(rawBody);
     } catch {
-      return failure(
+      return failureResponse(
         400,
         "invalid_json",
         "Request body must be valid JSON.",
@@ -175,7 +114,7 @@ export function createSeoAuditClaimHandler(
     }
     const parsed = claimRequestSchema.safeParse(parsedBody);
     if (!parsed.success) {
-      return failure(
+      return failureResponse(
         422,
         "invalid_fields",
         "Request fields are invalid.",
@@ -190,7 +129,7 @@ export function createSeoAuditClaimHandler(
         ((limit, claimAt) =>
           claimSeoAuditCandidates(dependencies.db, limit, claimAt))
       )(parsed.data.limit, now);
-      return response(
+      return jsonResponse(
         {
           ok: true,
           correlationId,
@@ -200,7 +139,7 @@ export function createSeoAuditClaimHandler(
       );
     } catch (error) {
       dependencies.reportUnexpectedError({ correlationId, error });
-      return failure(
+      return failureResponse(
         500,
         "internal_error",
         "Unable to claim audit candidates.",
@@ -217,10 +156,10 @@ export function createSeoAuditSubmissionHandler(
     const correlationId = dependencies.createCorrelationId();
     let rawBody: Uint8Array;
     try {
-      rawBody = await readRawBody(request);
+      rawBody = await readRawAgentBody(request);
     } catch (error) {
-      if (error instanceof RequestTooLargeError) {
-        return failure(
+      if (error instanceof AgentRequestTooLargeError) {
+        return failureResponse(
           413,
           "payload_too_large",
           "Request body exceeds 128 KB.",
@@ -228,15 +167,15 @@ export function createSeoAuditSubmissionHandler(
         );
       }
       dependencies.reportUnexpectedError({ correlationId, error });
-      return failure(
+      return failureResponse(
         400,
         "invalid_body",
         "Unable to read the request body.",
         correlationId,
       );
     }
-    if (!authenticate(request, rawBody, dependencies)) {
-      return failure(
+    if (!isAuthenticatedAgentRequest(request, rawBody, dependencies)) {
+      return failureResponse(
         401,
         "unauthorized",
         "Request authentication failed.",
@@ -246,9 +185,9 @@ export function createSeoAuditSubmissionHandler(
 
     let parsedBody: unknown;
     try {
-      parsedBody = parseJson(rawBody);
+      parsedBody = parseRawAgentJson(rawBody);
     } catch {
-      return failure(
+      return failureResponse(
         400,
         "invalid_json",
         "Request body must be valid JSON.",
@@ -257,7 +196,7 @@ export function createSeoAuditSubmissionHandler(
     }
     const parsed = seoAuditSubmissionSchema.safeParse(parsedBody);
     if (!parsed.success) {
-      return failure(
+      return failureResponse(
         422,
         "invalid_fields",
         "Audit submission fields are invalid.",
@@ -277,7 +216,7 @@ export function createSeoAuditSubmissionHandler(
         context.claimExpiresAt === null ||
         context.claimExpiresAt < now
       ) {
-        return failure(
+        return failureResponse(
           409,
           "claim_unavailable",
           "The audit claim is no longer available.",
@@ -314,7 +253,7 @@ export function createSeoAuditSubmissionHandler(
         throw error;
       }
 
-      return response(
+      return jsonResponse(
         {
           ok: true,
           correlationId,
@@ -325,7 +264,7 @@ export function createSeoAuditSubmissionHandler(
       );
     } catch (error) {
       if (error instanceof SeoAuditDraftCompletionError) {
-        return failure(
+        return failureResponse(
           409,
           error.code,
           "The audit draft can no longer be saved.",
@@ -333,7 +272,7 @@ export function createSeoAuditSubmissionHandler(
         );
       }
       dependencies.reportUnexpectedError({ correlationId, error });
-      return failure(
+      return failureResponse(
         500,
         "internal_error",
         "Unable to prepare the audit draft.",

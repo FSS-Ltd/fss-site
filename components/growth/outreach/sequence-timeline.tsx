@@ -33,7 +33,7 @@ const KIND_ICON: Record<
 
 function dayLabel(stepNumber: number | null): string {
   if (stepNumber === null) return "";
-  const days = [1, 5, 11, 20];
+  const days = [1, 5, 11, 14];
   return `Day ${days[stepNumber] ?? stepNumber}`;
 }
 
@@ -53,7 +53,9 @@ export function SequenceTimeline({
 
         return (
           <li className={styles.timelineItem} key={event.id}>
-            <span className={styles.timelineDay}>{dayLabel(event.stepNumber)}</span>
+            <span className={styles.timelineDay}>
+              {dayLabel(event.stepNumber)}
+            </span>
             <span className={styles.timelineMarker}>
               <span className={styles.timelineIcon} data-tone={tone}>
                 <Icon aria-hidden="true" size={16} strokeWidth={2} />
@@ -75,7 +77,10 @@ export function SequenceTimeline({
                 {event.providerObservedAt &&
                   event.localReceivedAt &&
                   event.providerObservedAt !== event.localReceivedAt && (
-                    <> · Recorded {formatGrowthDateTime(event.localReceivedAt)}</>
+                    <>
+                      {" "}
+                      · Recorded {formatGrowthDateTime(event.localReceivedAt)}
+                    </>
                   )}
               </p>
               {event.detail &&

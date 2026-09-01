@@ -34,7 +34,8 @@ test("starts an isolated, schema-constrained agent that cannot send email", () =
     assert.ok(input.args.includes("--output-schema"));
     const prompt = input.args.at(-1) ?? "";
     assert.match(prompt, /https:\/\/faithfulsoftware\.dev/);
-    assert.match(prompt, /seo-audits\/claim/i);
+    assert.match(prompt, /seo-audit-agent-api\.ts claim/i);
+    assert.match(prompt, /seo-audit-agent-api\.ts/);
     assert.match(prompt, /never request or use a database credential/i);
     assert.match(prompt, /do not create the PDF locally/i);
     assert.match(prompt, /never print a business name/i);
@@ -44,6 +45,7 @@ test("starts an isolated, schema-constrained agent that cannot send email", () =
       additionalProperties?: boolean;
     };
     assert.equal(schema.additionalProperties, false);
+    assert.match(input.claimLedgerPath, /claimed-audit-ids\.json$/);
     return report;
   };
 
@@ -57,14 +59,37 @@ test("starts an isolated, schema-constrained agent that cannot send email", () =
   assert.deepEqual(result.report, report);
 });
 
-test("documents the HMAC handoff required by the isolated audit agent", () => {
+test("releases claimed audits when the isolated agent does not complete", () => {
+  let releasedPath: string | null = null;
+  const result = executeScheduledSeoAuditAgent({
+    now: new Date("2026-09-01T05:30:00.000Z"),
+    repositoryRoot: process.cwd(),
+    executor: () => ({
+      ...report,
+      finalOutcome: "failed",
+      submitted: 0,
+      failed: 2,
+    }),
+    claimReleaser: ({ claimLedgerPath }) => {
+      releasedPath = claimLedgerPath;
+    },
+  });
+
+  assert.equal(result.succeeded, false);
+  assert.match(releasedPath ?? "", /claimed-audit-ids\.json$/);
+});
+
+test("documents the constrained API client required by the isolated audit agent", () => {
   const runbook = readFileSync(
     "docs/growth-os/runbooks/scheduled-seo-audits.md",
     "utf8",
   );
 
-  assert.match(runbook, /timestamp \+ \"\.\" \+ rawBody/);
-  assert.match(runbook, /X-FSS-Key-Id: seo-audit-agent-v1/);
-  assert.match(runbook, /node:crypto/);
-  assert.match(runbook, /never be printed, written to the repository/);
+  assert.match(runbook, /scripts\/seo-audit-agent-api\.ts claim/);
+  assert.match(runbook, /scripts\/seo-audit-agent-api\.ts submit/);
+  assert.match(
+    runbook,
+    /release only the remaining claimed audits immediately/,
+  );
+  assert.match(runbook, /never prints the secret or signature/);
 });

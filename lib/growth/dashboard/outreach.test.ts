@@ -100,12 +100,20 @@ function routesFor(overrides: {
   enrollment?: readonly object[];
   messages?: readonly object[];
   audits?: readonly object[];
+  seoAudits?: readonly object[];
   gmailSync?: readonly object[];
 }): FakeRoute[] {
   return [
-    { match: /"businessName"/, rows: overrides.enrollment ?? [baseEnrollmentRow()] },
-    { match: /"eventType"/, rows: overrides.messages ?? [outboundSent(), outboundScheduled()] },
+    {
+      match: /"businessName"/,
+      rows: overrides.enrollment ?? [baseEnrollmentRow()],
+    },
+    {
+      match: /"eventType"/,
+      rows: overrides.messages ?? [outboundSent(), outboundScheduled()],
+    },
     { match: /from growth\.audit_log/, rows: overrides.audits ?? [] },
+    { match: /from growth\.seo_audit_drafts/, rows: overrides.seoAudits ?? [] },
     {
       match: /from growth\.integration_connections/,
       rows: overrides.gmailSync ?? [
@@ -163,10 +171,92 @@ test("getOutreachDetail returns current step, stop reason, contact, and fit/offe
   assert.equal(result.data.currentStep, 1);
   assert.equal(result.data.stopReason, null);
   assert.equal(result.data.fitScore, 91);
+  assert.deepEqual(result.data.seoAudit, { state: "not_started" });
+});
+
+test("exposes a direct founder-review state once an SEO audit is ready", async () => {
+  const db = createFakeGrowthDb(
+    routesFor({
+      seoAudits: [
+        {
+          auditId: "33333333-3333-4333-8333-333333333333",
+          status: "draft",
+          claimExpiresAt: null,
+          completedAt: new Date("2026-09-01T12:00:00.000Z"),
+          approvedAt: null,
+        },
+      ],
+    }),
+  );
+
+  const result = await getOutreachDetail(sequenceId, db);
+  assert.equal(result.status, "ready");
+  if (result.status !== "ready") return;
+
+  assert.deepEqual(result.data.seoAudit, {
+    state: "draft",
+    auditId: "33333333-3333-4333-8333-333333333333",
+    completedAt: "2026-09-01T12:00:00.000Z",
+  });
+});
+
+test("keeps a claimed SEO audit visible while its claim is recoverable", async () => {
+  const db = createFakeGrowthDb(
+    routesFor({
+      seoAudits: [
+        {
+          auditId: "33333333-3333-4333-8333-333333333333",
+          status: "claimed",
+          claimExpiresAt: new Date("2026-09-01T14:46:10.085Z"),
+          completedAt: null,
+          approvedAt: null,
+        },
+      ],
+    }),
+  );
+
+  const result = await getOutreachDetail(sequenceId, db);
+  assert.equal(result.status, "ready");
+  if (result.status !== "ready") return;
+
+  assert.deepEqual(result.data.seoAudit, {
+    state: "claimed",
+    claimExpiresAt: "2026-09-01T14:46:10.085Z",
+  });
+});
+
+test("shows the actual replacement reason for a cancelled Day 11 placeholder", async () => {
+  const result = await getOutreachDetail(
+    sequenceId,
+    createFakeGrowthDb(
+      routesFor({
+        messages: [
+          outboundScheduled({
+            id: "audit-placeholder",
+            stepNumber: 2,
+            status: "cancelled",
+            scheduledFor: new Date("2026-09-07T09:00:00.000Z"),
+            lastErrorSummary:
+              "Replaced by the founder-approved SEO and AEO audit follow-up.",
+          }),
+        ],
+      }),
+    ),
+  );
+  assert.equal(result.status, "ready");
+  if (result.status !== "ready") return;
+
+  assert.equal(
+    result.data.timeline[0]?.detail,
+    "Replaced by the founder-approved SEO and AEO audit follow-up.",
+  );
 });
 
 test("constructs a safe Gmail mailbox URL only when a thread ID exists", async () => {
-  const withThread = await getOutreachDetail(sequenceId, createFakeGrowthDb(routesFor({})));
+  const withThread = await getOutreachDetail(
+    sequenceId,
+    createFakeGrowthDb(routesFor({})),
+  );
   assert.equal(withThread.status, "ready");
   if (withThread.status !== "ready") return;
   assert.equal(
@@ -205,12 +295,24 @@ test("orders timeline events deterministically: scheduled, sent, reply, then fou
   const db = createFakeGrowthDb(
     routesFor({
       messages: [
-        outboundScheduled({ id: "m-scheduled", scheduledFor: new Date("2026-08-20T09:12:00.000Z") }),
-        outboundSent({ id: "m-sent", sentAt: new Date("2026-08-15T09:12:00.000Z") }),
-        inboundReply({ id: "m-reply", eventOccurredAt: new Date("2026-08-16T14:45:00.000Z") }),
+        outboundScheduled({
+          id: "m-scheduled",
+          scheduledFor: new Date("2026-08-20T09:12:00.000Z"),
+        }),
+        outboundSent({
+          id: "m-sent",
+          sentAt: new Date("2026-08-15T09:12:00.000Z"),
+        }),
+        inboundReply({
+          id: "m-reply",
+          eventOccurredAt: new Date("2026-08-16T14:45:00.000Z"),
+        }),
       ],
       audits: [
-        { action: "sequence.stopped.pause", createdAt: new Date("2026-08-17T10:00:00.000Z") },
+        {
+          action: "sequence.stopped.pause",
+          createdAt: new Date("2026-08-17T10:00:00.000Z"),
+        },
       ],
     }),
   );
@@ -246,7 +348,9 @@ test("never queries reply body columns for the timeline", async () => {
     if (text.includes('"businessName"')) return [baseEnrollmentRow()];
     if (text.includes('"eventType"')) return [inboundReply()];
     if (text.includes("growth.audit_log")) return [];
-    if (text.includes("growth.integration_connections")) return [{ lastSyncedAt: null }];
+    if (text.includes("growth.seo_audit_drafts")) return [];
+    if (text.includes("growth.integration_connections"))
+      return [{ lastSyncedAt: null }];
     throw new Error(`Unexpected query: ${text}`);
   }) as unknown as GrowthQueryExecutor;
 
@@ -260,13 +364,18 @@ test("never queries reply body columns for the timeline", async () => {
 test("marks a paused sequence resumable and everything else not", async () => {
   const paused = await getOutreachDetail(
     sequenceId,
-    createFakeGrowthDb(routesFor({ enrollment: [baseEnrollmentRow({ status: "paused" })] })),
+    createFakeGrowthDb(
+      routesFor({ enrollment: [baseEnrollmentRow({ status: "paused" })] }),
+    ),
   );
   assert.equal(paused.status, "ready");
   if (paused.status !== "ready") return;
   assert.equal(paused.data.resumable, true);
 
-  const active = await getOutreachDetail(sequenceId, createFakeGrowthDb(routesFor({})));
+  const active = await getOutreachDetail(
+    sequenceId,
+    createFakeGrowthDb(routesFor({})),
+  );
   assert.equal(active.status, "ready");
   if (active.status !== "ready") return;
   assert.equal(active.data.resumable, false);
@@ -289,7 +398,11 @@ test("fails safe with a correlation ID when a query throws", async () => {
     throw new Error("connection refused");
   }) as unknown as GrowthQueryExecutor;
 
-  const result = await getOutreachDetail(sequenceId, db, () => "test-correlation-id");
+  const result = await getOutreachDetail(
+    sequenceId,
+    db,
+    () => "test-correlation-id",
+  );
   assert.equal(result.status, "error");
   if (result.status !== "error") return;
   assert.equal(result.correlationId, "test-correlation-id");

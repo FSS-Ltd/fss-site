@@ -32,43 +32,28 @@ business.
   Day 14 remain automatic shared-template follow-ups. Day 14 closes the loop
   only when the prospect has not replied.
 
-## Sign And Submit Agent Requests
+## Claim And Submit Agent Requests
 
-The agent makes only two application requests: claim candidates, then submit
-one completed audit for each candidate. It must use the signed request protocol
-below for both endpoints.
+The agent must use the tracked local client rather than creating request
+signatures itself. The client reads the Keychain secret at runtime, preserves
+the exact signed bytes, and never prints the secret or signature.
 
-1. Serialize the JSON request exactly once as UTF-8. Preserve those exact raw
-   bytes from signing through the HTTP request. The claim body is
-   `{\"limit\":3}`. The audit submission must conform to
-   `lib/growth/seo-audits/schema.ts`.
-2. Create the current Unix timestamp in whole seconds.
-3. Calculate a lowercase hexadecimal HMAC-SHA256 using the Keychain secret and
-   this exact byte sequence:
+```bash
+pnpm tsx scripts/seo-audit-agent-api.ts claim
+pnpm tsx scripts/seo-audit-agent-api.ts submit /private/tmp/audit-submission.json
+```
 
-   ```text
-   timestamp + "." + rawBody
-   ```
+The claim command returns at most three candidates. The agent writes each
+strict JSON submission to a private temporary file outside the repository, then
+passes that file to the submit command. The schema is
+`lib/growth/seo-audits/schema.ts`.
 
-4. Send the raw JSON with `Content-Type: application/json` and these headers:
-
-   ```text
-   X-FSS-Key-Id: seo-audit-agent-v1
-   X-FSS-Timestamp: <unix-seconds>
-   X-FSS-Signature: <lowercase-hex-hmac>
-   ```
-
-5. Use a short-lived local Node process with `node:crypto` to calculate the
-   signature and make each request. The Keychain secret, raw body, signature,
-   candidate response, and audit response must stay in that process and must
-   never be printed, written to the repository, or returned in the scheduler
-   report.
-6. Generate a new timestamp and signature for each request and retry. Do not
-   retry HTTP 400, 401, 409, 413, or 422 automatically. A claim is valid for
-   two hours; skip a candidate if its submission returns 409.
-
-The endpoint responses are operational input, not report content. The final
-scheduler response must remain the redacted JSON report defined by the wrapper.
+If the isolated agent exits without completing every claim, the scheduler uses
+the same signed client to release only the remaining claimed audits immediately.
+Released audits are eligible for the next run and are recorded in the Growth
+audit log. The endpoint responses are operational input, not report content;
+the final scheduler response remains the redacted JSON report defined by the
+wrapper.
 
 ## Installation
 

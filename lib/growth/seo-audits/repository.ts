@@ -129,6 +129,46 @@ export type CompleteSeoAuditDraftInput = {
   outputSnapshot: StoredSeoAuditDraft;
 };
 
+export async function releaseSeoAuditClaims(
+  db: GrowthDb,
+  input: { auditIds: readonly string[]; correlationId: string },
+  now: Date,
+): Promise<number> {
+  if (input.auditIds.length === 0 || input.auditIds.length > 5) {
+    throw new TypeError("SEO audit claim release count is invalid.");
+  }
+  if (!input.auditIds.every((auditId) => UUID_PATTERN.test(auditId))) {
+    throw new TypeError("SEO audit claim release ID is invalid.");
+  }
+
+  return withGrowthTransaction(db, async (transaction) => {
+    const rows = await transaction<{ id: string }[]>`
+      update growth.seo_audit_drafts
+      set claim_expires_at = ${now},
+          updated_at = ${now}
+      where id = any(${input.auditIds}::uuid[])
+        and status = 'claimed'
+      returning id
+    `;
+
+    await Promise.all(
+      rows.map((row) =>
+        appendAuditEvent(transaction, {
+          correlationId: input.correlationId,
+          actorType: "agent",
+          actorId: "seo-audit-agent-v1",
+          action: "seo_audit.claim_released",
+          entityType: "seo_audit_draft",
+          entityId: row.id,
+          metadata: { reasonCode: "agent_run_incomplete" },
+        }),
+      ),
+    );
+
+    return rows.length;
+  });
+}
+
 export type SeoAuditDraftRenderContext = {
   auditId: string;
   status: string;

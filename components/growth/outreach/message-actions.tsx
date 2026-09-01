@@ -33,9 +33,9 @@ async function postAction(
 
     if (response.ok) return { ok: true };
 
-    const payload = (await response.json().catch(() => null)) as
-      | { message?: string }
-      | null;
+    const payload = (await response.json().catch(() => null)) as {
+      message?: string;
+    } | null;
     return { ok: false, status: response.status, message: payload?.message };
   } catch {
     return { ok: false, status: 0 };
@@ -52,9 +52,9 @@ export function MessageActionsFrame({
   const formId = useId();
   const [pendingAction, setPendingAction] = useState<ActionKey | null>(null);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
-  const [mode, setMode] = useState<"idle" | "edit" | "redraft" | "confirm-send">(
-    "idle",
-  );
+  const [mode, setMode] = useState<
+    "idle" | "edit" | "redraft" | "confirm-send"
+  >("idle");
   const [subjectDraft, setSubjectDraft] = useState(message.subject);
   const [bodyDraft, setBodyDraft] = useState(
     message.editableParagraphs.join("\n\n"),
@@ -63,7 +63,11 @@ export function MessageActionsFrame({
 
   const busy = pendingAction !== null;
 
-  async function run(action: ActionKey, path: string, body: Record<string, unknown>) {
+  async function run(
+    action: ActionKey,
+    path: string,
+    body: Record<string, unknown>,
+  ) {
     setPendingAction(action);
     setFeedback(null);
 
@@ -111,9 +115,17 @@ export function MessageActionsFrame({
         )}
       </div>
 
-      <div aria-label="First-email decision" className={styles.actionsBar} role="group">
+      <div
+        aria-label="First-email decision"
+        className={styles.actionsBar}
+        role="group"
+      >
         {feedback && (
-          <p className={styles.actionFeedback} data-tone={feedback.tone} role="alert">
+          <p
+            className={styles.actionFeedback}
+            data-tone={feedback.tone}
+            role="alert"
+          >
             {feedback.message}
           </p>
         )}
@@ -149,7 +161,9 @@ export function MessageActionsFrame({
           }
           type="button"
         >
-          {pendingAction === "create-gmail-draft" ? "Creating…" : "Create Gmail draft"}
+          {pendingAction === "create-gmail-draft"
+            ? "Creating…"
+            : "Create Gmail draft"}
         </button>
 
         <button
@@ -163,7 +177,7 @@ export function MessageActionsFrame({
         </button>
 
         <p className={styles.actionHelp}>
-          Sending starts the approved Day 1, 5, 11 and 20 sequence.
+          Sending starts the approved Day 1, 5, 11 and 14 sequence.
         </p>
 
         <button
@@ -171,9 +185,13 @@ export function MessageActionsFrame({
           data-variant="danger"
           disabled={busy}
           onClick={() =>
-            run("reject", `/api/growth/prospects/${message.prospectId}/reject`, {
-              expectedVersion: message.prospectVersion,
-            })
+            run(
+              "reject",
+              `/api/growth/prospects/${message.prospectId}/reject`,
+              {
+                expectedVersion: message.prospectVersion,
+              },
+            )
           }
           type="button"
         >
@@ -193,7 +211,9 @@ export function MessageActionsFrame({
           }
           type="button"
         >
-          {pendingAction === "do-not-contact" ? "Suppressing…" : "Do not contact"}
+          {pendingAction === "do-not-contact"
+            ? "Suppressing…"
+            : "Do not contact"}
         </button>
       </div>
 
@@ -274,7 +294,8 @@ export function MessageActionsFrame({
         >
           <div className={styles.field}>
             <label className={styles.fieldLabel} htmlFor={`${formId}-reason`}>
-              Reason for redraft (at least {MIN_REDRAFT_REASON_LENGTH} characters)
+              Reason for redraft (at least {MIN_REDRAFT_REASON_LENGTH}{" "}
+              characters)
             </label>
             <textarea
               className={styles.textArea}
@@ -288,10 +309,14 @@ export function MessageActionsFrame({
             <button
               className={styles.actionButton}
               data-variant="warning"
-              disabled={busy || redraftReason.trim().length < MIN_REDRAFT_REASON_LENGTH}
+              disabled={
+                busy || redraftReason.trim().length < MIN_REDRAFT_REASON_LENGTH
+              }
               type="submit"
             >
-              {pendingAction === "needs-redraft" ? "Sending back…" : "Send back for redraft"}
+              {pendingAction === "needs-redraft"
+                ? "Sending back…"
+                : "Send back for redraft"}
             </button>
             <button
               className={styles.actionButton}
@@ -314,10 +339,11 @@ export function MessageActionsFrame({
             <h2 className={styles.dialogTitle} id={`${formId}-confirm-title`}>
               Confirm and send
             </h2>
-            <p>This starts the Day 1, 5, 11 and 20 sequence for:</p>
+            <p>This starts the Day 1, 5, 11 and 14 sequence for:</p>
             <dl className={styles.dialogSummary}>
               <div>
-                <strong>To:</strong> {message.contactName} &lt;{message.contactEmail}
+                <strong>To:</strong> {message.contactName} &lt;
+                {message.contactEmail}
                 &gt;
               </div>
               <div>
@@ -325,7 +351,9 @@ export function MessageActionsFrame({
               </div>
               <div>
                 <strong>Visual:</strong>{" "}
-                {message.visualKind === "stored" ? "Approved image attached" : "Fallback visual attached"}
+                {message.visualKind === "stored"
+                  ? "Approved image attached"
+                  : "Fallback visual attached"}
               </div>
               <div>
                 <strong>Potential value:</strong>{" "}
@@ -354,7 +382,9 @@ export function MessageActionsFrame({
                 }
                 type="button"
               >
-                {pendingAction === "approve-send" ? "Sending…" : "Approve & send"}
+                {pendingAction === "approve-send"
+                  ? "Sending…"
+                  : "Approve & send"}
               </button>
             </div>
           </div>

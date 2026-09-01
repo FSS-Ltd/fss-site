@@ -101,6 +101,12 @@ export type ThreadHealth = {
   lastGmailSyncAt: string | null;
 };
 
+export type SequenceSeoAudit =
+  | { state: "not_started" }
+  | { state: "claimed"; claimExpiresAt: string }
+  | { state: "draft"; auditId: string; completedAt: string }
+  | { state: "approved"; auditId: string; approvedAt: string };
+
 export type OutreachSequenceDetail = {
   sequenceId: string;
   prospectId: string;
@@ -121,6 +127,7 @@ export type OutreachSequenceDetail = {
   estimatedOneOffMaxPence: number;
   timeline: readonly TimelineEvent[];
   threadHealth: ThreadHealth;
+  seoAudit: SequenceSeoAudit;
 };
 
 export type OutreachDetailResult =
@@ -223,6 +230,14 @@ async function fetchMessageRows(
 
 type AuditRow = { action: string; createdAt: Date };
 
+type SeoAuditRow = {
+  auditId: string;
+  status: string;
+  claimExpiresAt: Date | null;
+  completedAt: Date | null;
+  approvedAt: Date | null;
+};
+
 async function fetchAuditRows(
   db: GrowthQueryExecutor,
   sequenceId: string,
@@ -233,6 +248,53 @@ async function fetchAuditRows(
     where entity_type = 'sequence_enrollment' and entity_id = ${sequenceId}
     order by created_at asc
   `;
+}
+
+async function fetchSeoAuditRow(
+  db: GrowthQueryExecutor,
+  sequenceId: string,
+): Promise<SeoAuditRow | null> {
+  const rows = await db<SeoAuditRow[]>`
+    select
+      id as "auditId",
+      status,
+      claim_expires_at as "claimExpiresAt",
+      completed_at as "completedAt",
+      approved_at as "approvedAt"
+    from growth.seo_audit_drafts
+    where sequence_enrollment_id = ${sequenceId}
+    limit 1
+  `;
+  return rows[0] ?? null;
+}
+
+function toSequenceSeoAudit(row: SeoAuditRow | null): SequenceSeoAudit {
+  if (row === null) return { state: "not_started" };
+
+  if (row.status === "claimed" && row.claimExpiresAt !== null) {
+    return {
+      state: "claimed",
+      claimExpiresAt: row.claimExpiresAt.toISOString(),
+    };
+  }
+
+  if (row.status === "draft" && row.completedAt !== null) {
+    return {
+      state: "draft",
+      auditId: row.auditId,
+      completedAt: row.completedAt.toISOString(),
+    };
+  }
+
+  if (row.status === "approved" && row.approvedAt !== null) {
+    return {
+      state: "approved",
+      auditId: row.auditId,
+      approvedAt: row.approvedAt.toISOString(),
+    };
+  }
+
+  return { state: "not_started" };
 }
 
 async function fetchLastGmailSyncAt(
@@ -351,7 +413,7 @@ function messageRowToEvent(row: MessageRow): TimelineEvent | null {
       occurredAt: row.updatedAt.toISOString(),
       providerObservedAt: null,
       localReceivedAt: null,
-      detail: "Cancelled because the sequence stopped",
+      detail: row.lastErrorSummary ?? "Cancelled because the sequence stopped",
     };
   }
 
@@ -425,11 +487,13 @@ export async function getOutreachDetail(
     const enrollment = await fetchEnrollmentRow(db, sequenceId);
     if (!enrollment) return { status: "not_found" };
 
-    const [messageRows, auditRows, lastGmailSyncAt] = await Promise.all([
-      fetchMessageRows(db, sequenceId),
-      fetchAuditRows(db, sequenceId),
-      fetchLastGmailSyncAt(db),
-    ]);
+    const [messageRows, auditRows, seoAuditRow, lastGmailSyncAt] =
+      await Promise.all([
+        fetchMessageRows(db, sequenceId),
+        fetchAuditRows(db, sequenceId),
+        fetchSeoAuditRow(db, sequenceId),
+        fetchLastGmailSyncAt(db),
+      ]);
 
     const timeline = buildTimeline(messageRows, auditRows);
     const deliveredCount = messageRows.filter(
@@ -461,6 +525,7 @@ export async function getOutreachDetail(
         estimatedOneOffMaxPence: enrollment.estimatedOneOffMaxPence,
         timeline,
         threadHealth: { deliveredCount, repliedCount, lastGmailSyncAt },
+        seoAudit: toSequenceSeoAudit(seoAuditRow),
       },
     };
   } catch {
