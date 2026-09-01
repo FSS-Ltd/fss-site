@@ -56,3 +56,15 @@ test("starts an isolated, schema-constrained agent that cannot send email", () =
   assert.equal(result.succeeded, true);
   assert.deepEqual(result.report, report);
 });
+
+test("documents the HMAC handoff required by the isolated audit agent", () => {
+  const runbook = readFileSync(
+    "docs/growth-os/runbooks/scheduled-seo-audits.md",
+    "utf8",
+  );
+
+  assert.match(runbook, /timestamp \+ \"\.\" \+ rawBody/);
+  assert.match(runbook, /X-FSS-Key-Id: seo-audit-agent-v1/);
+  assert.match(runbook, /node:crypto/);
+  assert.match(runbook, /never be printed, written to the repository/);
+});
