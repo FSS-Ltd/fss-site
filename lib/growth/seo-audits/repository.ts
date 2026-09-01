@@ -212,7 +212,6 @@ export class SeoAuditDraftCompletionError extends Error {
 }
 
 type SeoAuditDraftPersistencePhase =
-  | "parse_snapshot"
   | "lock_draft"
   | "save_draft"
   | "append_audit_event";
@@ -244,12 +243,7 @@ export async function completeSeoAuditDraft(
   if (!UUID_PATTERN.test(input.auditId)) {
     throw new TypeError("SEO audit draft ID is invalid.");
   }
-  let stored: StoredSeoAuditDraft;
-  try {
-    stored = parseStoredSeoAuditDraft(input.outputSnapshot);
-  } catch {
-    throw new SeoAuditDraftPersistenceError("parse_snapshot");
-  }
+  const stored: StoredSeoAuditDraft = input.outputSnapshot;
 
   let phase: SeoAuditDraftPersistencePhase = "lock_draft";
   try {
