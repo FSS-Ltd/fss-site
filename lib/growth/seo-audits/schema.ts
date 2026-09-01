@@ -5,6 +5,12 @@ import { escapeEmailHtmlText, isSafeEmailHtml } from "../email/html-policy";
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const CONTROL_PATTERN = /[\u0000-\u001f\u007f]/;
+const SEO_AUDIT_EMAIL_MIN_WORDS = 70;
+const SEO_AUDIT_EMAIL_MAX_WORDS = 220;
+const SEO_AUDIT_REPORT_URL_PLACEHOLDER =
+  "https://faithfulsoftware.dev/audit.pdf";
+const SEO_AUDIT_EMAIL_CLOSING =
+  "If you would rather not hear from me, reply and I will close the loop.";
 
 const publicUrlSchema = z
   .string()
@@ -30,6 +36,33 @@ const plainTextSchema = (minimum: number, maximum: number) =>
       (value) => !CONTROL_PATTERN.test(value),
       "Text contains control characters.",
     );
+
+function countWords(text: string): number {
+  return text.trim().split(/\s+/).length;
+}
+
+function buildSeoAuditEmailText(
+  paragraphs: readonly string[],
+  reportUrl: string,
+): string {
+  return [
+    ...paragraphs,
+    `I have put the full SEO and answer-engine audit here: ${reportUrl}`,
+    SEO_AUDIT_EMAIL_CLOSING,
+  ].join("\n\n");
+}
+
+export function hasValidSeoAuditEmailWordCount(
+  paragraphs: readonly string[],
+): boolean {
+  const wordCount = countWords(
+    buildSeoAuditEmailText(paragraphs, SEO_AUDIT_REPORT_URL_PLACEHOLDER),
+  );
+  return (
+    wordCount >= SEO_AUDIT_EMAIL_MIN_WORDS &&
+    wordCount <= SEO_AUDIT_EMAIL_MAX_WORDS
+  );
+}
 
 const auditActionSchema = z
   .object({
@@ -88,7 +121,11 @@ export const seoAuditSubmissionSchema = z
         subject: plainTextSchema(8, 160),
         paragraphs: z.array(plainTextSchema(20, 1_000)).min(2).max(4),
       })
-      .strict(),
+      .strict()
+      .refine(
+        (email) => hasValidSeoAuditEmailWordCount(email.paragraphs),
+        "SEO audit email must contain 70 to 220 words after application text is added.",
+      ),
   })
   .strict();
 
@@ -131,10 +168,6 @@ const storedSeoAuditDraftSchema = z
   })
   .strict();
 
-function countWords(text: string): number {
-  return text.trim().split(/\s+/).length;
-}
-
 export function createStoredSeoAuditDraft(input: {
   submission: SeoAuditSubmission;
   reportUrl: string;
@@ -148,11 +181,17 @@ export function createStoredSeoAuditDraft(input: {
   const paragraphs = [
     ...input.submission.email.paragraphs,
     `I have put the full SEO and answer-engine audit here: ${reportUrl}`,
-    "If you would rather not hear from me, reply and I will close the loop.",
+    SEO_AUDIT_EMAIL_CLOSING,
   ];
-  const text = paragraphs.join("\n\n");
+  const text = buildSeoAuditEmailText(
+    input.submission.email.paragraphs,
+    reportUrl,
+  );
   const wordCount = countWords(text);
-  if (wordCount < 70 || wordCount > 220) {
+  if (
+    wordCount < SEO_AUDIT_EMAIL_MIN_WORDS ||
+    wordCount > SEO_AUDIT_EMAIL_MAX_WORDS
+  ) {
     throw new TypeError(
       "SEO audit email content must contain 70 to 220 words.",
     );

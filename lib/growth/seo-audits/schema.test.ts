@@ -3,6 +3,7 @@ import test from "node:test";
 
 import {
   createStoredSeoAuditDraft,
+  hasValidSeoAuditEmailWordCount,
   parseStoredSeoAuditDraft,
   seoAuditSubmissionSchema,
   type SeoAuditSubmission,
@@ -120,5 +121,19 @@ test("requires a complete evidence-backed audit bundle", () => {
   const incomplete = submission();
   incomplete.audit.findings = incomplete.audit.findings.slice(0, 3);
 
+  assert.equal(seoAuditSubmissionSchema.safeParse(incomplete).success, false);
+});
+
+test("rejects an email that cannot meet the final word-count contract", () => {
+  const incomplete = submission();
+  incomplete.email.paragraphs = [
+    "I reviewed the public pages and found a few practical opportunities.",
+    "The attached report explains where to start with the work.",
+  ];
+
+  assert.equal(
+    hasValidSeoAuditEmailWordCount(incomplete.email.paragraphs),
+    false,
+  );
   assert.equal(seoAuditSubmissionSchema.safeParse(incomplete).success, false);
 });
