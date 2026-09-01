@@ -128,7 +128,7 @@ export async function getSeoAuditReview(
           select 1 from growth.email_messages second_follow_up
           where second_follow_up.sequence_enrollment_id = se.id
             and second_follow_up.direction = 'outbound'
-            and second_follow_up.step_number = 2
+            and second_follow_up.step_number = 1
             and second_follow_up.status = 'sent'
         ) as "secondFollowUpSent",
         exists (
