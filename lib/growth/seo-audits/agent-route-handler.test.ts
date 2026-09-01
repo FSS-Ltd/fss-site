@@ -210,3 +210,30 @@ test("rejects an under-length email before it renders a report", async () => {
   assert.equal(response.status, 422);
   assert.equal(renderAttempted, false);
 });
+
+test("reports only the failed submission phase for unexpected errors", async () => {
+  const reported: unknown[] = [];
+  const handler = createSeoAuditSubmissionHandler({
+    ...dependencies(),
+    getRenderContext: async () => ({
+      auditId: AUDIT_ID,
+      status: "claimed",
+      claimExpiresAt: new Date("2026-09-01T08:30:00.000Z"),
+      businessName: "Example & Sons",
+      websiteUrl: "https://example.test/",
+    }),
+    renderPdf: async () => {
+      throw new Error("do not expose this detail");
+    },
+    reportUnexpectedError: (input) => reported.push(input.error),
+  });
+
+  const response = await handler(
+    signedRequest("/api/agent/seo-audits", auditSubmission()),
+  );
+
+  assert.equal(response.status, 500);
+  assert.equal(reported.length, 1);
+  assert.equal((reported[0] as Error).name, "SeoAuditSubmissionRenderPdfError");
+  assert.equal((reported[0] as Error).message, "SEO audit submission failed.");
+});

@@ -55,6 +55,21 @@ export type SeoAuditAgentRouteDependencies = {
   ) => Promise<void>;
 };
 
+type SeoAuditSubmissionPhase =
+  | "render_pdf"
+  | "store_report"
+  | "build_draft"
+  | "complete_draft";
+
+function createSubmissionPhaseError(phase: SeoAuditSubmissionPhase): Error {
+  const error = new Error("SEO audit submission failed.");
+  error.name = `SeoAuditSubmission${phase
+    .split("_")
+    .map((segment) => segment[0]?.toUpperCase() + segment.slice(1))
+    .join("")}Error`;
+  return error;
+}
+
 function candidateResponse(candidate: SeoAuditCandidate) {
   return {
     auditId: candidate.auditId,
@@ -204,6 +219,7 @@ export function createSeoAuditSubmissionHandler(
       );
     }
 
+    let phase: SeoAuditSubmissionPhase = "render_pdf";
     try {
       const context = await (
         dependencies.getRenderContext ??
@@ -231,16 +247,19 @@ export function createSeoAuditSubmissionHandler(
         audit: parsed.data.audit,
       });
       const sha256 = createHash("sha256").update(pdf).digest("hex");
+      phase = "store_report";
       const storedReport = await dependencies.blobStorage.putReport({
         pathname: `growth-seo-audits/${context.auditId}/audit-${sha256}.pdf`,
         bytes: pdf,
       });
       try {
+        phase = "build_draft";
         const outputSnapshot = createStoredSeoAuditDraft({
           submission: parsed.data,
           reportUrl: storedReport.url,
           reportSha256: sha256,
         });
+        phase = "complete_draft";
         await (
           dependencies.completeDraft ??
           ((input, completedAt) =>
@@ -271,7 +290,10 @@ export function createSeoAuditSubmissionHandler(
           correlationId,
         );
       }
-      dependencies.reportUnexpectedError({ correlationId, error });
+      dependencies.reportUnexpectedError({
+        correlationId,
+        error: createSubmissionPhaseError(phase),
+      });
       return failureResponse(
         500,
         "internal_error",
