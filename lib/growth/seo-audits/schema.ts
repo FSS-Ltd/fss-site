@@ -5,6 +5,7 @@ import { escapeEmailHtmlText, isSafeEmailHtml } from "../email/html-policy";
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const CONTROL_PATTERN = /[\u0000-\u001f\u007f]/;
+const EMAIL_TEXT_CONTROL_PATTERN = /[\u0000-\u0009\u000b-\u001f\u007f]/;
 const SEO_AUDIT_EMAIL_MIN_WORDS = 70;
 const SEO_AUDIT_EMAIL_MAX_WORDS = 220;
 const SEO_AUDIT_REPORT_URL_PLACEHOLDER =
@@ -36,6 +37,16 @@ const plainTextSchema = (minimum: number, maximum: number) =>
       (value) => !CONTROL_PATTERN.test(value),
       "Text contains control characters.",
     );
+
+const emailTextSchema = z
+  .string()
+  .trim()
+  .min(20)
+  .max(20_000)
+  .refine(
+    (value) => !EMAIL_TEXT_CONTROL_PATTERN.test(value),
+    "Email text contains unsupported control characters.",
+  );
 
 function countWords(text: string): number {
   return text.trim().split(/\s+/).length;
@@ -161,7 +172,7 @@ const storedSeoAuditDraftSchema = z
       .object({
         subject: plainTextSchema(8, 160),
         html: z.string().min(1).max(20_000),
-        text: plainTextSchema(20, 20_000),
+        text: emailTextSchema,
         wordCount: z.number().int().positive().max(500),
       })
       .strict(),

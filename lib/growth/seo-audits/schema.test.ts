@@ -84,6 +84,7 @@ test("creates a safe stored email with a fixed report link and opt-out", () => {
     stored.email.html,
     /href="https:\/\/example\.test\/reports\/example-audit\.pdf"/,
   );
+  assert.deepEqual(parseStoredSeoAuditDraft(stored), stored);
 });
 
 test("escapes agent email content instead of trusting it as HTML", () => {

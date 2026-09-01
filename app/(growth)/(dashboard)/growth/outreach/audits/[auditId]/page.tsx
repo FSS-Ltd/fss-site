@@ -10,6 +10,6 @@ export default async function SeoAuditReviewPage({
 }) {
   const { auditId } = await params;
   const result = await getSeoAuditReview(auditId);
-  if (result.status === "not_found" || result.status === "invalid") notFound();
+  if (result.status === "not_found") notFound();
   return <SeoAuditReview result={result} />;
 }
