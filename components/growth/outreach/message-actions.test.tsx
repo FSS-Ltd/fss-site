@@ -50,8 +50,8 @@ function baseMessage(
     followUpCadence: [
       { day: "Day 1", label: "Personalised email" },
       { day: "Day 5", label: "Short follow-up" },
-      { day: "Day 11", label: "Useful example" },
-      { day: "Day 20", label: "Close the loop" },
+      { day: "Day 11", label: "Founder-approved SEO and AEO audit" },
+      { day: "Day 14", label: "Close the loop" },
     ],
     ...overrides,
   };

@@ -3,17 +3,17 @@ import test from "node:test";
 
 import { scheduleFollowUp, scheduleFollowUps } from "./schedule";
 
-test("schedules Day 5, 11, and 20 as calendar offsets and moves weekend targets to Monday", () => {
+test("schedules Day 5, 11, and 14 as calendar offsets and moves weekend targets to Monday", () => {
   // 2026-08-18 is a Tuesday (BST). Day 5 (+4) lands on Saturday 2026-08-22,
-  // Day 11 (+10) lands on Friday 2026-08-28, Day 20 (+19) lands on Sunday
-  // 2026-09-06.
+  // Day 11 (+10) lands on Friday 2026-08-28, Day 14 (+13) lands on Monday
+  // 2026-08-31.
   const firstSentAt = new Date(Date.UTC(2026, 7, 18, 12, 0, 0));
 
   const followUps = scheduleFollowUps(firstSentAt);
 
   assert.equal(followUps.day_5.toISOString(), "2026-08-24T09:00:00.000Z");
   assert.equal(followUps.day_11.toISOString(), "2026-08-28T09:00:00.000Z");
-  assert.equal(followUps.day_20.toISOString(), "2026-09-07T09:00:00.000Z");
+  assert.equal(followUps.day_14.toISOString(), "2026-08-31T09:00:00.000Z");
 });
 
 test("preserves the 10:00 local send time across the UK spring daylight-saving change", () => {
@@ -38,6 +38,14 @@ test("preserves the 10:00 local send time across the UK autumn daylight-saving c
 
 test("does not shift a follow-up that already lands on a weekday", () => {
   // 2026-08-18 is a Tuesday. Day 11 (+10) lands on Friday 2026-08-28.
+  const firstSentAt = new Date(Date.UTC(2026, 7, 18, 12, 0, 0));
+
+  const dueAt = scheduleFollowUp(firstSentAt, "day_11");
+
+  assert.equal(dueAt.toISOString(), "2026-08-28T09:00:00.000Z");
+});
+
+test("keeps an early-approved Day 11 audit on its sequence date", () => {
   const firstSentAt = new Date(Date.UTC(2026, 7, 18, 12, 0, 0));
 
   const dueAt = scheduleFollowUp(firstSentAt, "day_11");

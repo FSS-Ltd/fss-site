@@ -252,7 +252,7 @@ async function fetchLastGmailSyncAt(
 const OUTBOUND_STEP_LABELS = [
   "First email",
   "Short follow-up",
-  "Useful example",
+  "SEO and AEO audit",
   "Close the loop",
 ];
 
@@ -269,7 +269,10 @@ const AUDIT_ACTION_EVENTS: Record<
     kind: "stopped",
     label: "Marked as started talks",
   },
-  "sequence.stopped.rejected": { kind: "stopped", label: "Rejected by founder" },
+  "sequence.stopped.rejected": {
+    kind: "stopped",
+    label: "Rejected by founder",
+  },
   "sequence.stopped.do_not_contact": {
     kind: "stopped",
     label: "Marked do not contact",
@@ -279,7 +282,8 @@ const AUDIT_ACTION_EVENTS: Record<
 
 function messageRowToEvent(row: MessageRow): TimelineEvent | null {
   if (row.direction === "inbound") {
-    const kind: TimelineEventKind = row.eventType === "reply" ? "reply" : "stopped";
+    const kind: TimelineEventKind =
+      row.eventType === "reply" ? "reply" : "stopped";
     const occurredAt = row.eventOccurredAt ?? row.receivedAt;
     if (!occurredAt) return null;
     return {
