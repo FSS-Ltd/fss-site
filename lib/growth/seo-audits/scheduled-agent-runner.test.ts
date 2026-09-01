@@ -26,6 +26,57 @@ const auditIds = [
   "22222222-2222-4222-8222-222222222222",
 ] as const;
 
+function submissionFor(auditId: string): string {
+  return JSON.stringify({
+    auditId,
+    audit: {
+      executiveSummary:
+        "The public site has a sound starting point, but several visible gaps make it harder for local prospects and answer engines to understand the service, location, and next action without extra work.",
+      scores: {
+        technicalSeo: 62,
+        onPageSeo: 58,
+        localSeo: 48,
+        answerEngineReadiness: 44,
+      },
+      strengths: [
+        "The home page clearly states the primary service and includes a direct contact path.",
+      ],
+      findings: Array.from({ length: 4 }, (_, index) => ({
+        id: `finding-${index + 1}`,
+        severity: "medium",
+        title: `Clearer service information needed ${index + 1}`,
+        evidence:
+          "The public page does not present a concise question-and-answer explanation for this service, which leaves essential information hard to scan.",
+        whyItMatters:
+          "Search engines and prospective customers need direct, consistent explanations before they can match this page to a specific local need.",
+        actions: [
+          {
+            title: "Add a clear answer",
+            instructions:
+              "Add a short answer near the relevant service heading explaining who the service is for, what is included, and how a customer can get started.",
+          },
+        ],
+      })),
+      answerEngineSummary:
+        "Add concise service, audience, location, and process answers in plain language so answer engines can reliably extract accurate responses from the site.",
+      sources: [
+        {
+          title: "Public website",
+          url: "https://example.com/",
+          checkedAt: "2026-09-01T05:30:00.000Z",
+        },
+      ],
+    },
+    email: {
+      subject: "A practical SEO and AEO audit for your website",
+      paragraphs: [
+        "I reviewed your public website and prepared a practical audit focused on the changes that can help customers and search engines understand your services more clearly. It covers technical foundations, page content, local visibility, and answer-engine readiness using only publicly available information.",
+        "The report prioritises actions your team can complete without a developer, with plain instructions for each. I have also separated the quick wins from the items that need more care, so you can decide what to tackle first without changing your current website platform.",
+      ],
+    },
+  });
+}
+
 function candidateClaimer() {
   return {
     candidateJson: JSON.stringify({
@@ -56,6 +107,8 @@ test("starts an isolated, schema-constrained agent that cannot send email", () =
     assert.match(prompt, /do not create the PDF locally/i);
     assert.match(prompt, /never print a business name/i);
     assert.match(prompt, /create a Gmail draft, send email, queue an email/i);
+    assert.match(prompt, /exactly conforms to seoAuditSubmissionSchema/i);
+    assert.match(prompt, /50 to 190 words/i);
     const schemaPath = input.args[input.args.indexOf("--output-schema") + 1];
     const schema = JSON.parse(readFileSync(schemaPath, "utf8")) as {
       additionalProperties?: boolean;
@@ -65,7 +118,10 @@ test("starts an isolated, schema-constrained agent that cannot send email", () =
     assert.match(input.candidatePath, /candidates\.json$/);
     assert.match(input.submissionDirectory, /submissions$/);
     for (const auditId of auditIds) {
-      writeFileSync(join(input.submissionDirectory, `${auditId}.json`), "{}");
+      writeFileSync(
+        join(input.submissionDirectory, `${auditId}.json`),
+        submissionFor(auditId),
+      );
     }
     return report;
   };
@@ -78,7 +134,7 @@ test("starts an isolated, schema-constrained agent that cannot send email", () =
     candidateClaimer,
     submissionRunner: ({ submissionPath }) => {
       submittedPaths.push(submissionPath);
-      return true;
+      return { status: "submitted" };
     },
   });
 
@@ -116,14 +172,48 @@ test("releases only a missing or failed submission while preserving completed au
     executor: (input) => {
       writeFileSync(
         join(input.submissionDirectory, `${auditIds[0]}.json`),
-        "{}",
+        submissionFor(auditIds[0]),
       );
       return { ...report, submitted: 1, failed: 1 };
     },
-    submissionRunner: () => true,
+    submissionRunner: () => ({ status: "submitted" }),
     claimReleaser: () => {},
   });
 
+  assert.equal(result.succeeded, false);
+  assert.deepEqual(result.report, {
+    ...report,
+    submitted: 1,
+    failed: 1,
+    failureClass: "agent_failure",
+  });
+});
+
+test("does not submit malformed agent output and releases its claim", () => {
+  let attempts = 0;
+  const result = executeScheduledSeoAuditAgent({
+    now: new Date("2026-09-01T05:30:00.000Z"),
+    repositoryRoot: process.cwd(),
+    candidateClaimer,
+    executor: (input) => {
+      writeFileSync(
+        join(input.submissionDirectory, `${auditIds[0]}.json`),
+        "{}",
+      );
+      writeFileSync(
+        join(input.submissionDirectory, `${auditIds[1]}.json`),
+        submissionFor(auditIds[1]),
+      );
+      return report;
+    },
+    submissionRunner: () => {
+      attempts += 1;
+      return { status: "submitted" };
+    },
+    claimReleaser: () => {},
+  });
+
+  assert.equal(attempts, 1);
   assert.equal(result.succeeded, false);
   assert.deepEqual(result.report, {
     ...report,

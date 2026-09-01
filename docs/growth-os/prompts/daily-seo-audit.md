@@ -10,7 +10,11 @@ operating contract for review and future revisions.
   non-developer actions.
 - Submit a short, personalised email draft. The application adds the report
   link and opt-out sentence, renders the PDF, and holds the result for founder
-  approval.
+  approval. The agent's paragraphs must total 50 to 190 words, so the final
+  application email remains within its 70 to 220 word limit.
+- Each submission file must be raw JSON that exactly conforms to
+  `seoAuditSubmissionSchema`, with no Markdown fence, commentary, or extra
+  keys. Its filename and `auditId` must match exactly.
 - The scheduler wrapper supplies a private candidate file and handles every
   application request after the audit is written. Do not read the Keychain,
   calculate an HMAC signature, run `scripts/seo-audit-agent-api.ts`, or call
