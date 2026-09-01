@@ -44,7 +44,8 @@ export async function postSignedSeoAuditRequest(input: {
   path:
     | "/api/agent/seo-audits/claim"
     | "/api/agent/seo-audits"
-    | "/api/agent/seo-audits/release";
+    | "/api/agent/seo-audits/release"
+    | "/api/agent/seo-audits/regenerate-reports";
   secret: string;
   rawBody: Uint8Array;
   now?: Date;
