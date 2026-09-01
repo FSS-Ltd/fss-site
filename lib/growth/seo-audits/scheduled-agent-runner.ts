@@ -1,9 +1,12 @@
 import { spawnSync } from "node:child_process";
 import {
   chmodSync,
+  existsSync,
+  mkdirSync,
   mkdtempSync,
   readFileSync,
   rmSync,
+  statSync,
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
@@ -13,6 +16,7 @@ import { z } from "zod";
 
 const PROMPT_VERSION = "daily-seo-audit-v1";
 const DEFAULT_TIMEOUT_MS = 45 * 60 * 1_000;
+const MAX_SUBMISSION_BYTES = 128 * 1024;
 
 export const redactedSeoAuditRunReportSchema = z
   .object({
@@ -45,6 +49,8 @@ type SeoAuditAgentExecutionInput = {
   args: readonly string[];
   cwd: string;
   reportPath: string;
+  candidatePath: string;
+  submissionDirectory: string;
   claimLedgerPath: string;
   timeoutMs: number;
 };
@@ -71,6 +77,84 @@ function runRedactedSeoAuditChild(
   return redactedSeoAuditRunReportSchema.parse(
     JSON.parse(readFileSync(input.reportPath, "utf8")) as unknown,
   );
+}
+
+const agentClaimResponseSchema = z
+  .object({
+    ok: z.literal(true),
+    candidates: z.array(z.object({ auditId: z.string().uuid() }).passthrough()),
+  })
+  .passthrough();
+
+type SeoAuditClaim = {
+  candidateJson: string;
+  auditIds: readonly string[];
+};
+
+export type SeoAuditCandidateClaimer = (input: {
+  repositoryRoot: string;
+  claimLedgerPath: string;
+}) => SeoAuditClaim;
+
+function claimSeoAuditCandidatesForAgent(input: {
+  repositoryRoot: string;
+  claimLedgerPath: string;
+}): SeoAuditClaim {
+  const result = spawnSync(
+    process.execPath,
+    ["--import", "tsx", "scripts/seo-audit-agent-api.ts", "claim"],
+    {
+      cwd: input.repositoryRoot,
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        GROWTH_OS_SEO_AUDIT_CLAIM_LEDGER_PATH: input.claimLedgerPath,
+      },
+      stdio: ["ignore", "pipe", "ignore"],
+      timeout: 30_000,
+    },
+  );
+  if (result.error !== undefined || result.status !== 0) {
+    throw new Error("SEO audit candidates could not be claimed.");
+  }
+  if (result.stdout.length > 128 * 1024) {
+    throw new Error("SEO audit candidate response is too large.");
+  }
+
+  const parsed = agentClaimResponseSchema.parse(
+    JSON.parse(result.stdout) as unknown,
+  );
+  return {
+    candidateJson: result.stdout,
+    auditIds: parsed.candidates.map((candidate) => candidate.auditId),
+  };
+}
+
+export type SeoAuditSubmissionRunner = (input: {
+  repositoryRoot: string;
+  submissionPath: string;
+}) => boolean;
+
+function submitPreparedSeoAudit(input: {
+  repositoryRoot: string;
+  submissionPath: string;
+}): boolean {
+  const result = spawnSync(
+    process.execPath,
+    [
+      "--import",
+      "tsx",
+      "scripts/seo-audit-agent-api.ts",
+      "submit",
+      input.submissionPath,
+    ],
+    {
+      cwd: input.repositoryRoot,
+      stdio: ["ignore", "ignore", "ignore"],
+      timeout: 60_000,
+    },
+  );
+  return result.error === undefined && result.status === 0;
 }
 
 export type SeoAuditClaimReleaser = (input: {
@@ -105,6 +189,8 @@ type ExecuteScheduledSeoAuditAgentInput = {
   codexBinary?: string;
   timeoutMs?: number;
   executor?: SeoAuditAgentExecutor;
+  candidateClaimer?: SeoAuditCandidateClaimer;
+  submissionRunner?: SeoAuditSubmissionRunner;
   claimReleaser?: SeoAuditClaimReleaser;
 };
 
@@ -132,25 +218,24 @@ export function buildDailySeoAuditExternalRunId(date: Date): string {
 function buildAgentPrompt(
   repositoryRoot: string,
   externalRunId: string,
+  candidatePath: string,
+  submissionDirectory: string,
 ): string {
   const allowedFiles = [
     "docs/growth-os/prompts/daily-seo-audit.md",
     "docs/growth-os/runbooks/scheduled-seo-audits.md",
     "lib/growth/seo-audits/schema.ts",
-    "lib/growth/seo-audits/local-agent-client.ts",
-    "scripts/seo-audit-agent-api.ts",
   ].map((path) => join(repositoryRoot, path));
-  const apiScript = join(repositoryRoot, "scripts/seo-audit-agent-api.ts");
 
   return [
     "Run the founder-controlled daily SEO and answer-engine audit workflow for the Growth OS in submit mode against https://faithfulsoftware.dev.",
     `Use the stable external run ID ${externalRunId}.`,
-    `Use only these project paths: ${allowedFiles.join(", ")}.`,
+    `Use only these project paths: ${allowedFiles.join(", ")}, ${candidatePath}, and ${submissionDirectory}.`,
     "Do not inspect AGENTS files, Nexus vault files, Codex caches or memories, browser data, Git history, or any other user files. Do not run broad filesystem searches.",
-    `Use only the supplied local API client at ${apiScript} for application calls. First run \"pnpm tsx ${apiScript} claim\" to claim at most three candidates. For each completed audit, write the strict JSON submission to a private temporary file outside the repository, then run \"pnpm tsx ${apiScript} submit <temporary-file>\". Do not implement request signing, read the Keychain, or call an application endpoint another way. The application, not you, owns database access. Never request or use a database credential.`,
+    `Read the candidate response from ${candidatePath}. The trusted scheduler wrapper owns candidate claims, request signing, and final submission. Do not access the Keychain, run ${join(repositoryRoot, "scripts/seo-audit-agent-api.ts")}, implement request signing, or call an application endpoint. Never request or use a database credential.`,
     "For each claimed candidate, research only publicly accessible sources. Produce a rigorous SEO and AEO audit with evidence, source URLs, clear prioritised findings, and specific steps the business can do themselves without a developer. Do not claim that unverified tools or private analytics were used.",
-    "Submit one strict JSON bundle per successfully audited candidate to POST /api/agent/seo-audits. The application creates the PDF, stores it, and creates the founder-review email draft. Do not create the PDF locally, write files to the repository, create a Gmail draft, send email, queue an email, commit, deploy, or publish anything.",
-    "If no candidates are available, return finalOutcome no_candidates. If one candidate fails, continue with the others and record only redacted totals. Never print a business name, website URL, contact detail, source URL, audit text, email copy, request body, signature, secret, or provider response.",
+    `For each completed candidate, write one strict JSON submission to ${submissionDirectory}/<auditId>.json, where <auditId> exactly matches the candidate audit ID. The wrapper validates and submits each file, then the application creates the PDF, stores it, and creates the founder-review email draft. Do not create the PDF locally, write files to the repository, create a Gmail draft, send email, queue an email, commit, deploy, or publish anything.`,
+    "In the redacted report, count each valid submission file you write as submitted; the wrapper determines the final application submission result. If one candidate fails, continue with the others and record only redacted totals. Never print a business name, website URL, contact detail, source URL, audit text, email copy, request body, signature, secret, or provider response.",
     "Return only the strict redacted JSON run report defined by the supplied schema. Do not wrap it in Markdown or add commentary.",
   ].join(" ");
 }
@@ -174,6 +259,8 @@ export function executeScheduledSeoAuditAgent({
   codexBinary = "codex",
   timeoutMs = DEFAULT_TIMEOUT_MS,
   executor = runRedactedSeoAuditChild,
+  candidateClaimer = claimSeoAuditCandidatesForAgent,
+  submissionRunner = submitPreparedSeoAudit,
   claimReleaser = releaseIncompleteSeoAuditClaims,
 }: ExecuteScheduledSeoAuditAgentInput): ScheduledSeoAuditAgentResult {
   let workspace: string | null = null;
@@ -184,6 +271,8 @@ export function executeScheduledSeoAuditAgent({
     const schemaPath = join(workspace, "redacted-report.schema.json");
     const reportPath = join(workspace, "redacted-report.json");
     const claimLedgerPath = join(workspace, "claimed-audit-ids.json");
+    const candidatePath = join(workspace, "candidates.json");
+    const submissionDirectory = join(workspace, "submissions");
     writeFileSync(
       schemaPath,
       JSON.stringify(z.toJSONSchema(redactedSeoAuditRunReportSchema)),
@@ -192,8 +281,27 @@ export function executeScheduledSeoAuditAgent({
     writeFileSync(claimLedgerPath, JSON.stringify({ auditIds: [] }), {
       mode: 0o600,
     });
+    mkdirSync(submissionDirectory, { mode: 0o700 });
 
     const externalRunId = buildDailySeoAuditExternalRunId(now);
+    const claimed = candidateClaimer({ repositoryRoot, claimLedgerPath });
+    if (claimed.auditIds.length === 0) {
+      return {
+        succeeded: true,
+        report: {
+          runDate: londonDate(now),
+          externalRunId,
+          promptVersion: PROMPT_VERSION,
+          finalOutcome: "no_candidates",
+          claimed: 0,
+          submitted: 0,
+          failed: 0,
+          failureClass: null,
+        },
+      };
+    }
+    writeFileSync(candidatePath, claimed.candidateJson, { mode: 0o600 });
+
     const report = executor({
       command: codexBinary,
       args: [
@@ -216,23 +324,64 @@ export function executeScheduledSeoAuditAgent({
         schemaPath,
         "--output-last-message",
         reportPath,
-        buildAgentPrompt(repositoryRoot, externalRunId),
+        buildAgentPrompt(
+          repositoryRoot,
+          externalRunId,
+          candidatePath,
+          submissionDirectory,
+        ),
       ],
       cwd: repositoryRoot,
       reportPath,
+      candidatePath,
+      submissionDirectory,
       claimLedgerPath,
       timeoutMs,
     });
 
     if (
       report.externalRunId !== externalRunId ||
-      report.promptVersion !== PROMPT_VERSION
+      report.promptVersion !== PROMPT_VERSION ||
+      report.claimed !== claimed.auditIds.length
     ) {
       releaseClaims = true;
       return { succeeded: false, report: buildFailureReport(now) };
     }
-    releaseClaims = report.finalOutcome === "failed" || report.failed > 0;
-    return { succeeded: report.finalOutcome !== "failed", report };
+
+    let submitted = 0;
+    for (const auditId of claimed.auditIds) {
+      const submissionPath = join(submissionDirectory, `${auditId}.json`);
+      if (!existsSync(submissionPath)) {
+        continue;
+      }
+      const submission = statSync(submissionPath);
+      if (
+        !submission.isFile() ||
+        submission.size === 0 ||
+        submission.size > MAX_SUBMISSION_BYTES
+      ) {
+        continue;
+      }
+      if (submissionRunner({ repositoryRoot, submissionPath })) submitted += 1;
+    }
+    const failed = claimed.auditIds.length - submitted;
+    const finalReport: RedactedSeoAuditRunReport = {
+      runDate: londonDate(now),
+      externalRunId,
+      promptVersion: PROMPT_VERSION,
+      finalOutcome: submitted > 0 ? "submitted" : "failed",
+      claimed: claimed.auditIds.length,
+      submitted,
+      failed,
+      failureClass:
+        failed === 0
+          ? null
+          : report.failed > 0 || report.finalOutcome === "failed"
+            ? "agent_failure"
+            : "submission_failure",
+    };
+    releaseClaims = failed > 0;
+    return { succeeded: failed === 0, report: finalReport };
   } catch {
     releaseClaims = true;
     return { succeeded: false, report: buildFailureReport(now) };

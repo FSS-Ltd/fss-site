@@ -2,21 +2,22 @@
 
 ## Purpose
 
-At 06:30 Europe/London every day, a local isolated GPT agent asks the Growth
-OS for at most three eligible prospects. Eligibility requires an active
-sequence, a sent Day 5 follow-up, no inbound reply, and a public website.
-For each candidate, the agent researches public pages, submits an evidence-led
-SEO and AEO audit, and drafts the Day 11 follow-up. The application creates the
-PDF and keeps the email unsent for founder approval in `/growth/outreach`.
+At 06:30 Europe/London every day, the local scheduler claims at most three
+eligible prospects, then gives an isolated GPT agent a private candidate file.
+Eligibility requires an active sequence, a sent Day 5 follow-up, no inbound
+reply, and a public website. For each candidate, the agent researches public
+pages and writes an evidence-led SEO and AEO audit. The scheduler submits it,
+and the application creates the PDF and keeps the Day 11 email unsent for
+founder approval in `/growth/outreach`.
 
 The agent does not connect to PostgreSQL directly. The signed claim endpoint
-performs the scoped database query, which keeps database credentials out of the
-agent runtime and returns only the minimum information needed to research the
-business.
+performs the scoped database query in the trusted scheduler, which keeps
+database credentials and the signing secret outside the agent runtime while
+returning only the minimum information needed to research the business.
 
 ## Safety Contract
 
-- The agent key ID is `seo-audit-agent-v1`; it uses the existing
+- The scheduler uses the `seo-audit-agent-v1` key ID and the existing
   `GROWTH_OS_AGENT_HMAC_SECRET` stored in macOS Keychain under service
   `dev.faithfulsoftware.growth-os.agent-hmac` and account
   `growth-os-daily-seo-audit`.
@@ -32,28 +33,25 @@ business.
   Day 14 remain automatic shared-template follow-ups. Day 14 closes the loop
   only when the prospect has not replied.
 
-## Claim And Submit Agent Requests
+## Claim And Submit Scheduler Requests
 
-The agent must use the tracked local client rather than creating request
-signatures itself. The client reads the Keychain secret at runtime, preserves
-the exact signed bytes, and never prints the secret or signature.
+The trusted scheduler wrapper, not the isolated agent, runs the tracked local
+client. It claims up to three candidates, writes their response to a private
+temporary file, then gives the agent only that file and an empty private
+submission directory. The agent writes one strict JSON file per completed audit
+to that directory. The wrapper validates and submits the files after the agent
+exits. The schema is `lib/growth/seo-audits/schema.ts`.
 
-```bash
-pnpm tsx scripts/seo-audit-agent-api.ts claim
-pnpm tsx scripts/seo-audit-agent-api.ts submit /private/tmp/audit-submission.json
-```
+The signing client reads the Keychain secret at runtime, preserves the exact
+signed bytes, and never prints the secret or signature. The isolated agent
+never reads the Keychain, signs a request, or calls an application endpoint.
 
-The claim command returns at most three candidates. The agent writes each
-strict JSON submission to a private temporary file outside the repository, then
-passes that file to the submit command. The schema is
-`lib/growth/seo-audits/schema.ts`.
-
-If the isolated agent exits without completing every claim, the scheduler uses
-the same signed client to release only the remaining claimed audits immediately.
-Released audits are eligible for the next run and are recorded in the Growth
-audit log. The endpoint responses are operational input, not report content;
-the final scheduler response remains the redacted JSON report defined by the
-wrapper.
+If the isolated agent exits without completing every claim, or a submission
+fails, the scheduler uses the same signed client to release only the remaining
+claimed audits immediately. Released audits are eligible for the next run and
+are recorded in the Growth audit log. The endpoint responses are operational
+input, not report content; the final scheduler response remains the redacted
+JSON report defined by the wrapper.
 
 ## Installation
 

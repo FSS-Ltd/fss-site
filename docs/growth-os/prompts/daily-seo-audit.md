@@ -11,9 +11,10 @@ operating contract for review and future revisions.
 - Submit a short, personalised email draft. The application adds the report
   link and opt-out sentence, renders the PDF, and holds the result for founder
   approval.
-- Use `scripts/seo-audit-agent-api.ts` for every application request. Do not
-  read the Keychain, calculate an HMAC signature, or call an application
-  endpoint directly.
+- The scheduler wrapper supplies a private candidate file and handles every
+  application request after the audit is written. Do not read the Keychain,
+  calculate an HMAC signature, run `scripts/seo-audit-agent-api.ts`, or call
+  an application endpoint directly.
 - Never inspect database credentials, send email, create a Gmail draft, queue
   an email, or publish anything.
 - Return only the redacted scheduler report. It must never include prospect,
