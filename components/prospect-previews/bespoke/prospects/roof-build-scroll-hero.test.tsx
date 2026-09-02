@@ -4,7 +4,15 @@ import test from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { BestRoofingPage } from "./best-roofing";
+import { shouldEnableRoofBuildScroll } from "./roof-build-scroll-hero";
 import { TunbridgeWellsRoofingPage } from "./tunbridge-wells-roofing";
+
+test("waits for a decoded desktop video frame before scroll scrubbing", () => {
+  assert.equal(shouldEnableRoofBuildScroll(false, 768, 2), true);
+  assert.equal(shouldEnableRoofBuildScroll(false, 767, 4), false);
+  assert.equal(shouldEnableRoofBuildScroll(true, 1440, 4), false);
+  assert.equal(shouldEnableRoofBuildScroll(false, 1440, 1), false);
+});
 
 test("renders the shared roof-build journey in both requested roofing previews", () => {
   for (const Page of [BestRoofingPage, TunbridgeWellsRoofingPage]) {
@@ -19,6 +27,7 @@ test("renders the shared roof-build journey in both requested roofing previews",
     assert.match(html, /data-roof-build-scroll-video="true"/);
     assert.match(html, /roof-restoration-scroll-scrub-v1\.mp4/);
     assert.match(html, /roof-restoration-v1-poster\.jpg/);
+    assert.match(html, /<video[^>]*preload="auto"/);
     assert.doesNotMatch(html, /<video[^>]*autoPlay/);
   }
 });
