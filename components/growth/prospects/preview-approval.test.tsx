@@ -131,6 +131,18 @@ test("treats registered bespoke concepts as ready while generation reconciliatio
   for (const { businessName, slug } of [
     { businessName: "PRIORITY POINT LIMITED", slug: "priority-point" },
     { businessName: "BRIDGLAND LIMITED", slug: "bridgland-roofing" },
+    { businessName: "Hazel Motors (Gillingham) Limited", slug: "hazel-motors" },
+    { businessName: "Best Roofing Ltd", slug: "best-roofing" },
+    { businessName: "MD Accountancy Team Ltd", slug: "md-accountancy" },
+    { businessName: "HILL-WOOD & CO. (KENT) LIMITED", slug: "hill-wood" },
+    {
+      businessName: "Accountants of Kent Limited",
+      slug: "hilden-park-accountants",
+    },
+    {
+      businessName: "Tunbridge Wells Roofing Limited",
+      slug: "tunbridge-wells-roofing",
+    },
   ]) {
     const html = renderToStaticMarkup(
       <PreviewApprovalFrame

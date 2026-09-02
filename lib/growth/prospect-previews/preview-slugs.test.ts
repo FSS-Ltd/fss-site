@@ -29,3 +29,18 @@ test("resolves known bespoke previews from legal or trading names", () => {
     "hollis-motors",
   );
 });
+
+test("resolves the six new bespoke concepts from their legal company names", () => {
+  const expectedSlugsByLegalName = [
+    ["Hazel Motors (Gillingham) Limited", "hazel-motors"],
+    ["Best Roofing Ltd", "best-roofing"],
+    ["MD Accountancy Team Ltd", "md-accountancy"],
+    ["HILL-WOOD & CO. (KENT) LIMITED", "hill-wood"],
+    ["Accountants of Kent Limited", "hilden-park-accountants"],
+    ["Tunbridge Wells Roofing Limited", "tunbridge-wells-roofing"],
+  ] as const;
+
+  for (const [businessName, slug] of expectedSlugsByLegalName) {
+    assert.equal(resolveKnownBespokePreviewSlug(businessName), slug);
+  }
+});
