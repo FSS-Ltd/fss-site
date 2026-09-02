@@ -6,6 +6,7 @@ const videoSource =
   "/prospect-previews/bespoke/evo-kent-roofing/roof-restoration-scroll-scrub-v1.mp4";
 const posterSource =
   "/prospect-previews/bespoke/evo-kent-roofing/roof-restoration-v1-poster.jpg";
+const minimumDecodedVideoReadyState = 2;
 
 type RoofBuildScrollHeroProps = {
   accentClassName: string;
@@ -19,6 +20,18 @@ type RoofBuildScrollHeroProps = {
 
 function clamp(value: number, minimum: number, maximum: number): number {
   return Math.min(Math.max(value, minimum), maximum);
+}
+
+export function shouldEnableRoofBuildScroll(
+  prefersReducedMotion: boolean,
+  viewportWidth: number,
+  videoReadyState: number,
+): boolean {
+  return (
+    !prefersReducedMotion &&
+    viewportWidth >= 768 &&
+    videoReadyState >= minimumDecodedVideoReadyState
+  );
 }
 
 export function RoofBuildScrollHero({
@@ -46,7 +59,13 @@ export function RoofBuildScrollHero({
     const syncToScroll = () => {
       frameId = 0;
 
-      if (reducedMotion.matches || window.innerWidth < 768) {
+      if (
+        !shouldEnableRoofBuildScroll(
+          reducedMotion.matches,
+          window.innerWidth,
+          video.readyState,
+        )
+      ) {
         video.style.transform = "scale(1)";
         copy.dataset.roofBuildActiveBeat = "0";
         copy.style.setProperty("--roof-build-progress", "0");
@@ -83,6 +102,7 @@ export function RoofBuildScrollHero({
     };
 
     video.addEventListener("loadedmetadata", requestSync);
+    video.addEventListener("loadeddata", requestSync);
     window.addEventListener("scroll", requestSync, { passive: true });
     window.addEventListener("resize", requestSync);
     reducedMotion.addEventListener("change", requestSync);
@@ -90,6 +110,7 @@ export function RoofBuildScrollHero({
 
     return () => {
       video.removeEventListener("loadedmetadata", requestSync);
+      video.removeEventListener("loadeddata", requestSync);
       window.removeEventListener("scroll", requestSync);
       window.removeEventListener("resize", requestSync);
       reducedMotion.removeEventListener("change", requestSync);
@@ -111,7 +132,7 @@ export function RoofBuildScrollHero({
           muted
           playsInline
           poster={posterSource}
-          preload="metadata"
+          preload="auto"
           ref={videoRef}
           src={videoSource}
         />
