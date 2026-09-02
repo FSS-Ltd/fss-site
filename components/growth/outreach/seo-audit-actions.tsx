@@ -71,33 +71,43 @@ export function SeoAuditActions({ data }: { data: SeoAuditReviewData }) {
             {feedback.message}
           </p>
         )}
-        {data.eligibility.ready ? (
-          <p className={styles.readinessReady}>Ready for founder approval.</p>
+        {data.status === "approved" ? (
+          <p className={styles.readinessReady}>
+            This audit email is approved and queued for Day 11.
+          </p>
         ) : (
           <>
-            <p className={styles.readinessBlocked}>
-              Approval is blocked until these are resolved:
+            {data.eligibility.ready ? (
+              <p className={styles.readinessReady}>
+                Ready for founder approval.
+              </p>
+            ) : (
+              <>
+                <p className={styles.readinessBlocked}>
+                  Approval is blocked until these are resolved:
+                </p>
+                <ul className={styles.readinessReasons}>
+                  {data.eligibility.reasons.map((reason) => (
+                    <li key={reason}>{reason}</li>
+                  ))}
+                </ul>
+              </>
+            )}
+            <button
+              className={styles.actionButton}
+              data-variant="primary"
+              disabled={pending || !data.eligibility.ready}
+              onClick={approve}
+              type="button"
+            >
+              {pending ? "Approving…" : "Approve for Day 11 queue"}
+            </button>
+            <p className={styles.actionHelp}>
+              Approval queues this specific PDF and email draft. It does not
+              change the shared follow-up template.
             </p>
-            <ul className={styles.readinessReasons}>
-              {data.eligibility.reasons.map((reason) => (
-                <li key={reason}>{reason}</li>
-              ))}
-            </ul>
           </>
         )}
-        <button
-          className={styles.actionButton}
-          data-variant="primary"
-          disabled={pending || !data.eligibility.ready}
-          onClick={approve}
-          type="button"
-        >
-          {pending ? "Approving…" : "Approve for Day 11 queue"}
-        </button>
-        <p className={styles.actionHelp}>
-          Approval queues this specific PDF and email draft. It does not change
-          the shared follow-up template.
-        </p>
       </div>
     </section>
   );
