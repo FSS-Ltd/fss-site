@@ -7,20 +7,34 @@ import { DunkleysOfDealPage } from "./prospects/dunkley-s-of-deal";
 import { EvoKentRoofingPage } from "./prospects/evo-kent-roofing";
 import { FugglesBeerCafePage } from "./prospects/fuggles-beer-cafe";
 import { HideAndFoxPage } from "./prospects/hide-and-fox";
+import { HazelMotorsPage } from "./prospects/hazel-motors";
+import { HildenParkAccountantsPage } from "./prospects/hilden-park-accountants";
+import { HillWoodPage } from "./prospects/hill-wood";
 import { HollisMotorsPage } from "./prospects/hollis-motors";
 import { JaguarPlumbingPage } from "./prospects/jaguar-plumbing";
 import { KemsingMotorCompanyPage } from "./prospects/kemsing-motor-company";
 import { KentGarageEquipmentPage } from "./prospects/kent-garage-equipment";
 import { MardenGaragePage } from "./prospects/marden-garage";
+import { MdAccountancyPage } from "./prospects/md-accountancy";
 import { PaperstonePage } from "./prospects/paperstone";
 import { PrimelineRoofingPage } from "./prospects/primeline-roofing";
 import { PriorityPointPage } from "./prospects/priority-point";
 import { SealeysWalkerJarvisPage } from "./prospects/sealeys-walker-jarvis";
 import { StaggHomesPage } from "./prospects/stagg-homes";
+import { TunbridgeWellsRoofingPage } from "./prospects/tunbridge-wells-roofing";
 import { WormaldAccountantsPage } from "./prospects/wormald-accountants";
 import type { BespokeProspectPage } from "./types";
 
 export const bespokeProspectPages = {
+  "best-roofing": {
+    Page: BestRoofingPage,
+    businessName: "Best Roofing Ltd",
+    title: "Roofing surveys and repairs in Canterbury",
+    description:
+      "Roof repair, replacement and specialist-work enquiries prepared for a useful property survey.",
+    layoutSignature: "canterbury-roof-survey-route",
+    heroSignature: "kent-roof-assessment-at-work",
+  },
   "bridgland-roofing": {
     Page: BridglandRoofingPage,
     businessName: "Bridgland Roofing",
@@ -102,6 +116,33 @@ export const bespokeProspectPages = {
     layoutSignature: "midnight-tasting-editorial",
     heroSignature: "floating-tasting-plate",
   },
+  "hazel-motors": {
+    Page: HazelMotorsPage,
+    businessName: "Hazel Motors",
+    title: "MOT, servicing and repair in Paddock Wood",
+    description:
+      "A vehicle-first workshop route for MOT, service, repair and diagnostic enquiries.",
+    layoutSignature: "vehicle-first-workshop-check-in",
+    heroSignature: "daylight-kent-workshop-inspection",
+  },
+  "hilden-park-accountants": {
+    Page: HildenParkAccountantsPage,
+    businessName: "Hilden Park Chartered Accountants",
+    title: "Accountancy support in Hildenborough and Sevenoaks",
+    description:
+      "Prepare business, individual and existing-client accountancy conversations around the service and next deadline.",
+    layoutSignature: "blue-client-deadline-sequence",
+    heroSignature: "prepared-accountancy-meeting-table",
+  },
+  "hill-wood": {
+    Page: HillWoodPage,
+    businessName: "Hill-Wood & Co",
+    title: "Landscape architecture and Biodiversity Net Gain in Kent",
+    description:
+      "Begin landscape, planning and Biodiversity Net Gain conversations with the site and project stage.",
+    layoutSignature: "organic-landscape-project-brief",
+    heroSignature: "show-garden-plan-review",
+  },
   "hollis-motors": {
     Page: HollisMotorsPage,
     businessName: "Hollis Motors",
@@ -146,6 +187,15 @@ export const bespokeProspectPages = {
       "Begin the workshop request with the vehicle registration, then select MOT, service or repair.",
     layoutSignature: "soft-vehicle-service-orbit",
     heroSignature: "teal-registration-car",
+  },
+  "md-accountancy": {
+    Page: MdAccountancyPage,
+    businessName: "MD Accountancy Team",
+    title: "Business finance support in Marden",
+    description:
+      "Finance conversations prepared around the business stage, support need and next deadline.",
+    layoutSignature: "fit-before-files-finance-route",
+    heroSignature: "prepared-kent-finance-conversation",
   },
   paperstone: {
     Page: PaperstonePage,
@@ -192,6 +242,15 @@ export const bespokeProspectPages = {
     layoutSignature: "cinematic-owner-led-property-journey",
     heroSignature: "scroll-linked-kent-home-walkthrough",
   },
+  "tunbridge-wells-roofing": {
+    Page: TunbridgeWellsRoofingPage,
+    businessName: "Tunbridge Wells Roofing",
+    title: "Flat, pitched and industrial roofing in Kent",
+    description:
+      "Prepare repair, replacement, new-roof and specified-work enquiries with property, roof and urgency context.",
+    layoutSignature: "technical-slate-roof-assessment",
+    heroSignature: "after-rain-kent-roofline",
+  },
   "wormald-accountants": {
     Page: WormaldAccountantsPage,
     businessName: "Wormald Accountants",
@@ -216,3 +275,4 @@ export function getBespokeProspectPage(
 export function getBespokeProspectSlugs(): readonly BespokeProspectSlug[] {
   return Object.keys(bespokeProspectPages) as BespokeProspectSlug[];
 }
+import { BestRoofingPage } from "./prospects/best-roofing";

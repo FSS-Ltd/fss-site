@@ -240,6 +240,18 @@ test("publishes a registered bespoke preview while generation reconciliation is 
   for (const { businessName, slug } of [
     { businessName: "PRIORITY POINT LIMITED", slug: "priority-point" },
     { businessName: "BRIDGLAND LIMITED", slug: "bridgland-roofing" },
+    { businessName: "Hazel Motors (Gillingham) Limited", slug: "hazel-motors" },
+    { businessName: "Best Roofing Ltd", slug: "best-roofing" },
+    { businessName: "MD Accountancy Team Ltd", slug: "md-accountancy" },
+    { businessName: "HILL-WOOD & CO. (KENT) LIMITED", slug: "hill-wood" },
+    {
+      businessName: "Accountants of Kent Limited",
+      slug: "hilden-park-accountants",
+    },
+    {
+      businessName: "Tunbridge Wells Roofing Limited",
+      slug: "tunbridge-wells-roofing",
+    },
   ]) {
     const fake = createRepository();
     Object.assign(fake.state.prospect, { businessName });

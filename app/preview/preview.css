@@ -83,6 +83,80 @@ html {
   will-change: filter, opacity, transform;
 }
 
+/* Shared roof-build journey for Best Roofing and Tunbridge Wells Roofing. */
+[data-roof-build-scroll] {
+  min-height: 78svh;
+}
+
+[data-roof-build-scroll-frame] {
+  background: #101820;
+  isolation: isolate;
+  min-height: 78svh;
+  overflow: hidden;
+  position: relative;
+}
+
+[data-roof-build-scroll-video] {
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  object-position: center;
+  position: absolute;
+  transform: scale(1);
+  width: 100%;
+  will-change: transform;
+  z-index: -2;
+}
+
+[data-roof-build-scroll-shade] {
+  background:
+    linear-gradient(
+      90deg,
+      rgb(16 24 32 / 90%) 0%,
+      rgb(16 24 32 / 62%) 44%,
+      rgb(16 24 32 / 14%) 76%
+    ),
+    linear-gradient(0deg, rgb(16 24 32 / 76%) 0%, transparent 56%);
+  inset: 0;
+  position: absolute;
+  z-index: -1;
+}
+
+[data-roof-build-scroll-copy] {
+  --roof-build-progress: 0;
+}
+
+[data-roof-build-scroll-progress-track] {
+  background: rgb(255 255 255 / 28%);
+  border-radius: 999px;
+  height: 2px;
+  overflow: hidden;
+}
+
+[data-roof-build-scroll-progress-fill] {
+  background: currentcolor;
+  display: block;
+  height: 100%;
+  transform: scaleX(var(--roof-build-progress));
+  transform-origin: left;
+  width: 100%;
+}
+
+[data-roof-build-scroll-beat] {
+  opacity: 0.36;
+  transform: translate3d(0, 0, 0);
+}
+
+[data-roof-build-scroll-copy][data-roof-build-active-beat="0"]
+  [data-roof-build-scroll-beat="0"],
+[data-roof-build-scroll-copy][data-roof-build-active-beat="1"]
+  [data-roof-build-scroll-beat="1"],
+[data-roof-build-scroll-copy][data-roof-build-active-beat="2"]
+  [data-roof-build-scroll-beat="2"] {
+  opacity: 1;
+  transform: translate3d(0, -2px, 0);
+}
+
 [data-jaguar-water-journey] {
   min-height: 100svh;
 }
@@ -150,6 +224,21 @@ html {
   }
 
   [data-jaguar-water-journey-frame] {
+    height: 100svh;
+    min-height: 0;
+    position: sticky;
+    top: 0;
+  }
+}
+
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  [data-roof-build-scroll] {
+    height: 340svh;
+    min-height: 0;
+    position: relative;
+  }
+
+  [data-roof-build-scroll-frame] {
     height: 100svh;
     min-height: 0;
     position: sticky;
@@ -226,6 +315,43 @@ html {
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  [data-prospect-hero-copy] > * {
+    animation: prospect-hero-enter 680ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  [data-prospect-hero-copy] > :nth-child(2) {
+    animation-delay: 90ms;
+  }
+
+  [data-prospect-hero-copy] > :nth-child(3) {
+    animation-delay: 180ms;
+  }
+
+  [data-prospect-hero-copy] > :nth-child(4) {
+    animation-delay: 270ms;
+  }
+
+  [data-prospect-hero-copy] > :nth-child(5) {
+    animation-delay: 340ms;
+  }
+
+  [data-interactive-journey-content],
+  [data-md-finance-workspace-content] > *,
+  [data-md-finance-signal-content] {
+    animation: prospect-context-enter 460ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  [data-roof-build-scroll-progress-fill] {
+    transition: transform 80ms linear;
+    will-change: transform;
+  }
+
+  [data-roof-build-scroll-beat] {
+    transition:
+      opacity 220ms ease,
+      transform 220ms ease;
+  }
+
   .prospect-reveal[data-prospect-reveal] {
     transition:
       opacity 720ms cubic-bezier(0.16, 1, 0.3, 1),
@@ -243,7 +369,49 @@ html {
   }
 }
 
+@keyframes prospect-context-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes prospect-hero-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 22px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  [data-prospect-hero-copy] > * {
+    animation: none;
+  }
+
+  [data-interactive-journey-content],
+  [data-md-finance-workspace-content] > *,
+  [data-md-finance-signal-content] {
+    animation: none;
+  }
+
+  [data-roof-build-scroll-progress-fill] {
+    transform: scaleX(0);
+  }
+
+  [data-roof-build-scroll-beat] {
+    transition: none;
+  }
+
   [data-evo-roof-restoration-copy-beat] {
     display: none;
   }
