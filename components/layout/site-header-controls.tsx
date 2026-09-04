@@ -2,147 +2,78 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useRef, useState } from "react";
+import { navItems } from "./site-header-nav-items";
+import styles from "./site-header.module.css";
+import { ButtonLink } from "@/components/ui/button";
 
-import { navItems } from "@/components/layout/site-header-nav-items";
-
-export function SiteHeaderNav() {
+function HeaderLinks({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
-
-  return (
-    <nav
-      aria-label="Primary"
-      data-nav
-      style={{ display: "flex", alignItems: "center", gap: "4px" }}
+  return navItems.map((item) => (
+    <Link
+      key={item.href}
+      href={item.href}
+      prefetch={false}
+      aria-current={pathname === item.activePath ? "page" : undefined}
+      onClick={onNavigate}
     >
-      {navItems.map((item) => {
-        const active = item.activePath !== "" && pathname === item.activePath;
+      {item.label}
+    </Link>
+  ));
+}
 
-        return (
-          <Link
-            data-navlink={active ? undefined : ""}
-            href={item.href}
-            key={item.href}
-            prefetch={false}
-            style={{
-              padding: "9px 14px",
-              fontSize: "14px",
-              fontWeight: active ? 600 : 500,
-              color: active ? "#0a1a2e" : "#41506a",
-              borderRadius: "9px",
-              display: active ? "inline-flex" : undefined,
-              alignItems: active ? "center" : undefined,
-              gap: active ? "7px" : undefined,
-              transition: active ? undefined : "color .2s,background .2s",
-            }}
-          >
-            {active && (
-              <span
-                style={{
-                  width: "5px",
-                  height: "5px",
-                  borderRadius: "50%",
-                  background: "#14989e",
-                }}
-              />
-            )}
-            {item.label}
-          </Link>
-        );
-      })}
-    </nav>
+function MobileNavigation() {
+  const [open, setOpen] = useState(false);
+  const button = useRef<HTMLButtonElement>(null);
+  return (
+    <div
+      className={styles.mobile}
+      onKeyDown={(event) => {
+        if (event.key === "Escape" && open) {
+          event.preventDefault();
+          setOpen(false);
+          button.current?.focus();
+        }
+      }}
+    >
+      <button
+        ref={button}
+        className="min-h-11 min-w-14 cursor-pointer rounded-lg border border-border-strong bg-white px-3 py-2 text-sm font-semibold"
+        type="button"
+        aria-expanded={open}
+        aria-controls="site-mobile-navigation"
+        onClick={() => setOpen(!open)}
+      >
+        Menu
+      </button>
+      <nav
+        id="site-mobile-navigation"
+        aria-label="Mobile primary"
+        hidden={!open}
+        className={styles.mobilePanel}
+      >
+        <HeaderLinks onNavigate={() => setOpen(false)} />
+      </nav>
+    </div>
   );
 }
 
-export function SiteHeaderActions() {
-  const isStartPage = usePathname() === "/start";
-
+export function SiteHeaderNavigation() {
+  const pathname = usePathname();
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "10px",
-        flex: "none",
-      }}
-    >
-      <Link
-        data-cta-head
-        data-magnetic
-        href={isStartPage ? "#fssroot" : "/start"}
+    <div className="flex items-center gap-1.5">
+      <nav className={styles.desktop} aria-label="Primary">
+        <HeaderLinks />
+      </nav>
+      <ButtonLink
+        size="lg"
+        className="px-3 text-sm sm:px-5"
+        href="/contact"
         prefetch={false}
-        style={{
-          position: "relative",
-          display: "inline-flex",
-          alignItems: "center",
-          gap: "9px",
-          padding: "11px 20px",
-          borderRadius: "999px",
-          background: "#0a1a2e",
-          color: "#fff",
-          fontSize: "14px",
-          fontWeight: 600,
-          transition:
-            "transform .35s cubic-bezier(.2,.7,.2,1),background .25s",
-        }}
       >
-        <span
-          data-mag-label
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "9px",
-            transition: "transform .35s cubic-bezier(.2,.7,.2,1)",
-          }}
-        >
-          Start a project
-          <span
-            style={{
-              width: "6px",
-              height: "6px",
-              borderRadius: "50%",
-              background: "#46c7d8",
-              boxShadow: "0 0 0 4px rgba(70,199,216,.25)",
-            }}
-          />
-        </span>
-      </Link>
-
-      <button
-        aria-expanded="false"
-        aria-label="Menu"
-        data-menu-btn
-        style={{
-          display: "none",
-          width: "44px",
-          height: "44px",
-          border: "1px solid rgba(10,26,46,.14)",
-          background: "#fff",
-          borderRadius: "11px",
-          cursor: "pointer",
-          alignItems: "center",
-          justifyContent: "center",
-          flexDirection: "column",
-          gap: "4px",
-        }}
-        type="button"
-      >
-        <span
-          style={{
-            width: "16px",
-            height: "1.6px",
-            background: "#0a1a2e",
-            display: "block",
-          }}
-        />
-        <span
-          style={{
-            width: "16px",
-            height: "1.6px",
-            background: "#0a1a2e",
-            display: "block",
-          }}
-        />
-      </button>
+        Discuss a project
+      </ButtonLink>
+      <MobileNavigation key={pathname} />
     </div>
   );
 }

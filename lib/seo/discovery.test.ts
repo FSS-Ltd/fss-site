@@ -21,7 +21,7 @@ test("sitemap includes about and privacy with source dates and excludes non-inde
   const entries = await sitemap();
   assert.equal(
     entries.find((entry) => entry.url.endsWith("/about"))?.lastModified,
-    "2026-08-17",
+    "2026-09-04",
   );
   assert.equal(
     entries.find((entry) => entry.url.endsWith("/privacy"))?.lastModified,

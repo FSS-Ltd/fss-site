@@ -6,10 +6,10 @@ export type PublicPage = PageMetadataInput & { modifiedDate: string };
 export const publicPages = {
   "/": {
     path: "/",
-    title: "Custom Software Development Company UK for Complex Operations",
+    title: "Custom Software for UK Charities & Faith Organisations | FSS",
     description:
-      "Faithful Software Solutions builds bespoke software for UK charities, schools, churches and businesses. Custom ERP, portals, dashboards and workflow automation - built around your operational needs, not off-the-shelf limitations.",
-    modifiedDate: "2026-08-17",
+      "Custom software, portals and workflow automation for UK charities and faith organisations. Explore FSS-built NexSteps and discuss your operational software project.",
+    modifiedDate: "2026-09-04",
     index: true,
   },
   "/about": {
@@ -17,7 +17,7 @@ export const publicPages = {
     title: "About Faithful Software Solutions | UK Software Studio",
     description:
       "Faithful Software Solutions is a UK studio building dependable custom software, apps and private AI for organisations that need technology they can trust.",
-    modifiedDate: "2026-08-17",
+    modifiedDate: "2026-09-04",
     index: true,
   },
   "/ai-deployment-questionnaire": {
@@ -39,10 +39,10 @@ export const publicPages = {
   },
   "/contact": {
     path: "/contact",
-    title: "Book a Discovery Call | Custom Software Development UK",
+    title: "Discuss a custom software project | FSS",
     description:
-      "Talk to the Faithful Software Solutions team about your operational software needs. We work with UK charities, schools, churches and businesses to scope and deliver bespoke software.",
-    modifiedDate: "2026-08-17",
+      "Discuss a custom software project with Faithful Software Solutions. Share your organisation’s needs and we will reply about scope and next steps.",
+    modifiedDate: "2026-09-04",
     index: true,
   },
   "/privacy": {
@@ -67,7 +67,7 @@ export const publicPages = {
       "Bespoke Software Development UK | Portals, Dashboards & Workflow Automation",
     description:
       "Custom software development services for UK businesses, charities and schools. We build bespoke ERP systems, client portals, operational dashboards, workflow automation and legacy system migrations.",
-    modifiedDate: "2026-08-17",
+    modifiedDate: "2026-09-04",
     index: true,
   },
   "/start": {

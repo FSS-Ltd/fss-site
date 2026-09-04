@@ -38,6 +38,10 @@ const hstsHeader = {
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 const nextConfig: NextConfig = {
+  experimental: {
+    // Keep contact controls out of the public landing page's CSS payload.
+    cssChunking: false,
+  },
   turbopack: {
     root: projectRoot,
   },

@@ -1,0 +1,106 @@
+.form {
+  display: grid;
+  gap: 24px;
+}
+.fields {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 22px;
+  min-width: 0;
+}
+.row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.field {
+  display: grid;
+  gap: 8px;
+}
+.field label,
+.choices legend {
+  font-weight: 600;
+}
+.input {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: white;
+  color: var(--foreground);
+  font-size: 1rem;
+}
+.input[aria-invalid="true"] {
+  border-color: #9b2020;
+}
+.choices {
+  border: 0;
+  padding: 0;
+  min-width: 0;
+}
+.choices legend {
+  margin-bottom: 10px;
+}
+.choiceList {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.choice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 10px 14px;
+  background: white;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  cursor: pointer;
+}
+.choice:has(input:checked) {
+  border-color: var(--foreground);
+  background: #e5f1f2;
+}
+.choice input,
+.consent input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--foreground);
+  flex: none;
+}
+.consent {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  cursor: pointer;
+}
+.error {
+  color: #9b2020 !important;
+  font-size: 0.95rem;
+  margin: 0 !important;
+}
+.hint {
+  font-size: 0.9rem;
+  margin: 0 !important;
+}
+.status {
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  padding: 20px;
+  background: white;
+}
+.success {
+  padding: 28px;
+  border: 1px solid #0f7078;
+  border-radius: 18px;
+  background: #e5f1f2;
+}
+@media (max-width: 540px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+}

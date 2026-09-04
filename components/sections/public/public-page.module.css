@@ -1,0 +1,95 @@
+.page {
+  padding: 120px max(24px, calc((100% - 1120px) / 2)) 80px;
+}
+.hero {
+  max-width: 840px;
+  margin-bottom: 56px;
+}
+.eyebrow {
+  color: #0f7078;
+  font-size: 0.875rem;
+  font-weight: 650;
+  margin-bottom: 18px;
+}
+.page h1 {
+  font-size: clamp(2.4rem, 5.3vw, 4.5rem);
+  font-weight: 650;
+  letter-spacing: -0.04em;
+  line-height: 1.06;
+  margin: 0 0 24px;
+  text-wrap: balance;
+}
+.page h2 {
+  font-size: clamp(1.65rem, 3vw, 2.5rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  margin: 0 0 20px;
+  text-wrap: balance;
+}
+.page h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.35;
+  margin: 0 0 12px;
+}
+.page p {
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin: 0 0 20px;
+}
+
+.section {
+  margin-top: 64px;
+  padding-top: 40px;
+  border-top: 1px solid var(--border-soft);
+  scroll-margin-top: 100px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 36px;
+}
+.proof {
+  background: var(--surface-1);
+  border: 1px solid var(--border-soft);
+  border-radius: 24px;
+  padding: clamp(24px, 4vw, 44px);
+}
+
+.list {
+  padding-left: 22px;
+  margin: 12px 0 24px;
+  color: var(--text-muted);
+  line-height: 1.8;
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px;
+  list-style: decimal-leading-zero;
+  padding-left: 24px;
+}
+.steps li::marker {
+  color: #0f7078;
+  font-weight: 650;
+}
+
+@media (max-width: 680px) {
+  .page {
+    padding-top: 104px;
+    padding-bottom: 56px;
+  }
+  .hero {
+    margin-bottom: 36px;
+  }
+  .grid,
+  .steps {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .section {
+    margin-top: 44px;
+    padding-top: 32px;
+  }
+}

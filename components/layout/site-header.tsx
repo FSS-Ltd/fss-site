@@ -1,127 +1,35 @@
 import Link from "next/link";
-
-import {
-  SiteHeaderActions,
-  SiteHeaderNav,
-} from "@/components/layout/site-header-controls";
-import { navItems } from "@/components/layout/site-header-nav-items";
+import { SiteHeaderNavigation } from "./site-header-controls";
+import styles from "./site-header.module.css";
 
 export function SiteHeader() {
   return (
-    <header
-      data-header
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 90,
-        background: "rgba(242,243,245,0.55)",
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
-        borderBottom: "1px solid transparent",
-        transition: "background .4s,border-color .4s,box-shadow .4s",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: "1280px",
-          margin: "0 auto",
-          padding: "0 28px",
-          height: "72px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "24px",
-        }}
-      >
+    <header className="fixed inset-x-0 top-0 z-90 border-b border-border-soft bg-background">
+      <a href="#main-content" className={styles.skip}>
+        Skip to content
+      </a>
+      <div className="mx-auto flex min-h-[72px] max-w-7xl items-center justify-between gap-2 px-4 py-2.5 sm:gap-5 sm:px-6">
         <Link
           href="/"
           prefetch={false}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "13px",
-            flex: "none",
-          }}
+          aria-label="Faithful Software Solutions home"
+          className="inline-flex min-h-11 shrink-0 items-center gap-4"
         >
-          {/* The dedicated 128px asset keeps the displayed logo crisp without
-              loading the client-side Next Image runtime. */}
+          {/* Small, pre-sized local brand asset avoids image runtime overhead. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            alt="FSS"
-            decoding="async"
-            fetchPriority="high"
-            height={57}
-            loading="eager"
             src="/redesign/brand/fss-monogram-navy-small.png"
-            style={{ height: "26px", width: "auto", display: "block" }}
+            alt="FSS"
             width={128}
+            height={57}
+            decoding="async"
+            className="h-auto w-[59px]"
           />
-          <span
-            data-wordmark
-            style={{ display: "none", alignItems: "center", gap: "8px" }}
-          >
-            <span
-              style={{
-                width: "1px",
-                height: "20px",
-                background: "rgba(10,26,46,.18)",
-              }}
-            />
-            <span
-              style={{
-                fontSize: "11px",
-                fontWeight: 600,
-                letterSpacing: ".16em",
-                color: "#33455c",
-              }}
-            >
-              FAITHFUL&nbsp;SOFTWARE&nbsp;SOLUTIONS
-            </span>
+          <span className="hidden max-w-32 text-sm leading-tight font-semibold xl:block">
+            Faithful Software Solutions
           </span>
         </Link>
-
-        <SiteHeaderNav />
-        <SiteHeaderActions />
-      </div>
-
-      <div
-        data-menu
-        style={{
-          display: "none",
-          borderTop: "1px solid rgba(10,26,46,.08)",
-          background: "rgba(242,243,245,.96)",
-          backdropFilter: "blur(16px)",
-        }}
-      >
-        <div
-          style={{
-            padding: "14px 28px",
-            display: "flex",
-            flexDirection: "column",
-            gap: "2px",
-          }}
-        >
-          {navItems.map((item, index) => (
-            <Link
-              href={item.href}
-              key={item.href}
-              prefetch={false}
-              style={{
-                padding: "13px 4px",
-                fontSize: "18px",
-                fontWeight: 600,
-                borderBottom:
-                  index === navItems.length - 1
-                    ? undefined
-                    : "1px solid rgba(10,26,46,.06)",
-              }}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </div>
+        <SiteHeaderNavigation />
       </div>
     </header>
   );
