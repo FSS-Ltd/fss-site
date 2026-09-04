@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { ContactLink, PageIntro } from "./page-intro";
 import { DeliverySteps } from "./delivery-steps";
+import { RelatedLinks } from "./related-links";
+import { sectorLink, serviceLinks, costLink } from "@/lib/commercial/links";
 import styles from "./public-page.module.css";
 
 const services = [
@@ -57,7 +59,7 @@ export function ServicesPage() {
           operations, including role-scoped access and parent onboarding.
         </p>
         <Link
-          href="/#work"
+          href="/work/nexsteps"
           className="inline-flex min-h-11 items-center font-medium underline underline-offset-4"
         >
           Read the NexSteps case study
@@ -82,6 +84,7 @@ export function ServicesPage() {
           helps frame the first step.
         </p>
       </section>
+      <RelatedLinks links={[...serviceLinks, sectorLink, costLink]} />
     </div>
   );
 }

@@ -2,6 +2,8 @@ import Link from "next/link";
 import { ContactLink, PageIntro } from "./page-intro";
 import { NexStepsProof } from "./nexsteps-proof";
 import { DeliverySteps } from "./delivery-steps";
+import { RelatedLinks } from "./related-links";
+import { sectorLink, costLink } from "@/lib/commercial/links";
 import styles from "./public-page.module.css";
 
 export function HomePage() {
@@ -19,7 +21,7 @@ export function HomePage() {
         <div className="mt-7 flex flex-wrap items-center gap-6">
           <ContactLink />
           <Link
-            href="#work"
+            href="/work/nexsteps"
             className="inline-flex min-h-11 items-center font-medium underline underline-offset-4"
           >
             Read the NexSteps case study
@@ -53,6 +55,7 @@ export function HomePage() {
         </Link>
       </section>
       <DeliverySteps />
+      <RelatedLinks links={[sectorLink, costLink]} />
     </div>
   );
 }

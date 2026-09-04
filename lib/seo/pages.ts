@@ -1,9 +1,11 @@
 import type { PageMetadataInput } from "./metadata";
+import { commercialPages } from "@/lib/commercial/pages";
 
 export type PublicPage = PageMetadataInput & { modifiedDate: string };
 
 // Baseline dates come from the last committed page-source edit. Update on substantive content changes.
 export const publicPages = {
+  ...commercialPages,
   "/": {
     path: "/",
     title: "Custom Software for UK Charities & Faith Organisations | FSS",

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { organisation } from "@/lib/seo/organisation";
 import { ContactLink, PageIntro } from "./page-intro";
+import { RelatedLinks } from "./related-links";
+import { sectorLink } from "@/lib/commercial/links";
 import styles from "./public-page.module.css";
 
 export function AboutPage() {
@@ -45,7 +47,7 @@ export function AboutPage() {
           reflects the operational settings our work serves.
         </p>
         <Link
-          href="/#work"
+          href="/work/nexsteps"
           className="inline-flex min-h-11 items-center font-medium underline underline-offset-4"
         >
           Read the NexSteps case study
@@ -66,6 +68,7 @@ export function AboutPage() {
           See how we can help
         </Link>
       </section>
+      <RelatedLinks links={[sectorLink]} />
     </div>
   );
 }

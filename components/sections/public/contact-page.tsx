@@ -2,6 +2,8 @@ import { ContactForm } from "@/components/forms/contact-form";
 import { organisation } from "@/lib/seo/organisation";
 import { Faq } from "./faq";
 import { PageIntro } from "./page-intro";
+import { RelatedLinks } from "./related-links";
+import { sectorLink, nexstepsLink, costLink } from "@/lib/commercial/links";
 import styles from "./public-page.module.css";
 
 const questions = [
@@ -62,6 +64,7 @@ export function ContactPageContent() {
         <h2 id="contact-faq">Before you reach out</h2>
         <Faq items={questions} />
       </section>
+      <RelatedLinks links={[sectorLink, nexstepsLink, costLink]} />
     </div>
   );
 }
