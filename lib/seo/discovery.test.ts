@@ -17,7 +17,7 @@ test("public crawlers can read pages and noindex directives; preview deployments
   });
 });
 
-test("sitemap includes about and privacy with source dates and excludes non-indexable routes", async () => {
+test("sitemap includes public pages with source dates and excludes non-indexable routes", async () => {
   const entries = await sitemap();
   assert.equal(
     entries.find((entry) => entry.url.endsWith("/about"))?.lastModified,
@@ -26,6 +26,14 @@ test("sitemap includes about and privacy with source dates and excludes non-inde
   assert.equal(
     entries.find((entry) => entry.url.endsWith("/privacy"))?.lastModified,
     "2026-08-26",
+  );
+  assert.equal(
+    entries.find((entry) => entry.url.endsWith("/blog"))?.lastModified,
+    "2026-09-05",
+  );
+  assert.equal(
+    entries.find((entry) => entry.url.endsWith("/resources"))?.lastModified,
+    "2026-09-05",
   );
   assert.equal(
     entries.some((entry) =>

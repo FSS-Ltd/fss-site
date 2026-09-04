@@ -255,6 +255,30 @@ try {
       }
     }
   }
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const path of [
+    "/blog/bespoke-software-development-for-real-operational-problems",
+    "/resources/software-project-readiness-kit",
+  ]) {
+    await page.goto(`${baseURL}${path}`);
+    const headerBox = await page.locator("#fssroot > header").boundingBox();
+    const breadcrumbLinks = page
+      .getByRole("navigation", { name: "Breadcrumb", exact: true })
+      .getByRole("link");
+    assert.ok(headerBox, `${path} renders the fixed site header`);
+    assert.ok(
+      (await breadcrumbLinks.count()) > 0,
+      `${path} renders breadcrumb links`,
+    );
+    for (const link of await breadcrumbLinks.all()) {
+      const linkBox = await link.boundingBox();
+      assert.ok(linkBox, `${path} breadcrumb link has a visible layout box`);
+      assert.ok(
+        linkBox.y >= headerBox.y + headerBox.height,
+        `${path} breadcrumb link starts at ${linkBox.y}px, below the fixed header ending at ${headerBox.y + headerBox.height}px`,
+      );
+    }
+  }
   const noScriptContext = await browser.newContext({
     javaScriptEnabled: false,
   });

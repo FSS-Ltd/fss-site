@@ -17,7 +17,7 @@ type BlogPostLayoutProps = {
 
 export function BlogPostLayout({ post, children }: BlogPostLayoutProps) {
   return (
-    <article className="py-14 sm:py-20 lg:py-24">
+    <article className="pt-24 pb-14 sm:py-20 lg:py-24">
       <Container className="max-w-3xl">
         <ContentBreadcrumbs parent="Blog" title={post.title} />
         <header className="space-y-5">

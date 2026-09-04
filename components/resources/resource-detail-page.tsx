@@ -45,7 +45,7 @@ export async function ResourceDetailPage({
       : "mt-10 grid gap-6 px-6 md:grid-cols-2 sm:px-8";
 
   return (
-    <div className="py-14 sm:py-20 lg:py-24">
+    <div className="pt-24 pb-14 sm:py-20 lg:py-24">
       <Container>
         <ResourceSchema resource={resource.meta} />
         <ContentBreadcrumbs parent="Resources" title={resource.meta.title} />

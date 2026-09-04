@@ -156,4 +156,9 @@ test("existing public routes connect readers to the new commercial pages", async
     navItems.find((item: { label: string }) => item.label === "Work").href,
     "/work/nexsteps",
   );
+  assert.equal(
+    navItems.find((item: { label: string }) => item.label === "Work")
+      .activePath,
+    "/work/nexsteps",
+  );
 });

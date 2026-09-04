@@ -36,7 +36,7 @@ export const publicPages = {
       "Software Development Insights for UK Businesses, Charities and Schools",
     description:
       "Practical articles on bespoke software strategy, portal development, workflow automation and digital modernisation for UK charities, schools and SMEs.",
-    modifiedDate: "2026-08-17",
+    modifiedDate: "2026-09-05",
     index: true,
   },
   "/contact": {
@@ -60,7 +60,7 @@ export const publicPages = {
       "Free Software Strategy Guides for UK Charities, Schools and Businesses",
     description:
       "Download free practical guides on custom software planning, portal development and digital modernisation. Built for UK charity leaders, school administrators and business owners.",
-    modifiedDate: "2026-08-17",
+    modifiedDate: "2026-09-05",
     index: true,
   },
   "/services": {
