@@ -143,6 +143,14 @@ test("treats registered bespoke concepts as ready while generation reconciliatio
       businessName: "Tunbridge Wells Roofing Limited",
       slug: "tunbridge-wells-roofing",
     },
+    {
+      businessName: "ETE ELECTRICAL CONTRACTORS LIMITED",
+      slug: "ete-electrical",
+    },
+    {
+      businessName: "Tumber Hadley Electrical Ltd",
+      slug: "th-electrical",
+    },
   ]) {
     const html = renderToStaticMarkup(
       <PreviewApprovalFrame

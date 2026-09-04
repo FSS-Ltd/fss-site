@@ -34,6 +34,7 @@ const BESPOKE_PREVIEW_SLUGS_BY_BUSINESS_NAME = new Map(
     ["Sealeys Walker Jarvis", "sealeys-walker-jarvis"],
     ["Stagg Homes", "stagg-homes"],
     ["TH Electrical", "th-electrical"],
+    ["Tumber Hadley Electrical Ltd", "th-electrical"],
     ["Tunbridge Wells Roofing", "tunbridge-wells-roofing"],
     ["Tunbridge Wells Roofing Limited", "tunbridge-wells-roofing"],
     ["Wormald Accountants", "wormald-accountants"],
