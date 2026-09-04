@@ -44,3 +44,14 @@ test("resolves the six new bespoke concepts from their legal company names", () 
     assert.equal(resolveKnownBespokePreviewSlug(businessName), slug);
   }
 });
+
+test("resolves electrical concepts from their legal company names", () => {
+  const expectedSlugsByLegalName = [
+    ["ETE ELECTRICAL CONTRACTORS LIMITED", "ete-electrical"],
+    ["Tumber Hadley Electrical Ltd", "th-electrical"],
+  ] as const;
+
+  for (const [businessName, slug] of expectedSlugsByLegalName) {
+    assert.equal(resolveKnownBespokePreviewSlug(businessName), slug);
+  }
+});

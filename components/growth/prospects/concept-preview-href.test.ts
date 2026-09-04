@@ -44,7 +44,7 @@ test("opens Doorknobs' bespoke concept by business name when the stored slug is 
   );
 });
 
-test("opens each new bespoke concept from its legal company name", () => {
+test("opens registered bespoke concepts from their legal company names", () => {
   const expectedSlugsByLegalName = [
     ["Hazel Motors (Gillingham) Limited", "hazel-motors"],
     ["Best Roofing Ltd", "best-roofing"],
@@ -52,6 +52,8 @@ test("opens each new bespoke concept from its legal company name", () => {
     ["HILL-WOOD & CO. (KENT) LIMITED", "hill-wood"],
     ["Accountants of Kent Limited", "hilden-park-accountants"],
     ["Tunbridge Wells Roofing Limited", "tunbridge-wells-roofing"],
+    ["ETE ELECTRICAL CONTRACTORS LIMITED", "ete-electrical"],
+    ["Tumber Hadley Electrical Ltd", "th-electrical"],
   ] as const;
 
   for (const [businessName, slug] of expectedSlugsByLegalName) {
