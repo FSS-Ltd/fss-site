@@ -37,11 +37,20 @@ test("sitemap includes about and privacy with source dates and excludes non-inde
   for (const entry of entries)
     assert.match(String(entry.lastModified), /^\d{4}-\d{2}-\d{2}$/);
   const resources = await getAllResources();
-  for (const resource of resources) {
+  for (const resource of resources.filter((resource) => resource.indexable)) {
     assert.equal(
       entries.find((entry) => entry.url.endsWith(`/resources/${resource.slug}`))
         ?.lastModified,
       resource.modifiedDate,
+    );
+  }
+  for (const resource of resources.filter((resource) => !resource.indexable)) {
+    assert.equal(
+      entries.some((entry) =>
+        entry.url.endsWith(`/resources/${resource.slug}`),
+      ),
+      false,
+      `${resource.slug} must be excluded from the sitemap`,
     );
   }
 });
