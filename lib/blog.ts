@@ -3,6 +3,7 @@ import path from "node:path";
 
 import matter from "gray-matter";
 import readingTime from "reading-time";
+import { churchArticle } from "@/lib/commercial/church-article";
 import { z } from "zod";
 
 import type { BlogFrontmatter, BlogPost, BlogPostMeta } from "@/lib/types/blog";
@@ -11,19 +12,24 @@ import { contentEvidenceSchema, isoDateSchema } from "@/lib/seo/content";
 
 const BLOG_CONTENT_DIR = path.join(process.cwd(), "content", "blog");
 
-export const blogFrontmatterSchema = contentEvidenceSchema.extend({
-  title: z.string().min(1),
-  excerpt: z.string().min(1),
-  publishDate: isoDateSchema,
-  modifiedDate: isoDateSchema.optional(),
-  author: z.string().min(1),
-  category: z.string().min(1),
-  tags: z.array(z.string().min(1)).min(1),
-  coverImage: z.string().min(1),
-  seoTitle: z.string().min(1),
-  seoDescription: z.string().min(1),
-  featured: z.boolean().default(false),
-}).transform((post) => ({ ...post, modifiedDate: post.modifiedDate ?? post.publishDate }));
+export const blogFrontmatterSchema = contentEvidenceSchema
+  .extend({
+    title: z.string().min(1),
+    excerpt: z.string().min(1),
+    publishDate: isoDateSchema,
+    modifiedDate: isoDateSchema.optional(),
+    author: z.string().min(1),
+    category: z.string().min(1),
+    tags: z.array(z.string().min(1)).min(1),
+    coverImage: z.string().min(1),
+    seoTitle: z.string().min(1),
+    seoDescription: z.string().min(1),
+    featured: z.boolean().default(false),
+  })
+  .transform((post) => ({
+    ...post,
+    modifiedDate: post.modifiedDate ?? post.publishDate,
+  }));
 
 function parseFrontmatter(frontmatter: unknown): BlogFrontmatter {
   return blogFrontmatterSchema.parse(frontmatter);
@@ -36,7 +42,8 @@ function isPublished(publishDate: string): boolean {
 
 function sortByPublishDateDesc(posts: BlogPostMeta[]): BlogPostMeta[] {
   return [...posts].sort(
-    (a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime(),
+    (a, b) =>
+      new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime(),
   );
 }
 
@@ -57,7 +64,11 @@ function fileNameToSlug(fileName: string): string {
   return fileName.replace(/\.mdx$/, "");
 }
 
-function buildPostMeta(slug: string, body: string, frontmatter: BlogFrontmatter): BlogPostMeta {
+function buildPostMeta(
+  slug: string,
+  body: string,
+  frontmatter: BlogFrontmatter,
+): BlogPostMeta {
   return {
     ...frontmatter,
     slug,
@@ -80,7 +91,7 @@ export async function getAllBlogPosts(): Promise<BlogPostMeta[]> {
   );
 
   const published = posts.filter((post) => isPublished(post.publishDate));
-  return sortByPublishDateDesc(published);
+  return sortByPublishDateDesc([...published, churchArticle.meta]);
 }
 
 export async function getFeaturedBlogPosts(): Promise<BlogPostMeta[]> {
@@ -88,7 +99,10 @@ export async function getFeaturedBlogPosts(): Promise<BlogPostMeta[]> {
   return posts.filter((post) => post.featured);
 }
 
-export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
+export async function getBlogPostBySlug(
+  slug: string,
+): Promise<BlogPost | null> {
+  if (slug === churchArticle.meta.slug) return churchArticle;
   const sourcePath = path.join(BLOG_CONTENT_DIR, `${slug}.mdx`);
 
   try {
@@ -108,8 +122,16 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
   }
 }
 
-export async function getRelatedPosts(post: BlogPostMeta, limit = 2): Promise<BlogPostMeta[]> {
-  const allPosts = await getAllBlogPosts();
+export async function getRelatedPosts(
+  post: BlogPostMeta,
+  limit = 2,
+): Promise<BlogPostMeta[]> {
+  const allPosts = (await getAllBlogPosts()).filter(
+    (candidate) =>
+      !["sdk-integration-playbook", "technical-content-lead-pipeline"].includes(
+        candidate.slug,
+      ),
+  );
 
   const related = allPosts
     .filter((candidate) => candidate.slug !== post.slug)
@@ -126,7 +148,9 @@ export async function getRelatedPosts(post: BlogPostMeta, limit = 2): Promise<Bl
 
   const fallback = allPosts
     .filter((candidate) => candidate.slug !== post.slug)
-    .filter((candidate) => !related.some((item) => item.slug === candidate.slug))
+    .filter(
+      (candidate) => !related.some((item) => item.slug === candidate.slug),
+    )
     .slice(0, limit - related.length);
 
   return [...related, ...fallback];

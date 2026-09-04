@@ -29,14 +29,42 @@ test("private trees and thank-you pages receive robots response headers", async 
 });
 
 test("only the production www host redirects permanently to the canonical host", async () => {
-  assert.deepEqual(await nextConfig.redirects?.(), [
-    {
-      source: "/:path*",
-      has: [{ type: "host", value: "www.faithfulsoftware.dev" }],
-      destination: "https://faithfulsoftware.dev/:path*",
-      permanent: true,
-    },
-  ]);
+  assert.deepEqual(
+    (await nextConfig.redirects?.())?.filter(
+      (redirect) => redirect.source === "/:path*",
+    ),
+    [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.faithfulsoftware.dev" }],
+        destination: "https://faithfulsoftware.dev/:path*",
+        permanent: true,
+      },
+    ],
+  );
+});
+
+test("legacy resources use one 308 hop to completed landing and thank-you routes", async () => {
+  for (const [oldSlug, newSlug] of [
+    ["sdk-integration-readiness-kit", "software-project-readiness-kit"],
+    ["technical-content-conversion-playbook", "software-investment-framework"],
+  ]) {
+    for (const host of ["faithfulsoftware.dev", "www.faithfulsoftware.dev"]) {
+      for (const suffix of ["", "/thank-you"]) {
+        const response = await unstable_getResponseFromNextConfig({
+          url: `https://${host}/resources/${oldSlug}${suffix}?source=email`,
+          nextConfig,
+        });
+        assert.equal(response.status, 308);
+        const location = response.headers.get("location");
+        assert.ok(location);
+        assert.equal(
+          new URL(location, `https://${host}`).toString(),
+          `https://faithfulsoftware.dev/resources/${newSlug}${suffix}?source=email`,
+        );
+      }
+    }
+  }
 });
 
 test("routing matches private roots and descendants while leaving public routes indexable", async () => {

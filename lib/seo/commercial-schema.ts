@@ -4,6 +4,7 @@ import type {
 } from "@/lib/commercial/types";
 import { canonicalUrl, pageSchemaId, socialImage } from "./metadata";
 import { organisation } from "./organisation";
+import { churchArticle } from "@/lib/commercial/church-article";
 
 export function commercialBreadcrumbs(
   page: CommercialPageContent,
@@ -86,6 +87,9 @@ export function buildCommercialSchema(
       image: socialImage(page.path, page.title).url,
       dateModified: page.modifiedDate,
       author: { "@id": organisationId },
+      ...(page.path === "/blog/church-management-software-vs-bespoke"
+        ? { datePublished: churchArticle.meta.publishDate }
+        : {}),
       publisher: { "@id": organisationId },
       mainEntityOfPage: { "@id": pageSchemaId(page.path, "webpage") },
     });

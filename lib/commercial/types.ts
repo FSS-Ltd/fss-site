@@ -6,6 +6,7 @@ export type CommercialSection = {
   title: string;
   text: string;
   points?: readonly string[];
+  links?: readonly CommercialLink[];
 };
 
 export type CommercialPageContent = PageMetadataInput & {

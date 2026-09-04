@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import sitemap from "@/app/sitemap";
+import sitemap, { buildSitemapEntries } from "@/app/sitemap";
 import { blogFrontmatterSchema, getAllBlogPosts } from "@/lib/blog";
 import { getAllResources } from "@/lib/resources";
 import { buildRobots } from "./robots";
@@ -61,6 +61,27 @@ test("RSS publishes canonical article links and dates with escaped XML text", as
   assert.match(xml, /<link>https:\/\/faithfulsoftware.dev\/blog\//);
   assert.match(xml, /<pubDate>[^<]+ GMT<\/pubDate>/);
   assert.equal((xml.match(/<item>/g) ?? []).length, 1);
+});
+
+test("sitemap excludes a non-indexable resource while retaining indexable resources", async () => {
+  const resources = await getAllResources();
+  const [resource] = resources;
+  const entries = buildSitemapEntries(
+    [],
+    [
+      ...resources,
+      { ...resource, slug: "private-resource-fixture", indexable: false },
+    ],
+  );
+  assert.equal(
+    entries.some((entry) =>
+      entry.url.endsWith("/resources/private-resource-fixture"),
+    ),
+    false,
+  );
+  assert.ok(
+    entries.some((entry) => entry.url.endsWith(`/resources/${resource.slug}`)),
+  );
 });
 
 test("new articles from the existing generator default modification to their publication date", async () => {

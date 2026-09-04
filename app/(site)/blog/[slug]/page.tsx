@@ -18,7 +18,10 @@ type BlogPostRouteProps = {
 export async function generateStaticParams() {
   const posts = await getAllBlogPosts();
 
-  return posts.map((post) => ({ slug: post.slug }));
+  // The comparison has a dedicated static page sharing the same blog data.
+  return posts
+    .filter((post) => post.slug !== "church-management-software-vs-bespoke")
+    .map((post) => ({ slug: post.slug }));
 }
 
 export async function generateMetadata({

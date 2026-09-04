@@ -3,6 +3,8 @@ import { getAllBlogPosts } from "@/lib/blog";
 import { getAllResources } from "@/lib/resources";
 import { canonicalUrl } from "@/lib/seo/metadata";
 import { publicPages } from "@/lib/seo/pages";
+import type { BlogPostMeta } from "@/lib/types/blog";
+import type { ResourceMeta } from "@/lib/types/resource";
 
 export const revalidate = 3600;
 
@@ -11,9 +13,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getAllBlogPosts(),
     getAllResources(),
   ]);
+  return buildSitemapEntries(posts, resources);
+}
+
+export function buildSitemapEntries(
+  posts: BlogPostMeta[],
+  resources: ResourceMeta[],
+): MetadataRoute.Sitemap {
+  const articlePaths = new Set(posts.map((post) => `/blog/${post.slug}`));
   return [
     ...Object.values(publicPages)
-      .filter((page) => page.index)
+      .filter((page) => page.index && !articlePaths.has(page.path))
       .map((page) => ({
         url: canonicalUrl(page.path),
         lastModified: page.modifiedDate,

@@ -1,0 +1,28 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="1200"
+  height="700"
+  viewBox="0 0 1200 700"
+  role="img"
+  aria-labelledby="title desc"
+>
+  <title id="title">Software Project Readiness Kit</title>
+  <desc id="desc">
+    Define the problem, scope and ownership before commissioning software.
+  </desc>
+  <rect width="1200" height="700" fill="#0a1a2e" />
+  <rect x="70" y="80" width="10" height="540" fill="#14989e" />
+  <g fill="#fff" font-family="Arial,sans-serif">
+    <text x="120" y="155" font-size="24" letter-spacing="4">
+      FAITHFUL SOFTWARE SOLUTIONS
+    </text>
+    <text x="120" y="305" font-size="64" font-weight="700">
+      Software Project
+    </text>
+    <text x="120" y="385" font-size="64" font-weight="700">Readiness Kit</text>
+    <text x="120" y="515" font-size="29">Problem. Scope. Ownership.</text>
+    <text x="120" y="570" font-size="23">
+      A workbook for organisational software buyers
+    </text>
+  </g>
+</svg>

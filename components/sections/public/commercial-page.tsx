@@ -14,12 +14,21 @@ import { DeliverySteps } from "./delivery-steps";
 import { NexStepsProof } from "./nexsteps-proof";
 import { RelatedLinks } from "./related-links";
 import styles from "./public-page.module.css";
+import { ContentEvidence } from "@/components/seo/content-evidence";
+import { churchArticle } from "@/lib/commercial/church-article";
 
 function ContentSection({ section }: { section: CommercialSection }) {
   return (
     <section className={styles.section} aria-labelledby={section.id}>
       <h2 id={section.id}>{section.title}</h2>
       <p className="max-w-3xl">{section.text}</p>
+      {section.links?.map((link) => (
+        <p key={link.href}>
+          <Link href={link.href} className="underline underline-offset-4">
+            {link.label}
+          </Link>
+        </p>
+      ))}
       {section.points && (
         <ul className={styles.list}>
           {section.points.map((point) => (
@@ -65,6 +74,9 @@ export function CommercialPage({ page }: { page: CommercialPageContent }) {
             <ContactLink />
           </div>
         </PageIntro>
+        {page.path === "/blog/church-management-software-vs-bespoke" && (
+          <ContentEvidence content={churchArticle.meta} />
+        )}
         {page.kind === "case-study" && <NexStepsProof />}
         {page.sections.map((section) => (
           <ContentSection key={section.id} section={section} />

@@ -12,6 +12,7 @@ export type ResourceDelivery = {
   label?: string;
   notes?: string;
   fileName?: string;
+  encodingFormat?: "application/pdf";
   accessInstructions?: string;
 };
 

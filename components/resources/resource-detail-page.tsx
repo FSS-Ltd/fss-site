@@ -11,13 +11,19 @@ import { Container } from "@/components/ui/container";
 import { GlowCard } from "@/components/ui/spotlight-card";
 import { getDeliveryPromise } from "@/lib/resource-delivery";
 import { LeadMagnetCaptureForm } from "@/components/forms/lead-magnet-capture-form";
+import { ContentBreadcrumbs } from "@/components/seo/content-breadcrumbs";
+import { ContentEvidence } from "@/components/seo/content-evidence";
+import { ResourceSchema } from "@/components/seo/resource-schema";
 
 type ResourceDetailPageProps = {
   resource: ResourceItem;
   relatedResources: ResourceMeta[];
 };
 
-export async function ResourceDetailPage({ resource, relatedResources }: ResourceDetailPageProps) {
+export async function ResourceDetailPage({
+  resource,
+  relatedResources,
+}: ResourceDetailPageProps) {
   const { content } = await compileMDX({
     source: resource.body,
     components: resourceMdxComponents,
@@ -25,7 +31,8 @@ export async function ResourceDetailPage({ resource, relatedResources }: Resourc
 
   const redirectPath = "/resources/" + resource.meta.slug + "/thank-you";
   const deliveryPromise = getDeliveryPromise(resource.meta);
-  const usageSectionTitle = resource.meta.usageSectionTitle ?? "How Teams Use This Resource";
+  const usageSectionTitle =
+    resource.meta.usageSectionTitle ?? "How Teams Use This Resource";
   const usageSteps =
     resource.meta.usageSteps ??
     resource.meta.benefits.slice(0, 3).map((benefit, index) => ({
@@ -33,12 +40,19 @@ export async function ResourceDetailPage({ resource, relatedResources }: Resourc
       description: benefit,
     }));
   const usageGridClass =
-    usageSteps.length >= 3 ? "mt-10 grid gap-6 px-6 md:grid-cols-2 xl:grid-cols-3 sm:px-8" : "mt-10 grid gap-6 px-6 md:grid-cols-2 sm:px-8";
+    usageSteps.length >= 3
+      ? "mt-10 grid gap-6 px-6 md:grid-cols-2 xl:grid-cols-3 sm:px-8"
+      : "mt-10 grid gap-6 px-6 md:grid-cols-2 sm:px-8";
 
   return (
     <div className="py-14 sm:py-20 lg:py-24">
       <Container>
-        <section id="download-form" className="grid gap-16 lg:grid-cols-2 lg:items-start">
+        <ResourceSchema resource={resource.meta} />
+        <ContentBreadcrumbs parent="Resources" title={resource.meta.title} />
+        <section
+          id="download-form"
+          className="grid gap-16 lg:grid-cols-2 lg:items-start"
+        >
           <div className="space-y-8">
             <span className="inline-flex items-center rounded-full border border-brand-primary/20 bg-brand-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-widest text-brand-primary">
               {resource.meta.category} · {resource.meta.format}
@@ -47,8 +61,14 @@ export async function ResourceDetailPage({ resource, relatedResources }: Resourc
               {resource.meta.title}
             </h1>
             <p className="text-lg leading-relaxed text-text-muted">
-              {resource.meta.fullDescription}
+              {resource.meta.summary ?? resource.meta.fullDescription}
             </p>
+            <ContentEvidence content={resource.meta} />
+            {resource.meta.delivery.encodingFormat && (
+              <p className="text-sm text-text-muted">
+                {resource.meta.delivery.notes} File format: PDF.
+              </p>
+            )}
             <ul className="space-y-4">
               {resource.meta.benefits.map((benefit) => (
                 <li key={benefit} className="flex items-start gap-4">
@@ -64,7 +84,9 @@ export async function ResourceDetailPage({ resource, relatedResources }: Resourc
           <div className="relative">
             <div className="pointer-events-none absolute -inset-4 rounded-full bg-brand-primary/8 blur-3xl" />
             <GlowCard customSize className="relative p-8 shadow-2xl">
-              <h3 className="text-xl font-bold text-foreground">Download for Free</h3>
+              <h3 className="text-xl font-bold text-foreground">
+                Download for Free
+              </h3>
               <p className="mt-1 text-sm text-text-muted">{deliveryPromise}</p>
               <div className="mt-5">
                 <LeadMagnetCaptureForm
@@ -75,7 +97,8 @@ export async function ResourceDetailPage({ resource, relatedResources }: Resourc
                 />
               </div>
               <p className="mt-3 text-center text-[11px] text-text-subtle">
-                By downloading, you agree to receive strategic updates. Unsubscribe anytime.
+                By downloading, you agree to receive strategic updates.
+                Unsubscribe anytime.
               </p>
             </GlowCard>
           </div>
@@ -83,7 +106,9 @@ export async function ResourceDetailPage({ resource, relatedResources }: Resourc
 
         <section className="mt-20 rounded-2xl bg-surface-1/60 py-14 sm:py-16">
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-foreground sm:text-3xl">{usageSectionTitle}</h2>
+            <h2 className="text-2xl font-bold text-foreground sm:text-3xl">
+              {usageSectionTitle}
+            </h2>
             <div className="mx-auto mt-3 h-1 w-16 rounded-full bg-brand-primary" />
           </div>
           <div className={usageGridClass}>
@@ -92,8 +117,12 @@ export async function ResourceDetailPage({ resource, relatedResources }: Resourc
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-primary">
                   Step {index + 1}
                 </p>
-                <h3 className="mt-3 text-xl font-bold text-foreground">{step.title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-text-muted">{step.description}</p>
+                <h3 className="mt-3 text-xl font-bold text-foreground">
+                  {step.title}
+                </h3>
+                <p className="mt-3 text-sm leading-relaxed text-text-muted">
+                  {step.description}
+                </p>
               </GlowCard>
             ))}
           </div>
@@ -101,11 +130,11 @@ export async function ResourceDetailPage({ resource, relatedResources }: Resourc
 
         <section className="mt-20 py-16 text-center">
           <h3 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
-            Ready to lead your organization into the next decade?
+            Prepare the next software decision.
           </h3>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-text-muted">
-            Download the strategic roadmap today and start your modernization journey with
-            confidence.
+            Complete the resource with the people who own the process and agree
+            which open question to resolve next.
           </p>
           <div className="mt-8">
             <ButtonLink
@@ -120,16 +149,23 @@ export async function ResourceDetailPage({ resource, relatedResources }: Resourc
         </section>
 
         <GlowCard customSize className="mt-4 p-6 sm:p-8" as="section">
-          <h2 className="text-2xl font-semibold text-foreground">Implementation Guidance</h2>
+          <h2 className="text-2xl font-semibold text-foreground">
+            Implementation Guidance
+          </h2>
           <div className="mt-4 space-y-4 text-text-muted">{content}</div>
         </GlowCard>
 
         {relatedResources.length ? (
           <section className="mt-12">
-            <h2 className="text-2xl font-semibold text-foreground">Related resources</h2>
+            <h2 className="text-2xl font-semibold text-foreground">
+              Related resources
+            </h2>
             <div className="mt-6 grid gap-5 md:grid-cols-2">
               {relatedResources.map((relatedResource) => (
-                <ResourceCard key={relatedResource.slug} resource={relatedResource} />
+                <ResourceCard
+                  key={relatedResource.slug}
+                  resource={relatedResource}
+                />
               ))}
             </div>
             <p className="mt-6 text-sm text-text-subtle">
@@ -138,7 +174,10 @@ export async function ResourceDetailPage({ resource, relatedResources }: Resourc
                 Read our blog
               </Link>{" "}
               or{" "}
-              <Link href="/contact" className="text-brand-primary hover:underline">
+              <Link
+                href="/contact"
+                className="text-brand-primary hover:underline"
+              >
                 talk to FSS directly
               </Link>
               .

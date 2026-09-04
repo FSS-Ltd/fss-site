@@ -110,6 +110,7 @@ export const guidePages = {
       {
         id: "outcomes",
         title: "When an existing product is the better fit.",
+        links: [sectorLink],
         text: "An existing product is worth testing first when its supported workflows meet the essential requirements and its access model, exports and support terms suit the organisation.",
         points: [
           "Test real tasks rather than relying on a feature checklist",
@@ -120,6 +121,7 @@ export const guidePages = {
       {
         id: "bespoke",
         title: "When to investigate bespoke work.",
+        links: [serviceLinks[0]],
         text: "Consider a custom system where a critical process cannot be supported by configuration and the gap justifies building and maintaining software. A smaller portal or integration may address the need without replacing every current tool.",
       },
       {
@@ -130,11 +132,13 @@ export const guidePages = {
       {
         id: "evidence",
         title: "A first-party example: NexSteps.",
+        links: [nexstepsLink],
         text: "FSS built NexSteps for safeguarding, attendance and operations in schools, churches and community organisations. Its capabilities show the kind of work a custom product can cover. They do not establish that bespoke software is the right choice for every church.",
       },
       {
         id: "scope",
         title: "Compare the whole ownership commitment.",
+        links: [costLink],
         text: "For an existing product, examine subscriptions, configuration, migration and support. For bespoke work, include discovery, delivery, hosting, maintenance and future changes. No universal price comparison is possible without a defined scope.",
       },
       {

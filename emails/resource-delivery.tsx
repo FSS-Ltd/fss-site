@@ -5,12 +5,14 @@ import type { FssEmailImageProps } from "./components/email-image";
 import { emailColors } from "./styles";
 
 export const RESOURCE_DELIVERY_SUBJECT = "Your FSS practical guide is ready";
-export const RESOURCE_DELIVERY_PREVIEW = "Download the resource you requested and choose one useful next step.";
+export const RESOURCE_DELIVERY_PREVIEW =
+  "Download the resource you requested and choose one useful next step.";
 
 export type ResourceDeliveryProps = {
   firstName: string;
   resourceTitle: string;
   resourceUrl: string;
+  resourceSummary?: string;
   image?: FssEmailImageProps;
 };
 
@@ -31,14 +33,19 @@ function requireResourceUrl(value: string): string {
       throw new Error();
     }
   } catch {
-    throw new TypeError("Resource delivery requires a valid HTTPS resource URL.");
+    throw new TypeError(
+      "Resource delivery requires a valid HTTPS resource URL.",
+    );
   }
   return value;
 }
 
 export function ResourceDelivery(props: ResourceDeliveryProps) {
   const firstName = requireMergeValue(props.firstName, "first name");
-  const resourceTitle = requireMergeValue(props.resourceTitle, "resource title");
+  const resourceTitle = requireMergeValue(
+    props.resourceTitle,
+    "resource title",
+  );
   const resourceUrl = requireResourceUrl(props.resourceUrl);
 
   return (
@@ -49,13 +56,16 @@ export function ResourceDelivery(props: ResourceDeliveryProps) {
       image={props.image}
     >
       <Text>Hi {firstName},</Text>
+      <Text>Your copy of {resourceTitle} is ready.</Text>
       <Text>
-        Your copy of {resourceTitle} is ready.
-      </Text>
-      <Text>
-        This guide is designed to help you find the part of a process that creates repeated work, missing
-        information or avoidable delay. You do not need to change the whole system to make progress. Start
-        with the one handoff that costs the team the most time.
+        {props.resourceSummary ?? (
+          <>
+            This guide is designed to help you find the part of a process that
+            creates repeated work, missing information or avoidable delay. You
+            do not need to change the whole system to make progress. Start with
+            the one handoff that costs the team the most time.
+          </>
+        )}
       </Text>
       <Section style={{ textAlign: "center", padding: "8px 0 16px" }}>
         <Button
@@ -73,16 +83,20 @@ export function ResourceDelivery(props: ResourceDeliveryProps) {
           Download your guide
         </Button>
       </Section>
-      <Text>
-        If the button does not work, copy this link: {resourceUrl}
-      </Text>
+      <Text>If the button does not work, copy this link: {resourceUrl}</Text>
       <Text>As you work through it, write down:</Text>
-      <Text style={listItemStyle}>1. where information first enters the process;</Text>
-      <Text style={listItemStyle}>2. who has to retype, chase or correct it;</Text>
-      <Text style={{ margin: 0 }}>3. what a cleaner handoff would make possible.</Text>
+      <Text style={listItemStyle}>
+        1. where information first enters the process;
+      </Text>
+      <Text style={listItemStyle}>
+        2. who has to retype, chase or correct it;
+      </Text>
+      <Text style={{ margin: 0 }}>
+        3. what a cleaner handoff would make possible.
+      </Text>
       <Text>
-        If the guide exposes a problem that needs a practical software decision, reply to this email. I
-        will tell you whether FSS is likely to be useful.
+        If the guide exposes a problem that needs a practical software decision,
+        reply to this email. I will tell you whether FSS is likely to be useful.
       </Text>
       <Text style={{ margin: 0 }}>
         Jean-Fidele
