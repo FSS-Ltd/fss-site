@@ -5,6 +5,7 @@ import { BurfordsPage } from "./prospects/burfords";
 import { DoorknobsPage } from "./prospects/doorknobs";
 import { DunkleysOfDealPage } from "./prospects/dunkley-s-of-deal";
 import { EvoKentRoofingPage } from "./prospects/evo-kent-roofing";
+import { EteElectricalPage } from "./prospects/ete-electrical";
 import { FugglesBeerCafePage } from "./prospects/fuggles-beer-cafe";
 import { HideAndFoxPage } from "./prospects/hide-and-fox";
 import { HazelMotorsPage } from "./prospects/hazel-motors";
@@ -21,6 +22,7 @@ import { PrimelineRoofingPage } from "./prospects/primeline-roofing";
 import { PriorityPointPage } from "./prospects/priority-point";
 import { SealeysWalkerJarvisPage } from "./prospects/sealeys-walker-jarvis";
 import { StaggHomesPage } from "./prospects/stagg-homes";
+import { ThElectricalPage } from "./prospects/th-electrical";
 import { TunbridgeWellsRoofingPage } from "./prospects/tunbridge-wells-roofing";
 import { WormaldAccountantsPage } from "./prospects/wormald-accountants";
 import type { BespokeProspectPage } from "./types";
@@ -97,6 +99,15 @@ export const bespokeProspectPages = {
       "Repairs and replacements for homes, businesses and public buildings with useful site context.",
     layoutSignature: "curved-building-assessment",
     heroSignature: "exploded-roof-layers",
+  },
+  "ete-electrical": {
+    Page: EteElectricalPage,
+    businessName: "ETE Electrical Contractors",
+    title: "Electrical and fire-alarm work in Maidstone",
+    description:
+      "Route faults, inspections, landlord certificates and fire-alarm work with the property and urgency in view.",
+    layoutSignature: "red-black-electrical-safety-brief",
+    heroSignature: "consumer-unit-inspection",
   },
   "fuggles-beer-cafe": {
     Page: FugglesBeerCafePage,
@@ -241,6 +252,15 @@ export const bespokeProspectPages = {
       "A clearer property journey with local Kent knowledge and one consistent point of contact.",
     layoutSignature: "cinematic-owner-led-property-journey",
     heroSignature: "scroll-linked-kent-home-walkthrough",
+  },
+  "th-electrical": {
+    Page: ThElectricalPage,
+    businessName: "TH Electrical",
+    title: "Domestic and commercial electrical work in Kent",
+    description:
+      "Electrical repairs, installations, maintenance and inspections routed by property and urgency.",
+    layoutSignature: "switched-electrical-job-triage",
+    heroSignature: "consumer-unit-inspection-brief",
   },
   "tunbridge-wells-roofing": {
     Page: TunbridgeWellsRoofingPage,

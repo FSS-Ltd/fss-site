@@ -441,6 +441,186 @@ html {
     transition: none;
   }
 }
+/* Scroll-linked circuit-board canvas shared by the electrical concepts. */
+[data-electrical-circuit-board] {
+  background:
+    linear-gradient(90deg, rgb(9 11 15 / 12%), transparent 48%),
+    linear-gradient(0deg, rgb(9 11 15 / 20%), transparent 58%);
+  color: rgb(255 173 166 / 96%);
+  inset: 0;
+  mix-blend-mode: screen;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  z-index: 30;
+}
+
+[data-electrical-circuit-board][data-electrical-circuit-scope="site"] {
+  position: fixed;
+}
+
+[data-electrical-circuit-grid] {
+  background-image:
+    linear-gradient(to right, currentColor 1px, transparent 1px),
+    linear-gradient(to bottom, currentColor 1px, transparent 1px);
+  background-size: 3.5rem 3.5rem;
+  inset: -12%;
+  opacity: 0.2;
+  position: absolute;
+}
+
+.circuitTrace {
+  --circuit-trace-angle: 0deg;
+  background: currentColor;
+  box-shadow: 0 0 1.25rem currentColor;
+  height: 2px;
+  opacity: 0.44;
+  position: absolute;
+  transform: rotate(var(--circuit-trace-angle));
+  transform-origin: left center;
+  width: 37%;
+}
+
+.circuitTraceA {
+  left: -5%;
+  top: 22%;
+}
+
+.circuitTraceB {
+  --circuit-trace-angle: -24deg;
+  right: -8%;
+  top: 37%;
+  width: 45%;
+}
+
+.circuitTraceC {
+  --circuit-trace-angle: 29deg;
+  bottom: 24%;
+  left: 26%;
+  width: 42%;
+}
+
+.circuitTraceD {
+  --circuit-trace-angle: -38deg;
+  bottom: 13%;
+  right: -4%;
+  width: 31%;
+}
+
+.circuitNode {
+  background: #fff0ed;
+  border-radius: 999px;
+  box-shadow: 0 0 0.9rem currentColor, 0 0 2.25rem currentColor;
+  height: 0.7rem;
+  opacity: 0.7;
+  position: absolute;
+  width: 0.7rem;
+}
+
+.circuitNodeA {
+  left: 29%;
+  top: calc(22% - 0.25rem);
+}
+
+.circuitNodeB {
+  right: 26%;
+  top: 27%;
+}
+
+.circuitNodeC {
+  left: 39%;
+  top: 56%;
+}
+
+.circuitNodeD {
+  bottom: 25%;
+  right: 32%;
+}
+
+.circuitNodeE {
+  bottom: 13%;
+  right: 10%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view(block)) {
+    [data-electrical-circuit-board] {
+      animation: electrical-circuit-board-drift linear both;
+      animation-range: entry 0% exit 100%;
+      animation-timeline: view(block);
+    }
+
+    [data-electrical-circuit-board][data-electrical-circuit-scope="site"] {
+      animation-range: 0% 100%;
+      animation-timeline: scroll(root block);
+    }
+
+    .circuitTrace,
+    .circuitNode {
+      animation-range: entry 5% cover 95%;
+      animation-timeline: view(block);
+    }
+
+    .circuitTrace {
+      animation: electrical-circuit-trace linear both;
+    }
+
+    .circuitNode {
+      animation: electrical-circuit-node linear both;
+    }
+
+    [data-electrical-circuit-scope="site"] .circuitTrace,
+    [data-electrical-circuit-scope="site"] .circuitNode {
+      animation-range: 0% 100%;
+      animation-timeline: scroll(root block);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-electrical-circuit-board],
+  .circuitTrace,
+  .circuitNode {
+    animation: none;
+  }
+}
+
+@keyframes electrical-circuit-board-drift {
+  from {
+    opacity: 0.35;
+    transform: translate3d(-1.5%, -2%, 0) scale(1.04);
+  }
+
+  to {
+    opacity: 0.7;
+    transform: translate3d(1.5%, 2%, 0) scale(1);
+  }
+}
+
+@keyframes electrical-circuit-trace {
+  from {
+    opacity: 0.4;
+    transform: rotate(var(--circuit-trace-angle)) scaleX(0.45);
+  }
+
+  to {
+    opacity: 0.88;
+    transform: rotate(var(--circuit-trace-angle)) scaleX(1);
+  }
+}
+
+@keyframes electrical-circuit-node {
+  from {
+    opacity: 0.62;
+    transform: scale(0.7);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1.35);
+  }
+}
+
 
 /* Primeline Roofing day-to-night photographic scrollytelling. */
 .primelinePage {

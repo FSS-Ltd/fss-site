@@ -22,6 +22,7 @@ const expectedSlugs = [
   "doorknobs",
   "dunkley-s-of-deal",
   "evo-kent-roofing",
+  "ete-electrical",
   "fuggles-beer-cafe",
   "hide-and-fox",
   "hazel-motors",
@@ -38,6 +39,7 @@ const expectedSlugs = [
   "priority-point",
   "sealeys-walker-jarvis",
   "stagg-homes",
+  "th-electrical",
   "tunbridge-wells-roofing",
   "wormald-accountants",
 ] as const;
