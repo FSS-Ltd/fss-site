@@ -1,4 +1,6 @@
-export type BlogFrontmatter = {
+import type { ContentEvidence } from "@/lib/seo/content";
+
+export type BlogFrontmatter = ContentEvidence & {
   title: string;
   excerpt: string;
   publishDate: string;

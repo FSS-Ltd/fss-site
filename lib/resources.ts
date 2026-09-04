@@ -6,6 +6,8 @@ import { z } from "zod";
 
 import type { ResourceFrontmatter, ResourceItem, ResourceMeta } from "@/lib/types/resource";
 
+import { contentEvidenceSchema, isoDateSchema } from "@/lib/seo/content";
+
 const RESOURCES_CONTENT_DIR = path.join(process.cwd(), "content", "resources");
 
 const resourceDeliverySchema = z
@@ -37,7 +39,9 @@ const resourceUsageStepSchema = z.object({
   description: z.string().min(1),
 });
 
-const resourceFrontmatterSchema = z.object({
+const resourceFrontmatterSchema = contentEvidenceSchema.extend({
+  publishDate: isoDateSchema.optional(),
+  author: z.string().min(1).optional(),
   slug: z.string().min(1),
   title: z.string().min(1),
   shortDescription: z.string().min(1),

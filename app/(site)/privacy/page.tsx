@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
+import { createPageMetadata } from "@/lib/seo/metadata";
+import { publicPages } from "@/lib/seo/pages";
 
 import styles from "./privacy.module.css";
 
-export const metadata: Metadata = {
-  title: "Privacy notice",
-  description: "How Faithful Software Solutions Ltd handles personal data.",
-  alternates: { canonical: "/privacy" },
-};
+export const metadata: Metadata = createPageMetadata(publicPages["/privacy"]);
 
 const providers = [
   ["Vercel", "website hosting, deployment, logs and security"],

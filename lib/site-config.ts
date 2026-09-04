@@ -4,12 +4,14 @@ import {
   resolveSiteUrl,
 } from "@/lib/config/site-url";
 
+import { organisation } from "@/lib/seo/organisation";
+
 const siteUrl = resolveSiteUrl();
 const previewDeployment = isPreviewDeployment();
 
 export const siteConfig = {
-  name: "Faithful Software Solutions",
-  fullName: "Faithful Software Solutions Ltd",
+  name: organisation.name,
+  fullName: organisation.legalName,
   title: "Faithful Software Solutions | Custom Software Development UK",
   description:
     "Bespoke software development for UK charities, schools, churches and businesses. Custom ERP, portals, dashboards and workflow automation built around your operational needs.",
@@ -17,8 +19,8 @@ export const siteConfig = {
   deploymentContext: getDeploymentContext(),
   isPreviewDeployment: previewDeployment,
   allowSearchIndexing: !previewDeployment,
-  supportEmail: "hello@faithfulsoftware.dev",
+  supportEmail: organisation.email,
   social: {
-    linkedin: "https://www.linkedin.com/company/faithful-software-solutions",
+    linkedin: organisation.linkedin,
   },
 };

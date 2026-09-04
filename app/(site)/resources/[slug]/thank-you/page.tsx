@@ -14,7 +14,9 @@ export async function generateStaticParams() {
   return resources.map((resource) => ({ slug: resource.slug }));
 }
 
-export async function generateMetadata({ params }: ResourceThankYouRouteProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: ResourceThankYouRouteProps): Promise<Metadata> {
   const { slug } = await params;
   const resource = await getResourceBySlug(slug);
 
@@ -22,19 +24,23 @@ export async function generateMetadata({ params }: ResourceThankYouRouteProps): 
     return {
       title: "Thank you",
       description: "Submission received.",
+      robots: { index: false, follow: true },
     };
   }
 
   return {
     title: `Thanks for requesting ${resource.meta.title}`,
     description: resource.meta.thankYouMessage,
+    robots: { index: false, follow: true },
     alternates: {
       canonical: "/resources/" + resource.meta.slug + "/thank-you",
     },
   };
 }
 
-export default async function ResourceThankYouRoutePage({ params }: ResourceThankYouRouteProps) {
+export default async function ResourceThankYouRoutePage({
+  params,
+}: ResourceThankYouRouteProps) {
   const { slug } = await params;
   const resource = await getResourceBySlug(slug);
 

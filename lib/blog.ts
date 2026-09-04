@@ -7,20 +7,15 @@ import { z } from "zod";
 
 import type { BlogFrontmatter, BlogPost, BlogPostMeta } from "@/lib/types/blog";
 
+import { contentEvidenceSchema, isoDateSchema } from "@/lib/seo/content";
+
 const BLOG_CONTENT_DIR = path.join(process.cwd(), "content", "blog");
 
-function normalizePublishDateInput(value: unknown): unknown {
-  if (value instanceof Date) {
-    return value.toISOString().slice(0, 10);
-  }
-
-  return value;
-}
-
-const blogFrontmatterSchema = z.object({
+export const blogFrontmatterSchema = contentEvidenceSchema.extend({
   title: z.string().min(1),
   excerpt: z.string().min(1),
-  publishDate: z.preprocess(normalizePublishDateInput, z.string().min(1)),
+  publishDate: isoDateSchema,
+  modifiedDate: isoDateSchema.optional(),
   author: z.string().min(1),
   category: z.string().min(1),
   tags: z.array(z.string().min(1)).min(1),
@@ -28,7 +23,7 @@ const blogFrontmatterSchema = z.object({
   seoTitle: z.string().min(1),
   seoDescription: z.string().min(1),
   featured: z.boolean().default(false),
-});
+}).transform((post) => ({ ...post, modifiedDate: post.modifiedDate ?? post.publishDate }));
 
 function parseFrontmatter(frontmatter: unknown): BlogFrontmatter {
   return blogFrontmatterSchema.parse(frontmatter);

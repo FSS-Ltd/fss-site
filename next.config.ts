@@ -41,11 +41,29 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: projectRoot,
   },
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.faithfulsoftware.dev" }],
+        destination: "https://faithfulsoftware.dev/:path*",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {
         source: "/(.*)",
         headers: securityHeaders,
+      },
+      {
+        source: "/growth/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
+      {
+        source: "/resources/:slug/thank-you/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, follow" }],
       },
       {
         source: "/preview/:path*",

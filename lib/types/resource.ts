@@ -1,3 +1,5 @@
+import type { ContentEvidence } from "@/lib/seo/content";
+
 export type ResourceDeliveryType =
   | "direct_download"
   | "internal_asset_page"
@@ -18,7 +20,9 @@ export type ResourceUsageStep = {
   description: string;
 };
 
-export type ResourceFrontmatter = {
+export type ResourceFrontmatter = ContentEvidence & {
+  publishDate?: string;
+  author?: string;
   slug: string;
   title: string;
   shortDescription: string;
