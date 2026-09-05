@@ -14,6 +14,7 @@ import {
 import { DunkleysOfDealPage } from "./prospects/dunkley-s-of-deal";
 
 const expectedSlugs = [
+  "acckent-accountants",
   "best-roofing",
   "bridgland-roofing",
   "bright-accounting",
@@ -29,9 +30,12 @@ const expectedSlugs = [
   "hilden-park-accountants",
   "hill-wood",
   "hollis-motors",
+  "hosty-lets",
   "jaguar-plumbing",
+  "jenkinson-estates",
   "kemsing-motor-company",
   "kent-garage-equipment",
+  "legrys",
   "marden-garage",
   "md-accountancy",
   "paperstone",

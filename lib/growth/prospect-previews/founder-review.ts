@@ -3,7 +3,10 @@ import { randomUUID } from "node:crypto";
 import { getGrowthDb } from "../db/client";
 import type { GrowthQueryExecutor } from "../db/types";
 import type { ViewState } from "../dashboard/view-models";
-import { resolveConceptPreviewSlug } from "./preview-slugs";
+import {
+  resolveReviewableProspectPreviewSource,
+  type ReviewableProspectPreviewSource,
+} from "./reviewable-source";
 
 const PROSPECT_ID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -21,15 +24,14 @@ export type FounderDraftProspectPreviewSummary = {
 };
 
 export type FounderDraftProspectPreviewDestination = {
-  businessName: string;
   prospectId: string;
-  slug: string | null;
+  source: ReviewableProspectPreviewSource;
 };
 
 type FounderDraftPreviewSummaryRow = FounderDraftProspectPreviewSummary;
 
 type FounderDraftPreviewRow = {
-  businessName: string;
+  compositionDigest: string | null;
   prospectId: string;
   slug: string | null;
 };
@@ -62,12 +64,12 @@ export async function getFounderDraftProspectPreviewSummaries(
       order by pp.created_at asc, pp.id asc
     `;
 
-    const rowsWithPreviewRoutes = rows.filter(
-      (row) =>
-        resolveConceptPreviewSlug({
-          businessName: row.businessName,
-          slug: row.slug,
-        }) !== null,
+    const rowsWithPreviewRoutes = rows.filter((row) =>
+      resolveReviewableProspectPreviewSource({
+        digest: row.compositionDigest,
+        prospectId: row.prospectId,
+        slug: row.slug,
+      }),
     );
 
     if (rowsWithPreviewRoutes.length === 0) {
@@ -96,7 +98,7 @@ export async function getFounderDraftProspectPreviewDestination(
   try {
     const rows = await db<FounderDraftPreviewRow[]>`
       select
-        coalesce(b.trading_name, b.legal_name) as "businessName",
+        pp.composition_digest as "compositionDigest",
         p.id as "prospectId",
         pp.slug
       from growth.prospect_previews pp
@@ -109,14 +111,14 @@ export async function getFounderDraftProspectPreviewDestination(
     const row = rows[0];
     if (!row) return { status: "not_found" };
 
-    return {
-      status: "found",
-      data: {
-        businessName: row.businessName,
-        prospectId: row.prospectId,
-        slug: row.slug,
-      },
-    };
+    const source = resolveReviewableProspectPreviewSource({
+      digest: row.compositionDigest,
+      prospectId: row.prospectId,
+      slug: row.slug,
+    });
+    if (source === null) return { status: "not_found" };
+
+    return { status: "found", data: { prospectId: row.prospectId, source } };
   } catch {
     return {
       status: "error",

@@ -26,6 +26,7 @@
     "growth:seo-audits:daily": "tsx scripts/run-scheduled-seo-audit-agent.ts",
     "growth:previews:backfill": "tsx scripts/backfill-prospect-previews.ts",
     "growth:previews:backfill-pr": "tsx scripts/backfill-prospect-preview-pr.ts",
+    "growth:previews:reconcile-bespoke": "tsx scripts/reconcile-bespoke-prospect-previews.ts",
     "growth:previews:trigger-current-ten-drafts": "tsx scripts/trigger-current-ten-prospect-preview-drafts.ts",
     "growth:previews:trigger-current-ten": "tsx scripts/trigger-current-ten-prospect-preview-pr.ts",
     "growth:previews:trigger-evidence-refresh": "tsx scripts/trigger-current-thirteen-evidence-refresh.ts",

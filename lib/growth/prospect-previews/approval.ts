@@ -17,17 +17,16 @@ import {
   renderPreviewFirstEmail,
 } from "./content";
 import { getMergedProspectPreviewCompositionByProspectId } from "./compositions/manifest";
+import { prospectPreviewAssessmentSectionSchema } from "./types";
 import {
-  prospectPreviewAssessmentSectionSchema,
-} from "./types";
-import {
-  isPreviewSlug,
-  resolveKnownBespokePreviewSlug,
-} from "./preview-slugs";
+  resolveReviewableProspectPreviewSource,
+  type ReviewableProspectPreviewSource,
+} from "./reviewable-source";
 
 const PROSPECT_ID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const FOUNDER_ACTOR_ID_PATTERN = /^[0-9a-f]{64}$/;
+const PREVIEW_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const TERMINAL_PROSPECT_STATUSES = new Set([
   "won",
   "lost",
@@ -185,83 +184,40 @@ function readEmailNarrative(
 }
 
 function previewUrl(siteUrl: string, slug: string): string {
-  if (!isPreviewSlug(slug)) {
+  if (!PREVIEW_SLUG_PATTERN.test(slug)) {
     throw new ProspectPreviewApprovalError("not_publishable");
   }
   return new URL(`/preview/${slug}`, siteUrl).toString();
 }
 
-type ResolvedPreviewComposition = {
-  prospectId: string;
-  digest: string;
-};
-
-type ResolvedPreviewApprovalSource = {
-  expectedGenerationStatus:
-    | "merged_draft"
-    | "pending_pr"
-    | "composition_unavailable";
-  publishedGenerationStatus: "published" | "composition_unavailable";
-  slug: string;
-};
-
 type ProspectPreviewApproverDependencies = {
   repository: ProspectPreviewApprovalRepository;
   now?: () => Date;
   siteUrl?: string;
-  resolveComposition?: (
-    prospectId: string,
-  ) => ResolvedPreviewComposition | null;
+  resolveComposition?: (prospectId: string) => {
+    digest: string;
+    prospectId: string;
+    slug: string;
+  } | null;
+  resolveSource?: (input: {
+    digest: string | null;
+    prospectId: string;
+    slug: string | null;
+  }) => ReviewableProspectPreviewSource | null;
 };
-
-function resolvePreviewApprovalSource(
-  state: LockedProspectPreviewApprovalState,
-  resolveComposition: (
-    prospectId: string,
-  ) => ResolvedPreviewComposition | null,
-): ResolvedPreviewApprovalSource | null {
-  if (
-    state.preview.generationStatus === "merged_draft" &&
-    state.preview.slug !== null &&
-    state.preview.compositionDigest !== null
-  ) {
-    const composition = resolveComposition(state.prospect.id);
-    if (
-      composition !== null &&
-      composition.prospectId === state.prospect.id &&
-      composition.digest === state.preview.compositionDigest
-    ) {
-      return {
-        expectedGenerationStatus: "merged_draft",
-        publishedGenerationStatus: "published",
-        slug: state.preview.slug,
-      };
-    }
-  }
-
-  if (
-    state.preview.generationStatus === "pending_pr" ||
-    state.preview.generationStatus === "composition_unavailable"
-  ) {
-    const slug = resolveKnownBespokePreviewSlug(state.prospect.businessName);
-    if (slug === null) return null;
-    if (state.preview.slug !== null && state.preview.slug !== slug) return null;
-
-    return {
-      expectedGenerationStatus: state.preview.generationStatus,
-      publishedGenerationStatus: "composition_unavailable",
-      slug,
-    };
-  }
-
-  return null;
-}
 
 export function createProspectPreviewApprover({
   repository,
   now = () => new Date(),
   siteUrl = resolveSiteUrl(),
   resolveComposition = getMergedProspectPreviewCompositionByProspectId,
+  resolveSource = ({ digest, prospectId, slug }) =>
+    resolveReviewableProspectPreviewSource({
+      digest,
+      prospectId,
+      slug,
+      resolveComposition,
+    }),
 }: ProspectPreviewApproverDependencies) {
   return async function approve(
     db: GrowthDb,
@@ -285,11 +241,19 @@ export function createProspectPreviewApprover({
       ) {
         throw new ProspectPreviewApprovalError("not_publishable");
       }
-      const previewSource = resolvePreviewApprovalSource(
-        state,
-        resolveComposition,
-      );
-      if (previewSource === null) {
+      const previewSource = resolveSource({
+        digest: state.preview.compositionDigest,
+        prospectId: state.prospect.id,
+        slug: state.preview.slug,
+      });
+      if (
+        state.preview.generationStatus !== "merged_draft" ||
+        state.preview.slug === null ||
+        state.preview.compositionDigest === null ||
+        previewSource === null ||
+        previewSource.slug !== state.preview.slug ||
+        previewSource.digest !== state.preview.compositionDigest
+      ) {
         throw new ProspectPreviewApprovalError("not_publishable");
       }
 
@@ -318,7 +282,7 @@ export function createProspectPreviewApprover({
       const email = renderPreviewFirstEmail({
         subject: storedDraft.email.subject,
         narrative,
-        previewUrl: previewUrl(siteUrl, previewSource.slug),
+        previewUrl: previewUrl(siteUrl, state.preview.slug),
         optOutSentence: storedDraft.email.optOutSentence,
         conceptDisclaimer: storedDraft.email.conceptDisclaimer,
       });
@@ -344,11 +308,9 @@ export function createProspectPreviewApprover({
         expectedProspectVersion: input.expectedProspectVersion,
         previewId: state.preview.id,
         expectedPreviewVersion: input.expectedPreviewVersion,
-        expectedPreviewGenerationStatus:
-          previewSource.expectedGenerationStatus,
-        publishedPreviewGenerationStatus:
-          previewSource.publishedGenerationStatus,
-        previewSlug: previewSource.slug,
+        expectedPreviewGenerationStatus: "merged_draft",
+        publishedPreviewGenerationStatus: "published",
+        previewSlug: state.preview.slug,
         draftTaskId: state.draft.id,
         outputSnapshot,
         approvedAt,

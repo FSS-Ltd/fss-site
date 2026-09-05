@@ -2,6 +2,7 @@ const PREVIEW_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 const BESPOKE_PREVIEW_SLUGS_BY_BUSINESS_NAME = new Map(
   [
+    ["AccKent Accountants", "acckent-accountants"],
     ["Bridgland Roofing", "bridgland-roofing"],
     ["Bridgland Limited", "bridgland-roofing"],
     ["Bright Accounting Ltd", "bright-accounting"],
@@ -22,9 +23,12 @@ const BESPOKE_PREVIEW_SLUGS_BY_BUSINESS_NAME = new Map(
     ["Hill-Wood & Co. (Kent) Limited", "hill-wood"],
     ["Hollis Motors", "hollis-motors"],
     ["W. & G. Hollis Limited", "hollis-motors"],
+    ["Hosty Lets", "hosty-lets"],
     ["Jaguar Plumbing", "jaguar-plumbing"],
+    ["Jenkinson Estates", "jenkinson-estates"],
     ["Kemsing Motor Company", "kemsing-motor-company"],
     ["Kent Garage Equipment", "kent-garage-equipment"],
+    ["LeGrys", "legrys"],
     ["Marden Garage", "marden-garage"],
     ["MD Accountancy Team", "md-accountancy"],
     ["MD Accountancy Team Ltd", "md-accountancy"],

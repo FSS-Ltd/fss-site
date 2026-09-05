@@ -9,6 +9,7 @@ import {
   ProspectPreviewApprovalError,
   type ProspectPreviewApprovalRepository,
 } from "./approval";
+import { getReviewableBespokePreviewSourceBySlug } from "./reviewable-source";
 
 const PROSPECT_ID = "11111111-1111-4111-8111-111111111111";
 const PREVIEW_ID = "22222222-2222-4222-8222-222222222222";
@@ -152,7 +153,11 @@ function createRepository(status = "ready_for_email_review") {
 
 function resolveCurrentComposition(prospectId: string) {
   return prospectId === PROSPECT_ID
-    ? { prospectId: PROSPECT_ID, digest: COMPOSITION_DIGEST }
+    ? {
+        prospectId: PROSPECT_ID,
+        digest: COMPOSITION_DIGEST,
+        slug: PREVIEW_SLUG,
+      }
     : null;
 }
 
@@ -197,13 +202,14 @@ test("publishes a draft preview and revises only the stored first-email draft", 
   assert.equal(fake.state.audits.length, 1);
 });
 
-test("publishes a registered bespoke preview without a generated composition digest", async () => {
+test("publishes a matching stored bespoke source", async () => {
   const fake = createRepository();
-  Object.assign(fake.state.prospect, { businessName: "Bright Accounting" });
+  const source = getReviewableBespokePreviewSourceBySlug("acckent-accountants");
+  assert.ok(source);
   Object.assign(fake.state.preview, {
-    slug: null,
-    compositionDigest: null,
-    generationStatus: "composition_unavailable",
+    slug: source.slug,
+    compositionDigest: source.digest,
+    generationStatus: "merged_draft",
   });
   const approve = createProspectPreviewApprover({
     repository: fake.repository,
@@ -217,7 +223,7 @@ test("publishes a registered bespoke preview without a generated composition dig
   assert.equal(result.status, "published");
   assert.match(
     String((fake.state.savedSnapshots[0]?.email as { text?: unknown }).text),
-    /https:\/\/faithfulsoftware\.dev\/preview\/bright-accounting/,
+    /https:\/\/faithfulsoftware\.dev\/preview\/acckent-accountants/,
   );
   assert.deepEqual(
     {
@@ -228,37 +234,26 @@ test("publishes a registered bespoke preview without a generated composition dig
       previewSlug: fake.state.approvals[0]?.previewSlug,
     },
     {
-      expectedPreviewGenerationStatus: "composition_unavailable",
-      publishedPreviewGenerationStatus: "composition_unavailable",
-      previewSlug: "bright-accounting",
+      expectedPreviewGenerationStatus: "merged_draft",
+      publishedPreviewGenerationStatus: "published",
+      previewSlug: "acckent-accountants",
     },
   );
-  assert.equal(fake.state.preview.generationStatus, "composition_unavailable");
+  assert.equal(fake.state.preview.generationStatus, "published");
 });
 
-test("publishes a registered bespoke preview while generation reconciliation is pending", async () => {
-  for (const { businessName, slug } of [
-    { businessName: "PRIORITY POINT LIMITED", slug: "priority-point" },
-    { businessName: "BRIDGLAND LIMITED", slug: "bridgland-roofing" },
-    { businessName: "Hazel Motors (Gillingham) Limited", slug: "hazel-motors" },
-    { businessName: "Best Roofing Ltd", slug: "best-roofing" },
-    { businessName: "MD Accountancy Team Ltd", slug: "md-accountancy" },
-    { businessName: "HILL-WOOD & CO. (KENT) LIMITED", slug: "hill-wood" },
-    {
-      businessName: "Accountants of Kent Limited",
-      slug: "hilden-park-accountants",
-    },
-    {
-      businessName: "Tunbridge Wells Roofing Limited",
-      slug: "tunbridge-wells-roofing",
-    },
+test("rejects missing, mismatched, or stale bespoke source metadata", async () => {
+  const source = getReviewableBespokePreviewSourceBySlug("acckent-accountants");
+  assert.ok(source);
+  for (const preview of [
+    { slug: null, compositionDigest: null },
+    { slug: "hosty-lets", compositionDigest: source.digest },
+    { slug: source.slug, compositionDigest: "a".repeat(64) },
   ]) {
     const fake = createRepository();
-    Object.assign(fake.state.prospect, { businessName });
     Object.assign(fake.state.preview, {
-      slug: null,
-      compositionDigest: null,
-      generationStatus: "pending_pr",
+      ...preview,
+      generationStatus: "merged_draft",
     });
     const approve = createProspectPreviewApprover({
       repository: fake.repository,
@@ -267,27 +262,13 @@ test("publishes a registered bespoke preview while generation reconciliation is 
       resolveComposition: () => null,
     });
 
-    const result = await approve({} as GrowthDb, approvalInput());
-
-    assert.equal(result.status, "published");
-    assert.match(
-      String((fake.state.savedSnapshots[0]?.email as { text?: unknown }).text),
-      new RegExp(`https://faithfulsoftware\\.dev/preview/${slug}`),
+    await assert.rejects(
+      approve({} as GrowthDb, approvalInput()),
+      (error: unknown) =>
+        error instanceof ProspectPreviewApprovalError &&
+        error.code === "not_publishable",
     );
-    assert.deepEqual(
-      {
-        expectedPreviewGenerationStatus:
-          fake.state.approvals[0]?.expectedPreviewGenerationStatus,
-        publishedPreviewGenerationStatus:
-          fake.state.approvals[0]?.publishedPreviewGenerationStatus,
-        previewSlug: fake.state.approvals[0]?.previewSlug,
-      },
-      {
-        expectedPreviewGenerationStatus: "pending_pr",
-        publishedPreviewGenerationStatus: "composition_unavailable",
-        previewSlug: slug,
-      },
-    );
+    assert.equal(fake.state.approvals.length, 0);
   }
 });
 
