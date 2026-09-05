@@ -1,0 +1,86 @@
+/* Shared building blocks; each brand has its own composition and palette. */
+.variant-image {
+  position: relative;
+  overflow: hidden;
+  min-height: 320px;
+}
+.variant-image img {
+  object-fit: cover;
+}
+.variant-section-top {
+  max-width: 780px;
+  margin-bottom: 52px;
+}
+.variant-section-top h2,
+.variant-process h2,
+.variant-question h2,
+.variant-title {
+  font-size: clamp(36px, 5vw, 76px);
+  line-height: 1.04;
+  letter-spacing: -0.055em;
+  font-weight: 500;
+}
+.variant-service-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+.variant-service-grid article {
+  border-top: 1px solid currentColor;
+  padding-top: 26px;
+}
+.variant-service-grid h3 {
+  font-size: 26px;
+  line-height: 1.15;
+  margin: 35px 0 18px;
+  letter-spacing: -0.03em;
+}
+.variant-service-grid p,
+.variant-process p {
+  line-height: 1.75;
+  max-width: 42ch;
+  opacity: 0.8;
+}
+.variant-service-grid a {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 35px;
+  font-weight: 600;
+}
+.variant-process {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 90px;
+}
+.variant-process ol {
+  padding: 0;
+  list-style: none;
+}
+.variant-process li {
+  display: flex;
+  gap: 28px;
+  border-top: 1px solid currentColor;
+  padding: 26px 0;
+}
+.variant-process h3 {
+  font-size: 23px;
+  margin: 0 0 10px;
+}
+.variant-process .example-text-link {
+  display: inline-block;
+  margin-top: 32px;
+}
+.variant-question {
+  max-width: 1000px;
+  margin: auto;
+  text-align: center;
+}
+.variant-question > p:not(.example-eyebrow) {
+  max-width: 65ch;
+  margin: 28px auto;
+  line-height: 1.8;
+}
+.example-site em {
+  font-family: Georgia, serif;
+  font-weight: 400;
+}

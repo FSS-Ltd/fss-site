@@ -1,0 +1,185 @@
+.example-design-crownline-roofing {
+  --example-bg: #f3f2e9;
+  --example-ink: #22241e;
+  --example-accent: #e8ed38;
+}
+.example-design-crownline-roofing .example-button {
+  background: #e8ed38;
+  color: #22241e;
+}
+.crown-hero {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 6vw;
+  padding: 65px 5vw 70px;
+}
+.crown-hero h1 {
+  font-size: clamp(55px, 7.1vw, 115px);
+  font-weight: 850;
+  line-height: 0.94;
+  letter-spacing: -0.065em;
+  margin: 34px 0;
+}
+.crown-hero h1 span {
+  color: #737667;
+}
+.crown-hero > div > p:not(.example-eyebrow) {
+  max-width: 43ch;
+  line-height: 1.7;
+  margin-bottom: 30px;
+}
+.crown-hero-right {
+  display: grid;
+  grid-template-rows: 1fr auto;
+}
+.crown-hero .variant-image {
+  min-height: 310px;
+}
+.crown-quick {
+  background: #e8ed38;
+  padding: 28px;
+}
+.crown-quick a {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid #2225;
+  padding: 14px 0;
+}
+.crown-strip {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  background: #22241e;
+  color: #e8ed38;
+  padding: 26px 5vw;
+}
+.example-design-crownline-roofing .variant-question {
+  background: #e7e7dd;
+  max-width: none;
+}
+.example-design-slate-house {
+  background: #ebe9e3;
+  color: #292c2b;
+}
+.example-design-slate-house .example-button {
+  background: #343b36;
+  color: #fff;
+}
+.slate-hero {
+  padding: 50px 5vw 0;
+}
+.slate-hero h1 {
+  font-size: clamp(62px, 8.2vw, 132px);
+  line-height: 0.98;
+  font-weight: 400;
+  letter-spacing: -0.055em;
+  margin: 35px 0;
+}
+.slate-hero-caption {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  margin: 30px 0;
+  line-height: 1.7;
+}
+.slate-hero .variant-image {
+  height: 550px;
+}
+.slate-image-index {
+  display: block;
+  margin-top: 18px;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+}
+.slate-statement {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 40px;
+}
+.slate-statement h2 {
+  font-size: clamp(40px, 5.5vw, 82px);
+  font-weight: 400;
+  letter-spacing: -0.05em;
+  line-height: 1.08;
+  margin: 0;
+}
+.slate-statement > p:last-child {
+  grid-column: 2;
+  max-width: 52ch;
+  line-height: 1.8;
+}
+.slate-materials {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: #323b35;
+  color: #e6e6d9;
+  padding: 75px 5vw;
+  gap: 50px;
+}
+.slate-materials h3 {
+  font:
+    35px Georgia,
+    serif;
+  margin: 50px 0 20px;
+}
+.slate-materials p {
+  line-height: 1.7;
+  opacity: 0.8;
+}
+.example-design-northfield-roofing {
+  background: #f6f3e8;
+  color: #16382c;
+}
+.example-design-northfield-roofing .example-button {
+  background: #183e2f;
+  color: #fff;
+}
+.northfield-hero {
+  padding: 60px 5vw 90px;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 6vw;
+  align-items: center;
+}
+.northfield-hero h1 {
+  font-size: clamp(55px, 6vw, 91px);
+  line-height: 1.02;
+  letter-spacing: -0.055em;
+  margin: 35px 0;
+}
+.northfield-hero > div > p:not(.example-eyebrow) {
+  line-height: 1.8;
+  max-width: 43ch;
+  margin-bottom: 30px;
+}
+.northfield-hero .variant-image {
+  height: 580px;
+  border-radius: 220px 220px 24px 24px;
+}
+.northfield-checks {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 30px;
+  font-size: 13px;
+}
+.northfield-start {
+  background: #e5e8ba;
+  padding: 45px 5vw;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+}
+.northfield-start h2 {
+  font-size: clamp(28px, 3vw, 44px);
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+  margin: 16px 0;
+}
+.example-design-northfield-roofing .variant-service-grid article {
+  background: #eeeddd;
+  border: 0;
+  padding: 30px;
+  border-radius: 20px;
+}

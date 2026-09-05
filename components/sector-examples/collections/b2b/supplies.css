@@ -1,0 +1,366 @@
+.orbit-supply {
+  --b2b-ink: #293b30;
+  --b2b-paper: #eeefdf;
+}
+.folio-hero {
+  padding: 55px 6vw 25px;
+  position: relative;
+  min-height: 810px;
+}
+.folio-hero h1 {
+  position: relative;
+  z-index: 2;
+  max-width: 850px;
+}
+.folio-hero > p:not(.example-eyebrow) {
+  max-width: 360px;
+  margin: 25px 0;
+  position: relative;
+  z-index: 2;
+}
+.folio-hero > .b2b-button {
+  position: relative;
+  z-index: 2;
+}
+.folio-hero .b2b-scroll-story {
+  position: absolute;
+  width: 60%;
+  right: -2%;
+  top: 170px;
+}
+.folio-hero .b2b-supply-objects {
+  height: 520px;
+}
+.folio-bottom {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.64rem;
+  letter-spacing: 0.1em;
+  border-top: 1px solid #293b3033;
+  position: absolute;
+  bottom: 25px;
+  left: 6vw;
+  right: 6vw;
+  padding-top: 22px;
+}
+.folio-statement {
+  background: #dbe8bc;
+  padding: 100px 10vw;
+  display: grid;
+  grid-template-columns: 1.3fr 0.7fr;
+  gap: 30px 70px;
+}
+.folio-statement > .example-eyebrow {
+  grid-column: 1/-1;
+}
+.folio-statement > p:last-child {
+  align-self: end;
+  font-size: 1rem;
+  max-width: 340px;
+}
+.supply-index {
+  --b2b-ink: #1b3761;
+  --b2b-paper: #f4f5f1;
+}
+.index-hero {
+  padding: 30px 6vw 90px;
+}
+.index-masthead {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #1b376133;
+  padding-bottom: 20px;
+  font-size: 0.67rem;
+  letter-spacing: 0.12em;
+}
+.index-hero-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 7vw;
+  padding-top: 70px;
+  align-items: center;
+}
+.index-hero h1 {
+  font-size: clamp(3.4rem, 6vw, 6.5rem);
+}
+.index-hero h1 em {
+  color: #326cc0;
+}
+.index-hero-grid > div > p:not(.example-eyebrow) {
+  max-width: 450px;
+  margin: 27px 0;
+}
+.index-spec {
+  padding: 35px;
+  background: #e3e9ef;
+  transform: rotate(2deg);
+  box-shadow: 9px 12px 0 #1b376110;
+}
+.index-spec h2 {
+  font-size: 2.4rem;
+}
+.index-spec dl {
+  margin: 35px 0 0;
+}
+.index-spec dl > div {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-top: 1px solid #1b376133;
+  gap: 15px;
+  font-size: 0.8rem;
+}
+.index-spec dd {
+  margin: 0;
+  text-align: right;
+}
+.index-comparison {
+  padding: 85px 12vw;
+  background: #1b3761;
+  color: #f4f5f1;
+}
+.index-comparison > p:not(.example-eyebrow) {
+  max-width: 640px;
+  margin: 25px 0;
+}
+.index-comparison > a {
+  font-size: 0.85rem;
+}
+.commonplace-office {
+  --b2b-ink: #542e24;
+  --b2b-paper: #f6f0e5;
+}
+.commonplace-hero {
+  padding: 50px 6vw 0;
+}
+.commonplace-title {
+  text-align: center;
+  margin-bottom: 45px;
+}
+.commonplace-title h1 {
+  font-family: Georgia, serif;
+  font-size: clamp(3.6rem, 7vw, 7rem);
+  letter-spacing: -0.06em;
+}
+.commonplace-title em {
+  color: #a84730;
+}
+.commonplace-cover {
+  background: #dcb69b;
+  position: relative;
+  min-height: 530px;
+}
+.commonplace-cover .b2b-supply-objects {
+  max-width: 800px;
+  margin: auto;
+}
+.commonplace-cover .b2b-notebook {
+  background: #7c8261;
+  box-shadow:
+    inset 11px 0 0 #626947,
+    12px 25px 25px #1f322b20;
+}
+.commonplace-cover .b2b-notebook span {
+  color: #f6f0e5;
+}
+.commonplace-cover .b2b-object-caption {
+  display: none;
+}
+.commonplace-cover > p {
+  position: absolute;
+  bottom: 27px;
+  left: 35px;
+  font-family: Georgia, serif;
+  font-size: 1.05rem;
+}
+.commonplace-intro {
+  padding: 35px 0;
+  display: grid;
+  grid-template-columns: 0.7fr 1.3fr 0.6fr;
+  gap: 50px;
+  align-items: start;
+}
+.commonplace-intro > span {
+  font-size: 0.6rem;
+  letter-spacing: 0.09em;
+}
+.commonplace-intro > p {
+  font-size: 1rem;
+}
+.commonplace-intro > a {
+  font-size: 0.8rem;
+}
+.commonplace-manifesto {
+  padding: 100px 15vw;
+  text-align: center;
+  border-top: 1px solid #542e2429;
+}
+.commonplace-star {
+  display: block;
+  font-size: 3.5rem;
+  margin-bottom: 35px;
+  color: #a84730;
+}
+.commonplace-manifesto h2 {
+  font-family: Georgia, serif;
+  font-size: clamp(3rem, 6vw, 6rem);
+}
+.commonplace-manifesto > p {
+  max-width: 480px;
+  margin: 30px auto 0;
+}
+.commonplace-office .b2b-guides {
+  background: #eadfd1;
+}
+.desk-ready {
+  --b2b-ink: #253c35;
+  --b2b-paper: #f4f7ef;
+}
+.desk-hero {
+  padding: 80px 6vw;
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 7vw;
+  align-items: center;
+}
+.desk-hero h1 {
+  font-size: clamp(3.2rem, 6vw, 6rem);
+}
+.desk-hero h1 > span {
+  color: #598267;
+}
+.desk-hero > div > p:not(.example-eyebrow) {
+  max-width: 480px;
+  margin: 25px 0;
+}
+.desk-demo {
+  display: block;
+  font-size: 0.66rem;
+  opacity: 0.8;
+  margin-top: 15px;
+}
+.desk-checklist {
+  background: #e0edcd;
+  padding: 35px;
+  border-radius: 12px;
+  box-shadow: 0 18px 40px #253c3510;
+}
+.desk-checklist-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  margin-bottom: 35px;
+}
+.desk-checklist h2 {
+  font-size: 2rem;
+}
+.desk-checklist ol {
+  padding: 0;
+  list-style: none;
+  margin: 30px 0;
+}
+.desk-checklist li {
+  padding: 18px 0;
+  border-top: 1px solid #253c3529;
+  font-size: 0.86rem;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.desk-checklist li span {
+  font-size: 0.62rem;
+  border: 1px solid #253c3544;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  display: grid;
+  place-items: center;
+}
+.desk-checklist > a {
+  font-size: 0.87rem;
+}
+.desk-route-strip {
+  display: flex;
+  justify-content: space-around;
+  gap: 20px;
+  padding: 25px 6vw;
+  border-top: 1px solid #253c3522;
+  font-size: 0.75rem;
+}
+.desk-ready .example-enquiry {
+  border-radius: 20px 20px 0 0;
+}
+@media (max-width: 760px) {
+  .folio-hero {
+    min-height: 900px;
+    padding-top: 40px;
+  }
+  .folio-hero .b2b-scroll-story {
+    position: relative;
+    right: auto;
+    top: auto;
+    width: 110%;
+    margin: 15px -5% 0;
+  }
+  .folio-hero .b2b-supply-objects {
+    height: 350px;
+  }
+  .folio-bottom > span {
+    max-width: 180px;
+    line-height: 1.6;
+  }
+  .folio-statement {
+    padding: 65px 6vw;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .folio-statement > .example-eyebrow {
+    grid-column: auto;
+  }
+  .index-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 45px;
+    padding-top: 45px;
+  }
+  .index-masthead > span:last-child {
+    display: none;
+  }
+  .index-spec {
+    transform: none;
+  }
+  .index-comparison {
+    padding: 60px 6vw;
+  }
+  .commonplace-cover {
+    min-height: 430px;
+  }
+  .commonplace-cover .b2b-supply-objects {
+    height: 350px;
+  }
+  .commonplace-cover > p {
+    font-size: 0.9rem;
+    left: 22px;
+    bottom: 20px;
+  }
+  .commonplace-intro {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .commonplace-manifesto {
+    padding: 60px 6vw;
+  }
+  .desk-hero {
+    grid-template-columns: 1fr;
+    padding-top: 50px;
+    gap: 40px;
+  }
+  .desk-checklist {
+    padding: 26px;
+  }
+  .desk-route-strip {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 15px 25px;
+  }
+}

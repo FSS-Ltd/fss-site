@@ -1,0 +1,180 @@
+@import "tailwindcss" source(none);
+@source "../../components/prospect-previews/bespoke/prospects/roof-build-scroll-hero.tsx";
+@source "../../components/prospect-previews/bespoke/prospects/property-walkthrough-hero.tsx";
+
+/* Scoped presentation for the existing scroll heroes; bespoke concepts remain unchanged. */
+.example-roof [data-roof-build-scroll] {
+  min-height: 78svh;
+}
+.example-roof [data-roof-build-scroll-frame] {
+  position: relative;
+  isolation: isolate;
+  min-height: 78svh;
+  overflow: hidden;
+  background: #20291f;
+}
+.example-roof [data-roof-build-scroll-video] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+}
+.example-roof [data-roof-build-scroll-shade] {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, #172016dd, #17201670 55%, #17201622),
+    linear-gradient(0deg, #172016a8, transparent 70%);
+}
+.example-roof [data-roof-build-scroll-copy] {
+  --roof-build-progress: 0;
+  min-height: 90svh;
+  max-width: none;
+  padding-left: 6.5%;
+  padding-right: 6.5%;
+  padding-bottom: 70px;
+}
+.example-roof [data-roof-build-scroll] h1 {
+  font-weight: 500;
+  font-size: clamp(3.5rem, 8.2vw, 8.4rem);
+  max-width: 9ch;
+  line-height: 0.96;
+  letter-spacing: -0.065em;
+}
+.example-roof [data-roof-build-scroll] p:not(.sr-only) {
+  font-size: 15px;
+  line-height: 1.8;
+  max-width: 470px;
+}
+.example-roof
+  [data-roof-build-scroll]
+  [data-prospect-hero-copy]
+  > p:first-child {
+  font-size: 10px;
+  letter-spacing: 0.17em;
+}
+.example-roof [data-roof-build-scroll-progress-track] {
+  height: 2px;
+  background: #ffffff40;
+}
+.example-roof [data-roof-build-scroll-progress-fill] {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #e9a68c;
+  transform: scaleX(var(--roof-build-progress));
+  transform-origin: left;
+}
+.example-roof [data-roof-build-scroll-beat] {
+  opacity: 0.6;
+}
+.example-roof
+  [data-roof-build-active-beat="0"]
+  [data-roof-build-scroll-beat="0"],
+.example-roof
+  [data-roof-build-active-beat="1"]
+  [data-roof-build-scroll-beat="1"],
+.example-roof
+  [data-roof-build-active-beat="2"]
+  [data-roof-build-scroll-beat="2"] {
+  opacity: 1;
+}
+.example-estate [data-property-walkthrough] h1,
+.example-estate [data-property-walkthrough-copy-beat] > p:nth-child(2) {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+  letter-spacing: -0.055em;
+  max-width: 11ch;
+  font-size: clamp(3.7rem, 7.4vw, 7.5rem);
+  line-height: 1.02;
+}
+.example-estate [data-property-walkthrough-copy-beat] > p:last-child {
+  font-size: 15px;
+  line-height: 1.9;
+  max-width: 460px;
+}
+.example-estate [data-property-walkthrough] > div > div.relative {
+  max-width: none;
+  padding-left: 6.5%;
+  padding-bottom: 130px;
+}
+.example-estate [data-property-walkthrough] > div > a {
+  left: 6.5%;
+  border-radius: 2px;
+  font-weight: 500;
+  font-size: 12px;
+}
+.example-estate [data-property-walkthrough] > div > span {
+  right: 6.5%;
+  font-weight: 400;
+  font-size: 10px;
+  border: 0;
+  background: none;
+  backdrop-filter: none;
+}
+.example-estate [data-property-walkthrough-copy-beat] > p:first-child {
+  font-family: Arial, sans-serif;
+  font-weight: 500;
+  font-size: 10px;
+}
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .example-roof [data-roof-build-scroll] {
+    height: 280svh;
+    position: relative;
+  }
+  .example-roof [data-roof-build-scroll-frame] {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+  }
+  .example-roof [data-roof-build-scroll-copy] {
+    min-height: 100svh;
+  }
+}
+@media (max-width: 767px) {
+  .example-roof [data-roof-build-scroll-copy] {
+    padding-bottom: 45px;
+    min-height: 80svh;
+  }
+  .example-roof [data-roof-build-scroll] h1 {
+    font-size: clamp(3.5rem, 13vw, 5.5rem);
+  }
+  .example-roof [data-roof-build-scroll] p:not(.sr-only) {
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .example-roof [data-roof-build-scroll-beats] {
+    display: flex;
+    gap: 15px;
+  }
+  .example-roof [data-roof-build-scroll-beats] p {
+    font-size: 10px;
+  }
+  .example-estate [data-property-walkthrough] h1 {
+    font-size: clamp(3rem, 12vw, 4.8rem);
+  }
+  .example-estate [data-property-walkthrough] > div > span {
+    display: none;
+  }
+  .example-estate [data-property-walkthrough] > div > div.relative {
+    padding-bottom: 110px;
+  }
+  .example-estate [data-property-walkthrough-copy-beat] > p:last-child {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 767px) {
+  .example-estate [data-property-walkthrough] {
+    height: max(650px, calc(100svh - 134px));
+  }
+  .example-estate [data-property-walkthrough] > div {
+    height: 100%;
+  }
+  .example-estate [data-property-walkthrough] > div > div.relative {
+    height: 100%;
+  }
+}

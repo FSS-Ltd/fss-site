@@ -1,3 +1,4 @@
+import { renderSectorExampleFirstEmail } from "../../sector-examples/first-email";
 import { resolveSiteUrl } from "@/lib/config/site-url";
 
 import type { FounderSession } from "../auth/require-founder";
@@ -37,6 +38,7 @@ const TERMINAL_PROSPECT_STATUSES = new Set([
 export type LockedProspectPreviewApprovalState = {
   prospect: {
     businessName: string;
+    sector?: string;
     id: string;
     status: string;
     version: number;
@@ -279,13 +281,22 @@ export function createProspectPreviewApprover({
         storedDraft.snapshot,
         state.assessment,
       );
-      const email = renderPreviewFirstEmail({
+      const emailInput = {
         subject: storedDraft.email.subject,
         narrative,
         previewUrl: previewUrl(siteUrl, state.preview.slug),
         optOutSentence: storedDraft.email.optOutSentence,
         conceptDisclaimer: storedDraft.email.conceptDisclaimer,
-      });
+      };
+      const email =
+        state.prospect.sector !== undefined
+          ? renderSectorExampleFirstEmail({
+              ...emailInput,
+              sector: state.prospect.sector,
+              businessName: state.prospect.businessName,
+              siteUrl,
+            })
+          : renderPreviewFirstEmail(emailInput);
       const approvedAt = now();
       const emailDraftVersion = storedDraft.version + 1;
       const revision: RevisionRecord = {

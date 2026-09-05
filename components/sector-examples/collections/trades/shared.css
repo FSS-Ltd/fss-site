@@ -1,0 +1,171 @@
+.trade-site {
+  --trade-ink: #172d30;
+  --trade-paper: #f3f0e8;
+  --trade-accent: #bce8d1;
+  background: var(--trade-paper);
+  color: var(--trade-ink);
+}
+.trade-site h1,
+.trade-site h2,
+.trade-site h3,
+.trade-site p {
+  margin: 0;
+}
+.trade-site h1 {
+  font-size: clamp(3.5rem, 7.5vw, 8rem);
+  line-height: 0.98;
+  letter-spacing: -0.065em;
+  font-weight: 500;
+}
+.trade-site h2 {
+  font-size: clamp(2rem, 4vw, 4rem);
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+  font-weight: 500;
+}
+.trade-site p {
+  line-height: 1.7;
+}
+.trade-site em {
+  font-family: Georgia, serif;
+  font-weight: 400;
+}
+.trade-kicker {
+  font-size: 0.7rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.trade-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 1rem 1.4rem;
+  background: var(--trade-ink);
+  color: var(--trade-paper);
+  border-radius: 2px;
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: transform 0.2s;
+}
+.trade-action:hover {
+  transform: translateY(-3px);
+}
+.trade-site a:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 5px;
+}
+.trade-site .variant-image {
+  position: relative;
+  overflow: hidden;
+  min-height: 280px;
+}
+.trade-site .variant-image img {
+  object-fit: cover;
+}
+.trade-intro {
+  padding: 7rem 8%;
+  max-width: 1000px;
+}
+.trade-intro h2 {
+  margin: 1.6rem 0;
+}
+.trade-intro > p:last-child {
+  max-width: 530px;
+}
+.trade-site .variant-services,
+.trade-site .variant-process,
+.trade-site .example-enquiry {
+  background: var(--trade-paper);
+  color: var(--trade-ink);
+}
+.trade-site .variant-services h2,
+.trade-site .variant-process h2 {
+  max-width: 750px;
+}
+.trade-site .variant-service-grid {
+  border-top: 1px solid color-mix(in srgb, var(--trade-ink) 25%, transparent);
+}
+.trade-site .variant-service-grid article {
+  background: transparent;
+  border-radius: 0;
+}
+.trade-site .example-enquiry-panel {
+  background: color-mix(in srgb, var(--trade-ink) 5%, var(--trade-paper));
+  color: var(--trade-ink);
+}
+.trade-site .example-button {
+  background: var(--trade-ink);
+  color: var(--trade-paper);
+}
+.trade-small {
+  font-size: 0.72rem;
+}
+.trade-story {
+  padding: 2rem 8% 5rem;
+  --journey: 1;
+}
+.trade-story svg {
+  width: 100%;
+  height: 200px;
+  overflow: visible;
+}
+.trade-story path {
+  stroke: currentColor;
+  stroke-width: 2;
+  opacity: 0.2;
+}
+.trade-story .trade-story-current {
+  stroke: var(--trade-accent);
+  stroke-width: 5;
+  opacity: 1;
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(1 - var(--journey));
+}
+.trade-story-captions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+.trade-story-captions p {
+  font-size: 1.2rem;
+}
+.trade-story-captions span {
+  display: block;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 0.7rem;
+}
+@media (max-width: 760px) {
+  .trade-site h1 {
+    font-size: clamp(3.1rem, 12vw, 5.5rem);
+  }
+  .trade-intro {
+    padding: 4rem 6%;
+  }
+  .trade-story {
+    padding: 1rem 6% 3rem;
+  }
+  .trade-story-captions {
+    gap: 1rem;
+  }
+  .trade-story-captions p {
+    font-size: 0.85rem;
+  }
+  .trade-story svg {
+    height: 120px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .trade-action {
+    transition: none;
+  }
+  .trade-action:hover {
+    transform: none;
+  }
+  .trade-story .trade-story-current {
+    stroke-dashoffset: 0;
+  }
+}

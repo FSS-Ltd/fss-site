@@ -1,0 +1,134 @@
+/* Ridge & Vale: structural lines, warm masonry and generous technical space. */
+.example-roof {
+  --paper: #f2efe6;
+  --ink: #292c25;
+  --accent: #a84329;
+}
+.roof-title-band {
+  padding: 25px 3.5%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.roof-title-band > span {
+  font-size: 11px;
+  text-align: right;
+  line-height: 1.4;
+}
+.roof-spec-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 30px 6.5%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+}
+.roof-spec-strip span {
+  padding-left: 20px;
+  border-left: 1px solid #ffffff60;
+}
+.roof-services {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-block: 1px solid var(--line);
+}
+.roof-services article {
+  padding: 35px 30px 35px 0;
+}
+.roof-services article + article {
+  padding-left: 30px;
+  border-left: 1px solid var(--line);
+}
+.roof-services h3 {
+  margin: 26px 0 16px;
+  max-width: 260px;
+}
+.roof-services article > p {
+  font-size: 14px;
+  line-height: 1.8;
+  min-height: 100px;
+}
+.roof-services a {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  padding-top: 24px;
+  margin-top: 24px;
+  border-top: 1px solid var(--line);
+}
+.roof-line-art {
+  height: 130px;
+  position: relative;
+  margin: 30px 0 0;
+  overflow: hidden;
+}
+.roof-line-art i {
+  display: block;
+  position: absolute;
+  left: calc(50% - 70px);
+  top: 45px;
+  width: 140px;
+  height: 80px;
+  border: 1px solid var(--accent);
+  transform: rotate(-27deg) skewX(35deg);
+}
+.roof-line-art i:nth-child(2) {
+  top: 31px;
+}
+.roof-line-art i:nth-child(3) {
+  top: 17px;
+}
+.roof-art-02 i:nth-child(2) {
+  top: 10px;
+}
+.roof-art-02 i:nth-child(3) {
+  top: 70px;
+}
+.roof-art-03 i {
+  transform: rotate(-15deg) skewX(35deg);
+  width: 170px;
+  height: 45px;
+}
+.roof-story {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #e4e0d4;
+}
+.roof-story-image {
+  position: relative;
+  min-height: 700px;
+}
+.roof-story-image img {
+  object-fit: cover;
+}
+.roof-story-copy {
+  padding: 80px 13%;
+}
+.roof-story-copy h2 {
+  font-size: clamp(2.7rem, 4vw, 4.6rem);
+  margin: 30px 0 50px;
+}
+.roof-story ol {
+  list-style: none;
+  padding: 0;
+}
+.roof-story li {
+  display: flex;
+  gap: 28px;
+  padding: 26px 0;
+  border-top: 1px solid var(--line);
+}
+.roof-story li > span {
+  color: var(--accent);
+  font-size: 12px;
+}
+.roof-story li h3 {
+  font-size: 20px;
+  margin: 0 0 10px;
+  letter-spacing: -0.03em;
+}
+.roof-story li p {
+  font-size: 13px;
+  line-height: 1.8;
+}

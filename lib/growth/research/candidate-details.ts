@@ -1,3 +1,5 @@
+import { resolveSiteUrl } from "../../config/site-url";
+import { renderSectorExampleFirstEmail } from "../../sector-examples/first-email";
 import type { GrowthTransaction } from "../db/types";
 import type { InsertCandidateDetailsInput } from "./repository-types";
 
@@ -121,7 +123,14 @@ export async function insertCandidateDetails(
   };
   const outputSnapshot = {
     schemaVersion: "1.0",
-    email: candidate.firstEmail,
+    email: renderSectorExampleFirstEmail({
+      ...candidate.firstEmail,
+      narrative: candidate.emailNarrative,
+      sector: candidate.business.sector,
+      businessName: candidate.business.legalName,
+      siteUrl: resolveSiteUrl(),
+    }),
+    sector: candidate.business.sector,
     emailNarrative: candidate.emailNarrative,
     visual,
   };

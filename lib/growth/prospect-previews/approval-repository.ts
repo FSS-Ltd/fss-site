@@ -27,6 +27,7 @@ function createTransaction(
       const rows = await transaction<
         Array<{
           businessName: string;
+          sector: string;
           prospectId: string;
           prospectStatus: string;
           prospectVersion: number;
@@ -50,6 +51,7 @@ function createTransaction(
         select
           p.id as "prospectId",
           coalesce(b.trading_name, b.legal_name) as "businessName",
+          b.sector,
           p.status as "prospectStatus",
           p.version as "prospectVersion",
           pp.id as "previewId",
@@ -101,6 +103,7 @@ function createTransaction(
       return {
         prospect: {
           businessName: row.businessName,
+          sector: row.sector,
           id: row.prospectId,
           status: row.prospectStatus,
           version: row.prospectVersion,

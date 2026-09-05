@@ -1,0 +1,567 @@
+.fa-site {
+  --fa-ink: #232b31;
+  --fa-paper: #f0eee7;
+  --fa-accent: #455bca;
+  background: var(--fa-paper);
+  color: var(--fa-ink);
+}
+.fa-site h1,
+.fa-site h2,
+.fa-site p {
+  margin: 0;
+}
+.fa-site h1 {
+  font-size: clamp(3.5rem, 7.5vw, 8rem);
+  line-height: 1.02;
+  letter-spacing: -0.055em;
+  font-weight: 500;
+}
+.fa-site h2 {
+  font-size: clamp(2rem, 3.7vw, 4rem);
+  line-height: 1.12;
+  letter-spacing: -0.04em;
+  font-weight: 500;
+}
+.fa-site em {
+  font-family: Georgia, serif;
+  font-weight: 400;
+}
+.fa-site p {
+  line-height: 1.7;
+}
+.fa-eyebrow {
+  font-size: 0.68rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.fa-button {
+  display: inline-flex;
+  gap: 2rem;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: var(--fa-ink);
+  color: var(--fa-paper);
+  font-size: 0.82rem;
+  text-decoration: none;
+  margin-top: 2rem;
+  transition: transform 0.2s;
+}
+.fa-button:hover {
+  transform: translateY(-3px);
+}
+.fa-site a:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 5px;
+}
+.fa-site .variant-image {
+  position: relative;
+  overflow: hidden;
+  min-height: 300px;
+}
+.fa-site .variant-image img {
+  object-fit: cover;
+}
+.fa-site .variant-services,
+.fa-site .variant-process,
+.fa-site .example-enquiry {
+  background: var(--fa-paper);
+  color: var(--fa-ink);
+}
+.fa-site .variant-service-grid article {
+  background: transparent;
+  border-radius: 0;
+}
+.fa-site .example-enquiry-panel {
+  background: color-mix(in srgb, var(--fa-ink) 6%, var(--fa-paper));
+  color: var(--fa-ink);
+}
+.fa-site .example-button {
+  background: var(--fa-ink);
+  color: var(--fa-paper);
+}
+.unfold {
+  --fa-paper: #e9e4d8;
+  --fa-ink: #273944;
+}
+.unfold-hero {
+  position: relative;
+  isolation: isolate;
+  min-height: 760px;
+  padding: 5rem 7%;
+  display: flex;
+  align-items: center;
+}
+.unfold-hero > .variant-image {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+}
+.unfold-hero:after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: linear-gradient(90deg, #e9e4d8ed, #e9e4d8a6 44%, transparent);
+  z-index: -1;
+}
+.unfold-hero h1 {
+  margin: 2rem 0;
+}
+.unfold-hero h1 em {
+  font-size: 0.8em;
+}
+.unfold-caption {
+  position: absolute;
+  bottom: 2rem;
+  right: 6%;
+  font-size: 0.7rem;
+}
+.fa-motion {
+  --progress: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  padding: 7rem 7%;
+  align-items: center;
+}
+.fa-motion-copy h2 {
+  margin: 2rem 0;
+}
+.fa-motion-art {
+  position: relative;
+  min-height: 380px;
+  perspective: 900px;
+  display: grid;
+  place-items: center;
+}
+.fa-motion-unfold .fa-motion-art i {
+  position: absolute;
+  width: 55%;
+  height: 65%;
+  border: 1px solid #506987;
+  background: linear-gradient(130deg, #ffffff90, #b8c6da40);
+  transform: translateX(calc((var(--progress) - 0.5) * 70px))
+    rotateY(calc(var(--progress) * -30deg));
+  box-shadow: 7px 10px 20px #1e33531a;
+}
+.fa-motion-unfold .fa-motion-art i:nth-child(2) {
+  margin-left: -65px;
+  transform: rotateY(-25deg);
+}
+.fa-motion-unfold .fa-motion-art i:nth-child(3) {
+  margin-left: 65px;
+  transform: rotateY(-20deg);
+}
+.fa-motion-unfold .fa-motion-art i:nth-child(4) {
+  margin-left: 130px;
+  transform: rotateY(-15deg);
+}
+.fa-motion-unfold .fa-motion-art i:nth-child(5) {
+  margin-left: -130px;
+  transform: rotateY(-30deg);
+}
+.fa-motion-art > span {
+  z-index: 1;
+  font-family: Georgia, serif;
+  font-size: 3rem;
+}
+.ledger {
+  --fa-ink: #28394a;
+  --fa-paper: #eeeee7;
+}
+.ledger-finance-top {
+  padding: 3rem 7%;
+}
+.ledger-finance-top h1 {
+  font-family: Georgia, serif;
+  margin: 3rem 0;
+}
+.ledger-finance-deck {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  border-top: 1px solid #adb6bc;
+  border-bottom: 1px solid #adb6bc;
+  padding: 1.5rem 0;
+}
+.ledger-finance-deck > span {
+  font-size: 0.8rem;
+}
+.ledger-finance-feature {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 4rem;
+  padding: 2rem 7% 5rem;
+  align-items: center;
+}
+.ledger-finance-feature h2 {
+  font-family: Georgia, serif;
+  margin: 2rem 0;
+}
+.ledger-finance-feature .variant-image {
+  height: 430px;
+}
+.north-numbers {
+  --fa-ink: #263d36;
+  --fa-paper: #edf0e7;
+}
+.north-hero {
+  padding: 5rem 7%;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 5rem;
+  align-items: center;
+}
+.north-hero h1 {
+  margin: 2rem 0;
+}
+.north-hero > div > p {
+  max-width: 430px;
+}
+.north-hero .fa-button {
+  border-radius: 50px;
+}
+.north-portrait {
+  position: relative;
+  padding-bottom: 3rem;
+}
+.north-portrait .variant-image {
+  height: 520px;
+  border-radius: 48% 48% 8px 8px;
+}
+.north-note {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  position: absolute;
+  bottom: 0;
+  left: -2rem;
+  background: #d8e88e;
+  padding: 1.5rem 2rem;
+  border-radius: 8px;
+}
+.north-note > span {
+  font-size: 3rem;
+}
+.north-note p {
+  font-size: 0.9rem;
+}
+.north-prompts {
+  padding: 3rem 7%;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 3rem;
+  border-top: 1px solid #b8c4b5;
+}
+.north-prompts a {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  text-decoration: none;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid #b8c4b5;
+  font-size: 1.2rem;
+}
+.torque {
+  --fa-ink: #eeeae3;
+  --fa-paper: #161818;
+  --fa-accent: #ef5934;
+}
+.torque-hero {
+  position: relative;
+  isolation: isolate;
+  min-height: 760px;
+  padding: 5rem 6%;
+}
+.torque-hero > .variant-image {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+}
+.torque-hero:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #090b0bee, #090b0b6b 60%, transparent);
+  z-index: -1;
+}
+.torque-hero h1 {
+  font-size: clamp(4rem, 8.4vw, 9rem);
+  font-weight: 700;
+  margin: 3rem 0 2rem;
+}
+.torque-hero h1 em {
+  font-family: inherit;
+  font-style: normal;
+  color: #ef5934;
+}
+.torque .fa-button {
+  background: #ef5934;
+  color: #151616;
+}
+.torque-marker {
+  display: block;
+  margin-top: 4rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+}
+.fa-dial {
+  width: 300px;
+  aspect-ratio: 1;
+  border: 1px solid #77807c;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  position: relative;
+  background: repeating-conic-gradient(
+    from 0deg,
+    #7b88812b 0deg 1deg,
+    transparent 1deg 15deg
+  );
+}
+.fa-dial:before {
+  content: "";
+  position: absolute;
+  inset: 28px;
+  background: #161818;
+  border: 1px solid #404945;
+  border-radius: 50%;
+}
+.fa-dial span {
+  position: relative;
+  text-align: center;
+  font-size: 0.8rem;
+  line-height: 1.7;
+}
+.fa-dial i {
+  position: absolute;
+  width: 43%;
+  height: 2px;
+  background: #ef5934;
+  left: 50%;
+  top: 50%;
+  transform-origin: left;
+  transform: rotate(calc(-130deg + var(--progress) * 260deg));
+  z-index: 1;
+}
+.fa-scan {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  top: calc(15% + var(--progress) * 65%);
+  background: #ef5934;
+  opacity: 0.6;
+}
+.vantage {
+  --fa-ink: #e6e0d3;
+  --fa-paper: #24352f;
+}
+.vantage-intro {
+  padding: 4rem 7%;
+}
+.vantage-intro h1 {
+  font-family: Georgia, serif;
+  margin: 3rem 0;
+}
+.vantage-intro > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 3rem;
+  align-items: center;
+}
+.vantage-intro .fa-button {
+  margin: 0;
+  background: transparent;
+  border: 1px solid #9da79c;
+}
+.vantage-frame {
+  margin: 1rem 7% 0;
+}
+.vantage-frame .variant-image {
+  height: 560px;
+}
+.vantage-frame > span {
+  display: block;
+  padding: 1rem 0;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.vantage-essay {
+  padding: 5rem 7%;
+  display: grid;
+  grid-template-columns: 0.7fr 1.3fr 1fr;
+  gap: 3rem;
+  align-items: start;
+}
+.vantage-essay h2 {
+  font-family: Georgia, serif;
+}
+.sunday {
+  --fa-ink: #2e3a63;
+  --fa-paper: #f6efdf;
+}
+.sunday-hero {
+  padding: 3rem 6%;
+}
+.sunday-heading {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 4rem;
+  align-items: end;
+  margin: 3rem 0;
+}
+.sunday-heading h1 {
+  font-size: clamp(3.5rem, 7vw, 7rem);
+}
+.sunday-heading em {
+  color: #a8462f;
+}
+.sunday-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+.sunday-options > a {
+  padding: 2rem;
+  position: relative;
+  text-decoration: none;
+  background: #e5e7f0;
+  border-radius: 1rem;
+}
+.sunday-options > a:nth-child(2) {
+  background: #f0ddbf;
+}
+.sunday-options > a:nth-child(3) {
+  background: #dfe7d9;
+}
+.sunday-options span {
+  font-size: 0.7rem;
+}
+.sunday-options h2 {
+  font-size: 1.65rem;
+  margin: 2rem 0 0.6rem;
+}
+.sunday-options p {
+  font-size: 0.8rem;
+}
+.sunday-options b {
+  position: absolute;
+  right: 1.5rem;
+  top: 1.5rem;
+  font-size: 1.3rem;
+  font-weight: 400;
+}
+.sunday-photo {
+  margin: 1rem 6% 4rem;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  background: #2e3a63;
+  color: #f6efdf;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+.sunday-photo > div:last-child {
+  padding: 3rem;
+}
+.sunday-photo h2 {
+  margin: 2rem 0;
+}
+.sunday-photo .fa-button {
+  background: #f6efdf;
+  color: #2e3a63;
+  border-radius: 50px;
+}
+@media (max-width: 760px) {
+  .fa-site h1 {
+    font-size: clamp(3rem, 11vw, 5rem);
+  }
+  .unfold-hero {
+    min-height: 680px;
+    padding: 4rem 6%;
+  }
+  .unfold-caption {
+    left: 6%;
+    right: 6%;
+  }
+  .fa-motion,
+  .ledger-finance-deck,
+  .ledger-finance-feature,
+  .north-hero,
+  .north-prompts,
+  .vantage-essay,
+  .sunday-heading,
+  .sunday-options,
+  .sunday-photo {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  .fa-motion {
+    padding: 3rem 6%;
+  }
+  .fa-motion-art {
+    min-height: 320px;
+  }
+  .ledger-finance-feature .variant-image {
+    height: 300px;
+  }
+  .north-hero {
+    padding: 3rem 6%;
+  }
+  .north-portrait .variant-image {
+    height: 380px;
+  }
+  .north-note {
+    left: 1rem;
+    right: 1rem;
+  }
+  .north-prompts {
+    padding: 2rem 6%;
+  }
+  .torque-hero {
+    min-height: 710px;
+    padding: 3rem 6%;
+  }
+  .torque-hero h1 {
+    font-size: clamp(3.4rem, 13vw, 6rem);
+  }
+  .torque-marker {
+    font-size: 0.55rem;
+  }
+  .vantage-intro > div {
+    display: block;
+  }
+  .vantage-intro .fa-button {
+    margin-top: 2rem;
+  }
+  .vantage-frame .variant-image {
+    height: 350px;
+  }
+  .vantage-essay {
+    padding: 3rem 7%;
+  }
+  .sunday-heading {
+    margin: 2rem 0;
+  }
+  .sunday-photo > div:last-child {
+    padding: 2rem;
+  }
+  .sunday-photo .variant-image {
+    height: 300px;
+  }
+  .sunday-options h2 {
+    margin-top: 1rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fa-button {
+    transition: none;
+  }
+  .fa-button:hover {
+    transform: none;
+  }
+  .fa-motion-art {
+    --progress: 1;
+  }
+}

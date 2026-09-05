@@ -1,0 +1,344 @@
+.hl-stillground {
+  --hl-ink: #ebece0;
+  --hl-paper: #28352e;
+}
+.hl-still-hero {
+  position: relative;
+  min-height: 820px;
+  display: flex;
+  align-items: center;
+  padding: 5rem 6%;
+}
+.hl-still-hero > .variant-image {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+}
+.hl-still-hero > .variant-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, #15241dde, #15241d22),
+    linear-gradient(0deg, #15241d88, transparent 35%);
+}
+.hl-still-hero img {
+  object-position: 65% center;
+}
+.hl-still-copy {
+  position: relative;
+  z-index: 1;
+}
+.hl-still-copy h1 {
+  margin: 2rem 0 3rem;
+}
+.hl-still-caption {
+  position: absolute;
+  right: 5%;
+  bottom: 2rem;
+  font-size: 0.7rem;
+  line-height: 1.7;
+}
+.hl-still-story {
+  padding: 8rem 6%;
+}
+.hl-still-story h2 {
+  margin: 3rem 0;
+  font-size: clamp(3rem, 6vw, 6.5rem);
+}
+.hl-still-story > p:last-child {
+  max-width: 450px;
+  margin-left: auto;
+}
+.hl-root {
+  --hl-ink: #2e4033;
+  --hl-paper: #f1f2e9;
+}
+.hl-root-hero {
+  padding: 5rem 5%;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 6%;
+  align-items: center;
+}
+.hl-root-hero h1 {
+  font-size: clamp(3.5rem, 6.5vw, 6.8rem);
+  margin: 2rem 0;
+}
+.hl-root-hero > div > p:last-of-type {
+  max-width: 420px;
+  margin-bottom: 2rem;
+}
+.hl-root-hero figure {
+  margin: 0;
+}
+.hl-root-hero .variant-image {
+  height: 590px;
+}
+.hl-root-hero img {
+  object-position: 65% center;
+}
+.hl-root-hero figcaption {
+  padding: 1rem 0;
+  font-size: 0.7rem;
+  border-bottom: 1px solid #2e403333;
+}
+.hl-root-guide {
+  background: #e2e6d7;
+  padding: 6rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10%;
+}
+.hl-root-guide h2 {
+  margin: 2rem 0;
+}
+.hl-root-guide a {
+  font-size: 0.85rem;
+}
+.hl-root-guide ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.hl-root-guide li {
+  border-top: 1px solid #2e403355;
+  padding: 1.5rem 0;
+}
+.hl-root-guide li > span {
+  font-size: 0.7rem;
+}
+.hl-root-guide h3 {
+  margin: 1rem 0;
+}
+.hl-root-guide li p {
+  font-size: 0.9rem;
+}
+.hl-fieldnote {
+  --hl-ink: #4a3929;
+  --hl-paper: #eee9dc;
+}
+.hl-field-hero {
+  padding: 2rem 6% 4rem;
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  column-gap: 7%;
+}
+.hl-field-meta {
+  grid-column: 1/-1;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #4a392944;
+  padding-bottom: 2rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+}
+.hl-field-hero h1 {
+  grid-column: 1/-1;
+  font-size: clamp(5rem, 13vw, 14rem);
+  position: relative;
+  z-index: 1;
+  margin: 3rem 0 -1.8rem;
+}
+.hl-field-image {
+  grid-column: 2;
+  grid-row: 3/5;
+}
+.hl-field-image .variant-image {
+  height: 540px;
+}
+.hl-field-image img {
+  object-position: 75%;
+}
+.hl-field-image > span {
+  display: block;
+  margin-top: 1rem;
+  font-size: 0.65rem;
+}
+.hl-field-intro {
+  align-self: end;
+  margin-top: 5rem !important;
+  font-size: 1.3rem;
+}
+.hl-field-link {
+  align-self: end;
+  font-size: 1.1rem;
+  line-height: 1.4;
+  margin-top: 2rem;
+}
+.hl-field-manifesto {
+  padding: 7rem 6%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem 8%;
+  background: #e2d4bd;
+}
+.hl-field-manifesto > .hl-kicker {
+  grid-column: 1/-1;
+}
+.hl-field-manifesto h2 {
+  font-size: clamp(3.5rem, 6vw, 6rem);
+}
+.hl-field-manifesto > div {
+  align-self: end;
+  max-width: 370px;
+}
+.hl-field-manifesto p + p {
+  margin-top: 1.5rem;
+}
+.hl-open {
+  --hl-ink: #273e35;
+  --hl-paper: #f2f2e8;
+}
+.hl-open-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 740px;
+}
+.hl-open-copy {
+  padding: 5rem 10%;
+  background: #e0e9cc;
+}
+.hl-open-copy h1 {
+  margin: 2rem 0;
+}
+.hl-open-copy > p:not(.hl-kicker) {
+  max-width: 350px;
+}
+.hl-open-copy .hl-button {
+  margin: 2rem 0 1rem;
+}
+.hl-open-copy > span {
+  display: block;
+  font-size: 0.7rem;
+}
+.hl-open-hero > .variant-image {
+  height: 100%;
+  min-height: 600px;
+}
+.hl-open-hero img {
+  object-position: 75%;
+}
+.hl-open-tag {
+  position: absolute;
+  right: 3%;
+  bottom: 2rem;
+  width: 220px;
+  background: #f5f1e5;
+  padding: 1.8rem;
+  transform: rotate(-4deg);
+  box-shadow: 0 10px 30px #17292122;
+}
+.hl-open-tag > span {
+  display: block;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+.hl-open-tag strong {
+  display: block;
+  font-size: 2.8rem;
+  line-height: 1;
+  font-family: Georgia, serif;
+  font-weight: 400;
+  margin: 1.5rem 0;
+}
+.hl-open-tag a {
+  font-size: 0.7rem;
+}
+.hl-open-start {
+  padding: 6rem;
+}
+.hl-open-start h2 {
+  margin: 2rem 0 3rem;
+}
+.hl-open-start > div {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid #273e3555;
+}
+.hl-open-start a {
+  padding: 2rem;
+  border-right: 1px solid #273e3555;
+  transition: background 0.2s;
+}
+.hl-open-start a:hover {
+  background: #e0e9cc;
+}
+.hl-open-start a > span {
+  font-size: 0.8rem;
+}
+.hl-open-start h3 {
+  margin: 2rem 0 1rem;
+}
+.hl-open-start a > p {
+  font-size: 0.9rem;
+}
+@media (max-width: 760px) {
+  .hl-still-hero {
+    min-height: 720px;
+  }
+  .hl-still-caption {
+    left: 6%;
+    right: auto;
+  }
+  .hl-still-story {
+    padding: 5rem 6%;
+  }
+  .hl-root-hero,
+  .hl-root-guide,
+  .hl-field-manifesto,
+  .hl-open-hero {
+    grid-template-columns: 1fr;
+  }
+  .hl-root-hero {
+    padding: 3rem 6%;
+    gap: 3rem;
+  }
+  .hl-root-hero .variant-image {
+    height: 420px;
+  }
+  .hl-root-guide,
+  .hl-open-start {
+    padding: 4rem 6%;
+    gap: 3rem;
+  }
+  .hl-field-hero {
+    grid-template-columns: 1fr;
+  }
+  .hl-field-hero h1 {
+    font-size: 18vw;
+    margin-bottom: 2rem;
+  }
+  .hl-field-image {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  .hl-field-image .variant-image {
+    height: 390px;
+  }
+  .hl-field-intro {
+    margin-top: 2rem !important;
+  }
+  .hl-field-manifesto {
+    padding: 4rem 6%;
+  }
+  .hl-open-copy {
+    padding: 4rem 6%;
+  }
+  .hl-open-hero > .variant-image {
+    min-height: 430px;
+  }
+  .hl-open-tag {
+    width: 180px;
+    bottom: 1rem;
+  }
+  .hl-open-start > div {
+    grid-template-columns: 1fr;
+  }
+  .hl-open-start a {
+    border-right: 0;
+    border-bottom: 1px solid #273e3555;
+    padding: 2rem 0;
+  }
+}

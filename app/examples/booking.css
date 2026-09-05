@@ -1,0 +1,103 @@
+.example-enquiry-panel .example-booking-heading {
+  font-size: 1.4rem;
+  margin-top: 1.25rem;
+}
+.example-booking h3 {
+  margin-block: 1.5rem;
+}
+.example-booking-note {
+  font-size: 0.85rem;
+  line-height: 1.7;
+  max-width: 42ch;
+}
+.example-booking .example-booking-slots {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+.example-booking-slots label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid var(--line);
+  padding: 1rem 0.65rem;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+.example-booking-slots label:has(input:checked) {
+  border-color: var(--ink);
+  background: color-mix(in srgb, var(--ink) 8%, var(--paper));
+}
+.example-booking-slots label:has(input:focus-visible) {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+.example-booking-slots input {
+  accent-color: var(--ink);
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+.example-booking-slots label > span {
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+.example-booking-slots small {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.6rem;
+}
+.example-booking-ticket {
+  display: grid;
+  gap: 0.65rem;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--ink);
+  background: color-mix(in srgb, var(--ink) 5%, var(--paper));
+}
+.example-booking-ticket > span {
+  font-size: 0.75rem;
+}
+.example-booking-ticket strong {
+  font-size: 1.45rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+.example-booking-disclaimer {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.example-booking-complete .example-text-button {
+  display: block;
+  text-align: left;
+}
+@media (max-width: 480px) {
+  .example-booking .example-booking-slots {
+    grid-template-columns: 1fr;
+  }
+  .example-booking-slots label {
+    padding: 1rem;
+  }
+  .example-booking-slots label > span {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+  }
+  .example-booking-slots small {
+    margin: 0;
+  }
+  .example-booking-ticket strong {
+    font-size: 1.2rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .example-booking-slots label {
+    transition: none;
+  }
+}

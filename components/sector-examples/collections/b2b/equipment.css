@@ -1,0 +1,430 @@
+.axis-workshop {
+  --b2b-ink: #dce6d2;
+  --b2b-paper: #17221f;
+  --b2b-accent: #cee6a1;
+}
+.axis-hero {
+  padding: 30px 6vw 40px;
+  min-height: 850px;
+  position: relative;
+}
+.axis-topline {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  border-bottom: 1px solid #dce6d229;
+  padding-bottom: 22px;
+}
+.axis-hero h1 {
+  margin-top: 50px;
+  position: relative;
+  z-index: 2;
+  font-size: clamp(4rem, 9vw, 9rem);
+}
+.axis-hero h1 em {
+  font-family: inherit;
+  color: #c8dfa0;
+  font-style: normal;
+}
+.axis-hero .b2b-scroll-story {
+  position: absolute;
+  right: 0;
+  top: 160px;
+  width: 65%;
+}
+.axis-hero .b2b-lift {
+  height: 520px;
+}
+.axis-hero-footer {
+  position: absolute;
+  bottom: 45px;
+  left: 6vw;
+  right: 6vw;
+  display: flex;
+  justify-content: space-between;
+  gap: 25px;
+  align-items: end;
+}
+.axis-hero-footer p {
+  font-size: 0.9rem;
+}
+.axis-statement {
+  padding: 100px 8vw;
+  background: #d3e0c6;
+  color: #25352d;
+  display: grid;
+  grid-template-columns: 1.3fr 0.7fr;
+  gap: 35px;
+}
+.axis-statement > .example-eyebrow {
+  grid-column: 1/-1;
+}
+.axis-statement > p:last-child {
+  align-self: end;
+  max-width: 380px;
+}
+.axis-statement h2 span {
+  color: #617451;
+}
+.axis-workshop .example-enquiry {
+  background: #cee6a1;
+  color: #17221f;
+}
+.workshop-reference {
+  --b2b-ink: #183646;
+  --b2b-paper: #eff2ee;
+}
+.reference-hero {
+  padding: 35px 6vw 80px;
+  background-image:
+    linear-gradient(#18364606 1px, transparent 1px),
+    linear-gradient(90deg, #18364606 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+.reference-tab {
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  padding: 15px 0;
+  border-bottom: 2px solid #183646;
+}
+.reference-hero-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 6vw;
+  padding-top: 65px;
+  align-items: center;
+}
+.reference-hero h1 {
+  font-size: clamp(3rem, 5.2vw, 5.5rem);
+}
+.reference-hero h1 em {
+  color: #44778d;
+}
+.reference-hero-grid > div > p:not(.example-eyebrow) {
+  max-width: 480px;
+  margin: 25px 0;
+}
+.reference-notebook {
+  background: #183646;
+  color: #eff2ee;
+  padding: 32px;
+  border-top: 8px solid #a4d0bb;
+}
+.reference-notebook > span {
+  font-size: 0.6rem;
+  letter-spacing: 0.13em;
+}
+.reference-notebook h2 {
+  font-size: 3rem;
+  margin: 24px 0;
+}
+.reference-notebook dl {
+  margin: 0;
+}
+.reference-notebook dl > div {
+  border-top: 1px solid #eff2ee33;
+  padding: 14px 0;
+}
+.reference-notebook dt {
+  font-size: 0.72rem;
+  color: #a4d0bb;
+  margin-bottom: 6px;
+}
+.reference-notebook dd {
+  margin: 0;
+  font-size: 0.83rem;
+}
+.reference-notebook > p {
+  font-size: 0.7rem;
+  margin-top: 20px;
+  opacity: 0.75;
+}
+.reference-answer {
+  padding: 80px 10vw;
+  background: #dae7df;
+}
+.reference-answer > span {
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+}
+.reference-answer h2 {
+  margin-top: 25px;
+}
+.reference-answer p {
+  max-width: 650px;
+  margin: 25px 0;
+}
+.reference-answer > a {
+  font-size: 0.86rem;
+}
+.ironfield-equipment {
+  --b2b-ink: #342c27;
+  --b2b-paper: #e9e2d6;
+}
+.ironfield-hero {
+  padding: 45px 6vw 0;
+}
+.ironfield-title {
+  position: relative;
+  padding-bottom: 35px;
+}
+.ironfield-title h1 {
+  font-family: Georgia, serif;
+  font-size: clamp(4rem, 7.4vw, 7.4rem);
+}
+.ironfield-title h1 em {
+  color: #92513a;
+}
+.ironfield-title > span {
+  position: absolute;
+  right: 0;
+  bottom: 42px;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  writing-mode: vertical-rl;
+}
+.ironfield-illustration {
+  background: #6f776b;
+  position: relative;
+  overflow: hidden;
+}
+.ironfield-illustration .b2b-lift {
+  height: 470px;
+  max-width: 850px;
+  margin: auto;
+  color: #eff1db;
+}
+.ironfield-illustration .b2b-lift-grid {
+  background-size: 52px 52px;
+}
+.ironfield-illustration .b2b-lift-note {
+  display: none;
+}
+.ironfield-plate {
+  position: absolute;
+  bottom: 20px;
+  left: 25px;
+  color: #ede7db;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+}
+.ironfield-caption {
+  display: grid;
+  grid-template-columns: 0.7fr 1.3fr 0.6fr;
+  gap: 45px;
+  padding: 30px 0;
+}
+.ironfield-caption > span {
+  font-size: 0.6rem;
+  letter-spacing: 0.07em;
+}
+.ironfield-caption > a {
+  font-size: 0.82rem;
+}
+.ironfield-editorial {
+  padding: 100px 10vw;
+  display: grid;
+  grid-template-columns: 0.5fr 1fr;
+  gap: 8vw;
+  border-top: 1px solid #342c2733;
+}
+.ironfield-editorial > span {
+  font-family: Georgia, serif;
+  font-size: 12rem;
+  line-height: 1;
+  color: #9b6044;
+}
+.ironfield-editorial h2 {
+  font-family: Georgia, serif;
+}
+.ironfield-editorial p:last-child {
+  max-width: 550px;
+  margin-top: 30px;
+}
+.ironfield-equipment .b2b-guides {
+  background: #d8cfbf;
+}
+.bay-plan {
+  --b2b-ink: #203e49;
+  --b2b-paper: #f0f4f0;
+}
+.bay-hero {
+  padding: 70px 6vw 85px;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  align-items: center;
+  gap: 6vw;
+}
+.bay-hero h1 {
+  font-size: clamp(3.4rem, 6.4vw, 6.5rem);
+}
+.bay-hero h1 span {
+  color: #507d79;
+}
+.bay-headline > p:not(.example-eyebrow) {
+  max-width: 440px;
+  margin: 25px 0;
+}
+.bay-planner {
+  padding: 28px;
+  background: #d7e5df;
+  border-radius: 4px;
+  transform: rotate(2deg);
+}
+.bay-planner-heading {
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 25px;
+  gap: 10px;
+}
+.bay-floorplan {
+  border: 2px solid #507d7977;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  background-image:
+    linear-gradient(#507d7914 1px, transparent 1px),
+    linear-gradient(90deg, #507d7914 1px, transparent 1px);
+  background-size: 15px 15px;
+}
+.bay-floorplan > div {
+  border: 1px dashed #507d7977;
+  min-height: 230px;
+  text-align: center;
+  padding: 15px;
+}
+.bay-floorplan > div > span {
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+}
+.bay-floorplan i {
+  display: block;
+  width: 65%;
+  height: 135px;
+  border: 2px solid #507d79;
+  border-radius: 25px 25px 14px 14px;
+  margin: 20px auto 0;
+  background: linear-gradient(
+    transparent 22%,
+    #507d7966 23%,
+    #507d7966 25%,
+    transparent 26%,
+    transparent 70%,
+    #507d7966 71%,
+    #507d7966 73%,
+    transparent 74%
+  );
+}
+.bay-access {
+  grid-column: 1/-1;
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  text-align: center;
+}
+.bay-planner > p {
+  font-size: 0.8rem;
+  margin-top: 22px;
+}
+.bay-preparation {
+  padding: 85px 6vw;
+}
+.bay-preparation > div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 50px;
+  margin-top: 40px;
+}
+.bay-preparation p strong {
+  display: block;
+  margin-bottom: 12px;
+  font-weight: 500;
+  font-size: 1.2rem;
+}
+.bay-preparation > div > p {
+  max-width: 480px;
+}
+@media (max-width: 760px) {
+  .axis-hero {
+    min-height: 920px;
+  }
+  .axis-topline > span:last-child {
+    display: none;
+  }
+  .axis-hero .b2b-scroll-story {
+    position: relative;
+    right: auto;
+    top: auto;
+    width: 110%;
+    margin: 15px -5%;
+  }
+  .axis-hero .b2b-lift {
+    height: 370px;
+  }
+  .axis-hero-footer {
+    flex-direction: column;
+    align-items: start;
+    bottom: 30px;
+  }
+  .axis-statement {
+    grid-template-columns: 1fr;
+    padding: 60px 6vw;
+  }
+  .axis-statement > .example-eyebrow {
+    grid-column: auto;
+  }
+  .reference-hero-grid {
+    grid-template-columns: 1fr;
+    padding-top: 40px;
+    gap: 40px;
+  }
+  .reference-answer {
+    padding: 60px 6vw;
+  }
+  .ironfield-illustration .b2b-lift {
+    height: 350px;
+  }
+  .ironfield-caption {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .ironfield-editorial {
+    padding: 60px 6vw;
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+  .ironfield-editorial > span {
+    font-size: 5rem;
+  }
+  .bay-hero {
+    grid-template-columns: 1fr;
+    padding-top: 45px;
+    gap: 40px;
+  }
+  .bay-planner {
+    transform: none;
+    padding: 20px;
+  }
+  .bay-floorplan {
+    gap: 12px;
+    padding: 12px;
+  }
+  .bay-floorplan > div {
+    padding: 10px;
+    min-height: 200px;
+  }
+  .bay-floorplan i {
+    width: 80%;
+    height: 120px;
+  }
+  .bay-preparation {
+    padding: 60px 6vw;
+  }
+  .bay-preparation > div {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+}

@@ -394,3 +394,28 @@ test("rejects a generic draft when its merged composition is absent or stale", a
   assert.equal(fake.state.gmailCalls, 0);
   assert.equal(fake.state.sentMessages, 0);
 });
+
+test("preview approval uses the business name to resolve an ambiguous sector", async () => {
+  const { repository, state } = createRepository();
+  Object.assign(state.prospect, {
+    sector: "Automotive",
+    businessName: "Kent Garage Equipment",
+  });
+  const approve = createProspectPreviewApprover({
+    repository,
+    resolveComposition: resolveCurrentComposition,
+    siteUrl: "https://faithfulsoftware.dev",
+  });
+  await approve({} as GrowthDb, approvalInput());
+  const email = state.savedSnapshots[0]?.email as { text: string };
+  assert.match(email.text, /\/examples\/axis-workshop/);
+  assert.doesNotMatch(email.text, /\/examples\/torque-workshop/);
+  assert.equal(
+    (email.text.match(/https:\/\/faithfulsoftware.dev\/examples\//g) ?? [])
+      .length,
+    4,
+  );
+  assert.ok(email.text.includes(`/preview/${PREVIEW_SLUG}`));
+  assert.equal(state.gmailCalls, 0);
+  assert.equal(state.sentMessages, 0);
+});

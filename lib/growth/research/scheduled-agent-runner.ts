@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { z } from "zod";
+import { buildSectorExampleResearchInstructions } from "../../sector-examples/research-instructions";
 
 import {
   type RedactedResearchReport,
@@ -64,6 +65,7 @@ function buildAgentPrompt(
     "docs/growth-os/fixtures/research-run-v1.json",
     "lib/growth/research/ingestion-schema.ts",
     "lib/growth/research/types.ts",
+    "lib/sector-examples",
     "lib/growth/prospect-previews/experience-brief.ts",
     "lib/growth/prospect-previews/assets/route-handler.ts",
     "lib/growth/email/assets/fallbacks.ts",
@@ -78,7 +80,8 @@ function buildAgentPrompt(
     `Use only these project paths: ${allowedFiles.join(", ")}.`,
     "Do not inspect AGENTS files, Nexus vault files, Codex caches or memories, Library/Application Support, browser data, Git history, or any other user files. Do not run broad filesystem searches.",
     "Use web search for permitted research. Do not use browser-control automation.",
-    "For every accepted candidate, prepare one first-party strength and two or three sourced website-journey improvements for the reviewable initial email. After founder approval, the application adds the built-example close and private preview URL; do not publish the URL or send email.",
+    "For every accepted candidate, prepare one first-party strength and two or three sourced website-journey improvements for the reviewable initial email. Preserve an existing private preview URL when present; do not publish private concepts or send email.",
+    buildSectorExampleResearchInstructions("https://faithfulsoftware.dev"),
     "After the signed research submission succeeds, build one fully bespoke review-only site for every prospect returned as accepted. Work directly in the checked-out FSS project using components/prospect-previews/bespoke/prospects/[slug].tsx, the bespoke registry, and public/prospect-previews/bespoke/[slug]. The route is /preview/[slug].",
     "Load GROWTH_OS_AGENT_HMAC_SECRET only at runtime from macOS Keychain service dev.faithfulsoftware.growth-os.agent-hmac and account growth-os-weekday-company-research. Keep it in process memory only and never print or persist it.",
     "Create any temporary bundle or helper only inside the current disposable working directory. Delete it before finishing. Never print a secret, signature, raw bundle, email address, contact name, raw URL, email copy, or assessment text.",
