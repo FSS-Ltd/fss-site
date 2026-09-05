@@ -7,6 +7,7 @@ const assetBase = "/prospect-previews/bespoke/stagg-homes";
 const posterSource = `${assetBase}/hero-v1.png`;
 const videoSource = `${assetBase}/property-walkthrough-scroll-scrub-v1.mp4`;
 const minimumSeekDelta = 1 / 48;
+export const scrollLinkedWalkthroughHeightClass = "h-[500svh]";
 
 type PropertyWalkthroughBeat = {
   description: string;
@@ -162,7 +163,7 @@ export function PropertyWalkthroughHero({
   return (
     <section
       aria-labelledby="property-walkthrough-heading"
-      className={`relative ${isScrollLinked ? "h-[300svh]" : "h-svh"} text-white`}
+      className={`relative ${isScrollLinked ? scrollLinkedWalkthroughHeightClass : "h-svh"} text-white`}
       data-property-walkthrough="true"
       ref={sectionRef}
     >
