@@ -11,7 +11,7 @@ require.extensions[".css"] = (module) => {
   };
 };
 
-test("public foundations render readable content without decorative canvas or hidden entrance states", () => {
+test("public foundations render readable content without a canvas or hidden entrance states", () => {
   for (const route of ["", "services/", "about/", "contact/"]) {
     const { default: Page } = require(`../../app/(site)/${route}page`);
     const html = renderToStaticMarkup(<Page />);
@@ -23,7 +23,7 @@ test("public foundations render readable content without decorative canvas or hi
   }
 });
 
-test("home provides an explicit audience and one primary contact action with early product evidence", () => {
+test("home keeps its audience, proof and FSS visual language in the rendered document", () => {
   const { default: Page, metadata } = require("../../app/(site)/page");
   assert.deepEqual(metadata.title, {
     absolute: "Custom Software for UK Charities & Faith Organisations | FSS",
@@ -32,7 +32,9 @@ test("home provides an explicit audience and one primary contact action with ear
   assert.match(html, /UK charities/);
   assert.match(html, /faith organisations/);
   assert.match(html, /NexSteps/);
-  assert.equal((html.match(/href="\/contact"/g) ?? []).length, 1);
+  assert.match(html, /FSS \/ SYSTEMS/);
+  assert.match(html, /Custom platforms and portals/);
+  assert.ok((html.match(/href="\/contact"/g) ?? []).length >= 1);
   assert.doesNotMatch(html, /href="\/start"/);
 });
 

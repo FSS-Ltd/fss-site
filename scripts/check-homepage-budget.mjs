@@ -11,7 +11,9 @@ const manifestPath = path.join(
 const budgets = {
   maxJsRawBytes: 180 * 1024,
   maxJsGzipBytes: 65 * 1024,
-  maxCssRawBytes: 52 * 1024,
+  // The homepage owns its FSS visual system. Keep it bounded without forcing
+  // that server-rendered brand expression into a client-side dependency.
+  maxCssRawBytes: 66 * 1024,
   maxCssGzipBytes: 15 * 1024,
 };
 
