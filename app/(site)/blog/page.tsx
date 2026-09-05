@@ -1,26 +1,23 @@
 import type { Metadata } from "next";
+import { createPageMetadata } from "@/lib/seo/metadata";
+import { publicPages } from "@/lib/seo/pages";
 
 import { BlogIndex } from "@/components/sections/blog/blog-index";
 import { getAllBlogPosts } from "@/lib/blog";
+import { RelatedLinks } from "@/components/sections/public/related-links";
+import { sectorLink, costLink, comparisonLink } from "@/lib/commercial/links";
 
-export const metadata: Metadata = {
-  title: "Software Development Insights for UK Businesses, Charities and Schools",
-  description:
-    "Practical articles on bespoke software strategy, portal development, workflow automation and digital modernisation for UK charities, schools and SMEs.",
-  alternates: {
-    canonical: "/blog",
-  },
-  openGraph: {
-    title: "Software Development Insights | Faithful Software Solutions Blog",
-    description:
-      "Practical articles on bespoke software strategy, portal development, workflow automation and digital modernisation for UK organisations.",
-    url: "/blog",
-    type: "website",
-  },
-};
+export const metadata: Metadata = createPageMetadata(publicPages["/blog"]);
 
 export default async function BlogPage() {
   const posts = await getAllBlogPosts();
 
-  return <BlogIndex posts={posts} />;
+  return (
+    <>
+      <BlogIndex posts={posts} />
+      <div className="mx-auto max-w-6xl px-6 pb-16">
+        <RelatedLinks links={[sectorLink, costLink, comparisonLink]} />
+      </div>
+    </>
+  );
 }

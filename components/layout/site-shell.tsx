@@ -16,7 +16,9 @@ export function SiteShell({ children }: SiteShellProps) {
     >
       <SiteInteractions />
       <SiteHeader />
-      <main>{children}</main>
+      <main id="main-content" tabIndex={-1}>
+        {children}
+      </main>
       <SiteFooter />
     </div>
   );

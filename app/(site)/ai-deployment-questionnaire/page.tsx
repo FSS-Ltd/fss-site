@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { createPageMetadata } from "@/lib/seo/metadata";
+import { publicPages } from "@/lib/seo/pages";
 
 import {
   AiQuestionnairePage,
@@ -10,21 +12,9 @@ import { siteConfig } from "@/lib/site-config";
 const path = "/ai-deployment-questionnaire";
 const pageUrl = `${siteConfig.url}${path}`;
 
-export const metadata: Metadata = {
-  title: "Local AI vs Cloud AI Questionnaire for Data-Sensitive Businesses",
-  description:
-    "Find out whether local AI, cloud AI, or hybrid AI is best for your business. Built for law firms, clinics, hospitals, finance teams, and privacy-sensitive organisations.",
-  alternates: {
-    canonical: path,
-  },
-  openGraph: {
-    title: "Local AI vs Cloud AI Questionnaire | Faithful Software Solutions",
-    description:
-      "Answer seven questions and get a practical local, cloud, or hybrid AI recommendation based on data sensitivity, compliance, speed, budget, and workflow value.",
-    url: path,
-    type: "website",
-  },
-};
+export const metadata: Metadata = createPageMetadata(
+  publicPages["/ai-deployment-questionnaire"],
+);
 
 function AiQuestionnaireSchema() {
   const schema = {

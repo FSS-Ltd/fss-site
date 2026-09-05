@@ -1,10 +1,15 @@
 import Link from "next/link";
 
 import { CookieSettingsButton } from "@/components/layout/cookie-settings-button";
+import { organisation } from "@/lib/seo/organisation";
 
 const sitemapLinks = [
   { label: "Services", href: "/services" },
-  { label: "Work", href: "/#work" },
+  { label: "Work", href: "/work/nexsteps" },
+  {
+    label: "Charities and faith organisations",
+    href: "/sectors/charities-faith-organisations",
+  },
   { label: "About", href: "/about" },
   { label: "Resources", href: "/resources" },
   { label: "Blog", href: "/blog" },
@@ -133,7 +138,7 @@ export function SiteFooter() {
               }}
             >
               <a
-                href="https://www.linkedin.com/company/faithful-software-solutions-ltd"
+                href={organisation.linkedin}
                 data-foot
                 style={{ transition: "color .2s" }}
               >

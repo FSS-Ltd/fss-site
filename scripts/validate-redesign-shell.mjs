@@ -11,7 +11,6 @@ const files = {
     "utf8",
   ),
   footer: readFileSync("components/layout/site-footer.tsx", "utf8"),
-  fragments: readFileSync("components/redesign/design-fragments.ts", "utf8"),
   rootLayout: readFileSync("app/layout.tsx", "utf8"),
   siteLayout: readFileSync("app/(site)/layout.tsx", "utf8"),
   growthLayout: readFileSync("app/(growth)/layout.tsx", "utf8"),
@@ -46,21 +45,6 @@ if (
   !files.footer.includes('href: "/blog"')
 ) {
   failures.push("SiteFooter sitemap must expose the blog route.");
-}
-
-if (
-  !files.fragments.includes("data-sc-sticky") ||
-  !files.fragments.includes("data-sc-spacer")
-) {
-  failures.push(
-    "Home selected-work section must keep the sticky showcase and scroll spacer.",
-  );
-}
-
-if (/overflow-x-(hidden|clip)/.test(files.shell)) {
-  failures.push(
-    "SiteShell must not create an overflow container because that breaks the selected-work sticky scene.",
-  );
 }
 
 if (!files.rootLayout.includes("overflow-x-hidden")) {

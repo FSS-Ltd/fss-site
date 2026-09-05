@@ -24,7 +24,9 @@ function sanitize(value: string | undefined): string {
   return (value || "").replace(/[<>]/g, "").trim();
 }
 
-export function buildInternalLeadNotificationEmail(context: LeadEmailTemplateContext) {
+export function buildInternalLeadNotificationEmail(
+  context: LeadEmailTemplateContext,
+) {
   const { payload, siteUrl, resource } = context;
 
   return {
@@ -67,15 +69,31 @@ export async function buildSubmitterConfirmationEmail(
           firstName={payload.firstName}
           resourceTitle={resource.title}
           resourceUrl={resourceUrl}
+          resourceSummary={resource.summary}
         />
       ),
     });
-    return { subject: RESOURCE_DELIVERY_SUBJECT, html, text, category: "resource-delivery" };
+    return {
+      subject: RESOURCE_DELIVERY_SUBJECT,
+      html,
+      text,
+      category: "resource-delivery",
+    };
   }
 
   const { html, text } = await renderEmail({
     templateKey: "site-enquiry-thank-you",
-    element: <SiteEnquiryThankYou firstName={payload.firstName} businessName={payload.company} />,
+    element: (
+      <SiteEnquiryThankYou
+        firstName={payload.firstName}
+        businessName={payload.company}
+      />
+    ),
   });
-  return { subject: SITE_ENQUIRY_THANK_YOU_SUBJECT, html, text, category: "site-enquiry" };
+  return {
+    subject: SITE_ENQUIRY_THANK_YOU_SUBJECT,
+    html,
+    text,
+    category: "site-enquiry",
+  };
 }

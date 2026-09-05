@@ -4,17 +4,29 @@ import path from "node:path";
 import matter from "gray-matter";
 import { z } from "zod";
 
-import type { ResourceFrontmatter, ResourceItem, ResourceMeta } from "@/lib/types/resource";
+import type {
+  ResourceFrontmatter,
+  ResourceItem,
+  ResourceMeta,
+} from "@/lib/types/resource";
+
+import { contentEvidenceSchema, isoDateSchema } from "@/lib/seo/content";
 
 const RESOURCES_CONTENT_DIR = path.join(process.cwd(), "content", "resources");
 
 const resourceDeliverySchema = z
   .object({
-    type: z.enum(["direct_download", "internal_asset_page", "external_link", "email_later"]),
+    type: z.enum([
+      "direct_download",
+      "internal_asset_page",
+      "external_link",
+      "email_later",
+    ]),
     url: z.string().min(1).optional(),
     label: z.string().min(1).optional(),
     notes: z.string().min(1).optional(),
     fileName: z.string().min(1).optional(),
+    encodingFormat: z.literal("application/pdf").optional(),
     accessInstructions: z.string().min(1).optional(),
   })
   .superRefine((delivery, ctx) => {
@@ -37,7 +49,9 @@ const resourceUsageStepSchema = z.object({
   description: z.string().min(1),
 });
 
-const resourceFrontmatterSchema = z.object({
+const resourceFrontmatterSchema = contentEvidenceSchema.extend({
+  publishDate: isoDateSchema.optional(),
+  author: z.string().min(1).optional(),
   slug: z.string().min(1),
   title: z.string().min(1),
   shortDescription: z.string().min(1),
@@ -62,7 +76,9 @@ function parseFrontmatter(frontmatter: unknown): ResourceFrontmatter {
 }
 
 async function getResourceFileNames(): Promise<string[]> {
-  const entries = await fs.readdir(RESOURCES_CONTENT_DIR, { withFileTypes: true });
+  const entries = await fs.readdir(RESOURCES_CONTENT_DIR, {
+    withFileTypes: true,
+  });
 
   return entries
     .filter((entry) => entry.isFile() && entry.name.endsWith(".mdx"))
@@ -86,7 +102,10 @@ export async function getAllResources(): Promise<ResourceMeta[]> {
     }),
   );
 
-  return resources.sort((a, b) => Number(b.featured) - Number(a.featured) || a.title.localeCompare(b.title));
+  return resources.sort(
+    (a, b) =>
+      Number(b.featured) - Number(a.featured) || a.title.localeCompare(b.title),
+  );
 }
 
 export async function getFeaturedResources(): Promise<ResourceMeta[]> {
@@ -94,7 +113,9 @@ export async function getFeaturedResources(): Promise<ResourceMeta[]> {
   return resources.filter((resource) => resource.featured);
 }
 
-export async function getResourceBySlug(slug: string): Promise<ResourceItem | null> {
+export async function getResourceBySlug(
+  slug: string,
+): Promise<ResourceItem | null> {
   const sourcePath = path.join(RESOURCES_CONTENT_DIR, `${slug}.mdx`);
 
   try {
@@ -115,7 +136,10 @@ export async function getResourceBySlug(slug: string): Promise<ResourceItem | nu
   }
 }
 
-export async function getRelatedResources(resource: ResourceMeta, limit = 2): Promise<ResourceMeta[]> {
+export async function getRelatedResources(
+  resource: ResourceMeta,
+  limit = 2,
+): Promise<ResourceMeta[]> {
   const allResources = await getAllResources();
 
   const related = allResources
@@ -129,7 +153,9 @@ export async function getRelatedResources(resource: ResourceMeta, limit = 2): Pr
 
   const fallback = allResources
     .filter((candidate) => candidate.slug !== resource.slug)
-    .filter((candidate) => !related.some((item) => item.slug === candidate.slug))
+    .filter(
+      (candidate) => !related.some((item) => item.slug === candidate.slug),
+    )
     .slice(0, limit - related.length);
 
   return [...related, ...fallback];

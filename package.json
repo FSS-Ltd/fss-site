@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "next dev --webpack",
     "dev:turbo": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint && npm run lint:covers",
     "lint:covers": "tsx scripts/validate-blog-covers.ts",
@@ -33,7 +33,9 @@
     "perf:lighthouse:mobile": "lhci autorun --config=.lighthouserc.mobile.json",
     "verify:growth-release": "tsx scripts/verify-growth-release.ts",
     "verify:migrations": "tsx scripts/verify-migrations.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:public-site": "node --import tsx --test tests/integration/public-site-crawl.test.ts",
+    "generate:readiness-kit": "tsx scripts/generate-readiness-kit.ts"
   },
   "dependencies": {
     "@date-fns/tz": "^1.5.0",

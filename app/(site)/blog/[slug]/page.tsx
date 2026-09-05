@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
+import { createArticleMetadata } from "@/lib/seo/content-metadata";
 import { notFound } from "next/navigation";
 
 import { ArticleSchema } from "@/components/seo/article-schema";
 import { BreadcrumbSchema } from "@/components/seo/breadcrumb-schema";
 import { BlogPostPage } from "@/components/sections/blog/blog-post-page";
-import { getAllBlogPosts, getBlogPostBySlug, getRelatedPosts } from "@/lib/blog";
+import {
+  getAllBlogPosts,
+  getBlogPostBySlug,
+  getRelatedPosts,
+} from "@/lib/blog";
 
 type BlogPostRouteProps = {
   params: Promise<{ slug: string }>;
@@ -13,10 +18,15 @@ type BlogPostRouteProps = {
 export async function generateStaticParams() {
   const posts = await getAllBlogPosts();
 
-  return posts.map((post) => ({ slug: post.slug }));
+  // The comparison has a dedicated static page sharing the same blog data.
+  return posts
+    .filter((post) => post.slug !== "church-management-software-vs-bespoke")
+    .map((post) => ({ slug: post.slug }));
 }
 
-export async function generateMetadata({ params }: BlogPostRouteProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: BlogPostRouteProps): Promise<Metadata> {
   const { slug } = await params;
   const post = await getBlogPostBySlug(slug);
 
@@ -27,30 +37,7 @@ export async function generateMetadata({ params }: BlogPostRouteProps): Promise<
     };
   }
 
-  return {
-    title: post.meta.seoTitle,
-    description: post.meta.seoDescription,
-    alternates: {
-      canonical: `/blog/${post.meta.slug}`,
-    },
-    openGraph: {
-      type: "article",
-      title: post.meta.seoTitle,
-      description: post.meta.seoDescription,
-      url: `/blog/${post.meta.slug}`,
-      images: [post.meta.coverImage],
-      publishedTime: post.meta.publishDate,
-      authors: [post.meta.author],
-      section: post.meta.category,
-      tags: post.meta.tags,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: post.meta.seoTitle,
-      description: post.meta.seoDescription,
-      images: [post.meta.coverImage],
-    },
-  };
+  return createArticleMetadata(post.meta);
 }
 
 export default async function BlogPostRoute({ params }: BlogPostRouteProps) {

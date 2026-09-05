@@ -38,14 +38,60 @@ const hstsHeader = {
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 const nextConfig: NextConfig = {
+  experimental: {
+    // Keep contact controls out of the public landing page's CSS payload.
+    cssChunking: false,
+  },
   turbopack: {
     root: projectRoot,
+  },
+  async redirects() {
+    return [
+      {
+        source: "/resources/sdk-integration-readiness-kit/:path*",
+        has: [{ type: "host", value: "www.faithfulsoftware.dev" }],
+        destination:
+          "https://faithfulsoftware.dev/resources/software-project-readiness-kit/:path*",
+        permanent: true,
+      },
+      {
+        source: "/resources/technical-content-conversion-playbook/:path*",
+        has: [{ type: "host", value: "www.faithfulsoftware.dev" }],
+        destination:
+          "https://faithfulsoftware.dev/resources/software-investment-framework/:path*",
+        permanent: true,
+      },
+      {
+        source: "/resources/sdk-integration-readiness-kit/:path*",
+        destination: "/resources/software-project-readiness-kit/:path*",
+        permanent: true,
+      },
+      {
+        source: "/resources/technical-content-conversion-playbook/:path*",
+        destination: "/resources/software-investment-framework/:path*",
+        permanent: true,
+      },
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.faithfulsoftware.dev" }],
+        destination: "https://faithfulsoftware.dev/:path*",
+        permanent: true,
+      },
+    ];
   },
   async headers() {
     return [
       {
         source: "/(.*)",
         headers: securityHeaders,
+      },
+      {
+        source: "/growth/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
+      {
+        source: "/resources/:slug/thank-you/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, follow" }],
       },
       {
         source: "/preview/:path*",

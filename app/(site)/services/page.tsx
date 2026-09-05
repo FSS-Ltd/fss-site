@@ -1,30 +1,17 @@
 import type { Metadata } from "next";
+import { createPageMetadata } from "@/lib/seo/metadata";
+import { publicPages } from "@/lib/seo/pages";
 
-import { RedesignPage } from "@/components/redesign/design-page";
+import { ServicesPage } from "@/components/sections/public/services-page";
 import { ServiceSchema } from "@/components/seo/service-schema";
 
-export const metadata: Metadata = {
-  title:
-    "Bespoke Software Development UK | Portals, Dashboards & Workflow Automation",
-  description:
-    "Custom software development services for UK businesses, charities and schools. We build bespoke ERP systems, client portals, operational dashboards, workflow automation and legacy system migrations.",
-  alternates: {
-    canonical: "/services",
-  },
-  openGraph: {
-    title: "Bespoke Software Development UK | Faithful Software Solutions",
-    description:
-      "Custom portals, dashboards, ERP systems and workflow automation for UK organisations that have outgrown off-the-shelf tools.",
-    url: "/services",
-    type: "website",
-  },
-};
+export const metadata: Metadata = createPageMetadata(publicPages["/services"]);
 
 export default function Page() {
   return (
     <>
       <ServiceSchema />
-      <RedesignPage name="services" />
+      <ServicesPage />
     </>
   );
 }

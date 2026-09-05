@@ -1,0 +1,27 @@
+.item {
+  border-bottom: 1px solid var(--border-soft);
+}
+.item h3 {
+  margin: 0;
+}
+.question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  width: 100%;
+  min-height: 56px;
+  padding: 20px 0;
+  background: transparent;
+  border: 0;
+  text-align: left;
+  font-weight: 600;
+  cursor: pointer;
+}
+.question span {
+  font-size: 1.4rem;
+}
+.answer {
+  padding-bottom: 12px;
+  max-width: 800px;
+}

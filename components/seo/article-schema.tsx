@@ -14,9 +14,14 @@ export function ArticleSchema({ post }: ArticleSchemaProps) {
     headline: post.seoTitle,
     description: post.seoDescription,
     datePublished: post.publishDate,
+    dateModified:
+      post.modifiedDate > post.publishDate
+        ? post.modifiedDate
+        : post.publishDate,
     author: {
-      "@type": "Person",
+      "@type": "Organization",
       name: post.author,
+      ...(post.authorUrl ? { url: post.authorUrl } : {}),
     },
     publisher: {
       "@type": "Organization",

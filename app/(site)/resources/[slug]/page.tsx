@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
+import { createResourceMetadata } from "@/lib/seo/content-metadata";
 import { notFound } from "next/navigation";
 
 import { BreadcrumbSchema } from "@/components/seo/breadcrumb-schema";
 import { ResourceDetailPage } from "@/components/resources/resource-detail-page";
-import { getAllResources, getRelatedResources, getResourceBySlug } from "@/lib/resources";
+import {
+  getAllResources,
+  getRelatedResources,
+  getResourceBySlug,
+} from "@/lib/resources";
 
 type ResourceRouteProps = {
   params: Promise<{ slug: string }>;
@@ -15,7 +20,9 @@ export async function generateStaticParams() {
   return resources.map((resource) => ({ slug: resource.slug }));
 }
 
-export async function generateMetadata({ params }: ResourceRouteProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: ResourceRouteProps): Promise<Metadata> {
   const { slug } = await params;
   const resource = await getResourceBySlug(slug);
 
@@ -26,31 +33,12 @@ export async function generateMetadata({ params }: ResourceRouteProps): Promise<
     };
   }
 
-  const canonicalPath = "/resources/" + resource.meta.slug;
-
-  return {
-    title: resource.meta.seoTitle,
-    description: resource.meta.seoDescription,
-    alternates: {
-      canonical: canonicalPath,
-    },
-    openGraph: {
-      title: resource.meta.seoTitle,
-      description: resource.meta.seoDescription,
-      url: canonicalPath,
-      images: [resource.meta.coverImage],
-      type: "website",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: resource.meta.seoTitle,
-      description: resource.meta.seoDescription,
-      images: [resource.meta.coverImage],
-    },
-  };
+  return createResourceMetadata(resource.meta);
 }
 
-export default async function ResourceRoutePage({ params }: ResourceRouteProps) {
+export default async function ResourceRoutePage({
+  params,
+}: ResourceRouteProps) {
   const { slug } = await params;
   const resource = await getResourceBySlug(slug);
 
@@ -66,10 +54,16 @@ export default async function ResourceRoutePage({ params }: ResourceRouteProps) 
         items={[
           { name: "Home", path: "/" },
           { name: "Resources", path: "/resources" },
-          { name: resource.meta.title, path: `/resources/${resource.meta.slug}` },
+          {
+            name: resource.meta.title,
+            path: `/resources/${resource.meta.slug}`,
+          },
         ]}
       />
-      <ResourceDetailPage resource={resource} relatedResources={relatedResources} />
+      <ResourceDetailPage
+        resource={resource}
+        relatedResources={relatedResources}
+      />
     </>
   );
 }

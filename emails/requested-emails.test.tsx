@@ -38,6 +38,8 @@ const { buildIntakeSubmitterConfirmationEmail } =
 function resourceFixture(overrides: Partial<ResourceMeta> = {}): ResourceMeta {
   return {
     slug: "manual-process-audit-fss",
+    modifiedDate: "2026-04-08",
+    indexable: true,
     title: "Manual Process Audit",
     shortDescription: "Audit your manual processes.",
     fullDescription: "A complete guide to auditing manual processes.",

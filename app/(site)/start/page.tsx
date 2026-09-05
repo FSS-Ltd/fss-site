@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { createPageMetadata } from "@/lib/seo/metadata";
+import { publicPages } from "@/lib/seo/pages";
 
 import {
   BusinessIntakePage,
@@ -10,21 +12,7 @@ import { siteConfig } from "@/lib/site-config";
 const path = "/start";
 const pageUrl = `${siteConfig.url}${path}`;
 
-export const metadata: Metadata = {
-  title: "Business Idea Review | Should You Build an App, a Website, or an Audience First?",
-  description:
-    "Describe your business idea and goals. We'll review your answers and tell you whether the right first move is a website, an app, or building an audience before you build anything.",
-  alternates: {
-    canonical: path,
-  },
-  openGraph: {
-    title: "Business Idea Review | Faithful Software Solutions",
-    description:
-      "Answer a few questions about your idea, your goals, and the evidence you have so far. Get a practical read on what to build first.",
-    url: path,
-    type: "website",
-  },
-};
+export const metadata: Metadata = createPageMetadata(publicPages["/start"]);
 
 function BusinessIntakeSchema() {
   const schema = {

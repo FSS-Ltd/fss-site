@@ -1,78 +1,47 @@
 import type { MetadataRoute } from "next";
-
 import { getAllBlogPosts } from "@/lib/blog";
 import { getAllResources } from "@/lib/resources";
-import { siteConfig } from "@/lib/site-config";
+import { canonicalUrl } from "@/lib/seo/metadata";
+import { publicPages } from "@/lib/seo/pages";
+import type { BlogPostMeta } from "@/lib/types/blog";
+import type { ResourceMeta } from "@/lib/types/resource";
 
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = siteConfig.url;
-  const now = new Date();
-
-  const staticRoutes: MetadataRoute.Sitemap = [
-    {
-      url: baseUrl,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 1,
-    },
-    {
-      url: `${baseUrl}/services`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/ai-deployment-questionnaire`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/start`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/contact`,
-      lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/blog`,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/resources`,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-  ];
-
   const [posts, resources] = await Promise.all([
     getAllBlogPosts(),
     getAllResources(),
   ]);
+  return buildSitemapEntries(posts, resources);
+}
 
-  const blogRoutes: MetadataRoute.Sitemap = posts.map((post) => ({
-    url: `${baseUrl}/blog/${post.slug}`,
-    lastModified: new Date(post.publishDate),
-    changeFrequency: "monthly",
-    priority: 0.7,
-  }));
-
-  const resourceRoutes: MetadataRoute.Sitemap = resources.map((resource) => ({
-    url: `${baseUrl}/resources/${resource.slug}`,
-    lastModified: now,
-    changeFrequency: "monthly",
-    priority: 0.6,
-  }));
-
-  return [...staticRoutes, ...blogRoutes, ...resourceRoutes];
+export function buildSitemapEntries(
+  posts: BlogPostMeta[],
+  resources: ResourceMeta[],
+): MetadataRoute.Sitemap {
+  const articlePaths = new Set(posts.map((post) => `/blog/${post.slug}`));
+  return [
+    ...Object.values(publicPages)
+      .filter((page) => page.index && !articlePaths.has(page.path))
+      .map((page) => ({
+        url: canonicalUrl(page.path),
+        lastModified: page.modifiedDate,
+      })),
+    ...posts
+      .filter((post) => post.indexable)
+      .map((post) => ({
+        url: canonicalUrl(`/blog/${post.slug}`),
+        lastModified:
+          post.modifiedDate > post.publishDate
+            ? post.modifiedDate
+            : post.publishDate,
+      })),
+    ...resources
+      .filter((resource) => resource.indexable)
+      .map((resource) => ({
+        url: canonicalUrl(`/resources/${resource.slug}`),
+        lastModified: resource.modifiedDate,
+      })),
+  ];
 }

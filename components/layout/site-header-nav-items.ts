@@ -1,6 +1,6 @@
 export const navItems = [
   { label: "Services", href: "/services", activePath: "/services" },
-  { label: "Work", href: "/#work", activePath: "" },
+  { label: "Work", href: "/work/nexsteps", activePath: "/work/nexsteps" },
   { label: "About", href: "/about", activePath: "/about" },
   { label: "Resources", href: "/resources", activePath: "/resources" },
   { label: "Blog", href: "/blog", activePath: "/blog" },
