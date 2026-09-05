@@ -1,10 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 
-import { getConceptPreviewHref } from "@/components/growth/prospects/concept-preview-href";
 import styles from "@/components/growth/prospects/prospects.module.css";
-import {
-  getFounderDraftProspectPreviewDestination,
-} from "@/lib/growth/prospect-previews/founder-review";
+import { getFounderDraftProspectPreviewDestination } from "@/lib/growth/prospect-previews/founder-review";
 
 type FounderDraftPreviewPageProps = {
   params: Promise<{ prospectId: string }>;
@@ -22,16 +19,12 @@ export default async function FounderDraftPreviewPage({
     return (
       <div className={styles.errorState} role="alert">
         <p>{result.message}</p>
-        <p className={styles.errorCorrelation}>Reference: {result.correlationId}</p>
+        <p className={styles.errorCorrelation}>
+          Reference: {result.correlationId}
+        </p>
       </div>
     );
   }
 
-  const previewHref = getConceptPreviewHref({
-    businessName: result.data.businessName,
-    slug: result.data.slug,
-  });
-  if (!previewHref) notFound();
-
-  redirect(previewHref);
+  redirect(`/preview/${result.data.source.slug}`);
 }

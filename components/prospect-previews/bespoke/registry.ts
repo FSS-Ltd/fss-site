@@ -1,3 +1,4 @@
+import { AcckentAccountantsPage } from "./prospects/acckent-accountants";
 import { BrightAccountingPage } from "./prospects/bright-accounting";
 import { BridglandRoofingPage } from "./prospects/bridgland-roofing";
 import { BrightFoxLettingsPage } from "./prospects/bright-fox-lettings";
@@ -12,9 +13,12 @@ import { HazelMotorsPage } from "./prospects/hazel-motors";
 import { HildenParkAccountantsPage } from "./prospects/hilden-park-accountants";
 import { HillWoodPage } from "./prospects/hill-wood";
 import { HollisMotorsPage } from "./prospects/hollis-motors";
+import { HostyLetsPage } from "./prospects/hosty-lets";
 import { JaguarPlumbingPage } from "./prospects/jaguar-plumbing";
+import { JenkinsonEstatesPage } from "./prospects/jenkinson-estates";
 import { KemsingMotorCompanyPage } from "./prospects/kemsing-motor-company";
 import { KentGarageEquipmentPage } from "./prospects/kent-garage-equipment";
+import { LegrysPage } from "./prospects/legrys";
 import { MardenGaragePage } from "./prospects/marden-garage";
 import { MdAccountancyPage } from "./prospects/md-accountancy";
 import { PaperstonePage } from "./prospects/paperstone";
@@ -28,6 +32,15 @@ import { WormaldAccountantsPage } from "./prospects/wormald-accountants";
 import type { BespokeProspectPage } from "./types";
 
 export const bespokeProspectPages = {
+  "acckent-accountants": {
+    Page: AcckentAccountantsPage,
+    businessName: "AccKent Accountants",
+    title: "Limited-company accountancy in Dartford",
+    description:
+      "Monthly and one-off limited-company accountancy routed by year end, records and next deadline.",
+    layoutSignature: "limited-company-records-route",
+    heroSignature: "prepared-dartford-finance-handover",
+  },
   "best-roofing": {
     Page: BestRoofingPage,
     businessName: "Best Roofing Ltd",
@@ -163,6 +176,15 @@ export const bespokeProspectPages = {
     layoutSignature: "premium-dealership-crossfade-gallery",
     heroSignature: "locked-showroom-car-sequence",
   },
+  "hosty-lets": {
+    Page: HostyLetsPage,
+    businessName: "Hosty Lets",
+    title: "Property lettings in Chatham",
+    description:
+      "Valuation, landlord, tenant and managed-property enquiries routed by purpose and postcode.",
+    layoutSignature: "rounded-property-purpose-route",
+    heroSignature: "prepared-chatham-valuation-visit",
+  },
   "jaguar-plumbing": {
     Page: JaguarPlumbingPage,
     businessName: "Jaguar Plumbing",
@@ -171,6 +193,15 @@ export const bespokeProspectPages = {
       "Route emergency, repair and planned plumbing, heating and drainage enquiries with useful context.",
     layoutSignature: "premium-service-brief",
     heroSignature: "emergency-repair-plan-control-panel",
+  },
+  "jenkinson-estates": {
+    Page: JenkinsonEstatesPage,
+    businessName: "Jenkinson Estates",
+    title: "Independent estate and letting agents in Deal",
+    description:
+      "A coastal property route for valuations, sales, lettings, viewings and existing-client updates.",
+    layoutSignature: "coastal-deal-property-editorial",
+    heroSignature: "deal-townhouse-approach",
   },
   "kemsing-motor-company": {
     Page: KemsingMotorCompanyPage,
@@ -189,6 +220,15 @@ export const bespokeProspectPages = {
       "Workshop design, supply, installation, training and aftercare scoped by project need.",
     layoutSignature: "workshop-scrollytelling-brief",
     heroSignature: "cinematic-workshop-installation",
+  },
+  legrys: {
+    Page: LegrysPage,
+    businessName: "LeGrys",
+    title: "Estate agency services in Cranbrook",
+    description:
+      "Vendors, buyers, landlords and tenants routed by property, place and timeframe.",
+    layoutSignature: "personal-property-conversation",
+    heroSignature: "cranbrook-estate-agent-review",
   },
   "marden-garage": {
     Page: MardenGaragePage,

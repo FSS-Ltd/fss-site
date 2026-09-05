@@ -5,12 +5,9 @@ import test from "node:test";
 import postgres from "postgres";
 
 import type { GrowthDb } from "../../../lib/growth/db/types";
-import {
-  approveProspectPreview,
-} from "../../../lib/growth/prospect-previews/approval";
-import {
-  getPublishedProspectPreviewSlug,
-} from "../../../lib/growth/prospect-previews/public-repository";
+import { approveProspectPreview } from "../../../lib/growth/prospect-previews/approval";
+import { getPublishedProspectPreviewSlug } from "../../../lib/growth/prospect-previews/public-repository";
+import { getReviewableBespokePreviewSourceBySlug } from "../../../lib/growth/prospect-previews/reviewable-source";
 import { ingestResearchRun } from "../../../lib/growth/research/ingest";
 import { createValidResearchRunFixture } from "../../../lib/growth/research/ingestion-schema.test-fixture";
 
@@ -79,7 +76,7 @@ async function cleanupResearchRun(
 }
 
 test(
-  "approves a registered bespoke preview without generated package metadata",
+  "approves a reconciled allowlisted bespoke preview",
   { skip: !connectionString },
   async () => {
     if (!connectionString) return;
@@ -90,13 +87,17 @@ test(
     const companyNumber = token.slice(0, 12).toUpperCase();
     const contactEmail = `${externalRunId}-contact@example.test`;
     const correlationId = `${externalRunId}-approve`;
+    const source = getReviewableBespokePreviewSourceBySlug(
+      "acckent-accountants",
+    );
+    assert.ok(source);
 
     try {
       const fixture = createValidResearchRunFixture();
       fixture.externalRunId = externalRunId;
       const candidate = fixture.prospects[0]!;
-      candidate.business.legalName = `Bright Accounting Integration ${token}`;
-      candidate.business.tradingName = "Bright Accounting Ltd";
+      candidate.business.legalName = `AccKent Integration ${token}`;
+      candidate.business.tradingName = "AccKent Accountants";
       candidate.business.companyNumber = companyNumber;
       candidate.business.googlePlaceId = `place-${token}`;
       candidate.contact.email = contactEmail;
@@ -130,12 +131,12 @@ test(
 
       await sql`
         update growth.prospect_previews
-        set generation_status = 'composition_unavailable',
-            slug = null,
-            composition_digest = null,
-            generation_pr_number = null,
-            generation_branch = null,
-            generated_at = null
+        set generation_status = 'merged_draft',
+            slug = ${source.slug},
+            composition_digest = ${source.digest},
+            generation_pr_number = 198,
+            generation_branch = 'fix/reconcile-six-bespoke-concepts',
+            generated_at = now()
         where id = ${identity.previewId}
       `;
 
@@ -186,11 +187,11 @@ test(
         },
         {
           status: "published",
-          generationStatus: "composition_unavailable",
-          slug: "bright-accounting",
-          compositionDigest: null,
-          generationPrNumber: null,
-          generationBranch: null,
+          generationStatus: "published",
+          slug: "acckent-accountants",
+          compositionDigest: source.digest,
+          generationPrNumber: 198,
+          generationBranch: "fix/reconcile-six-bespoke-concepts",
           approvedBy: founder.actorId,
         },
       );
@@ -201,7 +202,7 @@ test(
           identity.previewPublicId,
           sql as unknown as GrowthDb,
         ),
-        "bright-accounting",
+        "acckent-accountants",
       );
     } finally {
       await cleanupResearchRun(sql, externalRunId, companyNumber);
