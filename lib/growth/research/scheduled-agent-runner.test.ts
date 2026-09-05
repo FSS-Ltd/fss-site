@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { sectorExamples } from "../../sector-examples/catalog";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
@@ -66,6 +67,17 @@ test("runs the researcher in the checked-out project with schema-constrained out
     assert.match(prompt, /first-party strength/i);
     assert.match(prompt, /two or three sourced website-journey improvements/i);
     assert.match(prompt, /private preview URL/i);
+    assert.match(prompt, /all four matching fictional-company example links/i);
+    assert.match(
+      prompt,
+      /added at ingestion rather than deferred until approval/i,
+    );
+    for (const example of sectorExamples)
+      assert.ok(
+        prompt.includes(
+          `https://faithfulsoftware.dev/examples/${example.slug}`,
+        ),
+      );
     assert.match(prompt, /version 1\.1 bundle/i);
     assert.match(prompt, /first-party preview evidence only/i);
     assert.match(prompt, /fully bespoke review-only site/i);

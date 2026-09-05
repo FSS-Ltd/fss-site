@@ -1,0 +1,358 @@
+@media (min-width: 1500px) {
+  .example-section,
+  .folio-hero,
+  .auto-hero-copy {
+    padding-left: max(6.5%, calc((100vw - 1360px) / 2));
+    padding-right: max(6.5%, calc((100vw - 1360px) / 2));
+  }
+}
+@media (max-width: 1000px) {
+  .example-header nav {
+    gap: 18px;
+  }
+  .example-wordmark {
+    font-size: 22px;
+  }
+  .example-section {
+    padding: 80px 5%;
+  }
+  .example-section-heading {
+    gap: 30px;
+  }
+  .roof-story-image {
+    min-height: 600px;
+  }
+  .roof-story-copy {
+    padding: 65px 10%;
+  }
+  .folio-hero {
+    gap: 6%;
+    padding: 70px 5%;
+  }
+  .folio-workspace-body {
+    padding: 25px;
+  }
+  .folio-services article {
+    padding: 24px;
+  }
+  .example-enquiry {
+    gap: 6%;
+  }
+  .example-enquiry-panel {
+    padding: 25px;
+  }
+  .auto-service-list article {
+    grid-template-columns: 30px 1fr 1.2fr 40px;
+    gap: 25px;
+  }
+  .auto-service-list a {
+    width: 40px;
+    height: 40px;
+  }
+}
+@media (max-width: 760px) {
+  .example-notice {
+    padding: 9px 5%;
+    font-size: 9px;
+    flex-wrap: wrap;
+    gap: 5px 15px;
+  }
+  .example-notice > span {
+    order: 3;
+    width: 100%;
+    font-size: 8px;
+  }
+  .example-header {
+    min-height: 85px;
+    padding: 19px 5%;
+    gap: 15px;
+  }
+  .example-header nav {
+    display: none;
+  }
+  .example-header .example-button {
+    padding: 11px 13px;
+    gap: 12px;
+    font-size: 10px;
+    min-height: 42px;
+  }
+  .example-wordmark {
+    font-size: 20px;
+    gap: 7px;
+  }
+  .example-symbol {
+    font-size: 30px;
+  }
+  .example-auto .example-wordmark {
+    font-size: 17px;
+    max-width: 140px;
+    white-space: normal;
+    line-height: 1.05;
+  }
+  .example-accounts .example-wordmark {
+    font-size: 26px;
+  }
+  .example-section {
+    padding: 65px 6%;
+  }
+  .example-section-heading {
+    grid-template-columns: 1fr;
+    margin-bottom: 35px;
+    gap: 22px;
+  }
+  .example-section-heading > .example-eyebrow {
+    margin-bottom: 0;
+  }
+  .example-section-heading > p:last-child:not(:first-child) {
+    font-size: 15px;
+  }
+  .example-site h2 {
+    font-size: clamp(2.5rem, 10vw, 4.5rem);
+  }
+  .example-enquiry {
+    grid-template-columns: 1fr;
+    gap: 35px;
+  }
+  .example-enquiry-panel {
+    padding: 22px;
+  }
+  .example-footer {
+    grid-template-columns: 1fr;
+    padding: 50px 6% 25px;
+    gap: 30px;
+  }
+  .example-footer small {
+    margin-top: 0;
+  }
+  .roof-spec-strip {
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 25px 6%;
+    font-size: 10px;
+  }
+  .roof-title-band {
+    padding: 20px 5%;
+  }
+  .roof-title-band .example-eyebrow {
+    font-size: 9px;
+    max-width: 200px;
+  }
+  .roof-services {
+    grid-template-columns: 1fr;
+  }
+  .roof-services article,
+  .roof-services article + article {
+    padding: 30px 0;
+    border-left: 0;
+    border-bottom: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: 1fr 130px;
+    column-gap: 15px;
+  }
+  .roof-services article > .example-eyebrow {
+    grid-column: 1/-1;
+  }
+  .roof-line-art {
+    grid-column: 2;
+    grid-row: 2/4;
+    align-self: center;
+    transform: scale(0.8);
+    margin: 0;
+  }
+  .roof-services h3 {
+    margin: 30px 0 15px;
+    font-size: 30px;
+  }
+  .roof-services article > p {
+    min-height: 0;
+    font-size: 13px;
+  }
+  .roof-services a {
+    grid-column: 1/-1;
+    margin-top: 20px;
+  }
+  .roof-story {
+    grid-template-columns: 1fr;
+  }
+  .roof-story-image {
+    min-height: 0;
+    aspect-ratio: 1.2;
+  }
+  .roof-story-copy {
+    padding: 55px 6%;
+  }
+  .roof-story-copy h2 {
+    margin: 25px 0 35px;
+  }
+  .estate-intro {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+  .estate-intro > div p {
+    font-size: 14px;
+  }
+  .estate-homes {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .estate-home-image {
+    aspect-ratio: 1.05;
+  }
+  .estate-filters {
+    flex-wrap: wrap;
+    gap: 18px;
+  }
+  .estate-filters button {
+    padding: 10px 14px;
+  }
+  .estate-seller {
+    padding: 70px 6% 40px;
+  }
+  .estate-seller-steps {
+    flex-direction: column;
+    margin-top: 45px;
+    gap: 18px;
+  }
+  .auto-hero-copy {
+    padding: 45px 6% 35px;
+  }
+  .auto-hero h1 {
+    font-size: clamp(2.85rem, 11vw, 5rem);
+    margin-top: 25px;
+  }
+  .auto-hero-bottom {
+    align-items: start;
+    flex-direction: column;
+  }
+  .auto-hero-bottom p {
+    font-size: 13px;
+  }
+  .auto-hero-image {
+    aspect-ratio: 1.2;
+    min-height: 0;
+  }
+  .auto-ticker {
+    font-size: 15px;
+    padding: 20px 0;
+    gap: 40px;
+  }
+  .auto-crosshair {
+    height: 60px;
+    width: 60px;
+    bottom: 20px;
+  }
+  .auto-image-caption {
+    font-size: 9px;
+    bottom: 20px;
+  }
+  .auto-service-list article {
+    grid-template-columns: 25px 1fr 45px;
+    gap: 20px;
+    padding: 30px 0;
+  }
+  .auto-service-list article > div {
+    grid-column: 2;
+    grid-row: 2;
+  }
+  .auto-service-list a {
+    grid-column: 3;
+    grid-row: 1;
+  }
+  .auto-service-list h3 {
+    font-size: 25px;
+  }
+  .auto-process {
+    grid-template-columns: 1fr;
+    gap: 45px;
+  }
+  .auto-process h2 {
+    font-size: 4.2rem;
+  }
+  .folio-hero {
+    grid-template-columns: 1fr;
+    padding: 50px 6% 65px;
+    gap: 50px;
+  }
+  .folio-hero h1 {
+    font-size: clamp(3.5rem, 13vw, 5rem);
+  }
+  .folio-workspace {
+    max-width: 470px;
+    width: calc(100% - 15px);
+    margin: 0 auto;
+    box-shadow: 12px 15px 0 #dddcd0;
+    transform: rotate(-1deg);
+  }
+  .folio-workspace-body {
+    padding: 25px;
+  }
+  .folio-promise {
+    font-size: 10px;
+    gap: 12px;
+    text-align: center;
+    padding: 22px 5%;
+  }
+  .folio-services {
+    grid-template-columns: 1fr;
+  }
+  .folio-services article {
+    padding: 30px;
+  }
+  .folio-service-symbol {
+    font-size: 65px;
+    margin: 25px 0;
+  }
+  .folio-services article > p:not(:first-child) {
+    min-height: 0;
+  }
+  .folio-approach {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .example-gallery {
+    padding: 0 6%;
+  }
+  .example-gallery-intro {
+    padding: 65px 0 50px;
+  }
+  .example-gallery h1 {
+    font-size: clamp(3rem, 10vw, 5rem);
+  }
+  .example-gallery-intro > p:last-child {
+    font-size: 15px;
+  }
+  .example-gallery-grid {
+    grid-template-columns: 1fr;
+    gap: 45px;
+  }
+  .example-gallery-card h2 {
+    font-size: 30px;
+  }
+  .example-gallery footer {
+    margin-top: 65px;
+    padding-top: 45px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .example-site *,
+  .example-gallery * {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+  .example-reading-progress {
+    display: none;
+  }
+  [data-reveal][data-waiting] {
+    opacity: 1;
+    transform: none;
+  }
+  .auto-hero-image img,
+  .auto-ticker span,
+  .auto-crosshair {
+    transform: none;
+  }
+  .folio-workspace {
+    transform: none;
+  }
+}

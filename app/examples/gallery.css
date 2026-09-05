@@ -1,0 +1,83 @@
+/* The public collection. */
+.example-gallery {
+  padding: 0 5%;
+  --paper: #f1eee6;
+  --ink: #222920;
+  --accent: #a84329;
+}
+.example-gallery header {
+  padding: 30px 0;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #22292030;
+  font-size: 13px;
+}
+.example-gallery-intro {
+  padding: 100px 0 75px;
+}
+.example-gallery h1 {
+  font-size: clamp(3.5rem, 7.5vw, 8rem);
+  margin: 30px 0;
+}
+.example-gallery-intro > p:last-child {
+  font-size: 17px;
+  line-height: 1.9;
+  max-width: 540px;
+}
+.example-gallery-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 70px 40px;
+}
+.example-gallery-card > div {
+  position: relative;
+  aspect-ratio: 1.5;
+  overflow: hidden;
+  background: #d6d6c9;
+}
+.example-gallery-card img {
+  object-fit: cover;
+  transition: transform 0.65s;
+}
+.example-gallery-card:hover img {
+  transform: scale(1.03);
+}
+.example-gallery-card > div > span {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background: #f1eee6;
+  padding: 8px 15px;
+  font-size: 11px;
+}
+.example-gallery-card > section {
+  display: grid;
+  grid-template-columns: 1fr 30px;
+  padding-top: 25px;
+}
+.example-gallery-card h2 {
+  font-size: 34px;
+  margin: 0 0 15px;
+}
+.example-gallery-card section > span {
+  font-size: 26px;
+}
+.example-gallery-card p {
+  grid-column: 1/-1;
+  max-width: 390px;
+  font-size: 13px;
+  line-height: 1.8;
+}
+.example-gallery footer {
+  border-top: 1px solid #22292030;
+  margin-top: 100px;
+  padding: 70px 0 35px;
+}
+.example-gallery footer h2 {
+  font-size: clamp(2rem, 3.5vw, 4rem);
+  line-height: 1.15;
+}
+.example-gallery footer p {
+  font-size: 11px;
+  margin-top: 55px;
+}

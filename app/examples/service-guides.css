@@ -1,0 +1,212 @@
+.example-guide-directory {
+  padding: 65px 5vw;
+  border-top: 1px solid #8885;
+}
+.example-guide-directory h2 {
+  font-size: clamp(30px, 4vw, 50px);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  margin: 20px 0 35px;
+}
+.example-guide-directory > div {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+.example-guide-directory a {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  border-top: 1px solid currentColor;
+  padding: 22px 0;
+  line-height: 1.5;
+}
+.example-service-page {
+  background: #f4f1e9;
+  color: #283229;
+  padding: 35px 6vw 85px;
+}
+.example-service-page > nav {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  margin-bottom: 70px;
+}
+.example-service-page > header {
+  max-width: 1000px;
+  margin-bottom: 80px;
+}
+.example-service-page h1 {
+  font-size: clamp(48px, 7vw, 104px);
+  letter-spacing: -0.06em;
+  line-height: 1.02;
+  font-weight: 500;
+  margin: 25px 0;
+}
+.example-service-page > header > p:not(.example-eyebrow) {
+  font-size: 21px;
+  line-height: 1.65;
+  max-width: 55ch;
+  margin: 25px 0;
+}
+.example-service-body {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 7vw;
+}
+.example-service-body h2,
+.example-service-faq h2 {
+  font-size: clamp(30px, 3.2vw, 46px);
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  font-weight: 500;
+}
+.example-service-body ol {
+  list-style: none;
+  padding: 0;
+}
+.example-service-body li {
+  line-height: 1.8;
+}
+.example-service-body ol li {
+  display: flex;
+  gap: 26px;
+  border-top: 1px solid #2834;
+  padding: 28px 0;
+}
+.example-service-body h3 {
+  font-size: 23px;
+  margin: 0 0 12px;
+  line-height: 1.3;
+}
+.example-service-body p {
+  line-height: 1.8;
+  margin: 0;
+  max-width: 55ch;
+}
+.example-service-body aside {
+  background: #e8e5d9;
+  padding: 35px;
+  height: fit-content;
+}
+.example-service-body ul {
+  padding-left: 20px;
+  margin: 30px 0;
+}
+.example-service-body ul li {
+  padding: 10px 0;
+}
+.example-service-faq {
+  max-width: 800px;
+  margin: 75px auto 0;
+  border-top: 1px solid #2834;
+  padding-top: 45px;
+}
+.example-service-faq > p:last-child {
+  line-height: 1.85;
+  margin-top: 25px;
+}
+.example-service-page .example-button {
+  background: #283229;
+  color: #fff;
+}
+.example-sector-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 80px;
+}
+.example-sector-nav a {
+  display: flex;
+  gap: 20px;
+  border: 1px solid #2834;
+  border-radius: 30px;
+  padding: 13px 20px;
+  font-size: 13px;
+}
+.example-sector-nav a:hover {
+  background: #203b2c;
+  color: #fff;
+}
+.example-sector-nav span {
+  opacity: 0.55;
+}
+.example-sector-collection {
+  scroll-margin-top: 25px;
+  margin-bottom: 100px;
+}
+.example-sector-heading {
+  margin-bottom: 40px;
+}
+.example-sector-heading h2 {
+  font-size: clamp(42px, 6vw, 80px);
+  font-weight: 500;
+  letter-spacing: -0.06em;
+  line-height: 1.1;
+  margin: 15px 0;
+}
+.example-sector-heading > p:last-child {
+  font-size: 18px;
+  line-height: 1.7;
+  max-width: 55ch;
+}
+.example-gallery-card h3 {
+  font-size: clamp(25px, 3vw, 38px);
+  letter-spacing: -0.04em;
+  font-weight: 500;
+  margin: 0;
+}
+.example-gallery-card small {
+  grid-column: 1/-1;
+  max-width: 55ch;
+  line-height: 1.7;
+  opacity: 0.7;
+}
+.example-gallery-card > section {
+  row-gap: 16px;
+}
+.example-gallery-card img {
+  transition: transform 0.7s;
+}
+.example-gallery-card:hover img {
+  transform: scale(1.035);
+}
+@media (max-width: 650px) {
+  .example-guide-directory > div,
+  .example-service-body {
+    grid-template-columns: 1fr;
+  }
+  .example-guide-directory {
+    padding: 45px 6vw;
+  }
+  .example-guide-directory > div {
+    gap: 10px;
+  }
+  .example-service-page > nav {
+    margin-bottom: 45px;
+  }
+  .example-service-page > header {
+    margin-bottom: 50px;
+  }
+  .example-service-body {
+    gap: 30px;
+  }
+  .example-service-body aside {
+    padding: 25px;
+  }
+  .example-sector-nav {
+    margin-bottom: 50px;
+  }
+  .example-sector-collection {
+    margin-bottom: 65px;
+  }
+  .example-service-faq {
+    margin-top: 50px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .example-gallery-card img {
+    transition: none;
+  }
+}

@@ -1,0 +1,167 @@
+@media (max-width: 900px) {
+  .variant-process {
+    gap: 40px;
+  }
+  .crown-hero,
+  .northfield-hero,
+  .maison-hero {
+    gap: 30px;
+  }
+  .crown-hero h1 {
+    font-size: 66px;
+  }
+  .northfield-hero .variant-image,
+  .maison-hero .variant-image {
+    height: 470px;
+  }
+  .fieldwork-hero {
+    min-height: 580px;
+  }
+  .fieldwork-hero h1 {
+    font-size: 68px;
+  }
+  .maison-intro {
+    grid-template-columns: 0.15fr 1fr;
+  }
+  .maison-intro > p {
+    grid-column: 2;
+  }
+  .variant-service-grid {
+    gap: 18px;
+  }
+}
+@media (max-width: 650px) {
+  .variant-service-grid,
+  .variant-process,
+  .crown-hero,
+  .northfield-hero,
+  .maison-hero,
+  .fieldwork-hero {
+    grid-template-columns: 1fr;
+  }
+  .variant-service-grid {
+    gap: 40px;
+  }
+  .variant-section-top {
+    margin-bottom: 35px;
+  }
+  .variant-process {
+    gap: 28px;
+  }
+  .crown-hero,
+  .northfield-hero,
+  .maison-hero {
+    padding: 40px 6vw;
+  }
+  .crown-hero h1 {
+    font-size: clamp(50px, 13vw, 78px);
+  }
+  .crown-hero .variant-image {
+    min-height: 270px;
+  }
+  .crown-strip {
+    flex-direction: column;
+    gap: 12px;
+    padding: 25px 6vw;
+  }
+  .slate-hero {
+    padding: 40px 6vw 0;
+  }
+  .slate-hero h1 {
+    font-size: 57px;
+  }
+  .slate-hero-caption {
+    align-items: start;
+    gap: 20px;
+    flex-direction: column;
+  }
+  .slate-hero .variant-image {
+    height: 350px;
+  }
+  .slate-statement,
+  .fieldwork-intro {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+  .slate-statement > p:last-child,
+  .fieldwork-intro > p:last-child {
+    grid-column: 1;
+  }
+  .slate-materials {
+    grid-template-columns: 1fr;
+    padding: 45px 6vw;
+    gap: 35px;
+  }
+  .slate-materials h3 {
+    margin: 20px 0;
+  }
+  .northfield-hero h1 {
+    font-size: 56px;
+  }
+  .northfield-hero .variant-image {
+    height: 420px;
+  }
+  .northfield-start {
+    padding: 35px 6vw;
+    flex-direction: column;
+    align-items: start;
+  }
+  .vale-hero {
+    padding: 35px 6vw 0;
+  }
+  .vale-hero h1 {
+    font-size: clamp(44px, 11.5vw, 68px);
+  }
+  .vale-hero-bottom {
+    align-items: start;
+    gap: 20px;
+    flex-direction: column;
+  }
+  .vale-hero .variant-image {
+    height: 310px;
+  }
+  .vale-paths {
+    padding: 0 6vw;
+    grid-template-columns: 1fr;
+  }
+  .vale-paths a {
+    padding: 22px;
+    border-bottom: 1px solid #2223;
+  }
+  .fieldwork-hero-copy {
+    padding: 45px 6vw;
+  }
+  .fieldwork-hero h1 {
+    font-size: 66px;
+    margin: 30px 0;
+  }
+  .fieldwork-hero .variant-image {
+    height: 390px;
+  }
+  .fieldwork-collection-heading {
+    flex-direction: column;
+    gap: 25px;
+  }
+  .fieldwork-note-panel {
+    padding: 50px 6vw;
+  }
+  .maison-hero h1 {
+    font-size: 77px;
+  }
+  .maison-hero .variant-image {
+    height: 430px;
+  }
+  .maison-vertical {
+    display: none;
+  }
+  .maison-services > a {
+    gap: 16px;
+    grid-template-columns: 25px 1fr 25px;
+  }
+  .maison-services p {
+    line-height: 1.6;
+  }
+  .maison-intro {
+    gap: 18px;
+  }
+}

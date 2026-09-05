@@ -113,3 +113,7 @@ uploaded by this workflow.
 Finish after producing the drafts, optional verified first-party preview-asset
 uploads, and redacted run report. Do not create a Gmail draft, publish a
 preview, or send email.
+
+## Sector examples in initial emails
+
+Include all four matching fictional-company links from lib/sector-examples/catalog.ts, using the researched sector and business name. The launcher builds its directory from that catalog and ingestion applies the same classifier. Preserve existing bespoke concepts and private preview URLs; never change started outreach. Unsupported types receive the honestly described collection link. Keep the required word limit, disclaimer and opt-out. Do not create provider drafts or send email.
