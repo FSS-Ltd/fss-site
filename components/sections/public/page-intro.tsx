@@ -22,7 +22,12 @@ export function PageIntro({
 
 export function ContactLink() {
   return (
-    <ButtonLink href="/contact" size="lg" className="min-h-12">
+    <ButtonLink
+      href="/contact"
+      prefetch={false}
+      size="lg"
+      className="min-h-12"
+    >
       Discuss your project <span aria-hidden="true">&nbsp;→</span>
     </ButtonLink>
   );

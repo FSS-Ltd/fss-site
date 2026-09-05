@@ -70,11 +70,6 @@
   list-style: decimal-leading-zero;
   padding-left: 24px;
 }
-.steps li::marker {
-  color: #0f7078;
-  font-weight: 650;
-}
-
 @media (max-width: 680px) {
   .page {
     padding-top: 104px;

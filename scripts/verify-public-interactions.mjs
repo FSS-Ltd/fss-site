@@ -48,6 +48,22 @@ await page.route("**/api/lead", async (route) => {
 });
 
 try {
+  const homePage = await context.newPage();
+  const cdpSession = await context.newCDPSession(homePage);
+  const cspIssues = [];
+  await cdpSession.send("Audits.enable");
+  cdpSession.on("Audits.issueAdded", ({ issue }) => {
+    if (issue.code === "ContentSecurityPolicyIssue") cspIssues.push(issue);
+  });
+  await homePage.goto(`${baseURL}/`);
+  await homePage.waitForTimeout(500);
+  assert.deepEqual(
+    cspIssues,
+    [],
+    "The homepage must not prefetch client code blocked by the Content Security Policy.",
+  );
+  await homePage.close();
+
   await page.goto(`${baseURL}/contact`);
   const rejectAnalytics = page.getByRole("button", {
     name: "Reject analytics",
