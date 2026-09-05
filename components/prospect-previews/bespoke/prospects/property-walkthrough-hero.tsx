@@ -30,12 +30,11 @@ function clamp(value: number, minimum: number, maximum: number): number {
   return Math.min(Math.max(value, minimum), maximum);
 }
 
-function canUseScrollLinkedVideo(
+export function shouldEnablePropertyWalkthrough(
   prefersReducedMotion: boolean,
   viewportWidth: number,
-  readyState: number,
 ): boolean {
-  return !prefersReducedMotion && viewportWidth >= 768 && readyState >= 1;
+  return !prefersReducedMotion && viewportWidth >= 768;
 }
 
 function getCopyOpacity(progress: number, start: number, end: number): number {
@@ -73,11 +72,23 @@ export function PropertyWalkthroughHero({
   useEffect(() => {
     const section = sectionRef.current;
     const video = videoRef.current;
-    if (!section || !video) return;
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    if (
+      !section ||
+      !video ||
+      !shouldEnablePropertyWalkthrough(
+        prefersReducedMotion,
+        window.innerWidth,
+      )
+    ) {
+      return;
+    }
 
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let frameId = 0;
-    let isActive = false;
+    let hasMetadata = video.readyState >= HTMLMediaElement.HAVE_METADATA;
+    let readyTimer: number | undefined;
 
     const syncCopyToProgress = (progress: number) => {
       copyRefs.current.forEach((copy, index) => {
@@ -92,24 +103,14 @@ export function PropertyWalkthroughHero({
       });
     };
 
-    const updateCapability = () => {
-      isActive = canUseScrollLinkedVideo(
-        reducedMotion.matches,
-        window.innerWidth,
-        video.readyState,
-      );
-      setIsScrollLinked(isActive);
-
-      if (!isActive) {
-        video.style.transform = "scale(1)";
-        syncCopyToProgress(0);
-      }
-    };
-
     const syncToScroll = () => {
       frameId = 0;
+      hasMetadata =
+        hasMetadata ||
+        (video.readyState >= HTMLMediaElement.HAVE_METADATA &&
+          video.duration > 0);
       if (
-        !isActive ||
+        !hasMetadata ||
         !Number.isFinite(video.duration) ||
         video.duration <= 0
       ) {
@@ -131,7 +132,6 @@ export function PropertyWalkthroughHero({
         video.currentTime = targetTime;
       }
 
-      video.style.transform = `scale(${(1 + progress * 0.025).toFixed(4)})`;
       syncCopyToProgress(progress);
     };
 
@@ -140,22 +140,24 @@ export function PropertyWalkthroughHero({
       frameId = window.requestAnimationFrame(syncToScroll);
     };
 
-    const refresh = () => {
-      updateCapability();
+    const handleLoadedMetadata = () => {
+      hasMetadata = video.duration > 0;
+      setIsScrollLinked(hasMetadata);
       requestSync();
     };
 
-    video.addEventListener("loadedmetadata", refresh);
+    video.addEventListener("loadedmetadata", handleLoadedMetadata);
     window.addEventListener("scroll", requestSync, { passive: true });
-    window.addEventListener("resize", refresh);
-    reducedMotion.addEventListener("change", refresh);
-    refresh();
+    window.addEventListener("resize", requestSync);
+    if (hasMetadata) {
+      readyTimer = window.setTimeout(handleLoadedMetadata, 0);
+    }
 
     return () => {
-      video.removeEventListener("loadedmetadata", refresh);
+      video.removeEventListener("loadedmetadata", handleLoadedMetadata);
       window.removeEventListener("scroll", requestSync);
-      window.removeEventListener("resize", refresh);
-      reducedMotion.removeEventListener("change", refresh);
+      window.removeEventListener("resize", requestSync);
+      if (readyTimer !== undefined) window.clearTimeout(readyTimer);
       if (frameId !== 0) window.cancelAnimationFrame(frameId);
     };
   }, []);
@@ -175,7 +177,7 @@ export function PropertyWalkthroughHero({
           muted
           playsInline
           poster={posterSource}
-          preload="metadata"
+          preload="auto"
           ref={videoRef}
           src={videoSource}
         />
