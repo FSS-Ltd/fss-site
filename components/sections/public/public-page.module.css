@@ -1,5 +1,19 @@
 .page {
+  position: relative;
+  isolation: isolate;
   padding: 120px max(24px, calc((100% - 1120px) / 2)) 80px;
+}
+.page::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0 0 auto;
+  height: 440px;
+  opacity: 0.62;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 88% 4%, rgb(70 199 216 / 0.14), transparent 32%),
+    radial-gradient(circle at 12% 0%, rgb(20 152 158 / 0.09), transparent 26%);
+  content: "";
 }
 .hero {
   max-width: 840px;
@@ -50,7 +64,24 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 36px;
 }
+.grid > div {
+  padding: clamp(22px, 3vw, 32px);
+  border: 1px solid rgb(10 26 46 / 0.1);
+  border-radius: 18px;
+  background: rgb(255 255 255 / 0.62);
+  box-shadow: 0 24px 52px -44px rgb(10 26 46 / 0.5);
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+.grid > div:hover {
+  border-color: rgb(15 122 131 / 0.36);
+  box-shadow: 0 32px 62px -44px rgb(10 26 46 / 0.58);
+  transform: translateY(-3px);
+}
 .proof {
+  position: relative;
   background: var(--surface-1);
   border: 1px solid var(--border-soft);
   border-radius: 24px;
@@ -69,6 +100,11 @@
   gap: 28px;
   list-style: decimal-leading-zero;
   padding-left: 24px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .grid > div:hover {
+    transform: none;
+  }
 }
 @media (max-width: 680px) {
   .page {

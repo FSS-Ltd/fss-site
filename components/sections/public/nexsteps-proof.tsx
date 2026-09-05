@@ -1,12 +1,16 @@
 import Image from "next/image";
 import styles from "./public-page.module.css";
 
-export function NexStepsProof() {
+type NexStepsProofProps = {
+  className?: string;
+};
+
+export function NexStepsProof({ className }: NexStepsProofProps) {
   return (
     <section
       id="work"
       aria-labelledby="nexsteps-title"
-      className={`${styles.proof} ${styles.grid}`}
+      className={`${styles.proof} ${styles.grid} ${className ?? ""}`}
     >
       <div>
         <div className={styles.eyebrow}>Our work · NexSteps</div>
