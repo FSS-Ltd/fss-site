@@ -1,0 +1,75 @@
+.page {
+  display: grid;
+  gap: 24px;
+}
+.eyebrow {
+  margin: 0 0 6px;
+  color: #526078;
+  font-size: 0.875rem;
+}
+.heading {
+  margin: 0;
+  color: #07182e;
+  font-size: 1.6rem;
+  font-weight: 750;
+}
+.subtitle {
+  margin: 6px 0 0;
+  color: #526078;
+}
+.list {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.row,
+.notice {
+  border: 1px solid #dce3e8;
+  border-radius: 12px;
+  padding: 24px;
+  background: white;
+  overflow-wrap: anywhere;
+}
+.name {
+  margin: 0;
+  color: #07182e;
+  font-size: 1.1rem;
+}
+.detail {
+  margin: 4px 0 0;
+  color: #526078;
+}
+.facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin: 20px 0 0;
+}
+.facts dt {
+  color: #526078;
+  font-size: 0.875rem;
+}
+.facts dd {
+  margin: 4px 0 0;
+  color: #07182e;
+}
+.page a {
+  color: #174a7c;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.page a:focus-visible {
+  outline: 2px solid #174a7c;
+  outline-offset: 4px;
+}
+@media (max-width: 640px) {
+  .facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .row,
+  .notice {
+    padding: 20px;
+  }
+}
