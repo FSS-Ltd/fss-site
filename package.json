@@ -36,7 +36,9 @@
     "verify:migrations": "tsx scripts/verify-migrations.ts",
     "typecheck": "tsc --noEmit",
     "test:public-site": "node --import tsx --test tests/integration/public-site-crawl.test.ts",
-    "generate:readiness-kit": "tsx scripts/generate-readiness-kit.ts"
+    "generate:readiness-kit": "tsx scripts/generate-readiness-kit.ts",
+    "test:integration:operations": "tsx scripts/require-operations-database-env.ts && node --import tsx --test --test-concurrency=1 tests/integration/operations/*.test.ts",
+    "test:coverage:operations": "tsx scripts/require-operations-database-env.ts && node --import tsx --test --test-concurrency=1 --experimental-test-coverage --test-coverage-include='lib/operations/**/*.ts' --test-coverage-exclude='**/*.test.ts' --test-coverage-lines=80 --test-coverage-functions=80 --test-coverage-branches=80 lib/operations/**/*.test.ts tests/integration/operations/*.test.ts"
   },
   "dependencies": {
     "@date-fns/tz": "^1.5.0",

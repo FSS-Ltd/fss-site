@@ -147,22 +147,33 @@ function readMigrationFiles(migrationsDir: string): MigrationFile[] {
 }
 
 function main(): void {
-  const migrationsDir = path.join(process.cwd(), "supabase", "migrations");
-  const files = readMigrationFiles(migrationsDir);
+  const files = [
+    ...readMigrationFiles(path.join(process.cwd(), "supabase", "migrations")),
+    ...readMigrationFiles(
+      path.join(process.cwd(), "supabase", "operations", "migrations"),
+    ),
+  ];
   const violations = checkMigrationPolicy(files);
 
   if (violations.length === 0) {
-    console.log(`verify-migrations: ${files.length} migration(s) passed policy.`);
+    console.log(
+      `verify-migrations: ${files.length} migration(s) passed policy.`,
+    );
     return;
   }
 
   for (const violation of violations) {
-    console.log(`  FAIL  ${violation.filename}  [${violation.rule}]  ${violation.detail}`);
+    console.log(
+      `  FAIL  ${violation.filename}  [${violation.rule}]  ${violation.detail}`,
+    );
   }
   console.log(`\nverify-migrations: ${violations.length} violation(s) found.`);
   process.exit(1);
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(process.argv[1]).href
+) {
   main();
 }
