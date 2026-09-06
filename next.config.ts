@@ -42,6 +42,7 @@ const nextConfig: NextConfig = {
     // Keep contact controls out of the public landing page's CSS payload.
     cssChunking: false,
   },
+  serverExternalPackages: ["pdfkit"],
   turbopack: {
     root: projectRoot,
   },
