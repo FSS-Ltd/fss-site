@@ -1,0 +1,130 @@
+.page,
+.form {
+  display: grid;
+  gap: 24px;
+  color: #07182e;
+}
+.page h1,
+.page h2,
+.page h3 {
+  margin: 0 0 8px;
+}
+.page p {
+  line-height: 1.6;
+}
+.page a {
+  color: #174a7c;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.card {
+  border: 1px solid #dce3e8;
+  border-radius: 12px;
+  padding: 24px;
+  background: #fff;
+  overflow-wrap: anywhere;
+}
+.form fieldset {
+  display: grid;
+  gap: 20px;
+  border: 1px solid #dce3e8;
+  border-radius: 8px;
+  margin: 0;
+  padding: 20px;
+  min-width: 0;
+}
+.form legend {
+  font-weight: 650;
+  padding: 0 6px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.field input,
+.field select,
+.field textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid #526078;
+  border-radius: 6px;
+  padding: 10px;
+  background: #fff;
+  color: #07182e;
+  font: inherit;
+}
+.field textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+.form input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+.form button {
+  min-height: 44px;
+  border: 1px solid #174a7c;
+  border-radius: 6px;
+  padding: 10px 16px;
+  color: #174a7c;
+  background: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+.form button.primary {
+  background: #174a7c;
+  color: #fff;
+  justify-self: start;
+}
+.form button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+.page :is(a, button, input, select, textarea, summary):focus-visible {
+  outline: 2px solid #174a7c;
+  outline-offset: 3px;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.error {
+  color: #a32121;
+}
+.page summary {
+  cursor: pointer;
+  padding: 12px 0;
+  font-weight: 600;
+}
+.facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.facts dt {
+  color: #526078;
+}
+.facts dd {
+  margin: 4px 0 0;
+  white-space: pre-wrap;
+}
+@media (max-width: 640px) {
+  .grid,
+  .facts {
+    grid-template-columns: 1fr;
+  }
+  .card,
+  .form fieldset {
+    padding: 16px;
+  }
+}
