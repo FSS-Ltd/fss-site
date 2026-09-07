@@ -4,14 +4,16 @@ import styles from "./projects.module.css";
 export function DocumentList({
   documents,
   organisationId,
+  headingId = "documents-heading",
 }: {
   documents: ClientDocument[];
   organisationId: string;
+  headingId?: string;
 }): React.JSX.Element {
   return (
-    <section aria-labelledby="documents-heading" className={styles.section}>
+    <section aria-labelledby={headingId} className={styles.section}>
       <div className={styles.sectionHeading}>
-        <h2 id="documents-heading">Documents</h2>
+        <h2 id={headingId}>Documents</h2>
         <span className={styles.note}>Shared with you</span>
       </div>
       {documents.length === 0 ? (

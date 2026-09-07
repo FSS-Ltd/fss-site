@@ -50,6 +50,11 @@ export function ClientList({
                     </Link>
                   </h2>
                   <p className={styles.detail}>{organisation.legalName}</p>
+                  <Link
+                    href={`/growth/operations/clients/${organisation.id}/requests`}
+                  >
+                    Requests
+                  </Link>
                 </div>
                 <dl className={styles.facts}>
                   <div>
