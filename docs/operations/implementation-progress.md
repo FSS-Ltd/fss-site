@@ -6,7 +6,9 @@ User-authorised execution: work through plan 07 in order, one task PR at a time.
 
 Task 1: complete. [PR #204](https://github.com/FSS-Ltd/fss-site/pull/204) passed CI, Mobile Lighthouse and Vercel checks, then merged on 6 September 2026 at `6d945ff8`.
 
-Task 2: agreement register and effective services, implemented and locally verified on `feat/operations-agreement-register`, starting from freshly fetched `main` at `6d945ff8`. Tasks 3–14 remain unstarted. The authoritative requirements are in [plan 07](../superpowers/plans/fss-operations-station/07-implementation-plan.md) and its linked specifications. Provider, identity and commercial decisions remain gates before dependent tasks.
+Task 2: complete. [PR #205](https://github.com/FSS-Ltd/fss-site/pull/205) passed CI, Mobile Lighthouse and Vercel checks, then merged on 7 September 2026 at `2b875aa4`.
+
+Task 3: client identity, invitations and tenant isolation in progress on `feat/operations-client-identity`, from freshly fetched `main` at `2b875aa4`. Tasks 4–14 remain unstarted. The authoritative requirements are in [plan 07](../superpowers/plans/fss-operations-station/07-implementation-plan.md) and its linked specifications.
 
 The founder explicitly approved the entire build plan after Task 1 checks completed. Continue the sequential PR process without requesting the same build/merge approval again. Prepare and verify the concrete rollout in Task 14 before enabling live services.
 
@@ -50,4 +52,19 @@ PR #204 checks and merge are verified. Live founder login, provider integrations
 - Type checking, lint, production build, migration policy, redesign checks and homepage bundle budget passed. Production dependency audit found no known vulnerabilities.
 - Independent source review passed after all SQL and form findings were fixed.
 - Interactive synthetic browser fixture: successful creation sends exact pence and clears the new form; field errors preserve inputs and expose the correct accessible label/description; desktop 1440 px and mobile 375 px have no horizontal overflow. Actual mobile screenshot inspected. API responses were mocked in this fixture; real persistence and authorization boundaries were verified separately by automated tests.
-- Authenticated deployed end-to-end testing, managed signing, live billing and production migration remain outside Task 2. PR checks and merge must finish before Task 3 starts.
+- Authenticated deployed end-to-end testing, managed signing, live billing and production migration remain outside Task 2. PR #205 checks and merge are verified.
+
+## Task 3 design direction, 7 September 2026
+
+The user requested a stronger Apple-inspired premium treatment after reviewing the initial portal screens. Login and activation now use a borderless focused composition, larger typography, restrained FSS colour, a softly raised brand mark, refined controls and quieter supporting text. The shared shell and organisation list use the same spacing, surface and type rules. Preserve this direction in subsequent Operations UI work.
+
+Desktop 1440×1000 and mobile 390×844 screenshots were inspected. The mobile page and activation page at 200% text have no horizontal overflow. The primary touch target is 54px; reduced motion disables press movement. Typecheck and focused lint pass. The broader Task 3 production build, repository lint, 40 Operations tests and the full Growth regression suite passed before the final image aspect-ratio polish. Actual application SDK adapters also passed the disposable managed-auth/Mailpit flow, including reuse of an existing provisioned account, email/PKCE replay rejection, cookie refresh and revoked-session rejection. Final operator integration, typecheck, formatting and production build passed after the visual polish. Task 3 PR checks and merge remain pending.
+
+## Task 3 local verification
+
+- Operations: 41 tests passed, no failures/skips; coverage 97.71% lines, 94.06% branches, 97.25% functions.
+- Full Growth/unit/component/script/database suite: 1,546 tests passed, no failures/skips. The final operator integration test additionally passed in the Operations suite.
+- Final typecheck, production build, repository lint, changed-file formatting, migration policy, redesign shell and homepage bundle budget passed. Production dependency audit found no known vulnerabilities.
+- Independent domain and SDK/operator source reviews passed after the internal organisation column grant was narrowed and covered by a restricted-role regression.
+- Founder auth configuration remains unchanged. Actual-role tests cover simultaneous invitation claims, wrong email, expiry/replay/replacement, archived organisations, revocation, pooled tenant context, restricted views/files/counts and atomic rate limits.
+- Managed-auth verification uses disposable local services and synthetic mailboxes. Hosted SMTP delivery and full production-environment end-to-end testing remain deferred to the Task 14 release gate. See [client identity](client-identity.md).
