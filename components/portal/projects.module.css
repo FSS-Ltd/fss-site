@@ -1,0 +1,252 @@
+.page {
+  width: 100%;
+  overflow-wrap: anywhere;
+}
+.breadcrumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  margin-bottom: 28px;
+  color: var(--portal-muted);
+  font-size: 0.875rem;
+}
+.title {
+  font-size: clamp(2rem, 5vw, 2.75rem);
+  font-weight: 600;
+  letter-spacing: -0.05em;
+  line-height: 1.1;
+  margin: 8px 0 16px;
+  text-wrap: balance;
+}
+.eyebrow,
+.note {
+  color: var(--portal-muted);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  margin: 0;
+}
+.copy {
+  color: var(--portal-muted);
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  margin: 12px 0;
+  white-space: pre-line;
+}
+.overview {
+  background: var(--surface-1);
+  border-radius: 24px;
+  padding: 32px;
+  margin-top: 32px;
+  box-shadow: 0 6px 32px rgba(7, 24, 46, 0.035);
+}
+.section {
+  margin-top: 44px;
+}
+.sectionHeading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+}
+.sectionHeading h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  margin: 0;
+}
+.sectionHeading h3,
+.documentTitle h3 {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  margin: 0;
+}
+.status {
+  display: inline-flex;
+  padding: 5px 10px;
+  border-radius: 100px;
+  background: var(--surface-3);
+  color: var(--portal-muted);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+.outcome {
+  font-size: 1.25rem;
+  line-height: 1.5;
+  letter-spacing: -0.02em;
+  margin: 24px 0 12px;
+  white-space: pre-line;
+}
+.facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  padding-block: 24px;
+  margin-top: 20px;
+  border-block: 1px solid var(--portal-line);
+}
+.facts dt {
+  color: var(--portal-muted);
+  font-size: 0.75rem;
+  margin-bottom: 8px;
+}
+.facts dd {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 550;
+}
+.deliverables {
+  margin-block: 24px;
+}
+.deliverables h3,
+.notice h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 0 0 12px;
+}
+.deliverables ul,
+.notice ul {
+  padding-left: 20px;
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.8;
+  list-style: disc;
+}
+.notice {
+  background: var(--surface-2);
+  padding: 20px;
+  border-radius: 16px;
+  margin-block: 24px;
+}
+.empty {
+  padding: 28px 0;
+  border-top: 1px solid var(--portal-line);
+  margin-top: 20px;
+  color: var(--portal-muted);
+  line-height: 1.7;
+  font-size: 0.9375rem;
+}
+.timeline {
+  padding: 0;
+  margin-top: 28px;
+  list-style: none;
+}
+.timeline > li {
+  display: flex;
+  gap: 18px;
+  position: relative;
+  padding-bottom: 30px;
+}
+.timeline > li:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  width: 1px;
+  top: 34px;
+  bottom: 4px;
+  left: 16px;
+  background: var(--portal-line);
+}
+.step {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: 0 0 33px;
+  height: 33px;
+  border: 1px solid var(--portal-line);
+  border-radius: 50%;
+  background: var(--surface-1);
+  font-size: 0.75rem;
+}
+.complete {
+  background: var(--brand-secondary);
+  color: white;
+  border-color: transparent;
+}
+.milestoneBody {
+  flex: 1;
+  min-width: 0;
+  padding-top: 5px;
+}
+.evidence {
+  font-size: 0.875rem;
+  padding-left: 12px;
+  border-left: 2px solid var(--border-strong);
+  line-height: 1.6;
+  margin: 14px 0 0;
+  white-space: pre-line;
+}
+.documents {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+.documents li {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 0;
+  border-top: 1px solid var(--portal-line);
+}
+.fileIcon {
+  color: var(--portal-muted);
+  flex-shrink: 0;
+}
+.documentTitle {
+  flex: 1;
+  min-width: 0;
+}
+.documentTitle h3 {
+  margin-bottom: 4px;
+}
+.documentAction {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--surface-1);
+  font-size: 0.8125rem;
+  color: var(--portal-accent);
+}
+.projectList {
+  list-style: none;
+  padding: 0;
+  margin: 32px 0 0;
+}
+.projectList li {
+  border-top: 1px solid var(--portal-line);
+}
+.projectLink {
+  display: block;
+  padding: 26px 4px;
+}
+.projectLink:hover h2 {
+  color: var(--portal-accent);
+}
+.projectLink h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+@media (max-width: 480px) {
+  .overview {
+    padding: 24px;
+  }
+  .facts {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .documents li {
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .documentAction {
+    margin-left: 34px;
+  }
+  .documentTitle {
+    flex-basis: calc(100% - 40px);
+  }
+}
