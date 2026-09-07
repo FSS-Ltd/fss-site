@@ -8,7 +8,9 @@ Task 1: complete. [PR #204](https://github.com/FSS-Ltd/fss-site/pull/204) passed
 
 Task 2: complete. [PR #205](https://github.com/FSS-Ltd/fss-site/pull/205) passed CI, Mobile Lighthouse and Vercel checks, then merged on 7 September 2026 at `2b875aa4`.
 
-Task 3: client identity, invitations and tenant isolation in progress on `feat/operations-client-identity`, from freshly fetched `main` at `2b875aa4`. Tasks 4–14 remain unstarted. The authoritative requirements are in [plan 07](../superpowers/plans/fss-operations-station/07-implementation-plan.md) and its linked specifications.
+Task 3: complete. [PR #206](https://github.com/FSS-Ltd/fss-site/pull/206) passed CI, Mobile Lighthouse and Vercel checks, then merged on 7 September 2026 at `8dff65a4`.
+
+Task 4: projects, milestones and private documents in progress on `feat/operations-project-documents`, starting from freshly fetched main at `8dff65a4`. Tasks 5–14 remain unstarted. The authoritative requirements remain in [plan 07](../superpowers/plans/fss-operations-station/07-implementation-plan.md).
 
 The founder explicitly approved the entire build plan after Task 1 checks completed. Continue the sequential PR process without requesting the same build/merge approval again. Prepare and verify the concrete rollout in Task 14 before enabling live services.
 
@@ -58,7 +60,7 @@ PR #204 checks and merge are verified. Live founder login, provider integrations
 
 The user requested a stronger Apple-inspired premium treatment after reviewing the initial portal screens. Login and activation now use a borderless focused composition, larger typography, restrained FSS colour, a softly raised brand mark, refined controls and quieter supporting text. The shared shell and organisation list use the same spacing, surface and type rules. Preserve this direction in subsequent Operations UI work.
 
-Desktop 1440×1000 and mobile 390×844 screenshots were inspected. The mobile page and activation page at 200% text have no horizontal overflow. The primary touch target is 54px; reduced motion disables press movement. Typecheck and focused lint pass. The broader Task 3 production build, repository lint, 40 Operations tests and the full Growth regression suite passed before the final image aspect-ratio polish. Actual application SDK adapters also passed the disposable managed-auth/Mailpit flow, including reuse of an existing provisioned account, email/PKCE replay rejection, cookie refresh and revoked-session rejection. Final operator integration, typecheck, formatting and production build passed after the visual polish. Task 3 PR checks and merge remain pending.
+Desktop 1440×1000 and mobile 390×844 screenshots were inspected. The mobile page and activation page at 200% text have no horizontal overflow. The primary touch target is 54px; reduced motion disables press movement. Typecheck and focused lint pass. The broader Task 3 production build, repository lint, 40 Operations tests and the full Growth regression suite passed before the final image aspect-ratio polish. Actual application SDK adapters also passed the disposable managed-auth/Mailpit flow, including reuse of an existing provisioned account, email/PKCE replay rejection, cookie refresh and revoked-session rejection. Final operator integration, typecheck, formatting and production build passed after the visual polish. Task 3 PR checks and merge are verified.
 
 ## Task 3 local verification
 
@@ -68,3 +70,14 @@ Desktop 1440×1000 and mobile 390×844 screenshots were inspected. The mobile pa
 - Independent domain and SDK/operator source reviews passed after the internal organisation column grant was narrowed and covered by a restricted-role regression.
 - Founder auth configuration remains unchanged. Actual-role tests cover simultaneous invitation claims, wrong email, expiry/replay/replacement, archived organisations, revocation, pooled tenant context, restricted views/files/counts and atomic rate limits.
 - Managed-auth verification uses disposable local services and synthetic mailboxes. Hosted SMTP delivery and full production-environment end-to-end testing remain deferred to the Task 14 release gate. See [client identity](client-identity.md).
+
+## Task 4 local verification, 7 September 2026
+
+- Added tenant-scoped projects, milestones, shared documents, reviewed founder updates and protected downloads. See [projects and documents](projects-and-documents.md).
+- Operations: 51 tests passed, no failures/skips; 98.19% lines, 94.22% branches, 97.31% functions. Full Growth/unit/component/script/database suite: 1,557 tests passed, no failures/skips.
+- Fixed the user-reported Growth proxy 500: the exported-handler regression reproduced `founderProxy is not a function`; direct Auth.js invocation passes anonymous redirect, login, authenticated founder and portal cases.
+- Real private Vercel Blob verification passed with synthetic bytes and actual restricted PostgreSQL roles. Anonymous, cross-tenant and revoked access were denied. Temporary object, store and empty project were removed; production resources remained untouched.
+- Actual component screenshots inspected at desktop 1440 px and mobile 390 px; no overflow at mobile or 200% text, visible keyboard focus and 44 px document controls. Temporary preview route removed.
+- Independent review passed after adding file-content signatures and the correctly hashed/mislabeled-file regression. Proxy fix also passed scoped review.
+- Typecheck, lint, production build, formatting, migration policy, redesign shell, homepage budget and production dependency audit passed. Build initially found stale generated development types for the removed preview; clearing that generated cache resolved it.
+- Task 4 PR checks and merge remain pending. Uploads and production Operations activation remain gated to the approved release process.

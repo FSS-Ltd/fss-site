@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { hasPortalCapability } from "@/lib/operations/auth/permissions";
 import { randomUUID } from "node:crypto";
 import { notFound, redirect } from "next/navigation";
 import { operationsEnabled } from "@/lib/operations/db/client";
@@ -58,6 +60,16 @@ export default async function PortalHomePage(): Promise<React.JSX.Element> {
             <li key={membership.organisationId} className={styles.row}>
               <h2 className={styles.name}>{membership.displayName}</h2>
               <p className={styles.copy}>{roleLabels[membership.role]}</p>
+              {hasPortalCapability(membership.role, "projects.read") && (
+                <p className={styles.actions}>
+                  <Link
+                    className={styles.link}
+                    href={`/portal/projects?organisationId=${membership.organisationId}`}
+                  >
+                    View projects
+                  </Link>
+                </p>
+              )}
             </li>
           ))}
         </ul>

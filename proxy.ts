@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server";
 import type { NextRequest, NextFetchEvent, NextMiddleware } from "next/server";
-import { auth } from "@/auth";
+import { auth as configuredAuth } from "@/auth";
 import { dispatchPortalProxy } from "@/lib/operations/auth/proxy-dispatch";
 import { refreshPortalSession } from "@/lib/operations/auth/proxy";
-const forwardFounder: NextMiddleware = () => NextResponse.next();
-const founderProxy = auth(forwardFounder);
+// Auth.js supports direct (request, event) invocation at runtime, but its
+// published overloads omit this middleware signature for lazy configuration.
+const auth = configuredAuth as unknown as NextMiddleware;
 
 export function proxy(
   request: NextRequest,
@@ -12,7 +12,7 @@ export function proxy(
 ): ReturnType<NextMiddleware> {
   return dispatchPortalProxy(
     request.nextUrl.pathname,
-    () => founderProxy(request, event),
+    () => auth(request, event),
     () => refreshPortalSession(request),
   );
 }
