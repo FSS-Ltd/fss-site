@@ -4,9 +4,11 @@ User-authorised execution: work through plan 07 in order, one task PR at a time.
 
 ## Current step
 
-Task 1: organisation register and historical engagement mapping. Implemented and locally verified on `feat/operations-client-register`, starting from GitHub main `64c7ab9a` (fetched 6 September 2026).
+Task 1: complete. [PR #204](https://github.com/FSS-Ltd/fss-site/pull/204) passed CI, Mobile Lighthouse and Vercel checks, then merged on 6 September 2026 at `6d945ff8`.
 
-Tasks 2–14 remain unstarted. The authoritative requirements are in [plan 07](../superpowers/plans/fss-operations-station/07-implementation-plan.md) and its linked specifications. Provider, identity and commercial decisions remain gates before dependent tasks.
+Task 2: agreement register and effective services, implemented and locally verified on `feat/operations-agreement-register`, starting from freshly fetched `main` at `6d945ff8`. Tasks 3–14 remain unstarted. The authoritative requirements are in [plan 07](../superpowers/plans/fss-operations-station/07-implementation-plan.md) and its linked specifications. Provider, identity and commercial decisions remain gates before dependent tasks.
+
+The founder explicitly approved the entire build plan after Task 1 checks completed. Continue the sequential PR process without requesting the same build/merge approval again. Prepare and verify the concrete rollout in Task 14 before enabling live services.
 
 ## Release boundary
 
@@ -38,4 +40,14 @@ Use Node 24 and the lockfile's pnpm version. Operations tests require `OPERATION
 - Independent source review: specification and code quality passed; no critical or important findings.
 - Browser check of synthetic component fixtures using the actual client-list markup/CSS: desktop 1440 px and mobile 375 px inspected, no mobile horizontal overflow, visible keyboard focus, empty/error recovery, 200% text error state fits. This does not claim authenticated end-to-end portal testing.
 
-PR checks and merge remain required before Task 2. Live founder login, provider integrations, real data and production rollout were not exercised by Task 1. The feature remains disabled until its approved environment is configured. See the [operator guide](client-register.md) for the reviewed mapping workflow.
+PR #204 checks and merge are verified. Live founder login, provider integrations, real data and production rollout were not exercised by Task 1. The feature remains disabled until its approved environment is configured. See the [operator guide](client-register.md) for the reviewed mapping workflow.
+
+## Task 2 verification, 7 September 2026
+
+- Immutable draft revisions, manual signed evidence and per-line effective services implemented. See [agreement register](agreement-register.md).
+- Operations database/unit coverage: 17 tests passed with no failures or skips; runtime-role integration includes concurrent revisions, exact totals, signing immutability, deposit/assets/date gates, malformed direct SQL, audit correlation and unchanged Growth history.
+- Full Growth/unit/component/script/database suite: 1,523 tests passed, no failures/skips. The added field-accessibility test also passed separately after the final UI correction.
+- Type checking, lint, production build, migration policy, redesign checks and homepage bundle budget passed. Production dependency audit found no known vulnerabilities.
+- Independent source review passed after all SQL and form findings were fixed.
+- Interactive synthetic browser fixture: successful creation sends exact pence and clears the new form; field errors preserve inputs and expose the correct accessible label/description; desktop 1440 px and mobile 375 px have no horizontal overflow. Actual mobile screenshot inspected. API responses were mocked in this fixture; real persistence and authorization boundaries were verified separately by automated tests.
+- Authenticated deployed end-to-end testing, managed signing, live billing and production migration remain outside Task 2. PR checks and merge must finish before Task 3 starts.

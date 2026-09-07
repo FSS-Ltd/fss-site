@@ -42,7 +42,13 @@ export function ClientList({
             {state.data.rows.map((organisation) => (
               <li className={styles.row} key={organisation.id}>
                 <div>
-                  <h2 className={styles.name}>{organisation.displayName}</h2>
+                  <h2 className={styles.name}>
+                    <Link
+                      href={`/growth/operations/clients/${organisation.id}/agreements`}
+                    >
+                      {organisation.displayName}
+                    </Link>
+                  </h2>
                   <p className={styles.detail}>{organisation.legalName}</p>
                 </div>
                 <dl className={styles.facts}>
