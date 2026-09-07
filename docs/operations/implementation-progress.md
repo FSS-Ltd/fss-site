@@ -10,7 +10,9 @@ Task 2: complete. [PR #205](https://github.com/FSS-Ltd/fss-site/pull/205) passed
 
 Task 3: complete. [PR #206](https://github.com/FSS-Ltd/fss-site/pull/206) passed CI, Mobile Lighthouse and Vercel checks, then merged on 7 September 2026 at `8dff65a4`.
 
-Task 4: projects, milestones and private documents in progress on `feat/operations-project-documents`, starting from freshly fetched main at `8dff65a4`. Tasks 5–14 remain unstarted. The authoritative requirements remain in [plan 07](../superpowers/plans/fss-operations-station/07-implementation-plan.md).
+Task 4: complete. [PR #207](https://github.com/FSS-Ltd/fss-site/pull/207) passed CI, Mobile Lighthouse and Vercel checks, then merged on 7 September 2026 at `6bba9598`.
+
+Task 5: request board, comments and versioned review in progress on `feat/operations-request-board`, starting from freshly fetched main at `6bba9598`. Tasks 6–14 remain unstarted. The authoritative requirements remain in [plan 07](../superpowers/plans/fss-operations-station/07-implementation-plan.md).
 
 The founder explicitly approved the entire build plan after Task 1 checks completed. Continue the sequential PR process without requesting the same build/merge approval again. Prepare and verify the concrete rollout in Task 14 before enabling live services.
 
@@ -80,4 +82,15 @@ Desktop 1440×1000 and mobile 390×844 screenshots were inspected. The mobile pa
 - Actual component screenshots inspected at desktop 1440 px and mobile 390 px; no overflow at mobile or 200% text, visible keyboard focus and 44 px document controls. Temporary preview route removed.
 - Independent review passed after adding file-content signatures and the correctly hashed/mislabeled-file regression. Proxy fix also passed scoped review.
 - Typecheck, lint, production build, formatting, migration policy, redesign shell, homepage budget and production dependency audit passed. Build initially found stale generated development types for the removed preview; clearing that generated cache resolved it.
-- Task 4 PR checks and merge remain pending. Uploads and production Operations activation remain gated to the approved release process.
+- Task 4 PR checks passed and merge is verified. The merged Vercel deployment passed; production Growth login returns 200 and the protected prospects route returns 307. Uploads and production Operations activation remain gated to the approved release process.
+
+## Task 5 local verification, 7 September 2026
+
+- Added client request list/board, creation, public comments, exact-version review and founder workflow controls. Founder priority remains separate from client-reported impact. See [requests](requests.md).
+- Final Operations coverage: 142 tests passed, zero failures/skips; 97.85% lines, 92.63% branches, 97.28% functions. Final Growth/unit/component/script/database suite: 1,668 tests passed, zero failures/skips.
+- Typecheck, repository lint, clean production build, changed-file formatting, migration policy, redesign shell and homepage bundle budget passed. Production dependency audit found no known vulnerabilities.
+- Independent primary/API and domain/UI reviews passed after fixing administrative New-request reopening, current versus historical document associations and the missing founder priority control. All fixes have covering tests and scoped re-review.
+- Clean migration replay and restricted-role tests used a fresh isolated native PostgreSQL 17.7 cluster after Docker Desktop became unavailable. Tests prove tenant isolation, reviewer revocation, concurrent submission/writes, stale deliverables, capacity, quote gates, private comments, priority boundaries and audit integrity. No production database was used.
+- Actual-component browser fixtures verified desktop 1440 px, mobile 375 px and 200% text reflow; native keyboard review/founder selectors, visible focus, stable failed-submit idempotency keys and retained conflict drafts passed. Screenshots inspected. Fixtures and preview server were removed/stopped before final build.
+- Browser/compile slowness included a transient generated-cache disk-space error. Clearing only this worktree's generated cache resolved the clean-build path. A sandbox IPC failure in lint's existing cover script passed when rerun with the required execution permission.
+- Hosted authentication-to-request end-to-end testing and a dedicated screen-reader session remain part of the release gate. Uploads and notification delivery remain gated to their later approved integrations. Task 5 PR checks and merge are pending; Task 6 has not started.

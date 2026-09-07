@@ -4,7 +4,7 @@ import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import type { VerifiedPortalIdentity } from "@/lib/operations/auth/types";
 
-export async function getProjectPageContext(organisation: unknown): Promise<{
+export async function getPortalPageContext(organisation: unknown): Promise<{
   identity: VerifiedPortalIdentity;
   organisationId: string;
 } | null> {

@@ -14,7 +14,7 @@ import { ProjectSummary } from "@/components/portal/project-summary";
 import { MilestoneList } from "@/components/portal/milestone-list";
 import { DocumentList } from "@/components/portal/document-list";
 import styles from "@/components/portal/projects.module.css";
-import { getProjectPageContext } from "../_context";
+import { getPortalPageContext } from "@/lib/operations/auth/page-context";
 
 export default async function ProjectPage({
   params,
@@ -23,7 +23,7 @@ export default async function ProjectPage({
   params: Promise<{ projectId: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }): Promise<React.JSX.Element> {
-  const context = await getProjectPageContext(
+  const context = await getPortalPageContext(
     (await searchParams).organisationId,
   );
   if (!context) return <PortalUnavailable />;

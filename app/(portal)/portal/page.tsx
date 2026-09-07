@@ -68,6 +68,13 @@ export default async function PortalHomePage(): Promise<React.JSX.Element> {
                   >
                     View projects
                   </Link>
+                  {" · "}
+                  <Link
+                    className={styles.link}
+                    href={`/portal/requests?organisationId=${membership.organisationId}`}
+                  >
+                    View requests
+                  </Link>
                 </p>
               )}
             </li>
