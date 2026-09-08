@@ -77,6 +77,17 @@ export default async function PortalHomePage(): Promise<React.JSX.Element> {
                   </Link>
                 </p>
               )}
+              {process.env.OPERATIONS_BILLING_ENABLED === "true" &&
+                hasPortalCapability(membership.role, "billing.read") && (
+                  <p className={styles.actions}>
+                    <Link
+                      className={styles.link}
+                      href={`/portal/billing?organisationId=${membership.organisationId}`}
+                    >
+                      View billing
+                    </Link>
+                  </p>
+                )}
             </li>
           ))}
         </ul>
