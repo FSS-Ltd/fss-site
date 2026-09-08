@@ -20,7 +20,7 @@ export function privateAuthHeaders(
 }
 
 export function reportAuthError(
-  deps: PortalAuthHandlerDependencies,
+  deps: Pick<PortalAuthHandlerDependencies, "reportUnexpectedError">,
   correlationId: string,
   error: unknown,
 ): void {

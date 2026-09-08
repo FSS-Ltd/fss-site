@@ -34,6 +34,8 @@ export function billingProviderFixture() {
     status: state.finalized ? "open" : "draft",
     total: state.amount,
     subtotal: state.amount,
+    amount_due: state.amount,
+    amount_overpaid: 0,
     amount_paid: 0,
     amount_remaining: state.amount,
     number: "SYNTHETIC-1",

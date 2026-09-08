@@ -14,7 +14,11 @@ Task 4: complete. [PR #207](https://github.com/FSS-Ltd/fss-site/pull/207) passed
 
 Task 5: complete. [PR #208](https://github.com/FSS-Ltd/fss-site/pull/208) passed CI, Mobile Lighthouse and Vercel checks, then merged on 7 September 2026 at `ad2499a2`.
 
-Task 6: provider capability gate in progress on `feat/operations-provider-sandbox`, from freshly fetched main at `ad2499a2`. The founder supplied test access; invoice, anchor, hosted Bacs, failure and signature proofs passed; review and PR checks remain pending; see [provider gate evidence](provider-sandbox-results.md). Tasks 7–14 remain unstarted. The authoritative requirements remain in [plan 07](../superpowers/plans/fss-operations-station/07-implementation-plan.md).
+Task 6: complete. [PR #209](https://github.com/FSS-Ltd/fss-site/pull/209) passed checks and merged on 8 September at `c1ed592`. See [provider gate evidence](provider-sandbox-results.md).
+
+Task 7: complete. [PR #210](https://github.com/FSS-Ltd/fss-site/pull/210) passed checks and merged on 8 September at `d028b11a`.
+
+Task 8: payment reconciliation implemented on `feat/operations-payment-reconciliation`; independent re-review approved all three corrections. Final checks and PR merge are in progress. Tasks 9–14 remain unstarted. The authoritative requirements remain in [plan 07](../superpowers/plans/fss-operations-station/07-implementation-plan.md).
 
 The founder explicitly approved the entire build plan after Task 1 checks completed. Continue the sequential PR process without requesting the same build/merge approval again. Prepare and verify the concrete rollout in Task 14 before enabling live services.
 
@@ -116,4 +120,10 @@ Desktop 1440×1000 and mobile 390×844 screenshots were inspected. The mobile pa
 - Independent review passed after fixing completed retries following later renewal invoices and ordinary issuance bypassing amendment holds. The final tests include both regressions and a concurrent preview/claim race.
 - Production build, TypeScript, repository lint, changed-file formatting, migration policy, design safeguards, homepage bundle budget and dependency audit passed. A temporary preview's stale generated types were cleared before the clean build. Private sandbox harnesses were moved outside the source tree before final lint.
 - Actual components verified at desktop 1440 px, mobile 375 px and 200% text with no horizontal overflow. Keyboard controls, error feedback and invoice-specific accessible action names passed. Preview route removed and owned browser/server stopped.
-- Explicit nonzero tax requires a reviewed provider mapping before issuance. Payment-event reconciliation remains Task 8; billing and production migration activation remain disabled until Task 14. PR checks/merge pending.
+- Explicit nonzero tax requires a reviewed provider mapping before issuance. Payment-event reconciliation remains Task 8; billing and production migration activation remain disabled until Task 14. PR #210 checks and merge verified.
+
+## Task 7 merge and Task 8 implementation, 8 September 2026
+
+Task 7 merged as PR #210 (`d028b11a168891503efa279b2dc0be41cd1478e9`) after local checks, independent review and CI passed. The user reaffirmed approval to push and merge every PR in the plan.
+
+Task 8 adds durable verified receipts, a restricted reconciliation worker, separate payment/refund/dispute/credit records, linked mandate state and a founder exception queue. Actual Stripe test payment, partial refund, dispute and duplicate replay verification passed. See [billing](billing.md) for the provider reminder activation gate and bounded-record limitations. Independent re-review approved all three corrections. Operations: 213 tests passed (97.58% lines, 91.73% branches, 97.29% functions). Growth regression: 1,735 tests passed. Typecheck, lint, production build, formatting, migration policy, design and bundle checks passed; production dependency audit found no known vulnerabilities. Exact final migration replay passed on a fresh disposable PostgreSQL baseline. PR checks and merge remain pending.

@@ -23,9 +23,13 @@ const invoice: InvoiceSummary = {
   currency: "GBP",
   totalPence: "120000",
   amountPaidPence: "20000",
+  amountDuePence: "120000",
+  amountOverpaidPence: "0",
   amountRemainingPence: "100000",
   dueDate: "2026-09-22",
   projectedAt: "2026-09-08T10:00:00Z",
+  paymentState: null,
+  mandateState: null,
 };
 test("invoice view identifies partial payment and uses meaningful individually named actions", () => {
   const html = renderToStaticMarkup(
@@ -54,13 +58,60 @@ test("preparing invoices do not expose a payment action and empty states explain
   assert.match(empty, /No invoices yet/);
   assert.match(empty, /once they have been issued/);
 });
+test("processing payments never imply settlement and inactive mandates request new consent", () => {
+  const html = renderToStaticMarkup(
+    <InvoiceList
+      organisationId={invoice.id}
+      invoices={[
+        {
+          ...invoice,
+          amountPaidPence: "0",
+          paymentState: "processing",
+          mandateState: "inactive",
+        },
+      ]}
+    />,
+  );
+  assert.match(html, /Payment processing/);
+  assert.match(html, /wait for confirmation before making another payment/);
+  assert.match(html, /new consent required/);
+  assert.doesNotMatch(html, />Paid<\/span>/);
+});
+test("overpayments remain visible separately from the invoice and account balance", () => {
+  const html = renderToStaticMarkup(
+    <InvoiceList
+      organisationId={invoice.id}
+      invoices={[
+        {
+          ...invoice,
+          status: "paid",
+          totalPence: "6000",
+          amountDuePence: "8000",
+          amountPaidPence: "12000",
+          amountRemainingPence: "0",
+          amountOverpaidPence: "4000",
+          paymentState: "succeeded",
+        },
+      ]}
+    />,
+  );
+  assert.match(html, /Amount due, including account balance/);
+  assert.match(html, /£80.00/);
+  assert.match(html, /Overpaid/);
+  assert.match(html, /£40.00/);
+  assert.match(html, /reviewing the extra payment/);
+});
 test("payment labels distinguish written-off invoices from paid and money never rounds through Number", () => {
   assert.equal(
-    invoiceStatus({ status: "uncollectible", amountPaidPence: "0" }),
+    invoiceStatus({
+      status: "uncollectible",
+      amountPaidPence: "0",
+      paymentState: null,
+    }),
     "Contact FSS",
   );
   assert.equal(
-    invoiceStatus({ status: "open", amountPaidPence: "0" }),
+    invoiceStatus({ status: "open", amountPaidPence: "0", paymentState: null }),
     "Awaiting payment",
   );
   assert.equal(

@@ -16,8 +16,7 @@ const CRON_LABELS: Record<string, string> = {
 };
 
 const EVERY_N_MINUTES_PATTERN = /^\*\/(\d+) \* \* \* \*$/;
-const FIXED_DAILY_TIMES_PATTERN =
-  /^(\d{1,2}) (\d{1,2}(?:,\d{1,2})+) \* \* \*$/;
+const FIXED_DAILY_TIMES_PATTERN = /^(\d{1,2}) (\d{1,2}(?:,\d{1,2})+) \* \* \*$/;
 const FIXED_WEEKDAY_TIME_PATTERN = /^(\d{1,2}) (\d{1,2}) \* \* 1-5$/;
 const NINETY_MINUTE_SCHEDULES = [
   "0 0,3,6,9,12,15,18,21 * * *",
@@ -113,10 +112,7 @@ function describeSchedules(schedules: readonly string[]): string {
   return minutes === "1" ? "Every minute" : `Every ${minutes} minutes`;
 }
 
-function getNextCronRun(
-  schedules: readonly string[],
-  now: Date,
-): Date | null {
+function getNextCronRun(schedules: readonly string[], now: Date): Date | null {
   const candidates = schedules
     .map((schedule) => computeNextCronRun(schedule, now))
     .filter((candidate): candidate is Date => candidate !== null)
@@ -201,6 +197,8 @@ export type BuildSettingsViewInput = {
 export function buildSettingsView(input: BuildSettingsViewInput): SettingsData {
   const schedulesByPath = new Map<string, string[]>();
   for (const job of cronConfig.crons) {
+    // This view describes jobs controlled by Growth's automation switch.
+    if (!Object.hasOwn(CRON_LABELS, job.path)) continue;
     const schedules = schedulesByPath.get(job.path) ?? [];
     schedules.push(job.schedule);
     schedulesByPath.set(job.path, schedules);
@@ -264,7 +262,9 @@ async function fetchGmailConnection(
   return rows[0] ?? null;
 }
 
-async function fetchActiveSequenceCount(db: GrowthQueryExecutor): Promise<number> {
+async function fetchActiveSequenceCount(
+  db: GrowthQueryExecutor,
+): Promise<number> {
   const rows = await db<{ count: string }[]>`
     select count(*)::text as count
     from growth.sequence_enrollments
@@ -303,8 +303,8 @@ export async function getSettings(
         codexConfigured: Boolean(env.agentHmacSecret),
         gmailConfigured: Boolean(
           env.googleGmailClientId &&
-            env.googleGmailClientSecret &&
-            env.googleGmailRedirectUri,
+          env.googleGmailClientSecret &&
+          env.googleGmailRedirectUri,
         ),
         gmailConnection,
         ownerEmail: env.ownerEmail,

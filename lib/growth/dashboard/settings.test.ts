@@ -24,15 +24,24 @@ function baseInput() {
 
 test("computeNextCronRun rounds up to the next N-minute boundary", () => {
   assert.equal(
-    computeNextCronRun("*/5 * * * *", new Date("2026-08-21T10:03:00.000Z"))?.toISOString(),
+    computeNextCronRun(
+      "*/5 * * * *",
+      new Date("2026-08-21T10:03:00.000Z"),
+    )?.toISOString(),
     "2026-08-21T10:05:00.000Z",
   );
   assert.equal(
-    computeNextCronRun("*/10 * * * *", new Date("2026-08-21T10:00:00.000Z"))?.toISOString(),
+    computeNextCronRun(
+      "*/10 * * * *",
+      new Date("2026-08-21T10:00:00.000Z"),
+    )?.toISOString(),
     "2026-08-21T10:10:00.000Z",
   );
   assert.equal(
-    computeNextCronRun("*/5 * * * *", new Date("2026-08-21T10:59:30.000Z"))?.toISOString(),
+    computeNextCronRun(
+      "*/5 * * * *",
+      new Date("2026-08-21T10:59:30.000Z"),
+    )?.toISOString(),
     "2026-08-21T11:00:00.000Z",
   );
 });
@@ -160,7 +169,10 @@ test("buildSettingsView only exposes the redacted fields — no secrets, tokens,
 });
 
 test("buildSettingsView passes through Vercel Blob configuration", () => {
-  const configured = buildSettingsView({ ...baseInput(), vercelBlobConfigured: true });
+  const configured = buildSettingsView({
+    ...baseInput(),
+    vercelBlobConfigured: true,
+  });
   assert.equal(configured.vercelBlobConfigured, true);
 
   const notConfigured = buildSettingsView({
@@ -173,7 +185,8 @@ test("buildSettingsView passes through Vercel Blob configuration", () => {
 test("buildSettingsView reports whether signed research ingestion is configured", () => {
   assert.equal(buildSettingsView(baseInput()).codexConfigured, true);
   assert.equal(
-    buildSettingsView({ ...baseInput(), codexConfigured: false }).codexConfigured,
+    buildSettingsView({ ...baseInput(), codexConfigured: false })
+      .codexConfigured,
     false,
   );
 });
@@ -181,6 +194,12 @@ test("buildSettingsView reports whether signed research ingestion is configured"
 test("buildSettingsView lists all five cron jobs with a label when automations are enabled", () => {
   const data = buildSettingsView(baseInput());
   assert.equal(data.automation.crons.length, 5);
+  assert.equal(
+    data.automation.crons.some(
+      (cron) => cron.path === "/api/cron/operations-billing",
+    ),
+    false,
+  );
   for (const cron of data.automation.crons) {
     assert.ok(cron.label.length > 0);
   }

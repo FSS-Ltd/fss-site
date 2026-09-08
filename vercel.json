@@ -2,13 +2,35 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "regions": ["cdg1"],
   "crons": [
-    { "path": "/api/cron/gmail-sync", "schedule": "0 0,3,6,9,12,15,18,21 * * *" },
-    { "path": "/api/cron/gmail-sync", "schedule": "30 1,4,7,10,13,16,19,22 * * *" },
-    { "path": "/api/cron/outreach-dispatch", "schedule": "0 0,3,6,9,12,15,18,21 * * *" },
-    { "path": "/api/cron/outreach-dispatch", "schedule": "30 1,4,7,10,13,16,19,22 * * *" },
-    { "path": "/api/cron/resend-dispatch", "schedule": "0 0,3,6,9,12,15,18,21 * * *" },
-    { "path": "/api/cron/resend-dispatch", "schedule": "30 1,4,7,10,13,16,19,22 * * *" },
+    { "path": "/api/cron/operations-billing", "schedule": "*/5 * * * *" },
+    {
+      "path": "/api/cron/gmail-sync",
+      "schedule": "0 0,3,6,9,12,15,18,21 * * *"
+    },
+    {
+      "path": "/api/cron/gmail-sync",
+      "schedule": "30 1,4,7,10,13,16,19,22 * * *"
+    },
+    {
+      "path": "/api/cron/outreach-dispatch",
+      "schedule": "0 0,3,6,9,12,15,18,21 * * *"
+    },
+    {
+      "path": "/api/cron/outreach-dispatch",
+      "schedule": "30 1,4,7,10,13,16,19,22 * * *"
+    },
+    {
+      "path": "/api/cron/resend-dispatch",
+      "schedule": "0 0,3,6,9,12,15,18,21 * * *"
+    },
+    {
+      "path": "/api/cron/resend-dispatch",
+      "schedule": "30 1,4,7,10,13,16,19,22 * * *"
+    },
     { "path": "/api/cron/maintenance", "schedule": "17 3 * * *" },
-    { "path": "/api/cron/prospect-preview-reconciliation", "schedule": "*/5 * * * *" }
+    {
+      "path": "/api/cron/prospect-preview-reconciliation",
+      "schedule": "*/5 * * * *"
+    }
   ]
 }

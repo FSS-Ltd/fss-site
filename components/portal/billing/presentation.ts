@@ -15,7 +15,7 @@ export function billingDate(date: string): string {
   }).format(new Date(date));
 }
 export function invoiceStatus(
-  invoice: Pick<InvoiceSummary, "status" | "amountPaidPence">,
+  invoice: Pick<InvoiceSummary, "status" | "amountPaidPence" | "paymentState">,
 ): string {
   switch (invoice.status) {
     case "paid":
@@ -27,6 +27,9 @@ export function invoiceStatus(
     case "draft":
       return "Preparing";
     case "open":
+      if (invoice.paymentState === "processing") return "Payment processing";
+      if (invoice.paymentState === "pending") return "Payment pending";
+      if (invoice.paymentState === "failed") return "Payment failed";
       return BigInt(invoice.amountPaidPence) > BigInt(0)
         ? "Part paid"
         : "Awaiting payment";
