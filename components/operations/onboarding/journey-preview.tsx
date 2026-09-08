@@ -96,6 +96,11 @@ export function JourneyPreview({
                 pending={pending}
                 onPreview={prepare}
               />
+            ) : available.length ? (
+              <p>
+                Configure billing before preparing a welcome journey. Your
+                existing agreements are ready to use once billing is available.
+              </p>
             ) : (
               <p>
                 Create an agreement to prepare another journey. Existing

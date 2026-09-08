@@ -40,3 +40,53 @@ test("London scheduling handles BST and invoice choices are named obligations", 
   assert.match(choices[0].label, /Installment 1: £/);
   assert.equal(choices[0].value, "installment:1");
 });
+
+const { JourneyPreview } =
+  require("./journey-preview") as typeof import("./journey-preview");
+import { AppRouterContext } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import type { AgreementRecord } from "@/lib/operations/agreements/types";
+test("welcome preparation distinguishes missing billing from no eligible agreements", () => {
+  const agreement: AgreementRecord = {
+    id: "agreement",
+    engagementId: "engagement",
+    version: 1,
+    revision: 1,
+    status: "draft",
+    draft: agreementDraft(),
+    evidence: null,
+    services: [],
+  };
+  const router = {
+    bfcacheId: "journey-preview-test",
+    back() {},
+    forward() {},
+    refresh() {},
+    hmrRefresh() {},
+    push() {},
+    replace() {},
+    prefetch() {},
+  };
+  const render = (agreements: AgreementRecord[]) =>
+    renderToStaticMarkup(
+      <AppRouterContext.Provider value={router}>
+        <JourneyPreview
+          organisationId="organisation"
+          organisationName="Client Limited"
+          agreements={agreements}
+          contacts={[]}
+          approvals={[]}
+          journeys={[]}
+          billing={null}
+        />
+      </AppRouterContext.Provider>,
+    );
+  const unconfigured = render([agreement]);
+  assert.match(
+    unconfigured,
+    /Configure billing before preparing a welcome journey/,
+  );
+  assert.doesNotMatch(unconfigured, /Create an agreement/);
+  const empty = render([]);
+  assert.match(empty, /Create an agreement to prepare another journey/);
+  assert.doesNotMatch(empty, /Configure billing before preparing/);
+});
