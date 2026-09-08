@@ -1,0 +1,165 @@
+{
+  "id": "evt_1UDGOxEouCWSSYTJwSWw9gu2",
+  "object": "event",
+  "api_version": "2026-08-26.dahlia",
+  "created": 1788840774,
+  "data": {
+    "object": {
+      "id": "in_1UDGOwEouCWSSYTJKvIvyNS3",
+      "object": "invoice",
+      "account_country": "GB",
+      "account_name": "Faithful Software Solutions sandbox",
+      "account_tax_ids": null,
+      "amount_due": 50000,
+      "amount_overpaid": 0,
+      "amount_paid": 0,
+      "amount_remaining": 50000,
+      "amount_shipping": 0,
+      "application": null,
+      "attempt_count": 0,
+      "attempted": false,
+      "auto_advance": true,
+      "automatic_tax": {
+        "disabled_reason": null,
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "automatically_finalizes_at": 1793782800,
+      "billing_reason": "subscription_cycle",
+      "collection_method": "send_invoice",
+      "created": 1793523600,
+      "currency": "gbp",
+      "custom_fields": null,
+      "customer": "cus_VDhiFNfwsmpmy9",
+      "customer_account": null,
+      "customer_address": null,
+      "customer_email": "operations-sandbox@example.com",
+      "customer_name": "FSS Operations synthetic gate",
+      "customer_phone": null,
+      "customer_shipping": null,
+      "customer_tax_exempt": "none",
+      "customer_tax_ids": [],
+      "default_payment_method": null,
+      "default_source": null,
+      "default_tax_rates": [],
+      "description": null,
+      "discounts": [],
+      "due_date": 1794733200,
+      "effective_at": null,
+      "ending_balance": null,
+      "footer": null,
+      "from_invoice": null,
+      "hosted_invoice_url": null,
+      "invoice_pdf": null,
+      "issuer": {
+        "type": "self"
+      },
+      "last_finalization_error": null,
+      "latest_revision": null,
+      "lines": {
+        "object": "list",
+        "data": [
+          {
+            "id": "il_1UWucOEouCWSSYTJg19edXwj",
+            "object": "line_item",
+            "amount": 50000,
+            "currency": "gbp",
+            "description": "1 \u00d7 FSS synthetic monthly retainer (at \u00a3500.00 / month)",
+            "discount_amounts": [],
+            "discountable": true,
+            "discounts": [],
+            "invoice": "in_1UDGOwEouCWSSYTJKvIvyNS3",
+            "livemode": false,
+            "metadata": {},
+            "parent": {
+              "invoice_item_details": null,
+              "subscription_item_details": {
+                "invoice_item": null,
+                "proration": false,
+                "proration_details": {
+                  "credited_items": null
+                },
+                "subscription": "sub_1UDGMUEouCWSSYTJbGQ9IhnG",
+                "subscription_item": "si_VDhlwxV4n8M0je"
+              },
+              "type": "subscription_item_details"
+            },
+            "period": {
+              "end": 1796115600,
+              "start": 1793523600
+            },
+            "pretax_credit_amounts": [],
+            "pricing": {
+              "price_details": {
+                "price": "price_1UDGLFEouCWSSYTJOmdmU1rr",
+                "product": "prod_VDhkN8OWApsSmX"
+              },
+              "type": "price_details",
+              "unit_amount_decimal": "50000"
+            },
+            "quantity": 1,
+            "quantity_decimal": "1",
+            "subtotal": 50000,
+            "taxes": []
+          }
+        ],
+        "has_more": false,
+        "total_count": 1,
+        "url": "[redacted]"
+      },
+      "livemode": false,
+      "metadata": {},
+      "next_payment_attempt": null,
+      "number": null,
+      "on_behalf_of": null,
+      "parent": {
+        "quote_details": null,
+        "subscription_details": {
+          "metadata": {},
+          "subscription": "sub_1UDGMUEouCWSSYTJbGQ9IhnG"
+        },
+        "type": "subscription_details"
+      },
+      "payment_settings": {
+        "default_mandate": null,
+        "payment_method_options": null,
+        "payment_method_types": null
+      },
+      "period_end": 1793523600,
+      "period_start": 1790845200,
+      "post_payment_credit_notes_amount": 0,
+      "pre_payment_credit_notes_amount": 0,
+      "receipt_number": null,
+      "rendering": null,
+      "shipping_cost": null,
+      "shipping_details": null,
+      "starting_balance": 0,
+      "statement_descriptor": null,
+      "status": "draft",
+      "status_transitions": {
+        "finalized_at": null,
+        "marked_uncollectible_at": null,
+        "paid_at": null,
+        "voided_at": null
+      },
+      "subtotal": 50000,
+      "subtotal_excluding_tax": 50000,
+      "test_clock": "clock_1UDGLFEouCWSSYTJAvksNRQ9",
+      "total": 50000,
+      "total_discount_amounts": [],
+      "total_excluding_tax": 50000,
+      "total_pretax_credit_amounts": [],
+      "total_taxes": [],
+      "webhooks_delivered_at": null
+    }
+  },
+  "livemode": false,
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "invoice.created"
+}

@@ -1,0 +1,50 @@
+{
+  "id": "evt_1UDGUPEouCWSSYTJN8hgzSBO",
+  "object": "event",
+  "api_version": "2026-08-26.dahlia",
+  "created": 1788841113,
+  "data": {
+    "object": {
+      "id": "mandate_1UDGUPEouCWSSYTJC3zgQQMc",
+      "object": "mandate",
+      "customer_acceptance": {
+        "accepted_at": 1788841113,
+        "online": {
+          "ip_address": "[redacted]",
+          "user_agent": "[redacted]"
+        },
+        "type": "online"
+      },
+      "livemode": false,
+      "multi_use": {},
+      "payment_method": "pm_1UDGUJEouCWSSYTJaEo1AxNl",
+      "payment_method_details": {
+        "bacs_debit": {
+          "display_name": null,
+          "network_status": "accepted",
+          "reference": "F1FTCI0DAYCBPODJ9B",
+          "revocation_reason": null,
+          "service_user_number": null,
+          "url": "[redacted]"
+        },
+        "type": "bacs_debit"
+      },
+      "status": "active",
+      "type": "multi_use"
+    },
+    "previous_attributes": {
+      "payment_method_details": {
+        "bacs_debit": {
+          "network_status": "pending"
+        }
+      }
+    }
+  },
+  "livemode": false,
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "mandate.updated"
+}
