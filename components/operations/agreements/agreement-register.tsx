@@ -71,6 +71,11 @@ export function AgreementRegister({
             Review electronic signing
           </Link>
         )}
+        {process.env.OPERATIONS_ONBOARDING_ENABLED === "true" && (
+          <Link href={`/growth/operations/clients/${organisationId}/journey`}>
+            Prepare and manage welcome journey
+          </Link>
+        )}
       </header>
       {register.agreements.length === 0 && <p>No agreements on this page.</p>}
       {register.agreements.map((record) => (
