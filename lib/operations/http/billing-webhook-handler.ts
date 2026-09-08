@@ -8,30 +8,7 @@ import {
 } from "../auth/http";
 
 export const MAX_BILLING_WEBHOOK_BYTES = 1024 * 1024;
-class WebhookBodyTooLarge extends Error {}
-async function readWebhookBytes(request: Request): Promise<Uint8Array> {
-  if (Number(request.headers.get("content-length")) > MAX_BILLING_WEBHOOK_BYTES)
-    throw new WebhookBodyTooLarge();
-  if (!request.body) return new Uint8Array();
-  const reader = request.body.getReader();
-  const chunks: Uint8Array[] = [];
-  let length = 0;
-  try {
-    while (true) {
-      const result = await reader.read();
-      if (result.done) break;
-      length += result.value.byteLength;
-      if (length > MAX_BILLING_WEBHOOK_BYTES) {
-        await reader.cancel();
-        throw new WebhookBodyTooLarge();
-      }
-      chunks.push(result.value);
-    }
-  } finally {
-    reader.releaseLock();
-  }
-  return Buffer.concat(chunks, length);
-}
+import { readWebhookBytes, WebhookBodyTooLarge } from "./webhook-body";
 export type BillingWebhookDependencies = Pick<
   PortalAuthHandlerDependencies,
   "enabled" | "createCorrelationId" | "reportUnexpectedError"
@@ -57,7 +34,7 @@ export function createBillingWebhookHandler(
       return reply(415, false);
     try {
       const config = deps.configuration();
-      const raw = await readWebhookBytes(request);
+      const raw = await readWebhookBytes(request, MAX_BILLING_WEBHOOK_BYTES);
       const receipt = verifyBillingWebhook(
         raw,
         request.headers.get("stripe-signature"),

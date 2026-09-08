@@ -52,6 +52,21 @@ export async function recordInvoice(
   actorId: string,
   correlationId: string,
 ): Promise<void> {
+  const snapshot = issuedInvoiceSnapshot(invoice);
+  const dueDate = snapshot.dueDate;
+  await tx`insert into operations.invoices(organisation_id,schedule_id,account_id,environment,provider_invoice_id,number,status,currency,total_pence,amount_due_pence,amount_overpaid_pence,amount_paid_pence,amount_remaining_pence,due_date,issued_snapshot,projected_at,created_by,correlation_id) values(${schedule.organisationId},${schedule.id},${schedule.accountId},${schedule.mode},${invoice.id},${invoice.number},${invoice.status},'GBP',${String(invoice.total)},${String(invoice.amount_due)},${String(invoice.amount_overpaid)},${String(invoice.amount_paid)},${String(invoice.amount_remaining)},${dueDate},${tx.json(snapshot)},now(),${actorId},${correlationId}) on conflict(account_id,environment,provider_invoice_id) do nothing`;
+}
+
+export async function loadInvoice(
+  tx: OperationsTransaction,
+  scope: BillingScope,
+  id: string,
+): Promise<BillingInvoice | null> {
+  z.uuid().parse(id);
+  return (await selectInvoices(tx, scope, id))[0] ?? null;
+}
+
+export function issuedInvoiceSnapshot(invoice: Stripe.Invoice) {
   if (invoice.lines.has_more)
     throw new Error("Complete invoice lines are required before recording.");
   if (
@@ -64,7 +79,7 @@ export async function recordInvoice(
     ? new Date(invoice.due_date * 1000).toISOString().slice(0, 10)
     : null;
   // Retain a deliberately shaped financial snapshot, without hosted bearer URLs or payment details.
-  const snapshot = {
+  return {
     providerInvoiceId: invoice.id,
     number: invoice.number,
     currency: "GBP",
@@ -79,14 +94,4 @@ export async function recordInvoice(
       period: { start: line.period.start, end: line.period.end },
     })),
   };
-  await tx`insert into operations.invoices(organisation_id,schedule_id,account_id,environment,provider_invoice_id,number,status,currency,total_pence,amount_due_pence,amount_overpaid_pence,amount_paid_pence,amount_remaining_pence,due_date,issued_snapshot,projected_at,created_by,correlation_id) values(${schedule.organisationId},${schedule.id},${schedule.accountId},${schedule.mode},${invoice.id},${invoice.number},${invoice.status},'GBP',${String(invoice.total)},${String(invoice.amount_due)},${String(invoice.amount_overpaid)},${String(invoice.amount_paid)},${String(invoice.amount_remaining)},${dueDate},${tx.json(snapshot)},now(),${actorId},${correlationId}) on conflict(account_id,environment,provider_invoice_id) do nothing`;
-}
-
-export async function loadInvoice(
-  tx: OperationsTransaction,
-  scope: BillingScope,
-  id: string,
-): Promise<BillingInvoice | null> {
-  z.uuid().parse(id);
-  return (await selectInvoices(tx, scope, id))[0] ?? null;
 }
