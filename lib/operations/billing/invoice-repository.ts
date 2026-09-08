@@ -7,16 +7,31 @@ import type {
   BillingScope,
 } from "./domain-types";
 import { validateBillingScope } from "./scope";
-export async function loadInvoices(
+async function selectInvoices(
   tx: OperationsTransaction,
   scope: BillingScope,
+  invoiceId: string | null,
 ): Promise<BillingInvoice[]> {
   validateBillingScope(scope);
   return [
     ...(await tx<
       BillingInvoice[]
-    >`select id,provider_invoice_id as "providerInvoiceId",number,status,currency,total_pence::text as "totalPence",amount_paid_pence::text as "amountPaidPence",amount_remaining_pence::text as "amountRemainingPence",due_date::text as "dueDate",projected_at::text as "projectedAt" from operations.invoices where organisation_id=${scope.organisationId} and account_id=${scope.accountId} and environment=${scope.mode} order by created_at desc,id limit 100`),
+    >`select id,provider_invoice_id as "providerInvoiceId",number,status,currency,total_pence::text as "totalPence",amount_due_pence::text as "amountDuePence",amount_overpaid_pence::text as "amountOverpaidPence",amount_paid_pence::text as "amountPaidPence",amount_remaining_pence::text as "amountRemainingPence",due_date::text as "dueDate",projected_at::text as "projectedAt",
+      (select p.state from operations.payment_allocations a join operations.payments p on p.id=a.payment_id
+       where a.invoice_id=invoices.id and p.organisation_id=invoices.organisation_id
+       order by (p.state='processing') desc,p.provider_created_at desc,p.id limit 1) as "paymentState",
+      (select m.status from operations.payment_allocations a join operations.payments p on p.id=a.payment_id
+       join operations.mandate_projections m on m.provider_mandate_id=p.provider_mandate_id and m.account_id=p.account_id and m.environment=p.environment and m.organisation_id=p.organisation_id
+       where a.invoice_id=invoices.id and p.organisation_id=invoices.organisation_id
+       order by (p.state='processing') desc,p.provider_created_at desc,p.id limit 1) as "mandateState"
+      from operations.invoices where organisation_id=${scope.organisationId} and account_id=${scope.accountId} and environment=${scope.mode} and (${invoiceId}::uuid is null or id=${invoiceId}::uuid) order by created_at desc,id limit 100`),
   ];
+}
+export async function loadInvoices(
+  tx: OperationsTransaction,
+  scope: BillingScope,
+): Promise<BillingInvoice[]> {
+  return selectInvoices(tx, scope, null);
 }
 export async function loadBillingSchedule(
   tx: OperationsTransaction,
@@ -55,6 +70,7 @@ export async function recordInvoice(
     currency: "GBP",
     totalPence: String(invoice.total),
     subtotalPence: String(invoice.subtotal),
+    amountDuePence: String(invoice.amount_due),
     dueDate,
     issuedAt: invoice.status_transitions.finalized_at,
     lines: invoice.lines.data.map((line) => ({
@@ -63,7 +79,7 @@ export async function recordInvoice(
       period: { start: line.period.start, end: line.period.end },
     })),
   };
-  await tx`insert into operations.invoices(organisation_id,schedule_id,account_id,environment,provider_invoice_id,number,status,currency,total_pence,amount_paid_pence,amount_remaining_pence,due_date,issued_snapshot,projected_at,created_by,correlation_id) values(${schedule.organisationId},${schedule.id},${schedule.accountId},${schedule.mode},${invoice.id},${invoice.number},${invoice.status},'GBP',${String(invoice.total)},${String(invoice.amount_paid)},${String(invoice.amount_remaining)},${dueDate},${tx.json(snapshot)},now(),${actorId},${correlationId}) on conflict(account_id,environment,provider_invoice_id) do nothing`;
+  await tx`insert into operations.invoices(organisation_id,schedule_id,account_id,environment,provider_invoice_id,number,status,currency,total_pence,amount_due_pence,amount_overpaid_pence,amount_paid_pence,amount_remaining_pence,due_date,issued_snapshot,projected_at,created_by,correlation_id) values(${schedule.organisationId},${schedule.id},${schedule.accountId},${schedule.mode},${invoice.id},${invoice.number},${invoice.status},'GBP',${String(invoice.total)},${String(invoice.amount_due)},${String(invoice.amount_overpaid)},${String(invoice.amount_paid)},${String(invoice.amount_remaining)},${dueDate},${tx.json(snapshot)},now(),${actorId},${correlationId}) on conflict(account_id,environment,provider_invoice_id) do nothing`;
 }
 
 export async function loadInvoice(
@@ -71,10 +87,6 @@ export async function loadInvoice(
   scope: BillingScope,
   id: string,
 ): Promise<BillingInvoice | null> {
-  validateBillingScope(scope);
   z.uuid().parse(id);
-  const [row] = await tx<
-    BillingInvoice[]
-  >`select id,provider_invoice_id as "providerInvoiceId",number,status,currency,total_pence::text as "totalPence",amount_paid_pence::text as "amountPaidPence",amount_remaining_pence::text as "amountRemainingPence",due_date::text as "dueDate",projected_at::text as "projectedAt" from operations.invoices where organisation_id=${scope.organisationId} and account_id=${scope.accountId} and environment=${scope.mode} and id=${id}`;
-  return row ?? null;
+  return (await selectInvoices(tx, scope, id))[0] ?? null;
 }

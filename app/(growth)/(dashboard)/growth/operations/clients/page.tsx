@@ -32,5 +32,10 @@ export default async function OperationsClientsPage({
         "The client register could not load. Reload the first page to try again.",
     };
   }
-  return <ClientList state={state} />;
+  return (
+    <ClientList
+      state={state}
+      billingEnabled={process.env.OPERATIONS_BILLING_ENABLED === "true"}
+    />
+  );
 }

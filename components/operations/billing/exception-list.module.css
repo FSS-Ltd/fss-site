@@ -1,0 +1,18 @@
+.page {
+  max-width: 1080px;
+}
+.page h1 {
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+}
+.page li {
+  border-radius: 20px;
+}
+.page a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-block: 8px;
+}

@@ -31,8 +31,18 @@ export type BillingInvoice = {
   status: "draft" | "open" | "paid" | "void" | "uncollectible";
   currency: "GBP";
   totalPence: string;
+  amountDuePence: string;
+  amountOverpaidPence: string;
   amountPaidPence: string;
   amountRemainingPence: string;
   dueDate: string | null;
   projectedAt: string;
+  paymentState:
+    | "pending"
+    | "processing"
+    | "succeeded"
+    | "failed"
+    | "canceled"
+    | null;
+  mandateState: "pending" | "active" | "inactive" | null;
 };

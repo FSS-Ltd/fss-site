@@ -33,6 +33,12 @@ export function InvoiceList({
           </div>
           <p className={styles.amount}>{billingAmount(invoice.totalPence)}</p>
           <dl className={styles.details}>
+            {invoice.amountDuePence !== invoice.totalPence && (
+              <div>
+                <dt>Amount due, including account balance</dt>
+                <dd>{billingAmount(invoice.amountDuePence)}</dd>
+              </div>
+            )}
             {invoice.dueDate && (
               <div>
                 <dt>Due</dt>
@@ -47,6 +53,12 @@ export function InvoiceList({
               <dt>Paid</dt>
               <dd>{billingAmount(invoice.amountPaidPence)}</dd>
             </div>
+            {BigInt(invoice.amountOverpaidPence) > BigInt(0) && (
+              <div>
+                <dt>Overpaid</dt>
+                <dd>{billingAmount(invoice.amountOverpaidPence)}</dd>
+              </div>
+            )}
             {invoice.status === "open" && (
               <div>
                 <dt>Remaining</dt>
@@ -54,6 +66,38 @@ export function InvoiceList({
               </div>
             )}
           </dl>
+          {BigInt(invoice.amountOverpaidPence) > BigInt(0) && (
+            <p>
+              We’re reviewing the extra payment. Please contact FSS before
+              making another payment.
+            </p>
+          )}
+          {invoice.paymentState === "processing" && (
+            <p>
+              Payment processing. Please wait for confirmation before making
+              another payment.
+            </p>
+          )}
+          {invoice.paymentState === "pending" && (
+            <p>Payment pending. Your invoice will update after confirmation.</p>
+          )}
+          {invoice.paymentState === "failed" && invoice.status === "open" && (
+            <p>
+              The payment did not complete. Review your payment method or
+              contact FSS.
+            </p>
+          )}
+          {invoice.mandateState && (
+            <p>
+              Direct Debit authorisation:{" "}
+              {invoice.mandateState === "active"
+                ? "active"
+                : invoice.mandateState === "pending"
+                  ? "pending confirmation"
+                  : "new consent required"}
+              .
+            </p>
+          )}
           <div className={styles.invoiceFooter}>
             <p>
               Last checked{" "}

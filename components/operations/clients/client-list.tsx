@@ -8,8 +8,10 @@ export type ClientListState =
 
 export function ClientList({
   state,
+  billingEnabled = false,
 }: {
   state: ClientListState;
+  billingEnabled?: boolean;
 }): React.JSX.Element {
   return (
     <section className={styles.page} aria-labelledby="clients-heading">
@@ -21,6 +23,11 @@ export function ClientList({
         <p className={styles.subtitle}>
           Organisations and their reviewed engagement links.
         </p>
+        {billingEnabled && (
+          <Link href="/growth/operations/billing">
+            Review billing exceptions
+          </Link>
+        )}
       </header>
       {state.status === "error" ? (
         <div className={styles.notice} role="alert">
