@@ -1,6 +1,6 @@
 # Approved welcome and onboarding scheduling
 
-Task 10 implements the queue and provider adapters. Founder preview, controls and recovery UI are Task 11. Production activation and migration promotion remain Task 14. No real messages or invoices were issued during implementation.
+Task 10 implements the queue and provider adapters. Task 11 adds founder preview, approvals, controls and recovery at each client’s Journey page, linked from Agreements. Production activation and migration promotion remain Task 14. No real messages or invoices were issued during implementation.
 
 ## Approval and timing
 
@@ -44,3 +44,21 @@ Inspect overdue counts, held jobs, failure codes and verified provider records. 
 ## Verification limitation
 
 The external Supabase advisor was not run: automatic approval review rejected possible schema metadata transmission. Local catalog-only checks passed for forced RLS, fixed function search paths, restricted grants and no worker access to Growth tables. Migrations remain staged and live-send gates remain off. Production activation is a separate release step.
+
+## Founder review and recovery (Task 11)
+
+Welcome preparation uses existing organisation contacts and agreement obligations, with the configured billing account and environment. The welcome sender organisation remains Faithful Software Solutions, distinct from the client name. The founder reviews exact email recipients/content, the generated PDF and its accessible equivalent, first-invoice selection and post-signature message before starting. Proposal approval separately previews current signing revision/hash/PDF, every signer’s role and the frozen activation messages for additional recipients. No marketing or automatic opt-in is added.
+
+Preview envelopes expire after 30 minutes. A domain-separated HMAC using the existing onboarding invitation key binds the exact PDF bytes, content, actor, organisation, agreement/version and relevant journey generation/proposal approval. No preview cache or new preview storage exists. Start retains those exact bytes; a private founder-only download serves the retained PDF. A changed agreement, generation or approval requires a fresh review. The envelope is authenticated, not encrypted; it stays in transient browser state and must not be logged.
+
+Pause, resume, cancellation, proposal approval, reconciliation and recovery lock the organisation-scoped journey using a narrowly granted function. Founder table grants remain SELECT-only. The timeline shows London civil time, held dependencies, stale approvals, delivery failures and cancellation outcomes. Cancellation never claims to unsend a provider-accepted effect, void a contract or refund billing.
+
+Known acceptance recovery requires the original provider ID/time and an independent review reference. It cannot infer absence or send a test message. Definite held failures may be retried only on an active journey, with no unresolved acceptance and fewer than six attempts, after the founder records a correction reference. Recovery preserves permanent keys, snapshots, attempt counts and completed effects. Delivery blocks, uncertainty and exhausted budgets cannot use this control. The recovery audit records the founder and exact job.
+
+Apply staged `20260908095350_operations_journey_controls.sql` after Task 10 only in the disposable/release-approved schema. It adds the narrow lock/retry functions and one audit action. Rollback disables onboarding; retain the approval, effect and audit records. Production application remains Task 14.
+
+The synthetic HTTP-to-worker fixture verifies separate welcome/proposal approvals, two retained signatures, one first Stripe invoice, reused signer memberships, one extra-owner invitation and five recipient-specific service messages. Repeated late cron runs issue no additional effects. Stripe HTTP, Resend fetch and account provisioning are synthetic boundaries; no provider email or charge is issued. A newsletter-only unsubscribed contact receives necessary service messages while remaining unsubscribed.
+
+### Existing completion invitation boundary
+
+Task 11 does not alter approved Growth outreach or completion messages. Existing Growth completion drafting omits a newsletter invitation for a contact already subscribed at draft time, and dispatch can remove the frozen invitation. It does not refresh subscription state at dispatch, and `newsletter_invited_at` belongs to the current engagement. A pre-existing stale-draft or cross-engagement invitation risk therefore remains in Growth. Onboarding adds no newsletter invitation, so it does not create a second invitation. Any broader marketing change requires its own reviewed policy and scope.
