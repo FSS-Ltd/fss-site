@@ -7,6 +7,21 @@ import type {
   AgreementRecord,
   AgreementRegister,
 } from "./types";
+import { AgreementConflict } from "./types";
+
+export async function assertNoPendingExecution(
+  tx: OperationsTransaction,
+  agreementId: string,
+): Promise<void> {
+  const [pending] = await tx<{ pending: boolean }[]>`
+    select exists(select 1 from operations.signing_approvals p
+      where p.agreement_id=${agreementId} and p.status='approved'
+      and (select count(*) from operations.signing_signatures s where s.approval_id=p.id and s.signed_at<=p.expires_at)=jsonb_array_length(p.snapshot->'signatories')) as pending`;
+  if (pending.pending)
+    throw new AgreementConflict(
+      "All parties have signed. The completed document is being retained; this agreement cannot be replaced.",
+    );
+}
 
 export async function withAgreementTransaction<T>(
   db: OperationsDb,
@@ -45,6 +60,7 @@ async function loadAgreements(
     AgreementRecord[]
   >`select a.id,a.engagement_id as "engagementId",a.version,a.current_revision as revision,a.status,r.snapshot as draft,
     (select evidence from operations.signature_evidence e where e.organisation_id=a.organisation_id and e.agreement_id=a.id and e.revision=a.current_revision) as evidence,
+    (select provenance from operations.signature_evidence e where e.organisation_id=a.organisation_id and e.agreement_id=a.id and e.revision=a.current_revision) as "evidenceProvenance",
     coalesce((select jsonb_agg(jsonb_build_object('lineNumber',s.line_number,'effectiveDate',s.effective_date::text,'endDate',s.end_date::text,'status',s.status) order by s.line_number) from operations.service_instances s where s.organisation_id=a.organisation_id and s.agreement_id=a.id and s.revision=a.current_revision),'[]'::jsonb) as services
     from operations.agreements a join operations.agreement_revisions r on r.organisation_id=a.organisation_id and r.agreement_id=a.id and r.revision=a.current_revision
     where a.organisation_id=${organisationId} and (${agreementId}::uuid is null or a.id=${agreementId}::uuid) and (${after}::uuid is null or a.id>${after}::uuid) order by a.id limit 51`;

@@ -1,6 +1,6 @@
 # Task 9 signature provider capability gate
 
-Reviewed: 2026-09-08. Candidate: Docusign, not selected. Gate: **NOT PASSED**.
+Reviewed: 2026-09-08. Candidate: Docusign, not selected. Gate: **SUPERSEDED by user-approved in-house signing on 8 September 2026**. This report is retained as historical provider research; provider access is no longer an implementation prerequisite.
 
 Read Task 9 brief and `docs/superpowers/plans/fss-operations-station/05-billing-and-provider-decision.md`, Agreement and signature flow. This is public-source research only. No account access, credentials, API requests, test envelopes, emails, purchases, adapter implementation occurred. Actual FSS account entitlement, configuration and price remain unknown.
 
@@ -38,7 +38,7 @@ Evidence limitation: Developer Center reference pages opened but exposed no read
 - [ ] Evidence retrieval failure is recoverable without prematurely recording signed state. Repeated completion invokes the existing Growth won/outreach-stopping boundary once and preserves historical terminal deals.
 - [ ] Keyboard/screen-reader signing journey and document readability pass; actual region, retention and contractual processing terms match FSS requirements.
 
-Task 9 remains blocked on provider/account input and actual capability evidence. Public documentation alone does not satisfy the account gate or authorize a purchase.
+At the time of this research, the managed-provider path was blocked on provider/account input and actual capability evidence. The user subsequently approved in-house signing, so this historical provider gate no longer blocks Task 9. Public documentation alone still does not establish account entitlement or authorize a purchase.
 
 ## Repository and configuration findings
 

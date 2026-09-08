@@ -10,20 +10,20 @@ The founder can start welcome while the proposal is still being edited, but the 
 
 ## Timeline and exact scheduling
 
-| Event                               | Action                                                                         | Conditions and timing                                                                                        |
-| ----------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
-| Founder starts journey              | Queue approved welcome email with welcome PDF                                  | Exact recipient/content/PDF snapshot approved; no active duplicate journey                                   |
-| Welcome accepted by Resend          | Record provider ID and accepted_at; schedule proposal                          | proposal_due_at = accepted_at + 2 elapsed hours                                                              |
-| Proposal due                        | Send approved current proposal through signature provider                      | Current revision/hash and signers still match approval; no bounce, pause, stop or already-sent envelope      |
-| Proposal edited before send         | Hold proposal step                                                             | New immutable revision requires reapproval; earliest send remains original due_at, or approval time if later |
-| All required signatures completed   | Verify evidence, activate signed-agreement record                              | Complete matching envelope/revision; duplicate events no-op                                                  |
-| Following calendar day 09:00 London | Create/finalise first agreed invoice, ensure portal invitation, send thank-you | Signed evidence saved; invoice and invitation steps individually durable                                     |
-| Client claims invitation            | Establish verified membership, show checklist                                  | Independent of payment clearance                                                                             |
-| Invoice payment succeeds            | Update billing and evaluate service-start conditions                           | Activation follows contract, assets and capacity requirements, not email opening                             |
+| Event                               | Action                                                                         | Conditions and timing                                                                                         |
+| ----------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| Founder starts journey              | Queue approved welcome email with welcome PDF                                  | Exact recipient/content/PDF snapshot approved; no active duplicate journey                                    |
+| Welcome accepted by Resend          | Record provider ID and accepted_at; schedule proposal                          | proposal_due_at = accepted_at + 2 elapsed hours                                                               |
+| Proposal due                        | Send approved current portal signing link through Resend                       | Current revision/hash and signers still match approval; no bounce, pause, stop or already-sent signing notice |
+| Proposal edited before send         | Hold proposal step                                                             | New immutable revision requires reapproval; earliest send remains original due_at, or approval time if later  |
+| All required signatures completed   | Verify evidence, activate signed-agreement record                              | Complete matching approval/revision and retained evidence; retries no-op                                      |
+| Following calendar day 09:00 London | Create/finalise first agreed invoice, ensure portal invitation, send thank-you | Signed evidence saved; invoice and invitation steps individually durable                                      |
+| Client claims invitation            | Establish verified membership, show checklist                                  | Independent of payment clearance                                                                              |
+| Invoice payment succeeds            | Update billing and evaluate service-start conditions                           | Activation follows contract, assets and capacity requirements, not email opening                              |
 
 “Accepted” means provider API acceptance, not delivered or read. Bounce/complaint events halt pending welcome/proposal emails and create a founder action. If delivery never becomes known, show uncertainty; never claim the client read it. The two-hour delay is a chosen experience rule, not evidence that this interval improves conversion.
 
-“Following day” defaults to the next calendar date at 09:00 Europe/London, including weekends. Store local scheduling policy and computed UTC instant using IANA timezone rules. Example: signature Friday 18:00 London → Saturday 09:00 London. If the founder prefers business days, approve a policy change before launch. Delayed signature webhook arriving after the due instant makes the action immediately eligible once verified; record actual lateness. Never backdate an invoice or email.
+“Following day” defaults to the next calendar date at 09:00 Europe/London, including weekends. Store local scheduling policy and computed UTC instant using IANA timezone rules. Example: signature Friday 18:00 London → Saturday 09:00 London. If the founder prefers business days, approve a policy change before launch. Delayed signature completion processing after the due instant makes the action immediately eligible once verified; record actual lateness. Never backdate an invoice or email.
 
 Cron proposed every five minutes, subject to Vercel plan and execution limits. A proposed operational target is dispatch within ten minutes of due time while providers are healthy. Use database due_at, not a two-hour sleeping function or browser timer. Keep this separate from existing 90-minute Growth jobs.
 
@@ -94,7 +94,7 @@ Please check the scope, payment schedule and responsibilities. If anything needs
 Jean-Fidele
 Faithful Software Solutions
 
-Prefer the signature provider's email delivery for its secure signing invitation. Configure its approved cover text rather than sending a duplicate signing email through Resend. Keep the envelope ID and sending evidence in the journey.
+The user approved in-house signing on 8 September. Resend owns the single approved signing notice with a normal portal URL, never an embedded signing credential. Before the proposal step, ensure each designated signer can claim approved portal access; Task 9 requires verified active membership before signing. Keep the approval ID and notification delivery evidence in the journey. The post-signature invitation step reuses existing access and only provisions missing access, without duplicate invitations.
 
 ### Post-signature thank-you
 

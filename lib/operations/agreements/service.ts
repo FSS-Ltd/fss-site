@@ -3,6 +3,7 @@ import type { OperationsDb } from "../db/client";
 import type { OperationsFounder } from "../organisations/types";
 import { activationSchema, validateActivation } from "../services/activation";
 import {
+  assertNoPendingExecution,
   insertRevision,
   loadAgreement,
   withAgreementTransaction,
@@ -88,6 +89,7 @@ export async function executeAgreementCommand(
         throw new AgreementConflict();
       if (command.action === "revise") {
         assertEditable(record, command.expectedVersion);
+        await assertNoPendingExecution(tx, id);
         await insertRevision(
           tx,
           organisationId,
@@ -100,6 +102,7 @@ export async function executeAgreementCommand(
         await tx`update operations.agreements set current_revision=current_revision+1,version=version+1 where organisation_id=${organisationId} and id=${id}`;
       } else if (command.action === "sign") {
         assertEditable(record, command.expectedVersion);
+        await assertNoPendingExecution(tx, id);
         if (
           command.evidence.sourceHash !== record.draft.documentHash ||
           JSON.stringify(command.evidence.signatories) !==

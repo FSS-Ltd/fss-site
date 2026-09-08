@@ -20,7 +20,7 @@ Task 7: complete. [PR #210](https://github.com/FSS-Ltd/fss-site/pull/210) passed
 
 Task 8: complete. [PR #211](https://github.com/FSS-Ltd/fss-site/pull/211) passed CI, Mobile Lighthouse and Vercel checks, then merged on 8 September at `5f5d446b`.
 
-Task 9: provider capability research complete on `feat/operations-managed-signatures`, but its required account gate is not passed. Signing-provider/account input, sandbox API access and account-specific entitlement/pricing are missing. No signing adapter, purchase or sends were implemented. See [signature provider gate](signature-provider-gate.md). Tasks 10–14 remain unstarted. The authoritative requirements remain in [plan 07](../superpowers/plans/fss-operations-station/07-implementation-plan.md).
+Task 9: in-house electronic signing implemented after explicit user approval on 8 September, superseding the managed-provider prerequisite. Founder approval, designated verified portal signers, immutable private PDFs/audit, cancellation/revision guards and durable Growth completion are implemented. Operations: 257 tests passed; Growth: 1,750 tests passed. Independent review approved with no findings; PR merge is pending. See [signing architecture and recovery](signing.md). Tasks 10–14 remain unstarted until Task 9 merges.
 
 The founder explicitly approved the entire build plan after Task 1 checks completed. Continue the sequential PR process without requesting the same build/merge approval again. Prepare and verify the concrete rollout in Task 14 before enabling live services.
 

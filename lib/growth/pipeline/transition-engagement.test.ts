@@ -527,3 +527,77 @@ test("rejects an invalid founder context even with valid input", async () => {
     TypeError,
   );
 });
+
+test("signing system completes negotiation once with explicit system attribution", async () => {
+  const state = createFakeState({
+    engagement: lockedEngagement({ stage: "negotiation" }),
+  });
+  const transition = createTransitioner(state);
+  const input = {
+    dimension: "commercial",
+    engagementId,
+    expectedVersion: 3,
+    toStage: "won",
+    reasonCode: "agreement_signed",
+    oneOffValuePence: 5000,
+  };
+  const context = {
+    system: "operations-signing" as const,
+    correlationId: "signed-agreement",
+  };
+  await transition(db, input, context);
+  assert.equal((await transition(db, input, context)).alreadyApplied, true);
+  assert.equal(state.events.length, 1);
+  assert.equal(state.events[0].actorType, "system");
+  assert.equal(state.audits[0].actorId, "operations-signing");
+  assert.equal(state.audits[0].actorType, "system");
+  assert.deepEqual(state.commercialApplications[0].wonAt, fixedNow);
+  assert.deepEqual(state.stopOutreachCalls, [prospectId]);
+});
+
+test("signing system cannot perform unrelated commercial or delivery transitions", async () => {
+  const state = createFakeState();
+  const transition = createTransitioner(state);
+  for (const input of [
+    { dimension: "commercial", toStage: "qualified" },
+    {
+      dimension: "commercial",
+      toStage: "won",
+      oneOffValuePence: 5000,
+      reasonCode: "unrelated",
+    },
+    { dimension: "delivery", toStatus: "in_progress" },
+  ]) {
+    await assert.rejects(
+      transition(
+        db,
+        { engagementId, expectedVersion: 3, ...input },
+        { system: "operations-signing", correlationId: "restricted-system" },
+      ),
+    );
+  }
+  assert.equal(state.events.length, 0);
+  assert.equal(state.commercialApplications.length, 0);
+});
+
+test("signing system preserves terminal losses and does not skip commercial stages", async () => {
+  for (const stage of ["lost", "qualified"] as const) {
+    const state = createFakeState({ engagement: lockedEngagement({ stage }) });
+    await assert.rejects(
+      createTransitioner(state)(
+        db,
+        {
+          dimension: "commercial",
+          engagementId,
+          expectedVersion: 3,
+          toStage: "won",
+          reasonCode: "agreement_signed",
+          oneOffValuePence: 5000,
+        },
+        { system: "operations-signing", correlationId: "preserve-history" },
+      ),
+      TransitionEngagementError,
+    );
+    assert.equal(state.events.length, 0);
+  }
+});

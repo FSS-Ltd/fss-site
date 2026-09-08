@@ -60,7 +60,7 @@ function createTransaction(
           reason_code, actor_type, actor_id, correlation_id
         ) values (
           ${input.engagementId}, ${input.dimension}, ${input.fromState}, ${input.toState},
-          ${input.reasonCode}, 'founder', ${input.actorId}, ${input.correlationId}
+          ${input.reasonCode}, ${input.actorType ?? "founder"}, ${input.actorId}, ${input.correlationId}
         )
       `;
     },
@@ -102,7 +102,7 @@ function createTransaction(
     appendTransitionAudit(input) {
       return appendAuditEvent(transaction, {
         correlationId: input.correlationId,
-        actorType: "founder",
+        actorType: input.actorType ?? "founder",
         actorId: input.actorId,
         action: `engagement.${input.dimension}_transitioned.${input.toState}`,
         entityType: "delivery_engagement",

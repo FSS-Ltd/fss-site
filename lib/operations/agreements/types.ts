@@ -12,6 +12,10 @@ export type AgreementRecord = {
   status: "draft" | "signed";
   draft: AgreementDraft;
   evidence: SignatureEvidence | null;
+  evidenceProvenance?:
+    | "manual_founder_confirmation"
+    | "authenticated_portal_electronic_signature"
+    | null;
   services: ServiceInstance[];
 };
 export type AgreementRegister = {
