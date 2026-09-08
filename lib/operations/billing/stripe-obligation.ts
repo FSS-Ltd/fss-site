@@ -26,6 +26,7 @@ export async function createStripeObligation(
   schedule: BillingSchedule,
   customerId: string,
   command: BillingCommand,
+  beforeWrite: () => Promise<void> = async () => {},
 ): Promise<ProviderObligation> {
   const amount = stripeAmount(schedule.amountPence);
   const metadata = {
@@ -84,12 +85,14 @@ export async function createStripeObligation(
       throw new Error(
         "Provider recurring invoice differs from signed obligation.",
       );
-    if (invoice.status === "draft")
+    if (invoice.status === "draft") {
+      await beforeWrite();
       invoice = await stripe.invoices.finalizeInvoice(
         invoice.id,
         { auto_advance: true },
         key("finalize"),
       );
+    }
     return invoice;
   };
   if (schedule.owner === "invoice") {
@@ -109,6 +112,7 @@ export async function createStripeObligation(
     }
     if (!invoice) {
       requireSafeReplay(command.createdAt);
+      await beforeWrite();
       invoice = await stripe.invoices.create(
         {
           customer: customerId,
@@ -140,6 +144,7 @@ export async function createStripeObligation(
         throw new Error("Multiple invoice items require reconciliation.");
       if (!existing.length) {
         requireSafeReplay(command.createdAt);
+        await beforeWrite();
         await stripe.invoiceItems.create(
           {
             customer: customerId,
@@ -157,6 +162,7 @@ export async function createStripeObligation(
         throw new Error(
           "Provider invoice total differs from signed obligation.",
         );
+      await beforeWrite();
       invoice = await stripe.invoices.finalizeInvoice(
         invoice.id,
         { auto_advance: false },
@@ -227,6 +233,7 @@ export async function createStripeObligation(
       };
   }
   requireSafeReplay(command.createdAt);
+  await beforeWrite();
   const product = await stripe.products.create(
     { name: schedule.description.slice(0, 250), metadata },
     key("product"),
@@ -242,6 +249,7 @@ export async function createStripeObligation(
     },
   };
   if (future) {
+    await beforeWrite();
     const provider = await stripe.subscriptionSchedules.create(
       {
         customer: customerId,
@@ -272,6 +280,7 @@ export async function createStripeObligation(
     );
     return { providerId: provider.id, invoice: null };
   }
+  await beforeWrite();
   const subscription = await stripe.subscriptions.create(
     {
       customer: customerId,

@@ -12,7 +12,11 @@ import {
   signPortalAgreement,
 } from "../../../lib/operations/agreements/signing-service";
 import type { SigningApproval } from "../../../lib/operations/agreements/signing-types";
-export async function signingFixture(t: TestContext, signerCount = 2) {
+export async function signingFixture(
+  t: TestContext,
+  signerCount = 2,
+  options: { taxFree?: boolean } = {},
+) {
   const url = requireOperationsTestDatabaseUrl(
     process.env.OPERATIONS_TEST_DATABASE_URL,
   );
@@ -99,6 +103,12 @@ export async function signingFixture(t: TestContext, signerCount = 2) {
     ...agreementDraft(),
     signatories: identities.map((i) => i.email),
   };
+  if (options.taxFree)
+    draft.lines = draft.lines.map((line) => ({
+      ...line,
+      unitPence: "12000",
+      taxPence: "0",
+    }));
   const record = await executeAgreementCommand(
     founderDb,
     founder,
