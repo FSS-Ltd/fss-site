@@ -14,7 +14,7 @@ Task 4: complete. [PR #207](https://github.com/FSS-Ltd/fss-site/pull/207) passed
 
 Task 5: complete. [PR #208](https://github.com/FSS-Ltd/fss-site/pull/208) passed CI, Mobile Lighthouse and Vercel checks, then merged on 7 September 2026 at `ad2499a2`.
 
-Task 6: provider capability gate in progress on `feat/operations-provider-sandbox`, from freshly fetched main at `ad2499a2`. Initial account checks require renewed FSS sandbox access; see [provider gate evidence](provider-sandbox-results.md). Tasks 7–14 remain unstarted. The authoritative requirements remain in [plan 07](../superpowers/plans/fss-operations-station/07-implementation-plan.md).
+Task 6: provider capability gate in progress on `feat/operations-provider-sandbox`, from freshly fetched main at `ad2499a2`. The founder supplied test access; invoice, anchor, hosted Bacs, failure and signature proofs passed; review and PR checks remain pending; see [provider gate evidence](provider-sandbox-results.md). Tasks 7–14 remain unstarted. The authoritative requirements remain in [plan 07](../superpowers/plans/fss-operations-station/07-implementation-plan.md).
 
 The founder explicitly approved the entire build plan after Task 1 checks completed. Continue the sequential PR process without requesting the same build/merge approval again. Prepare and verify the concrete rollout in Task 14 before enabling live services.
 
@@ -96,3 +96,13 @@ Desktop 1440×1000 and mobile 390×844 screenshots were inspected. The mobile pa
 - Actual-component browser fixtures verified desktop 1440 px, mobile 375 px and 200% text reflow; native keyboard review/founder selectors, visible focus, stable failed-submit idempotency keys and retained conflict drafts passed. Screenshots inspected. Fixtures and preview server were removed/stopped before final build.
 - Browser/compile slowness included a transient generated-cache disk-space error. Clearing only this worktree's generated cache resolved the clean-build path. A sandbox IPC failure in lint's existing cover script passed when rerun with the required execution permission.
 - Hosted authentication-to-request end-to-end testing and a dedicated screen-reader session remain part of the release gate. Uploads and notification delivery remain gated to their later approved integrations. Task 5 PR checks passed and merge is verified. CI completed in 7m47s and mobile Lighthouse in 3m21s.
+
+## Task 6 verification, 8 September 2026
+
+- Selected Stripe after actual test-account proofs for first-invoice idempotency/due amount, future recurring anchor and renewal, immediate recurring invoice ownership, hosted Bacs consent/default method/invoice history, delayed success and failure states, reusable mandate recovery and verified webhook replay/tamper/expiry. See [provider gate evidence](provider-sandbox-results.md).
+- Added the exact Stripe SDK 22.6.1 dependency, pinned API `2026-08-26.dahlia`, disabled-by-default configuration and account-bound client. Eight focused tests and the actual SDK test-account verification passed. Live mode is rejected outside a Vercel production deployment.
+- Operations suite: 150 passed, zero failures/skips; 97.90% lines, 92.68% branches, 97.36% functions. Full regression suite: 1,676 passed, zero failures/skips.
+- Production build, TypeScript, repository lint, migration policy, design checks, homepage bundle budget and production dependency audit passed. Source/docs/fixture formatting passed. The pnpm-generated lockfile retains its native format; Prettier flags the unchanged baseline too, so no unrelated lockfile reformat was made.
+- Independent specification/code review found no P1/P2 issues and verified all nine sanitised event fixtures plus selected private sandbox proof summaries. Two stale progress statements were corrected.
+- Synthetic subscriptions/customers/test clock were removed or cancelled, and the original test Bacs preference restored. Stripe-retained default configuration/price and financial test records are documented; portal features are disabled and the product archived. Owned browser and webhook processes stopped.
+- Live onboarding, account-specific limits/pricing, restricted production credentials and live Bacs activation remain Task 14 requirements. Application payment-ledger logic remains Task 8. No live billing was activated. Task 6 PR checks and merge remain pending; Task 7 has not started.

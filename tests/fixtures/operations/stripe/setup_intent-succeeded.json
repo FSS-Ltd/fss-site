@@ -1,0 +1,59 @@
+{
+  "id": "evt_1UDGUPEouCWSSYTJDkXg1yih",
+  "object": "event",
+  "api_version": "2026-08-26.dahlia",
+  "created": 1788841113,
+  "data": {
+    "object": {
+      "id": "seti_1UDGP2EouCWSSYTJyQSfbyBA",
+      "object": "setup_intent",
+      "allowed_payment_method_types": null,
+      "application": null,
+      "automatic_payment_methods": null,
+      "cancellation_reason": null,
+      "client_secret": "[redacted]",
+      "created": 1788840780,
+      "customer": "cus_VDhiFNfwsmpmy9",
+      "customer_account": null,
+      "description": null,
+      "excluded_payment_method_types": null,
+      "flow_directions": null,
+      "last_setup_error": null,
+      "latest_attempt": "setatt_1UDGUPEouCWSSYTJgOx7oIIX",
+      "livemode": false,
+      "managed_payments": {
+        "enabled": false
+      },
+      "mandate": "mandate_1UDGUPEouCWSSYTJC3zgQQMc",
+      "metadata": {},
+      "next_action": null,
+      "on_behalf_of": null,
+      "payment_method": "pm_1UDGUJEouCWSSYTJaEo1AxNl",
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "mandate_options": null,
+          "network": null,
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card",
+        "bacs_debit",
+        "link",
+        "revolut_pay",
+        "amazon_pay"
+      ],
+      "single_use_mandate": null,
+      "status": "succeeded",
+      "usage": "off_session"
+    }
+  },
+  "livemode": false,
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": "f6326354-ae8f-49b8-b8d8-fb23e81ece13"
+  },
+  "type": "setup_intent.succeeded"
+}

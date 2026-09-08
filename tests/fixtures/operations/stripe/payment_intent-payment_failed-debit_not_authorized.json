@@ -1,0 +1,125 @@
+{
+  "id": "evt_3UDGV4EouCWSSYTJ1332t6a2",
+  "object": "event",
+  "api_version": "2026-08-26.dahlia",
+  "created": 1788841524,
+  "data": {
+    "object": {
+      "id": "pi_3UDGV4EouCWSSYTJ1F054ShC",
+      "object": "payment_intent",
+      "allowed_payment_method_types": null,
+      "amount": 100,
+      "amount_capturable": 0,
+      "amount_details": {
+        "tip": {}
+      },
+      "amount_received": 0,
+      "application": null,
+      "application_fee_amount": null,
+      "automatic_payment_methods": {
+        "allow_redirects": "never",
+        "enabled": true
+      },
+      "canceled_at": null,
+      "cancellation_reason": null,
+      "capture_method": "automatic_async",
+      "client_secret": "[redacted]",
+      "confirmation_method": "automatic",
+      "created": 1788841154,
+      "currency": "gbp",
+      "customer": "cus_VDhq8AecCqvaJY",
+      "customer_account": null,
+      "description": null,
+      "excluded_payment_method_types": null,
+      "last_payment_error": {
+        "code": "debit_not_authorized",
+        "decline_code": "generic_decline",
+        "doc_url": "https://stripe.com/docs/error-codes/debit-not-authorized",
+        "failure_code": "debit_not_authorized",
+        "message": "The customer has notified their bank that this payment was unauthorized.",
+        "network_decline_code": "1",
+        "payment_method": {
+          "bacs_debit": {
+            "fingerprint": "H0lzBj8tc0e1poI2",
+            "sort_code": "108800",
+            "last4": "3335"
+          },
+          "allow_redisplay": "unspecified",
+          "created": 1788841154,
+          "shared_payment_granted_token": null,
+          "billing_details": {
+            "name": "Created from pm_bacsDebit_debitNotAuthorizedDelayed",
+            "phone": null,
+            "address": {
+              "country": "GB",
+              "city": "city",
+              "postal_code": "AB12 3CD",
+              "state": null,
+              "line1": "Test line1",
+              "line2": null
+            },
+            "email": "bacsDebitGeneratorTest+debitNotAuthorizedDelayed@stripe.com",
+            "tax_id": null
+          },
+          "customer": null,
+          "object": "payment_method",
+          "customer_account": null,
+          "id": "pm_1UDGV4EouCWSSYTJV0gN0fYs",
+          "metadata": {},
+          "type": "bacs_debit",
+          "livemode": false
+        },
+        "type": "card_error"
+      },
+      "latest_charge": "py_3UDGV4EouCWSSYTJ1Ad8LAKI",
+      "livemode": false,
+      "managed_payments": {
+        "enabled": false
+      },
+      "metadata": {
+        "verification": "operations-task6-20260908"
+      },
+      "next_action": null,
+      "on_behalf_of": null,
+      "payment_method": null,
+      "payment_method_configuration_details": {
+        "id": "pmc_1UDGDdEouCWSSYTJGn5FCul1",
+        "parent": null
+      },
+      "payment_method_options": {
+        "bacs_debit": {},
+        "card": {
+          "installments": null,
+          "mandate_options": null,
+          "network": null,
+          "request_three_d_secure": "automatic"
+        },
+        "link": {
+          "persistent_token": null
+        },
+        "revolut_pay": {}
+      },
+      "payment_method_types": ["card", "bacs_debit", "link", "revolut_pay"],
+      "payment_record": null,
+      "processing": null,
+      "receipt_email": null,
+      "review": null,
+      "setup_future_usage": null,
+      "shared_payment_granted_token": null,
+      "shipping": null,
+      "source": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "requires_payment_method",
+      "transfer_data": null,
+      "transfer_group": null
+    }
+  },
+  "livemode": false,
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "payment_intent.payment_failed"
+}

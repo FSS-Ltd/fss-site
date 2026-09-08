@@ -1,0 +1,90 @@
+{
+  "captured": "2026-09-08",
+  "source": "Stripe test events forwarded by authenticated Stripe CLI and signature-verified with stripe-node 22.6.1",
+  "fixtures": [
+    {
+      "file": "invoice-finalized.json",
+      "type": "invoice.finalized",
+      "apiVersion": "2026-08-26.dahlia",
+      "livemode": false,
+      "sourceSha256": "754b36aed918fa88fea63fcfc6768e138800475e6f8bd2d0e07bfe8cecafa3e2",
+      "redactedPaths": [
+        "/data/object/hosted_invoice_url",
+        "/data/object/invoice_pdf",
+        "/data/object/lines/url"
+      ]
+    },
+    {
+      "file": "invoice-created.json",
+      "type": "invoice.created",
+      "apiVersion": "2026-08-26.dahlia",
+      "livemode": false,
+      "sourceSha256": "1390f1eb6dafafb98face0de6a98db9de52d6bbcf0dc4075845af3eacde7de8c",
+      "redactedPaths": ["/data/object/lines/url"]
+    },
+    {
+      "file": "setup_intent-succeeded.json",
+      "type": "setup_intent.succeeded",
+      "apiVersion": "2026-08-26.dahlia",
+      "livemode": false,
+      "sourceSha256": "034db0fb8d433de187616d14c5b68c9bfd428a5de8442c3210fd6648a42568f0",
+      "redactedPaths": ["/data/object/client_secret"]
+    },
+    {
+      "file": "mandate-updated.json",
+      "type": "mandate.updated",
+      "apiVersion": "2026-08-26.dahlia",
+      "livemode": false,
+      "sourceSha256": "ec6bf448ba7d2d9041f3d26bbf68e8e168974c8829a139722a75048379bb51bb",
+      "redactedPaths": [
+        "/data/object/customer_acceptance/online/ip_address",
+        "/data/object/customer_acceptance/online/user_agent",
+        "/data/object/payment_method_details/bacs_debit/url"
+      ]
+    },
+    {
+      "file": "payment_intent-processing.json",
+      "type": "payment_intent.processing",
+      "apiVersion": "2026-08-26.dahlia",
+      "livemode": false,
+      "sourceSha256": "d149a10f0f8ae2215f320b25ca5acf35678e7c656b1017547f3e212f2a43f873",
+      "redactedPaths": ["/data/object/client_secret"]
+    },
+    {
+      "file": "payment_intent-succeeded.json",
+      "type": "payment_intent.succeeded",
+      "apiVersion": "2026-08-26.dahlia",
+      "livemode": false,
+      "sourceSha256": "758232dd4fed7a6658a4ca3bb9f5bc58e0f8394527e70c4d66e61e897761d738",
+      "redactedPaths": ["/data/object/client_secret"]
+    },
+    {
+      "file": "invoice-paid.json",
+      "type": "invoice.paid",
+      "apiVersion": "2026-08-26.dahlia",
+      "livemode": false,
+      "sourceSha256": "dab67128c05a9ba56478ad846258f3e237d1fee1376889476d4c8d01fa24495f",
+      "redactedPaths": [
+        "/data/object/hosted_invoice_url",
+        "/data/object/invoice_pdf",
+        "/data/object/lines/url"
+      ]
+    },
+    {
+      "file": "payment_intent-payment_failed-debit_not_authorized.json",
+      "type": "payment_intent.payment_failed",
+      "apiVersion": "2026-08-26.dahlia",
+      "livemode": false,
+      "sourceSha256": "2aa51bfee9f6fc1f34fca45874e3c3a38e0395c36baf8bee125d06b63f9da7ad",
+      "redactedPaths": ["/data/object/client_secret"]
+    },
+    {
+      "file": "payment_intent-payment_failed-insufficient_funds.json",
+      "type": "payment_intent.payment_failed",
+      "apiVersion": "2026-08-26.dahlia",
+      "livemode": false,
+      "sourceSha256": "a4e4e0f73cb20ba0230170b169177106ca9522e9b2568ad81284bc7b9d5f2a7c",
+      "redactedPaths": ["/data/object/client_secret"]
+    }
+  ]
+}
