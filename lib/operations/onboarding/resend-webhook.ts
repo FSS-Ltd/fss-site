@@ -24,7 +24,7 @@ export async function applyOnboardingDeliveryEvent(
   >`
  select b.recipient,a.snapshot->'welcome'->>'from' as "from",e.receipt->>'providerId' as "providerId"
  from operations.onboarding_jobs b join operations.onboarding_journeys j on j.id=b.journey_id join operations.onboarding_approvals a on a.id=j.approval_id join operations.onboarding_effects e on e.job_id=b.id
- where b.id=${data.tags.operations_job} and b.step in ('welcome','proposal','thank_you') and b.first_attempt_at is not null`;
+ where b.id=${data.tags.operations_job} and b.step in ('welcome','proposal','activation','thank_you') and b.first_attempt_at is not null`;
   if (
     !job ||
     job.recipient !== data.to[0].toLowerCase() ||

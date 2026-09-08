@@ -20,10 +20,13 @@ async function execute(
       });
     case "proposal_access":
       return effects.ensureProposalAccess(lease);
-    case "proposal": {
-      const email = lease.proposal?.emails.find(
-        (email) => email.to === lease.recipient,
-      );
+    case "proposal":
+    case "activation": {
+      const approved =
+        lease.step === "proposal"
+          ? lease.proposal?.emails
+          : lease.proposal?.activationEmails;
+      const email = approved?.find((email) => email.to === lease.recipient);
       if (!email)
         return {
           status: "failed",

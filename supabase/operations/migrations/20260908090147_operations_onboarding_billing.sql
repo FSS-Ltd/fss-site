@@ -6,9 +6,10 @@ declare b operations.onboarding_jobs; j operations.onboarding_journeys; a operat
  s operations.billing_schedules; customer_command operations.billing_commands; invoice_command operations.billing_commands;
  account text; env text; selected_key text; obligation jsonb; idx integer; owner text; amount numeric; due date; finish date; months integer; description text;
 begin
- if current_setting('role',true)<>'operations_onboarding_worker' or not operations.onboarding_can_execute(job,token,expected_generation) then raise exception 'Onboarding billing is unavailable' using errcode='42501'; end if;
+ if current_setting('role',true)<>'operations_onboarding_worker' then raise exception 'Onboarding billing is unavailable' using errcode='42501'; end if;
+ select * into strict j from operations.onboarding_journeys where id=(select journey_id from operations.onboarding_jobs where id=job) for update;
  select * into strict b from operations.onboarding_jobs where id=job and step='invoice' for update;
- select * into strict j from operations.onboarding_journeys where id=b.journey_id;
+ if not operations.onboarding_can_execute(job,token,expected_generation) then raise exception 'Onboarding billing is unavailable' using errcode='42501'; end if;
  select * into strict a from operations.onboarding_approvals where id=j.approval_id;
  select p1.* into strict p from operations.signing_approvals p1 join operations.onboarding_proposal_approvals p2 on p2.signing_approval_id=p1.id where p2.id=j.proposal_approval_id and p1.status='completed';
  if exists(select 1 from jsonb_array_elements(p.snapshot->'lines') line where (line->>'taxPence')::numeric>0) then raise exception 'Signed tax mapping requires founder review'; end if;
@@ -23,6 +24,7 @@ begin
   due:=(obligation->>'startDate')::date;finish:=(obligation->>'endDate')::date;months:=(obligation->>'recurrenceMonths')::integer;description:=obligation->>'description';
  end if;
  if obligation is null then raise exception 'Approved billing obligation is missing'; end if;
+ if not operations.onboarding_can_execute(job,token,expected_generation) then raise exception 'Onboarding billing is unavailable' using errcode='42501'; end if;
  insert into operations.billing_schedules(organisation_id,agreement_id,revision,account_id,environment,obligation_key,owner,amount_pence,due_date,end_date,recurrence_months,description,signed_snapshot,created_by,correlation_id)
  values(b.organisation_id,j.agreement_id,p.revision,account,env,selected_key,owner,amount,due,finish,months,description,p.snapshot,'system:operations-onboarding',job) on conflict do nothing;
  select * into strict s from operations.billing_schedules x where x.organisation_id=b.organisation_id and x.agreement_id=j.agreement_id and x.revision=p.revision and x.environment=env and x.obligation_key=selected_key;
@@ -46,8 +48,8 @@ declare b operations.onboarding_jobs; j operations.onboarding_journeys; a operat
  account text; env text; provider_ref text:=payload->>'providerId'; selected_target text;
 begin
  if current_setting('role',true)<>'operations_onboarding_worker' or not exists(select 1 from operations.onboarding_attempts where job_id=job and lease_token=token) then raise exception 'No authorized billing attempt' using errcode='42501'; end if;
+ select * into strict j from operations.onboarding_journeys where id=(select journey_id from operations.onboarding_jobs where id=job) for update;
  select * into strict b from operations.onboarding_jobs where id=job and step='invoice' for update;
- select * into strict j from operations.onboarding_journeys where id=b.journey_id;
  select * into strict a from operations.onboarding_approvals where id=j.approval_id;
  select * into strict p from operations.onboarding_proposal_approvals where id=j.proposal_approval_id;
  account:=a.snapshot->'invoice'->>'accountId';env:=case when (a.snapshot->'invoice'->>'livemode')::boolean then 'live' else 'test' end;

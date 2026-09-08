@@ -7,13 +7,18 @@ import {
   startApprovedJourney,
   approveJourneyProposal,
 } from "../../../lib/operations/onboarding/repository";
+import type { ProposalApprovalSnapshot } from "../../../lib/operations/onboarding/types";
 import { prepareProposal } from "../../../lib/operations/onboarding/approval";
 import { onboardingStore } from "../../../lib/operations/onboarding/outbox";
 import { requireOperationsTestDatabaseUrl } from "../../../scripts/require-operations-database-env";
 export async function onboardingFixture(
   t: TestContext,
   signers = 2,
-  options: { taxFree?: boolean } = {},
+  options: {
+    taxFree?: boolean;
+    welcomeRecipient?: string;
+    accessContacts?: ProposalApprovalSnapshot["access"];
+  } = {},
 ) {
   const cleanup: {
     signing?: Awaited<ReturnType<typeof signingFixture>>;
@@ -52,7 +57,12 @@ export async function onboardingFixture(
     { max: 4, connection: { options: "-c role=operations_onboarding_worker" } },
   );
   cleanup.worker = worker;
-  const prepared = await preparedWelcomeFixture(signing.identities[0].email);
+  for (const contact of options.accessContacts ?? []) {
+    await signing.admin`insert into operations.contacts(organisation_id,name,email,created_by,review_reference) values(${signing.organisationId},'Approved access contact',${contact.email},${signing.founder.actorId},'onboarding-test')`;
+  }
+  const prepared = await preparedWelcomeFixture(
+    options.welcomeRecipient ?? signing.identities[0].email,
+  );
   const approvalId = randomUUID(),
     journeyId = randomUUID();
   const input = {
@@ -72,10 +82,13 @@ export async function onboardingFixture(
       approvalHash: signingApproval.approvalHash,
       revision: signingApproval.revision,
       signers: signingApproval.requiredSigners,
-      access: signingApproval.requiredSigners.map((email) => ({
-        email,
-        role: "owner" as const,
-      })),
+      access: [
+        ...signingApproval.requiredSigners.map((email) => ({
+          email,
+          role: "owner" as const,
+        })),
+        ...(options.accessContacts ?? []),
+      ],
       portalUrl: "https://example.test/portal/agreements",
       scopeSummary: "the approved request board",
     },

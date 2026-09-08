@@ -13,7 +13,7 @@ function paragraphHtml(paragraph: string): string {
     .map((part, index) => {
       if (index % 2 === 0) return escapeHtml(part);
       const url = part.replace(/[.,;:!?]+$/, "");
-      return `<a href="${escapeHtml(url)}">${escapeHtml(url)}</a>${escapeHtml(part.slice(url.length))}`;
+      return `<a href="${escapeHtml(url)}" style="color:#17372d;text-decoration:underline;overflow-wrap:anywhere;word-break:break-all;">${escapeHtml(url)}</a>${escapeHtml(part.slice(url.length))}`;
     })
     .join("");
 }
@@ -31,7 +31,7 @@ export function emailFromParagraphs(
     to,
     subject,
     text: paragraphs.join("\n\n"),
-    html: `<main>${paragraphs.map((p) => `<p>${paragraphHtml(p)}</p>`).join("")}${appendix}</main>`,
+    html: `<main style="box-sizing:border-box;width:100%;max-width:640px;margin:0 auto;padding:24px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6;color:#24322d;overflow-wrap:anywhere;">${paragraphs.map((p) => `<p style="margin:0 0 20px;">${paragraphHtml(p)}</p>`).join("")}${appendix}</main>`,
   };
 }
 export function welcomeEmail(

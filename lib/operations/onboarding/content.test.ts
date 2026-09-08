@@ -67,7 +67,7 @@ test("proposal uses normal portal signing link and separately approved access ma
   };
   const p = prepareProposal(input, snapshot);
   assert.ok(p.emails[0].text.includes(input.portalUrl));
-  assert.ok(p.emails[0].html.includes(`<a href="${input.portalUrl}">`));
+  assert.ok(p.emails[0].html.includes(`<a href="${input.portalUrl}"`));
   assert.ok(p.emails[0].html.includes('href="{{portal_access_url}}"'));
   assert.ok(p.emails[0].text.includes("{{portal_access_url}}"));
   assert.throws(() =>

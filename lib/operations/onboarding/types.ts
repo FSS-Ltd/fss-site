@@ -4,6 +4,7 @@ export const onboardingSteps = [
   "proposal",
   "invoice",
   "invitation",
+  "activation",
   "thank_you",
 ] as const;
 export type OnboardingStep = (typeof onboardingSteps)[number];
@@ -59,6 +60,7 @@ export interface ProposalApprovalSnapshot {
     role: "owner" | "contributor" | "billing_contact" | "viewer";
   }[];
   emails: ApprovedEmail[];
+  activationEmails: ApprovedEmail[];
   portalUrl: string;
 }
 export interface OnboardingLease {

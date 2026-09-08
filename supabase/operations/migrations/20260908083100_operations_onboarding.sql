@@ -31,7 +31,7 @@ create table operations.onboarding_journeys (
 create unique index onboarding_one_agreement on operations.onboarding_journeys(agreement_id);
 create table operations.onboarding_jobs (
  id uuid primary key default gen_random_uuid(), organisation_id uuid not null, journey_id uuid not null,
- step text not null check(step in ('welcome','proposal_access','proposal','invoice','invitation','thank_you')),
+ step text not null check(step in ('welcome','proposal_access','proposal','invoice','invitation','activation','thank_you')),
  recipient text not null, idempotency_key text not null unique,
  state text not null default 'pending' check(state in ('pending','leased','succeeded','retryable_failure','unknown_outcome','held','cancelled')),
  generation integer not null default 1, lease_token uuid, lease_until timestamptz,
@@ -44,6 +44,8 @@ create table operations.onboarding_effects (
  job_id uuid primary key references operations.onboarding_jobs(id), organisation_id uuid not null,
  idempotency_key text not null unique, first_attempt_at timestamptz not null,
  status text not null check(status in ('unknown_outcome','retryable_failure','held','succeeded')), receipt jsonb,
+ -- An unresolved earlier acceptance survives the latest attempt's definite rejection.
+ unresolved_acceptance boolean not null default false,
  check((status='succeeded')=(receipt is not null))
 );
 create table operations.onboarding_attempts (
@@ -111,6 +113,8 @@ begin
  if p.status<>'approved' or p.expires_at<=clock_timestamp() or p.approval_hash is distinct from content->>'approvalHash'
  or p.revision is distinct from (content->>'revision')::integer or p.snapshot->'signatories' is distinct from content->'signers'
  or (select jsonb_agg(e->>'to' order by e->>'to') from jsonb_array_elements(content->'emails') e) is distinct from (select jsonb_agg(e order by e) from jsonb_array_elements_text(content->'signers') e)
+ or jsonb_typeof(content->'activationEmails') is distinct from 'array'
+ or coalesce((select jsonb_agg(e->>'to' order by e->>'to') from jsonb_array_elements(content->'activationEmails') e),'[]'::jsonb) is distinct from coalesce((select jsonb_agg(x->>'email' order by x->>'email') from jsonb_array_elements(content->'access') x where not ((content->'signers') ? (x->>'email')) and x->>'email'<>(select snapshot->>'recipient' from operations.onboarding_approvals where id=j.approval_id)),'[]'::jsonb)
  or jsonb_typeof(content->'access') is distinct from 'array'
  or exists(select 1 from jsonb_array_elements(content->'access') x where (x->>'role' is null or x->>'role' not in ('owner','contributor','billing_contact','viewer')) or not exists(select 1 from operations.contacts c where c.organisation_id=j.organisation_id and c.email=x->>'email'))
  or (select count(*) from jsonb_array_elements(content->'access'))<>(select count(distinct x->>'email') from jsonb_array_elements(content->'access') x)
@@ -119,6 +123,11 @@ begin
  then raise exception 'Current signing approval must match the proposal'; end if;
  if exists(select 1 from operations.onboarding_jobs where journey_id=journey and step='proposal' and first_attempt_at is not null)
  then raise exception 'An attempted signing notice must be reconciled before replacement'; end if;
+ -- An issued or uncertain access effect cannot become a different role in a new preview.
+ if exists(select 1 from operations.onboarding_jobs q join operations.onboarding_proposal_approvals prior on prior.id=j.proposal_approval_id
+ where q.journey_id=j.id and q.step in ('proposal_access','invitation') and q.first_attempt_at is not null
+ and (select x->>'role' from jsonb_array_elements(prior.snapshot->'access') x where x->>'email'=q.recipient) is distinct from (select x->>'role' from jsonb_array_elements(content->'access') x where x->>'email'=q.recipient))
+ then raise exception 'Previously attempted access roles require founder reconciliation'; end if;
  insert into operations.onboarding_proposal_approvals(id,organisation_id,agreement_id,signing_approval_id,snapshot,approved_by) values(approval,j.organisation_id,j.agreement_id,p.id,content,actor);
  update operations.onboarding_journeys set proposal_approval_id=approval,generation=generation+1 where id=journey;
  -- Unattempted old recipients may be replaced; attempted access is retained permanently.
@@ -130,7 +139,7 @@ begin
  if actor is null or actor !~ '^[a-f0-9]{64}$' then raise exception 'Founder approval required'; end if;
  select * into strict j from operations.onboarding_journeys where id=journey for update;
  if command not in ('pause','resume','cancel') or j.state in ('completed','cancelled') or (command='resume' and j.state<>'paused') then raise exception 'Invalid journey transition'; end if;
- update operations.onboarding_journeys set state=case command when 'pause' then 'paused' when 'resume' then case when exists(select 1 from operations.onboarding_jobs where journey_id=journey and step='thank_you' and state='succeeded') then 'completed' else 'active' end else 'cancelled' end,generation=generation+1 where id=journey;
+ update operations.onboarding_journeys set state=case command when 'pause' then 'paused' when 'resume' then case when exists(select 1 from operations.onboarding_jobs where journey_id=journey and step='thank_you' and state='succeeded') and not exists(select 1 from operations.onboarding_jobs where journey_id=journey and step='activation' and state<>'succeeded') then 'completed' else 'active' end else 'cancelled' end,generation=generation+1 where id=journey;
  if command='cancel' then update operations.onboarding_jobs set state='cancelled' where journey_id=journey and state<>'succeeded'; end if;
 end $$;
 create function operations.refresh_onboarding(batch_size integer default 100) returns void language plpgsql security definer set search_path='' as $$
@@ -151,6 +160,7 @@ begin
  perform operations.onboarding_enqueue(j,'invoice',a.snapshot->>'recipient',j.post_signature_due_at);
  for signer in select x->>'email' from jsonb_array_elements(p.snapshot->'access') x loop
  perform operations.onboarding_enqueue(j,'invitation',signer,j.post_signature_due_at);
+ if exists(select 1 from jsonb_array_elements(p.snapshot->'activationEmails') e where e->>'to'=signer) then perform operations.onboarding_enqueue(j,'activation',signer,j.post_signature_due_at); end if;
  end loop;
  perform operations.onboarding_enqueue(j,'thank_you',a.snapshot->>'recipient',j.post_signature_due_at);
  else
@@ -166,6 +176,7 @@ create function operations.onboarding_dependencies_ready(job operations.onboardi
  select case job.step
  when 'proposal' then exists(select 1 from operations.onboarding_journeys j where j.id=job.journey_id and j.proposal_approval_id is not null) and not exists(select 1 from operations.onboarding_journeys j join operations.onboarding_proposal_approvals p on p.id=j.proposal_approval_id cross join lateral jsonb_array_elements(p.snapshot->'access') x where j.id=job.journey_id and not exists(select 1 from operations.onboarding_jobs a where a.journey_id=j.id and a.step='proposal_access' and a.recipient=x->>'email' and a.state='succeeded'))
  when 'thank_you' then exists(select 1 from operations.onboarding_jobs a where a.journey_id=job.journey_id and a.step='invoice' and a.state='succeeded') and not exists(select 1 from operations.onboarding_jobs a where a.journey_id=job.journey_id and a.step='invitation' and a.state<>'succeeded')
+ when 'activation' then exists(select 1 from operations.onboarding_jobs a where a.journey_id=job.journey_id and a.step='invitation' and a.recipient=job.recipient and a.state='succeeded')
  when 'invitation' then exists(select 1 from operations.onboarding_jobs a where a.journey_id=job.journey_id and a.step='invoice' and a.state='succeeded')
  else true end;
 $$;
@@ -199,13 +210,13 @@ begin
  select * into strict b from operations.onboarding_jobs where id=job for update;
  if not operations.onboarding_can_execute(job,token,expected_generation) then return false; end if;
  if b.attempts>=6 then update operations.onboarding_jobs set state='held',failure_code='retry_budget_exhausted',lease_until=null where id=job; return false; end if;
- if exists(select 1 from operations.onboarding_effects where job_id=job and status='unknown_outcome' and first_attempt_at<=clock_timestamp()-interval '24 hours') then
+ if exists(select 1 from operations.onboarding_effects where job_id=job and (status='unknown_outcome' or unresolved_acceptance) and first_attempt_at<=clock_timestamp()-interval '24 hours') then
  update operations.onboarding_jobs set state='held',failure_code='dedupe_window_expired',lease_until=null where id=job; return false;
  end if;
  insert into operations.onboarding_attempts(job_id,organisation_id,lease_token,generation) values(job,b.organisation_id,token,expected_generation) on conflict do nothing;
  if not found then return false; end if;
  insert into operations.onboarding_effects(job_id,organisation_id,idempotency_key,first_attempt_at,status) values(job,b.organisation_id,b.idempotency_key,clock_timestamp(),'unknown_outcome')
- on conflict(job_id) do update set status='unknown_outcome' where operations.onboarding_effects.status<>'succeeded';
+ on conflict(job_id) do update set unresolved_acceptance=operations.onboarding_effects.unresolved_acceptance or operations.onboarding_effects.status='unknown_outcome',status='unknown_outcome' where operations.onboarding_effects.status<>'succeeded';
  update operations.onboarding_jobs set first_attempt_at=coalesce(first_attempt_at,clock_timestamp()),attempts=attempts+1 where id=job;
  return true;
 end $$;
@@ -222,10 +233,10 @@ begin
  if (select receipt->>'providerId' from operations.onboarding_effects where job_id=job)<>result->>'providerId' then raise exception 'Conflicting external acceptance requires review'; end if;
  return;
  end if;
- update operations.onboarding_effects set status='succeeded',receipt=result where job_id=job;
+ update operations.onboarding_effects set status='succeeded',receipt=result,unresolved_acceptance=false where job_id=job;
  update operations.onboarding_jobs set state='succeeded',succeeded_at=accepted,lease_until=null,failure_code=null where id=job;
  if b.step='welcome' then update operations.onboarding_journeys set welcome_accepted_at=accepted,proposal_due_at=accepted+interval '2 hours' where id=b.journey_id and welcome_accepted_at is null; end if;
- if b.step='thank_you' then update operations.onboarding_journeys set state='completed' where id=b.journey_id and state='active'; end if;
+ if b.step in ('thank_you','activation') then update operations.onboarding_journeys set state='completed' where id=b.journey_id and state='active' and exists(select 1 from operations.onboarding_jobs where journey_id=b.journey_id and step='thank_you' and state='succeeded') and not exists(select 1 from operations.onboarding_jobs where journey_id=b.journey_id and step='activation' and state<>'succeeded'); end if;
 end $$;
 create function operations.fail_onboarding_effect(job uuid, token uuid, code text, retry timestamptz, uncertain boolean) returns void language plpgsql security definer set search_path='' as $$
 declare b operations.onboarding_jobs;
@@ -233,7 +244,7 @@ begin
  select * into strict b from operations.onboarding_jobs where id=job for update;
  if b.lease_token is distinct from token or b.state<>'leased' then return; end if;
  if code !~ '^[a-z_]{1,80}$' then raise exception 'Safe failure code required'; end if;
- update operations.onboarding_effects set status=case when uncertain then 'unknown_outcome' when retry is null then 'held' else 'retryable_failure' end where job_id=job and status<>'succeeded';
+ update operations.onboarding_effects set unresolved_acceptance=unresolved_acceptance or uncertain,status=case when uncertain then 'unknown_outcome' when retry is null then 'held' else 'retryable_failure' end where job_id=job and status<>'succeeded';
  update operations.onboarding_jobs set state=case when retry is null then 'held' when uncertain then 'unknown_outcome' else 'retryable_failure' end,
  next_attempt_at=coalesce(retry,next_attempt_at),failure_code=code,lease_until=null where id=job;
 end $$;
@@ -242,11 +253,11 @@ declare b operations.onboarding_jobs;
 begin
  if kind not in ('bounced','complained') or length(account) not between 1 and 200 or length(event) not between 1 and 200 or provider_name<>'resend' then raise exception 'Invalid delivery event'; end if;
  select * into strict b from operations.onboarding_jobs where id=job;
- if b.step not in ('welcome','proposal','thank_you') then raise exception 'Email job required'; end if;
+ if b.step not in ('welcome','proposal','activation','thank_you') then raise exception 'Email job required'; end if;
  insert into operations.onboarding_delivery_events(provider,account_scope,event_id,job_id,organisation_id,event_type) values(provider_name,account,event,job,b.organisation_id,kind) on conflict do nothing;
  if not found then return false; end if;
  update operations.onboarding_journeys set state='blocked',generation=generation+1,failure_code=kind where id=b.journey_id and state in ('active','paused');
- update operations.onboarding_jobs set state='held',failure_code=kind where journey_id=b.journey_id and step in ('welcome','proposal') and state in ('pending','retryable_failure','unknown_outcome');
+ update operations.onboarding_jobs set state='held',failure_code=kind where journey_id=b.journey_id and step in ('welcome','proposal','activation') and state in ('pending','retryable_failure','unknown_outcome');
  return true;
 end $$;
 -- All mutations are bounded routines. The worker cannot alter approvals or write portal/billing tables.
@@ -261,7 +272,7 @@ begin
  if actor is null or actor !~ '^[a-f0-9]{64}$' then raise exception 'Founder reconciliation required'; end if;
  perform 1 from operations.onboarding_journeys where id=(select journey_id from operations.onboarding_jobs where id=job) for update;
  select * into strict b from operations.onboarding_jobs where id=job for update;
- if not exists(select 1 from operations.onboarding_effects where job_id=job and status='unknown_outcome') then raise exception 'An uncertain permanent attempt is required'; end if;
+ if not exists(select 1 from operations.onboarding_effects where job_id=job and (status='unknown_outcome' or unresolved_acceptance)) then raise exception 'An uncertain permanent attempt is required'; end if;
  select lease_token into strict token from operations.onboarding_attempts where job_id=job order by started_at desc limit 1;
  insert into operations.onboarding_reconciliations(job_id,organisation_id,reviewed_by,review_reference,receipt) values(job,b.organisation_id,actor,review_reference,provider_receipt);
  perform operations.finish_onboarding_effect(job,token,provider_receipt);

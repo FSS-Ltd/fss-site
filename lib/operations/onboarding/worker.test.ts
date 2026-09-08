@@ -126,8 +126,19 @@ test("resumable step routing and missing dependencies", async () => {
     signers: [f.lease.recipient],
     access: [{ email: f.lease.recipient, role: "owner" }],
     emails: [f.lease.snapshot.welcome],
+    activationEmails: [],
     portalUrl: "https://example.test/portal",
   };
+  assert.equal(
+    (await runOnboardingWorker(f.store, f.effects, { now })).succeeded,
+    1,
+  );
+  f.lease.step = "activation";
+  assert.equal(
+    (await runOnboardingWorker(f.store, f.effects, { now })).held,
+    1,
+  );
+  f.lease.proposal.activationEmails = [f.lease.snapshot.welcome];
   assert.equal(
     (await runOnboardingWorker(f.store, f.effects, { now })).succeeded,
     1,

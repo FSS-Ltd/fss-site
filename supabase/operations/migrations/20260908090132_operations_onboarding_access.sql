@@ -17,24 +17,28 @@ create function operations.onboarding_access(job uuid, token uuid, expected_gene
 declare b operations.onboarding_jobs; j operations.onboarding_journeys; p operations.onboarding_proposal_approvals;
  c operations.contacts; m operations.memberships; existing operations.portal_invites; binding operations.onboarding_access_bindings; wanted_role text; invite uuid; original_job uuid:=job;
 begin
- if current_setting('role',true)<>'operations_onboarding_worker' or not operations.onboarding_can_execute(job,token,expected_generation) then raise exception 'Onboarding access is unavailable' using errcode='42501'; end if;
+ if current_setting('role',true)<>'operations_onboarding_worker' then raise exception 'Onboarding access is unavailable' using errcode='42501'; end if;
+ -- Serialize scoped writes with pause/cancel, always journey -> job -> contact.
+ select * into strict j from operations.onboarding_journeys where id=(select journey_id from operations.onboarding_jobs where id=job) for update;
  select * into strict b from operations.onboarding_jobs where id=job and step in ('proposal_access','invitation') for update;
- select * into strict j from operations.onboarding_journeys where id=b.journey_id;
  select * into strict p from operations.onboarding_proposal_approvals where id=j.proposal_approval_id;
  select x->>'role' into strict wanted_role from jsonb_array_elements(p.snapshot->'access') x where x->>'email'=b.recipient;
  if wanted_role not in ('owner','contributor','billing_contact','viewer') then raise exception 'Invalid approved access'; end if;
  select * into strict c from operations.contacts where organisation_id=b.organisation_id and email=b.recipient for update;
- select * into m from operations.memberships where contact_id=c.id;
+ select * into m from operations.memberships where contact_id=c.id for update;
+ if not operations.onboarding_can_execute(job,token,expected_generation) then raise exception 'Onboarding access is unavailable' using errcode='42501'; end if;
  if m.revoked_at is not null then raise exception 'Revoked access requires founder review'; end if;
  if m.id is not null and m.role<>wanted_role and m.role<>'owner' then raise exception 'Billing access requires founder review'; end if;
  select * into binding from operations.onboarding_access_bindings where job_id=job;
  if binding.job_id is not null then
+  if binding.invitation_id is not null and (select role from operations.portal_invites where id=binding.invitation_id) is distinct from wanted_role then raise exception 'Bound invitation role requires founder review'; end if;
   if binding.invitation_id is not null and m.id is null and not exists(select 1 from operations.portal_invites where id=binding.invitation_id and revoked_at is null and claimed_at is null and expires_at>clock_timestamp()) then raise exception 'Expired invitation requires reviewed recovery'; end if;
   return jsonb_build_object('providerId',coalesce(binding.invitation_id::text,'membership:'||c.id::text),'acceptedAt',binding.created_at);
  end if;
  if m.id is null then
   if token_hash !~ '^[a-f0-9]{64}$' or encrypted->>'version'<>'1' or jsonb_typeof(encrypted->'ciphertext') is distinct from 'string' then raise exception 'Invalid encrypted invitation'; end if;
   select * into existing from operations.portal_invites where contact_id=c.id and claimed_at is null and revoked_at is null for update;
+  if not operations.onboarding_can_execute(job,token,expected_generation) then raise exception 'Onboarding access is unavailable' using errcode='42501'; end if;
   if existing.id is not null then
    -- Only an expired invitation issued by this journey may be replaced.
    select x.* into binding from operations.onboarding_access_bindings x join operations.onboarding_jobs q on q.id=x.job_id where x.invitation_id=existing.id and q.journey_id=j.id order by x.created_at limit 1;
@@ -60,7 +64,7 @@ create function operations.onboarding_email_access(job uuid, token uuid, expecte
 declare b operations.onboarding_jobs; source operations.onboarding_jobs; binding operations.onboarding_access_bindings;
 begin
  if current_setting('role',true)<>'operations_onboarding_worker' or not operations.onboarding_can_execute(job,token,expected_generation) then raise exception 'Onboarding access is unavailable' using errcode='42501'; end if;
- select * into strict b from operations.onboarding_jobs where id=job and step in ('proposal','thank_you');
+ select * into strict b from operations.onboarding_jobs where id=job and step in ('proposal','activation','thank_you');
  select * into strict source from operations.onboarding_jobs where journey_id=b.journey_id and recipient=b.recipient and step=case when b.step='proposal' then 'proposal_access' else 'invitation' end;
  select * into strict binding from operations.onboarding_access_bindings where job_id=source.id;
  return jsonb_build_object('jobId',coalesce(binding.token_job_id,source.id),'recipient',source.recipient,'encrypted',binding.encrypted_token);

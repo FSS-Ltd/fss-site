@@ -6,6 +6,7 @@ import type {
 } from "./types";
 import { renderWelcomePdf, welcomeAccessibleHtml } from "./content/welcome-pdf";
 import { welcomeEmail } from "./content/welcome-email";
+import { activationEmail } from "./content/activation-email";
 import { proposalEmail } from "./content/proposal-email";
 const text = z
   .string()
@@ -150,6 +151,11 @@ export function prepareProposal(
     signers,
     access,
     portalUrl: url.href,
+    activationEmails: access
+      .filter(
+        ({ email }) => email !== welcome.recipient && !signers.includes(email),
+      )
+      .map(({ email }) => activationEmail(email, welcome.content)),
     emails: signers.map((to) =>
       proposalEmail(to, welcome.content, input.scopeSummary, url.href),
     ),
