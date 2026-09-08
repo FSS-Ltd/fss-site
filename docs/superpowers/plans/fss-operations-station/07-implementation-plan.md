@@ -4,9 +4,9 @@
 
 **Goal:** Deliver founder operations, secure client delivery/billing access and a reliable welcome journey in independently reviewable slices.
 
-**Architecture:** Extend Growth OS with private operations domain modules and a separate portal identity boundary. PostgreSQL owns commercial/delivery records and durable work queues; managed providers own payment execution and signing evidence.
+**Architecture:** Extend Growth OS with private operations domain modules and a separate portal identity boundary. PostgreSQL owns commercial/delivery records, durable work queues and in-house signing evidence; Stripe owns payment execution. The user approved in-house ordinary signing on 8 September.
 
-**Tech Stack:** Existing Next.js, React, TypeScript, PostgreSQL, Resend, PDFKit, Vercel. Proposed additions: managed client auth SDKs, Stripe SDK and a selected signature integration, each justified at its slice.
+**Tech Stack:** Existing Next.js, React, TypeScript, PostgreSQL, Resend, PDFKit, Vercel. Client auth and Stripe SDKs were justified in their completed slices. In-house signing uses existing PDFKit and PostgreSQL.
 
 **Spec:** [Product](01-product-specification.md), [architecture](02-architecture-data-security.md), [metrics](03-operations-and-metrics.md), [portal](04-client-portal-and-requests.md), [billing](05-billing-and-provider-decision.md), [journey](06-welcome-journey.md).
 
@@ -29,7 +29,7 @@
 | A: Client register    | 1–2   | None                             | Founder can link clients to existing deals and register verified agreements |
 | B: Client workspace   | 3–5   | A                                | Two isolated clients can track milestones and submit/review work            |
 | C: Billing            | 6–8   | A, B identity                    | Sandbox invoice, recurring collection and payment management reconcile      |
-| D: Welcome automation | 9–11  | C plus signature capability gate | Complete timed journey with replay-safe sandbox effects                     |
+| D: Welcome automation | 9–11  | C plus verified in-house signing | Complete timed journey with replay-safe sandbox effects                     |
 | E: Operations insight | 12–13 | A–D                              | Reconciled metrics, offers, retention and exception queue                   |
 | F: Release            | 14    | All prior slices                 | Tested preview and a concrete release approval package                      |
 
@@ -140,15 +140,19 @@ No route accepts a provider customer ID, price ID, trusted role or recipient lis
 - [ ] Configure one owner for reminders/retries and method-specific policies; no automatic legal escalation or service suspension.
 - [ ] Prove payment projections match sandbox provider records after replay and recovery. Commit Slice C handoff.
 
-## Task 9: Proposal approval and managed signatures
+## Task 9: Proposal approval and in-house electronic signatures
 
-**Create:** `lib/operations/agreements/{approval,signature-client,signature-events}.ts` and tests; `components/operations/agreements/{proposal-editor,approval-preview}.tsx`; `app/api/webhooks/operations/signatures/route.ts`.
-**Consumes:** immutable agreement revisions. **Produces:** verified signed-agreement event with document evidence.
+User-approved change, 8 September 2026: replace the managed-provider dependency with an FSS-owned electronic signing flow for ordinary service agreements. Deeds, witnessed execution and qualified signatures are outside this slice.
 
-- [ ] Confirm signature provider API access, pricing, callback verification and evidence retrieval before dependency purchase or implementation.
-- [ ] Test edited-after-approval, signer changes, partial signature, declined/expired/replaced envelope and repeated completion event.
-- [ ] Implement provider send for the exact revision and secure evidence retrieval; signature completion alone advances signing state.
-- [ ] Verify existing Growth won transition/outreach stopping occurs once and historical terminal deals are not rewritten. Commit.
+**Create:** immutable approval and signature services, private document/evidence retention, founder proposal approval preview, authenticated portal signing routes and UI, and tests.
+**Consumes:** immutable agreement revisions and verified portal identities. **Produces:** verified signed-agreement completion with privately retained document and audit evidence.
+
+- [ ] Freeze the exact agreement content, document hash and required signers at founder approval. Content or signer edits invalidate approval; replacement supersedes old signing sessions.
+- [ ] Require verified authenticated access, designated signer email, active organisation access, typed name, authority confirmation and explicit consent to this exact document. Never sign from a browser return or a link alone.
+- [ ] Retain the immutable source PDF, signed PDF and audit evidence with hashes and timestamps; expose authenticated private downloads.
+- [ ] Test edited-after-approval, signer changes, partial signatures, decline, expiry, cancellation/replacement, concurrent signing, revoked access and repeated completion.
+- [ ] Only completion by all required signers plus durable evidence advances signing once. Reuse the Growth won/outreach-stopping boundary without rewriting historical terminal deals.
+- [ ] Verify the complete founder-to-signer flow, accessibility and recovery. Push and merge after checks and independent review, under existing approval.
 
 ## Task 10: Welcome content and durable scheduling
 

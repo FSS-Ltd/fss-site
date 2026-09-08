@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SigningForm } from "../signing/signing-form";
 import type {
   AgreementRegister as Register,
   AgreementRecord,
@@ -64,7 +65,12 @@ export function AgreementRegister({
       <header>
         <Link href="/growth/operations/clients">Back to client register</Link>
         <h1 id="agreement-heading">{register.organisationName}: agreements</h1>
-        <p>Signed terms, manual evidence and effective services.</p>
+        <p>Signed terms, signing evidence and effective services.</p>
+        {process.env.OPERATIONS_SIGNING_ENABLED === "true" && (
+          <Link href={`/growth/operations/clients/${organisationId}/signing`}>
+            Review electronic signing
+          </Link>
+        )}
       </header>
       {register.agreements.length === 0 && <p>No agreements on this page.</p>}
       {register.agreements.map((record) => (
@@ -73,7 +79,10 @@ export function AgreementRegister({
           <p>
             Revision {record.revision} ·{" "}
             {record.status === "signed"
-              ? "Signed · manual founder confirmation"
+              ? record.evidenceProvenance ===
+                "authenticated_portal_electronic_signature"
+                ? "Signed · verified portal signatures"
+                : "Signed · manual founder confirmation"
               : "Draft"}
           </p>
           <Terms record={record} />
@@ -131,6 +140,13 @@ export function AgreementRegister({
             </details>
           ) : (
             <>
+              {process.env.OPERATIONS_SIGNING_ENABLED === "true" && (
+                <SigningForm
+                  organisationId={organisationId}
+                  audience="founder"
+                  agreement={{ id: record.id, version: record.version }}
+                />
+              )}
               <details>
                 <summary>Edit draft as a new revision</summary>
                 <AgreementForm

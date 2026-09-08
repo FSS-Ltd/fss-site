@@ -84,10 +84,10 @@ export type TransitionEngagementInput = z.infer<
   typeof transitionEngagementInputSchema
 >;
 
-export type TransitionEngagementContext = {
-  founder: FounderSession;
-  correlationId: string;
-};
+export type TransitionEngagementContext = { correlationId: string } & (
+  | { founder: FounderSession; system?: never }
+  | { system: "operations-signing"; founder?: never }
+);
 
 export type LockedEngagement = {
   id: string;
@@ -119,6 +119,7 @@ export type InsertStageEventInput = {
   toState: string;
   reasonCode: string | null;
   actorId: string;
+  actorType?: "founder" | "system";
   correlationId: string;
 };
 
@@ -127,6 +128,7 @@ export type StopActiveOutreachResult = { stoppedCount: number };
 export type AppendTransitionAuditInput = {
   correlationId: string;
   actorId: string;
+  actorType?: "founder" | "system";
   engagementId: string;
   dimension: "commercial" | "delivery";
   toState: string;
@@ -152,7 +154,9 @@ export type CreateClientThankYouInput = {
 
 export interface EngagementTransitionTransaction {
   lockEngagement(engagementId: string): Promise<LockedEngagement | null>;
-  applyCommercialTransition(input: ApplyCommercialTransitionInput): Promise<void>;
+  applyCommercialTransition(
+    input: ApplyCommercialTransitionInput,
+  ): Promise<void>;
   applyDeliveryTransition(input: ApplyDeliveryTransitionInput): Promise<void>;
   insertStageEvent(input: InsertStageEventInput): Promise<void>;
   stopActiveOutreachForProspect(
@@ -194,14 +198,36 @@ export class TransitionEngagementError extends Error {
   }
 }
 
-function validateContext(context: TransitionEngagementContext): void {
+function resolveActor(
+  context: TransitionEngagementContext,
+  input: TransitionEngagementInput,
+): { actorId: string; actorType?: "system" } {
   if (
-    !FOUNDER_ACTOR_ID_PATTERN.test(context.founder.actorId) ||
     !context.correlationId.trim() ||
     context.correlationId.length > CORRELATION_ID_MAX_LENGTH
   ) {
     throw new TypeError("Engagement transition context is invalid.");
   }
+  if (context.system === "operations-signing" && !context.founder) {
+    if (
+      input.dimension !== "commercial" ||
+      input.toStage !== "won" ||
+      input.reasonCode !== "agreement_signed"
+    ) {
+      throw new TypeError(
+        "Signing may only complete a signed commercial agreement.",
+      );
+    }
+    return { actorId: "operations-signing", actorType: "system" };
+  }
+  if (
+    !context.founder ||
+    context.system ||
+    !FOUNDER_ACTOR_ID_PATTERN.test(context.founder.actorId)
+  ) {
+    throw new TypeError("Engagement transition context is invalid.");
+  }
+  return { actorId: context.founder.actorId };
 }
 
 type EngagementTransitionerDependencies = {
@@ -219,7 +245,7 @@ export function createEngagementTransitioner({
     context: TransitionEngagementContext,
   ): Promise<TransitionEngagementResult> {
     const input = transitionEngagementInputSchema.parse(rawInput);
-    validateContext(context);
+    const actor = resolveActor(context, input);
 
     return repository.withTransaction(db, async (transaction) => {
       const engagement = await transaction.lockEngagement(input.engagementId);
@@ -249,7 +275,8 @@ export function createEngagementTransitioner({
           toStage: input.toStage,
           wonAt: input.toStage === "won" ? transitionTime : null,
           lostAt: input.toStage === "lost" ? transitionTime : null,
-          lossReason: input.toStage === "lost" ? (input.reasonCode ?? null) : null,
+          lossReason:
+            input.toStage === "lost" ? (input.reasonCode ?? null) : null,
           oneOffValuePence: input.oneOffValuePence ?? null,
           monthlyValuePence: input.monthlyValuePence ?? null,
         });
@@ -260,17 +287,19 @@ export function createEngagementTransitioner({
           fromState: fromStage,
           toState: input.toStage,
           reasonCode: input.reasonCode ?? null,
-          actorId: context.founder.actorId,
+          ...actor,
           correlationId: context.correlationId,
         });
 
         if (COMMERCIAL_STAGES_THAT_STOP_OUTREACH.has(input.toStage)) {
-          await transaction.stopActiveOutreachForProspect(engagement.prospectId);
+          await transaction.stopActiveOutreachForProspect(
+            engagement.prospectId,
+          );
         }
 
         await transaction.appendTransitionAudit({
           correlationId: context.correlationId,
-          actorId: context.founder.actorId,
+          ...actor,
           engagementId: engagement.id,
           dimension: "commercial",
           toState: input.toStage,
@@ -300,7 +329,12 @@ export function createEngagementTransitioner({
       if (engagement.stage !== "won") {
         throw new TransitionEngagementError("delivery_requires_won");
       }
-      if (!isPermittedDeliveryTransition(engagement.deliveryStatus, input.toStatus)) {
+      if (
+        !isPermittedDeliveryTransition(
+          engagement.deliveryStatus,
+          input.toStatus,
+        )
+      ) {
         throw new TransitionEngagementError("invalid_transition");
       }
 
@@ -316,7 +350,7 @@ export function createEngagementTransitioner({
         fromState: fromStatus,
         toState: input.toStatus,
         reasonCode: input.reasonCode ?? null,
-        actorId: context.founder.actorId,
+        ...actor,
         correlationId: context.correlationId,
       });
 
@@ -329,7 +363,8 @@ export function createEngagementTransitioner({
         );
         if (recipient) {
           const includeInvite =
-            Boolean(input.includeNewsletterInvite) && !recipient.alreadySubscribed;
+            Boolean(input.includeNewsletterInvite) &&
+            !recipient.alreadySubscribed;
           const snapshot = await renderClientThankYouSnapshot({
             firstName: recipient.firstName,
             engagementName: recipient.engagementName,
@@ -343,14 +378,14 @@ export function createEngagementTransitioner({
             htmlSnapshot: snapshot.html,
             textSnapshot: snapshot.text,
             checksum: snapshot.checksum,
-            createdBy: context.founder.actorId,
+            createdBy: actor.actorId,
           });
         }
       }
 
       await transaction.appendTransitionAudit({
         correlationId: context.correlationId,
-        actorId: context.founder.actorId,
+        ...actor,
         engagementId: engagement.id,
         dimension: "delivery",
         toState: input.toStatus,

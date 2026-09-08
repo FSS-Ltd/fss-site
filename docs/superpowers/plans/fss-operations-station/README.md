@@ -38,17 +38,17 @@ The checkout already contains substantial unrelated changes. All files from this
 
 ## Decisions to confirm at build kickoff
 
-| Decision              | Proposed default                                                              | Why it matters                                               |
-| --------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| Market/currency       | UK B2B, GBP only initially                                                    | Bacs, tax and payment fees depend on geography               |
-| Billing provider      | Stripe Billing plus hosted invoice/payment management                         | Meets recurring billing and GBP Direct Debit requirements    |
-| Portal identity       | Supabase Auth, invite-only, separate from founder Auth.js                     | Clients need non-Google access without widening /growth      |
-| Signature provider    | Managed e-signature API, DocuSign candidate subject to quote and sandbox gate | API access and per-envelope cost need confirmation           |
-| Proposal timing       | Two elapsed hours after accepted welcome send                                 | Exact timing is a business preference, not research evidence |
-| Post-signature timing | 09:00 Europe/London next calendar day                                         | “Following day” interpreted explicitly, including weekends   |
-| Service start         | Signed agreement plus cleared deposit when contract requires it               | Portal access must not imply work has started                |
-| Support target        | One business day to acknowledge ordinary requests                             | Proposed target, not a sold SLA                              |
-| Commercial terms      | Enter per agreement; no invented package prices or VAT status                 | Prevents automation making commercial promises               |
+| Decision              | Proposed default                                                      | Why it matters                                                                                                |
+| --------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Market/currency       | UK B2B, GBP only initially                                            | Bacs, tax and payment fees depend on geography                                                                |
+| Billing provider      | Stripe Billing plus hosted invoice/payment management                 | Meets recurring billing and GBP Direct Debit requirements                                                     |
+| Portal identity       | Supabase Auth, invite-only, separate from founder Auth.js             | Clients need non-Google access without widening /growth                                                       |
+| Electronic signing    | In-house ordinary electronic signing, explicitly approved 8 September | Verified portal access, frozen documents and retained evidence; see [signing](../../../operations/signing.md) |
+| Proposal timing       | Two elapsed hours after accepted welcome send                         | Exact timing is a business preference, not research evidence                                                  |
+| Post-signature timing | 09:00 Europe/London next calendar day                                 | “Following day” interpreted explicitly, including weekends                                                    |
+| Service start         | Signed agreement plus cleared deposit when contract requires it       | Portal access must not imply work has started                                                                 |
+| Support target        | One business day to acknowledge ordinary requests                     | Proposed target, not a sold SLA                                                                               |
+| Commercial terms      | Enter per agreement; no invented package prices or VAT status         | Prevents automation making commercial promises                                                                |
 
 No answers are required to finish this planning pack. Confirm these before their dependent build slice; proposed defaults are not approved commercial policy.
 
@@ -58,4 +58,4 @@ Completed: repository discovery, product/data/workflow specifications, public-so
 
 ## Planning validation
 
-All nine Markdown files were inspected for scope coverage and consistency. Prettier check, local Markdown-link validation, placeholder scan and independent fee/metric arithmetic checks passed. No application typecheck, unit/integration tests or build was run because no application files changed. Provider behaviour remains documentation-backed planning, not a live or sandbox integration test. The signature provider page could be opened but its body was unavailable to the text reader; its requirements remain an explicit verification gate.
+All nine Markdown files were inspected for scope coverage and consistency. Prettier check, local Markdown-link validation, placeholder scan and independent fee/metric arithmetic checks passed. No application typecheck, unit/integration tests or build was run because no application files changed. Provider behaviour remains documentation-backed planning, not a live or sandbox integration test. The signature provider page could be opened but its body was unavailable to the text reader; its original account gate was later superseded by the approved in-house signing direction.

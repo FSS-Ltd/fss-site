@@ -33,7 +33,7 @@ Items 1–4 are included in the core plans where inexpensive; 5–7 are later en
 
 The exact two-hour welcome delay, next-day 09:00 send, reminder cadence, three-item WIP limit and one-day acknowledgement target are proposed FSS policies. No claim is made that research proves these numbers optimal. Start with transparent defaults, then review actual completion, late-payment and client-feedback data after a 30-day pilot. Changes to contractual promises require approved terms; internal thresholds can be tuned with an audit trail.
 
-The provider comparison is UK/GBP oriented. Rates and entitlements can change; evaluate the account's quote and payment mix at build time. Revolut's EUR SEPA support does not establish GBP collection support. Signature provider cost/production entitlement remains an explicit capability gate, not an invented price estimate.
+The provider comparison is UK/GBP oriented. Rates and entitlements can change; evaluate the account's quote and payment mix at build time. Revolut's EUR SEPA support does not establish GBP collection support. The original managed-signature cost and entitlement gate was superseded by the user-approved in-house signing decision on 8 September. Its historical provider research does not establish account entitlement.
 
 ## Sources register
 
