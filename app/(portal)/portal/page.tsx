@@ -98,6 +98,16 @@ export default async function PortalHomePage(): Promise<React.JSX.Element> {
                     </Link>
                   </p>
                 )}
+              {hasPortalCapability(membership.role, "offers.read") && (
+                <p className={styles.actions}>
+                  <Link
+                    className={styles.link}
+                    href={`/portal/services?organisationId=${membership.organisationId}`}
+                  >
+                    Explore services
+                  </Link>
+                </p>
+              )}
             </li>
           ))}
         </ul>
