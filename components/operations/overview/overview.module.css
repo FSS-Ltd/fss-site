@@ -1,0 +1,175 @@
+.overview {
+  display: grid;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  color: var(--foreground);
+}
+.overview h1 {
+  font-size: 2rem;
+  font-weight: 650;
+}
+.overview h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+.overview p {
+  line-height: 1.6;
+}
+.overview a {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.overview a:focus-visible,
+.overview button:focus-visible,
+.overview input:focus-visible,
+.overview select:focus-visible,
+.overview summary:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: 1rem;
+}
+.card,
+.section {
+  border: 1px solid var(--border-soft);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+}
+.value {
+  font-size: 1.75rem;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 1rem;
+}
+.filters label {
+  display: grid;
+  gap: 0.25rem;
+  flex: 1 1 10rem;
+}
+.filters input,
+.filters select,
+.filters button,
+.overview button {
+  border: 1px solid var(--border-soft);
+  border-radius: 0.4rem;
+  padding: 0.6rem;
+  background: transparent;
+  color: inherit;
+  min-height: 44px;
+  max-width: 100%;
+}
+.scroll {
+  overflow-x: auto;
+}
+.scroll table {
+  border-collapse: collapse;
+  width: 100%;
+  text-align: left;
+}
+.scroll caption {
+  text-align: left;
+  padding-block: 0.5rem;
+}
+.scroll th,
+.scroll td {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--border-soft);
+  vertical-align: top;
+}
+.actions {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+.actions li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-soft);
+  padding-bottom: 1rem;
+}
+.warning {
+  border: 1px solid currentColor;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.card,
+.section {
+  background: var(--surface-1);
+}
+.card > p:not(.value),
+.overview header > p,
+.actions li p {
+  color: var(--text-muted);
+}
+.filters {
+  padding: 1.25rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 0.75rem;
+  background: var(--surface-1);
+}
+.filters input,
+.filters select {
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+}
+.filters button {
+  background: var(--brand-secondary);
+  color: var(--cta-text);
+  font-weight: 600;
+  padding-inline: 1.25rem;
+}
+.filters button:hover {
+  opacity: 0.9;
+}
+.warning {
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+}
+.overview button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+@media (max-width: 640px) {
+  .overview {
+    padding: 0.75rem;
+  }
+  .card,
+  .section,
+  .filters {
+    padding: 1rem;
+  }
+}
+.overview,
+.overview > *,
+.filters label,
+.filters input,
+.filters select {
+  min-width: 0;
+}
+.overview {
+  overflow-wrap: anywhere;
+}
+.scroll {
+  overflow-wrap: normal;
+}
