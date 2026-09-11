@@ -4,9 +4,9 @@ Task 1 adds a founder-only, read-only register at `/growth/operations/clients`. 
 
 ## Release and credentials
 
-Keep `OPERATIONS_ENABLED` unset until the approved environment is ready. Exact value `true` enables the route and mapping command. `OPERATIONS_DATABASE_URL` must use a dedicated login assigned only the `operations_founder` role. Never reuse the Growth or migration administrator credential. The role can read/create register rows, but cannot edit links, delete history, read Growth records or forge audit events.
+`OPERATIONS_ENABLED=true` enables the route and mapping command after the approved environment is ready. `OPERATIONS_DATABASE_URL` must use a dedicated login assigned only the `operations_founder` role. Never reuse the Growth or migration administrator credential. The role can read/create register rows, but cannot edit links, delete history, read Growth records or forge audit events.
 
-The generated SQL is held in `supabase/operations/migrations`. During development apply it only to a dedicated disposable database after the existing Growth migrations. Production promotion and credential provisioning belong to the [release gate](implementation-progress.md#release-boundary).
+Operations migrations are promoted to `supabase/migrations` as part of the approved release and run through the existing CI-managed production migration job. Credential provisioning and feature activation remain part of the [release gate](implementation-progress.md#release-boundary).
 
 The audit trigger uses `SECURITY DEFINER` only to append evidence generated from inserted rows. It has an empty search path, fully qualified table names and no executable grant to application roles. Runtime users have read-only audit access. This prevents ordinary mapping commands from modifying audit history.
 
