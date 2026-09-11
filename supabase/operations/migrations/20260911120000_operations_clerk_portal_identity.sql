@@ -10,7 +10,7 @@ declare
   correlation uuid := nullif(current_setting('operations.correlation_id', true), '')::uuid;
 begin
   if verified_user is null or verified_email is null or correlation is null then return null; end if;
-  select i.*, c.* into invitation, contact
+  select i, c into invitation, contact
     from operations.portal_invites i
     join operations.contacts c on c.id = i.contact_id and c.organisation_id = i.organisation_id
     join operations.organisations o on o.id = i.organisation_id
