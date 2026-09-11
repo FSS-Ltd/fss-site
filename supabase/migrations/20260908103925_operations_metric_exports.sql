@@ -1,4 +1,4 @@
--- Staged Task 12 only; no production promotion.
+-- Promoted through the approved Operations production release gate.
 create table operations.metric_export_jobs (
  id uuid primary key default gen_random_uuid(), actor_id text not null check(actor_id ~ '^[a-f0-9]{64}$'),
  filters jsonb not null check(jsonb_typeof(filters)='object'), provider_scope jsonb not null check(jsonb_typeof(provider_scope)='object'),

@@ -34,7 +34,11 @@ export function OperationsOverview({
       <header>
         <h1>Operations</h1>
         <p>Contract revenue, invoice health and the next client actions.</p>
-        <Link href="/growth/operations/clients">Client register</Link>
+        <nav aria-label="Operations setup">
+          <Link href="/growth/operations/clients">Client register</Link>
+          {" · "}
+          <Link href="/growth/operations/portal-access">Portal access</Link>
+        </nav>
       </header>
       <form className={styles.filters}>
         <label>

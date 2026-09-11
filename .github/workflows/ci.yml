@@ -90,18 +90,6 @@ jobs:
               < "$migration"
           done
 
-      # Operations stays staged until the final release approval. Only the
-      # disposable CI service receives these migrations during implementation.
-      - name: Prepare staged Operations integration schema
-        env:
-          POSTGRES_CONTAINER_ID: ${{ job.services.postgres.id }}
-        run: |
-          for migration in supabase/operations/migrations/*.sql; do
-            docker exec -i "$POSTGRES_CONTAINER_ID" \
-              psql -U postgres -d fss_growth_test -v ON_ERROR_STOP=1 \
-              < "$migration"
-          done
-
       - name: Run Operations tests with coverage
         run: pnpm test:coverage:operations
 

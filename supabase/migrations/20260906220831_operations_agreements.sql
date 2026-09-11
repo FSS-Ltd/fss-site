@@ -1,4 +1,4 @@
--- Release hold: promote only through the Operations release gate.
+-- Promoted through the approved Operations production release gate.
 alter table operations.audit_events drop constraint audit_events_action_check;
 alter table operations.audit_events add constraint audit_events_action_check check (action in ('organisation.created', 'engagement.linked', 'agreement.revised', 'agreement.signed', 'service.activated'));
 alter table operations.audit_events add column correlation_id uuid;

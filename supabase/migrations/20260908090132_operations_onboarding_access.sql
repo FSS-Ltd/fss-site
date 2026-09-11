@@ -1,4 +1,4 @@
--- Staged Task 10 bridge. No production promotion before the release gate.
+-- Promoted through the approved Operations production release gate.
 -- The worker can act only on a leased, explicitly approved recipient and role.
 create table operations.onboarding_access_bindings (
  job_id uuid primary key references operations.onboarding_jobs(id),

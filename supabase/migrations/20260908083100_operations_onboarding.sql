@@ -1,4 +1,4 @@
--- Staged local release hold. Dedicated queue role, no production application.
+-- Promoted through the approved Operations production release gate. Dedicated queue role remains feature-flagged.
 create role operations_onboarding_worker nologin nosuperuser nocreatedb nocreaterole noinherit nobypassrls;
 grant usage on schema operations to operations_onboarding_worker;
 revoke all on schema growth from operations_onboarding_worker;

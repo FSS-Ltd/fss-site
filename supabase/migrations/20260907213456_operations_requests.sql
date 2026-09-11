@@ -1,4 +1,4 @@
--- STAGED ONLY: Task 5 request workflow. No production application authorized.
+-- Promoted through the approved Operations production release gate.
 create table operations.requests (
  id uuid primary key default gen_random_uuid(), organisation_id uuid not null, project_id uuid not null,
  created_by uuid not null, idempotency_key uuid not null,

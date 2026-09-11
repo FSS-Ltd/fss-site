@@ -1,4 +1,4 @@
--- Staged Task 11 only. Preserve SELECT-only founder table grants.
+-- Promoted through the approved Operations production release gate. Preserve SELECT-only founder table grants.
 create function operations.lock_onboarding_founder(org uuid, journey uuid, expected_generation integer, expected_proposal uuid)
 returns void language plpgsql security definer set search_path='' as $$
 declare actor text:=current_setting('operations.actor_id',true);

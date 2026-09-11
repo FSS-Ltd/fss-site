@@ -1,4 +1,4 @@
--- Staged Task 4 release hold. Apply only to an isolated test database until release approval.
+-- Promoted through the approved Operations production release gate.
 create table operations.projects (
   id uuid primary key default gen_random_uuid(),
   organisation_id uuid not null,
