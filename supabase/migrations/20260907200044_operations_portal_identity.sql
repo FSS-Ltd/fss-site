@@ -1,4 +1,4 @@
--- Staged release hold: promote only through Task 14. No production application.
+-- Promoted through the approved Operations production release gate.
 create role operations_portal nologin nosuperuser nocreatedb nocreaterole noinherit nobypassrls;
 grant usage on schema operations to operations_portal;
 revoke all on schema growth from operations_portal;

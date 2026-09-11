@@ -1,4 +1,4 @@
--- Staged only. Dedicated service role; no human identity context or Growth access.
+-- Promoted through the approved Operations production release gate. Dedicated service role; no human identity context or Growth access.
 create role operations_billing_worker nologin nosuperuser nocreatedb nocreaterole noinherit nobypassrls;
 grant usage on schema operations to operations_billing_worker;
 -- Provider amount due includes customer starting balance; the signed invoice total stays immutable.

@@ -1,4 +1,4 @@
--- Staged Task 13 only. No production promotion.
+-- Promoted through the approved Operations production release gate.
 create table operations.offers (
   id uuid primary key default gen_random_uuid(),
   name text not null check (length(trim(name)) between 1 and 160),

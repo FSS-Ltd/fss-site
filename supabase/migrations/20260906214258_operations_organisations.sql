@@ -1,5 +1,4 @@
--- Release hold: staged outside the automatic production migration directory.
--- Task 14 owns promotion after the Operations release gates pass.
+-- Promoted through the approved Operations production release gate.
 create schema operations;
 create role operations_founder nologin nosuperuser nocreatedb nocreaterole noinherit nobypassrls;
 revoke all on schema operations from public, anon, authenticated, service_role, growth_app;

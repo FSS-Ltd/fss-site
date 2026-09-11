@@ -28,7 +28,7 @@ The founder explicitly approved the entire build plan after Task 1 checks comple
 
 The existing main workflow automatically applies files in `supabase/migrations` to production. Operations migrations are generated using Supabase CLI, then staged in `supabase/operations/migrations` during implementation. CI applies both folders to its disposable PostgreSQL service. `pnpm verify:migrations` checks both sets together, including timestamp collisions. The production migration job continues to read only its existing folder.
 
-Moving the staged migrations into the release folder is part of Task 14's concrete approval package. Review ordering against migrations added in the meantime before promotion. Do not execute these migrations in production or enable Operations before that release gate. Operations is disabled by default. Merging code does not activate the portal, run historical mappings, send messages or collect payments.
+Task 14 has been approved. This release promotes the reviewed Operations migrations into the production migration folder, after confirming their ordering against migrations added in the meantime. Production activation still requires the restricted runtime roles and environment configuration to be verified. Migration alone does not create historical mappings, send messages or collect payments.
 
 ## Verification environment
 

@@ -1,4 +1,4 @@
--- Staged operations schema only. Apply to the isolated operations database.
+-- Promoted through the approved Operations production release gate.
 create table operations.billing_customers (
  id uuid primary key default gen_random_uuid(), organisation_id uuid not null references operations.organisations(id),
  provider text not null default 'stripe' check(provider='stripe'), account_id text not null check(account_id ~ '^acct_[A-Za-z0-9]+$'),

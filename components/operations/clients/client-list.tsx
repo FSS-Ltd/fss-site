@@ -23,6 +23,7 @@ export function ClientList({
         <p className={styles.subtitle}>
           Organisations and their reviewed engagement links.
         </p>
+        <Link href="/growth/operations/portal-access">Portal access</Link>
         {billingEnabled && (
           <Link href="/growth/operations/billing">
             Review billing exceptions

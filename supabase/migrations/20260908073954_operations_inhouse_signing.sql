@@ -1,4 +1,4 @@
--- Staged release hold. No production application. Ordinary electronic signatures only.
+-- Promoted through the approved Operations production release gate. Ordinary electronic signatures only.
 create role operations_signing_worker nologin nosuperuser nocreatedb nocreaterole noinherit nobypassrls;
 grant usage on schema operations to operations_signing_worker;
 revoke all on schema growth from operations_signing_worker;
