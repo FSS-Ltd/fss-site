@@ -28,6 +28,72 @@ export const revokeSchema = z.strictObject({
   reviewReference,
 });
 
+export type PortalAccessEntry = {
+  organisationId: string;
+  organisationName: string;
+  contactId: string;
+  name: string;
+  email: string;
+  membershipId: string | null;
+  role: (typeof portalRoles)[number] | null;
+  revokedAt: Date | null;
+  invitedAt: Date | null;
+  inviteExpiresAt: Date | null;
+  inviteClaimedAt: Date | null;
+};
+
+export type PortalAccessRegister = {
+  organisations: readonly { id: string; displayName: string }[];
+  entries: readonly PortalAccessEntry[];
+};
+
+export async function listPortalAccess(
+  db: OperationsDb,
+  context: OperationsFounder | null,
+): Promise<PortalAccessRegister> {
+  const founder = requireOperationsFounder(context);
+  const result = await db.begin(async (tx) => {
+    await tx`select set_config('operations.actor_id', ${founder.actorId}, true)`;
+    const [organisations, entries] = await Promise.all([
+      tx<{ id: string; displayName: string }[]>`
+        select id, display_name as "displayName"
+        from operations.organisations
+        where lifecycle = 'active'
+        order by display_name, id
+        limit 100
+      `,
+      tx<PortalAccessEntry[]>`
+        select
+          c.organisation_id as "organisationId",
+          o.display_name as "organisationName",
+          c.id as "contactId",
+          c.name,
+          c.email,
+          m.id as "membershipId",
+          m.role,
+          m.revoked_at as "revokedAt",
+          i.created_at as "invitedAt",
+          i.expires_at as "inviteExpiresAt",
+          i.claimed_at as "inviteClaimedAt"
+        from operations.contacts c
+        join operations.organisations o on o.id = c.organisation_id
+        left join operations.memberships m on m.contact_id = c.id
+        left join lateral (
+          select created_at, expires_at, claimed_at
+          from operations.portal_invites
+          where contact_id = c.id
+          order by created_at desc, id desc
+          limit 1
+        ) i on true
+        order by o.display_name, c.name, c.email
+        limit 300
+      `,
+    ]);
+    return { value: { organisations: [...organisations], entries: [...entries] } };
+  });
+  return result.value;
+}
+
 export async function createPortalContact(
   db: OperationsDb,
   context: OperationsFounder | null,

@@ -1,30 +1,45 @@
+import { createHash } from "node:crypto";
 import { z } from "zod";
 import type { VerifiedPortalIdentity } from "./types";
-const verifiedUser = z.object({
-  id: z.uuid(),
-  email: z.email().transform((email) => email.toLowerCase()),
-  email_confirmed_at: z.iso.datetime(),
-  is_anonymous: z.literal(false),
+const verifiedUser = z.strictObject({
+  id: z.string().regex(/^user_[A-Za-z0-9]+$/),
+  primary_email_address_id: z.string().nullable(),
+  email_addresses: z.array(
+    z.strictObject({
+      id: z.string().min(1),
+      email_address: z.email().transform((email) => email.toLowerCase()),
+      verification: z
+        .strictObject({ status: z.literal("verified") })
+        .nullable(),
+    }),
+  ),
 });
-type UserLookup = () => Promise<{ data: { user: unknown }; error: unknown }>;
-export async function readVerifiedPortalUser(
-  lookup: UserLookup,
-): Promise<VerifiedPortalIdentity | null> {
-  const { data, error } = await lookup();
-  if (error) {
-    if (
-      typeof error === "object" &&
-      (("status" in error &&
-        (error.status === 400 ||
-          error.status === 401 ||
-          error.status === 403)) ||
-        ("name" in error && error.name === "AuthSessionMissingError"))
-    )
-      return null;
-    throw new Error("Portal authentication is unavailable.");
-  }
-  const parsed = verifiedUser.safeParse(data.user);
-  return parsed.success
-    ? { userId: parsed.data.id, email: parsed.data.email, emailVerified: true }
+export function portalUserIdFromClerkId(clerkUserId: string): string {
+  const bytes = createHash("sha256").update(`clerk:${clerkUserId}`).digest();
+  bytes[6] = (bytes[6] & 0x0f) | 0x50;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = bytes.subarray(0, 16).toString("hex");
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+export function readVerifiedClerkEmail(user: unknown): string | null {
+  const parsed = verifiedUser.safeParse(user);
+  if (!parsed.success || !parsed.data.primary_email_address_id) return null;
+  const address = parsed.data.email_addresses.find(
+    ({ id }) => id === parsed.data.primary_email_address_id,
+  );
+  return address?.verification?.status === "verified"
+    ? address.email_address
     : null;
+}
+export function readVerifiedPortalUser(
+  user: unknown,
+): VerifiedPortalIdentity | null {
+  const parsed = verifiedUser.safeParse(user);
+  const email = readVerifiedClerkEmail(user);
+  if (!parsed.success || !email) return null;
+  return {
+    userId: portalUserIdFromClerkId(parsed.data.id),
+    email,
+    emailVerified: true,
+  };
 }

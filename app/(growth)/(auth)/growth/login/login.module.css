@@ -82,7 +82,24 @@
 }
 
 .loginForm {
+  display: grid;
+  gap: 12px;
   margin-top: 30px;
+}
+
+.loginInput {
+  min-height: 52px;
+  border: 1px solid rgba(7, 24, 46, 0.2);
+  border-radius: 999px;
+  padding: 0 18px;
+  background: rgba(255, 255, 255, 0.94);
+  color: #07182e;
+  font: inherit;
+}
+
+.loginInput:focus-visible {
+  outline: 3px solid #0f7a83;
+  outline-offset: 3px;
 }
 
 .loginAction {
@@ -113,6 +130,17 @@
 .loginAction:focus-visible {
   outline: 3px solid #0f7a83;
   outline-offset: 3px;
+}
+
+.loginSecondaryAction {
+  border: 0;
+  background: transparent;
+  color: #174a7c;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .loginFootnote {

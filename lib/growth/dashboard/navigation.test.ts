@@ -16,6 +16,7 @@ test("defines the approved founder dashboard navigation", () => {
       { label: "Pipeline", href: "/growth/pipeline" },
       { label: "Deals", href: "/growth/deals" },
       { label: "Clients", href: "/growth/clients" },
+      { label: "Operations", href: "/growth/operations" },
       { label: "Analytics", href: "/growth/analytics" },
       { label: "Newsletter", href: "/growth/newsletter" },
       { label: "Settings", href: "/growth/settings" },

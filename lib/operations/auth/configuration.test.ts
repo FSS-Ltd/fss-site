@@ -1,47 +1,20 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { readPortalAuthConfig, portalCookieOptions } from "./configuration";
-test("portal auth configuration never falls back to founder or privileged keys", () => {
+import { readPortalAuthConfig } from "./configuration";
+test("portal auth configuration requires dedicated Clerk keys", () => {
   const env = {
     OPERATIONS_ENABLED: "true",
-    OPERATIONS_SUPABASE_URL: "https://auth.example.test",
-    OPERATIONS_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_fixture",
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "pk_test_fixture",
+    CLERK_SECRET_KEY: "sk_test_fixture",
     OPERATIONS_PORTAL_DATABASE_URL: "postgres://fixture",
   };
-  assert.equal(readPortalAuthConfig(env).url, "https://auth.example.test");
+  assert.equal(readPortalAuthConfig(env).publishableKey, "pk_test_fixture");
   for (const changes of [
     { OPERATIONS_ENABLED: "false" },
-    { OPERATIONS_SUPABASE_PUBLISHABLE_KEY: "sb_secret_fixture" },
-    { OPERATIONS_SUPABASE_URL: "http://auth.example.test" },
-    { OPERATIONS_SUPABASE_URL: "https://user:password@auth.example.test" },
-    { OPERATIONS_SUPABASE_URL: "https://auth.example.test/auth/v1" },
+    { NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "sk_test_fixture" },
+    { CLERK_SECRET_KEY: "pk_test_fixture" },
+    { NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: undefined },
+    { CLERK_SECRET_KEY: undefined },
   ])
     assert.throws(() => readPortalAuthConfig({ ...env, ...changes }));
-  assert.throws(() =>
-    readPortalAuthConfig({
-      OPERATIONS_ENABLED: "true",
-      SUPABASE_SERVICE_ROLE_KEY: "secret",
-    }),
-  );
-  assert.equal(
-    readPortalAuthConfig({
-      ...env,
-      OPERATIONS_SUPABASE_URL: "http://127.0.0.1:55521",
-      NODE_ENV: "development",
-    }).url,
-    "http://127.0.0.1:55521",
-  );
-  assert.throws(() =>
-    readPortalAuthConfig({
-      ...env,
-      OPERATIONS_SUPABASE_URL: "http://127.0.0.1:55521",
-      NODE_ENV: "production",
-    }),
-  );
-  assert.deepEqual(portalCookieOptions("https://portal.example.test"), {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: true,
-    path: "/",
-  });
 });

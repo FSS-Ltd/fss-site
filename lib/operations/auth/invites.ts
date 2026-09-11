@@ -37,3 +37,16 @@ export async function claimPortalInvite(
     return { organisationId: result.organisationId };
   });
 }
+
+export async function claimPortalInviteForVerifiedEmail(
+  db: OperationsDb,
+  identity: VerifiedPortalIdentity | null,
+  correlationId: string,
+): Promise<boolean> {
+  return withVerifiedPortalIdentity(db, identity, correlationId, async (tx) => {
+    const [result] = await tx<{ organisationId: string | null }[]>`
+      select operations.claim_portal_invite_for_verified_email() as "organisationId"
+    `;
+    return Boolean(result?.organisationId);
+  });
+}

@@ -1,48 +1,30 @@
-import { createClient } from "@supabase/supabase-js";
+import { clerkClient } from "@clerk/nextjs/server";
 import { z } from "zod";
 import { readPortalAuthConfig } from "./configuration";
 
-type ProvisionInput = { email: string; email_confirm: true };
-type CreateAccount = (
-  input: ProvisionInput,
-) => Promise<{ error: { code?: string } | null }>;
+export type PortalInvitation = { emailAddress: string; redirectUrl: string };
+type CreateInvitation = (input: PortalInvitation) => Promise<void>;
 
 export function readPortalProvisionConfig(
   env: Readonly<Record<string, string | undefined>> = process.env,
-): { url: string; secretKey: string } {
-  const { url } = readPortalAuthConfig(env);
-  const secretKey = env.OPERATIONS_SUPABASE_SECRET_KEY;
-  if (!secretKey?.startsWith("sb_secret_"))
-    throw new Error("Portal provisioning is unavailable.");
-  return { url, secretKey };
+): { secretKey: string } {
+  return { secretKey: readPortalAuthConfig(env).secretKey };
 }
 
-function createAccount(input: ProvisionInput): ReturnType<CreateAccount> {
-  const { url, secretKey } = readPortalProvisionConfig();
-  const client = createClient(url, secretKey, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-      detectSessionInUrl: false,
-    },
-  });
-  return client.auth.admin.createUser(input);
+async function createInvitation(input: PortalInvitation): Promise<void> {
+  await (await clerkClient()).invitations.createInvitation(input);
 }
 
 export async function provisionPortalAccount(
   email: string,
-  create: CreateAccount = createAccount,
+  redirectUrl: string,
+  create: CreateInvitation = createInvitation,
 ): Promise<void> {
   const normalizedEmail = z.email().max(254).parse(email).toLowerCase();
-  // Signup is disabled. This creates no password or session; the first login
-  // still proves inbox ownership, and membership requires a separate invite claim.
-  const { error } = await create({
-    email: normalizedEmail,
-    email_confirm: true,
-  });
-  if (
-    error &&
-    !["email_exists", "user_already_exists"].includes(error.code ?? "")
-  )
+  const parsedRedirectUrl = z.url().parse(redirectUrl);
+  try {
+    await create({ emailAddress: normalizedEmail, redirectUrl: parsedRedirectUrl });
+  } catch {
     throw new Error("Portal provisioning is unavailable.");
+  }
 }

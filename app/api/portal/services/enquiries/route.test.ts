@@ -4,8 +4,8 @@ import { POST } from "./route";
 
 const keys = [
   "OPERATIONS_ENABLED",
-  "OPERATIONS_SUPABASE_URL",
-  "OPERATIONS_SUPABASE_PUBLISHABLE_KEY",
+  "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",
+  "CLERK_SECRET_KEY",
   "OPERATIONS_PORTAL_DATABASE_URL",
   "NEXT_PUBLIC_SITE_URL",
 ] as const;
@@ -22,8 +22,8 @@ test("service enquiry route fails closed before identity or database access", as
     assert.equal(response.status, 404);
     Object.assign(process.env, {
       OPERATIONS_ENABLED: "true",
-      OPERATIONS_SUPABASE_URL: "https://auth.example.test",
-      OPERATIONS_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_fixture",
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "pk_test_fixture",
+      CLERK_SECRET_KEY: "sk_test_fixture",
       OPERATIONS_PORTAL_DATABASE_URL: "postgres://unused",
       NEXT_PUBLIC_SITE_URL: "https://example.test",
     });
