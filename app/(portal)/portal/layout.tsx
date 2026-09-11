@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { operationsEnabled } from "@/lib/operations/db/client";
@@ -17,7 +18,8 @@ export default function PortalLayout({
 }): React.JSX.Element {
   if (!operationsEnabled()) notFound();
   return (
-    <div className={styles.shell}>
+    <ClerkProvider>
+      <div className={styles.shell}>
       <a href="#portal-content" className={styles.skip}>
         Skip to content
       </a>
@@ -34,6 +36,7 @@ export default function PortalLayout({
         <span>Built on trust. Delivered with care.</span>
         <span>Faithful Software Solutions</span>
       </footer>
-    </div>
+      </div>
+    </ClerkProvider>
   );
 }

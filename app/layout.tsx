@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { ClerkProvider } from "@clerk/nextjs";
 
 import "./globals.css";
 
@@ -15,7 +14,7 @@ export default function RootLayout({
   return (
     <html lang="en-GB" className="h-full">
       <body className="min-h-full overflow-x-hidden bg-background font-sans text-foreground antialiased">
-        <ClerkProvider>{children}</ClerkProvider>
+        {children}
       </body>
     </html>
   );
