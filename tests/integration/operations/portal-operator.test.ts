@@ -4,10 +4,10 @@ import test from "node:test";
 import postgres from "postgres";
 import { requireOperationsTestDatabaseUrl } from "../../../scripts/require-operations-database-env";
 import { applyPortalOperation } from "../../../lib/operations/auth/operator";
-import { claimPortalInvite } from "../../../lib/operations/auth/invites";
+import { claimPortalInviteForVerifiedEmail } from "../../../lib/operations/auth/invites";
 import { requirePortalMember } from "../../../lib/operations/auth/require-member";
 
-test("reviewed operator scopes provisioning, creates claimable invitations and revokes live membership", async (t) => {
+test("reviewed operator scopes provisioning, creates claimable invitations and revokes live membership", async () => {
   const url = requireOperationsTestDatabaseUrl(
     process.env.OPERATIONS_TEST_DATABASE_URL,
   );
@@ -24,38 +24,10 @@ test("reviewed operator scopes provisioning, creates claimable invitations and r
   const organisationId = randomUUID();
   const email = `${randomUUID()}@example.test`;
   const reviewReference = "synthetic-operator-review";
-  const environment = {
-    OPERATIONS_ENABLED: "true",
-    OPERATIONS_SUPABASE_URL: "https://synthetic.example.test",
-    OPERATIONS_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_test",
-    OPERATIONS_SUPABASE_SECRET_KEY: "sb_secret_test",
+  const provisioned: { email: string; redirectUrl: string }[] = [];
+  const provision = async (provisionedEmail: string, redirectUrl: string) => {
+    provisioned.push({ email: provisionedEmail, redirectUrl });
   };
-  const previous = new Map(
-    Object.keys(environment).map((key) => [key, process.env[key]]),
-  );
-  Object.assign(process.env, environment);
-  t.after(() => {
-    for (const [key, value] of previous) {
-      if (value === undefined) delete process.env[key];
-      else process.env[key] = value;
-    }
-  });
-  const providerInputs: unknown[] = [];
-  t.mock.method(
-    globalThis,
-    "fetch",
-    async (_input: unknown, init?: RequestInit) => {
-      providerInputs.push(JSON.parse(String(init?.body)));
-      return Response.json({
-        id: randomUUID(),
-        email,
-        app_metadata: {},
-        user_metadata: {},
-        aud: "authenticated",
-        created_at: new Date().toISOString(),
-      });
-    },
-  );
   try {
     await admin`insert into operations.organisations (id,legal_name,display_name,trading_status,timezone,created_by,review_reference) values (${organisationId},'Synthetic','Synthetic','active','Europe/London',${founder.actorId},${reviewReference})`;
     const created = await applyPortalOperation(
@@ -88,7 +60,7 @@ test("reviewed operator scopes provisioning, creates claimable invitations and r
       ),
       /contact was not found/,
     );
-    assert.equal(providerInputs.length, 0);
+    assert.equal(provisioned.length, 0);
     const issued = await applyPortalOperation(
       founderDb,
       founder,
@@ -100,23 +72,28 @@ test("reviewed operator scopes provisioning, creates claimable invitations and r
         reviewReference,
       },
       "https://portal.example.test",
+      provision,
     );
     assert.equal(issued.action, "issue_invite");
     if (issued.action !== "issue_invite")
       throw new Error("Unexpected operation result");
-    assert.deepEqual(providerInputs, [{ email, email_confirm: true }]);
+    assert.deepEqual(provisioned, [
+      { email, redirectUrl: "https://portal.example.test/portal/activate" },
+    ]);
     const activation = new URL(issued.activationUrl);
     assert.equal(activation.origin, "https://portal.example.test");
     assert.equal(activation.pathname, "/portal/activate");
     assert.equal(activation.search, "");
-    const token = new URLSearchParams(activation.hash.slice(1)).get("invite");
-    assert.ok(token);
+    assert.equal(activation.hash, "");
     const identity = {
       userId: randomUUID(),
       email,
       emailVerified: true as const,
     };
-    await claimPortalInvite(portal, identity, token, randomUUID());
+    assert.equal(
+      await claimPortalInviteForVerifiedEmail(portal, identity, randomUUID()),
+      true,
+    );
     assert.equal(
       (
         await requirePortalMember(

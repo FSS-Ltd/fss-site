@@ -144,8 +144,9 @@ test("separate signer, billing recipient and owner receive exactly their approve
   assert.equal(ownerMessages[0].text, ownerMessages[1].text);
   assert.match(
     ownerMessages[0].text,
-    /\/portal\/activate#invite=[A-Za-z0-9_-]{43}/,
+    /https:\/\/example\.test\/portal\/activate/,
   );
+  assert.doesNotMatch(ownerMessages[0].text, /#invite=/);
   assert.doesNotMatch(ownerMessages[0].text, /proposal|sign it/i);
   assert.equal(messages.filter((m) => m.step === "proposal").length, 1);
   const [completed] = await f.admin<
