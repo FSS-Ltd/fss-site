@@ -5,6 +5,7 @@ export type GrowthNavigationIcon =
   | "pipeline"
   | "deals"
   | "clients"
+  | "operations"
   | "analytics"
   | "newsletter"
   | "settings";
@@ -52,6 +53,12 @@ export const GROWTH_NAVIGATION_ITEMS = [
     accessibleLabel: "Open Clients",
     href: "/growth/clients",
     icon: "clients",
+  },
+  {
+    label: "Operations",
+    accessibleLabel: "Open Operations",
+    href: "/growth/operations",
+    icon: "operations",
   },
   {
     label: "Analytics",

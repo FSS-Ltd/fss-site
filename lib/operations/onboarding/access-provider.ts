@@ -45,7 +45,7 @@ export function createOnboardingAccessProvider(
       .object({ providerId: z.string().min(1), acceptedAt: z.string().min(1) })
       .parse(row.receipt);
     await requireCurrentEffect(db, lease);
-    await provision(lease.recipient);
+    await provision(lease.recipient, new URL("/portal/activate", portalOrigin).href);
     return {
       status: "succeeded",
       receipt: {
@@ -76,17 +76,9 @@ export async function resolveOnboardingAccess(
     .parse(row.binding);
   if (binding.recipient !== lease.recipient || email.to !== lease.recipient)
     throw new Error("Approved recipient mismatch.");
-  const url = new URL("/portal", portalOrigin);
-  if (binding.encrypted !== null) {
-    const token = decryptInviteToken(
-      binding.encrypted,
-      key,
-      binding.jobId,
-      binding.recipient,
-    );
-    url.pathname = "/portal/activate";
-    url.hash = `invite=${token}`;
-  }
+  const url = new URL("/portal/activate", portalOrigin);
+  if (binding.encrypted !== null)
+    decryptInviteToken(binding.encrypted, key, binding.jobId, binding.recipient);
   // Generated URLs contain only a configured origin/path and a base64url token.
   const target = url.href;
   return {

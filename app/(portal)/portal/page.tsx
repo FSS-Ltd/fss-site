@@ -112,14 +112,8 @@ export default async function PortalHomePage(): Promise<React.JSX.Element> {
           ))}
         </ul>
       )}
-      <form
-        method="post"
-        action="/portal/auth/logout"
-        className={styles.actions}
-      >
-        <button className={styles.button} type="submit">
-          Sign out
-        </button>
+      <form action="/api/auth/sign-out?returnTo=/portal/login" className={styles.actions} method="post">
+        <button className={styles.button} type="submit">Sign out</button>
       </form>
     </section>
   );

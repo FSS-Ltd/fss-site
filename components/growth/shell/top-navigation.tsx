@@ -1,12 +1,10 @@
 import Image from "next/image";
-import { LogOut } from "lucide-react";
 
 import {
   GROWTH_NAVIGATION_ITEMS,
   getActiveGrowthNavigationItem,
 } from "@/lib/growth/dashboard/navigation";
 
-import { signOutFounder } from "./actions";
 import { IntegrationStatusMenu } from "./integration-status-menu";
 import { GrowthNavigationLink } from "./navigation-link";
 import styles from "./shell.module.css";
@@ -52,13 +50,8 @@ export function TopNavigation({
         <span aria-hidden="true" className={styles.avatar}>
           JN
         </span>
-        <form action={signOutFounder} className={styles.desktopSignOut}>
-          <button
-            aria-label="Sign out"
-            className={styles.iconButton}
-            type="submit"
-          >
-            <LogOut aria-hidden="true" size={19} strokeWidth={1.8} />
+        <form action="/api/auth/sign-out?returnTo=/growth/login" className={styles.desktopSignOut} method="post">
+          <button aria-label="Sign out" className={styles.iconButton} type="submit">
             <span>Sign out</span>
           </button>
         </form>

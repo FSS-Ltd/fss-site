@@ -1,31 +1,18 @@
 import { operationsEnabled } from "../db/client";
-export const PORTAL_INVITE_COOKIE = "fss-portal-invite";
-export const PORTAL_SESSION_COOKIE = "fss-portal-auth";
 type Environment = Readonly<Record<string, string | undefined>>;
-export type PortalAuthConfig = { url: string; publishableKey: string };
+export type PortalAuthConfig = { publishableKey: string; secretKey: string };
+
+const defaultPortalOrigin = "https://portal.faithfulsoftware.dev";
 export function readPortalAuthConfig(
   env: Environment = process.env,
 ): PortalAuthConfig {
   if (!operationsEnabled(env))
     throw new Error("Portal authentication is unavailable.");
-  const raw = env.OPERATIONS_SUPABASE_URL;
-  const publishableKey = env.OPERATIONS_SUPABASE_PUBLISHABLE_KEY;
-  if (!raw || !publishableKey?.startsWith("sb_publishable_"))
+  const publishableKey = env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  const secretKey = env.CLERK_SECRET_KEY;
+  if (!publishableKey?.startsWith("pk_") || !secretKey?.startsWith("sk_"))
     throw new Error("Portal authentication is unavailable.");
-  const url = new URL(raw);
-  const local =
-    env.NODE_ENV !== "production" &&
-    ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname);
-  if (
-    (url.protocol !== "https:" && !(local && url.protocol === "http:")) ||
-    url.username ||
-    url.password ||
-    url.search ||
-    url.hash ||
-    url.pathname !== "/"
-  )
-    throw new Error("Portal authentication is unavailable.");
-  return { url: url.origin, publishableKey };
+  return { publishableKey, secretKey };
 }
 export function portalAuthConfigured(env: Environment = process.env): boolean {
   try {
@@ -35,16 +22,25 @@ export function portalAuthConfigured(env: Environment = process.env): boolean {
     return false;
   }
 }
-export function portalCookieOptions(origin: string): {
-  httpOnly: true;
-  sameSite: "lax";
-  secure: boolean;
-  path: "/";
-} {
-  return {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: new URL(origin).protocol === "https:",
-    path: "/",
-  };
+
+export function resolvePortalOrigin(env: Environment = process.env): string {
+  const value = env.OPERATIONS_PORTAL_ORIGIN ?? defaultPortalOrigin;
+
+  try {
+    const origin = new URL(value);
+    const isLocalHttp = origin.protocol === "http:" && origin.hostname === "localhost";
+
+    if (
+      !(origin.protocol === "https:" || isLocalHttp) ||
+      origin.pathname !== "/" ||
+      origin.search ||
+      origin.hash
+    ) {
+      throw new Error();
+    }
+
+    return origin.origin;
+  } catch {
+    throw new Error("OPERATIONS_PORTAL_ORIGIN must be an HTTPS origin.");
+  }
 }

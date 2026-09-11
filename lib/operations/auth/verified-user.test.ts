@@ -1,52 +1,24 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { randomUUID } from "node:crypto";
-import { readVerifiedPortalUser } from "./verified-user";
+import { portalUserIdFromClerkId, readVerifiedPortalUser } from "./verified-user";
 test("only server-confirmed nonanonymous email identity crosses the portal boundary", async () => {
   const user = {
-    id: randomUUID(),
-    email: "Client@example.test",
-    email_confirmed_at: "2026-09-07T00:00:00Z",
-    is_anonymous: false,
-    user_metadata: { role: "owner" },
+    id: "user_2zClientExample",
+    primary_email_address_id: "id_primary",
+    email_addresses: [{ id: "id_primary", email_address: "Client@example.test", verification: { status: "verified" } }],
   };
   assert.deepEqual(
-    await readVerifiedPortalUser(async () => ({ data: { user }, error: null })),
-    { userId: user.id, email: "client@example.test", emailVerified: true },
+    readVerifiedPortalUser(user),
+    { userId: portalUserIdFromClerkId(user.id), email: "client@example.test", emailVerified: true },
   );
   for (const candidate of [
     null,
-    { ...user, email_confirmed_at: null },
-    { ...user, is_anonymous: true },
+    { ...user, email_addresses: [{ ...user.email_addresses[0], verification: null }] },
     { ...user, id: "forged" },
-    { ...user, email: null },
+    { ...user, primary_email_address_id: null },
   ])
     assert.equal(
-      await readVerifiedPortalUser(async () => ({
-        data: { user: candidate },
-        error: null,
-      })),
+      readVerifiedPortalUser(candidate),
       null,
     );
-  assert.equal(
-    await readVerifiedPortalUser(async () => ({
-      data: { user },
-      error: { status: 401 },
-    })),
-    null,
-  );
-  assert.equal(
-    await readVerifiedPortalUser(async () => ({
-      data: { user: null },
-      error: { name: "AuthSessionMissingError" },
-    })),
-    null,
-  );
-  await assert.rejects(
-    readVerifiedPortalUser(async () => ({
-      data: { user },
-      error: { status: 500, message: "provider detail" },
-    })),
-    /unavailable/,
-  );
 });

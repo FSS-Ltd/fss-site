@@ -5,41 +5,34 @@ import { provisionPortalAccount, readPortalProvisionConfig } from "./provision";
 test("provisioning requires a dedicated server secret and enabled portal configuration", () => {
   const env = {
     OPERATIONS_ENABLED: "true",
-    OPERATIONS_SUPABASE_URL: "https://portal.example.test",
-    OPERATIONS_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_test",
-    OPERATIONS_SUPABASE_SECRET_KEY: "sb_secret_test",
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "pk_test_fixture",
+    CLERK_SECRET_KEY: "sk_test_fixture",
   };
-  assert.equal(readPortalProvisionConfig(env).secretKey, "sb_secret_test");
+  assert.equal(readPortalProvisionConfig(env).secretKey, "sk_test_fixture");
   assert.throws(() =>
     readPortalProvisionConfig({
       ...env,
-      OPERATIONS_SUPABASE_SECRET_KEY: "sb_publishable_test",
+      CLERK_SECRET_KEY: "pk_test_fixture",
     }),
   );
   assert.throws(() =>
     readPortalProvisionConfig({ ...env, OPERATIONS_ENABLED: "false" }),
   );
 });
-test("provisioning creates only a passwordless account and tolerates existing email", async () => {
+test("provisioning creates a Clerk invitation with a fixed activation redirect", async () => {
   const inputs: unknown[] = [];
-  await provisionPortalAccount("Client@example.test", async (input) => {
+  await provisionPortalAccount("Client@example.test", "https://portal.example.test/portal/activate", async (input) => {
     inputs.push(input);
-    return { error: null };
   });
   assert.deepEqual(inputs, [
-    { email: "client@example.test", email_confirm: true },
+    { emailAddress: "client@example.test", redirectUrl: "https://portal.example.test/portal/activate" },
   ]);
-  await provisionPortalAccount("client@example.test", async () => ({
-    error: { code: "email_exists" },
-  }));
   await assert.rejects(
-    provisionPortalAccount("client@example.test", async () => ({
-      error: { code: "unexpected" },
-    })),
+    provisionPortalAccount("client@example.test", "https://portal.example.test/portal/activate", async () => { throw new Error("provider failed"); }),
     /unavailable/,
   );
   await assert.rejects(
-    provisionPortalAccount("invalid", async () => {
+    provisionPortalAccount("invalid", "https://portal.example.test/portal/activate", async () => {
       throw new Error("must not call");
     }),
   );

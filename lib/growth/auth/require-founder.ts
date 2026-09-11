@@ -1,9 +1,9 @@
 import { createHash } from "node:crypto";
-
-import { auth } from "@/auth";
+import { auth, currentUser } from "@clerk/nextjs/server";
 
 import { readGrowthServerEnv } from "../config/env";
 import { isAllowedFounderProfile } from "./policy";
+import { readVerifiedClerkEmail } from "../../operations/auth/verified-user";
 
 export type FounderSession = {
   email: string;
@@ -50,5 +50,11 @@ export function resolveFounderSession(
 
 export async function requireFounder(): Promise<FounderSession> {
   const session = await auth();
-  return resolveFounderSession(session, readGrowthServerEnv().ownerEmail);
+  if (!session.userId) throw new FounderAuthorizationError();
+  const user = await currentUser();
+  const email = user && user.id === session.userId ? readVerifiedClerkEmail(user) : null;
+  return resolveFounderSession(
+    { user: { email, founderEmailVerified: Boolean(email) } },
+    readGrowthServerEnv().ownerEmail,
+  );
 }

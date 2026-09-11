@@ -7,6 +7,7 @@ import {
   Mail,
   Newspaper,
   Settings,
+  ShieldCheck,
   Users,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -20,6 +21,7 @@ const icons: Record<GrowthNavigationIcon, LucideIcon> = {
   pipeline: Kanban,
   deals: BadgePoundSterling,
   clients: Briefcase,
+  operations: ShieldCheck,
   analytics: ChartLine,
   newsletter: Newspaper,
   settings: Settings,

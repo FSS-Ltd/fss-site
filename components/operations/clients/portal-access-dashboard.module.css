@@ -1,0 +1,34 @@
+.page { display: grid; gap: 28px; color: #07182e; }
+.header { display: flex; align-items: end; justify-content: space-between; gap: 24px; }
+.header h1, .header h2, .header p { margin: 0; }
+.header h1 { font-size: clamp(2rem, 4vw, 2.75rem); letter-spacing: -0.05em; }
+.header p:not(.eyebrow) { max-width: 610px; margin-top: 10px; color: #526078; line-height: 1.6; }
+.eyebrow { color: #0f7a83; font-size: .75rem; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+.assurance { display: flex; max-width: 290px; align-items: center; gap: 10px; color: #315473; font-size: .84rem; line-height: 1.45; }
+.assurance svg { color: #0f7a83; flex: 0 0 auto; }
+.grantCard, .register { border: 1px solid #dce3e8; border-radius: 20px; background: linear-gradient(145deg, #fff, #f8fbfc); box-shadow: 0 16px 40px -34px rgba(7,24,46,.5); padding: clamp(22px, 4vw, 34px); }
+.grantHeading { display: flex; gap: 14px; align-items: flex-start; }
+.grantHeading svg { color: #0f7a83; margin-top: 3px; }
+.grantHeading h2, .sectionHeading h2 { margin: 0; font-size: 1.2rem; letter-spacing: -.025em; }
+.grantHeading p, .sectionHeading p { max-width: 650px; margin: 6px 0 0; color: #526078; line-height: 1.55; }
+.form { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-top: 26px; }
+.form label { display: grid; gap: 7px; color: #30435b; font-size: .79rem; font-weight: 650; }
+.form input, .form select { min-height: 44px; border: 1px solid #cbd7df; border-radius: 10px; padding: 0 12px; background: #fff; color: #07182e; font: inherit; font-size: .9rem; }
+.form input:focus-visible, .form select:focus-visible, .form button:focus-visible, .revoke:focus-visible { outline: 3px solid #0f7a83; outline-offset: 3px; }
+.reference { grid-column: span 2; }
+.form button { min-height: 44px; align-self: end; border: 0; border-radius: 10px; background: #07182e; color: #fff; cursor: pointer; font: inherit; font-weight: 700; transition: background-color 160ms ease, transform 160ms ease; }
+.form button:hover:not(:disabled) { background: #0f7a83; transform: translateY(-1px); }
+.form button:disabled { cursor: wait; opacity: .6; }
+.message { margin: 18px 0 0; color: #14605b; font-size: .9rem; }
+.error { color: #8a2d24; }
+.empty { margin: 22px 0 0; color: #526078; }
+.sectionHeading { display: flex; justify-content: space-between; gap: 20px; }
+.register ul { display: grid; gap: 10px; padding: 0; margin: 24px 0 0; list-style: none; }
+.entry { display: grid; grid-template-columns: minmax(170px, 1.1fr) minmax(200px, 1.4fr) auto auto; align-items: center; gap: 18px; padding: 18px; border: 1px solid #e0e7eb; border-radius: 14px; background: #fff; }
+.person, .role { display: grid; gap: 4px; min-width: 0; }
+.person strong { font-size: .95rem; }.person span, .role span { color: #526078; font-size: .82rem; overflow-wrap: anywhere; }.role strong { font-size: .87rem; }
+.active, .pending { border-radius: 999px; padding: 6px 9px; font-size: .75rem; font-weight: 700; white-space: nowrap; }.active { background: #e4f4ee; color: #14634c; }.pending { background: #eef2f5; color: #485b6d; }
+.revoke { border: 1px solid #d6a39d; border-radius: 9px; padding: 8px 10px; background: #fff; color: #8a2d24; cursor: pointer; font: inherit; font-size: .8rem; font-weight: 700; white-space: nowrap; }.revoke:hover:not(:disabled) { background: #fff0ed; }.revoke:disabled { cursor: wait; opacity: .6; }.noAction { color: #768496; font-size: .78rem; white-space: nowrap; }
+@media (max-width: 900px) { .header { align-items: flex-start; flex-direction: column; }.assurance { max-width: 540px; }.form { grid-template-columns: repeat(2, minmax(0, 1fr)); }.reference { grid-column: auto; }.entry { grid-template-columns: 1fr auto; }.role { grid-column: 1; }.entry > :nth-child(3), .entry > :nth-child(4) { grid-column: 2; } }
+@media (max-width: 560px) { .form, .entry { grid-template-columns: 1fr; }.entry > :nth-child(3), .entry > :nth-child(4) { grid-column: auto; justify-self: start; }.grantCard, .register { border-radius: 16px; padding: 22px; } }
+@media (prefers-reduced-motion: reduce) { .form button { transition: none; } }
