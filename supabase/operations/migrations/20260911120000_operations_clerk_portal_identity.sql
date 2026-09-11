@@ -10,9 +10,9 @@ declare
   correlation uuid := nullif(current_setting('operations.correlation_id', true), '')::uuid;
 begin
   if verified_user is null or verified_email is null or correlation is null then return null; end if;
-  select i into invitation
-    from operations.portal_invites i
-    join operations.contacts c on c.id = i.contact_id and c.organisation_id = i.organisation_id
+  select c.* into contact
+    from operations.contacts c
+    join operations.portal_invites i on i.contact_id = c.id and i.organisation_id = c.organisation_id
     join operations.organisations o on o.id = i.organisation_id
     where c.email = verified_email
       and i.claimed_at is null
@@ -21,11 +21,18 @@ begin
       and o.lifecycle = 'active'
     order by i.created_at desc, i.id desc
     limit 1
-    for update of i, c;
+    for update of c;
   if not found then return null; end if;
-  select c into contact
-    from operations.contacts c
-    where c.id = invitation.contact_id;
+  select * into invitation
+    from operations.portal_invites
+    where contact_id = contact.id
+      and claimed_at is null
+      and revoked_at is null
+      and expires_at > clock_timestamp()
+    order by created_at desc, id desc
+    limit 1
+    for update;
+  if not found then return null; end if;
   if exists (
     select 1 from operations.memberships
     where contact_id = contact.id and user_id <> verified_user
