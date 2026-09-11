@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { requireFounder } from "@/lib/growth/auth/require-founder";
-import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
+import { getOperationsDb } from "@/lib/operations/db/client";
 import type { MetricsSnapshot } from "@/lib/operations/metrics/snapshot-types";
 import type { MetricProviderScope } from "@/lib/operations/metrics/filters";
 import { loadMetricsSnapshot } from "@/lib/operations/metrics/snapshot-repository";
@@ -12,7 +11,6 @@ export default async function OperationsPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }): Promise<React.JSX.Element> {
-  if (!operationsEnabled()) notFound();
   const founder = await requireFounder();
   let data: MetricsSnapshot | null = null;
   try {
