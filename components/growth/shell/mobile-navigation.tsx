@@ -8,6 +8,7 @@ import {
   getActiveGrowthNavigationItem,
 } from "@/lib/growth/dashboard/navigation";
 
+import { signOutFounder } from "./actions";
 import { IntegrationStatusMenu } from "./integration-status-menu";
 import {
   createMobileDialogController,
@@ -131,8 +132,10 @@ export function MobileNavigation({
           <span className={styles.mobileAccountLabel}>Signed in as</span>
           <strong>{founder.email}</strong>
           <IntegrationStatusMenu integrations={integrations} />
-          <form action="/api/auth/sign-out?returnTo=/growth/login" method="post">
-            <button className={styles.signOutButton} type="submit">Sign out</button>
+          <form action={signOutFounder}>
+            <button className={styles.signOutButton} type="submit">
+              Sign out
+            </button>
           </form>
         </div>
       </dialog>
