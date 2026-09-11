@@ -7,6 +7,7 @@ const manifestPath = path.join(
   projectRoot,
   ".next/server/app/(site)/page_client-reference-manifest.js",
 );
+const homepageHtmlPath = path.join(projectRoot, ".next", "server", "app", "index.html");
 
 const budgets = {
   maxJsRawBytes: 180 * 1024,
@@ -41,7 +42,22 @@ function readHomepageManifest() {
   return JSON.parse(jsonText);
 }
 
-function collectChunkFiles(manifest) {
+function readHomepageAssetPaths() {
+  if (!fs.existsSync(homepageHtmlPath)) {
+    throw new Error(
+      `Missing homepage HTML at ${homepageHtmlPath}. Run "pnpm build" before running this check.`,
+    );
+  }
+
+  const source = fs.readFileSync(homepageHtmlPath, "utf8");
+  return new Set(
+    [...source.matchAll(/(?:src|href)="\/_next\/([^"?]+)/g)].map(
+      (match) => match[1],
+    ),
+  );
+}
+
+function collectChunkFiles(manifest, homepageAssets) {
   const files = new Set();
 
   for (const moduleMeta of Object.values(manifest.clientModules ?? {})) {
@@ -77,6 +93,7 @@ function collectChunkFiles(manifest) {
   }
 
   return [...files]
+    .filter((file) => homepageAssets.has(file))
     .filter((file) => file.endsWith(".js") || file.endsWith(".css"))
     .map((file) => {
       if (file.startsWith("/_next/")) {
@@ -119,7 +136,7 @@ function assertBudget(name, value, max) {
 
 try {
   const manifest = readHomepageManifest();
-  const files = collectChunkFiles(manifest);
+  const files = collectChunkFiles(manifest, readHomepageAssetPaths());
   const fileSizes = files.map(sizeForFile).sort((a, b) => b.raw - a.raw);
 
   const js = sumSizes(fileSizes, (file) => !file.isCss);
