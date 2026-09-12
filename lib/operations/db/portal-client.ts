@@ -1,6 +1,6 @@
-import postgres from "postgres";
 import { z } from "zod";
 import {
+  createOperationsDb,
   operationsEnabled,
   type OperationsDb,
   type OperationsTransaction,
@@ -17,13 +17,7 @@ export function getPortalDb(): OperationsDb {
   if (!operationsEnabled()) throw new Error("Operations is disabled.");
   const url = process.env.OPERATIONS_PORTAL_DATABASE_URL;
   if (!url) throw new Error("Portal database is not configured.");
-  sharedDb ??= postgres(url, {
-    prepare: false,
-    max: 5,
-    idle_timeout: 20,
-    connect_timeout: 10,
-    connection: { options: "-c role=operations_portal" },
-  });
+  sharedDb ??= createOperationsDb(url, "operations_portal", 5);
   return sharedDb;
 }
 
