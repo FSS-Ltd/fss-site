@@ -1,0 +1,133 @@
+name: Provision Operations database logins
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: operations-database-logins
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  provision:
+    name: Provision least-privilege runtime logins
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: production
+
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_PROJECT_ID: gfeyanrriryihpcgdvqi
+      OPERATIONS_FOUNDER_RUNTIME_DATABASE_PASSWORD: ${{ secrets.OPERATIONS_FOUNDER_RUNTIME_DATABASE_PASSWORD }}
+      OPERATIONS_PORTAL_RUNTIME_DATABASE_PASSWORD: ${{ secrets.OPERATIONS_PORTAL_RUNTIME_DATABASE_PASSWORD }}
+      OPERATIONS_BILLING_RUNTIME_DATABASE_PASSWORD: ${{ secrets.OPERATIONS_BILLING_RUNTIME_DATABASE_PASSWORD }}
+      OPERATIONS_SIGNING_RUNTIME_DATABASE_PASSWORD: ${{ secrets.OPERATIONS_SIGNING_RUNTIME_DATABASE_PASSWORD }}
+      OPERATIONS_ONBOARDING_RUNTIME_DATABASE_PASSWORD: ${{ secrets.OPERATIONS_ONBOARDING_RUNTIME_DATABASE_PASSWORD }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: 2.115.0
+
+      - name: Check provisioning credentials
+        shell: bash
+        run: |
+          missing=0
+          for secret_name in \
+            SUPABASE_ACCESS_TOKEN \
+            SUPABASE_DB_PASSWORD \
+            OPERATIONS_FOUNDER_RUNTIME_DATABASE_PASSWORD \
+            OPERATIONS_PORTAL_RUNTIME_DATABASE_PASSWORD \
+            OPERATIONS_BILLING_RUNTIME_DATABASE_PASSWORD \
+            OPERATIONS_SIGNING_RUNTIME_DATABASE_PASSWORD \
+            OPERATIONS_ONBOARDING_RUNTIME_DATABASE_PASSWORD; do
+            if [ -z "${!secret_name}" ]; then
+              echo "::error title=Provisioning credential missing::${secret_name} must be configured in the GitHub production environment."
+              missing=1
+            fi
+          done
+          exit "$missing"
+
+      - name: Link the approved production project
+        run: supabase link --project-ref "$SUPABASE_PROJECT_ID"
+
+      - name: Create least-privilege runtime logins
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+
+          encode_password() {
+            printf '%s' "$1" | base64 --wrap=0
+          }
+
+          founder_password=$(encode_password "$OPERATIONS_FOUNDER_RUNTIME_DATABASE_PASSWORD")
+          portal_password=$(encode_password "$OPERATIONS_PORTAL_RUNTIME_DATABASE_PASSWORD")
+          billing_password=$(encode_password "$OPERATIONS_BILLING_RUNTIME_DATABASE_PASSWORD")
+          signing_password=$(encode_password "$OPERATIONS_SIGNING_RUNTIME_DATABASE_PASSWORD")
+          onboarding_password=$(encode_password "$OPERATIONS_ONBOARDING_RUNTIME_DATABASE_PASSWORD")
+
+          cat > "$RUNNER_TEMP/operations-runtime-logins.sql" <<SQL
+          do \$provision\$
+          declare
+            runtime_role text;
+            permission_role text;
+            runtime_password text;
+            existing_membership text;
+          begin
+            for runtime_role, permission_role, runtime_password in
+              select * from (values
+                ('operations_founder_runtime', 'operations_founder', convert_from(decode('$founder_password', 'base64'), 'utf8')),
+                ('operations_portal_runtime', 'operations_portal', convert_from(decode('$portal_password', 'base64'), 'utf8')),
+                ('operations_billing_runtime', 'operations_billing_worker', convert_from(decode('$billing_password', 'base64'), 'utf8')),
+                ('operations_signing_runtime', 'operations_signing_worker', convert_from(decode('$signing_password', 'base64'), 'utf8')),
+                ('operations_onboarding_runtime', 'operations_onboarding_worker', convert_from(decode('$onboarding_password', 'base64'), 'utf8'))
+              ) as runtime_credentials(runtime_role, permission_role, runtime_password)
+            loop
+              if not exists (select 1 from pg_roles where rolname = permission_role) then
+                raise exception 'Required Operations permission role % is missing', permission_role;
+              end if;
+
+              if not exists (select 1 from pg_roles where rolname = runtime_role) then
+                execute format(
+                  'create role %I login noinherit nosuperuser nocreatedb nocreaterole noreplication nobypassrls password %L',
+                  runtime_role,
+                  runtime_password
+                );
+              else
+                execute format(
+                  'alter role %I login noinherit nosuperuser nocreatedb nocreaterole noreplication nobypassrls password %L',
+                  runtime_role,
+                  runtime_password
+                );
+              end if;
+
+              for existing_membership in
+                select parent.rolname
+                from pg_auth_members membership
+                join pg_roles parent on parent.oid = membership.roleid
+                join pg_roles member on member.oid = membership.member
+                where member.rolname = runtime_role
+                  and parent.rolname <> permission_role
+              loop
+                execute format('revoke %I from %I', existing_membership, runtime_role);
+              end loop;
+
+              execute format('grant %I to %I', permission_role, runtime_role);
+              execute format('grant connect on database %I to %I', current_database(), runtime_role);
+            end loop;
+          end
+          \$provision\$;
+          SQL
+
+          supabase db query --linked --file "$RUNNER_TEMP/operations-runtime-logins.sql"
