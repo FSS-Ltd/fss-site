@@ -1,7 +1,10 @@
 import { randomUUID } from "node:crypto";
-import postgres from "postgres";
 import { z } from "zod";
-import { operationsEnabled, type OperationsDb } from "../db/client";
+import {
+  createOperationsDb,
+  operationsEnabled,
+  type OperationsDb,
+} from "../db/client";
 import { loadSigningApprovals } from "./signing-repository";
 import { renderSignedAgreement, signingAudit } from "./signing-render";
 
@@ -15,13 +18,7 @@ export function getSigningWorkerDb(): OperationsDb {
   if (!signingEnabled()) throw new Error("Agreement signing is disabled.");
   const url = process.env.OPERATIONS_SIGNING_DATABASE_URL;
   if (!url) throw new Error("Agreement signing is not configured.");
-  sharedDb ??= postgres(url, {
-    prepare: false,
-    max: 3,
-    idle_timeout: 20,
-    connect_timeout: 10,
-    connection: { options: "-c role=operations_signing_worker" },
-  });
+  sharedDb ??= createOperationsDb(url, "operations_signing_worker", 3);
   return sharedDb;
 }
 export async function completeAgreementSigning(
