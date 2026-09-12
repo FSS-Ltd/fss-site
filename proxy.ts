@@ -1,15 +1,12 @@
 import type { NextFetchEvent, NextMiddleware, NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-import { auth as configuredAuth } from "@/auth";
 import { portalRouteForHost } from "@/lib/operations/auth/portal-host";
 
-const auth = configuredAuth as unknown as NextMiddleware;
-
-export function proxy(
+export async function proxy(
   request: NextRequest,
   event: NextFetchEvent,
-): ReturnType<NextMiddleware> {
+): Promise<ReturnType<NextMiddleware>> {
   const portalRoute = portalRouteForHost(
     request.nextUrl.hostname,
     request.nextUrl.pathname,
@@ -23,6 +20,8 @@ export function proxy(
     return response;
   }
 
+  if (request.nextUrl.pathname === "/") return NextResponse.next();
+
   if (
     request.nextUrl.pathname === "/portal" ||
     request.nextUrl.pathname.startsWith("/portal/") ||
@@ -34,7 +33,8 @@ export function proxy(
     return response;
   }
 
-  return auth(request, event);
+  const { auth } = await import("@/auth");
+  return (auth as unknown as NextMiddleware)(request, event);
 }
 
 export const config = {
