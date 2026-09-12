@@ -108,10 +108,6 @@ html {
 }
 
 @media (max-width: 939px) {
-  [data-hero-canvas] {
-    display: none !important;
-  }
-
   [data-foot-grid] {
     grid-template-columns: 1fr !important;
   }

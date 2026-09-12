@@ -150,7 +150,6 @@ export function FssInteractions({
     const initialTransforms = new WeakMap<HTMLElement, string>();
     const initialBorders = new WeakMap<HTMLElement, string>();
     let intersectionObserver: IntersectionObserver | null = null;
-    let canvasFrame = 0;
     let scrollFrame = 0;
     let ticking = false;
 
@@ -439,146 +438,162 @@ export function FssInteractions({
     };
 
     const initCanvas = () => {
-      const canvas = query<HTMLCanvasElement>(scope, "[data-hero-canvas]");
-      if (!canvas || noMotion || window.innerWidth < 940) return;
+      const canvases = queryAll<HTMLCanvasElement>(scope, "[data-hero-canvas]");
+      if (!canvases.length || noMotion) return;
 
-      const context = canvas.getContext("2d");
-      if (!context) return;
+      canvases.forEach((canvas) => {
+        const context = canvas.getContext("2d");
+        if (!context) return;
 
-      let width = 0;
-      let height = 0;
-      let nodes: Point[] = [];
-      let running = true;
-      const mouse = { x: -9999, y: -9999 };
-      const baseNodeCount = Math.round(nodeDensity * (calmMotion ? 0.6 : 1));
-      const maxDistance = 132;
+        let width = 0;
+        let height = 0;
+        let nodes: Point[] = [];
+        let running = true;
+        let frameId = 0;
+        const mouse = { x: -9999, y: -9999 };
+        const baseNodeCount = Math.round(nodeDensity * (calmMotion ? 0.6 : 1));
+        const maxDistance = 132;
 
-      const buildNodes = () => {
-        const count = Math.max(
-          0,
-          Math.round(
-            baseNodeCount * Math.min(1.2, (width * height) / (1280 * 720)),
-          ),
-        );
-        nodes = Array.from({ length: count }, () => ({
-          x: Math.random() * width,
-          y: Math.random() * height,
-          vx: (Math.random() - 0.5) * 0.16,
-          vy: (Math.random() - 0.5) * 0.16,
-        }));
-      };
+        const buildNodes = () => {
+          const sizeMultiplier =
+            width < 640 ? 0.36 : width < 940 ? 0.62 : 1;
+          const pointerMultiplier = finePointer ? 1 : 0.55;
+          const count = Math.max(
+            10,
+            Math.round(
+              baseNodeCount *
+                sizeMultiplier *
+                pointerMultiplier *
+                Math.min(1.2, (width * height) / (1280 * 720)),
+            ),
+          );
+          nodes = Array.from({ length: count }, () => ({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            vx: (Math.random() - 0.5) * 0.16,
+            vy: (Math.random() - 0.5) * 0.16,
+          }));
+        };
 
-      const resize = () => {
-        const rect = canvas.getBoundingClientRect();
-        const dpr = Math.min(2, window.devicePixelRatio || 1);
-        width = rect.width;
-        height = rect.height;
-        canvas.width = Math.round(width * dpr);
-        canvas.height = Math.round(height * dpr);
-        context.setTransform(dpr, 0, 0, dpr, 0, 0);
-        buildNodes();
-      };
-
-      const frame = () => {
-        if (!running) return;
-
-        context.clearRect(0, 0, width, height);
-
-        nodes.forEach((point) => {
-          point.x += point.vx;
-          point.y += point.vy;
-          if (point.x < 0 || point.x > width) point.vx *= -1;
-          if (point.y < 0 || point.y > height) point.vy *= -1;
-
-          const dx = point.x - mouse.x;
-          const dy = point.y - mouse.y;
-          const distance = Math.hypot(dx, dy);
-          if (distance > 0 && distance < 150) {
-            point.x += (dx / distance) * 0.5;
-            point.y += (dy / distance) * 0.5;
-          }
-        });
-
-        for (let i = 0; i < nodes.length; i += 1) {
-          for (let j = i + 1; j < nodes.length; j += 1) {
-            const first = nodes[i];
-            const second = nodes[j];
-            const distance = Math.hypot(first.x - second.x, first.y - second.y);
-
-            if (distance < maxDistance) {
-              const midX = (first.x + second.x) / 2;
-              const midY = (first.y + second.y) / 2;
-              const nearMouse =
-                Math.hypot(midX - mouse.x, midY - mouse.y) < 170;
-              context.strokeStyle = `rgba(20,152,158,${(1 - distance / maxDistance) * (nearMouse ? 0.5 : 0.14)})`;
-              context.lineWidth = nearMouse ? 1.1 : 0.7;
-              context.beginPath();
-              context.moveTo(first.x, first.y);
-              context.lineTo(second.x, second.y);
-              context.stroke();
-            }
-          }
-        }
-
-        nodes.forEach((point) => {
-          const nearMouse =
-            Math.hypot(point.x - mouse.x, point.y - mouse.y) < 150;
-          context.fillStyle = nearMouse
-            ? "rgba(15,122,131,.85)"
-            : "rgba(20,152,158,.32)";
-          context.beginPath();
-          context.arc(point.x, point.y, nearMouse ? 2.4 : 1.5, 0, Math.PI * 2);
-          context.fill();
-        });
-
-        canvasFrame = window.requestAnimationFrame(frame);
-      };
-
-      resize();
-      bind(window, "resize", resize, cleanups);
-      bind(
-        window,
-        "mousemove",
-        (event) => {
-          const mouseEvent = event as MouseEvent;
+        const resize = () => {
           const rect = canvas.getBoundingClientRect();
-          mouse.x = mouseEvent.clientX - rect.left;
-          mouse.y = mouseEvent.clientY - rect.top;
-        },
-        cleanups,
-      );
+          const dpr = Math.min(2, window.devicePixelRatio || 1);
+          width = rect.width;
+          height = rect.height;
+          canvas.width = Math.round(width * dpr);
+          canvas.height = Math.round(height * dpr);
+          context.setTransform(dpr, 0, 0, dpr, 0, 0);
+          buildNodes();
+        };
 
-      if (canvas.parentElement) {
-        bind(
-          canvas.parentElement,
-          "mouseleave",
-          () => {
-            mouse.x = -9999;
-            mouse.y = -9999;
-          },
-          cleanups,
-        );
-      }
+        const frame = () => {
+          if (!running) return;
 
-      canvasFrame = window.requestAnimationFrame(frame);
+          context.clearRect(0, 0, width, height);
 
-      if ("IntersectionObserver" in window) {
-        const visibilityObserver = new IntersectionObserver((entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting && !running) {
-              running = true;
-              canvasFrame = window.requestAnimationFrame(frame);
-            } else if (!entry.isIntersecting) {
-              running = false;
+          nodes.forEach((point) => {
+            point.x += point.vx;
+            point.y += point.vy;
+            if (point.x < 0 || point.x > width) point.vx *= -1;
+            if (point.y < 0 || point.y > height) point.vy *= -1;
+
+            const dx = point.x - mouse.x;
+            const dy = point.y - mouse.y;
+            const distance = Math.hypot(dx, dy);
+            if (distance > 0 && distance < 150) {
+              point.x += (dx / distance) * 0.5;
+              point.y += (dy / distance) * 0.5;
             }
           });
-        });
-        visibilityObserver.observe(canvas);
+
+          for (let i = 0; i < nodes.length; i += 1) {
+            for (let j = i + 1; j < nodes.length; j += 1) {
+              const first = nodes[i];
+              const second = nodes[j];
+              const distance = Math.hypot(
+                first.x - second.x,
+                first.y - second.y,
+              );
+
+              if (distance < maxDistance) {
+                const midX = (first.x + second.x) / 2;
+                const midY = (first.y + second.y) / 2;
+                const nearMouse =
+                  Math.hypot(midX - mouse.x, midY - mouse.y) < 170;
+                context.strokeStyle = `rgba(20,152,158,${(1 - distance / maxDistance) * (nearMouse ? 0.5 : 0.14)})`;
+                context.lineWidth = nearMouse ? 1.1 : 0.7;
+                context.beginPath();
+                context.moveTo(first.x, first.y);
+                context.lineTo(second.x, second.y);
+                context.stroke();
+              }
+            }
+          }
+
+          nodes.forEach((point) => {
+            const nearMouse =
+              Math.hypot(point.x - mouse.x, point.y - mouse.y) < 150;
+            context.fillStyle = nearMouse
+              ? "rgba(15,122,131,.85)"
+              : "rgba(20,152,158,.32)";
+            context.beginPath();
+            context.arc(point.x, point.y, nearMouse ? 2.4 : 1.5, 0, Math.PI * 2);
+            context.fill();
+          });
+
+          frameId = window.requestAnimationFrame(frame);
+        };
+
+        resize();
+        bind(window, "resize", resize, cleanups);
+
+        const host = canvas.parentElement;
+        if (host) {
+          bind(
+            host,
+            "pointermove",
+            (event) => {
+              if (!finePointer) return;
+              const pointer = event as PointerEvent;
+              const rect = canvas.getBoundingClientRect();
+              mouse.x = pointer.clientX - rect.left;
+              mouse.y = pointer.clientY - rect.top;
+            },
+            cleanups,
+          );
+          bind(
+            host,
+            "pointerleave",
+            () => {
+              mouse.x = -9999;
+              mouse.y = -9999;
+            },
+            cleanups,
+          );
+        }
+
+        frameId = window.requestAnimationFrame(frame);
+
+        if ("IntersectionObserver" in window) {
+          const visibilityObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting && !running) {
+                running = true;
+                frameId = window.requestAnimationFrame(frame);
+              } else if (!entry.isIntersecting) {
+                running = false;
+              }
+            });
+          });
+          visibilityObserver.observe(canvas);
+          cleanups.push(() => visibilityObserver.disconnect());
+        }
+
         cleanups.push(() => {
           running = false;
-          visibilityObserver.disconnect();
+          window.cancelAnimationFrame(frameId);
         });
-      }
+      });
     };
 
     const applyResponsive = () => {
@@ -937,9 +952,8 @@ export function FssInteractions({
     applyResponsive();
     bind(window, "resize", applyResponsive, cleanups);
 
-    // initReveals/guardTimeline gate [data-reveal] content's opacity, so they
-    // run synchronously — deferring them behind requestIdleCallback pushes
-    // back when below-the-fold content becomes visible. Everything else here
+    // initReveals/guardTimeline keep [data-reveal] content responsive, so they
+    // run synchronously. Everything else here
     // (hover/magnetic/spotlight wiring, the canvas particle loop, counters,
     // menu, contact form, scroll listeners) doesn't gate visibility, and
     // running all of it synchronously under CPU throttling is what shows up
@@ -963,7 +977,6 @@ export function FssInteractions({
     );
 
     return () => {
-      window.cancelAnimationFrame(canvasFrame);
       window.cancelAnimationFrame(scrollFrame);
       intersectionObserver?.disconnect();
       cleanups.forEach((cleanup) => cleanup());

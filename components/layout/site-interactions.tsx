@@ -2,21 +2,12 @@
 
 import type { ComponentType } from "react";
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
 
 export function SiteInteractions() {
-  const pathname = usePathname();
-  const legacyRoutes = [
-    "/start",
-    "/resources",
-    "/blog",
-    "/ai-deployment-questionnaire",
-  ];
-  if (!legacyRoutes.includes(pathname)) return null;
-  return <LegacyInteractions />;
+  return <PublicInteractions />;
 }
 
-function LegacyInteractions() {
+function PublicInteractions() {
   const [InteractionComponent, setInteractionComponent] =
     useState<ComponentType | null>(null);
 
@@ -42,6 +33,10 @@ function LegacyInteractions() {
     // progressive enhancement: navigation works before it loads, and the
     // first scroll, pointer, or keyboard interaction loads it immediately.
     window.addEventListener("scroll", mount, { passive: true, once: true });
+    window.addEventListener("pointermove", mount, {
+      passive: true,
+      once: true,
+    });
     window.addEventListener("pointerdown", mount, {
       passive: true,
       once: true,
@@ -51,6 +46,7 @@ function LegacyInteractions() {
     return () => {
       cancelled = true;
       window.removeEventListener("scroll", mount);
+      window.removeEventListener("pointermove", mount);
       window.removeEventListener("pointerdown", mount);
       window.removeEventListener("keydown", mount);
     };

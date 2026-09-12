@@ -5,6 +5,12 @@ const files = {
     "components/redesign/fss-interactions.tsx",
     "utf8",
   ),
+  siteInteractions: readFileSync(
+    "components/layout/site-interactions.tsx",
+    "utf8",
+  ),
+  homePage: readFileSync("components/sections/public/home-page.tsx", "utf8"),
+  globals: readFileSync("app/globals.css", "utf8"),
   header: readFileSync("components/layout/site-header.tsx", "utf8"),
   headerNavItems: readFileSync(
     "components/layout/site-header-nav-items.ts",
@@ -23,6 +29,34 @@ if (!files.interactions.includes("usePathname")) {
   failures.push(
     "FssInteractions must re-initialize on App Router pathname changes.",
   );
+}
+
+if (files.siteInteractions.includes("usePathname")) {
+  failures.push(
+    "SiteInteractions must stay available across the public site so every hero can opt into the shared runtime.",
+  );
+}
+
+if (!files.siteInteractions.includes('"pointermove"')) {
+  failures.push(
+    "SiteInteractions must load the interaction runtime when a pointer moves, not only after a click.",
+  );
+}
+
+if (!files.interactions.includes("queryAll<HTMLCanvasElement>")) {
+  failures.push("FssInteractions must initialize every hero particle canvas.");
+}
+
+if (files.interactions.includes("window.innerWidth < 940")) {
+  failures.push("FssInteractions must not disable hero particles below a fixed viewport width.");
+}
+
+if (files.globals.includes("[data-hero-canvas] {\n    display: none")) {
+  failures.push("Global CSS must not hide hero particle canvases on narrow screens.");
+}
+
+if (!files.homePage.includes("data-hero-canvas")) {
+  failures.push("The homepage hero must render the shared particle canvas.");
 }
 
 if (

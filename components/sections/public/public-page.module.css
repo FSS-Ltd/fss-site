@@ -16,8 +16,25 @@
   content: "";
 }
 .hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   max-width: 840px;
+  padding: 8px 0;
   margin-bottom: 56px;
+}
+.particleCanvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.42;
+}
+.hero > :not([data-hero-canvas]) {
+  position: relative;
+  z-index: 1;
 }
 .eyebrow {
   color: #0f7078;

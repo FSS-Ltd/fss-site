@@ -12,6 +12,11 @@ export function HomePage() {
   return (
     <div className={`${styles.page} ${homeStyles.home}`}>
       <section className={homeStyles.hero} aria-labelledby="home-title">
+        <canvas
+          data-hero-canvas
+          className={homeStyles.particleCanvas}
+          aria-hidden="true"
+        />
         <div className={homeStyles.heroGrid}>
           <div className={homeStyles.intro}>
             <p className={homeStyles.eyebrow}>
