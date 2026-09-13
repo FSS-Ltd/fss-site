@@ -58,6 +58,12 @@
   margin: 0.25rem 0 0;
   color: var(--operations-slate);
 }
+.rowAction {
+  display: inline-flex;
+  min-height: 44px;
+  min-width: 44px;
+  align-items: center;
+}
 .facts {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

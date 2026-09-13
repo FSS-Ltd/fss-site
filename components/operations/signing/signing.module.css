@@ -1,4 +1,24 @@
 .page {
+  max-width: 960px;
+  margin-inline: auto;
+  width: 100%;
+}
+.page > header {
+  padding-block: 16px 8px;
+}
+.page > header h1 {
+  margin-top: 24px;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 650;
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+}
+.page > header p {
+  max-width: 62ch;
+  color: #526078;
+  font-size: 1.0625rem;
+}
+.operationsPage {
   width: 100%;
   min-width: 0;
 }
@@ -14,18 +34,22 @@
   border-radius: 8px;
   background: var(--operations-surface-muted, #f7f8f9);
 }
-.page > article > h2 {
+.page > article > h2,
+.operationsPage > article > h2 {
   font-size: clamp(1.5rem, 3vw, 2rem);
   letter-spacing: -0.025em;
 }
-.page > article > h3 {
+.page > article > h3,
+.operationsPage > article > h3 {
   margin-top: 24px;
 }
-.page > article > form {
+.page > article > form,
+.operationsPage > article > form {
   margin-block: 24px;
   padding-top: 24px;
   border-top: 1px solid #dce3e8;
 }
-.page li {
+.page li,
+.operationsPage li {
   line-height: 1.6;
 }

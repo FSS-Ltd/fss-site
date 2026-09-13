@@ -36,7 +36,7 @@ export default async function SigningPage({
     );
   }
   return (
-    <section className={`${styles.page} ${signingStyles.page}`}>
+    <section className={`${styles.page} ${signingStyles.operationsPage}`}>
       <OperationsPageHeader
         context="Operations · Signing"
         title="Ready for agreement."

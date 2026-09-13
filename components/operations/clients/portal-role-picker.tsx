@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { portalRoleOptions } from "@/lib/operations/auth/access-dashboard-metrics";
 import type { PortalRole } from "@/lib/operations/auth/types";
 import { getPortalRoleHelpExpandedRole } from "./portal-role-picker-state";
@@ -21,6 +21,18 @@ export function PortalRolePicker({
 }: PortalRolePickerProps): React.JSX.Element {
   const [selectedRole, setSelectedRole] = useState<PortalRole>(defaultValue);
   const [expandedRole, setExpandedRole] = useState<PortalRole | null>(null);
+  useEffect(() => {
+    if (!expandedRole) return;
+    function dismissOnEscape(event: KeyboardEvent): void {
+      if (event.key === "Escape") {
+        setExpandedRole((role) =>
+          role ? getPortalRoleHelpExpandedRole(role, "escape") : null,
+        );
+      }
+    }
+    document.addEventListener("keydown", dismissOnEscape);
+    return () => document.removeEventListener("keydown", dismissOnEscape);
+  }, [expandedRole]);
   const selectedOption = options.find(
     (option) => option.value === selectedRole,
   );
@@ -53,19 +65,11 @@ export function PortalRolePicker({
                   <span>{option.detail}</span>
                 </span>
               </label>
-              <button
-                aria-describedby={tooltipId}
-                aria-expanded={isExpanded}
-                aria-label={`More about ${option.label}`}
-                className={styles.helpButton}
+              <div
+                className={styles.help}
                 onBlur={() =>
                   setExpandedRole(
                     getPortalRoleHelpExpandedRole(option.value, "blur"),
-                  )
-                }
-                onClick={() =>
-                  setExpandedRole(
-                    getPortalRoleHelpExpandedRole(option.value, "activate"),
                   )
                 }
                 onFocus={() =>
@@ -78,23 +82,43 @@ export function PortalRolePicker({
                     getPortalRoleHelpExpandedRole(option.value, "hover"),
                   )
                 }
-                onMouseLeave={() =>
-                  setExpandedRole(
-                    getPortalRoleHelpExpandedRole(option.value, "mouse_leave"),
-                  )
-                }
-                type="button"
+                onMouseLeave={(event) => {
+                  const hasFocus = event.currentTarget.contains(
+                    document.activeElement,
+                  );
+                  setExpandedRole((current) =>
+                    getPortalRoleHelpExpandedRole(
+                      option.value,
+                      "mouse_leave",
+                      hasFocus,
+                      current,
+                    ),
+                  );
+                }}
               >
-                ?
-              </button>
-              <span
-                className={styles.tooltip}
-                hidden={!isExpanded}
-                id={tooltipId}
-                role="tooltip"
-              >
-                {option.detail}
-              </span>
+                <button
+                  aria-describedby={tooltipId}
+                  aria-expanded={isExpanded}
+                  aria-label={`More about ${option.label}`}
+                  className={styles.helpButton}
+                  onClick={() =>
+                    setExpandedRole(
+                      getPortalRoleHelpExpandedRole(option.value, "activate"),
+                    )
+                  }
+                  type="button"
+                >
+                  ?
+                </button>
+                <span
+                  className={styles.tooltip}
+                  hidden={!isExpanded}
+                  id={tooltipId}
+                  role="tooltip"
+                >
+                  {option.detail}
+                </span>
+              </div>
             </div>
           );
         })}

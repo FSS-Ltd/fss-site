@@ -93,6 +93,7 @@ export function ClientList({
                     </h2>
                     <p className={styles.detail}>{organisation.legalName}</p>
                     <Link
+                      className={styles.rowAction}
                       href={`/growth/operations/clients/${organisation.id}/requests`}
                     >
                       Requests

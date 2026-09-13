@@ -17,6 +17,51 @@ import {
   invoiceChoices,
 } from "@/lib/operations/onboarding/display";
 import { agreementDraft } from "@/lib/operations/agreements/fixtures";
+import { portalRoleOptions } from "@/lib/operations/auth/access-dashboard-metrics";
+
+test("proposal approval access preview renders authoritative role labels and descriptions", () => {
+  const source = readFileSync(
+    new URL("./journey-preview.tsx", import.meta.url),
+    "utf8",
+  );
+  assert.doesNotMatch(source, /role\.replaceAll/);
+  const { ProposalAccessPreview } =
+    require("./proposal-access-preview") as typeof import("./proposal-access-preview");
+  const access = portalRoleOptions.map((option) => ({
+    email: `${option.value}@example.com`,
+    role: option.value,
+  }));
+  const html = renderToStaticMarkup(<ProposalAccessPreview access={access} />);
+  for (const option of portalRoleOptions) {
+    assert.ok(html.includes(option.label));
+    assert.ok(html.includes(option.detail));
+    assert.ok(html.includes(`${option.value}@example.com`));
+  }
+  assert.match(
+    source,
+    /<ProposalAccessPreview access=\{preview.snapshot.access\}/,
+  );
+});
+
+test("proposal selections derive their labels and schema values from shared role options", () => {
+  const source = readFileSync(
+    new URL("./proposal-form.tsx", import.meta.url),
+    "utf8",
+  );
+  assert.match(
+    source,
+    /import \{ portalRoleOptions \} from "@\/lib\/operations\/auth\/access-dashboard-metrics"/,
+  );
+  assert.match(source, /portalRoleOptions\.map/);
+  assert.match(
+    source,
+    /<option key=\{role.value\} value=\{role.value\}>\s*\{role.label\}/,
+  );
+  assert.doesNotMatch(
+    source,
+    /<option value="(?:owner|contributor|billing_contact|viewer)"/,
+  );
+});
 test("welcome form identifies FSS sender and configured billing without editable provider IDs", () => {
   const html = renderToStaticMarkup(
     <WelcomeForm
