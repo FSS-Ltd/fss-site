@@ -15,7 +15,7 @@
 }
 .page > header p {
   max-width: 62ch;
-  color: #526078;
+  color: #cae1ea;
   font-size: 1.0625rem;
 }
 .operationsPage {
@@ -49,7 +49,61 @@
   padding-top: 24px;
   border-top: 1px solid #dce3e8;
 }
+.summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.9fr);
+  gap: 18px;
+  margin: 24px 0;
+  padding: clamp(20px, 3vw, 28px);
+  border: 1px solid #dce3e8;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #ffffff, #f7fafb);
+  box-shadow: 0 16px 38px -34px rgba(7, 24, 46, 0.62);
+}
+.summaryHeading {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+}
+.summaryHeading p,
+.summaryHeading h2,
+.summaryHeading span {
+  margin: 0;
+}
+.summaryHeading p {
+  color: #0f7a83;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+.summaryHeading h2 {
+  color: #07182e;
+  font-size: 1.25rem;
+  letter-spacing: -0.025em;
+}
+.summaryHeading span {
+  max-width: 48ch;
+  color: #526078;
+  font-size: 0.87rem;
+  line-height: 1.55;
+}
+.metrics {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.page li {
+  padding-block: 6px;
+}
 .page li,
 .operationsPage li {
   line-height: 1.6;
+}
+@media (max-width: 860px) {
+  .summary,
+  .metrics {
+    grid-template-columns: 1fr;
+  }
 }

@@ -12,6 +12,7 @@ import {
 import { OperationsPageHeader } from "@/components/operations/shared/operations-page-header";
 import ui from "@/components/operations/shared/operations-ui.module.css";
 import layout from "@/components/operations/requests/requests.module.css";
+import { RequestQueueSummary } from "@/components/operations/requests/request-queue-summary";
 export const dynamic = "force-dynamic";
 export default async function FounderRequestsPage({
   params,
@@ -53,14 +54,7 @@ export default async function FounderRequestsPage({
           Showing up to 100 requests, with open work and action deadlines first.
         </p>
       </OperationsPageHeader>
-      <section className={ui.metricGrid} aria-label="Client request summary">
-        <article className={ui.metricCard}>
-          <h2 className={layout.metricLabel}>Requests shown</h2>
-          <p className={layout.metricValue}>
-            {requests.length} request{requests.length === 1 ? "" : "s"}
-          </p>
-        </article>
-      </section>
+      <RequestQueueSummary observedAt={now} requests={requests} />
       {requests.length === 0 ? (
         <p className={ui.emptyState}>
           No requests yet. Client submissions will appear here.

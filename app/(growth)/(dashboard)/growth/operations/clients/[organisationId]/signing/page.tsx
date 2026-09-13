@@ -6,6 +6,7 @@ import { getOperationsDb } from "@/lib/operations/db/client";
 import { signingEnabled } from "@/lib/operations/agreements/signing-commands";
 import { listFounderSigning } from "@/lib/operations/agreements/signing-service";
 import { SigningReview } from "@/components/operations/signing/signing-review";
+import { SigningSummary } from "@/components/operations/signing/signing-summary";
 import { OperationsPageHeader } from "@/components/operations/shared/operations-page-header";
 import ui from "@/components/operations/shared/operations-ui.module.css";
 import styles from "@/components/operations/agreements/agreements.module.css";
@@ -49,12 +50,7 @@ export default async function SigningPage({
           </Link>
         }
       />
-      <dl className={ui.metricGrid}>
-        <div className={ui.metricCard}>
-          <dt>Signing requests shown</dt>
-          <dd className={styles.count}>{approvals.length}</dd>
-        </div>
-      </dl>
+      <SigningSummary approvals={approvals} />
       {approvals.length === 0 && (
         <p className={ui.emptyState}>
           No signing requests yet. Prepare a document from the agreement

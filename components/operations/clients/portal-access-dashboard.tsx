@@ -1,28 +1,39 @@
 "use client";
 
 import {
-  BarChart3,
   CircleCheckBig,
-  Clock3,
   ShieldCheck,
   UserPlus,
   UsersRound,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useRef, useState, type FormEvent } from "react";
+import { useState } from "react";
 import {
   getPortalAccessMetrics,
   portalRoleOptions,
 } from "@/lib/operations/auth/access-dashboard-metrics";
 import type { PortalAccessRegister } from "@/lib/operations/auth/repository";
-import { createGrantAccessPayload } from "./portal-access-form";
-import { PortalRolePicker } from "./portal-role-picker";
+import { PortalInvitationDialog } from "./portal-invitation-dialog";
 import styles from "./portal-access-dashboard.module.css";
 
 type Status = {
   kind: "idle" | "pending" | "success" | "error";
   message?: string;
 };
+
+async function getRequestError(response: Response): Promise<string> {
+  const body: unknown = await response.json().catch(() => null);
+  if (
+    typeof body === "object" &&
+    body !== null &&
+    "message" in body &&
+    typeof body.message === "string" &&
+    body.message.trim()
+  ) {
+    return body.message;
+  }
+  return "Access could not be updated. Try again.";
+}
 
 function accessStatus(entry: PortalAccessRegister["entries"][number]): string {
   if (entry.membershipId && !entry.revokedAt) return "Active";
@@ -40,55 +51,11 @@ export function PortalAccessDashboard({
 }): React.JSX.Element {
   const router = useRouter();
   const [status, setStatus] = useState<Status>({ kind: "idle" });
-  const [formVersion, setFormVersion] = useState(0);
-  const organisationSelectRef = useRef<HTMLSelectElement>(null);
   const metrics = getPortalAccessMetrics(data.entries);
   const largestRoleCount = Math.max(
     ...metrics.roleCounts.map((role) => role.count),
     1,
   );
-
-  function focusInvitationForm(): void {
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-
-    document.getElementById("portal-invitation")?.scrollIntoView({
-      behavior: prefersReducedMotion ? "auto" : "smooth",
-      block: "start",
-    });
-    organisationSelectRef.current?.focus({ preventScroll: true });
-  }
-
-  async function submit(event: FormEvent<HTMLFormElement>): Promise<void> {
-    event.preventDefault();
-    if (status.kind === "pending") return;
-    setStatus({ kind: "pending" });
-    const formElement = event.currentTarget;
-    try {
-      const form = new FormData(formElement);
-      const response = await fetch("/api/growth/operations/portal-access", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(createGrantAccessPayload(form)),
-      });
-      if (!response.ok) throw new Error("Request failed.");
-      formElement.reset();
-      setFormVersion((version) => version + 1);
-      setStatus({
-        kind: "success",
-        message:
-          "Invitation issued. Clerk will send the client a secure activation email.",
-      });
-      router.refresh();
-    } catch {
-      setStatus({
-        kind: "error",
-        message:
-          "Access could not be granted. Check the details and try again.",
-      });
-    }
-  }
 
   async function revoke(
     entry: PortalAccessRegister["entries"][number],
@@ -110,13 +77,16 @@ export function PortalAccessDashboard({
           reviewReference,
         }),
       });
-      if (!response.ok) throw new Error("Request failed.");
+      if (!response.ok) throw new Error(await getRequestError(response));
       setStatus({ kind: "success", message: "Portal access removed." });
       router.refresh();
-    } catch {
+    } catch (error) {
       setStatus({
         kind: "error",
-        message: "Access could not be removed. Try again.",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Access could not be removed. Try again.",
       });
     }
   }
@@ -132,19 +102,9 @@ export function PortalAccessDashboard({
             record of active access.
           </p>
         </div>
-        <div className={styles.headerActions}>
-          <button
-            className={styles.primaryAction}
-            onClick={focusInvitationForm}
-            type="button"
-          >
-            <UserPlus aria-hidden="true" size={18} />
-            Invite portal user
-          </button>
-          <div className={styles.assurance}>
-            <ShieldCheck aria-hidden="true" size={20} />
-            <span>Roles are enforced against the live portal membership.</span>
-          </div>
+        <div className={styles.assurance}>
+          <ShieldCheck aria-hidden="true" size={20} />
+          <span>Roles are enforced against the live portal membership.</span>
         </div>
       </header>
 
@@ -159,16 +119,6 @@ export function PortalAccessDashboard({
           <p>{metrics.active}</p>
           <span>Active members</span>
         </article>
-        <article>
-          <Clock3 aria-hidden="true" size={19} />
-          <p>{metrics.pending}</p>
-          <span>Invitations pending</span>
-        </article>
-        <article>
-          <BarChart3 aria-hidden="true" size={19} />
-          <p>{metrics.claimed}</p>
-          <span>Awaiting activation</span>
-        </article>
       </section>
 
       <section
@@ -179,11 +129,10 @@ export function PortalAccessDashboard({
           <p className={styles.eyebrow}>Access coverage</p>
           <h2 id="role-distribution-heading">Role distribution</h2>
           <p>
-            Role counts come from the Operations access register, including
-            pending invitations.
+            Role counts are based on the accepted access records in Operations.
           </p>
         </div>
-        <ul aria-label="Members and invitations by role">
+        <ul aria-label="Active members by role">
           {metrics.roleCounts.map((role) => (
             <li key={role.value}>
               <div>
@@ -210,9 +159,8 @@ export function PortalAccessDashboard({
           <div>
             <h2 id="portal-invitation-heading">Invite portal user</h2>
             <p>
-              Choose a client, assign the database role, then send the
-              activation email. The role is written to Operations records before
-              Clerk delivers the activation email.
+              Clerk holds the invitation until the recipient creates their
+              account. The contact and membership are then written together.
             </p>
           </div>
         </div>
@@ -223,21 +171,21 @@ export function PortalAccessDashboard({
               <span>1</span>
               <div>
                 <strong>Founder approval</strong>
-                <p>The client contact and review note record the decision.</p>
+                <p>The review note records why the requested access is approved.</p>
               </div>
             </li>
             <li>
               <span>2</span>
               <div>
-                <strong>Operations role record</strong>
-                <p>The selected database role sets the access boundary.</p>
+                <strong>Clerk invitation</strong>
+                <p>The recipient receives the role and account details to accept.</p>
               </div>
             </li>
             <li>
               <span>3</span>
               <div>
-                <strong>Clerk sends the activation email</strong>
-                <p>The approved contact activates a verified account.</p>
+                <strong>Account acceptance</strong>
+                <p>Operations creates the contact and membership after setup.</p>
               </div>
             </li>
           </ol>
@@ -248,67 +196,14 @@ export function PortalAccessDashboard({
             portal access.
           </p>
         ) : (
-          <form
-            className={styles.form}
-            onSubmit={submit}
-            aria-busy={status.kind === "pending"}
-          >
-            <label>
-              Organisation
-              <select
-                defaultValue=""
-                name="organisationId"
-                ref={organisationSelectRef}
-                required
-              >
-                <option disabled value="">
-                  Choose an organisation
-                </option>
-                {data.organisations.map((organisation) => (
-                  <option key={organisation.id} value={organisation.id}>
-                    {organisation.displayName}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Client name
-              <input maxLength={200} name="name" required />
-            </label>
-            <label>
-              Email address
-              <input
-                autoComplete="email"
-                maxLength={254}
-                name="email"
-                required
-                type="email"
-              />
-            </label>
-            <div className={styles.rolePicker}>
-              <PortalRolePicker
-                defaultValue="viewer"
-                disabled={status.kind === "pending"}
-                key={formVersion}
-                name="role"
-                options={portalRoleOptions}
-              />
-            </div>
-            <label className={styles.reference}>
-              Review note
-              <input
-                maxLength={200}
-                name="reviewReference"
-                placeholder="Why this access is approved"
-                required
-              />
-            </label>
-            <button disabled={status.kind === "pending"} type="submit">
-              {status.kind === "pending"
-                ? "Granting access…"
-                : "Send invitation"}
-            </button>
-          </form>
+          <div className={styles.inviteControl}>
+            <PortalInvitationDialog
+              organisations={data.organisations}
+              onInvitationSent={(message) =>
+                setStatus({ kind: "success", message })
+              }
+            />
+          </div>
         )}
         <div aria-live="polite">
           {status.message && (
@@ -331,7 +226,7 @@ export function PortalAccessDashboard({
             <p>
               {data.entries.length
                 ? "Every role is scoped to one client organisation."
-                : "No client contacts have been added yet."}
+                : "Accepted invitations will appear here once account setup is complete."}
             </p>
           </div>
         </div>

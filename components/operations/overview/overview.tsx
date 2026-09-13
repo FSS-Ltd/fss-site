@@ -12,6 +12,7 @@ import { MetricCards } from "./metric-cards";
 import { ExceptionQueue } from "./exception-queue";
 import { RevenueMovements } from "./revenue-movements";
 import { ReceivablesTable } from "./receivables-table";
+import { RequestStatusDistribution } from "./request-status-distribution";
 import styles from "./overview.module.css";
 export function OperationsOverview({
   data,
@@ -223,17 +224,8 @@ export function OperationsOverview({
           value: {formatMoney(BigInt(data.revenue.signedOneOff))}.
         </p>
         <h2>Current requests by state</h2>
-        {data.requests.length ? (
-          <ul>
-            {data.requests.map((r) => (
-              <li key={r.status}>
-                {r.status.replaceAll("_", " ")}: {r.count}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No matching requests.</p>
-        )}
+        <RequestStatusDistribution requests={data.requests} />
+        {!data.requests.length ? <p>No matching requests.</p> : null}
       </section>
       <section className={`${sharedStyles.panel} ${styles.section}`}>
         <h2>Upcoming milestones</h2>

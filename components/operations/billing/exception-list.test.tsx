@@ -45,10 +45,11 @@ test("unmapped payment exceptions remain visible without inventing a client link
       }}
     />,
   );
-  assert.match(html, /1 open billing exception on this page/);
+  assert.match(html, /Exceptions shown/);
+  assert.match(html, /Client mapping coverage/);
   assert.doesNotMatch(html, /<main\b/);
   assert.match(html, /Client mapping needed/);
-  assert.match(html, /data-status="test">Test<\/span>/);
+  assert.match(html, /data-tone="neutral">Test provider<\/span>/);
   assert.match(html, /Match this provider record/);
   assert.doesNotMatch(html, /Review client agreements/);
 });

@@ -9,6 +9,7 @@ import { penceToGbp } from "@/lib/operations/agreements/money-input";
 import { AgreementForm } from "./agreement-form";
 import { SignatureForm } from "./signature-form";
 import { ActivationForm } from "./activation-form";
+import { AgreementSummary } from "./agreement-summary";
 import { OperationsPageHeader } from "../shared/operations-page-header";
 import ui from "../shared/operations-ui.module.css";
 import styles from "./agreements.module.css";
@@ -88,12 +89,7 @@ export function AgreementRegister({
           )}
         </div>
       </OperationsPageHeader>
-      <dl className={ui.metricGrid}>
-        <div className={ui.metricCard}>
-          <dt>Agreements on this page</dt>
-          <dd className={styles.count}>{register.agreements.length}</dd>
-        </div>
-      </dl>
+      <AgreementSummary register={register} />
       {register.agreements.length === 0 && (
         <p className={ui.emptyState}>No agreements on this page.</p>
       )}

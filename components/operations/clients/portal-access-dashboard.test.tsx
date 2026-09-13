@@ -51,9 +51,9 @@ test("portal access makes invitation primary and explains the activation sequenc
   );
   assert.match(
     html,
-    /Choose a client, assign the database role, then send the activation email/,
+    /Clerk holds the invitation until the recipient creates their account/,
   );
-  assert.match(html, /Clerk sends the activation email/);
+  assert.match(html, /Account acceptance/);
   assert.match(html, /Portal role/);
-  assert.match(html, /More about Owner/);
+  assert.match(html, /Accepted invitations will appear here once account setup is complete/);
 });

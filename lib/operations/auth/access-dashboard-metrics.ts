@@ -15,31 +15,17 @@ export const portalRoleOptions: readonly PortalRoleOption[] = [
   })),
 ];
 
-export function getPortalAccessMetrics(
-  entries: readonly PortalAccessEntry[],
-  now: Date = new Date(),
-): {
+export function getPortalAccessMetrics(entries: readonly PortalAccessEntry[]): {
   active: number;
-  claimed: number;
-  pending: number;
   roleCounts: readonly (PortalRoleOption & { count: number })[];
 } {
-  const active = entries.filter(
+  const activeEntries = entries.filter(
     (entry) => entry.membershipId && !entry.revokedAt,
-  ).length;
-  const pending = entries.filter(
-    (entry) =>
-      Boolean(entry.invitedAt) &&
-      !entry.inviteClaimedAt &&
-      !(entry.inviteExpiresAt && entry.inviteExpiresAt < now),
-  ).length;
-  const claimed = entries.filter(
-    (entry) => entry.inviteClaimedAt && !entry.membershipId,
-  ).length;
+  );
   const roleCounts = portalRoleOptions.map((role) => ({
     ...role,
-    count: entries.filter((entry) => entry.role === role.value).length,
+    count: activeEntries.filter((entry) => entry.role === role.value).length,
   }));
 
-  return { active, claimed, pending, roleCounts };
+  return { active: activeEntries.length, roleCounts };
 }

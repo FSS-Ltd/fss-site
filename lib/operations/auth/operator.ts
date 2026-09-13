@@ -2,6 +2,10 @@ import { z } from "zod";
 import type { OperationsDb } from "../db/client";
 import type { OperationsFounder } from "../organisations/types";
 import { portalRoles } from "./types";
+import {
+  createPortalInvitationMetadata,
+  type PortalInvitationMetadata,
+} from "./clerk-invitation";
 import { provisionPortalAccount } from "./provision";
 import {
   contactSchema,
@@ -27,14 +31,17 @@ export const portalOperationSchema = z.discriminatedUnion("action", [
 export type PortalOperation = z.infer<typeof portalOperationSchema>;
 export type PortalOperationResult =
   | { action: "create_contact"; contactId: string }
-  | { action: "grant_access"; activationUrl: string; expiresAt: string }
+  | { action: "grant_access" }
   | { action: "issue_invite"; activationUrl: string; expiresAt: string }
   | { action: "revoke_membership" };
 
 export type PortalAccountProvisioner = (
   email: string,
   redirectUrl: string,
+  metadata: PortalInvitationMetadata | undefined,
 ) => Promise<void>;
+
+export class PortalAccessConflict extends Error {}
 
 export async function applyPortalOperation(
   db: OperationsDb,
@@ -50,22 +57,24 @@ export async function applyPortalOperation(
     await revokePortalMembership(db, founder, input);
     return { action };
   }
-  const grant = action === "grant_access" ? grantAccessSchema.parse(operation) : null;
-  const invite = grant
-    ? {
+  if (action === "grant_access") {
+    const grant = grantAccessSchema.parse(operation);
+    const url = createInvitationActivationUrl(origin, grant.name, grant.email);
+    await provision(
+      grant.email,
+      url.href,
+      createPortalInvitationMetadata({
         organisationId: grant.organisationId,
-        contactId: (
-          await createPortalContact(db, founder, {
-            organisationId: grant.organisationId,
-            name: grant.name,
-            email: grant.email,
-            reviewReference: grant.reviewReference,
-          })
-        ).contactId,
+        name: grant.name,
+        email: grant.email,
         role: grant.role,
         reviewReference: grant.reviewReference,
-      }
-    : inviteSchema.parse(input);
+        approvedBy: founder.actorId,
+      }),
+    );
+    return { action };
+  }
+  const invite = inviteSchema.parse(input);
   const contact = await getPortalContact(db, founder, {
     organisationId: invite.organisationId,
     contactId: invite.contactId,
@@ -73,10 +82,21 @@ export async function applyPortalOperation(
   if (!contact) throw new Error("The approved portal contact was not found.");
   const issued = await issuePortalInvite(db, founder, invite);
   const url = new URL("/portal/activate", origin);
-  await provision(contact.email, url.href);
+  await provision(contact.email, url.href, undefined);
   return {
     action,
     activationUrl: url.href,
     expiresAt: issued.expiresAt.toISOString(),
   };
+}
+
+function createInvitationActivationUrl(
+  origin: string,
+  name: string,
+  email: string,
+): URL {
+  const url = new URL("/portal/activate", origin);
+  url.searchParams.set("name", name);
+  url.searchParams.set("email", email);
+  return url;
 }

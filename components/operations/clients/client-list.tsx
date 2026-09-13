@@ -2,11 +2,105 @@ import Link from "next/link";
 import { OperationsPageHeader } from "@/components/operations/shared/operations-page-header";
 import sharedStyles from "@/components/operations/shared/operations-ui.module.css";
 import type { OrganisationPage } from "@/lib/operations/organisations/types";
+import {
+  DashboardMetric,
+  DistributionBars,
+} from "../dashboard/dashboard-visuals";
 import styles from "./client-list.module.css";
 
 export type ClientListState =
   | { status: "ready"; data: OrganisationPage }
   | { status: "error"; message: string };
+
+function ClientPortfolioSummary({
+  data,
+}: {
+  data: OrganisationPage;
+}): React.JSX.Element | null {
+  if (data.rows.length === 0) return null;
+
+  const active = data.rows.filter(
+    (organisation) => organisation.tradingStatus === "active",
+  ).length;
+  const inactive = data.rows.filter(
+    (organisation) => organisation.tradingStatus === "inactive",
+  ).length;
+  const unverified = data.rows.filter(
+    (organisation) => organisation.tradingStatus === "unknown",
+  ).length;
+  const current = data.rows.filter(
+    (organisation) => organisation.lifecycle === "active",
+  ).length;
+  const engagementLinks = data.rows.reduce(
+    (sum, organisation) => sum + organisation.engagementCount,
+    0,
+  );
+
+  return (
+    <section className={styles.portfolio} aria-labelledby="portfolio-heading">
+      <div className={styles.sectionHeading}>
+        <div>
+          <p className={styles.eyebrow}>Portfolio view</p>
+          <h2 id="portfolio-heading">Client register coverage</h2>
+          <p>
+            The summary covers this page of the client register. Use it to spot
+            unverified trading status before opening an engagement.
+          </p>
+        </div>
+      </div>
+      <div className={styles.metrics}>
+        <DashboardMetric
+          label="Organisations shown"
+          supportingText="Rows in the current client register page."
+          value={data.rows.length.toLocaleString("en-GB")}
+        />
+        <DashboardMetric
+          label="Current client records"
+          signal={{
+            label:
+              current === data.rows.length
+                ? "All shown records are current"
+                : `${data.rows.length - current} archived record${data.rows.length - current === 1 ? "" : "s"} shown`,
+            tone: current === data.rows.length ? "positive" : "neutral",
+          }}
+          supportingText="Records still active in the Operations client register."
+          value={current.toLocaleString("en-GB")}
+        />
+        <DashboardMetric
+          label="Engagement links"
+          signal={{ label: "Reviewed mappings only", tone: "brand" }}
+          supportingText="Linked engagements available for agreement work."
+          value={engagementLinks.toLocaleString("en-GB")}
+        />
+        <DashboardMetric
+          label="Trading status to review"
+          signal={
+            unverified > 0
+              ? {
+                  label: "Verify before relying on the record",
+                  tone: "warning",
+                }
+              : {
+                  label: "All shown trading states are recorded",
+                  tone: "positive",
+                }
+          }
+          supportingText="Organisations whose trading status is not yet verified."
+          value={unverified.toLocaleString("en-GB")}
+        />
+      </div>
+      <DistributionBars
+        description="Trading status is displayed with text and colour so the data-quality issue remains clear in every viewing context."
+        items={[
+          { label: "Trading active", tone: "positive", value: active },
+          { label: "Trading inactive", tone: "neutral", value: inactive },
+          { label: "Status to verify", tone: "warning", value: unverified },
+        ]}
+        title="Trading status distribution"
+      />
+    </section>
+  );
+}
 
 export function ClientList({
   state,
@@ -15,12 +109,6 @@ export function ClientList({
   state: ClientListState;
   billingEnabled?: boolean;
 }): React.JSX.Element {
-  const rows = state.status === "ready" ? state.data.rows : [];
-  const engagementCount = rows.reduce(
-    (total, organisation) => total + organisation.engagementCount,
-    0,
-  );
-
   return (
     <section className={`${sharedStyles.page} ${styles.page}`}>
       <OperationsPageHeader
@@ -48,26 +136,8 @@ export function ClientList({
         </div>
       ) : (
         <>
-          <section
-            className={sharedStyles.metricGrid}
-            aria-label="Client register summary"
-          >
-            <article className={sharedStyles.metricCard}>
-              <h2 className={styles.metricLabel}>Client organisations</h2>
-              <p className={styles.metricValue}>
-                {rows.length} client organisation
-                {rows.length === 1 ? "" : "s"} on this page
-              </p>
-            </article>
-            <article className={sharedStyles.metricCard}>
-              <h2 className={styles.metricLabel}>Reviewed engagements</h2>
-              <p className={styles.metricValue}>
-                {engagementCount} reviewed engagement link
-                {engagementCount === 1 ? "" : "s"}
-              </p>
-            </article>
-          </section>
-          {rows.length === 0 ? (
+          <ClientPortfolioSummary data={state.data} />
+          {state.data.rows.length === 0 ? (
             <div className={`${sharedStyles.emptyState} ${styles.notice}`}>
               <h2>No organisations on this page</h2>
               <p>
@@ -78,7 +148,7 @@ export function ClientList({
             </div>
           ) : (
             <ul className={styles.list}>
-              {rows.map((organisation) => (
+              {state.data.rows.map((organisation) => (
                 <li
                   className={`${sharedStyles.panel} ${styles.row}`}
                   key={organisation.id}
