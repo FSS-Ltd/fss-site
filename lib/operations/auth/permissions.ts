@@ -43,6 +43,38 @@ const permissions: Record<PortalRole, readonly PortalCapability[]> = {
   viewer: ["projects.read", "documents.read", "offers.read"],
 };
 
+export type PortalRolePresentation = { label: string; detail: string };
+
+export const portalRolePresentation: Record<
+  PortalRole,
+  PortalRolePresentation
+> = {
+  owner: {
+    label: "Owner",
+    detail:
+      "Projects, requests, agreements, billing, and invitation requests for the organisation.",
+  },
+  contributor: {
+    label: "Contributor",
+    detail:
+      "Projects, shared documents, and creating or commenting on requests.",
+  },
+  billing_contact: {
+    label: "Billing contact",
+    detail: "Billing records and payment management only.",
+  },
+  viewer: {
+    label: "Viewer",
+    detail: "Read-only projects, documents, and services.",
+  },
+};
+
+export function getPortalRolePresentation(
+  role: PortalRole,
+): PortalRolePresentation {
+  return portalRolePresentation[role];
+}
+
 export function hasPortalCapability(
   role: PortalRole,
   capability: PortalCapability,

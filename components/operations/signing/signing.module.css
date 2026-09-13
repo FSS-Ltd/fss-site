@@ -18,19 +18,38 @@
   color: #526078;
   font-size: 1.0625rem;
 }
-.page > article > h2 {
+.operationsPage {
+  width: 100%;
+  min-width: 0;
+}
+.signers {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+  list-style: none;
+}
+.signers > li {
+  padding: 16px;
+  border: 1px solid var(--operations-border, #dce3e8);
+  border-radius: 8px;
+  background: var(--operations-surface-muted, #f7f8f9);
+}
+.page > article > h2,
+.operationsPage > article > h2 {
   font-size: clamp(1.5rem, 3vw, 2rem);
   letter-spacing: -0.025em;
 }
-.page > article > h3 {
+.page > article > h3,
+.operationsPage > article > h3 {
   margin-top: 24px;
 }
-.page > article > form {
+.page > article > form,
+.operationsPage > article > form {
   margin-block: 24px;
   padding-top: 24px;
   border-top: 1px solid #dce3e8;
 }
-.page li {
-  padding-block: 6px;
+.page li,
+.operationsPage li {
   line-height: 1.6;
 }

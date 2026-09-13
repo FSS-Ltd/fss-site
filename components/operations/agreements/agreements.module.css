@@ -1,15 +1,18 @@
-.page,
+.page {
+  composes: page from "../shared/operations-ui.module.css";
+}
+
 .form {
   display: grid;
   gap: 24px;
-  color: #07182e;
+  color: var(--operations-navy, #07182e);
 }
 .page h1,
 .page h2,
 .page h3 {
   margin: 0 0 8px;
 }
-.page p {
+.card p {
   line-height: 1.6;
 }
 .page a {
@@ -18,11 +21,33 @@
   text-underline-offset: 3px;
 }
 .card {
-  border: 1px solid #dce3e8;
-  border-radius: 12px;
-  padding: 24px;
-  background: #fff;
+  composes: panel from "../shared/operations-ui.module.css";
+  min-width: 0;
   overflow-wrap: anywhere;
+}
+.count {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 650;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+.timeline {
+  display: grid;
+  gap: 16px;
+  padding-left: 24px;
+}
+.timeline > li {
+  padding: 16px;
+  border: 1px solid var(--operations-border, #dce3e8);
+  border-radius: 8px;
+  background: var(--operations-surface-muted, #f7f8f9);
+}
+.card > details + details,
+.card > section + section {
+  margin-top: 20px;
+  border-top: 1px solid var(--operations-border, #dce3e8);
+  padding-top: 16px;
 }
 .form fieldset {
   display: grid;
@@ -98,6 +123,11 @@
   flex-wrap: wrap;
   gap: 12px;
 }
+.actions > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
 .error {
   color: #a32121;
 }
@@ -117,6 +147,9 @@
 .facts dd {
   margin: 4px 0 0;
   white-space: pre-wrap;
+}
+.facts > div {
+  min-width: 0;
 }
 @media (max-width: 640px) {
   .grid,

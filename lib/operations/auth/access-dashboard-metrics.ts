@@ -1,5 +1,6 @@
 import type { PortalAccessEntry } from "./repository";
-import type { PortalRole } from "./types";
+import { getPortalRolePresentation } from "./permissions";
+import { portalRoles, type PortalRole } from "./types";
 
 type PortalRoleOption = {
   value: PortalRole;
@@ -8,26 +9,10 @@ type PortalRoleOption = {
 };
 
 export const portalRoleOptions: readonly PortalRoleOption[] = [
-  {
-    value: "owner",
-    label: "Owner",
-    detail: "Full project, agreement and account access.",
-  },
-  {
-    value: "contributor",
-    label: "Contributor",
-    detail: "Project access, requests and shared files.",
-  },
-  {
-    value: "billing_contact",
-    label: "Billing contact",
-    detail: "Billing records and payment management.",
-  },
-  {
-    value: "viewer",
-    label: "Viewer",
-    detail: "Read-only projects, documents and services.",
-  },
+  ...portalRoles.map((value) => ({
+    value,
+    ...getPortalRolePresentation(value),
+  })),
 ];
 
 export function getPortalAccessMetrics(

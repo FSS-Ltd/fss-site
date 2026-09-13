@@ -5,6 +5,8 @@ import {
   METRIC_DEFINITION_VERSION,
 } from "@/lib/operations/metrics/definitions";
 import type { MetricsSnapshot } from "@/lib/operations/metrics/snapshot-types";
+import { OperationsPageHeader } from "@/components/operations/shared/operations-page-header";
+import sharedStyles from "@/components/operations/shared/operations-ui.module.css";
 import { ExportControl } from "./export-control";
 import { MetricCards } from "./metric-cards";
 import { ExceptionQueue } from "./exception-queue";
@@ -30,17 +32,19 @@ export function OperationsOverview({
     data.milestoneCount ?? 0,
   );
   return (
-    <main className={styles.overview}>
-      <header>
-        <h1>Operations</h1>
-        <p>Contract revenue, invoice health and the next client actions.</p>
-        <nav aria-label="Operations setup">
-          <Link href="/growth/operations/clients">Client register</Link>
-          {" · "}
-          <Link href="/growth/operations/portal-access">Portal access</Link>
-        </nav>
-      </header>
-      <form className={styles.filters}>
+    <section className={`${sharedStyles.page} ${styles.overview}`}>
+      <OperationsPageHeader
+        context="Growth · Operations"
+        title="Operations"
+        description="Contract revenue, invoice health and the next client actions."
+        action={
+          <nav className={styles.headerLinks} aria-label="Operations setup">
+            <Link href="/growth/operations/clients">Client register</Link>
+            <Link href="/growth/operations/portal-access">Portal access</Link>
+          </nav>
+        }
+      />
+      <form className={`${sharedStyles.panel} ${styles.filters}`}>
         <label>
           From
           <input name="from" type="date" defaultValue={f.from} />
@@ -85,11 +89,15 @@ export function OperationsOverview({
         </label>
         <button type="submit">Apply filters</button>
       </form>
-      <p>
+      <p className={`${sharedStyles.panel} ${styles.reportingPeriod}`}>
         Reporting dates: {f.from} to {f.to}, Europe/London. Generated{" "}
         {formatReportTime(data.generatedAt)}, London.
       </p>
-      <p className={data.freshness === "current" ? undefined : styles.warning}>
+      <p
+        className={`${sharedStyles.panel} ${styles.providerNotice} ${
+          data.freshness === "current" ? "" : styles.warning
+        }`}
+      >
         Provider reconciliation: {data.freshness}. Last successful account-wide
         reconciliation:{" "}
         {data.lastReconciledAt
@@ -101,7 +109,9 @@ export function OperationsOverview({
           : ""}
       </p>
       {data.correctedAt ? (
-        <p className={styles.warning}>
+        <p
+          className={`${sharedStyles.panel} ${styles.providerNotice} ${styles.warning}`}
+        >
           Correction: late provider evidence for this period was reconciled
           account-wide at {formatReportTime(data.correctedAt)}. Affected values
           are restated from the current evidence.
@@ -114,7 +124,10 @@ export function OperationsOverview({
         observedAt={data.generatedAt}
       />
       <RevenueMovements data={data.revenue} />
-      <section id="services" className={styles.section}>
+      <section
+        id="services"
+        className={`${sharedStyles.panel} ${styles.section}`}
+      >
         <h2>Recurring contract drill-down</h2>
         <p>
           All matching lines: {data.revenue.totalRows.toLocaleString("en-GB")}.
@@ -161,7 +174,7 @@ export function OperationsOverview({
           .
         </p>
         <div
-          className={styles.scroll}
+          className={`${sharedStyles.scrollRegion} ${styles.scroll}`}
           tabIndex={0}
           role="region"
           aria-label="Recurring contracts table, scroll horizontally"
@@ -201,7 +214,7 @@ export function OperationsOverview({
         ) : null}
       </section>
       <ReceivablesTable data={data.receivables} />
-      <section className={styles.section}>
+      <section className={`${sharedStyles.panel} ${styles.section}`}>
         <h2>Collections and signed work</h2>
         <p>
           Confirmed cash in period:{" "}
@@ -222,7 +235,7 @@ export function OperationsOverview({
           <p>No matching requests.</p>
         )}
       </section>
-      <section className={styles.section}>
+      <section className={`${sharedStyles.panel} ${styles.section}`}>
         <h2>Upcoming milestones</h2>
         <p>
           Next 30 days · {(data.milestoneCount ?? 0).toLocaleString("en-GB")}{" "}
@@ -252,11 +265,13 @@ export function OperationsOverview({
         ) : null}
       </nav>
       {process.env.OPERATIONS_METRIC_EXPORTS_ENABLED === "true" ? (
-        <ExportControl filters={f} />
+        <div className={sharedStyles.panel}>
+          <ExportControl filters={f} />
+        </div>
       ) : (
-        <p>CSV exports are unavailable.</p>
+        <p className={sharedStyles.panel}>CSV exports are unavailable.</p>
       )}
-      <details className={styles.section}>
+      <details className={`${sharedStyles.panel} ${styles.section}`}>
         <summary>Definitions and data coverage</summary>
         <p>Definition version: {METRIC_DEFINITION_VERSION}</p>
         <ul>
@@ -265,6 +280,6 @@ export function OperationsOverview({
           ))}
         </ul>
       </details>
-    </main>
+    </section>
   );
 }

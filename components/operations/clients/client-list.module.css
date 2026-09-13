@@ -1,75 +1,108 @@
 .page {
-  display: grid;
-  gap: 24px;
+  max-width: 1080px;
+  padding: 1.5rem;
 }
-.eyebrow {
-  margin: 0 0 6px;
-  color: #526078;
-  font-size: 0.875rem;
+.headerActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
-.heading {
+.headerActions a,
+.pagination a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border: 1px solid var(--operations-border);
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  background: var(--operations-surface);
+  color: var(--operations-navy);
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+}
+.metricLabel {
   margin: 0;
-  color: #07182e;
-  font-size: 1.6rem;
-  font-weight: 750;
+  color: var(--operations-slate);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
 }
-.subtitle {
-  margin: 6px 0 0;
-  color: #526078;
+.metricValue {
+  margin: 0;
+  color: var(--operations-navy);
+  font-size: 1.5rem;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
 }
 .list {
   display: grid;
-  gap: 12px;
+  gap: 0.75rem;
   padding: 0;
   margin: 0;
   list-style: none;
 }
-.row,
-.notice {
-  border: 1px solid #dce3e8;
-  border-radius: 12px;
-  padding: 24px;
-  background: white;
+.row {
+  display: grid;
+  gap: 1.25rem;
   overflow-wrap: anywhere;
 }
 .name {
   margin: 0;
-  color: #07182e;
+  color: var(--operations-navy);
   font-size: 1.1rem;
 }
 .detail {
-  margin: 4px 0 0;
-  color: #526078;
+  margin: 0.25rem 0 0;
+  color: var(--operations-slate);
+}
+.rowAction {
+  display: inline-flex;
+  min-height: 44px;
+  min-width: 44px;
+  align-items: center;
 }
 .facts {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
-  margin: 20px 0 0;
+  gap: 1rem;
+  margin: 0;
 }
 .facts dt {
-  color: #526078;
+  color: var(--operations-slate);
   font-size: 0.875rem;
 }
 .facts dd {
-  margin: 4px 0 0;
-  color: #07182e;
+  margin: 0.25rem 0 0;
+  color: var(--operations-navy);
+}
+.notice h2,
+.notice p {
+  margin-block: 0 0.5rem;
+}
+.pagination {
+  display: flex;
+  justify-content: flex-end;
 }
 .page a {
-  color: #174a7c;
+  color: var(--operations-navy);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 .page a:focus-visible {
-  outline: 2px solid #174a7c;
-  outline-offset: 4px;
+  outline: 3px solid var(--operations-teal);
+  outline-offset: 3px;
 }
 @media (max-width: 640px) {
+  .page {
+    padding: 0.75rem;
+  }
   .facts {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .row,
-  .notice {
-    padding: 20px;
+  .pagination {
+    justify-content: flex-start;
   }
 }

@@ -5,6 +5,7 @@ import {
   ratio,
 } from "@/lib/operations/metrics/definitions";
 import type { MetricsSnapshot } from "@/lib/operations/metrics/snapshot-types";
+import sharedStyles from "@/components/operations/shared/operations-ui.module.css";
 import styles from "./overview.module.css";
 export function MetricCards({
   data,
@@ -52,9 +53,12 @@ export function MetricCards({
     },
   ];
   return (
-    <div className={styles.cards}>
+    <div className={sharedStyles.metricGrid}>
       {cards.map((card) => (
-        <article key={card.title} className={styles.card}>
+        <article
+          key={card.title}
+          className={`${sharedStyles.metricCard} ${styles.card}`}
+        >
           <h2>{card.title}</h2>
           <p className={styles.value}>{card.value}</p>
           <p>

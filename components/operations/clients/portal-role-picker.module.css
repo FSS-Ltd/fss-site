@@ -1,0 +1,130 @@
+.fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.fieldset > legend {
+  margin-bottom: 8px;
+  color: #30435b;
+  font-size: 0.79rem;
+  font-weight: 650;
+}
+
+.selection {
+  margin: 0 0 14px;
+  color: #526078;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.option {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.card {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #cbd7df;
+  border-radius: 10px;
+  background: #fff;
+  color: #07182e;
+  cursor: pointer;
+}
+
+.card:has(input:checked) {
+  border-color: #0f7a83;
+  box-shadow: 0 0 0 1px #0f7a83;
+}
+
+.card input {
+  width: 1rem;
+  height: 1rem;
+  margin: 2px 0 0;
+  accent-color: #0f7a83;
+}
+
+.card > span {
+  display: grid;
+  gap: 3px;
+}
+
+.card strong {
+  font-size: 0.88rem;
+}
+
+.card strong + span {
+  color: #526078;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.help {
+  position: relative;
+  display: flex;
+  align-self: center;
+}
+
+.helpButton {
+  width: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  align-self: center;
+  border: 1px solid #cbd7df;
+  border-radius: 50%;
+  background: #fff;
+  color: #0f7a83;
+  cursor: help;
+  font: inherit;
+  font-weight: 800;
+}
+
+.card:focus-within,
+.helpButton:focus-visible {
+  outline: 3px solid #0f7a83;
+  outline-offset: 3px;
+}
+
+.tooltip {
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  bottom: 100%;
+  width: max-content;
+  max-width: min(280px, 90vw);
+  padding: 9px 11px;
+  border-radius: 8px;
+  background: #07182e;
+  color: #fff;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .helpButton {
+    transition: none;
+  }
+}

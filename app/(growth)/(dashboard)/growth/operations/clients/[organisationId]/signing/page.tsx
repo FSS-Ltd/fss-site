@@ -6,6 +6,8 @@ import { getOperationsDb } from "@/lib/operations/db/client";
 import { signingEnabled } from "@/lib/operations/agreements/signing-commands";
 import { listFounderSigning } from "@/lib/operations/agreements/signing-service";
 import { SigningReview } from "@/components/operations/signing/signing-review";
+import { OperationsPageHeader } from "@/components/operations/shared/operations-page-header";
+import ui from "@/components/operations/shared/operations-ui.module.css";
 import styles from "@/components/operations/agreements/agreements.module.css";
 import signingStyles from "@/components/operations/signing/signing.module.css";
 export const dynamic = "force-dynamic";
@@ -27,26 +29,34 @@ export default async function SigningPage({
     );
   } catch {
     return (
-      <section role="alert">
+      <section className={ui.errorState} role="alert">
         <h1>Signing could not load</h1>
         <p>Reload to try again.</p>
       </section>
     );
   }
   return (
-    <section className={`${styles.page} ${signingStyles.page}`}>
-      <header>
-        <Link href={`/growth/operations/clients/${organisationId}/agreements`}>
-          Back to agreements
-        </Link>
-        <h1>Ready for agreement.</h1>
-        <p>
-          Review the exact document, approve its signers, and follow each
-          signature.
-        </p>
-      </header>
+    <section className={`${styles.page} ${signingStyles.operationsPage}`}>
+      <OperationsPageHeader
+        context="Operations · Signing"
+        title="Ready for agreement."
+        description="Review the exact document, approve its signers, and follow each signature."
+        action={
+          <Link
+            href={`/growth/operations/clients/${organisationId}/agreements`}
+          >
+            Back to agreements
+          </Link>
+        }
+      />
+      <dl className={ui.metricGrid}>
+        <div className={ui.metricCard}>
+          <dt>Signing requests shown</dt>
+          <dd className={styles.count}>{approvals.length}</dd>
+        </div>
+      </dl>
       {approvals.length === 0 && (
-        <p>
+        <p className={ui.emptyState}>
           No signing requests yet. Prepare a document from the agreement
           register.
         </p>

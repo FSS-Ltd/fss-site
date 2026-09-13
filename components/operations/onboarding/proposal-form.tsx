@@ -1,4 +1,5 @@
 "use client";
+import { portalRoleOptions } from "@/lib/operations/auth/access-dashboard-metrics";
 import type { JourneyView } from "@/lib/operations/onboarding/command-types";
 import type { SigningApproval } from "@/lib/operations/agreements/signing-types";
 import styles from "../agreements/agreements.module.css";
@@ -76,10 +77,11 @@ export function ProposalForm({
               }
             >
               <option value="">No new access</option>
-              <option value="owner">Owner</option>
-              <option value="contributor">Contributor</option>
-              <option value="billing_contact">Billing contact</option>
-              <option value="viewer">Viewer</option>
+              {portalRoleOptions.map((role) => (
+                <option key={role.value} value={role.value}>
+                  {role.label}
+                </option>
+              ))}
             </select>
           </label>
         ))}

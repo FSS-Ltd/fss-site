@@ -9,12 +9,14 @@ import {
   UsersRound,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import {
   getPortalAccessMetrics,
   portalRoleOptions,
 } from "@/lib/operations/auth/access-dashboard-metrics";
 import type { PortalAccessRegister } from "@/lib/operations/auth/repository";
+import { createGrantAccessPayload } from "./portal-access-form";
+import { PortalRolePicker } from "./portal-role-picker";
 import styles from "./portal-access-dashboard.module.css";
 
 type Status = {
@@ -38,32 +40,41 @@ export function PortalAccessDashboard({
 }): React.JSX.Element {
   const router = useRouter();
   const [status, setStatus] = useState<Status>({ kind: "idle" });
+  const [formVersion, setFormVersion] = useState(0);
+  const organisationSelectRef = useRef<HTMLSelectElement>(null);
   const metrics = getPortalAccessMetrics(data.entries);
   const largestRoleCount = Math.max(
     ...metrics.roleCounts.map((role) => role.count),
     1,
   );
 
+  function focusInvitationForm(): void {
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    document.getElementById("portal-invitation")?.scrollIntoView({
+      behavior: prefersReducedMotion ? "auto" : "smooth",
+      block: "start",
+    });
+    organisationSelectRef.current?.focus({ preventScroll: true });
+  }
+
   async function submit(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
     if (status.kind === "pending") return;
     setStatus({ kind: "pending" });
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
     try {
+      const form = new FormData(formElement);
       const response = await fetch("/api/growth/operations/portal-access", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "grant_access",
-          organisationId: form.get("organisationId"),
-          name: form.get("name"),
-          email: form.get("email"),
-          role: form.get("role"),
-          reviewReference: form.get("reviewReference"),
-        }),
+        body: JSON.stringify(createGrantAccessPayload(form)),
       });
       if (!response.ok) throw new Error("Request failed.");
-      event.currentTarget.reset();
+      formElement.reset();
+      setFormVersion((version) => version + 1);
       setStatus({
         kind: "success",
         message:
@@ -121,9 +132,19 @@ export function PortalAccessDashboard({
             record of active access.
           </p>
         </div>
-        <div className={styles.assurance}>
-          <ShieldCheck aria-hidden="true" size={20} />
-          <span>Roles are enforced against the live portal membership.</span>
+        <div className={styles.headerActions}>
+          <button
+            className={styles.primaryAction}
+            onClick={focusInvitationForm}
+            type="button"
+          >
+            <UserPlus aria-hidden="true" size={18} />
+            Invite portal user
+          </button>
+          <div className={styles.assurance}>
+            <ShieldCheck aria-hidden="true" size={20} />
+            <span>Roles are enforced against the live portal membership.</span>
+          </div>
         </div>
       </header>
 
@@ -181,17 +202,45 @@ export function PortalAccessDashboard({
 
       <section
         className={styles.grantCard}
-        aria-labelledby="grant-access-heading"
+        aria-labelledby="portal-invitation-heading"
+        id="portal-invitation"
       >
         <div className={styles.grantHeading}>
           <UserPlus aria-hidden="true" size={20} />
           <div>
-            <h2 id="grant-access-heading">Grant access</h2>
+            <h2 id="portal-invitation-heading">Invite portal user</h2>
             <p>
-              Clerk sends the activation email. Access starts only after a
-              verified account is matched to this approved contact.
+              Choose a client, assign the database role, then send the
+              activation email. The role is written to Operations records before
+              Clerk delivers the activation email.
             </p>
           </div>
+        </div>
+        <div className={styles.accessSequence}>
+          <h3>How access starts</h3>
+          <ol>
+            <li>
+              <span>1</span>
+              <div>
+                <strong>Founder approval</strong>
+                <p>The client contact and review note record the decision.</p>
+              </div>
+            </li>
+            <li>
+              <span>2</span>
+              <div>
+                <strong>Operations role record</strong>
+                <p>The selected database role sets the access boundary.</p>
+              </div>
+            </li>
+            <li>
+              <span>3</span>
+              <div>
+                <strong>Clerk sends the activation email</strong>
+                <p>The approved contact activates a verified account.</p>
+              </div>
+            </li>
+          </ol>
         </div>
         {data.organisations.length === 0 ? (
           <p className={styles.empty}>
@@ -206,7 +255,12 @@ export function PortalAccessDashboard({
           >
             <label>
               Organisation
-              <select defaultValue="" name="organisationId" required>
+              <select
+                defaultValue=""
+                name="organisationId"
+                ref={organisationSelectRef}
+                required
+              >
                 <option disabled value="">
                   Choose an organisation
                 </option>
@@ -231,16 +285,15 @@ export function PortalAccessDashboard({
                 type="email"
               />
             </label>
-            <label>
-              Portal role
-              <select defaultValue="viewer" name="role">
-                {portalRoleOptions.map((role) => (
-                  <option key={role.value} value={role.value}>
-                    {role.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <div className={styles.rolePicker}>
+              <PortalRolePicker
+                defaultValue="viewer"
+                disabled={status.kind === "pending"}
+                key={formVersion}
+                name="role"
+                options={portalRoleOptions}
+              />
+            </div>
             <label className={styles.reference}>
               Review note
               <input
