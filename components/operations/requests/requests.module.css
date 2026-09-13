@@ -3,9 +3,9 @@
   --portal-muted: var(--text-muted, #46566c);
   --portal-line: var(--border-soft, rgba(10, 26, 46, 0.12));
   --portal-accent: #174a7c;
-  width: min(100%, 900px);
+  width: min(100%, 1080px);
   margin-inline: auto;
-  padding: 32px 16px 64px;
+  padding: 1.5rem;
   overflow-wrap: anywhere;
 }
 .header {
@@ -125,10 +125,108 @@ p.overdue {
   border: 1px dashed var(--portal-line);
   border-radius: 16px;
 }
-.internal h2 {
-  font-size: 1.125rem;
-  margin: 0 0 12px;
+
+.page a {
+  color: var(--operations-navy);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
+
+.metricLabel {
+  margin: 0;
+  color: var(--operations-slate);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.metricValue {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.list {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.requestPanel {
+  padding: 0;
+}
+
+.page .requestLink {
+  display: block;
+  min-height: 44px;
+  padding: 1.25rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.itemTitle {
+  margin: 0.875rem 0 0.5rem;
+  font-size: 1.125rem;
+  letter-spacing: -0.025em;
+}
+
+.nextAction {
+  margin: 0;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+.note {
+  margin: 0.75rem 0 0;
+  color: var(--operations-slate);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.overdue {
+  margin: 0.75rem 0 0;
+  color: #8d2930;
+  font-weight: 650;
+}
+
+.detail,
+.actionPanel,
+.registerNotice,
+.internal {
+  min-width: 0;
+}
+
+.actionPanel > section {
+  margin-top: 0;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.registerNotice {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.internal {
+  border: 1px dashed var(--portal-line);
+}
+
+.internalHeading {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.internalHeading h2 {
+  font-size: 1.125rem;
+  margin: 0;
+}
+
 .internal ul {
   list-style: none;
   padding: 0;
@@ -144,5 +242,11 @@ p.overdue {
   .summary,
   .metrics {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 0.75rem;
   }
 }

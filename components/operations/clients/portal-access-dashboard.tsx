@@ -151,17 +151,44 @@ export function PortalAccessDashboard({
 
       <section
         className={styles.grantCard}
-        aria-labelledby="grant-access-heading"
+        aria-labelledby="portal-invitation-heading"
+        id="portal-invitation"
       >
         <div className={styles.grantHeading}>
           <UserPlus aria-hidden="true" size={20} />
           <div>
-            <h2 id="grant-access-heading">Grant access</h2>
+            <h2 id="portal-invitation-heading">Invite portal user</h2>
             <p>
               Clerk holds the invitation until the recipient creates their
               account. The contact and membership are then written together.
             </p>
           </div>
+        </div>
+        <div className={styles.accessSequence}>
+          <h3>How access starts</h3>
+          <ol>
+            <li>
+              <span>1</span>
+              <div>
+                <strong>Founder approval</strong>
+                <p>The review note records why the requested access is approved.</p>
+              </div>
+            </li>
+            <li>
+              <span>2</span>
+              <div>
+                <strong>Clerk invitation</strong>
+                <p>The recipient receives the role and account details to accept.</p>
+              </div>
+            </li>
+            <li>
+              <span>3</span>
+              <div>
+                <strong>Account acceptance</strong>
+                <p>Operations creates the contact and membership after setup.</p>
+              </div>
+            </li>
+          </ol>
         </div>
         {data.organisations.length === 0 ? (
           <p className={styles.empty}>

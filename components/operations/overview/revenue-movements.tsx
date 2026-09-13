@@ -4,53 +4,11 @@ import {
   ratio,
 } from "@/lib/operations/metrics/definitions";
 import type { RevenueSummary } from "@/lib/operations/metrics/snapshot-types";
+import sharedStyles from "@/components/operations/shared/operations-ui.module.css";
 import styles from "./overview.module.css";
 
-type MovementTone = "brand" | "positive" | "critical";
-
-function movementWidth(value: bigint, largest: bigint): string {
-  if (largest === BigInt(0)) return "0%";
-  return `${Number((value * BigInt(10000)) / largest) / 100}%`;
-}
-
-function MovementChart({
-  items,
-}: {
-  items: readonly [string, string, MovementTone][];
-}): React.JSX.Element {
-  const largest = items.reduce((current, [, value]) => {
-    const amount = BigInt(value);
-    return amount > current ? amount : current;
-  }, BigInt(0));
-
-  return (
-    <figure className={styles.movementChart}>
-      <figcaption>
-        <h3>Revenue movement at a glance</h3>
-        <p>
-          Bar lengths compare the size of each recorded monthly movement. The
-          exact financial values remain in the table below.
-        </p>
-      </figcaption>
-      <ul>
-        {items.map(([name, value, tone]) => (
-          <li key={name}>
-            <div>
-              <span>{name}</span>
-              <strong>{formatMoney(BigInt(value), BigInt(12))}</strong>
-            </div>
-            <span aria-hidden="true" className={styles.movementTrack}>
-              <span
-                className={styles.movementFill}
-                data-tone={tone}
-                style={{ width: movementWidth(BigInt(value), largest) }}
-              />
-            </span>
-          </li>
-        ))}
-      </ul>
-    </figure>
-  );
+function absolute(value: bigint): bigint {
+  return value < BigInt(0) ? -value : value;
 }
 
 export function RevenueMovements({
@@ -58,25 +16,64 @@ export function RevenueMovements({
 }: {
   data: RevenueSummary;
 }): React.JSX.Element {
-  const items: [string, string, MovementTone][] = [
-    ["Start", data.start, "brand"],
-    ["New", data.new, "positive"],
-    ["Expansion", data.expansion, "positive"],
-    ["Reactivation", data.reactivation, "positive"],
-    ["Contraction", data.contraction, "critical"],
-    ["Churn", data.churn, "critical"],
-    ["End", data.active, "brand"],
+  const items = [
+    { name: "Start", value: data.start, reduction: false },
+    { name: "New", value: data.new, reduction: false },
+    { name: "Expansion", value: data.expansion, reduction: false },
+    { name: "Reactivation", value: data.reactivation, reduction: false },
+    { name: "Contraction", value: data.contraction, reduction: true },
+    { name: "Churn", value: data.churn, reduction: true },
+    { name: "End", value: data.active, reduction: false },
   ];
+  const largestAbsolute = items.reduce((largest, item) => {
+    const itemAbsolute = absolute(BigInt(item.value));
+    return itemAbsolute > largest ? itemAbsolute : largest;
+  }, BigInt(0));
+  const widthDenominator = largestAbsolute || BigInt(1);
+
   return (
-    <section id="movements" className={styles.section}>
+    <section
+      id="movements"
+      className={`${sharedStyles.panel} ${styles.section}`}
+    >
       <h2>MRR movements</h2>
-      <p>
-        Start + new + expansion + reactivation − contraction − churn = end. Net
-        movements per organisation, using recorded contracts.
-      </p>
-      <MovementChart items={items} />
+      <figure
+        aria-label="MRR movement visual"
+        className={styles.movementFigure}
+      >
+        <figcaption className={styles.movementCaption}>
+          Start + new + expansion + reactivation − contraction − churn = end.
+          Net movements per organisation, using recorded contracts.
+        </figcaption>
+        <ol className={styles.movementPlot}>
+          {items.map((item) => {
+            const value = BigInt(item.value);
+            const magnitude = absolute(value);
+            const width =
+              Number((magnitude * BigInt(10000)) / widthDenominator) / 100;
+            const displayValue = item.reduction ? -magnitude : value;
+
+            return (
+              <li className={styles.movementRow} key={item.name}>
+                <div className={styles.movementLabel}>
+                  <span>{item.name}</span>
+                  <strong className={item.reduction ? styles.reduction : ""}>
+                    {formatMoney(displayValue, BigInt(12))}
+                  </strong>
+                </div>
+                <span className={styles.movementTrack} aria-hidden="true">
+                  <span
+                    className={item.reduction ? styles.reduction : ""}
+                    style={{ width: `${width}%` }}
+                  />
+                </span>
+              </li>
+            );
+          })}
+        </ol>
+      </figure>
       <div
-        className={styles.scroll}
+        className={`${sharedStyles.scrollRegion} ${styles.scroll}`}
         tabIndex={0}
         role="region"
         aria-label="MRR movements table, scroll horizontally"
@@ -93,11 +90,11 @@ export function RevenueMovements({
             </tr>
           </thead>
           <tbody>
-            {items.map(([name, value]) => (
-              <tr key={name}>
-                <th scope="row">{name}</th>
-                <td>{formatMoney(BigInt(value), BigInt(12))}</td>
-                <td>{value}</td>
+            {items.map((item) => (
+              <tr key={item.name}>
+                <th scope="row">{item.name}</th>
+                <td>{formatMoney(BigInt(item.value), BigInt(12))}</td>
+                <td>{item.value}</td>
               </tr>
             ))}
           </tbody>

@@ -8,7 +8,7 @@ import {
   DashboardMetric,
   type DashboardTone,
 } from "../dashboard/dashboard-visuals";
-import styles from "./overview.module.css";
+import sharedStyles from "@/components/operations/shared/operations-ui.module.css";
 
 function movementSignal(
   current: bigint,
@@ -112,7 +112,7 @@ export function MetricCards({
     },
   ];
   return (
-    <div className={styles.cards}>
+    <div className={sharedStyles.metricGrid}>
       {cards.map((card) => (
         <DashboardMetric
           action={{ href: card.href, label: "View supporting records" }}

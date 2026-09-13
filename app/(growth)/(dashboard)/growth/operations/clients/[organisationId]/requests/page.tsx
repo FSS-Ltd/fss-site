@@ -9,7 +9,8 @@ import {
   statusLabels,
   requestDate,
 } from "@/components/portal/requests/presentation";
-import styles from "@/components/portal/requests/requests.module.css";
+import { OperationsPageHeader } from "@/components/operations/shared/operations-page-header";
+import ui from "@/components/operations/shared/operations-ui.module.css";
 import layout from "@/components/operations/requests/requests.module.css";
 import { RequestQueueSummary } from "@/components/operations/requests/request-queue-summary";
 export const dynamic = "force-dynamic";
@@ -33,7 +34,7 @@ export default async function FounderRequestsPage({
     );
   } catch {
     return (
-      <section role="alert">
+      <section className={ui.errorState} role="alert">
         <h1>Requests could not load</h1>
         <p>Reload to try again.</p>
         <Link href="/growth/operations/clients">Client register</Link>
@@ -42,47 +43,52 @@ export default async function FounderRequestsPage({
   }
   const { requests, observedAt: now } = queue;
   return (
-    <section className={layout.page}>
-      <header className={layout.header}>
-        <Link href="/growth/operations/clients">Client register</Link>
-        <p className={`${styles.eyebrow} ${layout.headerEyebrow}`}>
-          Operations
-        </p>
-        <h1 className={`${styles.title} ${layout.headerTitle}`}>
-          Client requests
-        </h1>
-        <p className={`${styles.copy} ${layout.headerCopy}`}>
-          Review new work, resolve waiting items and share the next step.
-        </p>
-        <p className={`${styles.note} ${layout.headerNote}`}>
+    <section className={`${ui.page} ${layout.page}`}>
+      <OperationsPageHeader
+        context="Operations · Requests"
+        title="Client requests"
+        description="Review new work, resolve waiting items and share the next step."
+        action={<Link href="/growth/operations/clients">Client register</Link>}
+      >
+        <p className={layout.note}>
           Showing up to 100 requests, with open work and action deadlines first.
         </p>
-      </header>
+      </OperationsPageHeader>
       <RequestQueueSummary observedAt={now} requests={requests} />
       {requests.length === 0 ? (
-        <p className={styles.empty}>
+        <p className={ui.emptyState}>
           No requests yet. Client submissions will appear here.
         </p>
       ) : (
-        <ul className={styles.list}>
+        <ul className={layout.list}>
           {requests.map((request) => (
-            <li key={request.id}>
+            <li
+              className={`${ui.panel} ${layout.requestPanel}`}
+              key={request.id}
+            >
               <Link
-                className={styles.requestLink}
+                className={layout.requestLink}
                 href={`/growth/operations/clients/${organisationId}/requests/${request.id}`}
               >
                 <span
-                  className={`${styles.status} ${layout.status}`}
-                  data-status={request.status}
+                  className={ui.statusChip}
+                  data-status={
+                    request.status === "done"
+                      ? "success"
+                      : request.status === "ready_for_review"
+                        ? "attention"
+                        : undefined
+                  }
                 >
                   {statusLabels[request.status]}
                 </span>
-                <h2 className={styles.itemTitle}>{request.title}</h2>
-                <p className={styles.copy}>
+                <h2 className={layout.itemTitle}>{request.title}</h2>
+                <p className={layout.nextAction}>
+                  <strong>Next action:</strong>{" "}
                   {request.nextAction ||
                     "Assess scope and confirm the next action."}
                 </p>
-                <p className={styles.note}>
+                <p className={layout.note}>
                   Owner: {request.ownerDisplay || "Awaiting acknowledgement"} ·
                   Target: {requestDate(request.targetDate)}
                 </p>

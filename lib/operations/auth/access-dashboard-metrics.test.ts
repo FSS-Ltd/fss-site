@@ -48,25 +48,27 @@ test("summarises active portal access accurately", () => {
       {
         value: "owner",
         label: "Owner",
-        detail: "Full project, agreement and account access.",
+        detail:
+          "Projects, requests, agreements, billing, and invitation requests for the organisation.",
         count: 1,
       },
       {
         value: "contributor",
         label: "Contributor",
-        detail: "Project access, requests and shared files.",
+        detail:
+          "Projects, shared documents, and creating or commenting on requests.",
         count: 0,
       },
       {
         value: "billing_contact",
         label: "Billing contact",
-        detail: "Billing records and payment management.",
+        detail: "Billing records and payment management only.",
         count: 0,
       },
       {
         value: "viewer",
         label: "Viewer",
-        detail: "Read-only projects, documents and services.",
+        detail: "Read-only projects, documents, and services.",
         count: 0,
       },
     ],

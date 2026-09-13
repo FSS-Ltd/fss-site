@@ -1,14 +1,13 @@
 .page {
   max-width: 1240px;
 }
-.page h1 {
-  font-size: clamp(1.75rem, 3vw, 2.25rem);
-  font-weight: 600;
-  letter-spacing: -0.035em;
-  line-height: 1.15;
+.safety {
+  margin: 0;
+  color: var(--operations-slate);
+  line-height: 1.6;
 }
 .page li {
-  border-radius: 20px;
+  border-radius: 1rem;
 }
 .page a {
   display: inline-flex;

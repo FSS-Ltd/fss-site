@@ -2,6 +2,8 @@ import type { SigningApproval } from "@/lib/operations/agreements/signing-types"
 import { totalLinePence } from "@/lib/operations/agreements/validation";
 import { penceToGbp } from "@/lib/operations/agreements/money-input";
 import { SigningForm } from "./signing-form";
+import ui from "../shared/operations-ui.module.css";
+import signingStyles from "./signing.module.css";
 import styles from "../agreements/agreements.module.css";
 const statusLabels: Record<SigningApproval["status"], string> = {
   prepared: "Ready for founder review",
@@ -33,7 +35,8 @@ export function SigningReview({
   return (
     <article className={styles.card} aria-labelledby={`title-${approval.id}`}>
       <p>
-        Revision {approval.revision} · {statusLabels[approval.status]}
+        Revision {approval.revision} ·{" "}
+        <span className={ui.statusChip}>{statusLabels[approval.status]}</span>
       </p>
       <h2 id={`title-${approval.id}`}>{approval.title}</h2>
       <p>For {approval.organisationLegalName}</p>
@@ -107,7 +110,7 @@ export function SigningReview({
         )}
       </details>
       <h3>Required signers</h3>
-      <ul>
+      <ul className={signingStyles.signers} role="list">
         {approval.requiredSigners.map((signer) => {
           const signature = approval.signatures.find(
             (item) => item.email === signer,
@@ -115,9 +118,11 @@ export function SigningReview({
           return (
             <li key={signer}>
               {signer}:{" "}
-              {signature
-                ? `signed as ${signature.typedName} on ${new Date(signature.signedAt).toUTCString()}`
-                : "awaiting signature"}
+              <span className={ui.statusChip}>
+                {signature
+                  ? `signed as ${signature.typedName} on ${new Date(signature.signedAt).toUTCString()}`
+                  : "awaiting signature"}
+              </span>
             </li>
           );
         })}

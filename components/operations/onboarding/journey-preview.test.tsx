@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { renderToStaticMarkup } from "react-dom/server";
 import { createRequire } from "node:module";
+import { readFileSync } from "node:fs";
 const require = createRequire(import.meta.url);
 require.extensions[".css"] = (module) => {
   module.exports = {
@@ -16,6 +17,51 @@ import {
   invoiceChoices,
 } from "@/lib/operations/onboarding/display";
 import { agreementDraft } from "@/lib/operations/agreements/fixtures";
+import { portalRoleOptions } from "@/lib/operations/auth/access-dashboard-metrics";
+
+test("proposal approval access preview renders authoritative role labels and descriptions", () => {
+  const source = readFileSync(
+    new URL("./journey-preview.tsx", import.meta.url),
+    "utf8",
+  );
+  assert.doesNotMatch(source, /role\.replaceAll/);
+  const { ProposalAccessPreview } =
+    require("./proposal-access-preview") as typeof import("./proposal-access-preview");
+  const access = portalRoleOptions.map((option) => ({
+    email: `${option.value}@example.com`,
+    role: option.value,
+  }));
+  const html = renderToStaticMarkup(<ProposalAccessPreview access={access} />);
+  for (const option of portalRoleOptions) {
+    assert.ok(html.includes(option.label));
+    assert.ok(html.includes(option.detail));
+    assert.ok(html.includes(`${option.value}@example.com`));
+  }
+  assert.match(
+    source,
+    /<ProposalAccessPreview access=\{preview.snapshot.access\}/,
+  );
+});
+
+test("proposal selections derive their labels and schema values from shared role options", () => {
+  const source = readFileSync(
+    new URL("./proposal-form.tsx", import.meta.url),
+    "utf8",
+  );
+  assert.match(
+    source,
+    /import \{ portalRoleOptions \} from "@\/lib\/operations\/auth\/access-dashboard-metrics"/,
+  );
+  assert.match(source, /portalRoleOptions\.map/);
+  assert.match(
+    source,
+    /<option key=\{role.value\} value=\{role.value\}>\s*\{role.label\}/,
+  );
+  assert.doesNotMatch(
+    source,
+    /<option value="(?:owner|contributor|billing_contact|viewer)"/,
+  );
+});
 test("welcome form identifies FSS sender and configured billing without editable provider IDs", () => {
   const html = renderToStaticMarkup(
     <WelcomeForm
@@ -81,6 +127,7 @@ test("welcome preparation distinguishes missing billing from no eligible agreeme
       </AppRouterContext.Provider>,
     );
   const unconfigured = render([agreement]);
+  assert.match(unconfigured, /Welcome and proposal have separate approvals/);
   assert.match(
     unconfigured,
     /Configure billing before preparing a welcome journey/,
@@ -89,4 +136,21 @@ test("welcome preparation distinguishes missing billing from no eligible agreeme
   const empty = render([]);
   assert.match(empty, /Create an agreement to prepare another journey/);
   assert.doesNotMatch(empty, /Configure billing before preparing/);
+});
+
+test("journey approval retains exact-recipient confirmation before either mutation", () => {
+  // The approval preview appears after a server command, beyond static rendering.
+  const source = readFileSync(
+    new URL("./journey-preview.tsx", import.meta.url),
+    "utf8",
+  );
+  assert.match(
+    source,
+    /I reviewed these exact recipients, content, documents and access/,
+  );
+  assert.match(source, /disabled=\{pending \|\| !confirmed\}/);
+  assert.match(
+    source,
+    /preview\.kind === "welcome" \? "start" : "approve_proposal"/,
+  );
 });
