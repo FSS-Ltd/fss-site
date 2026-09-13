@@ -22,7 +22,7 @@ export function ClientList({
   );
 
   return (
-    <main className={`${sharedStyles.page} ${styles.page}`}>
+    <section className={`${sharedStyles.page} ${styles.page}`}>
       <OperationsPageHeader
         context="Growth · Operations"
         title="Client register"
@@ -148,6 +148,6 @@ export function ClientList({
           )}
         </>
       )}
-    </main>
+    </section>
   );
 }

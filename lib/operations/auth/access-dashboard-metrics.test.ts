@@ -53,13 +53,15 @@ test("summarises active, pending and claimed portal access accurately", () => {
       {
         value: "owner",
         label: "Owner",
-        detail: "Projects, requests, agreements, billing, and invitation requests for the organisation.",
+        detail:
+          "Projects, requests, agreements, billing, and invitation requests for the organisation.",
         count: 1,
       },
       {
         value: "contributor",
         label: "Contributor",
-        detail: "Projects, shared documents, and creating or commenting on requests.",
+        detail:
+          "Projects, shared documents, and creating or commenting on requests.",
         count: 1,
       },
       {

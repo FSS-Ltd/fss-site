@@ -46,12 +46,24 @@ test("portal roles preserve billing, delivery and invitation boundaries", () => 
 });
 
 test("role descriptions state only capabilities granted by the permission matrix", () => {
-  assert.match(getPortalRolePresentation("owner").detail, /Projects, requests, agreements, billing/);
+  assert.match(
+    getPortalRolePresentation("owner").detail,
+    /Projects, requests, agreements, billing/,
+  );
   assert.equal(hasPortalCapability("owner", "invites.request"), true);
-  assert.match(getPortalRolePresentation("contributor").detail, /creating or commenting on requests/);
+  assert.match(
+    getPortalRolePresentation("contributor").detail,
+    /creating or commenting on requests/,
+  );
   assert.equal(hasPortalCapability("contributor", "billing.read"), false);
-  assert.match(getPortalRolePresentation("billing_contact").detail, /Billing records and payment management only/);
+  assert.match(
+    getPortalRolePresentation("billing_contact").detail,
+    /Billing records and payment management only/,
+  );
   assert.equal(hasPortalCapability("billing_contact", "projects.read"), false);
-  assert.match(getPortalRolePresentation("viewer").detail, /Read-only projects, documents, and services/);
+  assert.match(
+    getPortalRolePresentation("viewer").detail,
+    /Read-only projects, documents, and services/,
+  );
   assert.equal(hasPortalCapability("viewer", "requests.create"), false);
 });

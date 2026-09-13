@@ -42,7 +42,7 @@ export function BillingExceptionList({
     | { status: "ready"; rows: BillingException[]; nextCursor: string | null };
 }): React.JSX.Element {
   return (
-    <main
+    <section
       className={`${sharedStyles.page} ${styles.page} ${billingStyles.page}`}
     >
       <OperationsPageHeader
@@ -161,6 +161,6 @@ export function BillingExceptionList({
           )}
         </>
       )}
-    </main>
+    </section>
   );
 }

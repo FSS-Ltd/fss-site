@@ -32,7 +32,7 @@ export function OperationsOverview({
     data.milestoneCount ?? 0,
   );
   return (
-    <main className={`${sharedStyles.page} ${styles.overview}`}>
+    <section className={`${sharedStyles.page} ${styles.overview}`}>
       <OperationsPageHeader
         context="Growth · Operations"
         title="Operations"
@@ -280,6 +280,6 @@ export function OperationsOverview({
           ))}
         </ul>
       </details>
-    </main>
+    </section>
   );
 }

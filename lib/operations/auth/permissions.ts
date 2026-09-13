@@ -45,14 +45,19 @@ const permissions: Record<PortalRole, readonly PortalCapability[]> = {
 
 export type PortalRolePresentation = { label: string; detail: string };
 
-export const portalRolePresentation: Record<PortalRole, PortalRolePresentation> = {
+export const portalRolePresentation: Record<
+  PortalRole,
+  PortalRolePresentation
+> = {
   owner: {
     label: "Owner",
-    detail: "Projects, requests, agreements, billing, and invitation requests for the organisation.",
+    detail:
+      "Projects, requests, agreements, billing, and invitation requests for the organisation.",
   },
   contributor: {
     label: "Contributor",
-    detail: "Projects, shared documents, and creating or commenting on requests.",
+    detail:
+      "Projects, shared documents, and creating or commenting on requests.",
   },
   billing_contact: {
     label: "Billing contact",
@@ -64,7 +69,9 @@ export const portalRolePresentation: Record<PortalRole, PortalRolePresentation> 
   },
 };
 
-export function getPortalRolePresentation(role: PortalRole): PortalRolePresentation {
+export function getPortalRolePresentation(
+  role: PortalRole,
+): PortalRolePresentation {
   return portalRolePresentation[role];
 }
 

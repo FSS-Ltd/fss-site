@@ -53,7 +53,7 @@ export default async function FounderRequestPage({
   if (!request) notFound();
   const { internalComments, priority, ...publicRequest } = request;
   return (
-    <main className={`${ui.page} ${layout.page}`}>
+    <section className={`${ui.page} ${layout.page}`}>
       <OperationsPageHeader
         context="Operations · Requests"
         title="Request workspace"
@@ -118,6 +118,6 @@ export default async function FounderRequestPage({
           </ul>
         )}
       </section>
-    </main>
+    </section>
   );
 }
