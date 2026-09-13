@@ -13,6 +13,8 @@ import { listFounderJourneys } from "@/lib/operations/onboarding/queries";
 import { onboardingEnabled } from "@/lib/operations/onboarding/worker-db";
 import { JourneyPreview } from "@/components/operations/onboarding/journey-preview";
 import { JourneyTimeline } from "@/components/operations/onboarding/journey-timeline";
+import { OperationsPageHeader } from "@/components/operations/shared/operations-page-header";
+import ui from "@/components/operations/shared/operations-ui.module.css";
 import styles from "@/components/operations/agreements/agreements.module.css";
 import layout from "@/components/operations/signing/signing.module.css";
 export const dynamic = "force-dynamic";
@@ -42,7 +44,7 @@ export default async function JourneyPage({
     ]);
   } catch {
     return (
-      <section role="alert">
+      <section className={ui.errorState} role="alert">
         <h1>Journeys could not load</h1>
         <p>Refresh to try again.</p>
       </section>
@@ -61,19 +63,28 @@ export default async function JourneyPage({
   if (!register) notFound();
   return (
     <section className={`${styles.page} ${layout.page}`}>
-      <header>
-        <Link href={`/growth/operations/clients/${organisationId}/agreements`}>
-          Back to agreements
-        </Link>
-        <h1>A clear path to getting started.</h1>
-        <p>
-          {register.organisationName}. Approve each message, follow the journey
-          and resolve delivery safely.
-        </p>
+      <OperationsPageHeader
+        context="Operations · Onboarding"
+        title="A clear path to getting started."
+        description={`${register.organisationName}. Approve each message, follow the journey and resolve delivery safely.`}
+        action={
+          <Link
+            href={`/growth/operations/clients/${organisationId}/agreements`}
+          >
+            Back to agreements
+          </Link>
+        }
+      >
         <Link href={`/growth/operations/clients/${organisationId}/signing`}>
           Review signing documents
         </Link>
-      </header>
+      </OperationsPageHeader>
+      <dl className={ui.metricGrid}>
+        <div className={ui.metricCard}>
+          <dt>Journeys shown</dt>
+          <dd className={styles.count}>{journeys.length}</dd>
+        </div>
+      </dl>
       <JourneyPreview
         organisationId={organisationId}
         organisationName={register.organisationName}
@@ -84,7 +95,7 @@ export default async function JourneyPage({
         billing={billing}
       />
       {journeys.length === 0 ? (
-        <p>
+        <p className={ui.emptyState}>
           No journeys started. Prepare a welcome to review it before approval.
         </p>
       ) : (

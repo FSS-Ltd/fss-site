@@ -9,6 +9,8 @@ import { penceToGbp } from "@/lib/operations/agreements/money-input";
 import { AgreementForm } from "./agreement-form";
 import { SignatureForm } from "./signature-form";
 import { ActivationForm } from "./activation-form";
+import { OperationsPageHeader } from "../shared/operations-page-header";
+import ui from "../shared/operations-ui.module.css";
 import styles from "./agreements.module.css";
 function Terms({ record }: { record: AgreementRecord }): React.JSX.Element {
   const d = record.draft;
@@ -61,34 +63,53 @@ export function AgreementRegister({
   register: Register;
 }): React.JSX.Element {
   return (
-    <section className={styles.page} aria-labelledby="agreement-heading">
-      <header>
-        <Link href="/growth/operations/clients">Back to client register</Link>
-        <h1 id="agreement-heading">{register.organisationName}: agreements</h1>
-        <p>Signed terms, signing evidence and effective services.</p>
-        {process.env.OPERATIONS_SIGNING_ENABLED === "true" && (
-          <Link href={`/growth/operations/clients/${organisationId}/signing`}>
-            Review electronic signing
-          </Link>
-        )}
-        {process.env.OPERATIONS_ONBOARDING_ENABLED === "true" && (
-          <Link href={`/growth/operations/clients/${organisationId}/journey`}>
-            Prepare and manage welcome journey
-          </Link>
-        )}
-      </header>
-      {register.agreements.length === 0 && <p>No agreements on this page.</p>}
+    <section
+      className={styles.page}
+      aria-label={`${register.organisationName}: agreements`}
+    >
+      <OperationsPageHeader
+        context="Operations · Agreements"
+        title={`${register.organisationName}: agreements`}
+        description="Signed terms, signing evidence and effective services."
+        action={
+          <Link href="/growth/operations/clients">Back to client register</Link>
+        }
+      >
+        <div className={styles.actions}>
+          {process.env.OPERATIONS_SIGNING_ENABLED === "true" && (
+            <Link href={`/growth/operations/clients/${organisationId}/signing`}>
+              Review electronic signing
+            </Link>
+          )}
+          {process.env.OPERATIONS_ONBOARDING_ENABLED === "true" && (
+            <Link href={`/growth/operations/clients/${organisationId}/journey`}>
+              Prepare and manage welcome journey
+            </Link>
+          )}
+        </div>
+      </OperationsPageHeader>
+      <dl className={ui.metricGrid}>
+        <div className={ui.metricCard}>
+          <dt>Agreements on this page</dt>
+          <dd className={styles.count}>{register.agreements.length}</dd>
+        </div>
+      </dl>
+      {register.agreements.length === 0 && (
+        <p className={ui.emptyState}>No agreements on this page.</p>
+      )}
       {register.agreements.map((record) => (
         <article className={styles.card} key={`${record.id}-${record.version}`}>
           <h2>{record.draft.title}</h2>
           <p>
             Revision {record.revision} ·{" "}
-            {record.status === "signed"
-              ? record.evidenceProvenance ===
-                "authenticated_portal_electronic_signature"
-                ? "Signed · verified portal signatures"
-                : "Signed · manual founder confirmation"
-              : "Draft"}
+            <span className={ui.statusChip}>
+              {record.status === "signed"
+                ? record.evidenceProvenance ===
+                  "authenticated_portal_electronic_signature"
+                  ? "Signed · verified portal signatures"
+                  : "Signed · manual founder confirmation"
+                : "Draft"}
+            </span>
           </p>
           <Terms record={record} />
           {record.draft.lines.map((line, index) => {
@@ -107,7 +128,7 @@ export function AgreementRegister({
                   {line.endDate ? ` to ${line.endDate}` : ", no end date"}.
                 </p>
                 {service ? (
-                  <p>
+                  <p className={ui.statusChip}>
                     Active from {service.effectiveDate}
                     {service.endDate ? ` until ${service.endDate}` : ""}
                   </p>
@@ -121,7 +142,7 @@ export function AgreementRegister({
                     />
                   </details>
                 ) : (
-                  <p>Awaiting signed evidence.</p>
+                  <p className={ui.statusChip}>Awaiting signed evidence.</p>
                 )}
               </section>
             );

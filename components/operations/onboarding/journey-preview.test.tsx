@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { renderToStaticMarkup } from "react-dom/server";
 import { createRequire } from "node:module";
+import { readFileSync } from "node:fs";
 const require = createRequire(import.meta.url);
 require.extensions[".css"] = (module) => {
   module.exports = {
@@ -81,6 +82,7 @@ test("welcome preparation distinguishes missing billing from no eligible agreeme
       </AppRouterContext.Provider>,
     );
   const unconfigured = render([agreement]);
+  assert.match(unconfigured, /Welcome and proposal have separate approvals/);
   assert.match(
     unconfigured,
     /Configure billing before preparing a welcome journey/,
@@ -89,4 +91,21 @@ test("welcome preparation distinguishes missing billing from no eligible agreeme
   const empty = render([]);
   assert.match(empty, /Create an agreement to prepare another journey/);
   assert.doesNotMatch(empty, /Configure billing before preparing/);
+});
+
+test("journey approval retains exact-recipient confirmation before either mutation", () => {
+  // The approval preview appears after a server command, beyond static rendering.
+  const source = readFileSync(
+    new URL("./journey-preview.tsx", import.meta.url),
+    "utf8",
+  );
+  assert.match(
+    source,
+    /I reviewed these exact recipients, content, documents and access/,
+  );
+  assert.match(source, /disabled=\{pending \|\| !confirmed\}/);
+  assert.match(
+    source,
+    /preview\.kind === "welcome" \? "start" : "approve_proposal"/,
+  );
 });

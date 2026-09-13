@@ -12,6 +12,7 @@ import { useJourneyCommand } from "./use-journey-command";
 import { WelcomeForm } from "./welcome-form";
 import { ProposalForm } from "./proposal-form";
 import { EmailPreview } from "./email-preview";
+import ui from "../shared/operations-ui.module.css";
 import styles from "../agreements/agreements.module.css";
 function PreviewDocument({ base64 }: { base64: string }): React.JSX.Element {
   const link = useRef<HTMLAnchorElement>(null);
@@ -80,7 +81,7 @@ export function JourneyPreview({
   return (
     <article className={styles.card}>
       <h2>Prepare the next step.</h2>
-      <p>
+      <p className={ui.description}>
         {organisationName}: review the exact recipients, content and access
         before anything is queued. Welcome and proposal have separate approvals.
       </p>

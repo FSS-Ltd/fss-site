@@ -1,22 +1,18 @@
 .page {
-  max-width: 960px;
-  margin-inline: auto;
   width: 100%;
+  min-width: 0;
 }
-.page > header {
-  padding-block: 16px 8px;
+.signers {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+  list-style: none;
 }
-.page > header h1 {
-  margin-top: 24px;
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 650;
-  line-height: 1.12;
-  letter-spacing: -0.035em;
-}
-.page > header p {
-  max-width: 62ch;
-  color: #526078;
-  font-size: 1.0625rem;
+.signers > li {
+  padding: 16px;
+  border: 1px solid var(--operations-border, #dce3e8);
+  border-radius: 8px;
+  background: var(--operations-surface-muted, #f7f8f9);
 }
 .page > article > h2 {
   font-size: clamp(1.5rem, 3vw, 2rem);
@@ -31,6 +27,5 @@
   border-top: 1px solid #dce3e8;
 }
 .page li {
-  padding-block: 6px;
   line-height: 1.6;
 }

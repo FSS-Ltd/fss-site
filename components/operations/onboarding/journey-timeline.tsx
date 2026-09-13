@@ -7,6 +7,7 @@ import { useJourneyCommand } from "./use-journey-command";
 import { RetryFailure } from "./retry-failure";
 import { StepRecovery } from "./step-recovery";
 import { EmailPreview } from "./email-preview";
+import ui from "../shared/operations-ui.module.css";
 import styles from "../agreements/agreements.module.css";
 const labels = {
   welcome: "Welcome email",
@@ -37,7 +38,7 @@ export function JourneyTimeline({
   return (
     <article className={styles.card}>
       <h2>{journey.agreementTitle || "Client journey"}</h2>
-      <p>Journey {journey.state}</p>
+      <p className={ui.statusChip}>Journey {journey.state}</p>
       {journey.failureCode && (
         <p role="alert">
           Delivery stopped: {journey.failureCode.replaceAll("_", " ")}. Review
@@ -119,13 +120,16 @@ export function JourneyTimeline({
         )}
         <p role="status">{pending ? "Saving…" : message}</p>
       </div>
-      <ol>
+      <ol className={styles.timeline}>
         {journey.jobs.map((job) => (
           <li key={job.id}>
             <h3>{labels[job.step]}</h3>
             <p>
-              {job.recipient} · {job.state.replaceAll("_", " ")} · eligible{" "}
-              {journeyTime(job.dueAt)}
+              {job.recipient} ·{" "}
+              <span className={ui.statusChip}>
+                {job.state.replaceAll("_", " ")}
+              </span>{" "}
+              · eligible {journeyTime(job.dueAt)}
             </p>
             <p>{jobExplanation(job, journey)}</p>
             {job.providerId && (
