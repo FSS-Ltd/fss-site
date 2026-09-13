@@ -56,11 +56,7 @@ export function PortalRolePicker({
                 aria-label={`More about ${option.label}`}
                 className={styles.helpButton}
                 onBlur={() => setExpandedRole(null)}
-                onClick={() =>
-                  setExpandedRole((role) =>
-                    role === option.value ? null : option.value,
-                  )
-                }
+                onClick={() => setExpandedRole(option.value)}
                 onFocus={() => setExpandedRole(option.value)}
                 onMouseEnter={() => setExpandedRole(option.value)}
                 onMouseLeave={() => setExpandedRole(null)}
