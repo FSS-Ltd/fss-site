@@ -57,3 +57,15 @@ test("portal access makes invitation primary and explains the activation sequenc
   assert.match(html, /Portal role/);
   assert.match(html, /Accepted invitations will appear here once account setup is complete/);
 });
+
+test("portal access keeps the invitation action visible before an organisation exists", () => {
+  const html = renderToStaticMarkup(
+    <AppRouterContext.Provider value={router}>
+      <PortalAccessDashboard data={{ organisations: [], entries: [] }} />
+    </AppRouterContext.Provider>,
+  );
+
+  assert.match(html, /class="primaryAction"/);
+  assert.match(html, /Invite portal user/);
+  assert.match(html, /Create an active organisation/);
+});
