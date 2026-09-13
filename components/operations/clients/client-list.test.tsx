@@ -49,6 +49,10 @@ test("client register renders labelled facts, escaped names and pagination witho
   assert.equal(html.match(/data-status="active">active<\/span>/g)?.length, 2);
   assert.match(html, /after=next/);
   assert.match(html, /href="\/growth\/operations\/portal-access"/);
+  assert.match(
+    html,
+    /href="\/growth\/operations\/portal-access\?invite=true"[^>]*>Invite portal user/,
+  );
   assert.doesNotMatch(html, /<button|<form|<script>/);
 });
 
