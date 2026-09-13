@@ -11,15 +11,36 @@ require.extensions[".css"] = (module) => {
   };
 };
 
-test("public foundations render readable content without a canvas or hidden entrance states", () => {
+test("public foundations render readable content without hidden entrance states", () => {
   for (const route of ["", "services/", "about/", "contact/"]) {
     const { default: Page } = require(`../../app/(site)/${route}page`);
     const html = renderToStaticMarkup(<Page />);
     assert.equal((html.match(/<h1[\s>]/g) ?? []).length, 1);
     assert.doesNotMatch(
       html,
-      /<canvas|data-magnetic|data-reveal|data-sc-sticky|fssWordUp/,
+      /data-magnetic|data-reveal|data-sc-sticky|fssWordUp/,
     );
+  }
+});
+
+test("public hero variants render the shared particle canvas", () => {
+  const pageModules = [
+    ["../../app/(site)/page", "Page"],
+    ["../../app/(site)/services/page", "Page"],
+    ["../../app/(site)/about/page", "Page"],
+    ["../../app/(site)/contact/page", "Page"],
+    [
+      "../../app/(site)/ai-deployment-questionnaire/page",
+      "AiQuestionnairePage",
+    ],
+    ["../../app/(site)/start/page", "BusinessIntakePage"],
+  ] as const;
+
+  for (const [modulePath, componentName] of pageModules) {
+    const pageModule = require(modulePath);
+    const Component = pageModule[componentName] ?? pageModule.default;
+    const html = renderToStaticMarkup(<Component />);
+    assert.match(html, /data-hero-canvas/);
   }
 });
 

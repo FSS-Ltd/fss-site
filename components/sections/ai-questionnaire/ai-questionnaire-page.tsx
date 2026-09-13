@@ -130,8 +130,7 @@ export function AiQuestionnairePage() {
           <div
             data-spot
             data-reveal
-            className="fss-card relative overflow-hidden rounded-[20px] border border-[rgba(10,26,46,.1)] bg-white p-8 opacity-0 transition-[opacity,transform,border-color] duration-700 ease-out"
-            style={{ transform: "translateY(26px)" }}
+            className="fss-card relative overflow-hidden rounded-[20px] border border-[rgba(10,26,46,.1)] bg-white p-8"
           >
             <div
               data-glow
@@ -193,8 +192,7 @@ export function AiQuestionnairePage() {
               key={insight.title}
               data-lift-light
               data-reveal
-              className="rounded-[18px] border border-[rgba(10,26,46,.08)] bg-white p-7 opacity-0 transition-[opacity,transform,border-color,box-shadow] duration-700 ease-out"
-              style={{ transform: "translateY(26px)" }}
+              className="rounded-[18px] border border-[rgba(10,26,46,.08)] bg-white p-7"
             >
               <div className="mb-6 flex size-11 items-center justify-center rounded-[14px] bg-[rgba(20,152,158,.1)] text-[#0f7a83]">
                 <insight.icon className="size-5" aria-hidden="true" />
@@ -217,8 +215,7 @@ export function AiQuestionnairePage() {
         <div className="mx-auto max-w-[1180px]">
           <div
             data-reveal
-            className="mb-10 max-w-[760px] opacity-0 transition-[opacity,transform] duration-700 ease-out"
-            style={{ transform: "translateY(26px)" }}
+            className="mb-10 max-w-[760px]"
           >
             <p className="font-mono text-xs tracking-[0.14em] text-[#0f7a83]">
               FIND YOUR AI ROUTE
@@ -243,8 +240,6 @@ export function AiQuestionnairePage() {
         <div className="mx-auto grid max-w-[1180px] gap-10 lg:grid-cols-[.9fr_1.1fr] lg:items-start">
           <div
             data-reveal
-            className="opacity-0 transition-[opacity,transform] duration-700 ease-out"
-            style={{ transform: "translateY(26px)" }}
           >
             <p className="font-mono text-xs tracking-[0.14em] text-[#46c7d8]">
               PRACTICAL ANSWERS
@@ -264,8 +259,7 @@ export function AiQuestionnairePage() {
                 key={faq.question}
                 data-spot
                 data-reveal
-                className="fss-card relative overflow-hidden rounded-[18px] border border-white/10 bg-white/[.035] p-6 opacity-0 transition-[opacity,transform,border-color] duration-700 ease-out"
-                style={{ transform: "translateY(26px)" }}
+                className="fss-card relative overflow-hidden rounded-[18px] border border-white/10 bg-white/[.035] p-6"
               >
                 <div
                   data-glow
@@ -289,8 +283,6 @@ export function AiQuestionnairePage() {
         <div className="mx-auto grid max-w-[1180px] gap-10 lg:grid-cols-[1.1fr_.9fr] lg:items-center">
           <div
             data-reveal
-            className="opacity-0 transition-[opacity,transform] duration-700 ease-out"
-            style={{ transform: "translateY(26px)" }}
           >
             <p className="font-mono text-xs tracking-[0.14em] text-[#0f7a83]">
               PRIVATE AI WORKFLOW AUDIT
@@ -305,8 +297,7 @@ export function AiQuestionnairePage() {
           </div>
           <div
             data-reveal
-            className="rounded-[20px] border border-[rgba(10,26,46,.08)] bg-white p-7 opacity-0 transition-[opacity,transform] duration-700 ease-out"
-            style={{ transform: "translateY(26px)" }}
+            className="rounded-[20px] border border-[rgba(10,26,46,.08)] bg-white p-7"
           >
             <ol className="space-y-4">
               {processSteps.map((step, index) => (

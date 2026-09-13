@@ -82,10 +82,9 @@ export function ResourceLibrary({ resources }: ResourceLibraryProps) {
 
           <aside
             data-reveal
-            className="relative overflow-hidden rounded-2xl border border-[rgba(10,26,46,.09)] bg-white p-6 opacity-0 transition-[opacity,transform] duration-700 ease-out sm:p-7"
+            className="relative overflow-hidden rounded-2xl border border-[rgba(10,26,46,.09)] bg-white p-6 sm:p-7"
             style={{
               boxShadow: "0 40px 90px -56px rgba(10,26,46,.45)",
-              transform: "translateY(26px)",
             }}
             aria-label="Resource library summary"
           >
@@ -156,8 +155,7 @@ export function ResourceLibrary({ resources }: ResourceLibraryProps) {
         <div className="mx-auto max-w-[1180px]">
           <div
             data-reveal
-            className="mb-12 grid gap-6 opacity-0 transition-[opacity,transform] duration-700 ease-out lg:grid-cols-2 lg:items-end"
-            style={{ transform: "translateY(26px)" }}
+            className="mb-12 grid gap-6 lg:grid-cols-2 lg:items-end"
           >
             <div>
               <p className="font-mono text-xs tracking-[0.14em] text-[#0f7a83]">
@@ -187,11 +185,10 @@ export function ResourceLibrary({ resources }: ResourceLibraryProps) {
 
           <div
             data-reveal
-            className="relative mt-16 overflow-hidden rounded-3xl px-8 py-12 text-[#fff] opacity-0 transition-[opacity,transform] duration-700 ease-out sm:px-12"
+            className="relative mt-16 overflow-hidden rounded-3xl px-8 py-12 text-[#fff] sm:px-12"
             style={{
               background:
                 "linear-gradient(135deg, #07182e 0%, #0d2a45 56%, #14989e 130%)",
-              transform: "translateY(26px)",
             }}
           >
             <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.05)_1px,transparent_1px)] bg-[length:60px_60px] [mask-image:radial-gradient(100%_100%_at_90%_10%,#000,transparent_72%)]" />

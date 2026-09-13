@@ -59,8 +59,7 @@ export function BlogIndex({ posts }: BlogIndexProps) {
           {featuredPost ? (
             <div
               data-reveal
-              className="mb-14 grid gap-8 opacity-0 transition-[opacity,transform] duration-700 ease-out lg:grid-cols-[.85fr_1.15fr] lg:items-end"
-              style={{ transform: "translateY(26px)" }}
+              className="mb-14 grid gap-8 lg:grid-cols-[.85fr_1.15fr] lg:items-end"
             >
               <div>
                 <p className="font-mono text-xs tracking-[0.14em] text-[#0f7a83]">

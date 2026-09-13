@@ -46,7 +46,8 @@ for (const route of routes) {
     assert.match(html, /Frequently asked questions/);
     assert.match(html, /Related reading and next steps/);
     assert.match(html, /href="\/resources"/);
-    assert.doesNotMatch(html, /<canvas|href="\/?#work"/);
+    assert.match(html, /data-hero-canvas/);
+    assert.doesNotMatch(html, /href="\/?#work"/);
     const script = html.match(
       /<script type="application\/ld\+json">(.*?)<\/script>/,
     )?.[1];

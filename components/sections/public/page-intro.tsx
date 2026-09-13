@@ -13,6 +13,11 @@ export function PageIntro({
 }) {
   return (
     <header className={styles.hero}>
+      <canvas
+        data-hero-canvas
+        className={styles.particleCanvas}
+        aria-hidden="true"
+      />
       <div className={styles.eyebrow}>{eyebrow}</div>
       <h1>{title}</h1>
       {children}

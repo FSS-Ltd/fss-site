@@ -35,6 +35,11 @@ export function BusinessIntakePage() {
   return (
     <>
       <section className="relative overflow-hidden bg-[#f2f3f5] px-7 pb-16 pt-[138px]">
+        <canvas
+          data-hero-canvas
+          className="pointer-events-none absolute inset-0 h-full w-full opacity-70"
+          aria-hidden="true"
+        />
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(10,26,46,.026)_1px,transparent_1px),linear-gradient(90deg,rgba(10,26,46,.026)_1px,transparent_1px)] bg-[length:64px_64px] [mask-image:radial-gradient(120%_90%_at_42%_12%,#000,transparent_76%)]" />
         <div className="relative mx-auto max-w-[760px] text-center">
           <div className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-[rgba(10,26,46,.12)] bg-white/60 py-1.5 pr-3.5 pl-2.5">
@@ -82,8 +87,7 @@ export function BusinessIntakePage() {
                 key={faq.question}
                 data-spot
                 data-reveal
-                className="fss-card relative overflow-hidden rounded-[18px] border border-white/10 bg-white/[.035] p-6 opacity-0 transition-[opacity,transform,border-color] duration-700 ease-out"
-                style={{ transform: "translateY(26px)" }}
+                className="fss-card relative overflow-hidden rounded-[18px] border border-white/10 bg-white/[.035] p-6"
               >
                 <div
                   data-glow
