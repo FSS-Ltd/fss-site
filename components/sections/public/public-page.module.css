@@ -137,51 +137,9 @@
   list-style: decimal-leading-zero;
   padding-left: 24px;
 }
-.serviceScene {
-  margin-top: 64px;
-}
-.serviceViewport {
-  width: 100%;
-}
-.serviceRail {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 24px;
-}
-.serviceRail article {
-  padding: clamp(24px, 3vw, 34px);
-  border: 1px solid rgb(10 26 46 / 0.1);
-  border-radius: 22px;
-  background: rgb(255 255 255 / 0.72);
-}
-.serviceRail article > span {
-  color: #0f7a83;
-  font-size: 0.72rem;
-}
-.serviceRail h2 {
-  margin-top: 26px;
-}
-@media (min-width: 901px) and (prefers-reduced-motion: no-preference) {
-  :global(#fssroot[data-motion-enhanced="true"]) .serviceScene {
-    height: 235vh;
-  }
-  :global(#fssroot[data-motion-enhanced="true"]) .serviceViewport {
-    position: sticky;
-    top: 96px;
-    overflow: hidden;
-    height: calc(100svh - 116px);
-    display: grid;
-    align-content: center;
-  }
-  :global(#fssroot[data-motion-enhanced="true"]) .serviceRail {
-    display: flex;
-    width: max-content;
-    transform: translate3d(var(--motion-track-x, 0), 0, 0);
-    will-change: transform;
-  }
-  :global(#fssroot[data-motion-enhanced="true"]) .serviceRail article {
-    width: min(38vw, 460px);
-    min-height: 330px;
+@media (min-width: 901px) and (min-height: 650px) and (prefers-reduced-motion: no-preference) {
+  .section[data-motion-delivery="cinematic"] {
+    min-height: 220svh;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -199,7 +157,6 @@
   }
   .heroGrid,
   .grid,
-  .serviceRail,
   .steps {
     grid-template-columns: 1fr;
     gap: 24px;
@@ -207,5 +164,10 @@
   .section {
     margin-top: 44px;
     padding-top: 32px;
+  }
+}
+@media (max-width: 900px) {
+  .heroGrid {
+    grid-template-columns: 1fr;
   }
 }

@@ -98,3 +98,37 @@ test("contact renders the API fields with accessible choices and enquiry metadat
   assert.match(html, /Send project enquiry/);
   assert.doesNotMatch(html, /Book a|Opens your email app/);
 });
+
+test("the opening mission scene contains five outcome-led phrases, not a title-only curtain", () => {
+  const { HomeValueStory } = require("./public/home-story");
+  const html = renderToStaticMarkup(<HomeValueStory />);
+  assert.equal((html.match(/data-story-chapter=/g) ?? []).length, 5);
+  assert.match(html, /Built around your mission/);
+  assert.match(html, /Less admin. More time for people/);
+  assert.match(html, /More confident decisions/);
+  assert.match(html, /data-value-particles/);
+  assert.match(html, /data-hero-canvas/);
+  assert.doesNotMatch(html, /data-story-curtain|opacity:0/);
+});
+
+test("the mobile concept keeps a static image fallback and an isolated atom canvas", () => {
+  const { AppJourney } = require("./public/app-journey");
+  const html = renderToStaticMarkup(
+    <AppJourney>
+      <p>Services</p>
+    </AppJourney>,
+  );
+  assert.equal((html.match(/data-app-atoms=/g) ?? []).length, 1);
+  assert.doesNotMatch(html, /data-app-tile=/);
+  assert.match(html, /data-app-image/);
+  assert.match(html, /Illustrative app concept/);
+});
+
+test("home carries the hero mission branding and a dedicated delivery scene", () => {
+  const { HomePage } = require("./public/home-page");
+  const html = renderToStaticMarkup(<HomePage />);
+  assert.match(html, /fss-monogram-white/);
+  assert.match(html, /For Your Mission/);
+  assert.match(html, /data-motion-delivery="cinematic"/);
+  assert.equal((html.match(/data-delivery-step=/g) ?? []).length, 3);
+});

@@ -17,6 +17,7 @@ export function bindMagneticControls(scope: ParentNode) {
 
     const reset = () => {
       window.cancelAnimationFrame(frame);
+      frame = 0;
       pointer = null;
       control.style.removeProperty("--magnetic-x");
       control.style.removeProperty("--magnetic-y");
@@ -54,11 +55,13 @@ export function bindMagneticControls(scope: ParentNode) {
     control.addEventListener("pointermove", onPointerMove);
     control.addEventListener("pointerleave", reset);
     control.addEventListener("blur", reset);
+    control.addEventListener("keydown", reset);
     cleanups.push(() => {
       window.cancelAnimationFrame(frame);
       control.removeEventListener("pointermove", onPointerMove);
       control.removeEventListener("pointerleave", reset);
       control.removeEventListener("blur", reset);
+      control.removeEventListener("keydown", reset);
       reset();
     });
   });

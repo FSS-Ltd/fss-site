@@ -5,6 +5,7 @@ import { DeliverySteps } from "./delivery-steps";
 import { RelatedLinks } from "./related-links";
 import { sectorLink, serviceLinks, costLink } from "@/lib/commercial/links";
 import styles from "./public-page.module.css";
+import railStyles from "./service-rail.module.css";
 
 const services = [
   {
@@ -64,11 +65,11 @@ export function ServicesPage() {
       </PageIntro>
       <section
         aria-label="Software services"
-        className={styles.serviceScene}
+        className={railStyles.scene}
         data-motion-scene
       >
-        <div className={styles.serviceViewport}>
-          <div className={styles.serviceRail} data-motion-track>
+        <div className={railStyles.viewport}>
+          <div className={railStyles.rail} data-motion-track>
             {services.map((service, index) => (
               <article
                 key={service.title}

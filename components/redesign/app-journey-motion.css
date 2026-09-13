@@ -1,0 +1,60 @@
+@media (min-width: 901px) and (min-height: 650px) and (prefers-reduced-motion: no-preference) {
+  [data-app-ready] {
+    height: 340svh;
+  }
+  [data-app-ready] [data-app-viewport] {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    overflow: hidden;
+  }
+  [data-app-ready] [data-app-track] {
+    display: flex;
+    width: max-content;
+    height: 100%;
+    transform: translate3d(var(--app-travel, 0vw), 0, 0);
+  }
+  [data-app-ready] [data-app-panel] {
+    width: 100vw;
+    height: 100%;
+    flex: 0 0 100vw;
+    box-sizing: border-box;
+  }
+  [data-app-ready] [data-app-panel="services"] {
+    display: grid;
+    align-content: center;
+    padding-top: 70px;
+  }
+  [data-app-ready] [data-app-panel="services"] > div {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+  [data-app-ready] [data-app-panel="services"] article {
+    grid-column: span 4;
+  }
+  [data-app-ready] [data-app-panel="concept"] {
+    padding: 100px max(32px, calc((100vw - 1120px) / 2)) 38px;
+    perspective: 1200px;
+  }
+  [data-app-ready] [data-app-phone] {
+    width: min(330px, 40svh);
+    transform: rotateY(var(--app-turn, -18deg));
+    transform-style: preserve-3d;
+  }
+  [data-app-ready] [data-app-wire] {
+    clip-path: inset(0 0 var(--app-wire, 100%) 0);
+  }
+  [data-app-ready] [data-atoms-ready] [data-app-image] {
+    opacity: var(--app-resolution, 0);
+  }
+  [data-app-ready] [data-app-atoms] {
+    z-index: 2;
+    display: block;
+    position: absolute;
+    left: -16.6667%;
+    top: -9.5238%;
+    width: 133.3333%;
+    height: 119.0476%;
+    pointer-events: none;
+  }
+}

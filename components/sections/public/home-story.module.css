@@ -1,0 +1,121 @@
+.story {
+  position: relative;
+  background: #07182e;
+  color: #fff;
+}
+.stage {
+  position: relative;
+  overflow: hidden;
+  padding: 80px max(24px, calc((100% - 1280px) / 2));
+}
+.chapter {
+  padding: 36px 0;
+  max-width: 590px;
+}
+.story .chapter h2 {
+  color: #fff;
+  font-size: clamp(2.5rem, 4.7vw, 5rem);
+  line-height: 1.02;
+  letter-spacing: -0.055em;
+  margin: 22px 0;
+}
+.story .chapter p {
+  max-width: 410px;
+  color: #bcd2e2;
+  font-size: 1.05rem;
+  line-height: 1.65;
+}
+.story .chapter .label,
+.caption {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  color: #80dce5;
+}
+.visual {
+  position: relative;
+  margin: 64px 0;
+  perspective: 1200px;
+}
+.device {
+  position: relative;
+  aspect-ratio: 1000 / 585;
+  transform-style: preserve-3d;
+}
+.underlay,
+.blueprint,
+.finished {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+}
+.underlay {
+  border: 1px solid #387485;
+  background: #0d2943;
+  transform: translate3d(-18px, 24px, -35px);
+}
+.blueprint {
+  stroke: #80dce5;
+  stroke-width: 1.2;
+  background: #0a2138;
+}
+.finished {
+  object-fit: cover;
+}
+.caption {
+  position: relative;
+  margin: 36px 0 0;
+  line-height: 2;
+}
+.caption span {
+  display: block;
+  color: #bcd2e2;
+}
+.orbit {
+  position: absolute;
+  inset: -25% 0;
+  perspective: 800px;
+  opacity: 0.4;
+}
+.orbit i {
+  position: absolute;
+  inset: 0 15%;
+  border: 1px solid #3994a4;
+  border-radius: 50%;
+  transform: rotateX(62deg) rotateY(-25deg);
+}
+.orbit i:nth-child(2) {
+  transform: rotateX(62deg) rotateY(35deg);
+}
+.orbit i:nth-child(3) {
+  transform: rotateX(25deg) rotateY(62deg);
+}
+.particleEdge,
+.progress {
+  display: none;
+}
+@media (min-width: 901px) and (min-height: 650px) and (prefers-reduced-motion: no-preference) {
+  .story {
+    height: 360svh;
+  }
+  .stage {
+    min-height: 100svh;
+  }
+}
+.values {
+  background: #e3efed;
+  color: #07182e;
+}
+.values .chapter h2 {
+  color: #07182e;
+}
+.values .chapter p {
+  color: #46566c;
+}
+@media (min-width: 901px) and (min-height: 650px) and (prefers-reduced-motion: no-preference) {
+  .values {
+    height: 540svh;
+  }
+}

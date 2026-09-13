@@ -1,0 +1,63 @@
+.journey {
+  position: relative;
+}
+.panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 48px;
+  padding: 72px max(24px, calc((100% - 1120px) / 2));
+  background: #dcecea;
+}
+.copy {
+  max-width: 490px;
+}
+.copy h2 {
+  font-size: clamp(2.4rem, 4.7vw, 4.8rem);
+  letter-spacing: -0.05em;
+  line-height: 1.02;
+}
+.copy .caption {
+  font-size: 0.75rem;
+  color: #46566c;
+}
+.phone {
+  position: relative;
+  width: min(100%, 330px);
+  aspect-ratio: 4 / 7;
+  margin: auto;
+  border-radius: 28px;
+  border: 6px solid #0a1a2e;
+  background: #07182e;
+  box-shadow: 0 32px 70px -30px #32535a;
+}
+.image {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 22px;
+}
+.wire {
+  z-index: 0;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  stroke: #80dce5;
+  stroke-width: 1;
+}
+.atoms {
+  display: none;
+}
+@media (min-width: 901px) and (min-height: 650px) and (prefers-reduced-motion: no-preference) {
+  .journey {
+    min-height: 340svh;
+  }
+}
+@media (max-width: 900px) {
+  .panel {
+    grid-template-columns: 1fr;
+  }
+}

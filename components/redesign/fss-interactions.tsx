@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
 import {
@@ -143,6 +143,22 @@ export function FssInteractions({
   nodeDensity = 120,
 }: FssInteractionsProps) {
   const pathname = usePathname();
+  const [preferenceVersion, setPreferenceVersion] = useState(0);
+
+  useEffect(() => {
+    const preferences = [
+      window.matchMedia("(prefers-reduced-motion: reduce)"),
+      window.matchMedia("(hover:hover) and (pointer:fine)"),
+    ];
+    const update = () => setPreferenceVersion((version) => version + 1);
+    preferences.forEach((preference) =>
+      preference.addEventListener("change", update),
+    );
+    return () =>
+      preferences.forEach((preference) =>
+        preference.removeEventListener("change", update),
+      );
+  }, []);
 
   useEffect(() => {
     const scope = document.getElementById("fssroot") ?? document;
@@ -1003,7 +1019,7 @@ export function FssInteractions({
       intersectionObserver?.disconnect();
       cleanups.forEach((cleanup) => cleanup());
     };
-  }, [motion, nodeDensity, pathname]);
+  }, [motion, nodeDensity, pathname, preferenceVersion]);
 
   return null;
 }

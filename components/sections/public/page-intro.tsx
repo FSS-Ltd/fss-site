@@ -14,14 +14,14 @@ export function PageIntro({
   image?: ReactNode;
 }) {
   return (
-    <header className={styles.hero} data-motion-reveal="mask">
+    <header className={styles.hero}>
       <canvas
         data-hero-canvas
         className={styles.particleCanvas}
         aria-hidden="true"
       />
       <div className={image ? styles.heroGrid : undefined}>
-        <div>
+        <div data-motion-reveal="mask">
           <div className={styles.eyebrow}>{eyebrow}</div>
           <h1>{title}</h1>
           {children}

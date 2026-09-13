@@ -10,6 +10,8 @@ const files = {
     "utf8",
   ),
   homePage: readFileSync("components/sections/public/home-page.tsx", "utf8"),
+  pageIntro: readFileSync("components/sections/public/page-intro.tsx", "utf8"),
+  motionScenes: readFileSync("components/redesign/motion-scenes.ts", "utf8"),
   homeStyles: readFileSync(
     "components/sections/public/home-page.module.css",
     "utf8",
@@ -32,6 +34,20 @@ const files = {
 };
 
 const failures = [];
+
+if (/<header[^>]*data-motion-reveal/.test(files.pageIntro)) {
+  failures.push(
+    "Shared hero reveals must target content, never the full-width canvas parent.",
+  );
+}
+if (
+  files.motionScenes.includes('fill: "both"') ||
+  files.motionScenes.includes('fill: "forwards"')
+) {
+  failures.push(
+    "Completed reveals must release clipping and transform ownership.",
+  );
+}
 
 if (!files.interactions.includes("usePathname")) {
   failures.push(
@@ -56,18 +72,26 @@ if (!files.interactions.includes("queryAll<HTMLCanvasElement>")) {
 }
 
 if (files.interactions.includes("window.innerWidth < 940")) {
-  failures.push("FssInteractions must not disable hero particles below a fixed viewport width.");
+  failures.push(
+    "FssInteractions must not disable hero particles below a fixed viewport width.",
+  );
 }
 
 if (files.globals.includes("[data-hero-canvas] {\n    display: none")) {
-  failures.push("Global CSS must not hide hero particle canvases on narrow screens.");
+  failures.push(
+    "Global CSS must not hide hero particle canvases on narrow screens.",
+  );
 }
 
 if (!files.homePage.includes("data-hero-canvas")) {
   failures.push("The homepage hero must render the shared particle canvas.");
 }
 
-if (!files.interactions.includes('bind(\n          window,\n          "pointermove"')) {
+if (
+  !files.interactions.includes(
+    'bind(\n          window,\n          "pointermove"',
+  )
+) {
   failures.push(
     "Hero particle interaction must track the pointer at window scope so full-width canvases follow the mouse.",
   );
@@ -96,7 +120,7 @@ if (/\.processWrap\s*\{[^}]*max-width\s*:/.test(files.homeStyles)) {
 }
 
 if (
-  !/\[\s*motion\s*,\s*nodeDensity\s*,\s*pathname\s*\]/.test(files.interactions)
+  !/\[\s*motion\s*,\s*nodeDensity\s*,\s*pathname\s*,\s*preferenceVersion\s*\]/.test(files.interactions)
 ) {
   failures.push(
     "FssInteractions useEffect dependencies must include pathname.",
