@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ExceptionRow } from "@/lib/operations/metrics/snapshot-types";
+import sharedStyles from "@/components/operations/shared/operations-ui.module.css";
 import styles from "./overview.module.css";
 export function ExceptionQueue({
   rows,
@@ -11,7 +12,7 @@ export function ExceptionQueue({
   observedAt: string;
 }): React.JSX.Element {
   return (
-    <section className={styles.section}>
+    <section className={`${sharedStyles.panel} ${styles.section}`}>
       <h2>
         Action queue <span>({total.toLocaleString("en-GB")})</span>
       </h2>
@@ -24,7 +25,10 @@ export function ExceptionQueue({
       ) : (
         <ul className={styles.actions}>
           {rows.map((row) => (
-            <li key={`${row.severity}:${row.id}`}>
+            <li
+              className={`${sharedStyles.panel} ${styles.actionRow}`}
+              key={`${row.severity}:${row.id}`}
+            >
               <div>
                 <strong>{row.client}</strong>
                 <p>{row.reason.replaceAll("_", " ")}</p>
@@ -43,7 +47,9 @@ export function ExceptionQueue({
                   · Since {row.since.slice(0, 10)}
                 </p>
               </div>
-              <Link href={row.href}>{row.nextStep}</Link>
+              <Link className={styles.actionLink} href={row.href}>
+                {row.nextStep}
+              </Link>
             </li>
           ))}
         </ul>
