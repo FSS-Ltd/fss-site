@@ -46,10 +46,8 @@ function accessStatus(entry: PortalAccessRegister["entries"][number]): string {
 
 export function PortalAccessDashboard({
   data,
-  openInvitation = false,
 }: {
   data: PortalAccessRegister;
-  openInvitation?: boolean;
 }): React.JSX.Element {
   const router = useRouter();
   const [status, setStatus] = useState<Status>({ kind: "idle" });
@@ -104,9 +102,20 @@ export function PortalAccessDashboard({
             record of active access.
           </p>
         </div>
-        <div className={styles.assurance}>
-          <ShieldCheck aria-hidden="true" size={20} />
-          <span>Roles are enforced against the live portal membership.</span>
+        <div className={styles.headerActions}>
+          {data.organisations.length > 0 && (
+            <PortalInvitationDialog
+              triggerClassName={styles.primaryAction}
+              organisations={data.organisations}
+              onInvitationSent={(message) =>
+                setStatus({ kind: "success", message })
+              }
+            />
+          )}
+          <div className={styles.assurance}>
+            <ShieldCheck aria-hidden="true" size={20} />
+            <span>Roles are enforced against the live portal membership.</span>
+          </div>
         </div>
       </header>
 
@@ -197,17 +206,7 @@ export function PortalAccessDashboard({
             Create an active organisation in the client register before granting
             portal access.
           </p>
-        ) : (
-          <div className={styles.inviteControl}>
-            <PortalInvitationDialog
-              autoOpen={openInvitation}
-              organisations={data.organisations}
-              onInvitationSent={(message) =>
-                setStatus({ kind: "success", message })
-              }
-            />
-          </div>
-        )}
+        ) : null}
         <div aria-live="polite">
           {status.message && (
             <p

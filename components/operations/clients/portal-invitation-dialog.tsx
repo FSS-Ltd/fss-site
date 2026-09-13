@@ -1,7 +1,7 @@
 "use client";
 
 import { Send, UserPlus } from "lucide-react";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { portalRoleOptions } from "@/lib/operations/auth/access-dashboard-metrics";
 import styles from "./portal-access-dashboard.module.css";
 
@@ -27,22 +27,16 @@ async function getRequestError(response: Response): Promise<string> {
 }
 
 export function PortalInvitationDialog({
-  autoOpen = false,
   organisations,
   onInvitationSent,
+  triggerClassName,
 }: {
-  autoOpen?: boolean;
   organisations: readonly Organisation[];
   onInvitationSent: (message: string) => void;
+  triggerClassName?: string;
 }): React.JSX.Element {
   const dialog = useRef<HTMLDialogElement>(null);
   const [status, setStatus] = useState<Status>({ kind: "idle" });
-
-  useEffect(() => {
-    if (autoOpen && dialog.current && !dialog.current.open) {
-      dialog.current.showModal();
-    }
-  }, [autoOpen]);
 
   function close(): void {
     if (status.kind === "pending") return;
@@ -98,7 +92,11 @@ export function PortalInvitationDialog({
 
   return (
     <>
-      <button className={styles.inviteButton} onClick={open} type="button">
+      <button
+        className={triggerClassName ?? styles.inviteButton}
+        onClick={open}
+        type="button"
+      >
         <UserPlus aria-hidden="true" size={18} />
         Invite portal user
       </button>
