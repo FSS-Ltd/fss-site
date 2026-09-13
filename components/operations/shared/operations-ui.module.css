@@ -57,6 +57,44 @@
   justify-content: flex-end;
 }
 
+.header[data-variant="inverse"] {
+  padding: clamp(24px, 4vw, 40px);
+  border-radius: 1.25rem;
+  background:
+    radial-gradient(circle at 90% 0%, rgba(70, 199, 216, 0.3), transparent 28%),
+    linear-gradient(120deg, #07182e, #0b3049);
+  box-shadow: 0 24px 48px -34px rgba(7, 24, 46, 0.9);
+}
+
+.header[data-variant="inverse"] h1 {
+  color: #ffffff;
+}
+
+.header[data-variant="inverse"] .eyebrow,
+.header[data-variant="inverse"] .description {
+  color: #d0e1e9;
+}
+
+.header[data-variant="inverse"] .headerActions :is(a, button) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+  padding: 0.625rem 0.875rem;
+  background: #ffffff;
+  color: #07182e;
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.header[data-variant="inverse"] .headerActions :is(a, button):hover {
+  border-color: #7edfe9;
+  background: #dff7f9;
+}
+
 .panel,
 .metricCard,
 .emptyState,

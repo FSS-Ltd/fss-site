@@ -38,10 +38,13 @@ export function OperationsOverview({
         context="Growth · Operations"
         title="Operations"
         description="Contract revenue, invoice health and the next client actions."
+        variant="inverse"
         action={
           <nav className={styles.headerLinks} aria-label="Operations setup">
             <Link href="/growth/operations/clients">Client register</Link>
-            <Link href="/growth/operations/portal-access">Portal access</Link>
+            <Link href="/growth/operations/portal-access?invite=true">
+              Invite portal user
+            </Link>
           </nav>
         }
       />

@@ -152,6 +152,7 @@ export function BillingExceptionList({
         context="Growth · Operations · Billing"
         title="Needs your attention"
         description="Payment exceptions and collection decisions, ready for review."
+        variant="inverse"
         action={
           <nav className={styles.headerActions} aria-label="Billing review">
             <Link href="/growth/operations/clients">Client register</Link>
