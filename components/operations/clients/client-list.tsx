@@ -118,9 +118,6 @@ export function ClientList({
         variant="inverse"
         action={
           <nav className={styles.headerActions} aria-label="Client operations">
-            <Link href="/growth/operations/portal-access?invite=true">
-              Invite portal user
-            </Link>
             <Link href="/growth/operations/portal-access">Portal access</Link>
             {billingEnabled && (
               <Link href="/growth/operations/billing">
