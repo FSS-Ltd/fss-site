@@ -1,6 +1,11 @@
 import Link from "next/link";
 import type { BillingException } from "@/lib/operations/billing/exception-repository";
 import { billingDate } from "@/components/portal/billing/presentation";
+import {
+  DashboardMetric,
+  DistributionBars,
+  DonutChart,
+} from "../dashboard/dashboard-visuals";
 import styles from "../clients/client-list.module.css";
 import billingStyles from "./exception-list.module.css";
 
@@ -31,6 +36,104 @@ const descriptions: Record<string, string> = {
   payment_method_required:
     "The client needs to update or authorise their payment method.",
 };
+
+function categoryLabel(category: string): string {
+  return category.replaceAll("_", " ");
+}
+
+function BillingSummary({
+  rows,
+}: {
+  rows: readonly BillingException[];
+}): React.JSX.Element | null {
+  if (rows.length === 0) return null;
+
+  const mapped = rows.filter((item) => item.organisationId !== null).length;
+  const live = rows.filter((item) => item.mode === "live").length;
+  const byCategory = new Map<string, number>();
+
+  for (const item of rows) {
+    byCategory.set(item.category, (byCategory.get(item.category) ?? 0) + 1);
+  }
+
+  return (
+    <section
+      className={billingStyles.summary}
+      aria-labelledby="billing-summary-heading"
+    >
+      <div className={billingStyles.summaryHeading}>
+        <p className={styles.eyebrow}>Exception overview</p>
+        <h2 id="billing-summary-heading">Resolve the work that affects cash</h2>
+        <p>
+          This page is a review queue, not an automated collection workflow.
+          Confirm the record and next step before any client contact.
+        </p>
+      </div>
+      <div className={billingStyles.metrics}>
+        <DashboardMetric
+          label="Exceptions shown"
+          supportingText="Open billing exceptions in the current review page."
+          value={rows.length.toLocaleString("en-GB")}
+        />
+        <DashboardMetric
+          label="Client mapping"
+          signal={
+            mapped === rows.length
+              ? { label: "All shown records are linked", tone: "positive" }
+              : {
+                  label: `${rows.length - mapped} record${rows.length - mapped === 1 ? " needs" : "s need"} a client link`,
+                  tone: "warning",
+                }
+          }
+          supportingText="Exceptions already associated with a client organisation."
+          value={`${mapped} / ${rows.length}`}
+        />
+        <DashboardMetric
+          label="Live-provider records"
+          signal={
+            live > 0
+              ? { label: "Confirm live impact before acting", tone: "critical" }
+              : { label: "No live-provider records shown", tone: "positive" }
+          }
+          supportingText="Exceptions from the live Stripe account, not test data."
+          value={live.toLocaleString("en-GB")}
+        />
+      </div>
+      <div className={billingStyles.visuals}>
+        <DonutChart
+          centerLabel="Records"
+          description={`${mapped.toLocaleString("en-GB")} of ${rows.length.toLocaleString("en-GB")} open exceptions on this page already identify the client record needed for follow-up.`}
+          segments={[
+            { label: "Client linked", tone: "positive", value: mapped },
+            {
+              label: "Client mapping needed",
+              tone: "warning",
+              value: rows.length - mapped,
+            },
+          ]}
+          title="Client mapping coverage"
+        />
+        <DistributionBars
+          description="The categories identify the type of review to perform before a decision is recorded."
+          items={[...byCategory.entries()]
+            .sort(([, a], [, b]) => b - a)
+            .map(([category, value]) => ({
+              label: categoryLabel(category),
+              tone:
+                category === "dispute_review" || category === "overdue_review"
+                  ? ("critical" as const)
+                  : category === "unknown_mapping" ||
+                      category === "provider_unavailable"
+                    ? ("warning" as const)
+                    : ("brand" as const),
+              value,
+            }))}
+          title="Exception reasons"
+        />
+      </div>
+    </section>
+  );
+}
 
 export function BillingExceptionList({
   state,
@@ -71,12 +174,27 @@ export function BillingExceptionList({
         </div>
       ) : (
         <>
+          <BillingSummary rows={state.rows} />
           <ul className={styles.list}>
             {state.rows.map((item) => (
-              <li key={item.id} className={styles.row}>
-                <h2 className={styles.name}>
-                  {item.organisationName ?? "Client mapping needed"}
-                </h2>
+              <li key={item.id} className={billingStyles.item}>
+                <div className={billingStyles.itemHeading}>
+                  <h2 className={styles.name}>
+                    {item.organisationName ?? "Client mapping needed"}
+                  </h2>
+                  <div className={billingStyles.signals}>
+                    <span
+                      data-tone={item.organisationId ? "positive" : "warning"}
+                    >
+                      {item.organisationId ? "Client linked" : "Mapping needed"}
+                    </span>
+                    <span
+                      data-tone={item.mode === "live" ? "critical" : "neutral"}
+                    >
+                      {item.mode === "live" ? "Live provider" : "Test provider"}
+                    </span>
+                  </div>
+                </div>
                 <p>
                   {descriptions[item.category] ??
                     "Review this payment record before taking further action."}

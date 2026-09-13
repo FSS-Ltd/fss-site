@@ -46,7 +46,7 @@
 }
 .metrics {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
 }
 .metrics article {
@@ -187,21 +187,117 @@
   color: #526078;
   line-height: 1.55;
 }
-.form {
+.inviteControl {
+  margin-top: 24px;
+}
+.inviteButton,
+.submitButton,
+.cancelButton {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border-radius: 10px;
+  padding: 0 15px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+.inviteButton,
+.submitButton {
+  border: 0;
+  background: #07182e;
+  color: #fff;
+}
+.inviteButton:hover:not(:disabled),
+.submitButton:hover:not(:disabled) {
+  background: #0f7a83;
+}
+.cancelButton {
+  border: 1px solid #cbd7df;
+  background: #fff;
+  color: #30435b;
+}
+.cancelButton:hover:not(:disabled) {
+  background: #f3f8fa;
+}
+.inviteButton:focus-visible,
+.submitButton:focus-visible,
+.cancelButton:focus-visible,
+.dialogForm input:focus-visible,
+.dialogForm select:focus-visible,
+.revoke:focus-visible {
+  outline: 3px solid #0f7a83;
+  outline-offset: 3px;
+}
+.inviteButton:disabled,
+.submitButton:disabled,
+.cancelButton:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+.dialog {
+  width: min(calc(100% - 32px), 620px);
+  max-height: min(780px, calc(100dvh - 32px));
+  overflow: auto;
+  border: 1px solid #dce3e8;
+  border-radius: 20px;
+  padding: clamp(22px, 4vw, 32px);
+  background: #fff;
+  box-shadow: 0 28px 72px -34px rgba(7, 24, 46, 0.72);
+  color: #07182e;
+}
+.dialog::backdrop {
+  background: rgba(7, 24, 46, 0.56);
+  backdrop-filter: blur(3px);
+}
+.dialogHeader {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: flex-start;
+}
+.dialogIcon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 12px;
+  background: #e2f5f6;
+  color: #0f7a83;
+}
+.dialogHeader h2,
+.dialogHeader p {
+  margin: 0;
+}
+.dialogHeader h2 {
+  margin-top: 5px;
+  font-size: 1.25rem;
+  letter-spacing: -0.025em;
+}
+.dialogHeader p:not(.eyebrow) {
+  margin-top: 7px;
+  color: #526078;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+.dialogForm {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
   margin-top: 26px;
 }
-.form label {
+.dialogForm label {
   display: grid;
   gap: 7px;
   color: #30435b;
   font-size: 0.79rem;
   font-weight: 650;
 }
-.form input,
-.form select {
+.dialogForm input,
+.dialogForm select {
   min-height: 44px;
   border: 1px solid #cbd7df;
   border-radius: 10px;
@@ -211,37 +307,15 @@
   font: inherit;
   font-size: 0.9rem;
 }
-.form input:focus-visible,
-.form select:focus-visible,
-.form button:focus-visible,
-.revoke:focus-visible {
-  outline: 3px solid #0f7a83;
-  outline-offset: 3px;
+.dialogReference,
+.dialogActions {
+  grid-column: 1 / -1;
 }
-.reference {
-  grid-column: span 2;
-}
-.form button {
-  min-height: 44px;
-  align-self: end;
-  border: 0;
-  border-radius: 10px;
-  background: #07182e;
-  color: #fff;
-  cursor: pointer;
-  font: inherit;
-  font-weight: 700;
-  transition:
-    background-color 160ms ease,
-    transform 160ms ease;
-}
-.form button:hover:not(:disabled) {
-  background: #0f7a83;
-  transform: translateY(-1px);
-}
-.form button:disabled {
-  cursor: wait;
-  opacity: 0.6;
+.dialogActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
 }
 .message {
   margin: 18px 0 0;
@@ -343,17 +417,8 @@
   .assurance {
     max-width: 540px;
   }
-  .metrics {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
   .roleDistribution {
     grid-template-columns: 1fr;
-  }
-  .form {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .reference {
-    grid-column: auto;
   }
   .entry {
     grid-template-columns: 1fr auto;
@@ -367,7 +432,7 @@
   }
 }
 @media (max-width: 560px) {
-  .form,
+  .dialogForm,
   .entry {
     grid-template-columns: 1fr;
   }
@@ -383,7 +448,6 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .form button,
   .roleTrack > span {
     transition: none;
   }

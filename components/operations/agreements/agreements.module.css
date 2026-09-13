@@ -4,6 +4,49 @@
   gap: 24px;
   color: #07182e;
 }
+.page {
+  width: min(100%, 1240px);
+  margin-inline: auto;
+}
+.page > header {
+  padding: clamp(24px, 4vw, 36px);
+  border-radius: 20px;
+  background:
+    radial-gradient(
+      circle at 92% 0%,
+      rgba(70, 199, 216, 0.24),
+      transparent 30%
+    ),
+    linear-gradient(120deg, #07182e, #0b3049);
+  box-shadow: 0 22px 46px -34px rgba(7, 24, 46, 0.9);
+}
+.page > header h1 {
+  margin-top: 20px;
+  color: #ffffff;
+  font-size: clamp(2rem, 4vw, 2.65rem);
+  letter-spacing: -0.045em;
+}
+.page > header p {
+  max-width: 62ch;
+  color: #cae1ea;
+}
+.page > header a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  margin: 12px 10px 0 0;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  color: #ffffff;
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+.page > header a:hover {
+  border-color: #7edfe9;
+  background: rgba(255, 255, 255, 0.1);
+}
 .page h1,
 .page h2,
 .page h3 {
@@ -23,6 +66,48 @@
   padding: 24px;
   background: #fff;
   overflow-wrap: anywhere;
+}
+.summary {
+  display: grid;
+  gap: 18px;
+  padding: clamp(20px, 3vw, 28px);
+  border: 1px solid #dce3e8;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #ffffff, #f7fafb);
+  box-shadow: 0 16px 38px -34px rgba(7, 24, 46, 0.62);
+}
+.summaryHeading h2,
+.summaryHeading p {
+  margin: 0;
+}
+.summaryHeading h2 {
+  color: #07182e;
+  font-size: 1.25rem;
+  letter-spacing: -0.025em;
+}
+.summaryHeading > p:last-child {
+  max-width: 68ch;
+  margin-top: 7px;
+  color: #526078;
+  font-size: 0.87rem;
+}
+.eyebrow {
+  color: #0f7a83;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+.summaryMetrics,
+.summaryVisuals {
+  display: grid;
+  gap: 12px;
+}
+.summaryMetrics {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.summaryVisuals {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 .form fieldset {
   display: grid;
@@ -126,5 +211,16 @@
   .card,
   .form fieldset {
     padding: 16px;
+  }
+}
+@media (max-width: 860px) {
+  .summaryMetrics,
+  .summaryVisuals {
+    grid-template-columns: 1fr;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page > header a {
+    transition: none;
   }
 }

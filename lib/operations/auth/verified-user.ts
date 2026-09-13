@@ -1,19 +1,53 @@
 import { createHash } from "node:crypto";
 import { z } from "zod";
 import type { VerifiedPortalIdentity } from "./types";
-const verifiedUser = z.strictObject({
-  id: z.string().regex(/^user_[A-Za-z0-9]+$/),
-  primary_email_address_id: z.string().nullable(),
-  email_addresses: z.array(
-    z.strictObject({
-      id: z.string().min(1),
-      email_address: z.email().transform((email) => email.toLowerCase()),
-      verification: z
-        .strictObject({ status: z.literal("verified") })
-        .nullable(),
-    }),
-  ),
-});
+
+const verifiedUser = z
+  .object({
+    id: z.string().regex(/^user_[A-Za-z0-9]+$/),
+    primary_email_address_id: z.string().nullable().optional(),
+    primaryEmailAddressId: z.string().nullable().optional(),
+    email_addresses: z
+      .array(
+        z.object({
+          id: z.string().min(1),
+          email_address: z
+            .email()
+            .transform((email) => email.toLowerCase())
+            .optional(),
+          emailAddress: z
+            .email()
+            .transform((email) => email.toLowerCase())
+            .optional(),
+          verification: z.object({ status: z.literal("verified") }).nullable(),
+        }),
+      )
+      .optional(),
+    emailAddresses: z
+      .array(
+        z.object({
+          id: z.string().min(1),
+          email_address: z
+            .email()
+            .transform((email) => email.toLowerCase())
+            .optional(),
+          emailAddress: z
+            .email()
+            .transform((email) => email.toLowerCase())
+            .optional(),
+          verification: z.object({ status: z.literal("verified") }).nullable(),
+        }),
+      )
+      .optional(),
+  })
+  .passthrough();
+
+type ClerkEmailAddress = {
+  id: string;
+  email_address?: string;
+  emailAddress?: string;
+  verification: { status: "verified" } | null;
+};
 export function portalUserIdFromClerkId(clerkUserId: string): string {
   const bytes = createHash("sha256").update(`clerk:${clerkUserId}`).digest();
   bytes[6] = (bytes[6] & 0x0f) | 0x50;
@@ -23,13 +57,17 @@ export function portalUserIdFromClerkId(clerkUserId: string): string {
 }
 export function readVerifiedClerkEmail(user: unknown): string | null {
   const parsed = verifiedUser.safeParse(user);
-  if (!parsed.success || !parsed.data.primary_email_address_id) return null;
-  const address = parsed.data.email_addresses.find(
-    ({ id }) => id === parsed.data.primary_email_address_id,
-  );
-  return address?.verification?.status === "verified"
-    ? address.email_address
+  const primaryEmailAddressId = parsed.success
+    ? (parsed.data.primaryEmailAddressId ??
+      parsed.data.primary_email_address_id)
     : null;
+  const emailAddresses: readonly ClerkEmailAddress[] = parsed.success
+    ? (parsed.data.emailAddresses ?? parsed.data.email_addresses ?? [])
+    : [];
+  if (!parsed.success || !primaryEmailAddressId) return null;
+  const address = emailAddresses.find(({ id }) => id === primaryEmailAddressId);
+  if (address?.verification?.status !== "verified") return null;
+  return address.emailAddress ?? address.email_address ?? null;
 }
 export function readVerifiedPortalUser(
   user: unknown,

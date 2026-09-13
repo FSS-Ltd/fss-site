@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { createPortalInvitationMetadata } from "./clerk-invitation";
 import { provisionPortalAccount, readPortalProvisionConfig } from "./provision";
 
 test("provisioning requires a dedicated server secret and enabled portal configuration", () => {
@@ -21,19 +22,48 @@ test("provisioning requires a dedicated server secret and enabled portal configu
 });
 test("provisioning creates a Clerk invitation with a fixed activation redirect", async () => {
   const inputs: unknown[] = [];
-  await provisionPortalAccount("Client@example.test", "https://portal.example.test/portal/activate", async (input) => {
-    inputs.push(input);
+  const metadata = createPortalInvitationMetadata({
+    organisationId: "8aa24c0b-3665-4fd4-8694-500675c943c3",
+    name: "Client Example",
+    email: "client@example.test",
+    role: "viewer",
+    reviewReference: "Fixture approval",
+    approvedBy: "a".repeat(64),
   });
+  await provisionPortalAccount(
+    "Client@example.test",
+    "https://portal.example.test/portal/activate",
+    metadata,
+    async (input) => {
+      inputs.push(input);
+    },
+  );
   assert.deepEqual(inputs, [
-    { emailAddress: "client@example.test", redirectUrl: "https://portal.example.test/portal/activate" },
+    {
+      emailAddress: "client@example.test",
+      redirectUrl: "https://portal.example.test/portal/activate",
+      publicMetadata: { fssPortalInvitation: metadata },
+    },
   ]);
   await assert.rejects(
-    provisionPortalAccount("client@example.test", "https://portal.example.test/portal/activate", async () => { throw new Error("provider failed"); }),
+    provisionPortalAccount(
+      "client@example.test",
+      "https://portal.example.test/portal/activate",
+      undefined,
+      async () => {
+        throw new Error("provider failed");
+      },
+    ),
     /unavailable/,
   );
   await assert.rejects(
-    provisionPortalAccount("invalid", "https://portal.example.test/portal/activate", async () => {
-      throw new Error("must not call");
-    }),
+    provisionPortalAccount(
+      "invalid",
+      "https://portal.example.test/portal/activate",
+      undefined,
+      async () => {
+        throw new Error("must not call");
+      },
+    ),
   );
 });

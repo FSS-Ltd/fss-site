@@ -1,8 +1,9 @@
 import { randomUUID } from "node:crypto";
 import { verifyWebhook } from "@clerk/nextjs/webhooks";
 import type { NextRequest } from "next/server";
-import { readPortalIdentityFromClerkWebhook } from "@/lib/operations/auth/clerk-webhook";
-import { claimPortalInviteForVerifiedEmail } from "@/lib/operations/auth/invites";
+import { readPortalInvitationClaimFromClerkWebhook } from "@/lib/operations/auth/clerk-webhook";
+import { claimClerkPortalInvitation } from "@/lib/operations/auth/invites";
+import { clearPortalInvitationMetadata } from "@/lib/operations/auth/provision";
 import { operationsEnabled } from "@/lib/operations/db/client";
 import { getPortalDb } from "@/lib/operations/db/portal-client";
 
@@ -12,13 +13,15 @@ export async function POST(request: NextRequest): Promise<Response> {
   if (!operationsEnabled()) return new Response(null, { status: 404 });
   try {
     const event = await verifyWebhook(request);
-    const identity = readPortalIdentityFromClerkWebhook(event);
-    if (identity)
-      await claimPortalInviteForVerifiedEmail(
+    const claim = readPortalInvitationClaimFromClerkWebhook(event);
+    if (claim) {
+      const active = await claimClerkPortalInvitation(
         getPortalDb(),
-        identity,
+        claim,
         randomUUID(),
       );
+      if (active) await clearPortalInvitationMetadata(claim.clerkUserId);
+    }
     return new Response(null, { status: 204 });
   } catch (error) {
     console.error("Clerk webhook could not be processed.", {

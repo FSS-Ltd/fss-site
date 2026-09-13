@@ -89,7 +89,9 @@ export async function listPortalAccess(
         limit 300
       `,
     ]);
-    return { value: { organisations: [...organisations], entries: [...entries] } };
+    return {
+      value: { organisations: [...organisations], entries: [...entries] },
+    };
   });
   return result.value;
 }
@@ -150,6 +152,49 @@ export type PortalContact = {
   name: string;
   email: string;
 };
+
+type PortalContactForInvitation = PortalContact & {
+  activeMembershipId: string | null;
+};
+
+/**
+ * Reuse a previously approved contact when an invitation needs to be retried.
+ * The database constraint is the concurrency guard, so two near-simultaneous
+ * requests cannot create duplicate contacts for the same organisation/email.
+ */
+export async function getOrCreatePortalContactForInvitation(
+  db: OperationsDb,
+  context: OperationsFounder | null,
+  input: unknown,
+): Promise<PortalContactForInvitation> {
+  const founder = requireOperationsFounder(context);
+  const contact = contactSchema.parse(input);
+  const result = await db.begin(async (tx) => {
+    await tx`select set_config('operations.actor_id', ${founder.actorId}, true)`;
+    await tx`
+      insert into operations.contacts (organisation_id, name, email, created_by, review_reference)
+      values (${contact.organisationId}, ${contact.name}, ${contact.email}, ${founder.actorId}, ${contact.reviewReference})
+      on conflict (organisation_id, email) do nothing
+    `;
+    const [row] = await tx<PortalContactForInvitation[]>`
+      select
+        c.id as "contactId",
+        c.organisation_id as "organisationId",
+        c.name,
+        c.email,
+        m.id as "activeMembershipId"
+      from operations.contacts c
+      left join operations.memberships m
+        on m.contact_id = c.id and m.revoked_at is null
+      where c.organisation_id = ${contact.organisationId}
+        and c.email = ${contact.email}
+    `;
+    if (!row) throw new Error("The approved portal contact was not found.");
+    return { value: row };
+  });
+  return result.value;
+}
+
 export async function getPortalContact(
   db: OperationsDb,
   context: OperationsFounder | null,

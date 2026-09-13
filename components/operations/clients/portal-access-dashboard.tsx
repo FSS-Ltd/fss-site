@@ -1,26 +1,39 @@
 "use client";
 
 import {
-  BarChart3,
   CircleCheckBig,
-  Clock3,
   ShieldCheck,
   UserPlus,
   UsersRound,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
 import {
   getPortalAccessMetrics,
   portalRoleOptions,
 } from "@/lib/operations/auth/access-dashboard-metrics";
 import type { PortalAccessRegister } from "@/lib/operations/auth/repository";
+import { PortalInvitationDialog } from "./portal-invitation-dialog";
 import styles from "./portal-access-dashboard.module.css";
 
 type Status = {
   kind: "idle" | "pending" | "success" | "error";
   message?: string;
 };
+
+async function getRequestError(response: Response): Promise<string> {
+  const body: unknown = await response.json().catch(() => null);
+  if (
+    typeof body === "object" &&
+    body !== null &&
+    "message" in body &&
+    typeof body.message === "string" &&
+    body.message.trim()
+  ) {
+    return body.message;
+  }
+  return "Access could not be updated. Try again.";
+}
 
 function accessStatus(entry: PortalAccessRegister["entries"][number]): string {
   if (entry.membershipId && !entry.revokedAt) return "Active";
@@ -44,41 +57,6 @@ export function PortalAccessDashboard({
     1,
   );
 
-  async function submit(event: FormEvent<HTMLFormElement>): Promise<void> {
-    event.preventDefault();
-    if (status.kind === "pending") return;
-    setStatus({ kind: "pending" });
-    const form = new FormData(event.currentTarget);
-    try {
-      const response = await fetch("/api/growth/operations/portal-access", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "grant_access",
-          organisationId: form.get("organisationId"),
-          name: form.get("name"),
-          email: form.get("email"),
-          role: form.get("role"),
-          reviewReference: form.get("reviewReference"),
-        }),
-      });
-      if (!response.ok) throw new Error("Request failed.");
-      event.currentTarget.reset();
-      setStatus({
-        kind: "success",
-        message:
-          "Invitation issued. Clerk will send the client a secure activation email.",
-      });
-      router.refresh();
-    } catch {
-      setStatus({
-        kind: "error",
-        message:
-          "Access could not be granted. Check the details and try again.",
-      });
-    }
-  }
-
   async function revoke(
     entry: PortalAccessRegister["entries"][number],
   ): Promise<void> {
@@ -99,13 +77,16 @@ export function PortalAccessDashboard({
           reviewReference,
         }),
       });
-      if (!response.ok) throw new Error("Request failed.");
+      if (!response.ok) throw new Error(await getRequestError(response));
       setStatus({ kind: "success", message: "Portal access removed." });
       router.refresh();
-    } catch {
+    } catch (error) {
       setStatus({
         kind: "error",
-        message: "Access could not be removed. Try again.",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Access could not be removed. Try again.",
       });
     }
   }
@@ -138,16 +119,6 @@ export function PortalAccessDashboard({
           <p>{metrics.active}</p>
           <span>Active members</span>
         </article>
-        <article>
-          <Clock3 aria-hidden="true" size={19} />
-          <p>{metrics.pending}</p>
-          <span>Invitations pending</span>
-        </article>
-        <article>
-          <BarChart3 aria-hidden="true" size={19} />
-          <p>{metrics.claimed}</p>
-          <span>Awaiting activation</span>
-        </article>
       </section>
 
       <section
@@ -158,11 +129,10 @@ export function PortalAccessDashboard({
           <p className={styles.eyebrow}>Access coverage</p>
           <h2 id="role-distribution-heading">Role distribution</h2>
           <p>
-            Role counts come from the Operations access register, including
-            pending invitations.
+            Role counts are based on the accepted access records in Operations.
           </p>
         </div>
-        <ul aria-label="Members and invitations by role">
+        <ul aria-label="Active members by role">
           {metrics.roleCounts.map((role) => (
             <li key={role.value}>
               <div>
@@ -188,8 +158,8 @@ export function PortalAccessDashboard({
           <div>
             <h2 id="grant-access-heading">Grant access</h2>
             <p>
-              Clerk sends the activation email. Access starts only after a
-              verified account is matched to this approved contact.
+              Clerk holds the invitation until the recipient creates their
+              account. The contact and membership are then written together.
             </p>
           </div>
         </div>
@@ -199,63 +169,14 @@ export function PortalAccessDashboard({
             portal access.
           </p>
         ) : (
-          <form
-            className={styles.form}
-            onSubmit={submit}
-            aria-busy={status.kind === "pending"}
-          >
-            <label>
-              Organisation
-              <select defaultValue="" name="organisationId" required>
-                <option disabled value="">
-                  Choose an organisation
-                </option>
-                {data.organisations.map((organisation) => (
-                  <option key={organisation.id} value={organisation.id}>
-                    {organisation.displayName}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Client name
-              <input maxLength={200} name="name" required />
-            </label>
-            <label>
-              Email address
-              <input
-                autoComplete="email"
-                maxLength={254}
-                name="email"
-                required
-                type="email"
-              />
-            </label>
-            <label>
-              Portal role
-              <select defaultValue="viewer" name="role">
-                {portalRoleOptions.map((role) => (
-                  <option key={role.value} value={role.value}>
-                    {role.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className={styles.reference}>
-              Review note
-              <input
-                maxLength={200}
-                name="reviewReference"
-                placeholder="Why this access is approved"
-                required
-              />
-            </label>
-            <button disabled={status.kind === "pending"} type="submit">
-              {status.kind === "pending"
-                ? "Granting access…"
-                : "Send invitation"}
-            </button>
-          </form>
+          <div className={styles.inviteControl}>
+            <PortalInvitationDialog
+              organisations={data.organisations}
+              onInvitationSent={(message) =>
+                setStatus({ kind: "success", message })
+              }
+            />
+          </div>
         )}
         <div aria-live="polite">
           {status.message && (
@@ -278,7 +199,7 @@ export function PortalAccessDashboard({
             <p>
               {data.entries.length
                 ? "Every role is scoped to one client organisation."
-                : "No client contacts have been added yet."}
+                : "Accepted invitations will appear here once account setup is complete."}
             </p>
           </div>
         </div>

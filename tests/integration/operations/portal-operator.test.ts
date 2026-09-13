@@ -4,7 +4,11 @@ import test from "node:test";
 import postgres from "postgres";
 import { requireOperationsTestDatabaseUrl } from "../../../scripts/require-operations-database-env";
 import { applyPortalOperation } from "../../../lib/operations/auth/operator";
-import { claimPortalInviteForVerifiedEmail } from "../../../lib/operations/auth/invites";
+import {
+  claimClerkPortalInvitation,
+  claimPortalInviteForVerifiedEmail,
+} from "../../../lib/operations/auth/invites";
+import type { PortalInvitationMetadata } from "../../../lib/operations/auth/clerk-invitation";
 import { requirePortalMember } from "../../../lib/operations/auth/require-member";
 
 test("reviewed operator scopes provisioning, creates claimable invitations and revokes live membership", async () => {
@@ -24,9 +28,21 @@ test("reviewed operator scopes provisioning, creates claimable invitations and r
   const organisationId = randomUUID();
   const email = `${randomUUID()}@example.test`;
   const reviewReference = "synthetic-operator-review";
-  const provisioned: { email: string; redirectUrl: string }[] = [];
-  const provision = async (provisionedEmail: string, redirectUrl: string) => {
-    provisioned.push({ email: provisionedEmail, redirectUrl });
+  const provisioned: {
+    email: string;
+    redirectUrl: string;
+    metadata?: PortalInvitationMetadata;
+  }[] = [];
+  const provision = async (
+    provisionedEmail: string,
+    redirectUrl: string,
+    metadata: (typeof provisioned)[number]["metadata"],
+  ) => {
+    provisioned.push({
+      email: provisionedEmail,
+      redirectUrl,
+      ...(metadata ? { metadata } : {}),
+    });
   };
   try {
     await admin`insert into operations.organisations (id,legal_name,display_name,trading_status,timezone,created_by,review_reference) values (${organisationId},'Synthetic','Synthetic','active','Europe/London',${founder.actorId},${reviewReference})`;
@@ -61,6 +77,87 @@ test("reviewed operator scopes provisioning, creates claimable invitations and r
       /contact was not found/,
     );
     assert.equal(provisioned.length, 0);
+    const retryEmail = `${randomUUID()}@example.test`;
+    await assert.rejects(
+      applyPortalOperation(
+        founderDb,
+        founder,
+        {
+          action: "grant_access",
+          organisationId,
+          name: "Retry Contact",
+          email: retryEmail,
+          role: "viewer",
+          reviewReference,
+        },
+        "https://portal.example.test",
+        async () => {
+          throw new Error("provider failed");
+        },
+      ),
+      /provider failed/,
+    );
+    const retried = await applyPortalOperation(
+      founderDb,
+      founder,
+      {
+        action: "grant_access",
+        organisationId,
+        name: "Retry Contact",
+        email: retryEmail,
+        role: "viewer",
+        reviewReference,
+      },
+      "https://portal.example.test",
+      provision,
+    );
+    assert.equal(retried.action, "grant_access");
+    const retryProvision = provisioned.at(-1);
+    assert.equal(retryProvision?.email, retryEmail);
+    assert.equal(
+      new URL(retryProvision?.redirectUrl).pathname,
+      "/portal/activate",
+    );
+    assert.equal(
+      new URL(retryProvision?.redirectUrl).searchParams.get("name"),
+      "Retry Contact",
+    );
+    assert.equal(
+      new URL(retryProvision?.redirectUrl).searchParams.get("email"),
+      retryEmail,
+    );
+    assert.equal(retryProvision?.metadata?.email, retryEmail);
+    const [retriedContact] = await admin<{ count: number }[]>`
+      select count(*)::integer as count
+      from operations.contacts
+      where organisation_id=${organisationId} and email=${retryEmail}
+    `;
+    assert.equal(retriedContact.count, 0);
+    const acceptedIdentity = {
+      userId: randomUUID(),
+      email: retryEmail,
+      emailVerified: true as const,
+    };
+    assert.equal(
+      await claimClerkPortalInvitation(
+        portal,
+        retryProvision?.metadata
+          ? {
+              clerkUserId: "user_2zClientExample",
+              identity: acceptedIdentity,
+              invitation: retryProvision.metadata,
+            }
+          : null,
+        randomUUID(),
+      ),
+      true,
+    );
+    const [acceptedContact] = await admin<{ count: number }[]>`
+      select count(*)::integer as count
+      from operations.contacts
+      where organisation_id=${organisationId} and email=${retryEmail}
+    `;
+    assert.equal(acceptedContact.count, 1);
     const issued = await applyPortalOperation(
       founderDb,
       founder,
@@ -78,6 +175,11 @@ test("reviewed operator scopes provisioning, creates claimable invitations and r
     if (issued.action !== "issue_invite")
       throw new Error("Unexpected operation result");
     assert.deepEqual(provisioned, [
+      {
+        email: retryEmail,
+        redirectUrl: `https://portal.example.test/portal/activate?name=Retry+Contact&email=${encodeURIComponent(retryEmail)}`,
+        metadata: retryProvision?.metadata,
+      },
       { email, redirectUrl: "https://portal.example.test/portal/activate" },
     ]);
     const activation = new URL(issued.activationUrl);
@@ -85,29 +187,36 @@ test("reviewed operator scopes provisioning, creates claimable invitations and r
     assert.equal(activation.pathname, "/portal/activate");
     assert.equal(activation.search, "");
     assert.equal(activation.hash, "");
-    const identity = {
+    const legacyIdentity = {
       userId: randomUUID(),
       email,
       emailVerified: true as const,
     };
     assert.equal(
-      await claimPortalInviteForVerifiedEmail(portal, identity, randomUUID()),
+      await claimPortalInviteForVerifiedEmail(
+        portal,
+        legacyIdentity,
+        randomUUID(),
+      ),
       true,
     );
     assert.equal(
       (
         await requirePortalMember(
           portal,
-          identity,
+          legacyIdentity,
           organisationId,
           randomUUID(),
         )
       ).role,
       "viewer",
     );
-    const [member] = await admin<
-      { id: string }[]
-    >`select id from operations.memberships where organisation_id=${organisationId}`;
+    const [member] = await admin<{ id: string }[]>`
+      select m.id
+      from operations.memberships m
+      join operations.contacts c on c.id = m.contact_id
+      where m.organisation_id=${organisationId} and c.email=${email}
+    `;
     await applyPortalOperation(
       founderDb,
       founder,
@@ -120,7 +229,7 @@ test("reviewed operator scopes provisioning, creates claimable invitations and r
       "https://portal.example.test",
     );
     await assert.rejects(
-      requirePortalMember(portal, identity, organisationId, randomUUID()),
+      requirePortalMember(portal, legacyIdentity, organisationId, randomUUID()),
       /Portal access/,
     );
   } finally {

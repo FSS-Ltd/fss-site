@@ -11,6 +11,7 @@ import {
 } from "@/components/portal/requests/presentation";
 import styles from "@/components/portal/requests/requests.module.css";
 import layout from "@/components/operations/requests/requests.module.css";
+import { RequestQueueSummary } from "@/components/operations/requests/request-queue-summary";
 export const dynamic = "force-dynamic";
 export default async function FounderRequestsPage({
   params,
@@ -42,15 +43,22 @@ export default async function FounderRequestsPage({
   const { requests, observedAt: now } = queue;
   return (
     <section className={layout.page}>
-      <Link href="/growth/operations/clients">Client register</Link>
-      <p className={styles.eyebrow}>Operations</p>
-      <h1 className={styles.title}>Client requests</h1>
-      <p className={styles.copy}>
-        Review new work, resolve waiting items and share the next step.
-      </p>
-      <p className={styles.note}>
-        Showing up to 100 requests, with open work and action deadlines first.
-      </p>
+      <header className={layout.header}>
+        <Link href="/growth/operations/clients">Client register</Link>
+        <p className={`${styles.eyebrow} ${layout.headerEyebrow}`}>
+          Operations
+        </p>
+        <h1 className={`${styles.title} ${layout.headerTitle}`}>
+          Client requests
+        </h1>
+        <p className={`${styles.copy} ${layout.headerCopy}`}>
+          Review new work, resolve waiting items and share the next step.
+        </p>
+        <p className={`${styles.note} ${layout.headerNote}`}>
+          Showing up to 100 requests, with open work and action deadlines first.
+        </p>
+      </header>
+      <RequestQueueSummary observedAt={now} requests={requests} />
       {requests.length === 0 ? (
         <p className={styles.empty}>
           No requests yet. Client submissions will appear here.
@@ -63,7 +71,10 @@ export default async function FounderRequestsPage({
                 className={styles.requestLink}
                 href={`/growth/operations/clients/${organisationId}/requests/${request.id}`}
               >
-                <span className={styles.status}>
+                <span
+                  className={`${styles.status} ${layout.status}`}
+                  data-status={request.status}
+                >
                   {statusLabels[request.status]}
                 </span>
                 <h2 className={styles.itemTitle}>{request.title}</h2>
@@ -77,12 +88,12 @@ export default async function FounderRequestsPage({
                 </p>
                 {request.status === "new" &&
                   Date.parse(request.acknowledgementTarget) < now && (
-                    <p>Acknowledgement overdue</p>
+                    <p className={layout.overdue}>Acknowledgement overdue</p>
                   )}
                 {request.status === "ready_for_review" &&
                   request.reviewReminderTarget &&
                   Date.parse(request.reviewReminderTarget) < now && (
-                    <p>Review follow-up due</p>
+                    <p className={layout.overdue}>Review follow-up due</p>
                   )}
               </Link>
             </li>

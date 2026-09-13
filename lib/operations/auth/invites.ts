@@ -2,6 +2,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { z } from "zod";
 import type { OperationsDb } from "../db/client";
 import { withVerifiedPortalIdentity } from "../db/portal-client";
+import type { PortalInvitationClaim } from "./clerk-invitation";
 import { PortalAccessDenied, type VerifiedPortalIdentity } from "./types";
 
 export function createPortalInviteToken(): {
@@ -48,5 +49,48 @@ export async function claimPortalInviteForVerifiedEmail(
       select operations.claim_portal_invite_for_verified_email() as "organisationId"
     `;
     return Boolean(result?.organisationId);
+  });
+}
+
+export async function claimClerkPortalInvitation(
+  db: OperationsDb,
+  claim: PortalInvitationClaim | null,
+  correlationId: string,
+): Promise<boolean> {
+  if (!claim) return false;
+  return withVerifiedPortalIdentity(
+    db,
+    claim.identity,
+    correlationId,
+    async (tx) => {
+      const [result] = await tx<{ organisationId: string | null }[]>`
+        select operations.claim_clerk_portal_invitation(
+          ${claim.invitation.organisationId},
+          ${claim.invitation.name},
+          ${claim.invitation.email},
+          ${claim.invitation.role},
+          ${claim.invitation.reviewReference},
+          ${claim.invitation.approvedBy}
+        ) as "organisationId"
+      `;
+      return Boolean(result?.organisationId);
+    },
+  );
+}
+
+export async function hasActivePortalMembership(
+  db: OperationsDb,
+  identity: VerifiedPortalIdentity | null,
+  correlationId: string,
+): Promise<boolean> {
+  return withVerifiedPortalIdentity(db, identity, correlationId, async (tx) => {
+    const [result] = await tx<{ active: boolean }[]>`
+      select exists(
+        select 1 from operations.memberships
+        where user_id = nullif(current_setting('operations.user_id', true), '')::uuid
+          and revoked_at is null
+      ) as active
+    `;
+    return result?.active === true;
   });
 }

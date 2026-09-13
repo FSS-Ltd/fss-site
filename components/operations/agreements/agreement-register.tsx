@@ -9,6 +9,7 @@ import { penceToGbp } from "@/lib/operations/agreements/money-input";
 import { AgreementForm } from "./agreement-form";
 import { SignatureForm } from "./signature-form";
 import { ActivationForm } from "./activation-form";
+import { AgreementSummary } from "./agreement-summary";
 import styles from "./agreements.module.css";
 function Terms({ record }: { record: AgreementRecord }): React.JSX.Element {
   const d = record.draft;
@@ -77,6 +78,7 @@ export function AgreementRegister({
           </Link>
         )}
       </header>
+      <AgreementSummary register={register} />
       {register.agreements.length === 0 && <p>No agreements on this page.</p>}
       {register.agreements.map((record) => (
         <article className={styles.card} key={`${record.id}-${record.version}`}>

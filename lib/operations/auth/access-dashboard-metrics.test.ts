@@ -22,33 +22,28 @@ function entry(overrides: Partial<PortalAccessEntry>): PortalAccessEntry {
   };
 }
 
-test("summarises active, pending and claimed portal access accurately", () => {
-  const metrics = getPortalAccessMetrics(
-    [
-      entry({ membershipId: "member-active", role: "owner" }),
-      entry({
-        invitedAt: new Date("2026-09-11T12:00:00.000Z"),
-        inviteExpiresAt: new Date("2026-09-19T12:00:00.000Z"),
-        role: "contributor",
-      }),
-      entry({
-        invitedAt: new Date("2026-09-11T12:00:00.000Z"),
-        inviteClaimedAt: new Date("2026-09-12T10:00:00.000Z"),
-        role: "billing_contact",
-      }),
-      entry({
-        invitedAt: new Date("2026-09-01T12:00:00.000Z"),
-        inviteExpiresAt: new Date("2026-09-08T12:00:00.000Z"),
-      }),
-      entry({ membershipId: "member-revoked", revokedAt: now }),
-    ],
-    now,
-  );
+test("summarises active portal access accurately", () => {
+  const metrics = getPortalAccessMetrics([
+    entry({ membershipId: "member-active", role: "owner" }),
+    entry({
+      invitedAt: new Date("2026-09-11T12:00:00.000Z"),
+      inviteExpiresAt: new Date("2026-09-19T12:00:00.000Z"),
+      role: "contributor",
+    }),
+    entry({
+      invitedAt: new Date("2026-09-11T12:00:00.000Z"),
+      inviteClaimedAt: new Date("2026-09-12T10:00:00.000Z"),
+      role: "billing_contact",
+    }),
+    entry({
+      invitedAt: new Date("2026-09-01T12:00:00.000Z"),
+      inviteExpiresAt: new Date("2026-09-08T12:00:00.000Z"),
+    }),
+    entry({ membershipId: "member-revoked", revokedAt: now }),
+  ]);
 
   assert.deepEqual(metrics, {
     active: 1,
-    pending: 1,
-    claimed: 1,
     roleCounts: [
       {
         value: "owner",
@@ -60,19 +55,19 @@ test("summarises active, pending and claimed portal access accurately", () => {
         value: "contributor",
         label: "Contributor",
         detail: "Project access, requests and shared files.",
-        count: 1,
+        count: 0,
       },
       {
         value: "billing_contact",
         label: "Billing contact",
         detail: "Billing records and payment management.",
-        count: 1,
+        count: 0,
       },
       {
         value: "viewer",
         label: "Viewer",
         detail: "Read-only projects, documents and services.",
-        count: 2,
+        count: 0,
       },
     ],
   });

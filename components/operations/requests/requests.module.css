@@ -8,6 +8,117 @@
   padding: 32px 16px 64px;
   overflow-wrap: anywhere;
 }
+.header {
+  display: grid;
+  gap: 8px;
+  margin: 0 -16px;
+  padding: clamp(24px, 4vw, 36px);
+  border-radius: 20px;
+  background:
+    radial-gradient(
+      circle at 92% 0%,
+      rgba(70, 199, 216, 0.24),
+      transparent 30%
+    ),
+    linear-gradient(120deg, #07182e, #0b3049);
+  box-shadow: 0 22px 46px -34px rgba(7, 24, 46, 0.9);
+}
+.header a {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  color: #ffffff;
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+.header a:hover {
+  border-color: #7edfe9;
+  background: rgba(255, 255, 255, 0.1);
+}
+.headerEyebrow,
+.headerCopy,
+.headerNote {
+  color: #cae1ea;
+}
+.headerTitle {
+  margin: 4px 0 2px;
+  color: #ffffff;
+}
+.summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.9fr);
+  gap: 18px;
+  margin: 28px 0;
+  padding: clamp(20px, 3vw, 28px);
+  border: 1px solid #dce3e8;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #ffffff, #f7fafb);
+  box-shadow: 0 16px 38px -34px rgba(7, 24, 46, 0.62);
+}
+.summaryHeading {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+}
+.summaryHeading p,
+.summaryHeading h2,
+.summaryHeading span {
+  margin: 0;
+}
+.summaryHeading p {
+  color: #0f7a83;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+.summaryHeading h2 {
+  color: #07182e;
+  font-size: 1.25rem;
+  letter-spacing: -0.025em;
+}
+.summaryHeading span {
+  max-width: 48ch;
+  color: #526078;
+  font-size: 0.87rem;
+  line-height: 1.55;
+}
+.metrics {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.status {
+  font-weight: 700;
+}
+.status[data-status="done"] {
+  background: #e4f4ee;
+  color: #176447;
+}
+.status[data-status="new"],
+.status[data-status="changes_requested"] {
+  background: #fce9e7;
+  color: #9e3d38;
+}
+.status[data-status="ready_for_review"] {
+  background: #fff4dd;
+  color: #805b11;
+}
+.status[data-status="in_progress"],
+.status[data-status="planned"] {
+  background: #e3f4f5;
+  color: #0b6871;
+}
+p.overdue {
+  color: #9e3d38;
+  font-weight: 750;
+}
 .internal {
   margin-top: 40px;
   padding: 24px;
@@ -28,4 +139,10 @@
 }
 .internal p {
   white-space: pre-wrap;
+}
+@media (max-width: 860px) {
+  .summary,
+  .metrics {
+    grid-template-columns: 1fr;
+  }
 }

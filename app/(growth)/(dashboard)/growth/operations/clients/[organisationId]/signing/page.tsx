@@ -6,6 +6,7 @@ import { getOperationsDb } from "@/lib/operations/db/client";
 import { signingEnabled } from "@/lib/operations/agreements/signing-commands";
 import { listFounderSigning } from "@/lib/operations/agreements/signing-service";
 import { SigningReview } from "@/components/operations/signing/signing-review";
+import { SigningSummary } from "@/components/operations/signing/signing-summary";
 import styles from "@/components/operations/agreements/agreements.module.css";
 import signingStyles from "@/components/operations/signing/signing.module.css";
 export const dynamic = "force-dynamic";
@@ -45,6 +46,7 @@ export default async function SigningPage({
           signature.
         </p>
       </header>
+      <SigningSummary approvals={approvals} />
       {approvals.length === 0 && (
         <p>
           No signing requests yet. Prepare a document from the agreement
