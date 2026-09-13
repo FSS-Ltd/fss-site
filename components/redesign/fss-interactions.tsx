@@ -547,30 +547,27 @@ export function FssInteractions({
         resize();
         bind(window, "resize", resize, cleanups);
 
-        const host = canvas.parentElement;
-        if (host) {
-          bind(
-            host,
-            "pointermove",
-            (event) => {
-              if (!finePointer) return;
-              const pointer = event as PointerEvent;
-              const rect = canvas.getBoundingClientRect();
-              mouse.x = pointer.clientX - rect.left;
-              mouse.y = pointer.clientY - rect.top;
-            },
-            cleanups,
-          );
-          bind(
-            host,
-            "pointerleave",
-            () => {
-              mouse.x = -9999;
-              mouse.y = -9999;
-            },
-            cleanups,
-          );
-        }
+        bind(
+          window,
+          "pointermove",
+          (event) => {
+            if (!finePointer) return;
+            const pointer = event as PointerEvent;
+            const rect = canvas.getBoundingClientRect();
+            mouse.x = pointer.clientX - rect.left;
+            mouse.y = pointer.clientY - rect.top;
+          },
+          cleanups,
+        );
+        bind(
+          window,
+          "blur",
+          () => {
+            mouse.x = -9999;
+            mouse.y = -9999;
+          },
+          cleanups,
+        );
 
         frameId = window.requestAnimationFrame(frame);
 

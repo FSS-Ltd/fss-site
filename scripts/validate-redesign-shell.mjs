@@ -14,6 +14,10 @@ const files = {
     "components/sections/public/home-page.module.css",
     "utf8",
   ),
+  publicStyles: readFileSync(
+    "components/sections/public/public-page.module.css",
+    "utf8",
+  ),
   globals: readFileSync("app/globals.css", "utf8"),
   header: readFileSync("components/layout/site-header.tsx", "utf8"),
   headerNavItems: readFileSync(
@@ -61,6 +65,22 @@ if (files.globals.includes("[data-hero-canvas] {\n    display: none")) {
 
 if (!files.homePage.includes("data-hero-canvas")) {
   failures.push("The homepage hero must render the shared particle canvas.");
+}
+
+if (!files.interactions.includes('bind(\n          window,\n          "pointermove"')) {
+  failures.push(
+    "Hero particle interaction must track the pointer at window scope so full-width canvases follow the mouse.",
+  );
+}
+
+if (!files.publicStyles.includes("width: 100vw")) {
+  failures.push("Shared public hero canvases must span the viewport width.");
+}
+
+if (/\.hero\s*\{[^}]*overflow\s*:\s*hidden/.test(files.publicStyles)) {
+  failures.push(
+    "Shared public hero containers must not clip the full-width particle canvas.",
+  );
 }
 
 if (/\.serviceSection\s*\{[^}]*max-width\s*:/.test(files.homeStyles)) {

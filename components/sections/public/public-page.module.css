@@ -18,16 +18,17 @@
 .hero {
   position: relative;
   isolation: isolate;
-  overflow: hidden;
   max-width: 840px;
   padding: 8px 0;
   margin-bottom: 56px;
 }
 .particleCanvas {
   position: absolute;
-  inset: 0;
+  top: 0;
+  bottom: 0;
+  left: calc(-1 * max(24px, calc((100vw - 1120px) / 2)));
   z-index: 0;
-  width: 100%;
+  width: 100vw;
   height: 100%;
   pointer-events: none;
   opacity: 0.42;
