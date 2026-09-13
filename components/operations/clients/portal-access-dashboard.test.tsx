@@ -45,7 +45,10 @@ test("portal access makes invitation primary and explains the activation sequenc
     </AppRouterContext.Provider>,
   );
 
-  assert.match(html, /Invite portal user/);
+  assert.match(
+    html,
+    /<button[^>]*type="button"[^>]*>[\s\S]*?Invite portal user[\s\S]*?<\/button>/,
+  );
   assert.match(
     html,
     /Choose a client, assign the database role, then send the activation email/,

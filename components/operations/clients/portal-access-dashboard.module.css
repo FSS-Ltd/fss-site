@@ -400,6 +400,7 @@
   color: #485b6d;
 }
 .revoke {
+  min-height: 44px;
   border: 1px solid #d6a39d;
   border-radius: 9px;
   padding: 8px 10px;
