@@ -50,7 +50,6 @@ export function bindStoryScenes(scope: ParentNode): () => void {
         );
       });
       host.style.setProperty("--story-progress", progress.toFixed(4));
-      host.style.setProperty("--value-particle-radius", `${8 + 137 * progress}%`);
       if (!device) {
         host.setAttribute("data-story-ready", "");
         return;

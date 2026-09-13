@@ -8,6 +8,7 @@ import {
   getShowcaseScrollState,
 } from "@/components/redesign/showcase-progress";
 import { bindMagneticControls } from "@/components/redesign/magnetic-controls";
+import { bindValueNetwork } from "@/components/redesign/value-network-canvas";
 import {
   bindMotionReveals,
   bindScrollScenes,
@@ -447,6 +448,17 @@ export function FssInteractions({
       if (!canvases.length || !motionCapabilities.showParticles) return;
 
       canvases.forEach((canvas) => {
+        if (canvas.hasAttribute("data-value-particles")) {
+          cleanups.push(
+            bindValueNetwork(
+              canvas,
+              Math.round(nodeDensity * (calmMotion ? 0.6 : 1)),
+              finePointer,
+              noMotion,
+            ),
+          );
+          return;
+        }
         const context = canvas.getContext("2d");
         if (!context) return;
 

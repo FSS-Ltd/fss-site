@@ -81,9 +81,6 @@
     grid-template-columns: 1fr;
     text-align: center;
   }
-  [data-story-ready] [data-value-particles] {
-    clip-path: circle(var(--value-particle-radius, 145%) at 0% 100%);
-  }
   [data-motion-story="values"][data-story-ready] [data-story-chapters] {
     width: min(100%, 1080px);
     margin: auto;
