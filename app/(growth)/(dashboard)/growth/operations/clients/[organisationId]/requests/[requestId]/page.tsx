@@ -9,6 +9,8 @@ import { getFounderRequest } from "@/lib/operations/requests/repository";
 import { founderDeliveryOwnerId } from "@/lib/operations/requests/types";
 import { RequestDetail } from "@/components/portal/requests/request-detail";
 import { FounderRequestActions } from "@/components/portal/requests/founder-request-actions";
+import { OperationsPageHeader } from "@/components/operations/shared/operations-page-header";
+import ui from "@/components/operations/shared/operations-ui.module.css";
 import layout from "@/components/operations/requests/requests.module.css";
 export const dynamic = "force-dynamic";
 export default async function FounderRequestPage({
@@ -39,7 +41,7 @@ export default async function FounderRequestPage({
     );
   } catch {
     return (
-      <section role="alert">
+      <section className={ui.errorState} role="alert">
         <h1>Request could not load</h1>
         <p>Reload to try again.</p>
         <Link href={`/growth/operations/clients/${organisationId}/requests`}>
@@ -51,30 +53,43 @@ export default async function FounderRequestPage({
   if (!request) notFound();
   const { internalComments, priority, ...publicRequest } = request;
   return (
-    <div className={layout.page}>
-      <Link href={`/growth/operations/clients/${organisationId}/requests`}>
-        All requests
-      </Link>
-      <RequestDetail
-        request={publicRequest}
-        organisationId={organisationId}
-        canComment={false}
-        hidePortalActions
+    <main className={`${ui.page} ${layout.page}`}>
+      <OperationsPageHeader
+        context="Operations · Requests"
+        title="Request workspace"
+        description="Review the client request, record the operational decision and keep the next action current."
+        action={
+          <Link href={`/growth/operations/clients/${organisationId}/requests`}>
+            All requests
+          </Link>
+        }
       />
-      <FounderRequestActions
-        request={publicRequest}
-        organisationId={organisationId}
-        currentPriority={priority}
-        deliveryOwners={[{ id: founderDeliveryOwnerId, label: "FSS founder" }]}
-        agreements={(register?.agreements ?? [])
-          .filter((agreement) => agreement.status === "signed")
-          .map((agreement) => ({
-            id: agreement.id,
-            label: agreement.draft.title,
-          }))}
-      />
+      <section className={`${ui.panel} ${layout.detail}`}>
+        <RequestDetail
+          request={publicRequest}
+          organisationId={organisationId}
+          canComment={false}
+          hidePortalActions
+        />
+      </section>
+      <section className={`${ui.panel} ${layout.actionPanel}`}>
+        <FounderRequestActions
+          request={publicRequest}
+          organisationId={organisationId}
+          currentPriority={priority}
+          deliveryOwners={[
+            { id: founderDeliveryOwnerId, label: "FSS founder" },
+          ]}
+          agreements={(register?.agreements ?? [])
+            .filter((agreement) => agreement.status === "signed")
+            .map((agreement) => ({
+              id: agreement.id,
+              label: agreement.draft.title,
+            }))}
+        />
+      </section>
       {register?.nextCursor && (
-        <p>
+        <p className={`${ui.panel} ${layout.registerNotice}`}>
           Showing signed agreements from the current register page.{" "}
           <Link
             href={`/growth/operations/clients/${organisationId}/agreements`}
@@ -84,9 +99,12 @@ export default async function FounderRequestPage({
           or use the reviewed request command for an older agreement.
         </p>
       )}
-      <section className={layout.internal}>
-        <h2>Internal notes</h2>
-        <p>Visible only to FSS. Never included in the client thread.</p>
+      <section className={`${ui.panel} ${layout.internal}`}>
+        <div className={layout.internalHeading}>
+          <h2>Internal notes</h2>
+          <span className={ui.statusChip}>Visible only to FSS</span>
+        </div>
+        <p>Never included in the client thread.</p>
         {internalComments.length === 0 ? (
           <p>No internal notes.</p>
         ) : (
@@ -100,6 +118,6 @@ export default async function FounderRequestPage({
           </ul>
         )}
       </section>
-    </div>
+    </main>
   );
 }
