@@ -62,7 +62,7 @@ export default async function JourneyPage({
   }
   if (!register) notFound();
   return (
-    <section className={`${styles.page} ${layout.page}`}>
+    <section className={`${styles.page} ${layout.operationsPage}`}>
       <OperationsPageHeader
         context="Operations · Onboarding"
         title="A clear path to getting started."

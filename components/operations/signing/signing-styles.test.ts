@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-test("portal signing retains its header and width while Operations uses a separate page class", () => {
+test("portal signing retains its header and width while founder signing and journeys use the Operations page class", () => {
   const css = readFileSync(
     new URL("./signing.module.css", import.meta.url),
     "utf8",
@@ -31,8 +31,17 @@ test("portal signing retains its header and width while Operations uses a separa
     ),
     "utf8",
   );
+  const journey = readFileSync(
+    new URL(
+      "../../../app/(growth)/(dashboard)/growth/operations/clients/[organisationId]/journey/page.tsx",
+      import.meta.url,
+    ),
+    "utf8",
+  );
   assert.match(portal, /signingStyles\.page/);
   assert.doesNotMatch(portal, /signingStyles\.operationsPage/);
   assert.match(operations, /signingStyles\.operationsPage/);
   assert.doesNotMatch(operations, /signingStyles\.page/);
+  assert.match(journey, /layout\.operationsPage/);
+  assert.doesNotMatch(journey, /layout\.page/);
 });
