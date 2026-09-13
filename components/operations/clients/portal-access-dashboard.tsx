@@ -103,15 +103,13 @@ export function PortalAccessDashboard({
           </p>
         </div>
         <div className={styles.headerActions}>
-          {data.organisations.length > 0 && (
-            <PortalInvitationDialog
-              triggerClassName={styles.primaryAction}
-              organisations={data.organisations}
-              onInvitationSent={(message) =>
-                setStatus({ kind: "success", message })
-              }
-            />
-          )}
+          <PortalInvitationDialog
+            triggerClassName={styles.primaryAction}
+            organisations={data.organisations}
+            onInvitationSent={(message) =>
+              setStatus({ kind: "success", message })
+            }
+          />
           <div className={styles.assurance}>
             <ShieldCheck aria-hidden="true" size={20} />
             <span>Roles are enforced against the live portal membership.</span>
