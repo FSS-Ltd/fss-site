@@ -64,7 +64,11 @@ export async function applyPortalOperation(
       grant.email,
       url.href,
       createPortalInvitationMetadata({
-        ...grant,
+        organisationId: grant.organisationId,
+        name: grant.name,
+        email: grant.email,
+        role: grant.role,
+        reviewReference: grant.reviewReference,
         approvedBy: founder.actorId,
       }),
     );
