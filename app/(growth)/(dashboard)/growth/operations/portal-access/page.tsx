@@ -6,8 +6,18 @@ import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 
 export const dynamic = "force-dynamic";
 
-export default async function PortalAccessPage(): Promise<React.JSX.Element> {
+export default async function PortalAccessPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}): Promise<React.JSX.Element> {
   if (!operationsEnabled()) notFound();
   const data = await listPortalAccess(getOperationsDb(), await requireFounder());
-  return <PortalAccessDashboard data={data} />;
+  const invite = (await searchParams).invite;
+  return (
+    <PortalAccessDashboard
+      data={data}
+      openInvitation={invite === "true"}
+    />
+  );
 }

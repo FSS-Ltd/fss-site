@@ -30,3 +30,16 @@ test("operations header provides context, outcome and optional action", () => {
   assert.match(html, /Payment exceptions/);
   assert.match(html, /Client register/);
 });
+
+test("inverse header marks enterprise dashboard headers for accessible contrast", () => {
+  const html = renderToStaticMarkup(
+    <OperationsPageHeader
+      context="Growth · Operations"
+      title="Operations"
+      description="Contract revenue and client actions."
+      variant="inverse"
+    />,
+  );
+
+  assert.match(html, /data-variant="inverse"/);
+});

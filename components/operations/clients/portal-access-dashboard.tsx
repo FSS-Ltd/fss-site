@@ -46,8 +46,10 @@ function accessStatus(entry: PortalAccessRegister["entries"][number]): string {
 
 export function PortalAccessDashboard({
   data,
+  openInvitation = false,
 }: {
   data: PortalAccessRegister;
+  openInvitation?: boolean;
 }): React.JSX.Element {
   const router = useRouter();
   const [status, setStatus] = useState<Status>({ kind: "idle" });
@@ -198,6 +200,7 @@ export function PortalAccessDashboard({
         ) : (
           <div className={styles.inviteControl}>
             <PortalInvitationDialog
+              autoOpen={openInvitation}
               organisations={data.organisations}
               onInvitationSent={(message) =>
                 setStatus({ kind: "success", message })
