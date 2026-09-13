@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { portalRoleOptions } from "@/lib/operations/auth/access-dashboard-metrics";
 import type { PortalRole } from "@/lib/operations/auth/types";
+import { getPortalRoleHelpExpandedRole } from "./portal-role-picker-state";
 import styles from "./portal-role-picker.module.css";
 
 type PortalRolePickerProps = {
@@ -20,7 +21,9 @@ export function PortalRolePicker({
 }: PortalRolePickerProps): React.JSX.Element {
   const [selectedRole, setSelectedRole] = useState<PortalRole>(defaultValue);
   const [expandedRole, setExpandedRole] = useState<PortalRole | null>(null);
-  const selectedOption = options.find((option) => option.value === selectedRole);
+  const selectedOption = options.find(
+    (option) => option.value === selectedRole,
+  );
 
   return (
     <fieldset className={styles.fieldset} disabled={disabled}>
@@ -55,11 +58,31 @@ export function PortalRolePicker({
                 aria-expanded={isExpanded}
                 aria-label={`More about ${option.label}`}
                 className={styles.helpButton}
-                onBlur={() => setExpandedRole(null)}
-                onClick={() => setExpandedRole(option.value)}
-                onFocus={() => setExpandedRole(option.value)}
-                onMouseEnter={() => setExpandedRole(option.value)}
-                onMouseLeave={() => setExpandedRole(null)}
+                onBlur={() =>
+                  setExpandedRole(
+                    getPortalRoleHelpExpandedRole(option.value, "blur"),
+                  )
+                }
+                onClick={() =>
+                  setExpandedRole(
+                    getPortalRoleHelpExpandedRole(option.value, "activate"),
+                  )
+                }
+                onFocus={() =>
+                  setExpandedRole(
+                    getPortalRoleHelpExpandedRole(option.value, "focus"),
+                  )
+                }
+                onMouseEnter={() =>
+                  setExpandedRole(
+                    getPortalRoleHelpExpandedRole(option.value, "hover"),
+                  )
+                }
+                onMouseLeave={() =>
+                  setExpandedRole(
+                    getPortalRoleHelpExpandedRole(option.value, "mouse_leave"),
+                  )
+                }
                 type="button"
               >
                 ?
