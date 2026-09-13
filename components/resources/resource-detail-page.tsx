@@ -52,6 +52,7 @@ export async function ResourceDetailPage({
         <section
           id="download-form"
           className="grid gap-16 lg:grid-cols-2 lg:items-start"
+          data-motion-reveal="mask"
         >
           <div className="space-y-8">
             <span className="inline-flex items-center rounded-full border border-brand-primary/20 bg-brand-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-widest text-brand-primary">
@@ -104,7 +105,10 @@ export async function ResourceDetailPage({
           </div>
         </section>
 
-        <section className="mt-20 rounded-2xl bg-surface-1/60 py-14 sm:py-16">
+        <section
+          className="mt-20 rounded-2xl bg-surface-1/60 py-14 sm:py-16"
+          data-motion-reveal="up"
+        >
           <div className="text-center">
             <h2 className="text-2xl font-bold text-foreground sm:text-3xl">
               {usageSectionTitle}
@@ -128,7 +132,7 @@ export async function ResourceDetailPage({
           </div>
         </section>
 
-        <section className="mt-20 py-16 text-center">
+        <section className="mt-20 py-16 text-center" data-motion-reveal="up">
           <h3 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
             Prepare the next software decision.
           </h3>
@@ -141,6 +145,7 @@ export async function ResourceDetailPage({
               href="#download-form"
               variant="secondary"
               size="lg"
+              magnetic
               className="border-brand-primary/30 text-brand-primary hover:bg-brand-primary/10"
             >
               Get the Free Guide
@@ -148,7 +153,12 @@ export async function ResourceDetailPage({
           </div>
         </section>
 
-        <GlowCard customSize className="mt-4 p-6 sm:p-8" as="section">
+        <GlowCard
+          customSize
+          className="mt-4 p-6 sm:p-8"
+          as="section"
+          data-motion-reveal="up"
+        >
           <h2 className="text-2xl font-semibold text-foreground">
             Implementation Guidance
           </h2>
@@ -156,7 +166,7 @@ export async function ResourceDetailPage({
         </GlowCard>
 
         {relatedResources.length ? (
-          <section className="mt-12">
+          <section className="mt-12" data-motion-reveal="up">
             <h2 className="text-2xl font-semibold text-foreground">
               Related resources
             </h2>

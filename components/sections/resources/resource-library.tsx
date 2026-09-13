@@ -42,7 +42,10 @@ export function ResourceLibrary({ resources }: ResourceLibraryProps) {
           className="pointer-events-none absolute inset-0 h-full w-full opacity-70"
         />
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(10,26,46,.026)_1px,transparent_1px),linear-gradient(90deg,rgba(10,26,46,.026)_1px,transparent_1px)] bg-[length:64px_64px] [mask-image:radial-gradient(120%_90%_at_42%_12%,#000,transparent_76%)]" />
-        <div className="relative mx-auto grid max-w-[1180px] gap-12 lg:grid-cols-2 lg:items-end">
+        <div
+          className="relative mx-auto grid max-w-[1180px] gap-12 lg:grid-cols-2 lg:items-end"
+          data-motion-reveal="mask"
+        >
           <div>
             <div className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-[rgba(10,26,46,.12)] bg-white/60 py-1.5 pr-3.5 pl-2.5">
               <span className="h-2 w-2 rounded-full bg-[#14989e] shadow-[0_0_0_4px_rgba(20,152,158,.18)]" />
@@ -151,6 +154,7 @@ export function ResourceLibrary({ resources }: ResourceLibraryProps) {
       <section
         id="library"
         className="bg-[#f2f3f5] px-7 py-[clamp(80px,10vw,130px)]"
+        data-motion-reveal="up"
       >
         <div className="mx-auto max-w-[1180px]">
           <div

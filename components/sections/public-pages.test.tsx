@@ -11,15 +11,23 @@ require.extensions[".css"] = (module) => {
   };
 };
 
-test("public foundations render readable content without hidden entrance states", () => {
+test("public foundations render readable motion-enhanced content", () => {
   for (const route of ["", "services/", "about/", "contact/"]) {
     const { default: Page } = require(`../../app/(site)/${route}page`);
     const html = renderToStaticMarkup(<Page />);
     assert.equal((html.match(/<h1[\s>]/g) ?? []).length, 1);
-    assert.doesNotMatch(
-      html,
-      /data-magnetic|data-reveal|data-sc-sticky|fssWordUp/,
-    );
+    assert.match(html, /data-hero-canvas/);
+    assert.match(html, /data-motion-reveal/);
+    assert.doesNotMatch(html, /style="[^"]*opacity:\s*0/);
+  }
+});
+
+test("primary public calls to action opt into magnetic pointer feedback", () => {
+  for (const route of ["", "services/", "about/"]) {
+    const { default: Page } = require(`../../app/(site)/${route}page`);
+    const html = renderToStaticMarkup(<Page />);
+    assert.match(html, /data-magnetic="true"/);
+    assert.match(html, /data-mag-label="true"/);
   }
 });
 
@@ -42,6 +50,17 @@ test("public hero variants render the shared particle canvas", () => {
     const html = renderToStaticMarkup(<Component />);
     assert.match(html, /data-hero-canvas/);
   }
+
+  const { BlogIndex } = require("./blog/blog-index");
+  const { ResourceLibrary } = require("./resources/resource-library");
+  assert.match(
+    renderToStaticMarkup(<BlogIndex posts={[]} />),
+    /data-hero-canvas/,
+  );
+  assert.match(
+    renderToStaticMarkup(<ResourceLibrary resources={[]} />),
+    /data-hero-canvas/,
+  );
 });
 
 test("home keeps its audience, proof and FSS visual language in the rendered document", () => {
@@ -75,9 +94,7 @@ test("contact renders the API fields with accessible choices and enquiry metadat
   assert.match(html, /type="radio"/);
   assert.match(html, /type="checkbox"/);
   assert.match(html, /<form[^>]*method="post"/);
-  assert.match(
-    html,
-    /<button[^>]*disabled=""[^>]*>Send project enquiry<\/button>/,
-  );
+  assert.match(html, /<button[^>]*type="submit"[^>]*disabled=""[^>]*>/);
+  assert.match(html, /Send project enquiry/);
   assert.doesNotMatch(html, /Book a|Opens your email app/);
 });

@@ -19,7 +19,11 @@ import { churchArticle } from "@/lib/commercial/church-article";
 
 function ContentSection({ section }: { section: CommercialSection }) {
   return (
-    <section className={styles.section} aria-labelledby={section.id}>
+    <section
+      className={styles.section}
+      aria-labelledby={section.id}
+      data-motion-reveal="mask"
+    >
       <h2 id={section.id}>{section.title}</h2>
       <p className="max-w-3xl">{section.text}</p>
       {section.links?.map((link) => (
@@ -82,7 +86,11 @@ export function CommercialPage({ page }: { page: CommercialPageContent }) {
           <ContentSection key={section.id} section={section} />
         ))}
         {page.kind !== "article" && <DeliverySteps />}
-        <section className={styles.section} aria-labelledby="faq-title">
+        <section
+          className={styles.section}
+          aria-labelledby="faq-title"
+          data-motion-reveal="up"
+        >
           <h2 id="faq-title">Frequently asked questions</h2>
           {page.faqs.map((faq) => (
             <div key={faq.question} className="max-w-3xl">

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { ButtonLink } from "@/components/ui/button";
 import { ContactLink } from "./page-intro";
 import { NexStepsProof } from "./nexsteps-proof";
 import { DeliverySteps } from "./delivery-steps";
@@ -11,7 +12,11 @@ import homeStyles from "./home-page.module.css";
 export function HomePage() {
   return (
     <div className={`${styles.page} ${homeStyles.home}`}>
-      <section className={homeStyles.hero} aria-labelledby="home-title">
+      <section
+        className={homeStyles.hero}
+        aria-labelledby="home-title"
+        data-motion-reveal="mask"
+      >
         <canvas
           data-hero-canvas
           className={homeStyles.particleCanvas}
@@ -32,10 +37,7 @@ export function HomePage() {
             </p>
             <div className={homeStyles.actions}>
               <ContactLink />
-              <Link
-                href="/work/nexsteps"
-                className={homeStyles.caseStudyLink}
-              >
+              <Link href="/work/nexsteps" className={homeStyles.caseStudyLink}>
                 Read the NexSteps case study
               </Link>
             </div>
@@ -46,7 +48,11 @@ export function HomePage() {
               <span>Schools</span>
             </p>
           </div>
-          <div className={homeStyles.markStage} aria-hidden="true">
+          <div
+            className={homeStyles.markStage}
+            aria-hidden="true"
+            data-motion-parallax="0.08"
+          >
             <svg className={homeStyles.circuit} viewBox="0 0 520 450">
               <path d="M0 108h110v78h96" />
               <path d="M520 330H398v-82h-84" />
@@ -57,13 +63,23 @@ export function HomePage() {
             </svg>
             <div className={homeStyles.markFrame}>
               <Image
-                src="/redesign/brand/fss-monogram-navy.png"
+                src="/images/editorial/home-mission-systems-v1.webp"
                 alt=""
-                width={709}
-                height={316}
+                width={2048}
+                height={1280}
                 priority
-                className={homeStyles.markImage}
+                sizes="(max-width: 760px) 92vw, 44vw"
+                className={homeStyles.editorialImage}
               />
+              <div className={homeStyles.markOverlay}>
+                <Image
+                  src="/redesign/brand/fss-monogram-white.png"
+                  alt=""
+                  width={709}
+                  height={316}
+                  className={homeStyles.markImage}
+                />
+              </div>
               <div className={homeStyles.markCaption}>
                 <span>FSS / SYSTEMS</span>
                 <span>BUILT TO LAST</span>
@@ -72,7 +88,17 @@ export function HomePage() {
           </div>
         </div>
       </section>
-      <div className={homeStyles.serviceSection}>
+      <section
+        className={homeStyles.kineticStatement}
+        aria-label="Our approach"
+        data-motion-scene
+      >
+        <p data-motion-kinetic>Systems that fit the way you work.</p>
+        <p data-motion-kinetic="reverse">
+          Software for the people who care for others.
+        </p>
+      </section>
+      <div className={homeStyles.serviceSection} data-motion-reveal="mask">
         <div className={homeStyles.serviceHeader}>
           <div>
             <p>WHAT WE BUILD</p>
@@ -81,7 +107,7 @@ export function HomePage() {
           <Link href="/services">All services</Link>
         </div>
         <div className={homeStyles.serviceGrid}>
-          <article className={homeStyles.serviceCard}>
+          <article className={homeStyles.serviceCard} data-motion-reveal="left">
             <div className={homeStyles.serviceNumber}>01</div>
             <h3>Custom platforms and portals</h3>
             <p>
@@ -90,7 +116,10 @@ export function HomePage() {
             </p>
             <Link href="/services/portal-development">Explore portals</Link>
           </article>
-          <article className={homeStyles.serviceCard}>
+          <article
+            className={homeStyles.serviceCard}
+            data-motion-reveal="right"
+          >
             <div className={homeStyles.serviceNumber}>02</div>
             <h3>Workflows and integrations</h3>
             <p>
@@ -99,7 +128,7 @@ export function HomePage() {
             </p>
             <Link href="/services/workflow-automation">Explore automation</Link>
           </article>
-          <article className={homeStyles.serviceCard}>
+          <article className={homeStyles.serviceCard} data-motion-reveal="left">
             <div className={homeStyles.serviceNumber}>03</div>
             <h3>Private and local AI</h3>
             <p>
@@ -110,23 +139,34 @@ export function HomePage() {
           </article>
         </div>
       </div>
-      <NexStepsProof className={homeStyles.proofFeature} />
+      <div className={homeStyles.proofScene} data-motion-scene>
+        <NexStepsProof className={homeStyles.proofFeature} motionTrack />
+      </div>
       <div className={homeStyles.processWrap}>
         <DeliverySteps />
       </div>
       <div className={homeStyles.processWrap}>
         <RelatedLinks links={[sectorLink, costLink]} />
       </div>
-      <section className={homeStyles.closing} aria-labelledby="home-closing">
+      <section
+        className={homeStyles.closing}
+        aria-labelledby="home-closing"
+        data-motion-wipe
+      >
         <p>LET’S BUILD</p>
         <h2 id="home-closing">Start with the operational problem.</h2>
         <p>
           Tell us what is getting in the way. We will help you decide whether a
           custom system is the right next step.
         </p>
-        <Link href="/contact" prefetch={false}>
+        <ButtonLink
+          href="/contact"
+          prefetch={false}
+          magnetic
+          className={homeStyles.closingLink}
+        >
           Discuss your project
-        </Link>
+        </ButtonLink>
       </section>
     </div>
   );

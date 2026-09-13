@@ -7,6 +7,15 @@ import {
   getShowcaseLayoutState,
   getShowcaseScrollState,
 } from "@/components/redesign/showcase-progress";
+import { bindMagneticControls } from "@/components/redesign/magnetic-controls";
+import {
+  bindMotionReveals,
+  bindScrollScenes,
+} from "@/components/redesign/motion-scenes";
+import {
+  getMotionCapabilities,
+  getParticleNodeCount,
+} from "@/components/redesign/motion-values";
 
 type FssInteractionsProps = {
   motion?: "full" | "calm" | "off";
@@ -145,6 +154,10 @@ export function FssInteractions({
       "(prefers-reduced-motion: reduce)",
     ).matches;
     const noMotion = reducedMotion || motion === "off";
+    const motionCapabilities = getMotionCapabilities({
+      reducedMotion: noMotion,
+      finePointer,
+    });
     const calmMotion = motion === "calm";
     const initialGridColumns = new WeakMap<HTMLElement, string>();
     const initialTransforms = new WeakMap<HTMLElement, string>();
@@ -368,37 +381,13 @@ export function FssInteractions({
     };
 
     const initMagnetic = () => {
-      if (!finePointer || noMotion) return;
+      if (!motionCapabilities.magnetic) return;
+      cleanups.push(bindMagneticControls(scope));
+    };
 
-      queryAll<HTMLElement>(scope, "[data-magnetic]").forEach((button) => {
-        const label = query<HTMLElement>(button, "[data-mag-label]");
-        const strength = 0.32;
-
-        bind(
-          button,
-          "mousemove",
-          (event) => {
-            const mouse = event as MouseEvent;
-            const rect = button.getBoundingClientRect();
-            const offsetX = mouse.clientX - (rect.left + rect.width / 2);
-            const offsetY = mouse.clientY - (rect.top + rect.height / 2);
-            button.style.transform = `translate(${offsetX * strength}px,${offsetY * strength}px)`;
-            if (label) {
-              label.style.transform = `translate(${offsetX * strength * 0.4}px,${offsetY * strength * 0.4}px)`;
-            }
-          },
-          cleanups,
-        );
-        bind(
-          button,
-          "mouseleave",
-          () => {
-            button.style.transform = "";
-            if (label) label.style.transform = "";
-          },
-          cleanups,
-        );
-      });
+    const initMotionScenes = () => {
+      if (!motionCapabilities.scroll) return;
+      cleanups.push(bindMotionReveals(scope), bindScrollScenes(scope));
     };
 
     const initSpotlight = () => {
@@ -439,7 +428,7 @@ export function FssInteractions({
 
     const initCanvas = () => {
       const canvases = queryAll<HTMLCanvasElement>(scope, "[data-hero-canvas]");
-      if (!canvases.length || noMotion) return;
+      if (!canvases.length || !motionCapabilities.showParticles) return;
 
       canvases.forEach((canvas) => {
         const context = canvas.getContext("2d");
@@ -449,24 +438,19 @@ export function FssInteractions({
         let height = 0;
         let nodes: Point[] = [];
         let running = true;
+        let inViewport = true;
         let frameId = 0;
         const mouse = { x: -9999, y: -9999 };
         const baseNodeCount = Math.round(nodeDensity * (calmMotion ? 0.6 : 1));
         const maxDistance = 132;
 
         const buildNodes = () => {
-          const sizeMultiplier =
-            width < 640 ? 0.36 : width < 940 ? 0.62 : 1;
-          const pointerMultiplier = finePointer ? 1 : 0.55;
-          const count = Math.max(
-            10,
-            Math.round(
-              baseNodeCount *
-                sizeMultiplier *
-                pointerMultiplier *
-                Math.min(1.2, (width * height) / (1280 * 720)),
-            ),
-          );
+          const count = getParticleNodeCount({
+            baseCount: baseNodeCount,
+            width,
+            height,
+            finePointer,
+          });
           nodes = Array.from({ length: count }, () => ({
             x: Math.random() * width,
             y: Math.random() * height,
@@ -492,15 +476,21 @@ export function FssInteractions({
           context.clearRect(0, 0, width, height);
 
           nodes.forEach((point) => {
-            point.x += point.vx;
-            point.y += point.vy;
+            if (motionCapabilities.animateParticles) {
+              point.x += point.vx;
+              point.y += point.vy;
+            }
             if (point.x < 0 || point.x > width) point.vx *= -1;
             if (point.y < 0 || point.y > height) point.vy *= -1;
 
             const dx = point.x - mouse.x;
             const dy = point.y - mouse.y;
             const distance = Math.hypot(dx, dy);
-            if (distance > 0 && distance < 150) {
+            if (
+              motionCapabilities.animateParticles &&
+              distance > 0 &&
+              distance < 150
+            ) {
               point.x += (dx / distance) * 0.5;
               point.y += (dy / distance) * 0.5;
             }
@@ -537,21 +527,34 @@ export function FssInteractions({
               ? "rgba(15,122,131,.85)"
               : "rgba(20,152,158,.32)";
             context.beginPath();
-            context.arc(point.x, point.y, nearMouse ? 2.4 : 1.5, 0, Math.PI * 2);
+            context.arc(
+              point.x,
+              point.y,
+              nearMouse ? 2.4 : 1.5,
+              0,
+              Math.PI * 2,
+            );
             context.fill();
           });
 
-          frameId = window.requestAnimationFrame(frame);
+          if (motionCapabilities.animateParticles) {
+            frameId = window.requestAnimationFrame(frame);
+          }
+        };
+
+        const resizeAndRender = () => {
+          resize();
+          if (!motionCapabilities.animateParticles) frame();
         };
 
         resize();
-        bind(window, "resize", resize, cleanups);
+        bind(window, "resize", resizeAndRender, cleanups);
 
         bind(
           window,
           "pointermove",
           (event) => {
-            if (!finePointer) return;
+            if (!finePointer || !motionCapabilities.animateParticles) return;
             const pointer = event as PointerEvent;
             const rect = canvas.getBoundingClientRect();
             mouse.x = pointer.clientX - rect.left;
@@ -569,14 +572,37 @@ export function FssInteractions({
           cleanups,
         );
 
-        frameId = window.requestAnimationFrame(frame);
+        frame();
+
+        const syncDocumentVisibility = () => {
+          if (document.hidden) {
+            running = false;
+            window.cancelAnimationFrame(frameId);
+            return;
+          }
+
+          if (inViewport && !running) {
+            running = true;
+            if (motionCapabilities.animateParticles) {
+              frameId = window.requestAnimationFrame(frame);
+            } else {
+              frame();
+            }
+          }
+        };
+        bind(document, "visibilitychange", syncDocumentVisibility, cleanups);
 
         if ("IntersectionObserver" in window) {
           const visibilityObserver = new IntersectionObserver((entries) => {
             entries.forEach((entry) => {
-              if (entry.isIntersecting && !running) {
+              inViewport = entry.isIntersecting;
+              if (entry.isIntersecting && !document.hidden && !running) {
                 running = true;
-                frameId = window.requestAnimationFrame(frame);
+                if (motionCapabilities.animateParticles) {
+                  frameId = window.requestAnimationFrame(frame);
+                } else {
+                  frame();
+                }
               } else if (!entry.isIntersecting) {
                 running = false;
               }
@@ -730,10 +756,14 @@ export function FssInteractions({
       }
     };
 
-    const updateProcess = (lineLength: number) => {
+    const updateProcess = () => {
       const svg = query<SVGSVGElement>(scope, "[data-process-svg]");
       const line = query<SVGLineElement>(scope, "[data-process-line]");
       if (!svg || !line) return;
+      if (noMotion) {
+        line.style.transform = "scaleX(1)";
+        return;
+      }
 
       const host = svg.closest("section");
       if (!(host instanceof HTMLElement)) return;
@@ -746,7 +776,8 @@ export function FssInteractions({
           (window.innerHeight * 0.7 - rect.top) / (host.offsetHeight * 0.62),
         ),
       );
-      line.style.strokeDashoffset = String(lineLength * (1 - progress));
+      line.style.transformOrigin = "left center";
+      line.style.transform = `scaleX(${progress})`;
 
       queryAll<HTMLElement>(scope, "[data-step]").forEach((step) => {
         const dot = query<HTMLElement>(step, "[data-step-dot]");
@@ -765,16 +796,9 @@ export function FssInteractions({
     const initScroll = () => {
       const header = query<HTMLElement>(scope, "[data-header]");
       const processLine = query<SVGLineElement>(scope, "[data-process-line]");
-      let processLineLength = 1000;
-
-      if (processLine && "getTotalLength" in processLine) {
-        try {
-          processLineLength = processLine.getTotalLength();
-          processLine.style.strokeDasharray = String(processLineLength);
-          processLine.style.strokeDashoffset = String(processLineLength);
-        } catch {
-          processLineLength = 1000;
-        }
+      if (processLine) {
+        processLine.style.transformOrigin = "left center";
+        processLine.style.transform = noMotion ? "scaleX(1)" : "scaleX(0)";
       }
 
       const updateHeader = () => {
@@ -812,7 +836,7 @@ export function FssInteractions({
         updateHeader();
         updateParallax();
         updateShowcase();
-        updateProcess(processLineLength);
+        updateProcess();
       };
 
       const onScroll: EventListener = () => {
@@ -833,7 +857,7 @@ export function FssInteractions({
       // scroll/resize-driven updates still call `handle()` atomically so the
       // scroll-linked visuals stay in sync frame-to-frame.
       runInStages(
-        [updateHeader, updateParallax, updateShowcase, () => updateProcess(processLineLength)],
+        [updateHeader, updateParallax, updateShowcase, updateProcess],
         cleanups,
       );
     };
@@ -967,6 +991,7 @@ export function FssInteractions({
         initMagnetic,
         initSpotlight,
         initCanvas,
+        initMotionScenes,
         initScroll,
         initContact,
       ],

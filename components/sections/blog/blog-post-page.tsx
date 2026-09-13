@@ -22,9 +22,11 @@ export async function BlogPostPage({ post, relatedPosts }: BlogPostPageProps) {
     <>
       <BlogPostLayout post={post.meta}>{content}</BlogPostLayout>
       {relatedPosts.length ? (
-        <section className="pb-16 sm:pb-20">
+        <section className="pb-16 sm:pb-20" data-motion-reveal="up">
           <Container>
-            <h2 className="text-2xl font-semibold text-foreground">Related articles</h2>
+            <h2 className="text-2xl font-semibold text-foreground">
+              Related articles
+            </h2>
             <div className="mt-6 grid gap-5 md:grid-cols-2">
               {relatedPosts.map((relatedPost) => (
                 <BlogPostCard key={relatedPost.slug} post={relatedPost} />

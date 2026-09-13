@@ -97,6 +97,28 @@ html {
   outline-offset: 4px;
 }
 
+[data-magnetic] {
+  min-height: 44px;
+  transform: translate3d(var(--magnetic-x, 0), var(--magnetic-y, 0), 0);
+  transition: transform 360ms cubic-bezier(0.2, 0.75, 0.2, 1);
+  will-change: transform;
+}
+
+[data-mag-label] {
+  display: inline-flex;
+  align-items: center;
+  transform: translate3d(
+    var(--magnetic-label-x, 0),
+    var(--magnetic-label-y, 0),
+    0
+  );
+}
+
+[data-motion-parallax] {
+  transform: translate3d(0, var(--motion-parallax, 0), 0);
+  will-change: transform;
+}
+
 #fssroot footer :is(a, button) {
   min-height: 44px;
   display: inline-flex;
@@ -110,5 +132,28 @@ html {
 @media (max-width: 939px) {
   [data-foot-grid] {
     grid-template-columns: 1fr !important;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  [data-magnetic],
+  [data-mag-label] {
+    transform: none !important;
+    will-change: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-magnetic],
+  [data-mag-label],
+  [data-motion-parallax],
+  [data-motion-kinetic],
+  [data-motion-track] {
+    transform: none !important;
+    will-change: auto;
+  }
+
+  [data-motion-wipe] {
+    clip-path: none !important;
   }
 }

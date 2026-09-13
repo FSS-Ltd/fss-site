@@ -20,7 +20,7 @@ export function BlogPostLayout({ post, children }: BlogPostLayoutProps) {
     <article className="pt-24 pb-14 sm:py-20 lg:py-24">
       <Container className="max-w-3xl">
         <ContentBreadcrumbs parent="Blog" title={post.title} />
-        <header className="space-y-5">
+        <header className="space-y-5" data-motion-reveal="mask">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-primary">
             {post.category}
           </p>
@@ -41,7 +41,11 @@ export function BlogPostLayout({ post, children }: BlogPostLayoutProps) {
           </div>
         )}
 
-        <figure className="mt-10 overflow-hidden rounded-3xl border border-border-soft/45 bg-surface-1/72">
+        <figure
+          className="mt-10 overflow-hidden rounded-3xl border border-border-soft/45 bg-surface-1/72"
+          data-motion-reveal="up"
+          data-motion-parallax="0.035"
+        >
           <Image
             src={post.coverImage}
             alt={post.title}
@@ -52,7 +56,10 @@ export function BlogPostLayout({ post, children }: BlogPostLayoutProps) {
           />
         </figure>
 
-        <section className="mt-10 space-y-4 text-base leading-8 text-text-muted">
+        <section
+          className="mt-10 space-y-4 text-base leading-8 text-text-muted"
+          data-motion-reveal="up"
+        >
           {children}
         </section>
 

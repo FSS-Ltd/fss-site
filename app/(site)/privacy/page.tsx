@@ -20,7 +20,7 @@ const providers = [
 export default function PrivacyPage() {
   return (
     <article className={styles.page}>
-      <header className={styles.hero}>
+      <header className={styles.hero} data-motion-reveal="mask">
         <p className={styles.eyebrow}>PRIVACY NOTICE</p>
         <h1>How we handle personal data</h1>
         <p className={styles.intro}>
@@ -31,7 +31,7 @@ export default function PrivacyPage() {
       </header>
 
       <div className={styles.content}>
-        <section>
+        <section data-motion-reveal="up">
           <h2>Who is responsible</h2>
           <p>
             Faithful Software Solutions Ltd is the controller. We are registered
@@ -47,7 +47,7 @@ export default function PrivacyPage() {
           </p>
         </section>
 
-        <section>
+        <section data-motion-reveal="up">
           <h2>Information we use</h2>
           <p>We may process the following information:</p>
           <ul>
@@ -74,7 +74,7 @@ export default function PrivacyPage() {
           </ul>
         </section>
 
-        <section>
+        <section data-motion-reveal="up">
           <h2>Growth OS research and outreach</h2>
           <p>
             Growth OS helps us identify organisations that may have a relevant
@@ -92,7 +92,7 @@ export default function PrivacyPage() {
           </p>
         </section>
 
-        <section>
+        <section data-motion-reveal="up">
           <h2>Google sign-in and Gmail</h2>
           <p>
             Our private Growth OS requests the openid and email scopes for
@@ -108,7 +108,7 @@ export default function PrivacyPage() {
           </p>
         </section>
 
-        <section>
+        <section data-motion-reveal="up">
           <h2>Why we use information</h2>
           <ul>
             <li>
@@ -127,7 +127,7 @@ export default function PrivacyPage() {
           </ul>
         </section>
 
-        <section>
+        <section data-motion-reveal="up">
           <h2>Cookies and analytics</h2>
           <p>
             Essential cookies and local storage support security, sign-in and
@@ -142,7 +142,7 @@ export default function PrivacyPage() {
           </p>
         </section>
 
-        <section>
+        <section data-motion-reveal="up">
           <h2>Service providers and transfers</h2>
           <p>We use selected processors to operate our services:</p>
           <dl className={styles.providers}>
@@ -160,7 +160,7 @@ export default function PrivacyPage() {
           </p>
         </section>
 
-        <section>
+        <section data-motion-reveal="up">
           <h2>Retention and security</h2>
           <p>
             We keep information only for as long as needed for the stated
@@ -171,7 +171,7 @@ export default function PrivacyPage() {
           </p>
         </section>
 
-        <section>
+        <section data-motion-reveal="up">
           <h2>Your rights</h2>
           <p>
             Depending on the circumstances, you may ask for access, correction,
@@ -193,7 +193,7 @@ export default function PrivacyPage() {
           </p>
         </section>
 
-        <section>
+        <section data-motion-reveal="up">
           <h2>Changes to this notice</h2>
           <p>
             We will update this page when our processing changes. Material

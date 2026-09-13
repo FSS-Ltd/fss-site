@@ -92,7 +92,7 @@ export function AiQuestionnairePage() {
         />
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(10,26,46,.026)_1px,transparent_1px),linear-gradient(90deg,rgba(10,26,46,.026)_1px,transparent_1px)] bg-[length:64px_64px] [mask-image:radial-gradient(120%_90%_at_42%_12%,#000,transparent_76%)]" />
         <div className="relative mx-auto grid max-w-[1180px] gap-10 lg:grid-cols-[1.05fr_.95fr] lg:items-center">
-          <div>
+          <div data-motion-reveal="mask">
             <div className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-[rgba(10,26,46,.12)] bg-white/60 py-1.5 pr-3.5 pl-2.5">
               <span className="h-2 w-2 rounded-full bg-[#14989e] shadow-[0_0_0_4px_rgba(20,152,158,.18)]" />
               <span className="font-mono text-[11px] font-medium tracking-[0.12em] text-[#41506a]">
@@ -108,7 +108,12 @@ export function AiQuestionnairePage() {
               compliance, speed, and workflow value.
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-3">
-              <ButtonLink href="#questionnaire" size="lg" className="gap-2">
+              <ButtonLink
+                href="#questionnaire"
+                size="lg"
+                className="gap-2"
+                magnetic
+              >
                 Start the questionnaire <ArrowRight className="size-4" />
               </ButtonLink>
               <ButtonLink href="#answers" variant="secondary" size="lg">
@@ -213,10 +218,7 @@ export function AiQuestionnairePage() {
         className="bg-[#f2f3f5] px-7 py-[clamp(80px,10vw,130px)]"
       >
         <div className="mx-auto max-w-[1180px]">
-          <div
-            data-reveal
-            className="mb-10 max-w-[760px]"
-          >
+          <div data-reveal className="mb-10 max-w-[760px]">
             <p className="font-mono text-xs tracking-[0.14em] text-[#0f7a83]">
               FIND YOUR AI ROUTE
             </p>
@@ -238,9 +240,7 @@ export function AiQuestionnairePage() {
         className="bg-[#0a1a2e] px-7 py-[clamp(80px,10vw,130px)] text-[#e9eef5]"
       >
         <div className="mx-auto grid max-w-[1180px] gap-10 lg:grid-cols-[.9fr_1.1fr] lg:items-start">
-          <div
-            data-reveal
-          >
+          <div data-reveal>
             <p className="font-mono text-xs tracking-[0.14em] text-[#46c7d8]">
               PRACTICAL ANSWERS
             </p>
@@ -281,9 +281,7 @@ export function AiQuestionnairePage() {
 
       <section className="bg-[#f2f3f5] px-7 py-[clamp(80px,10vw,130px)]">
         <div className="mx-auto grid max-w-[1180px] gap-10 lg:grid-cols-[1.1fr_.9fr] lg:items-center">
-          <div
-            data-reveal
-          >
+          <div data-reveal>
             <p className="font-mono text-xs tracking-[0.14em] text-[#0f7a83]">
               PRIVATE AI WORKFLOW AUDIT
             </p>
