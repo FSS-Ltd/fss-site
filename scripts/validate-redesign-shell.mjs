@@ -10,6 +10,10 @@ const files = {
     "utf8",
   ),
   homePage: readFileSync("components/sections/public/home-page.tsx", "utf8"),
+  homeStyles: readFileSync(
+    "components/sections/public/home-page.module.css",
+    "utf8",
+  ),
   globals: readFileSync("app/globals.css", "utf8"),
   header: readFileSync("components/layout/site-header.tsx", "utf8"),
   headerNavItems: readFileSync(
@@ -57,6 +61,18 @@ if (files.globals.includes("[data-hero-canvas] {\n    display: none")) {
 
 if (!files.homePage.includes("data-hero-canvas")) {
   failures.push("The homepage hero must render the shared particle canvas.");
+}
+
+if (/\.serviceSection\s*\{[^}]*max-width\s*:/.test(files.homeStyles)) {
+  failures.push(
+    "The homepage service section must remain full width so its responsive side padding does not collapse the content column.",
+  );
+}
+
+if (/\.processWrap\s*\{[^}]*max-width\s*:/.test(files.homeStyles)) {
+  failures.push(
+    "The homepage process section must remain full width so its responsive side padding does not collapse the content column.",
+  );
 }
 
 if (
