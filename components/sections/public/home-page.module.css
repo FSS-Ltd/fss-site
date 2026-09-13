@@ -263,9 +263,9 @@
 }
 
 .serviceSection {
-  max-width: 1120px;
+  width: 100%;
+  box-sizing: border-box;
   padding: clamp(58px, 8vw, 96px) max(24px, calc((100% - 1120px) / 2));
-  margin: 0 auto;
 }
 
 .proofFeature {
@@ -477,9 +477,9 @@
 }
 
 .processWrap {
-  max-width: 1120px;
+  width: 100%;
+  box-sizing: border-box;
   padding: 0 max(24px, calc((100% - 1120px) / 2));
-  margin: 0 auto;
 }
 
 .closing {
