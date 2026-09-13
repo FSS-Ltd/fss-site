@@ -35,3 +35,16 @@ test("renders the portal invitation as a modal task with the required details", 
   assert.match(markup, /Access approval note/);
   assert.match(markup, />Cancel</);
 });
+
+test("allows the portal access header to supply its primary action style", () => {
+  const markup = renderToStaticMarkup(
+    <PortalInvitationDialog
+      organisations={[]}
+      onInvitationSent={() => undefined}
+      triggerClassName="primaryAction"
+    />,
+  );
+
+  assert.match(markup, /class="primaryAction"/);
+  assert.match(markup, /Invite portal user/);
+});
