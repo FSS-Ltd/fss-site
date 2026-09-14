@@ -10,17 +10,25 @@ import { getPortalDb } from "@/lib/operations/db/portal-client";
 
 export default async function PortalOnboardingPage(): Promise<React.JSX.Element> {
   if (!portalAuthConfigured()) return <PortalUnavailable />;
+
+  let destination: "/portal/login" | "/portal" | null = null;
   try {
     const identity = await getPortalIdentity();
-    if (!identity) redirect("/portal/login");
-    const db = getPortalDb();
-    if ((await listPortalMemberships(db, identity, randomUUID())).length > 0)
-      redirect("/portal");
-    if (!(await needsPortalOnboarding(db, identity, randomUUID())))
-      redirect("/portal");
-    return <OrganisationOnboarding />;
-  } catch (error) {
-    if (error && typeof error === "object" && "digest" in error) throw error;
+    if (!identity) {
+      destination = "/portal/login";
+    } else {
+      const db = getPortalDb();
+      const hasMembership =
+        (await listPortalMemberships(db, identity, randomUUID())).length > 0;
+      const hasPendingInvitation = hasMembership
+        ? false
+        : await needsPortalOnboarding(db, identity, randomUUID());
+      if (hasMembership || !hasPendingInvitation) destination = "/portal";
+    }
+  } catch {
     return <PortalUnavailable />;
   }
+
+  if (destination) redirect(destination);
+  return <OrganisationOnboarding />;
 }

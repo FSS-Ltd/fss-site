@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import type { OperationsDb } from "@/lib/operations/db/client";
-import { createPortalOnboardingHandler } from "./route";
+import { createPortalOnboardingHandler } from "./handler";
 
 const identity = {
   userId: "d6fd04aa-3f79-48b5-84ee-83a01b129428",
