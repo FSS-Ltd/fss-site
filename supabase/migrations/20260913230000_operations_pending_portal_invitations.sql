@@ -133,7 +133,7 @@ declare
   verified_email text := nullif(current_setting('operations.verified_email', true), '');
   correlation uuid := nullif(current_setting('operations.correlation_id', true), '')::uuid;
   invitation operations.pending_portal_invitations;
-  organisation_id uuid;
+  created_organisation_id uuid;
   contact_id uuid;
   portal_actor text;
 begin
@@ -154,30 +154,30 @@ begin
     order by created_at desc, id desc limit 1 for update;
   if not found then return null; end if;
 
-  organisation_id := gen_random_uuid();
+  created_organisation_id := gen_random_uuid();
   contact_id := gen_random_uuid();
   portal_actor := encode(sha256(convert_to(verified_user::text, 'UTF8')), 'hex');
   insert into operations.organisations (
     id, legal_name, display_name, trading_status, timezone, created_by, review_reference
   ) values (
-    organisation_id, trim(target_legal_name), trim(target_display_name), 'unknown', trim(target_timezone), invitation.created_by, invitation.review_reference
+    created_organisation_id, trim(target_legal_name), trim(target_display_name), 'unknown', trim(target_timezone), invitation.created_by, invitation.review_reference
   );
   insert into operations.contacts (
     id, organisation_id, name, email, created_by, review_reference
   ) values (
-    contact_id, organisation_id, invitation.name, invitation.email, invitation.created_by, invitation.review_reference
+    contact_id, created_organisation_id, invitation.name, invitation.email, invitation.created_by, invitation.review_reference
   );
   insert into operations.memberships (organisation_id, contact_id, user_id, role)
-    values (organisation_id, contact_id, verified_user, invitation.role);
+    values (created_organisation_id, contact_id, verified_user, invitation.role);
   update operations.pending_portal_invitations set
     state = 'completed',
     claimed_user_id = verified_user,
-    organisation_id = complete_portal_onboarding.organisation_id,
+    organisation_id = created_organisation_id,
     completed_at = clock_timestamp()
     where id = invitation.id;
   insert into operations.portal_invitation_audit (invitation_id, actor_id, action, correlation_id)
     values (invitation.id, portal_actor, 'completed', correlation);
-  return organisation_id;
+  return created_organisation_id;
 end;
 $$;
 
