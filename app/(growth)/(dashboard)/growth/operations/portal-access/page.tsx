@@ -10,5 +10,5 @@ export default async function PortalAccessPage(): Promise<React.JSX.Element> {
   if (!operationsEnabled()) notFound();
   const founder = await requireFounder();
   const data = await listPortalAccess(getOperationsDb(), founder);
-  return <PortalAccessDashboard data={data} founderEmail={founder.email} />;
+  return <PortalAccessDashboard data={data} />;
 }

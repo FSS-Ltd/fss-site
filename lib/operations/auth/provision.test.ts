@@ -45,6 +45,7 @@ test("provisioning creates a Clerk invitation with a fixed activation redirect",
   assert.deepEqual(inputs, [
     {
       emailAddress: "client@example.test",
+      notify: true,
       redirectUrl: "https://portal.example.test/portal/activate",
       publicMetadata: { fssPortalInvitation: metadata },
     },
@@ -73,18 +74,21 @@ test("provisioning creates a Clerk invitation with a fixed activation redirect",
 });
 
 test("provisioning classifies an existing Clerk invitation without retaining provider details", async () => {
-  const providerError = Object.assign(new Error("Invitation already exists for client@example.test"), {
-    name: "ClerkAPIResponseError",
-    status: 409,
-    errors: [
-      {
-        code: "form_identifier_exists",
-        message: "Invitation already exists for client@example.test",
-        longMessage: "The existing invitation is still pending.",
-        meta: { emailAddresses: ["client@example.test"] },
-      },
-    ],
-  });
+  const providerError = Object.assign(
+    new Error("Invitation already exists for client@example.test"),
+    {
+      name: "ClerkAPIResponseError",
+      status: 409,
+      errors: [
+        {
+          code: "form_identifier_exists",
+          message: "Invitation already exists for client@example.test",
+          longMessage: "The existing invitation is still pending.",
+          meta: { emailAddresses: ["client@example.test"] },
+        },
+      ],
+    },
+  );
 
   await assert.rejects(
     provisionPortalAccount(

@@ -16,17 +16,13 @@ const { PortalInvitationDialog } =
 
 test("renders the portal invitation as a modal task with the required details", () => {
   const markup = renderToStaticMarkup(
-    <PortalInvitationDialog
-      founderEmail="founder@example.test"
-      onInvitationSent={() => undefined}
-    />,
+    <PortalInvitationDialog onInvitationSent={() => undefined} />,
   );
 
   assert.match(markup, /Invite portal user/);
   assert.match(markup, /<dialog/);
-  assert.match(markup, /Client/);
-  assert.match(markup, /Founder/);
-  assert.match(markup, /founder@example\.test/);
+  assert.doesNotMatch(markup, /Founder/);
+  assert.doesNotMatch(markup, /Invitation type/);
   assert.doesNotMatch(markup, /name="organisationId"/);
   assert.match(markup, /name="email"/);
   assert.match(markup, /name="name"/);
@@ -38,7 +34,6 @@ test("renders the portal invitation as a modal task with the required details", 
 test("allows the portal access header to supply its primary action style", () => {
   const markup = renderToStaticMarkup(
     <PortalInvitationDialog
-      founderEmail="founder@example.test"
       onInvitationSent={() => undefined}
       triggerClassName="primaryAction"
     />,

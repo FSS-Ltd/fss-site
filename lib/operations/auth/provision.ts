@@ -5,6 +5,7 @@ import type { PortalInvitationMetadata } from "./clerk-invitation";
 
 export type PortalInvitation = {
   emailAddress: string;
+  notify: true;
   redirectUrl: string;
   publicMetadata?: { fssPortalInvitation: PortalInvitationMetadata };
 };
@@ -71,6 +72,7 @@ export async function provisionPortalAccount(
   try {
     await create({
       emailAddress: normalizedEmail,
+      notify: true,
       redirectUrl: parsedRedirectUrl,
       ...(metadata
         ? { publicMetadata: { fssPortalInvitation: metadata } }
@@ -81,13 +83,19 @@ export async function provisionPortalAccount(
   }
 }
 
-function classifyProvisioningError(error: unknown): PortalProvisioningErrorCode {
+function classifyProvisioningError(
+  error: unknown,
+): PortalProvisioningErrorCode {
   const status = readErrorStatus(error);
 
   if (status === 409) return "INVITATION_CONFLICT";
   if (status === 400 || status === 422) return "INVALID_PROVIDER_REQUEST";
   if (status === 401 || status === 403) return "PROVIDER_AUTHENTICATION_FAILED";
-  if (status === 408 || status === 429 || (status !== undefined && status >= 500))
+  if (
+    status === 408 ||
+    status === 429 ||
+    (status !== undefined && status >= 500)
+  )
     return "RETRYABLE_PROVIDER_ERROR";
   return "UNKNOWN_PROVIDER_ERROR";
 }
