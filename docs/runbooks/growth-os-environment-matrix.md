@@ -45,6 +45,22 @@ automations off and the least-privileged `growth_app` role.
 | `GITHUB_PROSPECT_PREVIEW_TOKEN` | Jean-Fidele | Approved local operator environment only | **Do not set** | Fine-grained token restricted to `FSS-Ltd/fss-site`, `contents: write` and `pull_requests: write` only | Revoke and recreate in GitHub, update Vercel, redeploy | Yes |
 | `GITHUB_PROSPECT_PREVIEW_REPOSITORY` | Jean-Fidele | `FSS-Ltd/fss-site` | **Do not set** | `FSS-Ltd/fss-site` exactly | Fixed allowlist, not a secret | Yes |
 
+## Operations worker gates
+
+`OPERATIONS_ENABLED` controls access to the live Operations portal. It must not
+be used to activate background workers. Each worker remains disabled unless its
+dedicated gate is explicitly set to `true` in Production after its release
+prerequisites are met.
+
+| Worker | Default | Required configuration before activation |
+| --- | --- | --- |
+| Onboarding | `OPERATIONS_ONBOARDING_ENABLED=false` | `OPERATIONS_ONBOARDING_DATABASE_URL` using the dedicated least-privilege worker role, plus a reviewed onboarding release gate |
+| Signing | `OPERATIONS_SIGNING_ENABLED=false` | `OPERATIONS_SIGNING_DATABASE_URL` using the dedicated least-privilege worker role, plus a reviewed signing release gate |
+| Billing | `OPERATIONS_BILLING_ENABLED=false` | `OPERATIONS_BILLING_DATABASE_URL`, reviewed Stripe account/mode/webhook configuration, and a billing release gate |
+
+The flags and connection-string names are server-only. Do not place a value in
+source control or expose any of them through `NEXT_PUBLIC_*`.
+
 ## Public values
 
 Only these are safe under `NEXT_PUBLIC_*` and may appear in the client

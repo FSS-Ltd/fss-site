@@ -14,8 +14,8 @@ export async function GET(request: Request): Promise<Response> {
       cronSecret: process.env.CRON_SECRET,
       automationsEnabled: onboardingEnabled(),
       disabledReason: "operations_onboarding_disabled",
-      reportUnexpectedError: () =>
-        console.error("Operations onboarding dispatch failed."),
+      reportUnexpectedError: (report) =>
+        console.error("Operations onboarding dispatch failed.", report),
     },
     async () => {
       const db = getOnboardingWorkerDb();

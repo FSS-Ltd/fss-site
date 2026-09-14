@@ -14,8 +14,8 @@ export async function GET(request: Request): Promise<Response> {
       cronSecret: process.env.CRON_SECRET,
       automationsEnabled: signingEnabled(),
       disabledReason: "operations_signing_disabled",
-      reportUnexpectedError: () =>
-        console.error("Operations signing completion failed."),
+      reportUnexpectedError: (report) =>
+        console.error("Operations signing completion failed.", report),
     },
     async () => {
       const db = getSigningWorkerDb();
