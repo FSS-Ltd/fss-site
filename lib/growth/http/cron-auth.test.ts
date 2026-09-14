@@ -98,7 +98,7 @@ test("route handler skips work and returns 200 when automations are disabled", a
 });
 
 test("route handler reports and masks an unexpected error from the work function", async () => {
-  const reported: unknown[] = [];
+  const reported: Array<{ errorName: string; errorCode?: string }> = [];
   const handler = createCronRouteHandler(
     {
       cronSecret: CRON_SECRET,
@@ -106,7 +106,9 @@ test("route handler reports and masks an unexpected error from the work function
       reportUnexpectedError: (error) => reported.push(error),
     },
     async () => {
-      throw new Error("Gmail is not connected.");
+      const error = new Error("Gmail token=secret must not reach logs.");
+      error.stack = "stack containing provider response and credentials";
+      throw error;
     },
   );
 
@@ -117,7 +119,51 @@ test("route handler reports and masks an unexpected error from the work function
     ok: false,
     code: "internal_error",
   });
-  assert.equal(reported.length, 1);
+  assert.deepEqual(reported, [{ errorName: "Error" }]);
+  assert.doesNotMatch(JSON.stringify(reported), /token=secret|stack|credentials/);
+});
+
+test("route handler preserves an allowlisted provider error code", async () => {
+  const reported: Array<{ errorName: string; errorCode?: string }> = [];
+  const handler = createCronRouteHandler(
+    {
+      cronSecret: CRON_SECRET,
+      automationsEnabled: true,
+      reportUnexpectedError: (error) => reported.push(error),
+    },
+    async () => {
+      const error = new Error("OAuth refresh token was rejected.");
+      error.name = "GmailClientError";
+      Object.assign(error, { code: "AUTHENTICATION_FAILED" });
+      throw error;
+    },
+  );
+
+  await handler(requestWithHeader(`Bearer ${CRON_SECRET}`));
+
+  assert.deepEqual(reported, [
+    { errorName: "GmailClientError", errorCode: "AUTHENTICATION_FAILED" },
+  ]);
+});
+
+test("route handler rejects unsafe provider error codes", async () => {
+  const reported: Array<{ errorName: string; errorCode?: string }> = [];
+  const handler = createCronRouteHandler(
+    {
+      cronSecret: CRON_SECRET,
+      automationsEnabled: true,
+      reportUnexpectedError: (error) => reported.push(error),
+    },
+    async () => {
+      const error = new Error("Provider response: recipient@example.test");
+      Object.assign(error, { code: "recipient@example.test" });
+      throw error;
+    },
+  );
+
+  await handler(requestWithHeader(`Bearer ${CRON_SECRET}`));
+
+  assert.deepEqual(reported, [{ errorName: "Error" }]);
 });
 
 test("route handler performs the work and returns its result when authorized and enabled", async () => {

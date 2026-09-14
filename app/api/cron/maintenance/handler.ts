@@ -1,5 +1,8 @@
 import type { IntegrationHealth } from "@/lib/growth/dashboard/view-models";
-import { createCronRouteHandler } from "@/lib/growth/http/cron-auth";
+import {
+  createCronRouteHandler,
+  type CronErrorReport,
+} from "@/lib/growth/http/cron-auth";
 
 export type MaintenanceReport = {
   integrations: readonly IntegrationHealth[];
@@ -9,7 +12,7 @@ export type MaintenanceRouteDependencies = {
   cronSecret: string | undefined;
   automationsEnabled: boolean;
   buildReport: () => Promise<MaintenanceReport>;
-  reportUnexpectedError?: (error: unknown) => void;
+  reportUnexpectedError?: (report: CronErrorReport) => void;
 };
 
 export function createMaintenanceRouteHandler(

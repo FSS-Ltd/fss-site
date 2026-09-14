@@ -19,8 +19,8 @@ export async function GET(request: Request): Promise<Response> {
         process.env.OPERATIONS_ENABLED === "true" &&
         process.env.OPERATIONS_BILLING_ENABLED === "true",
       disabledReason: "operations_billing_disabled",
-      reportUnexpectedError: () =>
-        console.error("Operations billing reconciliation failed."),
+      reportUnexpectedError: (report) =>
+        console.error("Operations billing reconciliation failed.", report),
     },
     async () => {
       const configuration = readBillingConfiguration();

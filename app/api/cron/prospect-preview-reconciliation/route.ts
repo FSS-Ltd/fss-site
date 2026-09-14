@@ -33,11 +33,8 @@ export async function GET(request: Request): Promise<Response> {
         resolveComposition: getMergedProspectPreviewCompositionByProspectId,
       });
     },
-    reportUnexpectedError: (error) => {
-      console.error("Prospect preview reconciliation failed.", {
-        errorName: error instanceof Error ? error.name : "UnknownError",
-      });
-    },
+    reportUnexpectedError: (report) =>
+      console.error("Prospect preview reconciliation failed.", report),
   });
 
   return handler(request);

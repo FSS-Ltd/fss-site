@@ -1,11 +1,14 @@
-import { createCronRouteHandler } from "@/lib/growth/http/cron-auth";
+import {
+  createCronRouteHandler,
+  type CronErrorReport,
+} from "@/lib/growth/http/cron-auth";
 import type { ProspectPreviewGenerationReconciliationResult } from "@/lib/growth/prospect-previews/generation/reconcile";
 
 export type ProspectPreviewReconciliationRouteDependencies = {
   cronSecret: string | undefined;
   previewPrEnabled: boolean;
   reconcile: () => Promise<ProspectPreviewGenerationReconciliationResult>;
-  reportUnexpectedError?: (error: unknown) => void;
+  reportUnexpectedError?: (report: CronErrorReport) => void;
 };
 
 export function createProspectPreviewReconciliationRouteHandler(

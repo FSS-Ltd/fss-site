@@ -14,11 +14,8 @@ export async function GET(request: Request): Promise<Response> {
     {
       cronSecret: env.cronSecret,
       automationsEnabled: env.automationsEnabled,
-      reportUnexpectedError: (error) => {
-        console.error("Growth OS gmail-sync cron failed.", {
-          errorName: error instanceof Error ? error.name : "UnknownError",
-        });
-      },
+      reportUnexpectedError: (report) =>
+        console.error("Growth OS gmail-sync cron failed.", report),
     },
     async () => {
       const db = getGrowthDb();

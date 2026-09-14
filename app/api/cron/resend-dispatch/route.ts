@@ -32,11 +32,8 @@ export async function GET(request: Request): Promise<Response> {
       });
       return dispatch(db);
     },
-    reportUnexpectedError: (error) => {
-      console.error("Growth OS resend-dispatch cron failed.", {
-        errorName: error instanceof Error ? error.name : "UnknownError",
-      });
-    },
+    reportUnexpectedError: (report) =>
+      console.error("Growth OS resend-dispatch cron failed.", report),
   });
 
   return handler(request);
