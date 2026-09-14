@@ -8,6 +8,8 @@ import {
 } from "./reconciliation";
 import {
   GmailClientError,
+  GmailHistoryResponseError,
+  GmailTokenResponseError,
   type GmailClient,
   type GmailCreateDraftInput,
   type GmailDraftResult,
@@ -260,9 +262,21 @@ class GoogleGmailClient implements GmailClient {
       throw new GmailClientError("AUTHENTICATION_FAILED");
     }
 
-    const parsed = tokenResponseSchema.safeParse(await readJson(response));
+    let tokenPayload: unknown;
+    try {
+      tokenPayload = await readJson(response);
+    } catch (error) {
+      if (
+        error instanceof GmailClientError &&
+        error.code === "INVALID_PROVIDER_RESPONSE"
+      ) {
+        throw new GmailTokenResponseError();
+      }
+      throw error;
+    }
+    const parsed = tokenResponseSchema.safeParse(tokenPayload);
     if (!parsed.success) {
-      throw new GmailClientError("INVALID_PROVIDER_RESPONSE");
+      throw new GmailTokenResponseError();
     }
 
     return {
@@ -413,7 +427,17 @@ class GoogleGmailClient implements GmailClient {
   }
 
   async listHistory(input: GmailHistoryInput): Promise<GmailHistoryResult> {
-    return readGmailHistoryPage(this.getJson.bind(this), input);
+    try {
+      return await readGmailHistoryPage(this.getJson.bind(this), input);
+    } catch (error) {
+      if (
+        error instanceof GmailClientError &&
+        error.code === "INVALID_PROVIDER_RESPONSE"
+      ) {
+        throw new GmailHistoryResponseError();
+      }
+      throw error;
+    }
   }
 
   async getMessageMetadata(messageId: string): Promise<GmailMessageMetadata> {

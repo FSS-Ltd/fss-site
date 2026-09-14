@@ -360,6 +360,7 @@ test("rejects invalid refresh and Gmail response schemas without leaking data", 
     invalidTokenClient.getProfile(),
     (error: unknown) =>
       error instanceof GmailClientError &&
+      error.name === "GmailTokenResponseError" &&
       error.code === "INVALID_PROVIDER_RESPONSE" &&
       !error.message.includes("secret-access-token"),
   );
@@ -377,6 +378,24 @@ test("rejects invalid refresh and Gmail response schemas without leaking data", 
     invalidProfileClient.getProfile(),
     (error: unknown) =>
       error instanceof GmailClientError &&
+      error.code === "INVALID_PROVIDER_RESPONSE" &&
+      !error.message.includes("private-provider-data"),
+  );
+});
+
+test("classifies a malformed Gmail history response without exposing its content", async () => {
+  const client = createGmailClient(config, {
+    fetch: async (input) =>
+      String(input).endsWith("/token")
+        ? tokenResponse("access-token")
+        : Response.json({ historyId: "private-provider-data" }),
+  });
+
+  await assert.rejects(
+    client.listHistory({ startHistoryId: "123" }),
+    (error: unknown) =>
+      error instanceof GmailClientError &&
+      error.name === "GmailHistoryResponseError" &&
       error.code === "INVALID_PROVIDER_RESPONSE" &&
       !error.message.includes("private-provider-data"),
   );
