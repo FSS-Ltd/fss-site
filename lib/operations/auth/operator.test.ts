@@ -68,3 +68,31 @@ test("client invitation records the pending grant and sends organisation-free Cl
     },
   ]);
 });
+
+test("founder invitation accepts no browser-selected recipient", async () => {
+  const request = {
+    action: "invite_founder",
+    reviewReference: "Founder requested access email",
+  } as const;
+  assert.equal(portalOperationSchema.safeParse(request).success, true);
+  assert.equal(
+    portalOperationSchema.safeParse({
+      ...request,
+      email: "other@example.test",
+    }).success,
+    false,
+  );
+  const sent: string[] = [];
+  assert.deepEqual(
+    await applyPortalOperation(
+      {} as OperationsDb,
+      { actorId: "a".repeat(64) },
+      request,
+      "https://portal.example.test",
+      async () => undefined,
+      { sendFounder: async (review) => void sent.push(review) },
+    ),
+    { action: "invite_founder" },
+  );
+  assert.deepEqual(sent, [request.reviewReference]);
+});

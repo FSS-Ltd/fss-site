@@ -22,6 +22,7 @@ import {
   issuePendingPortalInvitation,
   pendingPortalInvitationSchema,
 } from "./pending-invitations";
+import { sendConfiguredFounderInvitation } from "./founder-invitation";
 
 export const grantAccessSchema = contactSchema.extend({
   action: z.literal("grant_access"),
@@ -31,11 +32,16 @@ export const grantAccessSchema = contactSchema.extend({
 export const inviteClientSchema = pendingPortalInvitationSchema.extend({
   action: z.literal("invite_client"),
 });
+export const inviteFounderSchema = z.strictObject({
+  action: z.literal("invite_founder"),
+  reviewReference: z.string().trim().min(1).max(200),
+});
 
 export const portalOperationSchema = z.discriminatedUnion("action", [
   contactSchema.extend({ action: z.literal("create_contact") }),
   grantAccessSchema,
   inviteClientSchema,
+  inviteFounderSchema,
   inviteSchema.extend({ action: z.literal("issue_invite") }),
   revokeSchema.extend({ action: z.literal("revoke_membership") }),
 ]);
@@ -44,6 +50,7 @@ export type PortalOperationResult =
   | { action: "create_contact"; contactId: string }
   | { action: "grant_access" }
   | { action: "invite_client" }
+  | { action: "invite_founder" }
   | { action: "issue_invite"; activationUrl: string; expiresAt: string }
   | { action: "revoke_membership" };
 
@@ -59,12 +66,14 @@ type PortalOperationDependencies = {
   createId: () => string;
   issuePending: typeof issuePendingPortalInvitation;
   failPending: typeof failPendingPortalInvitation;
+  sendFounder: typeof sendConfiguredFounderInvitation;
 };
 
 const defaultDependencies: PortalOperationDependencies = {
   createId: randomUUID,
   issuePending: issuePendingPortalInvitation,
   failPending: failPendingPortalInvitation,
+  sendFounder: sendConfiguredFounderInvitation,
 };
 
 export async function applyPortalOperation(
@@ -73,8 +82,9 @@ export async function applyPortalOperation(
   operation: PortalOperation,
   origin: string,
   provision: PortalAccountProvisioner = provisionPortalAccount,
-  dependencies: PortalOperationDependencies = defaultDependencies,
+  dependencyOverrides: Partial<PortalOperationDependencies> = {},
 ): Promise<PortalOperationResult> {
+  const dependencies = { ...defaultDependencies, ...dependencyOverrides };
   const { action, ...input } = portalOperationSchema.parse(operation);
   if (action === "create_contact")
     return { action, ...(await createPortalContact(db, founder, input)) };
@@ -116,6 +126,11 @@ export async function applyPortalOperation(
       await dependencies.failPending(db, founder, invitationId, correlationId);
       throw error;
     }
+    return { action };
+  }
+  if (action === "invite_founder") {
+    const invitation = inviteFounderSchema.parse(operation);
+    await dependencies.sendFounder(invitation.reviewReference);
     return { action };
   }
   if (action === "grant_access") {
