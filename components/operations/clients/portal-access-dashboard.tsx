@@ -46,10 +46,8 @@ function accessStatus(entry: PortalAccessRegister["entries"][number]): string {
 
 export function PortalAccessDashboard({
   data,
-  founderEmail,
 }: {
   data: PortalAccessRegister;
-  founderEmail: string;
 }): React.JSX.Element {
   const router = useRouter();
   const [status, setStatus] = useState<Status>({ kind: "idle" });
@@ -107,7 +105,6 @@ export function PortalAccessDashboard({
         <div className={styles.headerActions}>
           <PortalInvitationDialog
             triggerClassName={styles.primaryAction}
-            founderEmail={founderEmail}
             onInvitationSent={(message) =>
               setStatus({ kind: "success", message })
             }
