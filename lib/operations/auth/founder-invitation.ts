@@ -1,8 +1,8 @@
 import { createHash } from "node:crypto";
 import { z } from "zod";
-import { resolveSiteUrl } from "@/lib/config/site-url";
 import { readGrowthServerEnv, requireResendEnv } from "@/lib/growth/config/env";
 import { createResendClient } from "@/lib/growth/integrations/resend/client";
+import { resolvePortalOrigin } from "./configuration";
 import type {
   ResendGateway,
   ResendMessage,
@@ -30,7 +30,7 @@ export async function sendFounderInvitation(
   const url = new URL(z.url().parse(loginUrl));
   if (
     url.protocol !== "https:" ||
-    url.pathname !== "/growth/login" ||
+    url.pathname !== "/portal" ||
     url.search ||
     url.hash ||
     url.username ||
@@ -59,14 +59,14 @@ export async function sendConfiguredFounderInvitation(
 ): Promise<void> {
   const env = readGrowthServerEnv();
   const resend = requireResendEnv(env);
-  const loginUrl = new URL("/growth/login", resolveSiteUrl()).href;
+  const portalUrl = new URL("/portal", resolvePortalOrigin()).href;
   await sendFounderInvitation(
     {
       ownerEmail: env.ownerEmail,
       from: resend.from,
       replyTo: resend.replyTo,
     },
-    loginUrl,
+    portalUrl,
     reviewReference,
     createResendClient(resend.apiKey),
   );

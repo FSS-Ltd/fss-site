@@ -11,7 +11,7 @@ test("founder invitation is delivered only to the configured owner email", async
       from: "FSS <access@example.test>",
       replyTo: "support@example.test",
     },
-    "https://example.test/growth/login",
+    "https://portal.example.test/portal",
     "approved self invitation",
     {
       async send(message) {
@@ -24,12 +24,12 @@ test("founder invitation is delivered only to the configured owner email", async
   assert.equal(sent.length, 1);
   assert.equal(sent[0]?.to, "founder@example.test");
   assert.equal(sent[0]?.category, "founder-access");
-  assert.match(sent[0]?.html ?? "", /https:\/\/example\.test\/growth\/login/);
-  assert.match(sent[0]?.text ?? "", /https:\/\/example\.test\/growth\/login/);
+  assert.match(sent[0]?.html ?? "", /https:\/\/portal\.example\.test\/portal/);
+  assert.match(sent[0]?.text ?? "", /https:\/\/portal\.example\.test\/portal/);
   assert.doesNotMatch(sent[0]?.html ?? "", /approved self invitation/);
 });
 
-test("founder invitation requires the exact founder login path", async () => {
+test("founder invitation requires the exact portal home path", async () => {
   await assert.rejects(
     sendFounderInvitation(
       {
@@ -37,7 +37,7 @@ test("founder invitation requires the exact founder login path", async () => {
         from: "FSS <access@example.test>",
         replyTo: "support@example.test",
       },
-      "https://example.test/portal/login",
+      "https://example.test/growth/login",
       "approved",
       {
         async send() {

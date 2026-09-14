@@ -55,7 +55,8 @@ export function PortalInvitationDialog({
     event.preventDefault();
     if (status.kind === "pending") return;
     setStatus({ kind: "pending" });
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
     try {
       const response = await fetch("/api/growth/operations/portal-access", {
         method: "POST",
@@ -80,7 +81,7 @@ export function PortalInvitationDialog({
         invitationType === "founder"
           ? founderEmail
           : form.get("email")?.toString().trim().toLowerCase();
-      event.currentTarget.reset();
+      formElement.reset();
       setStatus({
         kind: "success",
         message:
