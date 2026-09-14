@@ -2,7 +2,7 @@ import { z } from "zod";
 import { portalRoles, type VerifiedPortalIdentity } from "./types";
 import { readVerifiedPortalUser } from "./verified-user";
 
-const portalInvitationMetadataSchema = z.strictObject({
+const legacyPortalInvitationMetadataSchema = z.strictObject({
   version: z.literal(1),
   organisationId: z.uuid(),
   name: z.string().trim().min(1).max(200),
@@ -14,6 +14,22 @@ const portalInvitationMetadataSchema = z.strictObject({
   reviewReference: z.string().trim().min(1).max(200),
   approvedBy: z.string().regex(/^[a-f0-9]{64}$/),
 });
+
+const pendingPortalInvitationMetadataSchema = z.strictObject({
+  version: z.literal(2),
+  invitationId: z.uuid(),
+  email: z
+    .string()
+    .trim()
+    .email()
+    .max(254)
+    .transform((email) => email.toLowerCase()),
+});
+
+const portalInvitationMetadataSchema = z.discriminatedUnion("version", [
+  legacyPortalInvitationMetadataSchema,
+  pendingPortalInvitationMetadataSchema,
+]);
 
 const clerkUserEnvelope = z
   .object({
@@ -33,15 +49,22 @@ export type PortalInvitationClaim = {
   readonly invitation: PortalInvitationMetadata;
 };
 
-export function createPortalInvitationMetadata(input: {
-  organisationId: string;
-  name: string;
-  email: string;
-  role: (typeof portalRoles)[number];
-  reviewReference: string;
-  approvedBy: string;
-}): PortalInvitationMetadata {
-  return portalInvitationMetadataSchema.parse({ version: 1, ...input });
+type LegacyPortalInvitationInput = Omit<
+  z.input<typeof legacyPortalInvitationMetadataSchema>,
+  "version"
+>;
+type PendingPortalInvitationInput = Omit<
+  z.input<typeof pendingPortalInvitationMetadataSchema>,
+  "version"
+>;
+
+export function createPortalInvitationMetadata(
+  input: LegacyPortalInvitationInput | PendingPortalInvitationInput,
+): PortalInvitationMetadata {
+  return portalInvitationMetadataSchema.parse({
+    version: "invitationId" in input ? 2 : 1,
+    ...input,
+  });
 }
 
 export function readPortalInvitationClaim(

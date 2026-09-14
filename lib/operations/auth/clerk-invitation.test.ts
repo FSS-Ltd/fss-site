@@ -15,6 +15,20 @@ const metadata = createPortalInvitationMetadata({
   approvedBy: "a".repeat(64),
 });
 
+test("creates organisation-free metadata for a pending client invitation", () => {
+  const pending = createPortalInvitationMetadata({
+    invitationId: "12d347ee-3aa5-4ed1-a93e-9c3a8fd36607",
+    email: " Client@Example.test ",
+  });
+
+  assert.deepEqual(pending, {
+    version: 2,
+    invitationId: "12d347ee-3aa5-4ed1-a93e-9c3a8fd36607",
+    email: "client@example.test",
+  });
+  assert.equal("organisationId" in pending, false);
+});
+
 test("reads Clerk invitation metadata only for the verified invited email", () => {
   const user = {
     id: "user_2zClientExample",
@@ -65,5 +79,10 @@ test("accepts Clerk's camelCase user resource shape", () => {
     ],
     publicMetadata: { fssPortalInvitation: metadata },
   };
-  assert.equal(readPortalInvitationClaim(user)?.invitation.role, "viewer");
+  const claim = readPortalInvitationClaim(user);
+  assert.equal(claim?.invitation.version, 1);
+  assert.equal(
+    claim?.invitation.version === 1 ? claim.invitation.role : null,
+    "viewer",
+  );
 });

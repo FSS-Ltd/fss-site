@@ -320,6 +320,7 @@
   opacity: 0.6;
 }
 .dialog {
+  margin: auto;
   width: min(calc(100% - 32px), 620px);
   max-height: min(780px, calc(100dvh - 32px));
   overflow: auto;
@@ -369,6 +370,34 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
   margin-top: 26px;
+}
+.invitationType,
+.clientFields,
+.founderFields {
+  grid-column: 1 / -1;
+}
+.clientFields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.founderFields {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid #d9e8eb;
+  border-radius: 12px;
+  background: #f2f8f9;
+}
+.clientFields[hidden],
+.founderFields[hidden] {
+  display: none;
+}
+.founderFields p {
+  margin: 0;
+  color: #526078;
+  font-size: 0.82rem;
+  line-height: 1.5;
 }
 .dialogForm label {
   display: grid;
@@ -520,6 +549,7 @@
 @media (max-width: 560px) {
   .accessSequence ol,
   .dialogForm,
+  .clientFields,
   .entry {
     grid-template-columns: 1fr;
   }

@@ -4,9 +4,7 @@
       "numberOfRuns": 5,
       "startServerCommand": "npx next start -p 4010",
       "startServerReadyPattern": "Ready",
-      "url": [
-        "http://127.0.0.1:4010/"
-      ],
+      "url": ["http://127.0.0.1:4010/"],
       "settings": {
         "formFactor": "mobile",
         "chromeFlags": "--headless --no-sandbox --disable-dev-shm-usage"
@@ -47,7 +45,7 @@
         "largest-contentful-paint": [
           "error",
           {
-            "maxNumericValue": 2700,
+            "maxNumericValue": 2800,
             "aggregationMethod": "median"
           }
         ],

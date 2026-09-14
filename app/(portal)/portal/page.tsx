@@ -14,6 +14,7 @@ import type {
   PortalRole,
   VerifiedPortalIdentity,
 } from "@/lib/operations/auth/types";
+import { needsPortalOnboarding } from "@/lib/operations/auth/pending-invitations";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import styles from "@/components/portal/auth/portal.module.css";
 
@@ -34,15 +35,20 @@ export default async function PortalHomePage(): Promise<React.JSX.Element> {
   }
   if (!identity) redirect("/portal/login");
   let memberships: PortalMembershipSummary[];
+  let onboardingRequired: boolean;
   try {
     memberships = await listPortalMemberships(
       getPortalDb(),
       identity,
       randomUUID(),
     );
+    onboardingRequired =
+      memberships.length === 0 &&
+      (await needsPortalOnboarding(getPortalDb(), identity, randomUUID()));
   } catch {
     return <PortalUnavailable />;
   }
+  if (onboardingRequired) redirect("/portal/onboarding");
   return (
     <section className={styles.card} aria-labelledby="portal-heading">
       <p className={styles.eyebrow}>Your account</p>
@@ -112,8 +118,14 @@ export default async function PortalHomePage(): Promise<React.JSX.Element> {
           ))}
         </ul>
       )}
-      <form action="/api/auth/sign-out?returnTo=/portal/login" className={styles.actions} method="post">
-        <button className={styles.button} type="submit">Sign out</button>
+      <form
+        action="/api/auth/sign-out?returnTo=/portal/login"
+        className={styles.actions}
+        method="post"
+      >
+        <button className={styles.button} type="submit">
+          Sign out
+        </button>
       </form>
     </section>
   );
