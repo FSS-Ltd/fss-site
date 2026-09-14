@@ -89,3 +89,17 @@ export class GmailClientError extends Error {
     this.retryable = code === "RETRYABLE_PROVIDER_ERROR";
   }
 }
+
+export class GmailTokenResponseError extends GmailClientError {
+  constructor() {
+    super("INVALID_PROVIDER_RESPONSE");
+    this.name = "GmailTokenResponseError";
+  }
+}
+
+export class GmailHistoryResponseError extends GmailClientError {
+  constructor() {
+    super("INVALID_PROVIDER_RESPONSE");
+    this.name = "GmailHistoryResponseError";
+  }
+}
