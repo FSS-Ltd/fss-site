@@ -46,8 +46,10 @@ function accessStatus(entry: PortalAccessRegister["entries"][number]): string {
 
 export function PortalAccessDashboard({
   data,
+  founderEmail,
 }: {
   data: PortalAccessRegister;
+  founderEmail: string;
 }): React.JSX.Element {
   const router = useRouter();
   const [status, setStatus] = useState<Status>({ kind: "idle" });
@@ -105,7 +107,7 @@ export function PortalAccessDashboard({
         <div className={styles.headerActions}>
           <PortalInvitationDialog
             triggerClassName={styles.primaryAction}
-            organisations={data.organisations}
+            founderEmail={founderEmail}
             onInvitationSent={(message) =>
               setStatus({ kind: "success", message })
             }
@@ -180,31 +182,31 @@ export function PortalAccessDashboard({
               <span>1</span>
               <div>
                 <strong>Founder approval</strong>
-                <p>The review note records why the requested access is approved.</p>
+                <p>
+                  The review note records why the requested access is approved.
+                </p>
               </div>
             </li>
             <li>
               <span>2</span>
               <div>
                 <strong>Clerk invitation</strong>
-                <p>The recipient receives the role and account details to accept.</p>
+                <p>
+                  The recipient receives the role and account details to accept.
+                </p>
               </div>
             </li>
             <li>
               <span>3</span>
               <div>
                 <strong>Account acceptance</strong>
-                <p>Operations creates the contact and membership after setup.</p>
+                <p>
+                  Operations creates the contact and membership after setup.
+                </p>
               </div>
             </li>
           </ol>
         </div>
-        {data.organisations.length === 0 ? (
-          <p className={styles.empty}>
-            Create an active organisation in the client register before granting
-            portal access.
-          </p>
-        ) : null}
         <div aria-live="polite">
           {status.message && (
             <p
