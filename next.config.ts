@@ -11,11 +11,13 @@ const contentSecurityPolicy = [
   "form-action 'self'",
   "object-src 'none'",
   "frame-ancestors 'none'",
-  "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com https://www.googletagmanager.com https://www.google-analytics.com",
+  "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com https://www.googletagmanager.com https://www.google-analytics.com https://img.clerk.com",
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self' data:",
-  `script-src 'self' 'unsafe-inline'${developmentScriptSources} https://www.googletagmanager.com https://www.google-analytics.com`,
-  "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com",
+  `script-src 'self' 'unsafe-inline'${developmentScriptSources} https://www.googletagmanager.com https://www.google-analytics.com https://clerk.faithfulsoftware.dev https://challenges.cloudflare.com https://*.protect.clerk.com`,
+  "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://clerk.faithfulsoftware.dev https://*.protect.clerk.com:*",
+  "worker-src 'self' blob:",
+  "frame-src 'self' https://challenges.cloudflare.com https://*.protect.clerk.com",
 ].join("; ");
 
 const securityHeaders = [
