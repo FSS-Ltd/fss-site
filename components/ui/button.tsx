@@ -30,37 +30,52 @@ export const buttonVariants = cva(
 export interface ButtonProps
   extends
     React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {}
+    VariantProps<typeof buttonVariants> {
+  magnetic?: boolean;
+}
 
 export function Button({
   className,
   variant,
   size,
+  magnetic = false,
+  children,
   type = "button",
   ...props
 }: ButtonProps) {
   return (
     <button
       className={cn(buttonVariants({ variant, size, className }))}
+      data-magnetic={magnetic || undefined}
       type={type}
       {...props}
-    />
+    >
+      {magnetic ? <span data-mag-label>{children}</span> : children}
+    </button>
   );
 }
 
 type ButtonLinkProps = React.ComponentProps<typeof Link> &
-  VariantProps<typeof buttonVariants> & { className?: string };
+  VariantProps<typeof buttonVariants> & {
+    className?: string;
+    magnetic?: boolean;
+  };
 
 export function ButtonLink({
   className,
   variant,
   size,
+  magnetic = false,
+  children,
   ...props
 }: ButtonLinkProps) {
   return (
     <Link
       className={cn(buttonVariants({ variant, size, className }))}
+      data-magnetic={magnetic || undefined}
       {...props}
-    />
+    >
+      {magnetic ? <span data-mag-label>{children}</span> : children}
+    </Link>
   );
 }

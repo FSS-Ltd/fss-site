@@ -70,6 +70,7 @@ export function SiteHeaderNavigation() {
         className="px-3 text-sm sm:px-5"
         href="/contact"
         prefetch={false}
+        magnetic
       >
         Discuss a project
       </ButtonLink>

@@ -41,7 +41,7 @@ export function ContactPageContent() {
       </PageIntro>
       <div className={styles.grid}>
         <ContactForm />
-        <aside aria-labelledby="contact-next">
+        <aside aria-labelledby="contact-next" data-motion-reveal="right">
           <h2 id="contact-next">What happens next</h2>
           <ol className={styles.list}>
             <li>We review your project and constraints.</li>
@@ -60,7 +60,11 @@ export function ContactPageContent() {
           </a>
         </aside>
       </div>
-      <section className={styles.section} aria-labelledby="contact-faq">
+      <section
+        className={styles.section}
+        aria-labelledby="contact-faq"
+        data-motion-reveal="mask"
+      >
         <h2 id="contact-faq">Before you reach out</h2>
         <Faq items={questions} />
       </section>

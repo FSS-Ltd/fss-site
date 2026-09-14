@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 import postgres from "postgres";
 import { requireOperationsTestDatabaseUrl } from "../../../scripts/require-operations-database-env";
 import { loadMetricsSnapshot } from "../../../lib/operations/metrics/snapshot-repository";
+import { londonDate } from "../../../lib/operations/metrics/definitions";
 import {
   requestMetricExport,
   readMetricExport,
@@ -23,7 +24,7 @@ test("metrics enforce actor policies, unknown finance, correction markers and au
     accountId = `acct_metric${randomUUID().replaceAll("-", "")}`,
     scope = { accountId, mode: "test" as const };
   const now = new Date().toISOString(),
-    today = now.slice(0, 10),
+    today = londonDate(now),
     filters = { organisationId: randomUUID(), from: today, to: today };
   try {
     await assert.rejects(loadMetricsSnapshot(db, null));

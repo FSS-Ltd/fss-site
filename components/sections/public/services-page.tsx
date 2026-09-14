@@ -1,9 +1,11 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ContactLink, PageIntro } from "./page-intro";
 import { DeliverySteps } from "./delivery-steps";
 import { RelatedLinks } from "./related-links";
 import { sectorLink, serviceLinks, costLink } from "@/lib/commercial/links";
 import styles from "./public-page.module.css";
+import railStyles from "./service-rail.module.css";
 
 const services = [
   {
@@ -34,6 +36,23 @@ export function ServicesPage() {
       <PageIntro
         eyebrow="Services"
         title="Software built around your organisation."
+        image={
+          <div
+            className={styles.editorialFrame}
+            data-motion-parallax="0.07"
+            aria-hidden="true"
+          >
+            <Image
+              src="/images/editorial/services-workflow-v1.webp"
+              alt=""
+              width={2048}
+              height={1280}
+              sizes="(max-width: 900px) 92vw, 43vw"
+              className={styles.editorialImage}
+              priority
+            />
+          </div>
+        }
       >
         <p className="max-w-2xl text-lg sm:text-xl">
           Custom software, portals and automation for UK charities, faith
@@ -44,15 +63,31 @@ export function ServicesPage() {
           <ContactLink />
         </div>
       </PageIntro>
-      <section aria-label="Software services" className={styles.grid}>
-        {services.map((service) => (
-          <article key={service.title}>
-            <h2>{service.title}</h2>
-            <p>{service.description}</p>
-          </article>
-        ))}
+      <section
+        aria-label="Software services"
+        className={railStyles.scene}
+        data-motion-scene
+      >
+        <div className={railStyles.viewport}>
+          <div className={railStyles.rail} data-motion-track>
+            {services.map((service, index) => (
+              <article
+                key={service.title}
+                data-motion-reveal={index % 2 === 0 ? "left" : "right"}
+              >
+                <span aria-hidden="true">0{index + 1}</span>
+                <h2>{service.title}</h2>
+                <p>{service.description}</p>
+              </article>
+            ))}
+          </div>
+        </div>
       </section>
-      <section className={styles.section} aria-labelledby="service-evidence">
+      <section
+        className={styles.section}
+        aria-labelledby="service-evidence"
+        data-motion-reveal="left"
+      >
         <h2 id="service-evidence">See these foundations in NexSteps.</h2>
         <p>
           FSS built NexSteps for safeguarding, attendance and community
@@ -66,7 +101,11 @@ export function ServicesPage() {
         </Link>
       </section>
       <DeliverySteps />
-      <section className={styles.section} aria-labelledby="service-scope">
+      <section
+        className={styles.section}
+        aria-labelledby="service-scope"
+        data-motion-reveal="right"
+      >
         <h2 id="service-scope">Scope depends on the work involved.</h2>
         <p>
           Data migration, integrations, user roles and support needs all affect

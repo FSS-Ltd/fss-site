@@ -227,6 +227,7 @@ export function ContactForm() {
         size="lg"
         className="min-h-12"
         type="submit"
+        magnetic
         disabled={!hydrated || isSubmitting}
       >
         {isSubmitting ? "Sending…" : "Send project enquiry"}

@@ -4,7 +4,11 @@ import styles from "./public-page.module.css";
 
 export function RelatedLinks({ links }: { links: readonly CommercialLink[] }) {
   return (
-    <section className={styles.section} aria-labelledby="related-reading">
+    <section
+      className={styles.section}
+      aria-labelledby="related-reading"
+      data-motion-reveal="up"
+    >
       <h2
         id="related-reading"
         className="text-2xl font-semibold tracking-tight"

@@ -1,0 +1,51 @@
+.scene {
+  margin-top: 64px;
+}
+.viewport {
+  width: 100%;
+}
+.rail {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+.rail article {
+  padding: clamp(24px, 3vw, 34px);
+  border: 1px solid rgb(10 26 46 / 0.1);
+  border-radius: 22px;
+  background: rgb(255 255 255 / 0.72);
+}
+.rail article > span {
+  color: #0f7a83;
+  font-size: 0.72rem;
+}
+.rail h2 {
+  margin-top: 26px;
+}
+@media (min-width: 901px) and (prefers-reduced-motion: no-preference) {
+  :global(#fssroot[data-motion-enhanced="true"]) .scene {
+    height: 235vh;
+  }
+  :global(#fssroot[data-motion-enhanced="true"]) .viewport {
+    position: sticky;
+    top: 96px;
+    overflow: hidden;
+    height: calc(100svh - 116px);
+    display: grid;
+    align-content: center;
+  }
+  :global(#fssroot[data-motion-enhanced="true"]) .rail {
+    display: flex;
+    width: max-content;
+    transform: translate3d(var(--motion-track-x, 0), 0, 0);
+  }
+  :global(#fssroot[data-motion-enhanced="true"]) .rail article {
+    width: min(38vw, 460px);
+    min-height: 330px;
+  }
+}
+@media (max-width: 680px) {
+  .rail {
+    grid-template-columns: 1fr;
+  }
+}

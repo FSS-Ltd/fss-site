@@ -3,14 +3,20 @@ import styles from "./public-page.module.css";
 
 type NexStepsProofProps = {
   className?: string;
+  motionTrack?: boolean;
 };
 
-export function NexStepsProof({ className }: NexStepsProofProps) {
+export function NexStepsProof({
+  className,
+  motionTrack = false,
+}: NexStepsProofProps) {
   return (
     <section
       id="work"
       aria-labelledby="nexsteps-title"
       className={`${styles.proof} ${styles.grid} ${className ?? ""}`}
+      data-motion-track={motionTrack || undefined}
+      data-motion-reveal="mask"
     >
       <div>
         <div className={styles.eyebrow}>Our work · NexSteps</div>
