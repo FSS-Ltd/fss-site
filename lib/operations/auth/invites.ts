@@ -57,7 +57,8 @@ export async function claimClerkPortalInvitation(
   claim: PortalInvitationClaim | null,
   correlationId: string,
 ): Promise<boolean> {
-  if (!claim) return false;
+  if (!claim || claim.invitation.version !== 1) return false;
+  const invitation = claim.invitation;
   return withVerifiedPortalIdentity(
     db,
     claim.identity,
@@ -65,12 +66,12 @@ export async function claimClerkPortalInvitation(
     async (tx) => {
       const [result] = await tx<{ organisationId: string | null }[]>`
         select operations.claim_clerk_portal_invitation(
-          ${claim.invitation.organisationId},
-          ${claim.invitation.name},
-          ${claim.invitation.email},
-          ${claim.invitation.role},
-          ${claim.invitation.reviewReference},
-          ${claim.invitation.approvedBy}
+          ${invitation.organisationId},
+          ${invitation.name},
+          ${invitation.email},
+          ${invitation.role},
+          ${invitation.reviewReference},
+          ${invitation.approvedBy}
         ) as "organisationId"
       `;
       return Boolean(result?.organisationId);

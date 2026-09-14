@@ -5,6 +5,7 @@ import {
   claimPortalInviteForVerifiedEmail,
   hasActivePortalMembership,
 } from "@/lib/operations/auth/invites";
+import { needsPortalOnboarding } from "@/lib/operations/auth/pending-invitations";
 import {
   getPortalIdentity,
   getPortalInvitationClaim,
@@ -28,7 +29,13 @@ export async function POST(): Promise<Response> {
       activeFromClerkInvitation ||
       (await claimPortalInviteForVerifiedEmail(db, identity, randomUUID())) ||
       (await hasActivePortalMembership(db, identity, randomUUID()));
-    return Response.json({ active });
+    if (active) return Response.json({ active: true });
+    const onboardingRequired = await needsPortalOnboarding(
+      db,
+      identity,
+      randomUUID(),
+    );
+    return Response.json({ active: false, onboardingRequired });
   } catch {
     return Response.json({ active: false }, { status: 401 });
   }

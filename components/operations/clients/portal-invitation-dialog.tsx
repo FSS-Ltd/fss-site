@@ -10,7 +10,7 @@ type Status = {
   message?: string;
 };
 
-type Organisation = { id: string; displayName: string };
+type InvitationType = "client" | "founder";
 
 async function getRequestError(response: Response): Promise<string> {
   const body: unknown = await response.json().catch(() => null);
@@ -27,21 +27,24 @@ async function getRequestError(response: Response): Promise<string> {
 }
 
 export function PortalInvitationDialog({
-  organisations,
+  founderEmail,
   onInvitationSent,
   triggerClassName,
 }: {
-  organisations: readonly Organisation[];
+  founderEmail: string;
   onInvitationSent: (message: string) => void;
   triggerClassName?: string;
 }): React.JSX.Element {
   const dialog = useRef<HTMLDialogElement>(null);
   const [status, setStatus] = useState<Status>({ kind: "idle" });
+  const [invitationType, setInvitationType] =
+    useState<InvitationType>("client");
 
   function close(): void {
     if (status.kind === "pending") return;
     dialog.current?.close();
     setStatus({ kind: "idle" });
+    setInvitationType("client");
   }
 
   function open(): void {
@@ -57,26 +60,37 @@ export function PortalInvitationDialog({
       const response = await fetch("/api/growth/operations/portal-access", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "grant_access",
-          organisationId: form.get("organisationId"),
-          name: form.get("name"),
-          email: form.get("email"),
-          role: form.get("role"),
-          reviewReference: form.get("reviewReference"),
-        }),
+        body: JSON.stringify(
+          invitationType === "client"
+            ? {
+                action: "invite_client",
+                name: form.get("name"),
+                email: form.get("email"),
+                role: form.get("role"),
+                reviewReference: form.get("reviewReference"),
+              }
+            : {
+                action: "invite_founder",
+                reviewReference: form.get("reviewReference"),
+              },
+        ),
       });
       if (!response.ok) throw new Error(await getRequestError(response));
-      const email = form.get("email")?.toString().trim().toLowerCase();
+      const email =
+        invitationType === "founder"
+          ? founderEmail
+          : form.get("email")?.toString().trim().toLowerCase();
       event.currentTarget.reset();
       setStatus({
         kind: "success",
         message:
-          "Invitation sent. The access record will appear after the recipient creates their account.",
+          invitationType === "founder"
+            ? "Founder workspace invitation sent."
+            : "Invitation sent. The access record will appear after the recipient completes onboarding.",
       });
       onInvitationSent(
         email
-          ? `Invitation sent to ${email}. Access will be recorded after account creation.`
+          ? `Invitation sent to ${email}.`
           : "Invitation sent. Access will be recorded after account creation.",
       );
     } catch (error) {
@@ -101,7 +115,7 @@ export function PortalInvitationDialog({
         Invite portal user
       </button>
       <dialog
-        aria-labelledby="portal-invitation-heading"
+        aria-labelledby="portal-invitation-dialog-heading"
         className={styles.dialog}
         onClick={(event) => {
           if (event.target === event.currentTarget) close();
@@ -117,11 +131,11 @@ export function PortalInvitationDialog({
             <Send size={19} />
           </div>
           <div>
-            <p className={styles.eyebrow}>Portal invitation</p>
-            <h2 id="portal-invitation-heading">Invite a client user</h2>
+            <p className={styles.eyebrow}>Access invitation</p>
+            <h2 id="portal-invitation-dialog-heading">Invite a user</h2>
             <p>
-              Clerk sends the invitation. FSS creates the contact and role only
-              after the user accepts and completes account setup.
+              Invite a client to begin portal onboarding, or send the authorised
+              founder account a workspace sign-in link.
             </p>
           </div>
         </div>
@@ -130,59 +144,80 @@ export function PortalInvitationDialog({
           onSubmit={submit}
           aria-busy={status.kind === "pending"}
         >
-          <label>
-            Organisation
+          <label className={styles.invitationType}>
+            Invitation type
             <select
               autoFocus
-              defaultValue=""
-              name="organisationId"
-              required
+              name="invitationType"
+              value={invitationType}
+              onChange={(event) => {
+                setInvitationType(event.target.value as InvitationType);
+                setStatus({ kind: "idle" });
+              }}
               disabled={status.kind === "pending"}
             >
-              <option disabled value="">
-                Choose an organisation
-              </option>
-              {organisations.map((organisation) => (
-                <option key={organisation.id} value={organisation.id}>
-                  {organisation.displayName}
-                </option>
-              ))}
+              <option value="client">Client</option>
+              <option value="founder">Founder</option>
             </select>
           </label>
-          <label>
-            Client name
-            <input
-              maxLength={200}
-              name="name"
-              required
-              disabled={status.kind === "pending"}
-            />
-          </label>
-          <label>
-            Email address
-            <input
-              autoComplete="email"
-              maxLength={254}
-              name="email"
-              required
-              type="email"
-              disabled={status.kind === "pending"}
-            />
-          </label>
-          <label>
-            Portal role
-            <select
-              defaultValue="viewer"
-              name="role"
-              disabled={status.kind === "pending"}
-            >
-              {portalRoleOptions.map((role) => (
-                <option key={role.value} value={role.value}>
-                  {role.label}
-                </option>
-              ))}
-            </select>
-          </label>
+          <div
+            className={styles.clientFields}
+            hidden={invitationType !== "client"}
+          >
+            <label>
+              Client name
+              <input
+                maxLength={200}
+                name="name"
+                required={invitationType === "client"}
+                disabled={
+                  status.kind === "pending" || invitationType !== "client"
+                }
+              />
+            </label>
+            <label>
+              Email address
+              <input
+                autoComplete="email"
+                maxLength={254}
+                name="email"
+                required={invitationType === "client"}
+                type="email"
+                disabled={
+                  status.kind === "pending" || invitationType !== "client"
+                }
+              />
+            </label>
+            <label>
+              Portal role
+              <select
+                defaultValue="owner"
+                name="role"
+                disabled={
+                  status.kind === "pending" || invitationType !== "client"
+                }
+              >
+                {portalRoleOptions.map((role) => (
+                  <option key={role.value} value={role.value}>
+                    {role.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <div
+            className={styles.founderFields}
+            hidden={invitationType !== "founder"}
+          >
+            <label>
+              Founder email
+              <input readOnly type="email" value={founderEmail} />
+            </label>
+            <p>
+              Access still requires this exact verified Google Workspace
+              account.
+            </p>
+          </div>
           <label className={styles.dialogReference}>
             Access approval note
             <input

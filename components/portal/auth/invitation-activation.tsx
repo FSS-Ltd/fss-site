@@ -7,6 +7,7 @@ import { ArrowRight, LockKeyhole } from "lucide-react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useSignUp } from "@clerk/nextjs";
 import styles from "./portal.module.css";
+import { resolvePortalClaimDestination } from "./portal-claim-destination";
 
 type Status = {
   kind: "idle" | "pending" | "error";
@@ -31,20 +32,15 @@ function getClerkErrorMessage(error: unknown): string | null {
     : null;
 }
 
-async function claimPortalAccess(): Promise<void> {
+async function claimPortalAccess(): Promise<string> {
   const response = await fetch("/api/portal/access/claim", { method: "POST" });
   const result: unknown = await response.json().catch(() => null);
-  if (
-    !response.ok ||
-    typeof result !== "object" ||
-    result === null ||
-    !("active" in result) ||
-    result.active !== true
-  ) {
+  if (!response.ok) {
     throw new Error(
       "Your account was created, but portal access is not active yet.",
     );
   }
+  return resolvePortalClaimDestination(result);
 }
 
 export function PortalInvitationActivation(): React.JSX.Element {
@@ -110,8 +106,7 @@ export function PortalInvitationActivation(): React.JSX.Element {
           getClerkErrorMessage(finalResult.error) ??
             "Your account could not be activated.",
         );
-      await claimPortalAccess();
-      router.replace("/portal");
+      router.replace(await claimPortalAccess());
     } catch (error) {
       setStatus({
         kind: "error",
