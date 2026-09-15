@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { createPortalAccessClaimHandler } from "./handler";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import {
   claimClerkPortalInvitation,
@@ -14,29 +15,16 @@ import { getPortalDb } from "@/lib/operations/db/portal-client";
 
 export const runtime = "nodejs";
 
-export async function POST(): Promise<Response> {
-  if (!portalAuthConfigured())
-    return Response.json({ active: false }, { status: 503 });
-  try {
-    const identity = await getPortalIdentity();
-    const db = getPortalDb();
-    const activeFromClerkInvitation = await claimClerkPortalInvitation(
-      db,
-      await getPortalInvitationClaim(),
-      randomUUID(),
-    );
-    const active =
-      activeFromClerkInvitation ||
-      (await claimPortalInviteForVerifiedEmail(db, identity, randomUUID())) ||
-      (await hasActivePortalMembership(db, identity, randomUUID()));
-    if (active) return Response.json({ active: true });
-    const onboardingRequired = await needsPortalOnboarding(
-      db,
-      identity,
-      randomUUID(),
-    );
-    return Response.json({ active: false, onboardingRequired });
-  } catch {
-    return Response.json({ active: false }, { status: 401 });
-  }
-}
+export const POST = createPortalAccessClaimHandler({
+  configured: portalAuthConfigured,
+  createCorrelationId: randomUUID,
+  identity: getPortalIdentity,
+  invitationClaim: getPortalInvitationClaim,
+  db: getPortalDb,
+  claimClerkInvitation: claimClerkPortalInvitation,
+  claimVerifiedEmailInvite: claimPortalInviteForVerifiedEmail,
+  hasActiveMembership: hasActivePortalMembership,
+  needsOnboarding: needsPortalOnboarding,
+  reportUnexpectedError: (report) =>
+    console.error("Portal access claim failed.", report),
+});
