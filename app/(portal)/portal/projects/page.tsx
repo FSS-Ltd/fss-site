@@ -12,6 +12,7 @@ import {
   projectStatusLabels,
 } from "@/components/portal/project-summary";
 import styles from "@/components/portal/projects.module.css";
+import { portalPath } from "@/lib/operations/auth/portal-url";
 import { getPortalPageContext } from "@/lib/operations/auth/page-context";
 
 export default async function ProjectsPage({
@@ -37,7 +38,7 @@ export default async function ProjectsPage({
   }
   return (
     <div className={styles.page}>
-      <Link className={styles.breadcrumb} href="/portal">
+      <Link className={styles.breadcrumb} href={portalPath("/portal")}>
         <ArrowLeft size={16} aria-hidden="true" />
         Your workspace
       </Link>

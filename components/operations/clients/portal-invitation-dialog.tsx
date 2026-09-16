@@ -2,7 +2,11 @@
 
 import { Send, UserPlus } from "lucide-react";
 import { useRef, useState, type FormEvent } from "react";
-import { portalRoleOptions } from "@/lib/operations/auth/access-dashboard-metrics";
+import {
+  createInvitationPayload,
+  type InvitationType,
+} from "./portal-access-form";
+import { PortalInvitationFields } from "./portal-invitation-fields";
 import styles from "./portal-access-dashboard.module.css";
 
 type Status = {
@@ -33,11 +37,14 @@ export function PortalInvitationDialog({
 }): React.JSX.Element {
   const dialog = useRef<HTMLDialogElement>(null);
   const [status, setStatus] = useState<Status>({ kind: "idle" });
+  const [invitationType, setInvitationType] =
+    useState<InvitationType>("client");
 
   function close(): void {
     if (status.kind === "pending") return;
     dialog.current?.close();
     setStatus({ kind: "idle" });
+    setInvitationType("client");
   }
 
   function open(): void {
@@ -50,29 +57,26 @@ export function PortalInvitationDialog({
     setStatus({ kind: "pending" });
     const formElement = event.currentTarget;
     const form = new FormData(formElement);
-    const email = form.get("email")?.toString().trim().toLowerCase();
     try {
       const response = await fetch("/api/growth/operations/portal-access", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "invite_client",
-          name: form.get("name"),
-          email: form.get("email"),
-          role: form.get("role"),
-          reviewReference: form.get("reviewReference"),
-        }),
+        body: JSON.stringify(createInvitationPayload(form, invitationType)),
       });
       if (!response.ok) throw new Error(await getRequestError(response));
+      const email = form.get("email")?.toString().trim().toLowerCase();
       formElement.reset();
       setStatus({
         kind: "success",
-        message: email
-          ? `Invitation sent to ${email}. Their access will appear in the register once they complete setup.`
-          : "Invitation sent. Their access will appear in the register once they complete setup.",
+        message:
+          invitationType === "admin"
+            ? "FSS Admin invitation sent. Access starts after acceptance."
+            : "Client invitation sent. Access starts after onboarding.",
       });
       onInvitationSent(
-        email ? `Invitation sent to ${email}.` : "Invitation sent.",
+        email
+          ? `Invitation sent to ${email}.`
+          : "Invitation sent. Access will be recorded after account creation.",
       );
     } catch (error) {
       setStatus({
@@ -114,7 +118,9 @@ export function PortalInvitationDialog({
           <div>
             <p className={styles.eyebrow}>Access invitation</p>
             <h2 id="portal-invitation-dialog-heading">Invite a user</h2>
-            <p>Invite a client to begin portal onboarding.</p>
+            <p>
+              Invite a client to their portal or an FSS colleague to FSS Studio.
+            </p>
           </div>
         </div>
         <form
@@ -122,42 +128,28 @@ export function PortalInvitationDialog({
           onSubmit={submit}
           aria-busy={status.kind === "pending"}
         >
-          <div className={styles.clientFields}>
-            <label>
-              Client name
-              <input
-                maxLength={200}
-                name="name"
-                required
-                disabled={status.kind === "pending"}
-              />
-            </label>
-            <label>
-              Email address
-              <input
-                autoComplete="email"
-                maxLength={254}
-                name="email"
-                required
-                type="email"
-                disabled={status.kind === "pending"}
-              />
-            </label>
-            <label>
-              Portal role
-              <select
-                defaultValue="owner"
-                name="role"
-                disabled={status.kind === "pending"}
-              >
-                {portalRoleOptions.map((role) => (
-                  <option key={role.value} value={role.value}>
-                    {role.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
+          <label className={styles.invitationType}>
+            Invitation type
+            <select
+              autoFocus
+              name="invitationType"
+              value={invitationType}
+              onChange={(event) => {
+                setInvitationType(
+                  event.target.value === "admin" ? "admin" : "client",
+                );
+                setStatus({ kind: "idle" });
+              }}
+              disabled={status.kind === "pending"}
+            >
+              <option value="client">Client user</option>
+              <option value="admin">FSS Admin</option>
+            </select>
+          </label>
+          <PortalInvitationFields
+            type={invitationType}
+            pending={status.kind === "pending"}
+          />
           <label className={styles.dialogReference}>
             Access approval note
             <input

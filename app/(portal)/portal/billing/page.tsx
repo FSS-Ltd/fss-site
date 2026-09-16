@@ -16,6 +16,7 @@ import { HostedBillingAction } from "@/components/portal/billing/hosted-action";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import styles from "@/components/portal/projects.module.css";
 import billing from "@/components/portal/billing/billing.module.css";
+import { portalPath } from "@/lib/operations/auth/portal-url";
 
 export default async function BillingPage({
   searchParams,
@@ -64,7 +65,7 @@ export default async function BillingPage({
   }
   return (
     <div className={styles.page}>
-      <Link className={styles.breadcrumb} href="/portal">
+      <Link className={styles.breadcrumb} href={portalPath("/portal")}>
         Your workspace
       </Link>
       <p className={styles.eyebrow}>Your account, clearly</p>

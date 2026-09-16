@@ -3,7 +3,10 @@ import { createRequire } from "node:module";
 import test from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { AppRouterContext } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import type { PortalAccessRegister } from "@/lib/operations/auth/repository";
+import {
+  getFounderAccessMetrics,
+  type FounderAccessOverview,
+} from "@/lib/operations/auth/founder-access";
 
 const require = createRequire(import.meta.url);
 
@@ -18,14 +21,9 @@ const { PortalAccessDashboard } =
   require("./portal-access-dashboard") as typeof import("./portal-access-dashboard");
 
 const oneOrganisationRegister = {
-  organisations: [
-    {
-      id: "f26189c9-766c-4c28-bb2d-818556efe397",
-      displayName: "Example Client",
-    },
-  ],
+  metrics: getFounderAccessMetrics([], 1),
   entries: [],
-} satisfies PortalAccessRegister;
+} satisfies FounderAccessOverview;
 
 const router = {
   bfcacheId: "portal-access-dashboard-test",
@@ -49,26 +47,26 @@ test("portal access makes invitation primary and explains the activation sequenc
     html,
     /<button[^>]*type="button"[^>]*>[\s\S]*?Invite portal user[\s\S]*?<\/button>/,
   );
-  assert.match(
-    html,
-    /Clerk holds the invitation until the recipient creates their account/,
-  );
-  assert.match(html, /Account acceptance/);
+  assert.match(html, /Unique active users/);
+  assert.match(html, /Active FSS Admins/);
+  assert.match(html, /Pending invitations/);
   assert.match(html, /Portal role/);
-  assert.match(
-    html,
-    /Accepted invitations will appear here once account setup is complete/,
-  );
+  assert.match(html, /Invitations and accepted access will appear here/);
 });
 
 test("portal access keeps the invitation action visible before an organisation exists", () => {
   const html = renderToStaticMarkup(
     <AppRouterContext.Provider value={router}>
-      <PortalAccessDashboard data={{ organisations: [], entries: [] }} />
+      <PortalAccessDashboard
+        data={{ metrics: getFounderAccessMetrics([], 0), entries: [] }}
+      />
     </AppRouterContext.Provider>,
   );
 
   assert.match(html, /class="primaryAction"/);
   assert.match(html, /Invite portal user/);
   assert.doesNotMatch(html, /Create an active organisation/);
+  assert.match(html, /FSS Admin/);
+  assert.match(html, /Search users/);
+  assert.match(html, /All states and history/);
 });

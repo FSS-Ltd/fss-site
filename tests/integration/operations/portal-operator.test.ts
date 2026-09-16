@@ -116,7 +116,7 @@ test("reviewed operator scopes provisioning, creates claimable invitations and r
     assert.equal(retryProvision?.email, retryEmail);
     assert.equal(
       new URL(retryProvision?.redirectUrl).pathname,
-      "/portal/activate",
+      "/activate",
     );
     assert.equal(
       new URL(retryProvision?.redirectUrl).searchParams.get("name"),
@@ -177,14 +177,14 @@ test("reviewed operator scopes provisioning, creates claimable invitations and r
     assert.deepEqual(provisioned, [
       {
         email: retryEmail,
-        redirectUrl: `https://portal.example.test/portal/activate?name=Retry+Contact&email=${encodeURIComponent(retryEmail)}`,
+        redirectUrl: `https://portal.example.test/activate?name=Retry+Contact&email=${encodeURIComponent(retryEmail)}`,
         metadata: retryProvision?.metadata,
       },
-      { email, redirectUrl: "https://portal.example.test/portal/activate" },
+      { email, redirectUrl: "https://portal.example.test/activate" },
     ]);
     const activation = new URL(issued.activationUrl);
     assert.equal(activation.origin, "https://portal.example.test");
-    assert.equal(activation.pathname, "/portal/activate");
+    assert.equal(activation.pathname, "/activate");
     assert.equal(activation.search, "");
     assert.equal(activation.hash, "");
     const legacyIdentity = {

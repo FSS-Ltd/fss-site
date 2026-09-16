@@ -10,6 +10,7 @@ import { listPortalRequests } from "@/lib/operations/requests/repository";
 import { RequestBoard } from "@/components/portal/requests/board";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import styles from "@/components/portal/projects.module.css";
+import { portalPath } from "@/lib/operations/auth/portal-url";
 
 export default async function RequestsPage({
   searchParams,
@@ -42,7 +43,7 @@ export default async function RequestsPage({
   }
   return (
     <div className={styles.page}>
-      <Link className={styles.breadcrumb} href="/portal">
+      <Link className={styles.breadcrumb} href={portalPath("/portal")}>
         Your workspace
       </Link>
       <p className={styles.eyebrow}>Work, together</p>

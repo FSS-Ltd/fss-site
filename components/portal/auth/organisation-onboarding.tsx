@@ -2,6 +2,7 @@
 
 import { ArrowRight, Building2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { portalPath } from "@/lib/operations/auth/portal-url";
 import { useState, type FormEvent } from "react";
 import styles from "./portal.module.css";
 
@@ -28,7 +29,7 @@ export function OrganisationOnboarding(): React.JSX.Element {
       });
       if (!response.ok)
         throw new Error("Your organisation could not be created.");
-      router.replace("/portal");
+      router.replace(portalPath("/portal"));
       router.refresh();
     } catch (error) {
       setStatus({

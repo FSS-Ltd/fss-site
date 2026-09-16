@@ -8,8 +8,8 @@ test("accepted accounts continue to organisation onboarding when no tenant exist
       active: false,
       onboardingRequired: true,
     }),
-    "/portal/onboarding",
+    "/onboarding",
   );
-  assert.equal(resolvePortalClaimDestination({ active: true }), "/portal");
+  assert.equal(resolvePortalClaimDestination({ active: true }), "/");
   assert.throws(() => resolvePortalClaimDestination({ active: false }));
 });

@@ -15,6 +15,8 @@ import type {
   VerifiedPortalIdentity,
 } from "@/lib/operations/auth/types";
 import { needsPortalOnboarding } from "@/lib/operations/auth/pending-invitations";
+import { getActiveStaffMembership } from "@/lib/operations/auth/staff-invitations";
+import { portalPath } from "@/lib/operations/auth/portal-url";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import styles from "@/components/portal/auth/portal.module.css";
 
@@ -33,7 +35,7 @@ export default async function PortalHomePage(): Promise<React.JSX.Element> {
   } catch {
     return <PortalUnavailable />;
   }
-  if (!identity) redirect("/portal/login");
+  if (!identity) redirect(portalPath("/portal/login"));
   let memberships: PortalMembershipSummary[];
   let onboardingRequired: boolean;
   try {
@@ -48,7 +50,15 @@ export default async function PortalHomePage(): Promise<React.JSX.Element> {
   } catch {
     return <PortalUnavailable />;
   }
-  if (onboardingRequired) redirect("/portal/onboarding");
+  if (onboardingRequired) redirect(portalPath("/portal/onboarding"));
+  if (memberships.length === 0) {
+    const staff = await getActiveStaffMembership(
+      getPortalDb(),
+      identity,
+      randomUUID(),
+    );
+    if (staff) redirect("/admin");
+  }
   return (
     <section className={styles.card} aria-labelledby="portal-heading">
       <p className={styles.eyebrow}>Your account</p>
@@ -70,14 +80,14 @@ export default async function PortalHomePage(): Promise<React.JSX.Element> {
                 <p className={styles.actions}>
                   <Link
                     className={styles.link}
-                    href={`/portal/projects?organisationId=${membership.organisationId}`}
+                    href={`${portalPath("/portal/projects")}?organisationId=${membership.organisationId}`}
                   >
                     View projects
                   </Link>
                   {" · "}
                   <Link
                     className={styles.link}
-                    href={`/portal/requests?organisationId=${membership.organisationId}`}
+                    href={`${portalPath("/portal/requests")}?organisationId=${membership.organisationId}`}
                   >
                     View requests
                   </Link>
@@ -87,7 +97,7 @@ export default async function PortalHomePage(): Promise<React.JSX.Element> {
                 <p className={styles.actions}>
                   <Link
                     className={styles.link}
-                    href={`/portal/agreements?organisationId=${membership.organisationId}`}
+                    href={`${portalPath("/portal/agreements")}?organisationId=${membership.organisationId}`}
                   >
                     View agreements
                   </Link>
@@ -98,7 +108,7 @@ export default async function PortalHomePage(): Promise<React.JSX.Element> {
                   <p className={styles.actions}>
                     <Link
                       className={styles.link}
-                      href={`/portal/billing?organisationId=${membership.organisationId}`}
+                      href={`${portalPath("/portal/billing")}?organisationId=${membership.organisationId}`}
                     >
                       View billing
                     </Link>
@@ -108,7 +118,7 @@ export default async function PortalHomePage(): Promise<React.JSX.Element> {
                 <p className={styles.actions}>
                   <Link
                     className={styles.link}
-                    href={`/portal/services?organisationId=${membership.organisationId}`}
+                    href={`${portalPath("/portal/services")}?organisationId=${membership.organisationId}`}
                   >
                     Explore services
                   </Link>
@@ -119,7 +129,7 @@ export default async function PortalHomePage(): Promise<React.JSX.Element> {
         </ul>
       )}
       <form
-        action="/api/auth/sign-out?returnTo=/portal/login"
+        action={`/api/auth/sign-out?returnTo=${encodeURIComponent(portalPath("/portal/login"))}`}
         className={styles.actions}
         method="post"
       >

@@ -1,9 +1,39 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { inviteSchema } from "./repository";
+import { createPortalInvitationMetadata } from "./clerk-invitation";
 import {
   organisationOnboardingSchema,
   pendingPortalInvitationSchema,
 } from "./pending-invitations";
+
+test("Admin cannot be issued as a client invitation role", () => {
+  const input = {
+    name: "Admin",
+    email: "admin@example.test",
+    role: "admin",
+    reviewReference: "reviewed",
+  };
+  assert.equal(pendingPortalInvitationSchema.safeParse(input).success, false);
+  assert.equal(
+    inviteSchema.safeParse({
+      organisationId: "8aa24c0b-3665-4fd4-8694-500675c943c3",
+      contactId: "12d347ee-3aa5-4ed1-a93e-9c3a8fd36607",
+      role: "admin",
+      reviewReference: "reviewed",
+    }).success,
+    false,
+  );
+  assert.throws(() =>
+    Reflect.apply(createPortalInvitationMetadata, undefined, [
+      {
+        ...input,
+        organisationId: "8aa24c0b-3665-4fd4-8694-500675c943c3",
+        approvedBy: "a".repeat(64),
+      },
+    ]),
+  );
+});
 
 test("pending client invitations normalize email and reject organisation input", () => {
   assert.deepEqual(

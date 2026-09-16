@@ -21,7 +21,7 @@ test("retries a claim while Clerk finishes exposing the new session", async () =
     },
   );
 
-  assert.equal(destination, "/portal/onboarding");
+  assert.equal(destination, "/onboarding");
   assert.equal(requests, 2);
   assert.deepEqual(pauses, [250]);
 });

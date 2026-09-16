@@ -1,134 +1,67 @@
 "use client";
 
-import {
-  CircleCheckBig,
-  ShieldCheck,
-  UserPlus,
-  UsersRound,
-} from "lucide-react";
+import { ShieldCheck, UsersRound } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import {
-  getPortalAccessMetrics,
-  portalRoleOptions,
-} from "@/lib/operations/auth/access-dashboard-metrics";
-import type { PortalAccessRegister } from "@/lib/operations/auth/repository";
+import type { FounderAccessOverview } from "@/lib/operations/auth/founder-access";
 import { PortalInvitationDialog } from "./portal-invitation-dialog";
+import { PortalAccessRegister } from "./portal-access-register";
 import styles from "./portal-access-dashboard.module.css";
-
-type Status = {
-  kind: "idle" | "pending" | "success" | "error";
-  message?: string;
-};
-
-async function getRequestError(response: Response): Promise<string> {
-  const body: unknown = await response.json().catch(() => null);
-  if (
-    typeof body === "object" &&
-    body !== null &&
-    "message" in body &&
-    typeof body.message === "string" &&
-    body.message.trim()
-  ) {
-    return body.message;
-  }
-  return "Access could not be updated. Try again.";
-}
-
-function accessStatus(entry: PortalAccessRegister["entries"][number]): string {
-  if (entry.membershipId && !entry.revokedAt) return "Active";
-  if (entry.inviteClaimedAt) return "Claimed";
-  if (entry.inviteExpiresAt && entry.inviteExpiresAt < new Date())
-    return "Expired";
-  if (entry.invitedAt) return "Invitation pending";
-  return "Not invited";
-}
 
 export function PortalAccessDashboard({
   data,
 }: {
-  data: PortalAccessRegister;
+  data: FounderAccessOverview;
 }): React.JSX.Element {
   const router = useRouter();
-  const [status, setStatus] = useState<Status>({ kind: "idle" });
-  const metrics = getPortalAccessMetrics(data.entries);
+  const [message, setMessage] = useState("");
+  const { metrics } = data;
   const largestRoleCount = Math.max(
     ...metrics.roleCounts.map((role) => role.count),
     1,
   );
-
-  async function revoke(
-    entry: PortalAccessRegister["entries"][number],
-  ): Promise<void> {
-    if (!entry.membershipId || status.kind === "pending") return;
-    const reviewReference = window.prompt(
-      "Record the reason for removing access.",
-    );
-    if (!reviewReference?.trim()) return;
-    setStatus({ kind: "pending" });
-    try {
-      const response = await fetch("/api/growth/operations/portal-access", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "revoke_membership",
-          organisationId: entry.organisationId,
-          membershipId: entry.membershipId,
-          reviewReference,
-        }),
-      });
-      if (!response.ok) throw new Error(await getRequestError(response));
-      setStatus({ kind: "success", message: "Portal access removed." });
-      router.refresh();
-    } catch (error) {
-      setStatus({
-        kind: "error",
-        message:
-          error instanceof Error
-            ? error.message
-            : "Access could not be removed. Try again.",
-      });
-    }
-  }
+  const cards = [
+    ["Unique active users", metrics.uniqueActiveUsers],
+    ["Active client users", metrics.clientUsers],
+    ["Active FSS Admins", metrics.admins],
+    ["Pending invitations", metrics.pendingInvitations],
+    ["Client organisations", metrics.organisations],
+  ] as const;
 
   return (
     <section className={styles.page} aria-labelledby="portal-access-heading">
       <header className={styles.header}>
         <div>
-          <p className={styles.eyebrow}>Operations</p>
+          <p className={styles.eyebrow}>Growth Operations</p>
           <h1 id="portal-access-heading">Portal access</h1>
           <p>
-            Invite the right client contacts, set their role, and keep a clear
-            record of active access.
+            Invite client users and FSS Admins, review access, and see who uses
+            the portal.
           </p>
         </div>
         <div className={styles.headerActions}>
           <PortalInvitationDialog
             triggerClassName={styles.primaryAction}
-            onInvitationSent={(message) =>
-              setStatus({ kind: "success", message })
-            }
+            onInvitationSent={(result) => {
+              setMessage(result);
+              router.refresh();
+            }}
           />
           <div className={styles.assurance}>
             <ShieldCheck aria-hidden="true" size={20} />
-            <span>Roles are enforced against the live portal membership.</span>
+            <span>Only the founder can invite users and remove access.</span>
           </div>
         </div>
       </header>
-
       <section className={styles.metrics} aria-label="Portal access overview">
-        <article>
-          <UsersRound aria-hidden="true" size={19} />
-          <p>{data.organisations.length}</p>
-          <span>Client organisations</span>
-        </article>
-        <article>
-          <CircleCheckBig aria-hidden="true" size={19} />
-          <p>{metrics.active}</p>
-          <span>Active members</span>
-        </article>
+        {cards.map(([label, count]) => (
+          <article key={label}>
+            <UsersRound aria-hidden="true" size={19} />
+            <p>{count}</p>
+            <span>{label}</span>
+          </article>
+        ))}
       </section>
-
       <section
         className={styles.roleDistribution}
         aria-labelledby="role-distribution-heading"
@@ -137,10 +70,12 @@ export function PortalAccessDashboard({
           <p className={styles.eyebrow}>Access coverage</p>
           <h2 id="role-distribution-heading">Role distribution</h2>
           <p>
-            Role counts are based on the accepted access records in Operations.
+            Unique active people per role. A person with more than one role
+            appears in each relevant role total. Pending invitations exclude
+            people who already have active access.
           </p>
         </div>
-        <ul aria-label="Active members by role">
+        <ul aria-label="Active users by role">
           {metrics.roleCounts.map((role) => (
             <li key={role.value}>
               <div>
@@ -156,136 +91,13 @@ export function PortalAccessDashboard({
           ))}
         </ul>
       </section>
-
-      <section
-        className={styles.grantCard}
-        aria-labelledby="portal-invitation-heading"
-        id="portal-invitation"
-      >
-        <div className={styles.grantHeading}>
-          <UserPlus aria-hidden="true" size={20} />
-          <div>
-            <h2 id="portal-invitation-heading">Invite portal user</h2>
-            <p>
-              Clerk holds the invitation until the recipient creates their
-              account. The contact and membership are then written together.
-            </p>
-          </div>
-        </div>
-        <div className={styles.accessSequence}>
-          <h3>How access starts</h3>
-          <ol>
-            <li>
-              <span>1</span>
-              <div>
-                <strong>Founder approval</strong>
-                <p>
-                  The review note records why the requested access is approved.
-                </p>
-              </div>
-            </li>
-            <li>
-              <span>2</span>
-              <div>
-                <strong>Clerk invitation</strong>
-                <p>
-                  The recipient receives the role and account details to accept.
-                </p>
-              </div>
-            </li>
-            <li>
-              <span>3</span>
-              <div>
-                <strong>Account acceptance</strong>
-                <p>
-                  Operations creates the contact and membership after setup.
-                </p>
-              </div>
-            </li>
-          </ol>
-        </div>
-        <div aria-live="polite">
-          {status.message && (
-            <p
-              className={`${styles.message} ${status.kind === "error" ? styles.error : ""}`}
-            >
-              {status.message}
-            </p>
-          )}
-        </div>
-      </section>
-
-      <section
-        className={styles.register}
-        aria-labelledby="access-register-heading"
-      >
-        <div className={styles.sectionHeading}>
-          <div>
-            <h2 id="access-register-heading">Access register</h2>
-            <p>
-              {data.entries.length
-                ? "Every role is scoped to one client organisation."
-                : "Accepted invitations will appear here once account setup is complete."}
-            </p>
-          </div>
-        </div>
-        {data.entries.length > 0 && (
-          <ul>
-            {data.entries.map((entry) => (
-              <li key={entry.contactId} className={styles.entry}>
-                <div className={styles.person}>
-                  <strong>{entry.name}</strong>
-                  <span>{entry.email}</span>
-                  <span>{entry.organisationName}</span>
-                </div>
-                <div className={styles.role}>
-                  {entry.role ? (
-                    <>
-                      <strong>
-                        {
-                          portalRoleOptions.find(
-                            (role) => role.value === entry.role,
-                          )?.label
-                        }
-                      </strong>
-                      <span>
-                        {
-                          portalRoleOptions.find(
-                            (role) => role.value === entry.role,
-                          )?.detail
-                        }
-                      </span>
-                    </>
-                  ) : (
-                    <span>Role set when invited</span>
-                  )}
-                </div>
-                <span
-                  className={
-                    entry.membershipId && !entry.revokedAt
-                      ? styles.active
-                      : styles.pending
-                  }
-                >
-                  {accessStatus(entry)}
-                </span>
-                {entry.membershipId && !entry.revokedAt ? (
-                  <button
-                    className={styles.revoke}
-                    disabled={status.kind === "pending"}
-                    onClick={() => revoke(entry)}
-                    type="button"
-                  >
-                    Remove access
-                  </button>
-                ) : (
-                  <span className={styles.noAction}>No active access</span>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+      <div aria-live="polite">
+        {message && <p className={styles.message}>{message}</p>}
+      </div>
+      <PortalAccessRegister
+        entries={data.entries}
+        onAccessChanged={() => router.refresh()}
+      />
     </section>
   );
 }
