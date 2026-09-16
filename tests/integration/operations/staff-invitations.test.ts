@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import test from "node:test";
 import postgres from "postgres";
 import { requireOperationsTestDatabaseUrl } from "../../../scripts/require-operations-database-env";
+import { cleanupStaffInvitationFixtures } from "./staff-invitation-fixtures";
 
 test("staff invitation lifecycle is atomic, isolated, audited, and cannot be replayed after revocation", async () => {
   const db = postgres(
@@ -114,10 +115,7 @@ test("staff invitation lifecycle is atomic, isolated, audited, and cannot be rep
     assert.equal(audit.at(-1)?.review, "founder-revoked-test");
     assert.ok(audit.every((entry) => entry.correlationId === correlationId));
   } finally {
-    await db`delete from operations.staff_invitation_audit where invitation_id = ${invitationId}`;
-    await db`delete from operations.staff_memberships where invitation_id = ${invitationId}`;
-    await db`delete from operations.pending_staff_invitations where id = ${invitationId}`;
-    await db.end();
+    await cleanupStaffInvitationFixtures(db, [invitationId]);
   }
 });
 
@@ -184,14 +182,9 @@ test("expiry, provider failure, pending revocation, and client-only access canno
     >`select role from operations.memberships where contact_id = ${contactId} and revoked_at is null`;
     assert.equal(client.role, "owner");
   } finally {
-    for (const id of invitations) {
-      await db`delete from operations.staff_invitation_audit where invitation_id = ${id}`;
-      await db`delete from operations.staff_memberships where invitation_id = ${id}`;
-      await db`delete from operations.pending_staff_invitations where id = ${id}`;
-    }
-    await db`delete from operations.memberships where contact_id = ${contactId}`;
-    await db`delete from operations.contacts where id = ${contactId}`;
-    await db`delete from operations.organisations where id = ${organisationId}`;
-    await db.end();
+    await cleanupStaffInvitationFixtures(db, invitations, {
+      organisationId,
+      contactId,
+    });
   }
 });
