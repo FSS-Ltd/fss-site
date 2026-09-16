@@ -7,8 +7,7 @@ import { ArrowRight, LockKeyhole } from "lucide-react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useSignUp } from "@clerk/nextjs";
 import styles from "./portal.module.css";
-import { resolvePortalClaimDestination } from "./portal-claim-destination";
-import { portalPath } from "@/lib/operations/auth/portal-url";
+import { claimPortalAccess } from "./portal-claim-request";
 
 type Status = {
   kind: "idle" | "pending" | "error";
@@ -33,17 +32,6 @@ function getClerkErrorMessage(error: unknown): string | null {
     : null;
 }
 
-async function claimPortalAccess(): Promise<string> {
-  const response = await fetch("/api/portal/access/claim", { method: "POST" });
-  const result: unknown = await response.json().catch(() => null);
-  if (!response.ok) {
-    throw new Error(
-      "Your account was created, but portal access is not active yet.",
-    );
-  }
-  return resolvePortalClaimDestination(result);
-}
-
 export function PortalInvitationActivation(): React.JSX.Element {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -59,7 +47,7 @@ export function PortalInvitationActivation(): React.JSX.Element {
 
   useEffect(() => {
     if (initialValues.current.name || initialValues.current.email)
-      window.history.replaceState({}, "", portalPath("/portal/activate"));
+      window.history.replaceState({}, "", "/portal/activate");
   }, []);
 
   async function submit(event: FormEvent<HTMLFormElement>): Promise<void> {
@@ -131,7 +119,7 @@ export function PortalInvitationActivation(): React.JSX.Element {
           invitation.
         </p>
         <p className={styles.actions}>
-          <Link className={styles.link} href={portalPath("/portal/login")}>
+          <Link className={styles.link} href="/portal/login">
             Go to portal sign in
           </Link>
         </p>
@@ -237,7 +225,7 @@ export function PortalInvitationActivation(): React.JSX.Element {
         when this invitation is accepted.
       </p>
       <p className={styles.actions}>
-        <Link className={styles.link} href={portalPath("/portal/login")}>
+        <Link className={styles.link} href="/portal/login">
           Already have access? Sign in
         </Link>
       </p>

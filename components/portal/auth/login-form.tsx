@@ -4,8 +4,8 @@ import { useState, type FormEvent } from "react";
 import Image from "next/image";
 import { ArrowRight, LockKeyhole, MailCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { portalPath } from "@/lib/operations/auth/portal-url";
 import styles from "./portal.module.css";
+import { claimPortalAccess } from "./portal-claim-request";
 
 type Phase = "email" | "code";
 type Status = {
@@ -23,22 +23,6 @@ export function PortalLoginForm(): React.JSX.Element {
   const [status, setStatus] = useState<Status>({ kind: "idle" });
   const [phase, setPhase] = useState<Phase>("email");
   const loaded = signInLoaded;
-
-  async function claimAccess(): Promise<void> {
-    const response = await fetch("/api/portal/access/claim", {
-      method: "POST",
-    });
-    const result: unknown = await response.json().catch(() => null);
-    if (
-      !response.ok ||
-      typeof result !== "object" ||
-      result === null ||
-      !("active" in result) ||
-      result.active !== true
-    ) {
-      throw new Error("Portal access is not active.");
-    }
-  }
 
   async function submitEmail(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
@@ -94,12 +78,12 @@ export function PortalLoginForm(): React.JSX.Element {
       if (result.status !== "complete" || !result.createdSessionId)
         throw new Error("Verification is incomplete.");
       await activateSignIn({ session: result.createdSessionId });
-      await claimAccess();
+      const destination = await claimPortalAccess();
       setStatus({
         kind: "success",
         message: "Verified. Opening your workspace…",
       });
-      router.replace(portalPath("/portal"));
+      router.replace(destination);
     } catch {
       setStatus({
         kind: "error",

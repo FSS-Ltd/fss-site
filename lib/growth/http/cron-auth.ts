@@ -7,6 +7,43 @@ export type CronAuthorizationResult =
       reason: "missing_secret" | "missing_header" | "invalid_secret";
     };
 
+export type CronErrorReport = {
+  errorName: string;
+  errorCode?: string;
+};
+
+const SAFE_ERROR_NAME = /^[A-Za-z][A-Za-z0-9]{0,79}$/;
+const SAFE_ERROR_CODES = new Set([
+  "AUTHENTICATION_FAILED",
+  "HISTORY_ID_EXPIRED",
+  "INVALID_PROVIDER_RESPONSE",
+  "PERMANENT_PROVIDER_ERROR",
+  "REJECTED_CATEGORY",
+  "RETRYABLE_PROVIDER_ERROR",
+]);
+
+function readErrorString(error: unknown, property: "name" | "code"): string | undefined {
+  if (typeof error !== "object" || error === null) return undefined;
+
+  try {
+    const value = Reflect.get(error, property);
+    return typeof value === "string" ? value : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+export function toCronErrorReport(error: unknown): CronErrorReport {
+  const errorName = readErrorString(error, "name");
+  const errorCode = readErrorString(error, "code");
+
+  return {
+    errorName:
+      errorName && SAFE_ERROR_NAME.test(errorName) ? errorName : "UnknownError",
+    ...(errorCode && SAFE_ERROR_CODES.has(errorCode) ? { errorCode } : {}),
+  };
+}
+
 export function authorizeCronRequest(
   request: Request,
   cronSecret: string | undefined,
@@ -36,7 +73,7 @@ export type CronRouteConfig = {
   cronSecret: string | undefined;
   automationsEnabled: boolean;
   disabledReason?: string;
-  reportUnexpectedError?: (error: unknown) => void;
+  reportUnexpectedError?: (report: CronErrorReport) => void;
 };
 
 export function createCronRouteHandler<T extends object>(
@@ -69,7 +106,7 @@ export function createCronRouteHandler<T extends object>(
         { status: 200, headers: { "cache-control": "no-store" } },
       );
     } catch (error) {
-      config.reportUnexpectedError?.(error);
+      config.reportUnexpectedError?.(toCronErrorReport(error));
       return Response.json(
         { ok: false, code: "internal_error" },
         { status: 500, headers: { "cache-control": "no-store" } },

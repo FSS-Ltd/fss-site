@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { createPortalInvitationMetadata } from "./clerk-invitation";
-import { provisionPortalAccount, readPortalProvisionConfig } from "./provision";
+import {
+  provisionPortalAccount,
+  readPortalProvisionConfig,
+  toPortalProvisioningErrorReport,
+} from "./provision";
 
 test("provisioning requires a dedicated server secret and enabled portal configuration", () => {
   const env = {
@@ -41,6 +45,7 @@ test("provisioning creates a Clerk invitation with a fixed activation redirect",
   assert.deepEqual(inputs, [
     {
       emailAddress: "client@example.test",
+      notify: true,
       redirectUrl: "https://portal.example.test/portal/activate",
       publicMetadata: { fssPortalInvitation: metadata },
     },
@@ -66,4 +71,83 @@ test("provisioning creates a Clerk invitation with a fixed activation redirect",
       },
     ),
   );
+});
+
+test("provisioning classifies an existing Clerk invitation without retaining provider details", async () => {
+  const providerError = Object.assign(
+    new Error("Invitation already exists for client@example.test"),
+    {
+      name: "ClerkAPIResponseError",
+      status: 409,
+      errors: [
+        {
+          code: "form_identifier_exists",
+          message: "Invitation already exists for client@example.test",
+          longMessage: "The existing invitation is still pending.",
+          meta: { emailAddresses: ["client@example.test"] },
+        },
+      ],
+    },
+  );
+
+  await assert.rejects(
+    provisionPortalAccount(
+      "client@example.test",
+      "https://portal.example.test/portal/activate",
+      undefined,
+      async () => {
+        throw providerError;
+      },
+    ),
+    (error: unknown) => {
+      assert.equal(
+        typeof error === "object" && error !== null
+          ? Reflect.get(error, "name")
+          : undefined,
+        "PortalProvisioningError",
+      );
+      assert.equal(
+        typeof error === "object" && error !== null
+          ? Reflect.get(error, "code")
+          : undefined,
+        "INVITATION_CONFLICT",
+      );
+      assert.deepEqual(toPortalProvisioningErrorReport(error), {
+        errorName: "PortalProvisioningError",
+        errorCode: "INVITATION_CONFLICT",
+      });
+      assert.doesNotMatch(JSON.stringify(error), /client@example\.test/);
+      return true;
+    },
+  );
+});
+
+test("provisioning classifies Clerk failures by safe status category", async () => {
+  const cases = [
+    [400, "INVALID_PROVIDER_REQUEST"],
+    [401, "PROVIDER_AUTHENTICATION_FAILED"],
+    [429, "RETRYABLE_PROVIDER_ERROR"],
+    [500, "RETRYABLE_PROVIDER_ERROR"],
+    [418, "UNKNOWN_PROVIDER_ERROR"],
+  ] as const;
+
+  for (const [status, expectedCode] of cases) {
+    await assert.rejects(
+      provisionPortalAccount(
+        "client@example.test",
+        "https://portal.example.test/portal/activate",
+        undefined,
+        async () => {
+          throw Object.assign(new Error("provider response"), { status });
+        },
+      ),
+      (error: unknown) => {
+        assert.deepEqual(toPortalProvisioningErrorReport(error), {
+          errorName: "PortalProvisioningError",
+          errorCode: expectedCode,
+        });
+        return true;
+      },
+    );
+  }
 });

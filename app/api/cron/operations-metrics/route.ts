@@ -11,8 +11,8 @@ export async function GET(request: Request): Promise<Response> {
         process.env.OPERATIONS_ENABLED === "true" &&
         process.env.OPERATIONS_METRIC_EXPORTS_ENABLED === "true",
       disabledReason: "operations_metric_exports_disabled",
-      reportUnexpectedError: () =>
-        process.stderr.write("Operations export worker failed.\n"),
+      reportUnexpectedError: (report) =>
+        console.error("Operations export worker failed.", report),
     },
     async () => ({
       processed: await runNextMetricExport(

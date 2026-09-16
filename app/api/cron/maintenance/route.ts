@@ -14,11 +14,8 @@ export async function GET(request: Request): Promise<Response> {
     buildReport: async () => ({
       integrations: await getIntegrationHealthSummary(),
     }),
-    reportUnexpectedError: (error) => {
-      console.error("Growth OS maintenance cron failed.", {
-        errorName: error instanceof Error ? error.name : "UnknownError",
-      });
-    },
+    reportUnexpectedError: (report) =>
+      console.error("Growth OS maintenance cron failed.", report),
   });
 
   return handler(request);

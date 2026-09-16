@@ -13,6 +13,7 @@ import {
   portalOperationSchema,
 } from "@/lib/operations/auth/operator";
 import { resolvePortalOrigin } from "@/lib/operations/auth/configuration";
+import { toPortalProvisioningErrorReport } from "@/lib/operations/auth/provision";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 
 export const runtime = "nodejs";
@@ -31,6 +32,7 @@ export async function POST(request: Request): Promise<Response> {
     "application/json"
   )
     return Response.json({ message: "Send a JSON request." }, { status: 415 });
+  const correlationId = randomUUID();
   try {
     const operation = portalOperationSchema.parse(
       await readJsonRequestBody(request, 8 * 1024),
@@ -43,7 +45,7 @@ export async function POST(request: Request): Promise<Response> {
     );
     return Response.json(result, {
       status: 200,
-      headers: { "X-Correlation-Id": randomUUID() },
+      headers: { "X-Correlation-Id": correlationId },
     });
   } catch (error) {
     const status =
@@ -54,6 +56,11 @@ export async function POST(request: Request): Promise<Response> {
           : error instanceof PortalAccessConflict
             ? 409
             : 500;
+    if (status === 500)
+      console.error("Portal access update failed", {
+        correlationId,
+        error: toPortalProvisioningErrorReport(error),
+      });
     return Response.json(
       {
         message:
@@ -63,7 +70,7 @@ export async function POST(request: Request): Promise<Response> {
               ? "Portal access could not be updated."
               : "Check the access details and try again.",
       },
-      { status, headers: { "X-Correlation-Id": randomUUID() } },
+      { status, headers: { "X-Correlation-Id": correlationId } },
     );
   }
 }
