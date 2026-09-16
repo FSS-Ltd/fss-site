@@ -1,12 +1,31 @@
 import type { NextFetchEvent, NextMiddleware, NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-import { portalRouteForHost } from "@/lib/operations/auth/portal-host";
+import {
+  portalRedirectForHost,
+  portalRouteForHost,
+} from "@/lib/operations/auth/portal-host";
+
+function applyPortalSecurityHeaders(response: NextResponse): NextResponse {
+  response.headers.set("Cache-Control", "private, no-store");
+  response.headers.set("Referrer-Policy", "no-referrer");
+  return response;
+}
 
 export async function proxy(
   request: NextRequest,
   event: NextFetchEvent,
 ): Promise<ReturnType<NextMiddleware>> {
+  const portalRedirect = portalRedirectForHost(
+    request.nextUrl.hostname,
+    request.nextUrl.pathname,
+  );
+  if (portalRedirect) {
+    const url = request.nextUrl.clone();
+    url.pathname = portalRedirect;
+    return applyPortalSecurityHeaders(NextResponse.redirect(url));
+  }
+
   const portalRoute = portalRouteForHost(
     request.nextUrl.hostname,
     request.nextUrl.pathname,
@@ -14,10 +33,7 @@ export async function proxy(
   if (portalRoute) {
     const url = request.nextUrl.clone();
     url.pathname = portalRoute;
-    const response = NextResponse.rewrite(url);
-    response.headers.set("Cache-Control", "private, no-store");
-    response.headers.set("Referrer-Policy", "no-referrer");
-    return response;
+    return applyPortalSecurityHeaders(NextResponse.rewrite(url));
   }
 
   if (request.nextUrl.pathname === "/") return NextResponse.next();
@@ -27,10 +43,7 @@ export async function proxy(
     request.nextUrl.pathname.startsWith("/portal/") ||
     request.nextUrl.pathname.startsWith("/api/portal/")
   ) {
-    const response = NextResponse.next();
-    response.headers.set("Cache-Control", "private, no-store");
-    response.headers.set("Referrer-Policy", "no-referrer");
-    return response;
+    return applyPortalSecurityHeaders(NextResponse.next());
   }
 
   const { auth } = await import("@/auth");
@@ -38,5 +51,20 @@ export async function proxy(
 }
 
 export const config = {
-  matcher: ["/", "/growth/:path*", "/portal/:path*", "/api/portal/:path*"],
+  matcher: [
+    "/",
+    "/growth/:path*",
+    "/portal/:path*",
+    "/api/portal/:path*",
+    {
+      source: "/((?!api|webhooks|_next|.*\\..*).*)",
+      has: [
+        {
+          type: "header",
+          key: "host",
+          value: "portal\\.faithfulsoftware\\.dev",
+        },
+      ],
+    },
+  ],
 };
