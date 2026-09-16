@@ -5,6 +5,7 @@ import type { OperationsFounder } from "../organisations/types";
 import { portalRoles } from "./types";
 import {
   createPortalInvitationMetadata,
+  createStaffInvitationMetadata,
   type PortalInvitationMetadata,
 } from "./clerk-invitation";
 import { provisionPortalAccount } from "./provision";
@@ -23,6 +24,15 @@ import {
   pendingPortalInvitationSchema,
 } from "./pending-invitations";
 import { sendConfiguredFounderInvitation } from "./founder-invitation";
+import {
+  issueStaffInvitation,
+  failStaffInvitation,
+  revokeStaffMembership,
+  staffInvitationSchema,
+  revokeStaffMembershipSchema,
+} from "./staff-invitations";
+import { portalUrl } from "./portal-url";
+import { requireOperationsFounder } from "../organisations/link-engagement";
 
 export const grantAccessSchema = contactSchema.extend({
   action: z.literal("grant_access"),
@@ -31,6 +41,9 @@ export const grantAccessSchema = contactSchema.extend({
 
 export const inviteClientSchema = pendingPortalInvitationSchema.extend({
   action: z.literal("invite_client"),
+});
+export const inviteAdminSchema = staffInvitationSchema.extend({
+  action: z.literal("invite_admin"),
 });
 export const inviteFounderSchema = z.strictObject({
   action: z.literal("invite_founder"),
@@ -41,15 +54,29 @@ export const portalOperationSchema = z.discriminatedUnion("action", [
   contactSchema.extend({ action: z.literal("create_contact") }),
   grantAccessSchema,
   inviteClientSchema,
+  inviteAdminSchema,
+  revokeStaffMembershipSchema.extend({ action: z.literal("revoke_admin") }),
   inviteFounderSchema,
   inviteSchema.extend({ action: z.literal("issue_invite") }),
   revokeSchema.extend({ action: z.literal("revoke_membership") }),
 ]);
 export type PortalOperation = z.infer<typeof portalOperationSchema>;
+export type PortalAccessOperation = Extract<
+  PortalOperation,
+  {
+    action:
+      | "invite_client"
+      | "invite_admin"
+      | "revoke_membership"
+      | "revoke_admin";
+  }
+>;
 export type PortalOperationResult =
   | { action: "create_contact"; contactId: string }
   | { action: "grant_access" }
   | { action: "invite_client" }
+  | { action: "invite_admin" }
+  | { action: "revoke_admin" }
   | { action: "invite_founder" }
   | { action: "issue_invite"; activationUrl: string; expiresAt: string }
   | { action: "revoke_membership" };
@@ -67,6 +94,9 @@ type PortalOperationDependencies = {
   issuePending: typeof issuePendingPortalInvitation;
   failPending: typeof failPendingPortalInvitation;
   sendFounder: typeof sendConfiguredFounderInvitation;
+  issueStaff: typeof issueStaffInvitation;
+  failStaff: typeof failStaffInvitation;
+  revokeStaff: typeof revokeStaffMembership;
 };
 
 const defaultDependencies: PortalOperationDependencies = {
@@ -74,6 +104,9 @@ const defaultDependencies: PortalOperationDependencies = {
   issuePending: issuePendingPortalInvitation,
   failPending: failPendingPortalInvitation,
   sendFounder: sendConfiguredFounderInvitation,
+  issueStaff: issueStaffInvitation,
+  failStaff: failStaffInvitation,
+  revokeStaff: revokeStaffMembership,
 };
 
 export async function applyPortalOperation(
@@ -84,12 +117,48 @@ export async function applyPortalOperation(
   provision: PortalAccountProvisioner = provisionPortalAccount,
   dependencyOverrides: Partial<PortalOperationDependencies> = {},
 ): Promise<PortalOperationResult> {
+  requireOperationsFounder(founder);
   const dependencies = { ...defaultDependencies, ...dependencyOverrides };
   const { action, ...input } = portalOperationSchema.parse(operation);
   if (action === "create_contact")
     return { action, ...(await createPortalContact(db, founder, input)) };
   if (action === "revoke_membership") {
     await revokePortalMembership(db, founder, input);
+    return { action };
+  }
+  if (action === "revoke_admin") {
+    await dependencies.revokeStaff(db, founder, input, dependencies.createId());
+    return { action };
+  }
+  if (action === "invite_admin") {
+    const invitation = inviteAdminSchema.parse(operation);
+    const invitationId = dependencies.createId();
+    const correlationId = dependencies.createId();
+    await dependencies.issueStaff(
+      db,
+      founder,
+      {
+        name: invitation.name,
+        email: invitation.email,
+        reviewReference: invitation.reviewReference,
+      },
+      invitationId,
+      correlationId,
+    );
+    try {
+      await provision(
+        invitation.email,
+        createInvitationActivationUrl(origin, invitation.name, invitation.email)
+          .href,
+        createStaffInvitationMetadata({
+          invitationId,
+          email: invitation.email,
+        }),
+      );
+    } catch (error) {
+      await dependencies.failStaff(db, founder, invitationId, correlationId);
+      throw error;
+    }
     return { action };
   }
   if (action === "invite_client") {
@@ -157,7 +226,7 @@ export async function applyPortalOperation(
   });
   if (!contact) throw new Error("The approved portal contact was not found.");
   const issued = await issuePortalInvite(db, founder, invite);
-  const url = new URL("/portal/activate", origin);
+  const url = portalUrl("/activate", origin);
   await provision(contact.email, url.href, undefined);
   return {
     action,
@@ -171,7 +240,7 @@ function createInvitationActivationUrl(
   name: string,
   email: string,
 ): URL {
-  const url = new URL("/portal/activate", origin);
+  const url = portalUrl("/activate", origin);
   url.searchParams.set("name", name);
   url.searchParams.set("email", email);
   return url;

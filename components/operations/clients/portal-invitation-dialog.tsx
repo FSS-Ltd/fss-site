@@ -2,15 +2,17 @@
 
 import { Send, UserPlus } from "lucide-react";
 import { useRef, useState, type FormEvent } from "react";
-import { portalRoleOptions } from "@/lib/operations/auth/access-dashboard-metrics";
+import {
+  createInvitationPayload,
+  type InvitationType,
+} from "./portal-access-form";
+import { PortalInvitationFields } from "./portal-invitation-fields";
 import styles from "./portal-access-dashboard.module.css";
 
 type Status = {
   kind: "idle" | "pending" | "success" | "error";
   message?: string;
 };
-
-type InvitationType = "client" | "founder";
 
 async function getRequestError(response: Response): Promise<string> {
   const body: unknown = await response.json().catch(() => null);
@@ -27,11 +29,9 @@ async function getRequestError(response: Response): Promise<string> {
 }
 
 export function PortalInvitationDialog({
-  founderEmail,
   onInvitationSent,
   triggerClassName,
 }: {
-  founderEmail: string;
   onInvitationSent: (message: string) => void;
   triggerClassName?: string;
 }): React.JSX.Element {
@@ -55,38 +55,23 @@ export function PortalInvitationDialog({
     event.preventDefault();
     if (status.kind === "pending") return;
     setStatus({ kind: "pending" });
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
     try {
       const response = await fetch("/api/growth/operations/portal-access", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(
-          invitationType === "client"
-            ? {
-                action: "invite_client",
-                name: form.get("name"),
-                email: form.get("email"),
-                role: form.get("role"),
-                reviewReference: form.get("reviewReference"),
-              }
-            : {
-                action: "invite_founder",
-                reviewReference: form.get("reviewReference"),
-              },
-        ),
+        body: JSON.stringify(createInvitationPayload(form, invitationType)),
       });
       if (!response.ok) throw new Error(await getRequestError(response));
-      const email =
-        invitationType === "founder"
-          ? founderEmail
-          : form.get("email")?.toString().trim().toLowerCase();
-      event.currentTarget.reset();
+      const email = form.get("email")?.toString().trim().toLowerCase();
+      formElement.reset();
       setStatus({
         kind: "success",
         message:
-          invitationType === "founder"
-            ? "Founder workspace invitation sent."
-            : "Invitation sent. The access record will appear after the recipient completes onboarding.",
+          invitationType === "admin"
+            ? "FSS Admin invitation sent. Access starts after acceptance."
+            : "Client invitation sent. Access starts after onboarding.",
       });
       onInvitationSent(
         email
@@ -134,8 +119,7 @@ export function PortalInvitationDialog({
             <p className={styles.eyebrow}>Access invitation</p>
             <h2 id="portal-invitation-dialog-heading">Invite a user</h2>
             <p>
-              Invite a client to begin portal onboarding, or send the authorised
-              founder account a workspace sign-in link.
+              Invite a client to their portal or an FSS colleague to FSS Studio.
             </p>
           </div>
         </div>
@@ -151,73 +135,21 @@ export function PortalInvitationDialog({
               name="invitationType"
               value={invitationType}
               onChange={(event) => {
-                setInvitationType(event.target.value as InvitationType);
+                setInvitationType(
+                  event.target.value === "admin" ? "admin" : "client",
+                );
                 setStatus({ kind: "idle" });
               }}
               disabled={status.kind === "pending"}
             >
-              <option value="client">Client</option>
-              <option value="founder">Founder</option>
+              <option value="client">Client user</option>
+              <option value="admin">FSS Admin</option>
             </select>
           </label>
-          <div
-            className={styles.clientFields}
-            hidden={invitationType !== "client"}
-          >
-            <label>
-              Client name
-              <input
-                maxLength={200}
-                name="name"
-                required={invitationType === "client"}
-                disabled={
-                  status.kind === "pending" || invitationType !== "client"
-                }
-              />
-            </label>
-            <label>
-              Email address
-              <input
-                autoComplete="email"
-                maxLength={254}
-                name="email"
-                required={invitationType === "client"}
-                type="email"
-                disabled={
-                  status.kind === "pending" || invitationType !== "client"
-                }
-              />
-            </label>
-            <label>
-              Portal role
-              <select
-                defaultValue="owner"
-                name="role"
-                disabled={
-                  status.kind === "pending" || invitationType !== "client"
-                }
-              >
-                {portalRoleOptions.map((role) => (
-                  <option key={role.value} value={role.value}>
-                    {role.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-          <div
-            className={styles.founderFields}
-            hidden={invitationType !== "founder"}
-          >
-            <label>
-              Founder email
-              <input readOnly type="email" value={founderEmail} />
-            </label>
-            <p>
-              Access still requires this exact verified Google Workspace
-              account.
-            </p>
-          </div>
+          <PortalInvitationFields
+            type={invitationType}
+            pending={status.kind === "pending"}
+          />
           <label className={styles.dialogReference}>
             Access approval note
             <input

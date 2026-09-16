@@ -7,6 +7,7 @@ import {
   issueStaffInvitation,
   failStaffInvitation,
   revokeStaffInvitation,
+  revokeStaffMembership,
   claimClerkStaffInvitation,
   getActiveStaffMembership,
   staffInvitationSchema,
@@ -73,6 +74,34 @@ test("staff issue requires founder authority and maps normalized reviewed input"
     invitationId,
     "Admin",
     "admin@example.test",
+    "Reviewed",
+    correlationId,
+  ]);
+});
+
+test("membership revocation checks founder context and calls only the membership boundary", async () => {
+  const { db, calls } = recordingDb([]);
+  const input = {
+    staffMembershipId: membershipId,
+    reviewReference: " Reviewed ",
+  };
+  await assert.rejects(
+    revokeStaffMembership(db, null, input, correlationId),
+    /Founder/,
+  );
+  assert.equal(calls.length, 0);
+  await assert.rejects(
+    revokeStaffMembership(
+      db,
+      founder,
+      { ...input, invitationId },
+      correlationId,
+    ),
+  );
+  await revokeStaffMembership(db, founder, input, correlationId);
+  assert.match(calls.at(-1)?.sql ?? "", /operations.revoke_staff_membership/);
+  assert.deepEqual(calls.at(-1)?.values, [
+    membershipId,
     "Reviewed",
     correlationId,
   ]);

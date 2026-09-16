@@ -8,6 +8,7 @@ import { signingEnabled } from "@/lib/operations/agreements/signing-commands";
 import { listPortalSigning } from "@/lib/operations/agreements/signing-service";
 import { SigningReview } from "@/components/operations/signing/signing-review";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
+import { portalPath } from "@/lib/operations/auth/portal-url";
 import styles from "@/components/operations/agreements/agreements.module.css";
 import signingStyles from "@/components/operations/signing/signing.module.css";
 export const dynamic = "force-dynamic";
@@ -36,7 +37,7 @@ export default async function AgreementsPage({
   return (
     <section className={`${styles.page} ${signingStyles.page}`}>
       <header>
-        <Link href="/portal">Your organisations</Link>
+        <Link href={portalPath("/portal")}>Your organisations</Link>
         <h1>Your agreements.</h1>
         <p>
           Take a moment to review your terms. Your signature belongs to the

@@ -13,20 +13,18 @@ require.extensions[".css"] = (module) => {
 
 const { PortalInvitationDialog } =
   require("./portal-invitation-dialog") as typeof import("./portal-invitation-dialog");
+const { PortalInvitationFields } =
+  require("./portal-invitation-fields") as typeof import("./portal-invitation-fields");
 
 test("renders the portal invitation as a modal task with the required details", () => {
   const markup = renderToStaticMarkup(
-    <PortalInvitationDialog
-      founderEmail="founder@example.test"
-      onInvitationSent={() => undefined}
-    />,
+    <PortalInvitationDialog onInvitationSent={() => undefined} />,
   );
 
   assert.match(markup, /Invite portal user/);
   assert.match(markup, /<dialog/);
   assert.match(markup, /Client/);
-  assert.match(markup, /Founder/);
-  assert.match(markup, /founder@example\.test/);
+  assert.match(markup, /FSS Admin/);
   assert.doesNotMatch(markup, /name="organisationId"/);
   assert.match(markup, /name="email"/);
   assert.match(markup, /name="name"/);
@@ -38,7 +36,6 @@ test("renders the portal invitation as a modal task with the required details", 
 test("allows the portal access header to supply its primary action style", () => {
   const markup = renderToStaticMarkup(
     <PortalInvitationDialog
-      founderEmail="founder@example.test"
       onInvitationSent={() => undefined}
       triggerClassName="primaryAction"
     />,
@@ -46,4 +43,18 @@ test("allows the portal access header to supply its primary action style", () =>
 
   assert.match(markup, /class="primaryAction"/);
   assert.match(markup, /Invite portal user/);
+});
+
+test("Admin form displays a fixed role without client role or organisation controls", () => {
+  const markup = renderToStaticMarkup(
+    <PortalInvitationFields type="admin" pending={false} />,
+  );
+  assert.match(markup, /readOnly=""[^>]*value="Admin"/);
+  assert.doesNotMatch(markup, /name="role"|name="organisationId"/);
+  assert.match(markup, /name="name"/);
+  assert.match(markup, /name="email"/);
+  const pending = renderToStaticMarkup(
+    <PortalInvitationFields type="client" pending />,
+  );
+  assert.match(pending, /name="role" disabled=""/);
 });

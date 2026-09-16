@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import Image from "next/image";
 import { ArrowRight, LockKeyhole, MailCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { portalPath } from "@/lib/operations/auth/portal-url";
 import styles from "./portal.module.css";
 
 type Phase = "email" | "code";
@@ -98,7 +99,7 @@ export function PortalLoginForm(): React.JSX.Element {
         kind: "success",
         message: "Verified. Opening your workspace…",
       });
-      router.replace("/portal");
+      router.replace(portalPath("/portal"));
     } catch {
       setStatus({
         kind: "error",

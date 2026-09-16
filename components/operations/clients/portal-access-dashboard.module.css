@@ -78,7 +78,7 @@
 }
 .metrics {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 14px;
 }
 .metrics article {
@@ -184,12 +184,39 @@
 .roleTrack > span {
   display: block;
   height: 100%;
-  min-width: 3px;
+  min-width: 0;
   border-radius: inherit;
   background: #57d5e1;
   transition: width 240ms ease;
 }
-.grantCard,
+.filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: 16px;
+  margin-block: 20px;
+}
+.filters label {
+  display: grid;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.filters input,
+.filters select {
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px;
+  border: 1px solid #9caebb;
+  border-radius: 8px;
+  background: white;
+  color: #07182e;
+  font: inherit;
+}
+.filters :focus-visible,
+.revoke:focus-visible {
+  outline: 3px solid #0f7a83;
+  outline-offset: 3px;
+}
 .register {
   border: 1px solid #dce3e8;
   border-radius: 20px;
@@ -197,79 +224,16 @@
   box-shadow: 0 16px 40px -34px rgba(7, 24, 46, 0.5);
   padding: clamp(22px, 4vw, 34px);
 }
-.grantCard {
-  scroll-margin-top: 24px;
-}
-.grantHeading {
-  display: flex;
-  gap: 14px;
-  align-items: flex-start;
-}
-.grantHeading svg {
-  color: #0f7a83;
-  margin-top: 3px;
-}
-.grantHeading h2,
 .sectionHeading h2 {
   margin: 0;
   font-size: 1.2rem;
   letter-spacing: -0.025em;
 }
-.grantHeading p,
 .sectionHeading p {
   max-width: 650px;
   margin: 6px 0 0;
   color: #526078;
   line-height: 1.55;
-}
-.accessSequence {
-  margin-top: 24px;
-  padding: 18px;
-  border: 1px solid #d9e8eb;
-  border-radius: 14px;
-  background: #f2f8f9;
-}
-.accessSequence h3 {
-  margin: 0;
-  color: #07182e;
-  font-size: 0.9rem;
-  letter-spacing: -0.01em;
-}
-.accessSequence ol {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-  margin: 14px 0 0;
-  padding: 0;
-  list-style: none;
-}
-.accessSequence li {
-  display: flex;
-  min-width: 0;
-  gap: 10px;
-}
-.accessSequence li > span {
-  display: inline-flex;
-  width: 28px;
-  height: 28px;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: #0f7a83;
-  color: #fff;
-  font-size: 0.75rem;
-  font-weight: 800;
-}
-.accessSequence strong {
-  color: #16334d;
-  font-size: 0.82rem;
-}
-.accessSequence p {
-  margin: 4px 0 0;
-  color: #526078;
-  font-size: 0.78rem;
-  line-height: 1.45;
 }
 .inviteButton,
 .submitButton,
@@ -372,8 +336,7 @@
   margin-top: 26px;
 }
 .invitationType,
-.clientFields,
-.founderFields {
+.clientFields {
   grid-column: 1 / -1;
 }
 .clientFields {
@@ -381,19 +344,7 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
 }
-.founderFields {
-  display: grid;
-  gap: 10px;
-  padding: 16px;
-  border: 1px solid #d9e8eb;
-  border-radius: 12px;
-  background: #f2f8f9;
-}
-.clientFields[hidden],
-.founderFields[hidden] {
-  display: none;
-}
-.founderFields p {
+.clientFields p {
   margin: 0;
   color: #526078;
   font-size: 0.82rem;
@@ -408,6 +359,7 @@
 }
 .dialogForm input,
 .dialogForm select {
+  min-width: 0;
   min-height: 44px;
   border: 1px solid #cbd7df;
   border-radius: 10px;
@@ -547,7 +499,6 @@
   }
 }
 @media (max-width: 560px) {
-  .accessSequence ol,
   .dialogForm,
   .clientFields,
   .entry {
@@ -558,7 +509,6 @@
     grid-column: auto;
     justify-self: start;
   }
-  .grantCard,
   .register {
     border-radius: 16px;
     padding: 22px;

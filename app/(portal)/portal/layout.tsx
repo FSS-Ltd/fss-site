@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { operationsEnabled } from "@/lib/operations/db/client";
 import styles from "@/components/portal/auth/portal.module.css";
+import { portalPath } from "@/lib/operations/auth/portal-url";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -20,22 +21,22 @@ export default function PortalLayout({
   return (
     <ClerkProvider>
       <div className={styles.shell}>
-      <a href="#portal-content" className={styles.skip}>
-        Skip to content
-      </a>
-      <header className={styles.header}>
-        <Link href="/portal" className={styles.brand}>
-          Faithful Software Solutions
-        </Link>
-        <span className={styles.portalLabel}>Client portal</span>
-      </header>
-      <main id="portal-content" className={styles.main}>
-        {children}
-      </main>
-      <footer className={styles.footer}>
-        <span>Built on trust. Delivered with care.</span>
-        <span>Faithful Software Solutions</span>
-      </footer>
+        <a href="#portal-content" className={styles.skip}>
+          Skip to content
+        </a>
+        <header className={styles.header}>
+          <Link href={portalPath("/portal")} className={styles.brand}>
+            Faithful Software Solutions
+          </Link>
+          <span className={styles.portalLabel}>Client portal</span>
+        </header>
+        <main id="portal-content" className={styles.main}>
+          {children}
+        </main>
+        <footer className={styles.footer}>
+          <span>Built on trust. Delivered with care.</span>
+          <span>Faithful Software Solutions</span>
+        </footer>
       </div>
     </ClerkProvider>
   );

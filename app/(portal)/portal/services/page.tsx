@@ -10,6 +10,7 @@ import { PortalAccessDenied } from "@/lib/operations/auth/types";
 import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { listPublishedOffers } from "@/lib/operations/offers/repository";
 import styles from "@/components/portal/projects.module.css";
+import { portalPath } from "@/lib/operations/auth/portal-url";
 
 export default async function ServicesPage({
   searchParams,
@@ -44,7 +45,7 @@ export default async function ServicesPage({
   }
   return (
     <div className={styles.page}>
-      <Link className={styles.breadcrumb} href="/portal">
+      <Link className={styles.breadcrumb} href={portalPath("/portal")}>
         Your workspace
       </Link>
       <p className={styles.eyebrow}>Services</p>

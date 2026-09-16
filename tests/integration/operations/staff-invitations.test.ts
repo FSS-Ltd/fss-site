@@ -76,25 +76,43 @@ test("staff invitation lifecycle is atomic, isolated, audited, and cannot be rep
       "growth_app",
     ]) {
       const [privileges] = await db<
-        { tables: boolean; issue: boolean; claim: boolean }[]
+        {
+          tables: boolean;
+          issue: boolean;
+          claim: boolean;
+          register: boolean;
+          revoke: boolean;
+        }[]
       >`
         select has_table_privilege(${role}, 'operations.staff_memberships', 'select,insert,update,delete')
           or has_table_privilege(${role}, 'operations.pending_staff_invitations', 'select,insert,update,delete')
           or has_table_privilege(${role}, 'operations.staff_invitation_audit', 'select,insert,update,delete') as tables,
           has_function_privilege(${role}, 'operations.issue_staff_invitation(uuid,text,text,text,uuid)', 'execute') as issue,
-          has_function_privilege(${role}, 'operations.claim_staff_invitation(uuid)', 'execute') as claim
+          has_function_privilege(${role}, 'operations.claim_staff_invitation(uuid)', 'execute') as claim,
+          has_function_privilege(${role}, 'operations.founder_staff_access_register()', 'execute') as register,
+          has_function_privilege(${role}, 'operations.revoke_staff_membership(uuid,text,uuid)', 'execute') as revoke
       `;
       assert.deepEqual(privileges, {
         tables: false,
         issue: role === "operations_founder",
         claim: role === "operations_portal",
+        register: role === "operations_founder",
+        revoke: role === "operations_founder",
       });
     }
     await db.begin(async (tx) => {
       await tx`set local role operations_founder`;
       await tx`select set_config('operations.actor_id', ${actor}, true)`;
-      await tx`select operations.revoke_staff_invitation(${invitationId}, 'founder-revoked-test', ${correlationId})`;
-      await tx`select operations.revoke_staff_invitation(${invitationId}, 'idempotent-repeat', ${correlationId})`;
+      const [active] = await tx<{ state: string; membershipId: string }[]>`
+        select state, membership_id as "membershipId" from operations.founder_staff_access_register() where id = ${invitationId}
+      `;
+      assert.deepEqual(active, { state: "active", membershipId });
+      await tx`select operations.revoke_staff_membership(${membershipId}, 'founder-revoked-test', ${correlationId})`;
+      await tx`select operations.revoke_staff_membership(${membershipId}, 'idempotent-repeat', ${correlationId})`;
+      const [revoked] = await tx<
+        { state: string }[]
+      >`select state from operations.founder_staff_access_register() where id = ${invitationId}`;
+      assert.equal(revoked.state, "revoked");
     });
     assert.equal(await claim(email), null);
     await db.begin(async (tx) => {

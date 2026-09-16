@@ -59,7 +59,7 @@ test("client invitation records the pending grant and sends organisation-free Cl
     {
       email: "client@example.test",
       redirectUrl:
-        "https://portal.example.test/portal/activate?name=Client+Owner&email=client%40example.test",
+        "https://portal.example.test/activate?name=Client+Owner&email=client%40example.test",
       metadata: {
         version: 2,
         invitationId,
@@ -67,6 +67,126 @@ test("client invitation records the pending grant and sends organisation-free Cl
       },
     },
   ]);
+});
+
+test("Admin invitation rejects role or organisation and fixes staff metadata server-side", async () => {
+  const request = {
+    action: "invite_admin",
+    name: "FSS Colleague",
+    email: "ADMIN@EXAMPLE.TEST",
+    reviewReference: "Staff approved",
+  } as const;
+  assert.equal(portalOperationSchema.safeParse(request).success, true);
+  for (const extra of [{ role: "admin" }, { organisationId: randomUUID() }]) {
+    assert.equal(
+      portalOperationSchema.safeParse({ ...request, ...extra }).success,
+      false,
+    );
+  }
+  assert.equal(
+    portalOperationSchema.safeParse({
+      ...request,
+      action: "invite_client",
+      role: "admin",
+    }).success,
+    false,
+  );
+  const invitationId = randomUUID();
+  const events: string[] = [];
+  await applyPortalOperation(
+    {} as OperationsDb,
+    { actorId: "a".repeat(64) },
+    request,
+    "https://portal.example.test",
+    async (email, redirectUrl, metadata) => {
+      events.push("provider");
+      assert.equal(email, "admin@example.test");
+      assert.equal(new URL(redirectUrl).pathname, "/activate");
+      assert.deepEqual(metadata, {
+        version: 3,
+        realm: "staff",
+        role: "admin",
+        invitationId,
+        email,
+      });
+    },
+    {
+      createId: () => invitationId,
+      issueStaff: async (_db, _founder, input) => {
+        events.push("record");
+        assert.deepEqual(input, {
+          name: request.name,
+          email: "admin@example.test",
+          reviewReference: request.reviewReference,
+        });
+        return { invitationId, expiresAt: new Date() };
+      },
+    },
+  );
+  assert.deepEqual(events, ["record", "provider"]);
+});
+
+test("Admin provider failure is recorded before the error is returned", async () => {
+  const events: string[] = [];
+  const invitationId = randomUUID();
+  await assert.rejects(
+    applyPortalOperation(
+      {} as OperationsDb,
+      { actorId: "a".repeat(64) },
+      {
+        action: "invite_admin",
+        name: "Admin",
+        email: "admin@example.test",
+        reviewReference: "Reviewed",
+      },
+      "https://portal.example.test",
+      async () => {
+        throw new Error("provider unavailable");
+      },
+      {
+        createId: () => invitationId,
+        issueStaff: async () => ({ invitationId, expiresAt: new Date() }),
+        failStaff: async (_db, _founder, id) => {
+          assert.equal(id, invitationId);
+          events.push("failed");
+        },
+      },
+    ),
+    /provider unavailable/,
+  );
+  assert.deepEqual(events, ["failed"]);
+});
+
+test("Admin revocation accepts a membership ID, not an invitation ID", async () => {
+  const staffMembershipId = randomUUID();
+  const request = {
+    action: "revoke_admin",
+    staffMembershipId,
+    reviewReference: "Access removed",
+  } as const;
+  assert.equal(
+    portalOperationSchema.safeParse({ ...request, invitationId: randomUUID() })
+      .success,
+    false,
+  );
+  let revoked = false;
+  await applyPortalOperation(
+    {} as OperationsDb,
+    { actorId: "a".repeat(64) },
+    request,
+    "https://portal.example.test",
+    async () => undefined,
+    {
+      revokeStaff: async (_db, _founder, input) => {
+        assert.deepEqual(input, {
+          staffMembershipId,
+          reviewReference: request.reviewReference,
+        });
+        revoked = true;
+      },
+    },
+  );
+  assert.equal(revoked, true);
 });
 
 test("founder invitation accepts no browser-selected recipient", async () => {

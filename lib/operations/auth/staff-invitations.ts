@@ -22,6 +22,10 @@ export const staffInvitationSchema = z.strictObject({
     .transform((email) => email.toLowerCase()),
   reviewReference: reviewSchema,
 });
+export const revokeStaffMembershipSchema = z.strictObject({
+  staffMembershipId: z.uuid(),
+  reviewReference: reviewSchema,
+});
 const membershipSchema = z.strictObject({
   membershipId: z.uuid(),
   userId: z.uuid(),
@@ -79,6 +83,21 @@ export async function revokeStaffInvitation(
   await db.begin(async (tx) => {
     await tx`select set_config('operations.actor_id', ${founder.actorId}, true)`;
     await tx`select operations.revoke_staff_invitation(${ids.invitationId}, ${review}, ${ids.correlationId})`;
+  });
+}
+
+export async function revokeStaffMembership(
+  db: OperationsDb,
+  context: OperationsFounder | null,
+  input: unknown,
+  correlationId: string,
+): Promise<void> {
+  const founder = requireOperationsFounder(context);
+  const revoke = revokeStaffMembershipSchema.parse(input);
+  const correlation = z.uuid().parse(correlationId);
+  await db.begin(async (tx) => {
+    await tx`select set_config('operations.actor_id', ${founder.actorId}, true)`;
+    await tx`select operations.revoke_staff_membership(${revoke.staffMembershipId}, ${revoke.reviewReference}, ${correlation})`;
   });
 }
 

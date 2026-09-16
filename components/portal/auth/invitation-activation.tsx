@@ -8,6 +8,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useSignUp } from "@clerk/nextjs";
 import styles from "./portal.module.css";
 import { resolvePortalClaimDestination } from "./portal-claim-destination";
+import { portalPath } from "@/lib/operations/auth/portal-url";
 
 type Status = {
   kind: "idle" | "pending" | "error";
@@ -58,7 +59,7 @@ export function PortalInvitationActivation(): React.JSX.Element {
 
   useEffect(() => {
     if (initialValues.current.name || initialValues.current.email)
-      window.history.replaceState({}, "", "/portal/activate");
+      window.history.replaceState({}, "", portalPath("/portal/activate"));
   }, []);
 
   async function submit(event: FormEvent<HTMLFormElement>): Promise<void> {
@@ -130,7 +131,7 @@ export function PortalInvitationActivation(): React.JSX.Element {
           invitation.
         </p>
         <p className={styles.actions}>
-          <Link className={styles.link} href="/portal/login">
+          <Link className={styles.link} href={portalPath("/portal/login")}>
             Go to portal sign in
           </Link>
         </p>
@@ -236,7 +237,7 @@ export function PortalInvitationActivation(): React.JSX.Element {
         when this invitation is accepted.
       </p>
       <p className={styles.actions}>
-        <Link className={styles.link} href="/portal/login">
+        <Link className={styles.link} href={portalPath("/portal/login")}>
           Already have access? Sign in
         </Link>
       </p>

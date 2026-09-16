@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createGrantAccessPayload } from "./portal-access-form";
+import {
+  createGrantAccessPayload,
+  createInvitationPayload,
+} from "./portal-access-form";
 
 test("request payload preserves selected database role", () => {
   const form = new FormData();
@@ -29,4 +32,24 @@ test("request payload rejects a role outside the database role union", () => {
   form.set("reviewReference", "Finance contact approved by founder");
 
   assert.throws(() => createGrantAccessPayload(form));
+});
+test("switching to Admin removes client role and organisation from invitation payload", () => {
+  const form = new FormData();
+  form.set("name", "Colleague");
+  form.set("email", "staff@example.test");
+  form.set("reviewReference", "Approved");
+  form.set("role", "owner");
+  form.set("organisationId", "stale-client");
+  assert.deepEqual(createInvitationPayload(form, "admin"), {
+    action: "invite_admin",
+    name: "Colleague",
+    email: "staff@example.test",
+    reviewReference: "Approved",
+  });
+  assert.equal(createInvitationPayload(form, "client").action, "invite_client");
+  form.set("role", "admin");
+  assert.throws(
+    () => createInvitationPayload(form, "client"),
+    /supported client role/,
+  );
 });
