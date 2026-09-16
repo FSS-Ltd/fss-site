@@ -86,3 +86,90 @@ test("accepts Clerk's camelCase user resource shape", () => {
     "viewer",
   );
 });
+
+test("reads staff Admin metadata without treating it as a client role", () => {
+  const invitation = {
+    version: 3,
+    realm: "staff",
+    role: "admin",
+    invitationId: "12d347ee-3aa5-4ed1-a93e-9c3a8fd36607",
+    email: "admin@example.test",
+  };
+  const user = {
+    id: "user_staffAdmin",
+    primaryEmailAddressId: "email_primary",
+    emailAddresses: [
+      {
+        id: "email_primary",
+        emailAddress: invitation.email,
+        verification: { status: "verified" },
+      },
+    ],
+    publicMetadata: { fssPortalInvitation: invitation },
+  };
+  assert.deepEqual(readPortalInvitationClaim(user)?.invitation, invitation);
+  assert.equal(
+    readPortalInvitationClaim({
+      ...user,
+      publicMetadata: {
+        fssPortalInvitation: { ...invitation, realm: "client" },
+      },
+    }),
+    null,
+  );
+  assert.equal(
+    readPortalInvitationClaim({
+      ...user,
+      emailAddresses: [
+        { ...user.emailAddresses[0], emailAddress: "other@example.test" },
+      ],
+    }),
+    null,
+  );
+  assert.equal(
+    readPortalInvitationClaim({
+      ...user,
+      emailAddresses: [
+        { ...user.emailAddresses[0], verification: { status: "unverified" } },
+      ],
+    }),
+    null,
+  );
+});
+
+test("version 2 client metadata remains readable", () => {
+  const invitation = {
+    version: 2,
+    invitationId: "12d347ee-3aa5-4ed1-a93e-9c3a8fd36607",
+    email: "client@example.test",
+  };
+  assert.deepEqual(
+    readPortalInvitationClaim({
+      id: "user_clientExample",
+      primaryEmailAddressId: "email_primary",
+      emailAddresses: [
+        {
+          id: "email_primary",
+          emailAddress: invitation.email,
+          verification: { status: "verified" },
+        },
+      ],
+      publicMetadata: { fssPortalInvitation: invitation },
+    })?.invitation,
+    invitation,
+  );
+});
+
+test("client metadata creation cannot be coerced into a staff invitation", () => {
+  assert.throws(() =>
+    Reflect.apply(createPortalInvitationMetadata, undefined, [
+      {
+        version: 3,
+        realm: "staff",
+        role: "admin",
+        invitationId: "12d347ee-3aa5-4ed1-a93e-9c3a8fd36607",
+        email: "admin@example.test",
+      },
+    ]),
+  );
+});

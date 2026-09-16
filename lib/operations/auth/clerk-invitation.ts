@@ -26,9 +26,17 @@ const pendingPortalInvitationMetadataSchema = z.strictObject({
     .transform((email) => email.toLowerCase()),
 });
 
+const staffInvitationMetadataSchema =
+  pendingPortalInvitationMetadataSchema.extend({
+    version: z.literal(3),
+    realm: z.literal("staff"),
+    role: z.literal("admin"),
+  });
+
 const portalInvitationMetadataSchema = z.discriminatedUnion("version", [
   legacyPortalInvitationMetadataSchema,
   pendingPortalInvitationMetadataSchema,
+  staffInvitationMetadataSchema,
 ]);
 
 const clerkUserEnvelope = z
@@ -58,12 +66,23 @@ type PendingPortalInvitationInput = Omit<
   "version"
 >;
 
+export function createStaffInvitationMetadata(
+  input: PendingPortalInvitationInput,
+): z.infer<typeof staffInvitationMetadataSchema> {
+  return staffInvitationMetadataSchema.parse({
+    ...input,
+    version: 3,
+    realm: "staff",
+    role: "admin",
+  });
+}
+
 export function createPortalInvitationMetadata(
   input: LegacyPortalInvitationInput | PendingPortalInvitationInput,
 ): PortalInvitationMetadata {
   return portalInvitationMetadataSchema.parse({
-    version: "invitationId" in input ? 2 : 1,
     ...input,
+    version: "invitationId" in input ? 2 : 1,
   });
 }
 
