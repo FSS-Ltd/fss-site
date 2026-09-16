@@ -1,0 +1,37 @@
+[
+  {
+    "path": "assets/brand/full-logo.png",
+    "bytes": 711923,
+    "sha256": "ccceadbf535723226b88f2ce976562fca2c4cbedf9dfe7530683d0bed7e9c336"
+  },
+  {
+    "path": "assets/brand/icon.png",
+    "bytes": 924580,
+    "sha256": "21c170b11ec307077f1ff78292b831a02a3395763075309300e2d2fb805e6ff2"
+  },
+  {
+    "path": "assets/brand/wordmark.png",
+    "bytes": 1032833,
+    "sha256": "d71cc41d92bce6d2f72b146cf06f402d517c8de416cf300c1c1988f34eff661c"
+  },
+  {
+    "path": "assets/fonts/Geist.ttf",
+    "bytes": 169056,
+    "sha256": "73894e0448cae90a92b6c2f8732b7bb9acb7b94c418bff559dad4a18e1de9659"
+  },
+  {
+    "path": "assets/fonts/IBMPlexMono-Medium.ttf",
+    "bytes": 136704,
+    "sha256": "a9b4c49bb299e05b5f6c481e7fb5e78943d2793249a0c8874ab574a2d1ea6755"
+  },
+  {
+    "path": "assets/fonts/IBMPlexMono-Regular.ttf",
+    "bytes": 135580,
+    "sha256": "6a3412f058c7d8dfd9170c41e85ade48e5156ecb89356110ca57a0a27734af46"
+  },
+  {
+    "path": "assets/fonts/Sora.ttf",
+    "bytes": 111400,
+    "sha256": "84ff7096ae3ec6c8be47d906d1a0ba4de7f2ce78c615275c77301964a316e16c"
+  }
+]

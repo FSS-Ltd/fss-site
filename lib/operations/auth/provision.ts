@@ -5,6 +5,7 @@ import type { PortalInvitationMetadata } from "./clerk-invitation";
 
 export type PortalInvitation = {
   emailAddress: string;
+  notify: true;
   redirectUrl: string;
   publicMetadata?: { fssPortalInvitation: PortalInvitationMetadata };
 };
@@ -41,6 +42,7 @@ export async function provisionPortalAccount(
   try {
     await create({
       emailAddress: normalizedEmail,
+      notify: true,
       redirectUrl: parsedRedirectUrl,
       ...(metadata
         ? { publicMetadata: { fssPortalInvitation: metadata } }

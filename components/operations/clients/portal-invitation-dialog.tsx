@@ -10,8 +10,6 @@ type Status = {
   message?: string;
 };
 
-type InvitationType = "client" | "founder";
-
 async function getRequestError(response: Response): Promise<string> {
   const body: unknown = await response.json().catch(() => null);
   if (
@@ -27,24 +25,19 @@ async function getRequestError(response: Response): Promise<string> {
 }
 
 export function PortalInvitationDialog({
-  founderEmail,
   onInvitationSent,
   triggerClassName,
 }: {
-  founderEmail: string;
   onInvitationSent: (message: string) => void;
   triggerClassName?: string;
 }): React.JSX.Element {
   const dialog = useRef<HTMLDialogElement>(null);
   const [status, setStatus] = useState<Status>({ kind: "idle" });
-  const [invitationType, setInvitationType] =
-    useState<InvitationType>("client");
 
   function close(): void {
     if (status.kind === "pending") return;
     dialog.current?.close();
     setStatus({ kind: "idle" });
-    setInvitationType("client");
   }
 
   function open(): void {
@@ -55,43 +48,31 @@ export function PortalInvitationDialog({
     event.preventDefault();
     if (status.kind === "pending") return;
     setStatus({ kind: "pending" });
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
+    const email = form.get("email")?.toString().trim().toLowerCase();
     try {
       const response = await fetch("/api/growth/operations/portal-access", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(
-          invitationType === "client"
-            ? {
-                action: "invite_client",
-                name: form.get("name"),
-                email: form.get("email"),
-                role: form.get("role"),
-                reviewReference: form.get("reviewReference"),
-              }
-            : {
-                action: "invite_founder",
-                reviewReference: form.get("reviewReference"),
-              },
-        ),
+        body: JSON.stringify({
+          action: "invite_client",
+          name: form.get("name"),
+          email: form.get("email"),
+          role: form.get("role"),
+          reviewReference: form.get("reviewReference"),
+        }),
       });
       if (!response.ok) throw new Error(await getRequestError(response));
-      const email =
-        invitationType === "founder"
-          ? founderEmail
-          : form.get("email")?.toString().trim().toLowerCase();
-      event.currentTarget.reset();
+      formElement.reset();
       setStatus({
         kind: "success",
-        message:
-          invitationType === "founder"
-            ? "Founder workspace invitation sent."
-            : "Invitation sent. The access record will appear after the recipient completes onboarding.",
+        message: email
+          ? `Invitation sent to ${email}. Their access will appear in the register once they complete setup.`
+          : "Invitation sent. Their access will appear in the register once they complete setup.",
       });
       onInvitationSent(
-        email
-          ? `Invitation sent to ${email}.`
-          : "Invitation sent. Access will be recorded after account creation.",
+        email ? `Invitation sent to ${email}.` : "Invitation sent.",
       );
     } catch (error) {
       setStatus({
@@ -133,10 +114,7 @@ export function PortalInvitationDialog({
           <div>
             <p className={styles.eyebrow}>Access invitation</p>
             <h2 id="portal-invitation-dialog-heading">Invite a user</h2>
-            <p>
-              Invite a client to begin portal onboarding, or send the authorised
-              founder account a workspace sign-in link.
-            </p>
+            <p>Invite a client to begin portal onboarding.</p>
           </div>
         </div>
         <form
@@ -144,35 +122,14 @@ export function PortalInvitationDialog({
           onSubmit={submit}
           aria-busy={status.kind === "pending"}
         >
-          <label className={styles.invitationType}>
-            Invitation type
-            <select
-              autoFocus
-              name="invitationType"
-              value={invitationType}
-              onChange={(event) => {
-                setInvitationType(event.target.value as InvitationType);
-                setStatus({ kind: "idle" });
-              }}
-              disabled={status.kind === "pending"}
-            >
-              <option value="client">Client</option>
-              <option value="founder">Founder</option>
-            </select>
-          </label>
-          <div
-            className={styles.clientFields}
-            hidden={invitationType !== "client"}
-          >
+          <div className={styles.clientFields}>
             <label>
               Client name
               <input
                 maxLength={200}
                 name="name"
-                required={invitationType === "client"}
-                disabled={
-                  status.kind === "pending" || invitationType !== "client"
-                }
+                required
+                disabled={status.kind === "pending"}
               />
             </label>
             <label>
@@ -181,11 +138,9 @@ export function PortalInvitationDialog({
                 autoComplete="email"
                 maxLength={254}
                 name="email"
-                required={invitationType === "client"}
+                required
                 type="email"
-                disabled={
-                  status.kind === "pending" || invitationType !== "client"
-                }
+                disabled={status.kind === "pending"}
               />
             </label>
             <label>
@@ -193,9 +148,7 @@ export function PortalInvitationDialog({
               <select
                 defaultValue="owner"
                 name="role"
-                disabled={
-                  status.kind === "pending" || invitationType !== "client"
-                }
+                disabled={status.kind === "pending"}
               >
                 {portalRoleOptions.map((role) => (
                   <option key={role.value} value={role.value}>
@@ -204,19 +157,6 @@ export function PortalInvitationDialog({
                 ))}
               </select>
             </label>
-          </div>
-          <div
-            className={styles.founderFields}
-            hidden={invitationType !== "founder"}
-          >
-            <label>
-              Founder email
-              <input readOnly type="email" value={founderEmail} />
-            </label>
-            <p>
-              Access still requires this exact verified Google Workspace
-              account.
-            </p>
           </div>
           <label className={styles.dialogReference}>
             Access approval note

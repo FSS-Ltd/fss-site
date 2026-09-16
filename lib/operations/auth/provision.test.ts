@@ -41,6 +41,7 @@ test("provisioning creates a Clerk invitation with a fixed activation redirect",
   assert.deepEqual(inputs, [
     {
       emailAddress: "client@example.test",
+      notify: true,
       redirectUrl: "https://portal.example.test/portal/activate",
       publicMetadata: { fssPortalInvitation: metadata },
     },

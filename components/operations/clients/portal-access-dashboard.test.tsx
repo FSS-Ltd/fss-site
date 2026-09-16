@@ -41,10 +41,7 @@ const router = {
 test("portal access makes invitation primary and explains the activation sequence", () => {
   const html = renderToStaticMarkup(
     <AppRouterContext.Provider value={router}>
-      <PortalAccessDashboard
-        data={oneOrganisationRegister}
-        founderEmail="founder@example.test"
-      />
+      <PortalAccessDashboard data={oneOrganisationRegister} />
     </AppRouterContext.Provider>,
   );
 
@@ -67,15 +64,11 @@ test("portal access makes invitation primary and explains the activation sequenc
 test("portal access keeps the invitation action visible before an organisation exists", () => {
   const html = renderToStaticMarkup(
     <AppRouterContext.Provider value={router}>
-      <PortalAccessDashboard
-        data={{ organisations: [], entries: [] }}
-        founderEmail="founder@example.test"
-      />
+      <PortalAccessDashboard data={{ organisations: [], entries: [] }} />
     </AppRouterContext.Provider>,
   );
 
   assert.match(html, /class="primaryAction"/);
   assert.match(html, /Invite portal user/);
   assert.doesNotMatch(html, /Create an active organisation/);
-  assert.match(html, /founder@example\.test/);
 });
