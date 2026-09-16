@@ -105,9 +105,13 @@ function ClientPortfolioSummary({
 export function ClientList({
   state,
   billingEnabled = false,
+  routePrefix = "/growth/operations/clients",
+  showPortalAccess = true,
 }: {
   state: ClientListState;
   billingEnabled?: boolean;
+  routePrefix?: string;
+  showPortalAccess?: boolean;
 }): React.JSX.Element {
   return (
     <section className={`${sharedStyles.page} ${styles.page}`}>
@@ -116,9 +120,9 @@ export function ClientList({
         title="Client register"
         description="Organisations and their reviewed engagement links."
         variant="inverse"
-        action={
-          <nav className={styles.headerActions} aria-label="Client operations">
-            <Link href="/growth/operations/portal-access">Portal access</Link>
+          action={
+            <nav className={styles.headerActions} aria-label="Client operations">
+            {showPortalAccess && <Link href="/growth/operations">Portal access</Link>}
             {billingEnabled && (
               <Link href="/growth/operations/billing">
                 Review billing exceptions
@@ -149,7 +153,7 @@ export function ClientList({
             </div>
           ) : (
             <ul className={styles.list}>
-              {state.data.rows.map((organisation) => (
+            {state.data.rows.map((organisation) => (
                 <li
                   className={`${sharedStyles.panel} ${styles.row}`}
                   key={organisation.id}
@@ -157,7 +161,7 @@ export function ClientList({
                   <div>
                     <h2 className={styles.name}>
                       <Link
-                        href={`/growth/operations/clients/${organisation.id}/agreements`}
+                        href={`${routePrefix}/${organisation.id}`}
                       >
                         {organisation.displayName}
                       </Link>
@@ -165,7 +169,7 @@ export function ClientList({
                     <p className={styles.detail}>{organisation.legalName}</p>
                     <Link
                       className={styles.rowAction}
-                      href={`/growth/operations/clients/${organisation.id}/requests`}
+                      href={`${routePrefix}/${organisation.id}/requests`}
                     >
                       Requests
                     </Link>
@@ -212,7 +216,7 @@ export function ClientList({
               aria-label="Client register pages"
             >
               <Link
-                href={`/growth/operations/clients?after=${encodeURIComponent(state.data.nextCursor)}`}
+                href={`${routePrefix}?after=${encodeURIComponent(state.data.nextCursor)}`}
               >
                 Next page
               </Link>
