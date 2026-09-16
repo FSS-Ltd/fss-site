@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { randomUUID } from "node:crypto";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
@@ -22,46 +21,26 @@ export default async function FssStudioPage(): Promise<React.JSX.Element> {
     return <PortalUnavailable />;
   }
   return (
-    <section className={styles.card} aria-labelledby="studio-heading">
+    <section aria-labelledby="studio-heading">
       <p className={styles.eyebrow}>FSS Studio</p>
-      <h1 id="studio-heading" className={styles.heading}>
-        Operations overview
-      </h1>
+      <h1 id="studio-heading" className={styles.heading}>Operations overview</h1>
       <p className={styles.copy}>
-        Work across client delivery, agreements, welcome journeys, projects,
-        billing, notifications, and settings from one staff workspace.
+        A cross-client workspace for delivery, agreements, welcome journeys,
+        projects, billing, notifications, and settings.
       </p>
-      <nav aria-label="FSS Studio modules">
-        <ul className={styles.list}>
-          <li className={styles.row}>
-            <h2 className={styles.name}>Clients</h2>
-            <Link className={styles.link} href="/admin/clients">
-              Open client register
-            </Link>
-          </li>
-          <li className={styles.row}>
-            <h2 className={styles.name}>Delivery</h2>
-            <Link className={styles.link} href="/admin/delivery">
-              Open delivery workspace
-            </Link>
-          </li>
-          <li className={styles.row}>
-            <h2 className={styles.name}>Agreements and welcome</h2>
-            <Link className={styles.link} href="/admin/agreements">
-              Open agreement workspace
-            </Link>
-          </li>
-        </ul>
-      </nav>
-      <form
-        action="/api/auth/sign-out?returnTo=/login"
-        className={styles.actions}
-        method="post"
-      >
-        <button className={styles.button} type="submit">
-          Sign out
-        </button>
-      </form>
+      <div className={styles.list} role="list" aria-label="Studio work queues">
+        {[
+          ["Client delivery", "Requests and milestones needing operational attention."],
+          ["Agreement work", "Drafts, readiness checks, signing, and retained evidence."],
+          ["Welcome journeys", "Activation schedules, tasks, and recovery outcomes."],
+        ].map(([title, description]) => (
+          <article className={styles.row} key={title} role="listitem">
+            <h2 className={styles.name}>{title}</h2>
+            <p className={styles.copy}>{description}</p>
+            <p className={styles.actions}><span className={styles.link}>Workspace foundation ready</span></p>
+          </article>
+        ))}
+      </div>
     </section>
   );
 }
