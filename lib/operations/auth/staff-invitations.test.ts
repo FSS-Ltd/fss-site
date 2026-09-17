@@ -15,7 +15,7 @@ import {
 import { requireFssAdmin } from "./require-admin";
 import { createStaffInvitationMetadata } from "./clerk-invitation";
 
-const userId = randomUUID();
+const userId = "11111111-1111-4111-8111-111111111111";
 const membershipId = randomUUID();
 const invitationId = randomUUID();
 const correlationId = randomUUID();
@@ -186,6 +186,7 @@ test("Admin guard requires an active staff grant, never client membership", asyn
     realm: "staff",
     membershipId,
     userId,
+    actorId: "1ec68d221aa0a052e20f4208db78701c1ef2f6c47b1210fa30a1d4de47d605b1",
     role: "admin",
     correlationId,
   });

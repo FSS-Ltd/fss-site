@@ -1,0 +1,196 @@
+.page {
+  display: grid;
+  gap: 24px;
+  width: min(100%, 1120px);
+  margin-inline: auto;
+  font-family: "Geist", system-ui, sans-serif;
+}
+
+.backLink,
+.actionLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: #005e70;
+  font-size: 0.875rem;
+  font-weight: 650;
+  text-underline-offset: 4px;
+}
+
+.hero {
+  display: grid;
+  gap: 16px;
+  padding: clamp(24px, 4vw, 40px);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 92% 0%, rgba(70, 199, 216, 0.24), transparent 30%),
+    linear-gradient(120deg, #07182e, #0b3049);
+  color: #ffffff;
+}
+
+.eyebrow {
+  margin: 0;
+  color: #b4c5d8;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0;
+  font-family: "Sora", "Geist", system-ui, sans-serif;
+  font-size: clamp(1.875rem, 4vw, 2.5rem);
+  font-weight: 600;
+  letter-spacing: -0.05em;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.description {
+  max-width: 64ch;
+  margin: 0;
+  color: #d5e3ec;
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.hero .actionLink {
+  width: fit-content;
+  padding: 0 16px;
+  border-radius: 12px;
+  background: #0f7078;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.metricGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.metric {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid #d9dfe5;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 16px 38px -34px rgba(7, 24, 46, 0.75);
+}
+
+.metricValue,
+.metricLabel,
+.sectionTitle,
+.rowTitle,
+.rowCopy {
+  margin: 0;
+}
+
+.metricValue {
+  color: #0a1a2e;
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  font-weight: 700;
+  letter-spacing: -0.055em;
+  line-height: 1;
+}
+
+.metricLabel {
+  color: #46566c;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.workspace {
+  display: grid;
+  gap: 16px;
+}
+
+.sectionTitle {
+  color: #0a1a2e;
+  font-family: "Sora", "Geist", system-ui, sans-serif;
+  font-size: 1.25rem;
+  letter-spacing: -0.03em;
+}
+
+.rowList {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: grid;
+  gap: 8px 20px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  padding: 20px 24px;
+  border: 1px solid #d9dfe5;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 16px 38px -34px rgba(7, 24, 46, 0.7);
+}
+
+.rowContent {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.rowTitle {
+  color: #0a1a2e;
+  font-size: 1rem;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.rowCopy {
+  color: #46566c;
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.row .actionLink {
+  padding: 0 12px;
+  border: 1px solid #788696;
+  border-radius: 12px;
+  text-decoration: none;
+}
+
+.unavailable {
+  color: #46566c;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.page :is(a, button):focus-visible {
+  outline: 3px solid #0f7078;
+  outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .metricGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .row {
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+
+  .row .actionLink {
+    width: fit-content;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page * {
+    transition: none;
+  }
+}
