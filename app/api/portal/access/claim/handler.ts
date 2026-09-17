@@ -4,6 +4,7 @@ import {
   claimPortalInviteForVerifiedEmail,
   hasActivePortalMembership,
 } from "@/lib/operations/auth/invites";
+import { getActiveStaffMembership } from "@/lib/operations/auth/staff-invitations";
 import { needsPortalOnboarding } from "@/lib/operations/auth/pending-invitations";
 import type { VerifiedPortalIdentity } from "@/lib/operations/auth/types";
 import type { OperationsDb } from "@/lib/operations/db/client";
@@ -22,6 +23,8 @@ type ClaimFailureStage =
   | "clerk_invitation_claim"
   | "staff_invitation_claim"
   | "staff_email_claim"
+  | "staff_membership"
+  | "clerk_staff_invitation_reconciliation"
   | "verified_email_claim"
   | "membership"
   | "onboarding";
@@ -45,6 +48,8 @@ export type PortalAccessClaimDependencies = {
     identity: VerifiedPortalIdentity,
     correlationId: string,
   ) => Promise<boolean>;
+  reconcilePendingClerkStaffInvitations: (email: string) => Promise<void>;
+  hasActiveStaffMembership: typeof getActiveStaffMembership;
   claimVerifiedEmailInvite: typeof claimPortalInviteForVerifiedEmail;
   hasActiveMembership: typeof hasActivePortalMembership;
   needsOnboarding: typeof needsPortalOnboarding;
@@ -126,6 +131,14 @@ export function createPortalAccessClaimHandler(
           correlationId,
         )
       ) {
+        stage = "clerk_staff_invitation_reconciliation";
+        await deps.reconcilePendingClerkStaffInvitations(identity.email);
+        return response("active", 200);
+      }
+      stage = "staff_membership";
+      if (await deps.hasActiveStaffMembership(db, identity, correlationId)) {
+        stage = "clerk_staff_invitation_reconciliation";
+        await deps.reconcilePendingClerkStaffInvitations(identity.email);
         return response("active", 200);
       }
       stage = "verified_email_claim";
