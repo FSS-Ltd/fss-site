@@ -1,3 +1,4 @@
+import { clerkMiddleware } from "@clerk/nextjs/server";
 import type { NextFetchEvent, NextMiddleware, NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
@@ -12,10 +13,18 @@ function applyPortalSecurityHeaders(response: NextResponse): NextResponse {
   return response;
 }
 
-export async function proxy(
-  request: NextRequest,
-  event: NextFetchEvent,
-): Promise<ReturnType<NextMiddleware>> {
+function isPortalRequest(request: NextRequest): boolean {
+  const { hostname, pathname } = request.nextUrl;
+  return (
+    portalRedirectForHost(hostname, pathname) !== null ||
+    portalRouteForHost(hostname, pathname) !== null ||
+    pathname === "/portal" ||
+    pathname.startsWith("/portal/") ||
+    pathname.startsWith("/api/portal/")
+  );
+}
+
+export function portalProxyResponse(request: NextRequest): NextResponse {
   const portalRedirect = portalRedirectForHost(
     request.nextUrl.hostname,
     request.nextUrl.pathname,
@@ -36,19 +45,32 @@ export async function proxy(
     return applyPortalSecurityHeaders(NextResponse.rewrite(url));
   }
 
-  if (request.nextUrl.pathname === "/") return NextResponse.next();
-
-  if (
-    request.nextUrl.pathname === "/portal" ||
-    request.nextUrl.pathname.startsWith("/portal/") ||
-    request.nextUrl.pathname.startsWith("/api/portal/")
-  ) {
-    return applyPortalSecurityHeaders(NextResponse.next());
-  }
-
-  const { auth } = await import("@/auth");
-  return (auth as unknown as NextMiddleware)(request, event);
+  return applyPortalSecurityHeaders(NextResponse.next());
 }
+
+const portalMiddleware = clerkMiddleware((_auth, request) =>
+  portalProxyResponse(request),
+);
+
+export function createProxy(
+  portalRequestMiddleware: NextMiddleware,
+): NextMiddleware {
+  return async function proxy(
+    request: NextRequest,
+    event: NextFetchEvent,
+  ): Promise<Awaited<ReturnType<NextMiddleware>>> {
+    if (isPortalRequest(request)) {
+      return await portalRequestMiddleware(request, event);
+    }
+
+    if (request.nextUrl.pathname === "/") return NextResponse.next();
+
+    const { auth } = await import("@/auth");
+    return await (auth as unknown as NextMiddleware)(request, event);
+  };
+}
+
+export const proxy = createProxy(portalMiddleware);
 
 export const config = {
   matcher: [
