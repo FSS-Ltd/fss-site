@@ -65,6 +65,33 @@ test("returns session-pending when Clerk has not exposed the new session", async
   });
 });
 
+test("reports the identity stage when Clerk context is unavailable", async () => {
+  const reports: unknown[] = [];
+  const post = createPortalAccessClaimHandler(
+    createDependencies({
+      identity: async () => {
+        throw new Error("Clerk context is unavailable");
+      },
+      reportUnexpectedError: (report) => reports.push(report),
+    }),
+  );
+
+  const response = await post();
+
+  assert.equal(response.status, 503);
+  assert.deepEqual(await response.json(), {
+    active: false,
+    outcome: "unavailable",
+  });
+  assert.deepEqual(reports, [
+    {
+      correlationId: "b4d5ce58-dd9e-4a6f-a58b-bc39f0826b68",
+      errorName: "Error",
+      stage: "identity",
+    },
+  ]);
+});
+
 test("returns active when the verified user already has a portal membership", async () => {
   const post = createPortalAccessClaimHandler(
     createDependencies({ hasActiveMembership: async () => true }),
@@ -88,6 +115,55 @@ test("returns active when an existing Clerk session claims a pending staff invit
 
   assert.equal(response.status, 200);
   assert.deepEqual(await response.json(), { active: true, outcome: "active" });
+});
+
+test("reads the Clerk invitation once and stops after a successful staff claim", async () => {
+  let invitationReads = 0;
+  const post = createPortalAccessClaimHandler(
+    createDependencies({
+      invitationClaim: async () => {
+        invitationReads += 1;
+        return null;
+      },
+      claimStaffInvitation: async () => true,
+      claimStaffInvitationForVerifiedEmail: async () => {
+        throw new Error("should not continue after a successful claim");
+      },
+    }),
+  );
+
+  const response = await post();
+
+  assert.equal(invitationReads, 1);
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { active: true, outcome: "active" });
+});
+
+test("reports the staff-invitation claim stage without exposing the error", async () => {
+  const reports: unknown[] = [];
+  const post = createPortalAccessClaimHandler(
+    createDependencies({
+      claimStaffInvitation: async () => {
+        throw new Error("staff invite database query failed");
+      },
+      reportUnexpectedError: (report) => reports.push(report),
+    }),
+  );
+
+  const response = await post();
+
+  assert.equal(response.status, 503);
+  assert.deepEqual(await response.json(), {
+    active: false,
+    outcome: "unavailable",
+  });
+  assert.deepEqual(reports, [
+    {
+      correlationId: "b4d5ce58-dd9e-4a6f-a58b-bc39f0826b68",
+      errorName: "Error",
+      stage: "staff_invitation_claim",
+    },
+  ]);
 });
 
 test("returns access-denied when no active membership or pending invitation exists", async () => {
@@ -124,6 +200,7 @@ test("returns unavailable and reports a correlation ID when the portal database 
     {
       correlationId: "b4d5ce58-dd9e-4a6f-a58b-bc39f0826b68",
       errorName: "Error",
+      stage: "membership",
     },
   ]);
 });

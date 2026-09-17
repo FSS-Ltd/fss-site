@@ -15,9 +15,21 @@ type ClaimOutcome =
   | "access_denied"
   | "unavailable";
 
+type ClaimFailureStage =
+  | "identity"
+  | "database"
+  | "invitation_lookup"
+  | "clerk_invitation_claim"
+  | "staff_invitation_claim"
+  | "staff_email_claim"
+  | "verified_email_claim"
+  | "membership"
+  | "onboarding";
+
 type ClaimErrorReport = {
   readonly correlationId: string;
   readonly errorName: string;
+  readonly stage: ClaimFailureStage;
 };
 
 export type PortalAccessClaimDependencies = {
@@ -55,11 +67,13 @@ function response(
 function reportUnexpectedError(
   deps: PortalAccessClaimDependencies,
   correlationId: string,
+  stage: ClaimFailureStage,
   error: unknown,
 ): Response {
   deps.reportUnexpectedError({
     correlationId,
     errorName: error instanceof Error ? error.name : "UnknownError",
+    stage,
   });
   return response("unavailable", 503);
 }
@@ -75,34 +89,58 @@ export function createPortalAccessClaimHandler(
     try {
       identity = await deps.identity();
     } catch (error) {
-      return reportUnexpectedError(deps, correlationId, error);
+      return reportUnexpectedError(deps, correlationId, "identity", error);
     }
     if (!identity) return response("session_pending", 401);
 
+    let stage: ClaimFailureStage = "database";
     try {
       const db = deps.db();
-      const activeFromClerkInvitation = await deps.claimClerkInvitation(
-        db,
-        await deps.invitationClaim(),
-        correlationId,
-      );
-      const activeFromStaffInvitation = await deps.claimStaffInvitation(
-        db,
-        await deps.invitationClaim(),
-        correlationId,
-      );
-      const activeFromStaffEmail = await deps.claimStaffInvitationForVerifiedEmail(
-        db,
-        identity,
-        correlationId,
-      );
-      const active =
-        activeFromClerkInvitation ||
-        activeFromStaffInvitation ||
-        activeFromStaffEmail ||
-        (await deps.claimVerifiedEmailInvite(db, identity, correlationId)) ||
-        (await deps.hasActiveMembership(db, identity, correlationId));
-      if (active) return response("active", 200);
+      stage = "invitation_lookup";
+      const invitationClaim = await deps.invitationClaim();
+      stage = "clerk_invitation_claim";
+      if (
+        await deps.claimClerkInvitation(
+          db,
+          invitationClaim,
+          correlationId,
+        )
+      ) {
+        return response("active", 200);
+      }
+      stage = "staff_invitation_claim";
+      if (
+        await deps.claimStaffInvitation(
+          db,
+          invitationClaim,
+          correlationId,
+        )
+      ) {
+        return response("active", 200);
+      }
+      stage = "staff_email_claim";
+      if (
+        await deps.claimStaffInvitationForVerifiedEmail(
+          db,
+          identity,
+          correlationId,
+        )
+      ) {
+        return response("active", 200);
+      }
+      stage = "verified_email_claim";
+      if (
+        await deps.claimVerifiedEmailInvite(db, identity, correlationId)
+      ) {
+        return response("active", 200);
+      }
+      stage = "membership";
+      if (
+        await deps.hasActiveMembership(db, identity, correlationId)
+      ) {
+        return response("active", 200);
+      }
+      stage = "onboarding";
       const onboardingRequired = await deps.needsOnboarding(
         db,
         identity,
@@ -112,7 +150,7 @@ export function createPortalAccessClaimHandler(
         ? response("onboarding_required", 200, true)
         : response("access_denied", 403);
     } catch (error) {
-      return reportUnexpectedError(deps, correlationId, error);
+      return reportUnexpectedError(deps, correlationId, stage, error);
     }
   };
 }
