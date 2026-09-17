@@ -32,6 +32,11 @@ function getClerkErrorMessage(error: unknown): string | null {
     : null;
 }
 
+function isExistingSessionError(error: unknown): boolean {
+  const message = getClerkErrorMessage(error) ?? (error instanceof Error ? error.message : "");
+  return /session already exists/i.test(message);
+}
+
 export function PortalInvitationActivation(): React.JSX.Element {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -97,6 +102,16 @@ export function PortalInvitationActivation(): React.JSX.Element {
         );
       router.replace(await claimPortalAccess());
     } catch (error) {
+      if (isExistingSessionError(error)) {
+        try {
+          const destination = await claimPortalAccess();
+          setStatus({ kind: "pending" });
+          router.replace(destination);
+          return;
+        } catch {
+          // Fall through to the safe invitation error below.
+        }
+      }
       setStatus({
         kind: "error",
         message:

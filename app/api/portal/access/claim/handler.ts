@@ -27,6 +27,12 @@ export type PortalAccessClaimDependencies = {
   invitationClaim: () => Promise<PortalInvitationClaim | null>;
   db: () => OperationsDb;
   claimClerkInvitation: typeof claimClerkPortalInvitation;
+  claimStaffInvitation: typeof claimClerkPortalInvitation;
+  claimStaffInvitationForVerifiedEmail: (
+    db: OperationsDb,
+    identity: VerifiedPortalIdentity,
+    correlationId: string,
+  ) => Promise<boolean>;
   claimVerifiedEmailInvite: typeof claimPortalInviteForVerifiedEmail;
   hasActiveMembership: typeof hasActivePortalMembership;
   needsOnboarding: typeof needsPortalOnboarding;
@@ -80,8 +86,20 @@ export function createPortalAccessClaimHandler(
         await deps.invitationClaim(),
         correlationId,
       );
+      const activeFromStaffInvitation = await deps.claimStaffInvitation(
+        db,
+        await deps.invitationClaim(),
+        correlationId,
+      );
+      const activeFromStaffEmail = await deps.claimStaffInvitationForVerifiedEmail(
+        db,
+        identity,
+        correlationId,
+      );
       const active =
         activeFromClerkInvitation ||
+        activeFromStaffInvitation ||
+        activeFromStaffEmail ||
         (await deps.claimVerifiedEmailInvite(db, identity, correlationId)) ||
         (await deps.hasActiveMembership(db, identity, correlationId));
       if (active) return response("active", 200);

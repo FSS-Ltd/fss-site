@@ -6,6 +6,10 @@ import {
   claimPortalInviteForVerifiedEmail,
   hasActivePortalMembership,
 } from "@/lib/operations/auth/invites";
+import {
+  claimClerkStaffInvitation,
+  claimStaffInvitationForVerifiedEmail,
+} from "@/lib/operations/auth/staff-invitations";
 import { needsPortalOnboarding } from "@/lib/operations/auth/pending-invitations";
 import {
   getPortalIdentity,
@@ -22,6 +26,8 @@ export const POST = createPortalAccessClaimHandler({
   invitationClaim: getPortalInvitationClaim,
   db: getPortalDb,
   claimClerkInvitation: claimClerkPortalInvitation,
+  claimStaffInvitation: claimClerkStaffInvitation,
+  claimStaffInvitationForVerifiedEmail,
   claimVerifiedEmailInvite: claimPortalInviteForVerifiedEmail,
   hasActiveMembership: hasActivePortalMembership,
   needsOnboarding: needsPortalOnboarding,

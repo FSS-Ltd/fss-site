@@ -127,6 +127,19 @@ export async function claimClerkStaffInvitation(
   );
 }
 
+export async function claimStaffInvitationForVerifiedEmail(
+  db: OperationsDb,
+  identity: VerifiedPortalIdentity | null,
+  correlationId: string,
+): Promise<boolean> {
+  return withVerifiedPortalIdentity(db, identity, correlationId, async (tx) => {
+    const [row] = await tx<{ membershipId: string | null }[]>`
+      select operations.claim_staff_invitation_for_verified_email() as "membershipId"
+    `;
+    return z.uuid().safeParse(row?.membershipId).success;
+  });
+}
+
 export async function getActiveStaffMembership(
   db: OperationsDb,
   identity: VerifiedPortalIdentity | null,
