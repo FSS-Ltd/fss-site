@@ -26,6 +26,8 @@ function createDependencies(
     invitationClaim: async () => null,
     db: () => db,
     claimClerkInvitation: async () => false,
+    claimStaffInvitation: async () => false,
+    claimStaffInvitationForVerifiedEmail: async () => false,
     claimVerifiedEmailInvite: async () => false,
     hasActiveMembership: async () => false,
     needsOnboarding: async () => false,
@@ -75,6 +77,17 @@ test("returns active when the verified user already has a portal membership", as
     active: true,
     outcome: "active",
   });
+});
+
+test("returns active when an existing Clerk session claims a pending staff invitation by email", async () => {
+  const post = createPortalAccessClaimHandler(
+    createDependencies({ claimStaffInvitationForVerifiedEmail: async () => true }),
+  );
+
+  const response = await post();
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { active: true, outcome: "active" });
 });
 
 test("returns access-denied when no active membership or pending invitation exists", async () => {

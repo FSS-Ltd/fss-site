@@ -3,6 +3,7 @@ import { verifyWebhook } from "@clerk/nextjs/webhooks";
 import type { NextRequest } from "next/server";
 import { readPortalInvitationClaimFromClerkWebhook } from "@/lib/operations/auth/clerk-webhook";
 import { claimClerkPortalInvitation } from "@/lib/operations/auth/invites";
+import { claimClerkStaffInvitation } from "@/lib/operations/auth/staff-invitations";
 import { clearPortalInvitationMetadata } from "@/lib/operations/auth/provision";
 import { operationsEnabled } from "@/lib/operations/db/client";
 import { getPortalDb } from "@/lib/operations/db/portal-client";
@@ -20,7 +21,12 @@ export async function POST(request: NextRequest): Promise<Response> {
         claim,
         randomUUID(),
       );
-      if (active) await clearPortalInvitationMetadata(claim.clerkUserId);
+      const staffActive = await claimClerkStaffInvitation(
+        getPortalDb(),
+        claim,
+        randomUUID(),
+      );
+      if (active || staffActive) await clearPortalInvitationMetadata(claim.clerkUserId);
     }
     return new Response(null, { status: 204 });
   } catch (error) {
