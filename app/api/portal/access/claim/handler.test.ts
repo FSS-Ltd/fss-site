@@ -28,6 +28,8 @@ function createDependencies(
     claimClerkInvitation: async () => false,
     claimStaffInvitation: async () => false,
     claimStaffInvitationForVerifiedEmail: async () => false,
+    reconcilePendingClerkStaffInvitations: async () => undefined,
+    hasActiveStaffMembership: async () => null,
     claimVerifiedEmailInvite: async () => false,
     hasActiveMembership: async () => false,
     needsOnboarding: async () => false,
@@ -115,6 +117,71 @@ test("returns active when an existing Clerk session claims a pending staff invit
 
   assert.equal(response.status, 200);
   assert.deepEqual(await response.json(), { active: true, outcome: "active" });
+});
+
+test("reconciles the pending Clerk staff invitation after an email claim", async () => {
+  const reconciledEmails: string[] = [];
+  const post = createPortalAccessClaimHandler({
+    ...createDependencies({
+      claimStaffInvitationForVerifiedEmail: async () => true,
+    }),
+    reconcilePendingClerkStaffInvitations: async (email: string) => {
+      reconciledEmails.push(email);
+    },
+  });
+
+  const response = await post();
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(reconciledEmails, ["owner@example.test"]);
+});
+
+test("reconciles the pending Clerk staff invitation for an active Admin", async () => {
+  const reconciledEmails: string[] = [];
+  const post = createPortalAccessClaimHandler({
+    ...createDependencies(),
+    hasActiveStaffMembership: async () => ({
+      membershipId: "0f2a8c8e-8e9d-4603-9c72-107718235ff2",
+      userId: identity.userId,
+      role: "admin",
+    }),
+    reconcilePendingClerkStaffInvitations: async (email: string) => {
+      reconciledEmails.push(email);
+    },
+  });
+
+  const response = await post();
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(reconciledEmails, ["owner@example.test"]);
+});
+
+test("reports Clerk invitation reconciliation failures without exposing details", async () => {
+  const reports: unknown[] = [];
+  const post = createPortalAccessClaimHandler(
+    createDependencies({
+      claimStaffInvitationForVerifiedEmail: async () => true,
+      reconcilePendingClerkStaffInvitations: async () => {
+        throw new Error("Clerk invitation API unavailable");
+      },
+      reportUnexpectedError: (report) => reports.push(report),
+    }),
+  );
+
+  const response = await post();
+
+  assert.equal(response.status, 503);
+  assert.deepEqual(await response.json(), {
+    active: false,
+    outcome: "unavailable",
+  });
+  assert.deepEqual(reports, [
+    {
+      correlationId: "b4d5ce58-dd9e-4a6f-a58b-bc39f0826b68",
+      errorName: "Error",
+      stage: "clerk_staff_invitation_reconciliation",
+    },
+  ]);
 });
 
 test("reads the Clerk invitation once and stops after a successful staff claim", async () => {

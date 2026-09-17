@@ -77,6 +77,20 @@ export function createStaffInvitationMetadata(
   });
 }
 
+export function isStaffInvitationForEmail(
+  metadata: unknown,
+  email: string,
+): boolean {
+  const invitation = staffInvitationMetadataSchema.safeParse(
+    metadata &&
+      typeof metadata === "object" &&
+      "fssPortalInvitation" in metadata
+      ? metadata.fssPortalInvitation
+      : null,
+  );
+  return invitation.success && invitation.data.email === email.toLowerCase();
+}
+
 export function createPortalInvitationMetadata(
   input: LegacyPortalInvitationInput | PendingPortalInvitationInput,
 ): PortalInvitationMetadata {

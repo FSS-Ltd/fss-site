@@ -1,7 +1,10 @@
 import { clerkClient } from "@clerk/nextjs/server";
 import { z } from "zod";
 import { readPortalAuthConfig } from "./configuration";
-import type { PortalInvitationMetadata } from "./clerk-invitation";
+import {
+  isStaffInvitationForEmail,
+  type PortalInvitationMetadata,
+} from "./clerk-invitation";
 
 export type PortalInvitation = {
   emailAddress: string;
@@ -10,6 +13,24 @@ export type PortalInvitation = {
   publicMetadata?: { fssPortalInvitation: PortalInvitationMetadata };
 };
 type CreateInvitation = (input: PortalInvitation) => Promise<void>;
+type PendingInvitation = {
+  readonly id: string;
+  readonly emailAddress: string;
+  readonly publicMetadata: unknown;
+};
+type PendingInvitationQuery = {
+  readonly query: string;
+  readonly status: "pending";
+};
+type ClerkInvitationClient = {
+  invitations: {
+    getInvitationList: (
+      query: PendingInvitationQuery,
+    ) => Promise<{ data: readonly PendingInvitation[] }>;
+    revokeInvitation: (invitationId: string) => Promise<unknown>;
+  };
+};
+type ClerkInvitationClientFactory = () => Promise<ClerkInvitationClient>;
 
 export type PortalProvisioningErrorCode =
   | "INVITATION_CONFLICT"
@@ -59,6 +80,45 @@ export async function clearPortalInvitationMetadata(
   ).users.updateUserMetadata(clerkUserId, {
     publicMetadata: { fssPortalInvitation: null },
   });
+}
+
+export async function revokePendingClerkStaffInvitations(
+  email: string,
+  clientFactory: ClerkInvitationClientFactory = clerkClient,
+): Promise<void> {
+  const normalizedEmail = z
+    .string()
+    .trim()
+    .email()
+    .max(254)
+    .parse(email)
+    .toLowerCase();
+  const client = await clientFactory();
+  const { data: invitations } = await client.invitations.getInvitationList({
+    query: normalizedEmail,
+    status: "pending",
+  });
+
+  await Promise.all(
+    invitations
+      .filter((invitation) => {
+        const invitationEmail = z
+          .string()
+          .trim()
+          .email()
+          .max(254)
+          .safeParse(invitation.emailAddress);
+        return (
+          invitationEmail.success &&
+          invitationEmail.data.toLowerCase() === normalizedEmail &&
+          isStaffInvitationForEmail(
+            invitation.publicMetadata,
+            normalizedEmail,
+          )
+        );
+      })
+      .map((invitation) => client.invitations.revokeInvitation(invitation.id)),
+  );
 }
 
 export async function provisionPortalAccount(

@@ -9,12 +9,14 @@ import {
 import {
   claimClerkStaffInvitation,
   claimStaffInvitationForVerifiedEmail,
+  getActiveStaffMembership,
 } from "@/lib/operations/auth/staff-invitations";
 import { needsPortalOnboarding } from "@/lib/operations/auth/pending-invitations";
 import {
   getPortalIdentity,
   getPortalInvitationClaim,
 } from "@/lib/operations/auth/server";
+import { revokePendingClerkStaffInvitations } from "@/lib/operations/auth/provision";
 import { getPortalDb } from "@/lib/operations/db/portal-client";
 
 export const runtime = "nodejs";
@@ -28,6 +30,8 @@ export const POST = createPortalAccessClaimHandler({
   claimClerkInvitation: claimClerkPortalInvitation,
   claimStaffInvitation: claimClerkStaffInvitation,
   claimStaffInvitationForVerifiedEmail,
+  reconcilePendingClerkStaffInvitations: revokePendingClerkStaffInvitations,
+  hasActiveStaffMembership: getActiveStaffMembership,
   claimVerifiedEmailInvite: claimPortalInviteForVerifiedEmail,
   hasActiveMembership: hasActivePortalMembership,
   needsOnboarding: needsPortalOnboarding,
