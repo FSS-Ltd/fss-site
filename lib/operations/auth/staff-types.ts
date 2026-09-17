@@ -9,5 +9,7 @@ export type StaffMembership = {
 // Constructed only by requireFssAdmin after checking the current staff grant.
 export type FssAdminContext = StaffMembership & {
   readonly realm: "staff";
+  // A stable, non-PII audit actor derived from the verified Clerk identity.
+  readonly actorId: string;
   readonly correlationId: string;
 };

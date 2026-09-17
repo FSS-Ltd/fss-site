@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import type { OperationsDb } from "../db/client";
 import { getActiveStaffMembership } from "./staff-invitations";
 import type { FssAdminContext } from "./staff-types";
@@ -14,5 +15,12 @@ export async function requireFssAdmin(
     correlationId,
   );
   if (!membership) throw new PortalAccessDenied();
-  return { ...membership, realm: "staff", correlationId };
+  return {
+    ...membership,
+    realm: "staff",
+    actorId: createHash("sha256")
+      .update(`fss-admin:${membership.userId}`)
+      .digest("hex"),
+    correlationId,
+  };
 }
