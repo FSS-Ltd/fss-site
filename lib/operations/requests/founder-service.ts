@@ -14,7 +14,7 @@ import {
   type RequestStatus,
 } from "./types";
 import { translateRequestError } from "./errors";
-async function applyCommand(
+export async function applyRequestCommand(
   tx: OperationsTransaction,
   org: string,
   c: FounderRequestCommand,
@@ -92,58 +92,66 @@ export async function executeFounderRequestCommand(
   z.uuid().parse(correlationId);
   const command = founderRequestCommandSchema.parse(raw);
   try {
-    return await withAgreementTransaction(db, founder, async (tx) => {
-      await tx`select set_config('operations.correlation_id',${correlationId},true),set_config('operations.request_action',${command.action},true)`;
-      const [current] = await tx<
-        { version: number; status: RequestStatus }[]
-      >`select version,status from operations.requests where organisation_id=${organisationId} and id=${command.requestId} for update`;
-      if (!current || current.version !== command.expectedVersion)
-        throw new RequestConflict();
-      const expected: Partial<Record<FounderRequestCommand["action"], string>> =
-        {
-          acknowledge: "new",
-          plan: "acknowledged",
-          start: "planned",
-          review: "in_progress",
-          revise: "changes_requested",
-          reopen: "done",
-        };
-      if (
-        expected[command.action] &&
-        current.status !== expected[command.action]
-      )
-        throw new RequestConflict(
-          "This action is unavailable in the current state.",
-        );
-      if (
-        command.action === "classify_scope" &&
-        ["in_progress", "ready_for_review"].includes(current.status)
-      )
-        throw new RequestConflict("Reclassify scope before starting delivery.");
-      if (
-        ["cancel", "close", "classify_scope", "block"].includes(
-          command.action,
-        ) &&
-        ["done", "cancelled"].includes(current.status)
-      )
-        throw new RequestConflict("This request is already closed.");
-      const targets: Partial<
-        Record<FounderRequestCommand["action"], RequestStatus>
-      > = {
-        acknowledge: "acknowledged",
-        plan: "planned",
-        start: "in_progress",
-        review: "ready_for_review",
-        cancel: "cancelled",
-        reopen: "acknowledged",
-      };
-      const target = targets[command.action];
-      if (target && !canTransition(current.status, target))
-        throw new RequestConflict("This transition is unavailable.");
-      await applyCommand(tx, organisationId, command);
-      return { id: command.requestId, version: current.version + 1 };
-    });
+    return await withAgreementTransaction(db, founder, (tx) =>
+      runRequestCommand(tx, organisationId, command, correlationId),
+    );
   } catch (error) {
     translateRequestError(error);
   }
+}
+
+// Shared conflict/state checks and mutation for the founder and staff command
+// services. Callers provide the transaction with its audit actor already set.
+export async function runRequestCommand(
+  tx: OperationsTransaction,
+  organisationId: string,
+  command: FounderRequestCommand,
+  correlationId: string,
+): Promise<RequestCommandResult> {
+  z.uuid().parse(correlationId);
+  await tx`select set_config('operations.correlation_id',${correlationId},true),set_config('operations.request_action',${command.action},true)`;
+  const [current] = await tx<
+    { version: number; status: RequestStatus }[]
+  >`select version,status from operations.requests where organisation_id=${organisationId} and id=${command.requestId} for update`;
+  if (!current || current.version !== command.expectedVersion)
+    throw new RequestConflict();
+  const expected: Partial<Record<FounderRequestCommand["action"], string>> = {
+    acknowledge: "new",
+    plan: "acknowledged",
+    start: "planned",
+    review: "in_progress",
+    revise: "changes_requested",
+    reopen: "done",
+  };
+  if (expected[command.action] && current.status !== expected[command.action])
+    throw new RequestConflict(
+      "This action is unavailable in the current state.",
+    );
+  if (
+    command.action === "classify_scope" &&
+    ["in_progress", "ready_for_review"].includes(current.status)
+  )
+    throw new RequestConflict("Reclassify scope before starting delivery.");
+  if (
+    ["cancel", "close", "classify_scope", "block"].includes(
+      command.action,
+    ) &&
+    ["done", "cancelled"].includes(current.status)
+  )
+    throw new RequestConflict("This request is already closed.");
+  const targets: Partial<
+    Record<FounderRequestCommand["action"], RequestStatus>
+  > = {
+    acknowledge: "acknowledged",
+    plan: "planned",
+    start: "in_progress",
+    review: "ready_for_review",
+    cancel: "cancelled",
+    reopen: "acknowledged",
+  };
+  const target = targets[command.action];
+  if (target && !canTransition(current.status, target))
+    throw new RequestConflict("This transition is unavailable.");
+  await applyRequestCommand(tx, organisationId, command);
+  return { id: command.requestId, version: current.version + 1 };
 }

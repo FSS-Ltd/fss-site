@@ -122,6 +122,13 @@ export default async function PortalHomePage(): Promise<React.JSX.Element> {
                   >
                     Explore services
                   </Link>
+                  {" · "}
+                  <Link
+                    className={styles.link}
+                    href={`${portalPath("/portal/notifications")}?organisationId=${membership.organisationId}`}
+                  >
+                    Notifications
+                  </Link>
                 </p>
               )}
             </li>

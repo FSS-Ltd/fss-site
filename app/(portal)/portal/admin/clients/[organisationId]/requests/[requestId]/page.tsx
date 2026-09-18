@@ -5,6 +5,9 @@ import { z } from "zod";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import styles from "@/components/portal/studio-client.module.css";
 import { RequestDetail } from "@/components/portal/requests/request-detail";
+import { StaffRequestActions } from "@/components/portal/requests/staff-request-actions";
+import { founderDeliveryOwnerId } from "@/lib/operations/requests/types";
+import { listAgreementRegister } from "@/lib/operations/agreements/repository";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
@@ -26,7 +29,7 @@ export default async function AdminClientRequestPage({
     .object({ organisationId: z.uuid(), requestId: z.uuid() })
     .safeParse(await params);
   if (!parsed.success) notFound();
-  let request;
+  let request, register;
   try {
     const db = getOperationsDb();
     const admin = await requireFssAdmin(db, identity, randomUUID());
@@ -35,6 +38,11 @@ export default async function AdminClientRequestPage({
       admin,
       parsed.data.organisationId,
       parsed.data.requestId,
+    );
+    register = await listAgreementRegister(
+      db,
+      { actorId: admin.actorId },
+      parsed.data.organisationId,
     );
   } catch {
     return <PortalUnavailable />;
@@ -62,6 +70,25 @@ export default async function AdminClientRequestPage({
             hidePortalActions
           />
       </div>
+      <section className={styles.workspace} aria-labelledby="staff-actions-heading">
+          <h2 id="staff-actions-heading" className={styles.sectionTitle}>
+            Delivery controls
+          </h2>
+          <StaffRequestActions
+            request={clientRequest}
+            organisationId={parsed.data.organisationId}
+            deliveryOwners={[
+              { id: founderDeliveryOwnerId, label: "FSS delivery" },
+            ]}
+            agreements={(register?.agreements ?? [])
+              .filter((agreement) => agreement.status === "signed")
+              .map((agreement) => ({
+                id: agreement.id,
+                label: agreement.draft.title,
+              }))}
+            currentPriority={priority}
+          />
+      </section>
       <section className={styles.workspace} aria-labelledby="internal-notes-heading">
           <h2 id="internal-notes-heading" className={styles.sectionTitle}>
             Internal notes
