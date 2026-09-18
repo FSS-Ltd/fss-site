@@ -2,45 +2,75 @@ import Link from "next/link";
 import { randomUUID } from "node:crypto";
 import { notFound } from "next/navigation";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
-import { statusLabels } from "@/components/portal/requests/presentation";
+import { StaffDeliveryBoard } from "@/components/portal/requests/staff-delivery-board";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
-import { listStaffDeliveryQueue } from "@/lib/operations/requests/staff-repository";
+import {
+  listStaffDeliveryBoard,
+  listStaffDeliveryClients,
+} from "@/lib/operations/requests/staff-repository";
 import styles from "@/components/portal/auth/portal.module.css";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminDeliveryPage(): Promise<React.JSX.Element> {
+const laneKeys = new Set([
+  "all",
+  "new",
+  "acknowledged",
+  "planned",
+  "in_progress",
+  "ready_for_review",
+  "changes_requested",
+  "done",
+  "cancelled",
+]);
+
+export default async function AdminDeliveryPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}): Promise<React.JSX.Element> {
   if (!operationsEnabled()) notFound();
   if (!portalAuthConfigured()) return <PortalUnavailable />;
   const identity = await getPortalIdentity();
   if (!identity) return <PortalUnavailable />;
-  let requests;
+  const params = await searchParams;
+  const rawClient = Array.isArray(params.client) ? params.client[0] : params.client;
+  const rawStatus = Array.isArray(params.status) ? params.status[0] : params.status;
+  const filters = {
+    organisationId: rawClient && rawClient !== "all" ? rawClient : "all",
+    status: rawStatus && laneKeys.has(rawStatus) ? rawStatus : "all",
+  };
+  let requests, clients;
   try {
-    const admin = await requireFssAdmin(getOperationsDb(), identity, randomUUID());
-    requests = await listStaffDeliveryQueue(getOperationsDb(), admin);
+    const db = getOperationsDb();
+    const admin = await requireFssAdmin(db, identity, randomUUID());
+    [requests, clients] = await Promise.all([
+      listStaffDeliveryBoard(db, admin, filters),
+      listStaffDeliveryClients(db, admin),
+    ]);
   } catch {
     return <PortalUnavailable />;
   }
   return (
     <section aria-labelledby="delivery-heading">
       <p className={styles.eyebrow}>FSS Studio · Delivery</p>
-      <h1 id="delivery-heading" className={styles.heading}>Delivery queue</h1>
-      <p className={styles.copy}>Cross-client requests ordered so open work and overdue follow-ups stay visible.</p>
-      {requests.length === 0 ? <p className={styles.actions}>No active client requests.</p> : (
-        <ul className={styles.list}>
-          {requests.map((request) => (
-            <li className={styles.row} key={request.id}>
-              <p className={styles.eyebrow}>{request.organisationName}</p>
-              <h2 className={styles.name}>{request.title}</h2>
-              <p className={styles.copy}>{statusLabels[request.status]} · {request.nextAction || "No next action recorded."}</p>
-              <p className={styles.actions}><Link className={styles.link} href={`/admin/clients/${request.organisationId}/requests/${request.id}`}>Open request</Link></p>
-            </li>
-          ))}
-        </ul>
-      )}
+      <h1 id="delivery-heading" className={styles.heading}>Delivery board</h1>
+      <p className={styles.copy}>
+        Cross-client requests ordered so open work and overdue follow-ups stay visible. Transitions are validated on the server.
+      </p>
+      <StaffDeliveryBoard
+        requests={requests}
+        clients={clients}
+        filters={filters}
+      />
+      <p className={styles.actions}>
+        <Link className={styles.link} href="/admin/clients">
+          Open client workspaces
+        </Link>
+      </p>
     </section>
   );
 }

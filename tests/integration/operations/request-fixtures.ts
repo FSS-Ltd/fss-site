@@ -89,6 +89,8 @@ export async function removeRequestFixture(
   await admin.begin(async (tx) => {
     await tx`select set_config('operations.actor_id',${deliveryFounder.actorId},true),set_config('operations.correlation_id',${f.correlationId},true)`;
     await tx`delete from operations.request_history where organisation_id=${f.organisationId}`;
+    await tx`delete from operations.request_email_deliveries where organisation_id=${f.organisationId}`;
+    await tx`delete from operations.request_notifications where organisation_id=${f.organisationId}`;
     await tx`delete from operations.request_notification_outbox where organisation_id=${f.organisationId}`;
     await tx`delete from operations.request_documents where organisation_id=${f.organisationId}`;
     await tx`delete from operations.request_reviews where organisation_id=${f.organisationId}`;
