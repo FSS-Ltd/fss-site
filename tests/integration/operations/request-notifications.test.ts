@@ -97,6 +97,53 @@ test("request outbox events fan out to members with owner email records, idempot
   }
 });
 
+test("request notifications exclude billing-only contacts", async () => {
+  const admin = postgres(url, { max: 1 });
+  const founder = postgres(url, {
+    max: 4,
+    connection: { options: "-c role=operations_founder" },
+  });
+  const portal = postgres(url, {
+    max: 4,
+    connection: { options: "-c role=operations_portal" },
+  });
+  const f = await requestFixture(admin, founder);
+  try {
+    const request = await createPortalRequest(
+      portal,
+      f.identity,
+      f.organisationId,
+      newRequest(f.projectId),
+      f.correlationId,
+    );
+    await admin`update operations.memberships set role = 'billing_contact'
+      where organisation_id = ${f.organisationId} and user_id = ${f.identity.userId}`;
+
+    const summary = await dispatchRequestNotifications(founder);
+    assert.equal(summary.fannedOut, 1);
+    const notifications = await admin<{ count: number }[]>`
+      select count(*)::int as count from operations.request_notifications
+      where request_id = ${request.id}`;
+    assert.equal(notifications[0].count, 0);
+    const visible = await withPortalTransaction(
+      portal,
+      f.identity,
+      f.organisationId,
+      f.correlationId,
+      (tx) =>
+        tx<{ id: string }[]>`
+          select id from operations.request_notifications
+          where request_id = ${request.id}`,
+    );
+    assert.equal(visible.length, 0);
+  } finally {
+    await removeRequestFixture(admin, f);
+    await admin.end();
+    await founder.end();
+    await portal.end();
+  }
+});
+
 test("review publication queues an owner email delivery and the dispatcher completes it", async () => {
   const admin = postgres(url, { max: 1 });
   const founder = postgres(url, {

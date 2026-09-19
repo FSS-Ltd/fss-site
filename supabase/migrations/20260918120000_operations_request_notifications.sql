@@ -67,6 +67,7 @@ begin
     select event.organisation_id, event.request_id, m.user_id, event.kind, event.title, event.public_summary, event.version, event.id
     from operations.memberships m
     where m.organisation_id = event.organisation_id and m.revoked_at is null
+      and m.role in ('owner', 'contributor', 'viewer')
     on conflict (source_outbox_id, user_id) do nothing;
     if event.kind in ('review_requested','accepted') and event.owner_email is not null then
       insert into operations.request_email_deliveries(organisation_id, request_id, outbox_id, kind, recipient)
@@ -145,7 +146,7 @@ grant execute on function operations.dispatch_request_notifications(integer), op
 grant select on operations.request_notifications to operations_portal;
 create policy portal_read on operations.request_notifications for select to operations_portal
   using (user_id = nullif(current_setting('operations.user_id', true), '')::uuid
-    and operations.portal_has_membership(organisation_id, array['owner','contributor','billing_contact','viewer']));
+    and operations.portal_has_membership(organisation_id, array['owner','contributor','viewer']));
 grant update(read_at) on operations.request_notifications to operations_portal;
 create policy portal_mark_read on operations.request_notifications for update to operations_portal
   using (user_id = nullif(current_setting('operations.user_id', true), '')::uuid and read_at is null)

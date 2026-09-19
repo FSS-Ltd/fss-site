@@ -105,7 +105,7 @@ export function StaffDeliveryBoard({
   );
 
   function onCardKeyDown(
-    event: KeyboardEvent<HTMLDivElement>,
+    event: KeyboardEvent<HTMLAnchorElement>,
     request: StaffDeliveryBoardRequest,
   ): void {
     if (pendingId) return;
@@ -115,13 +115,6 @@ export function StaffDeliveryBoard({
         : event.key === "ArrowLeft" && request.status === "in_progress"
           ? "planned"
           : null;
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      router.push(
-        `/admin/clients/${request.organisationId}/requests/${request.id}`,
-      );
-      return;
-    }
     if (!target) return;
     event.preventDefault();
     void move(request, target);
@@ -196,10 +189,9 @@ export function StaffDeliveryBoard({
               <ul>
                 {cards.map((request) => (
                   <li key={request.id}>
-                    <div
+                    <Link
+                      href={`/admin/clients/${request.organisationId}/requests/${request.id}`}
                       className={styles.boardLink}
-                      role="button"
-                      tabIndex={0}
                       aria-label={`${request.title} — ${statusLabels[request.status]}. Use arrow keys to move, Enter to open.`}
                       aria-disabled={pendingId === request.id}
                       draggable={pendingId !== request.id}
@@ -215,10 +207,10 @@ export function StaffDeliveryBoard({
                       {request.blocked && (
                         <span className={styles.status}>Blocked</span>
                       )}
-                    </div>
+                    </Link>
                   </li>
                 ))}
-                {!cards.length && <p className={styles.note}>No requests</p>}
+                {!cards.length && <li className={styles.note}>No requests</li>}
               </ul>
             </section>
           );
