@@ -140,9 +140,9 @@ export function prepareProposal(
     url.password ||
     url.search ||
     url.hash ||
-    !(url.pathname === "/portal" || url.pathname.startsWith("/portal/"))
+    !["/agreements", "/portal/agreements"].includes(url.pathname)
   )
-    throw new Error("Use a normal HTTPS portal URL without credentials.");
+    throw new Error("Use the normal HTTPS agreement URL without credentials.");
   text.parse(input.scopeSummary);
   return {
     signingApprovalId: input.signingApprovalId,

@@ -10,12 +10,17 @@ export function StepRecovery({
   organisationId,
   journey,
   job,
+  commandEndpoint,
 }: {
   organisationId: string;
   journey: JourneyView;
   job: JourneyJob;
+  commandEndpoint?: string;
 }): React.JSX.Element | null {
-  const { submit, pending, message } = useJourneyCommand(organisationId);
+  const { submit, pending, message } = useJourneyCommand(
+    organisationId,
+    commandEndpoint,
+  );
   if (!canReconcile(job)) return null;
   return (
     <details>

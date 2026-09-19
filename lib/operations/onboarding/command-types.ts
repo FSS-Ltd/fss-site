@@ -19,6 +19,10 @@ export class JourneyConflict extends Error {
     this.name = "JourneyConflict";
   }
 }
+
+export type JourneyActor = {
+  actorId: string;
+};
 export interface JourneyJob {
   id: string;
   step: OnboardingStep;

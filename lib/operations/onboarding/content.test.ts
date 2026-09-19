@@ -54,7 +54,7 @@ test("unsupported fonts, missing fields and overflowing pages block approval", a
     }),
   );
 });
-test("proposal uses normal portal signing link and separately approved access marker", async () => {
+test("proposal uses the canonical signing link and separately approved access marker", async () => {
   const { snapshot } = await preparedWelcomeFixture();
   const input = {
     signingApprovalId: "10000000-0000-4000-8000-000000000001",
@@ -62,12 +62,19 @@ test("proposal uses normal portal signing link and separately approved access ma
     revision: 1,
     signers: ["signer0@example.test"],
     access: [{ email: "signer0@example.test", role: "owner" as const }],
-    portalUrl: "https://example.test/portal/agreements",
+    portalUrl: "https://example.test/agreements",
     scopeSummary: "the approved board",
   };
   const p = prepareProposal(input, snapshot);
   assert.ok(p.emails[0].text.includes(input.portalUrl));
   assert.ok(p.emails[0].html.includes(`<a href="${input.portalUrl}"`));
+  assert.equal(
+    prepareProposal(
+      { ...input, portalUrl: "https://example.test/portal/agreements" },
+      snapshot,
+    ).portalUrl,
+    "https://example.test/portal/agreements",
+  );
   assert.ok(p.emails[0].html.includes('href="{{portal_access_url}}"'));
   assert.ok(p.emails[0].text.includes("{{portal_access_url}}"));
   assert.throws(() =>
@@ -84,8 +91,8 @@ test("proposal uses normal portal signing link and separately approved access ma
   );
   const thanks = thankYouEmail(
     snapshot,
-    "https://example.test/portal/billing",
-    "https://example.test/portal",
+    "https://example.test/billing",
+    "https://example.test/",
   );
   assert.match(thanks.text, /first invoice is ready/);
   assert.doesNotMatch(thanks.text, /newsletter|subscribe/i);

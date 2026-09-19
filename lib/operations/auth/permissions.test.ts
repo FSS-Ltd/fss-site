@@ -42,6 +42,10 @@ test("portal roles preserve billing, delivery and invitation boundaries", () => 
       false,
       "signer authorization is separate",
     );
+    assert.equal(
+      hasPortalCapability(role, "onboarding.read"),
+      role !== "billing_contact",
+    );
   }
 });
 

@@ -154,3 +154,25 @@ test("journey approval retains exact-recipient confirmation before either mutati
     /preview\.kind === "welcome" \? "start" : "approve_proposal"/,
   );
 });
+
+test("journey UI accepts scoped Studio endpoints while retaining legacy defaults", () => {
+  const preview = readFileSync(
+    new URL("./journey-preview.tsx", import.meta.url),
+    "utf8",
+  );
+  const timeline = readFileSync(
+    new URL("./journey-timeline.tsx", import.meta.url),
+    "utf8",
+  );
+  const command = readFileSync(
+    new URL("./use-journey-command.ts", import.meta.url),
+    "utf8",
+  );
+  assert.match(preview, /commandEndpoint\?: string/);
+  assert.match(preview, /signingDownloadBase\?: string/);
+  assert.match(timeline, /welcomeDownloadUrl\?: string/);
+  assert.match(
+    command,
+    /endpoint = `\/api\/growth\/operations\/clients\/\$\{organisationId\}\/journey`/,
+  );
+});
