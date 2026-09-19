@@ -1,6 +1,8 @@
 import { z } from "zod";
-import type { OperationsDb } from "../db/client";
+import type { OperationsDb, OperationsTransaction } from "../db/client";
 import type { OperationsFounder } from "../organisations/types";
+import { withFssAdminTransaction } from "../auth/staff-transaction";
+import type { FssAdminContext } from "../auth/staff-types";
 import { withAgreementTransaction } from "../agreements/repository";
 import { privateAuthHeaders, reportAuthError } from "../auth/http";
 export async function loadWelcomePdf(
@@ -11,23 +13,44 @@ export async function loadWelcomePdf(
 ): Promise<Buffer | null> {
   z.uuid().parse(organisationId);
   z.uuid().parse(journeyId);
-  return withAgreementTransaction(db, founder, async (tx) => {
-    const [row] = await tx<
-      { pdf: Buffer }[]
-    >`select a.pdf from operations.onboarding_journeys j join operations.onboarding_approvals a on a.id=j.approval_id where j.organisation_id=${organisationId} and j.id=${journeyId}`;
-    return row?.pdf ?? null;
-  });
+  return withAgreementTransaction(db, founder, (tx) =>
+    loadWelcomePdfInTransaction(tx, organisationId, journeyId),
+  );
 }
-export function createWelcomeDownloadHandler(deps: {
+async function loadWelcomePdfInTransaction(
+  tx: OperationsTransaction,
+  organisationId: string,
+  journeyId: string,
+): Promise<Buffer | null> {
+  const [row] = await tx<
+    { pdf: Buffer }[]
+  >`select a.pdf from operations.onboarding_journeys j join operations.onboarding_approvals a on a.id=j.approval_id where j.organisation_id=${organisationId} and j.id=${journeyId}`;
+  return row?.pdf ?? null;
+}
+
+export async function loadStaffWelcomePdf(
+  db: OperationsDb,
+  admin: FssAdminContext,
+  organisationId: string,
+  journeyId: string,
+): Promise<Buffer | null> {
+  z.uuid().parse(organisationId);
+  z.uuid().parse(journeyId);
+  return withFssAdminTransaction(db, admin, (tx) =>
+    loadWelcomePdfInTransaction(tx, organisationId, journeyId),
+  );
+}
+
+export function createWelcomeDownloadHandler<Identity>(deps: {
   enabled: boolean;
-  authorize: () => Promise<OperationsFounder | null>;
+  authorize: () => Promise<Identity | null>;
   createCorrelationId: () => string;
   reportUnexpectedError: (report: {
     correlationId: string;
     errorName: string;
   }) => void;
   download: (
-    founder: OperationsFounder,
+    identity: Identity,
     organisationId: string,
     journeyId: string,
   ) => Promise<Buffer | null>;

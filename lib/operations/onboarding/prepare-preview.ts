@@ -2,10 +2,13 @@ import { invoiceChoices } from "./display";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import type { OperationsTransaction } from "../db/client";
-import type { OperationsFounder } from "../organisations/types";
 import { loadAgreement } from "../agreements/repository";
 import { prepareWelcome, prepareProposal } from "./approval";
-import { JourneyConflict, type JourneyCommandResult } from "./command-types";
+import {
+  JourneyConflict,
+  type JourneyActor,
+  type JourneyCommandResult,
+} from "./command-types";
 import { signPreview } from "./preview-token";
 import type { PreviewEnvelope } from "./preview-envelope";
 import type {
@@ -16,7 +19,7 @@ import type { JourneyCommand } from "./command-schema";
 import type { JourneyCommandOptions } from "./commands";
 export async function prepareWelcomePreview(
   tx: OperationsTransaction,
-  founder: OperationsFounder,
+  actor: JourneyActor,
   organisationId: string,
   command: Extract<JourneyCommand, { action: "preview_welcome" }>,
   options: JourneyCommandOptions,
@@ -69,7 +72,7 @@ export async function prepareWelcomePreview(
   }
   const data: PreviewEnvelope = {
     kind: "welcome",
-    actorId: founder.actorId,
+    actorId: actor.actorId,
     organisationId,
     agreementId: record.id,
     expectedVersion: record.version,
@@ -91,7 +94,7 @@ export async function prepareWelcomePreview(
 }
 export async function prepareProposalPreview(
   tx: OperationsTransaction,
-  founder: OperationsFounder,
+  actor: JourneyActor,
   organisationId: string,
   command: Extract<JourneyCommand, { action: "preview_proposal" }>,
   options: JourneyCommandOptions,
@@ -129,7 +132,7 @@ export async function prepareProposalPreview(
         ...approval,
         access: command.access,
         scopeSummary: command.scopeSummary,
-        portalUrl: new URL("/portal/agreements", options.portalOrigin).href,
+        portalUrl: new URL("/agreements", options.portalOrigin).href,
       },
       journey.welcome,
     );
@@ -142,7 +145,7 @@ export async function prepareProposalPreview(
   }
   const data: PreviewEnvelope = {
     kind: "proposal",
-    actorId: founder.actorId,
+    actorId: actor.actorId,
     organisationId,
     agreementId: journey.agreementId,
     expectedVersion: record.version,

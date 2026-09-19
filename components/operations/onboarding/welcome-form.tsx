@@ -157,8 +157,9 @@ export function WelcomeForm({
       <fieldset disabled={pending}>
         <legend>Welcome guide</legend>
         <p>
-          Use approved client facts. Each section becomes one readable PDF page.
-          Separate paragraphs with a blank line.
+          Template: FSS client welcome guide. Use approved client facts. Each
+          section becomes one readable PDF page. Separate paragraphs with a
+          blank line.
         </p>
         {guidePages.map((title, i) => (
           <label key={title} className={styles.field}>

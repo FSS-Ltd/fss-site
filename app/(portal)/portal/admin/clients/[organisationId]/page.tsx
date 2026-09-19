@@ -112,11 +112,22 @@ export default async function AdminClientContextPage({
               Open agreements
             </Link>
           </li>
+          <li className={styles.row}>
+            <div className={styles.rowContent}>
+              <h3 className={styles.rowTitle}>Welcome journey</h3>
+              <p className={styles.rowCopy}>
+                Prepare approved messages, signing access, and scheduled
+                activation with recovery evidence.
+              </p>
+            </div>
+            <Link
+              className={styles.actionLink}
+              href={`/admin/clients/${client.id}/journey`}
+            >
+              Open journeys
+            </Link>
+          </li>
           {[
-            [
-              "Welcome journey",
-              "Journey migration is not available in FSS Studio yet.",
-            ],
             [
               "People & access",
               "Portal access is managed by the founder in Growth Operations.",

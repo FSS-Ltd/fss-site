@@ -1,6 +1,8 @@
 import { z } from "zod";
 import type { OperationsDb, OperationsTransaction } from "../db/client";
 import type { OperationsFounder } from "../organisations/types";
+import { withFssAdminTransaction } from "../auth/staff-transaction";
+import type { FssAdminContext } from "../auth/staff-types";
 import { withAgreementTransaction } from "../agreements/repository";
 import type { JourneyView, JourneyJob } from "./command-types";
 export async function loadJourneys(
@@ -27,5 +29,69 @@ export async function listFounderJourneys(
   z.uuid().parse(organisationId);
   return withAgreementTransaction(db, founder, (tx) =>
     loadJourneys(tx, organisationId),
+  );
+}
+
+export type StaffJourneyOverviewRow = {
+  organisationId: string;
+  organisationName: string;
+  journeyCount: number;
+  activeCount: number;
+  recoveryCount: number;
+};
+
+export async function listStaffJourneys(
+  db: OperationsDb,
+  admin: FssAdminContext,
+  organisationId: string,
+): Promise<JourneyView[]> {
+  z.uuid().parse(organisationId);
+  return withFssAdminTransaction(db, admin, (tx) =>
+    loadJourneys(tx, organisationId),
+  );
+}
+
+export async function listStaffJourneyContacts(
+  db: OperationsDb,
+  admin: FssAdminContext,
+  organisationId: string,
+): Promise<Array<{ name: string; email: string }>> {
+  z.uuid().parse(organisationId);
+  return withFssAdminTransaction(
+    db,
+    admin,
+    (tx) =>
+      tx<Array<{ name: string; email: string }>>`
+      select name, email
+      from operations.contacts
+      where organisation_id = ${organisationId}
+      order by name, email
+      limit 100
+    `,
+  );
+}
+
+export async function listStaffJourneyOverview(
+  db: OperationsDb,
+  admin: FssAdminContext,
+): Promise<StaffJourneyOverviewRow[]> {
+  return withFssAdminTransaction(
+    db,
+    admin,
+    (tx) =>
+      tx<StaffJourneyOverviewRow[]>`
+        select
+          o.id as "organisationId",
+          o.display_name as "organisationName",
+          count(j.id)::integer as "journeyCount",
+          count(j.id) filter (where j.state in ('active', 'paused'))::integer as "activeCount",
+          count(j.id) filter (where j.state = 'blocked' or j.failure_code is not null)::integer as "recoveryCount"
+        from operations.organisations o
+        left join operations.onboarding_journeys j on j.organisation_id = o.id
+        where o.lifecycle = 'active'
+        group by o.id, o.display_name
+        order by o.display_name, o.id
+        limit 200
+      `,
   );
 }

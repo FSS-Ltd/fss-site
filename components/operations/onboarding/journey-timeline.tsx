@@ -21,11 +21,18 @@ const labels = {
 export function JourneyTimeline({
   organisationId,
   journey,
+  commandEndpoint,
+  welcomeDownloadUrl,
 }: {
   organisationId: string;
   journey: JourneyView;
+  commandEndpoint?: string;
+  welcomeDownloadUrl?: string;
 }): React.JSX.Element {
-  const { submit, pending, message } = useJourneyCommand(organisationId);
+  const { submit, pending, message } = useJourneyCommand(
+    organisationId,
+    commandEndpoint,
+  );
   const [cancel, setCancel] = useState(false);
   const terminal = ["completed", "cancelled"].includes(journey.state);
   const command = (action: "pause" | "resume" | "cancel") =>
@@ -142,11 +149,13 @@ export function JourneyTimeline({
               organisationId={organisationId}
               journey={journey}
               job={job}
+              commandEndpoint={commandEndpoint}
             />
             <StepRecovery
               organisationId={organisationId}
               journey={journey}
               job={job}
+              commandEndpoint={commandEndpoint}
             />
           </li>
         ))}
@@ -160,7 +169,10 @@ export function JourneyTimeline({
       <details>
         <summary>Approved welcome and recipient</summary>
         <a
-          href={`/api/growth/operations/clients/${organisationId}/journey/${journey.id}/welcome`}
+          href={
+            welcomeDownloadUrl ??
+            `/api/growth/operations/clients/${organisationId}/journey/${journey.id}/welcome`
+          }
         >
           Download approved welcome PDF
         </a>

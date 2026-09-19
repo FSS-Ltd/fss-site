@@ -17,6 +17,7 @@ import type {
 import { needsPortalOnboarding } from "@/lib/operations/auth/pending-invitations";
 import { getActiveStaffMembership } from "@/lib/operations/auth/staff-invitations";
 import { portalPath } from "@/lib/operations/auth/portal-url";
+import { onboardingEnabled } from "@/lib/operations/onboarding/worker-db";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import styles from "@/components/portal/auth/portal.module.css";
 
@@ -93,6 +94,17 @@ export default async function PortalHomePage(): Promise<React.JSX.Element> {
                   </Link>
                 </p>
               )}
+              {onboardingEnabled() &&
+                hasPortalCapability(membership.role, "onboarding.read") && (
+                  <p className={styles.actions}>
+                    <Link
+                      className={styles.link}
+                      href={`${portalPath("/portal/getting-started")}?organisationId=${membership.organisationId}`}
+                    >
+                      Getting started
+                    </Link>
+                  </p>
+                )}
               {process.env.OPERATIONS_SIGNING_ENABLED === "true" && (
                 <p className={styles.actions}>
                   <Link

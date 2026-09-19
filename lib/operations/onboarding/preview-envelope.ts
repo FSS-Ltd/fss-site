@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { welcomeInputSchema } from "./approval";
-import type { OperationsFounder } from "../organisations/types";
-import { JourneyConflict } from "./command-types";
+import { JourneyConflict, type JourneyActor } from "./command-types";
 const email = z.strictObject({
   from: z.email(),
   replyTo: z.email(),
@@ -55,13 +54,13 @@ const schema = z.discriminatedUnion("kind", [
 export type PreviewEnvelope = z.infer<typeof schema>;
 export function envelope(
   raw: unknown,
-  founder: OperationsFounder,
+  actor: JourneyActor,
   organisationId: string,
   now: number,
 ): PreviewEnvelope {
   const parsed = schema.parse(raw);
   if (
-    parsed.actorId !== founder.actorId ||
+    parsed.actorId !== actor.actorId ||
     parsed.organisationId !== organisationId ||
     parsed.expiresAt <= now
   )

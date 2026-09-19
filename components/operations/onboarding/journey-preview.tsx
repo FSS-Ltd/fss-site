@@ -46,6 +46,8 @@ export interface JourneyPreviewProps {
   approvals: SigningApproval[];
   journeys: JourneyView[];
   billing?: JourneyBillingAccount | null;
+  commandEndpoint?: string;
+  signingDownloadBase?: string;
 }
 export function JourneyPreview({
   organisationId,
@@ -55,8 +57,13 @@ export function JourneyPreview({
   approvals,
   journeys,
   billing = null,
+  commandEndpoint,
+  signingDownloadBase = `/api/growth/operations/clients/${organisationId}/signing`,
 }: JourneyPreviewProps): React.JSX.Element {
-  const { submit, pending, message } = useJourneyCommand(organisationId);
+  const { submit, pending, message } = useJourneyCommand(
+    organisationId,
+    commandEndpoint,
+  );
   const [preview, setPreview] = useState<Preview | null>(null);
   const [confirmed, setConfirmed] = useState(false);
   async function prepare(command: unknown) {
@@ -176,7 +183,7 @@ export function JourneyPreview({
                 {preview.snapshot.approvalHash}
               </p>
               <a
-                href={`/api/growth/operations/clients/${organisationId}/signing/${preview.snapshot.signingApprovalId}/source`}
+                href={`${signingDownloadBase}/${preview.snapshot.signingApprovalId}/source`}
               >
                 Download approved proposal PDF
               </a>
