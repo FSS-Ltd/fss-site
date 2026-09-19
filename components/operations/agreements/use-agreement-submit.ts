@@ -3,7 +3,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { FieldIssues } from "./form-fields";
 import { gbpToPence as poundsToPence } from "@/lib/operations/agreements/money-input";
-export function useAgreementSubmit(organisationId: string): {
+export function useAgreementSubmit(
+  organisationId: string,
+  endpoint = `/api/growth/operations/clients/${organisationId}/agreements`,
+): {
   pending: boolean;
   message: string;
   issues: FieldIssues;
@@ -19,14 +22,11 @@ export function useAgreementSubmit(organisationId: string): {
     setIssues([]);
     try {
       const body = build();
-      const response = await fetch(
-        `/api/growth/operations/clients/${organisationId}/agreements`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        },
-      );
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
       const result: { message?: string; issues?: FieldIssues } =
         await response.json();
       if (!response.ok) {

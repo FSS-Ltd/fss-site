@@ -12,11 +12,15 @@ export function SigningForm({
   approval,
   audience,
   agreement,
+  commandEndpoint,
+  successRedirect,
 }: {
   organisationId: string;
   approval?: SigningApproval;
-  audience: "founder" | "portal";
+  audience: "founder" | "staff" | "portal";
   agreement?: { id: string; version: number };
+  commandEndpoint?: string;
+  successRedirect?: string;
 }): React.JSX.Element {
   const router = useRouter();
   const [pending, setPending] = useState(false);
@@ -61,11 +65,10 @@ export function SigningForm({
                     }
                   : {}),
               };
-      const prefix =
-        audience === "founder"
-          ? "/api/growth/operations/clients"
-          : "/api/portal/organisations";
-      const response = await fetch(`${prefix}/${organisationId}/signing`, {
+      const endpoint =
+        commandEndpoint ??
+        `${audience === "portal" ? "/api/portal/organisations" : "/api/growth/operations/clients"}/${organisationId}/signing`;
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(command),
@@ -87,7 +90,10 @@ export function SigningForm({
           : "Agreement updated.",
       );
       if (action === "prepare")
-        router.push(`/growth/operations/clients/${organisationId}/signing`);
+        router.push(
+          successRedirect ??
+            `/growth/operations/clients/${organisationId}/signing`,
+        );
       router.refresh();
     } catch (error) {
       setError(
@@ -116,7 +122,7 @@ export function SigningForm({
             Prepare signing document
           </button>
         </>
-      ) : audience === "founder" ? (
+      ) : audience !== "portal" ? (
         <>
           {approval?.status === "prepared" && (
             <>

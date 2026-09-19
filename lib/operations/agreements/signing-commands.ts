@@ -2,11 +2,15 @@ import { z } from "zod";
 import type { VerifiedPortalIdentity } from "../auth/types";
 import type { OperationsDb } from "../db/client";
 import type { OperationsFounder } from "../organisations/types";
+import type { FssAdminContext } from "../auth/staff-types";
 import { approvalBindingSchema, signingConsentSchema } from "./signing-types";
 import {
   prepareAgreementSigning,
   approveAgreementSigning,
   cancelAgreementSigning,
+  prepareStaffAgreementSigning,
+  approveStaffAgreementSigning,
+  cancelStaffAgreementSigning,
   signPortalAgreement,
   declinePortalAgreement,
 } from "./signing-service";
@@ -55,6 +59,38 @@ export async function executeFounderSigningCommand(
   return cancelAgreementSigning(
     db,
     founder,
+    organisationId,
+    input,
+    correlationId,
+  );
+}
+export async function executeStaffSigningCommand(
+  db: OperationsDb,
+  admin: FssAdminContext,
+  organisationId: string,
+  raw: unknown,
+  correlationId: string,
+) {
+  const { action, ...input } = founderCommand.parse(raw);
+  if (action === "prepare")
+    return prepareStaffAgreementSigning(
+      db,
+      admin,
+      organisationId,
+      input,
+      correlationId,
+    );
+  if (action === "approve")
+    return approveStaffAgreementSigning(
+      db,
+      admin,
+      organisationId,
+      input,
+      correlationId,
+    );
+  return cancelStaffAgreementSigning(
+    db,
+    admin,
     organisationId,
     input,
     correlationId,

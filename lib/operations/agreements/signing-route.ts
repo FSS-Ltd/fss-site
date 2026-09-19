@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { resolveSiteUrl } from "../../config/site-url";
 import { requireFounder } from "../../growth/auth/require-founder";
 import { getPortalIdentity } from "../auth/server";
+import { requireFssAdmin } from "../auth/require-admin";
 import { getOperationsDb } from "../db/client";
 import { getPortalDb } from "../db/portal-client";
 import { consumeRequestRateLimit } from "../requests/rate-limit";
@@ -11,12 +12,14 @@ import {
 } from "./signing-http";
 import {
   executeFounderSigningCommand,
+  executeStaffSigningCommand,
   executePortalSigningCommand,
   signingEnabled,
 } from "./signing-commands";
 import {
   downloadFounderSigningArtifact,
   downloadPortalSigningArtifact,
+  downloadStaffSigningArtifact,
 } from "./signing-service";
 
 function configuration() {
@@ -72,6 +75,29 @@ export function portalSigningRoute() {
       ),
   });
 }
+async function authorizeStaff() {
+  const identity = await getPortalIdentity();
+  if (!identity) return null;
+  try {
+    return await requireFssAdmin(getPortalDb(), identity, randomUUID());
+  } catch {
+    return null;
+  }
+}
+export function staffSigningRoute() {
+  return createSigningCommandHandler({
+    ...configuration(),
+    authorize: authorizeStaff,
+    execute: (admin, organisationId, command, correlationId) =>
+      executeStaffSigningCommand(
+        getOperationsDb(),
+        admin,
+        organisationId,
+        command,
+        correlationId,
+      ),
+  });
+}
 export function founderSigningDownloadRoute() {
   return createSigningDownloadHandler({
     ...configuration(),
@@ -95,6 +121,21 @@ export function portalSigningDownloadRoute() {
       downloadPortalSigningArtifact(
         getPortalDb(),
         identity,
+        organisationId,
+        approvalId,
+        kind,
+        correlationId,
+      ),
+  });
+}
+export function staffSigningDownloadRoute() {
+  return createSigningDownloadHandler({
+    ...configuration(),
+    authorize: authorizeStaff,
+    download: (admin, organisationId, approvalId, kind, correlationId) =>
+      downloadStaffSigningArtifact(
+        getOperationsDb(),
+        admin,
         organisationId,
         approvalId,
         kind,

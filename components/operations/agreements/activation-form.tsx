@@ -8,12 +8,14 @@ export function ActivationForm({
   organisationId,
   record,
   lineNumber,
+  endpoint,
 }: {
   organisationId: string;
   record: AgreementRecord;
   lineNumber: number;
+  endpoint?: string;
 }): React.JSX.Element {
-  const state = useAgreementSubmit(organisationId);
+  const state = useAgreementSubmit(organisationId, endpoint);
   const depositRequired = BigInt(record.draft.requiredDepositPence) > BigInt(0);
   return (
     <form

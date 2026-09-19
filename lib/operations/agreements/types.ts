@@ -21,6 +21,7 @@ export type AgreementRecord = {
 export type AgreementRegister = {
   organisationName: string;
   engagementIds: string[];
+  engagementChoices?: Array<{ id: string; name: string }>;
   agreements: AgreementRecord[];
   nextCursor: string | null;
   moreEngagements: boolean;

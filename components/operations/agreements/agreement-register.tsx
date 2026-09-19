@@ -13,7 +13,25 @@ import { AgreementSummary } from "./agreement-summary";
 import { OperationsPageHeader } from "../shared/operations-page-header";
 import ui from "../shared/operations-ui.module.css";
 import styles from "./agreements.module.css";
-function Terms({ record }: { record: AgreementRecord }): React.JSX.Element {
+export type AgreementWorkspace = {
+  context: string;
+  backHref: string;
+  backLabel: string;
+  agreementEndpoint: string;
+  signingHref: string;
+  signingEndpoint: string;
+  nextPageHref: (cursor: string) => string;
+  evidenceMode: "manual" | "generated";
+  allowManualSigning: boolean;
+};
+
+function Terms({
+  record,
+  evidenceMode,
+}: {
+  record: AgreementRecord;
+  evidenceMode: AgreementWorkspace["evidenceMode"];
+}): React.JSX.Element {
   const d = record.draft;
   return (
     <details>
@@ -28,8 +46,12 @@ function Terms({ record }: { record: AgreementRecord }): React.JSX.Element {
           "Tax treatment": d.taxTreatment,
           "Billing contact": d.billingContact,
           Signatories: d.signatories.join(", "),
-          "Source hash": d.documentHash,
-          "Private source reference": d.documentReference,
+          ...(evidenceMode === "manual"
+            ? {
+                "Source hash": d.documentHash,
+                "Private source reference": d.documentReference,
+              }
+            : {}),
           "Notice period": `${d.noticeDays} days`,
           "Minimum term": `${d.minimumTermMonths} months`,
           "Required deposit": `£${penceToGbp(d.requiredDepositPence)}`,
@@ -59,36 +81,65 @@ function Terms({ record }: { record: AgreementRecord }): React.JSX.Element {
 export function AgreementRegister({
   organisationId,
   register,
+  workspace,
 }: {
   organisationId: string;
   register: Register;
+  workspace?: AgreementWorkspace;
 }): React.JSX.Element {
+  const routes: AgreementWorkspace = workspace ?? {
+    context: "Operations · Agreements",
+    backHref: "/growth/operations/clients",
+    backLabel: "Back to client register",
+    agreementEndpoint: `/api/growth/operations/clients/${organisationId}/agreements`,
+    signingHref: `/growth/operations/clients/${organisationId}/signing`,
+    signingEndpoint: `/api/growth/operations/clients/${organisationId}/signing`,
+    nextPageHref: (cursor) =>
+      `/growth/operations/clients/${organisationId}/agreements?after=${cursor}`,
+    evidenceMode: "manual",
+    allowManualSigning: true,
+  };
   return (
     <section
       className={styles.page}
       aria-label={`${register.organisationName}: agreements`}
     >
       <OperationsPageHeader
-        context="Operations · Agreements"
+        context={routes.context}
         title={`${register.organisationName}: agreements`}
         description="Signed terms, signing evidence and effective services."
-        action={
-          <Link href="/growth/operations/clients">Back to client register</Link>
-        }
+        action={<Link href={routes.backHref}>{routes.backLabel}</Link>}
       >
         <div className={styles.actions}>
           {process.env.OPERATIONS_SIGNING_ENABLED === "true" && (
-            <Link href={`/growth/operations/clients/${organisationId}/signing`}>
-              Review electronic signing
-            </Link>
+            <Link href={routes.signingHref}>Review electronic signing</Link>
           )}
-          {process.env.OPERATIONS_ONBOARDING_ENABLED === "true" && (
-            <Link href={`/growth/operations/clients/${organisationId}/journey`}>
-              Prepare and manage welcome journey
-            </Link>
-          )}
+          {!workspace &&
+            process.env.OPERATIONS_ONBOARDING_ENABLED === "true" && (
+              <Link
+                href={`/growth/operations/clients/${organisationId}/journey`}
+              >
+                Prepare and manage welcome journey
+              </Link>
+            )}
         </div>
       </OperationsPageHeader>
+      {workspace?.evidenceMode === "generated" && (
+        <section
+          className={styles.workflow}
+          aria-labelledby="agreement-workflow-heading"
+        >
+          <h2 id="agreement-workflow-heading">Agreement workflow</h2>
+          <ol>
+            <li>Choose the reviewed engagement.</li>
+            <li>Draft the scope, goals, and responsibilities.</li>
+            <li>Set services, fee schedule, tax, and deposit terms.</li>
+            <li>Confirm client assets and service readiness.</li>
+            <li>Generate and review the frozen signing PDF.</li>
+            <li>Open the exact revision for client signing and retention.</li>
+          </ol>
+        </section>
+      )}
       <AgreementSummary register={register} />
       {register.agreements.length === 0 && (
         <p className={ui.emptyState}>No agreements on this page.</p>
@@ -107,7 +158,7 @@ export function AgreementRegister({
                 : "Draft"}
             </span>
           </p>
-          <Terms record={record} />
+          <Terms record={record} evidenceMode={routes.evidenceMode} />
           {record.draft.lines.map((line, index) => {
             const service = record.services.find(
               (s) => s.lineNumber === index + 1,
@@ -135,6 +186,7 @@ export function AgreementRegister({
                       organisationId={organisationId}
                       record={record}
                       lineNumber={index + 1}
+                      endpoint={routes.agreementEndpoint}
                     />
                   </details>
                 ) : (
@@ -165,33 +217,46 @@ export function AgreementRegister({
               {process.env.OPERATIONS_SIGNING_ENABLED === "true" && (
                 <SigningForm
                   organisationId={organisationId}
-                  audience="founder"
+                  audience={workspace ? "staff" : "founder"}
                   agreement={{ id: record.id, version: record.version }}
+                  commandEndpoint={routes.signingEndpoint}
+                  successRedirect={routes.signingHref}
                 />
               )}
+              {workspace &&
+                process.env.OPERATIONS_SIGNING_ENABLED !== "true" && (
+                  <p className={ui.statusChip}>
+                    Electronic signing is unavailable until the signing feature
+                    is configured. This draft can still be edited.
+                  </p>
+                )}
               <details>
                 <summary>Edit draft as a new revision</summary>
                 <AgreementForm
                   organisationId={organisationId}
                   engagementIds={register.engagementIds}
+                  engagementChoices={register.engagementChoices}
                   record={record}
+                  endpoint={routes.agreementEndpoint}
+                  evidenceMode={routes.evidenceMode}
                 />
               </details>
-              <details>
-                <summary>Record signed evidence</summary>
-                <SignatureForm
-                  organisationId={organisationId}
-                  record={record}
-                />
-              </details>
+              {routes.allowManualSigning && (
+                <details>
+                  <summary>Record signed evidence</summary>
+                  <SignatureForm
+                    organisationId={organisationId}
+                    record={record}
+                    endpoint={routes.agreementEndpoint}
+                  />
+                </details>
+              )}
             </>
           )}
         </article>
       ))}
       {register.nextCursor && (
-        <Link
-          href={`/growth/operations/clients/${organisationId}/agreements?after=${register.nextCursor}`}
-        >
+        <Link href={routes.nextPageHref(register.nextCursor)}>
           Next agreement page
         </Link>
       )}
@@ -206,6 +271,9 @@ export function AgreementRegister({
         <AgreementForm
           organisationId={organisationId}
           engagementIds={register.engagementIds}
+          engagementChoices={register.engagementChoices}
+          endpoint={routes.agreementEndpoint}
+          evidenceMode={routes.evidenceMode}
         />
       </details>
     </section>

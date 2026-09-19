@@ -52,7 +52,10 @@ export default async function AdminClientContextPage({
         <p className={styles.description}>
           {client.legalName} · {client.timezone} · {client.lifecycle} record.
         </p>
-        <Link className={styles.actionLink} href={`/admin/clients/${client.id}/requests`}>
+        <Link
+          className={styles.actionLink}
+          href={`/admin/clients/${client.id}/requests`}
+        >
           Open client requests
         </Link>
       </header>
@@ -70,26 +73,62 @@ export default async function AdminClientContextPage({
           <dd className={styles.metricValue}>{client.engagementCount}</dd>
         </div>
       </dl>
-      <section className={styles.workspace} aria-labelledby="client-work-heading">
-        <h2 id="client-work-heading" className={styles.sectionTitle}>Client workspace</h2>
+      <section
+        className={styles.workspace}
+        aria-labelledby="client-work-heading"
+      >
+        <h2 id="client-work-heading" className={styles.sectionTitle}>
+          Client workspace
+        </h2>
         <ul className={styles.rowList}>
           <li className={styles.row}>
             <div className={styles.rowContent}>
               <h3 className={styles.rowTitle}>Delivery requests</h3>
               <p className={styles.rowCopy}>
-                {requests.length} {requests.length === 1 ? "request" : "requests"} in the current delivery queue.
+                {requests.length}{" "}
+                {requests.length === 1 ? "request" : "requests"} in the current
+                delivery queue.
               </p>
             </div>
-            <Link className={styles.actionLink} href={`/admin/clients/${client.id}/requests`}>
+            <Link
+              className={styles.actionLink}
+              href={`/admin/clients/${client.id}/requests`}
+            >
               Open requests
             </Link>
           </li>
+          <li className={styles.row}>
+            <div className={styles.rowContent}>
+              <h3 className={styles.rowTitle}>Agreement &amp; scope</h3>
+              <p className={styles.rowCopy}>
+                Build immutable agreement revisions and prepare the exact
+                document for signing.
+              </p>
+            </div>
+            <Link
+              className={styles.actionLink}
+              href={`/admin/clients/${client.id}/agreements`}
+            >
+              Open agreements
+            </Link>
+          </li>
           {[
-            ["Agreement & scope", "Agreement migration is not available in FSS Studio yet."],
-            ["Welcome journey", "Journey migration is not available in FSS Studio yet."],
-            ["People & access", "Portal access is managed by the founder in Growth Operations."],
-            ["Projects & files", "Project and document migration is not available in FSS Studio yet."],
-            ["Billing", "Billing migration is not available in FSS Studio yet."],
+            [
+              "Welcome journey",
+              "Journey migration is not available in FSS Studio yet.",
+            ],
+            [
+              "People & access",
+              "Portal access is managed by the founder in Growth Operations.",
+            ],
+            [
+              "Projects & files",
+              "Project and document migration is not available in FSS Studio yet.",
+            ],
+            [
+              "Billing",
+              "Billing migration is not available in FSS Studio yet.",
+            ],
           ].map(([title, detail]) => (
             <li className={styles.row} key={title}>
               <div className={styles.rowContent}>

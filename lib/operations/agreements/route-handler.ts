@@ -6,12 +6,12 @@ import {
 } from "../../growth/http/founder-request";
 import type { OperationsFounder } from "../organisations/types";
 import { AgreementConflict, type AgreementRecord } from "./types";
-export type AgreementRouteDependencies = {
+export type AgreementRouteDependencies<TActor = OperationsFounder> = {
   enabled: boolean;
   origin: string;
-  authorizeFounder: () => Promise<OperationsFounder>;
+  authorize: () => Promise<TActor>;
   execute: (
-    founder: OperationsFounder,
+    actor: TActor,
     organisationId: string,
     input: unknown,
     correlationId: string,
@@ -21,9 +21,10 @@ export type AgreementRouteDependencies = {
     correlationId: string;
     errorName: string;
   }) => void;
+  unauthorizedMessage?: string;
 };
-export function createAgreementRouteHandler(
-  deps: AgreementRouteDependencies,
+export function createAgreementRouteHandler<TActor>(
+  deps: AgreementRouteDependencies<TActor>,
 ): (request: Request, organisationId: string) => Promise<Response> {
   return async (request, organisationId) => {
     const correlationId = deps.createCorrelationId();
@@ -37,11 +38,17 @@ export function createAgreementRouteHandler(
       });
     if (!deps.enabled)
       return reply({ message: "Operations is unavailable." }, 404);
-    let founder: OperationsFounder;
+    let actor: TActor;
     try {
-      founder = await deps.authorizeFounder();
+      actor = await deps.authorize();
     } catch {
-      return reply({ message: "Founder authorization is required." }, 403);
+      return reply(
+        {
+          message:
+            deps.unauthorizedMessage ?? "Founder authorization is required.",
+        },
+        403,
+      );
     }
     if (!requestHasRegisteredOrigin(request, deps.origin))
       return reply({ message: "The request origin is not allowed." }, 403);
@@ -49,7 +56,7 @@ export function createAgreementRouteHandler(
       z.uuid().parse(organisationId);
       const body = await readJsonRequestBody(request, 64 * 1024);
       const record = await deps.execute(
-        founder,
+        actor,
         organisationId,
         body,
         correlationId,

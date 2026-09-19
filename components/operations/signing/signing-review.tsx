@@ -18,25 +18,35 @@ export function SigningReview({
   approval,
   audience,
   email,
+  commandEndpoint,
+  downloadBase,
 }: {
   approval: SigningApproval;
-  audience: "founder" | "portal";
+  audience: "founder" | "staff" | "portal";
   email?: string;
+  commandEndpoint?: string;
+  downloadBase?: string;
 }): React.JSX.Element {
   const d = approval.draft;
   const prefix =
-    audience === "founder"
-      ? "/api/growth/operations/clients"
-      : "/api/portal/organisations";
-  const download = `${prefix}/${approval.organisationId}/signing/${approval.id}`;
+    audience === "portal"
+      ? "/api/portal/organisations"
+      : "/api/growth/operations/clients";
+  const download =
+    downloadBase ??
+    `${prefix}/${approval.organisationId}/signing/${approval.id}`;
   const ownSignature = approval.signatures.find(
     (signature) => signature.email === email,
   );
+  const statusLabel =
+    audience === "staff" && approval.status === "prepared"
+      ? "Ready for FSS Studio review"
+      : statusLabels[approval.status];
   return (
     <article className={styles.card} aria-labelledby={`title-${approval.id}`}>
       <p>
         Revision {approval.revision} ·{" "}
-        <span className={ui.statusChip}>{statusLabels[approval.status]}</span>
+        <span className={ui.statusChip}>{statusLabel}</span>
       </p>
       <h2 id={`title-${approval.id}`}>{approval.title}</h2>
       <p>For {approval.organisationLegalName}</p>
@@ -133,11 +143,12 @@ export function SigningReview({
             All signatures are recorded. Preparing your final documents.
           </p>
         )}
-      {audience === "founder" ? (
+      {audience !== "portal" ? (
         <SigningForm
           organisationId={approval.organisationId}
           approval={approval}
           audience={audience}
+          commandEndpoint={commandEndpoint}
         />
       ) : approval.status === "approved" && !ownSignature ? (
         <>
