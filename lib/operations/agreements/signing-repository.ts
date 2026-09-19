@@ -4,6 +4,8 @@ import type { OperationsDb, OperationsTransaction } from "../db/client";
 import { withPortalTransaction } from "../db/portal-client";
 import type { VerifiedPortalIdentity } from "../auth/types";
 import type { OperationsFounder } from "../organisations/types";
+import { withFssAdminTransaction } from "../auth/staff-transaction";
+import type { FssAdminContext } from "../auth/staff-types";
 import { withAgreementTransaction } from "./repository";
 import type {
   SigningApproval,
@@ -41,6 +43,18 @@ export async function listFounderSigning(
   validateLookup(organisationId);
   z.uuid().parse(correlationId);
   return withAgreementTransaction(db, context, (tx) =>
+    loadSigningApprovals(tx, organisationId, null),
+  );
+}
+export async function listStaffSigning(
+  db: OperationsDb,
+  admin: FssAdminContext,
+  organisationId: string,
+  correlationId: string,
+): Promise<SigningApproval[]> {
+  validateLookup(organisationId);
+  z.uuid().parse(correlationId);
+  return withFssAdminTransaction(db, admin, (tx) =>
     loadSigningApprovals(tx, organisationId, null),
   );
 }
@@ -131,6 +145,20 @@ export async function downloadFounderSigningArtifact(
   validateLookup(organisationId, approvalId);
   z.uuid().parse(correlationId);
   return withAgreementTransaction(db, context, (tx) =>
+    artifact(tx, organisationId, approvalId, kind),
+  );
+}
+export async function downloadStaffSigningArtifact(
+  db: OperationsDb,
+  admin: FssAdminContext,
+  organisationId: string,
+  approvalId: string,
+  kind: SigningArtifactKind,
+  correlationId: string,
+): Promise<SigningArtifact | null> {
+  validateLookup(organisationId, approvalId);
+  z.uuid().parse(correlationId);
+  return withFssAdminTransaction(db, admin, (tx) =>
     artifact(tx, organisationId, approvalId, kind),
   );
 }

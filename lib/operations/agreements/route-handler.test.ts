@@ -28,7 +28,7 @@ function setup(overrides: Partial<AgreementRouteDependencies> = {}) {
   const handler = createAgreementRouteHandler({
     enabled: true,
     origin: "https://example.test",
-    authorizeFounder: async () => founder,
+    authorize: async () => founder,
     execute: async (actor, id, body, correlation) => {
       writes++;
       assert.deepEqual(actor, founder);
@@ -58,7 +58,7 @@ test("agreement endpoint authorizes and bounds requests before writes", async ()
     { overrides: { enabled: false }, status: 404 },
     {
       overrides: {
-        authorizeFounder: async () => {
+        authorize: async () => {
           throw new Error("denied");
         },
       },

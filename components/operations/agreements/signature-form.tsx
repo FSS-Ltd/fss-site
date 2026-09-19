@@ -6,11 +6,13 @@ import styles from "./agreements.module.css";
 export function SignatureForm({
   organisationId,
   record,
+  endpoint,
 }: {
   organisationId: string;
   record: AgreementRecord;
+  endpoint?: string;
 }): React.JSX.Element {
-  const state = useAgreementSubmit(organisationId);
+  const state = useAgreementSubmit(organisationId, endpoint);
   return (
     <form
       className={styles.form}

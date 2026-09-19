@@ -12,7 +12,7 @@ export async function POST(
   const handler = createAgreementRouteHandler({
     enabled: operationsEnabled(),
     origin: new URL(resolveSiteUrl()).origin,
-    authorizeFounder: requireFounder,
+    authorize: requireFounder,
     execute: (founder, organisationId, input, correlationId) =>
       executeAgreementCommand(
         getOperationsDb(),

@@ -9,13 +9,19 @@ import styles from "./agreements.module.css";
 export function AgreementForm({
   organisationId,
   engagementIds,
+  engagementChoices,
   record,
+  endpoint,
+  evidenceMode = "manual",
 }: {
   organisationId: string;
   engagementIds: string[];
+  engagementChoices?: Array<{ id: string; name: string }>;
   record?: AgreementRecord;
+  endpoint?: string;
+  evidenceMode?: "manual" | "generated";
 }): React.JSX.Element {
-  const state = useAgreementSubmit(organisationId);
+  const state = useAgreementSubmit(organisationId, endpoint);
   const [formVersion, setFormVersion] = useState(0);
   const draft = record?.draft;
   return (
@@ -57,8 +63,14 @@ export function AgreementForm({
               taxTreatment: value(data, "draft.taxTreatment"),
               billingContact: value(data, "draft.billingContact"),
               signatories: emails(data, "draft.signatories"),
-              documentHash: value(data, "draft.documentHash"),
-              documentReference: value(data, "draft.documentReference"),
+              documentHash:
+                evidenceMode === "manual"
+                  ? value(data, "draft.documentHash")
+                  : "0".repeat(64),
+              documentReference:
+                evidenceMode === "manual"
+                  ? value(data, "draft.documentReference")
+                  : "private:agreement-drafts/unbound.pdf",
               noticeDays: Number(value(data, "draft.noticeDays")),
               minimumTermMonths: Number(value(data, "draft.minimumTermMonths")),
               requiredDepositPence: moneyValue(
@@ -105,9 +117,12 @@ export function AgreementForm({
             <span>Reviewed engagement</span>
             <select name="engagementId" required>
               <option value="">Choose engagement</option>
-              {engagementIds.map((id) => (
-                <option key={id} value={id}>
-                  {id}
+              {(
+                engagementChoices ??
+                engagementIds.map((id) => ({ id, name: id }))
+              ).map((engagement) => (
+                <option key={engagement.id} value={engagement.id}>
+                  {engagement.name}
                 </option>
               ))}
             </select>
@@ -158,21 +173,25 @@ export function AgreementForm({
             defaultValue={draft?.signatories.join(", ")}
             required
           />
-          <Field
-            issues={state.issues}
-            label="Reviewed source document SHA-256"
-            name="draft.documentHash"
-            defaultValue={draft?.documentHash}
-            required
-          />
-          <Field
-            issues={state.issues}
-            label="Private source document reference"
-            name="draft.documentReference"
-            placeholder="private:agreements/source.pdf"
-            defaultValue={draft?.documentReference}
-            required
-          />
+          {evidenceMode === "manual" && (
+            <>
+              <Field
+                issues={state.issues}
+                label="Reviewed source document SHA-256"
+                name="draft.documentHash"
+                defaultValue={draft?.documentHash}
+                required
+              />
+              <Field
+                issues={state.issues}
+                label="Private source document reference"
+                name="draft.documentReference"
+                placeholder="private:agreements/source.pdf"
+                defaultValue={draft?.documentReference}
+                required
+              />
+            </>
+          )}
           <Field
             issues={state.issues}
             label="Agreed tax treatment"
@@ -211,6 +230,12 @@ export function AgreementForm({
             required
           />
         </div>
+        {evidenceMode === "generated" && (
+          <p>
+            FSS Studio generates and retains the source PDF when electronic
+            signing begins. No fingerprint or file path is entered here.
+          </p>
+        )}
         <label>
           <input
             type="checkbox"

@@ -2,6 +2,8 @@ import { z } from "zod";
 import type { OperationsDb, OperationsTransaction } from "../db/client";
 import { requireOperationsFounder } from "../organisations/link-engagement";
 import type { OperationsFounder } from "../organisations/types";
+import { withFssAdminTransaction } from "../auth/staff-transaction";
+import type { FssAdminContext } from "../auth/staff-types";
 import type {
   AgreementDraft,
   AgreementRecord,
@@ -83,21 +85,83 @@ export async function listAgreementRegister(
 ): Promise<AgreementRegister | null> {
   z.uuid().parse(organisationId);
   const cursor = after ? z.uuid().parse(after) : null;
-  return withAgreementTransaction(db, context, async (tx) => {
-    const [organisation] = await tx<
-      { display_name: string }[]
-    >`select display_name from operations.organisations where id=${organisationId}`;
-    if (!organisation) return null;
-    const links = await tx<
-      { engagement_id: string }[]
-    >`select engagement_id from operations.engagement_links where organisation_id=${organisationId} order by engagement_id limit 101`;
-    const rows = await loadAgreements(tx, organisationId, null, cursor);
+  return withAgreementTransaction(db, context, (tx) =>
+    readAgreementRegister(tx, organisationId, cursor),
+  );
+}
+
+async function readAgreementRegister(
+  tx: OperationsTransaction,
+  organisationId: string,
+  cursor: string | null,
+): Promise<AgreementRegister | null> {
+  const [organisation] = await tx<
+    { display_name: string }[]
+  >`select display_name from operations.organisations where id=${organisationId}`;
+  if (!organisation) return null;
+  const links = await tx<
+    { engagement_id: string }[]
+  >`select engagement_id from operations.engagement_links where organisation_id=${organisationId} order by engagement_id limit 101`;
+  const rows = await loadAgreements(tx, organisationId, null, cursor);
+  return {
+    organisationName: organisation.display_name,
+    engagementIds: links.slice(0, 100).map((link) => link.engagement_id),
+    moreEngagements: links.length > 100,
+    agreements: rows.slice(0, 50),
+    nextCursor: rows.length > 50 ? rows[49].id : null,
+  };
+}
+
+export type StaffAgreementOverviewRow = {
+  organisationId: string;
+  organisationName: string;
+  agreementCount: number;
+  draftCount: number;
+  signedCount: number;
+};
+
+export async function listStaffAgreementRegister(
+  db: OperationsDb,
+  admin: FssAdminContext,
+  organisationId: string,
+  after?: string,
+): Promise<AgreementRegister | null> {
+  z.uuid().parse(organisationId);
+  const cursor = after ? z.uuid().parse(after) : null;
+  return withFssAdminTransaction(db, admin, async (tx) => {
+    const register = await readAgreementRegister(tx, organisationId, cursor);
+    if (!register) return null;
+    const choices = await tx<Array<{ id: string; name: string }>>`
+      select id, name from operations.staff_linked_engagements(${organisationId})
+      limit 101
+    `;
     return {
-      organisationName: organisation.display_name,
-      engagementIds: links.slice(0, 100).map((l) => l.engagement_id),
-      moreEngagements: links.length > 100,
-      agreements: rows.slice(0, 50),
-      nextCursor: rows.length > 50 ? rows[49].id : null,
+      ...register,
+      engagementChoices: choices.slice(0, 100),
+      moreEngagements: choices.length > 100,
     };
   });
+}
+
+export async function listStaffAgreementOverview(
+  db: OperationsDb,
+  admin: FssAdminContext,
+): Promise<StaffAgreementOverviewRow[]> {
+  return withFssAdminTransaction(
+    db,
+    admin,
+    (tx) =>
+      tx<StaffAgreementOverviewRow[]>`
+      select o.id as "organisationId", o.display_name as "organisationName",
+        count(a.id)::integer as "agreementCount",
+        count(a.id) filter (where a.status = 'draft')::integer as "draftCount",
+        count(a.id) filter (where a.status = 'signed')::integer as "signedCount"
+      from operations.organisations o
+      left join operations.agreements a on a.organisation_id = o.id
+      where o.lifecycle = 'active'
+      group by o.id, o.display_name
+      order by o.display_name, o.id
+      limit 200
+    `,
+  );
 }

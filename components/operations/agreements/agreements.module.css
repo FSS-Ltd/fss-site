@@ -2,6 +2,43 @@
   composes: page from "../shared/operations-ui.module.css";
 }
 
+.workflow {
+  display: grid;
+  gap: 12px;
+  padding: clamp(20px, 3vw, 28px);
+  border: 1px solid #dce3e8;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #ffffff, #f7fafb);
+  box-shadow: 0 16px 38px -34px rgba(7, 24, 46, 0.62);
+}
+
+.workflow h2,
+.workflow ol {
+  margin: 0;
+}
+
+.workflow h2 {
+  color: #07182e;
+  font-size: 1.125rem;
+  letter-spacing: -0.02em;
+}
+
+.workflow ol {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px 24px;
+  padding-inline-start: 1.25rem;
+  color: #526078;
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+@media (max-width: 700px) {
+  .workflow ol {
+    grid-template-columns: 1fr;
+  }
+}
+
 .form {
   display: grid;
   gap: 24px;
