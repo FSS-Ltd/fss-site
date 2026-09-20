@@ -13,7 +13,8 @@ type InvitationSignUp = Pick<
 };
 
 export function clerkErrorMessage(error: unknown, fallback: string): string {
-  if (error instanceof Error) return error.message;
+  if (error instanceof Error)
+    return error.message.includes("@") ? fallback : error.message;
   if (!error || typeof error !== "object") return fallback;
   const errors: unknown = "errors" in error ? error.errors : undefined;
   if (Array.isArray(errors)) {
@@ -24,7 +25,7 @@ export function clerkErrorMessage(error: unknown, fallback: string): string {
       "message" in first &&
       typeof first.message === "string"
     )
-      return first.message;
+      return first.message.includes("@") ? fallback : first.message;
   }
   return fallback;
 }
