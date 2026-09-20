@@ -7,6 +7,16 @@
 @source not "../**/*.test.{ts,tsx}";
 
 :root {
+  --portal-canvas: #f2f3f5;
+  --portal-surface: #ffffff;
+  --portal-soft-surface: #f7f8f9;
+  --portal-ink: #0a1a2e;
+  --portal-muted: #46566c;
+  --portal-action: #0f7078;
+  --portal-tint: #e3f2f1;
+  --portal-navy: #07182e;
+  --portal-border: #d9dfe5;
+  --portal-control-boundary: #788696;
   --background: #f2f3f5;
   --foreground: #0a1a2e;
   --brand-primary: #14989e;
@@ -43,7 +53,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family:
-    "Geist",
+    var(--font-geist),
     "Manrope",
     system-ui,
     -apple-system,
