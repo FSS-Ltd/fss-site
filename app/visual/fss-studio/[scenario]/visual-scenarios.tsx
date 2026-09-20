@@ -9,14 +9,28 @@ import { StudioShell } from "@/components/portal/shell/studio-shell";
 import { PortalButton, PortalField } from "@/components/portal/ui";
 import type { ClientOverview as ClientOverviewData } from "@/lib/operations/overview/client-overview";
 import type { StudioOverview as StudioOverviewData } from "@/lib/operations/overview/studio-overview";
+import {
+  ClientBugReportScenario,
+  ClientRequestBoardScenario,
+  ClientRequestFormScenario,
+  ClientRequestReviewScenario,
+  StudioDeliveryBoardScenario,
+  StudioReviewPackageScenario,
+} from "./request-visual-fixtures";
 
 export type VisualScenarioName =
   | "client-login"
   | "client-overview"
   | "client-workspace-switcher"
   | "client-shell"
+  | "client-request-board"
+  | "client-bug-report"
+  | "client-request-form"
+  | "client-request-review"
   | "studio-overview"
-  | "studio-shell";
+  | "studio-shell"
+  | "studio-delivery-board"
+  | "studio-review-package";
 
 export type VisualScenario = Readonly<{
   name: VisualScenarioName;
@@ -137,7 +151,12 @@ function ClientLoginScenario(): React.JSX.Element {
     <PortalLoginPresentation invitationMessage="Your workspace invitation is ready">
       <form>
         <PortalField label="Work email" required>
-          <input autoComplete="email" id="visual-email" name="email" type="email" />
+          <input
+            autoComplete="email"
+            id="visual-email"
+            name="email"
+            type="email"
+          />
         </PortalField>
         <PortalButton type="submit">Continue</PortalButton>
       </form>
@@ -203,11 +222,35 @@ const scenarios: Record<VisualScenarioName, VisualScenario> = {
     content: <ClientWorkspaceSwitcherScenario />,
   },
   "client-shell": { name: "client-shell", content: <ClientShellScenario /> },
+  "client-request-board": {
+    name: "client-request-board",
+    content: <ClientRequestBoardScenario />,
+  },
+  "client-bug-report": {
+    name: "client-bug-report",
+    content: <ClientBugReportScenario />,
+  },
+  "client-request-form": {
+    name: "client-request-form",
+    content: <ClientRequestFormScenario />,
+  },
+  "client-request-review": {
+    name: "client-request-review",
+    content: <ClientRequestReviewScenario />,
+  },
   "studio-overview": {
     name: "studio-overview",
     content: <StudioOverviewScenario />,
   },
   "studio-shell": { name: "studio-shell", content: <StudioShellScenario /> },
+  "studio-delivery-board": {
+    name: "studio-delivery-board",
+    content: <StudioDeliveryBoardScenario />,
+  },
+  "studio-review-package": {
+    name: "studio-review-package",
+    content: <StudioReviewPackageScenario />,
+  },
 };
 
 export function resolveVisualScenario(
@@ -216,7 +259,5 @@ export function resolveVisualScenario(
   nodeEnvironment: string | undefined,
 ): VisualScenario | null {
   if (!enabled || nodeEnvironment === "production") return null;
-  return name in scenarios
-    ? scenarios[name as VisualScenarioName]
-    : null;
+  return name in scenarios ? scenarios[name as VisualScenarioName] : null;
 }
