@@ -123,7 +123,15 @@ grant execute on function operations.claim_pending_portal_invitation(uuid) to op
 
 create or replace function operations.pending_portal_onboarding() returns boolean
 language sql stable security definer set search_path = '' as $$
-  select exists(select 1 from operations.pending_portal_invitations where email=lower(trim(nullif(current_setting('operations.verified_email',true),''))) and claimed_user_id=nullif(current_setting('operations.user_id',true),'')::uuid and target_organisation_id is null and state='accepted');
+  select exists(
+    select 1 from operations.pending_portal_invitations
+    where email=lower(trim(nullif(current_setting('operations.verified_email',true),'')))
+      and target_organisation_id is null
+      and (
+        (state='accepted' and claimed_user_id=nullif(current_setting('operations.user_id',true),'')::uuid)
+        or (state='pending' and expires_at > clock_timestamp())
+      )
+  );
 $$;
 
 create or replace function operations.complete_portal_onboarding(
@@ -147,8 +155,11 @@ begin
   if target_timezone is null or length(trim(target_timezone)) not between 1 and 100 then return null; end if;
 
   select * into invitation from operations.pending_portal_invitations
-    where email=verified_email and claimed_user_id=verified_user and target_organisation_id is null
-      and state in ('accepted','completed')
+    where email=verified_email and target_organisation_id is null
+      and (
+        (state in ('accepted','completed') and claimed_user_id=verified_user)
+        or (state='pending' and expires_at > clock_timestamp())
+      )
     order by coalesce(completed_at, accepted_at, created_at) desc, id desc limit 1 for update;
   if not found then return null; end if;
   if invitation.state='completed' then return invitation.organisation_id; end if;
@@ -163,7 +174,7 @@ begin
   insert into operations.memberships(organisation_id,contact_id,user_id,role)
     values(created_organisation_id,contact_id,verified_user,'owner');
   update operations.pending_portal_invitations set
-    state='completed', organisation_id=created_organisation_id, completed_at=clock_timestamp()
+    state='completed', claimed_user_id=verified_user, organisation_id=created_organisation_id, completed_at=clock_timestamp()
     where id=invitation.id;
   insert into operations.portal_invitation_audit(invitation_id,actor_id,action,correlation_id)
     values(invitation.id,portal_actor,'completed',correlation);
