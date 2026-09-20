@@ -85,10 +85,14 @@ export async function listFounderAccessOverview(
   const state = filters.state ?? null;
   const result = await db.begin(async (tx) => {
     await tx`select set_config('operations.actor_id', ${founder.actorId}, true)`;
-    const [counts, metricRows, roleMetrics, rows] = await Promise.all([
+    const [counts, organisations, metricRows, roleMetrics, rows] = await Promise.all([
       tx<
         { count: number }[]
       >`select count(*)::integer as count from operations.organisations where lifecycle = 'active'`,
+      tx<{ id: string; displayName: string }[]>`
+        select id, display_name as "displayName" from operations.organisations
+        where lifecycle = 'active' order by display_name, id limit 100
+      `,
       tx<AccessMetricRow[]>`
         with active_access as (
           select m.user_id, 'client'::text as access_type, m.role::text as role,
@@ -227,6 +231,7 @@ export async function listFounderAccessOverview(
         filters,
         page,
         hasNext: rows.length > workspacePageSize,
+        organisations: [...organisations],
       },
     };
   });

@@ -18,17 +18,21 @@ const { PortalInvitationFields } =
 
 test("renders the portal invitation as a modal task with the required details", () => {
   const markup = renderToStaticMarkup(
-    <PortalInvitationDialog onInvitationSent={() => undefined} />,
+    <PortalInvitationDialog
+      onInvitationSent={() => undefined}
+      organisations={[{ id: "org-1", displayName: "Acme Ltd" }]}
+    />,
   );
 
   assert.match(markup, /Invite portal user/);
   assert.match(markup, /<dialog/);
-  assert.match(markup, /Client/);
+  assert.match(markup, /New client owner/);
+  assert.match(markup, /Existing client user/);
   assert.match(markup, /FSS Admin/);
   assert.doesNotMatch(markup, /name="organisationId"/);
   assert.match(markup, /name="email"/);
   assert.match(markup, /name="name"/);
-  assert.match(markup, /name="role"/);
+  assert.doesNotMatch(markup, /name="role"/);
   assert.match(markup, /Access approval note/);
   assert.match(markup, />Cancel</);
 });
@@ -37,6 +41,7 @@ test("allows the portal access header to supply its primary action style", () =>
   const markup = renderToStaticMarkup(
     <PortalInvitationDialog
       onInvitationSent={() => undefined}
+      organisations={[]}
       triggerClassName="primaryAction"
     />,
   );
@@ -47,14 +52,14 @@ test("allows the portal access header to supply its primary action style", () =>
 
 test("Admin form displays a fixed role without client role or organisation controls", () => {
   const markup = renderToStaticMarkup(
-    <PortalInvitationFields type="admin" pending={false} />,
+    <PortalInvitationFields type="admin" organisations={[]} pending={false} />,
   );
   assert.match(markup, /readOnly=""[^>]*value="Admin"/);
   assert.doesNotMatch(markup, /name="role"|name="organisationId"/);
   assert.match(markup, /name="name"/);
   assert.match(markup, /name="email"/);
   const pending = renderToStaticMarkup(
-    <PortalInvitationFields type="client" pending />,
+    <PortalInvitationFields type="existing_client" organisations={[]} pending />,
   );
   assert.match(pending, /name="role" disabled=""/);
 });

@@ -23,6 +23,10 @@ export const pendingPortalInvitationSchema = z.strictObject({
   reviewReference: boundedText,
 });
 
+export const existingPortalInvitationSchema = pendingPortalInvitationSchema.extend({
+  organisationId: z.uuid(),
+});
+
 export const organisationOnboardingSchema = z.strictObject({
   legalName: boundedText,
   displayName: boundedText,
@@ -44,7 +48,9 @@ export async function issuePendingPortalInvitation(
   correlationId: string,
 ): Promise<{ invitationId: string; expiresAt: Date }> {
   const founder = requireOperationsFounder(context);
-  const invitation = pendingPortalInvitationSchema.parse(input);
+  const invitation = z
+    .union([pendingPortalInvitationSchema, existingPortalInvitationSchema])
+    .parse(input);
   const ids = z
     .strictObject({ invitationId: z.uuid(), correlationId: z.uuid() })
     .parse({ invitationId, correlationId });
@@ -54,7 +60,8 @@ export async function issuePendingPortalInvitation(
       select id, expires_at as "expiresAt"
       from operations.issue_pending_portal_invitation(
         ${ids.invitationId}, ${invitation.name}, ${invitation.email},
-        ${invitation.role}, ${invitation.reviewReference}, ${ids.correlationId}
+        ${invitation.role}, ${invitation.reviewReference}, ${ids.correlationId},
+        ${"organisationId" in invitation ? invitation.organisationId : null}
       )
     `;
     if (!row) throw new Error("Portal invitation could not be recorded.");

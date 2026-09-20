@@ -20,6 +20,7 @@ import {
 } from "./repository";
 import {
   failPendingPortalInvitation,
+  existingPortalInvitationSchema,
   issuePendingPortalInvitation,
   pendingPortalInvitationSchema,
 } from "./pending-invitations";
@@ -31,7 +32,7 @@ import {
   staffInvitationSchema,
   revokeStaffMembershipSchema,
 } from "./staff-invitations";
-import { portalUrl } from "./portal-url";
+import { createInvitationActivationUrl, portalUrl } from "./portal-url";
 import { requireOperationsFounder } from "../organisations/link-engagement";
 
 export const grantAccessSchema = contactSchema.extend({
@@ -41,6 +42,9 @@ export const grantAccessSchema = contactSchema.extend({
 
 export const inviteClientSchema = pendingPortalInvitationSchema.extend({
   action: z.literal("invite_client"),
+});
+export const inviteExistingClientSchema = existingPortalInvitationSchema.extend({
+  action: z.literal("invite_existing_client"),
 });
 export const inviteAdminSchema = staffInvitationSchema.extend({
   action: z.literal("invite_admin"),
@@ -54,6 +58,7 @@ export const portalOperationSchema = z.discriminatedUnion("action", [
   contactSchema.extend({ action: z.literal("create_contact") }),
   grantAccessSchema,
   inviteClientSchema,
+  inviteExistingClientSchema,
   inviteAdminSchema,
   revokeStaffMembershipSchema.extend({ action: z.literal("revoke_admin") }),
   inviteFounderSchema,
@@ -66,6 +71,7 @@ export type PortalAccessOperation = Extract<
   {
     action:
       | "invite_client"
+      | "invite_existing_client"
       | "invite_admin"
       | "revoke_membership"
       | "revoke_admin";
@@ -75,6 +81,7 @@ export type PortalOperationResult =
   | { action: "create_contact"; contactId: string }
   | { action: "grant_access" }
   | { action: "invite_client" }
+  | { action: "invite_existing_client" }
   | { action: "invite_admin" }
   | { action: "revoke_admin" }
   | { action: "invite_founder" }
@@ -171,7 +178,7 @@ export async function applyPortalOperation(
       {
         name: invitation.name,
         email: invitation.email,
-        role: invitation.role,
+        role: "owner",
         reviewReference: invitation.reviewReference,
       },
       invitationId,
@@ -190,6 +197,36 @@ export async function applyPortalOperation(
           invitationId,
           email: invitation.email,
         }),
+      );
+    } catch (error) {
+      await dependencies.failPending(db, founder, invitationId, correlationId);
+      throw error;
+    }
+    return { action };
+  }
+  if (action === "invite_existing_client") {
+    const invitation = inviteExistingClientSchema.parse(operation);
+    const invitationId = dependencies.createId();
+    const correlationId = dependencies.createId();
+    await dependencies.issuePending(
+      db,
+      founder,
+      {
+        name: invitation.name,
+        email: invitation.email,
+        role: invitation.role,
+        reviewReference: invitation.reviewReference,
+        organisationId: invitation.organisationId,
+      },
+      invitationId,
+      correlationId,
+    );
+    try {
+      await provision(
+        invitation.email,
+        createInvitationActivationUrl(origin, invitation.name, invitation.email)
+          .href,
+        createPortalInvitationMetadata({ invitationId, email: invitation.email }),
       );
     } catch (error) {
       await dependencies.failPending(db, founder, invitationId, correlationId);
@@ -233,15 +270,4 @@ export async function applyPortalOperation(
     activationUrl: url.href,
     expiresAt: issued.expiresAt.toISOString(),
   };
-}
-
-function createInvitationActivationUrl(
-  origin: string,
-  name: string,
-  email: string,
-): URL {
-  const url = portalUrl("/activate", origin);
-  url.searchParams.set("name", name);
-  url.searchParams.set("email", email);
-  return url;
 }

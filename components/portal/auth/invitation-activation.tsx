@@ -100,11 +100,11 @@ export function PortalInvitationActivation(): React.JSX.Element {
           getClerkErrorMessage(finalResult.error) ??
             "Your account could not be activated.",
         );
-      router.replace(await claimPortalAccess());
+      router.replace(await claimPortalAccess(name));
     } catch (error) {
       if (isExistingSessionError(error)) {
         try {
-          const destination = await claimPortalAccess();
+          const destination = await claimPortalAccess(name ?? "");
           setStatus({ kind: "pending" });
           router.replace(destination);
           return;

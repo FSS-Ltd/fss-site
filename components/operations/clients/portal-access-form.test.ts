@@ -46,10 +46,10 @@ test("switching to Admin removes client role and organisation from invitation pa
     email: "staff@example.test",
     reviewReference: "Approved",
   });
-  assert.equal(createInvitationPayload(form, "client").action, "invite_client");
+  assert.equal(createInvitationPayload(form, "new_client").action, "invite_client");
   form.set("role", "admin");
   assert.throws(
-    () => createInvitationPayload(form, "client"),
+    () => createInvitationPayload(form, "existing_client"),
     /supported client role/,
   );
 });

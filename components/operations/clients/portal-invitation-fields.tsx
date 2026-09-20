@@ -4,9 +4,11 @@ import styles from "./portal-access-dashboard.module.css";
 
 export function PortalInvitationFields({
   type,
+  organisations,
   pending,
 }: {
   type: InvitationType;
+  organisations: readonly { id: string; displayName: string }[];
   pending: boolean;
 }): React.JSX.Element {
   return (
@@ -32,17 +34,37 @@ export function PortalInvitationFields({
           disabled={pending}
         />
       </label>
-      {type === "client" ? (
-        <label>
-          Portal role
-          <select defaultValue="owner" name="role" disabled={pending}>
-            {portalRoleOptions.map((role) => (
-              <option key={role.value} value={role.value}>
-                {role.label}
+      {type === "new_client" ? (
+        <p>
+          The first user for a new client is always the organisation owner and
+          will complete onboarding after accepting the invitation.
+        </p>
+      ) : type === "existing_client" ? (
+        <>
+          <label>
+            Client organisation
+            <select defaultValue="" name="organisationId" required disabled={pending}>
+              <option disabled value="">
+                Select a client
               </option>
-            ))}
-          </select>
-        </label>
+              {organisations.map((organisation) => (
+                <option key={organisation.id} value={organisation.id}>
+                  {organisation.displayName}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Portal role
+            <select defaultValue="contributor" name="role" disabled={pending}>
+              {portalRoleOptions.map((role) => (
+                <option key={role.value} value={role.value}>
+                  {role.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </>
       ) : (
         <label>
           FSS role

@@ -26,6 +26,7 @@ const oneOrganisationRegister = {
   filters: { query: "" },
   page: 1,
   hasNext: false,
+  organisations: [],
 } satisfies FounderAccessOverview;
 
 const router = {
@@ -53,7 +54,7 @@ test("portal access makes invitation primary and explains the activation sequenc
   assert.match(html, /Unique active users/);
   assert.match(html, /Active FSS Admins/);
   assert.match(html, /Pending invitations/);
-  assert.match(html, /Portal role/);
+  assert.match(html, /New client owner/);
   assert.match(html, /No access records match this view/);
 });
 
@@ -67,6 +68,7 @@ test("portal access keeps the invitation action visible before an organisation e
           filters: { query: "" },
           page: 1,
           hasNext: false,
+          organisations: [],
         }}
       />
     </AppRouterContext.Provider>,

@@ -91,6 +91,20 @@ export function isStaffInvitationForEmail(
   return invitation.success && invitation.data.email === email.toLowerCase();
 }
 
+export function isPortalInvitationForEmail(
+  metadata: unknown,
+  email: string,
+): boolean {
+  const invitation = portalInvitationMetadataSchema.safeParse(
+    metadata &&
+      typeof metadata === "object" &&
+      "fssPortalInvitation" in metadata
+      ? metadata.fssPortalInvitation
+      : null,
+  );
+  return invitation.success && invitation.data.email === email.toLowerCase();
+}
+
 export function createPortalInvitationMetadata(
   input: LegacyPortalInvitationInput | PendingPortalInvitationInput,
 ): PortalInvitationMetadata {
