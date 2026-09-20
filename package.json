@@ -34,6 +34,7 @@
     "perf:lighthouse:mobile": "lhci autorun --config=.lighthouserc.mobile.json",
     "verify:growth-release": "tsx scripts/verify-growth-release.ts",
     "verify:migrations": "tsx scripts/verify-migrations.ts",
+    "verify:fss-studio-coverage": "tsx scripts/verify-fss-studio-screen-coverage.ts",
     "typecheck": "tsc --noEmit",
     "test:public-site": "node --import tsx --test tests/integration/public-site-crawl.test.ts",
     "generate:readiness-kit": "tsx scripts/generate-readiness-kit.ts",

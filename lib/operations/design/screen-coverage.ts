@@ -4,7 +4,7 @@ export type ScreenManifestEntry = Readonly<{
   nav: string;
   title: string;
   route?: string;
-  primary: string;
+  primary: string | null;
 }>;
 
 export type ScreenCoverageStatus =

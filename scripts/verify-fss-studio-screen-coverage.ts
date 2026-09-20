@@ -59,7 +59,7 @@ function toScreenManifestEntry(value: unknown): ScreenManifestEntry {
     role: requiredString(value.role),
     nav: requiredString(value.nav),
     title: requiredString(value.title),
-    primary: requiredString(value.primary),
+    primary: nullableString(value.primary),
     ...(route === undefined ? {} : { route }),
   };
 }
@@ -75,6 +75,14 @@ function requiredString(value: unknown): string {
 function optionalString(value: unknown): string | undefined {
   if (value === undefined) {
     return undefined;
+  }
+
+  return requiredString(value);
+}
+
+function nullableString(value: unknown): string | null {
+  if (value === null) {
+    return null;
   }
 
   return requiredString(value);

@@ -40,3 +40,38 @@ test("rejects a repository package that does not contain all 88 screens", async 
     await rm(workspace, { recursive: true, force: true });
   }
 });
+
+test("accepts a null primary action for a loading screen contract", async () => {
+  const workspace = await mkdtemp(join(tmpdir(), "fss-screen-coverage-"));
+  const designDirectory = join(workspace, "docs/design/fss-studio-experience");
+
+  try {
+    await mkdir(designDirectory, { recursive: true });
+    await writeFile(
+      join(designDirectory, "screen-manifest.json"),
+      JSON.stringify([
+        {
+          id: "S09",
+          role: "Client",
+          nav: "Requests",
+          title: "Loading requests",
+          primary: null,
+          route: "/portal/requests?state=loading",
+        },
+      ]),
+    );
+    await writeFile(
+      join(designDirectory, "screen-coverage.csv"),
+      [
+        SCREEN_COVERAGE_CSV_HEADER,
+        "S09,shared,request-loading,docs/design/fss-studio-experience/wireframes/S09.svg,/portal/requests?state=loading,client request list loads,ClientRequestList,listPortalRequests,no command,requirePortalMember:request.view,S09 desktop visual,S09 mobile visual,components/portal/requests/list.test.tsx,2,planned",
+      ].join("\n"),
+    );
+
+    assert.deepEqual(await verifyFssStudioScreenCoverage(workspace), [
+      "FSS Studio screen manifest must contain 88 screens.",
+    ]);
+  } finally {
+    await rm(workspace, { recursive: true, force: true });
+  }
+});
