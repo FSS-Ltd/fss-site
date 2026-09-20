@@ -6,6 +6,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import { getPortalRolePresentation } from "@/lib/operations/auth/permissions";
 import type { PortalMembershipSummary } from "@/lib/operations/auth/require-member";
+import { PortalSignOutButton } from "../auth/portal-sign-out";
 import {
   clientMobileNavigationIds,
   getClientNavigation,
@@ -122,8 +123,6 @@ export function ClientShell({
       (membership) => membership.organisationId === requestedOrganisationId,
     ) ?? (memberships.length === 1 ? memberships[0] : undefined);
   const navigation = getClientNavigation(activeMembership?.role ?? null, pathname);
-  const returnTo = encodeURIComponent(portalPath("/portal/login"));
-
   return (
     <div className={styles.shell}>
       <a className={styles.skip} href="#portal-content">
@@ -190,11 +189,9 @@ export function ClientShell({
           <p className={styles.context}>
             {activeMembership?.displayName ?? "Your FSS workspace"}
           </p>
-          <form action={`/api/auth/sign-out?returnTo=${returnTo}`} method="post">
-            <button className={styles.signOut} type="submit">
-              Sign out
-            </button>
-          </form>
+          <PortalSignOutButton className={styles.signOut}>
+            Sign out
+          </PortalSignOutButton>
         </header>
         <main className={styles.main} id="portal-content">
           {children}
