@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { randomUUID } from "node:crypto";
 import { notFound } from "next/navigation";
 import { z } from "zod";
@@ -10,7 +9,9 @@ import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { getPortalRequest } from "@/lib/operations/requests/repository";
 import { RequestDetail } from "@/components/portal/requests/request-detail";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
+import { PageHeader } from "@/components/portal/ui";
 import { portalPath } from "@/lib/operations/auth/portal-url";
+import styles from "@/components/portal/requests/requests.module.css";
 
 export default async function RequestPage({
   params,
@@ -19,9 +20,8 @@ export default async function RequestPage({
   params: Promise<{ requestId: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }): Promise<React.JSX.Element> {
-  const context = await getPortalPageContext(
-    (await searchParams).organisationId,
-  );
+  const query = await searchParams;
+  const context = await getPortalPageContext(query.organisationId);
   if (!context) return <PortalUnavailable />;
   const parsed = z.uuid().safeParse((await params).requestId);
   if (!parsed.success) notFound();
@@ -48,16 +48,24 @@ export default async function RequestPage({
   }
   if (!request) notFound();
   return (
-    <div>
-      <Link
-        href={`${portalPath("/portal/requests")}?organisationId=${context.organisationId}`}
-      >
-        All requests
-      </Link>
+    <div className={styles.requestPage}>
+      <PageHeader
+        breadcrumbs={[
+          {
+            label: "Requests",
+            href: `${portalPath("/portal/requests")}?organisationId=${context.organisationId}`,
+          },
+          { label: request.title },
+        ]}
+        description="Follow the next step, share public feedback, and review an exact deliverable version when one is ready."
+        eyebrow="FSS Studio / Requests"
+        title={request.title}
+      />
       <RequestDetail
-        request={request}
-        organisationId={context.organisationId}
         canComment={hasPortalCapability(membership.role, "requests.comment")}
+        hideTitle
+        organisationId={context.organisationId}
+        request={request}
       />
     </div>
   );

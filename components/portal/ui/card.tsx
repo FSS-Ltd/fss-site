@@ -4,6 +4,7 @@ export type PortalCardProps = Readonly<{
   children: React.ReactNode;
   className?: string;
   description?: string;
+  headingId?: string;
   title?: string;
   tone?: "default" | "accent" | "dark";
 }>;
@@ -18,6 +19,7 @@ export function PortalCard({
   children,
   className,
   description,
+  headingId,
   title,
   tone = "default",
 }: PortalCardProps): React.JSX.Element {
@@ -26,9 +28,15 @@ export function PortalCard({
     .join(" ");
 
   return (
-    <section className={classNames}>
-      {title ? <h2 className={styles.cardTitle}>{title}</h2> : null}
-      {description ? <p className={styles.cardDescription}>{description}</p> : null}
+    <section aria-labelledby={headingId} className={classNames}>
+      {title ? (
+        <h2 className={styles.cardTitle} id={headingId}>
+          {title}
+        </h2>
+      ) : null}
+      {description ? (
+        <p className={styles.cardDescription}>{description}</p>
+      ) : null}
       <div className={styles.cardContent}>{children}</div>
     </section>
   );

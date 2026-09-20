@@ -4,6 +4,10 @@
   min-width: 0;
   overflow-wrap: anywhere;
 }
+.detail {
+  display: grid;
+  gap: 20px;
+}
 .workspace {
   container-type: inline-size;
 }
@@ -34,6 +38,9 @@
 .section {
   margin-top: 40px;
 }
+.detail > .section {
+  margin-top: 4px;
+}
 .sectionTitle {
   font-size: 1.125rem;
   font-weight: 600;
@@ -61,6 +68,11 @@
   line-height: 1.7;
   margin: 12px 0;
   white-space: pre-line;
+}
+.noticeCopy {
+  margin: 4px 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.65;
 }
 .prose {
   font-size: 0.9375rem;
@@ -212,6 +224,11 @@ textarea.input {
   flex-wrap: wrap;
   gap: 8px;
 }
+.actionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
 .primary,
 .secondary {
   display: inline-flex;
@@ -318,14 +335,21 @@ textarea.input {
   white-space: pre-wrap;
 }
 .review {
-  padding: 26px;
-  margin-top: 36px;
-  background: var(--surface-1);
-  border: 1px solid var(--portal-line);
-  border-radius: 20px;
+  display: grid;
+  gap: 16px;
+  margin-top: 4px;
 }
-.review .eyebrow {
-  margin-bottom: 8px;
+.reviewVersion {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+.followUpLink {
+  color: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .checkbox {
   display: flex;

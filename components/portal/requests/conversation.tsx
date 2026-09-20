@@ -1,6 +1,11 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import {
+  PortalButton,
+  PortalCard,
+  PortalTextarea,
+} from "@/components/portal/ui";
 import type { ClientRequestDetail } from "@/lib/operations/requests/types";
 import type { RequestAction } from "./actions";
 import { useRequestAction } from "./use-request-action";
@@ -39,13 +44,7 @@ export function RequestConversation({
       setBody("");
   }
   return (
-    <section
-      className={styles.section}
-      aria-labelledby="request-conversation-heading"
-    >
-      <h2 id="request-conversation-heading" className={styles.sectionTitle}>
-        Conversation
-      </h2>
+    <PortalCard className={styles.section} title="Latest conversation">
       {request.comments.length === 200 && (
         <p className={styles.note}>Showing the latest 200 comments.</p>
       )}
@@ -71,45 +70,34 @@ export function RequestConversation({
       )}
       {canComment && (
         <form className={styles.form} onSubmit={submit} aria-busy={pending}>
-          <label className={styles.field}>
-            Add a comment
-            <textarea
-              className={styles.input}
-              value={body}
-              onChange={(event) => setBody(event.target.value)}
-              maxLength={10000}
-              required
-              rows={4}
-              disabled={pending}
-              aria-describedby="request-comment-note"
-            />
-          </label>
-          <p id="request-comment-note" className={styles.note}>
-            Shared with your organisation and FSS. Do not include passwords or
-            other credentials. Ask FSS for the agreed secure method to share
-            files.
-          </p>
-          <button
-            type="submit"
-            className={styles.secondary}
+          <PortalTextarea
+            disabled={pending}
+            hint="Shared with your organisation and FSS. Do not include passwords or other credentials. Ask FSS for the agreed secure method to share files."
+            label="Add a comment"
+            maxLength={10000}
+            onChange={(event) => setBody(event.target.value)}
+            required
+            rows={4}
+            value={body}
+          />
+          <PortalButton
             disabled={pending || !body.trim()}
+            loading={pending}
+            type="submit"
+            variant="secondary"
           >
             {pending ? "Adding comment…" : "Add comment"}
-          </button>
+          </PortalButton>
           <p className={styles.feedback} role="status" aria-atomic="true">
             {message}
           </p>
           {result && !result.ok && result.conflict && (
-            <button
-              type="button"
-              onClick={onRefresh}
-              className={styles.secondary}
-            >
+            <PortalButton onClick={onRefresh} type="button" variant="secondary">
               Refresh request details
-            </button>
+            </PortalButton>
           )}
         </form>
       )}
-    </section>
+    </PortalCard>
   );
 }

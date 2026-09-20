@@ -14,7 +14,8 @@ require.extensions[".css"] = (module) => {
   };
 };
 const { RequestList } = require("./list") as typeof import("./list");
-const { RequestBoard, RequestBoardSkeleton } = require("./board") as typeof import("./board");
+const { RequestBoard, RequestBoardSkeleton } =
+  require("./board") as typeof import("./board");
 const { FounderActionFields } =
   require("./founder-action-fields") as typeof import("./founder-action-fields");
 const { RequestDetail } =
@@ -84,8 +85,41 @@ test("request content is escaped and the reviewer must explicitly confirm the cu
   assert.match(html, /&lt;script&gt;/);
   assert.match(html, /I have reviewed v1 and accept this deliverable/);
   assert.match(html, /type="checkbox"[^>]*required/);
-  assert.match(html, /disabled="">Accept deliverable/);
+  assert.match(html, /disabled="">Accept v1/);
   assert.match(html, /role="status"/);
+  assert.match(html, /Does this meet the agreed outcome\?/);
+  assert.match(html, /Accept v1/);
+  assert.match(html, /Request changes/);
+});
+
+test("a completed request distinguishes client acceptance from an FSS closure", () => {
+  const html = renderToStaticMarkup(
+    <AppRouterContext.Provider value={router}>
+      <RequestDetail
+        request={{
+          ...request,
+          status: "done",
+          reviews: [
+            {
+              createdAt: request.createdAt,
+              decision: "accepted",
+              deliverableVersion: "v1",
+              documentIds: [],
+              documents: [],
+              feedback: "",
+              id: "accepted-review",
+              reviewCycle: 1,
+            },
+          ],
+        }}
+        organisationId="org"
+        canComment={false}
+      />
+    </AppRouterContext.Provider>,
+  );
+
+  assert.match(html, /Version v1 accepted/);
+  assert.match(html, /Start a follow-up request/);
 });
 
 test("a contributor can comment but cannot submit an acceptance decision", () => {
@@ -99,7 +133,7 @@ test("a contributor can comment but cannot submit an acceptance decision", () =>
     </AppRouterContext.Provider>,
   );
   assert.match(html, /Add a comment/);
-  assert.doesNotMatch(html, /Accept deliverable|Send change request/);
+  assert.doesNotMatch(html, /Accept v1|Send feedback/);
 });
 
 test("approved allowance keeps contractual units and decision history visible", () => {
@@ -131,7 +165,7 @@ test("approved allowance keeps contractual units and decision history visible", 
   assert.match(html, /6 hours/);
   assert.match(html, /Approved form improvements/);
   assert.match(html, /Change order 04/);
-  assert.doesNotMatch(html, /Accept deliverable|Add a comment/);
+  assert.doesNotMatch(html, /Accept v1|Add a comment/);
 });
 
 test("list navigation carries organisation context and status is readable without colour", () => {
@@ -181,7 +215,7 @@ test("founder state changes use a keyboard-accessible select and never offer cli
   assert.match(html, /Update scope decision/);
   assert.match(html, /Close administratively/);
   assert.match(html, /Set operational priority/);
-  assert.doesNotMatch(html, /Accept deliverable|value="accept"/);
+  assert.doesNotMatch(html, /Accept v1|value="accept"/);
 });
 
 test("founder priority uses a labelled native choice with the current value", () => {

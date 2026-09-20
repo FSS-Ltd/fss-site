@@ -1,3 +1,4 @@
+import { PortalCard } from "@/components/portal/ui";
 import type { ClientRequestDetail } from "@/lib/operations/requests/types";
 import { requestDate } from "./presentation";
 import styles from "./requests.module.css";
@@ -7,13 +8,11 @@ export function RequestAllowance({
 }: Pick<ClientRequestDetail, "allowance">): React.JSX.Element | null {
   if (!allowance) return null;
   return (
-    <section
+    <PortalCard
       className={styles.section}
-      aria-labelledby="request-allowance-heading"
+      headingId="request-allowance-heading"
+      title="Approved allowance"
     >
-      <h2 id="request-allowance-heading" className={styles.sectionTitle}>
-        Approved allowance
-      </h2>
       <p className={styles.nextAction}>
         {allowance.total} {allowance.unit}
       </p>
@@ -36,6 +35,6 @@ export function RequestAllowance({
           </li>
         ))}
       </ol>
-    </section>
+    </PortalCard>
   );
 }

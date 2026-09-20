@@ -1,3 +1,4 @@
+import { PortalCard } from "@/components/portal/ui";
 import type { RequestReview } from "@/lib/operations/requests/types";
 import { requestDate } from "./presentation";
 import { RequestDocuments } from "./request-documents";
@@ -14,13 +15,11 @@ export function RequestReviewHistory({
 }): React.JSX.Element | null {
   if (!reviews.length) return null;
   return (
-    <section
+    <PortalCard
       className={styles.section}
-      aria-labelledby="review-history-heading"
+      headingId="review-history-heading"
+      title="Review history"
     >
-      <h2 id="review-history-heading" className={styles.sectionTitle}>
-        Review history
-      </h2>
       {reviews.length === 200 && (
         <p className={styles.note}>Showing the latest 200 review entries.</p>
       )}
@@ -60,6 +59,6 @@ export function RequestReviewHistory({
           </li>
         ))}
       </ol>
-    </section>
+    </PortalCard>
   );
 }
