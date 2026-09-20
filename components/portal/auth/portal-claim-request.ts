@@ -42,10 +42,27 @@ function claimFailureError(outcome: ClaimFailureOutcome | null): Error {
 }
 
 export async function claimPortalAccess(
-  request: ClaimRequest = () =>
-    fetch("/api/portal/access/claim", { method: "POST" }),
-  pause: Wait = wait,
+  displayNameOrRequest: string | undefined | ClaimRequest,
+  requestOrPause?: ClaimRequest | Wait,
+  suppliedPause?: Wait,
 ): Promise<string> {
+  const displayName =
+    typeof displayNameOrRequest === "string" ? displayNameOrRequest : undefined;
+  const request: ClaimRequest =
+    typeof displayNameOrRequest === "function"
+      ? displayNameOrRequest
+      : typeof requestOrPause === "function"
+        ? (requestOrPause as ClaimRequest)
+        : () =>
+    fetch("/api/portal/access/claim", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ displayName }),
+    });
+  const pause: Wait =
+    typeof displayNameOrRequest === "function"
+      ? (requestOrPause as Wait | undefined) ?? wait
+      : suppliedPause ?? wait;
   for (let attempt = 1; attempt <= claimAttempts; attempt += 1) {
     const response = await request();
     const result: unknown = await response.json().catch(() => null);

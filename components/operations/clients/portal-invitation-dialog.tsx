@@ -30,21 +30,23 @@ async function getRequestError(response: Response): Promise<string> {
 
 export function PortalInvitationDialog({
   onInvitationSent,
+  organisations,
   triggerClassName,
 }: {
   onInvitationSent: (message: string) => void;
+  organisations: readonly { id: string; displayName: string }[];
   triggerClassName?: string;
 }): React.JSX.Element {
   const dialog = useRef<HTMLDialogElement>(null);
   const [status, setStatus] = useState<Status>({ kind: "idle" });
   const [invitationType, setInvitationType] =
-    useState<InvitationType>("client");
+    useState<InvitationType>("new_client");
 
   function close(): void {
     if (status.kind === "pending") return;
     dialog.current?.close();
     setStatus({ kind: "idle" });
-    setInvitationType("client");
+    setInvitationType("new_client");
   }
 
   function open(): void {
@@ -71,7 +73,9 @@ export function PortalInvitationDialog({
         message:
           invitationType === "admin"
             ? "FSS Admin invitation sent. Access starts after acceptance."
-            : "Client invitation sent. Access starts after onboarding.",
+            : invitationType === "existing_client"
+              ? "Client invitation sent. Access starts after acceptance."
+              : "Client invitation sent. Access starts after onboarding.",
       });
       onInvitationSent(
         email
@@ -119,7 +123,8 @@ export function PortalInvitationDialog({
             <p className={styles.eyebrow}>Access invitation</p>
             <h2 id="portal-invitation-dialog-heading">Invite a user</h2>
             <p>
-              Invite a client to their portal or an FSS colleague to FSS Studio.
+              Invite a new client owner, an existing client user, or an FSS
+              colleague.
             </p>
           </div>
         </div>
@@ -135,19 +140,24 @@ export function PortalInvitationDialog({
               name="invitationType"
               value={invitationType}
               onChange={(event) => {
+                const type = event.target.value;
                 setInvitationType(
-                  event.target.value === "admin" ? "admin" : "client",
+                  type === "admin" || type === "existing_client"
+                    ? type
+                    : "new_client",
                 );
                 setStatus({ kind: "idle" });
               }}
               disabled={status.kind === "pending"}
             >
-              <option value="client">Client user</option>
+              <option value="new_client">New client owner</option>
+              <option value="existing_client">Existing client user</option>
               <option value="admin">FSS Admin</option>
             </select>
           </label>
           <PortalInvitationFields
             type={invitationType}
+            organisations={organisations}
             pending={status.kind === "pending"}
           />
           <label className={styles.dialogReference}>

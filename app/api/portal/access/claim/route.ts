@@ -16,8 +16,9 @@ import {
   getPortalIdentity,
   getPortalInvitationClaim,
 } from "@/lib/operations/auth/server";
-import { revokePendingClerkStaffInvitations } from "@/lib/operations/auth/provision";
+import { revokePendingClerkPortalInvitations } from "@/lib/operations/auth/provision";
 import { getPortalDb } from "@/lib/operations/db/portal-client";
+import { saveUserProfile } from "@/lib/operations/auth/user-profile";
 
 export const runtime = "nodejs";
 
@@ -30,11 +31,12 @@ export const POST = createPortalAccessClaimHandler({
   claimClerkInvitation: claimClerkPortalInvitation,
   claimStaffInvitation: claimClerkStaffInvitation,
   claimStaffInvitationForVerifiedEmail,
-  reconcilePendingClerkStaffInvitations: revokePendingClerkStaffInvitations,
+  reconcilePendingClerkStaffInvitations: revokePendingClerkPortalInvitations,
   hasActiveStaffMembership: getActiveStaffMembership,
   claimVerifiedEmailInvite: claimPortalInviteForVerifiedEmail,
   hasActiveMembership: hasActivePortalMembership,
   needsOnboarding: needsPortalOnboarding,
+  saveProfile: saveUserProfile,
   reportUnexpectedError: (report) =>
     console.error("Portal access claim failed.", report),
 });

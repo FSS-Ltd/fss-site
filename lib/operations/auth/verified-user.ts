@@ -81,3 +81,14 @@ export function readVerifiedPortalUser(
     emailVerified: true,
   };
 }
+
+export function readClerkDisplayName(user: unknown): string | null {
+  if (!user || typeof user !== "object") return null;
+  const firstName = Reflect.get(user, "first_name") ?? Reflect.get(user, "firstName");
+  const lastName = Reflect.get(user, "last_name") ?? Reflect.get(user, "lastName");
+  const name = [firstName, lastName]
+    .filter((value): value is string => typeof value === "string" && value.trim().length > 0)
+    .join(" ")
+    .trim();
+  return name.length > 0 && name.length <= 200 ? name : null;
+}

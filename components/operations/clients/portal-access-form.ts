@@ -1,14 +1,14 @@
 import { portalRoles, type PortalRole } from "@/lib/operations/auth/types";
 import type { PortalAccessOperation } from "@/lib/operations/auth/operator";
 
-export type InvitationType = "client" | "admin";
+export type InvitationType = "new_client" | "existing_client" | "admin";
 
 export function createInvitationPayload(
   form: FormData,
   type: InvitationType,
 ): Extract<
   PortalAccessOperation,
-  { action: "invite_client" | "invite_admin" }
+  { action: "invite_client" | "invite_existing_client" | "invite_admin" }
 > {
   const details = {
     name: readString(form, "name"),
@@ -16,10 +16,17 @@ export function createInvitationPayload(
     reviewReference: readString(form, "reviewReference"),
   };
   if (type === "admin") return { action: "invite_admin", ...details };
+  if (type === "new_client")
+    return { action: "invite_client", ...details, role: "owner" };
   const role = readString(form, "role");
   if (!isPortalRole(role))
     throw new TypeError("Choose a supported client role.");
-  return { action: "invite_client", ...details, role };
+  return {
+    action: "invite_existing_client",
+    ...details,
+    role,
+    organisationId: readString(form, "organisationId"),
+  };
 }
 
 type GrantAccessPayload = {

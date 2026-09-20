@@ -8,6 +8,7 @@ import { getActiveStaffMembership } from "@/lib/operations/auth/staff-invitation
 import { needsPortalOnboarding } from "@/lib/operations/auth/pending-invitations";
 import type { VerifiedPortalIdentity } from "@/lib/operations/auth/types";
 import type { OperationsDb } from "@/lib/operations/db/client";
+import { userProfileNameSchema } from "@/lib/operations/auth/user-profile";
 
 type ClaimOutcome =
   | "active"
@@ -18,6 +19,7 @@ type ClaimOutcome =
 
 type ClaimFailureStage =
   | "identity"
+  | "profile"
   | "database"
   | "invitation_lookup"
   | "clerk_invitation_claim"
@@ -53,6 +55,7 @@ export type PortalAccessClaimDependencies = {
   claimVerifiedEmailInvite: typeof claimPortalInviteForVerifiedEmail;
   hasActiveMembership: typeof hasActivePortalMembership;
   needsOnboarding: typeof needsPortalOnboarding;
+  saveProfile?: (db: OperationsDb, identity: VerifiedPortalIdentity, displayName: string, correlationId: string) => Promise<void>;
   reportUnexpectedError: (report: ClaimErrorReport) => void;
 };
 
@@ -60,11 +63,16 @@ function response(
   outcome: ClaimOutcome,
   status: number,
   onboardingRequired = false,
+  destination?: "admin" | "portal" | "onboarding",
 ): Response {
   return Response.json(
     onboardingRequired
-      ? { active: false, onboardingRequired: true, outcome }
-      : { active: outcome === "active", outcome },
+      ? { active: false, onboardingRequired: true, outcome, destination: "onboarding" }
+      : {
+          active: outcome === "active",
+          outcome,
+          ...(destination ? { destination } : {}),
+        },
     { status },
   );
 }
@@ -85,8 +93,8 @@ function reportUnexpectedError(
 
 export function createPortalAccessClaimHandler(
   deps: PortalAccessClaimDependencies,
-): () => Promise<Response> {
-  return async function post(): Promise<Response> {
+): (request: Request) => Promise<Response> {
+  return async function post(request: Request): Promise<Response> {
     const correlationId = deps.createCorrelationId();
     if (!deps.configured()) return response("unavailable", 503);
 
@@ -97,6 +105,34 @@ export function createPortalAccessClaimHandler(
       return reportUnexpectedError(deps, correlationId, "identity", error);
     }
     if (!identity) return response("session_pending", 401);
+
+    {
+      let displayName: string | undefined;
+      try {
+        const body: unknown = await request.json();
+        const suppliedName =
+          body && typeof body === "object" && "displayName" in body
+            ? body.displayName
+            : undefined;
+        displayName =
+          suppliedName === undefined
+            ? undefined
+            : userProfileNameSchema.parse(suppliedName);
+      } catch {
+        return Response.json(
+          { message: "A valid display name is required." },
+          { status: 422 },
+        );
+      }
+
+      if (displayName && deps.saveProfile) {
+        try {
+          await deps.saveProfile(deps.db(), identity, displayName, correlationId);
+        } catch (error) {
+          return reportUnexpectedError(deps, correlationId, "profile", error);
+        }
+      }
+    }
 
     let stage: ClaimFailureStage = "database";
     try {
@@ -111,7 +147,9 @@ export function createPortalAccessClaimHandler(
           correlationId,
         )
       ) {
-        return response("active", 200);
+        stage = "clerk_staff_invitation_reconciliation";
+        await deps.reconcilePendingClerkStaffInvitations(identity.email);
+        return response("active", 200, false, "portal");
       }
       stage = "staff_invitation_claim";
       if (
@@ -121,7 +159,7 @@ export function createPortalAccessClaimHandler(
           correlationId,
         )
       ) {
-        return response("active", 200);
+        return response("active", 200, false, "admin");
       }
       stage = "staff_email_claim";
       if (
@@ -133,25 +171,27 @@ export function createPortalAccessClaimHandler(
       ) {
         stage = "clerk_staff_invitation_reconciliation";
         await deps.reconcilePendingClerkStaffInvitations(identity.email);
-        return response("active", 200);
+        return response("active", 200, false, "admin");
       }
       stage = "staff_membership";
       if (await deps.hasActiveStaffMembership(db, identity, correlationId)) {
         stage = "clerk_staff_invitation_reconciliation";
         await deps.reconcilePendingClerkStaffInvitations(identity.email);
-        return response("active", 200);
+        return response("active", 200, false, "admin");
       }
       stage = "verified_email_claim";
       if (
         await deps.claimVerifiedEmailInvite(db, identity, correlationId)
       ) {
-        return response("active", 200);
+        stage = "clerk_staff_invitation_reconciliation";
+        await deps.reconcilePendingClerkStaffInvitations(identity.email);
+        return response("active", 200, false, "portal");
       }
       stage = "membership";
       if (
         await deps.hasActiveMembership(db, identity, correlationId)
       ) {
-        return response("active", 200);
+        return response("active", 200, false, "portal");
       }
       stage = "onboarding";
       const onboardingRequired = await deps.needsOnboarding(

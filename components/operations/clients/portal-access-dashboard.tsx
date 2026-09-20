@@ -42,6 +42,7 @@ export function PortalAccessDashboard({
         <div className={styles.headerActions}>
           <PortalInvitationDialog
             triggerClassName={styles.primaryAction}
+            organisations={data.organisations}
             onInvitationSent={(result) => {
               setMessage(result);
               router.refresh();

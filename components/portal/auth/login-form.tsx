@@ -78,7 +78,7 @@ export function PortalLoginForm(): React.JSX.Element {
       if (result.status !== "complete" || !result.createdSessionId)
         throw new Error("Verification is incomplete.");
       await activateSignIn({ session: result.createdSessionId });
-      const destination = await claimPortalAccess();
+      const destination = await claimPortalAccess(undefined);
       setStatus({
         kind: "success",
         message: "Verified. Opening your workspace…",

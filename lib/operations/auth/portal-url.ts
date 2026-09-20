@@ -23,3 +23,14 @@ export function portalUrl(path: string, origin: string): URL {
   url.pathname = portalPath(url.pathname);
   return url;
 }
+
+export function createInvitationActivationUrl(
+  origin: string,
+  name: string,
+  email: string,
+): URL {
+  const url = portalUrl("/activate", origin);
+  url.searchParams.set("name", name);
+  url.searchParams.set("email", email);
+  return url;
+}

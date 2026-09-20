@@ -95,4 +95,5 @@ export type FounderAccessOverview = {
   filters: FounderAccessFilters;
   page: number;
   hasNext: boolean;
+  organisations: readonly { id: string; displayName: string }[];
 };

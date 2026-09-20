@@ -16,6 +16,14 @@ const identity: VerifiedPortalIdentity = {
 // The injected claim functions do not execute database methods in these tests.
 const db = {} as OperationsDb;
 
+function claimRequest(): Request {
+  return new Request("https://portal.example.test/api/portal/access/claim", {
+    method: "POST",
+    body: JSON.stringify({ displayName: "Owner Example" }),
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
 function createDependencies(
   overrides: Partial<PortalAccessClaimDependencies> = {},
 ): PortalAccessClaimDependencies {
@@ -43,11 +51,12 @@ test("returns onboarding-required for a verified owner with a pending invitation
     createDependencies({ needsOnboarding: async () => true }),
   );
 
-  const response = await post();
+  const response = await post(claimRequest());
 
   assert.equal(response.status, 200);
   assert.deepEqual(await response.json(), {
     active: false,
+    destination: "onboarding",
     onboardingRequired: true,
     outcome: "onboarding_required",
   });
@@ -58,7 +67,7 @@ test("returns session-pending when Clerk has not exposed the new session", async
     createDependencies({ identity: async () => null }),
   );
 
-  const response = await post();
+  const response = await post(claimRequest());
 
   assert.equal(response.status, 401);
   assert.deepEqual(await response.json(), {
@@ -78,7 +87,7 @@ test("reports the identity stage when Clerk context is unavailable", async () =>
     }),
   );
 
-  const response = await post();
+  const response = await post(claimRequest());
 
   assert.equal(response.status, 503);
   assert.deepEqual(await response.json(), {
@@ -99,11 +108,12 @@ test("returns active when the verified user already has a portal membership", as
     createDependencies({ hasActiveMembership: async () => true }),
   );
 
-  const response = await post();
+  const response = await post(claimRequest());
 
   assert.equal(response.status, 200);
   assert.deepEqual(await response.json(), {
     active: true,
+    destination: "portal",
     outcome: "active",
   });
 });
@@ -113,10 +123,14 @@ test("returns active when an existing Clerk session claims a pending staff invit
     createDependencies({ claimStaffInvitationForVerifiedEmail: async () => true }),
   );
 
-  const response = await post();
+  const response = await post(claimRequest());
 
   assert.equal(response.status, 200);
-  assert.deepEqual(await response.json(), { active: true, outcome: "active" });
+  assert.deepEqual(await response.json(), {
+    active: true,
+    destination: "admin",
+    outcome: "active",
+  });
 });
 
 test("reconciles the pending Clerk staff invitation after an email claim", async () => {
@@ -130,7 +144,7 @@ test("reconciles the pending Clerk staff invitation after an email claim", async
     },
   });
 
-  const response = await post();
+  const response = await post(claimRequest());
 
   assert.equal(response.status, 200);
   assert.deepEqual(reconciledEmails, ["owner@example.test"]);
@@ -150,7 +164,7 @@ test("reconciles the pending Clerk staff invitation for an active Admin", async 
     },
   });
 
-  const response = await post();
+  const response = await post(claimRequest());
 
   assert.equal(response.status, 200);
   assert.deepEqual(reconciledEmails, ["owner@example.test"]);
@@ -168,7 +182,7 @@ test("reports Clerk invitation reconciliation failures without exposing details"
     }),
   );
 
-  const response = await post();
+  const response = await post(claimRequest());
 
   assert.equal(response.status, 503);
   assert.deepEqual(await response.json(), {
@@ -199,11 +213,15 @@ test("reads the Clerk invitation once and stops after a successful staff claim",
     }),
   );
 
-  const response = await post();
+  const response = await post(claimRequest());
 
   assert.equal(invitationReads, 1);
   assert.equal(response.status, 200);
-  assert.deepEqual(await response.json(), { active: true, outcome: "active" });
+  assert.deepEqual(await response.json(), {
+    active: true,
+    destination: "admin",
+    outcome: "active",
+  });
 });
 
 test("reports the staff-invitation claim stage without exposing the error", async () => {
@@ -217,7 +235,7 @@ test("reports the staff-invitation claim stage without exposing the error", asyn
     }),
   );
 
-  const response = await post();
+  const response = await post(claimRequest());
 
   assert.equal(response.status, 503);
   assert.deepEqual(await response.json(), {
@@ -236,7 +254,7 @@ test("reports the staff-invitation claim stage without exposing the error", asyn
 test("returns access-denied when no active membership or pending invitation exists", async () => {
   const post = createPortalAccessClaimHandler(createDependencies());
 
-  const response = await post();
+  const response = await post(claimRequest());
 
   assert.equal(response.status, 403);
   assert.deepEqual(await response.json(), {
@@ -256,7 +274,7 @@ test("returns unavailable and reports a correlation ID when the portal database 
     }),
   );
 
-  const response = await post();
+  const response = await post(claimRequest());
 
   assert.equal(response.status, 503);
   assert.deepEqual(await response.json(), {

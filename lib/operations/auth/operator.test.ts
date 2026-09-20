@@ -22,6 +22,26 @@ test("client invitation requests cannot choose an organisation", () => {
   );
 });
 
+test("existing-client invitations require an organisation and keep the selected role", () => {
+  const invitation = {
+    action: "invite_existing_client",
+    organisationId: "8aa24c0b-3665-4fd4-8694-500675c943c3",
+    name: "Client teammate",
+    email: "teammate@example.test",
+    role: "contributor",
+    reviewReference: "Client owner approved",
+  } as const;
+
+  assert.equal(portalOperationSchema.safeParse(invitation).success, true);
+  assert.equal(
+    portalOperationSchema.safeParse({
+      ...invitation,
+      organisationId: undefined,
+    }).success,
+    false,
+  );
+});
+
 test("client invitation records the pending grant and sends organisation-free Clerk metadata", async () => {
   const invitationId = randomUUID();
   const provisioned: unknown[] = [];

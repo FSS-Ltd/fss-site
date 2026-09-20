@@ -2,6 +2,7 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { z } from "zod";
 import { readPortalAuthConfig } from "./configuration";
 import {
+  isPortalInvitationForEmail,
   isStaffInvitationForEmail,
   type PortalInvitationMetadata,
 } from "./clerk-invitation";
@@ -115,6 +116,42 @@ export async function revokePendingClerkStaffInvitations(
             invitation.publicMetadata,
             normalizedEmail,
           )
+        );
+      })
+      .map((invitation) => client.invitations.revokeInvitation(invitation.id)),
+  );
+}
+
+/**
+ * A verified session has claimed Operations access, so any remaining Clerk
+ * invitations for the same portal recipient are obsolete.
+ */
+export async function revokePendingClerkPortalInvitations(
+  email: string,
+  clientFactory: ClerkInvitationClientFactory = clerkClient,
+): Promise<void> {
+  const normalizedEmail = z
+    .string()
+    .trim()
+    .email()
+    .max(254)
+    .parse(email)
+    .toLowerCase();
+  const client = await clientFactory();
+  const { data: invitations } = await client.invitations.getInvitationList({
+    query: normalizedEmail,
+    status: "pending",
+  });
+  await Promise.all(
+    invitations
+      .filter((invitation) => {
+        const invitationEmail = z.string().trim().email().max(254).safeParse(
+          invitation.emailAddress,
+        );
+        return (
+          invitationEmail.success &&
+          invitationEmail.data.toLowerCase() === normalizedEmail &&
+          isPortalInvitationForEmail(invitation.publicMetadata, normalizedEmail)
         );
       })
       .map((invitation) => client.invitations.revokeInvitation(invitation.id)),
