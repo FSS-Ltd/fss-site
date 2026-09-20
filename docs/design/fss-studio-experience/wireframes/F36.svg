@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1555" viewBox="0 0 1440 1555" role="img" aria-label="F36 · Create work for a client">
+<title>F36 · Create work for a client</title>
+<desc>FSS proposed interface. Text and shapes are editable SVG elements. Synthetic example data.</desc>
+<rect x="0" y="0" width="1440" height="1555" rx="0" fill="#f2f3f5"/>
+<text x="280" y="64" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="500" fill="#46566c">STUDIO / DELIVERY</text>
+<rect x="1226" y="40" width="148" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="1246" y="66" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Notifications · 3</text>
+<a href="../wireframes.html#F29" target="_top" aria-label="Notifications · 3"><rect x="1226" y="40" width="148" height="44" fill="transparent"/></a>
+<text x="280" y="152" font-family="Geist,Arial,sans-serif" font-size="36" font-weight="600" fill="#0a1a2e">Create work for a client</text>
+<text x="280" y="192" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Choose the right client and project before creating a request.</text>
+<rect x="280" y="223" width="1112" height="997" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="304" y="267" font-family="Geist,Arial,sans-serif" font-size="20" font-weight="600" fill="#0a1a2e">Request details</text>
+<text x="304" y="310" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Client</text>
+<rect x="304" y="324" width="1064" height="48" rx="8" fill="#ffffff" stroke="#788696"/>
+<text x="316" y="352" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Northstar Studio ▾</text>
+<text x="304" y="410" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Project</text>
+<rect x="304" y="424" width="1064" height="48" rx="8" fill="#ffffff" stroke="#788696"/>
+<text x="316" y="452" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Website &amp; booking experience ▾</text>
+<text x="304" y="510" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Type</text>
+<rect x="304" y="524" width="1064" height="48" rx="8" fill="#ffffff" stroke="#788696"/>
+<text x="316" y="552" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Work request ▾</text>
+<text x="304" y="610" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Title</text>
+<rect x="304" y="624" width="1064" height="48" rx="8" fill="#ffffff" stroke="#788696"/>
+<text x="316" y="652" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Add customer contact preferences</text>
+<text x="304" y="710" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Description</text>
+<rect x="304" y="724" width="1064" height="48" rx="8" fill="#ffffff" stroke="#788696"/>
+<text x="316" y="752" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Let customers select how they want to hear from the team.</text>
+<text x="304" y="810" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Desired outcome</text>
+<rect x="304" y="824" width="1064" height="48" rx="8" fill="#ffffff" stroke="#788696"/>
+<text x="316" y="852" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Customers can save and update their contact preference.</text>
+<text x="304" y="910" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Scope</text>
+<rect x="304" y="924" width="1064" height="48" rx="8" fill="#ffffff" stroke="#788696"/>
+<text x="316" y="952" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Assessment pending ▾</text>
+<text x="304" y="1010" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Owner</text>
+<rect x="304" y="1024" width="1064" height="48" rx="8" fill="#ffffff" stroke="#788696"/>
+<text x="316" y="1052" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Jean-Fidele ▾</text>
+<text x="304" y="1110" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Internal priority</text>
+<rect x="304" y="1124" width="1064" height="48" rx="8" fill="#ffffff" stroke="#788696"/>
+<text x="316" y="1152" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Normal ▾</text>
+<rect x="280" y="1244" width="1112" height="99" rx="16" fill="#e3f2f1" stroke="#d9dfe5"/>
+<text x="304" y="1284" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="600" fill="#0f7078">Public and internal details stay separate</text>
+<text x="304" y="1313" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">The client sees the request and its public updates. Internal priority and founder notes remain in operations.</text>
+<rect x="280" y="1367" width="146" height="44" rx="12" fill="#0f7078"/>
+<text x="300" y="1393" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#ffffff">Create request</text>
+<a href="../wireframes.html#F06" target="_top" aria-label="Create request"><rect x="280" y="1367" width="146" height="44" fill="transparent"/></a>
+<rect x="280" y="1423" width="112" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="300" y="1449" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Save draft</text>
+<text x="280" y="1503" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Faithful Software Solutions · Built on trust. Delivered with care.</text>
+<rect x="0" y="0" width="232" height="1555" rx="0" fill="#f7f8f9" stroke="#d9dfe5"/>
+<text x="24" y="58" font-family="Geist,Arial,sans-serif" font-size="30" font-weight="700" fill="#0a1a2e">FSS</text>
+<text x="24" y="88" font-family="Geist,Arial,sans-serif" font-size="10" font-weight="500" fill="#46566c">STUDIO OPERATIONS</text>
+<rect x="20" y="112" width="192" height="78" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="32" y="140" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="600" fill="#0a1a2e">Founder workspace</text>
+<text x="32" y="165" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">All clients ▾</text>
+<rect x="34" y="232" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="242" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Overview</text>
+<rect x="34" y="280" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="290" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Clients</text>
+<rect x="20" y="312" width="192" height="44" rx="12" fill="#e3f2f1"/>
+<rect x="34" y="328" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#0f7078"/>
+<text x="60" y="338" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0f7078">Delivery</text>
+<rect x="34" y="376" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="386" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Agreements</text>
+<rect x="34" y="424" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="434" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Welcome journeys</text>
+<rect x="34" y="472" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="482" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Projects</text>
+<rect x="34" y="520" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="530" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Billing</text>
+<rect x="34" y="568" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="578" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Portal access</text>
+<rect x="34" y="616" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="626" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Notifications</text>
+<rect x="34" y="664" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="674" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Settings</text>
+<text x="24" y="716" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Jean-Fidele</text>
+<text x="24" y="733" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Founder</text></svg>

@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="1740" viewBox="0 0 390 1740" role="img" aria-label="M04 · Report a problem">
+<title>M04 · Report a problem</title>
+<desc>FSS proposed interface. Text and shapes are editable SVG elements. Synthetic example data.</desc>
+<rect x="0" y="0" width="390" height="1740" rx="0" fill="#f2f3f5"/>
+<text x="20" y="48" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="500" fill="#46566c">FSS / REQUESTS</text>
+<text x="20" y="130" font-family="Geist,Arial,sans-serif" font-size="30" font-weight="600" fill="#0a1a2e">Report a problem</text>
+<text x="20" y="168" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Tell us what happened so we can reproduce it.</text>
+<text x="20" y="211" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="500" fill="#46566c">Request type</text>
+<rect x="20" y="227" width="110" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="40" y="253" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">New work</text>
+<a href="../wireframes.html#M04" target="_top" aria-label="New work"><rect x="20" y="227" width="110" height="44" fill="transparent"/></a>
+<rect x="138" y="227" width="92" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="158" y="253" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Change</text>
+<a href="../wireframes.html#M04" target="_top" aria-label="Change"><rect x="138" y="227" width="92" height="44" fill="transparent"/></a>
+<rect x="238" y="227" width="114" height="44" rx="12" fill="#0f7078"/>
+<text x="258" y="253" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#ffffff">Bug report</text>
+<a href="../wireframes.html#C07" target="_top" aria-label="Bug report"><rect x="238" y="227" width="114" height="44" fill="transparent"/></a>
+<rect x="20" y="283" width="72" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="40" y="309" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Help</text>
+<a href="../wireframes.html#M04" target="_top" aria-label="Help"><rect x="20" y="283" width="72" height="44" fill="transparent"/></a>
+<rect x="20" y="351" width="350" height="678" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="40" y="391" font-family="Geist,Arial,sans-serif" font-size="20" font-weight="600" fill="#0a1a2e">The problem</text>
+<text x="40" y="434" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Project</text>
+<rect x="40" y="448" width="310" height="48" rx="8" fill="#ffffff" stroke="#788696"/>
+<text x="52" y="476" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Website &amp; booking experience ▾</text>
+<text x="40" y="534" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Short title</text>
+<rect x="40" y="548" width="310" height="70" rx="8" fill="#ffffff" stroke="#788696"/>
+<text x="52" y="576" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Booking confirmation shows the</text>
+<text x="52" y="599" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">wrong time</text>
+<text x="40" y="656" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Steps to reproduce</text>
+<rect x="40" y="670" width="310" height="93" rx="8" fill="#ffffff" stroke="#788696"/>
+<text x="52" y="698" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">1. Choose a 10:00 slot.</text>
+<text x="52" y="721" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">2. Complete a test booking.</text>
+<text x="52" y="744" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">3. Open the confirmation email.</text>
+<text x="40" y="801" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">What you expected</text>
+<rect x="40" y="815" width="310" height="70" rx="8" fill="#ffffff" stroke="#788696"/>
+<text x="52" y="843" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">The email should show 10:00</text>
+<text x="52" y="866" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Europe/London.</text>
+<text x="40" y="923" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">What happened instead</text>
+<rect x="40" y="937" width="310" height="48" rx="8" fill="#ffffff" stroke="#788696"/>
+<text x="52" y="965" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">The email shows 09:00.</text>
+<rect x="20" y="1053" width="350" height="411" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="40" y="1093" font-family="Geist,Arial,sans-serif" font-size="20" font-weight="600" fill="#0a1a2e">Impact &amp; environment</text>
+<text x="40" y="1136" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Impact</text>
+<rect x="40" y="1150" width="310" height="70" rx="8" fill="#ffffff" stroke="#788696"/>
+<text x="52" y="1178" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Incorrect appointment time for</text>
+<text x="52" y="1201" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">customers</text>
+<text x="40" y="1258" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Page URL · optional</text>
+<rect x="40" y="1272" width="310" height="48" rx="8" fill="#ffffff" stroke="#788696"/>
+<text x="52" y="1300" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">https://northstar.example/book</text>
+<text x="40" y="1358" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Browser / device · optional</text>
+<rect x="40" y="1372" width="310" height="48" rx="8" fill="#ffffff" stroke="#788696"/>
+<text x="52" y="1400" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Safari · iPhone</text>
+<rect x="20" y="1488" width="166" height="44" rx="12" fill="#0f7078"/>
+<text x="40" y="1514" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#ffffff">Submit bug report</text>
+<a href="../wireframes.html#C08" target="_top" aria-label="Submit bug report"><rect x="20" y="1488" width="166" height="44" fill="transparent"/></a>
+<rect x="20" y="1544" width="74" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="40" y="1570" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Back</text>
+<text x="20" y="1624" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Faithful Software Solutions · Built on trust. Delivered with</text>
+<text x="20" y="1641" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">care.</text>
+<rect x="0" y="1676" width="390" height="64" rx="0" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="24" y="1711" font-family="Geist,Arial,sans-serif" font-size="13" font-weight="500" fill="#46566c">Home</text>
+<text x="116" y="1711" font-family="Geist,Arial,sans-serif" font-size="13" font-weight="500" fill="#46566c">Projects</text>
+<text x="208" y="1711" font-family="Geist,Arial,sans-serif" font-size="13" font-weight="500" fill="#0f7078">Requests</text>
+<text x="300" y="1711" font-family="Geist,Arial,sans-serif" font-size="13" font-weight="500" fill="#46566c">More</text></svg>

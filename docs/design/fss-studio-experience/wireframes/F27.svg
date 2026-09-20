@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1024" viewBox="0 0 1440 1024" role="img" aria-label="F27 · Billing operations">
+<title>F27 · Billing operations</title>
+<desc>FSS proposed interface. Text and shapes are editable SVG elements. Synthetic example data.</desc>
+<rect x="0" y="0" width="1440" height="1024" rx="0" fill="#f2f3f5"/>
+<text x="280" y="64" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="500" fill="#46566c">STUDIO / BILLING</text>
+<rect x="1226" y="40" width="148" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="1246" y="66" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Notifications · 3</text>
+<a href="../wireframes.html#F29" target="_top" aria-label="Notifications · 3"><rect x="1226" y="40" width="148" height="44" fill="transparent"/></a>
+<text x="280" y="152" font-family="Geist,Arial,sans-serif" font-size="36" font-weight="600" fill="#0a1a2e">Billing operations</text>
+<text x="280" y="192" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Agreed obligations, invoices and exceptions.</text>
+<rect x="280" y="223" width="159" height="44" rx="12" fill="#0f7078"/>
+<text x="300" y="249" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#ffffff">Open exceptions</text>
+<a href="../wireframes.html#F27" target="_top" aria-label="Open exceptions"><rect x="280" y="223" width="159" height="44" fill="transparent"/></a>
+<rect x="280.0" y="291" width="360.0" height="126" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="304.0" y="347" font-family="Geist,Arial,sans-serif" font-size="32" font-weight="600" fill="#0a1a2e">£7,200</text>
+<text x="304.0" y="369" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Due this month</text>
+<rect x="656.0" y="291" width="360.0" height="126" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="680.0" y="347" font-family="Geist,Arial,sans-serif" font-size="32" font-weight="600" fill="#0a1a2e">£2,400</text>
+<text x="680.0" y="369" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Overdue</text>
+<rect x="1032.0" y="291" width="360.0" height="126" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="1056.0" y="347" font-family="Geist,Arial,sans-serif" font-size="32" font-weight="600" fill="#0a1a2e">1</text>
+<text x="1056.0" y="369" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Needs reconciliation</text>
+<rect x="280" y="441" width="1112" height="322" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="304" y="485" font-family="Geist,Arial,sans-serif" font-size="20" font-weight="600" fill="#0a1a2e">Action queue</text>
+<text x="304" y="530" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Northstar · INV-2026-041</text>
+<text x="304" y="557" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">£1,200 · due 24 September</text>
+<rect x="1238" y="516" width="130" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="1258" y="542" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Open invoice</text>
+<a href="../wireframes.html#F27" target="_top" aria-label="Open invoice"><rect x="1238" y="516" width="130" height="44" fill="transparent"/></a>
+<text x="304" y="605" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Harbour · Deposit invoice</text>
+<text x="304" y="632" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">£1,200 · overdue 3 days</text>
+<rect x="1205" y="591" width="163" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="1225" y="617" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Review collection</text>
+<a href="../wireframes.html#F27" target="_top" aria-label="Review collection"><rect x="1205" y="591" width="163" height="44" fill="transparent"/></a>
+<text x="304" y="680" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Elm &amp; Co · Payment status</text>
+<text x="304" y="707" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Provider status needs reconciliation</text>
+<rect x="1260" y="666" width="108" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="1280" y="692" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Reconcile</text>
+<a href="../wireframes.html#F27" target="_top" aria-label="Reconcile"><rect x="1260" y="666" width="108" height="44" fill="transparent"/></a>
+<rect x="280" y="787" width="1112" height="99" rx="16" fill="#e3f2f1" stroke="#d9dfe5"/>
+<text x="304" y="827" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="600" fill="#0f7078">Commercial controls</text>
+<text x="304" y="856" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Invoice amounts come from retained signed terms. Reminder and collection actions do not change the agreement.</text>
+<text x="280" y="922" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Faithful Software Solutions · Built on trust. Delivered with care.</text>
+<rect x="0" y="0" width="232" height="1024" rx="0" fill="#f7f8f9" stroke="#d9dfe5"/>
+<text x="24" y="58" font-family="Geist,Arial,sans-serif" font-size="30" font-weight="700" fill="#0a1a2e">FSS</text>
+<text x="24" y="88" font-family="Geist,Arial,sans-serif" font-size="10" font-weight="500" fill="#46566c">STUDIO OPERATIONS</text>
+<rect x="20" y="112" width="192" height="78" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="32" y="140" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="600" fill="#0a1a2e">Founder workspace</text>
+<text x="32" y="165" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">All clients ▾</text>
+<rect x="34" y="232" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="242" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Overview</text>
+<rect x="34" y="280" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="290" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Clients</text>
+<rect x="34" y="328" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="338" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Delivery</text>
+<rect x="34" y="376" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="386" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Agreements</text>
+<rect x="34" y="424" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="434" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Welcome journeys</text>
+<rect x="34" y="472" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="482" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Projects</text>
+<rect x="20" y="504" width="192" height="44" rx="12" fill="#e3f2f1"/>
+<rect x="34" y="520" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#0f7078"/>
+<text x="60" y="530" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0f7078">Billing</text>
+<rect x="34" y="568" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="578" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Portal access</text>
+<rect x="34" y="616" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="626" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Notifications</text>
+<rect x="34" y="664" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="674" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Settings</text>
+<text x="24" y="716" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Jean-Fidele</text>
+<text x="24" y="733" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Founder</text></svg>

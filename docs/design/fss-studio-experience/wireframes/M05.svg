@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="1396" viewBox="0 0 390 1396" role="img" aria-label="M05 · Ready for your review">
+<title>M05 · Ready for your review</title>
+<desc>FSS proposed interface. Text and shapes are editable SVG elements. Synthetic example data.</desc>
+<rect x="0" y="0" width="390" height="1396" rx="0" fill="#f2f3f5"/>
+<text x="20" y="48" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="500" fill="#46566c">FSS / REQUESTS</text>
+<text x="20" y="130" font-family="Geist,Arial,sans-serif" font-size="30" font-weight="600" fill="#0a1a2e">Ready for your review</text>
+<text x="20" y="168" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">NS-014 · Booking confirmation email · Version</text>
+<text x="20" y="191" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">3</text>
+<rect x="20" y="222" width="350" height="301" rx="16" fill="#07182e" stroke="#d9dfe5"/>
+<text x="40" y="253" font-family="Geist,Arial,sans-serif" font-size="11" font-weight="500" fill="#ffffff">YOUR NEXT STEP</text>
+<text x="40" y="300" font-family="Geist,Arial,sans-serif" font-size="26" font-weight="600" fill="#ffffff">Does this meet the</text>
+<text x="40" y="338" font-family="Geist,Arial,sans-serif" font-size="26" font-weight="600" fill="#ffffff">agreed outcome?</text>
+<text x="40" y="382" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#ffffff">Check the time, studio address and</text>
+<text x="40" y="405" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#ffffff">booking reference in the preview. Your</text>
+<text x="40" y="428" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#ffffff">decision applies to version 3.</text>
+<rect x="40" y="459" width="137" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="60" y="485" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Open preview</text>
+<a href="../wireframes.html#C13" target="_top" aria-label="Open preview"><rect x="40" y="459" width="137" height="44" fill="transparent"/></a>
+<rect x="20" y="547" width="350" height="259" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="40" y="587" font-family="Geist,Arial,sans-serif" font-size="20" font-weight="600" fill="#0a1a2e">What changed</text>
+<text x="40" y="632" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Correct local time</text>
+<text x="40" y="659" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Bookings now display Europe/London time.</text>
+<text x="40" y="707" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Clearer appointment details</text>
+<text x="40" y="734" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">The confirmation includes the address, date</text>
+<text x="40" y="754" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">and booking reference.</text>
+<rect x="20" y="830" width="350" height="131" rx="16" fill="#e3f2f1" stroke="#d9dfe5"/>
+<text x="40" y="866" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="600" fill="#0f7078">Your decision</text>
+<text x="40" y="895" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Accept this version when you are happy with</text>
+<text x="40" y="915" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">the agreed work, or request changes with</text>
+<text x="40" y="935" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">specific feedback.</text>
+<rect x="20" y="985" width="350" height="259" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="40" y="1025" font-family="Geist,Arial,sans-serif" font-size="20" font-weight="600" fill="#0a1a2e">Review version 3</text>
+<rect x="40" y="1057" width="20" height="20" rx="4" fill="#ffffff" stroke="#788696"/>
+<text x="72" y="1070" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#0a1a2e">I confirm this deliverable meets the</text>
+<text x="72" y="1093" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#0a1a2e">agreed requirements.</text>
+<rect x="40" y="1124" width="157" height="44" rx="12" fill="#0f7078"/>
+<text x="60" y="1150" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#ffffff">Accept version 3</text>
+<a href="../wireframes.html#C11" target="_top" aria-label="Accept version 3"><rect x="40" y="1124" width="157" height="44" fill="transparent"/></a>
+<rect x="40" y="1180" width="159" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="60" y="1206" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Request changes</text>
+<a href="../wireframes.html#C10" target="_top" aria-label="Request changes"><rect x="40" y="1180" width="159" height="44" fill="transparent"/></a>
+<text x="20" y="1280" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Faithful Software Solutions · Built on trust. Delivered with</text>
+<text x="20" y="1297" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">care.</text>
+<rect x="0" y="1332" width="390" height="64" rx="0" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="24" y="1367" font-family="Geist,Arial,sans-serif" font-size="13" font-weight="500" fill="#46566c">Home</text>
+<text x="116" y="1367" font-family="Geist,Arial,sans-serif" font-size="13" font-weight="500" fill="#46566c">Projects</text>
+<text x="208" y="1367" font-family="Geist,Arial,sans-serif" font-size="13" font-weight="500" fill="#0f7078">Requests</text>
+<text x="300" y="1367" font-family="Geist,Arial,sans-serif" font-size="13" font-weight="500" fill="#46566c">More</text></svg>

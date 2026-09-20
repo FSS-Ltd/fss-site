@@ -48,7 +48,7 @@ Use Node 24 and the lockfile's pnpm version. Operations tests require `OPERATION
 - Node 24.20.0, pnpm 9.7.0, disposable PostgreSQL 17.
 - `pnpm test:coverage:growth`: 1,515 unit/component/script/database tests passed, zero failures/skips; 94.37% lines, 86.00% branches, 94.21% functions. This includes the repository unit tests and Growth database integration suite.
 - `pnpm test:coverage:operations`: 8 tests passed, zero failures/skips; 100% lines, 97.56% branches, 95.24% functions.
-- `pnpm typecheck`, `pnpm lint`, `pnpm build`, `pnpm verify:migrations`, `pnpm test:redesign`, `pnpm perf:budget:homepage`: passed.
+- `pnpm typecheck`, `pnpm lint`, `pnpm build`, `pnpm verify:migrations`, `pnpm test:public-redesign`, `pnpm perf:budget:homepage`: passed.
 - `pnpm audit --prod --audit-level high`: no known vulnerabilities.
 - Changed-file Prettier and diff whitespace checks: passed.
 - Independent source review: specification and code quality passed; no critical or important findings.
@@ -76,7 +76,7 @@ Desktop 1440×1000 and mobile 390×844 screenshots were inspected. The mobile pa
 
 - Operations: 41 tests passed, no failures/skips; coverage 97.71% lines, 94.06% branches, 97.25% functions.
 - Full Growth/unit/component/script/database suite: 1,546 tests passed, no failures/skips. The final operator integration test additionally passed in the Operations suite.
-- Final typecheck, production build, repository lint, changed-file formatting, migration policy, redesign shell and homepage bundle budget passed. Production dependency audit found no known vulnerabilities.
+- Final typecheck, production build, repository lint, changed-file formatting, migration policy, public redesign shell and homepage bundle budget passed. Production dependency audit found no known vulnerabilities.
 - Independent domain and SDK/operator source reviews passed after the internal organisation column grant was narrowed and covered by a restricted-role regression.
 - Founder auth configuration remains unchanged. Actual-role tests cover simultaneous invitation claims, wrong email, expiry/replay/replacement, archived organisations, revocation, pooled tenant context, restricted views/files/counts and atomic rate limits.
 - Managed-auth verification uses disposable local services and synthetic mailboxes. Hosted SMTP delivery and full production-environment end-to-end testing remain deferred to the Task 14 release gate. See [client identity](client-identity.md).
@@ -89,14 +89,14 @@ Desktop 1440×1000 and mobile 390×844 screenshots were inspected. The mobile pa
 - Real private Vercel Blob verification passed with synthetic bytes and actual restricted PostgreSQL roles. Anonymous, cross-tenant and revoked access were denied. Temporary object, store and empty project were removed; production resources remained untouched.
 - Actual component screenshots inspected at desktop 1440 px and mobile 390 px; no overflow at mobile or 200% text, visible keyboard focus and 44 px document controls. Temporary preview route removed.
 - Independent review passed after adding file-content signatures and the correctly hashed/mislabeled-file regression. Proxy fix also passed scoped review.
-- Typecheck, lint, production build, formatting, migration policy, redesign shell, homepage budget and production dependency audit passed. Build initially found stale generated development types for the removed preview; clearing that generated cache resolved it.
+- Typecheck, lint, production build, formatting, migration policy, public redesign shell, homepage budget and production dependency audit passed. Build initially found stale generated development types for the removed preview; clearing that generated cache resolved it.
 - Task 4 PR checks passed and merge is verified. The merged Vercel deployment passed; production Growth login returns 200 and the protected prospects route returns 307. Uploads and production Operations activation remain gated to the approved release process.
 
 ## Task 5 local verification, 7 September 2026
 
 - Added client request list/board, creation, public comments, exact-version review and founder workflow controls. Founder priority remains separate from client-reported impact. See [requests](requests.md).
 - Final Operations coverage: 142 tests passed, zero failures/skips; 97.85% lines, 92.63% branches, 97.28% functions. Final Growth/unit/component/script/database suite: 1,668 tests passed, zero failures/skips.
-- Typecheck, repository lint, clean production build, changed-file formatting, migration policy, redesign shell and homepage bundle budget passed. Production dependency audit found no known vulnerabilities.
+- Typecheck, repository lint, clean production build, changed-file formatting, migration policy, public redesign shell and homepage bundle budget passed. Production dependency audit found no known vulnerabilities.
 - Independent primary/API and domain/UI reviews passed after fixing administrative New-request reopening, current versus historical document associations and the missing founder priority control. All fixes have covering tests and scoped re-review.
 - Clean migration replay and restricted-role tests used a fresh isolated native PostgreSQL 17.7 cluster after Docker Desktop became unavailable. Tests prove tenant isolation, reviewer revocation, concurrent submission/writes, stale deliverables, capacity, quote gates, private comments, priority boundaries and audit integrity. No production database was used.
 - Actual-component browser fixtures verified desktop 1440 px, mobile 375 px and 200% text reflow; native keyboard review/founder selectors, visible focus, stable failed-submit idempotency keys and retained conflict drafts passed. Screenshots inspected. Fixtures and preview server were removed/stopped before final build.

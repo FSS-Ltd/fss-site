@@ -40,6 +40,12 @@ const hstsHeader = {
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 const nextConfig: NextConfig = {
+  // The local screenshot runner uses 127.0.0.1 rather than localhost. This
+  // development-only allow-list keeps HMR requests inside the test origin.
+  allowedDevOrigins: ["127.0.0.1"],
+  ...(process.env.FSS_VISUAL_TESTS_ENABLED === "true"
+    ? { devIndicators: false }
+    : {}),
   experimental: {
     // Keep contact controls out of the public landing page's CSS payload.
     cssChunking: false,

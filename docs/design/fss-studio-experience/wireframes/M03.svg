@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="1026" viewBox="0 0 390 1026" role="img" aria-label="M03 · Requests &amp; feedback">
+<title>M03 · Requests &amp; feedback</title>
+<desc>FSS proposed interface. Text and shapes are editable SVG elements. Synthetic example data.</desc>
+<rect x="0" y="0" width="390" height="1026" rx="0" fill="#f2f3f5"/>
+<text x="20" y="48" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="500" fill="#46566c">FSS / REQUESTS</text>
+<text x="20" y="130" font-family="Geist,Arial,sans-serif" font-size="30" font-weight="600" fill="#0a1a2e">Requests &amp; feedback</text>
+<text x="20" y="168" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">A shared view of what is coming, moving and</text>
+<text x="20" y="191" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">ready for you.</text>
+<rect x="20" y="222" width="129" height="44" rx="12" fill="#0f7078"/>
+<text x="40" y="248" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#ffffff">New request</text>
+<a href="../wireframes.html#C06" target="_top" aria-label="New request"><rect x="20" y="222" width="129" height="44" fill="transparent"/></a>
+<text x="20" y="302" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="500" fill="#46566c">Request state</text>
+<rect x="20" y="318" width="58" height="44" rx="12" fill="#0f7078"/>
+<text x="40" y="344" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#ffffff">All</text>
+<a href="../wireframes.html#M03" target="_top" aria-label="All"><rect x="20" y="318" width="58" height="44" fill="transparent"/></a>
+<rect x="86" y="318" width="114" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="106" y="344" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">For review</text>
+<a href="../wireframes.html#M03" target="_top" aria-label="For review"><rect x="86" y="318" width="114" height="44" fill="transparent"/></a>
+<rect x="208" y="318" width="119" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="228" y="344" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">In progress</text>
+<a href="../wireframes.html#M03" target="_top" aria-label="In progress"><rect x="208" y="318" width="119" height="44" fill="transparent"/></a>
+<rect x="20" y="386" width="350" height="488" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="40" y="426" font-family="Geist,Arial,sans-serif" font-size="20" font-weight="600" fill="#0a1a2e">Your requests</text>
+<text x="40" y="471" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Booking flow v3</text>
+<text x="40" y="498" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Ready for review · Alex Morgan</text>
+<rect x="40" y="518" width="91" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="60" y="544" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Review</text>
+<a href="../wireframes.html#C09" target="_top" aria-label="Review"><rect x="40" y="518" width="91" height="44" fill="transparent"/></a>
+<text x="40" y="604" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Confirmation email</text>
+<text x="40" y="631" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">In progress · Jean-Fidele</text>
+<rect x="40" y="651" width="77" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="60" y="677" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Open</text>
+<a href="../wireframes.html#M03" target="_top" aria-label="Open"><rect x="40" y="651" width="77" height="44" fill="transparent"/></a>
+<text x="40" y="737" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Customer account area</text>
+<text x="40" y="764" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">New · Scope assessment</text>
+<rect x="40" y="784" width="77" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="60" y="810" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Open</text>
+<a href="../wireframes.html#M03" target="_top" aria-label="Open"><rect x="40" y="784" width="77" height="44" fill="transparent"/></a>
+<text x="20" y="910" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Faithful Software Solutions · Built on trust. Delivered with</text>
+<text x="20" y="927" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">care.</text>
+<rect x="0" y="962" width="390" height="64" rx="0" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="24" y="997" font-family="Geist,Arial,sans-serif" font-size="13" font-weight="500" fill="#46566c">Home</text>
+<text x="116" y="997" font-family="Geist,Arial,sans-serif" font-size="13" font-weight="500" fill="#46566c">Projects</text>
+<text x="208" y="997" font-family="Geist,Arial,sans-serif" font-size="13" font-weight="500" fill="#0f7078">Requests</text>
+<text x="300" y="997" font-family="Geist,Arial,sans-serif" font-size="13" font-weight="500" fill="#46566c">More</text></svg>

@@ -28,7 +28,7 @@ Prompt: Generate a premium mobile app screen only, portrait, no phone body or pe
 
 ## Verification and constraints
 
-Use `pnpm typecheck`, `pnpm test:unit`, `pnpm test:redesign`, `pnpm build`, and `pnpm perf:budget:homepage`. The repository lint command scans unrelated generated `.worktrees` directories; source verification used `pnpm exec eslint --ignore-pattern '.worktrees/**' --ignore-pattern '.playwright-cli/**'` plus `pnpm lint:covers`.
+Use `pnpm typecheck`, `pnpm test:unit`, `pnpm test:public-redesign`, `pnpm build`, and `pnpm perf:budget:homepage`. The repository lint command scans unrelated generated `.worktrees` directories; source verification used `pnpm exec eslint --ignore-pattern '.worktrees/**' --ignore-pattern '.playwright-cli/**'` plus `pnpm lint:covers`.
 
 Final verification passed type checking, all 1,787 unit tests, redesign assertions, production build, source lint, cover checks, homepage bundle budgets, and mobile Lighthouse assertions across five runs. Initial homepage CSS is 65.9 KB against a 66 KB budget, so further base styles need budget review. In-app browser checks covered desktop and mobile layouts; native Safari was not available for validation.
 

@@ -9,7 +9,7 @@ pnpm typecheck
 pnpm lint
 pnpm test
 pnpm build
-pnpm test:redesign
+pnpm test:public-redesign
 pnpm perf:budget:homepage
 pnpm start --port 3104 --hostname 127.0.0.1
 # In another terminal:

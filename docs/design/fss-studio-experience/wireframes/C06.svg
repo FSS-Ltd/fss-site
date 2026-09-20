@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1522" viewBox="0 0 1440 1522" role="img" aria-label="C06 · What would you like us to do?">
+<title>C06 · What would you like us to do?</title>
+<desc>FSS proposed interface. Text and shapes are editable SVG elements. Synthetic example data.</desc>
+<rect x="0" y="0" width="1440" height="1522" rx="0" fill="#f2f3f5"/>
+<text x="280" y="64" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="500" fill="#46566c">NORTHSTAR STUDIO / REQUESTS</text>
+<rect x="1226" y="40" width="148" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="1246" y="66" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Notifications · 3</text>
+<a href="../wireframes.html#C21" target="_top" aria-label="Notifications · 3"><rect x="1226" y="40" width="148" height="44" fill="transparent"/></a>
+<text x="280" y="152" font-family="Geist,Arial,sans-serif" font-size="36" font-weight="600" fill="#0a1a2e">What would you like us to do?</text>
+<text x="280" y="192" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">A clear request helps us give you a useful next step.</text>
+<text x="280" y="235" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="500" fill="#46566c">Request type</text>
+<rect x="280" y="251" width="110" height="44" rx="12" fill="#0f7078"/>
+<text x="300" y="277" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#ffffff">New work</text>
+<a href="../wireframes.html#C06" target="_top" aria-label="New work"><rect x="280" y="251" width="110" height="44" fill="transparent"/></a>
+<rect x="398" y="251" width="92" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="418" y="277" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Change</text>
+<a href="../wireframes.html#C06" target="_top" aria-label="Change"><rect x="398" y="251" width="92" height="44" fill="transparent"/></a>
+<rect x="498" y="251" width="114" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="518" y="277" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Bug report</text>
+<a href="../wireframes.html#C07" target="_top" aria-label="Bug report"><rect x="498" y="251" width="114" height="44" fill="transparent"/></a>
+<rect x="620" y="251" width="72" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="640" y="277" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Help</text>
+<a href="../wireframes.html#C06" target="_top" aria-label="Help"><rect x="620" y="251" width="72" height="44" fill="transparent"/></a>
+<rect x="280" y="319" width="1112" height="522" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="304" y="363" font-family="Geist,Arial,sans-serif" font-size="20" font-weight="600" fill="#0a1a2e">Your request</text>
+<text x="304" y="406" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Project</text>
+<rect x="304" y="420" width="1064" height="48" rx="8" fill="#ffffff" stroke="#788696"/>
+<text x="316" y="448" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Website &amp; booking experience ▾</text>
+<text x="304" y="488" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Only projects you can access appear here.</text>
+<text x="304" y="531" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Request title</text>
+<rect x="304" y="545" width="1064" height="48" rx="8" fill="#ffffff" stroke="#788696"/>
+<text x="316" y="573" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Add a booking confirmation email</text>
+<text x="304" y="631" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Description</text>
+<rect x="304" y="645" width="1064" height="48" rx="8" fill="#ffffff" stroke="#788696"/>
+<text x="316" y="673" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Send customers a confirmation with the appointment details.</text>
+<text x="304" y="731" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">What does success look like?</text>
+<rect x="304" y="745" width="1064" height="48" rx="8" fill="#ffffff" stroke="#788696"/>
+<text x="316" y="773" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Customers receive the right time, location and booking reference.</text>
+<rect x="280" y="865" width="1112" height="322" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="304" y="909" font-family="Geist,Arial,sans-serif" font-size="20" font-weight="600" fill="#0a1a2e">Useful context</text>
+<text x="304" y="952" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Desired date · optional</text>
+<rect x="304" y="966" width="1064" height="48" rx="8" fill="#ffffff" stroke="#788696"/>
+<text x="316" y="994" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">25 September 2026</text>
+<text x="304" y="1034" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">A requested date is not yet an agreed delivery date.</text>
+<text x="304" y="1077" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Impact · optional</text>
+<rect x="304" y="1091" width="1064" height="48" rx="8" fill="#ffffff" stroke="#788696"/>
+<text x="316" y="1119" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Customers currently need to call us to confirm.</text>
+<rect x="280" y="1211" width="1112" height="99" rx="16" fill="#e3f2f1" stroke="#d9dfe5"/>
+<text x="304" y="1251" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="600" fill="#0f7078">Attachments</text>
+<text x="304" y="1280" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Add a screenshot or document once secure uploads are enabled. Use your agreed secure sharing route for credentials.</text>
+<rect x="280" y="1334" width="147" height="44" rx="12" fill="#0f7078"/>
+<text x="300" y="1360" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#ffffff">Submit request</text>
+<a href="../wireframes.html#C08" target="_top" aria-label="Submit request"><rect x="280" y="1334" width="147" height="44" fill="transparent"/></a>
+<rect x="280" y="1390" width="74" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="300" y="1416" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Back</text>
+<text x="280" y="1470" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Faithful Software Solutions · Built on trust. Delivered with care.</text>
+<rect x="0" y="0" width="232" height="1522" rx="0" fill="#f7f8f9" stroke="#d9dfe5"/>
+<text x="24" y="58" font-family="Geist,Arial,sans-serif" font-size="30" font-weight="700" fill="#0a1a2e">FSS</text>
+<text x="24" y="88" font-family="Geist,Arial,sans-serif" font-size="10" font-weight="500" fill="#46566c">YOUR STUDIO WORKSPACE</text>
+<rect x="20" y="112" width="192" height="78" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="32" y="140" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="600" fill="#0a1a2e">Northstar Studio</text>
+<text x="32" y="165" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Client workspace ▾</text>
+<rect x="34" y="232" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="242" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Home</text>
+<rect x="34" y="280" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="290" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Getting started</text>
+<rect x="34" y="328" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="338" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Projects</text>
+<rect x="20" y="360" width="192" height="44" rx="12" fill="#e3f2f1"/>
+<rect x="34" y="376" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#0f7078"/>
+<text x="60" y="386" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0f7078">Requests</text>
+<rect x="34" y="424" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="434" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Documents</text>
+<rect x="34" y="472" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="482" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Agreements</text>
+<rect x="34" y="520" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="530" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Billing</text>
+<rect x="34" y="568" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="578" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Services</text>
+<rect x="34" y="616" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="626" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Notifications</text>
+<rect x="34" y="664" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="674" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Help</text>
+<rect x="34" y="712" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="722" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Settings</text>
+<text x="24" y="764" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Alex Morgan</text>
+<text x="24" y="781" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Northstar Studio</text></svg>

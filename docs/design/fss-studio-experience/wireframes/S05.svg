@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1024" viewBox="0 0 1440 1024" role="img" aria-label="S05 · This invitation has expired.">
+<title>S05 · This invitation has expired.</title>
+<desc>FSS proposed interface. Text and shapes are editable SVG elements. Synthetic example data.</desc>
+<rect x="0" y="0" width="1440" height="1024" rx="0" fill="#f2f3f5"/>
+<text x="360" y="64" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="500" fill="#46566c">NORTHSTAR STUDIO / HOME</text>
+<text x="360" y="152" font-family="Geist,Arial,sans-serif" font-size="36" font-weight="600" fill="#0a1a2e">This invitation has expired.</text>
+<text x="360" y="192" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">We will help you get to the right workspace.</text>
+<rect x="360" y="223" width="209" height="44" rx="12" fill="#0f7078"/>
+<text x="380" y="249" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#ffffff">Request a new invitation</text>
+<a href="../wireframes.html#S05" target="_top" aria-label="Request a new invitation"><rect x="360" y="223" width="209" height="44" fill="transparent"/></a>
+<rect x="360" y="291" width="720" height="99" rx="16" fill="#fff4df" stroke="#d9dfe5"/>
+<text x="384" y="331" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="600" fill="#805300">A fresh invitation is needed</text>
+<text x="384" y="360" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Request another invitation from FSS. Signing in alone does not activate organisation access.</text>
+<rect x="360" y="414" width="720" height="172" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="384" y="458" font-family="Geist,Arial,sans-serif" font-size="20" font-weight="600" fill="#0a1a2e">Already have access?</text>
+<text x="384" y="503" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Sign in with your existing account</text>
+<text x="384" y="530" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Use your verified email to see memberships.</text>
+<rect x="971" y="489" width="85" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="991" y="515" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Sign in</text>
+<a href="../wireframes.html#C00" target="_top" aria-label="Sign in"><rect x="971" y="489" width="85" height="44" fill="transparent"/></a>
+<text x="360" y="622" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Faithful Software Solutions · Built on trust. Delivered with care.</text></svg>

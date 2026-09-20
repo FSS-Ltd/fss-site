@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1330" viewBox="0 0 1440 1330" role="img" aria-label="F23 · Ready when you are.">
+<title>F23 · Ready when you are.</title>
+<desc>FSS proposed interface. Text and shapes are editable SVG elements. Synthetic example data.</desc>
+<rect x="0" y="0" width="1440" height="1330" rx="0" fill="#f2f3f5"/>
+<text x="280" y="64" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="500" fill="#46566c">STUDIO / WELCOME JOURNEYS</text>
+<rect x="1226" y="40" width="148" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="1246" y="66" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Notifications · 3</text>
+<a href="../wireframes.html#F29" target="_top" aria-label="Notifications · 3"><rect x="1226" y="40" width="148" height="44" fill="transparent"/></a>
+<text x="280" y="152" font-family="Geist,Arial,sans-serif" font-size="36" font-weight="600" fill="#0a1a2e">Ready when you are.</text>
+<text x="280" y="192" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Step 5 · Review exactly what starting will do.</text>
+<rect x="280" y="223" width="1112" height="90" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="304" y="259" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="600" fill="#0f7078">STEP 5 OF 5 / READINESS &amp; ACTIVATION</text>
+<rect x="304.0" y="281" width="206.4" height="4" rx="2" fill="#0f7078"/>
+<rect x="518.4" y="281" width="206.4" height="4" rx="2" fill="#0f7078"/>
+<rect x="732.8" y="281" width="206.4" height="4" rx="2" fill="#0f7078"/>
+<rect x="947.2" y="281" width="206.4" height="4" rx="2" fill="#0f7078"/>
+<rect x="1161.6" y="281" width="206.4" height="4" rx="2" fill="#0f7078"/>
+<rect x="280" y="337" width="1112" height="462" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="304" y="381" font-family="Geist,Arial,sans-serif" font-size="20" font-weight="600" fill="#0a1a2e">Preflight</text>
+<rect x="304" y="410" width="32" height="32" rx="10" fill="#eaf5ed"/>
+<text x="314" y="430" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="600" fill="#226143">✓</text>
+<text x="352" y="426" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Client and contacts</text>
+<text x="352" y="453" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Northstar Studio · Alex Morgan</text>
+<rect x="304" y="483" width="32" height="32" rx="10" fill="#eaf5ed"/>
+<text x="314" y="503" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="600" fill="#226143">✓</text>
+<text x="352" y="499" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Welcome email and guide</text>
+<text x="352" y="526" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Approved content · accessible version ready</text>
+<rect x="304" y="556" width="32" height="32" rx="10" fill="#eaf5ed"/>
+<text x="314" y="576" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="600" fill="#226143">✓</text>
+<text x="352" y="572" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Proposal and signers</text>
+<text x="352" y="599" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Revision 2 · Alex and Jean-Fidele</text>
+<rect x="304" y="629" width="32" height="32" rx="10" fill="#eaf5ed"/>
+<text x="314" y="649" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="600" fill="#226143">✓</text>
+<text x="352" y="645" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Billing and portal roles</text>
+<text x="352" y="672" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">First obligation selected · existing access reused</text>
+<rect x="304" y="702" width="32" height="32" rx="10" fill="#eaf5ed"/>
+<text x="314" y="722" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="600" fill="#226143">✓</text>
+<text x="352" y="718" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Delivery settings</text>
+<text x="352" y="745" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Sender verified · provider and worker ready</text>
+<rect x="280" y="823" width="1112" height="99" rx="16" fill="#e3f2f1" stroke="#d9dfe5"/>
+<text x="304" y="863" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="600" fill="#0f7078">Start this journey</text>
+<text x="304" y="892" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Queues the reviewed welcome email to Alex now. The proposal follows its timing and approval gates. Later invoice and access steps wait for verified signatures.</text>
+<rect x="280" y="946" width="1112" height="172" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="304" y="990" font-family="Geist,Arial,sans-serif" font-size="20" font-weight="600" fill="#0a1a2e">Final previews</text>
+<text x="304" y="1035" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Welcome · proposal · thank-you · activation emails</text>
+<text x="304" y="1062" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Exact recipients and content retained</text>
+<rect x="1223" y="1021" width="145" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="1243" y="1047" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Open previews</text>
+<a href="../wireframes.html#F23" target="_top" aria-label="Open previews"><rect x="1223" y="1021" width="145" height="44" fill="transparent"/></a>
+<rect x="280" y="1142" width="130" height="44" rx="12" fill="#0f7078"/>
+<text x="300" y="1168" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#ffffff">Start journey</text>
+<a href="../wireframes.html#F24" target="_top" aria-label="Start journey"><rect x="280" y="1142" width="130" height="44" fill="transparent"/></a>
+<rect x="280" y="1198" width="112" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="300" y="1224" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Save draft</text>
+<text x="280" y="1278" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Faithful Software Solutions · Built on trust. Delivered with care.</text>
+<rect x="0" y="0" width="232" height="1330" rx="0" fill="#f7f8f9" stroke="#d9dfe5"/>
+<text x="24" y="58" font-family="Geist,Arial,sans-serif" font-size="30" font-weight="700" fill="#0a1a2e">FSS</text>
+<text x="24" y="88" font-family="Geist,Arial,sans-serif" font-size="10" font-weight="500" fill="#46566c">STUDIO OPERATIONS</text>
+<rect x="20" y="112" width="192" height="78" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="32" y="140" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="600" fill="#0a1a2e">Founder workspace</text>
+<text x="32" y="165" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">All clients ▾</text>
+<rect x="34" y="232" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="242" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Overview</text>
+<rect x="34" y="280" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="290" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Clients</text>
+<rect x="34" y="328" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="338" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Delivery</text>
+<rect x="34" y="376" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="386" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Agreements</text>
+<rect x="20" y="408" width="192" height="44" rx="12" fill="#e3f2f1"/>
+<rect x="34" y="424" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#0f7078"/>
+<text x="60" y="434" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0f7078">Welcome journeys</text>
+<rect x="34" y="472" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="482" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Projects</text>
+<rect x="34" y="520" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="530" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Billing</text>
+<rect x="34" y="568" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="578" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Portal access</text>
+<rect x="34" y="616" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="626" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Notifications</text>
+<rect x="34" y="664" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="674" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Settings</text>
+<text x="24" y="716" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Jean-Fidele</text>
+<text x="24" y="733" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Founder</text></svg>

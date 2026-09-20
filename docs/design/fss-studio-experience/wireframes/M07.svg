@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="1775" viewBox="0 0 390 1775" role="img" aria-label="M07 · Your studio, in focus.">
+<title>M07 · Your studio, in focus.</title>
+<desc>FSS proposed interface. Text and shapes are editable SVG elements. Synthetic example data.</desc>
+<rect x="0" y="0" width="390" height="1775" rx="0" fill="#f2f3f5"/>
+<text x="20" y="48" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="500" fill="#46566c">FSS / OVERVIEW</text>
+<text x="20" y="130" font-family="Geist,Arial,sans-serif" font-size="30" font-weight="600" fill="#0a1a2e">Your studio, in focus.</text>
+<text x="20" y="168" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Tuesday, 15 September · All clients</text>
+<rect x="20" y="199" width="135" height="44" rx="12" fill="#0f7078"/>
+<text x="40" y="225" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#ffffff">View delivery</text>
+<a href="../wireframes.html#F05" target="_top" aria-label="View delivery"><rect x="20" y="199" width="135" height="44" fill="transparent"/></a>
+<rect x="20" y="267" width="350" height="301" rx="16" fill="#07182e" stroke="#d9dfe5"/>
+<text x="40" y="298" font-family="Geist,Arial,sans-serif" font-size="11" font-weight="500" fill="#ffffff">YOUR NEXT STEP</text>
+<text x="40" y="345" font-family="Geist,Arial,sans-serif" font-size="26" font-weight="600" fill="#ffffff">Three decisions will</text>
+<text x="40" y="383" font-family="Geist,Arial,sans-serif" font-size="26" font-weight="600" fill="#ffffff">move work forward.</text>
+<text x="40" y="427" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#ffffff">One request needs assessment, one</text>
+<text x="40" y="450" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#ffffff">agreement needs review and one</text>
+<text x="40" y="473" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#ffffff">welcome step needs attention.</text>
+<rect x="40" y="504" width="169" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="60" y="530" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Open action queue</text>
+<a href="../wireframes.html#M07" target="_top" aria-label="Open action queue"><rect x="40" y="504" width="169" height="44" fill="transparent"/></a>
+<rect x="20.0" y="592" width="111.33333333333333" height="120" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="32.0" y="627" font-family="Geist,Arial,sans-serif" font-size="23" font-weight="600" fill="#0a1a2e">3 / 3</text>
+<text x="32.0" y="667" font-family="Geist,Arial,sans-serif" font-size="11" font-weight="400" fill="#46566c">Delivery capacity</text>
+<rect x="139.33333333333331" y="592" width="111.33333333333333" height="120" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="151.33333333333331" y="627" font-family="Geist,Arial,sans-serif" font-size="23" font-weight="600" fill="#0a1a2e">2</text>
+<text x="151.33333333333331" y="667" font-family="Geist,Arial,sans-serif" font-size="11" font-weight="400" fill="#46566c">Client reviews</text>
+<text x="151.33333333333331" y="683" font-family="Geist,Arial,sans-serif" font-size="11" font-weight="400" fill="#46566c">open</text>
+<rect x="258.66666666666663" y="592" width="111.33333333333333" height="120" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="270.66666666666663" y="627" font-family="Geist,Arial,sans-serif" font-size="23" font-weight="600" fill="#0a1a2e">£2,400</text>
+<text x="270.66666666666663" y="667" font-family="Geist,Arial,sans-serif" font-size="11" font-weight="400" fill="#46566c">Invoices overdue</text>
+<rect x="20" y="736" width="350" height="508" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="40" y="776" font-family="Geist,Arial,sans-serif" font-size="20" font-weight="600" fill="#0a1a2e">Needs your attention</text>
+<text x="40" y="821" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Northstar · Review booking scope</text>
+<text x="40" y="848" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">New request · acknowledgement target today</text>
+<rect x="40" y="868" width="149" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="60" y="894" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Assess request</text>
+<a href="../wireframes.html#F08" target="_top" aria-label="Assess request"><rect x="40" y="868" width="149" height="44" fill="transparent"/></a>
+<text x="40" y="954" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Harbour · Finish agreement</text>
+<text x="40" y="981" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Missing engagement link</text>
+<rect x="40" y="1001" width="182" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="60" y="1027" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Continue agreement</text>
+<a href="../wireframes.html#F16" target="_top" aria-label="Continue agreement"><rect x="40" y="1001" width="182" height="44" fill="transparent"/></a>
+<text x="40" y="1087" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Northstar · Welcome email</text>
+<text x="40" y="1114" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Delivery outcome unknown · reconcile before</text>
+<text x="40" y="1134" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">retry</text>
+<rect x="40" y="1154" width="156" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="60" y="1180" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Resolve delivery</text>
+<a href="../wireframes.html#F25" target="_top" aria-label="Resolve delivery"><rect x="40" y="1154" width="156" height="44" fill="transparent"/></a>
+<rect x="20" y="1268" width="350" height="355" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="40" y="1308" font-family="Geist,Arial,sans-serif" font-size="20" font-weight="600" fill="#0a1a2e">This week</text>
+<text x="40" y="1353" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Northstar · Website &amp; booking</text>
+<text x="40" y="1380" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Design review 17 Sep · next action with client</text>
+<rect x="40" y="1400" width="117" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="60" y="1426" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">View client</text>
+<a href="../wireframes.html#M07" target="_top" aria-label="View client"><rect x="40" y="1400" width="117" height="44" fill="transparent"/></a>
+<text x="40" y="1486" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Harbour · Membership portal</text>
+<text x="40" y="1513" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Kickoff pending agreement and assets</text>
+<rect x="40" y="1533" width="117" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="60" y="1559" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">View client</text>
+<a href="../wireframes.html#M07" target="_top" aria-label="View client"><rect x="40" y="1533" width="117" height="44" fill="transparent"/></a>
+<text x="20" y="1659" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Faithful Software Solutions · Built on trust. Delivered with</text>
+<text x="20" y="1676" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">care.</text>
+<rect x="0" y="1711" width="390" height="64" rx="0" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="24" y="1746" font-family="Geist,Arial,sans-serif" font-size="13" font-weight="500" fill="#0f7078">Overview</text>
+<text x="116" y="1746" font-family="Geist,Arial,sans-serif" font-size="13" font-weight="500" fill="#46566c">Clients</text>
+<text x="208" y="1746" font-family="Geist,Arial,sans-serif" font-size="13" font-weight="500" fill="#46566c">Delivery</text>
+<text x="300" y="1746" font-family="Geist,Arial,sans-serif" font-size="13" font-weight="500" fill="#46566c">More</text></svg>

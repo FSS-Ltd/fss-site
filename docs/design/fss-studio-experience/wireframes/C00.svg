@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1024" viewBox="0 0 1440 1024" role="img" aria-label="C00 · Welcome to your FSS workspace">
+<title>C00 · Welcome to your FSS workspace</title>
+<desc>FSS proposed interface. Text and shapes are editable SVG elements. Synthetic example data.</desc>
+<rect x="0" y="0" width="1440" height="1024" rx="0" fill="#f2f3f5"/>
+<text x="360" y="64" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="500" fill="#46566c">NORTHSTAR STUDIO / HOME</text>
+<text x="360" y="152" font-family="Geist,Arial,sans-serif" font-size="36" font-weight="600" fill="#0a1a2e">Welcome to your FSS workspace</text>
+<text x="360" y="192" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">One place for your project, feedback and next steps.</text>
+<rect x="360" y="223" width="720" height="210" rx="16" fill="#07182e" stroke="#d9dfe5"/>
+<text x="384" y="258" font-family="Geist,Arial,sans-serif" font-size="11" font-weight="500" fill="#ffffff">YOUR NEXT STEP</text>
+<text x="384" y="309" font-family="Geist,Arial,sans-serif" font-size="30" font-weight="600" fill="#ffffff">Good work starts here.</text>
+<text x="384" y="355" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#ffffff">Sign in with your invited email to see your workspace. Your project updates and decisions</text>
+<text x="384" y="378" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#ffffff">stay together.</text>
+<rect x="360" y="457" width="720" height="222" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="384" y="501" font-family="Geist,Arial,sans-serif" font-size="20" font-weight="600" fill="#0a1a2e">Sign in</text>
+<text x="384" y="544" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Email address</text>
+<rect x="384" y="558" width="672" height="48" rx="8" fill="#ffffff" stroke="#788696"/>
+<text x="396" y="586" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">alex@northstar.example</text>
+<text x="384" y="626" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Use the email on your invitation.</text>
+<rect x="360" y="703" width="720" height="99" rx="16" fill="#e3f2f1" stroke="#d9dfe5"/>
+<text x="384" y="743" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="600" fill="#0f7078">Have an invitation?</text>
+<text x="384" y="772" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Open the invitation link to activate your approved access. Need a fresh link? Request access help.</text>
+<rect x="360" y="826" width="102" height="44" rx="12" fill="#0f7078"/>
+<text x="380" y="852" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#ffffff">Continue</text>
+<a href="../wireframes.html#C01" target="_top" aria-label="Continue"><rect x="360" y="826" width="102" height="44" fill="transparent"/></a>
+<rect x="360" y="882" width="74" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="380" y="908" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Back</text>
+<text x="360" y="962" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Faithful Software Solutions · Built on trust. Delivered with care.</text></svg>

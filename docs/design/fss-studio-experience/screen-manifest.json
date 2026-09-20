@@ -1,0 +1,4313 @@
+[
+  {
+    "id": "C00",
+    "role": "Client",
+    "nav": "Home",
+    "title": "Welcome to your FSS workspace",
+    "subtitle": "One place for your project, feedback and next steps.",
+    "sections": [
+      {
+        "type": "hero",
+        "title": "Good work starts here.",
+        "body": "Sign in with your invited email to see your workspace. Your project updates and decisions stay together.",
+        "tone": "navy"
+      },
+      {
+        "type": "fields",
+        "title": "Sign in",
+        "items": [
+          [
+            "Email address",
+            "alex@northstar.example",
+            "Use the email on your invitation."
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Have an invitation?",
+        "body": "Open the invitation link to activate your approved access. Need a fresh link? Request access help.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Continue",
+    "route": "/portal/login"
+  },
+  {
+    "id": "C01",
+    "role": "Client",
+    "nav": "Home",
+    "title": "Good morning, Alex.",
+    "subtitle": "Here is where things stand with Northstar Studio.",
+    "sections": [
+      {
+        "type": "hero",
+        "title": "Your booking flow is ready.",
+        "body": "Review the updated prototype and tell us whether it meets the agreed outcome.",
+        "action": "Review the update",
+        "tone": "navy"
+      },
+      {
+        "type": "metrics",
+        "items": [
+          [
+            "1",
+            "Waiting for you"
+          ],
+          [
+            "3",
+            "In delivery"
+          ],
+          [
+            "24 Sep",
+            "Next milestone"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Your next steps",
+        "items": [
+          [
+            "Review booking flow \u00b7 v3",
+            "Ready for review \u00b7 Alex Morgan \u00b7 requested today",
+            "Open review"
+          ],
+          [
+            "Upload your approved brand assets",
+            "Needed before development \u00b7 due 18 Sep",
+            "Add assets"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Your project",
+        "items": [
+          [
+            "Website & booking experience",
+            "Design phase \u00b7 Jean-Fidele \u00b7 next update Friday",
+            "View project"
+          ],
+          [
+            "Latest update",
+            "The booking journey is ready for your review. Development starts after approval.",
+            "Read update"
+          ]
+        ]
+      }
+    ],
+    "primary": "New request",
+    "route": "/portal?organisationId=:org"
+  },
+  {
+    "id": "C02",
+    "role": "Client",
+    "nav": "Getting started",
+    "title": "Let\u2019s get you ready.",
+    "subtitle": "Three of six steps complete. Your progress is saved as you go.",
+    "sections": [
+      {
+        "type": "hero",
+        "title": "Next: share your brand assets.",
+        "body": "Add your approved logo, brand guide and final copy so we can prepare your project.",
+        "action": "Upload assets",
+        "tone": "navy"
+      },
+      {
+        "type": "timeline",
+        "title": "Your launch checklist",
+        "items": [
+          [
+            "\u2713",
+            "Confirm your details",
+            "Completed \u00b7 12 Sep"
+          ],
+          [
+            "\u2713",
+            "Review and sign your agreement",
+            "Signed \u00b7 revision 2"
+          ],
+          [
+            "\u2713",
+            "Set up billing",
+            "Deposit paid \u00b7 \u00a31,200"
+          ],
+          [
+            "4",
+            "Share brand assets",
+            "Your action \u00b7 logo, brand guide and approved copy"
+          ],
+          [
+            "5",
+            "Confirm kickoff",
+            "Choose from the times offered by FSS"
+          ],
+          [
+            "6",
+            "Ready to begin",
+            "FSS confirms the start after all prerequisites are met"
+          ]
+        ]
+      }
+    ],
+    "primary": "Continue setup",
+    "route": "/portal/getting-started"
+  },
+  {
+    "id": "C03",
+    "role": "Client",
+    "nav": "Projects",
+    "title": "Your projects",
+    "subtitle": "Clear outcomes, visible milestones and a named owner.",
+    "sections": [
+      {
+        "type": "metrics",
+        "items": [
+          [
+            "1",
+            "Active project"
+          ],
+          [
+            "1",
+            "Awaiting your review"
+          ],
+          [
+            "1",
+            "Completed project"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Active work",
+        "items": [
+          [
+            "Website & booking experience",
+            "Design \u00b7 next milestone 24 Sep \u00b7 Jean-Fidele",
+            "Open project"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Completed work",
+        "items": [
+          [
+            "Brand landing page",
+            "Delivered 28 Aug \u00b7 handover available",
+            "View handover"
+          ]
+        ]
+      }
+    ],
+    "primary": "Open active project",
+    "route": "/portal/projects"
+  },
+  {
+    "id": "C04",
+    "role": "Client",
+    "nav": "Projects",
+    "title": "Website & booking experience",
+    "subtitle": "Northstar Studio \u00b7 Project NS-001 \u00b7 Jean-Fidele",
+    "sections": [
+      {
+        "type": "hero",
+        "title": "A simpler route from enquiry to booking.",
+        "body": "Current milestone: approve the booking experience. Target: 24 September, subject to feedback.",
+        "action": "Review milestone",
+        "tone": "navy"
+      },
+      {
+        "type": "timeline",
+        "title": "Delivery plan",
+        "items": [
+          [
+            "\u2713",
+            "Discover",
+            "Goals and scope agreed"
+          ],
+          [
+            "2",
+            "Design",
+            "Booking flow ready for your review"
+          ],
+          [
+            "3",
+            "Build",
+            "Starts after design approval and assets"
+          ],
+          [
+            "4",
+            "Launch & handover",
+            "Readiness checks, training and acceptance"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Project workspace",
+        "items": [
+          [
+            "Agreed scope",
+            "Booking journey, five content pages and contact workflow",
+            "Read scope"
+          ],
+          [
+            "Requests & decisions",
+            "7 requests \u00b7 1 waiting for review",
+            "Open board"
+          ],
+          [
+            "Files & deliverables",
+            "Brand guide, approved copy and design v3",
+            "View files"
+          ]
+        ]
+      }
+    ],
+    "primary": "New request",
+    "route": "/portal/projects/:project"
+  },
+  {
+    "id": "C05",
+    "role": "Client",
+    "nav": "Requests",
+    "title": "Requests & feedback",
+    "subtitle": "A shared view of what is coming, moving and ready for you.",
+    "sections": [
+      {
+        "type": "board",
+        "founder": false
+      },
+      {
+        "type": "notice",
+        "title": "How your board works",
+        "body": "FSS plans and progresses delivery. You can accept a review or request changes. Open a card for its next action and discussion.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "New request",
+    "route": "/portal/requests"
+  },
+  {
+    "id": "C06",
+    "role": "Client",
+    "nav": "Requests",
+    "title": "What would you like us to do?",
+    "subtitle": "A clear request helps us give you a useful next step.",
+    "sections": [
+      {
+        "type": "choices",
+        "title": "Request type",
+        "items": [
+          "New work",
+          "Change",
+          "Bug report",
+          "Help"
+        ]
+      },
+      {
+        "type": "fields",
+        "title": "Your request",
+        "items": [
+          [
+            "Project",
+            "Website & booking experience  \u2304",
+            "Only projects you can access appear here."
+          ],
+          [
+            "Request title",
+            "Add a booking confirmation email"
+          ],
+          [
+            "Description",
+            "Send customers a confirmation with the appointment details."
+          ],
+          [
+            "What does success look like?",
+            "Customers receive the right time, location and booking reference."
+          ]
+        ]
+      },
+      {
+        "type": "fields",
+        "title": "Useful context",
+        "items": [
+          [
+            "Desired date \u00b7 optional",
+            "25 September 2026",
+            "A requested date is not yet an agreed delivery date."
+          ],
+          [
+            "Impact \u00b7 optional",
+            "Customers currently need to call us to confirm."
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Attachments",
+        "body": "Add a screenshot or document once secure uploads are enabled. Use your agreed secure sharing route for credentials.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Submit request",
+    "route": "/portal/requests/new"
+  },
+  {
+    "id": "C07",
+    "role": "Client",
+    "nav": "Requests",
+    "title": "Report a problem",
+    "subtitle": "Tell us what happened so we can reproduce it.",
+    "sections": [
+      {
+        "type": "choices",
+        "title": "Request type",
+        "items": [
+          "New work",
+          "Change",
+          "Bug report",
+          "Help"
+        ],
+        "selected": 2
+      },
+      {
+        "type": "fields",
+        "title": "The problem",
+        "items": [
+          [
+            "Project",
+            "Website & booking experience  \u2304"
+          ],
+          [
+            "Short title",
+            "Booking confirmation shows the wrong time"
+          ],
+          [
+            "Steps to reproduce",
+            "1. Choose a 10:00 slot.\n2. Complete a test booking.\n3. Open the confirmation email."
+          ],
+          [
+            "What you expected",
+            "The email should show 10:00 Europe/London."
+          ],
+          [
+            "What happened instead",
+            "The email shows 09:00."
+          ]
+        ]
+      },
+      {
+        "type": "fields",
+        "title": "Impact & environment",
+        "items": [
+          [
+            "Impact",
+            "Incorrect appointment time for customers"
+          ],
+          [
+            "Page URL \u00b7 optional",
+            "https://northstar.example/book"
+          ],
+          [
+            "Browser / device \u00b7 optional",
+            "Safari \u00b7 iPhone"
+          ]
+        ]
+      }
+    ],
+    "primary": "Submit bug report",
+    "route": "/portal/requests/new?type=bug"
+  },
+  {
+    "id": "C08",
+    "role": "Client",
+    "nav": "Requests",
+    "title": "Booking confirmation email",
+    "subtitle": "NS-014 \u00b7 New work \u00b7 Website & booking experience",
+    "sections": [
+      {
+        "type": "notice",
+        "title": "In progress",
+        "body": "Jean-Fidele is building the email template. Next update: Friday.",
+        "tone": "tint"
+      },
+      {
+        "type": "columns",
+        "left": {
+          "type": "rows",
+          "title": "Request details",
+          "items": [
+            [
+              "Desired outcome",
+              "Customers receive the correct time and booking reference."
+            ],
+            [
+              "Scope",
+              "Included in your agreed booking workflow."
+            ],
+            [
+              "Target",
+              "24 September \u00b7 agreed after assessment"
+            ]
+          ]
+        },
+        "right": {
+          "type": "rows",
+          "title": "Latest conversation",
+          "items": [
+            [
+              "Jean-Fidele \u00b7 today, 10:32",
+              "The template is built. I\u2019m checking the time zone and mobile layout."
+            ],
+            [
+              "Alex \u00b7 yesterday, 15:10",
+              "Please include our studio address in the confirmation."
+            ]
+          ]
+        }
+      },
+      {
+        "type": "fields",
+        "title": "Add a comment",
+        "items": [
+          [
+            "Your message",
+            "Write a message to your FSS team\u2026"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "History",
+        "items": [
+          [
+            "Acknowledged \u2192 Planned \u2192 In progress",
+            "Owner: Jean-Fidele \u00b7 3 public updates",
+            "View history"
+          ]
+        ]
+      }
+    ],
+    "primary": "Send comment",
+    "route": "/portal/requests/:request"
+  },
+  {
+    "id": "C09",
+    "role": "Client",
+    "nav": "Requests",
+    "title": "Ready for your review",
+    "subtitle": "NS-014 \u00b7 Booking confirmation email \u00b7 Version 3",
+    "sections": [
+      {
+        "type": "hero",
+        "title": "Does this meet the agreed outcome?",
+        "body": "Check the time, studio address and booking reference in the preview. Your decision applies to version 3.",
+        "action": "Open preview",
+        "tone": "navy"
+      },
+      {
+        "type": "rows",
+        "title": "What changed",
+        "items": [
+          [
+            "Correct local time",
+            "Bookings now display Europe/London time."
+          ],
+          [
+            "Clearer appointment details",
+            "The confirmation includes the address, date and booking reference."
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Your decision",
+        "body": "Accept this version when you are happy with the agreed work, or request changes with specific feedback.",
+        "tone": "tint"
+      },
+      {
+        "type": "review",
+        "title": "Review version 3",
+        "body": "I confirm this deliverable meets the agreed requirements.",
+        "actions": [
+          "Accept version 3",
+          "Request changes"
+        ]
+      }
+    ],
+    "primary": "Open preview",
+    "route": "/portal/requests/:request/review"
+  },
+  {
+    "id": "C10",
+    "role": "Client",
+    "nav": "Requests",
+    "title": "What needs changing?",
+    "subtitle": "Your feedback stays attached to version 3.",
+    "sections": [
+      {
+        "type": "fields",
+        "title": "Feedback",
+        "items": [
+          [
+            "Required changes",
+            "The confirmation needs to include our cancellation contact."
+          ],
+          [
+            "Why this matters \u00b7 optional",
+            "Customers should know who to contact before their appointment."
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "What happens next",
+        "body": "FSS will assess your feedback and confirm whether it is included in the agreed revision scope. No additional charge is created by this feedback.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Send feedback",
+    "route": "/portal/requests/:request/review?decision=changes"
+  },
+  {
+    "id": "C11",
+    "role": "Client",
+    "nav": "Requests",
+    "title": "All done.",
+    "subtitle": "NS-014 \u00b7 Booking confirmation email",
+    "sections": [
+      {
+        "type": "hero",
+        "title": "Version 3 accepted.",
+        "body": "Accepted by Alex Morgan on 15 September at 14:12. The final files and review history are available below.",
+        "action": "View final deliverable",
+        "tone": "tint"
+      },
+      {
+        "type": "rows",
+        "title": "Completion record",
+        "items": [
+          [
+            "Accepted outcome",
+            "Correct local time, studio address and booking reference."
+          ],
+          [
+            "Final deliverable",
+            "Booking confirmation email \u00b7 v3 \u00b7 accepted"
+          ],
+          [
+            "Need something else?",
+            "Start a linked follow-up so the completed record stays intact.",
+            "New follow-up"
+          ]
+        ]
+      }
+    ],
+    "primary": "Back to requests",
+    "route": "/portal/requests/:request?state=done"
+  },
+  {
+    "id": "C12",
+    "role": "Client",
+    "nav": "Documents",
+    "title": "Your documents",
+    "subtitle": "Approved files, agreements and deliverables in one place.",
+    "sections": [
+      {
+        "type": "choices",
+        "title": "Filter documents",
+        "items": [
+          "All files",
+          "Deliverables",
+          "Agreements",
+          "Welcome"
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Shared with Northstar Studio",
+        "items": [
+          [
+            "Booking flow \u00b7 v3",
+            "Deliverable \u00b7 15 Sep \u00b7 ready for review",
+            "Open file"
+          ],
+          [
+            "Website agreement \u00b7 revision 2",
+            "Signed agreement \u00b7 12 Sep",
+            "View agreement"
+          ],
+          [
+            "Your welcome guide",
+            "Getting started \u00b7 accessible web version available",
+            "Read guide"
+          ],
+          [
+            "Brand guide \u00b7 v1",
+            "Client asset \u00b7 verified and ready",
+            "Open file"
+          ]
+        ]
+      }
+    ],
+    "primary": "Upload document",
+    "route": "/portal/documents"
+  },
+  {
+    "id": "C13",
+    "role": "Client",
+    "nav": "Documents",
+    "title": "Booking flow \u00b7 version 3",
+    "subtitle": "Shared by Jean-Fidele \u00b7 15 September 2026",
+    "sections": [
+      {
+        "type": "document",
+        "title": "Booking experience",
+        "body": "01  Choose your appointment\n02  Confirm the details\n03  Receive your booking confirmation",
+        "caption": "Design preview \u00b7 version 3 \u00b7 linked to NS-014"
+      },
+      {
+        "type": "rows",
+        "title": "File information",
+        "items": [
+          [
+            "Access",
+            "Shared with your project team"
+          ],
+          [
+            "Version history",
+            "v3 current \u00b7 v2 superseded \u00b7 v1 superseded"
+          ],
+          [
+            "Related request",
+            "NS-014 \u00b7 Ready for review",
+            "Open request"
+          ]
+        ]
+      }
+    ],
+    "primary": "Download file",
+    "route": "/portal/documents/:document"
+  },
+  {
+    "id": "C14",
+    "role": "Client",
+    "nav": "Agreements",
+    "title": "Your agreements",
+    "subtitle": "Know what is included, what it costs and what happens next.",
+    "sections": [
+      {
+        "type": "rows",
+        "title": "Action needed",
+        "items": [
+          [
+            "Website & booking experience",
+            "Revision 2 \u00b7 awaiting your signature \u00b7 Alex Morgan",
+            "Review agreement"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Signed agreements",
+        "items": [
+          [
+            "Brand landing page",
+            "Signed 28 August \u00b7 all signatures complete",
+            "View signed copy"
+          ]
+        ]
+      }
+    ],
+    "primary": "Review agreement",
+    "route": "/portal/agreements"
+  },
+  {
+    "id": "C15",
+    "role": "Client",
+    "nav": "Agreements",
+    "title": "Your agreement, clearly explained.",
+    "subtitle": "Website & booking experience \u00b7 Revision 2",
+    "sections": [
+      {
+        "type": "metrics",
+        "items": [
+          [
+            "\u00a34,800",
+            "One-off total"
+          ],
+          [
+            "\u00a31,200",
+            "Initial deposit"
+          ],
+          [
+            "4",
+            "Delivery milestones"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "At a glance",
+        "items": [
+          [
+            "What we will deliver",
+            "Five content pages, booking workflow, confirmation email and handover."
+          ],
+          [
+            "What you provide",
+            "Approved brand assets, website copy and one authorised reviewer."
+          ],
+          [
+            "Payment schedule",
+            "\u00a31,200 deposit + 3 milestone payments of \u00a31,200. Tax follows the agreement."
+          ],
+          [
+            "Support & changes",
+            "Agreed defect support and a separate quote for additional scope."
+          ]
+        ]
+      },
+      {
+        "type": "document",
+        "title": "Full agreement",
+        "body": "Scope, fees, delivery assumptions, responsibilities, support and terms.",
+        "caption": "The complete agreement governs. Read or download before signing."
+      }
+    ],
+    "primary": "Continue to signing",
+    "route": "/portal/agreements/:agreement"
+  },
+  {
+    "id": "C16",
+    "role": "Client",
+    "nav": "Agreements",
+    "title": "Review and sign",
+    "subtitle": "Website & booking experience \u00b7 Revision 2",
+    "sections": [
+      {
+        "type": "notice",
+        "title": "Signing as Alex Morgan",
+        "body": "You are a designated signer for Northstar Studio. Your verified email is alex@northstar.example.",
+        "tone": "tint"
+      },
+      {
+        "type": "document",
+        "title": "Agreement revision 2",
+        "body": "The exact document you are signing is shown here. Download an accessible copy or read the full text.",
+        "caption": "Document prepared 15 September 2026"
+      },
+      {
+        "type": "fields",
+        "title": "Your signature",
+        "items": [
+          [
+            "Full legal name",
+            "Alex Morgan"
+          ],
+          [
+            "Role / position",
+            "Director"
+          ]
+        ]
+      },
+      {
+        "type": "review",
+        "title": "Confirm your agreement",
+        "body": "I have read this agreement and am authorised to sign on behalf of Northstar Studio.",
+        "actions": [
+          "Sign agreement",
+          "Back to agreement"
+        ]
+      }
+    ],
+    "primary": "Sign agreement",
+    "route": "/portal/agreements/:agreement/sign"
+  },
+  {
+    "id": "C17",
+    "role": "Client",
+    "nav": "Billing",
+    "title": "Billing, at a glance",
+    "subtitle": "Invoices, payments and your agreed schedule.",
+    "sections": [
+      {
+        "type": "metrics",
+        "items": [
+          [
+            "\u00a31,200",
+            "Next payment"
+          ],
+          [
+            "24 Sep",
+            "Payment due"
+          ],
+          [
+            "\u00a31,200",
+            "Paid to date"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Invoices",
+        "items": [
+          [
+            "INV-2026-041 \u00b7 Design milestone",
+            "\u00a31,200 \u00b7 due 24 September \u00b7 Awaiting payment",
+            "View invoice"
+          ],
+          [
+            "INV-2026-034 \u00b7 Initial deposit",
+            "\u00a31,200 \u00b7 paid 12 September",
+            "Download receipt"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Payment details",
+        "items": [
+          [
+            "Payment method",
+            "Manage securely with our payment provider.",
+            "Manage billing"
+          ],
+          [
+            "Billing contact",
+            "Alex Morgan \u00b7 alex@northstar.example",
+            "Contact FSS"
+          ]
+        ]
+      }
+    ],
+    "primary": "View next invoice",
+    "route": "/portal/billing"
+  },
+  {
+    "id": "C18",
+    "role": "Client",
+    "nav": "Billing",
+    "title": "Invoice INV-2026-041",
+    "subtitle": "Northstar Studio \u00b7 Design milestone",
+    "sections": [
+      {
+        "type": "hero",
+        "title": "\u00a31,200 due 24 September",
+        "body": "Issued 15 September \u00b7 Website & booking experience \u00b7 GBP",
+        "action": "Pay securely",
+        "tone": "navy"
+      },
+      {
+        "type": "rows",
+        "title": "Invoice breakdown",
+        "items": [
+          [
+            "Design milestone",
+            "1 \u00d7 \u00a31,200"
+          ],
+          [
+            "Tax treatment",
+            "As recorded on the issued invoice"
+          ],
+          [
+            "Amount due",
+            "\u00a31,200"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Payment status",
+        "body": "Awaiting payment. If you have just paid, we will update this page when the provider confirms it.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Download invoice",
+    "route": "/portal/billing/invoices/:invoice"
+  },
+  {
+    "id": "C19",
+    "role": "Client",
+    "nav": "Services",
+    "title": "Support for what comes next.",
+    "subtitle": "Your services and ways we can help.",
+    "sections": [
+      {
+        "type": "rows",
+        "title": "Your active services",
+        "items": [
+          [
+            "Website delivery",
+            "Website & booking experience \u00b7 in delivery",
+            "View scope"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Explore services",
+        "items": [
+          [
+            "Website care",
+            "Maintenance, updates and agreed support. Scope and pricing confirmed in a proposal.",
+            "Explore care"
+          ],
+          [
+            "Workflow improvements",
+            "Remove repetitive steps with focused automation.",
+            "Discuss an idea"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "A conversation first",
+        "body": "An enquiry starts a discussion. It does not activate a service or charge your payment method.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Ask about a service",
+    "route": "/portal/services"
+  },
+  {
+    "id": "C20",
+    "role": "Client",
+    "nav": "Services",
+    "title": "Tell us what you need",
+    "subtitle": "Website care \u00b7 Service enquiry",
+    "sections": [
+      {
+        "type": "fields",
+        "title": "Your enquiry",
+        "items": [
+          [
+            "What would you like help with?",
+            "Keeping our site updated after launch."
+          ],
+          [
+            "Preferred start \u00b7 optional",
+            "After the website launch"
+          ],
+          [
+            "Main contact",
+            "Alex Morgan \u00b7 alex@northstar.example"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Next step",
+        "body": "FSS will review your enquiry and follow up with a proposed scope and price.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Send enquiry",
+    "route": "/portal/services/:offer/enquire"
+  },
+  {
+    "id": "C21",
+    "role": "Client",
+    "nav": "Notifications",
+    "title": "Your updates",
+    "subtitle": "Important decisions and progress, without the noise.",
+    "sections": [
+      {
+        "type": "choices",
+        "title": "Inbox",
+        "items": [
+          "Unread 3",
+          "All",
+          "Action needed"
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Today",
+        "items": [
+          [
+            "Review requested \u00b7 Booking flow v3",
+            "NS-014 \u00b7 Your decision is needed \u00b7 10:30",
+            "Review now"
+          ],
+          [
+            "Completed \u00b7 Brand landing page",
+            "Accepted by Alex \u00b7 final files available \u00b7 09:12",
+            "View work"
+          ],
+          [
+            "New comment from Jean-Fidele",
+            "NS-012 \u00b7 Mobile spacing update \u00b7 08:40",
+            "Open request"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "You control ordinary updates",
+        "body": "Review requests and completion emails are enabled. Change your update preferences in Settings.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Mark all as read",
+    "route": "/portal/notifications"
+  },
+  {
+    "id": "C22",
+    "role": "Client",
+    "nav": "Help",
+    "title": "How can we help?",
+    "subtitle": "A clear route to the right support.",
+    "sections": [
+      {
+        "type": "hero",
+        "title": "Something is not working?",
+        "body": "Report the issue with steps to reproduce and the impact on your team.",
+        "action": "Report a bug",
+        "tone": "navy"
+      },
+      {
+        "type": "rows",
+        "title": "Support options",
+        "items": [
+          [
+            "Project question",
+            "Ask your named delivery contact about current work.",
+            "Create help request"
+          ],
+          [
+            "Urgent incident",
+            "Use the escalation contact and hours shown in your signed support agreement.",
+            "View support details"
+          ],
+          [
+            "Using your workspace",
+            "Learn how requests, reviews, files and billing work.",
+            "Read the guide"
+          ]
+        ]
+      }
+    ],
+    "primary": "Create help request",
+    "route": "/portal/help"
+  },
+  {
+    "id": "C23",
+    "role": "Client",
+    "nav": "Settings",
+    "title": "Your preferences",
+    "subtitle": "Keep your details and updates working for you.",
+    "sections": [
+      {
+        "type": "fields",
+        "title": "Profile",
+        "items": [
+          [
+            "Full name",
+            "Alex Morgan"
+          ],
+          [
+            "Email",
+            "alex@northstar.example",
+            "Change through verified account settings."
+          ],
+          [
+            "Timezone",
+            "Europe/London  \u2304"
+          ]
+        ]
+      },
+      {
+        "type": "settings",
+        "title": "Email notifications",
+        "items": [
+          [
+            "Review requested",
+            "On"
+          ],
+          [
+            "Work completed",
+            "On"
+          ],
+          [
+            "Public comments",
+            "Daily digest"
+          ],
+          [
+            "Ordinary status updates",
+            "Daily digest"
+          ],
+          [
+            "Marketing newsletter",
+            "Off"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Security",
+        "items": [
+          [
+            "Account security",
+            "Manage your sign-in methods and active sessions.",
+            "Open security"
+          ]
+        ]
+      }
+    ],
+    "primary": "Save preferences",
+    "route": "/portal/settings"
+  },
+  {
+    "id": "C24",
+    "role": "Client",
+    "nav": "Settings",
+    "title": "Your team",
+    "subtitle": "Northstar Studio \u00b7 Access is managed by role.",
+    "sections": [
+      {
+        "type": "rows",
+        "title": "Members",
+        "items": [
+          [
+            "Alex Morgan",
+            "Owner \u00b7 billing access \u00b7 designated reviewer",
+            "View permissions"
+          ],
+          [
+            "Jamie Lee",
+            "Contributor \u00b7 can create requests and comment",
+            "View permissions"
+          ],
+          [
+            "Taylor Reed",
+            "Viewer \u00b7 read-only project access",
+            "View permissions"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Need to change access?",
+        "body": "Ask FSS to invite a teammate or change a role. Signer and reviewer designations are managed separately.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Request access change",
+    "route": "/portal/settings/team"
+  },
+  {
+    "id": "C25",
+    "role": "Client",
+    "nav": "Home",
+    "title": "Choose your workspace",
+    "subtitle": "Your access is separate for each organisation.",
+    "sections": [
+      {
+        "type": "rows",
+        "title": "Available workspaces",
+        "items": [
+          [
+            "Northstar Studio",
+            "Owner \u00b7 1 active project",
+            "Open workspace"
+          ],
+          [
+            "Harbour Foundation",
+            "Viewer \u00b7 2 active projects",
+            "Open workspace"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "No workspace shown?",
+        "body": "Open your invitation or request help from FSS. Signing in does not grant organisation access.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Open Northstar",
+    "route": "/portal/workspaces"
+  },
+  {
+    "id": "F01",
+    "role": "Founder",
+    "nav": "Overview",
+    "title": "Your studio, in focus.",
+    "subtitle": "Tuesday, 15 September \u00b7 All clients",
+    "sections": [
+      {
+        "type": "hero",
+        "title": "Three decisions will move work forward.",
+        "body": "One request needs assessment, one agreement needs review and one welcome step needs attention.",
+        "action": "Open action queue",
+        "tone": "navy"
+      },
+      {
+        "type": "metrics",
+        "items": [
+          [
+            "3 / 3",
+            "Delivery capacity"
+          ],
+          [
+            "2",
+            "Client reviews open"
+          ],
+          [
+            "\u00a32,400",
+            "Invoices overdue"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Needs your attention",
+        "items": [
+          [
+            "Northstar \u00b7 Review booking scope",
+            "New request \u00b7 acknowledgement target today",
+            "Assess request"
+          ],
+          [
+            "Harbour \u00b7 Finish agreement",
+            "Missing engagement link",
+            "Continue agreement"
+          ],
+          [
+            "Northstar \u00b7 Welcome email",
+            "Delivery outcome unknown \u00b7 reconcile before retry",
+            "Resolve delivery"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "This week",
+        "items": [
+          [
+            "Northstar \u00b7 Website & booking",
+            "Design review 17 Sep \u00b7 next action with client",
+            "View client"
+          ],
+          [
+            "Harbour \u00b7 Membership portal",
+            "Kickoff pending agreement and assets",
+            "View client"
+          ]
+        ]
+      }
+    ],
+    "primary": "View delivery",
+    "route": "/growth/operations"
+  },
+  {
+    "id": "F02",
+    "role": "Founder",
+    "nav": "Clients",
+    "title": "Your clients",
+    "subtitle": "Relationships, delivery and commercial readiness.",
+    "sections": [
+      {
+        "type": "metrics",
+        "items": [
+          [
+            "8",
+            "Active clients"
+          ],
+          [
+            "2",
+            "Getting started"
+          ],
+          [
+            "3",
+            "Need attention"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Client register",
+        "items": [
+          [
+            "Northstar Studio",
+            "Website & booking \u00b7 Review pending \u00b7 Jean-Fidele",
+            "Open client"
+          ],
+          [
+            "Harbour Foundation",
+            "Membership portal \u00b7 Agreement incomplete",
+            "Open client"
+          ],
+          [
+            "Elm & Co",
+            "Website care \u00b7 All on track",
+            "Open client"
+          ]
+        ]
+      }
+    ],
+    "primary": "Add client",
+    "route": "/growth/operations/clients"
+  },
+  {
+    "id": "F03",
+    "role": "Founder",
+    "nav": "Clients",
+    "title": "Northstar Studio",
+    "subtitle": "Client since September 2026 \u00b7 Jean-Fidele",
+    "sections": [
+      {
+        "type": "hero",
+        "title": "Design is ready for Alex\u2019s review.",
+        "body": "One decision is outstanding. Billing and access are ready.",
+        "action": "Open review",
+        "tone": "navy"
+      },
+      {
+        "type": "metrics",
+        "items": [
+          [
+            "1",
+            "Active project"
+          ],
+          [
+            "7",
+            "Open requests"
+          ],
+          [
+            "\u00a31,200",
+            "Next invoice"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Client workspace",
+        "items": [
+          [
+            "Agreement & scope",
+            "Website & booking experience \u00b7 signed revision 2",
+            "Open agreements"
+          ],
+          [
+            "Welcome journey",
+            "Active \u00b7 waiting for client assets",
+            "View journey"
+          ],
+          [
+            "People & access",
+            "Alex: owner and signer \u00b7 Jamie: contributor",
+            "Manage access"
+          ],
+          [
+            "Projects & files",
+            "One project \u00b7 four public milestones",
+            "Manage project"
+          ]
+        ]
+      }
+    ],
+    "primary": "Prepare welcome",
+    "route": "/growth/operations/clients/:org"
+  },
+  {
+    "id": "F04",
+    "role": "Founder",
+    "nav": "Clients",
+    "title": "Add a client",
+    "subtitle": "Start with the organisation and its primary contact.",
+    "sections": [
+      {
+        "type": "fields",
+        "title": "Organisation",
+        "items": [
+          [
+            "Display name",
+            "Northstar Studio"
+          ],
+          [
+            "Legal entity name",
+            "Northstar Studio Ltd"
+          ],
+          [
+            "Organisation type",
+            "Company  \u2304"
+          ]
+        ]
+      },
+      {
+        "type": "fields",
+        "title": "Primary contact",
+        "items": [
+          [
+            "Full name",
+            "Alex Morgan"
+          ],
+          [
+            "Email",
+            "alex@northstar.example"
+          ],
+          [
+            "Role",
+            "Director"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "What saving does",
+        "body": "Creates the client record only. Invitations, agreements and welcome messages each have their own review step.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Save client",
+    "route": "/growth/operations/clients/new"
+  },
+  {
+    "id": "F05",
+    "role": "Founder",
+    "nav": "Delivery",
+    "title": "Delivery board",
+    "subtitle": "All clients \u00b7 Owner: Jean-Fidele \u00b7 3 of 3 in progress",
+    "sections": [
+      {
+        "type": "board",
+        "founder": true
+      },
+      {
+        "type": "notice",
+        "title": "Move work with confidence",
+        "body": "Drag a card or use Move to. Required scope, review and capacity checks appear before a move is committed.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "New request",
+    "route": "/growth/operations/requests"
+  },
+  {
+    "id": "F06",
+    "role": "Founder",
+    "nav": "Delivery",
+    "title": "Booking confirmation email",
+    "subtitle": "Northstar Studio \u00b7 NS-014 \u00b7 In progress",
+    "sections": [
+      {
+        "type": "columns",
+        "left": {
+          "type": "rows",
+          "title": "Delivery brief",
+          "items": [
+            [
+              "Outcome",
+              "Correct local time, address and booking reference."
+            ],
+            [
+              "Scope",
+              "Included \u00b7 signed website agreement, revision 2"
+            ],
+            [
+              "Owner & target",
+              "Jean-Fidele \u00b7 24 September"
+            ]
+          ]
+        },
+        "right": {
+          "type": "rows",
+          "title": "Controls",
+          "items": [
+            [
+              "Next step",
+              "Publish version 3 for client review",
+              "Prepare review"
+            ],
+            [
+              "Workflow state",
+              "In progress",
+              "Move to"
+            ],
+            [
+              "Blocker",
+              "None",
+              "Add blocker"
+            ]
+          ]
+        }
+      },
+      {
+        "type": "choices",
+        "title": "Conversation visibility",
+        "items": [
+          "Public discussion",
+          "Internal notes"
+        ]
+      },
+      {
+        "type": "fields",
+        "title": "Public update",
+        "items": [
+          [
+            "Message to client",
+            "The email is built. I\u2019m checking time zones before review."
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Client visibility",
+        "body": "Public updates appear in the portal. Internal notes stay within founder operations.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Post public update",
+    "route": "/growth/operations/clients/:org/requests/:request"
+  },
+  {
+    "id": "F07",
+    "role": "Founder",
+    "nav": "Delivery",
+    "title": "Send work for review",
+    "subtitle": "NS-014 \u00b7 Northstar Studio",
+    "sections": [
+      {
+        "type": "fields",
+        "title": "Review package",
+        "items": [
+          [
+            "Deliverable",
+            "Booking confirmation email \u00b7 version 3  \u2304"
+          ],
+          [
+            "Reviewer",
+            "Alex Morgan \u00b7 Owner  \u2304"
+          ],
+          [
+            "What changed",
+            "Correct local time and clearer booking details."
+          ],
+          [
+            "What to check",
+            "Confirm the time, studio address and booking reference."
+          ],
+          [
+            "Review requested by",
+            "18 September 2026",
+            "Reminder target, not automatic acceptance."
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Notifications",
+        "body": "Alex will receive an in-app review request and one email linking to this version. The card moves to Ready for review.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Publish review",
+    "route": "/growth/operations/clients/:org/requests/:request/review"
+  },
+  {
+    "id": "F08",
+    "role": "Founder",
+    "nav": "Delivery",
+    "title": "Assess scope and next steps",
+    "subtitle": "NS-017 \u00b7 Add a customer account area",
+    "sections": [
+      {
+        "type": "fields",
+        "title": "Assessment",
+        "items": [
+          [
+            "Scope decision",
+            "Additional quote required  \u2304"
+          ],
+          [
+            "Reason for client",
+            "Customer accounts are outside the signed website scope."
+          ],
+          [
+            "Owner",
+            "Jean-Fidele  \u2304"
+          ],
+          [
+            "Next action",
+            "Prepare a change proposal"
+          ],
+          [
+            "Operational priority",
+            "Normal  \u2304",
+            "Internal only. Separate from client-reported impact."
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Commercial link",
+        "items": [
+          [
+            "Change agreement",
+            "Not created yet",
+            "Create change proposal"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Planning is held",
+        "body": "This request can be acknowledged now. Planning and delivery need approved scope.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Save assessment",
+    "route": "/growth/operations/clients/:org/requests/:request/scope"
+  },
+  {
+    "id": "F09",
+    "role": "Founder",
+    "nav": "Agreements",
+    "title": "Agreements",
+    "subtitle": "Create clear agreements and track every revision.",
+    "sections": [
+      {
+        "type": "rows",
+        "title": "Draft & awaiting signature",
+        "items": [
+          [
+            "Harbour \u00b7 Membership portal",
+            "Draft \u00b7 engagement required",
+            "Continue draft"
+          ],
+          [
+            "Northstar \u00b7 Website & booking",
+            "Revision 2 \u00b7 ready for founder review",
+            "Review draft"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Signed",
+        "items": [
+          [
+            "Elm & Co \u00b7 Website care",
+            "Signed revision 1 \u00b7 service active",
+            "View agreement"
+          ]
+        ]
+      }
+    ],
+    "primary": "New agreement",
+    "route": "/growth/operations/agreements"
+  },
+  {
+    "id": "F10",
+    "role": "Founder",
+    "nav": "Agreements",
+    "title": "Create an agreement",
+    "subtitle": "Northstar Studio \u00b7 Saved as a draft",
+    "sections": [
+      {
+        "type": "wizard",
+        "current": 1,
+        "total": 6,
+        "label": "Client & engagement"
+      },
+      {
+        "type": "fields",
+        "title": "Link the right work",
+        "items": [
+          [
+            "Client",
+            "Northstar Studio  \u2304"
+          ],
+          [
+            "Engagement",
+            "Website & booking experience \u00b7 Discovery complete  \u2304",
+            "Linked to Northstar. Reviewed by Jean-Fidele on 12 Sep."
+          ],
+          [
+            "Agreement title",
+            "Website & booking experience"
+          ],
+          [
+            "Starting point",
+            "Website project template \u00b7 approved v2  \u2304"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "No linked engagement?",
+        "body": "Link an existing engagement or create one here. Your draft stays saved.",
+        "tone": "tint"
+      },
+      {
+        "type": "rows",
+        "title": "Related work",
+        "items": [
+          [
+            "Website & booking experience",
+            "Goals and proposed scope available",
+            "View engagement"
+          ]
+        ]
+      }
+    ],
+    "primary": "Continue to scope",
+    "route": "/growth/operations/clients/:org/agreements/new"
+  },
+  {
+    "id": "F11",
+    "role": "Founder",
+    "nav": "Agreements",
+    "title": "Define the work",
+    "subtitle": "Step 2 \u00b7 Be clear about outcomes, inclusions and boundaries.",
+    "sections": [
+      {
+        "type": "wizard",
+        "current": 2,
+        "total": 6,
+        "label": "Scope & outcomes"
+      },
+      {
+        "type": "fields",
+        "title": "Scope",
+        "items": [
+          [
+            "Client goals",
+            "Make it easier for customers to book online."
+          ],
+          [
+            "Included deliverables",
+            "Five content pages, booking workflow and confirmation email."
+          ],
+          [
+            "Not included",
+            "Customer accounts, paid advertising and ongoing content entry."
+          ],
+          [
+            "Acceptance criteria",
+            "A customer can book, receive confirmation and find support details."
+          ],
+          [
+            "Responsibilities & support",
+            "Client supplies final copy and brand assets. Support follows the agreed term."
+          ]
+        ]
+      }
+    ],
+    "primary": "Continue to fees",
+    "route": "/growth/operations/clients/:org/agreements/new?step=scope"
+  },
+  {
+    "id": "F12",
+    "role": "Founder",
+    "nav": "Agreements",
+    "title": "Fees, schedule and terms",
+    "subtitle": "Step 3 \u00b7 All amounts shown in GBP.",
+    "sections": [
+      {
+        "type": "wizard",
+        "current": 3,
+        "total": 6,
+        "label": "Fees & terms"
+      },
+      {
+        "type": "pricing",
+        "title": "Agreed fees",
+        "items": [
+          [
+            "Website & booking experience",
+            "1",
+            "\u00a34,800",
+            "\u00a34,800"
+          ]
+        ],
+        "total": "\u00a34,800"
+      },
+      {
+        "type": "fields",
+        "title": "Payment terms",
+        "items": [
+          [
+            "Tax treatment",
+            "Use approved organisation tax policy  \u2304",
+            "Select the applicable reviewed policy. Do not infer tax from this mockup."
+          ],
+          [
+            "Deposit",
+            "\u00a31,200"
+          ],
+          [
+            "Remaining payments",
+            "3 milestone payments \u00d7 \u00a31,200"
+          ],
+          [
+            "Minimum term / notice",
+            "Project term \u00b7 30 days notice as drafted"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Validation",
+        "body": "Payment amounts must reconcile with the agreement total. Recurring lines must have a cadence and start policy.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Continue to people",
+    "route": "/growth/operations/clients/:org/agreements/new?step=fees"
+  },
+  {
+    "id": "F13",
+    "role": "Founder",
+    "nav": "Agreements",
+    "title": "People and responsibilities",
+    "subtitle": "Step 4 \u00b7 Make it clear who signs, pays and reviews.",
+    "sections": [
+      {
+        "type": "wizard",
+        "current": 4,
+        "total": 6,
+        "label": "Contacts & signers"
+      },
+      {
+        "type": "fields",
+        "title": "Contacts",
+        "items": [
+          [
+            "Billing contact",
+            "Alex Morgan \u00b7 alex@northstar.example  \u2304"
+          ],
+          [
+            "Required client signer",
+            "Alex Morgan \u00b7 Director  \u2304"
+          ],
+          [
+            "FSS signer",
+            "Jean-Fidele Ntagengwa  \u2304"
+          ],
+          [
+            "Delivery reviewer",
+            "Alex Morgan  \u2304"
+          ],
+          [
+            "Client responsibilities",
+            "Provide approved copy and assets before development."
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Separate permissions",
+        "body": "Being a signer does not grant owner access. Portal roles are reviewed separately before invitations are issued.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Continue to document",
+    "route": "/growth/operations/clients/:org/agreements/new?step=people"
+  },
+  {
+    "id": "F14",
+    "role": "Founder",
+    "nav": "Agreements",
+    "title": "Prepare the agreement document",
+    "subtitle": "Step 5 \u00b7 The exact version reviewed is retained.",
+    "sections": [
+      {
+        "type": "wizard",
+        "current": 5,
+        "total": 6,
+        "label": "Document & evidence"
+      },
+      {
+        "type": "choices",
+        "title": "Document source",
+        "items": [
+          "Generate from draft",
+          "Upload existing PDF"
+        ]
+      },
+      {
+        "type": "document",
+        "title": "Website & booking experience",
+        "body": "Revision 2\nScope, fees, responsibilities and agreed terms\nPrepared from the saved draft",
+        "caption": "Ready to preview \u00b7 5 pages \u00b7 generated by FSS"
+      },
+      {
+        "type": "notice",
+        "title": "Document fingerprint recorded",
+        "body": "Calculated automatically from the final document. If the document changes, a new revision must be reviewed.",
+        "tone": "tint"
+      },
+      {
+        "type": "rows",
+        "title": "Document details",
+        "items": [
+          [
+            "Website-agreement-r2.pdf",
+            "Revision 2 \u00b7 prepared 15 Sep \u00b7 private document",
+            "View details"
+          ]
+        ]
+      }
+    ],
+    "primary": "Generate & preview",
+    "route": "/growth/operations/clients/:org/agreements/new?step=document"
+  },
+  {
+    "id": "F15",
+    "role": "Founder",
+    "nav": "Agreements",
+    "title": "Review before sending",
+    "subtitle": "Step 6 \u00b7 Northstar Studio \u00b7 Revision 2",
+    "sections": [
+      {
+        "type": "wizard",
+        "current": 6,
+        "total": 6,
+        "label": "Preview & approve"
+      },
+      {
+        "type": "metrics",
+        "items": [
+          [
+            "\u00a34,800",
+            "Agreement total"
+          ],
+          [
+            "\u00a31,200",
+            "Initial deposit"
+          ],
+          [
+            "2",
+            "Required signers"
+          ]
+        ]
+      },
+      {
+        "type": "document",
+        "title": "Website & booking experience",
+        "body": "Client: Northstar Studio\nOutcome: a clear online booking journey\nScope: five pages, booking flow and confirmation\nPayment: \u00a31,200 deposit + three milestone payments",
+        "caption": "Revision 2 \u00b7 exact document retained for signing"
+      },
+      {
+        "type": "timeline",
+        "title": "Readiness checks",
+        "items": [
+          [
+            "\u2713",
+            "Engagement linked",
+            "Website & booking experience"
+          ],
+          [
+            "\u2713",
+            "Fees and schedule reconcile",
+            "Total \u00a34,800"
+          ],
+          [
+            "\u2713",
+            "Signers and access reviewed",
+            "Alex Morgan + Jean-Fidele"
+          ],
+          [
+            "\u2713",
+            "Document preview reviewed",
+            "Revision 2"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Sending choice",
+        "body": "Send the signing request now or attach this approved revision to a welcome journey. The same signing notice must not be sent twice.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Approve signing request",
+    "route": "/growth/operations/clients/:org/agreements/new?step=review"
+  },
+  {
+    "id": "F16",
+    "role": "Founder",
+    "nav": "Agreements",
+    "title": "Link the work first",
+    "subtitle": "Your agreement draft is saved.",
+    "sections": [
+      {
+        "type": "notice",
+        "title": "No engagement is linked",
+        "body": "An engagement connects this agreement to the work you discussed. Choose existing work or create a new engagement.",
+        "tone": "warningTint"
+      },
+      {
+        "type": "rows",
+        "title": "Available work",
+        "items": [
+          [
+            "Website & booking experience",
+            "Northstar Studio \u00b7 Discovery complete \u00b7 12 Sep",
+            "Link engagement"
+          ]
+        ]
+      },
+      {
+        "type": "fields",
+        "title": "Find an engagement",
+        "items": [
+          [
+            "Search",
+            "Search by project or engagement name\u2026"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Starting fresh?",
+        "items": [
+          [
+            "Create an engagement",
+            "Record the goal, proposed scope and client relationship.",
+            "Create engagement"
+          ]
+        ]
+      }
+    ],
+    "primary": "Link selected engagement",
+    "route": "/growth/operations/clients/:org/agreements/new?state=no-engagement"
+  },
+  {
+    "id": "F17",
+    "role": "Founder",
+    "nav": "Agreements",
+    "title": "Signed and recorded",
+    "subtitle": "Northstar Studio \u00b7 Website & booking \u00b7 Revision 2",
+    "sections": [
+      {
+        "type": "hero",
+        "title": "Both signatures are complete.",
+        "body": "The signed copy and signing evidence are retained. Service activation still follows deposit, assets and capacity checks.",
+        "action": "Open signed copy",
+        "tone": "tint"
+      },
+      {
+        "type": "timeline",
+        "title": "Signing record",
+        "items": [
+          [
+            "\u2713",
+            "Alex Morgan \u00b7 Client",
+            "Signed 15 September \u00b7 14:12"
+          ],
+          [
+            "\u2713",
+            "Jean-Fidele \u00b7 FSS",
+            "Signed 15 September \u00b7 14:18"
+          ],
+          [
+            "\u2713",
+            "Evidence retained",
+            "Signed document and source revision match"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Next steps",
+        "items": [
+          [
+            "Welcome journey",
+            "First invoice and thank-you become eligible tomorrow at 09:00 London.",
+            "View journey"
+          ],
+          [
+            "Service readiness",
+            "Deposit, assets and capacity checked separately.",
+            "View readiness"
+          ]
+        ]
+      }
+    ],
+    "primary": "Prepare welcome",
+    "route": "/growth/operations/clients/:org/agreements/:agreement"
+  },
+  {
+    "id": "F18",
+    "role": "Founder",
+    "nav": "Welcome journeys",
+    "title": "Welcome journeys",
+    "subtitle": "Every client gets a considered start.",
+    "sections": [
+      {
+        "type": "metrics",
+        "items": [
+          [
+            "2",
+            "Draft journeys"
+          ],
+          [
+            "3",
+            "Active journeys"
+          ],
+          [
+            "1",
+            "Needs attention"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Your journeys",
+        "items": [
+          [
+            "Northstar \u00b7 Website & booking",
+            "Active \u00b7 waiting for brand assets",
+            "Open journey"
+          ],
+          [
+            "Harbour \u00b7 Membership portal",
+            "Draft \u00b7 3 of 5 setup steps complete",
+            "Continue setup"
+          ],
+          [
+            "Elm & Co \u00b7 Website care",
+            "Needs attention \u00b7 invitation delivery failed",
+            "Resolve issue"
+          ]
+        ]
+      }
+    ],
+    "primary": "Create journey",
+    "route": "/growth/operations/journeys"
+  },
+  {
+    "id": "F19",
+    "role": "Founder",
+    "nav": "Welcome journeys",
+    "title": "Prepare a warm welcome",
+    "subtitle": "Northstar Studio \u00b7 Draft journey",
+    "sections": [
+      {
+        "type": "wizard",
+        "current": 1,
+        "total": 5,
+        "label": "Client & goals"
+      },
+      {
+        "type": "fields",
+        "title": "Journey setup",
+        "items": [
+          [
+            "Client",
+            "Northstar Studio  \u2304"
+          ],
+          [
+            "Agreement",
+            "Website & booking \u00b7 revision 2  \u2304"
+          ],
+          [
+            "Primary recipient",
+            "Alex Morgan \u00b7 approved billing contact  \u2304"
+          ],
+          [
+            "Template",
+            "Project welcome \u00b7 approved v2  \u2304"
+          ],
+          [
+            "Primary goal",
+            "Make online booking easier for customers."
+          ],
+          [
+            "Proposed outcome",
+            "A clear website and booking experience that reduces manual follow-up."
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Your starting point",
+        "body": "Client, agreement and discovery details are prefilled. Review them before continuing.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Continue to content",
+    "route": "/growth/operations/clients/:org/journey/new"
+  },
+  {
+    "id": "F20",
+    "role": "Founder",
+    "nav": "Welcome journeys",
+    "title": "Make the welcome personal",
+    "subtitle": "Step 2 \u00b7 Edit and preview before anything is sent.",
+    "sections": [
+      {
+        "type": "wizard",
+        "current": 2,
+        "total": 5,
+        "label": "Welcome content"
+      },
+      {
+        "type": "columns",
+        "left": {
+          "type": "fields",
+          "title": "Email content",
+          "items": [
+            [
+              "Subject",
+              "Your next steps with FSS"
+            ],
+            [
+              "Greeting",
+              "Hello Alex,"
+            ],
+            [
+              "Opening",
+              "Thank you for talking through your online booking goals."
+            ],
+            [
+              "Next step",
+              "Your welcome guide explains the proposed work and how we will keep you informed."
+            ]
+          ]
+        },
+        "right": {
+          "type": "document",
+          "title": "Your next steps with FSS",
+          "body": "Hello Alex,\n\nThank you for talking through your online booking goals.\n\nYour welcome guide explains our process, the proposed work and what we will need from you.\n\nJean-Fidele\nFaithful Software Solutions",
+          "caption": "Email preview \u00b7 To Alex Morgan"
+        }
+      },
+      {
+        "type": "rows",
+        "title": "Welcome guide \u00b7 five sections",
+        "items": [
+          [
+            "Your priorities \u00b7 Proposed work \u00b7 Delivery process",
+            "Prefilled from approved client facts",
+            "Edit guide"
+          ],
+          [
+            "Working together \u00b7 Next steps",
+            "Named owner, client actions and support route",
+            "Preview guide"
+          ]
+        ]
+      }
+    ],
+    "primary": "Continue to access",
+    "route": "/growth/operations/clients/:org/journey/new?step=content"
+  },
+  {
+    "id": "F21",
+    "role": "Founder",
+    "nav": "Welcome journeys",
+    "title": "People, signing and access",
+    "subtitle": "Step 3 \u00b7 Confirm each person\u2019s responsibilities.",
+    "sections": [
+      {
+        "type": "wizard",
+        "current": 3,
+        "total": 5,
+        "label": "Signers & portal roles"
+      },
+      {
+        "type": "rows",
+        "title": "Approved contacts",
+        "items": [
+          [
+            "Alex Morgan",
+            "Signer \u00b7 billing recipient \u00b7 proposed owner role",
+            "Review role"
+          ],
+          [
+            "Jamie Lee",
+            "Not a signer \u00b7 proposed contributor role",
+            "Review role"
+          ]
+        ]
+      },
+      {
+        "type": "fields",
+        "title": "Signing notice",
+        "items": [
+          [
+            "Approved agreement",
+            "Website & booking \u00b7 revision 2"
+          ],
+          [
+            "Subject",
+            "Your FSS proposal is ready to review"
+          ],
+          [
+            "Message",
+            "Please review the scope, payment schedule and responsibilities before signing."
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Existing access is reused",
+        "body": "Active memberships are not re-invited. Role conflicts need founder review. Additional recipients have their own activation preview.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Continue to schedule",
+    "route": "/growth/operations/clients/:org/journey/new?step=access"
+  },
+  {
+    "id": "F22",
+    "role": "Founder",
+    "nav": "Welcome journeys",
+    "title": "Sequence the next steps",
+    "subtitle": "Step 4 \u00b7 Times shown in Europe/London.",
+    "sections": [
+      {
+        "type": "wizard",
+        "current": 4,
+        "total": 5,
+        "label": "Timing & client tasks"
+      },
+      {
+        "type": "timeline",
+        "title": "Journey sequence",
+        "items": [
+          [
+            "1",
+            "Welcome email & guide",
+            "After you start the approved journey"
+          ],
+          [
+            "2",
+            "Proposal for signature",
+            "Two elapsed hours after welcome provider acceptance; held if unapproved"
+          ],
+          [
+            "3",
+            "First invoice, access & thank-you",
+            "Next calendar day at 09:00 after all signatures are verified"
+          ],
+          [
+            "4",
+            "Client checklist",
+            "Profile \u2192 agreement \u2192 billing \u2192 assets \u2192 kickoff"
+          ],
+          [
+            "5",
+            "Ready for delivery",
+            "Founder confirms contractual start prerequisites"
+          ]
+        ]
+      },
+      {
+        "type": "fields",
+        "title": "Client tasks",
+        "items": [
+          [
+            "Required assets",
+            "Logo, brand guide and approved website copy"
+          ],
+          [
+            "Kickoff",
+            "Offer reviewed slots after signature"
+          ],
+          [
+            "First invoice",
+            "Deposit \u00b7 \u00a31,200 \u00b7 signed obligation"
+          ]
+        ]
+      }
+    ],
+    "primary": "Review journey",
+    "route": "/growth/operations/clients/:org/journey/new?step=schedule"
+  },
+  {
+    "id": "F23",
+    "role": "Founder",
+    "nav": "Welcome journeys",
+    "title": "Ready when you are.",
+    "subtitle": "Step 5 \u00b7 Review exactly what starting will do.",
+    "sections": [
+      {
+        "type": "wizard",
+        "current": 5,
+        "total": 5,
+        "label": "Readiness & activation"
+      },
+      {
+        "type": "timeline",
+        "title": "Preflight",
+        "items": [
+          [
+            "\u2713",
+            "Client and contacts",
+            "Northstar Studio \u00b7 Alex Morgan"
+          ],
+          [
+            "\u2713",
+            "Welcome email and guide",
+            "Approved content \u00b7 accessible version ready"
+          ],
+          [
+            "\u2713",
+            "Proposal and signers",
+            "Revision 2 \u00b7 Alex and Jean-Fidele"
+          ],
+          [
+            "\u2713",
+            "Billing and portal roles",
+            "First obligation selected \u00b7 existing access reused"
+          ],
+          [
+            "\u2713",
+            "Delivery settings",
+            "Sender verified \u00b7 provider and worker ready"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Start this journey",
+        "body": "Queues the reviewed welcome email to Alex now. The proposal follows its timing and approval gates. Later invoice and access steps wait for verified signatures.",
+        "tone": "tint"
+      },
+      {
+        "type": "rows",
+        "title": "Final previews",
+        "items": [
+          [
+            "Welcome \u00b7 proposal \u00b7 thank-you \u00b7 activation emails",
+            "Exact recipients and content retained",
+            "Open previews"
+          ]
+        ]
+      }
+    ],
+    "primary": "Start journey",
+    "route": "/growth/operations/clients/:org/journey/new?step=activate"
+  },
+  {
+    "id": "F24",
+    "role": "Founder",
+    "nav": "Welcome journeys",
+    "title": "Northstar\u2019s welcome journey",
+    "subtitle": "Started 15 Sep \u00b7 10:00 \u00b7 Active",
+    "sections": [
+      {
+        "type": "metrics",
+        "items": [
+          [
+            "2 / 5",
+            "Steps complete"
+          ],
+          [
+            "16 Sep",
+            "Next eligible action"
+          ],
+          [
+            "0",
+            "Delivery issues"
+          ]
+        ]
+      },
+      {
+        "type": "timeline",
+        "title": "Live timeline",
+        "items": [
+          [
+            "\u2713",
+            "Welcome accepted by email provider",
+            "15 Sep, 10:01 \u00b7 delivery confirmed 10:02"
+          ],
+          [
+            "\u2713",
+            "Proposal sent",
+            "15 Sep, 12:01 \u00b7 approved revision 2"
+          ],
+          [
+            "3",
+            "Waiting for signatures",
+            "Alex has signed \u00b7 waiting for FSS"
+          ],
+          [
+            "4",
+            "Invoice, portal access & thank-you",
+            "Eligible next calendar day at 09:00 after verified signatures"
+          ],
+          [
+            "5",
+            "Client setup & kickoff",
+            "Starts after the required preceding steps"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Client progress",
+        "items": [
+          [
+            "3 of 6 setup steps complete",
+            "Brand assets are the next client action",
+            "View checklist"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Pause behaviour",
+        "body": "Pausing stops remaining eligible actions. Messages already accepted cannot be unsent.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Pause journey",
+    "route": "/growth/operations/clients/:org/journey"
+  },
+  {
+    "id": "F25",
+    "role": "Founder",
+    "nav": "Welcome journeys",
+    "title": "Resolve delivery safely",
+    "subtitle": "Elm & Co \u00b7 Welcome journey \u00b7 Needs attention",
+    "sections": [
+      {
+        "type": "notice",
+        "title": "Welcome email outcome unknown",
+        "body": "The provider may have accepted this message before the connection failed. Check the existing attempt before sending again.",
+        "tone": "warningTint"
+      },
+      {
+        "type": "rows",
+        "title": "Attempt details",
+        "items": [
+          [
+            "Last attempt",
+            "15 September, 10:01 \u00b7 connection timed out"
+          ],
+          [
+            "Client impact",
+            "Proposal step held until welcome acceptance is confirmed"
+          ],
+          [
+            "Next action",
+            "Reconcile the original message with the provider",
+            "Check delivery"
+          ]
+        ]
+      },
+      {
+        "type": "timeline",
+        "title": "Recovery sequence",
+        "items": [
+          [
+            "1",
+            "Check provider record",
+            "Look up the existing message using its saved reference"
+          ],
+          [
+            "2",
+            "Confirm the outcome",
+            "Record accepted, failed or still unknown"
+          ],
+          [
+            "3",
+            "Resume eligible steps",
+            "Completed steps stay complete; do not recreate invoices or invitations"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "When retry is safe",
+        "body": "Retry only a confirmed failed attempt with the same approved content and durable delivery key.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Check delivery",
+    "route": "/growth/operations/clients/:org/journey?view=recovery"
+  },
+  {
+    "id": "F26",
+    "role": "Founder",
+    "nav": "Welcome journeys",
+    "title": "Welcome templates",
+    "subtitle": "A consistent experience, adapted to each client.",
+    "sections": [
+      {
+        "type": "rows",
+        "title": "Approved templates",
+        "items": [
+          [
+            "Project welcome \u00b7 v2",
+            "Email, five-section guide, proposal and thank-you",
+            "Edit draft version"
+          ],
+          [
+            "Website care \u00b7 v1",
+            "Care scope, support route and billing introduction",
+            "Preview template"
+          ]
+        ]
+      },
+      {
+        "type": "fields",
+        "title": "Template editor",
+        "items": [
+          [
+            "Template name",
+            "Project welcome"
+          ],
+          [
+            "Section",
+            "Working together  \u2304"
+          ],
+          [
+            "Content",
+            "Your FSS contact is {{delivery_owner}}. Your project updates and requests are available in your workspace."
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Versioned publishing",
+        "body": "Editing creates a draft version. Active journeys keep their approved content until explicitly revised and reapproved.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Save template draft",
+    "route": "/growth/operations/journeys/templates"
+  },
+  {
+    "id": "F27",
+    "role": "Founder",
+    "nav": "Billing",
+    "title": "Billing operations",
+    "subtitle": "Agreed obligations, invoices and exceptions.",
+    "sections": [
+      {
+        "type": "metrics",
+        "items": [
+          [
+            "\u00a37,200",
+            "Due this month"
+          ],
+          [
+            "\u00a32,400",
+            "Overdue"
+          ],
+          [
+            "1",
+            "Needs reconciliation"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Action queue",
+        "items": [
+          [
+            "Northstar \u00b7 INV-2026-041",
+            "\u00a31,200 \u00b7 due 24 September",
+            "Open invoice"
+          ],
+          [
+            "Harbour \u00b7 Deposit invoice",
+            "\u00a31,200 \u00b7 overdue 3 days",
+            "Review collection"
+          ],
+          [
+            "Elm & Co \u00b7 Payment status",
+            "Provider status needs reconciliation",
+            "Reconcile"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Commercial controls",
+        "body": "Invoice amounts come from retained signed terms. Reminder and collection actions do not change the agreement.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Open exceptions",
+    "route": "/growth/operations/billing"
+  },
+  {
+    "id": "F28",
+    "role": "Founder",
+    "nav": "Portal access",
+    "title": "People and portal access",
+    "subtitle": "Invitations, memberships and roles with clear outcomes.",
+    "sections": [
+      {
+        "type": "rows",
+        "title": "Access register",
+        "items": [
+          [
+            "Alex Morgan \u00b7 Northstar",
+            "Owner \u00b7 Active \u00b7 last verified 15 Sep",
+            "Manage access"
+          ],
+          [
+            "Jamie Lee \u00b7 Northstar",
+            "Contributor \u00b7 Invitation sent \u00b7 expires 22 Sep",
+            "View invitation"
+          ],
+          [
+            "Taylor Reed \u00b7 Harbour",
+            "Viewer \u00b7 Invitation expired",
+            "Prepare new invite"
+          ]
+        ]
+      },
+      {
+        "type": "fields",
+        "title": "Invite a contact",
+        "items": [
+          [
+            "Client",
+            "Northstar Studio  \u2304"
+          ],
+          [
+            "Contact",
+            "Jamie Lee \u00b7 jamie@northstar.example  \u2304"
+          ],
+          [
+            "Portal role",
+            "Contributor  \u2304",
+            "Can create requests and comment. Cannot accept work unless designated."
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Before sending",
+        "body": "Review the contact, organisation and role. Confirmation must show sent, failed or pending delivery accurately.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Review invitation",
+    "route": "/growth/operations/portal-access"
+  },
+  {
+    "id": "F29",
+    "role": "Founder",
+    "nav": "Notifications",
+    "title": "Notification delivery",
+    "subtitle": "See what clients received and resolve what they did not.",
+    "sections": [
+      {
+        "type": "metrics",
+        "items": [
+          [
+            "18",
+            "Delivered today"
+          ],
+          [
+            "1",
+            "Retry scheduled"
+          ],
+          [
+            "1",
+            "Needs attention"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Delivery log",
+        "items": [
+          [
+            "Northstar \u00b7 Review requested \u00b7 NS-014 v3",
+            "In-app created \u00b7 email delivered \u00b7 Alex Morgan",
+            "View event"
+          ],
+          [
+            "Harbour \u00b7 Work completed \u00b7 HF-009",
+            "In-app created \u00b7 email retry scheduled",
+            "View attempt"
+          ],
+          [
+            "Elm & Co \u00b7 Welcome",
+            "Outcome unknown \u00b7 reconciliation required",
+            "Resolve"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "One event, independent channels",
+        "body": "An email failure does not roll back the work status or remove the in-app notification.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Open failed deliveries",
+    "route": "/growth/operations/notifications"
+  },
+  {
+    "id": "F30",
+    "role": "Founder",
+    "nav": "Settings",
+    "title": "Studio settings",
+    "subtitle": "Keep your client experience consistent.",
+    "sections": [
+      {
+        "type": "fields",
+        "title": "Studio identity",
+        "items": [
+          [
+            "Display name",
+            "Faithful Software Solutions"
+          ],
+          [
+            "Reply-to address",
+            "Choose an approved sender"
+          ],
+          [
+            "Default timezone",
+            "Europe/London"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Operational policies",
+        "items": [
+          [
+            "Business calendar",
+            "Mon\u2013Fri \u00b7 09:00\u201317:00 \u00b7 reviewed England/Wales holidays",
+            "Review calendar"
+          ],
+          [
+            "Delivery capacity",
+            "3 in-progress items \u00b7 founder owner",
+            "Review policy"
+          ],
+          [
+            "Notification templates",
+            "Review requested, completed and welcome content",
+            "Manage templates"
+          ],
+          [
+            "Integrations",
+            "Authentication, email, signing, billing and file scanning",
+            "View health"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Changes with side effects",
+        "body": "Changing a sender, timing policy or published template does not rewrite active approvals.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Save settings draft",
+    "route": "/growth/operations/settings"
+  },
+  {
+    "id": "F31",
+    "role": "Founder",
+    "nav": "Projects",
+    "title": "Shape the client\u2019s project view",
+    "subtitle": "Northstar Studio \u00b7 Website & booking experience",
+    "sections": [
+      {
+        "type": "fields",
+        "title": "Public project details",
+        "items": [
+          [
+            "Project title",
+            "Website & booking experience"
+          ],
+          [
+            "Client outcome",
+            "Make it easier for customers to book online."
+          ],
+          [
+            "Delivery owner",
+            "Jean-Fidele"
+          ],
+          [
+            "Next update",
+            "Friday, 18 September"
+          ],
+          [
+            "Milestone",
+            "Design approval \u00b7 target 24 September"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Public milestones",
+        "items": [
+          [
+            "Discover",
+            "Complete \u00b7 scope and goals agreed",
+            "Edit milestone"
+          ],
+          [
+            "Design",
+            "Active \u00b7 client review needed",
+            "Edit milestone"
+          ],
+          [
+            "Build",
+            "Pending \u00b7 assets and design approval",
+            "Edit milestone"
+          ],
+          [
+            "Launch & handover",
+            "Pending \u00b7 readiness and client acceptance",
+            "Edit milestone"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Visibility preview",
+        "body": "Only published milestones and public updates appear in the client portal. Internal estimates remain private.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Save project",
+    "route": "/growth/operations/clients/:org/projects/:project/edit"
+  },
+  {
+    "id": "F32",
+    "role": "Founder",
+    "nav": "Clients",
+    "title": "Create an engagement",
+    "subtitle": "Connect the client\u2019s goals to a defined piece of work.",
+    "sections": [
+      {
+        "type": "fields",
+        "title": "Engagement",
+        "items": [
+          [
+            "Client",
+            "Northstar Studio"
+          ],
+          [
+            "Engagement name",
+            "Website & booking experience"
+          ],
+          [
+            "Primary goal",
+            "Make it easier for customers to book online."
+          ],
+          [
+            "Proposed scope",
+            "Website pages and a booking workflow"
+          ],
+          [
+            "Source",
+            "Founder discovery  \u2304"
+          ],
+          [
+            "Review status",
+            "Ready for founder review  \u2304"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Save and return",
+        "body": "Create the engagement, link it to this client and return to the saved agreement draft. Review status is recorded explicitly.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Create & link engagement",
+    "route": "/growth/operations/clients/:org/engagements/new"
+  },
+  {
+    "id": "S01",
+    "role": "Client",
+    "nav": "Requests",
+    "title": "Your first request starts here.",
+    "subtitle": "Keep feedback connected to your project.",
+    "sections": [
+      {
+        "type": "hero",
+        "title": "Nothing in your board yet.",
+        "body": "Create a request or report a bug. FSS will assess scope and confirm the next step.",
+        "action": "Create first request",
+        "tone": "tint"
+      }
+    ],
+    "primary": "New request",
+    "route": "/portal/requests?state=empty"
+  },
+  {
+    "id": "S02",
+    "role": "Client",
+    "nav": "Requests",
+    "title": "Connect your project first",
+    "subtitle": "No shared project is available.",
+    "sections": [
+      {
+        "type": "notice",
+        "title": "A project is needed for this request",
+        "body": "Ask FSS to connect the right project to your workspace. Your account does not currently have access to one.",
+        "tone": "warningTint"
+      },
+      {
+        "type": "rows",
+        "title": "Your options",
+        "items": [
+          [
+            "Project setup",
+            "Ask your FSS contact to set up or share the project.",
+            "Request setup"
+          ],
+          [
+            "Different organisation?",
+            "Choose another workspace you can access.",
+            "Switch workspace"
+          ]
+        ]
+      }
+    ],
+    "primary": "Ask FSS for help",
+    "route": "/portal/requests/new?state=no-project"
+  },
+  {
+    "id": "S03",
+    "role": "Client",
+    "nav": "Requests",
+    "title": "This request has changed.",
+    "subtitle": "Your feedback has been kept.",
+    "sections": [
+      {
+        "type": "notice",
+        "title": "Version 4 is now ready",
+        "body": "You were reviewing version 3. Review version 4 before accepting work. No acceptance has been recorded.",
+        "tone": "warningTint"
+      },
+      {
+        "type": "fields",
+        "title": "Your saved feedback",
+        "items": [
+          [
+            "Feedback",
+            "Please include the cancellation contact."
+          ]
+        ]
+      }
+    ],
+    "primary": "Review latest version",
+    "route": "/portal/requests/:request?state=conflict"
+  },
+  {
+    "id": "S04",
+    "role": "Client",
+    "nav": "Home",
+    "title": "We couldn\u2019t load your workspace.",
+    "subtitle": "Your work is safe. Please try again.",
+    "sections": [
+      {
+        "type": "notice",
+        "title": "Temporarily unavailable",
+        "body": "If this continues, contact FSS with reference FSS-DEMO-042.",
+        "tone": "warningTint"
+      }
+    ],
+    "primary": "Try again",
+    "route": "/portal?state=unavailable"
+  },
+  {
+    "id": "S05",
+    "role": "Client",
+    "nav": "Home",
+    "title": "This invitation has expired.",
+    "subtitle": "We will help you get to the right workspace.",
+    "sections": [
+      {
+        "type": "notice",
+        "title": "A fresh invitation is needed",
+        "body": "Request another invitation from FSS. Signing in alone does not activate organisation access.",
+        "tone": "warningTint"
+      },
+      {
+        "type": "rows",
+        "title": "Already have access?",
+        "items": [
+          [
+            "Sign in with your existing account",
+            "Use your verified email to see memberships.",
+            "Sign in"
+          ]
+        ]
+      }
+    ],
+    "primary": "Request a new invitation",
+    "route": "/portal/activate?state=expired"
+  },
+  {
+    "id": "S06",
+    "role": "Founder",
+    "nav": "Welcome journeys",
+    "title": "Two things need your attention.",
+    "subtitle": "Welcome draft saved.",
+    "sections": [
+      {
+        "type": "timeline",
+        "title": "Readiness checks",
+        "items": [
+          [
+            "\u2713",
+            "Client and contacts",
+            "Confirmed"
+          ],
+          [
+            "!",
+            "Agreement needs review",
+            "Revision 3 replaced approved revision 2"
+          ],
+          [
+            "!",
+            "Sender not configured",
+            "Choose a verified sender"
+          ],
+          [
+            "\u2713",
+            "Welcome guide",
+            "Prepared and previewed"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Resolve before starting",
+        "items": [
+          [
+            "Review revision 3",
+            "Previous approval retained in history.",
+            "Open agreement"
+          ],
+          [
+            "Configure sender",
+            "Use an authorised FSS identity.",
+            "Open settings"
+          ]
+        ]
+      }
+    ],
+    "primary": "Review missing details",
+    "route": "/growth/operations/journeys/new?state=blocked"
+  },
+  {
+    "id": "S07",
+    "role": "Client",
+    "nav": "Documents",
+    "title": "Your file is being checked.",
+    "subtitle": "Brand-guidelines.pdf \u00b7 Upload complete",
+    "sections": [
+      {
+        "type": "notice",
+        "title": "Security check in progress",
+        "body": "The file will be available after it passes the security check. You can leave and return later.",
+        "tone": "tint"
+      },
+      {
+        "type": "rows",
+        "title": "Upload status",
+        "items": [
+          [
+            "File received",
+            "Brand-guidelines.pdf \u00b7 2.4 MB"
+          ],
+          [
+            "Security check",
+            "In progress \u00b7 not yet shared"
+          ]
+        ]
+      }
+    ],
+    "primary": "Back to documents",
+    "route": "/portal/documents?state=quarantine"
+  },
+  {
+    "id": "S08",
+    "role": "Founder",
+    "nav": "Delivery",
+    "title": "Move work to Ready for review",
+    "subtitle": "Complete the review package before saving this move.",
+    "sections": [
+      {
+        "type": "fields",
+        "title": "Required for this move",
+        "items": [
+          [
+            "Deliverable version",
+            "Choose an approved deliverable  \u2304"
+          ],
+          [
+            "Reviewer",
+            "Alex Morgan  \u2304"
+          ],
+          [
+            "Public summary",
+            "Describe what changed\u2026"
+          ],
+          [
+            "Review instructions",
+            "Explain what the client should check\u2026"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Nothing has moved yet",
+        "body": "Cancel to keep NS-014 In progress. Publishing creates the review and its in-app and email notifications.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Publish review",
+    "route": "/growth/operations/requests?state=move-sheet"
+  },
+  {
+    "id": "S09",
+    "role": "Client",
+    "nav": "Requests",
+    "title": "Loading your requests\u2026",
+    "subtitle": "Fetching the latest project updates.",
+    "sections": [
+      {
+        "type": "skeleton",
+        "title": "Loading board"
+      }
+    ],
+    "primary": null,
+    "route": "/portal/requests?state=loading"
+  },
+  {
+    "id": "S10",
+    "role": "Client",
+    "nav": "Settings",
+    "title": "You have read-only access.",
+    "subtitle": "You can view the project and its public updates.",
+    "sections": [
+      {
+        "type": "notice",
+        "title": "Need to contribute?",
+        "body": "Request a role change from FSS. Only designated reviewers can accept work.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "View project",
+    "route": "/portal/requests?state=viewer"
+  },
+  {
+    "id": "E01",
+    "role": "Client",
+    "nav": "Notifications",
+    "title": "Your update is ready.",
+    "subtitle": "Email preview \u00b7 Review requested",
+    "sections": [
+      {
+        "type": "document",
+        "title": "Ready for your review: Booking flow",
+        "body": "Hello Alex,\n\nThe booking flow now shows the correct local time and clearer appointment details.\n\nPlease review version 3 and check the time, studio address and booking reference.\n\nYour target review date is 18 September. Tell us if you need more time.\n\nJean-Fidele\nFaithful Software Solutions",
+        "caption": "Northstar Studio \u00b7 NS-014 \u00b7 authenticated portal link"
+      }
+    ],
+    "primary": "Review the update",
+    "route": "email/review-requested"
+  },
+  {
+    "id": "E02",
+    "role": "Client",
+    "nav": "Notifications",
+    "title": "All done.",
+    "subtitle": "Email preview \u00b7 Work completed",
+    "sections": [
+      {
+        "type": "document",
+        "title": "Completed: Booking confirmation email",
+        "body": "Hello Alex,\n\nVersion 3 was accepted by Alex Morgan on 15 September.\n\nThe final deliverable and review history are ready in your workspace.\n\nThank you for your feedback.\n\nJean-Fidele\nFaithful Software Solutions",
+        "caption": "Northstar Studio \u00b7 NS-014 \u00b7 no private attachment"
+      }
+    ],
+    "primary": "View completed work",
+    "route": "email/work-completed"
+  },
+  {
+    "id": "F33",
+    "role": "Founder",
+    "nav": "Welcome journeys",
+    "title": "Build the client checklist",
+    "subtitle": "Tasks can be reordered within their dependencies.",
+    "sections": [
+      {
+        "type": "timeline",
+        "title": "Client tasks",
+        "items": [
+          [
+            "1",
+            "Confirm details",
+            "Required \u00b7 client owner"
+          ],
+          [
+            "2",
+            "Sign agreement",
+            "Required \u00b7 designated signer \u00b7 verified evidence"
+          ],
+          [
+            "3",
+            "Pay agreed deposit",
+            "Required if contracted \u00b7 billing contact"
+          ],
+          [
+            "4",
+            "Share brand assets",
+            "Required \u00b7 owner or contributor"
+          ],
+          [
+            "5",
+            "Confirm kickoff",
+            "Required \u00b7 client owner \u00b7 after signature"
+          ]
+        ]
+      },
+      {
+        "type": "fields",
+        "title": "Selected task: Share brand assets",
+        "items": [
+          [
+            "Task title",
+            "Share brand assets"
+          ],
+          [
+            "Instructions",
+            "Upload your logo, brand guide and approved copy."
+          ],
+          [
+            "Owner role",
+            "Owner or contributor  \u2304"
+          ],
+          [
+            "Due target",
+            "3 business days after access"
+          ],
+          [
+            "Required",
+            "Yes  \u2304"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Add a task",
+        "body": "Choose profile, upload, review, scheduling or preparation. Payment and signing tasks complete only from verified records.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Save checklist",
+    "route": "/growth/operations/journeys/templates/:template/tasks"
+  },
+  {
+    "id": "F34",
+    "role": "Founder",
+    "nav": "Agreements",
+    "title": "Record a signed agreement",
+    "subtitle": "Manual evidence record \u00b7 founder only",
+    "sections": [
+      {
+        "type": "fields",
+        "title": "Evidence",
+        "items": [
+          [
+            "Source agreement",
+            "Website & booking \u00b7 revision 2"
+          ],
+          [
+            "Signed document",
+            "Choose a retained signed PDF"
+          ],
+          [
+            "Required signers",
+            "Alex Morgan and Jean-Fidele"
+          ],
+          [
+            "Completed on",
+            "15 September 2026"
+          ],
+          [
+            "Evidence provenance",
+            "Manually reviewed external signature"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Fingerprints are automatic",
+        "body": "Source and signed documents have separate system-calculated fingerprints. Record evidence you have reviewed; this does not verify a cryptographic signature.",
+        "tone": "tint"
+      }
+    ],
+    "primary": "Review signed evidence",
+    "route": "/growth/operations/clients/:org/agreements/:agreement/record-signature"
+  },
+  {
+    "id": "M01",
+    "role": "Client",
+    "nav": "Home",
+    "title": "Good morning, Alex.",
+    "subtitle": "Here is where things stand with Northstar Studio.",
+    "sections": [
+      {
+        "type": "hero",
+        "title": "Your booking flow is ready.",
+        "body": "Review the updated prototype and tell us whether it meets the agreed outcome.",
+        "action": "Review the update",
+        "tone": "navy"
+      },
+      {
+        "type": "metrics",
+        "items": [
+          [
+            "1",
+            "Waiting for you"
+          ],
+          [
+            "3",
+            "In delivery"
+          ],
+          [
+            "24 Sep",
+            "Next milestone"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Your next steps",
+        "items": [
+          [
+            "Review booking flow \u00b7 v3",
+            "Ready for review \u00b7 Alex Morgan \u00b7 requested today",
+            "Open review"
+          ],
+          [
+            "Upload your approved brand assets",
+            "Needed before development \u00b7 due 18 Sep",
+            "Add assets"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Your project",
+        "items": [
+          [
+            "Website & booking experience",
+            "Design phase \u00b7 Jean-Fidele \u00b7 next update Friday",
+            "View project"
+          ],
+          [
+            "Latest update",
+            "The booking journey is ready for your review. Development starts after approval.",
+            "Read update"
+          ]
+        ]
+      }
+    ],
+    "primary": "New request",
+    "route": "/portal?organisationId=:org",
+    "mobile": true,
+    "sourceId": "C01"
+  },
+  {
+    "id": "M02",
+    "role": "Client",
+    "nav": "Getting started",
+    "title": "Let\u2019s get you ready.",
+    "subtitle": "Three of six steps complete. Your progress is saved as you go.",
+    "sections": [
+      {
+        "type": "hero",
+        "title": "Next: share your brand assets.",
+        "body": "Add your approved logo, brand guide and final copy so we can prepare your project.",
+        "action": "Upload assets",
+        "tone": "navy"
+      },
+      {
+        "type": "timeline",
+        "title": "Your launch checklist",
+        "items": [
+          [
+            "\u2713",
+            "Confirm your details",
+            "Completed \u00b7 12 Sep"
+          ],
+          [
+            "\u2713",
+            "Review and sign your agreement",
+            "Signed \u00b7 revision 2"
+          ],
+          [
+            "\u2713",
+            "Set up billing",
+            "Deposit paid \u00b7 \u00a31,200"
+          ],
+          [
+            "4",
+            "Share brand assets",
+            "Your action \u00b7 logo, brand guide and approved copy"
+          ],
+          [
+            "5",
+            "Confirm kickoff",
+            "Choose from the times offered by FSS"
+          ],
+          [
+            "6",
+            "Ready to begin",
+            "FSS confirms the start after all prerequisites are met"
+          ]
+        ]
+      }
+    ],
+    "primary": "Continue setup",
+    "route": "/portal/getting-started",
+    "mobile": true,
+    "sourceId": "C02"
+  },
+  {
+    "id": "M03",
+    "role": "Client",
+    "nav": "Requests",
+    "title": "Requests & feedback",
+    "subtitle": "A shared view of what is coming, moving and ready for you.",
+    "sections": [
+      {
+        "type": "choices",
+        "title": "Request state",
+        "items": [
+          "All",
+          "For review",
+          "In progress"
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Your requests",
+        "items": [
+          [
+            "Booking flow v3",
+            "Ready for review \u00b7 Alex Morgan",
+            "Review"
+          ],
+          [
+            "Confirmation email",
+            "In progress \u00b7 Jean-Fidele",
+            "Open"
+          ],
+          [
+            "Customer account area",
+            "New \u00b7 Scope assessment",
+            "Open"
+          ]
+        ]
+      }
+    ],
+    "primary": "New request",
+    "route": "/portal/requests",
+    "mobile": true,
+    "sourceId": "C05"
+  },
+  {
+    "id": "M04",
+    "role": "Client",
+    "nav": "Requests",
+    "title": "Report a problem",
+    "subtitle": "Tell us what happened so we can reproduce it.",
+    "sections": [
+      {
+        "type": "choices",
+        "title": "Request type",
+        "items": [
+          "New work",
+          "Change",
+          "Bug report",
+          "Help"
+        ],
+        "selected": 2
+      },
+      {
+        "type": "fields",
+        "title": "The problem",
+        "items": [
+          [
+            "Project",
+            "Website & booking experience  \u2304"
+          ],
+          [
+            "Short title",
+            "Booking confirmation shows the wrong time"
+          ],
+          [
+            "Steps to reproduce",
+            "1. Choose a 10:00 slot.\n2. Complete a test booking.\n3. Open the confirmation email."
+          ],
+          [
+            "What you expected",
+            "The email should show 10:00 Europe/London."
+          ],
+          [
+            "What happened instead",
+            "The email shows 09:00."
+          ]
+        ]
+      },
+      {
+        "type": "fields",
+        "title": "Impact & environment",
+        "items": [
+          [
+            "Impact",
+            "Incorrect appointment time for customers"
+          ],
+          [
+            "Page URL \u00b7 optional",
+            "https://northstar.example/book"
+          ],
+          [
+            "Browser / device \u00b7 optional",
+            "Safari \u00b7 iPhone"
+          ]
+        ]
+      }
+    ],
+    "primary": "Submit bug report",
+    "route": "/portal/requests/new?type=bug",
+    "mobile": true,
+    "sourceId": "C07"
+  },
+  {
+    "id": "M05",
+    "role": "Client",
+    "nav": "Requests",
+    "title": "Ready for your review",
+    "subtitle": "NS-014 \u00b7 Booking confirmation email \u00b7 Version 3",
+    "sections": [
+      {
+        "type": "hero",
+        "title": "Does this meet the agreed outcome?",
+        "body": "Check the time, studio address and booking reference in the preview. Your decision applies to version 3.",
+        "action": "Open preview",
+        "tone": "navy"
+      },
+      {
+        "type": "rows",
+        "title": "What changed",
+        "items": [
+          [
+            "Correct local time",
+            "Bookings now display Europe/London time."
+          ],
+          [
+            "Clearer appointment details",
+            "The confirmation includes the address, date and booking reference."
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Your decision",
+        "body": "Accept this version when you are happy with the agreed work, or request changes with specific feedback.",
+        "tone": "tint"
+      },
+      {
+        "type": "review",
+        "title": "Review version 3",
+        "body": "I confirm this deliverable meets the agreed requirements.",
+        "actions": [
+          "Accept version 3",
+          "Request changes"
+        ]
+      }
+    ],
+    "primary": "Open preview",
+    "route": "/portal/requests/:request/review",
+    "mobile": true,
+    "sourceId": "C09"
+  },
+  {
+    "id": "M06",
+    "role": "Client",
+    "nav": "Agreements",
+    "title": "Your agreement, clearly explained.",
+    "subtitle": "Website & booking experience \u00b7 Revision 2",
+    "sections": [
+      {
+        "type": "metrics",
+        "items": [
+          [
+            "\u00a34,800",
+            "One-off total"
+          ],
+          [
+            "\u00a31,200",
+            "Initial deposit"
+          ],
+          [
+            "4",
+            "Delivery milestones"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "At a glance",
+        "items": [
+          [
+            "What we will deliver",
+            "Five content pages, booking workflow, confirmation email and handover."
+          ],
+          [
+            "What you provide",
+            "Approved brand assets, website copy and one authorised reviewer."
+          ],
+          [
+            "Payment schedule",
+            "\u00a31,200 deposit + 3 milestone payments of \u00a31,200. Tax follows the agreement."
+          ],
+          [
+            "Support & changes",
+            "Agreed defect support and a separate quote for additional scope."
+          ]
+        ]
+      },
+      {
+        "type": "document",
+        "title": "Full agreement",
+        "body": "Scope, fees, delivery assumptions, responsibilities, support and terms.",
+        "caption": "The complete agreement governs. Read or download before signing."
+      }
+    ],
+    "primary": "Continue to signing",
+    "route": "/portal/agreements/:agreement",
+    "mobile": true,
+    "sourceId": "C15"
+  },
+  {
+    "id": "M07",
+    "role": "Founder",
+    "nav": "Overview",
+    "title": "Your studio, in focus.",
+    "subtitle": "Tuesday, 15 September \u00b7 All clients",
+    "sections": [
+      {
+        "type": "hero",
+        "title": "Three decisions will move work forward.",
+        "body": "One request needs assessment, one agreement needs review and one welcome step needs attention.",
+        "action": "Open action queue",
+        "tone": "navy"
+      },
+      {
+        "type": "metrics",
+        "items": [
+          [
+            "3 / 3",
+            "Delivery capacity"
+          ],
+          [
+            "2",
+            "Client reviews open"
+          ],
+          [
+            "\u00a32,400",
+            "Invoices overdue"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Needs your attention",
+        "items": [
+          [
+            "Northstar \u00b7 Review booking scope",
+            "New request \u00b7 acknowledgement target today",
+            "Assess request"
+          ],
+          [
+            "Harbour \u00b7 Finish agreement",
+            "Missing engagement link",
+            "Continue agreement"
+          ],
+          [
+            "Northstar \u00b7 Welcome email",
+            "Delivery outcome unknown \u00b7 reconcile before retry",
+            "Resolve delivery"
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "This week",
+        "items": [
+          [
+            "Northstar \u00b7 Website & booking",
+            "Design review 17 Sep \u00b7 next action with client",
+            "View client"
+          ],
+          [
+            "Harbour \u00b7 Membership portal",
+            "Kickoff pending agreement and assets",
+            "View client"
+          ]
+        ]
+      }
+    ],
+    "primary": "View delivery",
+    "route": "/growth/operations",
+    "mobile": true,
+    "sourceId": "F01"
+  },
+  {
+    "id": "M08",
+    "role": "Founder",
+    "nav": "Welcome journeys",
+    "title": "Ready when you are.",
+    "subtitle": "Step 5 \u00b7 Review exactly what starting will do.",
+    "sections": [
+      {
+        "type": "wizard",
+        "current": 5,
+        "total": 5,
+        "label": "Readiness & activation"
+      },
+      {
+        "type": "timeline",
+        "title": "Preflight",
+        "items": [
+          [
+            "\u2713",
+            "Client and contacts",
+            "Northstar Studio \u00b7 Alex Morgan"
+          ],
+          [
+            "\u2713",
+            "Welcome email and guide",
+            "Approved content \u00b7 accessible version ready"
+          ],
+          [
+            "\u2713",
+            "Proposal and signers",
+            "Revision 2 \u00b7 Alex and Jean-Fidele"
+          ],
+          [
+            "\u2713",
+            "Billing and portal roles",
+            "First obligation selected \u00b7 existing access reused"
+          ],
+          [
+            "\u2713",
+            "Delivery settings",
+            "Sender verified \u00b7 provider and worker ready"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Start this journey",
+        "body": "Queues the reviewed welcome email to Alex now. The proposal follows its timing and approval gates. Later invoice and access steps wait for verified signatures.",
+        "tone": "tint"
+      },
+      {
+        "type": "rows",
+        "title": "Final previews",
+        "items": [
+          [
+            "Welcome \u00b7 proposal \u00b7 thank-you \u00b7 activation emails",
+            "Exact recipients and content retained",
+            "Open previews"
+          ]
+        ]
+      }
+    ],
+    "primary": "Start journey",
+    "route": "/growth/operations/clients/:org/journey/new?step=activate",
+    "mobile": true,
+    "sourceId": "F23"
+  },
+  {
+    "id": "C26",
+    "role": "Client",
+    "nav": "Getting started",
+    "title": "Tell us about your team",
+    "subtitle": "Getting started \u00b7 Task 1 of 6",
+    "route": "/portal/onboarding/tasks/:task",
+    "primary": "Save profile",
+    "sections": [
+      {
+        "type": "fields",
+        "title": "Your working details",
+        "items": [
+          [
+            "Preferred name",
+            "Alex Morgan"
+          ],
+          [
+            "Role",
+            "Operations director"
+          ],
+          [
+            "Decision maker",
+            "Alex Morgan \u25be"
+          ],
+          [
+            "Billing contact",
+            "Morgan Lee \u25be"
+          ],
+          [
+            "Best way to contact you",
+            "Email \u25be"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Used to support your project",
+        "body": "These details help us contact the right people. Changing a contact does not grant portal access."
+      }
+    ]
+  },
+  {
+    "id": "C27",
+    "role": "Client",
+    "nav": "Getting started",
+    "title": "Bring your brand with you",
+    "subtitle": "Getting started \u00b7 Upload approved project assets",
+    "route": "/portal/onboarding/tasks/:task/upload",
+    "primary": "Submit assets",
+    "sections": [
+      {
+        "type": "fields",
+        "title": "Add your files",
+        "items": [
+          [
+            "Files",
+            "Choose files or drop them here",
+            "Accepted formats and size limit come from the project upload policy."
+          ],
+          [
+            "What are these files?",
+            "Approved logo and brand guidelines"
+          ],
+          [
+            "Notes for FSS",
+            "Use the teal logo on light backgrounds."
+          ]
+        ]
+      },
+      {
+        "type": "rows",
+        "title": "Upload status",
+        "items": [
+          [
+            "Northstar-logo.svg",
+            "Uploaded \u00b7 Safety checks passed",
+            "Remove"
+          ],
+          [
+            "Brand-guidelines.pdf",
+            "Checking file \u00b7 2.4 MB",
+            "Cancel upload"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "One file is still being checked",
+        "body": "You can leave this page. Submit assets becomes available when all included files pass the checks."
+      }
+    ],
+    "primaryDisabled": true
+  },
+  {
+    "id": "C28",
+    "role": "Client",
+    "nav": "Getting started",
+    "title": "Let\u2019s plan the kickoff",
+    "subtitle": "Getting started \u00b7 Meet your delivery lead",
+    "route": "/portal/onboarding/tasks/:task/booking",
+    "primary": "Choose a time",
+    "sections": [
+      {
+        "type": "hero",
+        "title": "A clear start, together.",
+        "body": "A 30-minute session to confirm priorities, dependencies and what success looks like. Your delivery lead is Jean-Fidele.",
+        "action": "Choose a time"
+      },
+      {
+        "type": "rows",
+        "title": "Before we meet",
+        "items": [
+          [
+            "Your goals",
+            "Bring your top three outcomes and any fixed deadlines."
+          ],
+          [
+            "The right people",
+            "Invite anyone responsible for content, decisions or access."
+          ],
+          [
+            "Booking status",
+            "No confirmed time yet. We will show it here once the booking is verified."
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Times shown in Europe/London",
+        "body": "The booking service shows available times. Opening the calendar does not mark this task complete."
+      }
+    ]
+  },
+  {
+    "id": "C29",
+    "role": "Client",
+    "nav": "Getting started",
+    "title": "You\u2019re ready for the next step.",
+    "subtitle": "Your required setup tasks are complete.",
+    "route": "/portal/onboarding?state=complete",
+    "primary": "View your project",
+    "sections": [
+      {
+        "type": "hero",
+        "title": "Everything is in place.",
+        "body": "Your team details, agreement and assets are ready. Your next milestone is the kickoff.",
+        "action": "View your project"
+      },
+      {
+        "type": "timeline",
+        "title": "Your setup",
+        "items": [
+          [
+            "\u2713",
+            "Team details confirmed",
+            "Alex Morgan \u00b7 15 September"
+          ],
+          [
+            "\u2713",
+            "Agreement signed",
+            "Version 2 \u00b7 all required parties"
+          ],
+          [
+            "\u2713",
+            "Approved assets received",
+            "3 files retained"
+          ],
+          [
+            "\u2713",
+            "Kickoff confirmed",
+            "18 September \u00b7 10:00 Europe/London"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Need to update something?",
+        "body": "Your completed checklist stays available. You can contact FSS if your people, assets or requirements change."
+      }
+    ]
+  },
+  {
+    "id": "C30",
+    "role": "Client",
+    "nav": "Agreements",
+    "title": "Signed. A clear beginning.",
+    "subtitle": "Your agreement signature has been recorded.",
+    "route": "/portal/agreements/:agreement?state=signed",
+    "primary": "Continue setup",
+    "sections": [
+      {
+        "type": "hero",
+        "title": "Your signed agreement is ready.",
+        "body": "Website & booking experience \u00b7 Version 2. All required parties have signed this agreement.",
+        "action": "Download signed agreement"
+      },
+      {
+        "type": "rows",
+        "title": "Your record",
+        "items": [
+          [
+            "Alex Morgan",
+            "Signed 15 September 2026 \u00b7 11:24 Europe/London"
+          ],
+          [
+            "FSS authorised signer",
+            "Signed 15 September 2026 \u00b7 11:25 Europe/London"
+          ],
+          [
+            "Retained copy",
+            "The signed version stays available in Agreements.",
+            "View agreement"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "What happens next",
+        "body": "Return to getting started for your remaining setup tasks. Billing and access steps follow the approved welcome sequence."
+      }
+    ]
+  },
+  {
+    "id": "F35",
+    "role": "Founder",
+    "nav": "Welcome journeys",
+    "title": "Create a useful next step",
+    "subtitle": "Welcome checklist \u00b7 Task editor",
+    "route": "/growth/operations/journeys/templates/:template/tasks/:task",
+    "primary": "Save task",
+    "sections": [
+      {
+        "type": "fields",
+        "title": "Task details",
+        "items": [
+          [
+            "Task title",
+            "Upload approved brand assets"
+          ],
+          [
+            "Task type",
+            "File upload \u25be"
+          ],
+          [
+            "Instructions",
+            "Upload your approved logo and brand guidelines."
+          ],
+          [
+            "Responsible role",
+            "Client owner \u25be"
+          ],
+          [
+            "Required to finish setup",
+            "Yes \u25be"
+          ],
+          [
+            "Depends on",
+            "Confirm team details \u25be"
+          ],
+          [
+            "Due rule",
+            "3 calendar days after activation"
+          ],
+          [
+            "Completion evidence",
+            "All required files safely retained \u25be"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Client preview",
+        "body": "Upload approved brand assets \u00b7 Required \u00b7 Due 18 September. Opens a labelled upload task with progress and safety checks."
+      }
+    ]
+  },
+  {
+    "id": "F36",
+    "role": "Founder",
+    "nav": "Delivery",
+    "title": "Create work for a client",
+    "subtitle": "Choose the right client and project before creating a request.",
+    "route": "/growth/operations/requests/new",
+    "primary": "Create request",
+    "sections": [
+      {
+        "type": "fields",
+        "title": "Request details",
+        "items": [
+          [
+            "Client",
+            "Northstar Studio \u25be"
+          ],
+          [
+            "Project",
+            "Website & booking experience \u25be"
+          ],
+          [
+            "Type",
+            "Work request \u25be"
+          ],
+          [
+            "Title",
+            "Add customer contact preferences"
+          ],
+          [
+            "Description",
+            "Let customers select how they want to hear from the team."
+          ],
+          [
+            "Desired outcome",
+            "Customers can save and update their contact preference."
+          ],
+          [
+            "Scope",
+            "Assessment pending \u25be"
+          ],
+          [
+            "Owner",
+            "Jean-Fidele \u25be"
+          ],
+          [
+            "Internal priority",
+            "Normal \u25be"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Public and internal details stay separate",
+        "body": "The client sees the request and its public updates. Internal priority and founder notes remain in operations."
+      }
+    ]
+  },
+  {
+    "id": "F37",
+    "role": "Founder",
+    "nav": "Agreements",
+    "title": "Signing request prepared",
+    "subtitle": "The approved agreement is awaiting signatures.",
+    "route": "/growth/operations/clients/:org/agreements/:agreement?state=awaiting-signature",
+    "primary": "View signing status",
+    "sections": [
+      {
+        "type": "hero",
+        "title": "Ready for the named signers.",
+        "body": "Version 2 is approved and retained. The signing request has been queued; no signature is recorded yet."
+      },
+      {
+        "type": "rows",
+        "title": "Delivery and signing",
+        "items": [
+          [
+            "Alex Morgan",
+            "Signing email queued \u00b7 Signature pending"
+          ],
+          [
+            "FSS authorised signer",
+            "Signature pending"
+          ],
+          [
+            "Document",
+            "Website & booking experience \u00b7 Version 2",
+            "Preview agreement"
+          ]
+        ]
+      },
+      {
+        "type": "notice",
+        "title": "Approval is not signature",
+        "body": "This agreement becomes signed only after verified evidence for every required party. Failed delivery appears in the operations queue."
+      }
+    ]
+  }
+]

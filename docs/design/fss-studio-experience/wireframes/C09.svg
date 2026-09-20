@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1148" viewBox="0 0 1440 1148" role="img" aria-label="C09 · Ready for your review">
+<title>C09 · Ready for your review</title>
+<desc>FSS proposed interface. Text and shapes are editable SVG elements. Synthetic example data.</desc>
+<rect x="0" y="0" width="1440" height="1148" rx="0" fill="#f2f3f5"/>
+<text x="280" y="64" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="500" fill="#46566c">NORTHSTAR STUDIO / REQUESTS</text>
+<rect x="1226" y="40" width="148" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="1246" y="66" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Notifications · 3</text>
+<a href="../wireframes.html#C21" target="_top" aria-label="Notifications · 3"><rect x="1226" y="40" width="148" height="44" fill="transparent"/></a>
+<text x="280" y="152" font-family="Geist,Arial,sans-serif" font-size="36" font-weight="600" fill="#0a1a2e">Ready for your review</text>
+<text x="280" y="192" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">NS-014 · Booking confirmation email · Version 3</text>
+<rect x="280" y="223" width="1112" height="231" rx="16" fill="#07182e" stroke="#d9dfe5"/>
+<text x="304" y="258" font-family="Geist,Arial,sans-serif" font-size="11" font-weight="500" fill="#ffffff">YOUR NEXT STEP</text>
+<text x="304" y="309" font-family="Geist,Arial,sans-serif" font-size="30" font-weight="600" fill="#ffffff">Does this meet the agreed outcome?</text>
+<text x="304" y="355" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#ffffff">Check the time, studio address and booking reference in the preview. Your decision applies to version 3.</text>
+<rect x="304" y="386" width="137" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="324" y="412" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Open preview</text>
+<a href="../wireframes.html#C13" target="_top" aria-label="Open preview"><rect x="304" y="386" width="137" height="44" fill="transparent"/></a>
+<rect x="280" y="478" width="1112" height="247" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="304" y="522" font-family="Geist,Arial,sans-serif" font-size="20" font-weight="600" fill="#0a1a2e">What changed</text>
+<text x="304" y="567" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Correct local time</text>
+<text x="304" y="594" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Bookings now display Europe/London time.</text>
+<text x="304" y="642" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Clearer appointment details</text>
+<text x="304" y="669" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">The confirmation includes the address, date and booking reference.</text>
+<rect x="280" y="749" width="1112" height="99" rx="16" fill="#e3f2f1" stroke="#d9dfe5"/>
+<text x="304" y="789" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="600" fill="#0f7078">Your decision</text>
+<text x="304" y="818" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Accept this version when you are happy with the agreed work, or request changes with specific feedback.</text>
+<rect x="280" y="872" width="1112" height="188" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="304" y="916" font-family="Geist,Arial,sans-serif" font-size="20" font-weight="600" fill="#0a1a2e">Review version 3</text>
+<rect x="304" y="948" width="20" height="20" rx="4" fill="#ffffff" stroke="#788696"/>
+<text x="336" y="961" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#0a1a2e">I confirm this deliverable meets the agreed requirements.</text>
+<rect x="304" y="992" width="157" height="44" rx="12" fill="#0f7078"/>
+<text x="324" y="1018" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#ffffff">Accept version 3</text>
+<a href="../wireframes.html#C11" target="_top" aria-label="Accept version 3"><rect x="304" y="992" width="157" height="44" fill="transparent"/></a>
+<rect x="473" y="992" width="159" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="493" y="1018" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Request changes</text>
+<a href="../wireframes.html#C10" target="_top" aria-label="Request changes"><rect x="473" y="992" width="159" height="44" fill="transparent"/></a>
+<text x="280" y="1096" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Faithful Software Solutions · Built on trust. Delivered with care.</text>
+<rect x="0" y="0" width="232" height="1148" rx="0" fill="#f7f8f9" stroke="#d9dfe5"/>
+<text x="24" y="58" font-family="Geist,Arial,sans-serif" font-size="30" font-weight="700" fill="#0a1a2e">FSS</text>
+<text x="24" y="88" font-family="Geist,Arial,sans-serif" font-size="10" font-weight="500" fill="#46566c">YOUR STUDIO WORKSPACE</text>
+<rect x="20" y="112" width="192" height="78" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="32" y="140" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="600" fill="#0a1a2e">Northstar Studio</text>
+<text x="32" y="165" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Client workspace ▾</text>
+<rect x="34" y="232" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="242" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Home</text>
+<rect x="34" y="280" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="290" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Getting started</text>
+<rect x="34" y="328" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="338" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Projects</text>
+<rect x="20" y="360" width="192" height="44" rx="12" fill="#e3f2f1"/>
+<rect x="34" y="376" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#0f7078"/>
+<text x="60" y="386" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0f7078">Requests</text>
+<rect x="34" y="424" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="434" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Documents</text>
+<rect x="34" y="472" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="482" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Agreements</text>
+<rect x="34" y="520" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="530" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Billing</text>
+<rect x="34" y="568" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="578" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Services</text>
+<rect x="34" y="616" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="626" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Notifications</text>
+<rect x="34" y="664" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="674" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Help</text>
+<rect x="34" y="712" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="722" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Settings</text>
+<text x="24" y="764" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Alex Morgan</text>
+<text x="24" y="781" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Northstar Studio</text></svg>

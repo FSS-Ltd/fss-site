@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1251" viewBox="0 0 1440 1251" role="img" aria-label="C27 · Bring your brand with you">
+<title>C27 · Bring your brand with you</title>
+<desc>FSS proposed interface. Text and shapes are editable SVG elements. Synthetic example data.</desc>
+<rect x="0" y="0" width="1440" height="1251" rx="0" fill="#f2f3f5"/>
+<text x="280" y="64" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="500" fill="#46566c">NORTHSTAR STUDIO / GETTING STARTED</text>
+<rect x="1226" y="40" width="148" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="1246" y="66" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Notifications · 3</text>
+<a href="../wireframes.html#C21" target="_top" aria-label="Notifications · 3"><rect x="1226" y="40" width="148" height="44" fill="transparent"/></a>
+<text x="280" y="152" font-family="Geist,Arial,sans-serif" font-size="36" font-weight="600" fill="#0a1a2e">Bring your brand with you</text>
+<text x="280" y="192" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Getting started · Upload approved project assets</text>
+<rect x="280" y="223" width="1112" height="422" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="304" y="267" font-family="Geist,Arial,sans-serif" font-size="20" font-weight="600" fill="#0a1a2e">Add your files</text>
+<text x="304" y="310" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Files</text>
+<rect x="304" y="324" width="1064" height="48" rx="8" fill="#ffffff" stroke="#788696"/>
+<text x="316" y="352" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Choose files or drop them here</text>
+<text x="304" y="392" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Accepted formats and size limit come from the project upload policy.</text>
+<text x="304" y="435" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">What are these files?</text>
+<rect x="304" y="449" width="1064" height="48" rx="8" fill="#ffffff" stroke="#788696"/>
+<text x="316" y="477" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Approved logo and brand guidelines</text>
+<text x="304" y="535" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Notes for FSS</text>
+<rect x="304" y="549" width="1064" height="48" rx="8" fill="#ffffff" stroke="#788696"/>
+<text x="316" y="577" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Use the teal logo on light backgrounds.</text>
+<rect x="280" y="669" width="1112" height="247" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="304" y="713" font-family="Geist,Arial,sans-serif" font-size="20" font-weight="600" fill="#0a1a2e">Upload status</text>
+<text x="304" y="758" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Northstar-logo.svg</text>
+<text x="304" y="785" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Uploaded · Safety checks passed</text>
+<rect x="1271" y="744" width="97" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="1291" y="770" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Remove</text>
+<a href="../wireframes.html#C27" target="_top" aria-label="Remove"><rect x="1271" y="744" width="97" height="44" fill="transparent"/></a>
+<text x="304" y="833" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Brand-guidelines.pdf</text>
+<text x="304" y="860" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Checking file · 2.4 MB</text>
+<rect x="1231" y="819" width="137" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="1251" y="845" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Cancel upload</text>
+<a href="../wireframes.html#C27" target="_top" aria-label="Cancel upload"><rect x="1231" y="819" width="137" height="44" fill="transparent"/></a>
+<rect x="280" y="940" width="1112" height="99" rx="16" fill="#e3f2f1" stroke="#d9dfe5"/>
+<text x="304" y="980" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="600" fill="#0f7078">One file is still being checked</text>
+<text x="304" y="1009" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">You can leave this page. Submit assets becomes available when all included files pass the checks.</text>
+<rect x="280" y="1063" width="139" height="44" rx="12" fill="#e2e6ea"/>
+<text x="300" y="1089" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Submit assets</text>
+<rect x="280" y="1119" width="74" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="300" y="1145" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Back</text>
+<text x="280" y="1199" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Faithful Software Solutions · Built on trust. Delivered with care.</text>
+<rect x="0" y="0" width="232" height="1251" rx="0" fill="#f7f8f9" stroke="#d9dfe5"/>
+<text x="24" y="58" font-family="Geist,Arial,sans-serif" font-size="30" font-weight="700" fill="#0a1a2e">FSS</text>
+<text x="24" y="88" font-family="Geist,Arial,sans-serif" font-size="10" font-weight="500" fill="#46566c">YOUR STUDIO WORKSPACE</text>
+<rect x="20" y="112" width="192" height="78" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="32" y="140" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="600" fill="#0a1a2e">Northstar Studio</text>
+<text x="32" y="165" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Client workspace ▾</text>
+<rect x="34" y="232" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="242" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Home</text>
+<rect x="20" y="264" width="192" height="44" rx="12" fill="#e3f2f1"/>
+<rect x="34" y="280" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#0f7078"/>
+<text x="60" y="290" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0f7078">Getting started</text>
+<rect x="34" y="328" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="338" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Projects</text>
+<rect x="34" y="376" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="386" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Requests</text>
+<rect x="34" y="424" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="434" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Documents</text>
+<rect x="34" y="472" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="482" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Agreements</text>
+<rect x="34" y="520" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="530" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Billing</text>
+<rect x="34" y="568" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="578" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Services</text>
+<rect x="34" y="616" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="626" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Notifications</text>
+<rect x="34" y="664" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="674" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Help</text>
+<rect x="34" y="712" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="722" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Settings</text>
+<text x="24" y="764" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Alex Morgan</text>
+<text x="24" y="781" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Northstar Studio</text></svg>
