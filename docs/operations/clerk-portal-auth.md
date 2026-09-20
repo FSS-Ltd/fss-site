@@ -25,6 +25,8 @@ The client portal uses Clerk for identity and invitation delivery. The operation
 
 Application profiles hold the confirmed display name and verified email. Asynchronous Clerk webhooks initialize missing profiles without replacing an existing confirmed name. See [the invitation repair and rollout record](auth-invitation-repair-2026-09-20.md) for migration order and verification.
 
+Invitation screens do not display recipient or saved-session email addresses. A saved session that differs from the invitation hint, or has no hint to compare, must be cleared before continuing. Account switching clears Clerk's browser sessions and fully reloads the same invitation with its ticket intact. The page then removes personal query fields again. The hint only controls this prompt; the server still authorizes access from the verified identity and approved database invitation. See [the privacy follow-up](auth-invitation-privacy-2026-09-20.md).
+
 Deleting a Clerk account prevents a new portal session immediately. Revoke the operations membership in Growth OS to remove the retained access record as well.
 
 ## Studio cutover

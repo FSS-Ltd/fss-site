@@ -2,8 +2,25 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   completeInvitationSignUp,
+  clerkErrorMessage,
   invitationAddressWithoutPersonalDetails,
 } from "./invitation-sign-up";
+
+test("invitation feedback never reveals an email returned by the provider", () => {
+  for (const error of [
+    new Error("Session belongs to previous-user@example.test"),
+    { errors: [{ message: "invited@example.test already exists" }] },
+  ]) {
+    assert.equal(
+      clerkErrorMessage(error, "Try signing in."),
+      "Try signing in.",
+    );
+  }
+  assert.equal(
+    clerkErrorMessage(new Error("Your passwords do not match."), "Try again."),
+    "Your passwords do not match.",
+  );
+});
 
 test("invitation signup supplies the ticket and password together and routes through the access claim", async () => {
   const calls: unknown[] = [];
