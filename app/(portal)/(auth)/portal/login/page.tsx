@@ -15,6 +15,7 @@ export default function PortalLoginPage(): React.JSX.Element {
         home: portalPath("/portal"),
         onboarding: portalPath("/portal/onboarding"),
       }}
+      supportHref="/contact"
     />
   );
 }

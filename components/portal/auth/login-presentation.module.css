@@ -1,0 +1,256 @@
+.presentation {
+  display: grid;
+  width: min(100%, 560px);
+  gap: 12px;
+  margin-inline: auto;
+  color: var(--portal-ink, #0a1a2e);
+}
+
+.introduction {
+  display: grid;
+  gap: 10px;
+  padding: 4px 0 8px;
+}
+
+.brand {
+  width: 46px;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.eyebrow,
+.sectionLabel,
+.footer {
+  margin: 0;
+  color: var(--portal-muted, #46566c);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.045em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.introduction h1,
+.nextStep h2,
+.signInCard h2,
+.nextStep p,
+.invitation p,
+.invitation span {
+  margin: 0;
+}
+
+.introduction h1 {
+  font-size: clamp(1.875rem, 5vw, 2.5rem);
+  letter-spacing: -0.045em;
+  line-height: 1.15;
+}
+
+.lede {
+  margin: 0;
+  color: var(--portal-muted, #46566c);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+.nextStep {
+  display: grid;
+  gap: 10px;
+  padding: 20px;
+  border-radius: 12px;
+  background: var(--portal-navy, #07182e);
+  color: #ffffff;
+}
+
+.nextStep .sectionLabel {
+  color: #c4dbdf;
+}
+
+.nextStep h2 {
+  font-size: 1.3125rem;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.nextStep > p:last-child {
+  color: #edf7f8;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.signInCard {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid var(--portal-border, #d9dfe5);
+  border-radius: 12px;
+  background: var(--portal-surface, #ffffff);
+}
+
+.signInCard h2 {
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.formContent {
+  display: grid;
+  gap: 12px;
+}
+
+.form {
+  display: grid;
+  gap: 10px;
+}
+
+.fieldLabel {
+  color: var(--portal-ink, #0a1a2e);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.input {
+  width: 100%;
+  min-height: 44px;
+  box-sizing: border-box;
+  border: 1px solid var(--portal-control-boundary, #788696);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: var(--portal-surface, #ffffff);
+  color: var(--portal-ink, #0a1a2e);
+  font: inherit;
+  line-height: 1.45;
+}
+
+.input::placeholder {
+  color: #657183;
+}
+
+.submit {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 10px 16px;
+  background: var(--portal-action, #0f7078);
+  color: #ffffff;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.submit:hover:not(:disabled) {
+  background: #0b5e65;
+}
+
+.submit:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.textButton {
+  width: fit-content;
+  min-height: 36px;
+  border: 0;
+  padding: 6px 0;
+  background: transparent;
+  color: var(--portal-action, #0f7078);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.feedback {
+  margin: 0;
+  padding: 12px;
+  border: 1px solid #b5dbd7;
+  border-radius: 8px;
+  background: var(--portal-tint, #e3f2f1);
+  color: #0b5e65;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.error {
+  border-color: #e7b5ae;
+  background: #fff0ed;
+  color: #9e2f22;
+}
+
+.feedbackIcon {
+  margin-right: 6px;
+  vertical-align: text-bottom;
+}
+
+.reassurance {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  margin: 0;
+  color: var(--portal-muted, #46566c);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.invitation {
+  display: grid;
+  gap: 5px;
+  padding: 16px 20px;
+  border: 1px solid #b5dbd7;
+  border-radius: 12px;
+  background: var(--portal-tint, #e3f2f1);
+  color: var(--portal-ink, #0a1a2e);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.invitation p {
+  color: var(--portal-action, #0f7078);
+  font-weight: 700;
+}
+
+.invitation a {
+  width: fit-content;
+  min-height: 28px;
+  color: var(--portal-action, #0f7078);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.footer {
+  padding: 8px 0 0;
+  font-size: 0.5625rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.presentation :is(a, button, input):focus-visible {
+  outline: 3px solid var(--portal-action, #0f7078);
+  outline-offset: 3px;
+}
+
+@media (max-width: 480px) {
+  .presentation {
+    gap: 12px;
+  }
+
+  .nextStep,
+  .signInCard,
+  .invitation {
+    padding: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .presentation * {
+    transition: none;
+  }
+}

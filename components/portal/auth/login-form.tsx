@@ -2,10 +2,10 @@
 import { useSignIn } from "@clerk/nextjs/legacy";
 import { useUser } from "@clerk/nextjs";
 import { useState, type FormEvent } from "react";
-import Image from "next/image";
-import { ArrowRight, LockKeyhole, MailCheck } from "lucide-react";
+import { ArrowRight, MailCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
-import styles from "./portal.module.css";
+import styles from "./login-presentation.module.css";
+import { PortalLoginPresentation } from "./login-presentation";
 import { claimPortalAccess } from "./portal-claim-request";
 import {
   defaultPortalClaimDestinations,
@@ -20,8 +20,10 @@ type Status = {
 
 export function PortalLoginForm({
   claimDestinations = defaultPortalClaimDestinations,
+  supportHref,
 }: {
   claimDestinations?: PortalClaimDestinations;
+  supportHref?: string;
 }): React.JSX.Element {
   const router = useRouter();
   const { isSignedIn } = useUser();
@@ -127,24 +129,10 @@ export function PortalLoginForm({
   }
 
   return (
-    <section className={styles.authPanel} aria-labelledby="portal-heading">
-      <div className={styles.identityMark} aria-hidden="true">
-        <Image
-          src="/redesign/brand/fss-monogram-navy-small.png"
-          alt=""
-          width={74}
-          height={32}
-          style={{ height: "auto" }}
-          priority
-        />
-      </div>
-      <p className={styles.eyebrow}>Your FSS workspace</p>
-      <h1 id="portal-heading" className={styles.heading}>
-        Welcome back.
-      </h1>
-      <p className={styles.copy}>
-        We’ll send a one-time code to your email so you can continue securely.
-      </p>
+    <PortalLoginPresentation
+      invitationMessage="Open the invitation link from your email to activate approved access."
+      supportHref={supportHref}
+    >
       {isSignedIn ? (
         <form
           onSubmit={continueSession}
@@ -152,7 +140,7 @@ export function PortalLoginForm({
           aria-busy={status.kind === "pending"}
         >
           <button
-            className={styles.button}
+            className={styles.submit}
             disabled={status.kind === "pending"}
             type="submit"
           >
@@ -167,8 +155,8 @@ export function PortalLoginForm({
           className={styles.form}
           aria-busy={status.kind === "pending"}
         >
-          <label htmlFor="portal-email" className={styles.label}>
-            Email address
+          <label htmlFor="portal-email" className={styles.fieldLabel}>
+            Work email
           </label>
           <input
             id="portal-email"
@@ -184,13 +172,13 @@ export function PortalLoginForm({
           />
           <button
             type="submit"
-            className={styles.button}
+            className={styles.submit}
             disabled={!loaded || status.kind === "pending"}
           >
             <span>
               {status.kind === "pending"
                 ? "Sending code…"
-                : "Continue with email"}
+                : "Continue"}
             </span>
             <ArrowRight size={18} aria-hidden="true" />
           </button>
@@ -201,7 +189,7 @@ export function PortalLoginForm({
           className={styles.form}
           aria-busy={status.kind === "pending"}
         >
-          <label htmlFor="portal-code" className={styles.label}>
+          <label htmlFor="portal-code" className={styles.fieldLabel}>
             Verification code
           </label>
           <input
@@ -217,7 +205,7 @@ export function PortalLoginForm({
           />
           <button
             type="submit"
-            className={styles.button}
+            className={styles.submit}
             disabled={!loaded || status.kind === "pending"}
           >
             <span>
@@ -262,9 +250,8 @@ export function PortalLoginForm({
         </form>
       )}
       <p className={styles.reassurance}>
-        <LockKeyhole size={14} aria-hidden="true" /> Private access through your
-        verified email.
+        Private access through your verified email.
       </p>
-    </section>
+    </PortalLoginPresentation>
   );
 }
