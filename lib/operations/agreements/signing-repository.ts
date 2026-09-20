@@ -58,6 +58,53 @@ export async function listStaffSigning(
     loadSigningApprovals(tx, organisationId, null),
   );
 }
+
+export type StaffSigningReadiness = {
+  approvalId: string;
+  organisationId: string;
+  organisationName: string;
+  title: string;
+  status: "prepared" | "approved" | "expired";
+};
+
+/**
+ * Cross-client signing work cannot be assembled from listStaffSigning without
+ * one staff transaction per organisation. This queue keeps the Studio
+ * overview inside a single staff-scoped read.
+ */
+export async function listStaffSigningReadiness(
+  db: OperationsDb,
+  admin: FssAdminContext,
+): Promise<StaffSigningReadiness[]> {
+  return withFssAdminTransaction(
+    db,
+    admin,
+    (tx) =>
+      tx<StaffSigningReadiness[]>`
+        select
+          p.id as "approvalId",
+          p.organisation_id as "organisationId",
+          o.display_name as "organisationName",
+          coalesce(p.snapshot->>'title', 'Agreement') as title,
+          case
+            when p.status = 'approved'
+              and p.expires_at <= clock_timestamp()
+              and (select count(*) from operations.signing_signatures s
+                where s.approval_id = p.id) < jsonb_array_length(p.snapshot->'signatories')
+              then 'expired'
+            else p.status
+          end as status
+        from operations.signing_approvals p
+        join operations.organisations o on o.id = p.organisation_id
+        where p.status in ('prepared', 'approved')
+        order by
+          case p.status when 'prepared' then 0 else 1 end,
+          p.created_at asc,
+          p.id
+        limit 50
+      `,
+  );
+}
 export async function getFounderSigning(
   db: OperationsDb,
   context: OperationsFounder | null,
