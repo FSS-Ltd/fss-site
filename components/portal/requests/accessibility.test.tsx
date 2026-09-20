@@ -359,3 +359,25 @@ test("request collection provides an actionable empty board and clear board guid
   assert.match(loadingBoard, /Loading your requests/);
   assert.match(loadingBoard, /aria-busy="true"/);
 });
+
+test("request creation exposes the no-project recovery and bug-report fields", () => {
+  const noProjectHtml = renderToStaticMarkup(
+    <AppRouterContext.Provider value={router}>
+      <RequestForm organisationId="org" projects={[]} />
+    </AppRouterContext.Provider>,
+  );
+  const bugHtml = renderToStaticMarkup(
+    <AppRouterContext.Provider value={router}>
+      <RequestForm
+        initialType="bug"
+        organisationId="org"
+        projects={[{ id: request.projectId, title: "Website" }]}
+      />
+    </AppRouterContext.Provider>,
+  );
+
+  assert.match(noProjectHtml, /A project is needed for this request/);
+  assert.match(noProjectHtml, /Ask FSS to set up your project/);
+  assert.match(bugHtml, /Steps to reproduce/);
+  assert.match(bugHtml, /What happened instead/);
+});

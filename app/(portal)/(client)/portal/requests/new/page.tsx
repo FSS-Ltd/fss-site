@@ -1,5 +1,4 @@
 import { randomUUID } from "node:crypto";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPortalPageContext } from "@/lib/operations/auth/page-context";
 import { requirePortalMember } from "@/lib/operations/auth/require-member";
@@ -9,7 +8,8 @@ import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { listPortalProjects } from "@/lib/operations/projects/repository";
 import { RequestForm } from "@/components/portal/requests/request-form";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
-import styles from "@/components/portal/projects.module.css";
+import { PageHeader } from "@/components/portal/ui";
+import styles from "@/components/portal/requests/requests.module.css";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 
 export default async function NewRequestPage({
@@ -17,9 +17,8 @@ export default async function NewRequestPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }): Promise<React.JSX.Element> {
-  const context = await getPortalPageContext(
-    (await searchParams).organisationId,
-  );
+  const params = await searchParams;
+  const context = await getPortalPageContext(params.organisationId);
   if (!context) return <PortalUnavailable />;
   let projects;
   try {
@@ -44,16 +43,29 @@ export default async function NewRequestPage({
     return <PortalUnavailable />;
   }
   return (
-    <div className={styles.page}>
-      <Link
-        className={styles.breadcrumb}
-        href={`${portalPath("/portal/requests")}?organisationId=${context.organisationId}`}
-      >
-        All requests
-      </Link>
-      <p className={styles.eyebrow}>Tell us what you need</p>
-      <h1 className={styles.title}>New request</h1>
+    <div className={styles.requestPage}>
+      <PageHeader
+        breadcrumbs={[
+          {
+            label: "Requests",
+            href: `${portalPath("/portal/requests")}?organisationId=${context.organisationId}`,
+          },
+          { label: "New request" },
+        ]}
+        description={
+          params.type === "bug"
+            ? "Tell us what happened so we can reproduce it."
+            : "A clear request helps us give you a useful next step."
+        }
+        eyebrow="FSS Studio / Requests"
+        title={
+          params.type === "bug"
+            ? "Report a problem"
+            : "What would you like us to do?"
+        }
+      />
       <RequestForm
+        initialType={params.type === "bug" ? "bug" : "work"}
         organisationId={context.organisationId}
         projects={projects.map(({ id, title }) => ({ id, title }))}
       />
