@@ -19,7 +19,7 @@ test("portal signing retains its header and width while founder signing and jour
   assert.match(css, /\.page > header p\s*\{[^}]*max-width: 62ch;/);
   const portal = readFileSync(
     new URL(
-      "../../../app/(portal)/portal/agreements/page.tsx",
+      "../../../app/(portal)/(client)/portal/agreements/page.tsx",
       import.meta.url,
     ),
     "utf8",

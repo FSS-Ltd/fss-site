@@ -2,7 +2,7 @@ import { StudioShell } from "@/components/portal/studio-shell";
 import { notFound } from "next/navigation";
 import { fssStudioEnabled } from "@/lib/operations/auth/release-flags";
 
-export default function AdminLayout({
+function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -10,3 +10,5 @@ export default function AdminLayout({
   if (!fssStudioEnabled()) notFound();
   return <StudioShell>{children}</StudioShell>;
 }
+
+export default AdminLayout;
