@@ -1,9 +1,15 @@
+import { ClerkProvider } from "@clerk/nextjs";
 import { notFound } from "next/navigation";
 import { portalFont } from "@/components/portal/portal-font";
 import styles from "@/components/portal/portal-theme.module.css";
 import { resolveVisualScenario } from "./visual-scenarios";
 
 export const dynamic = "force-dynamic";
+
+// Visual fixtures render portal shells outside the portal route group's provider.
+// This is a valid, non-secret development publishable key for the test-only route.
+const VISUAL_CLERK_PUBLISHABLE_KEY =
+  "pk_test_Zm9vLWJhci0xLmNsZXJrLmFjY291bnRzLmRldiQ";
 
 export default async function FssStudioVisualScenarioPage({
   params,
@@ -17,8 +23,10 @@ export default async function FssStudioVisualScenarioPage({
   );
   if (!visual) notFound();
   return (
-    <div className={`${portalFont.variable} ${styles.theme}`}>
-      {visual.content}
-    </div>
+    <ClerkProvider publishableKey={VISUAL_CLERK_PUBLISHABLE_KEY}>
+      <div className={`${portalFont.variable} ${styles.theme}`}>
+        {visual.content}
+      </div>
+    </ClerkProvider>
   );
 }

@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import styles from "./login-presentation.module.css";
 import { PortalLoginPresentation } from "./login-presentation";
 import { claimPortalAccess } from "./portal-claim-request";
+import { PortalSignOutButton } from "./portal-sign-out";
 import {
   defaultPortalClaimDestinations,
   type PortalClaimDestinations,
@@ -239,15 +240,11 @@ export function PortalLoginForm({
         )}
       </div>
       {isSignedIn && (
-        <form
-          method="post"
-          action="/api/auth/sign-out"
-          className={styles.actions}
-        >
-          <button type="submit" className={styles.textButton}>
+        <p className={styles.actions}>
+          <PortalSignOutButton className={styles.textButton}>
             Sign out and use another account
-          </button>
-        </form>
+          </PortalSignOutButton>
+        </p>
       )}
       <p className={styles.reassurance}>
         Private access through your verified email.

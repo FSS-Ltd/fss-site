@@ -23,6 +23,16 @@ navigationMock.exports = {
 };
 require.cache[navigationModulePath] = navigationMock;
 
+const clerkModulePath = require.resolve("@clerk/nextjs");
+const clerkMock = new Module(clerkModulePath);
+
+clerkMock.filename = clerkModulePath;
+clerkMock.loaded = true;
+clerkMock.exports = {
+  useClerk: () => ({ signOut: async () => undefined }),
+};
+require.cache[clerkModulePath] = clerkMock;
+
 const { ClientShell } = require("./client-shell") as typeof import("./client-shell");
 const { StudioShell } = require("./studio-shell") as typeof import("./studio-shell");
 
@@ -62,4 +72,9 @@ test("marks the active client destination as the current page", () => {
     renderClient("owner"),
     /aria-current="page"[^>]*href="\/requests\?organisationId=/,
   );
+});
+
+test("uses Clerk sign-out controls instead of origin-gated forms", () => {
+  assert.doesNotMatch(renderClient("owner"), /api\/auth\/sign-out/);
+  assert.doesNotMatch(renderStudio(), /api\/auth\/sign-out/);
 });

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { portalPath } from "@/lib/operations/auth/portal-url";
+import { PortalSignOutButton } from "../auth/portal-sign-out";
 import {
   getStudioNavigation,
   studioMobileNavigationIds,
@@ -86,8 +87,6 @@ export function StudioShell({
 }>): React.JSX.Element {
   const pathname = usePathname();
   const navigation = getStudioNavigation(pathname);
-  const returnTo = encodeURIComponent(portalPath("/portal/login"));
-
   return (
     <div className={styles.shell}>
       <a className={styles.skip} href="#studio-content">
@@ -118,11 +117,9 @@ export function StudioShell({
       <div className={styles.content}>
         <header className={styles.topbar}>
           <p className={styles.context}>FSS Studio</p>
-          <form action={`/api/auth/sign-out?returnTo=${returnTo}`} method="post">
-            <button className={styles.signOut} type="submit">
-              Sign out
-            </button>
-          </form>
+          <PortalSignOutButton className={styles.signOut}>
+            Sign out
+          </PortalSignOutButton>
         </header>
         <main className={styles.main} id="studio-content">
           {children}
