@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import type { OperationsTransaction } from "../db/client";
 import { loadAgreement } from "../agreements/repository";
+import { portalUrl } from "../auth/portal-url";
 import { prepareWelcome, prepareProposal } from "./approval";
 import {
   JourneyConflict,
@@ -132,7 +133,7 @@ export async function prepareProposalPreview(
         ...approval,
         access: command.access,
         scopeSummary: command.scopeSummary,
-        portalUrl: new URL("/agreements", options.portalOrigin).href,
+        portalUrl: portalUrl("/agreements", options.portalOrigin).href,
       },
       journey.welcome,
     );

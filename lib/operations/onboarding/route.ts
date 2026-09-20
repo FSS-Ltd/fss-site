@@ -15,6 +15,7 @@ import { journeyCommandOptions } from "./command-configuration";
 import { createJourneyCommandHandler } from "./http";
 import { executeJourneyCommand, executeStaffJourneyCommand } from "./commands";
 import type { FssAdminContext } from "../auth/staff-types";
+import { fssStudioEnabled } from "../auth/release-flags";
 export function founderJourneyRoute() {
   return createJourneyCommandHandler({
     enabled: onboardingEnabled(),
@@ -70,7 +71,7 @@ async function authorizeStaff(): Promise<FssAdminContext | null> {
 
 export function staffJourneyRoute() {
   return createJourneyCommandHandler({
-    enabled: onboardingEnabled(),
+    enabled: onboardingEnabled() && fssStudioEnabled(),
     origin: new URL(resolveSiteUrl()).origin,
     createCorrelationId: randomUUID,
     authorize: authorizeStaff,
@@ -89,7 +90,7 @@ export function staffJourneyRoute() {
 
 export function staffWelcomeDownloadRoute() {
   return createWelcomeDownloadHandler({
-    enabled: onboardingEnabled(),
+    enabled: onboardingEnabled() && fssStudioEnabled(),
     createCorrelationId: randomUUID,
     authorize: authorizeStaff,
     reportUnexpectedError: (report) =>

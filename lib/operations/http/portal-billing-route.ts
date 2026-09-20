@@ -1,9 +1,12 @@
 import { randomUUID } from "node:crypto";
-import { resolveSiteUrl } from "@/lib/config/site-url";
 import { PortalAccessDenied } from "../auth/types";
 import { hasPortalCapability } from "../auth/permissions";
 import { getPortalIdentity } from "../auth/server";
-import { portalAuthConfigured } from "../auth/configuration";
+import {
+  portalAuthConfigured,
+  resolvePortalOrigin,
+} from "../auth/configuration";
+import { portalUrl } from "../auth/portal-url";
 import { getPortalDb, withPortalTransaction } from "../db/portal-client";
 import { readBillingConfiguration } from "../billing/configuration";
 import { createOperationsBillingClient } from "../billing/client";
@@ -12,7 +15,7 @@ import { createPortalBillingHandler } from "./billing-handler";
 import { executePortalBillingCommand } from "./billing-access";
 
 export function portalBillingRoute(): (request: Request) => Promise<Response> {
-  const origin = new URL(resolveSiteUrl()).origin;
+  const origin = resolvePortalOrigin();
   return createPortalBillingHandler({
     enabled:
       process.env.OPERATIONS_ENABLED === "true" &&
@@ -52,7 +55,10 @@ export function portalBillingRoute(): (request: Request) => Promise<Response> {
         command,
         hostedBillingProvider(stripe),
         process.env.STRIPE_BILLING_PORTAL_CONFIGURATION_ID,
-        `${origin}/portal/billing?organisationId=${encodeURIComponent(command.organisationId)}`,
+        portalUrl(
+          `/billing?organisationId=${encodeURIComponent(command.organisationId)}`,
+          origin,
+        ).href,
         correlationId,
       );
     },

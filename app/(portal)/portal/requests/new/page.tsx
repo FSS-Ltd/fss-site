@@ -10,6 +10,7 @@ import { listPortalProjects } from "@/lib/operations/projects/repository";
 import { RequestForm } from "@/components/portal/requests/request-form";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import styles from "@/components/portal/projects.module.css";
+import { portalPath } from "@/lib/operations/auth/portal-url";
 
 export default async function NewRequestPage({
   searchParams,
@@ -46,7 +47,7 @@ export default async function NewRequestPage({
     <div className={styles.page}>
       <Link
         className={styles.breadcrumb}
-        href={`/portal/requests?organisationId=${context.organisationId}`}
+        href={`${portalPath("/portal/requests")}?organisationId=${context.organisationId}`}
       >
         All requests
       </Link>

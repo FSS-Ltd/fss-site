@@ -1,9 +1,11 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { requireFounder } from "@/lib/growth/auth/require-founder";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import { listAgreementRegister } from "@/lib/operations/agreements/repository";
 import { AgreementRegister } from "@/components/operations/agreements/agreement-register";
+import { growthOperationsCutoverEnabled } from "@/lib/operations/auth/release-flags";
+import { fssStudioUrl } from "@/lib/operations/auth/studio-url";
 export const dynamic = "force-dynamic";
 export default async function AgreementsPage({
   params,
@@ -16,6 +18,13 @@ export default async function AgreementsPage({
   const founder = await requireFounder();
   const { organisationId } = await params;
   const { after } = await searchParams;
+  if (growthOperationsCutoverEnabled()) {
+    const query =
+      typeof after === "string" ? `?after=${encodeURIComponent(after)}` : "";
+    redirect(
+      fssStudioUrl(`/admin/clients/${organisationId}/agreements${query}`),
+    );
+  }
   let register;
   try {
     if (Array.isArray(after)) throw new Error("Invalid cursor.");

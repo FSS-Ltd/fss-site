@@ -66,6 +66,24 @@ test("redirects legacy portal paths while preserving search parameters", async (
   );
 });
 
+test("restores visible legacy portal paths when prefix-free routing is disabled", async () => {
+  const proxyWithLegacyPortalResponse = portalProxy.createProxy(
+    portalProxy.createPortalProxyResponse(() => false),
+    () => false,
+  );
+  const request = new NextRequest(
+    "https://portal.faithfulsoftware.dev/projects/project-123?view=active",
+  );
+
+  const response = await proxyWithLegacyPortalResponse(request, unusedEvent);
+
+  assert.equal(response?.status, 307);
+  assert.equal(
+    response?.headers.get("location"),
+    "https://portal.faithfulsoftware.dev/portal/projects/project-123?view=active",
+  );
+});
+
 test("runs portal API requests through the injected Clerk middleware", async () => {
   const request = new NextRequest(
     "https://portal.faithfulsoftware.dev/api/portal/access/claim",

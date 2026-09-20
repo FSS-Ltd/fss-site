@@ -8,6 +8,10 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useSignUp } from "@clerk/nextjs";
 import styles from "./portal.module.css";
 import { claimPortalAccess } from "./portal-claim-request";
+import {
+  defaultPortalClaimDestinations,
+  type PortalClaimDestinations,
+} from "./portal-claim-destination";
 
 type Status = {
   kind: "idle" | "pending" | "error";
@@ -33,11 +37,21 @@ function getClerkErrorMessage(error: unknown): string | null {
 }
 
 function isExistingSessionError(error: unknown): boolean {
-  const message = getClerkErrorMessage(error) ?? (error instanceof Error ? error.message : "");
+  const message =
+    getClerkErrorMessage(error) ??
+    (error instanceof Error ? error.message : "");
   return /session already exists/i.test(message);
 }
 
-export function PortalInvitationActivation(): React.JSX.Element {
+export function PortalInvitationActivation({
+  activationPath = "/activate",
+  claimDestinations = defaultPortalClaimDestinations,
+  loginPath = "/login",
+}: {
+  activationPath?: string;
+  claimDestinations?: PortalClaimDestinations;
+  loginPath?: string;
+}): React.JSX.Element {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialValues = useRef({
@@ -52,8 +66,8 @@ export function PortalInvitationActivation(): React.JSX.Element {
 
   useEffect(() => {
     if (initialValues.current.name || initialValues.current.email)
-      window.history.replaceState({}, "", "/portal/activate");
-  }, []);
+      window.history.replaceState({}, "", activationPath);
+  }, [activationPath]);
 
   async function submit(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
@@ -100,11 +114,16 @@ export function PortalInvitationActivation(): React.JSX.Element {
           getClerkErrorMessage(finalResult.error) ??
             "Your account could not be activated.",
         );
-      router.replace(await claimPortalAccess(name));
+      router.replace(
+        await claimPortalAccess(name, { destinations: claimDestinations }),
+      );
     } catch (error) {
       if (isExistingSessionError(error)) {
         try {
-          const destination = await claimPortalAccess(name ?? "");
+          const destination = await claimPortalAccess(
+            name ?? "",
+            { destinations: claimDestinations },
+          );
           setStatus({ kind: "pending" });
           router.replace(destination);
           return;
@@ -134,7 +153,7 @@ export function PortalInvitationActivation(): React.JSX.Element {
           invitation.
         </p>
         <p className={styles.actions}>
-          <Link className={styles.link} href="/portal/login">
+          <Link className={styles.link} href={loginPath}>
             Go to portal sign in
           </Link>
         </p>
@@ -240,7 +259,7 @@ export function PortalInvitationActivation(): React.JSX.Element {
         when this invitation is accepted.
       </p>
       <p className={styles.actions}>
-        <Link className={styles.link} href="/portal/login">
+        <Link className={styles.link} href={loginPath}>
           Already have access? Sign in
         </Link>
       </p>

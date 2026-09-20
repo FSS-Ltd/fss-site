@@ -63,6 +63,26 @@ In this order:
    a domain rollback can silently break exactly these, the same way a
    forward cutover can.
 
+## Operations Studio and portal-routing rollback
+
+For an Operations cutover incident, do not alter staff records, invitations,
+or audit evidence. In Vercel Production, make each flag change deliberately
+and redeploy after it:
+
+1. Set `OPERATIONS_GROWTH_OPERATIONS_CUTOVER_ENABLED=false` to restore the
+   old Growth client and billing workflow routes and endpoints.
+2. Set `OPERATIONS_FSS_STUDIO_ENABLED=false` if Studio itself is implicated.
+   This also makes the Growth cutover ineffective.
+3. Set `OPERATIONS_PORTAL_PREFIX_FREE_ENABLED=false` if portal host routing is
+   implicated. Prefix-free portal URLs then redirect to compatible visible
+   `/portal/*` destinations.
+4. Confirm that the legacy Clerk activation URL remains allow-listed before
+   testing an outstanding invitation. Do not remove either activation redirect
+   until the agreed rollback window ends.
+
+See [the Operations Studio cutover runbook](./operations-studio-cutover.md)
+for the route mapping and post-change smoke checks.
+
 ## Database recovery
 
 **Prefer a forward repair migration** in every case that isn't confirmed

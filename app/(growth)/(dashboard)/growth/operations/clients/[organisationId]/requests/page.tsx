@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { z } from "zod";
 import { requireFounder } from "@/lib/growth/auth/require-founder";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
@@ -13,6 +13,8 @@ import { OperationsPageHeader } from "@/components/operations/shared/operations-
 import ui from "@/components/operations/shared/operations-ui.module.css";
 import layout from "@/components/operations/requests/requests.module.css";
 import { RequestQueueSummary } from "@/components/operations/requests/request-queue-summary";
+import { growthOperationsCutoverEnabled } from "@/lib/operations/auth/release-flags";
+import { fssStudioUrl } from "@/lib/operations/auth/studio-url";
 export const dynamic = "force-dynamic";
 export default async function FounderRequestsPage({
   params,
@@ -24,6 +26,9 @@ export default async function FounderRequestsPage({
   const parsed = z.uuid().safeParse((await params).organisationId);
   if (!parsed.success) notFound();
   const organisationId = parsed.data;
+  if (growthOperationsCutoverEnabled()) {
+    redirect(fssStudioUrl(`/admin/clients/${organisationId}/requests`));
+  }
   let queue;
   try {
     queue = await loadFounderRequestQueue(

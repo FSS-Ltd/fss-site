@@ -4,11 +4,14 @@ import { resolveSiteUrl } from "@/lib/config/site-url";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import { executeFounderRequestCommand } from "@/lib/operations/requests/service";
 import { createFounderRequestHandler } from "@/lib/operations/http/founder-request-handler";
+import { retiredGrowthOperationsResponse } from "@/lib/operations/auth/legacy-growth-route";
 export const runtime = "nodejs";
 export async function POST(
   request: Request,
   context: { params: Promise<{ organisationId: string; requestId: string }> },
 ): Promise<Response> {
+  const retired = retiredGrowthOperationsResponse();
+  if (retired) return retired;
   const { organisationId, requestId } = await context.params;
   return createFounderRequestHandler({
     enabled: operationsEnabled(),

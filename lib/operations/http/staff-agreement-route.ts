@@ -5,6 +5,7 @@ import { requireFssAdmin } from "../auth/require-admin";
 import type { FssAdminContext } from "../auth/staff-types";
 import { getOperationsDb, operationsEnabled } from "../db/client";
 import { getPortalDb } from "../db/portal-client";
+import { fssStudioEnabled } from "../auth/release-flags";
 import { createAgreementRouteHandler } from "../agreements/route-handler";
 import { executeStaffAgreementCommand } from "../agreements/staff-service";
 
@@ -13,7 +14,7 @@ export function staffAgreementRoute(): (
   organisationId: string,
 ) => Promise<Response> {
   return createAgreementRouteHandler<FssAdminContext>({
-    enabled: operationsEnabled(),
+    enabled: operationsEnabled() && fssStudioEnabled(),
     origin: new URL(resolveSiteUrl()).origin,
     authorize: async () => {
       const identity = await getPortalIdentity();

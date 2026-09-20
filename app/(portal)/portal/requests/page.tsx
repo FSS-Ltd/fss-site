@@ -74,7 +74,7 @@ export default async function RequestsPage({
       {hasPortalCapability(membership.role, "requests.create") && (
         <Link
           className={styles.breadcrumb}
-          href={`/portal/requests/new?organisationId=${context.organisationId}`}
+          href={`${portalPath("/portal/requests/new")}?organisationId=${context.organisationId}`}
         >
           New request
         </Link>

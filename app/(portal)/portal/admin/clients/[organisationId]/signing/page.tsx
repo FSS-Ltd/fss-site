@@ -6,10 +6,12 @@ import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import { SigningReview } from "@/components/operations/signing/signing-review";
 import { SigningSummary } from "@/components/operations/signing/signing-summary";
 import { OperationsPageHeader } from "@/components/operations/shared/operations-page-header";
+import studio from "@/components/portal/studio-client.module.css";
 import styles from "@/components/operations/agreements/agreements.module.css";
 import signingStyles from "@/components/operations/signing/signing.module.css";
 import ui from "@/components/operations/shared/operations-ui.module.css";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
+import type { FssAdminContext } from "@/lib/operations/auth/staff-types";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
@@ -23,16 +25,34 @@ export default async function StaffClientSigningPage({
 }: {
   params: Promise<{ organisationId: string }>;
 }): Promise<React.JSX.Element> {
-  if (!operationsEnabled() || !signingEnabled()) notFound();
+  if (!operationsEnabled()) notFound();
   if (!portalAuthConfigured()) return <PortalUnavailable />;
   const identity = await getPortalIdentity();
   if (!identity) return <PortalUnavailable />;
   const organisationId = z.uuid().safeParse((await params).organisationId);
   if (!organisationId.success) notFound();
+  let admin: FssAdminContext;
+  try {
+    admin = await requireFssAdmin(getOperationsDb(), identity, randomUUID());
+  } catch {
+    return <PortalUnavailable />;
+  }
+  if (!signingEnabled()) {
+    return (
+      <section className={studio.page} aria-labelledby="signing-unavailable-heading">
+        <h1 id="signing-unavailable-heading" className={studio.title}>
+          Signing unavailable
+        </h1>
+        <p className={studio.rowCopy}>
+          Signing delivery is not enabled. No documents or signature requests
+          can be prepared from this workspace.
+        </p>
+      </section>
+    );
+  }
   let approvals;
   try {
     const db = getOperationsDb();
-    const admin = await requireFssAdmin(db, identity, randomUUID());
     approvals = await listStaffSigning(
       db,
       admin,

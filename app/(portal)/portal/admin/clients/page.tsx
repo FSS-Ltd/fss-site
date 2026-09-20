@@ -38,6 +38,7 @@ export default async function AdminClientsPage({
       state={{ status: "ready", data }}
       routePrefix="/admin/clients"
       showPortalAccess={false}
+      workspaceContext="FSS Studio · Clients"
     />
   );
 }

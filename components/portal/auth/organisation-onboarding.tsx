@@ -2,13 +2,16 @@
 
 import { ArrowRight, Building2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { portalPath } from "@/lib/operations/auth/portal-url";
 import { useState, type FormEvent } from "react";
 import styles from "./portal.module.css";
 
 type Status = { kind: "idle" | "pending" | "error"; message?: string };
 
-export function OrganisationOnboarding(): React.JSX.Element {
+export function OrganisationOnboarding({
+  homePath = "/",
+}: {
+  homePath?: string;
+}): React.JSX.Element {
   const router = useRouter();
   const [status, setStatus] = useState<Status>({ kind: "idle" });
 
@@ -29,7 +32,7 @@ export function OrganisationOnboarding(): React.JSX.Element {
       });
       if (!response.ok)
         throw new Error("Your organisation could not be created.");
-      router.replace(portalPath("/portal"));
+      router.replace(homePath);
       router.refresh();
     } catch (error) {
       setStatus({

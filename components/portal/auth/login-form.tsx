@@ -6,6 +6,10 @@ import { ArrowRight, LockKeyhole, MailCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import styles from "./portal.module.css";
 import { claimPortalAccess } from "./portal-claim-request";
+import {
+  defaultPortalClaimDestinations,
+  type PortalClaimDestinations,
+} from "./portal-claim-destination";
 
 type Phase = "email" | "code";
 type Status = {
@@ -13,7 +17,11 @@ type Status = {
   message?: string;
 };
 
-export function PortalLoginForm(): React.JSX.Element {
+export function PortalLoginForm({
+  claimDestinations = defaultPortalClaimDestinations,
+}: {
+  claimDestinations?: PortalClaimDestinations;
+}): React.JSX.Element {
   const router = useRouter();
   const {
     isLoaded: signInLoaded,
@@ -78,7 +86,10 @@ export function PortalLoginForm(): React.JSX.Element {
       if (result.status !== "complete" || !result.createdSessionId)
         throw new Error("Verification is incomplete.");
       await activateSignIn({ session: result.createdSessionId });
-      const destination = await claimPortalAccess(undefined);
+      const destination = await claimPortalAccess(
+        undefined,
+        { destinations: claimDestinations },
+      );
       setStatus({
         kind: "success",
         message: "Verified. Opening your workspace…",

@@ -4,11 +4,14 @@ import { resolveSiteUrl } from "@/lib/config/site-url";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import { createAgreementRouteHandler } from "@/lib/operations/agreements/route-handler";
 import { executeAgreementCommand } from "@/lib/operations/agreements/service";
+import { retiredGrowthOperationsResponse } from "@/lib/operations/auth/legacy-growth-route";
 export const runtime = "nodejs";
 export async function POST(
   request: Request,
   context: { params: Promise<{ organisationId: string }> },
 ): Promise<Response> {
+  const retired = retiredGrowthOperationsResponse();
+  if (retired) return retired;
   const handler = createAgreementRouteHandler({
     enabled: operationsEnabled(),
     origin: new URL(resolveSiteUrl()).origin,

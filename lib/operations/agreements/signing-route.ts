@@ -21,6 +21,7 @@ import {
   downloadPortalSigningArtifact,
   downloadStaffSigningArtifact,
 } from "./signing-service";
+import { fssStudioEnabled } from "../auth/release-flags";
 
 function configuration() {
   return {
@@ -87,6 +88,7 @@ async function authorizeStaff() {
 export function staffSigningRoute() {
   return createSigningCommandHandler({
     ...configuration(),
+    enabled: signingEnabled() && fssStudioEnabled(),
     authorize: authorizeStaff,
     execute: (admin, organisationId, command, correlationId) =>
       executeStaffSigningCommand(
@@ -131,6 +133,7 @@ export function portalSigningDownloadRoute() {
 export function staffSigningDownloadRoute() {
   return createSigningDownloadHandler({
     ...configuration(),
+    enabled: signingEnabled() && fssStudioEnabled(),
     authorize: authorizeStaff,
     download: (admin, organisationId, approvalId, kind, correlationId) =>
       downloadStaffSigningArtifact(
