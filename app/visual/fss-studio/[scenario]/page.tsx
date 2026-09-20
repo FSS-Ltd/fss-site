@@ -1,4 +1,6 @@
 import { notFound } from "next/navigation";
+import { portalFont } from "@/components/portal/portal-font";
+import styles from "@/components/portal/portal-theme.module.css";
 import { resolveVisualScenario } from "./visual-scenarios";
 
 export const dynamic = "force-dynamic";
@@ -14,5 +16,9 @@ export default async function FssStudioVisualScenarioPage({
     process.env.NODE_ENV,
   );
   if (!visual) notFound();
-  return visual.content;
+  return (
+    <div className={`${portalFont.variable} ${styles.theme}`}>
+      {visual.content}
+    </div>
+  );
 }

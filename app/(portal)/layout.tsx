@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { notFound } from "next/navigation";
+import { portalFont } from "@/components/portal/portal-font";
+import styles from "@/components/portal/portal-theme.module.css";
 import { operationsEnabled } from "@/lib/operations/db/client";
 
 export const dynamic = "force-dynamic";
@@ -18,7 +20,13 @@ function PortalProviderLayout({
 }>): React.JSX.Element {
   if (!operationsEnabled()) notFound();
 
-  return <ClerkProvider>{children}</ClerkProvider>;
+  return (
+    <ClerkProvider>
+      <div className={`${portalFont.variable} ${styles.theme}`}>
+        {children}
+      </div>
+    </ClerkProvider>
+  );
 }
 
 export default PortalProviderLayout;
