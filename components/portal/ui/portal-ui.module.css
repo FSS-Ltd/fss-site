@@ -85,6 +85,10 @@
   opacity: 0.6;
 }
 
+.buttonLoader {
+  animation: portal-spin 800ms linear infinite;
+}
+
 .buttonReason {
   color: var(--portal-muted, #46566c);
   font-size: 0.8125rem;
@@ -135,6 +139,54 @@
 .error {
   color: #9e2f22;
   font-weight: 600;
+}
+
+.card {
+  display: grid;
+  gap: 10px;
+  border: 1px solid var(--portal-border, #d9dfe5);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.cardDefault {
+  background: var(--portal-surface, #ffffff);
+  color: var(--portal-ink, #0a1a2e);
+}
+
+.cardAccent {
+  border-color: #b5dbd7;
+  background: var(--portal-tint, #e3f2f1);
+  color: #0b5e65;
+}
+
+.cardDark {
+  border-color: var(--portal-navy, #07182e);
+  background: var(--portal-navy, #07182e);
+  color: #ffffff;
+}
+
+.cardTitle,
+.cardDescription {
+  margin: 0;
+}
+
+.cardTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.cardDescription {
+  color: inherit;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  opacity: 0.8;
+}
+
+.cardContent {
+  display: grid;
+  gap: 14px;
 }
 
 .statusBadge {
@@ -234,6 +286,12 @@
   text-underline-offset: 3px;
 }
 
+@keyframes portal-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .pageHeader {
   display: grid;
   gap: 14px;
@@ -313,7 +371,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .button {
+  .button,
+  .buttonLoader {
     transition: none;
+    animation: none;
   }
 }

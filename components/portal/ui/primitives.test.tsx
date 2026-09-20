@@ -15,7 +15,9 @@ const {
   Notice,
   PageHeader,
   PortalButton,
+  PortalCard,
   PortalField,
+  PortalSelect,
   StatusBadge,
 } = require("./index") as typeof import("./index");
 
@@ -66,4 +68,19 @@ test("renders named notice actions and a navigable page header", () => {
   assert.match(html, /role="alert"/);
   assert.match(html, /Warning/);
   assert.match(html, /Get help/);
+});
+
+test("groups a labelled native select inside a Studio card", () => {
+  const html = renderToStaticMarkup(
+    <PortalCard title="Your request">
+      <PortalSelect label="Project" name="project">
+        <option value="website">Website &amp; booking experience</option>
+      </PortalSelect>
+    </PortalCard>,
+  );
+
+  assert.match(html, /<section[^>]*>[\s\S]*Your request/);
+  assert.match(html, /<label[^>]*>Project/);
+  assert.match(html, /<select[^>]*name="project"/);
+  assert.match(html, /Website &amp; booking experience/);
 });
