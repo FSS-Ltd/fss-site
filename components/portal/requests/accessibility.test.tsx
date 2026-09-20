@@ -14,7 +14,7 @@ require.extensions[".css"] = (module) => {
   };
 };
 const { RequestList } = require("./list") as typeof import("./list");
-const { RequestBoard } = require("./board") as typeof import("./board");
+const { RequestBoard, RequestBoardSkeleton } = require("./board") as typeof import("./board");
 const { FounderActionFields } =
   require("./founder-action-fields") as typeof import("./founder-action-fields");
 const { RequestDetail } =
@@ -208,13 +208,11 @@ test("request filters describe server-paged results and retain native controls",
       organisationId="org"
     />,
   );
-  assert.match(
-    board,
-    /Filters and pages are applied before requests reach this workspace/,
-  );
+  assert.match(board, /1 request in this view/);
   assert.match(board, /<form/);
   assert.match(board, /name="query"/);
   assert.match(board, /name="status"/);
+  assert.match(board, /All states/);
   const history: ClientRequestDetail = {
     ...request,
     comments: Array.from({ length: 200 }, (_, index) => ({
@@ -335,4 +333,29 @@ test("review documents stay with their version and only authorised projections b
     founderHtml,
     /href="https:\/\/example.com\/review-v[12]"/,
   );
+});
+
+test("request collection provides an actionable empty board and clear board guidance", () => {
+  const board = renderToStaticMarkup(
+    <RequestBoard
+      filters={{ query: "", status: undefined }}
+      requests={[request]}
+      organisationId="org"
+    />,
+  );
+  const emptyBoard = renderToStaticMarkup(
+    <RequestBoard
+      filters={{ query: "", status: undefined }}
+      requests={[]}
+      organisationId="org"
+    />,
+  );
+  const loadingBoard = renderToStaticMarkup(<RequestBoardSkeleton />);
+
+  assert.match(board, /How your board works/);
+  assert.match(board, /Ready for review/);
+  assert.match(emptyBoard, /Nothing in your board yet/);
+  assert.match(emptyBoard, /Create first request/);
+  assert.match(loadingBoard, /Loading your requests/);
+  assert.match(loadingBoard, /aria-busy="true"/);
 });

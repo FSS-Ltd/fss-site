@@ -11,7 +11,8 @@ import { listPortalRequests } from "@/lib/operations/requests/repository";
 import { RequestBoard } from "@/components/portal/requests/board";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import { CollectionPagination } from "@/components/portal/workspace/collection-pagination";
-import styles from "@/components/portal/projects.module.css";
+import { PageHeader } from "@/components/portal/ui";
+import styles from "@/components/portal/requests/requests.module.css";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import { parseWorkspacePage } from "@/lib/operations/workspaces/pagination";
 import {
@@ -62,23 +63,23 @@ export default async function RequestsPage({
     return <PortalUnavailable />;
   }
   return (
-    <div className={styles.page}>
-      <Link className={styles.breadcrumb} href={portalPath("/portal")}>
-        Your workspace
-      </Link>
-      <p className={styles.eyebrow}>Work, together</p>
-      <h1 className={styles.title}>Requests</h1>
-      <p className={styles.copy}>
-        A clear place for new ideas, feedback and the next step.
-      </p>
-      {hasPortalCapability(membership.role, "requests.create") && (
-        <Link
-          className={styles.breadcrumb}
-          href={`${portalPath("/portal/requests/new")}?organisationId=${context.organisationId}`}
-        >
-          New request
-        </Link>
-      )}
+    <div className={styles.requestPage}>
+      <PageHeader
+        breadcrumbs={[{ label: "Your workspace", href: portalPath("/portal") }, { label: "Requests" }]}
+        description="A shared view of what is coming, moving and ready for you."
+        eyebrow="FSS Studio / Requests"
+        title="Requests & feedback"
+        action={
+          hasPortalCapability(membership.role, "requests.create") ? (
+            <Link
+              className={styles.primary}
+              href={`${portalPath("/portal/requests/new")}?organisationId=${context.organisationId}`}
+            >
+              New request
+            </Link>
+          ) : undefined
+        }
+      />
       <RequestBoard
         filters={filters}
         requests={requests.items}

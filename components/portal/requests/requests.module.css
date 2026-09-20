@@ -7,6 +7,13 @@
 .workspace {
   container-type: inline-size;
 }
+.requestPage {
+  display: grid;
+  gap: 24px;
+}
+.requestPage > .workspace {
+  margin-top: 8px;
+}
 .title {
   font-size: clamp(2rem, 5vw, 2.75rem);
   font-weight: 600;
@@ -354,26 +361,30 @@ textarea.input {
 }
 .board {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 22px;
-  margin: 26px 0;
+  grid-template-columns: repeat(6, minmax(190px, 1fr));
+  gap: 12px;
+  margin: 24px 0;
+  overflow-x: auto;
+  padding-bottom: 6px;
 }
 .mobileList {
   display: none;
 }
 .lane {
   min-width: 0;
-  border-top: 2px solid var(--portal-line);
-  padding-top: 16px;
+  min-width: 190px;
+  border-radius: 12px;
+  background: var(--portal-soft-surface, #f7f8f9);
+  padding: 10px;
 }
 .laneTitle {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   justify-content: space-between;
-  font-size: 0.875rem;
-  font-weight: 550;
-  margin: 0 0 16px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin: 0 0 10px;
 }
 .laneTitle span {
   color: var(--portal-muted);
@@ -384,23 +395,109 @@ textarea.input {
   margin: 0;
 }
 .boardLink {
-  display: block;
+  display: grid;
+  gap: 9px;
   background: var(--surface-1);
-  border-radius: 14px;
-  padding: 18px;
+  border: 1px solid var(--portal-border, #d9dfe5);
+  border-radius: 10px;
+  padding: 12px;
   margin-bottom: 12px;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+.boardLink:hover {
+  border-color: var(--portal-action, #0f7078);
+  box-shadow: 0 6px 16px rgba(7, 24, 46, 0.08);
 }
 .boardLink h3 {
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   line-height: 1.5;
-  font-weight: 550;
+  font-weight: 700;
   margin: 0;
 }
 .boardLink p {
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   line-height: 1.6;
   color: var(--portal-muted);
-  margin: 10px 0 0;
+  margin: 0;
+}
+.cardReference,
+.cardMeta {
+  color: var(--portal-muted);
+  font-size: 0.6875rem;
+  line-height: 1.45;
+}
+.cardMeta {
+  display: grid;
+  gap: 2px;
+}
+.cardAction {
+  width: fit-content;
+  border: 1px solid var(--portal-control-boundary, #788696);
+  border-radius: 8px;
+  padding: 7px 10px;
+  color: var(--portal-ink, #0a1a2e);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.emptyBoard {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  min-height: 230px;
+  align-content: center;
+  border: 1px dashed var(--portal-control-boundary, #788696);
+  border-radius: 14px;
+  padding: 28px;
+  background: var(--portal-surface, #fff);
+  text-align: left;
+}
+.emptyBoard .copy,
+.boardGuidance .copy {
+  margin: 0;
+}
+.emptyBoardActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.boardGuidance {
+  display: grid;
+  gap: 6px;
+  margin-top: 24px;
+  border: 1px solid #b5dbd7;
+  border-radius: 12px;
+  padding: 16px;
+  background: var(--portal-tint, #e3f2f1);
+}
+.requestSkeleton {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.skeletonCard {
+  min-height: 132px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #edf1f2 20%, #f7f8f9 50%, #edf1f2 80%);
+  background-size: 200% 100%;
+  animation: request-skeleton 1.5s ease-in-out infinite;
+}
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+@keyframes request-skeleton {
+  to {
+    background-position: -200% 0;
+  }
 }
 @container (max-width: 580px) {
   .board,
@@ -411,6 +508,9 @@ textarea.input {
     display: block;
   }
   .filters {
+    grid-template-columns: 1fr;
+  }
+  .requestSkeleton {
     grid-template-columns: 1fr;
   }
 }
@@ -427,6 +527,9 @@ textarea.input {
   .secondary {
     width: 100%;
   }
+  .emptyBoardActions {
+    width: 100%;
+  }
 }
 @media (forced-colors: active) {
   .status,
@@ -434,5 +537,12 @@ textarea.input {
   .secondary,
   .boardLink {
     border: 1px solid ButtonText;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .boardLink,
+  .skeletonCard {
+    transition: none;
+    animation: none;
   }
 }
