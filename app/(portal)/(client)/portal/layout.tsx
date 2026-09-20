@@ -1,32 +1,35 @@
-import Link from "next/link";
-import styles from "@/components/portal/auth/portal.module.css";
-import { portalPath } from "@/lib/operations/auth/portal-url";
+import { randomUUID } from "node:crypto";
+import { ClientShell } from "@/components/portal/shell/client-shell";
+import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
+import {
+  listPortalMemberships,
+  type PortalMembershipSummary,
+} from "@/lib/operations/auth/require-member";
+import { getPortalIdentity } from "@/lib/operations/auth/server";
+import { getPortalDb } from "@/lib/operations/db/portal-client";
 
-function ClientPortalLayout({
+async function ClientPortalLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>): React.JSX.Element {
-  return (
-    <div className={styles.shell}>
-      <a href="#portal-content" className={styles.skip}>
-        Skip to content
-      </a>
-      <header className={styles.header}>
-        <Link href={portalPath("/portal")} className={styles.brand}>
-          Faithful Software Solutions
-        </Link>
-        <span className={styles.portalLabel}>Client portal</span>
-      </header>
-      <main id="portal-content" className={styles.main}>
-        {children}
-      </main>
-      <footer className={styles.footer}>
-        <span>Built on trust. Delivered with care.</span>
-        <span>Faithful Software Solutions</span>
-      </footer>
-    </div>
-  );
+}>): Promise<React.JSX.Element> {
+  let memberships: PortalMembershipSummary[] = [];
+
+  if (portalAuthConfigured()) {
+    try {
+      const identity = await getPortalIdentity();
+      if (identity)
+        memberships = await listPortalMemberships(
+          getPortalDb(),
+          identity,
+          randomUUID(),
+        );
+    } catch {
+      // Child pages keep their existing authenticated error states and guards.
+    }
+  }
+
+  return <ClientShell memberships={memberships}>{children}</ClientShell>;
 }
 
 export default ClientPortalLayout;
