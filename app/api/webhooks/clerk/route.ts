@@ -21,14 +21,25 @@ export async function POST(request: NextRequest): Promise<Response> {
   try {
     event = await verifyWebhook(request);
   } catch {
-    return Response.json({ message: "Invalid webhook signature." }, { status: 400 });
+    return Response.json(
+      { message: "Invalid webhook signature." },
+      { status: 400 },
+    );
   }
 
   try {
+    if (event.type !== "user.created" && event.type !== "user.updated")
+      return new Response(null, { status: 204 });
     const identity = readVerifiedPortalUser(event.data);
     const displayName = readClerkDisplayName(event.data);
     if (identity && displayName)
-      await saveUserProfile(getPortalDb(), identity, displayName, randomUUID());
+      await saveUserProfile(
+        getPortalDb(),
+        identity,
+        displayName,
+        randomUUID(),
+        false,
+      );
     const claim = readPortalInvitationClaimFromClerkWebhook(event);
     if (claim) {
       const active = await claimClerkPortalInvitation(
@@ -41,13 +52,17 @@ export async function POST(request: NextRequest): Promise<Response> {
         claim,
         randomUUID(),
       );
-      if (active || staffActive) await clearPortalInvitationMetadata(claim.clerkUserId);
+      if (active || staffActive)
+        await clearPortalInvitationMetadata(claim.clerkUserId);
     }
     return new Response(null, { status: 204 });
   } catch (error) {
     console.error("Clerk webhook could not be processed.", {
       errorName: error instanceof Error ? error.name : "UnknownError",
     });
-    return Response.json({ message: "Webhook could not be processed." }, { status: 503 });
+    return Response.json(
+      { message: "Webhook could not be processed." },
+      { status: 503 },
+    );
   }
 }

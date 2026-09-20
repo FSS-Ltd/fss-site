@@ -114,10 +114,7 @@ test("reviewed operator scopes provisioning, creates claimable invitations and r
     assert.equal(retried.action, "grant_access");
     const retryProvision = provisioned.at(-1);
     assert.equal(retryProvision?.email, retryEmail);
-    assert.equal(
-      new URL(retryProvision?.redirectUrl).pathname,
-      "/activate",
-    );
+    assert.equal(new URL(retryProvision?.redirectUrl).pathname, "/activate");
     assert.equal(
       new URL(retryProvision?.redirectUrl).searchParams.get("name"),
       "Retry Contact",
@@ -233,6 +230,8 @@ test("reviewed operator scopes provisioning, creates claimable invitations and r
       /Portal access/,
     );
   } finally {
+    await admin`delete from operations.portal_invitation_audit where invitation_id in (select id from operations.pending_portal_invitations where target_organisation_id=${organisationId})`;
+    await admin`delete from operations.pending_portal_invitations where target_organisation_id=${organisationId}`;
     await admin`delete from operations.portal_invites where organisation_id=${organisationId}`;
     await admin`delete from operations.memberships where organisation_id=${organisationId}`;
     await admin`delete from operations.contacts where organisation_id=${organisationId}`;

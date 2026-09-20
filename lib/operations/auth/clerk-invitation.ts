@@ -102,7 +102,11 @@ export function isPortalInvitationForEmail(
       ? metadata.fssPortalInvitation
       : null,
   );
-  return invitation.success && invitation.data.email === email.toLowerCase();
+  return (
+    invitation.success &&
+    invitation.data.version !== 3 &&
+    invitation.data.email === email.toLowerCase()
+  );
 }
 
 export function createPortalInvitationMetadata(
@@ -136,4 +140,17 @@ export function readPortalInvitationClaim(
     identity,
     invitation: invitation.data,
   };
+}
+
+export function readPortalInvitationId(metadata: unknown): string | null {
+  const invitation = portalInvitationMetadataSchema.safeParse(
+    metadata &&
+      typeof metadata === "object" &&
+      "fssPortalInvitation" in metadata
+      ? metadata.fssPortalInvitation
+      : null,
+  );
+  return invitation.success && invitation.data.version !== 1
+    ? invitation.data.invitationId
+    : null;
 }

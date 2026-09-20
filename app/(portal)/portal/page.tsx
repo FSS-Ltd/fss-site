@@ -15,7 +15,10 @@ import type {
   VerifiedPortalIdentity,
 } from "@/lib/operations/auth/types";
 import { needsPortalOnboarding } from "@/lib/operations/auth/pending-invitations";
-import { getActiveStaffMembership } from "@/lib/operations/auth/staff-invitations";
+import {
+  getActiveStaffMembership,
+  hasStaffAccessOrInvitation,
+} from "@/lib/operations/auth/staff-invitations";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import { onboardingEnabled } from "@/lib/operations/onboarding/worker-db";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
@@ -39,7 +42,15 @@ export default async function PortalHomePage(): Promise<React.JSX.Element> {
   if (!identity) redirect(portalPath("/portal/login"));
   let memberships: PortalMembershipSummary[];
   let onboardingRequired: boolean;
+  let staffActive: boolean;
+  let staffPending: boolean;
   try {
+    staffActive = Boolean(
+      await getActiveStaffMembership(getPortalDb(), identity, randomUUID()),
+    );
+    staffPending =
+      !staffActive &&
+      (await hasStaffAccessOrInvitation(getPortalDb(), identity, randomUUID()));
     memberships = await listPortalMemberships(
       getPortalDb(),
       identity,
@@ -51,15 +62,9 @@ export default async function PortalHomePage(): Promise<React.JSX.Element> {
   } catch {
     return <PortalUnavailable />;
   }
+  if (staffActive) redirect(portalPath("/admin"));
+  if (staffPending) redirect(portalPath("/portal/login"));
   if (onboardingRequired) redirect(portalPath("/portal/onboarding"));
-  if (memberships.length === 0) {
-    const staff = await getActiveStaffMembership(
-      getPortalDb(),
-      identity,
-      randomUUID(),
-    );
-    if (staff) redirect("/admin");
-  }
   return (
     <section className={styles.card} aria-labelledby="portal-heading">
       <p className={styles.eyebrow}>Your account</p>

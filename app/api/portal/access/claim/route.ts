@@ -1,6 +1,9 @@
 import { randomUUID } from "node:crypto";
 import { createPortalAccessClaimHandler } from "./handler";
-import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
+import {
+  portalAuthConfigured,
+  resolvePortalOrigin,
+} from "@/lib/operations/auth/configuration";
 import {
   claimClerkPortalInvitation,
   claimPortalInviteForVerifiedEmail,
@@ -11,12 +14,19 @@ import {
   claimStaffInvitationForVerifiedEmail,
   getActiveStaffMembership,
 } from "@/lib/operations/auth/staff-invitations";
-import { needsPortalOnboarding } from "@/lib/operations/auth/pending-invitations";
+import {
+  claimPendingPortalInvitationForVerifiedEmail,
+  needsPortalOnboarding,
+  getClaimedInvitationIds,
+} from "@/lib/operations/auth/pending-invitations";
 import {
   getPortalIdentity,
   getPortalInvitationClaim,
 } from "@/lib/operations/auth/server";
-import { revokePendingClerkPortalInvitations } from "@/lib/operations/auth/provision";
+import {
+  revokePendingClerkPortalInvitations,
+  revokePendingClerkStaffInvitations,
+} from "@/lib/operations/auth/provision";
 import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { saveUserProfile } from "@/lib/operations/auth/user-profile";
 
@@ -24,6 +34,7 @@ export const runtime = "nodejs";
 
 export const POST = createPortalAccessClaimHandler({
   configured: portalAuthConfigured,
+  origin: resolvePortalOrigin,
   createCorrelationId: randomUUID,
   identity: getPortalIdentity,
   invitationClaim: getPortalInvitationClaim,
@@ -31,7 +42,27 @@ export const POST = createPortalAccessClaimHandler({
   claimClerkInvitation: claimClerkPortalInvitation,
   claimStaffInvitation: claimClerkStaffInvitation,
   claimStaffInvitationForVerifiedEmail,
-  reconcilePendingClerkStaffInvitations: revokePendingClerkPortalInvitations,
+  reconcilePendingClerkStaffInvitations: async (
+    email,
+    db,
+    identity,
+    correlationId,
+  ) =>
+    revokePendingClerkStaffInvitations(
+      email,
+      await getClaimedInvitationIds(db, identity, "staff", correlationId),
+    ),
+  reconcilePendingClerkPortalInvitations: async (
+    email,
+    db,
+    identity,
+    correlationId,
+  ) =>
+    revokePendingClerkPortalInvitations(
+      email,
+      await getClaimedInvitationIds(db, identity, "portal", correlationId),
+    ),
+  claimPendingInvitation: claimPendingPortalInvitationForVerifiedEmail,
   hasActiveStaffMembership: getActiveStaffMembership,
   claimVerifiedEmailInvite: claimPortalInviteForVerifiedEmail,
   hasActiveMembership: hasActivePortalMembership,

@@ -43,9 +43,11 @@ export const grantAccessSchema = contactSchema.extend({
 export const inviteClientSchema = pendingPortalInvitationSchema.extend({
   action: z.literal("invite_client"),
 });
-export const inviteExistingClientSchema = existingPortalInvitationSchema.extend({
-  action: z.literal("invite_existing_client"),
-});
+export const inviteExistingClientSchema = existingPortalInvitationSchema.extend(
+  {
+    action: z.literal("invite_existing_client"),
+  },
+);
 export const inviteAdminSchema = staffInvitationSchema.extend({
   action: z.literal("invite_admin"),
 });
@@ -204,8 +206,11 @@ export async function applyPortalOperation(
     }
     return { action };
   }
-  if (action === "invite_existing_client") {
-    const invitation = inviteExistingClientSchema.parse(operation);
+  if (action === "invite_existing_client" || action === "grant_access") {
+    const invitation =
+      action === "grant_access"
+        ? grantAccessSchema.parse(operation)
+        : inviteExistingClientSchema.parse(operation);
     const invitationId = dependencies.createId();
     const correlationId = dependencies.createId();
     await dependencies.issuePending(
@@ -226,7 +231,10 @@ export async function applyPortalOperation(
         invitation.email,
         createInvitationActivationUrl(origin, invitation.name, invitation.email)
           .href,
-        createPortalInvitationMetadata({ invitationId, email: invitation.email }),
+        createPortalInvitationMetadata({
+          invitationId,
+          email: invitation.email,
+        }),
       );
     } catch (error) {
       await dependencies.failPending(db, founder, invitationId, correlationId);
@@ -237,23 +245,6 @@ export async function applyPortalOperation(
   if (action === "invite_founder") {
     const invitation = inviteFounderSchema.parse(operation);
     await dependencies.sendFounder(invitation.reviewReference);
-    return { action };
-  }
-  if (action === "grant_access") {
-    const grant = grantAccessSchema.parse(operation);
-    const url = createInvitationActivationUrl(origin, grant.name, grant.email);
-    await provision(
-      grant.email,
-      url.href,
-      createPortalInvitationMetadata({
-        organisationId: grant.organisationId,
-        name: grant.name,
-        email: grant.email,
-        role: grant.role,
-        reviewReference: grant.reviewReference,
-        approvedBy: founder.actorId,
-      }),
-    );
     return { action };
   }
   const invite = inviteSchema.parse(input);

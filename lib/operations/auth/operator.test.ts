@@ -236,3 +236,36 @@ test("founder invitation accepts no browser-selected recipient", async () => {
   );
   assert.deepEqual(sent, [request.reviewReference]);
 });
+
+test("legacy grant-access commands persist a scoped invitation before provider delivery", async () => {
+  const issued: unknown[] = [];
+  const metadata: unknown[] = [];
+  const id = "2e83e9c3-b021-4a55-b117-78c05b456c15";
+  await applyPortalOperation(
+    {} as OperationsDb,
+    { actorId: "a".repeat(64) },
+    {
+      action: "grant_access",
+      organisationId: id,
+      name: "Client",
+      email: "client@example.test",
+      role: "viewer",
+      reviewReference: "Approved",
+    },
+    "https://portal.example.test",
+    async (_email, _url, invitation) => {
+      metadata.push(invitation);
+    },
+    {
+      createId: () => id,
+      issuePending: async (_db, _founder, input) => {
+        issued.push(input);
+        return { invitationId: id, expiresAt: new Date() };
+      },
+    },
+  );
+  assert.equal(issued.length, 1);
+  assert.deepEqual(metadata, [
+    { version: 2, invitationId: id, email: "client@example.test" },
+  ]);
+});

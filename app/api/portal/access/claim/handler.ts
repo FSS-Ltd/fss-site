@@ -1,3 +1,9 @@
+import { z } from "zod";
+import {
+  PayloadTooLargeError,
+  readJsonRequestBody,
+  requestHasRegisteredOrigin,
+} from "@/lib/growth/http/founder-request";
 import type { PortalInvitationClaim } from "@/lib/operations/auth/clerk-invitation";
 import {
   claimClerkPortalInvitation,
@@ -27,9 +33,18 @@ type ClaimFailureStage =
   | "staff_email_claim"
   | "staff_membership"
   | "clerk_staff_invitation_reconciliation"
+  | "clerk_portal_invitation_reconciliation"
+  | "pending_invitation_claim"
   | "verified_email_claim"
   | "membership"
   | "onboarding";
+
+type ReconcileInvitations = (
+  email: string,
+  db: OperationsDb,
+  identity: VerifiedPortalIdentity,
+  correlationId: string,
+) => Promise<void>;
 
 type ClaimErrorReport = {
   readonly correlationId: string;
@@ -39,6 +54,7 @@ type ClaimErrorReport = {
 
 export type PortalAccessClaimDependencies = {
   configured: () => boolean;
+  origin: () => string;
   createCorrelationId: () => string;
   identity: () => Promise<VerifiedPortalIdentity | null>;
   invitationClaim: () => Promise<PortalInvitationClaim | null>;
@@ -50,12 +66,23 @@ export type PortalAccessClaimDependencies = {
     identity: VerifiedPortalIdentity,
     correlationId: string,
   ) => Promise<boolean>;
-  reconcilePendingClerkStaffInvitations: (email: string) => Promise<void>;
+  reconcilePendingClerkStaffInvitations: ReconcileInvitations;
+  reconcilePendingClerkPortalInvitations: ReconcileInvitations;
+  claimPendingInvitation: (
+    db: OperationsDb,
+    identity: VerifiedPortalIdentity,
+    correlationId: string,
+  ) => Promise<"portal" | "onboarding" | null>;
   hasActiveStaffMembership: typeof getActiveStaffMembership;
   claimVerifiedEmailInvite: typeof claimPortalInviteForVerifiedEmail;
   hasActiveMembership: typeof hasActivePortalMembership;
   needsOnboarding: typeof needsPortalOnboarding;
-  saveProfile?: (db: OperationsDb, identity: VerifiedPortalIdentity, displayName: string, correlationId: string) => Promise<void>;
+  saveProfile?: (
+    db: OperationsDb,
+    identity: VerifiedPortalIdentity,
+    displayName: string,
+    correlationId: string,
+  ) => Promise<void>;
   reportUnexpectedError: (report: ClaimErrorReport) => void;
 };
 
@@ -67,7 +94,12 @@ function response(
 ): Response {
   return Response.json(
     onboardingRequired
-      ? { active: false, onboardingRequired: true, outcome, destination: "onboarding" }
+      ? {
+          active: false,
+          onboardingRequired: true,
+          outcome,
+          destination: "onboarding",
+        }
       : {
           active: outcome === "active",
           outcome,
@@ -97,6 +129,19 @@ export function createPortalAccessClaimHandler(
   return async function post(request: Request): Promise<Response> {
     const correlationId = deps.createCorrelationId();
     if (!deps.configured()) return response("unavailable", 503);
+    if (!requestHasRegisteredOrigin(request, new URL(deps.origin()).origin))
+      return Response.json(
+        { message: "Request origin is not allowed." },
+        { status: 403 },
+      );
+    if (
+      request.headers.get("content-type")?.split(";")[0].trim() !==
+      "application/json"
+    )
+      return Response.json(
+        { message: "Send a JSON request." },
+        { status: 415 },
+      );
 
     let identity: VerifiedPortalIdentity | null;
     try {
@@ -109,16 +154,16 @@ export function createPortalAccessClaimHandler(
     {
       let displayName: string | undefined;
       try {
-        const body: unknown = await request.json();
-        const suppliedName =
-          body && typeof body === "object" && "displayName" in body
-            ? body.displayName
-            : undefined;
-        displayName =
-          suppliedName === undefined
-            ? undefined
-            : userProfileNameSchema.parse(suppliedName);
-      } catch {
+        const body = z
+          .strictObject({ displayName: userProfileNameSchema.optional() })
+          .parse(await readJsonRequestBody(request, 8 * 1024));
+        displayName = body.displayName;
+      } catch (error) {
+        if (error instanceof PayloadTooLargeError)
+          return Response.json(
+            { message: "Request is too large." },
+            { status: 413 },
+          );
         return Response.json(
           { message: "A valid display name is required." },
           { status: 422 },
@@ -127,10 +172,38 @@ export function createPortalAccessClaimHandler(
 
       if (displayName && deps.saveProfile) {
         try {
-          await deps.saveProfile(deps.db(), identity, displayName, correlationId);
+          await deps.saveProfile(
+            deps.db(),
+            identity,
+            displayName,
+            correlationId,
+          );
         } catch (error) {
           return reportUnexpectedError(deps, correlationId, "profile", error);
         }
+      }
+    }
+
+    const verifiedIdentity = identity;
+    async function reconcile(
+      realm: "staff" | "portal",
+      db: OperationsDb,
+    ): Promise<void> {
+      try {
+        await (
+          realm === "staff"
+            ? deps.reconcilePendingClerkStaffInvitations
+            : deps.reconcilePendingClerkPortalInvitations
+        )(verifiedIdentity.email, db, verifiedIdentity, correlationId);
+      } catch (error) {
+        deps.reportUnexpectedError({
+          correlationId,
+          errorName: error instanceof Error ? error.name : "UnknownError",
+          stage:
+            realm === "staff"
+              ? "clerk_staff_invitation_reconciliation"
+              : "clerk_portal_invitation_reconciliation",
+        });
       }
     }
 
@@ -139,26 +212,9 @@ export function createPortalAccessClaimHandler(
       const db = deps.db();
       stage = "invitation_lookup";
       const invitationClaim = await deps.invitationClaim();
-      stage = "clerk_invitation_claim";
-      if (
-        await deps.claimClerkInvitation(
-          db,
-          invitationClaim,
-          correlationId,
-        )
-      ) {
-        stage = "clerk_staff_invitation_reconciliation";
-        await deps.reconcilePendingClerkStaffInvitations(identity.email);
-        return response("active", 200, false, "portal");
-      }
       stage = "staff_invitation_claim";
-      if (
-        await deps.claimStaffInvitation(
-          db,
-          invitationClaim,
-          correlationId,
-        )
-      ) {
+      if (await deps.claimStaffInvitation(db, invitationClaim, correlationId)) {
+        await reconcile("staff", db);
         return response("active", 200, false, "admin");
       }
       stage = "staff_email_claim";
@@ -169,28 +225,39 @@ export function createPortalAccessClaimHandler(
           correlationId,
         )
       ) {
-        stage = "clerk_staff_invitation_reconciliation";
-        await deps.reconcilePendingClerkStaffInvitations(identity.email);
+        await reconcile("staff", db);
         return response("active", 200, false, "admin");
       }
       stage = "staff_membership";
       if (await deps.hasActiveStaffMembership(db, identity, correlationId)) {
-        stage = "clerk_staff_invitation_reconciliation";
-        await deps.reconcilePendingClerkStaffInvitations(identity.email);
+        await reconcile("staff", db);
         return response("active", 200, false, "admin");
       }
+      stage = "pending_invitation_claim";
+      const pendingDestination = await deps.claimPendingInvitation(
+        db,
+        identity,
+        correlationId,
+      );
+      if (pendingDestination) {
+        await reconcile("portal", db);
+        return pendingDestination === "onboarding"
+          ? response("onboarding_required", 200, true)
+          : response("active", 200, false, "portal");
+      }
+      stage = "clerk_invitation_claim";
+      if (await deps.claimClerkInvitation(db, invitationClaim, correlationId)) {
+        await reconcile("portal", db);
+        return response("active", 200, false, "portal");
+      }
       stage = "verified_email_claim";
-      if (
-        await deps.claimVerifiedEmailInvite(db, identity, correlationId)
-      ) {
-        stage = "clerk_staff_invitation_reconciliation";
-        await deps.reconcilePendingClerkStaffInvitations(identity.email);
+      if (await deps.claimVerifiedEmailInvite(db, identity, correlationId)) {
+        await reconcile("portal", db);
         return response("active", 200, false, "portal");
       }
       stage = "membership";
-      if (
-        await deps.hasActiveMembership(db, identity, correlationId)
-      ) {
+      if (await deps.hasActiveMembership(db, identity, correlationId)) {
+        await reconcile("portal", db);
         return response("active", 200, false, "portal");
       }
       stage = "onboarding";

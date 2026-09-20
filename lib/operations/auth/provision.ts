@@ -3,6 +3,7 @@ import { z } from "zod";
 import { readPortalAuthConfig } from "./configuration";
 import {
   isPortalInvitationForEmail,
+  readPortalInvitationId,
   isStaffInvitationForEmail,
   type PortalInvitationMetadata,
 } from "./clerk-invitation";
@@ -10,6 +11,8 @@ import {
 export type PortalInvitation = {
   emailAddress: string;
   notify: true;
+  ignoreExisting: true;
+  expiresInDays: 3;
   redirectUrl: string;
   publicMetadata?: { fssPortalInvitation: PortalInvitationMetadata };
 };
@@ -22,6 +25,8 @@ type PendingInvitation = {
 type PendingInvitationQuery = {
   readonly query: string;
   readonly status: "pending";
+  readonly limit: number;
+  readonly offset: number;
 };
 type ClerkInvitationClient = {
   invitations: {
@@ -85,50 +90,35 @@ export async function clearPortalInvitationMetadata(
 
 export async function revokePendingClerkStaffInvitations(
   email: string,
+  claimedInvitationIds: readonly string[],
   clientFactory: ClerkInvitationClientFactory = clerkClient,
 ): Promise<void> {
-  const normalizedEmail = z
-    .string()
-    .trim()
-    .email()
-    .max(254)
-    .parse(email)
-    .toLowerCase();
-  const client = await clientFactory();
-  const { data: invitations } = await client.invitations.getInvitationList({
-    query: normalizedEmail,
-    status: "pending",
-  });
-
-  await Promise.all(
-    invitations
-      .filter((invitation) => {
-        const invitationEmail = z
-          .string()
-          .trim()
-          .email()
-          .max(254)
-          .safeParse(invitation.emailAddress);
-        return (
-          invitationEmail.success &&
-          invitationEmail.data.toLowerCase() === normalizedEmail &&
-          isStaffInvitationForEmail(
-            invitation.publicMetadata,
-            normalizedEmail,
-          )
-        );
-      })
-      .map((invitation) => client.invitations.revokeInvitation(invitation.id)),
+  await reconcilePendingInvitations(
+    email,
+    claimedInvitationIds,
+    isStaffInvitationForEmail,
+    clientFactory,
   );
 }
 
-/**
- * A verified session has claimed Operations access, so any remaining Clerk
- * invitations for the same portal recipient are obsolete.
- */
 export async function revokePendingClerkPortalInvitations(
   email: string,
+  claimedInvitationIds: readonly string[],
   clientFactory: ClerkInvitationClientFactory = clerkClient,
+): Promise<void> {
+  await reconcilePendingInvitations(
+    email,
+    claimedInvitationIds,
+    isPortalInvitationForEmail,
+    clientFactory,
+  );
+}
+
+async function reconcilePendingInvitations(
+  email: string,
+  claimedInvitationIds: readonly string[],
+  matchesRealm: (metadata: unknown, email: string) => boolean,
+  clientFactory: ClerkInvitationClientFactory,
 ): Promise<void> {
   const normalizedEmail = z
     .string()
@@ -137,25 +127,29 @@ export async function revokePendingClerkPortalInvitations(
     .max(254)
     .parse(email)
     .toLowerCase();
+  const claimedIds = new Set(claimedInvitationIds);
   const client = await clientFactory();
-  const { data: invitations } = await client.invitations.getInvitationList({
-    query: normalizedEmail,
-    status: "pending",
-  });
-  await Promise.all(
-    invitations
-      .filter((invitation) => {
-        const invitationEmail = z.string().trim().email().max(254).safeParse(
-          invitation.emailAddress,
-        );
-        return (
-          invitationEmail.success &&
-          invitationEmail.data.toLowerCase() === normalizedEmail &&
-          isPortalInvitationForEmail(invitation.publicMetadata, normalizedEmail)
-        );
-      })
-      .map((invitation) => client.invitations.revokeInvitation(invitation.id)),
-  );
+  const pendingIds = new Set<string>();
+  const pageSize = 100;
+  // Read all pages first: revoking while paginating shifts the remaining offsets.
+  for (let offset = 0; ; offset += pageSize) {
+    const { data } = await client.invitations.getInvitationList({
+      query: normalizedEmail,
+      status: "pending",
+      limit: pageSize,
+      offset,
+    });
+    for (const invitation of data) {
+      if (
+        invitation.emailAddress.trim().toLowerCase() === normalizedEmail &&
+        matchesRealm(invitation.publicMetadata, normalizedEmail) &&
+        claimedIds.has(readPortalInvitationId(invitation.publicMetadata) ?? "")
+      )
+        pendingIds.add(invitation.id);
+    }
+    if (data.length < pageSize) break;
+  }
+  for (const id of pendingIds) await client.invitations.revokeInvitation(id);
 }
 
 export async function provisionPortalAccount(
@@ -170,6 +164,8 @@ export async function provisionPortalAccount(
     await create({
       emailAddress: normalizedEmail,
       notify: true,
+      ignoreExisting: true,
+      expiresInDays: 3,
       redirectUrl: parsedRedirectUrl,
       ...(metadata
         ? { publicMetadata: { fssPortalInvitation: metadata } }

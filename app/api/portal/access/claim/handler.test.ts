@@ -20,7 +20,10 @@ function claimRequest(): Request {
   return new Request("https://portal.example.test/api/portal/access/claim", {
     method: "POST",
     body: JSON.stringify({ displayName: "Owner Example" }),
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Origin: "https://portal.example.test",
+    },
   });
 }
 
@@ -29,6 +32,7 @@ function createDependencies(
 ): PortalAccessClaimDependencies {
   return {
     configured: () => true,
+    origin: () => "https://portal.example.test",
     createCorrelationId: () => "b4d5ce58-dd9e-4a6f-a58b-bc39f0826b68",
     identity: async () => identity,
     invitationClaim: async () => null,
@@ -37,6 +41,8 @@ function createDependencies(
     claimStaffInvitation: async () => false,
     claimStaffInvitationForVerifiedEmail: async () => false,
     reconcilePendingClerkStaffInvitations: async () => undefined,
+    reconcilePendingClerkPortalInvitations: async () => undefined,
+    claimPendingInvitation: async () => null,
     hasActiveStaffMembership: async () => null,
     claimVerifiedEmailInvite: async () => false,
     hasActiveMembership: async () => false,
@@ -120,7 +126,9 @@ test("returns active when the verified user already has a portal membership", as
 
 test("returns active when an existing Clerk session claims a pending staff invitation by email", async () => {
   const post = createPortalAccessClaimHandler(
-    createDependencies({ claimStaffInvitationForVerifiedEmail: async () => true }),
+    createDependencies({
+      claimStaffInvitationForVerifiedEmail: async () => true,
+    }),
   );
 
   const response = await post(claimRequest());
@@ -184,10 +192,11 @@ test("reports Clerk invitation reconciliation failures without exposing details"
 
   const response = await post(claimRequest());
 
-  assert.equal(response.status, 503);
+  assert.equal(response.status, 200);
   assert.deepEqual(await response.json(), {
-    active: false,
-    outcome: "unavailable",
+    active: true,
+    destination: "admin",
+    outcome: "active",
   });
   assert.deepEqual(reports, [
     {
@@ -196,6 +205,40 @@ test("reports Clerk invitation reconciliation failures without exposing details"
       stage: "clerk_staff_invitation_reconciliation",
     },
   ]);
+});
+
+test("staff access takes precedence over stale client invitation metadata", async () => {
+  let clientClaimed = false;
+  const post = createPortalAccessClaimHandler(
+    createDependencies({
+      claimClerkInvitation: async () => {
+        clientClaimed = true;
+        return true;
+      },
+      hasActiveStaffMembership: async () => ({
+        membershipId: "0f2a8c8e-8e9d-4603-9c72-107718235ff2",
+        userId: identity.userId,
+        role: "admin",
+      }),
+    }),
+  );
+  const response = await post(claimRequest());
+  assert.equal((await response.json()).destination, "admin");
+  assert.equal(clientClaimed, false);
+});
+
+test("metadata-based staff claims also reconcile pending Clerk invitations", async () => {
+  let reconciled = false;
+  const post = createPortalAccessClaimHandler(
+    createDependencies({
+      claimStaffInvitation: async () => true,
+      reconcilePendingClerkStaffInvitations: async () => {
+        reconciled = true;
+      },
+    }),
+  );
+  assert.equal((await post(claimRequest())).status, 200);
+  assert.equal(reconciled, true);
 });
 
 test("reads the Clerk invitation once and stops after a successful staff claim", async () => {
@@ -288,4 +331,80 @@ test("returns unavailable and reports a correlation ID when the portal database 
       stage: "membership",
     },
   ]);
+});
+
+test("existing client accounts use database invitations and reconcile only client invitations", async () => {
+  let clientReconciled = false;
+  const post = createPortalAccessClaimHandler(
+    createDependencies({
+      claimPendingInvitation: async () => "portal",
+      reconcilePendingClerkPortalInvitations: async () => {
+        clientReconciled = true;
+      },
+      reconcilePendingClerkStaffInvitations: async () => {
+        assert.fail("Client claims cannot revoke staff invitations");
+      },
+    }),
+  );
+  assert.equal(
+    (await (await post(claimRequest())).json()).destination,
+    "portal",
+  );
+  assert.equal(clientReconciled, true);
+});
+
+test("first-owner acceptance reconciles Clerk before organisation onboarding", async () => {
+  let reconciled = false;
+  const post = createPortalAccessClaimHandler(
+    createDependencies({
+      claimPendingInvitation: async () => "onboarding",
+      reconcilePendingClerkPortalInvitations: async () => {
+        reconciled = true;
+      },
+    }),
+  );
+  const result = await (await post(claimRequest())).json();
+  assert.equal(result.destination, "onboarding");
+  assert.equal(result.active, false);
+  assert.equal(reconciled, true);
+});
+
+test("cross-origin requests cannot save profiles or claim access", async () => {
+  let saved = false;
+  const post = createPortalAccessClaimHandler(
+    createDependencies({
+      saveProfile: async () => {
+        saved = true;
+      },
+    }),
+  );
+  const request = new Request(
+    "https://portal.example.test/api/portal/access/claim",
+    {
+      method: "POST",
+      headers: {
+        Origin: "https://untrusted.example.test",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ displayName: "Forged name" }),
+    },
+  );
+  assert.equal((await post(request)).status, 403);
+  assert.equal(saved, false);
+});
+
+test("a current database invitation is claimed before stale completed client metadata", async () => {
+  let currentClaimed = false;
+  const post = createPortalAccessClaimHandler(
+    createDependencies({
+      claimClerkInvitation: async () => true,
+      claimPendingInvitation: async () => {
+        currentClaimed = true;
+        return "onboarding";
+      },
+    }),
+  );
+  const result = await (await post(claimRequest())).json();
+  assert.equal(result.destination, "onboarding");
+  assert.equal(currentClaimed, true);
 });

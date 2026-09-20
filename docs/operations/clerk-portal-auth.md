@@ -16,11 +16,14 @@ The client portal uses Clerk for identity and invitation delivery. The operation
 
 ## Access flow
 
-1. A founder grants an approved contact a portal role in Growth OS.
-2. The operations database records the auditable invitation, then Clerk sends the activation email.
-3. A verified Clerk account reaches the signed webhook or portal claim endpoint.
-4. The portal creates or reactivates the membership only when the verified email matches the pending approved contact.
-5. Each portal request checks that membership through the restricted `operations_portal` database role.
+1. A founder invites an FSS Admin, a new client owner, or a user of an existing client organisation. Client owners can also invite permitted team roles within their own organisation.
+2. Operations records the approved invitation before Clerk sends the activation email. Both invitation windows are three days. Re-inviting an existing Clerk recipient is supported.
+3. New users create an account with the invitation ticket. Existing users sign in, then claim their database invitation using their verified primary email.
+4. Staff access is checked first and routes to Studio. Only an approved first-owner client invitation can create an organisation. An existing-client invitation joins its specified organisation.
+5. Each request checks the database membership through the restricted `operations_portal` role. Roles are never inferred from an organisation name or browser-submitted metadata.
+6. Clerk invitations accepted during signup appear as accepted. Obsolete pending invitations for an already verified session are revoked after the database claim, within the matching staff or client realm. Provider cleanup errors are logged and retried on a later claim without blocking granted access.
+
+Application profiles hold the confirmed display name and verified email. Asynchronous Clerk webhooks initialize missing profiles without replacing an existing confirmed name. See [the invitation repair and rollout record](auth-invitation-repair-2026-09-20.md) for migration order and verification.
 
 Deleting a Clerk account prevents a new portal session immediately. Revoke the operations membership in Growth OS to remove the retained access record as well.
 

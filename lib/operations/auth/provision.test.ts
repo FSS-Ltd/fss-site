@@ -47,6 +47,8 @@ test("provisioning creates a Clerk invitation with a fixed activation redirect",
     {
       emailAddress: "client@example.test",
       notify: true,
+      ignoreExisting: true,
+      expiresInDays: 3,
       redirectUrl: "https://portal.example.test/portal/activate",
       publicMetadata: { fssPortalInvitation: metadata },
     },
@@ -157,60 +159,64 @@ test("reconciles only the matching pending Clerk staff invitation", async () => 
   const listRequests: unknown[] = [];
   const revokedInvitationIds: string[] = [];
 
-  await revokePendingClerkStaffInvitations(" Admin@example.test ", async () => ({
-    invitations: {
-      getInvitationList: async (params) => {
-        listRequests.push(params);
-        return {
-          data: [
-            {
-              id: "inv_staff",
-              emailAddress: "admin@example.test",
-              publicMetadata: {
-                fssPortalInvitation: {
-                  version: 3,
-                  realm: "staff",
-                  role: "admin",
-                  invitationId: "2e83e9c3-b021-4a55-b117-78c05b456c15",
-                  email: "admin@example.test",
+  await revokePendingClerkStaffInvitations(
+    " Admin@example.test ",
+    ["2e83e9c3-b021-4a55-b117-78c05b456c15"],
+    async () => ({
+      invitations: {
+        getInvitationList: async (params) => {
+          listRequests.push(params);
+          return {
+            data: [
+              {
+                id: "inv_staff",
+                emailAddress: "admin@example.test",
+                publicMetadata: {
+                  fssPortalInvitation: {
+                    version: 3,
+                    realm: "staff",
+                    role: "admin",
+                    invitationId: "2e83e9c3-b021-4a55-b117-78c05b456c15",
+                    email: "admin@example.test",
+                  },
                 },
               },
-            },
-            {
-              id: "inv_client",
-              emailAddress: "admin@example.test",
-              publicMetadata: {
-                fssPortalInvitation: {
-                  version: 2,
-                  invitationId: "2e83e9c3-b021-4a55-b117-78c05b456c15",
-                  email: "admin@example.test",
+              {
+                id: "inv_client",
+                emailAddress: "admin@example.test",
+                publicMetadata: {
+                  fssPortalInvitation: {
+                    version: 2,
+                    invitationId: "2e83e9c3-b021-4a55-b117-78c05b456c15",
+                    email: "admin@example.test",
+                  },
                 },
               },
-            },
-            {
-              id: "inv_other_email",
-              emailAddress: "other@example.test",
-              publicMetadata: {
-                fssPortalInvitation: {
-                  version: 3,
-                  realm: "staff",
-                  role: "admin",
-                  invitationId: "2e83e9c3-b021-4a55-b117-78c05b456c15",
-                  email: "admin@example.test",
+              {
+                id: "inv_other_email",
+                emailAddress: "other@example.test",
+                publicMetadata: {
+                  fssPortalInvitation: {
+                    version: 3,
+                    realm: "staff",
+                    role: "admin",
+                    invitationId: "2e83e9c3-b021-4a55-b117-78c05b456c15",
+                    email: "admin@example.test",
+                  },
                 },
               },
-            },
-          ],
-        };
+            ],
+          };
+        },
+        revokeInvitation: async (invitationId) => {
+          revokedInvitationIds.push(invitationId);
+        },
       },
-      revokeInvitation: async (invitationId) => {
-        revokedInvitationIds.push(invitationId);
-      },
-    },
-  }));
+    }),
+  );
 
   assert.deepEqual(listRequests, [
-    { query: "admin@example.test", status: "pending" },
+    { query: "admin@example.test", status: "pending", limit: 100, offset: 0 },
   ]);
   assert.deepEqual(revokedInvitationIds, ["inv_staff"]);
 });
@@ -219,15 +225,19 @@ test("reconciliation rejects invalid email input before contacting Clerk", async
   let contacted = false;
 
   await assert.rejects(
-    revokePendingClerkStaffInvitations("not-an-email", async () => {
-      contacted = true;
-      return {
-        invitations: {
-          getInvitationList: async () => ({ data: [] }),
-          revokeInvitation: async () => undefined,
-        },
-      };
-    }),
+    revokePendingClerkStaffInvitations(
+      "not-an-email",
+      ["2e83e9c3-b021-4a55-b117-78c05b456c15"],
+      async () => {
+        contacted = true;
+        return {
+          invitations: {
+            getInvitationList: async () => ({ data: [] }),
+            revokeInvitation: async () => undefined,
+          },
+        };
+      },
+    ),
   );
 
   assert.equal(contacted, false);
@@ -237,18 +247,138 @@ test("reconciliation propagates provider failures without exposing invitation de
   const providerFailure = new Error("provider unavailable for inv_staff");
 
   await assert.rejects(
-    revokePendingClerkStaffInvitations("admin@example.test", async () => ({
-      invitations: {
-        getInvitationList: async () => {
-          throw providerFailure;
+    revokePendingClerkStaffInvitations(
+      "admin@example.test",
+      ["2e83e9c3-b021-4a55-b117-78c05b456c15"],
+      async () => ({
+        invitations: {
+          getInvitationList: async () => {
+            throw providerFailure;
+          },
+          revokeInvitation: async () => undefined,
         },
-        revokeInvitation: async () => undefined,
-      },
-    })),
+      }),
+    ),
     (error: unknown) => {
       assert.equal(error, providerFailure);
       assert.doesNotMatch(String(error), /admin@example\.test/);
       return true;
     },
   );
+});
+
+test("client reconciliation preserves staff invitations for the same email", async () => {
+  const { revokePendingClerkPortalInvitations } = await import("./provision");
+  const revoked: string[] = [];
+  await revokePendingClerkPortalInvitations(
+    "owner@example.test",
+    ["2e83e9c3-b021-4a55-b117-78c05b456c15"],
+    async () => ({
+      invitations: {
+        getInvitationList: async () => ({
+          data: [
+            {
+              id: "inv_staff",
+              emailAddress: "owner@example.test",
+              publicMetadata: {
+                fssPortalInvitation: {
+                  version: 3,
+                  realm: "staff",
+                  role: "admin",
+                  invitationId: "2e83e9c3-b021-4a55-b117-78c05b456c15",
+                  email: "owner@example.test",
+                },
+              },
+            },
+            {
+              id: "inv_client",
+              emailAddress: "owner@example.test",
+              publicMetadata: {
+                fssPortalInvitation: {
+                  version: 2,
+                  invitationId: "2e83e9c3-b021-4a55-b117-78c05b456c15",
+                  email: "owner@example.test",
+                },
+              },
+            },
+          ],
+        }),
+        revokeInvitation: async (id) => {
+          revoked.push(id);
+        },
+      },
+    }),
+  );
+  assert.deepEqual(revoked, ["inv_client"]);
+});
+
+test("reconciliation visits every provider page before revoking invitations", async () => {
+  const revoked: string[] = [];
+  await revokePendingClerkStaffInvitations(
+    "admin@example.test",
+    ["2e83e9c3-b021-4a55-b117-78c05b456c15"],
+    async () => ({
+      invitations: {
+        getInvitationList: async (query) => {
+          assert.equal(
+            revoked.length,
+            0,
+            "Pagination must finish before revocation shifts offsets",
+          );
+          const offset = "offset" in query ? query.offset : 0;
+          return {
+            data: Array.from({ length: offset === 0 ? 100 : 1 }, (_, i) => ({
+              id: `inv_${offset}_${i}`,
+              emailAddress: "admin@example.test",
+              publicMetadata: {
+                fssPortalInvitation: {
+                  version: 3,
+                  realm: "staff",
+                  role: "admin",
+                  invitationId: "2e83e9c3-b021-4a55-b117-78c05b456c15",
+                  email: "admin@example.test",
+                },
+              },
+            })),
+          };
+        },
+        revokeInvitation: async (id) => {
+          revoked.push(id);
+        },
+      },
+    }),
+  );
+  assert.equal(revoked.length, 101);
+});
+
+test("client cleanup leaves a newer unclaimed provider invitation intact", async () => {
+  const { revokePendingClerkPortalInvitations } = await import("./provision");
+  const revoked: string[] = [];
+  await revokePendingClerkPortalInvitations(
+    "owner@example.test",
+    ["2e83e9c3-b021-4a55-b117-78c05b456c15"],
+    async () => ({
+      invitations: {
+        getInvitationList: async () => ({
+          data: [
+            {
+              id: "inv_unclaimed",
+              emailAddress: "owner@example.test",
+              publicMetadata: {
+                fssPortalInvitation: {
+                  version: 2,
+                  invitationId: "339e26f7-7f06-46a9-bd16-934aad5af540",
+                  email: "owner@example.test",
+                },
+              },
+            },
+          ],
+        }),
+        revokeInvitation: async (id) => {
+          revoked.push(id);
+        },
+      },
+    }),
+  );
+  assert.deepEqual(revoked, []);
 });
