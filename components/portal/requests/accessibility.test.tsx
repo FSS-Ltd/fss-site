@@ -200,12 +200,21 @@ test("founder priority uses a labelled native choice with the current value", ()
   assert.match(html, /Internal delivery priority/);
 });
 
-test("request and history limits are explicit without implying filters cover older records", () => {
+test("request filters describe server-paged results and retain native controls", () => {
   const board = renderToStaticMarkup(
-    <RequestBoard requests={[request]} organisationId="org" />,
+    <RequestBoard
+      filters={{ query: "", status: undefined }}
+      requests={[request]}
+      organisationId="org"
+    />,
   );
-  assert.match(board, /up to 100 recent requests/);
-  assert.match(board, /filters apply to these displayed requests/);
+  assert.match(
+    board,
+    /Filters and pages are applied before requests reach this workspace/,
+  );
+  assert.match(board, /<form/);
+  assert.match(board, /name="query"/);
+  assert.match(board, /name="status"/);
   const history: ClientRequestDetail = {
     ...request,
     comments: Array.from({ length: 200 }, (_, index) => ({

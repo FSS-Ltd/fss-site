@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   accessRoleOptions,
   accessStates,
   type AccessState,
   type FounderAccessEntry,
+  type FounderAccessFilters,
 } from "@/lib/operations/auth/founder-access";
 import styles from "./portal-access-dashboard.module.css";
 
@@ -29,25 +31,27 @@ function dateLabel(value: string | null): string {
 
 export function PortalAccessRegister({
   entries,
+  filters,
+  page,
+  hasNext,
   onAccessChanged,
 }: {
   entries: readonly FounderAccessEntry[];
+  filters: FounderAccessFilters;
+  page: number;
+  hasNext: boolean;
   onAccessChanged: () => void;
 }): React.JSX.Element {
-  const [query, setQuery] = useState("");
-  const [accessType, setAccessType] = useState("all");
-  const [state, setState] = useState("all");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState(false);
   const [message, setMessage] = useState("");
-  const filtered = entries.filter(
-    (entry) =>
-      (accessType === "all" || entry.accessType === accessType) &&
-      (state === "all" || entry.state === state) &&
-      `${entry.name} ${entry.email} ${entry.organisationName ?? ""}`
-        .toLowerCase()
-        .includes(query.trim().toLowerCase()),
-  );
+  const hrefForPage = (nextPage: number): string => {
+    const search = new URLSearchParams({ page: String(nextPage) });
+    if (filters.query) search.set("query", filters.query);
+    if (filters.accessType) search.set("accessType", filters.accessType);
+    if (filters.state) search.set("state", filters.state);
+    return `/growth/operations?${search.toString()}`;
+  };
 
   async function revoke(entry: FounderAccessEntry): Promise<void> {
     if (!entry.membershipId || pending) return;
@@ -103,22 +107,19 @@ export function PortalAccessRegister({
           </p>
         </div>
       </div>
-      <div className={styles.filters}>
+      <form action="/growth/operations" className={styles.filters} method="get">
         <label>
           Search users
           <input
             type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            defaultValue={filters.query}
+            name="query"
             placeholder="Name, email or organisation"
           />
         </label>
         <label>
           Access type
-          <select
-            value={accessType}
-            onChange={(event) => setAccessType(event.target.value)}
-          >
+          <select defaultValue={filters.accessType ?? "all"} name="accessType">
             <option value="all">All access</option>
             <option value="client">Client user</option>
             <option value="admin">FSS Admin</option>
@@ -126,10 +127,7 @@ export function PortalAccessRegister({
         </label>
         <label>
           Access state
-          <select
-            value={state}
-            onChange={(event) => setState(event.target.value)}
-          >
+          <select defaultValue={filters.state ?? "all"} name="state">
             <option value="all">All states and history</option>
             {accessStates.map((value) => (
               <option key={value} value={value}>
@@ -138,8 +136,14 @@ export function PortalAccessRegister({
             ))}
           </select>
         </label>
-      </div>
-      <p aria-live="polite">{filtered.length} access records</p>
+        <button className={styles.submitButton} type="submit">
+          Apply filters
+        </button>
+      </form>
+      <p aria-live="polite">
+        {entries.length} access {entries.length === 1 ? "record" : "records"} on
+        this page
+      </p>
       <div aria-live="polite">
         {message && (
           <p className={`${styles.message} ${error ? styles.error : ""}`}>
@@ -147,9 +151,9 @@ export function PortalAccessRegister({
           </p>
         )}
       </div>
-      {filtered.length ? (
+      {entries.length ? (
         <ul aria-busy={pending}>
-          {filtered.map((entry) => (
+          {entries.map((entry) => (
             <li key={entry.id} className={styles.entry}>
               <div className={styles.person}>
                 <strong>{entry.name}</strong>
@@ -195,11 +199,22 @@ export function PortalAccessRegister({
           ))}
         </ul>
       ) : (
-        <p>
-          {entries.length
-            ? "No access records match these filters."
-            : "Invitations and accepted access will appear here."}
-        </p>
+        <p>No access records match this view.</p>
+      )}
+      {(page > 1 || hasNext) && (
+        <nav className={styles.pagination} aria-label="Access register pages">
+          {page > 1 ? (
+            <Link href={hrefForPage(page - 1)}>Previous page</Link>
+          ) : (
+            <span />
+          )}
+          <span>Page {page}</span>
+          {hasNext ? (
+            <Link href={hrefForPage(page + 1)}>Next page</Link>
+          ) : (
+            <span />
+          )}
+        </nav>
       )}
     </section>
   );

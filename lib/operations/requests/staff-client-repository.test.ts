@@ -17,7 +17,11 @@ type ListStaffClientRequests = (
   db: OperationsDb,
   admin: FssAdminContext,
   clientId: string,
-) => Promise<Array<{ id: string; title: string }>>;
+) => Promise<{
+  items: Array<{ id: string; title: string }>;
+  page: number;
+  hasNext: boolean;
+}>;
 
 type GetStaffClientContext = (
   db: OperationsDb,
@@ -26,6 +30,7 @@ type GetStaffClientContext = (
 ) => Promise<{
   projectCount: number;
   openRequestCount: number;
+  requestCount: number;
 } | null>;
 
 test("staff client request reads recheck staff access before loading the client queue", async () => {
@@ -55,9 +60,11 @@ test("staff client request reads recheck staff access before loading the client 
   const listStaffClientRequests = candidate as ListStaffClientRequests;
   const requests = await listStaffClientRequests(db, context, organisationId);
 
-  assert.deepEqual(requests, [
-    { id: "request-1", title: "Review delivery" },
-  ]);
+  assert.deepEqual(requests, {
+    items: [{ id: "request-1", title: "Review delivery" }],
+    page: 1,
+    hasNext: false,
+  });
   assert.ok(
     calls.findIndex((sql) => sql.includes("assert_active_staff_membership")) <
       calls.findIndex((sql) => sql.includes("from operations.requests")),
@@ -70,7 +77,7 @@ test("staff client context derives project and open-request counts from authoris
     const sql = parts.join("?");
     if (sql.includes("from operations.organisations")) {
       clientQuery = sql;
-      return [{ projectCount: 2, openRequestCount: 5 }];
+      return [{ projectCount: 2, openRequestCount: 5, requestCount: 7 }];
     }
     return [];
   };
@@ -91,6 +98,7 @@ test("staff client context derives project and open-request counts from authoris
   assert.deepEqual(await getStaffClientContext(db, context, organisationId), {
     projectCount: 2,
     openRequestCount: 5,
+    requestCount: 7,
   });
   assert.match(clientQuery, /as "projectCount"/);
   assert.match(clientQuery, /as "openRequestCount"/);

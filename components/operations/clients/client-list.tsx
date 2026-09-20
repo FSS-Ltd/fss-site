@@ -113,6 +113,16 @@ export function ClientList({
   routePrefix?: string;
   showPortalAccess?: boolean;
 }): React.JSX.Element {
+  const hasServerPagination =
+    state.status === "ready" &&
+    state.data.page !== undefined &&
+    state.data.hasNext !== undefined;
+  const currentPage =
+    state.status === "ready" && state.data.page !== undefined
+      ? state.data.page
+      : 1;
+  const pageHref = (page: number) => `${routePrefix}?page=${page}`;
+
   return (
     <section className={`${sharedStyles.page} ${styles.page}`}>
       <OperationsPageHeader
@@ -120,9 +130,11 @@ export function ClientList({
         title="Client register"
         description="Organisations and their reviewed engagement links."
         variant="inverse"
-          action={
-            <nav className={styles.headerActions} aria-label="Client operations">
-            {showPortalAccess && <Link href="/growth/operations">Portal access</Link>}
+        action={
+          <nav className={styles.headerActions} aria-label="Client operations">
+            {showPortalAccess && (
+              <Link href="/growth/operations">Portal access</Link>
+            )}
             {billingEnabled && (
               <Link href="/growth/operations/billing">
                 Review billing exceptions
@@ -153,16 +165,14 @@ export function ClientList({
             </div>
           ) : (
             <ul className={styles.list}>
-            {state.data.rows.map((organisation) => (
+              {state.data.rows.map((organisation) => (
                 <li
                   className={`${sharedStyles.panel} ${styles.row}`}
                   key={organisation.id}
                 >
                   <div>
                     <h2 className={styles.name}>
-                      <Link
-                        href={`${routePrefix}/${organisation.id}`}
-                      >
+                      <Link href={`${routePrefix}/${organisation.id}`}>
                         {organisation.displayName}
                       </Link>
                     </h2>
@@ -210,7 +220,24 @@ export function ClientList({
               ))}
             </ul>
           )}
-          {state.data.nextCursor && (
+          {hasServerPagination && (currentPage > 1 || state.data.hasNext) && (
+            <nav
+              className={styles.pagination}
+              aria-label="Client register pages"
+            >
+              {currentPage > 1 ? (
+                <Link href={pageHref(currentPage - 1)}>Previous page</Link>
+              ) : (
+                <span />
+              )}
+              {state.data.hasNext ? (
+                <Link href={pageHref(currentPage + 1)}>Next page</Link>
+              ) : (
+                <span />
+              )}
+            </nav>
+          )}
+          {!hasServerPagination && state.data.nextCursor && (
             <nav
               className={styles.pagination}
               aria-label="Client register pages"

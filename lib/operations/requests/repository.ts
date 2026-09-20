@@ -12,17 +12,43 @@ import type {
   RequestDocument,
   RequestAllowance,
   RequestPriority,
+  RequestStatus,
 } from "./types";
+
+import {
+  parseWorkspacePage,
+  toWorkspaceCollectionPage,
+  workspacePageOffset,
+  workspacePageSize,
+  type WorkspaceCollectionPage,
+} from "../workspaces/pagination";
+
+type RequestListSelection = {
+  limit: number;
+  offset: number;
+  status: RequestStatus | null;
+  query: string | null;
+};
+
+const defaultRequestListSelection: RequestListSelection = {
+  limit: 100,
+  offset: 0,
+  status: null,
+  query: null,
+};
+
 export async function loadRequests(
   tx: OperationsTransaction,
   organisationId: string,
   requestId: string | null,
   founderPriority = false,
+  selection: RequestListSelection = defaultRequestListSelection,
 ): Promise<ClientRequest[]> {
+  const { limit, offset, status, query } = selection;
   return [
     ...(await tx<
       ClientRequest[]
-    >`select id,project_id as "projectId",title,description,type,desired_outcome as "desiredOutcome",desired_date::text as "desiredDate",impact,reproduction_steps as "reproductionSteps",expected_behaviour as "expectedBehaviour",actual_behaviour as "actualBehaviour",status,scope,scope_reason as "scopeReason",owner_display as "ownerDisplay",next_action as "nextAction",target_date::text as "targetDate",version,review_cycle as "reviewCycle",deliverable_version as "deliverableVersion",review_instructions as "reviewInstructions",public_summary as "publicSummary",acknowledgement_target::text as "acknowledgementTarget",review_reminder_target::text as "reviewReminderTarget",created_at::text as "createdAt",case when blocked_since is null then null else jsonb_build_object('since',blocked_since::text,'reason',blocked_reason,'responsibleParty',blocked_responsible_party,'nextCheckDate',blocked_next_check_date::text) end as blocked,closure_label as "closureLabel" from operations.requests where organisation_id=${organisationId} and (${requestId}::uuid is null or id=${requestId}::uuid) order by ${founderPriority ? tx`case when status in ('done','cancelled') then 1 else 0 end,case when status='new' and acknowledgement_target<=clock_timestamp() then acknowledgement_target when status='ready_for_review' and review_reminder_target<=clock_timestamp() then review_reminder_target else null end asc nulls last,case priority when 'urgent' then 0 when 'high' then 1 when 'normal' then 2 else 3 end,case when status='new' then acknowledgement_target when status='ready_for_review' then review_reminder_target else coalesce(blocked_next_check_date::timestamptz,created_at) end asc,created_at asc` : tx`created_at desc`},id limit 100`),
+    >`select id,project_id as "projectId",title,description,type,desired_outcome as "desiredOutcome",desired_date::text as "desiredDate",impact,reproduction_steps as "reproductionSteps",expected_behaviour as "expectedBehaviour",actual_behaviour as "actualBehaviour",status,scope,scope_reason as "scopeReason",owner_display as "ownerDisplay",next_action as "nextAction",target_date::text as "targetDate",version,review_cycle as "reviewCycle",deliverable_version as "deliverableVersion",review_instructions as "reviewInstructions",public_summary as "publicSummary",acknowledgement_target::text as "acknowledgementTarget",review_reminder_target::text as "reviewReminderTarget",created_at::text as "createdAt",case when blocked_since is null then null else jsonb_build_object('since',blocked_since::text,'reason',blocked_reason,'responsibleParty',blocked_responsible_party,'nextCheckDate',blocked_next_check_date::text) end as blocked,closure_label as "closureLabel" from operations.requests where organisation_id=${organisationId} and (${requestId}::uuid is null or id=${requestId}::uuid) and (${status}::text is null or status=${status}::text) and (${query}::text is null or title ilike '%' || ${query} || '%') order by ${founderPriority ? tx`case when status in ('done','cancelled') then 1 else 0 end,case when status='new' and acknowledgement_target<=clock_timestamp() then acknowledgement_target when status='ready_for_review' and review_reminder_target<=clock_timestamp() then review_reminder_target else null end asc nulls last,case priority when 'urgent' then 0 when 'high' then 1 when 'normal' then 2 else 3 end,case when status='new' then acknowledgement_target when status='ready_for_review' then review_reminder_target else coalesce(blocked_next_check_date::timestamptz,created_at) end asc,created_at asc` : tx`created_at desc`},id limit ${limit} offset ${offset}`),
   ];
 }
 export async function loadRequestDetail(
@@ -85,18 +111,40 @@ export async function loadRequestDetail(
     canReview: permission.allowed,
   };
 }
+export type PortalRequestListInput = {
+  page: number;
+  status?: RequestStatus;
+  query?: string;
+};
+
 export async function listPortalRequests(
   db: OperationsDb,
   identity: VerifiedPortalIdentity | null,
   organisationId: string,
   correlationId: string,
-): Promise<ClientRequest[]> {
+  input: PortalRequestListInput = { page: 1 },
+): Promise<WorkspaceCollectionPage<ClientRequest>> {
+  const page = parseWorkspacePage(input.page);
+  const query =
+    z
+      .string()
+      .trim()
+      .max(100)
+      .parse(input.query ?? "") || null;
   return withPortalTransaction(
     db,
     identity,
     organisationId,
     correlationId,
-    (tx) => loadRequests(tx, organisationId, null),
+    async (tx) => {
+      const rows = await loadRequests(tx, organisationId, null, false, {
+        limit: workspacePageSize + 1,
+        offset: workspacePageOffset(page),
+        status: input.status ?? null,
+        query,
+      });
+      return toWorkspaceCollectionPage(rows, page);
+    },
   );
 }
 export async function getPortalRequest(

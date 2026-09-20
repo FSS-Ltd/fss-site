@@ -33,7 +33,9 @@
   gap: 4px;
 }
 .nav a {
-  display: block;
+  display: flex;
+  min-height: 44px;
+  align-items: center;
   border-radius: 8px;
   padding: 10px 12px;
   color: #d7e7ec;
@@ -71,7 +73,9 @@
   font-size: 0.8rem;
   cursor: pointer;
 }
-.main { min-width: 0; }
+.main {
+  min-width: 0;
+}
 .skip {
   position: absolute;
   left: 16px;
@@ -81,16 +85,34 @@
   background: #fff;
   color: #07182e;
 }
-.skip:focus { top: 12px; }
+.skip:focus {
+  top: 12px;
+}
 .shell :is(a, button):focus-visible {
   outline: 3px solid #55d5df;
   outline-offset: 3px;
 }
 @media (max-width: 760px) {
-  .shell { display: block; }
-  .sidebar { padding: 18px 20px; gap: 16px; }
-  .nav { display: flex; overflow-x: auto; gap: 4px; padding-bottom: 2px; }
-  .nav a { white-space: nowrap; }
-  .content { padding: 28px 20px 44px; }
-  .topbar { margin-bottom: 28px; }
+  .shell {
+    display: block;
+  }
+  .sidebar {
+    padding: 18px 20px;
+    gap: 16px;
+  }
+  .nav {
+    display: flex;
+    overflow-x: auto;
+    gap: 4px;
+    padding-bottom: 2px;
+  }
+  .nav a {
+    white-space: nowrap;
+  }
+  .content {
+    padding: 28px 20px 44px;
+  }
+  .topbar {
+    margin-bottom: 28px;
+  }
 }

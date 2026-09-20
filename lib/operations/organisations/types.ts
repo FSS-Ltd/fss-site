@@ -27,6 +27,8 @@ export type OrganisationListRow = {
 export type OrganisationPage = {
   rows: OrganisationListRow[];
   nextCursor: string | null;
+  page?: number;
+  hasNext?: boolean;
 };
 
 export type MappingResult = {

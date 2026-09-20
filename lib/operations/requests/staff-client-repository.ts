@@ -3,6 +3,13 @@ import { withFssAdminTransaction } from "../auth/staff-transaction";
 import type { FssAdminContext } from "../auth/staff-types";
 import type { OperationsDb } from "../db/client";
 import {
+  parseWorkspacePage,
+  toWorkspaceCollectionPage,
+  workspacePageOffset,
+  workspacePageSize,
+  type WorkspaceCollectionPage,
+} from "../workspaces/pagination";
+import {
   loadRequestDetail,
   loadRequests,
   type FounderRequestDetail,
@@ -18,6 +25,7 @@ export type StaffClientContext = {
   engagementCount: number;
   projectCount: number;
   openRequestCount: number;
+  requestCount: number;
 };
 
 export async function getStaffClientContext(
@@ -36,7 +44,9 @@ export async function getStaffClientContext(
           where p.organisation_id = o.id) as "projectCount",
         (select count(*)::integer from operations.requests r
           where r.organisation_id = o.id
-            and r.status not in ('done', 'cancelled')) as "openRequestCount"
+            and r.status not in ('done', 'cancelled')) as "openRequestCount",
+        (select count(*)::integer from operations.requests r
+          where r.organisation_id = o.id) as "requestCount"
       from operations.organisations o
       where o.id = ${id}
     `;
@@ -48,11 +58,19 @@ export async function listStaffClientRequests(
   db: OperationsDb,
   admin: FssAdminContext,
   organisationId: string,
-): Promise<ClientRequest[]> {
+  input: { page?: number } = {},
+): Promise<WorkspaceCollectionPage<ClientRequest>> {
   const id = z.uuid().parse(organisationId);
-  return withFssAdminTransaction(db, admin, (tx) =>
-    loadRequests(tx, id, null, true),
-  );
+  const page = parseWorkspacePage(input.page ?? 1);
+  return withFssAdminTransaction(db, admin, async (tx) => {
+    const requests = await loadRequests(tx, id, null, true, {
+      limit: workspacePageSize + 1,
+      offset: workspacePageOffset(page),
+      status: null,
+      query: null,
+    });
+    return toWorkspaceCollectionPage(requests, page);
+  });
 }
 
 export async function getStaffClientRequest(

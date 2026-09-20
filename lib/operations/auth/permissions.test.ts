@@ -46,6 +46,18 @@ test("portal roles preserve billing, delivery and invitation boundaries", () => 
       hasPortalCapability(role, "onboarding.read"),
       role !== "billing_contact",
     );
+    assert.equal(
+      hasPortalCapability(role, "notifications.read"),
+      role !== "billing_contact",
+    );
+    assert.equal(
+      hasPortalCapability(role, "team.read"),
+      role !== "billing_contact",
+    );
+    assert.equal(
+      hasPortalCapability(role, "settings.manage"),
+      role === "owner",
+    );
   }
 });
 

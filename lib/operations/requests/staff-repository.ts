@@ -1,7 +1,20 @@
+import { z } from "zod";
 import type { OperationsDb } from "../db/client";
 import type { FssAdminContext } from "../auth/staff-types";
-import type { RequestPriority, RequestScope, RequestStatus } from "./types";
+import {
+  requestStatuses,
+  type RequestPriority,
+  type RequestScope,
+  type RequestStatus,
+} from "./types";
 import { withFssAdminTransaction } from "../auth/staff-transaction";
+import {
+  parseWorkspacePage,
+  toWorkspaceCollectionPage,
+  workspacePageOffset,
+  workspacePageSize,
+  type WorkspaceCollectionPage,
+} from "../workspaces/pagination";
 
 export type StaffDeliveryRequest = {
   id: string;
@@ -43,16 +56,19 @@ export async function listStaffDeliveryQueue(
 export async function listStaffDeliveryBoard(
   db: OperationsDb,
   context: FssAdminContext,
-  filters: { organisationId?: string; status?: string } = {},
-): Promise<StaffDeliveryBoardRequest[]> {
+  filters: { organisationId?: string; status?: string; page?: number } = {},
+): Promise<WorkspaceCollectionPage<StaffDeliveryBoardRequest>> {
   const organisationId =
     filters.organisationId && filters.organisationId !== "all"
-      ? filters.organisationId
+      ? z.uuid().parse(filters.organisationId)
       : null;
   const status =
-    filters.status && filters.status !== "all" ? filters.status : null;
-  return withFssAdminTransaction(db, context, (tx) =>
-    tx<StaffDeliveryBoardRequest[]>`
+    filters.status && filters.status !== "all"
+      ? z.enum(requestStatuses).parse(filters.status)
+      : null;
+  const page = parseWorkspacePage(filters.page ?? 1);
+  return withFssAdminTransaction(db, context, async (tx) => {
+    const rows = await tx<StaffDeliveryBoardRequest[]>`
       select r.id, r.organisation_id as "organisationId", o.display_name as "organisationName",
         r.title, r.status, r.owner_display as "ownerDisplay", r.next_action as "nextAction",
         r.target_date::text as "targetDate", r.created_at::text as "createdAt",
@@ -64,17 +80,21 @@ export async function listStaffDeliveryBoard(
       order by case when r.status in ('done', 'cancelled') then 1 else 0 end,
         case r.priority when 'urgent' then 0 when 'high' then 1 when 'normal' then 2 else 3 end,
         r.created_at desc, r.id desc
-      limit 200
-    `,
-  );
+      limit ${workspacePageSize + 1} offset ${workspacePageOffset(page)}
+    `;
+    return toWorkspaceCollectionPage(rows, page);
+  });
 }
 
 export async function listStaffDeliveryClients(
   db: OperationsDb,
   context: FssAdminContext,
 ): Promise<Array<{ id: string; displayName: string }>> {
-  return withFssAdminTransaction(db, context, (tx) =>
-    tx<Array<{ id: string; displayName: string }>>`
+  return withFssAdminTransaction(
+    db,
+    context,
+    (tx) =>
+      tx<Array<{ id: string; displayName: string }>>`
       select id, display_name as "displayName"
       from operations.organisations
       where lifecycle = 'active'

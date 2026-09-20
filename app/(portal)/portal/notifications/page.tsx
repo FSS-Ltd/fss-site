@@ -1,27 +1,21 @@
 import { randomUUID } from "node:crypto";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { z } from "zod";
 import { getPortalPageContext } from "@/lib/operations/auth/page-context";
 import { PortalAccessDenied } from "@/lib/operations/auth/types";
 import { getPortalDb } from "@/lib/operations/db/portal-client";
-import { withVerifiedPortalIdentity } from "@/lib/operations/db/portal-client";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import { MarkNotificationsRead } from "@/components/portal/requests/mark-notifications-read";
+import { CollectionPagination } from "@/components/portal/workspace/collection-pagination";
 import styles from "@/components/portal/auth/portal.module.css";
+import workspace from "@/components/portal/workspace/workspace.module.css";
 import { portalPath } from "@/lib/operations/auth/portal-url";
+import { parseWorkspacePage } from "@/lib/operations/workspaces/pagination";
+import { listPortalNotifications } from "@/lib/operations/workspaces/portal-repository";
+import type { PortalNotificationFilter } from "@/lib/operations/workspaces/types";
 
 export const dynamic = "force-dynamic";
-
-type NotificationRow = {
-  id: string;
-  kind: string;
-  title: string;
-  body: string;
-  requestId: string;
-  requestVersion: number;
-  createdAt: string;
-  readAt: string | null;
-};
 
 const kindLabels: Record<string, string> = {
   request_received: "New request",
@@ -36,33 +30,34 @@ export default async function NotificationsPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }): Promise<React.JSX.Element> {
-  const context = await getPortalPageContext(
-    (await searchParams).organisationId,
-  );
+  const params = await searchParams;
+  const context = await getPortalPageContext(params.organisationId);
   if (!context) return <PortalUnavailable />;
-  let notifications: NotificationRow[];
-  try {
-    const db = getPortalDb();
-    notifications = await withVerifiedPortalIdentity(
-      db,
+  const data = await (async () => {
+    const filter = z
+      .enum(["all", "unread"])
+      .parse(
+        Array.isArray(params.filter) ? undefined : (params.filter ?? "all"),
+      ) as PortalNotificationFilter;
+    const page = parseWorkspacePage(params.page);
+    const notifications = await listPortalNotifications(
+      getPortalDb(),
       context.identity,
+      context.organisationId,
       randomUUID(),
-      (tx) =>
-        tx<NotificationRow[]>`
-          select n.id, n.kind, n.title, n.body, n.request_id as "requestId",
-            n.request_version as "requestVersion", n.created_at::text as "createdAt",
-            n.read_at::text as "readAt"
-          from operations.request_notifications n
-          where n.user_id = ${context.identity.userId}
-          order by n.created_at desc, n.id desc
-          limit 100
-        `,
+      filter,
+      page,
     );
-  } catch (error) {
+    const unread = notifications.items.filter(
+      (row) => row.readAt === null,
+    ).length;
+    return { filter, notifications, unread };
+  })().catch((error) => {
     if (error instanceof PortalAccessDenied) notFound();
-    return <PortalUnavailable />;
-  }
-  const unread = notifications.filter((row) => row.readAt === null).length;
+    return null;
+  });
+  if (!data) return <PortalUnavailable />;
+  const { filter, notifications, unread } = data;
   return (
     <section aria-labelledby="notifications-heading">
       <p className={styles.eyebrow}>Client portal</p>
@@ -71,24 +66,41 @@ export default async function NotificationsPage({
       </h1>
       <p className={styles.copy}>
         {unread === 0
-          ? "You are up to date."
-          : `${unread} unread notification${unread === 1 ? "" : "s"}.`}
+          ? "You are up to date on this page."
+          : `${unread} unread notification${unread === 1 ? "" : "s"} on this page.`}
       </p>
-      {notifications.length > 0 && (
+      <form className={workspace.filterForm} method="get">
+        <input
+          name="organisationId"
+          type="hidden"
+          value={context.organisationId}
+        />
+        <label>
+          Show
+          <select defaultValue={filter} name="filter">
+            <option value="all">All notifications</option>
+            <option value="unread">Unread only</option>
+          </select>
+        </label>
+        <button type="submit">Apply filter</button>
+      </form>
+      {notifications.items.length > 0 && (
         <MarkNotificationsRead
           organisationId={context.organisationId}
-          ids={notifications
+          ids={notifications.items
             .filter((row) => row.readAt === null)
             .map((row) => row.id)}
         />
       )}
-      {notifications.length === 0 ? (
+      {notifications.items.length === 0 ? (
         <p className={styles.actions}>
-          Notifications appear here when your requests change.
+          {filter === "unread"
+            ? "There are no unread notifications."
+            : "Notifications appear here when your requests change."}
         </p>
       ) : (
         <ul className={styles.list}>
-          {notifications.map((row) => (
+          {notifications.items.map((row) => (
             <li
               className={styles.row}
               key={row.id}
@@ -112,6 +124,13 @@ export default async function NotificationsPage({
           ))}
         </ul>
       )}
+      <CollectionPagination
+        filter={{ filter: filter === "all" ? undefined : filter }}
+        hasNext={notifications.hasNext}
+        organisationId={context.organisationId}
+        page={notifications.page}
+        path="/portal/notifications"
+      />
     </section>
   );
 }

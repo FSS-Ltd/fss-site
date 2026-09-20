@@ -75,7 +75,7 @@ test("request lifecycle: scoped identity, concurrent idempotency, evidence, vers
           f.organisationId,
           f.correlationId,
         )
-      ).length,
+      ).items.length,
       1,
     );
     await assert.rejects(() => create({ ...newRequest(b.projectId) }));

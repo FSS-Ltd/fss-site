@@ -1,0 +1,242 @@
+.collection {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px 20px;
+  align-items: center;
+  padding: 20px 24px;
+  border: 1px solid var(--portal-line);
+  border-radius: 16px;
+  background: var(--surface-1);
+  box-shadow: 0 16px 38px -34px rgba(7, 24, 46, 0.7);
+}
+
+.icon {
+  color: var(--portal-muted);
+}
+
+.rowContent {
+  min-width: 0;
+}
+
+.rowContent h2,
+.rowContent p,
+.empty,
+.preferenceCopy,
+.feedback {
+  margin: 0;
+}
+
+.rowContent h2 {
+  color: var(--portal-ink);
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.rowContent p,
+.empty,
+.preferenceCopy,
+.feedback {
+  margin-top: 7px;
+  color: var(--portal-muted);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.rowAction,
+.pagination a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 12px;
+  border: 1px solid var(--portal-line);
+  border-radius: 10px;
+  background: var(--surface-1);
+  color: var(--portal-accent);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.status {
+  max-width: 34ch;
+  color: var(--portal-muted);
+  font-size: 0.75rem;
+  line-height: 1.45;
+  text-align: end;
+}
+
+.pagination {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 12px;
+  align-items: center;
+  margin-top: 20px;
+  color: var(--portal-muted);
+  font-size: 0.8125rem;
+}
+
+.filterForm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.filterForm label {
+  display: grid;
+  gap: 7px;
+  color: var(--portal-ink);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.filterForm select,
+.filterForm button {
+  min-height: 44px;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font: inherit;
+}
+
+.filterForm select {
+  border: 1px solid var(--portal-line);
+  background: var(--surface-1);
+  color: var(--portal-ink);
+}
+
+.filterForm button {
+  border: 0;
+  background: var(--brand-secondary);
+  color: #fff;
+  cursor: pointer;
+  font-weight: 650;
+}
+
+.pagination a:last-child {
+  justify-self: end;
+}
+
+.preferences {
+  display: grid;
+  gap: 16px;
+  padding: clamp(24px, 4vw, 32px);
+  border: 1px solid var(--portal-line);
+  border-radius: 20px;
+  background: var(--surface-1);
+  box-shadow: 0 16px 38px -34px rgba(7, 24, 46, 0.7);
+}
+
+.preferences fieldset {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.preferences legend {
+  color: var(--portal-ink);
+  font-size: 1rem;
+  font-weight: 650;
+}
+
+.checkRow {
+  display: flex;
+  min-height: 44px;
+  align-items: flex-start;
+  gap: 12px;
+  color: var(--portal-ink);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.checkRow input {
+  width: 20px;
+  height: 20px;
+  margin-top: 3px;
+  accent-color: var(--brand-secondary);
+}
+
+.preferences button {
+  min-height: 44px;
+  width: fit-content;
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 16px;
+  background: var(--brand-secondary);
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 650;
+}
+
+.preferences button:hover:not(:disabled) {
+  background: #19334f;
+}
+
+.preferences button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.error {
+  margin: 0;
+  color: #782b23;
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+:is(
+  .rowAction,
+  .pagination a,
+  .filterForm select,
+  .filterForm button,
+  .preferences input,
+  .preferences button
+):focus-visible {
+  outline: 3px solid var(--portal-accent);
+  outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .row {
+    grid-template-columns: auto minmax(0, 1fr);
+    padding: 20px;
+  }
+
+  .rowAction,
+  .status {
+    grid-column: 2;
+    justify-self: start;
+    text-align: start;
+  }
+
+  .pagination {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .pagination > span:not(:first-child) {
+    display: none;
+  }
+
+  .pagination a:last-child {
+    justify-self: end;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preferences button {
+    transition: none;
+  }
+}

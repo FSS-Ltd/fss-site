@@ -23,6 +23,9 @@ const { PortalAccessDashboard } =
 const oneOrganisationRegister = {
   metrics: getFounderAccessMetrics([], 1),
   entries: [],
+  filters: { query: "" },
+  page: 1,
+  hasNext: false,
 } satisfies FounderAccessOverview;
 
 const router = {
@@ -51,14 +54,20 @@ test("portal access makes invitation primary and explains the activation sequenc
   assert.match(html, /Active FSS Admins/);
   assert.match(html, /Pending invitations/);
   assert.match(html, /Portal role/);
-  assert.match(html, /Invitations and accepted access will appear here/);
+  assert.match(html, /No access records match this view/);
 });
 
 test("portal access keeps the invitation action visible before an organisation exists", () => {
   const html = renderToStaticMarkup(
     <AppRouterContext.Provider value={router}>
       <PortalAccessDashboard
-        data={{ metrics: getFounderAccessMetrics([], 0), entries: [] }}
+        data={{
+          metrics: getFounderAccessMetrics([], 0),
+          entries: [],
+          filters: { query: "" },
+          page: 1,
+          hasNext: false,
+        }}
       />
     </AppRouterContext.Provider>,
   );

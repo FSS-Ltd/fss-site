@@ -3,47 +3,46 @@
 import { useState } from "react";
 import Link from "next/link";
 import { RequestList, type RequestCollectionProps } from "./list";
-import { requestStatuses } from "@/lib/operations/requests/types";
+import {
+  requestStatuses,
+  type RequestStatus,
+} from "@/lib/operations/requests/types";
 import { requestHref, statusLabels } from "./presentation";
 import styles from "./requests.module.css";
+
+type RequestBoardProps = RequestCollectionProps & {
+  filters: { query: string; status?: RequestStatus };
+};
 
 export function RequestBoard({
   requests,
   organisationId,
-}: RequestCollectionProps): React.JSX.Element {
-  const [status, setStatus] = useState("all");
-  const [search, setSearch] = useState("");
+  filters,
+}: RequestBoardProps): React.JSX.Element {
   const [view, setView] = useState<"list" | "board">("list");
-  const filtered = requests.filter(
-    (request) =>
-      (status === "all" || request.status === status) &&
-      request.title
-        .toLocaleLowerCase()
-        .includes(search.trim().toLocaleLowerCase()),
-  );
   return (
     <section className={styles.workspace} aria-label="Project requests">
       <p className={styles.note}>
-        Showing up to 100 recent requests. Search and filters apply to these
-        displayed requests.
+        Filters and pages are applied before requests reach this workspace.
       </p>
-      <div className={styles.filters}>
+      <form className={styles.filters} method="get">
+        <input name="organisationId" type="hidden" value={organisationId} />
         <label className={styles.field}>
           Find a request
           <input
-            type="search"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search by title"
+            defaultValue={filters.query}
             className={styles.input}
+            name="query"
+            type="search"
+            placeholder="Search by title"
           />
         </label>
         <label className={styles.field}>
           Status
           <select
-            value={status}
-            onChange={(event) => setStatus(event.target.value)}
             className={styles.input}
+            defaultValue={filters.status ?? "all"}
+            name="status"
           >
             <option value="all">All statuses</option>
             {requestStatuses.map((value) => (
@@ -53,10 +52,14 @@ export function RequestBoard({
             ))}
           </select>
         </label>
-      </div>
+        <button className={styles.secondary} type="submit">
+          Apply filters
+        </button>
+      </form>
       <div className={styles.row}>
         <p className={styles.note} role="status">
-          {filtered.length} {filtered.length === 1 ? "request" : "requests"}
+          {requests.length} {requests.length === 1 ? "request" : "requests"} on
+          this page
         </p>
         <div className={styles.viewSwitch} aria-label="Request view">
           <button
@@ -76,12 +79,12 @@ export function RequestBoard({
         </div>
       </div>
       <div className={view === "board" ? styles.mobileList : undefined}>
-        <RequestList requests={filtered} organisationId={organisationId} />
+        <RequestList requests={requests} organisationId={organisationId} />
       </div>
       {view === "board" && (
         <div className={styles.board}>
           {requestStatuses
-            .filter((value) => status === "all" || status === value)
+            .filter((value) => !filters.status || filters.status === value)
             .map((value) => (
               <section
                 className={styles.lane}
@@ -92,13 +95,13 @@ export function RequestBoard({
                   {statusLabels[value]}{" "}
                   <span>
                     {
-                      filtered.filter((request) => request.status === value)
+                      requests.filter((request) => request.status === value)
                         .length
                     }
                   </span>
                 </h2>
                 <ul>
-                  {filtered
+                  {requests
                     .filter((request) => request.status === value)
                     .map((request) => (
                       <li key={request.id}>
@@ -115,7 +118,7 @@ export function RequestBoard({
                       </li>
                     ))}
                 </ul>
-                {!filtered.some((request) => request.status === value) && (
+                {!requests.some((request) => request.status === value) && (
                   <p className={styles.note}>No requests</p>
                 )}
               </section>
