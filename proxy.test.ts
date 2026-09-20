@@ -101,3 +101,18 @@ test("runs portal API requests through the injected Clerk middleware", async () 
   assert.equal(clerkMiddlewareRan, true);
   assert.equal(response?.headers.get("x-middleware-next"), "1");
 });
+
+test("portal sign-out receives Clerk session middleware", async () => {
+  let ran = false;
+  const middleware = portalProxy.createProxy(() => {
+    ran = true;
+    return NextResponse.next();
+  });
+  await middleware(
+    new NextRequest("https://portal.faithfulsoftware.dev/api/auth/sign-out", {
+      method: "POST",
+    }),
+    unusedEvent,
+  );
+  assert.equal(ran, true);
+});

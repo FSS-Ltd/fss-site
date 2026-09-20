@@ -19,7 +19,7 @@ const verifiedUser = z
             .email()
             .transform((email) => email.toLowerCase())
             .optional(),
-          verification: z.object({ status: z.literal("verified") }).nullable(),
+          verification: z.object({ status: z.string() }).nullable(),
         }),
       )
       .optional(),
@@ -35,7 +35,7 @@ const verifiedUser = z
             .email()
             .transform((email) => email.toLowerCase())
             .optional(),
-          verification: z.object({ status: z.literal("verified") }).nullable(),
+          verification: z.object({ status: z.string() }).nullable(),
         }),
       )
       .optional(),
@@ -46,7 +46,7 @@ type ClerkEmailAddress = {
   id: string;
   email_address?: string;
   emailAddress?: string;
-  verification: { status: "verified" } | null;
+  verification: { status: string } | null;
 };
 export function portalUserIdFromClerkId(clerkUserId: string): string {
   const bytes = createHash("sha256").update(`clerk:${clerkUserId}`).digest();
@@ -84,10 +84,15 @@ export function readVerifiedPortalUser(
 
 export function readClerkDisplayName(user: unknown): string | null {
   if (!user || typeof user !== "object") return null;
-  const firstName = Reflect.get(user, "first_name") ?? Reflect.get(user, "firstName");
-  const lastName = Reflect.get(user, "last_name") ?? Reflect.get(user, "lastName");
+  const firstName =
+    Reflect.get(user, "first_name") ?? Reflect.get(user, "firstName");
+  const lastName =
+    Reflect.get(user, "last_name") ?? Reflect.get(user, "lastName");
   const name = [firstName, lastName]
-    .filter((value): value is string => typeof value === "string" && value.trim().length > 0)
+    .filter(
+      (value): value is string =>
+        typeof value === "string" && value.trim().length > 0,
+    )
     .join(" ")
     .trim();
   return name.length > 0 && name.length <= 200 ? name : null;

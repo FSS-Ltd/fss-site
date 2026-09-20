@@ -10,9 +10,10 @@ export async function saveUserProfile(
   identity: VerifiedPortalIdentity | null,
   displayName: string,
   correlationId: string,
+  overwriteName = true,
 ): Promise<void> {
   const name = userProfileNameSchema.parse(displayName);
   await withVerifiedPortalIdentity(db, identity, correlationId, async (tx) => {
-    await tx`select operations.upsert_user_profile(${name})`;
+    await tx`select operations.upsert_user_profile(${name}, ${overwriteName})`;
   });
 }

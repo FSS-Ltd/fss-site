@@ -23,9 +23,10 @@ export const pendingPortalInvitationSchema = z.strictObject({
   reviewReference: boundedText,
 });
 
-export const existingPortalInvitationSchema = pendingPortalInvitationSchema.extend({
-  organisationId: z.uuid(),
-});
+export const existingPortalInvitationSchema =
+  pendingPortalInvitationSchema.extend({
+    organisationId: z.uuid(),
+  });
 
 export const organisationOnboardingSchema = z.strictObject({
   legalName: boundedText,
@@ -99,6 +100,21 @@ export async function needsPortalOnboarding(
   });
 }
 
+export async function claimPendingPortalInvitationForVerifiedEmail(
+  db: OperationsDb,
+  identity: VerifiedPortalIdentity | null,
+  correlationId: string,
+): Promise<"portal" | "onboarding" | null> {
+  return withVerifiedPortalIdentity(db, identity, correlationId, async (tx) => {
+    const [row] = await tx<{ destination: string | null }[]>`
+      select operations.claim_pending_portal_invitation_for_verified_email() as destination
+    `;
+    return row?.destination === "portal" || row?.destination === "onboarding"
+      ? row.destination
+      : null;
+  });
+}
+
 export async function completePortalOnboarding(
   db: OperationsDb,
   identity: VerifiedPortalIdentity | null,
@@ -114,5 +130,19 @@ export async function completePortalOnboarding(
     `;
     if (!row?.organisationId) throw new PortalAccessDenied();
     return { organisationId: row.organisationId };
+  });
+}
+
+export async function getClaimedInvitationIds(
+  db: OperationsDb,
+  identity: VerifiedPortalIdentity,
+  realm: "staff" | "portal",
+  correlationId: string,
+): Promise<string[]> {
+  return withVerifiedPortalIdentity(db, identity, correlationId, async (tx) => {
+    const rows = await tx<{ invitationId: string }[]>`
+      select invitation_id as "invitationId" from operations.claimed_invitation_ids(${realm})
+    `;
+    return rows.map((row) => row.invitationId);
   });
 }

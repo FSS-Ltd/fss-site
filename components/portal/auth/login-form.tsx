@@ -1,5 +1,6 @@
 "use client";
 import { useSignIn } from "@clerk/nextjs/legacy";
+import { useUser } from "@clerk/nextjs";
 import { useState, type FormEvent } from "react";
 import Image from "next/image";
 import { ArrowRight, LockKeyhole, MailCheck } from "lucide-react";
@@ -23,6 +24,7 @@ export function PortalLoginForm({
   claimDestinations?: PortalClaimDestinations;
 }): React.JSX.Element {
   const router = useRouter();
+  const { isSignedIn } = useUser();
   const {
     isLoaded: signInLoaded,
     setActive: setSignInActive,
@@ -65,6 +67,27 @@ export function PortalLoginForm({
     }
   }
 
+  async function continueSession(
+    event: FormEvent<HTMLFormElement>,
+  ): Promise<void> {
+    event.preventDefault();
+    if (status.kind === "pending") return;
+    setStatus({ kind: "pending" });
+    try {
+      router.replace(
+        await claimPortalAccess(undefined, { destinations: claimDestinations }),
+      );
+    } catch (error) {
+      setStatus({
+        kind: "error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Access could not be activated.",
+      });
+    }
+  }
+
   async function submitCode(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
     if (!loaded || status.kind === "pending") return;
@@ -86,10 +109,9 @@ export function PortalLoginForm({
       if (result.status !== "complete" || !result.createdSessionId)
         throw new Error("Verification is incomplete.");
       await activateSignIn({ session: result.createdSessionId });
-      const destination = await claimPortalAccess(
-        undefined,
-        { destinations: claimDestinations },
-      );
+      const destination = await claimPortalAccess(undefined, {
+        destinations: claimDestinations,
+      });
       setStatus({
         kind: "success",
         message: "Verified. Opening your workspace…",
@@ -123,7 +145,23 @@ export function PortalLoginForm({
       <p className={styles.copy}>
         We’ll send a one-time code to your email so you can continue securely.
       </p>
-      {phase === "email" ? (
+      {isSignedIn ? (
+        <form
+          onSubmit={continueSession}
+          className={styles.form}
+          aria-busy={status.kind === "pending"}
+        >
+          <button
+            className={styles.button}
+            disabled={status.kind === "pending"}
+            type="submit"
+          >
+            {status.kind === "pending"
+              ? "Opening your workspace…"
+              : "Continue to your workspace"}
+          </button>
+        </form>
+      ) : phase === "email" ? (
         <form
           onSubmit={submitEmail}
           className={styles.form}
@@ -212,6 +250,17 @@ export function PortalLoginForm({
           </p>
         )}
       </div>
+      {isSignedIn && (
+        <form
+          method="post"
+          action="/api/auth/sign-out"
+          className={styles.actions}
+        >
+          <button type="submit" className={styles.textButton}>
+            Sign out and use another account
+          </button>
+        </form>
+      )}
       <p className={styles.reassurance}>
         <LockKeyhole size={14} aria-hidden="true" /> Private access through your
         verified email.

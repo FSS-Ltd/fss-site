@@ -24,7 +24,8 @@ function isPortalRequest(
     portalRouteForHost(hostname, pathname, prefixFreeEnabled) !== null ||
     pathname === "/portal" ||
     pathname.startsWith("/portal/") ||
-    pathname.startsWith("/api/portal/")
+    pathname.startsWith("/api/portal/") ||
+    pathname === "/api/auth/sign-out"
   );
 }
 
@@ -92,6 +93,7 @@ export const config = {
     "/growth/:path*",
     "/portal/:path*",
     "/api/portal/:path*",
+    "/api/auth/sign-out",
     {
       source: "/((?!api|webhooks|_next|.*\\..*).*)",
       has: [

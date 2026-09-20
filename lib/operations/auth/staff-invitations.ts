@@ -158,3 +158,16 @@ export async function getActiveStaffMembership(
       : null;
   });
 }
+
+export async function hasStaffAccessOrInvitation(
+  db: OperationsDb,
+  identity: VerifiedPortalIdentity | null,
+  correlationId: string,
+): Promise<boolean> {
+  return withVerifiedPortalIdentity(db, identity, correlationId, async (tx) => {
+    const [row] = await tx<
+      { eligible: boolean }[]
+    >`select operations.has_staff_access_or_invitation() as eligible`;
+    return row?.eligible === true;
+  });
+}
