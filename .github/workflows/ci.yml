@@ -96,8 +96,8 @@ jobs:
       - name: Run Growth OS tests with coverage
         run: pnpm test:coverage:growth
 
-      - name: Validate redesign shell
-        run: pnpm test:redesign
+      - name: Validate public redesign shell
+        run: pnpm test:public-redesign
 
       - name: Run lint
         run: pnpm lint
