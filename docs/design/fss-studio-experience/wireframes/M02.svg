@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="1334" viewBox="0 0 390 1334" role="img" aria-label="M02 · Let’s get you ready.">
+<title>M02 · Let’s get you ready.</title>
+<desc>FSS proposed interface. Text and shapes are editable SVG elements. Synthetic example data.</desc>
+<rect x="0" y="0" width="390" height="1334" rx="0" fill="#f2f3f5"/>
+<text x="20" y="48" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="500" fill="#46566c">FSS / GETTING STARTED</text>
+<text x="20" y="130" font-family="Geist,Arial,sans-serif" font-size="30" font-weight="600" fill="#0a1a2e">Let’s get you ready.</text>
+<text x="20" y="168" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Three of six steps complete. Your progress is</text>
+<text x="20" y="191" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">saved as you go.</text>
+<rect x="20" y="222" width="145" height="44" rx="12" fill="#0f7078"/>
+<text x="40" y="248" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#ffffff">Continue setup</text>
+<a href="../wireframes.html#C02" target="_top" aria-label="Continue setup"><rect x="20" y="222" width="145" height="44" fill="transparent"/></a>
+<rect x="20" y="290" width="350" height="301" rx="16" fill="#07182e" stroke="#d9dfe5"/>
+<text x="40" y="321" font-family="Geist,Arial,sans-serif" font-size="11" font-weight="500" fill="#ffffff">YOUR NEXT STEP</text>
+<text x="40" y="368" font-family="Geist,Arial,sans-serif" font-size="26" font-weight="600" fill="#ffffff">Next: share your brand</text>
+<text x="40" y="406" font-family="Geist,Arial,sans-serif" font-size="26" font-weight="600" fill="#ffffff">assets.</text>
+<text x="40" y="450" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#ffffff">Add your approved logo, brand guide and</text>
+<text x="40" y="473" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#ffffff">final copy so we can prepare your</text>
+<text x="40" y="496" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#ffffff">project.</text>
+<rect x="40" y="527" width="139" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="60" y="553" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Upload assets</text>
+<a href="../wireframes.html#S07" target="_top" aria-label="Upload assets"><rect x="40" y="527" width="139" height="44" fill="transparent"/></a>
+<rect x="20" y="615" width="350" height="567" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="40" y="655" font-family="Geist,Arial,sans-serif" font-size="20" font-weight="600" fill="#0a1a2e">Your launch checklist</text>
+<rect x="40" y="684" width="32" height="32" rx="10" fill="#eaf5ed"/>
+<text x="50" y="704" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="600" fill="#226143">✓</text>
+<text x="88" y="700" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Confirm your details</text>
+<text x="88" y="727" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Completed · 12 Sep</text>
+<rect x="40" y="757" width="32" height="32" rx="10" fill="#eaf5ed"/>
+<text x="50" y="777" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="600" fill="#226143">✓</text>
+<text x="88" y="773" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Review and sign your agreement</text>
+<text x="88" y="800" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Signed · revision 2</text>
+<rect x="40" y="830" width="32" height="32" rx="10" fill="#eaf5ed"/>
+<text x="50" y="850" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="600" fill="#226143">✓</text>
+<text x="88" y="846" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Set up billing</text>
+<text x="88" y="873" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Deposit paid · £1,200</text>
+<rect x="40" y="903" width="32" height="32" rx="10" fill="#e3f2f1"/>
+<text x="50" y="923" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="600" fill="#0f7078">4</text>
+<text x="88" y="919" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Share brand assets</text>
+<text x="88" y="946" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Your action · logo, brand guide and</text>
+<text x="88" y="966" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">approved copy</text>
+<rect x="40" y="996" width="32" height="32" rx="10" fill="#e3f2f1"/>
+<text x="50" y="1016" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="600" fill="#0f7078">5</text>
+<text x="88" y="1012" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Confirm kickoff</text>
+<text x="88" y="1039" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">Choose from the times offered by FSS</text>
+<rect x="40" y="1069" width="32" height="32" rx="10" fill="#e3f2f1"/>
+<text x="50" y="1089" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="600" fill="#0f7078">6</text>
+<text x="88" y="1085" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="500" fill="#0a1a2e">Ready to begin</text>
+<text x="88" y="1112" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">FSS confirms the start after all</text>
+<text x="88" y="1132" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">prerequisites are met</text>
+<text x="20" y="1218" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Faithful Software Solutions · Built on trust. Delivered with</text>
+<text x="20" y="1235" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">care.</text>
+<rect x="0" y="1270" width="390" height="64" rx="0" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="24" y="1305" font-family="Geist,Arial,sans-serif" font-size="13" font-weight="500" fill="#46566c">Home</text>
+<text x="116" y="1305" font-family="Geist,Arial,sans-serif" font-size="13" font-weight="500" fill="#46566c">Projects</text>
+<text x="208" y="1305" font-family="Geist,Arial,sans-serif" font-size="13" font-weight="500" fill="#46566c">Requests</text>
+<text x="300" y="1305" font-family="Geist,Arial,sans-serif" font-size="13" font-weight="500" fill="#46566c">More</text></svg>

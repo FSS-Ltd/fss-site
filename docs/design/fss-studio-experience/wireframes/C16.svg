@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1266" viewBox="0 0 1440 1266" role="img" aria-label="C16 · Review and sign">
+<title>C16 · Review and sign</title>
+<desc>FSS proposed interface. Text and shapes are editable SVG elements. Synthetic example data.</desc>
+<rect x="0" y="0" width="1440" height="1266" rx="0" fill="#f2f3f5"/>
+<text x="280" y="64" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="500" fill="#46566c">NORTHSTAR STUDIO / AGREEMENTS</text>
+<rect x="1226" y="40" width="148" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="1246" y="66" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Notifications · 3</text>
+<a href="../wireframes.html#C21" target="_top" aria-label="Notifications · 3"><rect x="1226" y="40" width="148" height="44" fill="transparent"/></a>
+<text x="280" y="152" font-family="Geist,Arial,sans-serif" font-size="36" font-weight="600" fill="#0a1a2e">Review and sign</text>
+<text x="280" y="192" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Website &amp; booking experience · Revision 2</text>
+<rect x="280" y="223" width="1112" height="99" rx="16" fill="#e3f2f1" stroke="#d9dfe5"/>
+<text x="304" y="263" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="600" fill="#0f7078">Signing as Alex Morgan</text>
+<text x="304" y="292" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="400" fill="#46566c">You are a designated signer for Northstar Studio. Your verified email is alex@northstar.example.</text>
+<rect x="280" y="346" width="1112" height="299" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="304" y="390" font-family="Geist,Arial,sans-serif" font-size="20" font-weight="600" fill="#0a1a2e">Agreement revision 2</text>
+<rect x="304" y="419" width="1064" height="169" rx="12" fill="#f7f8f9" stroke="#d9dfe5"/>
+<text x="328" y="454" font-family="Geist,Arial,sans-serif" font-size="11" font-weight="500" fill="#0f7078">FAITHFUL SOFTWARE SOLUTIONS</text>
+<text x="328" y="509" font-family="Geist,Arial,sans-serif" font-size="26" font-weight="600" fill="#0a1a2e">Agreement revision 2</text>
+<text x="328" y="557" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">The exact document you are signing is shown here. Download an accessible copy or read the full text.</text>
+<text x="304" y="616" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Document prepared 15 September 2026</text>
+<rect x="280" y="669" width="1112" height="297" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="304" y="713" font-family="Geist,Arial,sans-serif" font-size="20" font-weight="600" fill="#0a1a2e">Your signature</text>
+<text x="304" y="756" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Full legal name</text>
+<rect x="304" y="770" width="1064" height="48" rx="8" fill="#ffffff" stroke="#788696"/>
+<text x="316" y="798" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Alex Morgan</text>
+<text x="304" y="856" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Role / position</text>
+<rect x="304" y="870" width="1064" height="48" rx="8" fill="#ffffff" stroke="#788696"/>
+<text x="316" y="898" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Director</text>
+<rect x="280" y="990" width="1112" height="188" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="304" y="1034" font-family="Geist,Arial,sans-serif" font-size="20" font-weight="600" fill="#0a1a2e">Confirm your agreement</text>
+<rect x="304" y="1066" width="20" height="20" rx="4" fill="#ffffff" stroke="#788696"/>
+<text x="336" y="1079" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#0a1a2e">I have read this agreement and am authorised to sign on behalf of Northstar Studio.</text>
+<rect x="304" y="1110" width="150" height="44" rx="12" fill="#0f7078"/>
+<text x="324" y="1136" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#ffffff">Sign agreement</text>
+<a href="../wireframes.html#C30" target="_top" aria-label="Sign agreement"><rect x="304" y="1110" width="150" height="44" fill="transparent"/></a>
+<rect x="466" y="1110" width="172" height="44" rx="12" fill="#ffffff" stroke="#788696"/>
+<text x="486" y="1136" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0a1a2e">Back to agreement</text>
+<a href="../wireframes.html#C16" target="_top" aria-label="Back to agreement"><rect x="466" y="1110" width="172" height="44" fill="transparent"/></a>
+<text x="280" y="1214" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Faithful Software Solutions · Built on trust. Delivered with care.</text>
+<rect x="0" y="0" width="232" height="1266" rx="0" fill="#f7f8f9" stroke="#d9dfe5"/>
+<text x="24" y="58" font-family="Geist,Arial,sans-serif" font-size="30" font-weight="700" fill="#0a1a2e">FSS</text>
+<text x="24" y="88" font-family="Geist,Arial,sans-serif" font-size="10" font-weight="500" fill="#46566c">YOUR STUDIO WORKSPACE</text>
+<rect x="20" y="112" width="192" height="78" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="32" y="140" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="600" fill="#0a1a2e">Northstar Studio</text>
+<text x="32" y="165" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Client workspace ▾</text>
+<rect x="34" y="232" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="242" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Home</text>
+<rect x="34" y="280" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="290" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Getting started</text>
+<rect x="34" y="328" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="338" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Projects</text>
+<rect x="34" y="376" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="386" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Requests</text>
+<rect x="34" y="424" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="434" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Documents</text>
+<rect x="20" y="456" width="192" height="44" rx="12" fill="#e3f2f1"/>
+<rect x="34" y="472" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#0f7078"/>
+<text x="60" y="482" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#0f7078">Agreements</text>
+<rect x="34" y="520" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="530" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Billing</text>
+<rect x="34" y="568" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="578" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Services</text>
+<rect x="34" y="616" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="626" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Notifications</text>
+<rect x="34" y="664" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="674" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Help</text>
+<rect x="34" y="712" width="12" height="12" rx="3" fill="#f7f8f9" stroke="#46566c"/>
+<text x="60" y="722" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#46566c">Settings</text>
+<text x="24" y="764" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Alex Morgan</text>
+<text x="24" y="781" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Northstar Studio</text></svg>

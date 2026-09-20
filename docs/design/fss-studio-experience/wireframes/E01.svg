@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="1024" viewBox="0 0 680 1024" role="img" aria-label="E01 · Your update is ready.">
+<title>E01 · Your update is ready.</title>
+<desc>FSS proposed interface. Text and shapes are editable SVG elements. Synthetic example data.</desc>
+<rect x="0" y="0" width="680" height="1024" rx="0" fill="#f2f3f5"/>
+<text x="48" y="64" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="500" fill="#46566c">NORTHSTAR STUDIO / NOTIFICATIONS</text>
+<text x="48" y="152" font-family="Geist,Arial,sans-serif" font-size="36" font-weight="600" fill="#0a1a2e">Your update is ready.</text>
+<text x="48" y="192" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Email preview · Review requested</text>
+<rect x="48" y="223" width="169" height="44" rx="12" fill="#0f7078"/>
+<text x="68" y="249" font-family="Geist,Arial,sans-serif" font-size="14" font-weight="500" fill="#ffffff">Review the update</text>
+<a href="../wireframes.html#C09" target="_top" aria-label="Review the update"><rect x="48" y="223" width="169" height="44" fill="transparent"/></a>
+<rect x="48" y="291" width="584" height="575" rx="16" fill="#ffffff" stroke="#d9dfe5"/>
+<text x="72" y="335" font-family="Geist,Arial,sans-serif" font-size="20" font-weight="600" fill="#0a1a2e">Ready for your review: Booking flow</text>
+<rect x="72" y="364" width="536" height="445" rx="12" fill="#f7f8f9" stroke="#d9dfe5"/>
+<text x="96" y="399" font-family="Geist,Arial,sans-serif" font-size="11" font-weight="500" fill="#0f7078">FAITHFUL SOFTWARE SOLUTIONS</text>
+<text x="96" y="454" font-family="Geist,Arial,sans-serif" font-size="26" font-weight="600" fill="#0a1a2e">Ready for your review: Booking flow</text>
+<text x="96" y="502" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Hello Alex,</text>
+<text x="96" y="525" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c"></text>
+<text x="96" y="548" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">The booking flow now shows the correct local time and clearer</text>
+<text x="96" y="571" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">appointment details.</text>
+<text x="96" y="594" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c"></text>
+<text x="96" y="617" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Please review version 3 and check the time, studio address and</text>
+<text x="96" y="640" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">booking reference.</text>
+<text x="96" y="663" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c"></text>
+<text x="96" y="686" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Your target review date is 18 September. Tell us if you need more</text>
+<text x="96" y="709" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">time.</text>
+<text x="96" y="732" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c"></text>
+<text x="96" y="755" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Jean-Fidele</text>
+<text x="96" y="778" font-family="Geist,Arial,sans-serif" font-size="16" font-weight="400" fill="#46566c">Faithful Software Solutions</text>
+<text x="72" y="837" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Northstar Studio · NS-014 · authenticated portal link</text>
+<text x="48" y="902" font-family="Geist,Arial,sans-serif" font-size="12" font-weight="400" fill="#46566c">Faithful Software Solutions · Built on trust. Delivered with care.</text></svg>
