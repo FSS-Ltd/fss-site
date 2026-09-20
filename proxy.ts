@@ -6,6 +6,7 @@ import {
   portalRedirectForHost,
   portalRouteForHost,
 } from "@/lib/operations/auth/portal-host";
+import { prefixFreePortalEnabled } from "@/lib/operations/auth/release-flags";
 
 function applyPortalSecurityHeaders(response: NextResponse): NextResponse {
   response.headers.set("Cache-Control", "private, no-store");
@@ -13,40 +14,52 @@ function applyPortalSecurityHeaders(response: NextResponse): NextResponse {
   return response;
 }
 
-function isPortalRequest(request: NextRequest): boolean {
+function isPortalRequest(
+  request: NextRequest,
+  prefixFreeEnabled: boolean,
+): boolean {
   const { hostname, pathname } = request.nextUrl;
   return (
-    portalRedirectForHost(hostname, pathname) !== null ||
-    portalRouteForHost(hostname, pathname) !== null ||
+    portalRedirectForHost(hostname, pathname, prefixFreeEnabled) !== null ||
+    portalRouteForHost(hostname, pathname, prefixFreeEnabled) !== null ||
     pathname === "/portal" ||
     pathname.startsWith("/portal/") ||
     pathname.startsWith("/api/portal/")
   );
 }
 
-export function portalProxyResponse(request: NextRequest): NextResponse {
-  const portalRedirect = portalRedirectForHost(
-    request.nextUrl.hostname,
-    request.nextUrl.pathname,
-  );
-  if (portalRedirect) {
-    const url = request.nextUrl.clone();
-    url.pathname = portalRedirect;
-    return applyPortalSecurityHeaders(NextResponse.redirect(url));
-  }
+export function createPortalProxyResponse(
+  prefixFreeEnabled: () => boolean = prefixFreePortalEnabled,
+): (request: NextRequest) => NextResponse {
+  return (request) => {
+    const routingEnabled = prefixFreeEnabled();
+    const portalRedirect = portalRedirectForHost(
+      request.nextUrl.hostname,
+      request.nextUrl.pathname,
+      routingEnabled,
+    );
+    if (portalRedirect) {
+      const url = request.nextUrl.clone();
+      url.pathname = portalRedirect;
+      return applyPortalSecurityHeaders(NextResponse.redirect(url));
+    }
 
-  const portalRoute = portalRouteForHost(
-    request.nextUrl.hostname,
-    request.nextUrl.pathname,
-  );
-  if (portalRoute) {
-    const url = request.nextUrl.clone();
-    url.pathname = portalRoute;
-    return applyPortalSecurityHeaders(NextResponse.rewrite(url));
-  }
+    const portalRoute = portalRouteForHost(
+      request.nextUrl.hostname,
+      request.nextUrl.pathname,
+      routingEnabled,
+    );
+    if (portalRoute) {
+      const url = request.nextUrl.clone();
+      url.pathname = portalRoute;
+      return applyPortalSecurityHeaders(NextResponse.rewrite(url));
+    }
 
-  return applyPortalSecurityHeaders(NextResponse.next());
+    return applyPortalSecurityHeaders(NextResponse.next());
+  };
 }
+
+export const portalProxyResponse = createPortalProxyResponse();
 
 const portalMiddleware = clerkMiddleware((_auth, request) =>
   portalProxyResponse(request),
@@ -54,12 +67,13 @@ const portalMiddleware = clerkMiddleware((_auth, request) =>
 
 export function createProxy(
   portalRequestMiddleware: NextMiddleware,
+  prefixFreeEnabled: () => boolean = prefixFreePortalEnabled,
 ): NextMiddleware {
   return async function proxy(
     request: NextRequest,
     event: NextFetchEvent,
   ): Promise<Awaited<ReturnType<NextMiddleware>>> {
-    if (isPortalRequest(request)) {
+    if (isPortalRequest(request, prefixFreeEnabled())) {
       return await portalRequestMiddleware(request, event);
     }
 

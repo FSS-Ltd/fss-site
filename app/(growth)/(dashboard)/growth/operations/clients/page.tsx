@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import {
   ClientList,
   type ClientListState,
@@ -6,6 +6,8 @@ import {
 import { requireFounder } from "@/lib/growth/auth/require-founder";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import { listOrganisations } from "@/lib/operations/organisations/repository";
+import { growthOperationsCutoverEnabled } from "@/lib/operations/auth/release-flags";
+import { fssStudioUrl } from "@/lib/operations/auth/studio-url";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +19,8 @@ export default async function OperationsClientsPage({
   if (!operationsEnabled()) notFound();
   // Layouts and pages may render concurrently; authorise here before any query.
   const founder = await requireFounder();
+  if (growthOperationsCutoverEnabled())
+    redirect(fssStudioUrl("/admin/clients"));
   const params = await searchParams;
   let state: ClientListState;
   try {

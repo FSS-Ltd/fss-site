@@ -144,7 +144,7 @@ test("separate signer, billing recipient and owner receive exactly their approve
   assert.equal(ownerMessages[0].text, ownerMessages[1].text);
   assert.match(
     ownerMessages[0].text,
-    /https:\/\/example\.test\/portal\/activate/,
+    /https:\/\/example\.test\/activate/,
   );
   assert.doesNotMatch(ownerMessages[0].text, /#invite=/);
   assert.doesNotMatch(ownerMessages[0].text, /proposal|sign it/i);

@@ -6,8 +6,11 @@ import {
   requestMetricExport,
   readMetricExport,
 } from "@/lib/operations/metrics/export-repository";
+import { retiredGrowthOperationsResponse } from "@/lib/operations/auth/legacy-growth-route";
 export const dynamic = "force-dynamic";
-function handle(request: Request): Promise<Response> {
+async function handle(request: Request): Promise<Response> {
+  const retired = retiredGrowthOperationsResponse();
+  if (retired) return retired;
   return createMetricExportHandler({
     enabled:
       operationsEnabled() &&

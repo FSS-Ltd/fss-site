@@ -1,3 +1,5 @@
+import { prefixFreePortalEnabled } from "./release-flags";
+
 const portalHostname = "portal.faithfulsoftware.dev";
 
 const excludedPortalPathPattern =
@@ -14,8 +16,13 @@ function isPortalUiPath(pathname: string): boolean {
 export function portalRouteForHost(
   hostname: string,
   pathname: string,
+  prefixFreeEnabled: boolean = prefixFreePortalEnabled(),
 ): string | null {
-  if (!isPortalHost(hostname) || !isPortalUiPath(pathname)) {
+  if (
+    !prefixFreeEnabled ||
+    !isPortalHost(hostname) ||
+    !isPortalUiPath(pathname)
+  ) {
     return null;
   }
 
@@ -28,10 +35,19 @@ export function portalRouteForHost(
 export function portalRedirectForHost(
   hostname: string,
   pathname: string,
+  prefixFreeEnabled: boolean = prefixFreePortalEnabled(),
 ): string | null {
-  if (!isPortalHost(hostname)) return null;
-  if (pathname === "/portal") return "/";
-  if (pathname.startsWith("/portal/")) return pathname.slice("/portal".length);
+  if (!isPortalHost(hostname) || !isPortalUiPath(pathname)) return null;
 
-  return null;
+  if (prefixFreeEnabled) {
+    if (pathname === "/portal") return "/";
+    if (pathname.startsWith("/portal/"))
+      return pathname.slice("/portal".length);
+    return null;
+  }
+
+  if (pathname === "/portal" || pathname.startsWith("/portal/")) return null;
+  if (pathname === "/") return "/portal";
+
+  return `/portal${pathname}`;
 }

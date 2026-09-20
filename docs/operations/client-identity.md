@@ -15,9 +15,10 @@ credential.
 
 Configure Clerk with `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`,
 and `CLERK_WEBHOOK_SIGNING_SECRET`. Set
-`OPERATIONS_PORTAL_ORIGIN=https://portal.faithfulsoftware.dev`, allow
-`https://portal.faithfulsoftware.dev/portal/activate` as a redirect URL, and
-send Clerk `user.created` and `user.updated` webhooks to
+`OPERATIONS_PORTAL_ORIGIN=https://portal.faithfulsoftware.dev`, allow both
+`https://portal.faithfulsoftware.dev/portal/activate` and
+`https://portal.faithfulsoftware.dev/activate` as redirect URLs during the
+portal routing rollback window, and send Clerk `user.created` and `user.updated` webhooks to
 `https://portal.faithfulsoftware.dev/api/webhooks/clerk`.
 
 Keep every credential in the deployment secret manager. The publishable Clerk
@@ -39,6 +40,23 @@ are server-only.
 
 Removing a Clerk account prevents a new portal session. Revoke the Operations
 membership in Growth OS to remove its durable access record as well.
+
+## Controlled routing and Studio rollout
+
+In a production deployment, all three values below default to disabled until
+the founder turns them on through the reviewed release procedure:
+
+- `OPERATIONS_PORTAL_PREFIX_FREE_ENABLED=true` makes visible portal URLs
+  prefix-free and redirects old `/portal/*` URLs to their canonical form.
+- `OPERATIONS_FSS_STUDIO_ENABLED=true` makes the Admin workspace and its
+  server-side commands available to verified FSS Admins.
+- `OPERATIONS_GROWTH_OPERATIONS_CUTOVER_ENABLED=true` retires the old Growth
+  Operations client and billing workflow routes after the Studio check passes.
+
+The last flag has no effect unless Studio is enabled. Set the flags and run the
+checks in [the Operations Studio cutover runbook](../runbooks/operations-studio-cutover.md).
+Turning either of the first two flags off restores its compatible legacy path;
+additive staff records and audit history remain in place.
 
 ## Reviewed operator workflow
 

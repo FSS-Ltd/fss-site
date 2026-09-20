@@ -47,20 +47,23 @@ Before making any change, record (values only, never secrets):
 - Current automation state (`GROWTH_OS_AUTOMATIONS_ENABLED` value, which
   should already be `false`).
 
-## Step 3: Apply reviewed database migrations
+## Step 3: Let GitHub Actions apply reviewed database migrations
 
 1. Take or verify a fresh backup.
-2. Re-run `supabase db diff --linked` — confirm it matches exactly what
-   was reviewed at preview time. If it doesn't, stop and re-review; do
-   not push a diff that wasn't the one approved.
-3. Run `pnpm verify:migrations` one more time against the final
-   migration set.
-4. Apply only the reviewed forward migrations (`supabase db push`).
-   **Never** a destructive down-migration or `supabase db reset` — see
-   the Global Constraints in the release plan.
-5. Verify schema, grants, and the runtime role (`growth_app`) after
-   applying — confirm no browser-facing role (`anon`, `authenticated`)
-   picked up unexpected access.
+2. Re-run `pnpm verify:migrations` against the exact reviewed commit.
+3. Merge only after the pull request's validation workflow passes. The
+   protected GitHub Actions `production` environment runs
+   `supabase db push --linked --dry-run` and then applies the reviewed forward
+   migrations from `main`.
+4. Review and approve the protected GitHub Actions environment when it is
+   requested. Do not run `supabase db push`, `supabase migration repair`, or
+   any production migration command from an operator workstation.
+5. Confirm the GitHub Actions migration job completed and verify schema,
+   grants, and the runtime role (`growth_app`) afterwards. Confirm no
+   browser-facing role (`anon`, `authenticated`) received unexpected access.
+
+**Never** use a destructive down-migration or `supabase db reset`. The
+GitHub Actions migration job is the only production migration path.
 
 ## Step 4: Promote the reviewed commit to Vercel production
 

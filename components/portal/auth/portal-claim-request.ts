@@ -1,4 +1,8 @@
-import { resolvePortalClaimDestination } from "./portal-claim-destination";
+import {
+  defaultPortalClaimDestinations,
+  resolvePortalClaimDestination,
+  type PortalClaimDestinations,
+} from "./portal-claim-destination";
 
 const claimRetryDelayMs = 250;
 const claimAttempts = 3;
@@ -6,6 +10,11 @@ const claimAttempts = 3;
 type ClaimRequest = () => Promise<Response>;
 type Wait = (milliseconds: number) => Promise<void>;
 type ClaimFailureOutcome = "session_pending" | "access_denied" | "unavailable";
+type ClaimPortalAccessOptions = Readonly<{
+  destinations?: PortalClaimDestinations;
+  pause?: Wait;
+  request?: ClaimRequest;
+}>;
 
 const wait: Wait = (milliseconds) =>
   new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -41,32 +50,48 @@ function claimFailureError(outcome: ClaimFailureOutcome | null): Error {
   return inactiveAccessError();
 }
 
+export function claimPortalAccess(
+  displayName?: string,
+  options?: ClaimPortalAccessOptions,
+): Promise<string>;
+export function claimPortalAccess(
+  request: ClaimRequest,
+  pause?: Wait,
+  destinations?: PortalClaimDestinations,
+): Promise<string>;
 export async function claimPortalAccess(
-  displayNameOrRequest: string | undefined | ClaimRequest,
-  requestOrPause?: ClaimRequest | Wait,
-  suppliedPause?: Wait,
+  displayNameOrRequest: string | ClaimRequest | undefined = undefined,
+  optionsOrPause: ClaimPortalAccessOptions | Wait = {},
+  injectedDestinations?: PortalClaimDestinations,
 ): Promise<string> {
+  const isInjectedRequest = typeof displayNameOrRequest === "function";
+  const options =
+    !isInjectedRequest && typeof optionsOrPause !== "function"
+      ? optionsOrPause
+      : {};
   const displayName =
     typeof displayNameOrRequest === "string" ? displayNameOrRequest : undefined;
-  const request: ClaimRequest =
-    typeof displayNameOrRequest === "function"
-      ? displayNameOrRequest
-      : typeof requestOrPause === "function"
-        ? (requestOrPause as ClaimRequest)
-        : () =>
-    fetch("/api/portal/access/claim", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ displayName }),
-    });
-  const pause: Wait =
-    typeof displayNameOrRequest === "function"
-      ? (requestOrPause as Wait | undefined) ?? wait
-      : suppliedPause ?? wait;
+  const request = isInjectedRequest
+    ? displayNameOrRequest
+    : (options.request ??
+      (() =>
+        fetch("/api/portal/access/claim", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(displayName ? { displayName } : {}),
+        })));
+  const pause = isInjectedRequest
+    ? typeof optionsOrPause === "function"
+      ? optionsOrPause
+      : wait
+    : (options.pause ?? wait);
+  const destinations = isInjectedRequest
+    ? (injectedDestinations ?? defaultPortalClaimDestinations)
+    : (options.destinations ?? defaultPortalClaimDestinations);
   for (let attempt = 1; attempt <= claimAttempts; attempt += 1) {
     const response = await request();
     const result: unknown = await response.json().catch(() => null);
-    if (response.ok) return resolvePortalClaimDestination(result);
+    if (response.ok) return resolvePortalClaimDestination(result, destinations);
     const outcome = readFailureOutcome(result);
     if (
       response.status !== 401 ||

@@ -15,6 +15,7 @@ import { MilestoneList } from "@/components/portal/milestone-list";
 import { DocumentList } from "@/components/portal/document-list";
 import styles from "@/components/portal/projects.module.css";
 import { getPortalPageContext } from "@/lib/operations/auth/page-context";
+import { portalPath } from "@/lib/operations/auth/portal-url";
 
 export default async function ProjectPage({
   params,
@@ -58,7 +59,7 @@ export default async function ProjectPage({
     <div className={styles.page}>
       <Link
         className={styles.breadcrumb}
-        href={`/portal/projects?organisationId=${context.organisationId}`}
+        href={`${portalPath("/portal/projects")}?organisationId=${context.organisationId}`}
       >
         <ArrowLeft size={16} aria-hidden="true" />
         All projects

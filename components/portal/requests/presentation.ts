@@ -21,7 +21,7 @@ export const scopeLabels: Record<RequestScope, string> = {
 };
 
 export function requestHref(id: string, organisationId: string): string {
-  return `/portal/requests/${encodeURIComponent(id)}?organisationId=${encodeURIComponent(organisationId)}`;
+  return `/requests/${encodeURIComponent(id)}?organisationId=${encodeURIComponent(organisationId)}`;
 }
 
 export function requestDate(value: string | null): string {

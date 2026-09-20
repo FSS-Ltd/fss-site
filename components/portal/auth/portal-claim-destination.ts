@@ -1,6 +1,19 @@
-import { portalPath } from "@/lib/operations/auth/portal-url";
+export type PortalClaimDestinations = Readonly<{
+  admin: string;
+  home: string;
+  onboarding: string;
+}>;
 
-export function resolvePortalClaimDestination(result: unknown): string {
+export const defaultPortalClaimDestinations: PortalClaimDestinations = {
+  admin: "/admin",
+  home: "/",
+  onboarding: "/onboarding",
+};
+
+export function resolvePortalClaimDestination(
+  result: unknown,
+  destinations: PortalClaimDestinations = defaultPortalClaimDestinations,
+): string {
   if (!result || typeof result !== "object" || !("active" in result)) {
     throw new Error(
       "Your account was created, but portal access is not active yet.",
@@ -8,17 +21,15 @@ export function resolvePortalClaimDestination(result: unknown): string {
   }
   if (result.active === true) {
     if ("destination" in result && result.destination === "admin")
-      return portalPath("/admin");
-    return portalPath("/portal");
+      return destinations.admin;
+    return destinations.home;
   }
   if (
     result.active === false &&
     "onboardingRequired" in result &&
     result.onboardingRequired === true
   ) {
-    if ("destination" in result && result.destination === "onboarding")
-      return portalPath("/portal/onboarding");
-    return portalPath("/portal/onboarding");
+    return destinations.onboarding;
   }
   throw new Error(
     "Your account was created, but portal access is not active yet.",

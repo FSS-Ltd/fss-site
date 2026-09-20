@@ -7,6 +7,7 @@ import {
 } from "../billing/command-repository";
 import { createStripeObligation } from "../billing/stripe-obligation";
 import { issuedInvoiceSnapshot } from "../billing/invoice-repository";
+import { portalUrl } from "../auth/portal-url";
 import { requireCurrentEffect } from "./access-provider";
 import type { EffectResult, OnboardingLease } from "./types";
 const command = z.object({
@@ -192,7 +193,7 @@ export function createOnboardingBillingProvider(
       receipt: {
         providerId: invoice.id,
         acceptedAt: new Date(finalized * 1000).toISOString(),
-        url: new URL("/portal/billing", configuration.portalOrigin).href,
+        url: portalUrl("/billing", configuration.portalOrigin).href,
       },
     };
   };

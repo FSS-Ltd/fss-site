@@ -10,6 +10,7 @@ import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { getPortalRequest } from "@/lib/operations/requests/repository";
 import { RequestDetail } from "@/components/portal/requests/request-detail";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
+import { portalPath } from "@/lib/operations/auth/portal-url";
 
 export default async function RequestPage({
   params,
@@ -48,7 +49,9 @@ export default async function RequestPage({
   if (!request) notFound();
   return (
     <div>
-      <Link href={`/portal/requests?organisationId=${context.organisationId}`}>
+      <Link
+        href={`${portalPath("/portal/requests")}?organisationId=${context.organisationId}`}
+      >
         All requests
       </Link>
       <RequestDetail

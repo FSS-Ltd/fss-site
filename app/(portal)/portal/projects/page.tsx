@@ -58,7 +58,7 @@ export default async function ProjectsPage({
             <li key={project.id}>
               <Link
                 className={styles.projectLink}
-                href={`/portal/projects/${project.id}?organisationId=${context.organisationId}`}
+                href={`${portalPath(`/portal/projects/${project.id}`)}?organisationId=${context.organisationId}`}
               >
                 <div className={styles.sectionHeading}>
                   <h2>{project.title}</h2>

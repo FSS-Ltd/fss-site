@@ -1,14 +1,28 @@
+import { prefixFreePortalEnabled } from "./release-flags";
+
 /** Convert an internal portal path into its public portal-subdomain URL. */
-export function portalPath(path: string): string {
+export function portalPath(
+  path: string,
+  prefixFreeEnabled: boolean = prefixFreePortalEnabled(),
+): string {
   if (!path.startsWith("/") || path.startsWith("//") || path.includes("\\")) {
     throw new Error("Expected a portal-relative path.");
+  }
+  if (!prefixFreeEnabled) {
+    if (path === "/") return "/portal";
+    if (path === "/portal" || path.startsWith("/portal/")) return path;
+    return `/portal${path}`;
   }
   if (path === "/portal") return "/";
   if (path.startsWith("/portal/")) return path.slice(7);
   return path;
 }
 
-export function portalUrl(path: string, origin: string): URL {
+export function portalUrl(
+  path: string,
+  origin: string,
+  prefixFreeEnabled: boolean = prefixFreePortalEnabled(),
+): URL {
   if (!path.startsWith("/") || path.startsWith("//") || path.includes("\\")) {
     throw new Error("Expected a portal-relative path.");
   }
@@ -20,7 +34,7 @@ export function portalUrl(path: string, origin: string): URL {
     throw new Error("Expected a secure portal origin.");
   }
   const url = new URL(path, base.origin);
-  url.pathname = portalPath(url.pathname);
+  url.pathname = portalPath(url.pathname, prefixFreeEnabled);
   return url;
 }
 

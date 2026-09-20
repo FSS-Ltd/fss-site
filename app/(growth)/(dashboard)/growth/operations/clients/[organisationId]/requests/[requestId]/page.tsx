@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { z } from "zod";
 import { requireFounder } from "@/lib/growth/auth/require-founder";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
@@ -12,6 +12,8 @@ import { FounderRequestActions } from "@/components/portal/requests/founder-requ
 import { OperationsPageHeader } from "@/components/operations/shared/operations-page-header";
 import ui from "@/components/operations/shared/operations-ui.module.css";
 import layout from "@/components/operations/requests/requests.module.css";
+import { growthOperationsCutoverEnabled } from "@/lib/operations/auth/release-flags";
+import { fssStudioUrl } from "@/lib/operations/auth/studio-url";
 export const dynamic = "force-dynamic";
 export default async function FounderRequestPage({
   params,
@@ -25,6 +27,11 @@ export default async function FounderRequestPage({
     .safeParse(await params);
   if (!parsed.success) notFound();
   const { organisationId, requestId } = parsed.data;
+  if (growthOperationsCutoverEnabled()) {
+    redirect(
+      fssStudioUrl(`/admin/clients/${organisationId}/requests/${requestId}`),
+    );
+  }
   let request, register;
   try {
     request = await getFounderRequest(

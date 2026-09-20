@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { OperationsDb } from "../db/client";
 import { createPortalInviteToken } from "../auth/invites";
 import { provisionPortalAccount } from "../auth/provision";
+import { portalUrl } from "../auth/portal-url";
 import { decryptInviteToken, encryptInviteToken } from "./invite-crypto";
 import type { ApprovedEmail, EffectResult, OnboardingLease } from "./types";
 export async function requireCurrentEffect(
@@ -47,7 +48,7 @@ export function createOnboardingAccessProvider(
     await requireCurrentEffect(db, lease);
     await provision(
       lease.recipient,
-      new URL("/portal/activate", portalOrigin).href,
+      portalUrl("/activate", portalOrigin).href,
       undefined,
     );
     return {
@@ -55,7 +56,7 @@ export function createOnboardingAccessProvider(
       receipt: {
         ...receipt,
         acceptedAt: new Date(receipt.acceptedAt).toISOString(),
-        url: new URL("/portal", portalOrigin).href,
+        url: portalUrl("/", portalOrigin).href,
       },
     };
   };
@@ -80,7 +81,7 @@ export async function resolveOnboardingAccess(
     .parse(row.binding);
   if (binding.recipient !== lease.recipient || email.to !== lease.recipient)
     throw new Error("Approved recipient mismatch.");
-  const url = new URL("/portal/activate", portalOrigin);
+  const url = portalUrl("/activate", portalOrigin);
   if (binding.encrypted !== null)
     decryptInviteToken(
       binding.encrypted,

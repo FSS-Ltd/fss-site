@@ -5,6 +5,7 @@ import { requireFssAdmin } from "../auth/require-admin";
 import type { FssAdminContext } from "../auth/staff-types";
 import { operationsEnabled, getOperationsDb } from "../db/client";
 import { getPortalDb } from "../db/portal-client";
+import { fssStudioEnabled } from "../auth/release-flags";
 import { executeStaffRequestCommand } from "../requests/staff-service";
 import { createRequestCommandHandler } from "./request-command-handler";
 
@@ -13,7 +14,7 @@ export function staffRequestRoute(): (
   context: { params: Promise<{ organisationId: string; requestId: string }> },
 ) => Promise<Response> {
   const commandHandler = createRequestCommandHandler<FssAdminContext>({
-    enabled: operationsEnabled(),
+    enabled: operationsEnabled() && fssStudioEnabled(),
     origin: new URL(resolveSiteUrl()).origin,
     authorize: async () => {
       const identity = await getPortalIdentity();

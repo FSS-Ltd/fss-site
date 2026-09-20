@@ -59,7 +59,7 @@ test("access bridge requires approved scope, binds encrypted token, and preserve
     origin,
   );
   assert.deepEqual(first, replay);
-  assert.match(first.text, /https:\/\/example\.test\/portal\/activate/);
+  assert.match(first.text, /https:\/\/example\.test\/activate/);
   assert.doesNotMatch(first.text, /#invite=/);
   assert.ok(first.text.includes(f.proposal.portalUrl));
   assert.equal(provisions, 1);

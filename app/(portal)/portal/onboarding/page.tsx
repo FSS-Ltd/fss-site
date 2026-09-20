@@ -32,5 +32,5 @@ export default async function PortalOnboardingPage(): Promise<React.JSX.Element>
   }
 
   if (destination) redirect(destination);
-  return <OrganisationOnboarding />;
+  return <OrganisationOnboarding homePath={portalPath("/portal")} />;
 }

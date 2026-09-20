@@ -107,11 +107,13 @@ export function ClientList({
   billingEnabled = false,
   routePrefix = "/growth/operations/clients",
   showPortalAccess = true,
+  workspaceContext = "Growth · Operations",
 }: {
   state: ClientListState;
   billingEnabled?: boolean;
   routePrefix?: string;
   showPortalAccess?: boolean;
+  workspaceContext?: string;
 }): React.JSX.Element {
   const hasServerPagination =
     state.status === "ready" &&
@@ -126,7 +128,7 @@ export function ClientList({
   return (
     <section className={`${sharedStyles.page} ${styles.page}`}>
       <OperationsPageHeader
-        context="Growth · Operations"
+        context={workspaceContext}
         title="Client register"
         description="Organisations and their reviewed engagement links."
         variant="inverse"
@@ -149,7 +151,7 @@ export function ClientList({
           role="alert"
         >
           <p>{state.message}</p>
-          <Link href="/growth/operations/clients">Reload client register</Link>
+          <Link href={routePrefix}>Reload client register</Link>
         </div>
       ) : (
         <>
@@ -161,7 +163,7 @@ export function ClientList({
                 Organisations appear here after their engagement mappings have
                 been reviewed.
               </p>
-              <Link href="/growth/operations/clients">View first page</Link>
+              <Link href={routePrefix}>View first page</Link>
             </div>
           ) : (
             <ul className={styles.list}>
