@@ -151,6 +151,13 @@ export function RequestDetail({
           </dl>
         )}
       </PortalCard>
+      {!hidePortalActions && (
+        <ReviewActions
+          request={request}
+          commandAction={action}
+          onRefresh={() => router.refresh()}
+        />
+      )}
       {(request.publicSummary || request.documents.length > 0) && (
         <PortalCard
           className={styles.section}
@@ -195,17 +202,16 @@ export function RequestDetail({
                 A follow-up is a new request, so it does not change this
                 completed record.
               </p>
+              {acceptance ? (
+                <p className={styles.note}>
+                  Accepted {requestDate(acceptance.createdAt)}. The review
+                  history contains the recorded acceptance details.
+                </p>
+              ) : null}
             </>
           ) : null}
         </PortalCard>
       ) : null}
-      {!hidePortalActions && (
-        <ReviewActions
-          request={request}
-          commandAction={action}
-          onRefresh={() => router.refresh()}
-        />
-      )}
       <RequestConversation
         request={request}
         canComment={canComment}

@@ -2,6 +2,7 @@
 
 import { useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { PortalButton, PortalCard, PortalSelect } from "@/components/portal/ui";
 import type {
   ClientRequestDetail,
   RequestStatus,
@@ -162,29 +163,23 @@ export function FounderRequestActions({
     }
   }
   return (
-    <section
-      className={styles.review}
-      aria-labelledby="founder-request-actions-heading"
+    <PortalCard
+      headingId="founder-request-actions-heading"
+      title="Manage request"
     >
-      <h2 id="founder-request-actions-heading" className={styles.sectionTitle}>
-        Manage request
-      </h2>
       <form onSubmit={submit} className={styles.form} aria-busy={pending}>
         <fieldset disabled={pending} className={styles.fieldset}>
-          <label className={styles.field}>
-            Action
-            <select
-              value={action}
-              onChange={(event) => setAction(event.target.value)}
-              className={styles.input}
-            >
-              {choices.map((choice) => (
-                <option key={choice.value} value={choice.value}>
-                  {choice.label}
-                </option>
-              ))}
-            </select>
-          </label>
+          <PortalSelect
+            label="Action"
+            onChange={(event) => setAction(event.target.value)}
+            value={action}
+          >
+            {choices.map((choice) => (
+              <option key={choice.value} value={choice.value}>
+                {choice.label}
+              </option>
+            ))}
+          </PortalSelect>
           <FounderActionFields
             key={action}
             action={action}
@@ -192,31 +187,31 @@ export function FounderRequestActions({
             agreements={agreements}
             currentPriority={currentPriority}
           />
-          <button
-            className={styles.primary}
-            type="submit"
+          <PortalButton
             disabled={
               pending ||
               !choices.some((choice) => choice.value === action) ||
               (action === "acknowledge" && !deliveryOwners.length)
             }
+            loading={pending}
+            type="submit"
           >
             {pending ? "Saving update…" : "Save update"}
-          </button>
+          </PortalButton>
         </fieldset>
         <p className={styles.feedback} role="status" aria-atomic="true">
           {message}
         </p>
         {conflict && (
-          <button
-            type="button"
-            className={styles.secondary}
+          <PortalButton
             onClick={() => router.refresh()}
+            type="button"
+            variant="secondary"
           >
             Refresh request details
-          </button>
+          </PortalButton>
         )}
       </form>
-    </section>
+    </PortalCard>
   );
 }

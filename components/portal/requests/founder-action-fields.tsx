@@ -1,6 +1,6 @@
+import { Notice, PortalSelect } from "@/components/portal/ui";
 import { RequestField } from "./form-field";
 import { scopeLabels } from "./presentation";
-import styles from "./requests.module.css";
 import {
   requestPriorities,
   type RequestPriority,
@@ -12,47 +12,40 @@ export function FounderActionFields({
   deliveryOwners,
   agreements,
   currentPriority,
+  documents,
 }: {
   action: string;
   deliveryOwners: Choice[];
   agreements: Choice[];
   currentPriority: RequestPriority;
+  documents?: Choice[];
 }): React.JSX.Element {
   return (
     <>
       {action === "set_priority" && (
-        <label className={styles.field}>
-          Operational priority
-          <select
-            name="priority"
-            className={styles.input}
-            defaultValue={currentPriority}
-            required
-          >
-            {requestPriorities.map((priority) => (
-              <option key={priority} value={priority}>
-                {priority.charAt(0).toUpperCase() + priority.slice(1)}
-              </option>
-            ))}
-          </select>
-          <span className={styles.note}>
-            Internal delivery priority, assessed separately from the client’s
-            reported impact.
-          </span>
-        </label>
+        <PortalSelect
+          label="Operational priority"
+          name="priority"
+          defaultValue={currentPriority}
+          hint="Internal delivery priority, assessed separately from the client’s reported impact."
+          required
+        >
+          {requestPriorities.map((priority) => (
+            <option key={priority} value={priority}>
+              {priority.charAt(0).toUpperCase() + priority.slice(1)}
+            </option>
+          ))}
+        </PortalSelect>
       )}
       {action === "acknowledge" && (
         <>
-          <label className={styles.field}>
-            Delivery owner
-            <select name="deliveryOwnerId" className={styles.input} required>
-              {deliveryOwners.map((owner) => (
-                <option key={owner.id} value={owner.id}>
-                  {owner.label}
-                </option>
-              ))}
-            </select>
-          </label>
+          <PortalSelect label="Delivery owner" name="deliveryOwnerId" required>
+            {deliveryOwners.map((owner) => (
+              <option key={owner.id} value={owner.id}>
+                {owner.label}
+              </option>
+            ))}
+          </PortalSelect>
           <RequestField
             name="ownerDisplay"
             label="Owner shown to the client"
@@ -63,20 +56,17 @@ export function FounderActionFields({
       )}
       {(action === "acknowledge" || action === "classify_scope") && (
         <>
-          <label className={styles.field}>
-            Scope decision
-            <select
-              name="scope"
-              className={styles.input}
-              defaultValue="assessment_pending"
-            >
-              {Object.entries(scopeLabels).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </label>
+          <PortalSelect
+            label="Scope decision"
+            name="scope"
+            defaultValue="assessment_pending"
+          >
+            {Object.entries(scopeLabels).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </PortalSelect>
           <RequestField
             name="scopeReason"
             label="Scope explanation"
@@ -104,25 +94,41 @@ export function FounderActionFields({
       )}
       {(action === "plan" || action === "classify_scope") && (
         <>
-          <label className={styles.field}>
-            Approved agreement
-            <select name="agreementId" className={styles.input}>
-              <option value="">No new agreement required</option>
-              {agreements.map((agreement) => (
-                <option key={agreement.id} value={agreement.id}>
-                  {agreement.label}
-                </option>
-              ))}
-            </select>
-            <span className={styles.note}>
-              Quote-required work needs an approved agreement before it can
-              start.
-            </span>
-          </label>
+          <PortalSelect
+            hint="Quote-required work needs an approved agreement before it can start."
+            label="Approved agreement"
+            name="agreementId"
+          >
+            <option value="">No new agreement required</option>
+            {agreements.map((agreement) => (
+              <option key={agreement.id} value={agreement.id}>
+                {agreement.label}
+              </option>
+            ))}
+          </PortalSelect>
         </>
       )}
       {action === "review" && (
         <>
+          {documents ? (
+            documents.length ? (
+              <PortalSelect label="Deliverable" name="documentIds" required>
+                <option disabled value="">
+                  Choose a retained deliverable
+                </option>
+                {documents.map((document) => (
+                  <option key={document.id} value={document.id}>
+                    {document.label}
+                  </option>
+                ))}
+              </PortalSelect>
+            ) : (
+              <Notice tone="warning">
+                Add or retain a deliverable in the request before publishing a
+                review.
+              </Notice>
+            )
+          ) : null}
           <RequestField
             name="deliverableVersion"
             label="Deliverable version"
@@ -131,14 +137,14 @@ export function FounderActionFields({
           />
           <RequestField
             name="publicSummary"
-            label="Summary for the client"
+            label="What changed"
             required
             multiline
             maxLength={4000}
           />
           <RequestField
             name="reviewInstructions"
-            label="Review instructions"
+            label="What to check"
             required
             multiline
             maxLength={4000}
@@ -148,15 +154,10 @@ export function FounderActionFields({
       )}
       {action === "revise" && (
         <>
-          <label className={styles.field}>
-            Revision decision
-            <select name="revisionDecision" className={styles.input}>
-              <option value="included">Included revision</option>
-              <option value="assessment_pending">
-                Assess additional scope
-              </option>
-            </select>
-          </label>
+          <PortalSelect label="Revision decision" name="revisionDecision">
+            <option value="included">Included revision</option>
+            <option value="assessment_pending">Assess additional scope</option>
+          </PortalSelect>
           <RequestField
             name="reason"
             label="Decision reason"
@@ -212,19 +213,27 @@ export function FounderActionFields({
           />
         </>
       )}
+      {(action === "public_update" || action === "internal_note") && (
+        <RequestField
+          name="body"
+          label={
+            action === "public_update" ? "Message to client" : "Internal note"
+          }
+          required
+          multiline
+          maxLength={10000}
+        />
+      )}
       {action === "comment" && (
         <>
-          <label className={styles.field}>
-            Who can see this?
-            <select
-              name="visibility"
-              className={styles.input}
-              defaultValue="internal"
-            >
-              <option value="internal">FSS only</option>
-              <option value="client">Client and FSS</option>
-            </select>
-          </label>
+          <PortalSelect
+            defaultValue="internal"
+            label="Who can see this?"
+            name="visibility"
+          >
+            <option value="internal">FSS only</option>
+            <option value="client">Client and FSS</option>
+          </PortalSelect>
           <RequestField
             name="body"
             label="Comment"

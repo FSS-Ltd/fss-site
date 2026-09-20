@@ -5,6 +5,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { AppRouterContext } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import type { ClientRequestDetail } from "@/lib/operations/requests/types";
 import type { ClientDocument } from "@/lib/operations/documents/types";
+import type { StaffDeliveryBoardRequest } from "@/lib/operations/requests/staff-repository";
 
 const require = createRequire(import.meta.url);
 require.extensions[".css"] = (module) => {
@@ -24,6 +25,10 @@ const { RequestForm } =
   require("./request-form") as typeof import("./request-form");
 const { FounderRequestActions } =
   require("./founder-request-actions") as typeof import("./founder-request-actions");
+const { StaffDeliveryBoard } =
+  require("./staff-delivery-board") as typeof import("./staff-delivery-board");
+const { StaffRequestActions } =
+  require("./staff-request-actions") as typeof import("./staff-request-actions");
 const router = {
   bfcacheId: "request-ui-test",
   back() {},
@@ -74,6 +79,21 @@ const request: ClientRequestDetail = {
   canReview: true,
   allowance: null,
 };
+const staffRequest: StaffDeliveryBoardRequest = {
+  blocked: false,
+  createdAt: request.createdAt,
+  id: request.id,
+  nextAction: request.nextAction,
+  organisationId: "org",
+  organisationName: "Northstar Studio",
+  ownerDisplay: "Jean-Fidele",
+  priority: "normal",
+  scope: "included",
+  status: "in_progress",
+  targetDate: request.targetDate,
+  title: request.title,
+  version: request.version,
+};
 
 test("request content is escaped and the reviewer must explicitly confirm the current version", () => {
   const html = renderToStaticMarkup(
@@ -88,6 +108,7 @@ test("request content is escaped and the reviewer must explicitly confirm the cu
   assert.match(html, /disabled="">Accept v1/);
   assert.match(html, /role="status"/);
   assert.match(html, /Does this meet the agreed outcome\?/);
+  assert.match(html, /What changed/);
   assert.match(html, /Accept v1/);
   assert.match(html, /Request changes/);
 });
@@ -218,6 +239,46 @@ test("founder state changes use a keyboard-accessible select and never offer cli
   assert.doesNotMatch(html, /Accept v1|value="accept"/);
 });
 
+test("founder delivery exposes a move control and separates review and public update work", () => {
+  const boardHtml = renderToStaticMarkup(
+    <AppRouterContext.Provider value={router}>
+      <StaffDeliveryBoard
+        clients={[{ id: "org", displayName: "Northstar Studio" }]}
+        filters={{ organisationId: "all", status: "all" }}
+        requests={[staffRequest]}
+      />
+    </AppRouterContext.Provider>,
+  );
+  const actionsHtml = renderToStaticMarkup(
+    <AppRouterContext.Provider value={router}>
+      <StaffRequestActions
+        initialAction="review"
+        deliveryOwners={[{ id: "owner", label: "Jean-Fidele" }]}
+        organisationId="org"
+        request={{ ...request, status: "in_progress" }}
+      />
+    </AppRouterContext.Provider>,
+  );
+  const publicUpdateHtml = renderToStaticMarkup(
+    <AppRouterContext.Provider value={router}>
+      <StaffRequestActions
+        initialAction="public_update"
+        deliveryOwners={[{ id: "owner", label: "Jean-Fidele" }]}
+        organisationId="org"
+        request={{ ...request, status: "in_progress" }}
+      />
+    </AppRouterContext.Provider>,
+  );
+
+  assert.match(boardHtml, /Move to/);
+  assert.match(actionsHtml, /Review package/);
+  assert.match(actionsHtml, /Public update/);
+  assert.match(actionsHtml, /Add or retain a deliverable/);
+  assert.match(publicUpdateHtml, /Message to client/);
+  assert.match(publicUpdateHtml, /client portal/);
+  assert.doesNotMatch(actionsHtml, /Accept v1/);
+});
+
 test("founder priority uses a labelled native choice with the current value", () => {
   const html = renderToStaticMarkup(
     <FounderActionFields
@@ -227,7 +288,8 @@ test("founder priority uses a labelled native choice with the current value", ()
       currentPriority="high"
     />,
   );
-  assert.match(html, /Operational priority<select name="priority"/);
+  assert.match(html, /<label[^>]*>Operational priority/);
+  assert.match(html, /<select[^>]*name="priority"/);
   assert.match(html, /<option value="high" selected="">High/);
   for (const value of ["low", "normal", "high", "urgent"])
     assert.match(html, new RegExp(`<option value="${value}"`));

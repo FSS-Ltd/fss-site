@@ -86,6 +86,12 @@ export function ReviewActions({
           Your decision applies to {deliverableVersion}.
         </p>
       </PortalCard>
+      <PortalCard title="What changed">
+        <p className={styles.prose}>
+          {request.publicSummary ||
+            "FSS has not added a public summary for this version yet."}
+        </p>
+      </PortalCard>
 
       <PortalCard
         description="Accept this version when you are happy with the agreed work, or request changes with specific feedback."

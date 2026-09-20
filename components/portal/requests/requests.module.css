@@ -15,6 +15,16 @@
   display: grid;
   gap: 24px;
 }
+.deliveryWorkspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.8fr);
+  align-items: start;
+  gap: 24px;
+}
+.deliveryControls {
+  display: grid;
+  gap: 20px;
+}
 .requestPage > .workspace {
   margin-top: 8px;
 }
@@ -410,6 +420,38 @@ textarea.input {
   overflow-x: auto;
   padding-bottom: 6px;
 }
+.deliveryBoard {
+  display: grid;
+  gap: 18px;
+}
+.deliveryCard {
+  gap: 10px;
+  padding: 14px;
+}
+.deliveryCardLink {
+  width: fit-content;
+  color: var(--portal-action, #0f7078);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.moveSheet {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  align-items: end;
+  justify-items: center;
+  padding: 20px;
+  background: rgb(7 24 46 / 45%);
+}
+.moveSheet > * {
+  width: min(100%, 560px);
+  max-height: min(78vh, 620px);
+  overflow: auto;
+  box-shadow: 0 20px 70px rgb(7 24 46 / 30%);
+}
 .mobileList {
   display: none;
 }
@@ -572,6 +614,11 @@ textarea.input {
   }
   .emptyBoardActions {
     width: 100%;
+  }
+}
+@media (max-width: 900px) {
+  .deliveryWorkspace {
+    grid-template-columns: 1fr;
   }
 }
 @media (forced-colors: active) {

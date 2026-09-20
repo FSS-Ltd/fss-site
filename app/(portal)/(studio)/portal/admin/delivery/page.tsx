@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { notFound } from "next/navigation";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import { StaffDeliveryBoard } from "@/components/portal/requests/staff-delivery-board";
+import { PageHeader } from "@/components/portal/ui";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
@@ -11,7 +12,7 @@ import {
   listStaffDeliveryBoard,
   listStaffDeliveryClients,
 } from "@/lib/operations/requests/staff-repository";
-import styles from "@/components/portal/auth/portal.module.css";
+import styles from "@/components/portal/requests/requests.module.css";
 import { StudioPagination } from "@/components/portal/workspace/studio-pagination";
 import { parseWorkspacePage } from "@/lib/operations/workspaces/pagination";
 
@@ -62,15 +63,17 @@ export default async function AdminDeliveryPage({
     return <PortalUnavailable />;
   }
   return (
-    <section aria-labelledby="delivery-heading">
-      <p className={styles.eyebrow}>FSS Studio · Delivery</p>
-      <h1 id="delivery-heading" className={styles.heading}>
-        Delivery board
-      </h1>
-      <p className={styles.copy}>
-        Cross-client requests ordered so open work and overdue follow-ups stay
-        visible. Transitions are validated on the server.
-      </p>
+    <div className={styles.requestPage}>
+      <PageHeader
+        action={
+          <Link className={styles.followUpLink} href="/admin/clients">
+            Open client workspaces
+          </Link>
+        }
+        description="Cross-client work ordered so open delivery and overdue follow-ups stay visible. Every transition is validated on the server."
+        eyebrow="FSS Studio / Delivery"
+        title="Delivery board"
+      />
       <StaffDeliveryBoard
         requests={requests.items}
         clients={clients}
@@ -88,11 +91,6 @@ export default async function AdminDeliveryPage({
         page={requests.page}
         path="/admin/delivery"
       />
-      <p className={styles.actions}>
-        <Link className={styles.link} href="/admin/clients">
-          Open client workspaces
-        </Link>
-      </p>
-    </section>
+    </div>
   );
 }
