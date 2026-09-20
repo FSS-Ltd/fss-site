@@ -9,23 +9,24 @@ import {
   withPortalTransaction,
 } from "@/lib/operations/db/portal-client";
 import { readBillingConfiguration } from "@/lib/operations/billing/configuration";
-import { loadInvoices } from "@/lib/operations/billing/invoice-repository";
+import { loadInvoicePage } from "@/lib/operations/billing/invoice-repository";
 import { loadBillingCustomer } from "@/lib/operations/billing/customer-repository";
 import { InvoiceList } from "@/components/portal/billing/invoice-list";
 import { HostedBillingAction } from "@/components/portal/billing/hosted-action";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
+import { CollectionPagination } from "@/components/portal/workspace/collection-pagination";
 import styles from "@/components/portal/projects.module.css";
 import billing from "@/components/portal/billing/billing.module.css";
 import { portalPath } from "@/lib/operations/auth/portal-url";
+import { parseWorkspacePage } from "@/lib/operations/workspaces/pagination";
 
 export default async function BillingPage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }): Promise<React.JSX.Element> {
-  const context = await getPortalPageContext(
-    (await searchParams).organisationId,
-  );
+  const params = await searchParams;
+  const context = await getPortalPageContext(params.organisationId);
   if (!context) return <PortalUnavailable />;
   let configuration;
   try {
@@ -36,6 +37,7 @@ export default async function BillingPage({
   if (!configuration.enabled) return <PortalUnavailable />;
   let data;
   try {
+    const page = parseWorkspacePage(params.page);
     const scope = {
       organisationId: context.organisationId,
       accountId: configuration.accountId,
@@ -49,7 +51,7 @@ export default async function BillingPage({
       async (tx, membership) => {
         if (!hasPortalCapability(membership.role, "billing.read"))
           throw new PortalAccessDenied();
-        const invoices = await loadInvoices(tx, scope);
+        const invoices = await loadInvoicePage(tx, scope, page);
         const customer = await loadBillingCustomer(tx, scope);
         return {
           invoices,
@@ -103,15 +105,15 @@ export default async function BillingPage({
           invoice for its latest status before making another payment.
         </p>
         <InvoiceList
-          invoices={data.invoices}
+          invoices={data.invoices.items}
           organisationId={context.organisationId}
         />
-        {data.invoices.length === 100 && (
-          <p className={styles.note}>
-            Showing your latest 100 invoices. Open payment management for your
-            full invoice history.
-          </p>
-        )}
+        <CollectionPagination
+          hasNext={data.invoices.hasNext}
+          organisationId={context.organisationId}
+          page={data.invoices.page}
+          path="/portal/billing"
+        />
       </section>
       <p className={styles.copy}>
         To change or cancel a service, contact your FSS team. Your agreement’s

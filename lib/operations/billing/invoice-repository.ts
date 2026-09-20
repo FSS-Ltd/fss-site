@@ -7,12 +7,26 @@ import type {
   BillingScope,
 } from "./domain-types";
 import { validateBillingScope } from "./scope";
+import {
+  toWorkspaceCollectionPage,
+  workspacePageOffset,
+  workspacePageSize,
+  type WorkspaceCollectionPage,
+} from "../workspaces/pagination";
+
+type InvoiceSelection = {
+  invoiceId: string | null;
+  limit: number;
+  offset: number;
+};
+
 async function selectInvoices(
   tx: OperationsTransaction,
   scope: BillingScope,
-  invoiceId: string | null,
+  selection: InvoiceSelection,
 ): Promise<BillingInvoice[]> {
   validateBillingScope(scope);
+  const { invoiceId, limit, offset } = selection;
   return [
     ...(await tx<
       BillingInvoice[]
@@ -24,14 +38,31 @@ async function selectInvoices(
        join operations.mandate_projections m on m.provider_mandate_id=p.provider_mandate_id and m.account_id=p.account_id and m.environment=p.environment and m.organisation_id=p.organisation_id
        where a.invoice_id=invoices.id and p.organisation_id=invoices.organisation_id
        order by (p.state='processing') desc,p.provider_created_at desc,p.id limit 1) as "mandateState"
-      from operations.invoices where organisation_id=${scope.organisationId} and account_id=${scope.accountId} and environment=${scope.mode} and (${invoiceId}::uuid is null or id=${invoiceId}::uuid) order by created_at desc,id limit 100`),
+      from operations.invoices where organisation_id=${scope.organisationId} and account_id=${scope.accountId} and environment=${scope.mode} and (${invoiceId}::uuid is null or id=${invoiceId}::uuid) order by created_at desc,id limit ${limit} offset ${offset}`),
   ];
 }
 export async function loadInvoices(
   tx: OperationsTransaction,
   scope: BillingScope,
 ): Promise<BillingInvoice[]> {
-  return selectInvoices(tx, scope, null);
+  return selectInvoices(tx, scope, {
+    invoiceId: null,
+    limit: 100,
+    offset: 0,
+  });
+}
+
+export async function loadInvoicePage(
+  tx: OperationsTransaction,
+  scope: BillingScope,
+  page: number,
+): Promise<WorkspaceCollectionPage<BillingInvoice>> {
+  const rows = await selectInvoices(tx, scope, {
+    invoiceId: null,
+    limit: workspacePageSize + 1,
+    offset: workspacePageOffset(page),
+  });
+  return toWorkspaceCollectionPage(rows, page);
 }
 export async function loadBillingSchedule(
   tx: OperationsTransaction,
@@ -63,7 +94,15 @@ export async function loadInvoice(
   id: string,
 ): Promise<BillingInvoice | null> {
   z.uuid().parse(id);
-  return (await selectInvoices(tx, scope, id))[0] ?? null;
+  return (
+    (
+      await selectInvoices(tx, scope, {
+        invoiceId: id,
+        limit: 1,
+        offset: 0,
+      })
+    )[0] ?? null
+  );
 }
 
 export function issuedInvoiceSnapshot(invoice: Stripe.Invoice) {

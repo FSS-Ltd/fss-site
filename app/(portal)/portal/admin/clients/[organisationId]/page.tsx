@@ -8,10 +8,7 @@ import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
-import {
-  getStaffClientContext,
-  listStaffClientRequests,
-} from "@/lib/operations/requests/staff-client-repository";
+import { getStaffClientContext } from "@/lib/operations/requests/staff-client-repository";
 
 export const dynamic = "force-dynamic";
 
@@ -28,13 +25,9 @@ export default async function AdminClientContextPage({
   if (!parsed.success) notFound();
   const db = getOperationsDb();
   let client;
-  let requests;
   try {
     const admin = await requireFssAdmin(db, identity, randomUUID());
-    [client, requests] = await Promise.all([
-      getStaffClientContext(db, admin, parsed.data),
-      listStaffClientRequests(db, admin, parsed.data),
-    ]);
+    client = await getStaffClientContext(db, admin, parsed.data);
   } catch {
     return <PortalUnavailable />;
   }
@@ -85,9 +78,9 @@ export default async function AdminClientContextPage({
             <div className={styles.rowContent}>
               <h3 className={styles.rowTitle}>Delivery requests</h3>
               <p className={styles.rowCopy}>
-                {requests.length}{" "}
-                {requests.length === 1 ? "request" : "requests"} in the current
-                delivery queue.
+                {client.requestCount}{" "}
+                {client.requestCount === 1 ? "request" : "requests"} recorded
+                for this client.
               </p>
             </div>
             <Link
@@ -127,26 +120,37 @@ export default async function AdminClientContextPage({
               Open journeys
             </Link>
           </li>
+          <li className={styles.row}>
+            <div className={styles.rowContent}>
+              <h3 className={styles.rowTitle}>People &amp; access</h3>
+              <p className={styles.rowCopy}>
+                Portal access is managed by the founder in Growth Operations.
+              </p>
+            </div>
+            <span className={styles.unavailable}>Founder only</span>
+          </li>
           {[
             [
-              "People & access",
-              "Portal access is managed by the founder in Growth Operations.",
-            ],
-            [
               "Projects & files",
-              "Project and document migration is not available in FSS Studio yet.",
+              "Delivery plans, milestones, and retained client documents.",
+              `/admin/projects?organisationId=${client.id}`,
+              "Open projects",
             ],
             [
               "Billing",
-              "Billing migration is not available in FSS Studio yet.",
+              "Provider-backed billing exceptions that need FSS follow-up.",
+              `/admin/billing?organisationId=${client.id}`,
+              "Open billing",
             ],
-          ].map(([title, detail]) => (
+          ].map(([title, detail, href, action]) => (
             <li className={styles.row} key={title}>
               <div className={styles.rowContent}>
                 <h3 className={styles.rowTitle}>{title}</h3>
                 <p className={styles.rowCopy}>{detail}</p>
               </div>
-              <span className={styles.unavailable}>Unavailable</span>
+              <Link className={styles.actionLink} href={href}>
+                {action}
+              </Link>
             </li>
           ))}
         </ul>

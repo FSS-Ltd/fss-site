@@ -12,6 +12,9 @@ export type PortalCapability =
   | "agreements.read"
   | "agreements.accept"
   | "onboarding.read"
+  | "notifications.read"
+  | "settings.manage"
+  | "team.read"
   | "invites.request"
   | "offers.read"
   | "offers.enquire";
@@ -28,6 +31,9 @@ const permissions: Record<PortalRole, readonly PortalCapability[]> = {
     "billing.manage",
     "agreements.read",
     "onboarding.read",
+    "notifications.read",
+    "settings.manage",
+    "team.read",
     "invites.request",
     "offers.read",
     "offers.enquire",
@@ -39,11 +45,20 @@ const permissions: Record<PortalRole, readonly PortalCapability[]> = {
     "requests.comment",
     "assets.write",
     "onboarding.read",
+    "notifications.read",
+    "team.read",
     "offers.read",
     "offers.enquire",
   ],
   billing_contact: ["billing.read", "billing.manage", "offers.read"],
-  viewer: ["projects.read", "documents.read", "onboarding.read", "offers.read"],
+  viewer: [
+    "projects.read",
+    "documents.read",
+    "onboarding.read",
+    "notifications.read",
+    "team.read",
+    "offers.read",
+  ],
 };
 
 export type PortalRolePresentation = { label: string; detail: string };

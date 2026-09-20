@@ -6,9 +6,17 @@ import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 
 export const dynamic = "force-dynamic";
 
-export default async function OperationsPage(): Promise<React.JSX.Element> {
+export default async function OperationsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}): Promise<React.JSX.Element> {
   if (!operationsEnabled()) notFound();
   const founder = await requireFounder();
-  const data = await listFounderAccessOverview(getOperationsDb(), founder);
+  const data = await listFounderAccessOverview(
+    getOperationsDb(),
+    founder,
+    await searchParams,
+  );
   return <PortalAccessDashboard data={data} />;
 }

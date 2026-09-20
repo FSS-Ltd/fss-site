@@ -96,7 +96,10 @@ export function PortalAccessDashboard({
       </div>
       <PortalAccessRegister
         entries={data.entries}
+        filters={data.filters}
+        hasNext={data.hasNext}
         onAccessChanged={() => router.refresh()}
+        page={data.page}
       />
     </section>
   );

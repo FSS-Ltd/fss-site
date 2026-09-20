@@ -12,6 +12,8 @@ import {
   listStaffDeliveryClients,
 } from "@/lib/operations/requests/staff-repository";
 import styles from "@/components/portal/auth/portal.module.css";
+import { StudioPagination } from "@/components/portal/workspace/studio-pagination";
+import { parseWorkspacePage } from "@/lib/operations/workspaces/pagination";
 
 export const dynamic = "force-dynamic";
 
@@ -37,18 +39,23 @@ export default async function AdminDeliveryPage({
   const identity = await getPortalIdentity();
   if (!identity) return <PortalUnavailable />;
   const params = await searchParams;
-  const rawClient = Array.isArray(params.client) ? params.client[0] : params.client;
-  const rawStatus = Array.isArray(params.status) ? params.status[0] : params.status;
+  const rawClient = Array.isArray(params.client)
+    ? params.client[0]
+    : params.client;
+  const rawStatus = Array.isArray(params.status)
+    ? params.status[0]
+    : params.status;
   const filters = {
     organisationId: rawClient && rawClient !== "all" ? rawClient : "all",
     status: rawStatus && laneKeys.has(rawStatus) ? rawStatus : "all",
   };
   let requests, clients;
   try {
+    const page = parseWorkspacePage(params.page);
     const db = getOperationsDb();
     const admin = await requireFssAdmin(db, identity, randomUUID());
     [requests, clients] = await Promise.all([
-      listStaffDeliveryBoard(db, admin, filters),
+      listStaffDeliveryBoard(db, admin, { ...filters, page }),
       listStaffDeliveryClients(db, admin),
     ]);
   } catch {
@@ -57,14 +64,29 @@ export default async function AdminDeliveryPage({
   return (
     <section aria-labelledby="delivery-heading">
       <p className={styles.eyebrow}>FSS Studio · Delivery</p>
-      <h1 id="delivery-heading" className={styles.heading}>Delivery board</h1>
+      <h1 id="delivery-heading" className={styles.heading}>
+        Delivery board
+      </h1>
       <p className={styles.copy}>
-        Cross-client requests ordered so open work and overdue follow-ups stay visible. Transitions are validated on the server.
+        Cross-client requests ordered so open work and overdue follow-ups stay
+        visible. Transitions are validated on the server.
       </p>
       <StaffDeliveryBoard
-        requests={requests}
+        requests={requests.items}
         clients={clients}
         filters={filters}
+      />
+      <StudioPagination
+        filter={{
+          client:
+            filters.organisationId === "all"
+              ? undefined
+              : filters.organisationId,
+          status: filters.status === "all" ? undefined : filters.status,
+        }}
+        hasNext={requests.hasNext}
+        page={requests.page}
+        path="/admin/delivery"
       />
       <p className={styles.actions}>
         <Link className={styles.link} href="/admin/clients">

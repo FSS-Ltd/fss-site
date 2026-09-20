@@ -49,6 +49,12 @@ export type FounderAccessMetrics = {
   }[];
 };
 
+export type FounderAccessFilters = {
+  query: string;
+  accessType?: FounderAccessEntry["accessType"];
+  state?: AccessState;
+};
+
 export function getFounderAccessMetrics(
   entries: readonly FounderAccessEntry[],
   organisationCount: number,
@@ -86,4 +92,7 @@ export function getFounderAccessMetrics(
 export type FounderAccessOverview = {
   entries: readonly FounderAccessEntry[];
   metrics: FounderAccessMetrics;
+  filters: FounderAccessFilters;
+  page: number;
+  hasNext: boolean;
 };

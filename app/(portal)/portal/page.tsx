@@ -92,6 +92,13 @@ export default async function PortalHomePage(): Promise<React.JSX.Element> {
                   >
                     View requests
                   </Link>
+                  {" · "}
+                  <Link
+                    className={styles.link}
+                    href={`${portalPath("/portal/documents")}?organisationId=${membership.organisationId}`}
+                  >
+                    View documents
+                  </Link>
                 </p>
               )}
               {onboardingEnabled() &&
@@ -134,15 +141,44 @@ export default async function PortalHomePage(): Promise<React.JSX.Element> {
                   >
                     Explore services
                   </Link>
-                  {" · "}
+                </p>
+              )}
+              {hasPortalCapability(membership.role, "notifications.read") && (
+                <p className={styles.actions}>
                   <Link
                     className={styles.link}
                     href={`${portalPath("/portal/notifications")}?organisationId=${membership.organisationId}`}
                   >
                     Notifications
                   </Link>
+                  {" · "}
+                  <Link
+                    className={styles.link}
+                    href={`${portalPath("/portal/team")}?organisationId=${membership.organisationId}`}
+                  >
+                    Team
+                  </Link>
+                  {membership.role === "owner" && (
+                    <>
+                      {" · "}
+                      <Link
+                        className={styles.link}
+                        href={`${portalPath("/portal/settings")}?organisationId=${membership.organisationId}`}
+                      >
+                        Settings
+                      </Link>
+                    </>
+                  )}
                 </p>
               )}
+              <p className={styles.actions}>
+                <Link
+                  className={styles.link}
+                  href={`${portalPath("/portal/help")}?organisationId=${membership.organisationId}`}
+                >
+                  Help
+                </Link>
+              </p>
             </li>
           ))}
         </ul>
