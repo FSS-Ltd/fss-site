@@ -120,7 +120,7 @@ export function ClientShell({
   const activeMembership =
     memberships.find(
       (membership) => membership.organisationId === requestedOrganisationId,
-    ) ?? memberships[0];
+    ) ?? (memberships.length === 1 ? memberships[0] : undefined);
   const navigation = getClientNavigation(activeMembership?.role ?? null, pathname);
   const returnTo = encodeURIComponent(portalPath("/portal/login"));
 

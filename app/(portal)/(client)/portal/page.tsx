@@ -1,38 +1,58 @@
-import Link from "next/link";
-import { hasPortalCapability } from "@/lib/operations/auth/permissions";
 import { randomUUID } from "node:crypto";
 import { notFound, redirect } from "next/navigation";
-import { operationsEnabled } from "@/lib/operations/db/client";
-import { getPortalDb } from "@/lib/operations/db/portal-client";
+import {
+  ClientOverview,
+  ClientWorkspaceChooser,
+} from "@/components/portal/overview/client-overview";
+import { PortalUnavailable } from "@/components/portal/auth/unavailable";
+import { Notice, PageHeader } from "@/components/portal/ui";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
-import { getPortalIdentity } from "@/lib/operations/auth/server";
+import { needsPortalOnboarding } from "@/lib/operations/auth/pending-invitations";
+import { hasPortalCapability } from "@/lib/operations/auth/permissions";
 import {
   listPortalMemberships,
   type PortalMembershipSummary,
 } from "@/lib/operations/auth/require-member";
-import type {
-  PortalRole,
-  VerifiedPortalIdentity,
-} from "@/lib/operations/auth/types";
-import { needsPortalOnboarding } from "@/lib/operations/auth/pending-invitations";
+import { getPortalIdentity } from "@/lib/operations/auth/server";
 import {
   getActiveStaffMembership,
   hasStaffAccessOrInvitation,
 } from "@/lib/operations/auth/staff-invitations";
+import type { VerifiedPortalIdentity } from "@/lib/operations/auth/types";
 import { portalPath } from "@/lib/operations/auth/portal-url";
-import { onboardingEnabled } from "@/lib/operations/onboarding/worker-db";
-import { PortalUnavailable } from "@/components/portal/auth/unavailable";
-import styles from "@/components/portal/auth/portal.module.css";
+import { operationsEnabled } from "@/lib/operations/db/client";
+import { getPortalDb } from "@/lib/operations/db/portal-client";
+import { loadClientOverview } from "@/lib/operations/overview/client-overview";
 
-const roleLabels: Record<PortalRole, string> = {
-  owner: "Owner",
-  contributor: "Contributor",
-  billing_contact: "Billing contact",
-  viewer: "Viewer",
-};
-export default async function PortalHomePage(): Promise<React.JSX.Element> {
+function requestedOrganisationId(
+  value: string | string[] | undefined,
+): string | undefined {
+  return Array.isArray(value) ? undefined : value;
+}
+
+function NoActiveAccess(): React.JSX.Element {
+  return (
+    <div>
+      <PageHeader
+        description="You are signed in, but there is no active organisation linked to this account."
+        eyebrow="Your FSS workspace"
+        title="No active access"
+      />
+      <Notice tone="info">
+        Open your invitation to activate access, or contact your FSS team for help.
+      </Notice>
+    </div>
+  );
+}
+
+export default async function PortalHomePage({
+  searchParams,
+}: Readonly<{
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}>): Promise<React.JSX.Element> {
   if (!operationsEnabled()) notFound();
   if (!portalAuthConfigured()) return <PortalUnavailable />;
+
   let identity: VerifiedPortalIdentity | null;
   try {
     identity = await getPortalIdentity();
@@ -40,163 +60,66 @@ export default async function PortalHomePage(): Promise<React.JSX.Element> {
     return <PortalUnavailable />;
   }
   if (!identity) redirect(portalPath("/portal/login"));
+
+  let db: ReturnType<typeof getPortalDb>;
   let memberships: PortalMembershipSummary[];
   let onboardingRequired: boolean;
   let staffActive: boolean;
   let staffPending: boolean;
   try {
+    db = getPortalDb();
     staffActive = Boolean(
-      await getActiveStaffMembership(getPortalDb(), identity, randomUUID()),
+      await getActiveStaffMembership(db, identity, randomUUID()),
     );
     staffPending =
       !staffActive &&
-      (await hasStaffAccessOrInvitation(getPortalDb(), identity, randomUUID()));
-    memberships = await listPortalMemberships(
-      getPortalDb(),
-      identity,
-      randomUUID(),
-    );
+      (await hasStaffAccessOrInvitation(db, identity, randomUUID()));
+    memberships = await listPortalMemberships(db, identity, randomUUID());
     onboardingRequired =
       memberships.length === 0 &&
-      (await needsPortalOnboarding(getPortalDb(), identity, randomUUID()));
+      (await needsPortalOnboarding(db, identity, randomUUID()));
   } catch {
     return <PortalUnavailable />;
   }
+
   if (staffActive) redirect(portalPath("/admin"));
   if (staffPending) redirect(portalPath("/portal/login"));
   if (onboardingRequired) redirect(portalPath("/portal/onboarding"));
+  if (memberships.length === 0) return <NoActiveAccess />;
+
+  const organisationId = requestedOrganisationId(
+    (await searchParams).organisationId,
+  );
+  const selectedMembership =
+    memberships.length === 1
+      ? memberships[0]
+      : memberships.find(
+          (membership) => membership.organisationId === organisationId,
+        );
+
+  if (!selectedMembership) {
+    return <ClientWorkspaceChooser memberships={memberships} />;
+  }
+
+  let overview: Awaited<ReturnType<typeof loadClientOverview>>;
+  try {
+    overview = await loadClientOverview(
+      db,
+      identity,
+      selectedMembership.organisationId,
+      randomUUID(),
+    );
+  } catch {
+    return <PortalUnavailable />;
+  }
   return (
-    <section className={styles.card} aria-labelledby="portal-heading">
-      <p className={styles.eyebrow}>Your account</p>
-      <h1 id="portal-heading" className={styles.heading}>
-        {memberships.length ? "Your organisations" : "No active access"}
-      </h1>
-      <p className={styles.copy}>
-        {memberships.length
-          ? "Your approved organisation access is listed below."
-          : "You are signed in, but there is no active organisation linked to this account. Open your invitation to activate access, or contact your FSS team."}
-      </p>
-      {memberships.length > 0 && (
-        <ul className={styles.list}>
-          {memberships.map((membership) => (
-            <li key={membership.organisationId} className={styles.row}>
-              <h2 className={styles.name}>{membership.displayName}</h2>
-              <p className={styles.copy}>{roleLabels[membership.role]}</p>
-              {hasPortalCapability(membership.role, "projects.read") && (
-                <p className={styles.actions}>
-                  <Link
-                    className={styles.link}
-                    href={`${portalPath("/portal/projects")}?organisationId=${membership.organisationId}`}
-                  >
-                    View projects
-                  </Link>
-                  {" · "}
-                  <Link
-                    className={styles.link}
-                    href={`${portalPath("/portal/requests")}?organisationId=${membership.organisationId}`}
-                  >
-                    View requests
-                  </Link>
-                  {" · "}
-                  <Link
-                    className={styles.link}
-                    href={`${portalPath("/portal/documents")}?organisationId=${membership.organisationId}`}
-                  >
-                    View documents
-                  </Link>
-                </p>
-              )}
-              {onboardingEnabled() &&
-                hasPortalCapability(membership.role, "onboarding.read") && (
-                  <p className={styles.actions}>
-                    <Link
-                      className={styles.link}
-                      href={`${portalPath("/portal/getting-started")}?organisationId=${membership.organisationId}`}
-                    >
-                      Getting started
-                    </Link>
-                  </p>
-                )}
-              {process.env.OPERATIONS_SIGNING_ENABLED === "true" && (
-                <p className={styles.actions}>
-                  <Link
-                    className={styles.link}
-                    href={`${portalPath("/portal/agreements")}?organisationId=${membership.organisationId}`}
-                  >
-                    View agreements
-                  </Link>
-                </p>
-              )}
-              {process.env.OPERATIONS_BILLING_ENABLED === "true" &&
-                hasPortalCapability(membership.role, "billing.read") && (
-                  <p className={styles.actions}>
-                    <Link
-                      className={styles.link}
-                      href={`${portalPath("/portal/billing")}?organisationId=${membership.organisationId}`}
-                    >
-                      View billing
-                    </Link>
-                  </p>
-                )}
-              {hasPortalCapability(membership.role, "offers.read") && (
-                <p className={styles.actions}>
-                  <Link
-                    className={styles.link}
-                    href={`${portalPath("/portal/services")}?organisationId=${membership.organisationId}`}
-                  >
-                    Explore services
-                  </Link>
-                </p>
-              )}
-              {hasPortalCapability(membership.role, "notifications.read") && (
-                <p className={styles.actions}>
-                  <Link
-                    className={styles.link}
-                    href={`${portalPath("/portal/notifications")}?organisationId=${membership.organisationId}`}
-                  >
-                    Notifications
-                  </Link>
-                  {" · "}
-                  <Link
-                    className={styles.link}
-                    href={`${portalPath("/portal/team")}?organisationId=${membership.organisationId}`}
-                  >
-                    Team
-                  </Link>
-                  {membership.role === "owner" && (
-                    <>
-                      {" · "}
-                      <Link
-                        className={styles.link}
-                        href={`${portalPath("/portal/settings")}?organisationId=${membership.organisationId}`}
-                      >
-                        Settings
-                      </Link>
-                    </>
-                  )}
-                </p>
-              )}
-              <p className={styles.actions}>
-                <Link
-                  className={styles.link}
-                  href={`${portalPath("/portal/help")}?organisationId=${membership.organisationId}`}
-                >
-                  Help
-                </Link>
-              </p>
-            </li>
-          ))}
-        </ul>
+    <ClientOverview
+      canCreateRequest={hasPortalCapability(
+        selectedMembership.role,
+        "requests.create",
       )}
-      <form
-        action={`/api/auth/sign-out?returnTo=${encodeURIComponent(portalPath("/portal/login"))}`}
-        className={styles.actions}
-        method="post"
-      >
-        <button className={styles.button} type="submit">
-          Sign out
-        </button>
-      </form>
-    </section>
+      overview={overview}
+      workspaceName={selectedMembership.displayName}
+    />
   );
 }
