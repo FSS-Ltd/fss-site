@@ -62,7 +62,32 @@ test.describe("FSS Studio desktop visuals", () => {
 
   test("client request review desktop matches C09", async ({ page }) => {
     await openScenario(page, "client-request-review", "Ready for your review");
-    await expect(page).toHaveScreenshot("c09-client-request-review-desktop.png");
+    await expect(page).toHaveScreenshot(
+      "c09-client-request-review-desktop.png",
+    );
+  });
+
+  test("client agreement list desktop matches C14", async ({ page }) => {
+    await openScenario(page, "client-agreement-list", "Your agreements");
+    await expect(page).toHaveScreenshot("c14-client-agreements-desktop.png");
+  });
+
+  test("client agreement detail desktop matches C15", async ({ page }) => {
+    await openScenario(
+      page,
+      "client-agreement-detail",
+      "Website & booking experience",
+    );
+    await expect(page).toHaveScreenshot(
+      "c15-client-agreement-detail-desktop.png",
+    );
+  });
+
+  test("client agreement signing desktop matches C16", async ({ page }) => {
+    await openScenario(page, "client-agreement-signing", "Review and sign");
+    await expect(page).toHaveScreenshot(
+      "c16-client-agreement-signing-desktop.png",
+    );
   });
 
   test("Studio overview desktop matches F01", async ({ page }) => {
@@ -72,12 +97,35 @@ test.describe("FSS Studio desktop visuals", () => {
 
   test("Studio delivery board desktop matches F05", async ({ page }) => {
     await openScenario(page, "studio-delivery-board", "Delivery board");
-    await expect(page).toHaveScreenshot("f05-studio-delivery-board-desktop.png");
+    await expect(page).toHaveScreenshot(
+      "f05-studio-delivery-board-desktop.png",
+    );
   });
 
   test("Studio review package desktop matches F07", async ({ page }) => {
     await openScenario(page, "studio-review-package", "Send work for review");
-    await expect(page).toHaveScreenshot("f07-studio-review-package-desktop.png");
+    await expect(page).toHaveScreenshot(
+      "f07-studio-review-package-desktop.png",
+    );
+  });
+
+  test("Studio agreement register desktop matches F09", async ({ page }) => {
+    await openScenario(page, "studio-agreement-list", "Agreements");
+    await expect(page).toHaveScreenshot("f09-studio-agreements-desktop.png");
+  });
+
+  test("Studio agreement builder desktop matches F10", async ({ page }) => {
+    await openScenario(page, "studio-agreement-builder", "Create an agreement");
+    await expect(page).toHaveScreenshot(
+      "f10-studio-agreement-builder-desktop.png",
+    );
+  });
+
+  test("Studio signed agreement desktop matches F17", async ({ page }) => {
+    await openScenario(page, "studio-agreement-signed", "Signed and recorded");
+    await expect(page).toHaveScreenshot(
+      "f17-studio-agreement-signed-desktop.png",
+    );
   });
 });
 
@@ -113,6 +161,17 @@ test.describe("FSS Studio mobile visuals", () => {
   test("client request review mobile matches M05", async ({ page }) => {
     await openScenario(page, "client-request-review", "Ready for your review");
     await expect(page).toHaveScreenshot("m05-client-request-review-mobile.png");
+  });
+
+  test("client agreement detail mobile matches M06", async ({ page }) => {
+    await openScenario(
+      page,
+      "client-agreement-detail",
+      "Website & booking experience",
+    );
+    await expect(page).toHaveScreenshot(
+      "m06-client-agreement-detail-mobile.png",
+    );
   });
 
   test("Studio overview mobile matches M07", async ({ page }) => {

@@ -143,6 +143,19 @@ export async function listStaffAgreementRegister(
   });
 }
 
+export async function getStaffAgreement(
+  db: OperationsDb,
+  admin: FssAdminContext,
+  organisationId: string,
+  agreementId: string,
+): Promise<AgreementRecord | null> {
+  z.uuid().parse(organisationId);
+  z.uuid().parse(agreementId);
+  return withFssAdminTransaction(db, admin, (tx) =>
+    loadAgreement(tx, organisationId, agreementId),
+  );
+}
+
 export async function listStaffAgreementOverview(
   db: OperationsDb,
   admin: FssAdminContext,

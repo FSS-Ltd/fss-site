@@ -1,0 +1,259 @@
+.page,
+.listPage,
+.detail {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+}
+
+.builder {
+  display: grid;
+  gap: 20px;
+}
+
+.builderHeading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.builderHeading h2 {
+  margin: 4px 0 8px;
+  color: var(--portal-ink, #0a1a2e);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 650;
+  letter-spacing: -0.035em;
+}
+
+.builderSteps {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  list-style: none;
+}
+
+.builderSteps li {
+  display: inline-flex;
+  min-width: max-content;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 10px;
+  border: 1px solid var(--portal-border, #d9dfe5);
+  border-radius: 999px;
+  color: var(--portal-muted, #46566c);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.builderSteps li[aria-current="step"] {
+  border-color: var(--portal-action, #0f7078);
+  background: var(--portal-tint, #e3f2f1);
+  color: var(--portal-ink, #0a1a2e);
+  font-weight: 650;
+}
+
+.builderSteps span {
+  display: inline-grid;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--portal-soft-surface, #f7f8f9);
+  font-size: 0.6875rem;
+}
+
+.group {
+  display: grid;
+  gap: 14px;
+}
+
+.groupHeading,
+.cardHeading,
+.detailStatus,
+.actionRow,
+.schedule li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.groupHeading {
+  justify-content: space-between;
+}
+
+.groupHeading h2,
+.groupHeading p,
+.cardHeading h3,
+.version,
+.muted,
+.prose,
+.metric {
+  margin: 0;
+}
+
+.groupHeading h2,
+.cardHeading h3 {
+  color: var(--portal-ink, #0a1a2e);
+  font-weight: 650;
+  letter-spacing: -0.025em;
+}
+
+.groupHeading h2 {
+  font-size: 1.125rem;
+}
+
+.groupHeading p,
+.muted,
+.version,
+.detailStatus,
+.schedule time {
+  color: var(--portal-muted, #46566c);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.groupHeading > span {
+  display: inline-grid;
+  min-width: 28px;
+  min-height: 28px;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--portal-accent, #0f7078);
+  font-size: 0.8125rem;
+  font-weight: 650;
+}
+
+.agreementList,
+.schedule {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.listCard {
+  display: grid;
+  gap: 14px;
+}
+
+.cardHeading {
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.cardHeading h3 {
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.version {
+  margin-bottom: 4px;
+  font-size: 0.75rem;
+  font-weight: 650;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+.empty {
+  margin: 0;
+  padding: 18px 0;
+  color: var(--portal-muted, #46566c);
+  font-size: 0.9375rem;
+  line-height: 1.65;
+}
+
+.detailStatus > span:last-child {
+  font-size: 0.875rem;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.metric {
+  color: var(--portal-ink, #0a1a2e);
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  font-weight: 650;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.summaryList {
+  display: grid;
+  gap: 18px;
+  margin: 0;
+}
+
+.summaryList div {
+  display: grid;
+  gap: 6px;
+  padding-top: 18px;
+  border-top: 1px solid var(--portal-line, #d9dfe5);
+}
+
+.summaryList div:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.summaryList dt {
+  color: var(--portal-muted, #46566c);
+  font-size: 0.8125rem;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.summaryList dd,
+.prose {
+  color: var(--portal-ink, #0a1a2e);
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.schedule li {
+  justify-content: space-between;
+  padding: 14px 0;
+  border-top: 1px solid var(--portal-line, #d9dfe5);
+}
+
+.schedule li:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.schedule li > span {
+  color: var(--portal-ink, #0a1a2e);
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+}
+
+.actionRow {
+  margin-top: 20px;
+}
+
+@media (max-width: 720px) {
+  .metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .groupHeading,
+  .cardHeading,
+  .schedule li {
+    align-items: flex-start;
+  }
+
+  .groupHeading > span {
+    flex-shrink: 0;
+  }
+}

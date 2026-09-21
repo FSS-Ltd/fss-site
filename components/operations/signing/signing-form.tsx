@@ -5,6 +5,13 @@ import {
   SIGNING_CONSENT,
   type SigningApproval,
 } from "@/lib/operations/agreements/signing-types";
+import {
+  Notice,
+  PortalButton,
+  PortalCard,
+  PortalCheckbox,
+  PortalField,
+} from "@/components/portal/ui";
 import styles from "../agreements/agreements.module.css";
 
 export function SigningForm({
@@ -106,69 +113,65 @@ export function SigningForm({
     }
   }
   return (
-    <form onSubmit={submit} className={styles.form}>
+    <form aria-busy={pending} onSubmit={submit} className={styles.form}>
       {agreement ? (
         <>
           <p>
             Prepare a frozen PDF from this revision, then review it before
             opening it for signing.
           </p>
-          <button
-            className={styles.primary}
-            type="submit"
-            value="prepare"
-            disabled={pending}
-          >
+          <PortalButton loading={pending} type="submit" value="prepare">
             Prepare signing document
-          </button>
+          </PortalButton>
         </>
       ) : audience !== "portal" ? (
         <>
           {approval?.status === "prepared" && (
             <>
-              <label className={styles.field}>
-                Signing deadline (UTC)
+              <PortalField
+                hint="Choose a future deadline within the next 90 days."
+                label="Signing deadline (UTC)"
+                required
+              >
                 <input
                   name="expiresAt"
                   type="date"
                   required
                   disabled={pending}
                 />
-              </label>
-              <p>Choose a future deadline within the next 90 days.</p>
-              <label>
-                <input type="checkbox" required disabled={pending} />I have
-                reviewed this exact document and its required signers. I approve
-                it for electronic signing as an ordinary service agreement.
-              </label>
-              <button
-                className={styles.primary}
-                type="submit"
-                value="approve"
+              </PortalField>
+              <PortalCheckbox
                 disabled={pending}
-              >
+                label="I have reviewed this exact document and its required signers. I approve it for electronic signing as an ordinary service agreement."
+                required
+              />
+              <PortalButton loading={pending} type="submit" value="approve">
                 Approve and open for signing
-              </button>
+              </PortalButton>
             </>
           )}
           {(approval?.status === "prepared" ||
             (approval?.status === "approved" &&
               approval.signatures.length <
                 approval.requiredSigners.length)) && (
-            <button
+            <PortalButton
+              disabled={pending}
               type="submit"
               value="cancel"
               formNoValidate
-              disabled={pending}
+              variant="destructive"
             >
               Cancel signing
-            </button>
+            </PortalButton>
           )}
         </>
       ) : (
         <>
-          <label className={styles.field}>
-            Your full name
+          <PortalField
+            hint="Use the name you are authorised to sign with."
+            label="Full legal name"
+            required
+          >
             <input
               name="typedName"
               autoComplete="name"
@@ -177,56 +180,69 @@ export function SigningForm({
               required
               disabled={pending || Boolean(success)}
             />
-          </label>
-          <label>
-            <input
-              name="authority"
-              type="checkbox"
-              required
-              disabled={pending || Boolean(success)}
-            />
-            I have authority to bind the named organisation.
-          </label>
-          <label>
-            <input
-              name="consent"
-              type="checkbox"
-              required
-              disabled={pending || Boolean(success)}
-            />
-            {SIGNING_CONSENT}
-          </label>
-          <button
-            className={styles.primary}
-            type="submit"
-            value="sign"
+          </PortalField>
+          <PortalCheckbox
             disabled={pending || Boolean(success)}
+            label="I have authority to bind the named organisation."
+            name="authority"
+            required
+          />
+          <PortalCard
+            description="Confirming records your consent only after the approved signing command succeeds."
+            title="Confirm your agreement"
           >
-            {pending ? "Saving…" : "Sign agreement"}
-          </button>
-          <details>
-            <summary>Unable to accept this agreement?</summary>
-            <p>
-              Declining closes this signing request for everyone. Contact your
-              FSS team to discuss revised terms.
-            </p>
-            <button
+            <PortalCheckbox
+              disabled={pending || Boolean(success)}
+              label={SIGNING_CONSENT}
+              name="consent"
+              required
+            />
+            <PortalButton
+              disabled={pending || Boolean(success)}
+              loading={pending}
+              type="submit"
+              value="sign"
+            >
+              Sign agreement
+            </PortalButton>
+          </PortalCard>
+          <PortalCard
+            description="Declining closes this signing request for everyone. Contact your FSS team to discuss revised terms."
+            title="Need a revised agreement?"
+          >
+            <PortalButton
+              disabled={pending || Boolean(success)}
+              formNoValidate
               type="submit"
               value="decline"
-              formNoValidate
-              disabled={pending || Boolean(success)}
+              variant="destructive"
             >
               Decline agreement
-            </button>
-          </details>
+            </PortalButton>
+          </PortalCard>
         </>
       )}
-      {error && (
-        <p role="alert" className={styles.error}>
-          {error}
-        </p>
-      )}
-      {success && <p role="status">{success}</p>}
+      {error ? (
+        audience === "portal" ? (
+          <Notice tone="error">
+            <strong>We could not complete this signing step.</strong>
+            <p>{error}</p>
+          </Notice>
+        ) : (
+          <p role="alert" className={styles.error}>
+            {error}
+          </p>
+        )
+      ) : null}
+      {success ? (
+        audience === "portal" ? (
+          <Notice tone="success">
+            <strong>{success}</strong>
+          </Notice>
+        ) : (
+          <p role="status">{success}</p>
+        )
+      ) : null}
     </form>
   );
 }

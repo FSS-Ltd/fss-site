@@ -23,6 +23,15 @@ const variantClassNames: Record<PortalButtonVariant, string> = {
   destructive: styles.buttonDestructive,
 };
 
+export function portalButtonClassName(
+  variant: PortalButtonVariant,
+  className?: string,
+): string {
+  return [styles.button, variantClassNames[variant], className]
+    .filter(Boolean)
+    .join(" ");
+}
+
 export function PortalButton({
   children,
   className,
@@ -47,9 +56,7 @@ export function PortalButton({
         {...props}
         aria-busy={loading || undefined}
         aria-describedby={describedBy || undefined}
-        className={[styles.button, variantClassNames[variant], className]
-          .filter(Boolean)
-          .join(" ")}
+        className={portalButtonClassName(variant, className)}
         disabled={isDisabled}
       >
         {children}

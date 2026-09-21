@@ -1,0 +1,117 @@
+import { SigningForm } from "@/components/operations/signing/signing-form";
+import {
+  Notice,
+  PortalActionLink,
+  PortalCard,
+  StatusBadge,
+} from "@/components/portal/ui";
+import { portalPath } from "@/lib/operations/auth/portal-url";
+import type { SigningApproval } from "@/lib/operations/agreements/signing-types";
+import { AgreementStatusCard, hasCompleteSigningEvidence } from "./presentation";
+import styles from "./agreements.module.css";
+
+type ClientSigningReviewProps = Readonly<{
+  approval: SigningApproval;
+  email: string;
+  organisationId: string;
+  signerName?: string;
+}>;
+
+function agreementPath(approvalId: string, organisationId: string): string {
+  const query = new URLSearchParams({ organisationId });
+  return `${portalPath(`/portal/agreements/${approvalId}`)}?${query.toString()}`;
+}
+
+function sourceDownloadPath(approval: SigningApproval): string {
+  return `/api/portal/organisations/${encodeURIComponent(approval.organisationId)}/signing/${encodeURIComponent(approval.id)}/source`;
+}
+
+export function ClientSigningReview({
+  approval,
+  email,
+  organisationId,
+  signerName,
+}: ClientSigningReviewProps): React.JSX.Element {
+  const normalisedEmail = email.trim().toLowerCase();
+  const ownSignature = approval.signatures.find(
+    (signature) => signature.email === normalisedEmail,
+  );
+  const complete = hasCompleteSigningEvidence(approval);
+  const signingOpen = approval.status === "approved" && !ownSignature;
+  const shownName = signerName?.trim() || normalisedEmail;
+  const backHref = agreementPath(approval.id, organisationId);
+
+  return (
+    <article className={styles.detail}>
+      <Notice tone="info">
+        <strong>Signing as {shownName}</strong>
+        <p>
+          You are a designated signer for {approval.organisationLegalName}. Your
+          verified email is {normalisedEmail}.
+        </p>
+      </Notice>
+      <PortalCard
+        description="The exact document you are signing is retained against this revision. Download an accessible copy before confirming."
+        title={`Agreement revision ${approval.revision}`}
+      >
+        <p className={styles.prose}>{approval.draft.terms}</p>
+        <div className={styles.actionRow}>
+          <PortalActionLink href={sourceDownloadPath(approval)} variant="secondary">
+            Download agreement PDF
+          </PortalActionLink>
+          <PortalActionLink href={backHref} variant="quiet">
+            Back to agreement
+          </PortalActionLink>
+        </div>
+      </PortalCard>
+      {signingOpen ? (
+        <PortalCard
+          description="Your signature is recorded only after the approved signing command confirms it."
+          title="Your signature"
+        >
+          <SigningForm
+            approval={approval}
+            audience="portal"
+            organisationId={organisationId}
+          />
+        </PortalCard>
+      ) : ownSignature ? (
+        <Notice tone={complete ? "success" : "info"}>
+          <strong>
+            {complete
+              ? "Your signed agreement is ready."
+              : "Your signature is already recorded."}
+          </strong>
+          <p>
+            {complete
+              ? "All required signatures have been retained for this agreement."
+              : "We are awaiting the remaining signers before the final document is retained."}
+          </p>
+        </Notice>
+      ) : (
+        <Notice tone="warning">
+          <strong>This signing request is not open.</strong>
+          <p>
+            Its current state does not allow another signature. Review the
+            agreement or contact FSS for the next step.
+          </p>
+        </Notice>
+      )}
+      <div className={styles.detailStatus}>
+        <StatusBadge status={complete ? "success" : "info"}>
+          {complete ? "Signed and complete" : "Exact revision"}
+        </StatusBadge>
+        <span>Version {approval.agreementVersion}</span>
+      </div>
+      <AgreementStatusCard
+        status={
+          complete
+            ? "signed"
+            : approval.status === "approved"
+              ? "awaiting_signature"
+              : "voided"
+        }
+      />
+    </article>
+  );
+}

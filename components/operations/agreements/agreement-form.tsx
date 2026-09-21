@@ -2,6 +2,11 @@
 import { useState } from "react";
 import type { AgreementRecord } from "@/lib/operations/agreements/types";
 import { penceToGbp as penceToPounds } from "@/lib/operations/agreements/money-input";
+import {
+  PortalButton,
+  PortalCheckbox,
+  PortalSelect,
+} from "@/components/portal/ui";
 import { AgreementLines } from "./agreement-lines";
 import { Field, value, emails } from "./form-fields";
 import { useAgreementSubmit, moneyValue } from "./use-agreement-submit";
@@ -113,20 +118,20 @@ export function AgreementForm({
           {record ? "Create next draft revision" : "New agreement"}
         </legend>
         {!record && (
-          <label className={styles.field}>
-            <span>Reviewed engagement</span>
-            <select name="engagementId" required>
-              <option value="">Choose engagement</option>
-              {(
-                engagementChoices ??
-                engagementIds.map((id) => ({ id, name: id }))
-              ).map((engagement) => (
-                <option key={engagement.id} value={engagement.id}>
-                  {engagement.name}
-                </option>
-              ))}
-            </select>
-          </label>
+          <PortalSelect
+            label="Reviewed engagement"
+            name="engagementId"
+            required
+          >
+            <option value="">Choose engagement</option>
+            {(
+              engagementChoices ?? engagementIds.map((id) => ({ id, name: id }))
+            ).map((engagement) => (
+              <option key={engagement.id} value={engagement.id}>
+                {engagement.name}
+              </option>
+            ))}
+          </PortalSelect>
         )}
         <Field
           issues={state.issues}
@@ -236,22 +241,15 @@ export function AgreementForm({
             signing begins. No fingerprint or file path is entered here.
           </p>
         )}
-        <label>
-          <input
-            type="checkbox"
-            name="draft.assetsRequired"
-            defaultChecked={draft?.assetsRequired}
-          />{" "}
-          Client assets are required before service starts
-        </label>
+        <PortalCheckbox
+          defaultChecked={draft?.assetsRequired}
+          label="Client assets are required before service starts"
+          name="draft.assetsRequired"
+        />
         <AgreementLines draft={draft} issues={state.issues} />
-        <button className={styles.primary} type="submit">
-          {state.pending
-            ? "Saving…"
-            : record
-              ? "Save new revision"
-              : "Save agreement"}
-        </button>
+        <PortalButton loading={state.pending} type="submit">
+          {record ? "Save new revision" : "Save agreement"}
+        </PortalButton>
       </fieldset>
       {state.message && <p role="status">{state.message}</p>}
     </form>

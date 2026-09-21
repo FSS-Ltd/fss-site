@@ -14,8 +14,10 @@ require.extensions[".css"] = (module) => {
 const {
   Notice,
   PageHeader,
+  PortalActionLink,
   PortalButton,
   PortalCard,
+  PortalCheckbox,
   PortalField,
   PortalSelect,
   PortalTextarea,
@@ -72,6 +74,29 @@ test("renders named notice actions and a navigable page header", () => {
   assert.match(html, /role="alert"/);
   assert.match(html, /Warning/);
   assert.match(html, /Get help/);
+});
+
+test("keeps route actions as links while applying the shared button treatment", () => {
+  const html = renderToStaticMarkup(
+    <PortalActionLink href="/portal/agreements">Open agreement</PortalActionLink>,
+  );
+
+  assert.match(html, /<a[^>]*href="\/portal\/agreements"/);
+  assert.match(html, /Open agreement/);
+});
+
+test("keeps signing confirmations as labelled native checkboxes", () => {
+  const html = renderToStaticMarkup(
+    <PortalCheckbox
+      label="I have authority to bind the named organisation."
+      name="authority"
+      required
+    />,
+  );
+
+  assert.match(html, /<input[^>]*name="authority"/);
+  assert.match(html, /type="checkbox"/);
+  assert.match(html, /I have authority to bind the named organisation/);
 });
 
 test("groups a labelled native select inside a Studio card", () => {
