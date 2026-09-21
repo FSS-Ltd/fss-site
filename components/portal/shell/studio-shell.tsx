@@ -10,6 +10,7 @@ import {
   studioMobileNavigationIds,
   type PortalNavigationItem,
 } from "./navigation";
+import { PortalNavigationIcon } from "./navigation-icon";
 import styles from "./portal-shell.module.css";
 
 function StudioNavigationLink({
@@ -20,7 +21,7 @@ function StudioNavigationLink({
   if (!item.href) {
     return (
       <span className={styles.navigationUnavailable} aria-disabled="true">
-        <span className={styles.navigationIcon} aria-hidden="true" />
+        <PortalNavigationIcon itemId={item.id} />
         <span className={styles.navigationUnavailableContent}>
           <span>{item.label}</span>
           {item.unavailableReason ? (
@@ -39,7 +40,7 @@ function StudioNavigationLink({
       className={`${styles.navigationLink} ${item.active ? styles.navigationCurrent : ""}`}
       href={portalPath(item.href)}
     >
-      <span className={styles.navigationIcon} aria-hidden="true" />
+      <PortalNavigationIcon itemId={item.id} />
       <span>{item.label}</span>
     </Link>
   );

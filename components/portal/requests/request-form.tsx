@@ -1,26 +1,40 @@
 "use client";
 
+import Link from "next/link";
 import { useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { PortalButton, PortalCard, PortalSelect } from "@/components/portal/ui";
 import { createRequestSchema } from "@/lib/operations/requests/validation";
 import { postRequestCommand, type CreateRequestAction } from "./actions";
 import { RequestField } from "./form-field";
 import { requestHref } from "./presentation";
 import styles from "./requests.module.css";
 
+const requestTypes = ["work", "change", "bug", "help"] as const;
+type RequestType = (typeof requestTypes)[number];
+
+const requestTypeLabels: Record<RequestType, string> = {
+  bug: "Bug report",
+  change: "Change",
+  help: "Help",
+  work: "New work",
+};
+
 export function RequestForm({
   organisationId,
   projects,
   createAction,
+  initialType = "work",
 }: {
   organisationId: string;
   projects: Array<{ id: string; title: string }>;
   createAction?: CreateRequestAction;
+  initialType?: RequestType;
 }): React.JSX.Element {
   const router = useRouter();
   const key = useRef<string | null>(null);
   const submitting = useRef(false);
-  const [type, setType] = useState("work");
+  const [type, setType] = useState<RequestType>(initialType);
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -31,20 +45,24 @@ export function RequestForm({
     const form = event.currentTarget;
     const data = new FormData(form);
     key.current ??= crypto.randomUUID();
+    const reproductionSteps = data.get("reproductionSteps");
+    const expectedBehaviour = data.get("expectedBehaviour");
+    const actualBehaviour = data.get("actualBehaviour");
     const input = createRequestSchema.safeParse({
       projectId: data.get("projectId"),
       title: data.get("title"),
-      description: data.get("description"),
+      description: type === "bug" ? actualBehaviour : data.get("description"),
       type,
-      desiredOutcome: data.get("desiredOutcome"),
+      desiredOutcome:
+        type === "bug" ? expectedBehaviour : data.get("desiredOutcome"),
       desiredDate: data.get("desiredDate") || null,
       impact: data.get("impact"),
       idempotencyKey: key.current,
       ...(type === "bug"
         ? {
-            reproductionSteps: data.get("reproductionSteps"),
-            expectedBehaviour: data.get("expectedBehaviour"),
-            actualBehaviour: data.get("actualBehaviour"),
+            reproductionSteps,
+            expectedBehaviour,
+            actualBehaviour,
           }
         : {}),
     });
@@ -95,135 +113,162 @@ export function RequestForm({
 
   if (!projects.length)
     return (
-      <p className={styles.empty}>
-        A shared project is needed before you can create a request. Contact your
-        FSS team to confirm the right project.
-      </p>
+      <section className={styles.noProject} aria-labelledby="no-project-heading">
+        <p className={styles.eyebrow}>Project setup</p>
+        <h2 className={styles.sectionTitle} id="no-project-heading">
+          A project is needed for this request.
+        </h2>
+        <p className={styles.copy}>
+          Ask FSS to connect the right project to your workspace. Your account
+          does not currently have access to one.
+        </p>
+        <Link
+          className={styles.primary}
+          href={`/help?organisationId=${encodeURIComponent(organisationId)}`}
+        >
+          Ask FSS to set up your project
+        </Link>
+      </section>
     );
+
   return (
     <form onSubmit={submit} className={styles.form} aria-busy={pending}>
       <fieldset className={styles.fieldset} disabled={pending}>
-        <legend className={styles.sectionTitle}>What do you need?</legend>
-        <label className={styles.field}>
-          Project
-          <select
+        <legend className={styles.sectionTitle}>Request type</legend>
+        <div className={styles.typeSelector} aria-label="Request type">
+          {requestTypes.map((requestType) => (
+            <PortalButton
+              key={requestType}
+              onClick={() => setType(requestType)}
+              type="button"
+              variant={type === requestType ? "primary" : "secondary"}
+            >
+              {requestTypeLabels[requestType]}
+            </PortalButton>
+          ))}
+        </div>
+
+        <PortalCard title={type === "bug" ? "The problem" : "Your request"}>
+          <PortalSelect
+            defaultValue={projects.length === 1 ? projects[0].id : ""}
+            error={errors.projectId}
+            hint="Only projects you can access appear here."
+            label="Project"
             name="projectId"
             required
-            className={styles.input}
-            defaultValue={projects.length === 1 ? projects[0].id : ""}
-            aria-invalid={!!errors.projectId}
-            aria-describedby={
-              errors.projectId ? "request-project-error" : undefined
-            }
           >
-            <option value="" disabled>
-              Choose a project
-            </option>
-            {projects.map((project) => (
-              <option key={project.id} value={project.id}>
-                {project.title}
+              <option disabled value="">
+                Choose a project
               </option>
-            ))}
-          </select>
-          {errors.projectId && (
-            <span className={styles.errorText} id="request-project-error">
-              {errors.projectId}
-            </span>
+              {projects.map((project) => (
+                <option key={project.id} value={project.id}>
+                  {project.title}
+                </option>
+              ))}
+          </PortalSelect>
+          <RequestField
+            error={errors.title}
+            label={type === "bug" ? "Short title" : "Request title"}
+            maxLength={160}
+            name="title"
+            required
+          />
+          {type === "bug" ? (
+            <>
+              <RequestField
+                error={errors.reproductionSteps}
+                label="Steps to reproduce"
+                maxLength={4000}
+                multiline
+                name="reproductionSteps"
+                required
+              />
+              <RequestField
+                error={errors.expectedBehaviour}
+                label="What you expected"
+                maxLength={4000}
+                multiline
+                name="expectedBehaviour"
+                required
+              />
+              <RequestField
+                error={errors.actualBehaviour}
+                label="What happened instead"
+                maxLength={4000}
+                multiline
+                name="actualBehaviour"
+                required
+              />
+            </>
+          ) : (
+            <>
+              <RequestField
+                error={errors.description}
+                label="Description"
+                maxLength={10000}
+                multiline
+                name="description"
+                required
+              />
+              <RequestField
+                error={errors.desiredOutcome}
+                hint="What will a successful result let you do?"
+                label="What does success look like?"
+                maxLength={4000}
+                multiline
+                name="desiredOutcome"
+                required
+              />
+            </>
           )}
-        </label>
-        <RequestField
-          name="title"
-          label="Request title"
-          required
-          maxLength={160}
-          error={errors.title}
-          hint="A short, specific description of the work."
-        />
-        <label className={styles.field}>
-          Request type
-          <select
-            name="type"
-            value={type}
-            onChange={(event) => setType(event.target.value)}
-            className={styles.input}
-          >
-            <option value="work">New work</option>
-            <option value="change">Change to existing work</option>
-            <option value="bug">Something is not working</option>
-            <option value="help">Help or advice</option>
-          </select>
-        </label>
-        <RequestField
-          name="description"
-          label="Description"
-          required
-          multiline
-          maxLength={10000}
-          error={errors.description}
-        />
-        <RequestField
-          name="desiredOutcome"
-          label="Desired outcome"
-          required
-          multiline
-          maxLength={4000}
-          error={errors.desiredOutcome}
-          hint="What will a successful result let you do?"
-        />
-        <div hidden={type !== "bug"} className={styles.form}>
-          <RequestField
-            name="reproductionSteps"
-            label="Steps to reproduce"
-            required={type === "bug"}
-            multiline
-            maxLength={4000}
-            error={errors.reproductionSteps}
-          />
-          <RequestField
-            name="expectedBehaviour"
-            label="What you expected"
-            required={type === "bug"}
-            multiline
-            maxLength={4000}
-            error={errors.expectedBehaviour}
-          />
-          <RequestField
-            name="actualBehaviour"
-            label="What happened instead"
-            required={type === "bug"}
-            multiline
-            maxLength={4000}
-            error={errors.actualBehaviour}
-          />
-        </div>
-        <div className={styles.notice}>
-          <h2 className={styles.sectionTitle}>Timing and impact</h2>
-          <p className={styles.copy}>
-            A desired date helps us assess your request. We will confirm an
-            agreed target after reviewing the scope.
-          </p>
-        </div>
-        <RequestField
-          name="desiredDate"
-          label="Desired date"
-          type="date"
-          error={errors.desiredDate}
-        />
-        <RequestField
-          name="impact"
-          label="Impact on your work"
-          multiline
-          maxLength={4000}
-          error={errors.impact}
-        />
-        <p className={styles.note}>
-          Do not paste passwords, API keys or other credentials. File uploads
-          are not available yet. Ask your FSS team for the agreed secure
-          transfer method.
-        </p>
-        <button type="submit" className={styles.primary} disabled={pending}>
-          {pending ? "Sending request…" : "Send request"}
-        </button>
+        </PortalCard>
+
+        {type === "bug" ? (
+          <PortalCard title="Impact & environment">
+            <RequestField
+              error={errors.impact}
+              label="Impact"
+              maxLength={4000}
+              multiline
+              name="impact"
+            />
+            <p className={styles.note}>
+              Include the page address and browser/device in the description if
+              they will help FSS reproduce the issue.
+            </p>
+          </PortalCard>
+        ) : (
+          <PortalCard title="Useful context">
+            <RequestField
+              error={errors.desiredDate}
+              hint="A requested date is not yet an agreed delivery date."
+              label="Desired date"
+              name="desiredDate"
+              type="date"
+            />
+            <RequestField
+              error={errors.impact}
+              label="Impact"
+              maxLength={4000}
+              multiline
+              name="impact"
+            />
+          </PortalCard>
+        )}
+
+        <PortalCard
+          description="Add a screenshot or document once secure uploads are enabled. Do not paste passwords, API keys or other credentials. Use your agreed secure sharing route for credentials."
+          title="Attachments"
+          tone="accent"
+        >
+          <span className={styles.visuallyHidden}>
+            File uploads are not available yet.
+          </span>
+        </PortalCard>
+
+        <PortalButton loading={pending} type="submit">
+          Submit request
+        </PortalButton>
       </fieldset>
       <p role="status" aria-atomic="true" className={styles.feedback}>
         {message}

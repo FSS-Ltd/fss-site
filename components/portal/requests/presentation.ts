@@ -20,6 +20,13 @@ export const scopeLabels: Record<RequestScope, string> = {
   declined_with_reason: "Declined",
 };
 
+export const requestTypeLabels = {
+  bug: "Bug report",
+  change: "Change",
+  help: "Help",
+  work: "New work",
+} as const;
+
 export function requestHref(id: string, organisationId: string): string {
   return `/requests/${encodeURIComponent(id)}?organisationId=${encodeURIComponent(organisationId)}`;
 }

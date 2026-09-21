@@ -1,5 +1,4 @@
-import { useId } from "react";
-import styles from "./requests.module.css";
+import { PortalField, PortalTextarea } from "@/components/portal/ui";
 
 type FieldProps = {
   name: string;
@@ -22,32 +21,29 @@ export function RequestField({
   error,
   hint,
 }: FieldProps): React.JSX.Element {
-  const id = useId();
-  const props = {
-    id,
-    name,
-    required,
-    maxLength,
-    className: styles.input,
-    "aria-invalid": error ? (true as const) : undefined,
-    "aria-describedby": error || hint ? `${id}-help` : undefined,
-  };
+  const visibleLabel = required ? label : `${label} (optional)`;
+
+  if (multiline)
+    return (
+      <PortalTextarea
+        error={error}
+        hint={hint}
+        label={visibleLabel}
+        maxLength={maxLength}
+        name={name}
+        required={required}
+        rows={4}
+      />
+    );
+
   return (
-    <div className={styles.field}>
-      <label htmlFor={id}>
-        {label}
-        {!required && <span className={styles.optional}> (optional)</span>}
-      </label>
-      {multiline ? (
-        <textarea {...props} rows={4} />
-      ) : (
-        <input {...props} type={type} />
-      )}
-      {(error || hint) && (
-        <p id={`${id}-help`} className={error ? styles.errorText : styles.note}>
-          {error || hint}
-        </p>
-      )}
-    </div>
+    <PortalField
+      error={error}
+      hint={hint}
+      label={visibleLabel}
+      required={required}
+    >
+      <input maxLength={maxLength} name={name} type={type} />
+    </PortalField>
   );
 }

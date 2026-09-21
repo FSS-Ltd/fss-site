@@ -4,6 +4,7 @@ import type { ClientRequest } from "@/lib/operations/requests/types";
 import {
   requestDate,
   requestHref,
+  requestTypeLabels,
   scopeLabels,
   statusLabels,
 } from "./presentation";
@@ -21,8 +22,7 @@ export function RequestList({
   if (!requests.length)
     return (
       <p className={styles.empty}>
-        No requests to show. Create a request when you need a change, a fix or a
-        hand with your project.
+        Nothing in your board yet.
       </p>
     );
   return (
@@ -40,6 +40,7 @@ export function RequestList({
               >
                 {statusLabels[request.status]}
               </span>
+              <span className={styles.note}>{requestTypeLabels[request.type]}</span>
               {request.blocked && <span className={styles.note}>Blocked</span>}
               <ArrowUpRight
                 className={styles.arrow}

@@ -5,6 +5,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { AppRouterContext } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import type { ClientRequestDetail } from "@/lib/operations/requests/types";
 import type { ClientDocument } from "@/lib/operations/documents/types";
+import type { StaffDeliveryBoardRequest } from "@/lib/operations/requests/staff-repository";
 
 const require = createRequire(import.meta.url);
 require.extensions[".css"] = (module) => {
@@ -14,7 +15,8 @@ require.extensions[".css"] = (module) => {
   };
 };
 const { RequestList } = require("./list") as typeof import("./list");
-const { RequestBoard } = require("./board") as typeof import("./board");
+const { RequestBoard, RequestBoardSkeleton } =
+  require("./board") as typeof import("./board");
 const { FounderActionFields } =
   require("./founder-action-fields") as typeof import("./founder-action-fields");
 const { RequestDetail } =
@@ -23,6 +25,10 @@ const { RequestForm } =
   require("./request-form") as typeof import("./request-form");
 const { FounderRequestActions } =
   require("./founder-request-actions") as typeof import("./founder-request-actions");
+const { StaffDeliveryBoard } =
+  require("./staff-delivery-board") as typeof import("./staff-delivery-board");
+const { StaffRequestActions } =
+  require("./staff-request-actions") as typeof import("./staff-request-actions");
 const router = {
   bfcacheId: "request-ui-test",
   back() {},
@@ -73,6 +79,21 @@ const request: ClientRequestDetail = {
   canReview: true,
   allowance: null,
 };
+const staffRequest: StaffDeliveryBoardRequest = {
+  blocked: false,
+  createdAt: request.createdAt,
+  id: request.id,
+  nextAction: request.nextAction,
+  organisationId: "org",
+  organisationName: "Northstar Studio",
+  ownerDisplay: "Jean-Fidele",
+  priority: "normal",
+  scope: "included",
+  status: "in_progress",
+  targetDate: request.targetDate,
+  title: request.title,
+  version: request.version,
+};
 
 test("request content is escaped and the reviewer must explicitly confirm the current version", () => {
   const html = renderToStaticMarkup(
@@ -84,8 +105,42 @@ test("request content is escaped and the reviewer must explicitly confirm the cu
   assert.match(html, /&lt;script&gt;/);
   assert.match(html, /I have reviewed v1 and accept this deliverable/);
   assert.match(html, /type="checkbox"[^>]*required/);
-  assert.match(html, /disabled="">Accept deliverable/);
+  assert.match(html, /disabled="">Accept v1/);
   assert.match(html, /role="status"/);
+  assert.match(html, /Does this meet the agreed outcome\?/);
+  assert.match(html, /What changed/);
+  assert.match(html, /Accept v1/);
+  assert.match(html, /Request changes/);
+});
+
+test("a completed request distinguishes client acceptance from an FSS closure", () => {
+  const html = renderToStaticMarkup(
+    <AppRouterContext.Provider value={router}>
+      <RequestDetail
+        request={{
+          ...request,
+          status: "done",
+          reviews: [
+            {
+              createdAt: request.createdAt,
+              decision: "accepted",
+              deliverableVersion: "v1",
+              documentIds: [],
+              documents: [],
+              feedback: "",
+              id: "accepted-review",
+              reviewCycle: 1,
+            },
+          ],
+        }}
+        organisationId="org"
+        canComment={false}
+      />
+    </AppRouterContext.Provider>,
+  );
+
+  assert.match(html, /Version v1 accepted/);
+  assert.match(html, /Start a follow-up request/);
 });
 
 test("a contributor can comment but cannot submit an acceptance decision", () => {
@@ -99,7 +154,7 @@ test("a contributor can comment but cannot submit an acceptance decision", () =>
     </AppRouterContext.Provider>,
   );
   assert.match(html, /Add a comment/);
-  assert.doesNotMatch(html, /Accept deliverable|Send change request/);
+  assert.doesNotMatch(html, /Accept v1|Send feedback/);
 });
 
 test("approved allowance keeps contractual units and decision history visible", () => {
@@ -131,7 +186,7 @@ test("approved allowance keeps contractual units and decision history visible", 
   assert.match(html, /6 hours/);
   assert.match(html, /Approved form improvements/);
   assert.match(html, /Change order 04/);
-  assert.doesNotMatch(html, /Accept deliverable|Add a comment/);
+  assert.doesNotMatch(html, /Accept v1|Add a comment/);
 });
 
 test("list navigation carries organisation context and status is readable without colour", () => {
@@ -181,7 +236,47 @@ test("founder state changes use a keyboard-accessible select and never offer cli
   assert.match(html, /Update scope decision/);
   assert.match(html, /Close administratively/);
   assert.match(html, /Set operational priority/);
-  assert.doesNotMatch(html, /Accept deliverable|value="accept"/);
+  assert.doesNotMatch(html, /Accept v1|value="accept"/);
+});
+
+test("founder delivery exposes a move control and separates review and public update work", () => {
+  const boardHtml = renderToStaticMarkup(
+    <AppRouterContext.Provider value={router}>
+      <StaffDeliveryBoard
+        clients={[{ id: "org", displayName: "Northstar Studio" }]}
+        filters={{ organisationId: "all", status: "all" }}
+        requests={[staffRequest]}
+      />
+    </AppRouterContext.Provider>,
+  );
+  const actionsHtml = renderToStaticMarkup(
+    <AppRouterContext.Provider value={router}>
+      <StaffRequestActions
+        initialAction="review"
+        deliveryOwners={[{ id: "owner", label: "Jean-Fidele" }]}
+        organisationId="org"
+        request={{ ...request, status: "in_progress" }}
+      />
+    </AppRouterContext.Provider>,
+  );
+  const publicUpdateHtml = renderToStaticMarkup(
+    <AppRouterContext.Provider value={router}>
+      <StaffRequestActions
+        initialAction="public_update"
+        deliveryOwners={[{ id: "owner", label: "Jean-Fidele" }]}
+        organisationId="org"
+        request={{ ...request, status: "in_progress" }}
+      />
+    </AppRouterContext.Provider>,
+  );
+
+  assert.match(boardHtml, /Move to/);
+  assert.match(actionsHtml, /Review package/);
+  assert.match(actionsHtml, /Public update/);
+  assert.match(actionsHtml, /Add or retain a deliverable/);
+  assert.match(publicUpdateHtml, /Message to client/);
+  assert.match(publicUpdateHtml, /client portal/);
+  assert.doesNotMatch(actionsHtml, /Accept v1/);
 });
 
 test("founder priority uses a labelled native choice with the current value", () => {
@@ -193,7 +288,8 @@ test("founder priority uses a labelled native choice with the current value", ()
       currentPriority="high"
     />,
   );
-  assert.match(html, /Operational priority<select name="priority"/);
+  assert.match(html, /<label[^>]*>Operational priority/);
+  assert.match(html, /<select[^>]*name="priority"/);
   assert.match(html, /<option value="high" selected="">High/);
   for (const value of ["low", "normal", "high", "urgent"])
     assert.match(html, new RegExp(`<option value="${value}"`));
@@ -208,13 +304,11 @@ test("request filters describe server-paged results and retain native controls",
       organisationId="org"
     />,
   );
-  assert.match(
-    board,
-    /Filters and pages are applied before requests reach this workspace/,
-  );
+  assert.match(board, /1 request in this view/);
   assert.match(board, /<form/);
   assert.match(board, /name="query"/);
   assert.match(board, /name="status"/);
+  assert.match(board, /All states/);
   const history: ClientRequestDetail = {
     ...request,
     comments: Array.from({ length: 200 }, (_, index) => ({
@@ -335,4 +429,51 @@ test("review documents stay with their version and only authorised projections b
     founderHtml,
     /href="https:\/\/example.com\/review-v[12]"/,
   );
+});
+
+test("request collection provides an actionable empty board and clear board guidance", () => {
+  const board = renderToStaticMarkup(
+    <RequestBoard
+      filters={{ query: "", status: undefined }}
+      requests={[request]}
+      organisationId="org"
+    />,
+  );
+  const emptyBoard = renderToStaticMarkup(
+    <RequestBoard
+      filters={{ query: "", status: undefined }}
+      requests={[]}
+      organisationId="org"
+    />,
+  );
+  const loadingBoard = renderToStaticMarkup(<RequestBoardSkeleton />);
+
+  assert.match(board, /How your board works/);
+  assert.match(board, /Ready for review/);
+  assert.match(emptyBoard, /Nothing in your board yet/);
+  assert.match(emptyBoard, /Create first request/);
+  assert.match(loadingBoard, /Loading your requests/);
+  assert.match(loadingBoard, /aria-busy="true"/);
+});
+
+test("request creation exposes the no-project recovery and bug-report fields", () => {
+  const noProjectHtml = renderToStaticMarkup(
+    <AppRouterContext.Provider value={router}>
+      <RequestForm organisationId="org" projects={[]} />
+    </AppRouterContext.Provider>,
+  );
+  const bugHtml = renderToStaticMarkup(
+    <AppRouterContext.Provider value={router}>
+      <RequestForm
+        initialType="bug"
+        organisationId="org"
+        projects={[{ id: request.projectId, title: "Website" }]}
+      />
+    </AppRouterContext.Provider>,
+  );
+
+  assert.match(noProjectHtml, /A project is needed for this request/);
+  assert.match(noProjectHtml, /Ask FSS to set up your project/);
+  assert.match(bugHtml, /Steps to reproduce/);
+  assert.match(bugHtml, /What happened instead/);
 });

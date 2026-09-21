@@ -202,11 +202,10 @@
 }
 
 .navigationIcon {
-  width: 9px;
-  height: 9px;
+  width: 16px;
+  height: 16px;
   flex: 0 0 auto;
-  border: 1px solid currentColor;
-  border-radius: 3px;
+  stroke: currentColor;
 }
 
 .content {

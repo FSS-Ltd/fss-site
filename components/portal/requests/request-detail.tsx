@@ -1,6 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import {
+  Notice,
+  PortalCard,
+  StatusBadge,
+  type PortalStatus,
+} from "@/components/portal/ui";
 import type { ClientRequestDetail } from "@/lib/operations/requests/types";
 import { postRequestCommand, type RequestAction } from "./actions";
 import { RequestConversation } from "./conversation";
@@ -11,18 +18,35 @@ import { RequestReviewHistory } from "./review-history";
 import { requestDate, scopeLabels, statusLabels } from "./presentation";
 import styles from "./requests.module.css";
 
+function statusTone(status: ClientRequestDetail["status"]): PortalStatus {
+  if (status === "done") return "success";
+  if (status === "ready_for_review") return "info";
+  if (status === "changes_requested") return "warning";
+  return "neutral";
+}
+
+function latestAcceptance(request: ClientRequestDetail) {
+  return request.reviews.find(
+    (review) =>
+      review.decision === "accepted" &&
+      review.deliverableVersion === request.deliverableVersion,
+  );
+}
+
 export function RequestDetail({
   request,
   organisationId,
   canComment,
   commandAction,
   hidePortalActions = false,
+  hideTitle = false,
 }: {
   request: ClientRequestDetail;
   organisationId: string;
   canComment: boolean;
   commandAction?: RequestAction;
   hidePortalActions?: boolean;
+  hideTitle?: boolean;
 }): React.JSX.Element {
   const router = useRouter();
   const action: RequestAction =
@@ -33,63 +57,68 @@ export function RequestDetail({
         organisationId,
         command,
       ));
+  const acceptance = latestAcceptance(request);
   return (
     <article className={styles.detail}>
       <div className={styles.row}>
-        <span
-          className={styles.status}
-          data-review={request.status === "ready_for_review"}
-        >
+        <StatusBadge status={statusTone(request.status)}>
           {statusLabels[request.status]}
-        </span>
+        </StatusBadge>
         <span className={styles.note}>{scopeLabels[request.scope]}</span>
       </div>
-      <h1 className={styles.title}>{request.title}</h1>
-      <p className={styles.note}>Submitted {requestDate(request.createdAt)}</p>
-      <div className={styles.overview}>
-        <p className={styles.eyebrow}>Next step</p>
-        <p className={styles.nextAction}>
+      {!hideTitle ? (
+        <>
+          <h1 className={styles.title}>{request.title}</h1>
+          <p className={styles.note}>
+            Submitted {requestDate(request.createdAt)}
+          </p>
+        </>
+      ) : null}
+      <Notice tone={request.status === "done" ? "success" : "info"}>
+        <strong>Next step</strong>
+        <p className={styles.noticeCopy}>
           {request.nextAction ||
             "Your FSS team will assess the request and confirm the next step."}
         </p>
+      </Notice>
+      <PortalCard title="Request details">
         <dl className={styles.facts}>
           <div>
-            <dt>Owner</dt>
-            <dd>{request.ownerDisplay || "To be confirmed"}</dd>
-          </div>
-          <div>
-            <dt>Target date</dt>
-            <dd>{requestDate(request.targetDate)}</dd>
-          </div>
-          <div>
-            <dt>Acknowledgement target</dt>
-            <dd>{requestDate(request.acknowledgementTarget)}</dd>
+            <dt>Desired outcome</dt>
+            <dd>{request.desiredOutcome}</dd>
           </div>
           <div>
             <dt>Scope</dt>
             <dd>{scopeLabels[request.scope]}</dd>
+          </div>
+          <div>
+            <dt>Target</dt>
+            <dd>{requestDate(request.targetDate)}</dd>
+          </div>
+          <div>
+            <dt>Owner</dt>
+            <dd>{request.ownerDisplay || "To be confirmed"}</dd>
           </div>
         </dl>
         {request.scopeReason && (
           <p className={styles.prose}>{request.scopeReason}</p>
         )}
         {request.closureLabel && (
-          <p className={styles.notice}>{request.closureLabel}</p>
+          <p className={styles.noticeCopy}>{request.closureLabel}</p>
         )}
-      </div>
+      </PortalCard>
       <RequestAllowance allowance={request.allowance} />
       {request.blocked && (
-        <aside className={styles.notice} aria-label="Request blocked">
-          <h2 className={styles.sectionTitle}>Blocked</h2>
+        <Notice tone="warning">
+          <strong>Blocked</strong>
           <p className={styles.prose}>{request.blocked.reason}</p>
           <p className={styles.copy}>
             Waiting on {request.blocked.responsibleParty}. Next check:{" "}
             {requestDate(request.blocked.nextCheckDate)}.
           </p>
-        </aside>
+        </Notice>
       )}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>The request</h2>
+      <PortalCard className={styles.section} title="The request">
         <p className={styles.prose}>{request.description}</p>
         <h3 className={styles.subheading}>Desired outcome</h3>
         <p className={styles.prose}>{request.desiredOutcome}</p>
@@ -121,15 +150,19 @@ export function RequestDetail({
             </div>
           </dl>
         )}
-      </section>
+      </PortalCard>
+      {!hidePortalActions && (
+        <ReviewActions
+          request={request}
+          commandAction={action}
+          onRefresh={() => router.refresh()}
+        />
+      )}
       {(request.publicSummary || request.documents.length > 0) && (
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>
-            Deliverable
-            {request.deliverableVersion
-              ? ` · ${request.deliverableVersion}`
-              : ""}
-          </h2>
+        <PortalCard
+          className={styles.section}
+          title={`Deliverable${request.deliverableVersion ? ` · ${request.deliverableVersion}` : ""}`}
+        >
           {request.publicSummary && (
             <p className={styles.prose}>{request.publicSummary}</p>
           )}
@@ -139,15 +172,46 @@ export function RequestDetail({
             hidePortalActions={hidePortalActions}
             headingId="current-request-documents"
           />
-        </section>
+        </PortalCard>
       )}
-      {!hidePortalActions && (
-        <ReviewActions
-          request={request}
-          commandAction={action}
-          onRefresh={() => router.refresh()}
-        />
-      )}
+      {request.status === "done" ? (
+        <PortalCard
+          className={styles.section}
+          description={
+            acceptance
+              ? "The final files and review history are available below."
+              : request.closureLabel ||
+                "FSS has closed this request without a client acceptance."
+          }
+          title={
+            acceptance
+              ? `Version ${acceptance.deliverableVersion} accepted.`
+              : "FSS closed this request."
+          }
+          tone="accent"
+        >
+          {!hidePortalActions ? (
+            <>
+              <Link
+                className={styles.followUpLink}
+                href={`/portal/requests/new?organisationId=${encodeURIComponent(organisationId)}`}
+              >
+                Start a follow-up request
+              </Link>
+              <p className={styles.note}>
+                A follow-up is a new request, so it does not change this
+                completed record.
+              </p>
+              {acceptance ? (
+                <p className={styles.note}>
+                  Accepted {requestDate(acceptance.createdAt)}. The review
+                  history contains the recorded acceptance details.
+                </p>
+              ) : null}
+            </>
+          ) : null}
+        </PortalCard>
+      ) : null}
       <RequestConversation
         request={request}
         canComment={canComment}

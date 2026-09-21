@@ -1,4 +1,5 @@
 import { useId, type ButtonHTMLAttributes } from "react";
+import { LoaderCircle } from "lucide-react";
 import styles from "./portal-ui.module.css";
 
 export type PortalButtonVariant =
@@ -52,7 +53,12 @@ export function PortalButton({
         disabled={isDisabled}
       >
         {children}
-        {loading ? <span className={styles.visuallyHidden}>Loading</span> : null}
+        {loading ? (
+          <>
+            <LoaderCircle aria-hidden="true" className={styles.buttonLoader} size={16} />
+            <span className={styles.visuallyHidden}>Loading</span>
+          </>
+        ) : null}
       </button>
       {isDisabled && disabledReason ? (
         <span id={disabledReasonId} className={styles.buttonReason}>
