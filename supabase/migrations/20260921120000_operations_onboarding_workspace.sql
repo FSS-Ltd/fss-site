@@ -444,6 +444,60 @@ begin
 end;
 $$;
 
+create function operations.bind_onboarding_journey_workspace_snapshot(
+  target_journey uuid,
+  target_template_version uuid,
+  target_draft uuid,
+  expected_draft_version integer
+)
+returns void
+language plpgsql
+security definer
+set search_path = '' as $$
+declare
+  journey operations.onboarding_journeys;
+  draft operations.onboarding_journey_drafts;
+begin
+  perform operations.assert_onboarding_founder();
+  if expected_draft_version < 1 then
+    raise exception 'Workspace draft version is invalid.' using errcode = '22023';
+  end if;
+
+  select * into strict journey
+  from operations.onboarding_journeys
+  where id = target_journey
+  for update;
+  select * into strict draft
+  from operations.onboarding_journey_drafts
+  where id = target_draft
+  for update;
+
+  if draft.organisation_id <> journey.organisation_id
+    or draft.agreement_id <> journey.agreement_id
+    or draft.template_version_id <> target_template_version
+    or draft.version <> expected_draft_version then
+    raise exception 'Workspace draft changed.' using errcode = '40001';
+  end if;
+  if journey.onboarding_workspace_draft_id is not null
+    and journey.onboarding_workspace_draft_id <> target_draft then
+    raise exception 'Journey workspace snapshot changed.' using errcode = '40001';
+  end if;
+  if journey.onboarding_template_version_id is not null
+    and journey.onboarding_template_version_id <> target_template_version then
+    raise exception 'Journey template snapshot changed.' using errcode = '40001';
+  end if;
+
+  perform operations.instantiate_onboarding_journey_tasks(
+    target_journey,
+    target_template_version
+  );
+  update operations.onboarding_journeys
+    set onboarding_workspace_draft_id = target_draft,
+        onboarding_template_version_id = target_template_version
+    where id = journey.id;
+end;
+$$;
+
 create function operations.read_onboarding_workspace(target_organisation uuid)
 returns jsonb
 language plpgsql
@@ -474,6 +528,8 @@ begin
       select jsonb_agg(jsonb_build_object(
         'id', d.id, 'agreementId', d.agreement_id, 'contactId', d.contact_id,
         'templateVersionId', d.template_version_id, 'stage', d.stage,
+        'expectedAgreementVersion', (d.content ->> 'expectedAgreementVersion')::integer,
+        'recipientRole', d.content ->> 'recipientRole',
         'version', d.version, 'updatedAt', d.updated_at
       ) order by d.updated_at desc, d.id)
       from operations.onboarding_journey_drafts d
@@ -697,6 +753,7 @@ revoke all on function operations.assert_onboarding_template_content(jsonb),
   operations.publish_onboarding_template_version(uuid, integer, text),
   operations.save_onboarding_journey_draft(uuid, uuid, uuid, uuid, uuid, text, jsonb, integer, text),
   operations.instantiate_onboarding_journey_tasks(uuid, uuid),
+  operations.bind_onboarding_journey_workspace_snapshot(uuid, uuid, uuid, integer),
   operations.read_onboarding_workspace(uuid),
   operations.complete_onboarding_task(uuid, uuid, jsonb, uuid[], timestamptz, text),
   operations.onboarding_template_version_immutable()
@@ -706,7 +763,8 @@ revoke all on function operations.assert_onboarding_template_content(jsonb),
 grant execute on function operations.save_onboarding_template_draft(uuid, uuid, text, jsonb, integer, text),
   operations.publish_onboarding_template_version(uuid, integer, text),
   operations.save_onboarding_journey_draft(uuid, uuid, uuid, uuid, uuid, text, jsonb, integer, text),
-  operations.instantiate_onboarding_journey_tasks(uuid, uuid)
+  operations.instantiate_onboarding_journey_tasks(uuid, uuid),
+  operations.bind_onboarding_journey_workspace_snapshot(uuid, uuid, uuid, integer)
   to operations_founder;
 grant execute on function operations.read_onboarding_workspace(uuid)
   to operations_founder, operations_portal;

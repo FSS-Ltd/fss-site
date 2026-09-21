@@ -12,12 +12,80 @@ import {
 } from "./command-types";
 import { signPreview } from "./preview-token";
 import type { PreviewEnvelope } from "./preview-envelope";
+import { parseOnboardingWorkspace } from "./queries";
+import {
+  buildOnboardingReadiness,
+  type OnboardingReadinessInput,
+} from "./readiness";
 import type {
   ProposalApprovalSnapshot,
   WelcomeApprovalSnapshot,
 } from "./types";
 import type { JourneyCommand } from "./command-schema";
 import type { JourneyCommandOptions } from "./commands";
+import type { OnboardingReadinessCheck } from "./workspace-types";
+
+type WorkspaceReadinessContext = Readonly<{
+  workspace?: Extract<JourneyCommand, { action: "preview_welcome" }>["workspace"];
+  recipient: string;
+}>;
+
+export async function workspaceReadiness(
+  tx: OperationsTransaction,
+  organisationId: string,
+  agreement: { id: string; version: number; status: string },
+  command: WorkspaceReadinessContext,
+  options: JourneyCommandOptions,
+  expectedJourneyId?: string,
+): Promise<readonly OnboardingReadinessCheck[]> {
+  if (!command.workspace)
+    return buildOnboardingReadiness({
+      senderConfigured: true,
+      currentAgreement: true,
+      noActiveJourney: true,
+      contactAvailable: true,
+      templateVersionAvailable: true,
+      recipientRoleAllowed: true,
+      billingConfigured: options.billing !== null,
+      signingReady: agreement.status === "draft",
+    });
+  const [row] = await tx<Array<{ workspace: unknown }>>`
+    select operations.read_onboarding_workspace(${organisationId}) as workspace
+  `;
+  const workspace = row ? parseOnboardingWorkspace(row.workspace) : null;
+  const draft = workspace?.journeyDrafts.find(
+    (candidate) => candidate.id === command.workspace!.draftId,
+  );
+  const [contact] = await tx<Array<{ email: string }>>`
+    select email from operations.contacts
+    where organisation_id = ${organisationId} and id = ${command.workspace.contactId}
+  `;
+  const [existing] = await tx<Array<{ id: string }>>`
+    select id from operations.onboarding_journeys
+    where organisation_id = ${organisationId} and agreement_id = ${agreement.id}
+  `;
+  const input: OnboardingReadinessInput = {
+    senderConfigured: true,
+    currentAgreement:
+      draft?.agreementId === agreement.id &&
+      draft.expectedAgreementVersion === agreement.version &&
+      draft.version === command.workspace.expectedDraftVersion,
+    noActiveJourney: !existing || existing.id === expectedJourneyId,
+    contactAvailable:
+      draft?.contactId === command.workspace.contactId &&
+      contact?.email.toLowerCase() === command.recipient,
+    templateVersionAvailable:
+      draft?.templateVersionId === command.workspace.templateVersionId &&
+      workspace?.templates.some(
+        (template) => template.id === command.workspace!.templateVersionId,
+      ) === true,
+    recipientRoleAllowed:
+      draft?.recipientRole === command.workspace.recipientRole,
+    billingConfigured: options.billing !== null,
+    signingReady: agreement.status === "draft",
+  };
+  return buildOnboardingReadiness(input);
+}
 export async function prepareWelcomePreview(
   tx: OperationsTransaction,
   actor: JourneyActor,
@@ -82,7 +150,15 @@ export async function prepareWelcomePreview(
     approvalId: randomUUID(),
     snapshot: prepared.snapshot,
     pdfBase64: prepared.pdf.toString("base64"),
+    workspace: command.workspace,
   };
+  const readiness = await workspaceReadiness(
+    tx,
+    organisationId,
+    record,
+    { workspace: command.workspace, recipient: command.welcome.recipient },
+    options,
+  );
   return {
     preview: {
       kind: "welcome",
@@ -90,6 +166,7 @@ export async function prepareWelcomePreview(
       agreementId: record.id,
       snapshot: prepared.snapshot,
       pdfBase64: data.pdfBase64,
+      readiness,
     },
   };
 }

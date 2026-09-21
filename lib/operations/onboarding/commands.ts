@@ -20,7 +20,9 @@ import { envelope } from "./preview-envelope";
 import {
   prepareWelcomePreview,
   prepareProposalPreview,
+  workspaceReadiness,
 } from "./prepare-preview";
+import { canStartOnboardingJourney } from "./readiness";
 export interface JourneyCommandOptions {
   previewKey: Buffer;
   portalOrigin: string;
@@ -84,9 +86,33 @@ export async function runJourneyCommand(
         "The agreement changed after preview. Prepare and review it again.",
       );
     if (data.kind === "welcome") {
+      if (
+        data.workspace &&
+        !canStartOnboardingJourney(
+          await workspaceReadiness(
+            tx,
+            organisationId,
+            record,
+            { workspace: data.workspace, recipient: data.snapshot.recipient },
+            options,
+            data.journeyId,
+          ),
+        )
+      )
+        throw new JourneyConflict(
+          "stale_preview",
+          "This welcome setup changed. Review the preflight checks and prepare it again.",
+        );
       const snapshot = JSON.stringify(data.snapshot);
       const pdf = Buffer.from(data.pdfBase64 ?? "", "base64");
       await tx`select operations.start_onboarding(${data.approvalId},${data.journeyId},${organisationId},${data.agreementId},${snapshot}::text::jsonb,${pdf},encode(sha256(convert_to(${snapshot}::text::jsonb::text,'UTF8')||${pdf}),'hex'))`;
+      if (data.workspace)
+        await tx`select operations.bind_onboarding_journey_workspace_snapshot(
+          ${data.journeyId},
+          ${data.workspace.templateVersionId},
+          ${data.workspace.draftId},
+          ${data.workspace.expectedDraftVersion}
+        )`;
     } else {
       await tx`select operations.approve_onboarding_proposal(${data.journeyId},${data.approvalId},${JSON.stringify(data.snapshot)}::text::jsonb)`;
     }

@@ -14,12 +14,20 @@ const binding = {
   expectedGeneration: z.number().int().positive(),
   expectedProposalApprovalId: z.uuid().nullable(),
 };
+export const welcomeWorkspaceBindingSchema = z.strictObject({
+  draftId: z.uuid(),
+  expectedDraftVersion: z.number().int().positive(),
+  templateVersionId: z.uuid(),
+  contactId: z.uuid(),
+  recipientRole: z.enum(["owner", "contributor", "billing_contact", "viewer"]),
+});
 export const journeyCommandSchema = z.discriminatedUnion("action", [
   z.strictObject({
     action: z.literal("preview_welcome"),
     agreementId: z.uuid(),
     expectedVersion: z.number().int().positive(),
     welcome: welcomeInputSchema,
+    workspace: welcomeWorkspaceBindingSchema.optional(),
   }),
   z.strictObject({
     action: z.literal("start"),

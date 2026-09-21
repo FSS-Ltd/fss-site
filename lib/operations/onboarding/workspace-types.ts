@@ -105,6 +105,8 @@ export type OnboardingWorkspaceJourneyDraft = Readonly<{
   contactId: string;
   templateVersionId: string;
   stage: OnboardingJourneyDraft["stage"];
+  expectedAgreementVersion: number | null;
+  recipientRole: PortalRole | null;
   version: number;
   updatedAt: string;
 }>;

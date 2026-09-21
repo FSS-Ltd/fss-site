@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { welcomeInputSchema } from "./approval";
+import { welcomeWorkspaceBindingSchema } from "./command-schema";
 import { JourneyConflict, type JourneyActor } from "./command-types";
 const email = z.strictObject({
   from: z.email(),
@@ -28,6 +29,7 @@ const schema = z.discriminatedUnion("kind", [
       pdfHash: z.string().regex(/^[a-f0-9]{64}$/),
     }),
     pdfBase64: z.string(),
+    workspace: welcomeWorkspaceBindingSchema.optional(),
   }),
   z.strictObject({
     ...base,

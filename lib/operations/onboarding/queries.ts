@@ -31,6 +31,8 @@ const onboardingWorkspaceSchema = z.strictObject({
       contactId: z.uuid(),
       templateVersionId: z.uuid(),
       stage: z.enum(["setup", "content", "access", "schedule", "activate"]),
+      expectedAgreementVersion: z.number().int().positive().nullable(),
+      recipientRole: z.enum(portalRoles).nullable(),
       version: z.number().int().positive(),
       updatedAt: z.string().min(1),
     }),
