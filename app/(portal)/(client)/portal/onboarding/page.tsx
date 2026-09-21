@@ -2,9 +2,11 @@ import { randomUUID } from "node:crypto";
 import { redirect } from "next/navigation";
 import { OrganisationOnboarding } from "@/components/portal/auth/organisation-onboarding";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
+import { StudioUnavailable } from "@/components/portal/auth/studio-unavailable";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { needsPortalOnboarding } from "@/lib/operations/auth/pending-invitations";
 import { portalPath } from "@/lib/operations/auth/portal-url";
+import { fssStudioEnabled } from "@/lib/operations/auth/release-flags";
 import { listPortalMemberships } from "@/lib/operations/auth/require-member";
 import {
   getActiveStaffMembership,
@@ -17,6 +19,7 @@ export default async function PortalOnboardingPage(): Promise<React.JSX.Element>
   if (!portalAuthConfigured()) return <PortalUnavailable />;
 
   let destination: string | null = null;
+  let studioUnavailable = false;
   try {
     const identity = await getPortalIdentity();
     if (!identity) {
@@ -25,7 +28,8 @@ export default async function PortalOnboardingPage(): Promise<React.JSX.Element>
       const db = getPortalDb();
       const staff = await getActiveStaffMembership(db, identity, randomUUID());
       if (staff) {
-        destination = portalPath("/admin");
+        if (!fssStudioEnabled()) studioUnavailable = true;
+        else destination = portalPath("/admin");
       } else if (await hasStaffAccessOrInvitation(db, identity, randomUUID())) {
         destination = portalPath("/portal/login");
       } else {
@@ -42,6 +46,7 @@ export default async function PortalOnboardingPage(): Promise<React.JSX.Element>
     return <PortalUnavailable />;
   }
 
+  if (studioUnavailable) return <StudioUnavailable />;
   if (destination) redirect(destination);
   return <OrganisationOnboarding homePath={portalPath("/portal")} />;
 }

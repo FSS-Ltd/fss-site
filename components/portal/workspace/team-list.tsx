@@ -1,5 +1,6 @@
 import type { PortalTeamMember } from "@/lib/operations/workspaces/types";
 import { getPortalRolePresentation } from "@/lib/operations/auth/permissions";
+import { PortalCard, StatusBadge } from "@/components/portal/ui";
 import styles from "./workspace.module.css";
 
 function joinedLabel(value: string): string {
@@ -22,19 +23,21 @@ export function TeamList({
   return (
     <ul className={styles.collection} aria-label="Active workspace members">
       {members.map((member) => (
-        <li className={styles.row} key={`${member.name}-${member.joinedAt}`}>
-          <div className={styles.rowContent}>
-            <h2>{member.name}</h2>
-            <p>
-              {getPortalRolePresentation(member.role).label} · Joined{" "}
-              <time dateTime={member.joinedAt}>
-                {joinedLabel(member.joinedAt)}
-              </time>
-            </p>
-          </div>
-          <span className={styles.status}>
-            {getPortalRolePresentation(member.role).detail}
-          </span>
+        <li key={`${member.name}-${member.joinedAt}`}>
+          <PortalCard>
+            <div className={styles.rowContent}>
+              <h3>{member.name}</h3>
+              <p>
+                {getPortalRolePresentation(member.role).label} · Joined{" "}
+                <time dateTime={member.joinedAt}>
+                  {joinedLabel(member.joinedAt)}
+                </time>
+              </p>
+            </div>
+            <StatusBadge status="info">
+              {getPortalRolePresentation(member.role).detail}
+            </StatusBadge>
+          </PortalCard>
         </li>
       ))}
     </ul>

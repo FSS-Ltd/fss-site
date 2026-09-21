@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Notice, PortalButton, PortalCheckbox } from "@/components/portal/ui";
 import styles from "./workspace.module.css";
 
 export function NotificationPreferences({
@@ -41,27 +42,22 @@ export function NotificationPreferences({
 
   return (
     <form className={styles.preferences} onSubmit={save}>
-      <fieldset disabled={pending}>
-        <legend>Request email alerts</legend>
-        <label className={styles.checkRow}>
-          <input
-            checked={requestEmailEnabled}
-            onChange={(event) => setRequestEmailEnabled(event.target.checked)}
-            type="checkbox"
-          />
-          <span>
-            Email me when FSS asks for a review or confirms completed work.
-          </span>
-        </label>
-      </fieldset>
+      <PortalCheckbox
+        checked={requestEmailEnabled}
+        disabled={pending}
+        label="Email me when FSS asks for a review or confirms completed work."
+        onChange={(event) => setRequestEmailEnabled(event.target.checked)}
+      />
       <p className={styles.preferenceCopy}>
         In-app notifications remain available in your workspace. This setting
         controls only the owner’s request email alerts.
       </p>
-      <button type="submit">{pending ? "Saving…" : "Save preferences"}</button>
-      <p aria-live="polite" className={error ? styles.error : styles.feedback}>
-        {message}
-      </p>
+      <PortalButton loading={pending} type="submit">
+        Save preferences
+      </PortalButton>
+      {message ? (
+        <Notice tone={error ? "error" : "success"}>{message}</Notice>
+      ) : null}
     </form>
   );
 }

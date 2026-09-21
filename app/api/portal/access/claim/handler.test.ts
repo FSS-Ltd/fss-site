@@ -47,6 +47,7 @@ function createDependencies(
     claimVerifiedEmailInvite: async () => false,
     hasActiveMembership: async () => false,
     needsOnboarding: async () => false,
+    studioEnabled: () => true,
     reportUnexpectedError: () => undefined,
     ...overrides,
   };
@@ -303,6 +304,28 @@ test("returns access-denied when no active membership or pending invitation exis
   assert.deepEqual(await response.json(), {
     active: false,
     outcome: "access_denied",
+  });
+});
+
+test("keeps an active staff member out of the Studio route until its release gate is enabled", async () => {
+  const post = createPortalAccessClaimHandler(
+    createDependencies({
+      hasActiveStaffMembership: async () => ({
+        membershipId: "84b943cb-b9a3-4c69-9df1-3913068431d5",
+        userId: identity.userId,
+        role: "admin",
+      }),
+      studioEnabled: () => false,
+    }),
+  );
+
+  const response = await post(claimRequest());
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), {
+    active: true,
+    destination: "portal",
+    outcome: "active",
   });
 });
 

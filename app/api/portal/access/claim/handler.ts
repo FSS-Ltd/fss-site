@@ -77,12 +77,13 @@ export type PortalAccessClaimDependencies = {
   claimVerifiedEmailInvite: typeof claimPortalInviteForVerifiedEmail;
   hasActiveMembership: typeof hasActivePortalMembership;
   needsOnboarding: typeof needsPortalOnboarding;
+  studioEnabled: () => boolean;
   saveProfile?: (
     db: OperationsDb,
     identity: VerifiedPortalIdentity,
     displayName: string,
     correlationId: string,
-  ) => Promise<void>;
+  ) => Promise<unknown>;
   reportUnexpectedError: (report: ClaimErrorReport) => void;
 };
 
@@ -185,6 +186,8 @@ export function createPortalAccessClaimHandler(
     }
 
     const verifiedIdentity = identity;
+    const staffDestination = (): "admin" | "portal" =>
+      deps.studioEnabled() ? "admin" : "portal";
     async function reconcile(
       realm: "staff" | "portal",
       db: OperationsDb,
@@ -215,7 +218,7 @@ export function createPortalAccessClaimHandler(
       stage = "staff_invitation_claim";
       if (await deps.claimStaffInvitation(db, invitationClaim, correlationId)) {
         await reconcile("staff", db);
-        return response("active", 200, false, "admin");
+        return response("active", 200, false, staffDestination());
       }
       stage = "staff_email_claim";
       if (
@@ -226,12 +229,12 @@ export function createPortalAccessClaimHandler(
         )
       ) {
         await reconcile("staff", db);
-        return response("active", 200, false, "admin");
+        return response("active", 200, false, staffDestination());
       }
       stage = "staff_membership";
       if (await deps.hasActiveStaffMembership(db, identity, correlationId)) {
         await reconcile("staff", db);
-        return response("active", 200, false, "admin");
+        return response("active", 200, false, staffDestination());
       }
       stage = "pending_invitation_claim";
       const pendingDestination = await deps.claimPendingInvitation(
