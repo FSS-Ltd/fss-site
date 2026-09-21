@@ -14,6 +14,7 @@ require.extensions[".css"] = (module) => {
 const {
   Notice,
   PageHeader,
+  PortalActionLink,
   PortalButton,
   PortalCard,
   PortalField,
@@ -72,6 +73,15 @@ test("renders named notice actions and a navigable page header", () => {
   assert.match(html, /role="alert"/);
   assert.match(html, /Warning/);
   assert.match(html, /Get help/);
+});
+
+test("keeps route actions as links while applying the shared button treatment", () => {
+  const html = renderToStaticMarkup(
+    <PortalActionLink href="/portal/agreements">Open agreement</PortalActionLink>,
+  );
+
+  assert.match(html, /<a[^>]*href="\/portal\/agreements"/);
+  assert.match(html, /Open agreement/);
 });
 
 test("groups a labelled native select inside a Studio card", () => {

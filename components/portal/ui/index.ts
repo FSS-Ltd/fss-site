@@ -1,8 +1,13 @@
 export {
   PortalButton,
+  portalButtonClassName,
   type PortalButtonProps,
   type PortalButtonVariant,
 } from "./button";
+export {
+  PortalActionLink,
+  type PortalActionLinkProps,
+} from "./action-link";
 export { PortalCard, type PortalCardProps } from "./card";
 export { PortalField, type PortalFieldProps } from "./field";
 export { Notice, type NoticeProps, type NoticeTone } from "./notice";

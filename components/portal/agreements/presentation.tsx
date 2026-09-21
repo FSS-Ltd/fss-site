@@ -16,6 +16,18 @@ export type SigningStatusInput = Pick<SigningApproval, "status"> & {
   allRequiredSignaturesRecorded: boolean;
 };
 
+export function hasCompleteSigningEvidence(approval: SigningApproval): boolean {
+  return (
+    approval.status === "completed" &&
+    approval.requiredSigners.length > 0 &&
+    approval.requiredSigners.every((requiredSigner) =>
+      approval.signatures.some(
+        (signature) => signature.email === requiredSigner,
+      ),
+    )
+  );
+}
+
 export type PortalAgreementSummary = Readonly<{
   agreementId: string;
   approvalId: string;
