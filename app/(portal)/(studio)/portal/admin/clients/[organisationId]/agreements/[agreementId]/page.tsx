@@ -70,12 +70,16 @@ export default async function StaffAgreementPage({
       <StaffAgreementDetail
         organisationId={organisationId.data}
         record={record}
+        signingCommandEndpoint={`/api/portal/admin/clients/${organisationId.data}/signing`}
         signingApproval={signingApproval}
         signingDownloadBase={
           signingApproval
             ? `/api/portal/admin/clients/${organisationId.data}/signing/${signingApproval.id}`
             : undefined
         }
+        signingSuccessRedirect={portalPath(
+          `/portal/admin/clients/${organisationId.data}/signing`,
+        )}
       />
     </div>
   );

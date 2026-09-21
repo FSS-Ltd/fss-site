@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import test from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
+import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { agreementDraft } from "@/lib/operations/agreements/fixtures";
 import type { SigningApproval } from "@/lib/operations/agreements/signing-types";
 import type { AgreementRecord } from "@/lib/operations/agreements/types";
@@ -15,6 +16,25 @@ require.extensions[".css"] = (module) => {
 };
 
 const { StaffAgreementDetail } = require("./staff-agreement-detail") as typeof import("./staff-agreement-detail");
+const { AppRouterContext } = require("next/dist/shared/lib/app-router-context.shared-runtime") as typeof import("next/dist/shared/lib/app-router-context.shared-runtime");
+
+const router: AppRouterInstance = {
+  back: () => undefined,
+  bfcacheId: "test-router",
+  forward: () => undefined,
+  prefetch: () => undefined,
+  push: () => undefined,
+  refresh: () => undefined,
+  replace: () => undefined,
+};
+
+function renderDetail(children: React.ReactNode): string {
+  return renderToStaticMarkup(
+    <AppRouterContext.Provider value={router}>
+      {children}
+    </AppRouterContext.Provider>,
+  );
+}
 
 const record: AgreementRecord = {
   draft: agreementDraft(),
@@ -62,7 +82,7 @@ const completedApproval: SigningApproval = {
 };
 
 test("shows retained electronic signer evidence only from the completed signing record", () => {
-  const html = renderToStaticMarkup(
+  const html = renderDetail(
     <StaffAgreementDetail
       organisationId={completedApproval.organisationId}
       record={record}
@@ -75,4 +95,19 @@ test("shows retained electronic signer evidence only from the completed signing 
   assert.match(html, /Alex Morgan/);
   assert.match(html, /FSS authorised signer/);
   assert.match(html, /Retained signed document/);
+});
+
+test("gives an unsigned Studio agreement the authenticated signing preparation command", () => {
+  const html = renderDetail(
+    <StaffAgreementDetail
+      organisationId={completedApproval.organisationId}
+      record={{ ...record, status: "draft", version: 2 }}
+      signingCommandEndpoint="/api/portal/admin/clients/example/signing"
+      signingSuccessRedirect="/portal/admin/clients/example/signing"
+    />,
+  );
+
+  assert.match(html, /Prepare signing document/);
+  assert.match(html, /Prepare a frozen PDF from this revision/);
+  assert.doesNotMatch(html, /Both signatures are complete/);
 });

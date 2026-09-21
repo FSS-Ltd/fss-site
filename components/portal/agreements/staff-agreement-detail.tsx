@@ -1,3 +1,4 @@
+import { SigningForm } from "@/components/operations/signing/signing-form";
 import type { AgreementRecord } from "@/lib/operations/agreements/types";
 import {
   Notice,
@@ -15,13 +16,17 @@ import styles from "./agreements.module.css";
 export function StaffAgreementDetail({
   organisationId,
   record,
+  signingCommandEndpoint,
   signingApproval,
   signingDownloadBase,
+  signingSuccessRedirect,
 }: Readonly<{
   organisationId: string;
   record: AgreementRecord;
+  signingCommandEndpoint?: string;
   signingApproval?: SigningApproval | null;
   signingDownloadBase?: string;
+  signingSuccessRedirect?: string;
 }>): React.JSX.Element {
   const completedSigning =
     signingApproval?.agreementId === record.id &&
@@ -146,17 +151,33 @@ export function StaffAgreementDetail({
       ) : null}
       <AgreementStatusCard status={signed ? "signed" : "draft"} />
       {!signed ? (
-        <PortalCard
-          description="Use this only when retained manual evidence is available for every required signer. The server checks its fingerprints against this exact source; this path does not represent provider verification."
-          title="Manual evidence"
-        >
-          <PortalActionLink
-            href={`${workspaceHref}/${record.id}/record-signature`}
-            variant="secondary"
+        <>
+          {signingCommandEndpoint && signingSuccessRedirect ? (
+            <PortalCard
+              description="Create the retained signing source from this exact revision, then review and approve the named signers in the signing workspace."
+              title="Prepare signing"
+            >
+              <SigningForm
+                agreement={{ id: record.id, version: record.version }}
+                audience="staff"
+                commandEndpoint={signingCommandEndpoint}
+                organisationId={organisationId}
+                successRedirect={signingSuccessRedirect}
+              />
+            </PortalCard>
+          ) : null}
+          <PortalCard
+            description="Use this only when retained manual evidence is available for every required signer. The server checks its fingerprints against this exact source; this path does not represent provider verification."
+            title="Manual evidence"
           >
-            Record signed evidence
-          </PortalActionLink>
-        </PortalCard>
+            <PortalActionLink
+              href={`${workspaceHref}/${record.id}/record-signature`}
+              variant="secondary"
+            >
+              Record signed evidence
+            </PortalActionLink>
+          </PortalCard>
+        </>
       ) : null}
       <PortalActionLink href={workspaceHref} variant="secondary">
         Back to agreement workspace

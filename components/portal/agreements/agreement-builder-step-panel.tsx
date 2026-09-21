@@ -377,11 +377,15 @@ function ReviewStep({
       </PortalCard>
       <Notice tone="warning">
         <strong>Prepare signing, not signed.</strong>
-        <p>Creating this agreement preserves the reviewed draft. The existing signing workflow must record retained evidence before it is shown as signed.</p>
+        <p>
+          Creating this agreement preserves the reviewed draft. Prepare its
+          signing document on the agreement record before opening it for the
+          required signers.
+        </p>
       </Notice>
       <div className={styles.actionRow}>
         <PortalButton disabled={!draftExists || pending} disabledReason={!draftExists ? "Save this review before creating the agreement record." : undefined} loading={pending} onClick={() => void finalise()} type="button">
-          Create agreement &amp; prepare signing
+          Create agreement
         </PortalButton>
         <PortalButton disabled={pending} onClick={() => void onSave("review", content)} type="button" variant="quiet">
           Save draft

@@ -78,3 +78,22 @@ test("a server-loaded saved draft opens at its persisted builder step", () => {
   assert.match(html, /Continue to fees/);
   assert.doesNotMatch(html, /Link the right work/);
 });
+
+test("the review step does not claim that creating an agreement also prepares signing", () => {
+  const html = renderBuilder([], {
+    content: {
+      agreement: { title: "Website & booking experience" },
+      engagementId,
+    },
+    createdAt: "2026-09-21T18:00:00.000Z",
+    engagementId,
+    id: "33333333-3333-4333-8333-333333333333",
+    organisationId,
+    step: "review",
+    updatedAt: "2026-09-21T18:05:00.000Z",
+    version: 2,
+  });
+
+  assert.match(html, />Create agreement</);
+  assert.doesNotMatch(html, /Create agreement &amp; prepare signing/);
+});
