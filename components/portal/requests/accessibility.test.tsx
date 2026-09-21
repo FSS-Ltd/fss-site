@@ -474,8 +474,11 @@ test("request collection provides an actionable empty board and clear board guid
   assert.match(board, /Ready for review/);
   assert.match(emptyBoard, /Nothing in your board yet/);
   assert.match(emptyBoard, /Create first request/);
+  assert.match(emptyBoard, /href="\/portal\/requests\/new\?organisationId=org"/);
+  assert.match(emptyBoard, /href="\/portal\/requests\/new\?organisationId=org&amp;type=bug"/);
   assert.match(loadingBoard, /Loading your requests/);
   assert.match(loadingBoard, /aria-busy="true"/);
+  assert.match(loadingBoard, /role="status"/);
 });
 
 test("request creation exposes the no-project recovery and bug-report fields", () => {
@@ -496,6 +499,7 @@ test("request creation exposes the no-project recovery and bug-report fields", (
 
   assert.match(noProjectHtml, /A project is needed for this request/);
   assert.match(noProjectHtml, /Ask FSS to set up your project/);
+  assert.match(noProjectHtml, /href="\/portal\/help\?organisationId=org"/);
   assert.match(bugHtml, /Steps to reproduce/);
   assert.match(bugHtml, /What happened instead/);
 });

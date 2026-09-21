@@ -3,6 +3,12 @@
 import Link from "next/link";
 import { useState } from "react";
 import {
+  PortalActionLink,
+  PortalButton,
+  PortalField,
+  PortalSelect,
+} from "@/components/portal/ui";
+import {
   requestStatuses,
   type RequestStatus,
 } from "@/lib/operations/requests/types";
@@ -39,7 +45,7 @@ const cancelledLane = {
 function requestNewHref(organisationId: string, type?: "bug"): string {
   const query = new URLSearchParams({ organisationId });
   if (type) query.set("type", type);
-  return `/requests/new?${query.toString()}`;
+  return `/portal/requests/new?${query.toString()}`;
 }
 
 function requestLanesForFilter(status?: RequestStatus): readonly {
@@ -58,7 +64,9 @@ export function RequestBoardSkeleton(): React.JSX.Element {
       aria-label="Loading requests"
       className={styles.requestSkeleton}
     >
-      <p className={styles.visuallyHidden}>Loading your requests</p>
+      <p className={styles.visuallyHidden} role="status">
+        Loading your requests
+      </p>
       {Array.from({ length: 3 }, (_, index) => (
         <div className={styles.skeletonCard} key={index} />
       ))}
@@ -79,34 +87,29 @@ export function RequestBoard({
     <section className={styles.workspace} aria-label="Project requests">
       <form className={styles.filters} method="get">
         <input name="organisationId" type="hidden" value={organisationId} />
-        <label className={styles.field}>
-          Find a request
+        <PortalField label="Find a request">
           <input
-            className={styles.input}
             defaultValue={filters.query}
             name="query"
             placeholder="Search by title"
             type="search"
           />
-        </label>
-        <label className={styles.field}>
-          Request state
-          <select
-            className={styles.input}
-            defaultValue={filters.status ?? "all"}
-            name="status"
-          >
-            <option value="all">All states</option>
-            {requestStatuses.map((value) => (
-              <option key={value} value={value}>
-                {statusLabels[value]}
-              </option>
-            ))}
-          </select>
-        </label>
-        <button className={styles.secondary} type="submit">
+        </PortalField>
+        <PortalSelect
+          defaultValue={filters.status ?? "all"}
+          label="Request state"
+          name="status"
+        >
+          <option value="all">All states</option>
+          {requestStatuses.map((value) => (
+            <option key={value} value={value}>
+              {statusLabels[value]}
+            </option>
+          ))}
+        </PortalSelect>
+        <PortalButton type="submit" variant="secondary">
           Apply filters
-        </button>
+        </PortalButton>
       </form>
 
       <div className={styles.row}>
@@ -115,20 +118,22 @@ export function RequestBoard({
           this view
         </p>
         <div className={styles.viewSwitch} aria-label="Request view">
-          <button
+          <PortalButton
             aria-pressed={view === "board"}
             onClick={() => setView("board")}
             type="button"
+            variant={view === "board" ? "primary" : "quiet"}
           >
             Board
-          </button>
-          <button
+          </PortalButton>
+          <PortalButton
             aria-pressed={view === "list"}
             onClick={() => setView("list")}
             type="button"
+            variant={view === "list" ? "primary" : "quiet"}
           >
             List
-          </button>
+          </PortalButton>
         </div>
       </div>
 
@@ -143,15 +148,15 @@ export function RequestBoard({
             the next step.
           </p>
           <div className={styles.emptyBoardActions}>
-            <Link className={styles.primary} href={requestNewHref(organisationId)}>
+            <PortalActionLink href={requestNewHref(organisationId)}>
               Create first request
-            </Link>
-            <Link
-              className={styles.secondary}
+            </PortalActionLink>
+            <PortalActionLink
               href={requestNewHref(organisationId, "bug")}
+              variant="secondary"
             >
               Report a bug
-            </Link>
+            </PortalActionLink>
           </div>
         </section>
       ) : null}

@@ -129,7 +129,7 @@ export function RequestForm({
         </p>
         <Link
           className={styles.primary}
-          href={`/help?organisationId=${encodeURIComponent(organisationId)}`}
+          href={`/portal/help?organisationId=${encodeURIComponent(organisationId)}`}
         >
           Ask FSS to set up your project
         </Link>
