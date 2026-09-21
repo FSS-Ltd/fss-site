@@ -60,6 +60,11 @@ export async function listPortalWorkspaceDocuments(
         join operations.projects p
           on p.organisation_id = d.organisation_id and p.id = d.project_id
         where d.organisation_id = ${context.organisationId}
+          and p.visibility = 'client'
+          and d.visibility = 'client'
+          and d.scan_status = 'cleared'
+          and d.revoked_at is null
+          and (d.expires_at is null or d.expires_at > clock_timestamp())
         order by d.created_at desc, d.id desc
         limit ${workspacePageSize + 1} offset ${offset}
       `;
@@ -113,16 +118,48 @@ export async function listPortalNotifications(
       if (!hasPortalCapability(context.role, "notifications.read"))
         throw new PortalAccessDenied();
       const rows = await tx<PortalNotification[]>`
-        select id, kind, title, body, request_id as "requestId",
-          request_version as "requestVersion", created_at::text as "createdAt",
-          read_at::text as "readAt"
-        from operations.request_notifications
-        where organisation_id = ${context.organisationId}
-          and (${filter}::text = 'all' or read_at is null)
-        order by created_at desc, id desc
+        select n.id, n.kind, n.title, n.body, n.request_id as "requestId",
+          n.request_version as "requestVersion", n.created_at::text as "createdAt",
+          n.read_at::text as "readAt"
+        from operations.request_notifications n
+        join operations.requests r
+          on r.organisation_id = n.organisation_id and r.id = n.request_id
+        where n.organisation_id = ${context.organisationId}
+          and (${filter}::text <> 'unread' or n.read_at is null)
+          and (${filter}::text <> 'action_needed' or (
+            n.kind = 'review_requested' and r.status = 'ready_for_review'
+          ))
+        order by n.created_at desc, n.id desc
         limit ${workspacePageSize + 1} offset ${offset}
       `;
       return toWorkspaceCollectionPage(rows, page);
+    },
+  );
+}
+
+const notificationReadSchema = z.array(z.uuid()).min(1).max(100);
+
+export async function markPortalNotificationsRead(
+  db: OperationsDb,
+  identity: VerifiedPortalIdentity | null,
+  organisationId: string,
+  correlationId: string,
+  input: unknown,
+): Promise<void> {
+  const ids = notificationReadSchema.parse(input);
+  await withPortalTransaction(
+    db,
+    identity,
+    organisationId,
+    correlationId,
+    async (tx, context) => {
+      if (!hasPortalCapability(context.role, "notifications.read"))
+        throw new PortalAccessDenied();
+      await tx`update operations.request_notifications set read_at = clock_timestamp()
+        where organisation_id = ${context.organisationId}
+          and user_id = ${context.userId}
+          and read_at is null
+          and id in ${tx(ids)}`;
     },
   );
 }

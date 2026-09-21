@@ -1,4 +1,5 @@
 import { Download, ExternalLink, FileText } from "lucide-react";
+import { PortalActionLink } from "@/components/portal/ui";
 import type { PortalWorkspaceDocument } from "@/lib/operations/workspaces/types";
 import styles from "./workspace.module.css";
 
@@ -31,7 +32,7 @@ export function DocumentWorkspaceList({
                 : "Approved link"}
             </p>
           </div>
-          <a
+          <PortalActionLink
             className={styles.rowAction}
             href={
               document.kind === "link"
@@ -42,6 +43,7 @@ export function DocumentWorkspaceList({
               ? { target: "_blank", rel: "noopener noreferrer" }
               : {})}
             aria-label={`${document.kind === "link" ? "Open" : "Download"} ${document.title}${document.kind === "link" ? " in a new tab" : ""}`}
+            variant="secondary"
           >
             {document.kind === "link" ? (
               <ExternalLink aria-hidden="true" size={17} />
@@ -49,7 +51,7 @@ export function DocumentWorkspaceList({
               <Download aria-hidden="true" size={17} />
             )}
             {document.kind === "link" ? "Open" : "Download"}
-          </a>
+          </PortalActionLink>
         </li>
       ))}
     </ul>

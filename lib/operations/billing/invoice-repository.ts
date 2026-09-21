@@ -3,6 +3,7 @@ import type Stripe from "stripe";
 import type { OperationsTransaction } from "../db/client";
 import type {
   BillingInvoice,
+  BillingInvoiceDetail,
   BillingSchedule,
   BillingScope,
 } from "./domain-types";
@@ -103,6 +104,47 @@ export async function loadInvoice(
       })
     )[0] ?? null
   );
+}
+
+const issuedSnapshotSchema = z.object({
+  issuedAt: z.number().int().nonnegative().nullable(),
+  lines: z
+    .array(
+      z.object({
+        amountPence: z.string().regex(/^\d+$/),
+        description: z.string().max(2000).nullable(),
+      }),
+    )
+    .max(200),
+});
+
+export async function loadInvoiceDetail(
+  tx: OperationsTransaction,
+  scope: BillingScope,
+  id: string,
+): Promise<BillingInvoiceDetail | null> {
+  const invoice = await loadInvoice(tx, scope, id);
+  if (!invoice) return null;
+
+  const [row] = await tx<{ issuedSnapshot: unknown }[]>`
+    select issued_snapshot as "issuedSnapshot"
+    from operations.invoices
+    where organisation_id = ${scope.organisationId}
+      and account_id = ${scope.accountId}
+      and environment = ${scope.mode}
+      and id = ${id}
+  `;
+  const snapshot = issuedSnapshotSchema.safeParse(row?.issuedSnapshot);
+  if (!snapshot.success)
+    throw new Error("Issued invoice snapshot is unavailable.");
+
+  return {
+    ...invoice,
+    issuedAt: snapshot.data.issuedAt
+      ? new Date(snapshot.data.issuedAt * 1000).toISOString()
+      : null,
+    lines: snapshot.data.lines,
+  };
 }
 
 export function issuedInvoiceSnapshot(invoice: Stripe.Invoice) {

@@ -1,8 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import styles from "./requests.module.css";
+import { Notice, PortalButton } from "@/components/portal/ui";
 
 export function MarkNotificationsRead({
   organisationId,
@@ -11,7 +10,6 @@ export function MarkNotificationsRead({
   organisationId: string;
   ids: string[];
 }): React.JSX.Element {
-  const router = useRouter();
   const locked = useRef(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
@@ -33,7 +31,7 @@ export function MarkNotificationsRead({
         setError("Notifications could not be marked as read. Try again.");
         return;
       }
-      router.refresh();
+      window.location.reload();
     } catch {
       setError("We could not connect. Try again.");
     } finally {
@@ -43,19 +41,15 @@ export function MarkNotificationsRead({
   }
   return (
     <div>
-      <button
-        type="button"
-        className={styles.secondary}
+      <PortalButton
         onClick={() => void markRead()}
         disabled={pending || ids.length === 0}
+        loading={pending}
+        type="button"
       >
-        {pending
-          ? "Marking read…"
-          : `Mark ${ids.length} notification${ids.length === 1 ? "" : "s"} as read`}
-      </button>
-      <p className={styles.note} role="status">
-        {error}
-      </p>
+        Mark {ids.length} notification{ids.length === 1 ? "" : "s"} as read
+      </PortalButton>
+      {error ? <Notice tone="error">{error}</Notice> : null}
     </div>
   );
 }

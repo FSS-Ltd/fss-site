@@ -21,6 +21,7 @@ const bodySchema = z.strictObject({
   offerId: z.uuid(),
   idempotencyKey: z.uuid(),
   interest: z.string(),
+  preferredStart: z.string().nullable().optional(),
   context: z.record(z.string(), z.string()).optional(),
 });
 
@@ -61,14 +62,14 @@ export async function POST(request: Request): Promise<Response> {
         { error: "Too many requests. Wait a minute and try again." },
         429,
       );
-    const id = await insertOfferEnquiry(
+    const enquiry = await insertOfferEnquiry(
       getPortalDb(),
       identity,
       body.organisationId,
       correlationId,
       parseOfferEnquiry(body),
     );
-    return reply({ enquiry: { id } }, 200);
+    return reply({ enquiry }, 200);
   } catch (error) {
     if (error instanceof PortalAccessDenied)
       return reply(

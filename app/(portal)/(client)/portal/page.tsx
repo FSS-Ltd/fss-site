@@ -5,6 +5,7 @@ import {
   ClientWorkspaceChooser,
 } from "@/components/portal/overview/client-overview";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
+import { StudioUnavailable } from "@/components/portal/auth/studio-unavailable";
 import { Notice, PageHeader } from "@/components/portal/ui";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { needsPortalOnboarding } from "@/lib/operations/auth/pending-invitations";
@@ -20,6 +21,7 @@ import {
 } from "@/lib/operations/auth/staff-invitations";
 import type { VerifiedPortalIdentity } from "@/lib/operations/auth/types";
 import { portalPath } from "@/lib/operations/auth/portal-url";
+import { fssStudioEnabled } from "@/lib/operations/auth/release-flags";
 import { operationsEnabled } from "@/lib/operations/db/client";
 import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { loadClientOverview } from "@/lib/operations/overview/client-overview";
@@ -39,7 +41,8 @@ function NoActiveAccess(): React.JSX.Element {
         title="No active access"
       />
       <Notice tone="info">
-        Open your invitation to activate access, or contact your FSS team for help.
+        Open your invitation to activate access, or contact your FSS team for
+        help.
       </Notice>
     </div>
   );
@@ -82,7 +85,10 @@ export default async function PortalHomePage({
     return <PortalUnavailable />;
   }
 
-  if (staffActive) redirect(portalPath("/admin"));
+  if (staffActive) {
+    if (!fssStudioEnabled()) return <StudioUnavailable />;
+    redirect(portalPath("/admin"));
+  }
   if (staffPending) redirect(portalPath("/portal/login"));
   if (onboardingRequired) redirect(portalPath("/portal/onboarding"));
   if (memberships.length === 0) return <NoActiveAccess />;

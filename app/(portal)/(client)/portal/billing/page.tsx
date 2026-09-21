@@ -1,5 +1,4 @@
 import { randomUUID } from "node:crypto";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPortalPageContext } from "@/lib/operations/auth/page-context";
 import { hasPortalCapability } from "@/lib/operations/auth/permissions";
@@ -9,15 +8,18 @@ import {
   withPortalTransaction,
 } from "@/lib/operations/db/portal-client";
 import { readBillingConfiguration } from "@/lib/operations/billing/configuration";
-import { loadInvoicePage } from "@/lib/operations/billing/invoice-repository";
+import {
+  loadInvoicePage,
+  loadInvoices,
+} from "@/lib/operations/billing/invoice-repository";
 import { loadBillingCustomer } from "@/lib/operations/billing/customer-repository";
-import { InvoiceList } from "@/components/portal/billing/invoice-list";
-import { HostedBillingAction } from "@/components/portal/billing/hosted-action";
+import { ClientBillingOverview } from "@/components/portal/billing/client-billing-overview";
+import {
+  nextOpenInvoice,
+  toInvoiceSummary,
+} from "@/components/portal/billing/presentation";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import { CollectionPagination } from "@/components/portal/workspace/collection-pagination";
-import styles from "@/components/portal/projects.module.css";
-import billing from "@/components/portal/billing/billing.module.css";
-import { portalPath } from "@/lib/operations/auth/portal-url";
 import { parseWorkspacePage } from "@/lib/operations/workspaces/pagination";
 
 export default async function BillingPage({
@@ -51,9 +53,13 @@ export default async function BillingPage({
       async (tx, membership) => {
         if (!hasPortalCapability(membership.role, "billing.read"))
           throw new PortalAccessDenied();
-        const invoices = await loadInvoicePage(tx, scope, page);
-        const customer = await loadBillingCustomer(tx, scope);
+        const [invoices, allInvoices, customer] = await Promise.all([
+          loadInvoicePage(tx, scope, page),
+          loadInvoices(tx, scope),
+          loadBillingCustomer(tx, scope),
+        ]);
         return {
+          allInvoices,
           invoices,
           canManage:
             Boolean(customer) &&
@@ -66,59 +72,19 @@ export default async function BillingPage({
     return <PortalUnavailable />;
   }
   return (
-    <div className={styles.page}>
-      <Link className={styles.breadcrumb} href={portalPath("/portal")}>
-        Your workspace
-      </Link>
-      <p className={styles.eyebrow}>Your account, clearly</p>
-      <h1 className={styles.title}>Billing</h1>
-      <p className={styles.copy}>
-        Your invoices and payment details, in one place.
-      </p>
-      <section className={billing.management} aria-labelledby="payment-details">
-        <div>
-          <h2 id="payment-details">Payment details</h2>
-          <p>
-            {data.canManage
-              ? "Update your payment method securely with Stripe."
-              : "Payment management will be available when billing is set up."}
-          </p>
-        </div>
-        {data.canManage && (
-          <HostedBillingAction
-            primary
-            command={{
-              action: "manage",
-              organisationId: context.organisationId,
-            }}
-          >
-            Manage payment method
-          </HostedBillingAction>
-        )}
-      </section>
-      <section aria-labelledby="invoice-heading">
-        <h2 id="invoice-heading" className={billing.sectionTitle}>
-          Invoices
-        </h2>
-        <p className={styles.copy}>
-          Direct Debit payments can take a few working days to settle. Open an
-          invoice for its latest status before making another payment.
-        </p>
-        <InvoiceList
-          invoices={data.invoices.items}
-          organisationId={context.organisationId}
-        />
+    <ClientBillingOverview
+      canManage={data.canManage}
+      invoices={data.invoices.items.map(toInvoiceSummary)}
+      nextPayment={nextOpenInvoice(data.allInvoices.map(toInvoiceSummary))}
+      organisationId={context.organisationId}
+      pagination={
         <CollectionPagination
           hasNext={data.invoices.hasNext}
           organisationId={context.organisationId}
           page={data.invoices.page}
           path="/portal/billing"
         />
-      </section>
-      <p className={styles.copy}>
-        To change or cancel a service, contact your FSS team. Your agreement’s
-        notice and cancellation terms apply.
-      </p>
-    </div>
+      }
+    />
   );
 }

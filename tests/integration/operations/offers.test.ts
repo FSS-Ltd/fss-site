@@ -51,16 +51,18 @@ test("portal hides drafts, deduplicates enquiries and preserves tenant and payme
       offerId: published.id,
       idempotencyKey: key,
       interest: "Please review this need.",
+      preferredStart: null,
       context: {},
     };
-    const id = await insertOfferEnquiry(
+    const enquiry = await insertOfferEnquiry(
       portal,
       first.identity,
       first.organisationId,
       first.correlationId,
       command,
     );
-    assert.equal(
+    assert.match(enquiry.reference, /^FSS-ENQ-[A-F0-9]{32}$/);
+    assert.deepEqual(
       await insertOfferEnquiry(
         portal,
         first.identity,
@@ -68,7 +70,7 @@ test("portal hides drafts, deduplicates enquiries and preserves tenant and payme
         first.correlationId,
         command,
       ),
-      id,
+      enquiry,
     );
     await assert.rejects(
       insertOfferEnquiry(
@@ -81,7 +83,7 @@ test("portal hides drafts, deduplicates enquiries and preserves tenant and payme
     );
     const [counts] = await admin<
       { enquiries: number; commands: number }[]
-    >`select (select count(*)::integer from operations.offer_enquiries where id=${id}) as enquiries,(select count(*)::integer from operations.billing_commands where organisation_id=${first.organisationId}) as commands`;
+    >`select (select count(*)::integer from operations.offer_enquiries where id=${enquiry.id}) as enquiries,(select count(*)::integer from operations.billing_commands where organisation_id=${first.organisationId}) as commands`;
     assert.deepEqual(counts, { enquiries: 1, commands: 0 });
   } finally {
     await admin`delete from operations.offer_enquiries where offer_id in (${draft.id},${published.id})`;

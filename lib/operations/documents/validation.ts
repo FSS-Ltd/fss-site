@@ -1,6 +1,16 @@
 import { z } from "zod";
 import { documentMimeTypes } from "./types";
 import { MAX_DOCUMENT_BYTES } from "./uploads";
+
+function isCredentialFreeHttpsUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && !url.username && !url.password;
+  } catch {
+    return false;
+  }
+}
+
 const shared = {
   projectId: z.uuid(),
   milestoneId: z.uuid().nullable(),
@@ -11,15 +21,10 @@ const shared = {
 const httpsUrl = z
   .url()
   .max(2000)
-  .refine((value) => {
-    const url = URL.parse(value);
-    return (
-      url !== null &&
-      url.protocol === "https:" &&
-      !url.username &&
-      !url.password
-    );
-  }, "An HTTPS link without credentials is required.");
+  .refine(
+    isCredentialFreeHttpsUrl,
+    "An HTTPS link without credentials is required.",
+  );
 export const documentMetadataSchema = z.discriminatedUnion("kind", [
   z.strictObject({ ...shared, kind: z.literal("link"), url: httpsUrl }),
   z

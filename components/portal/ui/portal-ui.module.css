@@ -216,6 +216,11 @@
   gap: 14px;
 }
 
+.cardContent > form {
+  display: grid;
+  gap: 14px;
+}
+
 .statusBadge {
   display: inline-flex;
   align-items: center;

@@ -26,7 +26,7 @@
   min-width: 0;
 }
 
-.rowContent h2,
+.rowContent h3,
 .rowContent p,
 .empty,
 .preferenceCopy,
@@ -34,7 +34,7 @@
   margin: 0;
 }
 
-.rowContent h2 {
+.rowContent h3 {
   color: var(--portal-ink);
   font-size: 1rem;
   line-height: 1.4;

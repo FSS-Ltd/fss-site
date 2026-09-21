@@ -24,11 +24,13 @@ export function RequestForm({
   organisationId,
   projects,
   createAction,
+  initialProjectId,
   initialType = "work",
 }: {
   organisationId: string;
   projects: Array<{ id: string; title: string }>;
   createAction?: CreateRequestAction;
+  initialProjectId?: string;
   initialType?: RequestType;
 }): React.JSX.Element {
   const router = useRouter();
@@ -113,7 +115,10 @@ export function RequestForm({
 
   if (!projects.length)
     return (
-      <section className={styles.noProject} aria-labelledby="no-project-heading">
+      <section
+        className={styles.noProject}
+        aria-labelledby="no-project-heading"
+      >
         <p className={styles.eyebrow}>Project setup</p>
         <h2 className={styles.sectionTitle} id="no-project-heading">
           A project is needed for this request.
@@ -150,21 +155,27 @@ export function RequestForm({
 
         <PortalCard title={type === "bug" ? "The problem" : "Your request"}>
           <PortalSelect
-            defaultValue={projects.length === 1 ? projects[0].id : ""}
+            defaultValue={
+              projects.some((project) => project.id === initialProjectId)
+                ? initialProjectId
+                : projects.length === 1
+                  ? projects[0].id
+                  : ""
+            }
             error={errors.projectId}
             hint="Only projects you can access appear here."
             label="Project"
             name="projectId"
             required
           >
-              <option disabled value="">
-                Choose a project
+            <option disabled value="">
+              Choose a project
+            </option>
+            {projects.map((project) => (
+              <option key={project.id} value={project.id}>
+                {project.title}
               </option>
-              {projects.map((project) => (
-                <option key={project.id} value={project.id}>
-                  {project.title}
-                </option>
-              ))}
+            ))}
           </PortalSelect>
           <RequestField
             error={errors.title}

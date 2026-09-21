@@ -29,6 +29,7 @@ import {
 } from "@/lib/operations/auth/provision";
 import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { saveUserProfile } from "@/lib/operations/auth/user-profile";
+import { fssStudioEnabled } from "@/lib/operations/auth/release-flags";
 
 export const runtime = "nodejs";
 
@@ -67,6 +68,7 @@ export const POST = createPortalAccessClaimHandler({
   claimVerifiedEmailInvite: claimPortalInviteForVerifiedEmail,
   hasActiveMembership: hasActivePortalMembership,
   needsOnboarding: needsPortalOnboarding,
+  studioEnabled: fssStudioEnabled,
   saveProfile: saveUserProfile,
   reportUnexpectedError: (report) =>
     console.error("Portal access claim failed.", report),

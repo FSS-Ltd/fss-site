@@ -11,6 +11,7 @@ import {
 } from "../../../lib/operations/projects/repository";
 import { executeDocumentCommand } from "../../../lib/operations/documents/service";
 import {
+  getPortalDocumentDetail,
   listProjectDocuments,
   getAuthorisedDocumentDownload,
 } from "../../../lib/operations/documents/repository";
@@ -57,6 +58,14 @@ test("real portal role exposes only scoped public delivery metadata and rechecks
     );
   const download = (id: string) =>
     getAuthorisedDocumentDownload(
+      portal,
+      a.identity,
+      a.organisationId,
+      id,
+      a.correlationId,
+    );
+  const documentDetail = (id: string) =>
+    getPortalDocumentDetail(
       portal,
       a.identity,
       a.organisationId,
@@ -193,6 +202,12 @@ test("real portal role exposes only scoped public delivery metadata and rechecks
         url: "https://example.test/deliverable",
       },
     });
+    const linkDetail = await documentDetail(linkId);
+    assert.equal(linkDetail?.kind, "link");
+    assert.equal(linkDetail?.projectId, project.id);
+    assert.equal(linkDetail?.version, 1);
+    assert.equal(JSON.stringify(linkDetail).includes("review"), false);
+    assert.equal(JSON.stringify(linkDetail).includes("scan"), false);
     const fileId = randomUUID();
     const metadata = {
       kind: "file",
@@ -216,6 +231,7 @@ test("real portal role exposes only scoped public delivery metadata and rechecks
       reviewReference: "registered quarantined",
     });
     assert.equal(await download(fileId), null);
+    assert.equal(await documentDetail(fileId), null);
     assert.equal((await documents(project.id)).length, 1);
     await writeDocument({
       action: "update",
@@ -233,6 +249,30 @@ test("real portal role exposes only scoped public delivery metadata and rechecks
       (await download(fileId))?.objectKey,
       `operations/${a.organisationId}/${fileId}/${metadata.contentHash}`,
     );
+    const fileDetail = await documentDetail(fileId);
+    assert.deepEqual(
+      fileDetail && {
+        filename: fileDetail.kind === "file" ? fileDetail.filename : null,
+        id: fileDetail.id,
+        kind: fileDetail.kind,
+        mimeType: fileDetail.kind === "file" ? fileDetail.mimeType : null,
+        projectId: fileDetail.projectId,
+        sizeBytes: fileDetail.kind === "file" ? fileDetail.sizeBytes : null,
+        version: fileDetail.version,
+      },
+      {
+        filename: "guide.pdf",
+        id: fileId,
+        kind: "file",
+        mimeType: "application/pdf",
+        projectId: project.id,
+        sizeBytes: 32,
+        version: 2,
+      },
+    );
+    assert.equal(JSON.stringify(fileDetail).includes("objectKey"), false);
+    assert.equal(JSON.stringify(fileDetail).includes("contentHash"), false);
+    assert.equal(JSON.stringify(fileDetail).includes("scan"), false);
     // Database checks independently bind scan approval, bytes and object identity.
     for (const column of ["object_key", "scan_content_hash", "content_hash"]) {
       await assert.rejects(
@@ -278,6 +318,16 @@ test("real portal role exposes only scoped public delivery metadata and rechecks
       ),
       null,
     );
+    assert.equal(
+      await getPortalDocumentDetail(
+        portal,
+        b.identity,
+        b.organisationId,
+        fileId,
+        b.correlationId,
+      ),
+      null,
+    );
     assert.deepEqual(await documents(other.id), []);
     for (const role of ["owner", "contributor", "viewer"]) {
       await admin`update operations.memberships set role=${role} where organisation_id=${a.organisationId}`;
@@ -310,6 +360,7 @@ test("real portal role exposes only scoped public delivery metadata and rechecks
       reviewReference: "expired",
     });
     assert.equal(await download(fileId), null);
+    assert.equal(await documentDetail(fileId), null);
     await writeDocument({
       action: "revoke",
       documentId: linkId,
@@ -317,6 +368,7 @@ test("real portal role exposes only scoped public delivery metadata and rechecks
       reviewReference: "revoked",
     });
     assert.deepEqual(await documents(project.id), []);
+    assert.equal(await documentDetail(linkId), null);
     await assert.rejects(
       writeDocument({
         action: "revoke",

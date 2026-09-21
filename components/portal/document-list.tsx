@@ -1,4 +1,5 @@
 import { Download, ExternalLink, FileText } from "lucide-react";
+import { PortalActionLink } from "@/components/portal/ui";
 import type { ClientDocument } from "@/lib/operations/documents/types";
 import styles from "./projects.module.css";
 export function DocumentList({
@@ -38,7 +39,7 @@ export function DocumentList({
                     : "Approved deliverable"}
                 </p>
               </div>
-              <a
+              <PortalActionLink
                 className={styles.documentAction}
                 href={
                   document.kind === "link"
@@ -49,6 +50,7 @@ export function DocumentList({
                   ? { target: "_blank", rel: "noopener noreferrer" }
                   : {})}
                 aria-label={`${document.kind === "link" ? "Open" : "Download"} ${document.title}${document.kind === "link" ? " (opens in a new tab)" : ""}`}
+                variant="secondary"
               >
                 {document.kind === "link" ? (
                   <ExternalLink size={17} aria-hidden="true" />
@@ -56,7 +58,7 @@ export function DocumentList({
                   <Download size={17} aria-hidden="true" />
                 )}
                 <span>{document.kind === "link" ? "Open" : "Download"}</span>
-              </a>
+              </PortalActionLink>
             </li>
           ))}
         </ul>

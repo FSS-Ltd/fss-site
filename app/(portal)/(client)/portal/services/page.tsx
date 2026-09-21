@@ -1,16 +1,13 @@
 import { randomUUID } from "node:crypto";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
-import { OfferList } from "@/components/portal/services/offer-list";
+import { ClientServiceCatalogue } from "@/components/portal/services/client-service-catalogue";
 import { getPortalPageContext } from "@/lib/operations/auth/page-context";
 import { hasPortalCapability } from "@/lib/operations/auth/permissions";
 import { requirePortalMember } from "@/lib/operations/auth/require-member";
 import { PortalAccessDenied } from "@/lib/operations/auth/types";
 import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { listPublishedOffers } from "@/lib/operations/offers/repository";
-import styles from "@/components/portal/projects.module.css";
-import { portalPath } from "@/lib/operations/auth/portal-url";
 
 export default async function ServicesPage({
   searchParams,
@@ -44,22 +41,10 @@ export default async function ServicesPage({
     return <PortalUnavailable />;
   }
   return (
-    <div className={styles.page}>
-      <Link className={styles.breadcrumb} href={portalPath("/portal")}>
-        Your workspace
-      </Link>
-      <p className={styles.eyebrow}>Services</p>
-      <h1 className={styles.title}>Explore what comes next</h1>
-      <p className={styles.copy}>
-        Clear service options for conversations about your next outcome. Nothing
-        here changes your agreement or billing until FSS prepares a proposal and
-        the right people approve it.
-      </p>
-      <OfferList
-        offers={offers}
-        organisationId={context.organisationId}
-        canEnquire={canEnquire}
-      />
-    </div>
+    <ClientServiceCatalogue
+      canEnquire={canEnquire}
+      offers={offers}
+      organisationId={context.organisationId}
+    />
   );
 }

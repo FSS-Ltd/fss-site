@@ -1,16 +1,17 @@
 "use client";
 import { useId, useState } from "react";
+import { PortalButton, type PortalButtonVariant } from "@/components/portal/ui";
 import type { PortalBillingCommand } from "@/lib/operations/http/billing-handler";
 import styles from "./billing.module.css";
 
 export function HostedBillingAction({
   command,
   children,
-  primary = false,
+  variant = "secondary",
 }: {
   command: PortalBillingCommand;
   children: React.ReactNode;
-  primary?: boolean;
+  variant?: PortalButtonVariant;
 }): React.JSX.Element {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,16 +50,15 @@ export function HostedBillingAction({
   }
   return (
     <div className={styles.actionGroup}>
-      <button
+      <PortalButton
         type="button"
-        className={primary ? styles.primaryAction : styles.invoiceAction}
         onClick={openBilling}
-        disabled={pending}
-        aria-busy={pending}
         aria-describedby={error ? errorId : undefined}
+        loading={pending}
+        variant={variant}
       >
-        {pending ? "Opening…" : children}
-      </button>
+        {children}
+      </PortalButton>
       {error && (
         <p className={styles.error} role="alert" id={errorId}>
           {error}

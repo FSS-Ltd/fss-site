@@ -10,7 +10,38 @@ async function openScenario(
   await expect(
     page.getByRole("heading", { level: 1, name: heading }),
   ).toBeVisible();
+  await page.evaluate(async () => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    window.scrollTo({ top: 0 });
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+    });
+    window.scrollTo({ top: 0 });
+  });
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+}
+
+async function openClientScenario(
+  page: Page,
+  scenario: string,
+  heading: string,
+): Promise<void> {
+  await openScenario(page, scenario, heading);
+  await expect(page.getByRole("button", { name: "Sign out" })).toBeVisible();
+}
+
+async function openPhaseFiveScenario(
+  page: Page,
+  scenario: string,
+  heading: string,
+): Promise<void> {
+  if (scenario === "client-invitation-expired") {
+    await openScenario(page, scenario, heading);
+    return;
+  }
+  await openClientScenario(page, scenario, heading);
 }
 
 const phaseFourDesktopScenarios = [
@@ -211,6 +242,159 @@ const phaseFourMobileScenarios = [
   ],
 ] as const;
 
+const phaseFiveDesktopScenarios = [
+  [
+    "C03",
+    "client-projects",
+    "Your projects",
+    "c03-client-projects-desktop.png",
+  ],
+  [
+    "C04",
+    "client-project-detail",
+    "Website & booking experience",
+    "c04-client-project-detail-desktop.png",
+  ],
+  [
+    "C12",
+    "client-documents",
+    "Your documents",
+    "c12-client-documents-desktop.png",
+  ],
+  [
+    "C13",
+    "client-document-detail",
+    "Booking flow · v3",
+    "c13-client-document-detail-desktop.png",
+  ],
+  ["C17", "client-billing", "Billing", "c17-client-billing-desktop.png"],
+  ["C18", "client-invoice", "INV-2026-041", "c18-client-invoice-desktop.png"],
+  [
+    "C19",
+    "client-services",
+    "Support for what comes next.",
+    "c19-client-services-desktop.png",
+  ],
+  [
+    "C20",
+    "client-service-enquiry",
+    "Tell us what you need",
+    "c20-client-service-enquiry-desktop.png",
+  ],
+  [
+    "C21",
+    "client-notifications",
+    "Your updates",
+    "c21-client-notifications-desktop.png",
+  ],
+  ["C22", "client-help", "How can we help?", "c22-client-help-desktop.png"],
+  [
+    "C23",
+    "client-preferences",
+    "Settings",
+    "c23-client-preferences-desktop.png",
+  ],
+  ["C24", "client-team", "Team", "c24-client-team-desktop.png"],
+  [
+    "S04",
+    "client-unavailable",
+    "We couldn’t load your workspace",
+    "s04-client-unavailable-desktop.png",
+  ],
+  [
+    "S05",
+    "client-invitation-expired",
+    "This invitation has expired",
+    "s05-client-invitation-expired-desktop.png",
+  ],
+  [
+    "S07",
+    "client-document-quarantine",
+    "Your documents",
+    "s07-client-document-quarantine-desktop.png",
+  ],
+  [
+    "S10",
+    "client-viewer-access",
+    "Settings",
+    "s10-client-viewer-access-desktop.png",
+  ],
+] as const;
+
+const phaseFiveMobileScenarios = [
+  ["C03", "client-projects", "Your projects", "c03-client-projects-mobile.png"],
+  [
+    "C04",
+    "client-project-detail",
+    "Website & booking experience",
+    "c04-client-project-detail-mobile.png",
+  ],
+  [
+    "C12",
+    "client-documents",
+    "Your documents",
+    "c12-client-documents-mobile.png",
+  ],
+  [
+    "C13",
+    "client-document-detail",
+    "Booking flow · v3",
+    "c13-client-document-detail-mobile.png",
+  ],
+  ["C17", "client-billing", "Billing", "c17-client-billing-mobile.png"],
+  ["C18", "client-invoice", "INV-2026-041", "c18-client-invoice-mobile.png"],
+  [
+    "C19",
+    "client-services",
+    "Support for what comes next.",
+    "c19-client-services-mobile.png",
+  ],
+  [
+    "C20",
+    "client-service-enquiry",
+    "Tell us what you need",
+    "c20-client-service-enquiry-mobile.png",
+  ],
+  [
+    "C21",
+    "client-notifications",
+    "Your updates",
+    "c21-client-notifications-mobile.png",
+  ],
+  ["C22", "client-help", "How can we help?", "c22-client-help-mobile.png"],
+  [
+    "C23",
+    "client-preferences",
+    "Settings",
+    "c23-client-preferences-mobile.png",
+  ],
+  ["C24", "client-team", "Team", "c24-client-team-mobile.png"],
+  [
+    "S04",
+    "client-unavailable",
+    "We couldn’t load your workspace",
+    "s04-client-unavailable-mobile.png",
+  ],
+  [
+    "S05",
+    "client-invitation-expired",
+    "This invitation has expired",
+    "s05-client-invitation-expired-mobile.png",
+  ],
+  [
+    "S07",
+    "client-document-quarantine",
+    "Your documents",
+    "s07-client-document-quarantine-mobile.png",
+  ],
+  [
+    "S10",
+    "client-viewer-access",
+    "Settings",
+    "s10-client-viewer-access-mobile.png",
+  ],
+] as const;
+
 test.describe("FSS Studio desktop visuals", () => {
   test.beforeEach(async ({ page }, testInfo) => {
     test.skip(
@@ -339,6 +523,20 @@ test.describe("FSS Studio desktop visuals", () => {
       await expect(page).toHaveScreenshot(screenshot);
     });
   }
+
+  for (const [
+    coverageId,
+    scenario,
+    heading,
+    screenshot,
+  ] of phaseFiveDesktopScenarios) {
+    test(`Phase 5 ${coverageId} desktop matches the approved client workspace`, async ({
+      page,
+    }) => {
+      await openPhaseFiveScenario(page, scenario, heading);
+      await expect(page).toHaveScreenshot(screenshot);
+    });
+  }
 });
 
 test.describe("FSS Studio mobile visuals", () => {
@@ -401,6 +599,20 @@ test.describe("FSS Studio mobile visuals", () => {
       page,
     }) => {
       await openScenario(page, scenario, heading);
+      await expect(page).toHaveScreenshot(screenshot);
+    });
+  }
+
+  for (const [
+    coverageId,
+    scenario,
+    heading,
+    screenshot,
+  ] of phaseFiveMobileScenarios) {
+    test(`Phase 5 ${coverageId} mobile matches the approved client workspace`, async ({
+      page,
+    }) => {
+      await openPhaseFiveScenario(page, scenario, heading);
       await expect(page).toHaveScreenshot(screenshot);
     });
   }

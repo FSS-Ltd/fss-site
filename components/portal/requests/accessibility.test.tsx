@@ -199,6 +199,7 @@ test("list navigation carries organisation context and status is readable withou
 });
 
 test("creation labels required inputs and does not expose uploads or persisted drafts", () => {
+  const selectedProjectId = "4d3e1c27-3a6c-4720-a163-23b20af2bb6c";
   const html = renderToStaticMarkup(
     <AppRouterContext.Provider value={router}>
       <RequestForm
@@ -220,6 +221,25 @@ test("creation labels required inputs and does not expose uploads or persisted d
   assert.doesNotMatch(html, /Operational priority|name="priority"/);
   const ids = [...html.matchAll(/\sid="([^"]+)"/g)].map((match) => match[1]);
   assert.equal(new Set(ids).size, ids.length);
+
+  const preselectedHtml = renderToStaticMarkup(
+    <AppRouterContext.Provider value={router}>
+      <RequestForm
+        initialProjectId={selectedProjectId}
+        organisationId="org"
+        projects={[
+          { id: request.projectId, title: "Website" },
+          { id: selectedProjectId, title: "Booking flow" },
+        ]}
+      />
+    </AppRouterContext.Provider>,
+  );
+  assert.match(
+    preselectedHtml,
+    new RegExp(
+      `<option value="${selectedProjectId}" selected="">Booking flow</option>`,
+    ),
+  );
 });
 
 test("founder state changes use a keyboard-accessible select and never offer client acceptance", () => {

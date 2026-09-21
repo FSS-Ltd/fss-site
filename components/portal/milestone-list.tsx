@@ -1,7 +1,16 @@
 import { Check } from "lucide-react";
+import { StatusBadge, type PortalStatus } from "@/components/portal/ui";
 import type { ClientMilestone } from "@/lib/operations/projects/types";
 import { projectDate, projectStatusLabels } from "./project-summary";
 import styles from "./projects.module.css";
+
+function projectStatusTone(status: ClientMilestone["status"]): PortalStatus {
+  if (status === "completed") return "success";
+  if (status === "waiting_for_you") return "warning";
+  if (status === "active" || status === "waiting_for_us") return "info";
+  return "neutral";
+}
+
 export function MilestoneList({
   milestones,
 }: {
@@ -35,9 +44,9 @@ export function MilestoneList({
               <div className={styles.milestoneBody}>
                 <div className={styles.sectionHeading}>
                   <h3>{milestone.title}</h3>
-                  <span className={styles.status}>
+                  <StatusBadge status={projectStatusTone(milestone.status)}>
                     {projectStatusLabels[milestone.status]}
-                  </span>
+                  </StatusBadge>
                 </div>
                 <p className={styles.copy}>{milestone.summary}</p>
                 <p className={styles.note}>
