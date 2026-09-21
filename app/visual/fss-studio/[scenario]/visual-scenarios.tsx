@@ -18,6 +18,21 @@ import {
   StudioReviewPackageScenario,
 } from "./request-visual-fixtures";
 import {
+  ClientRequestCompleteScenario,
+  ClientRequestConflictScenario,
+  ClientRequestDetailScenario,
+  ClientRequestEmptyScenario,
+  ClientRequestFeedbackScenario,
+  ClientRequestLoadingScenario,
+  ClientRequestNoProjectScenario,
+  ClientReviewRequestedEmailScenario,
+  ClientWorkCompletedEmailScenario,
+  StudioRequestCreateScenario,
+  StudioRequestDetailScenario,
+  StudioRequestMoveScenario,
+  StudioRequestScopeScenario,
+} from "./request-completion-visual-fixtures";
+import {
   ClientAgreementDetailScenario,
   ClientAgreementListScenario,
   ClientAgreementSigningScenario,
@@ -78,6 +93,15 @@ export type VisualScenarioName =
   | "client-bug-report"
   | "client-request-form"
   | "client-request-review"
+  | "client-request-detail"
+  | "client-request-feedback"
+  | "client-request-complete"
+  | "client-request-empty"
+  | "client-request-no-project"
+  | "client-request-conflict"
+  | "client-request-loading"
+  | "client-review-requested-email"
+  | "client-work-completed-email"
   | "client-agreement-list"
   | "client-agreement-detail"
   | "client-agreement-signing"
@@ -106,6 +130,10 @@ export type VisualScenarioName =
   | "studio-shell"
   | "studio-delivery-board"
   | "studio-review-package"
+  | "studio-request-detail"
+  | "studio-request-scope"
+  | "studio-request-create"
+  | "studio-request-move"
   | "studio-agreement-list"
   | "studio-agreement-builder"
   | "studio-agreement-signed"
@@ -336,6 +364,42 @@ const scenarios: Record<VisualScenarioName, VisualScenario> = {
     name: "client-request-review",
     content: <ClientRequestReviewScenario />,
   },
+  "client-request-detail": {
+    name: "client-request-detail",
+    content: <ClientRequestDetailScenario />,
+  },
+  "client-request-feedback": {
+    name: "client-request-feedback",
+    content: <ClientRequestFeedbackScenario />,
+  },
+  "client-request-complete": {
+    name: "client-request-complete",
+    content: <ClientRequestCompleteScenario />,
+  },
+  "client-request-empty": {
+    name: "client-request-empty",
+    content: <ClientRequestEmptyScenario />,
+  },
+  "client-request-no-project": {
+    name: "client-request-no-project",
+    content: <ClientRequestNoProjectScenario />,
+  },
+  "client-request-conflict": {
+    name: "client-request-conflict",
+    content: <ClientRequestConflictScenario />,
+  },
+  "client-request-loading": {
+    name: "client-request-loading",
+    content: <ClientRequestLoadingScenario />,
+  },
+  "client-review-requested-email": {
+    name: "client-review-requested-email",
+    content: <ClientReviewRequestedEmailScenario />,
+  },
+  "client-work-completed-email": {
+    name: "client-work-completed-email",
+    content: <ClientWorkCompletedEmailScenario />,
+  },
   "client-agreement-list": {
     name: "client-agreement-list",
     content: <ClientAgreementListScenario />,
@@ -444,6 +508,22 @@ const scenarios: Record<VisualScenarioName, VisualScenario> = {
   "studio-review-package": {
     name: "studio-review-package",
     content: <StudioReviewPackageScenario />,
+  },
+  "studio-request-detail": {
+    name: "studio-request-detail",
+    content: <StudioRequestDetailScenario />,
+  },
+  "studio-request-scope": {
+    name: "studio-request-scope",
+    content: <StudioRequestScopeScenario />,
+  },
+  "studio-request-create": {
+    name: "studio-request-create",
+    content: <StudioRequestCreateScenario />,
+  },
+  "studio-request-move": {
+    name: "studio-request-move",
+    content: <StudioRequestMoveScenario />,
   },
   "studio-agreement-list": {
     name: "studio-agreement-list",

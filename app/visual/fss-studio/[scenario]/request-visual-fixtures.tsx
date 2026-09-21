@@ -11,8 +11,11 @@ import type { PortalMembershipSummary } from "@/lib/operations/auth/require-memb
 import type { StaffDeliveryBoardRequest } from "@/lib/operations/requests/staff-repository";
 import type { ClientRequestDetail } from "@/lib/operations/requests/types";
 
-const organisationId = "f10e9fc0-8c60-4f8e-8772-3d01a2bdfc55";
-const projectId = "584a707c-7072-4f5a-92d0-5b1447f05db5";
+export const requestVisualOrganisationId =
+  "f10e9fc0-8c60-4f8e-8772-3d01a2bdfc55";
+export const requestVisualProjectId = "584a707c-7072-4f5a-92d0-5b1447f05db5";
+const organisationId = requestVisualOrganisationId;
+const projectId = requestVisualProjectId;
 
 const memberships: readonly PortalMembershipSummary[] = [
   {
@@ -22,7 +25,7 @@ const memberships: readonly PortalMembershipSummary[] = [
   },
 ];
 
-const reviewRequest: ClientRequestDetail = {
+export const requestVisualReviewRequest: ClientRequestDetail = {
   acknowledgementTarget: "2026-09-12T17:00:00Z",
   actualBehaviour: "",
   allowance: null,
@@ -104,36 +107,36 @@ const reviewRequest: ClientRequestDetail = {
 
 const boardRequests = [
   {
-    ...reviewRequest,
+    ...requestVisualReviewRequest,
     id: "1d879f2d-9a86-4d1c-a3cc-3f92af426341",
     status: "new" as const,
     title: "Customer account area",
     type: "change" as const,
   },
   {
-    ...reviewRequest,
+    ...requestVisualReviewRequest,
     id: "7e1d2ff5-f0d4-4aac-85c5-7b82a7ef3e43",
     status: "planned" as const,
     title: "Contact preferences",
     type: "work" as const,
   },
   {
-    ...reviewRequest,
+    ...requestVisualReviewRequest,
     id: "9c227a1a-2556-40d2-a3d8-93ce30fa2f50",
     status: "in_progress" as const,
     title: "Mobile spacing",
     type: "change" as const,
   },
-  reviewRequest,
+  requestVisualReviewRequest,
   {
-    ...reviewRequest,
+    ...requestVisualReviewRequest,
     id: "bf4b0a67-d96b-438b-a1a4-978b4f63704f",
     status: "changes_requested" as const,
     title: "Services page copy",
     type: "work" as const,
   },
   {
-    ...reviewRequest,
+    ...requestVisualReviewRequest,
     id: "0a03249a-a7de-4039-824a-2b31a7c06a17",
     status: "done" as const,
     title: "Brand landing page",
@@ -141,8 +144,8 @@ const boardRequests = [
   },
 ];
 
-const deliveryRequests: StaffDeliveryBoardRequest[] = boardRequests.map(
-  (request, index) => ({
+export const requestVisualDeliveryRequests: StaffDeliveryBoardRequest[] =
+  boardRequests.map((request, index) => ({
     blocked: index === 1,
     createdAt: request.createdAt,
     id: request.id,
@@ -156,8 +159,7 @@ const deliveryRequests: StaffDeliveryBoardRequest[] = boardRequests.map(
     targetDate: request.targetDate,
     title: request.title,
     version: request.version,
-  }),
-);
+  }));
 
 function ClientFrame({ children }: Readonly<{ children: React.ReactNode }>) {
   return <ClientShell memberships={memberships}>{children}</ClientShell>;
@@ -204,9 +206,7 @@ function ClientRequestForm({
           }
           eyebrow="FSS Studio / Requests"
           title={
-            isBugReport
-              ? "Report a problem"
-              : "What would you like us to do?"
+            isBugReport ? "Report a problem" : "What would you like us to do?"
           }
         />
         <RequestForm
@@ -234,7 +234,7 @@ export function ClientRequestReviewScenario(): React.JSX.Element {
         <PageHeader
           breadcrumbs={[
             { label: "Requests", href: "/portal/requests" },
-            { label: reviewRequest.title },
+            { label: requestVisualReviewRequest.title },
           ]}
           description="Review this exact deliverable version before accepting it or requesting changes."
           eyebrow="FSS Studio / Requests"
@@ -244,7 +244,7 @@ export function ClientRequestReviewScenario(): React.JSX.Element {
           canComment
           hideTitle
           organisationId={organisationId}
-          request={reviewRequest}
+          request={requestVisualReviewRequest}
         />
       </div>
     </ClientFrame>
@@ -263,7 +263,7 @@ export function StudioDeliveryBoardScenario(): React.JSX.Element {
         <StaffDeliveryBoard
           clients={[{ id: organisationId, displayName: "Northstar Studio" }]}
           filters={{ organisationId: "all", status: "all" }}
-          requests={deliveryRequests}
+          requests={requestVisualDeliveryRequests}
         />
       </div>
     </StudioShell>
@@ -277,7 +277,7 @@ export function StudioReviewPackageScenario(): React.JSX.Element {
         <PageHeader
           breadcrumbs={[
             { label: "Delivery", href: "/admin/delivery" },
-            { label: reviewRequest.title },
+            { label: requestVisualReviewRequest.title },
           ]}
           description="Complete the review package before publishing this move."
           eyebrow="FSS Studio / Delivery"
@@ -292,7 +292,7 @@ export function StudioReviewPackageScenario(): React.JSX.Element {
           ]}
           initialAction="review"
           organisationId={organisationId}
-          request={{ ...reviewRequest, status: "in_progress" }}
+          request={{ ...requestVisualReviewRequest, status: "in_progress" }}
         />
       </div>
     </StudioShell>
