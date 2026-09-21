@@ -39,11 +39,29 @@ test("shows reviewed provenance instead of accepting a free-form engagement", ()
           name: "Website & booking experience · Discovery complete",
         },
       ]}
+      growthWorkflowHref="/growth/pipeline"
     />,
   );
 
   assert.match(html, /Review status/);
   assert.match(html, /Discovery complete/);
+  assert.doesNotMatch(html, /<input[^>]*name="engagement"/);
+});
+
+test("returns to the saved draft after directing staff to the Growth workflow", () => {
+  const agreementHref =
+    "/portal/admin/clients/example/agreements/new?draftId=aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+  const html = renderToStaticMarkup(
+    <EngagementForm
+      agreementHref={agreementHref}
+      engagementChoices={[]}
+      growthWorkflowHref={`/growth/pipeline?returnTo=${encodeURIComponent(agreementHref)}`}
+    />,
+  );
+
+  assert.match(html, /Open Growth delivery workflow/);
+  assert.match(html, /draftId=aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/);
+  assert.match(html, /authoritative Growth workflow/);
   assert.doesNotMatch(html, /<input[^>]*name="engagement"/);
 });
 

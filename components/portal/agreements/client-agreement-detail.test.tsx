@@ -148,6 +148,11 @@ test("shows the signed result only after every required signature is retained", 
     />,
   );
 
+  assert.match(html, /Your signed agreement is ready/);
   assert.match(html, /All required parties have signed this agreement/);
   assert.match(html, /Download signed agreement/);
+  assert.match(html, /Your record/);
+  assert.match(html, /Alex Morgan/);
+  assert.match(html, /FSS authorised signer/);
+  assert.match(html, /Retained copy/);
 });

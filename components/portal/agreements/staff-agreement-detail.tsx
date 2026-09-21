@@ -1,3 +1,4 @@
+import { SigningForm } from "@/components/operations/signing/signing-form";
 import type { AgreementRecord } from "@/lib/operations/agreements/types";
 import {
   Notice,
@@ -7,22 +8,40 @@ import {
 } from "@/components/portal/ui";
 import { penceToGbp } from "@/lib/operations/agreements/money-input";
 import { totalLinePence } from "@/lib/operations/agreements/validation";
-import { AgreementStatusCard } from "./presentation";
+import { portalPath } from "@/lib/operations/auth/portal-url";
+import type { SigningApproval } from "@/lib/operations/agreements/signing-types";
+import { AgreementStatusCard, hasCompleteSigningEvidence } from "./presentation";
 import styles from "./agreements.module.css";
 
 export function StaffAgreementDetail({
   organisationId,
   record,
+  signingCommandEndpoint,
+  signingApproval,
+  signingDownloadBase,
+  signingSuccessRedirect,
 }: Readonly<{
   organisationId: string;
   record: AgreementRecord;
+  signingCommandEndpoint?: string;
+  signingApproval?: SigningApproval | null;
+  signingDownloadBase?: string;
+  signingSuccessRedirect?: string;
 }>): React.JSX.Element {
-  const signed = record.status === "signed" && record.evidence !== null;
-  const workspaceHref = `/admin/clients/${encodeURIComponent(organisationId)}/agreements`;
-  const evidenceLabel =
-    record.evidenceProvenance === "authenticated_portal_electronic_signature"
-      ? "Authenticated portal electronic signature evidence"
-      : "Manual founder-confirmed evidence";
+  const completedSigning =
+    signingApproval?.agreementId === record.id &&
+    signingApproval.revision === record.revision &&
+    hasCompleteSigningEvidence(signingApproval)
+      ? signingApproval
+      : null;
+  const manualEvidence = record.status === "signed" && record.evidence !== null;
+  const signed = manualEvidence || completedSigning !== null;
+  const workspaceHref = portalPath(
+    `/portal/admin/clients/${encodeURIComponent(organisationId)}/agreements`,
+  );
+  const evidenceLabel = completedSigning
+    ? "Authenticated portal electronic signature evidence"
+    : "Manual founder-confirmed evidence";
 
   return (
     <article className={styles.detail}>
@@ -34,7 +53,9 @@ export function StaffAgreementDetail({
       </div>
       {signed ? (
         <Notice tone="success">
-          <strong>Signed and recorded.</strong>
+          <strong>
+            {completedSigning ? "Both signatures are complete." : "Signed and recorded."}
+          </strong>
           <p>
             {evidenceLabel} is retained for this exact revision. Service
             activation remains a separate operational step.
@@ -79,7 +100,38 @@ export function StaffAgreementDetail({
           ))}
         </ul>
       </PortalCard>
-      {record.evidence ? (
+      {completedSigning ? (
+        <PortalCard title="Signing record">
+          <dl className={styles.summaryList}>
+            {completedSigning.signatures.map((signature) => (
+              <div key={signature.email}>
+                <dt>{signature.email}</dt>
+                <dd>
+                  {signature.typedName} · {new Intl.DateTimeFormat("en-GB", {
+                    dateStyle: "long",
+                    timeStyle: "short",
+                    timeZone: "Europe/London",
+                  }).format(new Date(signature.signedAt))}
+                </dd>
+              </div>
+            ))}
+            <div>
+              <dt>Retained signed document</dt>
+              <dd>Verified signing evidence and the exact approved source are retained.</dd>
+            </div>
+          </dl>
+          {signingDownloadBase ? (
+            <div className={styles.actionRow}>
+              <PortalActionLink href={`${signingDownloadBase}/signed`} variant="secondary">
+                Open signed copy
+              </PortalActionLink>
+              <PortalActionLink href={`${signingDownloadBase}/audit`} variant="quiet">
+                Open signing record
+              </PortalActionLink>
+            </div>
+          ) : null}
+        </PortalCard>
+      ) : record.evidence ? (
         <PortalCard title="Retained evidence">
           <dl className={styles.summaryList}>
             <div>
@@ -99,17 +151,33 @@ export function StaffAgreementDetail({
       ) : null}
       <AgreementStatusCard status={signed ? "signed" : "draft"} />
       {!signed ? (
-        <PortalCard
-          description="Use this only when retained manual evidence is available for every required signer. This path does not represent provider verification."
-          title="Manual evidence"
-        >
-          <PortalActionLink
-            href={`${workspaceHref}/${record.id}/record-signature`}
-            variant="secondary"
+        <>
+          {signingCommandEndpoint && signingSuccessRedirect ? (
+            <PortalCard
+              description="Create the retained signing source from this exact revision, then review and approve the named signers in the signing workspace."
+              title="Prepare signing"
+            >
+              <SigningForm
+                agreement={{ id: record.id, version: record.version }}
+                audience="staff"
+                commandEndpoint={signingCommandEndpoint}
+                organisationId={organisationId}
+                successRedirect={signingSuccessRedirect}
+              />
+            </PortalCard>
+          ) : null}
+          <PortalCard
+            description="Use this only when retained manual evidence is available for every required signer. The server checks its fingerprints against this exact source; this path does not represent provider verification."
+            title="Manual evidence"
           >
-            Record signed evidence
-          </PortalActionLink>
-        </PortalCard>
+            <PortalActionLink
+              href={`${workspaceHref}/${record.id}/record-signature`}
+              variant="secondary"
+            >
+              Record signed evidence
+            </PortalActionLink>
+          </PortalCard>
+        </>
       ) : null}
       <PortalActionLink href={workspaceHref} variant="secondary">
         Back to agreement workspace

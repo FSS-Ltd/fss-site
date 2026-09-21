@@ -97,6 +97,8 @@ test("binds the signer to the exact approved revision", () => {
 
   assert.match(html, /Signing as Alex Morgan/);
   assert.match(html, /Agreement revision 2/);
+  assert.match(html, /Full legal name/);
+  assert.match(html, /Role \/ position/);
   assert.match(html, /Confirm your agreement/);
   assert.match(html, /Sign agreement/);
   assert.doesNotMatch(html, /Sign agreement[\s\S]*Revision 1/);

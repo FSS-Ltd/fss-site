@@ -41,7 +41,8 @@ test("groups FSS Studio agreement work by actionable status", () => {
   assert.match(html, /Signed/);
   assert.match(html, /Continue draft/);
   assert.match(html, /Approval is not signature/);
-  assert.match(html, /Approved and queued/);
+  assert.match(html, /Awaiting signature/);
+  assert.doesNotMatch(html, /Approved and queued/);
 });
 
 test("describes signed records as completed evidence rather than an approval", () => {

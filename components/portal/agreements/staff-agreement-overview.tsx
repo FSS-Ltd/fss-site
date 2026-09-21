@@ -1,5 +1,6 @@
 import type { StaffAgreementOverviewRow } from "@/lib/operations/agreements/repository";
 import type { StaffSigningReadiness } from "@/lib/operations/agreements/signing-repository";
+import { portalPath } from "@/lib/operations/auth/portal-url";
 import {
   Notice,
   PageHeader,
@@ -15,11 +16,15 @@ type StaffAgreementOverviewProps = Readonly<{
 }>;
 
 function agreementWorkspaceHref(organisationId: string): string {
-  return `/admin/clients/${encodeURIComponent(organisationId)}/agreements`;
+  return portalPath(
+    `/portal/admin/clients/${encodeURIComponent(organisationId)}/agreements`,
+  );
 }
 
 function signingWorkspaceHref(organisationId: string): string {
-  return `/admin/clients/${encodeURIComponent(organisationId)}/signing`;
+  return portalPath(
+    `/portal/admin/clients/${encodeURIComponent(organisationId)}/signing`,
+  );
 }
 
 function AgreementWorkspaceRow({
@@ -95,18 +100,16 @@ function AgreementGroup({
   );
 }
 
-function signingTone(
-  status: StaffSigningReadiness["status"],
-): "error" | "info" | "warning" {
+function signingTone(status: StaffSigningReadiness["status"]): "error" | "info" | "warning" {
   if (status === "expired") return "error";
   if (status === "approved") return "info";
   return "warning";
 }
 
 function signingLabel(status: StaffSigningReadiness["status"]): string {
-  if (status === "approved") return "Approved and queued";
+  if (status === "approved") return "Awaiting signature";
   if (status === "expired") return "Signing deadline expired";
-  return "Ready for founder review";
+  return "Prepared for approval";
 }
 
 export function StaffAgreementOverview({
@@ -128,7 +131,9 @@ export function StaffAgreementOverview({
     <div className={styles.page}>
       <PageHeader
         action={
-          <PortalActionLink href="/admin/clients">New agreement</PortalActionLink>
+          <PortalActionLink href={portalPath("/portal/admin/clients")}>
+            New agreement
+          </PortalActionLink>
         }
         breadcrumbs={[{ label: "FSS Studio" }, { label: "Agreements" }]}
         description="Create clear agreements and track every revision, signing step and retained evidence."

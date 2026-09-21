@@ -35,10 +35,14 @@ import {
 import {
   ClientAgreementDetailScenario,
   ClientAgreementListScenario,
+  ClientAgreementSignedScenario,
   ClientAgreementSigningScenario,
+  StudioEngagementProvenanceScenario,
   StudioAgreementBuilderScenario,
   StudioAgreementListScenario,
   StudioAgreementSignedScenario,
+  StudioSignatureEvidenceScenario,
+  StudioSigningStatusScenario,
 } from "./agreement-visual-fixtures";
 import {
   ClientGettingStartedScenario,
@@ -104,6 +108,7 @@ export type VisualScenarioName =
   | "client-work-completed-email"
   | "client-agreement-list"
   | "client-agreement-detail"
+  | "client-agreement-signed"
   | "client-agreement-signing"
   | "client-getting-started"
   | "client-onboarding-profile"
@@ -136,7 +141,16 @@ export type VisualScenarioName =
   | "studio-request-move"
   | "studio-agreement-list"
   | "studio-agreement-builder"
+  | "studio-agreement-builder-scope"
+  | "studio-agreement-builder-fees"
+  | "studio-agreement-builder-people"
+  | "studio-agreement-builder-document"
+  | "studio-agreement-builder-review"
+  | "studio-agreement-no-engagement"
   | "studio-agreement-signed"
+  | "studio-engagement-provenance"
+  | "studio-signature-evidence"
+  | "studio-signing-status"
   | "studio-welcome-journeys"
   | "studio-welcome-builder"
   | "studio-welcome-content"
@@ -408,6 +422,10 @@ const scenarios: Record<VisualScenarioName, VisualScenario> = {
     name: "client-agreement-detail",
     content: <ClientAgreementDetailScenario />,
   },
+  "client-agreement-signed": {
+    name: "client-agreement-signed",
+    content: <ClientAgreementSignedScenario />,
+  },
   "client-agreement-signing": {
     name: "client-agreement-signing",
     content: <ClientAgreementSigningScenario />,
@@ -533,9 +551,45 @@ const scenarios: Record<VisualScenarioName, VisualScenario> = {
     name: "studio-agreement-builder",
     content: <StudioAgreementBuilderScenario />,
   },
+  "studio-agreement-builder-scope": {
+    name: "studio-agreement-builder-scope",
+    content: <StudioAgreementBuilderScenario step="scope" />,
+  },
+  "studio-agreement-builder-fees": {
+    name: "studio-agreement-builder-fees",
+    content: <StudioAgreementBuilderScenario step="fees" />,
+  },
+  "studio-agreement-builder-people": {
+    name: "studio-agreement-builder-people",
+    content: <StudioAgreementBuilderScenario step="people" />,
+  },
+  "studio-agreement-builder-document": {
+    name: "studio-agreement-builder-document",
+    content: <StudioAgreementBuilderScenario step="document" />,
+  },
+  "studio-agreement-builder-review": {
+    name: "studio-agreement-builder-review",
+    content: <StudioAgreementBuilderScenario step="review" />,
+  },
+  "studio-agreement-no-engagement": {
+    name: "studio-agreement-no-engagement",
+    content: <StudioAgreementBuilderScenario noEngagement />,
+  },
   "studio-agreement-signed": {
     name: "studio-agreement-signed",
     content: <StudioAgreementSignedScenario />,
+  },
+  "studio-engagement-provenance": {
+    name: "studio-engagement-provenance",
+    content: <StudioEngagementProvenanceScenario />,
+  },
+  "studio-signature-evidence": {
+    name: "studio-signature-evidence",
+    content: <StudioSignatureEvidenceScenario />,
+  },
+  "studio-signing-status": {
+    name: "studio-signing-status",
+    content: <StudioSigningStatusScenario />,
   },
   "studio-welcome-journeys": {
     name: "studio-welcome-journeys",

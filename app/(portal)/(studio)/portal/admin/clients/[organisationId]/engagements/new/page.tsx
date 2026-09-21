@@ -8,6 +8,7 @@ import styles from "@/components/portal/agreements/agreements.module.css";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
+import { portalPath } from "@/lib/operations/auth/portal-url";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import { listStaffAgreementRegister } from "@/lib/operations/agreements/repository";
 
@@ -15,8 +16,10 @@ export const dynamic = "force-dynamic";
 
 export default async function StaffEngagementPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ organisationId: string }>;
+  searchParams: Promise<{ draftId?: string | string[] }>;
 }): Promise<React.JSX.Element> {
   if (!operationsEnabled()) notFound();
   if (!portalAuthConfigured()) return <PortalUnavailable />;
@@ -24,6 +27,10 @@ export default async function StaffEngagementPage({
   if (!identity) return <PortalUnavailable />;
   const organisationId = z.uuid().safeParse((await params).organisationId);
   if (!organisationId.success) notFound();
+  const rawDraftId = (await searchParams).draftId;
+  if (Array.isArray(rawDraftId)) notFound();
+  const draftId = rawDraftId ? z.uuid().safeParse(rawDraftId) : null;
+  if (rawDraftId && !draftId?.success) notFound();
 
   let register;
   try {
@@ -35,12 +42,20 @@ export default async function StaffEngagementPage({
   }
   if (!register) notFound();
 
-  const agreementHref = `/admin/clients/${organisationId.data}/agreements`;
+  const agreementBaseHref = portalPath(
+    `/portal/admin/clients/${organisationId.data}/agreements`,
+  );
+  const agreementHref = draftId?.success
+    ? `${agreementBaseHref}/new?${new URLSearchParams({ draftId: draftId.data }).toString()}`
+    : agreementBaseHref;
+  const growthWorkflowHref = `/growth/pipeline?${new URLSearchParams({
+    returnTo: agreementHref,
+  }).toString()}`;
   return (
     <div className={styles.page}>
       <PageHeader
         breadcrumbs={[
-          { label: "Agreements", href: agreementHref },
+          { label: "Agreements", href: agreementBaseHref },
           { label: "Engagement provenance" },
         ]}
         description="Only reviewed organisation mappings can become agreement work."
@@ -50,6 +65,7 @@ export default async function StaffEngagementPage({
       <EngagementForm
         agreementHref={agreementHref}
         engagementChoices={register.engagementChoices ?? []}
+        growthWorkflowHref={growthWorkflowHref}
       />
     </div>
   );

@@ -1,12 +1,20 @@
-import { AgreementBuilder } from "@/components/portal/agreements/agreement-builder";
 import { ClientAgreementDetail } from "@/components/portal/agreements/client-agreement-detail";
 import { ClientAgreementList } from "@/components/portal/agreements/client-agreement-list";
 import { ClientSigningReview } from "@/components/portal/agreements/client-signing-review";
+import { EngagementForm } from "@/components/portal/agreements/engagement-form";
 import { StaffAgreementDetail } from "@/components/portal/agreements/staff-agreement-detail";
+import {
+  StaffAgreementBuilder,
+  type AgreementEngagementChoice,
+} from "@/components/portal/agreements/staff-agreement-builder";
 import { StaffAgreementOverview } from "@/components/portal/agreements/staff-agreement-overview";
+import { StaffSigningStatus } from "@/components/portal/agreements/staff-signing-status";
+import { SignatureEvidenceForm } from "@/components/portal/agreements/signature-evidence-form";
 import { ClientShell } from "@/components/portal/shell/client-shell";
 import { StudioShell } from "@/components/portal/shell/studio-shell";
 import { PageHeader } from "@/components/portal/ui";
+import type { AgreementBuilderStep } from "@/lib/operations/agreements/builder-draft-schema";
+import type { AgreementBuilderDraft } from "@/lib/operations/agreements/builder-draft-service";
 import type { AgreementRecord } from "@/lib/operations/agreements/types";
 import type { SigningApproval } from "@/lib/operations/agreements/signing-types";
 
@@ -55,6 +63,32 @@ const draft = {
   title: "Website & booking experience",
 };
 
+const builderAgreement = {
+  assetsRequired: draft.assetsRequired,
+  billingContact: draft.billingContact,
+  currency: draft.currency,
+  goals: draft.goals,
+  installments: draft.installments,
+  lines: draft.lines,
+  minimumTermMonths: draft.minimumTermMonths,
+  noticeDays: draft.noticeDays,
+  requiredDepositPence: draft.requiredDepositPence,
+  responsibilities: draft.responsibilities,
+  scope: draft.scope,
+  signatories: draft.signatories,
+  support: draft.support,
+  taxTreatment: draft.taxTreatment,
+  terms: draft.terms,
+  title: draft.title,
+};
+
+const engagementChoices: readonly AgreementEngagementChoice[] = [
+  {
+    id: "9d8be1e3-f8d8-4fe1-b15d-01e78c438384",
+    name: "Website & booking experience · Discovery complete",
+  },
+];
+
 const approval: SigningApproval = {
   agreementId,
   agreementVersion: 2,
@@ -73,6 +107,26 @@ const approval: SigningApproval = {
   sourceHash: "c".repeat(64),
   status: "approved",
   title: draft.title,
+};
+
+const completedApproval: SigningApproval = {
+  ...approval,
+  completedAt: "2026-09-15T11:25:00.000Z",
+  signatures: [
+    {
+      email: "alex@northstar.example",
+      signedAt: "2026-09-15T11:24:00.000Z",
+      typedName: "Alex Morgan",
+      userId: "a29f4e42-9b72-4202-a4c8-55a75f4d03dc",
+    },
+    {
+      email: "fss@faithful.software",
+      signedAt: "2026-09-15T11:25:00.000Z",
+      typedName: "FSS authorised signer",
+      userId: "a4d4a4c5-bf79-4bf9-8fea-19bef0e809fc",
+    },
+  ],
+  status: "completed",
 };
 
 const signedRecord: AgreementRecord = {
@@ -99,6 +153,24 @@ const memberships = [
   { displayName: "Northstar Studio", organisationId, role: "owner" as const },
 ];
 
+function builderDraft(
+  step: AgreementBuilderStep,
+  noEngagement = false,
+): AgreementBuilderDraft {
+  return {
+    content: noEngagement
+      ? { agreement: { title: draft.title } }
+      : { agreement: builderAgreement, engagementId: signedRecord.engagementId },
+    createdAt: "2026-09-15T09:00:00.000Z",
+    engagementId: noEngagement ? null : signedRecord.engagementId,
+    id: "e5d6e353-c33d-488f-9cb0-1d7b05e07050",
+    organisationId,
+    step,
+    updatedAt: "2026-09-15T09:00:00.000Z",
+    version: 3,
+  };
+}
+
 export function ClientAgreementListScenario(): React.JSX.Element {
   return (
     <ClientShell memberships={memberships}>
@@ -117,6 +189,22 @@ export function ClientAgreementDetailScenario(): React.JSX.Element {
       <PageHeader eyebrow="FSS Studio / Agreements" title={draft.title} />
       <ClientAgreementDetail
         approval={approval}
+        email="alex@northstar.example"
+        organisationId={organisationId}
+      />
+    </ClientShell>
+  );
+}
+
+export function ClientAgreementSignedScenario(): React.JSX.Element {
+  return (
+    <ClientShell memberships={memberships}>
+      <PageHeader
+        eyebrow="FSS Studio / Agreements"
+        title="Your signed agreement"
+      />
+      <ClientAgreementDetail
+        approval={completedApproval}
         email="alex@northstar.example"
         organisationId={organisationId}
       />
@@ -165,23 +253,28 @@ export function StudioAgreementListScenario(): React.JSX.Element {
   );
 }
 
-export function StudioAgreementBuilderScenario(): React.JSX.Element {
+export function StudioAgreementBuilderScenario({
+  noEngagement = false,
+  step = "link",
+}: Readonly<{
+  noEngagement?: boolean;
+  step?: AgreementBuilderStep;
+}>): React.JSX.Element {
+  const currentDraft = builderDraft(step, noEngagement);
   return (
     <StudioShell>
       <PageHeader
         eyebrow="FSS Studio / Agreements"
         title="Create an agreement"
       />
-      <AgreementBuilder
-        engagementChoices={[
-          {
-            id: signedRecord.engagementId,
-            name: "Website & booking experience · Discovery complete",
-          },
-        ]}
-        engagementHref="/admin/clients/example/engagements/new"
+      <StaffAgreementBuilder
+        agreementListHref={`/portal/admin/clients/${organisationId}/agreements`}
+        baseHref={`/portal/admin/clients/${organisationId}/agreements/new`}
+        commandEndpoint={`/api/portal/admin/clients/${organisationId}/agreement-drafts`}
+        engagementHref={`/portal/admin/clients/${organisationId}/engagements/new?draftId=${currentDraft.id}`}
+        engagements={noEngagement ? [] : engagementChoices}
+        initialDraft={currentDraft}
         organisationName="Northstar Studio"
-        step="fees"
       />
     </StudioShell>
   );
@@ -197,6 +290,43 @@ export function StudioAgreementSignedScenario(): React.JSX.Element {
       <StaffAgreementDetail
         organisationId={organisationId}
         record={signedRecord}
+        signingApproval={completedApproval}
+        signingDownloadBase={`/api/portal/admin/clients/${organisationId}/signing/${approvalId}`}
+      />
+    </StudioShell>
+  );
+}
+
+export function StudioEngagementProvenanceScenario(): React.JSX.Element {
+  const agreementHref = `/portal/admin/clients/${organisationId}/agreements/new?draftId=e5d6e353-c33d-488f-9cb0-1d7b05e07050`;
+  return (
+    <StudioShell>
+      <PageHeader eyebrow="FSS Studio / Agreements" title="Create an engagement" />
+      <EngagementForm
+        agreementHref={agreementHref}
+        engagementChoices={engagementChoices}
+        growthWorkflowHref={`/growth/pipeline?returnTo=${encodeURIComponent(agreementHref)}`}
+      />
+    </StudioShell>
+  );
+}
+
+export function StudioSignatureEvidenceScenario(): React.JSX.Element {
+  return (
+    <StudioShell>
+      <PageHeader eyebrow="FSS Studio / Agreements" title="Record signed evidence" />
+      <SignatureEvidenceForm organisationId={organisationId} record={signedRecord} />
+    </StudioShell>
+  );
+}
+
+export function StudioSigningStatusScenario(): React.JSX.Element {
+  return (
+    <StudioShell>
+      <PageHeader eyebrow="FSS Studio / Agreements" title="Signing status" />
+      <StaffSigningStatus
+        approval={approval}
+        downloadBase={`/api/portal/admin/clients/${organisationId}/signing/${approvalId}`}
       />
     </StudioShell>
   );

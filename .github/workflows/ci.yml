@@ -19,7 +19,10 @@ jobs:
   validate:
     name: Lint and Build
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # The Operations, Growth, and full visual suites run serially. Allow the
+    # visual regression check to complete after the data-backed suites rather
+    # than cancelling the validation job before it can upload failures.
+    timeout-minutes: 35
     services:
       postgres:
         image: postgres:17
