@@ -21,6 +21,8 @@ const { FounderActionFields } =
   require("./founder-action-fields") as typeof import("./founder-action-fields");
 const { RequestDetail } =
   require("./request-detail") as typeof import("./request-detail");
+const { ReviewActions } =
+  require("./review-actions") as typeof import("./review-actions");
 const { RequestForm } =
   require("./request-form") as typeof import("./request-form");
 const { FounderRequestActions } =
@@ -496,4 +498,42 @@ test("request creation exposes the no-project recovery and bug-report fields", (
   assert.match(noProjectHtml, /Ask FSS to set up your project/);
   assert.match(bugHtml, /Steps to reproduce/);
   assert.match(bugHtml, /What happened instead/);
+});
+
+test("request detail keeps review decisions on the dedicated review route", () => {
+  const html = renderToStaticMarkup(
+    <AppRouterContext.Provider value={router}>
+      <RequestDetail
+        request={request}
+        organisationId="org"
+        canComment
+        showReviewActions={false}
+      />
+    </AppRouterContext.Provider>,
+  );
+
+  assert.match(html, /Review v1/);
+  assert.doesNotMatch(html, /Accept v1|Send feedback/);
+});
+
+test("review feedback starts selected and presents conflict recovery without serializing a draft", () => {
+  const html = renderToStaticMarkup(
+    <AppRouterContext.Provider value={router}>
+      <ReviewActions
+        request={request}
+        commandAction={async () => ({
+          ok: false,
+          conflict: true,
+          error: "This request has changed.",
+        })}
+        initialDecision="request_changes"
+        initialConflict
+        onRefresh={() => {}}
+      />
+    </AppRouterContext.Provider>,
+  );
+
+  assert.match(html, /What needs changing\?/);
+  assert.match(html, /Review the latest version/);
+  assert.doesNotMatch(html, /name="feedback"[^>]*value=/);
 });

@@ -40,6 +40,9 @@ export function RequestDetail({
   commandAction,
   hidePortalActions = false,
   hideTitle = false,
+  initialConflict = false,
+  initialReviewDecision,
+  showReviewActions = true,
 }: {
   request: ClientRequestDetail;
   organisationId: string;
@@ -47,6 +50,9 @@ export function RequestDetail({
   commandAction?: RequestAction;
   hidePortalActions?: boolean;
   hideTitle?: boolean;
+  initialConflict?: boolean;
+  initialReviewDecision?: "accept" | "request_changes";
+  showReviewActions?: boolean;
 }): React.JSX.Element {
   const router = useRouter();
   const action: RequestAction =
@@ -81,6 +87,27 @@ export function RequestDetail({
             "Your FSS team will assess the request and confirm the next step."}
         </p>
       </Notice>
+      {initialConflict && !showReviewActions ? (
+        <Notice
+          action={
+            request.status === "ready_for_review" ? (
+              <Link
+                className={styles.followUpLink}
+                href={`/portal/requests/${encodeURIComponent(request.id)}/review?organisationId=${encodeURIComponent(organisationId)}`}
+              >
+                Review the latest version
+              </Link>
+            ) : undefined
+          }
+          tone="warning"
+        >
+          <strong>This request has changed.</strong>
+          <p className={styles.noticeCopy}>
+            Review the current record before submitting a decision. No decision
+            has been recorded from the stale version.
+          </p>
+        </Notice>
+      ) : null}
       <PortalCard title="Request details">
         <dl className={styles.facts}>
           <div>
@@ -151,13 +178,32 @@ export function RequestDetail({
           </dl>
         )}
       </PortalCard>
-      {!hidePortalActions && (
+      {!hidePortalActions && showReviewActions && (
         <ReviewActions
           request={request}
           commandAction={action}
+          initialConflict={initialConflict}
+          initialDecision={initialReviewDecision}
           onRefresh={() => router.refresh()}
         />
       )}
+      {!hidePortalActions &&
+      !showReviewActions &&
+      request.status === "ready_for_review" ? (
+        <PortalCard
+          className={styles.section}
+          description="Open the exact version before accepting it or asking FSS for changes."
+          title="Your review is ready"
+          tone="accent"
+        >
+          <Link
+            className={styles.followUpLink}
+            href={`/portal/requests/${encodeURIComponent(request.id)}/review?organisationId=${encodeURIComponent(organisationId)}`}
+          >
+            Review {request.deliverableVersion || "the update"}
+          </Link>
+        </PortalCard>
+      ) : null}
       {(request.publicSummary || request.documents.length > 0) && (
         <PortalCard
           className={styles.section}
