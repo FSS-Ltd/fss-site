@@ -8,6 +8,7 @@ import styles from "@/components/portal/agreements/agreements.module.css";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
+import { portalPath } from "@/lib/operations/auth/portal-url";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import { getStaffAgreement } from "@/lib/operations/agreements/repository";
 
@@ -43,14 +44,17 @@ export default async function StaffSignatureEvidencePage({
   }
   if (!record || record.status === "signed") notFound();
 
-  const agreementHref = `/admin/clients/${organisationId.data}/agreements/${record.id}`;
+  const agreementWorkspaceHref = portalPath(
+    `/portal/admin/clients/${organisationId.data}/agreements`,
+  );
+  const agreementHref = `${agreementWorkspaceHref}/${record.id}`;
   return (
     <div className={styles.page}>
       <PageHeader
         breadcrumbs={[
           {
             label: "Agreements",
-            href: `/admin/clients/${organisationId.data}/agreements`,
+            href: agreementWorkspaceHref,
           },
           { label: record.draft.title, href: agreementHref },
           { label: "Record signed evidence" },

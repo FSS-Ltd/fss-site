@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/portal/ui";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
+import { portalPath } from "@/lib/operations/auth/portal-url";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import { getStaffAgreement } from "@/lib/operations/agreements/repository";
 import styles from "@/components/portal/agreements/agreements.module.css";
@@ -37,7 +38,9 @@ export default async function StaffAgreementPage({
   }
   if (!record) notFound();
 
-  const workspaceHref = `/admin/clients/${organisationId.data}/agreements`;
+  const workspaceHref = portalPath(
+    `/portal/admin/clients/${organisationId.data}/agreements`,
+  );
   return (
     <div className={styles.page}>
       <PageHeader

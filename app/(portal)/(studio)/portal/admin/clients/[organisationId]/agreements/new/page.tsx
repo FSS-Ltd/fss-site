@@ -1,0 +1,96 @@
+import { randomUUID } from "node:crypto";
+import { notFound } from "next/navigation";
+import { z } from "zod";
+import { RoutedStaffAgreementBuilder } from "@/components/portal/agreements/routed-staff-agreement-builder";
+import { PortalUnavailable } from "@/components/portal/auth/unavailable";
+import { PageHeader } from "@/components/portal/ui";
+import styles from "@/components/portal/agreements/agreements.module.css";
+import { getPortalIdentity } from "@/lib/operations/auth/server";
+import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
+import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
+import { portalPath } from "@/lib/operations/auth/portal-url";
+import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
+import { loadStaffAgreementBuilderDraft } from "@/lib/operations/agreements/builder-draft-service";
+import { listStaffAgreementRegister } from "@/lib/operations/agreements/repository";
+
+export const dynamic = "force-dynamic";
+
+function parseDraftId(value: string | string[] | undefined): string | null {
+  if (value === undefined) return null;
+  if (Array.isArray(value)) notFound();
+  const parsed = z.uuid().safeParse(value);
+  if (!parsed.success) notFound();
+  return parsed.data;
+}
+
+export default async function NewStaffAgreementPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ organisationId: string }>;
+  searchParams: Promise<{ draftId?: string | string[]; step?: string | string[] }>;
+}): Promise<React.JSX.Element> {
+  if (!operationsEnabled()) notFound();
+  if (!portalAuthConfigured()) return <PortalUnavailable />;
+  const identity = await getPortalIdentity();
+  if (!identity) return <PortalUnavailable />;
+
+  const organisationId = z.uuid().safeParse((await params).organisationId);
+  const draftId = parseDraftId((await searchParams).draftId);
+  if (!organisationId.success) notFound();
+
+  let register;
+  let initialDraft;
+  try {
+    const db = getOperationsDb();
+    const admin = await requireFssAdmin(db, identity, randomUUID());
+    register = await listStaffAgreementRegister(db, admin, organisationId.data);
+    initialDraft = draftId
+      ? await loadStaffAgreementBuilderDraft(
+          db,
+          admin,
+          organisationId.data,
+          draftId,
+        )
+      : null;
+  } catch {
+    return <PortalUnavailable />;
+  }
+  if (!register || (draftId && !initialDraft)) notFound();
+
+  const agreementListHref = portalPath(
+    `/portal/admin/clients/${organisationId.data}/agreements`,
+  );
+  const baseHref = `${agreementListHref}/new`;
+  const engagementHref = portalPath(
+    `/portal/admin/clients/${organisationId.data}/engagements/new`,
+  );
+
+  return (
+    <div className={styles.page}>
+      <PageHeader
+        breadcrumbs={[
+          { label: "Clients", href: portalPath("/portal/admin/clients") },
+          {
+            label: register.organisationName,
+            href: portalPath(`/portal/admin/clients/${organisationId.data}`),
+          },
+          { label: "Agreements", href: agreementListHref },
+          { label: "Create agreement" },
+        ]}
+        description="Build a complete agreement from reviewed work. The server checks the saved draft again before it creates an agreement record."
+        eyebrow="FSS Studio / Agreements"
+        title="Create an agreement"
+      />
+      <RoutedStaffAgreementBuilder
+        agreementListHref={agreementListHref}
+        baseHref={baseHref}
+        commandEndpoint={`/api/portal/admin/clients/${organisationId.data}/agreement-drafts`}
+        engagementHref={engagementHref}
+        engagements={register.engagementChoices ?? []}
+        initialDraft={initialDraft}
+        organisationName={register.organisationName}
+      />
+    </div>
+  );
+}

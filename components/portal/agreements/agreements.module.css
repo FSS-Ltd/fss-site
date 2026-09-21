@@ -11,6 +11,130 @@
   gap: 20px;
 }
 
+.builderCard,
+.relatedWork,
+.documentPreview {
+  display: grid;
+  gap: 16px;
+}
+
+.builderCardHeading,
+.feeLineHeading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.builderCardHeading h2,
+.feeLineHeading h3 {
+  margin: 0;
+  color: var(--portal-ink, #0a1a2e);
+  font-size: 1.125rem;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+}
+
+.builderIcon {
+  display: inline-grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--portal-tint, #e3f2f1);
+  color: var(--portal-action, #0f7078);
+}
+
+.stepCaption,
+.totalLine {
+  margin: 0;
+  color: var(--portal-muted, #46566c);
+  font-size: 0.8125rem;
+  font-weight: 650;
+  letter-spacing: 0.035em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.totalLine strong {
+  margin-left: 6px;
+  color: var(--portal-ink, #0a1a2e);
+  font-variant-numeric: tabular-nums;
+}
+
+.builderFormFields,
+.feeLineList,
+.checkList {
+  display: grid;
+  gap: 16px;
+}
+
+.fieldGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.feeFieldset {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.feeFieldset legend {
+  padding: 0;
+  color: var(--portal-ink, #0a1a2e);
+  font-size: 1rem;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.feeLine {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--portal-border, #d9dfe5);
+  border-radius: 10px;
+  background: var(--portal-soft-surface, #f7f8f9);
+}
+
+.checkList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.checkList li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  border-top: 1px solid var(--portal-line, #d9dfe5);
+  color: var(--portal-ink, #0a1a2e);
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.checkList li:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.checkList svg {
+  color: var(--portal-action, #0f7078);
+}
+
+.checkList strong {
+  color: var(--portal-muted, #46566c);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-align: right;
+}
+
 .builderHeading {
   display: flex;
   align-items: flex-start;
@@ -243,6 +367,10 @@
 }
 
 @media (max-width: 720px) {
+  .fieldGrid {
+    grid-template-columns: 1fr;
+  }
+
   .metrics {
     grid-template-columns: 1fr;
   }
@@ -255,5 +383,14 @@
 
   .groupHeading > span {
     flex-shrink: 0;
+  }
+
+  .checkList li {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .checkList strong {
+    grid-column: 2;
+    text-align: left;
   }
 }

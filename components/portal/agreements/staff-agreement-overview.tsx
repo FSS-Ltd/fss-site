@@ -1,5 +1,6 @@
 import type { StaffAgreementOverviewRow } from "@/lib/operations/agreements/repository";
 import type { StaffSigningReadiness } from "@/lib/operations/agreements/signing-repository";
+import { portalPath } from "@/lib/operations/auth/portal-url";
 import {
   Notice,
   PageHeader,
@@ -15,11 +16,15 @@ type StaffAgreementOverviewProps = Readonly<{
 }>;
 
 function agreementWorkspaceHref(organisationId: string): string {
-  return `/admin/clients/${encodeURIComponent(organisationId)}/agreements`;
+  return portalPath(
+    `/portal/admin/clients/${encodeURIComponent(organisationId)}/agreements`,
+  );
 }
 
 function signingWorkspaceHref(organisationId: string): string {
-  return `/admin/clients/${encodeURIComponent(organisationId)}/signing`;
+  return portalPath(
+    `/portal/admin/clients/${encodeURIComponent(organisationId)}/signing`,
+  );
 }
 
 function AgreementWorkspaceRow({
@@ -128,7 +133,9 @@ export function StaffAgreementOverview({
     <div className={styles.page}>
       <PageHeader
         action={
-          <PortalActionLink href="/admin/clients">New agreement</PortalActionLink>
+          <PortalActionLink href={portalPath("/portal/admin/clients")}>
+            New agreement
+          </PortalActionLink>
         }
         breadcrumbs={[{ label: "FSS Studio" }, { label: "Agreements" }]}
         description="Create clear agreements and track every revision, signing step and retained evidence."

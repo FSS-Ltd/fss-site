@@ -7,6 +7,7 @@ import {
 } from "@/components/portal/ui";
 import { penceToGbp } from "@/lib/operations/agreements/money-input";
 import { totalLinePence } from "@/lib/operations/agreements/validation";
+import { portalPath } from "@/lib/operations/auth/portal-url";
 import { AgreementStatusCard } from "./presentation";
 import styles from "./agreements.module.css";
 
@@ -18,7 +19,9 @@ export function StaffAgreementDetail({
   record: AgreementRecord;
 }>): React.JSX.Element {
   const signed = record.status === "signed" && record.evidence !== null;
-  const workspaceHref = `/admin/clients/${encodeURIComponent(organisationId)}/agreements`;
+  const workspaceHref = portalPath(
+    `/portal/admin/clients/${encodeURIComponent(organisationId)}/agreements`,
+  );
   const evidenceLabel =
     record.evidenceProvenance === "authenticated_portal_electronic_signature"
       ? "Authenticated portal electronic signature evidence"

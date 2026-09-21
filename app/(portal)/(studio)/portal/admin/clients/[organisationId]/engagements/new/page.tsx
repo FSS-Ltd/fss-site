@@ -8,6 +8,7 @@ import styles from "@/components/portal/agreements/agreements.module.css";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
+import { portalPath } from "@/lib/operations/auth/portal-url";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import { listStaffAgreementRegister } from "@/lib/operations/agreements/repository";
 
@@ -35,7 +36,9 @@ export default async function StaffEngagementPage({
   }
   if (!register) notFound();
 
-  const agreementHref = `/admin/clients/${organisationId.data}/agreements`;
+  const agreementHref = portalPath(
+    `/portal/admin/clients/${organisationId.data}/agreements`,
+  );
   return (
     <div className={styles.page}>
       <PageHeader
