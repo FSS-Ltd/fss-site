@@ -11,6 +11,8 @@ import type { ProposalApprovalSnapshot } from "../../../lib/operations/onboardin
 import { prepareProposal } from "../../../lib/operations/onboarding/approval";
 import { onboardingStore } from "../../../lib/operations/onboarding/outbox";
 import { requireOperationsTestDatabaseUrl } from "../../../scripts/require-operations-database-env";
+import { registerFixtureCleanup } from "./fixture-cleanup";
+
 export async function onboardingFixture(
   t: TestContext,
   signers = 2,
@@ -24,7 +26,9 @@ export async function onboardingFixture(
     signing?: Awaited<ReturnType<typeof signingFixture>>;
     worker?: ReturnType<typeof postgres>;
   } = {};
-  t.after(async () => {
+  const signing = await signingFixture(t, signers, options);
+  cleanup.signing = signing;
+  const clean = registerFixtureCleanup(async () => {
     await cleanup.worker?.end();
     if (cleanup.signing) {
       await cleanup.signing
@@ -61,8 +65,7 @@ export async function onboardingFixture(
         );
     }
   });
-  const signing = await signingFixture(t, signers, options);
-  cleanup.signing = signing;
+  t.after(clean);
   const worker = postgres(
     requireOperationsTestDatabaseUrl(process.env.OPERATIONS_TEST_DATABASE_URL),
     { max: 4, connection: { options: "-c role=operations_onboarding_worker" } },
