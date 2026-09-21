@@ -1,6 +1,12 @@
-import Link from "next/link";
+import { Building2, TriangleAlert } from "lucide-react";
+import {
+  Notice,
+  PageHeader,
+  PortalActionLink,
+  PortalCard,
+  StatusBadge,
+} from "@/components/portal/ui";
 import type { StaffJourneyOverviewRow } from "@/lib/operations/onboarding/queries";
-import styles from "../studio-client.module.css";
 
 export function StaffJourneyOverview({
   journeys,
@@ -17,77 +23,74 @@ export function StaffJourneyOverview({
   );
 
   return (
-    <section className={styles.page} aria-labelledby="welcome-journeys-heading">
-      <header className={styles.hero}>
-        <p className={styles.eyebrow}>FSS Studio · Welcome journeys</p>
-        <h1 id="welcome-journeys-heading" className={styles.title}>
-          A clear start for every client
-        </h1>
-        <p className={styles.description}>
-          Review welcome content, signing readiness, delivery schedules, and
-          recovery evidence from one client workspace.
-        </p>
-      </header>
-      <dl className={styles.metricGrid} aria-label="Welcome journey summary">
-        <div className={styles.metric}>
-          <dt className={styles.metricLabel}>Client workspaces</dt>
-          <dd className={styles.metricValue}>{journeys.length}</dd>
-        </div>
-        <div className={styles.metric}>
-          <dt className={styles.metricLabel}>Journeys</dt>
-          <dd className={styles.metricValue}>{totals.journeys}</dd>
-        </div>
-        <div className={styles.metric}>
-          <dt className={styles.metricLabel}>Active</dt>
-          <dd className={styles.metricValue}>{totals.active}</dd>
-        </div>
-      </dl>
-      {totals.recovery > 0 && (
-        <p className={styles.rowCopy} role="status">
-          {totals.recovery} journey{totals.recovery === 1 ? " needs" : "s need"}{" "}
-          recovery review.
-        </p>
-      )}
+    <main aria-labelledby="welcome-journeys-heading">
+      <PageHeader
+        description="Review welcome content, signing readiness, delivery schedules, and recovery evidence from one client workspace."
+        eyebrow="FSS Studio · Welcome journeys"
+        title="A clear start for every client"
+      />
+      <section aria-label="Welcome journey summary">
+        <PortalCard title="Draft journeys" tone="accent">
+          <dl>
+            <div>
+              <dt>Client workspaces</dt>
+              <dd>{journeys.length}</dd>
+            </div>
+            <div>
+              <dt>Journeys</dt>
+              <dd>{totals.journeys}</dd>
+            </div>
+            <div>
+              <dt>Active</dt>
+              <dd>{totals.active}</dd>
+            </div>
+          </dl>
+        </PortalCard>
+      </section>
+      {totals.recovery > 0 ? (
+        <Notice tone="warning">
+          <TriangleAlert aria-hidden="true" size={18} />
+          <strong>Needs attention.</strong> {totals.recovery} journey
+          {totals.recovery === 1 ? " needs" : "s need"} recovery review.
+        </Notice>
+      ) : null}
       {journeys.length === 0 ? (
-        <section
-          className={styles.workspace}
-          aria-labelledby="no-journeys-heading"
+        <PortalCard
+          description="Client workspaces appear after an organisation has been registered for Operations."
+          title="No client workspaces yet"
         >
-          <h2 id="no-journeys-heading" className={styles.sectionTitle}>
-            No client workspaces yet
-          </h2>
-          <p className={styles.rowCopy}>
-            Client workspaces appear after an organisation has been registered
-            for Operations.
-          </p>
-          <Link className={styles.actionLink} href="/admin/clients">
+          <PortalActionLink href="/admin/clients">
             Open client register
-          </Link>
-        </section>
+          </PortalActionLink>
+        </PortalCard>
       ) : (
-        <ul className={styles.rowList} aria-label="Client welcome workspaces">
+        <ul aria-label="Client welcome workspaces">
           {journeys.map((organisation) => (
-            <li className={styles.row} key={organisation.organisationId}>
-              <div className={styles.rowContent}>
-                <h2 className={styles.rowTitle}>
-                  {organisation.organisationName}
-                </h2>
-                <p className={styles.rowCopy}>
+            <li key={organisation.organisationId}>
+              <PortalCard title={organisation.organisationName}>
+                <Building2 aria-hidden="true" size={20} />
+                <p>
                   {organisation.journeyCount === 0
                     ? "No welcome journey has been prepared."
                     : `${organisation.journeyCount} journey${organisation.journeyCount === 1 ? "" : "s"}, ${organisation.activeCount} active.`}
                 </p>
-              </div>
-              <Link
-                className={styles.actionLink}
-                href={`/admin/clients/${organisation.organisationId}/journey`}
-              >
-                Open workspace
-              </Link>
+                <StatusBadge
+                  status={organisation.recoveryCount ? "warning" : "info"}
+                >
+                  {organisation.recoveryCount
+                    ? `${organisation.recoveryCount} needs attention`
+                    : "Monitoring"}
+                </StatusBadge>
+                <PortalActionLink
+                  href={`/admin/clients/${organisation.organisationId}/journey`}
+                >
+                  Open workspace
+                </PortalActionLink>
+              </PortalCard>
             </li>
           ))}
         </ul>
       )}
-    </section>
+    </main>
   );
 }

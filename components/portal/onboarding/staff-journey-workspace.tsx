@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { AgreementRegister } from "@/lib/operations/agreements/types";
 import type { SigningApproval } from "@/lib/operations/agreements/signing-types";
 import type {
@@ -7,10 +6,12 @@ import type {
 } from "@/lib/operations/onboarding/command-types";
 import { JourneyPreview } from "@/components/operations/onboarding/journey-preview";
 import { JourneyTimeline } from "@/components/operations/onboarding/journey-timeline";
-import { OperationsPageHeader } from "@/components/operations/shared/operations-page-header";
-import ui from "@/components/operations/shared/operations-ui.module.css";
-import styles from "@/components/operations/agreements/agreements.module.css";
-import layout from "@/components/operations/signing/signing.module.css";
+import {
+  Notice,
+  PageHeader,
+  PortalActionLink,
+  PortalCard,
+} from "@/components/portal/ui";
 
 type StaffJourneyWorkspaceProps = {
   organisationId: string;
@@ -32,27 +33,31 @@ export function StaffJourneyWorkspace({
   const apiRoot = `/api/portal/admin/clients/${organisationId}`;
 
   return (
-    <section className={`${styles.page} ${layout.operationsPage}`}>
-      <OperationsPageHeader
-        context="FSS Studio · Welcome journeys"
+    <main>
+      <PageHeader
+        eyebrow="FSS Studio · Welcome journeys"
         title="A deliberate first step."
         description={`${register.organisationName}. Review each recipient, schedule, and recovery decision before any delivery is queued.`}
         action={
-          <Link href={`/admin/clients/${organisationId}`}>
+          <PortalActionLink
+            href={`/admin/clients/${organisationId}`}
+            variant="secondary"
+          >
             Back to client workspace
-          </Link>
+          </PortalActionLink>
         }
-      >
-        <Link href={`/admin/clients/${organisationId}/signing`}>
+      />
+      <PortalCard title="Draft journeys" tone="accent">
+        <p>
+          {journeys.length} journey{journeys.length === 1 ? "" : "s"} shown.
+        </p>
+        <PortalActionLink
+          href={`/admin/clients/${organisationId}/signing`}
+          variant="secondary"
+        >
           Review signing documents
-        </Link>
-      </OperationsPageHeader>
-      <dl className={ui.metricGrid}>
-        <div className={ui.metricCard}>
-          <dt>Journeys shown</dt>
-          <dd className={styles.count}>{journeys.length}</dd>
-        </div>
-      </dl>
+        </PortalActionLink>
+      </PortalCard>
       <JourneyPreview
         organisationId={organisationId}
         organisationName={register.organisationName}
@@ -65,9 +70,9 @@ export function StaffJourneyWorkspace({
         signingDownloadBase={`${apiRoot}/signing`}
       />
       {journeys.length === 0 ? (
-        <p className={ui.emptyState}>
+        <Notice tone="info">
           No journeys started. Prepare a welcome to review it before approval.
-        </p>
+        </Notice>
       ) : (
         journeys.map((journey) => (
           <JourneyTimeline
@@ -82,11 +87,11 @@ export function StaffJourneyWorkspace({
       {(journeys.length === 50 ||
         contacts.length === 100 ||
         register.nextCursor) && (
-        <p>
+        <Notice tone="info">
           The latest 50 journeys, first 50 agreements and first 100 contacts are
           shown.
-        </p>
+        </Notice>
       )}
-    </section>
+    </main>
   );
 }

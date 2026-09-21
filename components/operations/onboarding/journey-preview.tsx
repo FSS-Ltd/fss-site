@@ -13,6 +13,7 @@ import { WelcomeForm } from "./welcome-form";
 import { ProposalForm } from "./proposal-form";
 import { ProposalAccessPreview } from "./proposal-access-preview";
 import { EmailPreview } from "./email-preview";
+import { PortalButton, PortalCheckbox } from "@/components/portal/ui";
 import ui from "../shared/operations-ui.module.css";
 import styles from "../agreements/agreements.module.css";
 function PreviewDocument({ base64 }: { base64: string }): React.JSX.Element {
@@ -201,19 +202,16 @@ export function JourneyPreview({
               </p>
             </>
           )}
-          <label>
-            <input
-              type="checkbox"
-              checked={confirmed}
-              onChange={(e) => setConfirmed(e.target.checked)}
-              disabled={pending}
-            />
-            I reviewed these exact recipients, content, documents and access.
-          </label>
+          <PortalCheckbox
+            checked={confirmed}
+            disabled={pending}
+            label="I reviewed these exact recipients, content, documents and access."
+            onChange={(e) => setConfirmed(e.target.checked)}
+          />
           <div className={styles.actions}>
-            <button
-              className={styles.primary}
+            <PortalButton
               disabled={pending || !confirmed}
+              loading={pending}
               onClick={async () => {
                 const result = await submit({
                   action:
@@ -223,22 +221,25 @@ export function JourneyPreview({
                 });
                 if (result) setPreview(null);
               }}
+              type="button"
             >
               {pending
                 ? "Saving…"
                 : preview.kind === "welcome"
                   ? "Start approved welcome"
                   : "Approve proposal and access"}
-            </button>
-            <button
+            </PortalButton>
+            <PortalButton
               disabled={pending}
               onClick={() => {
                 setPreview(null);
                 setConfirmed(false);
               }}
+              type="button"
+              variant="secondary"
             >
               Back to preparation
-            </button>
+            </PortalButton>
           </div>
         </div>
       )}

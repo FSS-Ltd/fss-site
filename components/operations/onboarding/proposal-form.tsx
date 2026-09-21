@@ -2,6 +2,11 @@
 import { portalRoleOptions } from "@/lib/operations/auth/access-dashboard-metrics";
 import type { JourneyView } from "@/lib/operations/onboarding/command-types";
 import type { SigningApproval } from "@/lib/operations/agreements/signing-types";
+import {
+  PortalButton,
+  PortalSelect,
+  PortalTextarea,
+} from "@/components/portal/ui";
 import styles from "../agreements/agreements.module.css";
 export function ProposalForm({
   journey,
@@ -41,56 +46,60 @@ export function ProposalForm({
     >
       <fieldset disabled={pending}>
         <legend>Separate proposal approval</legend>
-        <label className={styles.field}>
-          Approved signing document
-          <select name="signingApprovalId" required defaultValue="">
-            <option disabled value="">
-              Select revision
+        <PortalSelect
+          label="Approved signing document"
+          name="signingApprovalId"
+          required
+          defaultValue=""
+        >
+          <option disabled value="">
+            Select revision
+          </option>
+          {current.map((a) => (
+            <option key={a.id} value={a.id}>
+              {a.title} · revision {a.revision}
             </option>
-            {current.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.title} · revision {a.revision}
-              </option>
-            ))}
-          </select>
-        </label>
+          ))}
+        </PortalSelect>
         {!current.length && (
           <p>Prepare and approve the current document in Signing first.</p>
         )}
-        <label className={styles.field}>
-          Approved scope summary
-          <textarea name="scopeSummary" maxLength={2000} required />
-        </label>
+        <PortalTextarea
+          label="Approved scope summary"
+          name="scopeSummary"
+          maxLength={2000}
+          required
+        />
         <p>
           Select each signer’s access and the billing recipient’s owner or
           billing role. Additional contacts receive their own approved
           activation email after signing.
         </p>
         {contacts.map((c) => (
-          <label key={c.email} className={styles.field}>
-            {c.name} · {c.email}
-            <select
-              name={`access-${c.email}`}
-              defaultValue={
-                journey.proposal?.access.find((a) => a.email === c.email)
-                  ?.role ?? ""
-              }
-            >
-              <option value="">No new access</option>
-              {portalRoleOptions.map((role) => (
-                <option key={role.value} value={role.value}>
-                  {role.label}
-                </option>
-              ))}
-            </select>
-          </label>
+          <PortalSelect
+            key={c.email}
+            label={`${c.name} · ${c.email}`}
+            name={`access-${c.email}`}
+            defaultValue={
+              journey.proposal?.access.find((a) => a.email === c.email)?.role ??
+              ""
+            }
+          >
+            <option value="">No new access</option>
+            {portalRoleOptions.map((role) => (
+              <option key={role.value} value={role.value}>
+                {role.label}
+              </option>
+            ))}
+          </PortalSelect>
         ))}
-        <button
-          className={styles.primary}
+        <PortalButton
           disabled={pending || !current.length}
+          loading={pending}
+          type="submit"
         >
           {pending ? "Preparing…" : "Preview proposal and access"}
-        </button>
+        </PortalButton>
       </fieldset>
     </form>
   );

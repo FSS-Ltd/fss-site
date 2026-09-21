@@ -3,6 +3,12 @@ import { useState } from "react";
 import { invoiceChoices } from "@/lib/operations/onboarding/display";
 import type { JourneyBillingAccount } from "@/lib/operations/onboarding/command-types";
 import type { AgreementRecord } from "@/lib/operations/agreements/types";
+import {
+  PortalButton,
+  PortalField,
+  PortalSelect,
+  PortalTextarea,
+} from "@/components/portal/ui";
 import styles from "../agreements/agreements.module.css";
 const guidePages = [
   "Your priorities",
@@ -73,37 +79,37 @@ export function WelcomeForm({
     >
       <fieldset disabled={pending}>
         <legend>Welcome and first invoice</legend>
-        <label className={styles.field}>
-          Agreement
-          <select
-            name="agreementId"
-            required
-            value={agreementId}
-            onChange={(e) => setAgreementId(e.target.value)}
-          >
-            <option value="" disabled>
-              Select agreement
+        <PortalSelect
+          label="Agreement"
+          name="agreementId"
+          required
+          value={agreementId}
+          onChange={(e) => setAgreementId(e.target.value)}
+        >
+          <option value="" disabled>
+            Select agreement
+          </option>
+          {agreements.map((a) => (
+            <option key={a.id} value={a.id}>
+              {a.draft.title} · revision {a.revision}
             </option>
-            {agreements.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.draft.title} · revision {a.revision}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className={styles.field}>
-          Welcome and billing recipient
-          <select name="recipient" required defaultValue="">
-            <option value="" disabled>
-              Select contact
+          ))}
+        </PortalSelect>
+        <PortalSelect
+          label="Welcome and billing recipient"
+          name="recipient"
+          required
+          defaultValue=""
+        >
+          <option value="" disabled>
+            Select contact
+          </option>
+          {contacts.map((c) => (
+            <option key={c.email} value={c.email}>
+              {c.name} · {c.email}
             </option>
-            {contacts.map((c) => (
-              <option key={c.email} value={c.email}>
-                {c.name} · {c.email}
-              </option>
-            ))}
-          </select>
-        </label>
+          ))}
+        </PortalSelect>
         <div className={styles.grid}>
           {[
             ["contactFirstName", "Contact first name"],
@@ -111,48 +117,49 @@ export function WelcomeForm({
             ["from", "Approved sender email"],
             ["replyTo", "Reply email"],
           ].map(([name, label]) => (
-            <label key={name} className={styles.field}>
-              {label}
+            <PortalField key={name} label={label} required>
               <input
                 name={name}
                 type={["from", "replyTo"].includes(name) ? "email" : "text"}
                 required
                 maxLength={200}
               />
-            </label>
+            </PortalField>
           ))}
         </div>
-        <label className={styles.field}>
-          First agreed invoice
-          <select
-            name="obligationKey"
-            required
-            key={agreementId}
-            defaultValue=""
-          >
-            <option value="" disabled>
-              Select an obligation
-            </option>
-            {selected &&
-              invoiceChoices(selected.draft).map((choice) => (
-                <option key={choice.value} value={choice.value}>
-                  {choice.label}
-                </option>
-              ))}
-          </select>
-        </label>
+        <PortalSelect
+          label="First agreed invoice"
+          name="obligationKey"
+          required
+          key={agreementId}
+          defaultValue=""
+        >
+          <option value="" disabled>
+            Select an obligation
+          </option>
+          {selected &&
+            invoiceChoices(selected.draft).map((choice) => (
+              <option key={choice.value} value={choice.value}>
+                {choice.label}
+              </option>
+            ))}
+        </PortalSelect>
         <p>
           Billing uses the configured {billing.livemode ? "live" : "test"}{" "}
           account. Sender organisation: Faithful Software Solutions.
         </p>
-        <label className={styles.field}>
-          Client’s primary goal
-          <textarea name="primaryGoal" required maxLength={2000} />
-        </label>
-        <label className={styles.field}>
-          Proposed outcome summary
-          <textarea name="outcomeSummary" required maxLength={2000} />
-        </label>
+        <PortalTextarea
+          label="Client’s primary goal"
+          name="primaryGoal"
+          required
+          maxLength={2000}
+        />
+        <PortalTextarea
+          label="Proposed outcome summary"
+          name="outcomeSummary"
+          required
+          maxLength={2000}
+        />
       </fieldset>
       <fieldset disabled={pending}>
         <legend>Welcome guide</legend>
@@ -162,10 +169,13 @@ export function WelcomeForm({
           blank line.
         </p>
         {guidePages.map((title, i) => (
-          <label key={title} className={styles.field}>
-            {title}
-            <textarea name={`page-${i}`} required maxLength={6000} />
-          </label>
+          <PortalTextarea
+            key={title}
+            label={title}
+            name={`page-${i}`}
+            required
+            maxLength={6000}
+          />
         ))}
       </fieldset>
       <fieldset disabled={pending}>
@@ -180,18 +190,22 @@ export function WelcomeForm({
           ["nextStep", "Contractual next step"],
           ["requiredAction", "Required client action"],
         ].map(([name, label]) => (
-          <label key={name} className={styles.field}>
-            {label}
-            <textarea name={name} required maxLength={2000} />
-          </label>
+          <PortalTextarea
+            key={name}
+            label={label}
+            name={name}
+            required
+            maxLength={2000}
+          />
         ))}
       </fieldset>
-      <button
-        className={styles.primary}
+      <PortalButton
         disabled={pending || !agreements.length || !contacts.length}
+        loading={pending}
+        type="submit"
       >
         {pending ? "Preparing…" : "Preview welcome"}
-      </button>
+      </PortalButton>
     </form>
   );
 }
