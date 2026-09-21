@@ -41,12 +41,7 @@ export function StaffAgreementDetail({
           </p>
         </Notice>
       ) : (
-        <Notice
-          action={
-            <PortalActionLink href={workspaceHref}>Continue draft</PortalActionLink>
-          }
-          tone="warning"
-        >
+        <Notice tone="warning">
           <strong>This agreement is still a draft.</strong>
           <p>
             Approval is not signature. Prepare and review the exact signing
@@ -103,6 +98,19 @@ export function StaffAgreementDetail({
         </PortalCard>
       ) : null}
       <AgreementStatusCard status={signed ? "signed" : "draft"} />
+      {!signed ? (
+        <PortalCard
+          description="Use this only when retained manual evidence is available for every required signer. This path does not represent provider verification."
+          title="Manual evidence"
+        >
+          <PortalActionLink
+            href={`${workspaceHref}/${record.id}/record-signature`}
+            variant="secondary"
+          >
+            Record signed evidence
+          </PortalActionLink>
+        </PortalCard>
+      ) : null}
       <PortalActionLink href={workspaceHref} variant="secondary">
         Back to agreement workspace
       </PortalActionLink>
