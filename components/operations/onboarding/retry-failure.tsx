@@ -4,6 +4,11 @@ import type {
   JourneyView,
 } from "@/lib/operations/onboarding/command-types";
 import { canRetry } from "@/lib/operations/onboarding/recovery";
+import {
+  PortalButton,
+  PortalCheckbox,
+  PortalField,
+} from "@/components/portal/ui";
 import { useJourneyCommand } from "./use-journey-command";
 import styles from "../agreements/agreements.module.css";
 export function RetryFailure({
@@ -47,17 +52,17 @@ export function RetryFailure({
         }}
       >
         <fieldset disabled={pending}>
-          <label className={styles.field}>
-            Recovery review reference
+          <PortalField label="Recovery review reference" required>
             <input name="reviewReference" required maxLength={200} />
-          </label>
-          <label>
-            <input type="checkbox" name="confirmed" required />I reviewed and
-            corrected the definite failure.
-          </label>
-          <button disabled={pending} className={styles.primary}>
+          </PortalField>
+          <PortalCheckbox
+            label="I reviewed and corrected the definite failure."
+            name="confirmed"
+            required
+          />
+          <PortalButton disabled={pending} loading={pending} type="submit">
             {pending ? "Queuing…" : "Retry this step"}
-          </button>
+          </PortalButton>
         </fieldset>
         <p role="status">{message}</p>
       </form>

@@ -4,6 +4,11 @@ import type {
   JourneyView,
 } from "@/lib/operations/onboarding/command-types";
 import { canReconcile } from "@/lib/operations/onboarding/recovery";
+import {
+  PortalButton,
+  PortalCheckbox,
+  PortalField,
+} from "@/components/portal/ui";
 import { useJourneyCommand } from "./use-journey-command";
 import styles from "../agreements/agreements.module.css";
 export function StepRecovery({
@@ -48,29 +53,30 @@ export function StepRecovery({
         }}
       >
         <fieldset disabled={pending}>
-          <label className={styles.field}>
-            Provider acceptance ID
+          <PortalField label="Provider acceptance ID" required>
             <input name="providerId" required maxLength={300} />
-          </label>
-          <label className={styles.field}>
-            Original acceptance time (ISO 8601, with timezone)
+          </PortalField>
+          <PortalField
+            label="Original acceptance time (ISO 8601, with timezone)"
+            required
+          >
             <input
               name="acceptedAt"
               required
               placeholder="2026-09-08T10:15:00Z"
             />
-          </label>
-          <label className={styles.field}>
-            Review reference
+          </PortalField>
+          <PortalField label="Review reference" required>
             <input name="reviewReference" required maxLength={500} />
-          </label>
-          <label>
-            <input name="confirmed" type="checkbox" required />I verified this
-            acceptance for this exact recipient and effect.
-          </label>
-          <button className={styles.primary} disabled={pending}>
+          </PortalField>
+          <PortalCheckbox
+            label="I verified this acceptance for this exact recipient and effect."
+            name="confirmed"
+            required
+          />
+          <PortalButton disabled={pending} loading={pending} type="submit">
             {pending ? "Recording…" : "Record acceptance"}
-          </button>
+          </PortalButton>
         </fieldset>
         <p role="status">{message}</p>
       </form>

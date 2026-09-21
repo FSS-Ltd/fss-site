@@ -13,6 +13,204 @@ async function openScenario(
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
 }
 
+const phaseFourDesktopScenarios = [
+  [
+    "C02",
+    "client-getting-started",
+    "Your launch checklist",
+    "c02-client-getting-started-desktop.png",
+  ],
+  [
+    "C26",
+    "client-onboarding-profile",
+    "Tell us about your team",
+    "c26-client-onboarding-profile-desktop.png",
+  ],
+  [
+    "C27",
+    "client-onboarding-assets",
+    "Bring your brand with you",
+    "c27-client-onboarding-assets-desktop.png",
+  ],
+  [
+    "C28",
+    "client-onboarding-booking",
+    "Let’s plan the kickoff",
+    "c28-client-onboarding-booking-desktop.png",
+  ],
+  [
+    "C29",
+    "client-onboarding-complete",
+    "Your launch checklist",
+    "c29-client-onboarding-complete-desktop.png",
+  ],
+  [
+    "F18",
+    "studio-welcome-journeys",
+    "A clear start for every client",
+    "f18-studio-welcome-journeys-desktop.png",
+  ],
+  [
+    "F19",
+    "studio-welcome-builder",
+    "Prepare a warm welcome",
+    "f19-studio-welcome-builder-desktop.png",
+  ],
+  [
+    "F20",
+    "studio-welcome-content",
+    "Make the welcome personal",
+    "f20-studio-welcome-content-desktop.png",
+  ],
+  [
+    "F21",
+    "studio-welcome-access",
+    "People, signing and access",
+    "f21-studio-welcome-access-desktop.png",
+  ],
+  [
+    "F22",
+    "studio-welcome-schedule",
+    "Sequence the next steps",
+    "f22-studio-welcome-schedule-desktop.png",
+  ],
+  [
+    "F23",
+    "studio-welcome-preflight",
+    "Ready when you are.",
+    "f23-studio-welcome-preflight-desktop.png",
+  ],
+  [
+    "F24",
+    "studio-welcome-active",
+    "Northstar’s welcome journey",
+    "f24-studio-welcome-active-desktop.png",
+  ],
+  [
+    "F25",
+    "studio-welcome-recovery",
+    "Resolve delivery safely",
+    "f25-studio-welcome-recovery-desktop.png",
+  ],
+  [
+    "F26",
+    "studio-welcome-templates",
+    "Welcome templates",
+    "f26-studio-welcome-templates-desktop.png",
+  ],
+  [
+    "F33",
+    "studio-checklist-editor",
+    "Build the client checklist",
+    "f33-studio-checklist-editor-desktop.png",
+  ],
+  [
+    "F35",
+    "studio-checklist-task-editor",
+    "Create a useful next step",
+    "f35-studio-checklist-task-editor-desktop.png",
+  ],
+] as const;
+
+const phaseFourMobileScenarios = [
+  [
+    "M02",
+    "client-getting-started",
+    "Your launch checklist",
+    "m02-client-getting-started-mobile.png",
+  ],
+  [
+    "C26",
+    "client-onboarding-profile",
+    "Tell us about your team",
+    "c26-client-onboarding-profile-mobile.png",
+  ],
+  [
+    "C27",
+    "client-onboarding-assets",
+    "Bring your brand with you",
+    "c27-client-onboarding-assets-mobile.png",
+  ],
+  [
+    "C28",
+    "client-onboarding-booking",
+    "Let’s plan the kickoff",
+    "c28-client-onboarding-booking-mobile.png",
+  ],
+  [
+    "C29",
+    "client-onboarding-complete",
+    "Your launch checklist",
+    "c29-client-onboarding-complete-mobile.png",
+  ],
+  [
+    "F18",
+    "studio-welcome-journeys",
+    "A clear start for every client",
+    "f18-studio-welcome-journeys-mobile.png",
+  ],
+  [
+    "F19",
+    "studio-welcome-builder",
+    "Prepare a warm welcome",
+    "f19-studio-welcome-builder-mobile.png",
+  ],
+  [
+    "F20",
+    "studio-welcome-content",
+    "Make the welcome personal",
+    "f20-studio-welcome-content-mobile.png",
+  ],
+  [
+    "F21",
+    "studio-welcome-access",
+    "People, signing and access",
+    "f21-studio-welcome-access-mobile.png",
+  ],
+  [
+    "F22",
+    "studio-welcome-schedule",
+    "Sequence the next steps",
+    "f22-studio-welcome-schedule-mobile.png",
+  ],
+  [
+    "M08",
+    "studio-welcome-preflight",
+    "Ready when you are.",
+    "m08-studio-welcome-preflight-mobile.png",
+  ],
+  [
+    "F24",
+    "studio-welcome-active",
+    "Northstar’s welcome journey",
+    "f24-studio-welcome-active-mobile.png",
+  ],
+  [
+    "F25",
+    "studio-welcome-recovery",
+    "Resolve delivery safely",
+    "f25-studio-welcome-recovery-mobile.png",
+  ],
+  [
+    "F26",
+    "studio-welcome-templates",
+    "Welcome templates",
+    "f26-studio-welcome-templates-mobile.png",
+  ],
+  [
+    "F33",
+    "studio-checklist-editor",
+    "Build the client checklist",
+    "f33-studio-checklist-editor-mobile.png",
+  ],
+  [
+    "F35",
+    "studio-checklist-task-editor",
+    "Create a useful next step",
+    "f35-studio-checklist-task-editor-mobile.png",
+  ],
+] as const;
+
 test.describe("FSS Studio desktop visuals", () => {
   test.beforeEach(async ({ page }, testInfo) => {
     test.skip(
@@ -127,6 +325,20 @@ test.describe("FSS Studio desktop visuals", () => {
       "f17-studio-agreement-signed-desktop.png",
     );
   });
+
+  for (const [
+    coverageId,
+    scenario,
+    heading,
+    screenshot,
+  ] of phaseFourDesktopScenarios) {
+    test(`Phase 4 ${coverageId} desktop matches the approved journey`, async ({
+      page,
+    }) => {
+      await openScenario(page, scenario, heading);
+      await expect(page).toHaveScreenshot(screenshot);
+    });
+  }
 });
 
 test.describe("FSS Studio mobile visuals", () => {
@@ -178,4 +390,18 @@ test.describe("FSS Studio mobile visuals", () => {
     await openScenario(page, "studio-overview", "Your studio, in focus.");
     await expect(page).toHaveScreenshot("m07-studio-overview-mobile.png");
   });
+
+  for (const [
+    coverageId,
+    scenario,
+    heading,
+    screenshot,
+  ] of phaseFourMobileScenarios) {
+    test(`Phase 4 ${coverageId} mobile matches the approved journey`, async ({
+      page,
+    }) => {
+      await openScenario(page, scenario, heading);
+      await expect(page).toHaveScreenshot(screenshot);
+    });
+  }
 });

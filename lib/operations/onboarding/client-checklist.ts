@@ -1,6 +1,6 @@
 import { hasPortalCapability } from "../auth/permissions";
 import { PortalAccessDenied, type VerifiedPortalIdentity } from "../auth/types";
-import type { OperationsDb } from "../db/client";
+import type { OperationsDb, OperationsTransaction } from "../db/client";
 import { withPortalTransaction } from "../db/portal-client";
 
 export type ClientSetupChecklist = {
@@ -9,6 +9,22 @@ export type ClientSetupChecklist = {
   filesReady: boolean;
   serviceReady: boolean;
 };
+
+export async function loadClientSetupChecklist(
+  tx: OperationsTransaction,
+  organisationId: string,
+): Promise<ClientSetupChecklist> {
+  const [checklist] = await tx<ClientSetupChecklist[]>`
+    select
+      agreement_signed as "agreementSigned",
+      billing_ready as "billingReady",
+      files_ready as "filesReady",
+      service_ready as "serviceReady"
+    from operations.portal_onboarding_checklist(${organisationId})
+  `;
+  if (!checklist) throw new PortalAccessDenied();
+  return checklist;
+}
 
 export async function getClientSetupChecklist(
   db: OperationsDb,
@@ -24,16 +40,7 @@ export async function getClientSetupChecklist(
     async (tx, context) => {
       if (!hasPortalCapability(context.role, "onboarding.read"))
         throw new PortalAccessDenied();
-      const [checklist] = await tx<ClientSetupChecklist[]>`
-        select
-          agreement_signed as "agreementSigned",
-          billing_ready as "billingReady",
-          files_ready as "filesReady",
-          service_ready as "serviceReady"
-        from operations.portal_onboarding_checklist(${organisationId})
-      `;
-      if (!checklist) throw new PortalAccessDenied();
-      return checklist;
+      return loadClientSetupChecklist(tx, organisationId);
     },
   );
 }

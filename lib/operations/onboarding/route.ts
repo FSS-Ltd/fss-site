@@ -14,6 +14,11 @@ import { onboardingEnabled } from "./worker-db";
 import { journeyCommandOptions } from "./command-configuration";
 import { createJourneyCommandHandler } from "./http";
 import { executeJourneyCommand, executeStaffJourneyCommand } from "./commands";
+import {
+  executeStaffOnboardingWorkspaceCommand,
+  type OnboardingWorkspaceCommandResult,
+} from "./workspace-commands";
+import type { JourneyCommandResult } from "./command-types";
 import type { FssAdminContext } from "../auth/staff-types";
 import { fssStudioEnabled } from "../auth/release-flags";
 export function founderJourneyRoute() {
@@ -79,6 +84,76 @@ export function staffJourneyRoute() {
       console.error("Staff journey request failed.", report),
     execute: (admin, organisationId, raw) =>
       executeStaffJourneyCommand(
+        getOperationsDb(),
+        admin,
+        organisationId,
+        raw,
+        journeyCommandOptions(),
+      ),
+  });
+}
+
+const workspaceActions = new Set([
+  "save_template_draft",
+  "publish_template",
+  "save_journey_draft",
+  "discard_journey_draft",
+  "confirm_booking",
+]);
+
+function isWorkspaceAction(raw: unknown): boolean {
+  return (
+    typeof raw === "object" &&
+    raw !== null &&
+    "action" in raw &&
+    typeof raw.action === "string" &&
+    workspaceActions.has(raw.action)
+  );
+}
+
+export function staffOnboardingRoute() {
+  return createJourneyCommandHandler<
+    FssAdminContext,
+    JourneyCommandResult | OnboardingWorkspaceCommandResult
+  >({
+    enabled: onboardingEnabled() && fssStudioEnabled(),
+    origin: new URL(resolveSiteUrl()).origin,
+    createCorrelationId: randomUUID,
+    authorize: authorizeStaff,
+    reportUnexpectedError: (report) =>
+      console.error("Staff onboarding request failed.", report),
+    execute: (admin, organisationId, raw) =>
+      isWorkspaceAction(raw)
+        ? executeStaffOnboardingWorkspaceCommand(
+            getOperationsDb(),
+            admin,
+            organisationId,
+            raw,
+            journeyCommandOptions(),
+          )
+        : executeStaffJourneyCommand(
+            getOperationsDb(),
+            admin,
+            organisationId,
+            raw,
+            journeyCommandOptions(),
+          ),
+  });
+}
+
+export function staffOnboardingWorkspaceRoute() {
+  return createJourneyCommandHandler<
+    FssAdminContext,
+    OnboardingWorkspaceCommandResult
+  >({
+    enabled: onboardingEnabled() && fssStudioEnabled(),
+    origin: new URL(resolveSiteUrl()).origin,
+    createCorrelationId: randomUUID,
+    authorize: authorizeStaff,
+    reportUnexpectedError: (report) =>
+      console.error("Staff onboarding workspace request failed.", report),
+    execute: (admin, organisationId, raw) =>
+      executeStaffOnboardingWorkspaceCommand(
         getOperationsDb(),
         admin,
         organisationId,

@@ -1,10 +1,105 @@
 import { z } from "zod";
 import type { OperationsDb, OperationsTransaction } from "../db/client";
 import type { OperationsFounder } from "../organisations/types";
+import { portalRoles } from "../auth/types";
 import { withFssAdminTransaction } from "../auth/staff-transaction";
 import type { FssAdminContext } from "../auth/staff-types";
 import { withAgreementTransaction } from "../agreements/repository";
 import type { JourneyView, JourneyJob } from "./command-types";
+import { onboardingTaskDefinitionSchema } from "./workspace-schema";
+import {
+  onboardingDueRules,
+  onboardingTaskKinds,
+  type OnboardingWorkspace,
+} from "./workspace-types";
+
+const onboardingWorkspaceSchema = z.strictObject({
+  templates: z.array(
+    z.strictObject({
+      id: z.uuid(),
+      templateId: z.uuid(),
+      version: z.number().int().positive(),
+      name: z.string().min(1).max(160),
+      tasks: z.array(onboardingTaskDefinitionSchema),
+      publishedAt: z.string().min(1),
+    }),
+  ),
+  templateDrafts: z.array(
+    z.strictObject({
+      id: z.uuid(),
+      name: z.string().min(1).max(160),
+      draftVersion: z.number().int().positive(),
+      publishedVersion: z.number().int().nonnegative(),
+      tasks: z.array(onboardingTaskDefinitionSchema),
+    }),
+  ),
+  journeyDrafts: z.array(
+    z.strictObject({
+      id: z.uuid(),
+      agreementId: z.uuid(),
+      contactId: z.uuid(),
+      templateVersionId: z.uuid(),
+      stage: z.enum(["setup", "content", "access", "schedule", "activate"]),
+      expectedAgreementVersion: z.number().int().positive().nullable(),
+      recipientRole: z.enum(portalRoles).nullable(),
+      version: z.number().int().positive(),
+      updatedAt: z.string().min(1),
+    }),
+  ),
+  tasks: z.array(
+    z.strictObject({
+      id: z.uuid(),
+      journeyId: z.uuid(),
+      templateVersionId: z.uuid(),
+      title: z.string().min(1).max(160),
+      instructions: z.string().min(1).max(4_000),
+      kind: z.enum(onboardingTaskKinds),
+      required: z.boolean(),
+      ownerRole: z.enum(portalRoles),
+      dueRule: z.enum(onboardingDueRules),
+      bookingUrl: z.string().url().nullable(),
+      state: z.enum(["blocked", "available", "complete"]),
+      completionDetail: z.string().min(1).nullable(),
+    }),
+  ),
+});
+
+export function parseOnboardingWorkspace(input: unknown): OnboardingWorkspace {
+  return onboardingWorkspaceSchema.parse(input);
+}
+
+async function loadOnboardingWorkspace(
+  tx: OperationsTransaction,
+  organisationId: string,
+): Promise<OnboardingWorkspace> {
+  const [row] = await tx<Array<{ workspace: unknown }>>`
+    select operations.read_onboarding_workspace(${organisationId}) as workspace
+  `;
+  if (!row) throw new Error("Onboarding workspace is unavailable.");
+  return parseOnboardingWorkspace(row.workspace);
+}
+
+export async function loadFounderOnboardingWorkspace(
+  db: OperationsDb,
+  founder: OperationsFounder,
+  organisationId: string,
+): Promise<OnboardingWorkspace> {
+  z.uuid().parse(organisationId);
+  return withAgreementTransaction(db, founder, (tx) =>
+    loadOnboardingWorkspace(tx, organisationId),
+  );
+}
+
+export async function loadStaffOnboardingWorkspace(
+  db: OperationsDb,
+  admin: FssAdminContext,
+  organisationId: string,
+): Promise<OnboardingWorkspace> {
+  z.uuid().parse(organisationId);
+  return withFssAdminTransaction(db, admin, (tx) =>
+    loadOnboardingWorkspace(tx, organisationId),
+  );
+}
 export async function loadJourneys(
   tx: OperationsTransaction,
   organisationId: string,
@@ -55,14 +150,14 @@ export async function listStaffJourneyContacts(
   db: OperationsDb,
   admin: FssAdminContext,
   organisationId: string,
-): Promise<Array<{ name: string; email: string }>> {
+): Promise<Array<{ id: string; name: string; email: string }>> {
   z.uuid().parse(organisationId);
   return withFssAdminTransaction(
     db,
     admin,
     (tx) =>
-      tx<Array<{ name: string; email: string }>>`
-      select name, email
+      tx<Array<{ id: string; name: string; email: string }>>`
+      select id, name, email
       from operations.contacts
       where organisation_id = ${organisationId}
       order by name, email

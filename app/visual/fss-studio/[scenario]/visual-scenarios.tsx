@@ -25,6 +25,20 @@ import {
   StudioAgreementListScenario,
   StudioAgreementSignedScenario,
 } from "./agreement-visual-fixtures";
+import {
+  ClientGettingStartedScenario,
+  ClientOnboardingAssetsScenario,
+  ClientOnboardingBookingScenario,
+  ClientOnboardingCompleteScenario,
+  ClientOnboardingProfileScenario,
+  StudioWelcomeActiveScenario,
+  StudioWelcomeBuilderScenario,
+  StudioWelcomeJourneysScenario,
+  StudioWelcomePreflightScenario,
+  StudioWelcomeRecoveryScenario,
+  StudioWelcomeTemplatesScenario,
+  visualChecklistTaskId,
+} from "./welcome-visual-fixtures";
 
 export type VisualScenarioName =
   | "client-login"
@@ -38,13 +52,29 @@ export type VisualScenarioName =
   | "client-agreement-list"
   | "client-agreement-detail"
   | "client-agreement-signing"
+  | "client-getting-started"
+  | "client-onboarding-profile"
+  | "client-onboarding-assets"
+  | "client-onboarding-booking"
+  | "client-onboarding-complete"
   | "studio-overview"
   | "studio-shell"
   | "studio-delivery-board"
   | "studio-review-package"
   | "studio-agreement-list"
   | "studio-agreement-builder"
-  | "studio-agreement-signed";
+  | "studio-agreement-signed"
+  | "studio-welcome-journeys"
+  | "studio-welcome-builder"
+  | "studio-welcome-content"
+  | "studio-welcome-access"
+  | "studio-welcome-schedule"
+  | "studio-welcome-preflight"
+  | "studio-welcome-active"
+  | "studio-welcome-recovery"
+  | "studio-welcome-templates"
+  | "studio-checklist-editor"
+  | "studio-checklist-task-editor";
 
 export type VisualScenario = Readonly<{
   name: VisualScenarioName;
@@ -264,6 +294,26 @@ const scenarios: Record<VisualScenarioName, VisualScenario> = {
     name: "client-agreement-signing",
     content: <ClientAgreementSigningScenario />,
   },
+  "client-getting-started": {
+    name: "client-getting-started",
+    content: <ClientGettingStartedScenario />,
+  },
+  "client-onboarding-profile": {
+    name: "client-onboarding-profile",
+    content: <ClientOnboardingProfileScenario />,
+  },
+  "client-onboarding-assets": {
+    name: "client-onboarding-assets",
+    content: <ClientOnboardingAssetsScenario />,
+  },
+  "client-onboarding-booking": {
+    name: "client-onboarding-booking",
+    content: <ClientOnboardingBookingScenario />,
+  },
+  "client-onboarding-complete": {
+    name: "client-onboarding-complete",
+    content: <ClientOnboardingCompleteScenario />,
+  },
   "studio-overview": {
     name: "studio-overview",
     content: <StudioOverviewScenario />,
@@ -288,6 +338,57 @@ const scenarios: Record<VisualScenarioName, VisualScenario> = {
   "studio-agreement-signed": {
     name: "studio-agreement-signed",
     content: <StudioAgreementSignedScenario />,
+  },
+  "studio-welcome-journeys": {
+    name: "studio-welcome-journeys",
+    content: <StudioWelcomeJourneysScenario />,
+  },
+  "studio-welcome-builder": {
+    name: "studio-welcome-builder",
+    content: <StudioWelcomeBuilderScenario stage="setup" />,
+  },
+  "studio-welcome-content": {
+    name: "studio-welcome-content",
+    content: <StudioWelcomeBuilderScenario stage="content" />,
+  },
+  "studio-welcome-access": {
+    name: "studio-welcome-access",
+    content: <StudioWelcomeBuilderScenario stage="access" />,
+  },
+  "studio-welcome-schedule": {
+    name: "studio-welcome-schedule",
+    content: <StudioWelcomeBuilderScenario stage="schedule" />,
+  },
+  "studio-welcome-preflight": {
+    name: "studio-welcome-preflight",
+    content: <StudioWelcomePreflightScenario />,
+  },
+  "studio-welcome-active": {
+    name: "studio-welcome-active",
+    content: <StudioWelcomeActiveScenario />,
+  },
+  "studio-welcome-recovery": {
+    name: "studio-welcome-recovery",
+    content: <StudioWelcomeRecoveryScenario />,
+  },
+  "studio-welcome-templates": {
+    name: "studio-welcome-templates",
+    content: <StudioWelcomeTemplatesScenario title="Welcome templates" />,
+  },
+  "studio-checklist-editor": {
+    name: "studio-checklist-editor",
+    content: (
+      <StudioWelcomeTemplatesScenario title="Build the client checklist" />
+    ),
+  },
+  "studio-checklist-task-editor": {
+    name: "studio-checklist-task-editor",
+    content: (
+      <StudioWelcomeTemplatesScenario
+        taskId={visualChecklistTaskId}
+        title="Create a useful next step"
+      />
+    ),
   },
 };
 

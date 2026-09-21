@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { z } from "zod";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import { StaffJourneyWorkspace } from "@/components/portal/onboarding/staff-journey-workspace";
+import { isJourneyBuilderStage } from "@/components/portal/onboarding/staff-journey-builder";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
@@ -18,6 +19,7 @@ import type { SigningApproval } from "@/lib/operations/agreements/signing-types"
 import {
   listStaffJourneyContacts,
   listStaffJourneys,
+  loadStaffOnboardingWorkspace,
 } from "@/lib/operations/onboarding/queries";
 import type {
   JourneyBillingAccount,
@@ -27,13 +29,16 @@ import { onboardingEnabled } from "@/lib/operations/onboarding/worker-db";
 import { readBillingConfiguration } from "@/lib/operations/billing/configuration";
 import styles from "@/components/portal/studio-client.module.css";
 import type { FssAdminContext } from "@/lib/operations/auth/staff-types";
+import type { OnboardingWorkspace } from "@/lib/operations/onboarding/workspace-types";
 
 export const dynamic = "force-dynamic";
 
 export default async function StaffClientJourneyPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ organisationId: string }>;
+  searchParams: Promise<{ step?: string }>;
 }): Promise<React.JSX.Element> {
   if (!operationsEnabled()) notFound();
   if (!portalAuthConfigured()) return <PortalUnavailable />;
@@ -41,6 +46,10 @@ export default async function StaffClientJourneyPage({
   if (!identity) return <PortalUnavailable />;
   const organisationId = z.uuid().safeParse((await params).organisationId);
   if (!organisationId.success) notFound();
+  const requestedStage = (await searchParams).step;
+  const builderStage = isJourneyBuilderStage(requestedStage)
+    ? requestedStage
+    : undefined;
   let db: OperationsDb;
   let admin: FssAdminContext;
   try {
@@ -69,16 +78,19 @@ export default async function StaffClientJourneyPage({
     register: AgreementRegister;
     journeys: JourneyView[];
     approvals: SigningApproval[];
-    contacts: Array<{ name: string; email: string }>;
+    contacts: Array<{ id: string; name: string; email: string }>;
     billing: JourneyBillingAccount | null;
+    workspace: OnboardingWorkspace;
   };
   try {
-    const [register, journeys, approvals, contacts] = await Promise.all([
-      listStaffAgreementRegister(db, admin, organisationId.data),
-      listStaffJourneys(db, admin, organisationId.data),
-      listStaffSigning(db, admin, organisationId.data, randomUUID()),
-      listStaffJourneyContacts(db, admin, organisationId.data),
-    ]);
+    const [register, journeys, approvals, contacts, workspace] =
+      await Promise.all([
+        listStaffAgreementRegister(db, admin, organisationId.data),
+        listStaffJourneys(db, admin, organisationId.data),
+        listStaffSigning(db, admin, organisationId.data, randomUUID()),
+        listStaffJourneyContacts(db, admin, organisationId.data),
+        loadStaffOnboardingWorkspace(db, admin, organisationId.data),
+      ]);
     if (!register) notFound();
     let billing = null;
     try {
@@ -92,7 +104,7 @@ export default async function StaffClientJourneyPage({
     } catch {
       billing = null;
     }
-    data = { register, journeys, approvals, contacts, billing };
+    data = { register, journeys, approvals, contacts, billing, workspace };
   } catch {
     return <PortalUnavailable />;
   }
@@ -104,6 +116,8 @@ export default async function StaffClientJourneyPage({
       approvals={data.approvals}
       contacts={data.contacts}
       billing={data.billing}
+      builderStage={builderStage}
+      workspace={data.workspace}
     />
   );
 }

@@ -5,8 +5,8 @@ import {
   requestHasRegisteredOrigin,
 } from "../../growth/http/founder-request";
 import { privateAuthHeaders, reportAuthError } from "../auth/http";
-import { JourneyConflict, type JourneyCommandResult } from "./command-types";
-export function createJourneyCommandHandler<Identity>(deps: {
+import { JourneyConflict } from "./command-types";
+export function createJourneyCommandHandler<Identity, Result>(deps: {
   enabled: boolean;
   origin: string;
   authorize: () => Promise<Identity | null>;
@@ -19,7 +19,7 @@ export function createJourneyCommandHandler<Identity>(deps: {
     identity: Identity,
     organisationId: string,
     command: unknown,
-  ) => Promise<JourneyCommandResult>;
+  ) => Promise<Result>;
 }) {
   return async (
     request: Request,

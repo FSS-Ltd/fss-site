@@ -1,24 +1,32 @@
-import Link from "next/link";
 import type { AgreementRegister } from "@/lib/operations/agreements/types";
 import type { SigningApproval } from "@/lib/operations/agreements/signing-types";
 import type {
   JourneyBillingAccount,
   JourneyView,
 } from "@/lib/operations/onboarding/command-types";
+import type { OnboardingWorkspace } from "@/lib/operations/onboarding/workspace-types";
+import { portalPath } from "@/lib/operations/auth/portal-url";
+import { StaffJourneyBuilder } from "./staff-journey-builder";
+import type { JourneyBuilderStage } from "./staff-journey-builder";
+import { StaffJourneyDetail } from "./staff-journey-detail";
 import { JourneyPreview } from "@/components/operations/onboarding/journey-preview";
 import { JourneyTimeline } from "@/components/operations/onboarding/journey-timeline";
-import { OperationsPageHeader } from "@/components/operations/shared/operations-page-header";
-import ui from "@/components/operations/shared/operations-ui.module.css";
-import styles from "@/components/operations/agreements/agreements.module.css";
-import layout from "@/components/operations/signing/signing.module.css";
+import {
+  Notice,
+  PageHeader,
+  PortalActionLink,
+  PortalCard,
+} from "@/components/portal/ui";
 
 type StaffJourneyWorkspaceProps = {
   organisationId: string;
   register: AgreementRegister;
   journeys: JourneyView[];
   approvals: SigningApproval[];
-  contacts: Array<{ name: string; email: string }>;
+  contacts: Array<{ id: string; name: string; email: string }>;
   billing: JourneyBillingAccount | null;
+  builderStage?: JourneyBuilderStage;
+  workspace: OnboardingWorkspace;
 };
 
 export function StaffJourneyWorkspace({
@@ -28,31 +36,58 @@ export function StaffJourneyWorkspace({
   approvals,
   contacts,
   billing,
+  builderStage,
+  workspace,
 }: StaffJourneyWorkspaceProps): React.JSX.Element {
   const apiRoot = `/api/portal/admin/clients/${organisationId}`;
 
   return (
-    <section className={`${styles.page} ${layout.operationsPage}`}>
-      <OperationsPageHeader
-        context="FSS Studio · Welcome journeys"
+    <main>
+      <PageHeader
+        eyebrow="FSS Studio · Welcome journeys"
         title="A deliberate first step."
         description={`${register.organisationName}. Review each recipient, schedule, and recovery decision before any delivery is queued.`}
         action={
-          <Link href={`/admin/clients/${organisationId}`}>
+          <PortalActionLink
+            href={portalPath(`/portal/admin/clients/${organisationId}`)}
+            variant="secondary"
+          >
             Back to client workspace
-          </Link>
+          </PortalActionLink>
         }
-      >
-        <Link href={`/admin/clients/${organisationId}/signing`}>
+      />
+      <PortalCard title="Draft journeys" tone="accent">
+        <p>
+          {journeys.length} journey{journeys.length === 1 ? "" : "s"} shown.
+        </p>
+        <PortalActionLink
+          href={portalPath(`/portal/admin/clients/${organisationId}/signing`)}
+          variant="secondary"
+        >
           Review signing documents
-        </Link>
-      </OperationsPageHeader>
-      <dl className={ui.metricGrid}>
-        <div className={ui.metricCard}>
-          <dt>Journeys shown</dt>
-          <dd className={styles.count}>{journeys.length}</dd>
-        </div>
-      </dl>
+        </PortalActionLink>
+        <PortalActionLink
+          href={`${portalPath("/portal/admin/welcome/templates")}?organisationId=${encodeURIComponent(organisationId)}`}
+          variant="secondary"
+        >
+          Manage welcome templates
+        </PortalActionLink>
+      </PortalCard>
+      <StaffJourneyBuilder
+        agreements={register.agreements.map((agreement) => ({
+          id: agreement.id,
+          label: agreement.draft.title,
+          version: agreement.version,
+        }))}
+        commandEndpoint={`${apiRoot}/journey`}
+        contacts={contacts}
+        initialStage={builderStage}
+        templates={workspace.templates.map((template) => ({
+          id: template.id,
+          name: template.name,
+          version: template.version,
+        }))}
+      />
       <JourneyPreview
         organisationId={organisationId}
         organisationName={register.organisationName}
@@ -63,30 +98,35 @@ export function StaffJourneyWorkspace({
         billing={billing}
         commandEndpoint={`${apiRoot}/journey`}
         signingDownloadBase={`${apiRoot}/signing`}
+        workspaceDrafts={workspace.journeyDrafts}
       />
       {journeys.length === 0 ? (
-        <p className={ui.emptyState}>
+        <Notice tone="info">
           No journeys started. Prepare a welcome to review it before approval.
-        </p>
+        </Notice>
       ) : (
         journeys.map((journey) => (
-          <JourneyTimeline
+          <section
             key={`${journey.id}-${journey.generation}-${journey.proposalApprovalId}`}
-            organisationId={organisationId}
-            journey={journey}
-            commandEndpoint={`${apiRoot}/journey`}
-            welcomeDownloadUrl={`${apiRoot}/journey/${journey.id}/welcome`}
-          />
+          >
+            <StaffJourneyDetail journey={journey} />
+            <JourneyTimeline
+              organisationId={organisationId}
+              journey={journey}
+              commandEndpoint={`${apiRoot}/journey`}
+              welcomeDownloadUrl={`${apiRoot}/journey/${journey.id}/welcome`}
+            />
+          </section>
         ))
       )}
       {(journeys.length === 50 ||
         contacts.length === 100 ||
         register.nextCursor) && (
-        <p>
+        <Notice tone="info">
           The latest 50 journeys, first 50 agreements and first 100 contacts are
           shown.
-        </p>
+        </Notice>
       )}
-    </section>
+    </main>
   );
 }

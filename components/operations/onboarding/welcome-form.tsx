@@ -3,6 +3,14 @@ import { useState } from "react";
 import { invoiceChoices } from "@/lib/operations/onboarding/display";
 import type { JourneyBillingAccount } from "@/lib/operations/onboarding/command-types";
 import type { AgreementRecord } from "@/lib/operations/agreements/types";
+import type { OnboardingWorkspaceJourneyDraft } from "@/lib/operations/onboarding/workspace-types";
+import {
+  Notice,
+  PortalButton,
+  PortalField,
+  PortalSelect,
+  PortalTextarea,
+} from "@/components/portal/ui";
 import styles from "../agreements/agreements.module.css";
 const guidePages = [
   "Your priorities",
@@ -17,15 +25,31 @@ export function WelcomeForm({
   billing,
   pending,
   onPreview,
+  workspaceDrafts,
 }: {
   agreements: AgreementRecord[];
-  contacts: { email: string; name: string }[];
+  contacts: { id?: string; email: string; name: string }[];
   billing: JourneyBillingAccount;
   pending: boolean;
   onPreview: (command: unknown) => void;
+  workspaceDrafts?: readonly OnboardingWorkspaceJourneyDraft[];
 }): React.JSX.Element {
   const [agreementId, setAgreementId] = useState("");
-  const selected = agreements.find((a) => a.id === agreementId);
+  const [recipient, setRecipient] = useState("");
+  const [workspaceDraftId, setWorkspaceDraftId] = useState("");
+  const selectedWorkspaceDraft = workspaceDrafts?.find(
+    (draft) => draft.id === workspaceDraftId,
+  );
+  const selected = agreements.find((agreement) => agreement.id === agreementId);
+  const selectedContact = selectedWorkspaceDraft
+    ? contacts.find(
+        (contact) => contact.id === selectedWorkspaceDraft.contactId,
+      )
+    : null;
+  const workspaceDraftIsUsable =
+    !selectedWorkspaceDraft ||
+    (selectedWorkspaceDraft.agreementId === agreementId &&
+      Boolean(selectedContact));
   return (
     <form
       className={styles.form}
@@ -33,14 +57,14 @@ export function WelcomeForm({
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         const value = (name: string) => String(data.get(name) ?? "").trim();
-        const agreement = agreements.find((a) => a.id === value("agreementId"));
-        if (!agreement) return;
+        const agreement = agreements.find((item) => item.id === agreementId);
+        if (!agreement || !recipient || !workspaceDraftIsUsable) return;
         onPreview({
           action: "preview_welcome",
           agreementId: agreement.id,
           expectedVersion: agreement.version,
           welcome: {
-            recipient: value("recipient"),
+            recipient,
             invoice: {
               obligationKey: value("obligationKey"),
               accountId: billing.accountId,
@@ -68,42 +92,87 @@ export function WelcomeForm({
               requiredAction: value("requiredAction"),
             },
           },
+          workspace: selectedWorkspaceDraft
+            ? {
+                contactId: selectedWorkspaceDraft.contactId,
+                draftId: selectedWorkspaceDraft.id,
+                expectedDraftVersion: selectedWorkspaceDraft.version,
+                recipientRole: selectedWorkspaceDraft.recipientRole ?? "owner",
+                templateVersionId: selectedWorkspaceDraft.templateVersionId,
+              }
+            : undefined,
         });
       }}
     >
       <fieldset disabled={pending}>
         <legend>Welcome and first invoice</legend>
-        <label className={styles.field}>
-          Agreement
-          <select
-            name="agreementId"
-            required
-            value={agreementId}
-            onChange={(e) => setAgreementId(e.target.value)}
+        {workspaceDrafts?.length ? (
+          <PortalSelect
+            label="Saved journey setup"
+            name="workspaceDraftId"
+            onChange={(event) => {
+              const nextDraftId = event.target.value;
+              const nextDraft = workspaceDrafts.find(
+                (draft) => draft.id === nextDraftId,
+              );
+              setWorkspaceDraftId(nextDraftId);
+              if (!nextDraft) return;
+              setAgreementId(nextDraft.agreementId);
+              setRecipient(
+                contacts.find((contact) => contact.id === nextDraft.contactId)
+                  ?.email ?? "",
+              );
+            }}
+            value={workspaceDraftId}
           >
-            <option value="" disabled>
-              Select agreement
-            </option>
-            {agreements.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.draft.title} · revision {a.revision}
+            <option value="">Prepare without a saved journey draft</option>
+            {workspaceDrafts.map((draft) => (
+              <option key={draft.id} value={draft.id}>
+                Saved {draft.stage} draft · version {draft.version}
               </option>
             ))}
-          </select>
-        </label>
-        <label className={styles.field}>
-          Welcome and billing recipient
-          <select name="recipient" required defaultValue="">
-            <option value="" disabled>
-              Select contact
+          </PortalSelect>
+        ) : null}
+        <PortalSelect
+          label="Agreement"
+          name="agreementId"
+          required
+          value={agreementId}
+          onChange={(e) => setAgreementId(e.target.value)}
+          disabled={Boolean(selectedWorkspaceDraft)}
+        >
+          <option value="" disabled>
+            Select agreement
+          </option>
+          {agreements.map((a) => (
+            <option key={a.id} value={a.id}>
+              {a.draft.title} · revision {a.revision}
             </option>
-            {contacts.map((c) => (
-              <option key={c.email} value={c.email}>
-                {c.name} · {c.email}
-              </option>
-            ))}
-          </select>
-        </label>
+          ))}
+        </PortalSelect>
+        <PortalSelect
+          label="Welcome and billing recipient"
+          name="recipient"
+          required
+          value={recipient}
+          onChange={(event) => setRecipient(event.target.value)}
+          disabled={Boolean(selectedWorkspaceDraft)}
+        >
+          <option value="" disabled>
+            Select contact
+          </option>
+          {contacts.map((c) => (
+            <option key={c.email} value={c.email}>
+              {c.name} · {c.email}
+            </option>
+          ))}
+        </PortalSelect>
+        {!workspaceDraftIsUsable ? (
+          <Notice tone="warning">
+            This saved journey setup no longer matches an available agreement or
+            contact. Return to the builder and save a new draft.
+          </Notice>
+        ) : null}
         <div className={styles.grid}>
           {[
             ["contactFirstName", "Contact first name"],
@@ -111,48 +180,49 @@ export function WelcomeForm({
             ["from", "Approved sender email"],
             ["replyTo", "Reply email"],
           ].map(([name, label]) => (
-            <label key={name} className={styles.field}>
-              {label}
+            <PortalField key={name} label={label} required>
               <input
                 name={name}
                 type={["from", "replyTo"].includes(name) ? "email" : "text"}
                 required
                 maxLength={200}
               />
-            </label>
+            </PortalField>
           ))}
         </div>
-        <label className={styles.field}>
-          First agreed invoice
-          <select
-            name="obligationKey"
-            required
-            key={agreementId}
-            defaultValue=""
-          >
-            <option value="" disabled>
-              Select an obligation
-            </option>
-            {selected &&
-              invoiceChoices(selected.draft).map((choice) => (
-                <option key={choice.value} value={choice.value}>
-                  {choice.label}
-                </option>
-              ))}
-          </select>
-        </label>
+        <PortalSelect
+          label="First agreed invoice"
+          name="obligationKey"
+          required
+          key={agreementId}
+          defaultValue=""
+        >
+          <option value="" disabled>
+            Select an obligation
+          </option>
+          {selected &&
+            invoiceChoices(selected.draft).map((choice) => (
+              <option key={choice.value} value={choice.value}>
+                {choice.label}
+              </option>
+            ))}
+        </PortalSelect>
         <p>
           Billing uses the configured {billing.livemode ? "live" : "test"}{" "}
           account. Sender organisation: Faithful Software Solutions.
         </p>
-        <label className={styles.field}>
-          Client’s primary goal
-          <textarea name="primaryGoal" required maxLength={2000} />
-        </label>
-        <label className={styles.field}>
-          Proposed outcome summary
-          <textarea name="outcomeSummary" required maxLength={2000} />
-        </label>
+        <PortalTextarea
+          label="Client’s primary goal"
+          name="primaryGoal"
+          required
+          maxLength={2000}
+        />
+        <PortalTextarea
+          label="Proposed outcome summary"
+          name="outcomeSummary"
+          required
+          maxLength={2000}
+        />
       </fieldset>
       <fieldset disabled={pending}>
         <legend>Welcome guide</legend>
@@ -162,10 +232,13 @@ export function WelcomeForm({
           blank line.
         </p>
         {guidePages.map((title, i) => (
-          <label key={title} className={styles.field}>
-            {title}
-            <textarea name={`page-${i}`} required maxLength={6000} />
-          </label>
+          <PortalTextarea
+            key={title}
+            label={title}
+            name={`page-${i}`}
+            required
+            maxLength={6000}
+          />
         ))}
       </fieldset>
       <fieldset disabled={pending}>
@@ -180,18 +253,27 @@ export function WelcomeForm({
           ["nextStep", "Contractual next step"],
           ["requiredAction", "Required client action"],
         ].map(([name, label]) => (
-          <label key={name} className={styles.field}>
-            {label}
-            <textarea name={name} required maxLength={2000} />
-          </label>
+          <PortalTextarea
+            key={name}
+            label={label}
+            name={name}
+            required
+            maxLength={2000}
+          />
         ))}
       </fieldset>
-      <button
-        className={styles.primary}
-        disabled={pending || !agreements.length || !contacts.length}
+      <PortalButton
+        disabled={
+          pending ||
+          !agreements.length ||
+          !contacts.length ||
+          !workspaceDraftIsUsable
+        }
+        loading={pending}
+        type="submit"
       >
         {pending ? "Preparing…" : "Preview welcome"}
-      </button>
+      </PortalButton>
     </form>
   );
 }

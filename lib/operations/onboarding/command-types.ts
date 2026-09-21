@@ -4,6 +4,7 @@ import type {
   JourneyState,
   OnboardingStep,
 } from "./types";
+import type { OnboardingReadinessCheck } from "./workspace-types";
 export class JourneyConflict extends Error {
   constructor(
     readonly code:
@@ -64,6 +65,7 @@ export interface WelcomePreview {
   agreementId: string;
   snapshot: WelcomeApprovalSnapshot;
   pdfBase64: string;
+  readiness: readonly OnboardingReadinessCheck[];
 }
 export interface ProposalPreview {
   kind: "proposal";

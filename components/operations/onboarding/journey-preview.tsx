@@ -8,12 +8,21 @@ import type {
 } from "@/lib/operations/onboarding/command-types";
 import type { AgreementRecord } from "@/lib/operations/agreements/types";
 import type { SigningApproval } from "@/lib/operations/agreements/signing-types";
+import type { OnboardingWorkspaceJourneyDraft } from "@/lib/operations/onboarding/workspace-types";
+import { canStartOnboardingJourney } from "@/lib/operations/onboarding/readiness";
+import { portalPath } from "@/lib/operations/auth/portal-url";
 import { useJourneyCommand } from "./use-journey-command";
 import { WelcomeForm } from "./welcome-form";
 import { ProposalForm } from "./proposal-form";
 import { ProposalAccessPreview } from "./proposal-access-preview";
 import { EmailPreview } from "./email-preview";
-import ui from "../shared/operations-ui.module.css";
+import {
+  PortalActionLink,
+  PortalButton,
+  PortalCard,
+  PortalCheckbox,
+  StatusBadge,
+} from "@/components/portal/ui";
 import styles from "../agreements/agreements.module.css";
 function PreviewDocument({ base64 }: { base64: string }): React.JSX.Element {
   const link = useRef<HTMLAnchorElement>(null);
@@ -38,16 +47,24 @@ function PreviewDocument({ base64 }: { base64: string }): React.JSX.Element {
     </p>
   );
 }
+
+function readinessStatus(
+  status: "failed" | "needs_action" | "passed",
+): "error" | "success" | "warning" {
+  if (status === "passed") return "success";
+  return status === "failed" ? "error" : "warning";
+}
 export interface JourneyPreviewProps {
   organisationId: string;
   organisationName: string;
   agreements: AgreementRecord[];
-  contacts: { email: string; name: string }[];
+  contacts: { id?: string; email: string; name: string }[];
   approvals: SigningApproval[];
   journeys: JourneyView[];
   billing?: JourneyBillingAccount | null;
   commandEndpoint?: string;
   signingDownloadBase?: string;
+  workspaceDrafts?: readonly OnboardingWorkspaceJourneyDraft[];
 }
 export function JourneyPreview({
   organisationId,
@@ -59,6 +76,7 @@ export function JourneyPreview({
   billing = null,
   commandEndpoint,
   signingDownloadBase = `/api/growth/operations/clients/${organisationId}/signing`,
+  workspaceDrafts,
 }: JourneyPreviewProps): React.JSX.Element {
   const { submit, pending, message } = useJourneyCommand(
     organisationId,
@@ -86,13 +104,13 @@ export function JourneyPreview({
           (c) => c.value === preview.snapshot.invoice.obligationKey,
         )?.label
       : null;
+  const welcomeCanStart =
+    preview?.kind !== "welcome" || canStartOnboardingJourney(preview.readiness);
   return (
-    <article className={styles.card}>
-      <h2>Prepare the next step.</h2>
-      <p className={ui.description}>
-        {organisationName}: review the exact recipients, content and access
-        before anything is queued. Welcome and proposal have separate approvals.
-      </p>
+    <PortalCard
+      description={`${organisationName}: review the exact recipients, content and access before anything is queued. Welcome and proposal have separate approvals.`}
+      title="Prepare the next step."
+    >
       {!preview && (
         <>
           <details>
@@ -104,6 +122,7 @@ export function JourneyPreview({
                 billing={billing}
                 pending={pending}
                 onPreview={prepare}
+                workspaceDrafts={workspaceDrafts}
               />
             ) : available.length ? (
               <p>
@@ -144,6 +163,26 @@ export function JourneyPreview({
           </h3>
           {preview.kind === "welcome" ? (
             <>
+              <section aria-label="Welcome activation preflight">
+                <h3>Preflight</h3>
+                <ul>
+                  {preview.readiness.map((check) => (
+                    <li key={check.id}>
+                      <StatusBadge status={readinessStatus(check.status)}>
+                        {check.reason}
+                      </StatusBadge>
+                      {check.href && check.status !== "passed" ? (
+                        <PortalActionLink
+                          href={portalPath(check.href)}
+                          variant="secondary"
+                        >
+                          Resolve this check
+                        </PortalActionLink>
+                      ) : null}
+                    </li>
+                  ))}
+                </ul>
+              </section>
               <EmailPreview email={preview.snapshot.welcome} />
               <PreviewDocument base64={preview.pdfBase64} />
               <p>PDF SHA-256: {preview.snapshot.pdfHash}</p>
@@ -201,19 +240,16 @@ export function JourneyPreview({
               </p>
             </>
           )}
-          <label>
-            <input
-              type="checkbox"
-              checked={confirmed}
-              onChange={(e) => setConfirmed(e.target.checked)}
-              disabled={pending}
-            />
-            I reviewed these exact recipients, content, documents and access.
-          </label>
+          <PortalCheckbox
+            checked={confirmed}
+            disabled={pending}
+            label="I reviewed these exact recipients, content, documents and access."
+            onChange={(e) => setConfirmed(e.target.checked)}
+          />
           <div className={styles.actions}>
-            <button
-              className={styles.primary}
-              disabled={pending || !confirmed}
+            <PortalButton
+              disabled={pending || !confirmed || !welcomeCanStart}
+              loading={pending}
               onClick={async () => {
                 const result = await submit({
                   action:
@@ -223,26 +259,29 @@ export function JourneyPreview({
                 });
                 if (result) setPreview(null);
               }}
+              type="button"
             >
               {pending
                 ? "Saving…"
                 : preview.kind === "welcome"
                   ? "Start approved welcome"
                   : "Approve proposal and access"}
-            </button>
-            <button
+            </PortalButton>
+            <PortalButton
               disabled={pending}
               onClick={() => {
                 setPreview(null);
                 setConfirmed(false);
               }}
+              type="button"
+              variant="secondary"
             >
               Back to preparation
-            </button>
+            </PortalButton>
           </div>
         </div>
       )}
       <p role="status">{message}</p>
-    </article>
+    </PortalCard>
   );
 }

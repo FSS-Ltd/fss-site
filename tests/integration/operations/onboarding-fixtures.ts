@@ -11,6 +11,8 @@ import type { ProposalApprovalSnapshot } from "../../../lib/operations/onboardin
 import { prepareProposal } from "../../../lib/operations/onboarding/approval";
 import { onboardingStore } from "../../../lib/operations/onboarding/outbox";
 import { requireOperationsTestDatabaseUrl } from "../../../scripts/require-operations-database-env";
+import { registerFixtureCleanup } from "./fixture-cleanup";
+
 export async function onboardingFixture(
   t: TestContext,
   signers = 2,
@@ -24,18 +26,31 @@ export async function onboardingFixture(
     signing?: Awaited<ReturnType<typeof signingFixture>>;
     worker?: ReturnType<typeof postgres>;
   } = {};
-  t.after(async () => {
+  const signing = await signingFixture(t, signers, options);
+  cleanup.signing = signing;
+  const clean = registerFixtureCleanup(async () => {
     await cleanup.worker?.end();
     if (cleanup.signing) {
       await cleanup.signing
         .admin`delete from operations.onboarding_access_bindings where job_id in (select id from operations.onboarding_jobs where organisation_id=${cleanup.signing.organisationId})`;
+      await cleanup.signing
+        .admin`update operations.onboarding_journeys set onboarding_template_version_id = null, onboarding_workspace_draft_id = null where organisation_id = ${cleanup.signing.organisationId}`;
       for (const table of [
+        "onboarding_journey_task_attachments",
+        "onboarding_journey_tasks",
+        "onboarding_journey_drafts",
+        "onboarding_client_profiles",
+        "onboarding_template_versions",
+        "onboarding_templates",
         "onboarding_reconciliations",
         "onboarding_delivery_events",
         "onboarding_attempts",
         "onboarding_effects",
         "onboarding_jobs",
         "onboarding_journeys",
+        "documents",
+        "milestones",
+        "projects",
         "onboarding_proposal_approvals",
         "onboarding_approvals",
         "invoices",
@@ -50,8 +65,7 @@ export async function onboardingFixture(
         );
     }
   });
-  const signing = await signingFixture(t, signers, options);
-  cleanup.signing = signing;
+  t.after(clean);
   const worker = postgres(
     requireOperationsTestDatabaseUrl(process.env.OPERATIONS_TEST_DATABASE_URL),
     { max: 4, connection: { options: "-c role=operations_onboarding_worker" } },

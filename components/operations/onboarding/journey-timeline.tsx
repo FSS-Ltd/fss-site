@@ -7,7 +7,12 @@ import { useJourneyCommand } from "./use-journey-command";
 import { RetryFailure } from "./retry-failure";
 import { StepRecovery } from "./step-recovery";
 import { EmailPreview } from "./email-preview";
-import ui from "../shared/operations-ui.module.css";
+import {
+  Notice,
+  PortalButton,
+  PortalCard,
+  StatusBadge,
+} from "@/components/portal/ui";
 import styles from "../agreements/agreements.module.css";
 const labels = {
   welcome: "Welcome email",
@@ -18,6 +23,16 @@ const labels = {
   activation: "Additional recipient activation",
   thank_you: "Agreement thank-you",
 };
+
+function journeyStatus(
+  journey: JourneyView,
+): "error" | "info" | "success" | "warning" {
+  if (journey.failureCode || journey.state === "blocked") return "error";
+  if (journey.state === "completed") return "success";
+  if (journey.state === "paused") return "warning";
+  return "info";
+}
+
 export function JourneyTimeline({
   organisationId,
   journey,
@@ -43,24 +58,25 @@ export function JourneyTimeline({
       expectedProposalApprovalId: journey.proposalApprovalId,
     });
   return (
-    <article className={styles.card}>
-      <h2>{journey.agreementTitle || "Client journey"}</h2>
-      <p className={ui.statusChip}>Journey {journey.state}</p>
+    <PortalCard title={journey.agreementTitle || "Client journey"}>
+      <StatusBadge status={journeyStatus(journey)}>
+        Journey {journey.state}
+      </StatusBadge>
       {journey.failureCode && (
-        <p role="alert">
+        <Notice tone="error">
           Delivery stopped: {journey.failureCode.replaceAll("_", " ")}. Review
           delivery evidence before continuing.
-        </p>
+        </Notice>
       )}
       {!journey.proposal && (
         <p>Welcome approved. Proposal is held until its separate approval.</p>
       )}
       {journey.proposal && !journey.currentProposal && !journey.signatureAt && (
-        <p role="alert">
+        <Notice tone="warning">
           Proposal approval is stale or no longer valid. Review the current
           signing document and approve a new preview. Attempted notices and
           access must be reconciled before replacement.
-        </p>
+        </Notice>
       )}
       <dl className={styles.facts}>
         <div>
@@ -84,24 +100,30 @@ export function JourneyTimeline({
       </dl>
       <div className={styles.form}>
         <div className={styles.actions}>
-          <button
+          <PortalButton
             disabled={pending || terminal || journey.state === "paused"}
             onClick={() => command("pause")}
+            type="button"
+            variant="secondary"
           >
             Pause
-          </button>
-          <button
+          </PortalButton>
+          <PortalButton
             disabled={pending || journey.state !== "paused"}
             onClick={() => command("resume")}
+            type="button"
+            variant="secondary"
           >
             Resume
-          </button>
-          <button
+          </PortalButton>
+          <PortalButton
             disabled={pending || terminal}
             onClick={() => setCancel(true)}
+            type="button"
+            variant="destructive"
           >
             Cancel remaining steps
-          </button>
+          </PortalButton>
         </div>
         {cancel && (
           <div>
@@ -111,17 +133,24 @@ export function JourneyTimeline({
               flight may still complete.
             </p>
             <div className={styles.actions}>
-              <button
+              <PortalButton
                 disabled={pending}
                 onClick={async () => {
                   if (await command("cancel")) setCancel(false);
                 }}
+                type="button"
+                variant="destructive"
               >
                 Confirm cancellation
-              </button>
-              <button disabled={pending} onClick={() => setCancel(false)}>
+              </PortalButton>
+              <PortalButton
+                disabled={pending}
+                onClick={() => setCancel(false)}
+                type="button"
+                variant="secondary"
+              >
                 Keep journey
-              </button>
+              </PortalButton>
             </div>
           </div>
         )}
@@ -133,9 +162,17 @@ export function JourneyTimeline({
             <h3>{labels[job.step]}</h3>
             <p>
               {job.recipient} ·{" "}
-              <span className={ui.statusChip}>
+              <StatusBadge
+                status={
+                  job.state === "succeeded"
+                    ? "success"
+                    : job.state === "held" || job.state === "unknown_outcome"
+                      ? "warning"
+                      : "neutral"
+                }
+              >
                 {job.state.replaceAll("_", " ")}
-              </span>{" "}
+              </StatusBadge>{" "}
               · eligible {journeyTime(job.dueAt)}
             </p>
             <p>{jobExplanation(job, journey)}</p>
@@ -209,6 +246,6 @@ export function JourneyTimeline({
           ))}
         </details>
       )}
-    </article>
+    </PortalCard>
   );
 }

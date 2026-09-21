@@ -12,6 +12,7 @@ import {
   signPortalAgreement,
 } from "../../../lib/operations/agreements/signing-service";
 import type { SigningApproval } from "../../../lib/operations/agreements/signing-types";
+import { registerFixtureCleanup } from "./fixture-cleanup";
 export async function signingFixture(
   t: TestContext,
   signerCount = 2,
@@ -42,7 +43,7 @@ export async function signingFixture(
     email: `signer${i}@example.test`,
     emailVerified: true as const,
   }));
-  t.after(async () => {
+  const clean = registerFixtureCleanup(async () => {
     await Promise.all([founderDb.end(), portal.end(), worker.end()]);
     try {
       await admin.begin(async (tx) => {
@@ -80,6 +81,7 @@ export async function signingFixture(
       await admin.end();
     }
   });
+  t.after(clean);
   await applyReviewedMapping(founderDb, founder, {
     reviewReference: "signing-test",
     organisations: [

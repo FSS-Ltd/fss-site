@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { notFound } from "next/navigation";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import { StaffJourneyOverview } from "@/components/portal/onboarding/staff-journey-overview";
+import { Notice, PageHeader } from "@/components/portal/ui";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
@@ -16,7 +17,6 @@ import {
 } from "@/lib/operations/onboarding/queries";
 import { onboardingEnabled } from "@/lib/operations/onboarding/worker-db";
 import type { FssAdminContext } from "@/lib/operations/auth/staff-types";
-import styles from "@/components/portal/studio-client.module.css";
 
 export const dynamic = "force-dynamic";
 
@@ -35,21 +35,17 @@ export default async function AdminWelcomeJourneysPage(): Promise<React.JSX.Elem
   }
   if (!onboardingEnabled()) {
     return (
-      <section
-        className={styles.page}
-        aria-labelledby="welcome-unavailable-heading"
-      >
-        <header className={styles.hero}>
-          <p className={styles.eyebrow}>FSS Studio · Welcome journeys</p>
-          <h1 id="welcome-unavailable-heading" className={styles.title}>
-            Welcome journeys unavailable
-          </h1>
-          <p className={styles.description}>
-            This workspace stays unavailable until the approved onboarding
-            worker and provider configuration are enabled.
-          </p>
-        </header>
-      </section>
+      <main>
+        <PageHeader
+          description="This workspace stays unavailable until the approved onboarding worker and provider configuration are enabled."
+          eyebrow="FSS Studio · Welcome journeys"
+          title="Welcome journeys unavailable"
+        />
+        <Notice tone="info">
+          No messages, access invitations, or billing effects can be prepared
+          while onboarding is disabled.
+        </Notice>
+      </main>
     );
   }
   let journeys: StaffJourneyOverviewRow[];

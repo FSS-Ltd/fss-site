@@ -1,0 +1,150 @@
+.workspace,
+.taskPage {
+  display: grid;
+  gap: 24px;
+  width: 100%;
+}
+
+.leadCard,
+.taskCard,
+.detailCard {
+  display: grid;
+  gap: 16px;
+}
+
+.leadCopy,
+.taskCopy,
+.taskMeta,
+.completionDetail,
+.formFeedback,
+.documentMeta {
+  color: var(--portal-muted);
+  line-height: 1.65;
+  margin: 0;
+}
+
+.taskList,
+.milestoneList,
+.documentChoices {
+  display: grid;
+  gap: 14px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.taskCard {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+}
+
+.taskContent {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.taskTitleRow,
+.taskMetadata,
+.taskActions,
+.milestoneRow,
+.documentChoice {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.taskTitle {
+  font-size: 1.0625rem;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.taskMetadata {
+  color: var(--portal-muted);
+  font-size: 0.875rem;
+}
+
+.taskActions {
+  justify-content: flex-end;
+}
+
+.milestoneList {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.milestoneRow {
+  border: 1px solid var(--portal-line);
+  border-radius: 14px;
+  justify-content: space-between;
+  min-height: 52px;
+  padding: 10px 12px;
+}
+
+.milestoneLabel {
+  align-items: center;
+  display: inline-flex;
+  font-size: 0.875rem;
+  font-weight: 600;
+  gap: 8px;
+}
+
+.form {
+  display: grid;
+  gap: 18px;
+}
+
+.formActions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.documentChoice {
+  align-items: flex-start;
+  border: 1px solid var(--portal-line);
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.documentChoice > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.documentTitle {
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.returnLink {
+  align-items: center;
+  color: var(--portal-muted);
+  display: inline-flex;
+  font-size: 0.875rem;
+  gap: 8px;
+  min-height: 44px;
+  width: fit-content;
+}
+
+@media (max-width: 680px) {
+  .taskCard {
+    grid-template-columns: 1fr;
+  }
+
+  .taskActions {
+    justify-content: flex-start;
+  }
+
+  .milestoneList {
+    grid-template-columns: 1fr;
+  }
+
+  .taskActions :global(a),
+  .formActions :global(button) {
+    width: 100%;
+  }
+}

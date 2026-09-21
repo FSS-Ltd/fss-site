@@ -148,7 +148,12 @@ test("journey approval retains exact-recipient confirmation before either mutati
     source,
     /I reviewed these exact recipients, content, documents and access/,
   );
-  assert.match(source, /disabled=\{pending \|\| !confirmed\}/);
+  assert.match(source, /Welcome activation preflight/);
+  assert.match(source, /canStartOnboardingJourney\(preview\.readiness\)/);
+  assert.match(
+    source,
+    /disabled=\{pending \|\| !confirmed \|\| !welcomeCanStart\}/,
+  );
   assert.match(
     source,
     /preview\.kind === "welcome" \? "start" : "approve_proposal"/,
