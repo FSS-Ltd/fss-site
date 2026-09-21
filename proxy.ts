@@ -24,9 +24,18 @@ function isPortalRequest(
     portalRouteForHost(hostname, pathname, prefixFreeEnabled) !== null ||
     pathname === "/portal" ||
     pathname.startsWith("/portal/") ||
+    pathname === "/admin" ||
+    pathname.startsWith("/admin/") ||
     pathname.startsWith("/api/portal/") ||
     pathname === "/api/auth/sign-out"
   );
+}
+
+function studioRouteForPath(pathname: string): string | null {
+  if (pathname === "/admin" || pathname.startsWith("/admin/")) {
+    return `/portal${pathname}`;
+  }
+  return null;
 }
 
 export function createPortalProxyResponse(
@@ -53,6 +62,13 @@ export function createPortalProxyResponse(
     if (portalRoute) {
       const url = request.nextUrl.clone();
       url.pathname = portalRoute;
+      return applyPortalSecurityHeaders(NextResponse.rewrite(url));
+    }
+
+    const studioRoute = studioRouteForPath(request.nextUrl.pathname);
+    if (studioRoute) {
+      const url = request.nextUrl.clone();
+      url.pathname = studioRoute;
       return applyPortalSecurityHeaders(NextResponse.rewrite(url));
     }
 
@@ -92,6 +108,7 @@ export const config = {
     "/",
     "/growth/:path*",
     "/portal/:path*",
+    "/admin/:path*",
     "/api/portal/:path*",
     "/api/auth/sign-out",
     {

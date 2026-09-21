@@ -93,8 +93,7 @@ const studioNavigation: readonly Omit<PortalNavigationItem, "active">[] = [
   {
     id: "portal-access",
     label: "Portal access",
-    href: null,
-    unavailableReason: "Portal access is being prepared for this workspace.",
+    href: "/portal/admin/portal-access",
   },
   {
     id: "notifications",

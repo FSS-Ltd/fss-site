@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { z } from "zod";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import styles from "@/components/portal/studio-client.module.css";
+import { PortalButton, PortalSelect } from "@/components/portal/ui";
 import { StudioPagination } from "@/components/portal/workspace/studio-pagination";
 import { studioDateLabel } from "@/components/portal/workspace/studio-date";
 import workspace from "@/components/portal/workspace/workspace.module.css";
@@ -73,18 +74,19 @@ export default async function AdminProjectsPage({
         {organisationId && (
           <input name="organisationId" type="hidden" value={organisationId} />
         )}
-        <label>
-          Project status
-          <select defaultValue={rawStatus ?? "all"} name="status">
-            <option value="all">All project states</option>
-            {projectStatuses.map((value) => (
-              <option key={value} value={value}>
-                {projectStatusLabels[value]}
-              </option>
-            ))}
-          </select>
-        </label>
-        <button type="submit">Apply filter</button>
+        <PortalSelect
+          defaultValue={rawStatus ?? "all"}
+          label="Project status"
+          name="status"
+        >
+          <option value="all">All project states</option>
+          {projectStatuses.map((value) => (
+            <option key={value} value={value}>
+              {projectStatusLabels[value]}
+            </option>
+          ))}
+        </PortalSelect>
+        <PortalButton type="submit">Apply filter</PortalButton>
       </form>
       {projects.items.length === 0 ? (
         <p className={styles.rowCopy}>No projects match this workspace view.</p>
@@ -108,9 +110,9 @@ export default async function AdminProjectsPage({
               </div>
               <Link
                 className={styles.actionLink}
-                href={`/admin/clients/${project.organisationId}`}
+                href={`/admin/projects/${project.id}/edit`}
               >
-                Client context
+                Edit project
               </Link>
             </li>
           ))}

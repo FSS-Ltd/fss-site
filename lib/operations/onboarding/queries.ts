@@ -10,8 +10,10 @@ import { onboardingTaskDefinitionSchema } from "./workspace-schema";
 import {
   onboardingDueRules,
   onboardingTaskKinds,
+  type OnboardingReadinessCheck,
   type OnboardingWorkspace,
 } from "./workspace-types";
+import { buildOnboardingReadiness, canStartOnboardingJourney } from "./readiness";
 
 const onboardingWorkspaceSchema = z.strictObject({
   templates: z.array(
@@ -189,4 +191,100 @@ export async function listStaffJourneyOverview(
         limit 200
       `,
   );
+}
+
+export type StaffJourneyRecovery = Readonly<{
+  organisationId: string;
+  organisationName: string;
+  draftId: string;
+  updatedAt: string;
+  checks: readonly OnboardingReadinessCheck[];
+  canStart: boolean;
+}>;
+
+export type StaffJourneyRecoveryAvailability = Readonly<{
+  senderConfigured: boolean;
+  billingConfigured: boolean;
+  signingConfigured: boolean;
+}>;
+
+type StaffJourneyRecoveryRow = Readonly<{
+  organisationId: string;
+  organisationName: string;
+  draftId: string;
+  updatedAt: string;
+  expectedAgreementVersion: number | null;
+  recipientRole: string | null;
+  agreementVersion: number | null;
+  agreementStatus: string | null;
+  contactAvailable: boolean;
+  templateVersionAvailable: boolean;
+  existingJourney: boolean;
+}>;
+
+/**
+ * Loads the most recently saved welcome draft and derives its preflight from
+ * retained Operations records. The result is informational only: the command
+ * boundary repeats the same checks immediately before activation.
+ */
+export async function loadStaffJourneyRecovery(
+  db: OperationsDb,
+  admin: FssAdminContext,
+  availability: StaffJourneyRecoveryAvailability,
+): Promise<StaffJourneyRecovery | null> {
+  return withFssAdminTransaction(db, admin, async (tx) => {
+    const [row] = await tx<StaffJourneyRecoveryRow[]>`
+      select
+        d.organisation_id as "organisationId",
+        o.display_name as "organisationName",
+        d.id as "draftId",
+        d.updated_at::text as "updatedAt",
+        (d.content ->> 'expectedAgreementVersion')::integer as "expectedAgreementVersion",
+        d.content ->> 'recipientRole' as "recipientRole",
+        a.current_revision as "agreementVersion",
+        a.status as "agreementStatus",
+        exists(
+          select 1 from operations.contacts c
+          where c.organisation_id = d.organisation_id and c.id = d.contact_id
+        ) as "contactAvailable",
+        exists(
+          select 1 from operations.onboarding_template_versions v
+          where v.organisation_id = d.organisation_id and v.id = d.template_version_id
+        ) as "templateVersionAvailable",
+        exists(
+          select 1 from operations.onboarding_journeys j
+          where j.organisation_id = d.organisation_id and j.agreement_id = d.agreement_id
+        ) as "existingJourney"
+      from operations.onboarding_journey_drafts d
+      join operations.organisations o on o.id = d.organisation_id
+      left join operations.agreements a
+        on a.organisation_id = d.organisation_id and a.id = d.agreement_id
+      order by d.updated_at desc, d.id desc
+      limit 1
+    `;
+    if (!row) return null;
+    const checks = buildOnboardingReadiness({
+      billingConfigured: availability.billingConfigured,
+      contactAvailable: row.contactAvailable,
+      currentAgreement:
+        row.agreementVersion !== null &&
+        row.expectedAgreementVersion === row.agreementVersion,
+      noActiveJourney: !row.existingJourney,
+      recipientRoleAllowed:
+        row.recipientRole !== null &&
+        portalRoles.includes(row.recipientRole as (typeof portalRoles)[number]),
+      senderConfigured: availability.senderConfigured,
+      signingReady:
+        availability.signingConfigured && row.agreementStatus === "draft",
+      templateVersionAvailable: row.templateVersionAvailable,
+    });
+    return {
+      organisationId: row.organisationId,
+      organisationName: row.organisationName,
+      draftId: row.draftId,
+      updatedAt: row.updatedAt,
+      checks,
+      canStart: canStartOnboardingJourney(checks),
+    };
+  });
 }
