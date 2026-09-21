@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-test("portal signing retains its header and width while founder signing and journeys use the Operations page class", () => {
+test("legacy signing retains its header and width while redesigned portal agreements use shared portal layout", () => {
   const css = readFileSync(
     new URL("./signing.module.css", import.meta.url),
     "utf8",
@@ -38,8 +38,12 @@ test("portal signing retains its header and width while founder signing and jour
     ),
     "utf8",
   );
-  assert.match(portal, /signingStyles\.page/);
-  assert.doesNotMatch(portal, /signingStyles\.operationsPage/);
+  assert.match(
+    portal,
+    /components\/portal\/agreements\/agreements\.module\.css/,
+  );
+  assert.match(portal, /className=\{styles\.page\}/);
+  assert.doesNotMatch(portal, /signingStyles\./);
   assert.match(operations, /signingStyles\.operationsPage/);
   assert.doesNotMatch(operations, /signingStyles\.page/);
   assert.match(journey, /layout\.operationsPage/);
