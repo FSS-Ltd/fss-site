@@ -15,6 +15,7 @@ type ClientDocumentWorkspaceProps = Readonly<{
   documents: readonly PortalWorkspaceDocument[];
   organisationId: string;
   pagination?: React.ReactNode;
+  quarantineNotice?: boolean;
   uploadConfiguration: UploadConfiguration;
 }>;
 
@@ -32,6 +33,7 @@ export function ClientDocumentWorkspace({
   documents,
   organisationId,
   pagination,
+  quarantineNotice = false,
   uploadConfiguration,
 }: ClientDocumentWorkspaceProps): React.JSX.Element {
   return (
@@ -56,6 +58,12 @@ export function ClientDocumentWorkspace({
       <Notice tone="info">
         Files only appear after FSS has cleared them for your workspace.
       </Notice>
+      {quarantineNotice ? (
+        <Notice tone="warning">
+          Your file is being checked. The file will be available after it
+          passes the security check. You can leave and return later.
+        </Notice>
+      ) : null}
       <section
         className={styles.group}
         aria-labelledby="shared-documents-heading"

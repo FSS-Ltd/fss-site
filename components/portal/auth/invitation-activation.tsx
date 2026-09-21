@@ -1,12 +1,18 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight, LockKeyhole } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import { useClerk, useSignUp, useUser } from "@clerk/nextjs";
+import {
+  Notice,
+  PortalActionLink,
+  PortalButton,
+  PortalField,
+} from "@/components/portal/ui";
 import styles from "./portal.module.css";
+import { InvitationExpired } from "./invitation-expired";
 import {
   completeInvitationSignUp,
   clerkErrorMessage,
@@ -18,6 +24,7 @@ import {
   defaultPortalClaimDestinations,
   type PortalClaimDestinations,
 } from "./portal-claim-destination";
+import { isExpiredInvitationStatus } from "./invitation-state";
 
 type Status = {
   kind: "idle" | "pending" | "error";
@@ -53,6 +60,9 @@ export function PortalInvitationActivation({
       invitedEmail !== user.primaryEmailAddress?.emailAddress.toLowerCase());
   const busy =
     !isLoaded || status.kind === "pending" || fetchStatus === "fetching";
+  const invitationExpired = isExpiredInvitationStatus(
+    initialValues.clerkStatus,
+  );
 
   useEffect(() => {
     if (initialValues.name || initialValues.email)
@@ -65,6 +75,8 @@ export function PortalInvitationActivation({
         ),
       );
   }, [activationPath, initialValues.name, initialValues.email]);
+
+  if (invitationExpired) return <InvitationExpired loginHref={loginPath} />;
 
   async function switchAccount(): Promise<void> {
     if (!ticket || busy) return;
@@ -158,9 +170,13 @@ export function PortalInvitationActivation({
           invitation.
         </p>
         <p className={styles.actions}>
-          <Link className={styles.link} href={loginPath}>
+          <PortalActionLink
+            className={styles.link}
+            href={loginPath}
+            variant="secondary"
+          >
             Go to portal sign in
-          </Link>
+          </PortalActionLink>
         </p>
       </section>
     );
@@ -196,73 +212,54 @@ export function PortalInvitationActivation({
       <form onSubmit={submit} className={styles.form} aria-busy={busy}>
         {!isSignedIn && (
           <>
-            <label htmlFor="portal-invitation-name" className={styles.label}>
-              Full name
-            </label>
-            <input
-              autoComplete="name"
-              autoFocus
-              className={styles.input}
-              defaultValue={initialValues.name}
-              id="portal-invitation-name"
-              maxLength={200}
-              name="name"
-              required
-              disabled={busy}
-            />
-            <label
-              htmlFor="portal-invitation-password"
-              className={styles.label}
-            >
-              Create a password
-            </label>
-            <input
-              autoComplete="new-password"
-              className={styles.input}
-              id="portal-invitation-password"
-              minLength={8}
-              name="password"
-              required
-              type="password"
-              disabled={busy}
-            />
-            <label
-              htmlFor="portal-invitation-confirmation"
-              className={styles.label}
-            >
-              Confirm password
-            </label>
-            <input
-              autoComplete="new-password"
-              className={styles.input}
-              id="portal-invitation-confirmation"
-              minLength={8}
-              name="confirmation"
-              required
-              type="password"
-              disabled={busy}
-            />
+            <PortalField label="Full name" required>
+              <input
+                autoComplete="name"
+                autoFocus
+                className={styles.input}
+                defaultValue={initialValues.name}
+                maxLength={200}
+                name="name"
+                disabled={busy}
+              />
+            </PortalField>
+            <PortalField label="Create a password" required>
+              <input
+                autoComplete="new-password"
+                className={styles.input}
+                minLength={8}
+                name="password"
+                type="password"
+                disabled={busy}
+              />
+            </PortalField>
+            <PortalField label="Confirm password" required>
+              <input
+                autoComplete="new-password"
+                className={styles.input}
+                minLength={8}
+                name="confirmation"
+                type="password"
+                disabled={busy}
+              />
+            </PortalField>
           </>
         )}
-        <button type="submit" className={styles.button} disabled={busy}>
+        <PortalButton className={styles.button} loading={busy} type="submit">
           <span>
-            {busy
-              ? "Opening your workspace…"
-              : accountSwitchRequired
-                ? "Sign out and continue with invitation"
-                : isSignedIn
-                  ? "Accept invitation and continue"
-                  : "Create account and continue"}
+            {accountSwitchRequired
+              ? "Sign out and continue with invitation"
+              : isSignedIn
+                ? "Accept invitation and continue"
+                : "Create account and continue"}
           </span>
           <ArrowRight size={18} aria-hidden="true" />
-        </button>
+        </PortalButton>
         <div id="clerk-captcha" />
       </form>
       <div aria-live="polite" aria-atomic="true">
         {status.kind === "error" && (
-          <p className={`${styles.feedback} ${styles.error}`}>
-            {status.message}
-          </p>
+          <Notice tone="error">{status.message}</Notice>
         )}
       </div>
       <p className={styles.reassurance}>
@@ -271,21 +268,25 @@ export function PortalInvitationActivation({
       </p>
       {isSignedIn && !accountSwitchRequired && (
         <p className={styles.actions}>
-          <button
-            type="button"
-            className={styles.textButton}
+          <PortalButton
             disabled={busy}
             onClick={switchAccount}
+            type="button"
+            variant="quiet"
           >
             Sign out and use another account
-          </button>
+          </PortalButton>
         </p>
       )}
       {!accountSwitchRequired && (
         <p className={styles.actions}>
-          <Link className={styles.link} href={loginPath}>
+          <PortalActionLink
+            className={styles.link}
+            href={loginPath}
+            variant="secondary"
+          >
             Already have access? Sign in
-          </Link>
+          </PortalActionLink>
         </p>
       )}
     </section>

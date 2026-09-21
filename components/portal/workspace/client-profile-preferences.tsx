@@ -9,6 +9,7 @@ import {
   PortalCard,
   PortalField,
 } from "@/components/portal/ui";
+import { ViewerAccessNotice } from "@/components/portal/auth/viewer-access-notice";
 import type { PortalProfile } from "@/lib/operations/auth/user-profile";
 import { hasPortalCapability } from "@/lib/operations/auth/permissions";
 import { portalPath } from "@/lib/operations/auth/portal-url";
@@ -67,6 +68,9 @@ export function ClientProfilePreferences({
         Essential account messages remain enabled for security, access, and
         service updates.
       </Notice>
+      {profile.role === "viewer" ? (
+        <ViewerAccessNotice organisationId={organisationId} />
+      ) : null}
       <PortalCard title="Your profile">
         <form onSubmit={save} aria-busy={pending}>
           <PortalField label="Your name" required>

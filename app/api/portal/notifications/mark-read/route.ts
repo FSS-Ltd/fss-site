@@ -1,39 +1,40 @@
 import { randomUUID } from "node:crypto";
-import { z } from "zod";
+import {
+  portalAuthConfigured,
+  resolvePortalOrigin,
+} from "@/lib/operations/auth/configuration";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
-import { PortalAccessDenied } from "@/lib/operations/auth/types";
-import { getPortalDb, withVerifiedPortalIdentity } from "@/lib/operations/db/portal-client";
+import { operationsEnabled } from "@/lib/operations/db/client";
+import { getPortalDb } from "@/lib/operations/db/portal-client";
+import { createNotificationReadHandler } from "@/lib/operations/workspaces/notification-read-handler";
+import { markPortalNotificationsRead } from "@/lib/operations/workspaces/portal-repository";
 
 export const runtime = "nodejs";
 
-const bodySchema = z.strictObject({ ids: z.array(z.uuid()).min(1).max(100) });
-
 export async function POST(request: Request): Promise<Response> {
-  const identity = await getPortalIdentity();
-  if (!identity) throw new PortalAccessDenied();
-  let body: { ids: string[] };
+  let origin: string;
   try {
-    body = bodySchema.parse(await request.json());
-  } catch {
-    return Response.json({ error: "Invalid notification list." }, { status: 400 });
-  }
-  try {
-    await withVerifiedPortalIdentity(
-      getPortalDb(),
-      identity,
-      randomUUID(),
-      async (tx) => {
-        await tx`update operations.request_notifications set read_at = clock_timestamp()
-          where user_id = ${identity.userId}
-            and read_at is null
-            and id in ${tx(body.ids)}`;
-      },
-    );
+    origin = resolvePortalOrigin();
   } catch {
     return Response.json(
-      { error: "Notifications could not be updated." },
-      { status: 503 },
+      { error: "Portal is unavailable." },
+      { status: 404, headers: { "Cache-Control": "private, no-store" } },
     );
   }
-  return Response.json({ ok: true }, { status: 200 });
+  return createNotificationReadHandler({
+    authorize: getPortalIdentity,
+    createCorrelationId: randomUUID,
+    enabled: operationsEnabled() && portalAuthConfigured(),
+    origin,
+    reportUnexpectedError: (report) =>
+      console.error("Portal notification update failed.", report),
+    update: (identity, organisationId, correlationId, ids) =>
+      markPortalNotificationsRead(
+        getPortalDb(),
+        identity,
+        organisationId,
+        correlationId,
+        ids,
+      ),
+  })(request);
 }

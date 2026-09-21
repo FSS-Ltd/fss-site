@@ -46,6 +46,9 @@ export default async function DocumentsPage({
           path="/portal/documents"
         />
       }
+      quarantineNotice={
+        !Array.isArray(params.state) && params.state === "quarantine"
+      }
       uploadConfiguration={documentUploadConfiguration()}
     />
   );
