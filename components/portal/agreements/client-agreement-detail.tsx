@@ -57,6 +57,57 @@ function formatDate(value: string): string {
   }).format(new Date(`${value}T12:00:00Z`));
 }
 
+function formatSignedAt(value: string): string {
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    month: "long",
+    timeZone: "Europe/London",
+    timeZoneName: "short",
+    year: "numeric",
+  }).format(new Date(value));
+}
+
+function SigningRecord({
+  approval,
+}: Readonly<{
+  approval: SigningApproval;
+}>): React.JSX.Element | null {
+  if (!hasCompleteSigningEvidence(approval)) return null;
+
+  const signatures = approval.requiredSigners.flatMap((requiredSigner) => {
+    const signature = approval.signatures.find(
+      (candidate) => candidate.email === requiredSigner,
+    );
+    return signature ? [signature] : [];
+  });
+
+  return (
+    <PortalCard title="Your record">
+      <ul className={styles.schedule}>
+        {signatures.map((signature) => (
+          <li key={`${signature.email}-${signature.signedAt}`}>
+            <span>{signature.typedName}</span>
+            <time dateTime={signature.signedAt}>
+              Signed {formatSignedAt(signature.signedAt)}
+            </time>
+          </li>
+        ))}
+      </ul>
+      <dl className={styles.summaryList}>
+        <div>
+          <dt>Retained copy</dt>
+          <dd>
+            The signed version and its source revision remain available in
+            Agreements.
+          </dd>
+        </div>
+      </dl>
+    </PortalCard>
+  );
+}
+
 function CompletionNotice({
   approval,
   ownSignature,
@@ -225,6 +276,7 @@ export function ClientAgreementDetail({
           ) : null}
         </div>
       </PortalCard>
+      <SigningRecord approval={approval} />
       <AgreementStatusCard status={status} />
       {complete ? (
         <Notice

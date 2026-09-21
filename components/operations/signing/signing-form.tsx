@@ -181,6 +181,19 @@ export function SigningForm({
               disabled={pending || Boolean(success)}
             />
           </PortalField>
+          <PortalField
+            hint="This confirms your authority for this signing step. FSS records your verified signer identity, consent and signing time separately."
+            label="Role / position"
+            required
+          >
+            <input
+              autoComplete="organization-title"
+              maxLength={200}
+              minLength={2}
+              required
+              disabled={pending || Boolean(success)}
+            />
+          </PortalField>
           <PortalCheckbox
             disabled={pending || Boolean(success)}
             label="I have authority to bind the named organisation."
