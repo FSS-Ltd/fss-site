@@ -1,0 +1,196 @@
+.page {
+  display: grid;
+  gap: 24px;
+  width: 100%;
+}
+
+.group {
+  display: grid;
+  gap: 16px;
+}
+
+.groupHeading,
+.cardHeader,
+.documentHeading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.groupHeading h2,
+.cardHeader h3,
+.documentHeading h3 {
+  margin: 0;
+  color: var(--portal-ink, #0a1a2e);
+  font-weight: 700;
+}
+
+.groupHeading h2 {
+  font-size: 1.125rem;
+  line-height: 1.35;
+}
+
+.groupHeading p,
+.summary,
+.documentHeading p {
+  margin: 6px 0 0;
+  color: var(--portal-muted, #46566c);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.outcome {
+  max-width: 48rem;
+  margin: 0;
+  color: inherit;
+  font-size: clamp(1.125rem, 2vw, 1.35rem);
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.groupHeading > span {
+  display: inline-grid;
+  min-width: 28px;
+  min-height: 28px;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--portal-soft-surface, #f7f8f9);
+  color: var(--portal-muted, #46566c);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.cardList {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.card {
+  height: 100%;
+}
+
+.metadata {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding-top: 2px;
+  margin: 0;
+}
+
+.metadata div {
+  min-width: 0;
+}
+
+.metadata dt {
+  color: var(--portal-muted, #46566c);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.metadata dd {
+  margin: 3px 0 0;
+  color: var(--portal-ink, #0a1a2e);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.documentHeading {
+  justify-content: flex-start;
+}
+
+.documentHeading > svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: var(--portal-action, #0f7078);
+}
+
+.empty {
+  padding: 20px;
+  margin: 0;
+  border: 1px dashed var(--portal-border, #d9dfe5);
+  border-radius: 12px;
+  color: var(--portal-muted, #46566c);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.timeline {
+  display: grid;
+  gap: 14px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.timeline > li {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.timelineMarker {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid var(--portal-border, #d9dfe5);
+  border-radius: 999px;
+  background: var(--portal-surface, #fff);
+  color: var(--portal-action, #0f7078);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.timelineCard {
+  min-width: 0;
+}
+
+.metaText,
+.evidence {
+  margin: 0;
+  color: var(--portal-muted, #46566c);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+}
+
+.evidence {
+  padding-left: 12px;
+  border-left: 2px solid var(--portal-action, #0f7078);
+}
+
+.noticeList,
+.compactList {
+  display: grid;
+  gap: 6px;
+  padding-left: 20px;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.workspaceGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 520px) {
+  .groupHeading,
+  .cardHeader {
+    flex-direction: column;
+  }
+
+  .metadata {
+    grid-template-columns: 1fr;
+  }
+
+  .workspaceGrid {
+    grid-template-columns: 1fr;
+  }
+}

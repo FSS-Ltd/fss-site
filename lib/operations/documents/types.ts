@@ -16,6 +16,19 @@ export type ClientDocument = DocumentSummary &
         sizeBytes: number;
       }
   );
+
+/**
+ * The only document metadata that may cross the portal read boundary for a
+ * document-detail page. Storage, integrity and review fields remain server-only.
+ */
+export type ClientDocumentDetail = ClientDocument &
+  Readonly<{
+    createdAt: string;
+    expiresAt: string | null;
+    projectTitle: string;
+    version: number;
+  }>;
+
 // Server-only download resolution. Never serialize this object into a client page.
 export type PrivateDocumentDownload = DocumentSummary & {
   objectKey: string;

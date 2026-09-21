@@ -60,6 +60,11 @@ export async function listPortalWorkspaceDocuments(
         join operations.projects p
           on p.organisation_id = d.organisation_id and p.id = d.project_id
         where d.organisation_id = ${context.organisationId}
+          and p.visibility = 'client'
+          and d.visibility = 'client'
+          and d.scan_status = 'cleared'
+          and d.revoked_at is null
+          and (d.expires_at is null or d.expires_at > clock_timestamp())
         order by d.created_at desc, d.id desc
         limit ${workspacePageSize + 1} offset ${offset}
       `;

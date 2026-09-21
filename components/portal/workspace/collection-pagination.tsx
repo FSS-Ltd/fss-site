@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { PortalActionLink } from "@/components/portal/ui";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import styles from "./workspace.module.css";
 
@@ -31,12 +31,20 @@ export function CollectionPagination({
   return (
     <nav className={styles.pagination} aria-label="Collection pages">
       {page > 1 ? (
-        <Link href={hrefForPage(page - 1)}>Previous page</Link>
+        <PortalActionLink href={hrefForPage(page - 1)} variant="secondary">
+          Previous page
+        </PortalActionLink>
       ) : (
         <span />
       )}
       <span>Page {page}</span>
-      {hasNext ? <Link href={hrefForPage(page + 1)}>Next page</Link> : <span />}
+      {hasNext ? (
+        <PortalActionLink href={hrefForPage(page + 1)} variant="secondary">
+          Next page
+        </PortalActionLink>
+      ) : (
+        <span />
+      )}
     </nav>
   );
 }

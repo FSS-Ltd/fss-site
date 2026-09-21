@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { notFound } from "next/navigation";
+import { z } from "zod";
 import { getPortalPageContext } from "@/lib/operations/auth/page-context";
 import { requirePortalMember } from "@/lib/operations/auth/require-member";
 import { hasPortalCapability } from "@/lib/operations/auth/permissions";
@@ -65,6 +66,7 @@ export default async function NewRequestPage({
         }
       />
       <RequestForm
+        initialProjectId={z.uuid().safeParse(params.projectId).data}
         initialType={params.type === "bug" ? "bug" : "work"}
         organisationId={context.organisationId}
         projects={projects.map(({ id, title }) => ({ id, title }))}

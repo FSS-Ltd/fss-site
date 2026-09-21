@@ -1,14 +1,12 @@
 import { randomUUID } from "node:crypto";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CollectionPagination } from "@/components/portal/workspace/collection-pagination";
-import { DocumentWorkspaceList } from "@/components/portal/workspace/document-workspace-list";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
-import styles from "@/components/portal/projects.module.css";
+import { ClientDocumentWorkspace } from "@/components/portal/documents/client-document-workspace";
 import { getPortalPageContext } from "@/lib/operations/auth/page-context";
-import { portalPath } from "@/lib/operations/auth/portal-url";
 import { PortalAccessDenied } from "@/lib/operations/auth/types";
 import { getPortalDb } from "@/lib/operations/db/portal-client";
+import { documentUploadConfiguration } from "@/lib/operations/documents/uploads";
 import { parseWorkspacePage } from "@/lib/operations/workspaces/pagination";
 import { listPortalWorkspaceDocuments } from "@/lib/operations/workspaces/portal-repository";
 
@@ -37,34 +35,18 @@ export default async function DocumentsPage({
   });
   if (!documents) return <PortalUnavailable />;
   return (
-    <div className={styles.page}>
-      <Link className={styles.breadcrumb} href={portalPath("/portal")}>
-        Your workspace
-      </Link>
-      <p className={styles.eyebrow}>Your retained work</p>
-      <h1 className={styles.title}>Documents</h1>
-      <p className={styles.copy}>
-        Approved project files and links shared with your organisation.
-      </p>
-      <section
-        className={styles.section}
-        aria-labelledby="shared-documents-heading"
-      >
-        <div className={styles.sectionHeading}>
-          <h2 id="shared-documents-heading">Shared documents</h2>
-          <span className={styles.note}>Cleared for your workspace</span>
-        </div>
-        <DocumentWorkspaceList
-          documents={documents.items}
-          organisationId={context.organisationId}
-        />
+    <ClientDocumentWorkspace
+      documents={documents.items}
+      organisationId={context.organisationId}
+      pagination={
         <CollectionPagination
           hasNext={documents.hasNext}
           organisationId={context.organisationId}
           page={documents.page}
           path="/portal/documents"
         />
-      </section>
-    </div>
+      }
+      uploadConfiguration={documentUploadConfiguration()}
+    />
   );
 }

@@ -2,6 +2,7 @@ import type {
   ClientProject,
   ProjectStatus,
 } from "@/lib/operations/projects/types";
+import { StatusBadge, type PortalStatus } from "@/components/portal/ui";
 import styles from "./projects.module.css";
 
 export const projectStatusLabels: Record<ProjectStatus, string> = {
@@ -12,6 +13,13 @@ export const projectStatusLabels: Record<ProjectStatus, string> = {
   completed: "Completed",
   paused: "Paused",
 };
+
+function projectStatusTone(status: ProjectStatus): PortalStatus {
+  if (status === "completed") return "success";
+  if (status === "waiting_for_you") return "warning";
+  if (status === "active" || status === "waiting_for_us") return "info";
+  return "neutral";
+}
 export function projectDate(value: string | null): string {
   if (!value) return "To be confirmed";
   return new Intl.DateTimeFormat("en-GB", {
@@ -30,9 +38,9 @@ export function ProjectSummary({
     <section aria-labelledby="project-overview" className={styles.overview}>
       <div className={styles.sectionHeading}>
         <h2 id="project-overview">The outcome</h2>
-        <span className={styles.status}>
+        <StatusBadge status={projectStatusTone(project.status)}>
           {projectStatusLabels[project.status]}
-        </span>
+        </StatusBadge>
       </div>
       <p className={styles.outcome}>{project.outcome}</p>
       <p className={styles.copy}>{project.summary}</p>
