@@ -1,63 +1,9 @@
-.page {
+.page,
+.group,
+.workspaceList,
+.workspaceCard {
   display: grid;
-  gap: 24px;
-  width: min(100%, 1120px);
-  margin-inline: auto;
-  font-family: "Geist", system-ui, sans-serif;
-}
-
-.hero {
-  display: grid;
-  gap: 16px;
-  padding: clamp(24px, 4vw, 40px);
-  border-radius: 24px;
-  background:
-    radial-gradient(
-      circle at 92% 0%,
-      rgba(70, 199, 216, 0.24),
-      transparent 30%
-    ),
-    linear-gradient(120deg, #07182e, #0b3049);
-  color: #ffffff;
-}
-
-.eyebrow,
-.title,
-.description,
-.metrics dt,
-.metrics dd,
-.row h2,
-.row p,
-.counts dt,
-.counts dd,
-.empty h2,
-.empty p {
-  margin: 0;
-}
-
-.eyebrow {
-  color: #b4c5d8;
-  font-family: "IBM Plex Mono", ui-monospace, monospace;
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.title {
-  font-family: "Sora", "Geist", system-ui, sans-serif;
-  font-size: clamp(1.875rem, 4vw, 2.5rem);
-  font-weight: 600;
-  letter-spacing: -0.05em;
-  line-height: 1.15;
-  text-wrap: balance;
-}
-
-.description {
-  max-width: 64ch;
-  color: #d5e3ec;
-  font-size: 1rem;
-  line-height: 1.55;
+  gap: 20px;
 }
 
 .metrics {
@@ -67,138 +13,73 @@
   margin: 0;
 }
 
-.metrics > div,
-.empty,
-.row {
-  border: 1px solid #d9dfe5;
-  border-radius: 16px;
-  background: #ffffff;
-  box-shadow: 0 16px 38px -34px rgba(7, 24, 46, 0.7);
-}
-
-.metrics > div {
-  display: grid;
-  gap: 6px;
-  padding: 20px;
-}
-
-.metrics dt,
-.counts dt {
-  color: #46566c;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  line-height: 1.45;
-}
-
-.metrics dd {
-  color: #0a1a2e;
-  font-size: clamp(1.75rem, 3vw, 2.25rem);
-  font-weight: 700;
-  letter-spacing: -0.055em;
-  line-height: 1;
-}
-
-.list {
-  display: grid;
-  gap: 12px;
+.metric {
   margin: 0;
+  color: var(--portal-ink, #0a1a2e);
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 650;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.group h2,
+.cardHeading h3,
+.cardHeading p,
+.cardCopy,
+.empty {
+  margin: 0;
+}
+
+.group h2,
+.cardHeading h3 {
+  color: var(--portal-ink, #0a1a2e);
+  font-weight: 650;
+  letter-spacing: -0.025em;
+}
+
+.group h2 {
+  font-size: 1.25rem;
+}
+
+.workspaceList {
   padding: 0;
   list-style: none;
 }
 
-.row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
-  gap: 20px;
-  align-items: center;
-  padding: 20px 24px;
+.workspaceCard {
+  gap: 14px;
 }
 
-.row h2,
-.empty h2 {
-  color: #0a1a2e;
-  font-family: "Sora", "Geist", system-ui, sans-serif;
+.cardHeading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cardHeading h3 {
   font-size: 1rem;
-  letter-spacing: -0.02em;
+  line-height: 1.4;
 }
 
-.row p,
-.empty p {
-  margin-top: 8px;
-  color: #46566c;
-  font-size: 0.875rem;
-  line-height: 1.55;
-}
-
-.counts {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-  margin: 0;
-}
-
-.counts dd {
-  margin: 3px 0 0;
-  color: #0a1a2e;
-  font-weight: 700;
-}
-
-.action,
-.empty a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  padding: 0 12px;
-  border: 1px solid #788696;
-  border-radius: 12px;
-  color: #005e70;
-  font-size: 0.875rem;
-  font-weight: 650;
-  text-decoration: none;
-}
-
+.cardHeading p,
+.cardCopy,
 .empty {
-  display: grid;
-  gap: 8px;
-  padding: 24px;
+  color: var(--portal-muted, #46566c);
+  font-size: 0.875rem;
+  line-height: 1.6;
 }
 
-.empty a {
-  width: fit-content;
-  margin-top: 8px;
-}
-
-.page :is(a, button):focus-visible {
-  outline: 3px solid #0f7078;
-  outline-offset: 3px;
-}
-
-@media (max-width: 800px) {
+@media (max-width: 780px) {
   .metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .row {
-    grid-template-columns: 1fr;
-  }
-
-  .counts {
-    width: fit-content;
-  }
-
-  .action {
-    width: fit-content;
   }
 }
 
 @media (max-width: 480px) {
   .metrics {
     grid-template-columns: 1fr;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .page * {
-    transition: none;
   }
 }
