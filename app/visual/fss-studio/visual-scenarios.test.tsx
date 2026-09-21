@@ -40,3 +40,15 @@ test("registers each Phase 2 request and delivery visual fixture", () => {
   ])
     assert.ok(resolveVisualScenario(name, true, "test"));
 });
+
+test("registers each Phase 3 agreement visual fixture", () => {
+  for (const name of [
+    "client-agreement-list",
+    "client-agreement-detail",
+    "client-agreement-signing",
+    "studio-agreement-list",
+    "studio-agreement-builder",
+    "studio-agreement-signed",
+  ])
+    assert.ok(resolveVisualScenario(name, true, "test"));
+});

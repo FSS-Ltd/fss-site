@@ -17,6 +17,14 @@ import {
   StudioDeliveryBoardScenario,
   StudioReviewPackageScenario,
 } from "./request-visual-fixtures";
+import {
+  ClientAgreementDetailScenario,
+  ClientAgreementListScenario,
+  ClientAgreementSigningScenario,
+  StudioAgreementBuilderScenario,
+  StudioAgreementListScenario,
+  StudioAgreementSignedScenario,
+} from "./agreement-visual-fixtures";
 
 export type VisualScenarioName =
   | "client-login"
@@ -27,10 +35,16 @@ export type VisualScenarioName =
   | "client-bug-report"
   | "client-request-form"
   | "client-request-review"
+  | "client-agreement-list"
+  | "client-agreement-detail"
+  | "client-agreement-signing"
   | "studio-overview"
   | "studio-shell"
   | "studio-delivery-board"
-  | "studio-review-package";
+  | "studio-review-package"
+  | "studio-agreement-list"
+  | "studio-agreement-builder"
+  | "studio-agreement-signed";
 
 export type VisualScenario = Readonly<{
   name: VisualScenarioName;
@@ -238,6 +252,18 @@ const scenarios: Record<VisualScenarioName, VisualScenario> = {
     name: "client-request-review",
     content: <ClientRequestReviewScenario />,
   },
+  "client-agreement-list": {
+    name: "client-agreement-list",
+    content: <ClientAgreementListScenario />,
+  },
+  "client-agreement-detail": {
+    name: "client-agreement-detail",
+    content: <ClientAgreementDetailScenario />,
+  },
+  "client-agreement-signing": {
+    name: "client-agreement-signing",
+    content: <ClientAgreementSigningScenario />,
+  },
   "studio-overview": {
     name: "studio-overview",
     content: <StudioOverviewScenario />,
@@ -250,6 +276,18 @@ const scenarios: Record<VisualScenarioName, VisualScenario> = {
   "studio-review-package": {
     name: "studio-review-package",
     content: <StudioReviewPackageScenario />,
+  },
+  "studio-agreement-list": {
+    name: "studio-agreement-list",
+    content: <StudioAgreementListScenario />,
+  },
+  "studio-agreement-builder": {
+    name: "studio-agreement-builder",
+    content: <StudioAgreementBuilderScenario />,
+  },
+  "studio-agreement-signed": {
+    name: "studio-agreement-signed",
+    content: <StudioAgreementSignedScenario />,
   },
 };
 
