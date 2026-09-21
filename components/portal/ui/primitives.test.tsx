@@ -17,6 +17,7 @@ const {
   PortalActionLink,
   PortalButton,
   PortalCard,
+  PortalCheckbox,
   PortalField,
   PortalSelect,
   PortalTextarea,
@@ -82,6 +83,20 @@ test("keeps route actions as links while applying the shared button treatment", 
 
   assert.match(html, /<a[^>]*href="\/portal\/agreements"/);
   assert.match(html, /Open agreement/);
+});
+
+test("keeps signing confirmations as labelled native checkboxes", () => {
+  const html = renderToStaticMarkup(
+    <PortalCheckbox
+      label="I have authority to bind the named organisation."
+      name="authority"
+      required
+    />,
+  );
+
+  assert.match(html, /<input[^>]*name="authority"/);
+  assert.match(html, /type="checkbox"/);
+  assert.match(html, /I have authority to bind the named organisation/);
 });
 
 test("groups a labelled native select inside a Studio card", () => {

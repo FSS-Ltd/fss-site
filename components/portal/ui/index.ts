@@ -9,6 +9,7 @@ export {
   type PortalActionLinkProps,
 } from "./action-link";
 export { PortalCard, type PortalCardProps } from "./card";
+export { PortalCheckbox, type PortalCheckboxProps } from "./checkbox";
 export { PortalField, type PortalFieldProps } from "./field";
 export { Notice, type NoticeProps, type NoticeTone } from "./notice";
 export {

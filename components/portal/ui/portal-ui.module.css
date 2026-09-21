@@ -141,6 +141,33 @@
   font-weight: 600;
 }
 
+.checkboxField {
+  display: grid;
+  gap: 7px;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--portal-ink, #0a1a2e);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.checkboxInput {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  margin: 2px 0 0;
+  accent-color: var(--portal-action, #0f7078);
+}
+
+.checkboxInput:focus-visible {
+  outline: 3px solid var(--portal-action, #0f7078);
+  outline-offset: 3px;
+}
+
 .card {
   display: grid;
   gap: 10px;
