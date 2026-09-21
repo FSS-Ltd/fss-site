@@ -3,8 +3,8 @@ import { randomUUID } from "node:crypto";
 import test from "node:test";
 import {
   clientOnboardingTaskCommandSchema,
-  createClientOnboardingTaskHandler,
 } from "./client-workspace";
+import { createClientOnboardingTaskHandler } from "./client-workspace-http";
 
 const organisationId = "a85e5e49-dff3-4816-a2be-155f39101868";
 const taskId = "0ecb5e3c-5c4b-4f3c-abfe-bd8296e505d4";

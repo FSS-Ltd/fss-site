@@ -1,4 +1,4 @@
-import { portalOnboardingTaskRoute } from "@/lib/operations/onboarding/client-workspace";
+import { portalOnboardingTaskRoute } from "@/lib/operations/onboarding/client-workspace-http";
 
 export const runtime = "nodejs";
 
