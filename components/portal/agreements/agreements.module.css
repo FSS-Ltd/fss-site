@@ -6,6 +6,66 @@
   min-width: 0;
 }
 
+.builder {
+  display: grid;
+  gap: 20px;
+}
+
+.builderHeading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.builderHeading h2 {
+  margin: 4px 0 8px;
+  color: var(--portal-ink, #0a1a2e);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 650;
+  letter-spacing: -0.035em;
+}
+
+.builderSteps {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  list-style: none;
+}
+
+.builderSteps li {
+  display: inline-flex;
+  min-width: max-content;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 10px;
+  border: 1px solid var(--portal-border, #d9dfe5);
+  border-radius: 999px;
+  color: var(--portal-muted, #46566c);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.builderSteps li[aria-current="step"] {
+  border-color: var(--portal-action, #0f7078);
+  background: var(--portal-tint, #e3f2f1);
+  color: var(--portal-ink, #0a1a2e);
+  font-weight: 650;
+}
+
+.builderSteps span {
+  display: inline-grid;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--portal-soft-surface, #f7f8f9);
+  font-size: 0.6875rem;
+}
+
 .group {
   display: grid;
   gap: 14px;
