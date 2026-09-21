@@ -17,14 +17,18 @@ type ReviewDecision = "accept" | "request_changes";
 export function ReviewActions({
   request,
   commandAction,
+  initialConflict = false,
+  initialDecision = "accept",
   onRefresh,
 }: {
   request: ClientRequestDetail;
   commandAction: RequestAction;
+  initialConflict?: boolean;
+  initialDecision?: ReviewDecision;
   onRefresh: () => void;
 }): React.JSX.Element | null {
   const [feedback, setFeedback] = useState("");
-  const [decision, setDecision] = useState<ReviewDecision>("accept");
+  const [decision, setDecision] = useState<ReviewDecision>(initialDecision);
   const [confirmedVersion, setConfirmedVersion] = useState<string | null>(null);
   const reviewVersion = `${request.version}:${request.reviewCycle}:${request.deliverableVersion}`;
   const confirmed = confirmedVersion === reviewVersion;
@@ -175,7 +179,7 @@ export function ReviewActions({
           <p role="status" aria-atomic="true" className={styles.feedback}>
             {message}
           </p>
-          {result && !result.ok && result.conflict ? (
+          {initialConflict || (result && !result.ok && result.conflict) ? (
             <Notice
               action={
                 <PortalButton

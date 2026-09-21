@@ -6,34 +6,48 @@ import {
 } from "./types";
 const text = (max: number) => z.string().trim().min(1).max(max);
 const optionalText = z.string().trim().max(4000).default("");
+const createRequestFields = {
+  projectId: z.uuid(),
+  title: text(160),
+  description: text(10000),
+  type: z.enum(["work", "change", "bug", "help"]),
+  desiredOutcome: text(4000),
+  desiredDate: z.iso.date().nullable().default(null),
+  impact: optionalText,
+  reproductionSteps: optionalText,
+  expectedBehaviour: optionalText,
+  actualBehaviour: optionalText,
+  idempotencyKey: z.uuid(),
+};
+
+function requireBugEvidence(
+  value: { type: "work" | "change" | "bug" | "help" } & Record<
+    "reproductionSteps" | "expectedBehaviour" | "actualBehaviour",
+    string
+  >,
+  context: z.RefinementCtx,
+): void {
+  if (value.type === "bug")
+    for (const field of [
+      "reproductionSteps",
+      "expectedBehaviour",
+      "actualBehaviour",
+    ] as const)
+      if (!value[field])
+        context.addIssue({
+          code: "custom",
+          path: [field],
+          message: "Required for bug reports.",
+        });
+}
+
 export const createRequestSchema = z
-  .strictObject({
-    projectId: z.uuid(),
-    title: text(160),
-    description: text(10000),
-    type: z.enum(["work", "change", "bug", "help"]),
-    desiredOutcome: text(4000),
-    desiredDate: z.iso.date().nullable().default(null),
-    impact: optionalText,
-    reproductionSteps: optionalText,
-    expectedBehaviour: optionalText,
-    actualBehaviour: optionalText,
-    idempotencyKey: z.uuid(),
-  })
-  .superRefine((v, c) => {
-    if (v.type === "bug")
-      for (const field of [
-        "reproductionSteps",
-        "expectedBehaviour",
-        "actualBehaviour",
-      ] as const)
-        if (!v[field])
-          c.addIssue({
-            code: "custom",
-            path: [field],
-            message: "Required for bug reports.",
-          });
-  });
+  .strictObject(createRequestFields)
+  .superRefine(requireBugEvidence);
+
+export const createStaffRequestSchema = z
+  .strictObject({ ...createRequestFields, priority: z.enum(requestPriorities) })
+  .superRefine(requireBugEvidence);
 const base = {
   requestId: z.uuid(),
   expectedVersion: z.number().int().positive(),

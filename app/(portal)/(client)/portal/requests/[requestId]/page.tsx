@@ -47,6 +47,7 @@ export default async function RequestPage({
     return <PortalUnavailable />;
   }
   if (!request) notFound();
+  const requestState = Array.isArray(query.state) ? undefined : query.state;
   return (
     <div className={styles.requestPage}>
       <PageHeader
@@ -64,8 +65,10 @@ export default async function RequestPage({
       <RequestDetail
         canComment={hasPortalCapability(membership.role, "requests.comment")}
         hideTitle
+        initialConflict={requestState === "conflict"}
         organisationId={context.organisationId}
         request={request}
+        showReviewActions={false}
       />
     </div>
   );

@@ -44,6 +44,28 @@ async function openPhaseFiveScenario(
   await openClientScenario(page, scenario, heading);
 }
 
+async function openPhaseSevenScenario(
+  page: Page,
+  scenario: string,
+  heading: string,
+): Promise<void> {
+  if (
+    [
+      "client-request-detail",
+      "client-request-feedback",
+      "client-request-complete",
+      "client-request-empty",
+      "client-request-no-project",
+      "client-request-conflict",
+      "client-request-loading",
+    ].includes(scenario)
+  ) {
+    await openClientScenario(page, scenario, heading);
+    return;
+  }
+  await openScenario(page, scenario, heading);
+}
+
 const phaseFourDesktopScenarios = [
   [
     "C02",
@@ -397,26 +419,268 @@ const phaseFiveMobileScenarios = [
 
 const phaseSixDesktopScenarios = [
   ["F02", "studio-clients", "Your clients", "f02-studio-clients-desktop.png"],
-  ["F03", "studio-client-detail", "Northstar Studio", "f03-studio-client-detail-desktop.png"],
-  ["F04", "studio-client-create", "Add a client", "f04-studio-client-create-desktop.png"],
-  ["F27", "studio-billing-operations", "Billing operations", "f27-studio-billing-operations-desktop.png"],
-  ["F28", "studio-portal-access", "People and portal access", "f28-studio-portal-access-desktop.png"],
-  ["F29", "studio-notification-delivery", "Notification delivery", "f29-studio-notification-delivery-desktop.png"],
-  ["F30", "studio-settings", "Studio settings", "f30-studio-settings-desktop.png"],
-  ["F31", "studio-project-edit", "Edit project", "f31-studio-project-edit-desktop.png"],
-  ["S06", "studio-journey-blocked", "Two things need your attention", "s06-studio-journey-blocked-desktop.png"],
+  [
+    "F03",
+    "studio-client-detail",
+    "Northstar Studio",
+    "f03-studio-client-detail-desktop.png",
+  ],
+  [
+    "F04",
+    "studio-client-create",
+    "Add a client",
+    "f04-studio-client-create-desktop.png",
+  ],
+  [
+    "F27",
+    "studio-billing-operations",
+    "Billing operations",
+    "f27-studio-billing-operations-desktop.png",
+  ],
+  [
+    "F28",
+    "studio-portal-access",
+    "People and portal access",
+    "f28-studio-portal-access-desktop.png",
+  ],
+  [
+    "F29",
+    "studio-notification-delivery",
+    "Notification delivery",
+    "f29-studio-notification-delivery-desktop.png",
+  ],
+  [
+    "F30",
+    "studio-settings",
+    "Studio settings",
+    "f30-studio-settings-desktop.png",
+  ],
+  [
+    "F31",
+    "studio-project-edit",
+    "Edit project",
+    "f31-studio-project-edit-desktop.png",
+  ],
+  [
+    "S06",
+    "studio-journey-blocked",
+    "Two things need your attention",
+    "s06-studio-journey-blocked-desktop.png",
+  ],
 ] as const;
 
 const phaseSixMobileScenarios = [
   ["F02", "studio-clients", "Your clients", "f02-studio-clients-mobile.png"],
-  ["F03", "studio-client-detail", "Northstar Studio", "f03-studio-client-detail-mobile.png"],
-  ["F04", "studio-client-create", "Add a client", "f04-studio-client-create-mobile.png"],
-  ["F27", "studio-billing-operations", "Billing operations", "f27-studio-billing-operations-mobile.png"],
-  ["F28", "studio-portal-access", "People and portal access", "f28-studio-portal-access-mobile.png"],
-  ["F29", "studio-notification-delivery", "Notification delivery", "f29-studio-notification-delivery-mobile.png"],
-  ["F30", "studio-settings", "Studio settings", "f30-studio-settings-mobile.png"],
-  ["F31", "studio-project-edit", "Edit project", "f31-studio-project-edit-mobile.png"],
-  ["S06", "studio-journey-blocked", "Two things need your attention", "s06-studio-journey-blocked-mobile.png"],
+  [
+    "F03",
+    "studio-client-detail",
+    "Northstar Studio",
+    "f03-studio-client-detail-mobile.png",
+  ],
+  [
+    "F04",
+    "studio-client-create",
+    "Add a client",
+    "f04-studio-client-create-mobile.png",
+  ],
+  [
+    "F27",
+    "studio-billing-operations",
+    "Billing operations",
+    "f27-studio-billing-operations-mobile.png",
+  ],
+  [
+    "F28",
+    "studio-portal-access",
+    "People and portal access",
+    "f28-studio-portal-access-mobile.png",
+  ],
+  [
+    "F29",
+    "studio-notification-delivery",
+    "Notification delivery",
+    "f29-studio-notification-delivery-mobile.png",
+  ],
+  [
+    "F30",
+    "studio-settings",
+    "Studio settings",
+    "f30-studio-settings-mobile.png",
+  ],
+  [
+    "F31",
+    "studio-project-edit",
+    "Edit project",
+    "f31-studio-project-edit-mobile.png",
+  ],
+  [
+    "S06",
+    "studio-journey-blocked",
+    "Two things need your attention",
+    "s06-studio-journey-blocked-mobile.png",
+  ],
+] as const;
+
+const phaseSevenDesktopScenarios = [
+  [
+    "C08",
+    "client-request-detail",
+    "Booking confirmation email",
+    "c08-client-request-detail-desktop.png",
+  ],
+  [
+    "C10",
+    "client-request-feedback",
+    "Ready for your review",
+    "c10-client-request-feedback-desktop.png",
+  ],
+  [
+    "C11",
+    "client-request-complete",
+    "Booking confirmation email",
+    "c11-client-request-complete-desktop.png",
+  ],
+  [
+    "F06",
+    "studio-request-detail",
+    "Booking confirmation email",
+    "f06-studio-request-detail-desktop.png",
+  ],
+  [
+    "F08",
+    "studio-request-scope",
+    "Booking confirmation email",
+    "f08-studio-request-scope-desktop.png",
+  ],
+  [
+    "F36",
+    "studio-request-create",
+    "Create work for a client",
+    "f36-studio-request-create-desktop.png",
+  ],
+  [
+    "S01",
+    "client-request-empty",
+    "Requests & feedback",
+    "s01-client-request-empty-desktop.png",
+  ],
+  [
+    "S02",
+    "client-request-no-project",
+    "What would you like us to do?",
+    "s02-client-request-no-project-desktop.png",
+  ],
+  [
+    "S03",
+    "client-request-conflict",
+    "Booking confirmation email",
+    "s03-client-request-conflict-desktop.png",
+  ],
+  [
+    "S08",
+    "studio-request-move",
+    "Delivery board",
+    "s08-studio-request-move-desktop.png",
+  ],
+  [
+    "S09",
+    "client-request-loading",
+    "Requests & feedback",
+    "s09-client-request-loading-desktop.png",
+  ],
+  [
+    "E01",
+    "client-review-requested-email",
+    "Your update is ready.",
+    "e01-review-requested-email-desktop.png",
+  ],
+  [
+    "E02",
+    "client-work-completed-email",
+    "All done.",
+    "e02-work-completed-email-desktop.png",
+  ],
+] as const;
+
+const phaseSevenMobileScenarios = [
+  [
+    "C08",
+    "client-request-detail",
+    "Booking confirmation email",
+    "c08-client-request-detail-mobile.png",
+  ],
+  [
+    "C10",
+    "client-request-feedback",
+    "Ready for your review",
+    "c10-client-request-feedback-mobile.png",
+  ],
+  [
+    "C11",
+    "client-request-complete",
+    "Booking confirmation email",
+    "c11-client-request-complete-mobile.png",
+  ],
+  [
+    "F06",
+    "studio-request-detail",
+    "Booking confirmation email",
+    "f06-studio-request-detail-mobile.png",
+  ],
+  [
+    "F08",
+    "studio-request-scope",
+    "Booking confirmation email",
+    "f08-studio-request-scope-mobile.png",
+  ],
+  [
+    "F36",
+    "studio-request-create",
+    "Create work for a client",
+    "f36-studio-request-create-mobile.png",
+  ],
+  [
+    "S01",
+    "client-request-empty",
+    "Requests & feedback",
+    "s01-client-request-empty-mobile.png",
+  ],
+  [
+    "S02",
+    "client-request-no-project",
+    "What would you like us to do?",
+    "s02-client-request-no-project-mobile.png",
+  ],
+  [
+    "S03",
+    "client-request-conflict",
+    "Booking confirmation email",
+    "s03-client-request-conflict-mobile.png",
+  ],
+  [
+    "S08",
+    "studio-request-move",
+    "Delivery board",
+    "s08-studio-request-move-mobile.png",
+  ],
+  [
+    "S09",
+    "client-request-loading",
+    "Requests & feedback",
+    "s09-client-request-loading-mobile.png",
+  ],
+  [
+    "E01",
+    "client-review-requested-email",
+    "Your update is ready.",
+    "e01-review-requested-email-mobile.png",
+  ],
+  [
+    "E02",
+    "client-work-completed-email",
+    "All done.",
+    "e02-work-completed-email-mobile.png",
+  ],
 ] as const;
 
 test.describe("FSS Studio desktop visuals", () => {
@@ -562,11 +826,30 @@ test.describe("FSS Studio desktop visuals", () => {
     });
   }
 
-  for (const [coverageId, scenario, heading, screenshot] of phaseSixDesktopScenarios) {
+  for (const [
+    coverageId,
+    scenario,
+    heading,
+    screenshot,
+  ] of phaseSixDesktopScenarios) {
     test(`Phase 6 ${coverageId} desktop matches the Studio workspace`, async ({
       page,
     }) => {
       await openScenario(page, scenario, heading);
+      await expect(page).toHaveScreenshot(screenshot);
+    });
+  }
+
+  for (const [
+    coverageId,
+    scenario,
+    heading,
+    screenshot,
+  ] of phaseSevenDesktopScenarios) {
+    test(`Phase 7 ${coverageId} desktop matches the completed request journey`, async ({
+      page,
+    }) => {
+      await openPhaseSevenScenario(page, scenario, heading);
       await expect(page).toHaveScreenshot(screenshot);
     });
   }
@@ -650,12 +933,31 @@ test.describe("FSS Studio mobile visuals", () => {
     });
   }
 
-  for (const [coverageId, scenario, heading, screenshot] of phaseSixMobileScenarios) {
+  for (const [
+    coverageId,
+    scenario,
+    heading,
+    screenshot,
+  ] of phaseSixMobileScenarios) {
     test(`Phase 6 ${coverageId} mobile matches the Studio workspace`, async ({
       page,
     }) => {
       await openScenario(page, scenario, heading);
       await expect(page.locator("summary", { hasText: "More" })).toBeVisible();
+      await expect(page).toHaveScreenshot(screenshot);
+    });
+  }
+
+  for (const [
+    coverageId,
+    scenario,
+    heading,
+    screenshot,
+  ] of phaseSevenMobileScenarios) {
+    test(`Phase 7 ${coverageId} mobile matches the completed request journey`, async ({
+      page,
+    }) => {
+      await openPhaseSevenScenario(page, scenario, heading);
       await expect(page).toHaveScreenshot(screenshot);
     });
   }

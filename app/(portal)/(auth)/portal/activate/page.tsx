@@ -4,6 +4,7 @@ import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { Suspense } from "react";
 import { PortalInvitationActivation } from "@/components/portal/auth/invitation-activation";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
+import { getPortalClaimDestinations } from "@/lib/operations/auth/portal-claim-destinations";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 
 export default function PortalActivatePage(): React.JSX.Element {
@@ -13,11 +14,7 @@ export default function PortalActivatePage(): React.JSX.Element {
     <Suspense fallback={<PortalUnavailable />}>
       <PortalInvitationActivation
         activationPath={portalPath("/portal/activate")}
-        claimDestinations={{
-          admin: portalPath("/admin"),
-          home: portalPath("/portal"),
-          onboarding: portalPath("/portal/onboarding"),
-        }}
+        claimDestinations={getPortalClaimDestinations()}
         loginPath={portalPath("/portal/login")}
       />
     </Suspense>

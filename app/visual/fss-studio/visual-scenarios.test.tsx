@@ -114,3 +114,23 @@ test("registers each Phase 6 Studio workspace visual fixture", () => {
     assert.ok(resolveVisualScenario(name, true, "test"));
   }
 });
+
+test("registers each Phase 7 request-completion visual fixture", () => {
+  for (const name of [
+    "client-request-detail",
+    "client-request-feedback",
+    "client-request-complete",
+    "client-request-empty",
+    "client-request-no-project",
+    "client-request-conflict",
+    "client-request-loading",
+    "studio-request-detail",
+    "studio-request-scope",
+    "studio-request-create",
+    "studio-request-move",
+    "client-review-requested-email",
+    "client-work-completed-email",
+  ]) {
+    assert.ok(resolveVisualScenario(name, true, "test"));
+  }
+});

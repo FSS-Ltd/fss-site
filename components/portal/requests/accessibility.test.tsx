@@ -21,6 +21,8 @@ const { FounderActionFields } =
   require("./founder-action-fields") as typeof import("./founder-action-fields");
 const { RequestDetail } =
   require("./request-detail") as typeof import("./request-detail");
+const { ReviewActions } =
+  require("./review-actions") as typeof import("./review-actions");
 const { RequestForm } =
   require("./request-form") as typeof import("./request-form");
 const { FounderRequestActions } =
@@ -65,6 +67,7 @@ const request: ClientRequestDetail = {
   reviewReminderTarget: null,
   createdAt: "2026-09-07T10:00:00Z",
   blocked: null,
+  closureReason: null,
   closureLabel: null,
   comments: [
     {
@@ -141,6 +144,22 @@ test("a completed request distinguishes client acceptance from an FSS closure", 
 
   assert.match(html, /Version v1 accepted/);
   assert.match(html, /Start a follow-up request/);
+
+  const closureHtml = renderToStaticMarkup(
+    <AppRouterContext.Provider value={router}>
+      <RequestDetail
+        request={{
+          ...request,
+          closureLabel: "Closed by FSS",
+          closureReason: "The client cancelled the agreed work.",
+          status: "done",
+        }}
+        organisationId="org"
+        canComment={false}
+      />
+    </AppRouterContext.Provider>,
+  );
+  assert.match(closureHtml, /The client cancelled the agreed work/);
 });
 
 test("a contributor can comment but cannot submit an acceptance decision", () => {
@@ -297,6 +316,34 @@ test("founder delivery exposes a move control and separates review and public up
   assert.match(publicUpdateHtml, /Message to client/);
   assert.match(publicUpdateHtml, /client portal/);
   assert.doesNotMatch(actionsHtml, /Accept v1/);
+});
+
+test("founder request scope and move-sheet states retain server-validated work", () => {
+  const scopeHtml = renderToStaticMarkup(
+    <AppRouterContext.Provider value={router}>
+      <StaffRequestActions
+        initialAction="classify_scope"
+        deliveryOwners={[{ id: "owner", label: "Jean-Fidele" }]}
+        organisationId="org"
+        request={{ ...request, status: "new" }}
+      />
+    </AppRouterContext.Provider>,
+  );
+  const moveHtml = renderToStaticMarkup(
+    <AppRouterContext.Provider value={router}>
+      <StaffDeliveryBoard
+        clients={[{ id: "org", displayName: "Northstar Studio" }]}
+        filters={{ organisationId: "all", status: "all" }}
+        initialMoveRequestId={staffRequest.id}
+        requests={[staffRequest]}
+      />
+    </AppRouterContext.Provider>,
+  );
+
+  assert.match(scopeHtml, /Scope decision/);
+  assert.match(scopeHtml, /Scope explanation/);
+  assert.match(moveHtml, /Nothing has moved yet/);
+  assert.match(moveHtml, /Open request workspace/);
 });
 
 test("founder priority uses a labelled native choice with the current value", () => {
@@ -472,8 +519,11 @@ test("request collection provides an actionable empty board and clear board guid
   assert.match(board, /Ready for review/);
   assert.match(emptyBoard, /Nothing in your board yet/);
   assert.match(emptyBoard, /Create first request/);
+  assert.match(emptyBoard, /href="\/portal\/requests\/new\?organisationId=org"/);
+  assert.match(emptyBoard, /href="\/portal\/requests\/new\?organisationId=org&amp;type=bug"/);
   assert.match(loadingBoard, /Loading your requests/);
   assert.match(loadingBoard, /aria-busy="true"/);
+  assert.match(loadingBoard, /role="status"/);
 });
 
 test("request creation exposes the no-project recovery and bug-report fields", () => {
@@ -494,6 +544,83 @@ test("request creation exposes the no-project recovery and bug-report fields", (
 
   assert.match(noProjectHtml, /A project is needed for this request/);
   assert.match(noProjectHtml, /Ask FSS to set up your project/);
+  assert.match(noProjectHtml, /href="\/portal\/help\?organisationId=org"/);
   assert.match(bugHtml, /Steps to reproduce/);
   assert.match(bugHtml, /What happened instead/);
+});
+
+test("request detail keeps review decisions on the dedicated review route", () => {
+  const html = renderToStaticMarkup(
+    <AppRouterContext.Provider value={router}>
+      <RequestDetail
+        request={request}
+        organisationId="org"
+        canComment
+        showReviewActions={false}
+      />
+    </AppRouterContext.Provider>,
+  );
+
+  assert.match(html, /Review v1/);
+  assert.doesNotMatch(html, /Accept v1|Send feedback/);
+});
+
+test("review feedback starts selected and presents conflict recovery without serializing a draft", () => {
+  const html = renderToStaticMarkup(
+    <AppRouterContext.Provider value={router}>
+      <ReviewActions
+        request={request}
+        commandAction={async () => ({
+          ok: false,
+          conflict: true,
+          error: "This request has changed.",
+        })}
+        initialDecision="request_changes"
+        initialConflict
+        onRefresh={() => {}}
+      />
+    </AppRouterContext.Provider>,
+  );
+
+  assert.match(html, /What needs changing\?/);
+  assert.match(html, /Review the latest version/);
+  assert.doesNotMatch(html, /name="feedback"[^>]*value=/);
+});
+
+test("staff request creation starts scope assessment without exposing client controls", () => {
+  let StaffRequestForm:
+    | ((props: {
+        clients: Array<{
+          id: string;
+          displayName: string;
+          projects: Array<{ id: string; title: string }>;
+        }>;
+      }) => React.JSX.Element)
+    | undefined;
+  try {
+    StaffRequestForm = (require("./staff-request-form") as {
+      StaffRequestForm?: typeof StaffRequestForm;
+    }).StaffRequestForm;
+  } catch {
+    StaffRequestForm = undefined;
+  }
+  assert.equal(typeof StaffRequestForm, "function");
+  if (!StaffRequestForm) return;
+
+  const html = renderToStaticMarkup(
+    <AppRouterContext.Provider value={router}>
+      <StaffRequestForm
+        clients={[
+          {
+            id: "org",
+            displayName: "Northstar Studio",
+            projects: [{ id: request.projectId, title: "Website" }],
+          },
+        ]}
+      />
+    </AppRouterContext.Provider>,
+  );
+  assert.match(html, /Assessment pending/);
+  assert.doesNotMatch(html, /Included scope/);
+  assert.doesNotMatch(html, /Accept v1|Add a comment/);
 });

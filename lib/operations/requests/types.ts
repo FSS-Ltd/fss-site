@@ -63,6 +63,7 @@ export type ClientRequest = {
     responsibleParty: string;
     nextCheckDate: string;
   } | null;
+  closureReason: string | null;
   closureLabel: string | null;
 };
 export type RequestComment = {

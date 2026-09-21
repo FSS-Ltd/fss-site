@@ -5,6 +5,7 @@ import {
   founderRequestCommandSchema,
   portalRequestCommandSchema,
 } from "./validation";
+import * as requestValidation from "./validation";
 const id = "11111111-1111-4111-8111-111111111111";
 const request = {
   projectId: id,
@@ -75,6 +76,25 @@ test("founder cannot split capacity by choosing arbitrary owner IDs", () => {
       deliveryOwnerId: id,
       scope: "included",
     }).success,
+    false,
+  );
+});
+
+test("staff creation accepts only the initial assessment-pending request fields", () => {
+  const candidate = Reflect.get(requestValidation, "createStaffRequestSchema");
+  assert.equal(typeof candidate, "object");
+  if (!candidate || typeof candidate !== "object" || !("safeParse" in candidate)) return;
+  const schema = candidate as {
+    safeParse: (input: unknown) => { success: boolean };
+  };
+
+  assert.equal(
+    schema.safeParse({ ...request, priority: "high" }).success,
+    true,
+  );
+  assert.equal(
+    schema.safeParse({ ...request, priority: "high", scope: "included" })
+      .success,
     false,
   );
 });
