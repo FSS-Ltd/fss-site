@@ -56,9 +56,9 @@ export function SignatureEvidenceForm({
       <Notice tone="warning">
         <strong>Manual review is distinct from provider verification.</strong>
         <p>
-          Fingerprints are checked against this exact source and retained signed
-          document. This route records reviewed evidence; it does not claim a
-          provider-verified signature.
+          Fingerprints are checked server-side against this exact source and
+          retained signed document. This route records reviewed evidence; it
+          does not claim a provider-verified signature.
         </p>
       </Notice>
       <PortalCard

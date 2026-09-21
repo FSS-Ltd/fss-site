@@ -100,18 +100,16 @@ function AgreementGroup({
   );
 }
 
-function signingTone(
-  status: StaffSigningReadiness["status"],
-): "error" | "info" | "warning" {
+function signingTone(status: StaffSigningReadiness["status"]): "error" | "info" | "warning" {
   if (status === "expired") return "error";
   if (status === "approved") return "info";
   return "warning";
 }
 
 function signingLabel(status: StaffSigningReadiness["status"]): string {
-  if (status === "approved") return "Approved and queued";
+  if (status === "approved") return "Awaiting signature";
   if (status === "expired") return "Signing deadline expired";
-  return "Ready for founder review";
+  return "Prepared for approval";
 }
 
 export function StaffAgreementOverview({

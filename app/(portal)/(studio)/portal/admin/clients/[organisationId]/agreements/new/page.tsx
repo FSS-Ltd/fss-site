@@ -62,8 +62,11 @@ export default async function NewStaffAgreementPage({
     `/portal/admin/clients/${organisationId.data}/agreements`,
   );
   const baseHref = `${agreementListHref}/new`;
+  const engagementQuery = draftId
+    ? `?${new URLSearchParams({ draftId }).toString()}`
+    : "";
   const engagementHref = portalPath(
-    `/portal/admin/clients/${organisationId.data}/engagements/new`,
+    `/portal/admin/clients/${organisationId.data}/engagements/new${engagementQuery}`,
   );
 
   return (

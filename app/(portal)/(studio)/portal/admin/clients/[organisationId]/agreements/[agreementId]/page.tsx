@@ -10,6 +10,9 @@ import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import { getStaffAgreement } from "@/lib/operations/agreements/repository";
+import { listStaffSigning } from "@/lib/operations/agreements/signing-service";
+import type { SigningApproval } from "@/lib/operations/agreements/signing-types";
+import type { AgreementRecord } from "@/lib/operations/agreements/types";
 import styles from "@/components/portal/agreements/agreements.module.css";
 
 export const dynamic = "force-dynamic";
@@ -28,11 +31,23 @@ export default async function StaffAgreementPage({
   const organisationId = z.uuid().safeParse(rawOrganisationId);
   if (!agreementId.success || !organisationId.success) notFound();
 
-  let record;
+  let record: AgreementRecord | null;
+  let signingApproval: SigningApproval | null;
   try {
     const db = getOperationsDb();
     const admin = await requireFssAdmin(db, identity, randomUUID());
     record = await getStaffAgreement(db, admin, organisationId.data, agreementId.data);
+    const approvals = await listStaffSigning(
+      db,
+      admin,
+      organisationId.data,
+      randomUUID(),
+    );
+    signingApproval = approvals.find(
+      (approval) =>
+        approval.agreementId === agreementId.data &&
+        approval.revision === record?.revision,
+    ) ?? null;
   } catch {
     return <PortalUnavailable />;
   }
@@ -52,7 +67,16 @@ export default async function StaffAgreementPage({
         eyebrow="FSS Studio / Agreements"
         title={record.draft.title}
       />
-      <StaffAgreementDetail organisationId={organisationId.data} record={record} />
+      <StaffAgreementDetail
+        organisationId={organisationId.data}
+        record={record}
+        signingApproval={signingApproval}
+        signingDownloadBase={
+          signingApproval
+            ? `/api/portal/admin/clients/${organisationId.data}/signing/${signingApproval.id}`
+            : undefined
+        }
+      />
     </div>
   );
 }

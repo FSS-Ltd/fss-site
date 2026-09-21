@@ -9,9 +9,11 @@ import styles from "./agreements.module.css";
 export function EngagementForm({
   agreementHref,
   engagementChoices,
+  growthWorkflowHref,
 }: Readonly<{
   agreementHref: string;
   engagementChoices: readonly { id: string; name: string }[];
+  growthWorkflowHref: string;
 }>): React.JSX.Element {
   return (
     <section
@@ -26,7 +28,8 @@ export function EngagementForm({
           <strong>Review status</strong>
           <p>
             The reviewed mapping is the provenance boundary. This Studio screen
-            does not create a free-form engagement or change that mapping.
+            does not create a free-form engagement or change that mapping. Use
+            the authoritative Growth workflow to review or create eligible work.
           </p>
         </Notice>
         {engagementChoices.length ? (
@@ -50,6 +53,9 @@ export function EngagementForm({
           </Notice>
         )}
       </PortalCard>
+      <PortalActionLink href={growthWorkflowHref}>
+        Open Growth delivery workflow
+      </PortalActionLink>
       <PortalActionLink href={agreementHref} variant="secondary">
         Back to agreement builder
       </PortalActionLink>
