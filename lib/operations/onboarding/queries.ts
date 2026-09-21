@@ -24,6 +24,15 @@ const onboardingWorkspaceSchema = z.strictObject({
       publishedAt: z.string().min(1),
     }),
   ),
+  templateDrafts: z.array(
+    z.strictObject({
+      id: z.uuid(),
+      name: z.string().min(1).max(160),
+      draftVersion: z.number().int().positive(),
+      publishedVersion: z.number().int().nonnegative(),
+      tasks: z.array(onboardingTaskDefinitionSchema),
+    }),
+  ),
   journeyDrafts: z.array(
     z.strictObject({
       id: z.uuid(),
@@ -55,9 +64,7 @@ const onboardingWorkspaceSchema = z.strictObject({
   ),
 });
 
-export function parseOnboardingWorkspace(
-  input: unknown,
-): OnboardingWorkspace {
+export function parseOnboardingWorkspace(input: unknown): OnboardingWorkspace {
   return onboardingWorkspaceSchema.parse(input);
 }
 
@@ -143,14 +150,14 @@ export async function listStaffJourneyContacts(
   db: OperationsDb,
   admin: FssAdminContext,
   organisationId: string,
-): Promise<Array<{ name: string; email: string }>> {
+): Promise<Array<{ id: string; name: string; email: string }>> {
   z.uuid().parse(organisationId);
   return withFssAdminTransaction(
     db,
     admin,
     (tx) =>
-      tx<Array<{ name: string; email: string }>>`
-      select name, email
+      tx<Array<{ id: string; name: string; email: string }>>`
+      select id, name, email
       from operations.contacts
       where organisation_id = ${organisationId}
       order by name, email

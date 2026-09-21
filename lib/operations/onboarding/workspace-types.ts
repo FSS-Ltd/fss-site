@@ -30,8 +30,7 @@ export const onboardingEvidenceRules = [
   "staff_confirmed",
 ] as const;
 
-export type OnboardingEvidenceRule =
-  (typeof onboardingEvidenceRules)[number];
+export type OnboardingEvidenceRule = (typeof onboardingEvidenceRules)[number];
 
 export type OnboardingTaskDefinition = Readonly<{
   id: string;
@@ -99,6 +98,14 @@ export type OnboardingWorkspaceTemplateVersion = Readonly<{
   publishedAt: string;
 }>;
 
+export type OnboardingWorkspaceTemplateDraft = Readonly<{
+  id: string;
+  name: string;
+  draftVersion: number;
+  publishedVersion: number;
+  tasks: readonly OnboardingTaskDefinition[];
+}>;
+
 export type OnboardingWorkspaceJourneyDraft = Readonly<{
   id: string;
   agreementId: string;
@@ -128,6 +135,7 @@ export type OnboardingWorkspaceTask = Readonly<{
 
 export type OnboardingWorkspace = Readonly<{
   templates: readonly OnboardingWorkspaceTemplateVersion[];
+  templateDrafts: readonly OnboardingWorkspaceTemplateDraft[];
   journeyDrafts: readonly OnboardingWorkspaceJourneyDraft[];
   tasks: readonly OnboardingWorkspaceTask[];
 }>;

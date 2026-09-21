@@ -4,6 +4,10 @@ import type {
   JourneyBillingAccount,
   JourneyView,
 } from "@/lib/operations/onboarding/command-types";
+import type { OnboardingWorkspace } from "@/lib/operations/onboarding/workspace-types";
+import { portalPath } from "@/lib/operations/auth/portal-url";
+import { StaffJourneyBuilder } from "./staff-journey-builder";
+import { StaffJourneyDetail } from "./staff-journey-detail";
 import { JourneyPreview } from "@/components/operations/onboarding/journey-preview";
 import { JourneyTimeline } from "@/components/operations/onboarding/journey-timeline";
 import {
@@ -18,8 +22,9 @@ type StaffJourneyWorkspaceProps = {
   register: AgreementRegister;
   journeys: JourneyView[];
   approvals: SigningApproval[];
-  contacts: Array<{ name: string; email: string }>;
+  contacts: Array<{ id: string; name: string; email: string }>;
   billing: JourneyBillingAccount | null;
+  workspace: OnboardingWorkspace;
 };
 
 export function StaffJourneyWorkspace({
@@ -29,6 +34,7 @@ export function StaffJourneyWorkspace({
   approvals,
   contacts,
   billing,
+  workspace,
 }: StaffJourneyWorkspaceProps): React.JSX.Element {
   const apiRoot = `/api/portal/admin/clients/${organisationId}`;
 
@@ -40,7 +46,7 @@ export function StaffJourneyWorkspace({
         description={`${register.organisationName}. Review each recipient, schedule, and recovery decision before any delivery is queued.`}
         action={
           <PortalActionLink
-            href={`/admin/clients/${organisationId}`}
+            href={portalPath(`/portal/admin/clients/${organisationId}`)}
             variant="secondary"
           >
             Back to client workspace
@@ -52,12 +58,32 @@ export function StaffJourneyWorkspace({
           {journeys.length} journey{journeys.length === 1 ? "" : "s"} shown.
         </p>
         <PortalActionLink
-          href={`/admin/clients/${organisationId}/signing`}
+          href={portalPath(`/portal/admin/clients/${organisationId}/signing`)}
           variant="secondary"
         >
           Review signing documents
         </PortalActionLink>
+        <PortalActionLink
+          href={`${portalPath("/portal/admin/welcome/templates")}?organisationId=${encodeURIComponent(organisationId)}`}
+          variant="secondary"
+        >
+          Manage welcome templates
+        </PortalActionLink>
       </PortalCard>
+      <StaffJourneyBuilder
+        agreements={register.agreements.map((agreement) => ({
+          id: agreement.id,
+          label: agreement.draft.title,
+          version: agreement.version,
+        }))}
+        commandEndpoint={`${apiRoot}/journey`}
+        contacts={contacts}
+        templates={workspace.templates.map((template) => ({
+          id: template.id,
+          name: template.name,
+          version: template.version,
+        }))}
+      />
       <JourneyPreview
         organisationId={organisationId}
         organisationName={register.organisationName}
@@ -68,6 +94,7 @@ export function StaffJourneyWorkspace({
         billing={billing}
         commandEndpoint={`${apiRoot}/journey`}
         signingDownloadBase={`${apiRoot}/signing`}
+        workspaceDrafts={workspace.journeyDrafts}
       />
       {journeys.length === 0 ? (
         <Notice tone="info">
@@ -75,13 +102,17 @@ export function StaffJourneyWorkspace({
         </Notice>
       ) : (
         journeys.map((journey) => (
-          <JourneyTimeline
+          <section
             key={`${journey.id}-${journey.generation}-${journey.proposalApprovalId}`}
-            organisationId={organisationId}
-            journey={journey}
-            commandEndpoint={`${apiRoot}/journey`}
-            welcomeDownloadUrl={`${apiRoot}/journey/${journey.id}/welcome`}
-          />
+          >
+            <StaffJourneyDetail journey={journey} />
+            <JourneyTimeline
+              organisationId={organisationId}
+              journey={journey}
+              commandEndpoint={`${apiRoot}/journey`}
+              welcomeDownloadUrl={`${apiRoot}/journey/${journey.id}/welcome`}
+            />
+          </section>
         ))
       )}
       {(journeys.length === 50 ||

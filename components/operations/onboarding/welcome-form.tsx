@@ -3,7 +3,9 @@ import { useState } from "react";
 import { invoiceChoices } from "@/lib/operations/onboarding/display";
 import type { JourneyBillingAccount } from "@/lib/operations/onboarding/command-types";
 import type { AgreementRecord } from "@/lib/operations/agreements/types";
+import type { OnboardingWorkspaceJourneyDraft } from "@/lib/operations/onboarding/workspace-types";
 import {
+  Notice,
   PortalButton,
   PortalField,
   PortalSelect,
@@ -23,15 +25,31 @@ export function WelcomeForm({
   billing,
   pending,
   onPreview,
+  workspaceDrafts,
 }: {
   agreements: AgreementRecord[];
-  contacts: { email: string; name: string }[];
+  contacts: { id?: string; email: string; name: string }[];
   billing: JourneyBillingAccount;
   pending: boolean;
   onPreview: (command: unknown) => void;
+  workspaceDrafts?: readonly OnboardingWorkspaceJourneyDraft[];
 }): React.JSX.Element {
   const [agreementId, setAgreementId] = useState("");
-  const selected = agreements.find((a) => a.id === agreementId);
+  const [recipient, setRecipient] = useState("");
+  const [workspaceDraftId, setWorkspaceDraftId] = useState("");
+  const selectedWorkspaceDraft = workspaceDrafts?.find(
+    (draft) => draft.id === workspaceDraftId,
+  );
+  const selected = agreements.find((agreement) => agreement.id === agreementId);
+  const selectedContact = selectedWorkspaceDraft
+    ? contacts.find(
+        (contact) => contact.id === selectedWorkspaceDraft.contactId,
+      )
+    : null;
+  const workspaceDraftIsUsable =
+    !selectedWorkspaceDraft ||
+    (selectedWorkspaceDraft.agreementId === agreementId &&
+      Boolean(selectedContact));
   return (
     <form
       className={styles.form}
@@ -39,14 +57,14 @@ export function WelcomeForm({
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         const value = (name: string) => String(data.get(name) ?? "").trim();
-        const agreement = agreements.find((a) => a.id === value("agreementId"));
-        if (!agreement) return;
+        const agreement = agreements.find((item) => item.id === agreementId);
+        if (!agreement || !recipient || !workspaceDraftIsUsable) return;
         onPreview({
           action: "preview_welcome",
           agreementId: agreement.id,
           expectedVersion: agreement.version,
           welcome: {
-            recipient: value("recipient"),
+            recipient,
             invoice: {
               obligationKey: value("obligationKey"),
               accountId: billing.accountId,
@@ -74,17 +92,54 @@ export function WelcomeForm({
               requiredAction: value("requiredAction"),
             },
           },
+          workspace: selectedWorkspaceDraft
+            ? {
+                contactId: selectedWorkspaceDraft.contactId,
+                draftId: selectedWorkspaceDraft.id,
+                expectedDraftVersion: selectedWorkspaceDraft.version,
+                recipientRole: selectedWorkspaceDraft.recipientRole ?? "owner",
+                templateVersionId: selectedWorkspaceDraft.templateVersionId,
+              }
+            : undefined,
         });
       }}
     >
       <fieldset disabled={pending}>
         <legend>Welcome and first invoice</legend>
+        {workspaceDrafts?.length ? (
+          <PortalSelect
+            label="Saved journey setup"
+            name="workspaceDraftId"
+            onChange={(event) => {
+              const nextDraftId = event.target.value;
+              const nextDraft = workspaceDrafts.find(
+                (draft) => draft.id === nextDraftId,
+              );
+              setWorkspaceDraftId(nextDraftId);
+              if (!nextDraft) return;
+              setAgreementId(nextDraft.agreementId);
+              setRecipient(
+                contacts.find((contact) => contact.id === nextDraft.contactId)
+                  ?.email ?? "",
+              );
+            }}
+            value={workspaceDraftId}
+          >
+            <option value="">Prepare without a saved journey draft</option>
+            {workspaceDrafts.map((draft) => (
+              <option key={draft.id} value={draft.id}>
+                Saved {draft.stage} draft · version {draft.version}
+              </option>
+            ))}
+          </PortalSelect>
+        ) : null}
         <PortalSelect
           label="Agreement"
           name="agreementId"
           required
           value={agreementId}
           onChange={(e) => setAgreementId(e.target.value)}
+          disabled={Boolean(selectedWorkspaceDraft)}
         >
           <option value="" disabled>
             Select agreement
@@ -99,7 +154,9 @@ export function WelcomeForm({
           label="Welcome and billing recipient"
           name="recipient"
           required
-          defaultValue=""
+          value={recipient}
+          onChange={(event) => setRecipient(event.target.value)}
+          disabled={Boolean(selectedWorkspaceDraft)}
         >
           <option value="" disabled>
             Select contact
@@ -110,6 +167,12 @@ export function WelcomeForm({
             </option>
           ))}
         </PortalSelect>
+        {!workspaceDraftIsUsable ? (
+          <Notice tone="warning">
+            This saved journey setup no longer matches an available agreement or
+            contact. Return to the builder and save a new draft.
+          </Notice>
+        ) : null}
         <div className={styles.grid}>
           {[
             ["contactFirstName", "Contact first name"],
@@ -200,7 +263,12 @@ export function WelcomeForm({
         ))}
       </fieldset>
       <PortalButton
-        disabled={pending || !agreements.length || !contacts.length}
+        disabled={
+          pending ||
+          !agreements.length ||
+          !contacts.length ||
+          !workspaceDraftIsUsable
+        }
         loading={pending}
         type="submit"
       >

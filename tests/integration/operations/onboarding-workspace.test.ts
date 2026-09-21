@@ -78,7 +78,10 @@ test("onboarding workspace keeps template versions tenant-scoped and immutable",
     await tx`select operations.instantiate_onboarding_journey_tasks(${fixture.journeyId}, ${firstVersion.id})`;
   });
 
-  const [secondDraft] = await saveTemplate([profileTask(secondTaskId)], firstDraft.draftVersion);
+  const [secondDraft] = await saveTemplate(
+    [profileTask(secondTaskId)],
+    firstDraft.draftVersion,
+  );
   const [secondVersion] = await publish(secondDraft.draftVersion);
   assert.equal(secondVersion.version, 2);
 
@@ -87,7 +90,24 @@ test("onboarding workspace keeps template versions tenant-scoped and immutable",
     fixture.founder,
     fixture.organisationId,
   );
-  assert.deepEqual(workspace.tasks.map((task) => task.templateVersionId), [firstVersion.id]);
+  assert.deepEqual(
+    workspace.templateDrafts.map((template) => ({
+      draftVersion: template.draftVersion,
+      id: template.id,
+      publishedVersion: template.publishedVersion,
+    })),
+    [
+      {
+        draftVersion: secondDraft.draftVersion,
+        id: templateId,
+        publishedVersion: secondVersion.version,
+      },
+    ],
+  );
+  assert.deepEqual(
+    workspace.tasks.map((task) => task.templateVersionId),
+    [firstVersion.id],
+  );
 
   await assert.rejects(
     fixture.admin`update operations.onboarding_template_versions set content = ${JSON.stringify({ tasks: [] })}::jsonb where id = ${firstVersion.id}`,

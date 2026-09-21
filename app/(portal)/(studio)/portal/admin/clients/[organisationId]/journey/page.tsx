@@ -18,6 +18,7 @@ import type { SigningApproval } from "@/lib/operations/agreements/signing-types"
 import {
   listStaffJourneyContacts,
   listStaffJourneys,
+  loadStaffOnboardingWorkspace,
 } from "@/lib/operations/onboarding/queries";
 import type {
   JourneyBillingAccount,
@@ -27,6 +28,7 @@ import { onboardingEnabled } from "@/lib/operations/onboarding/worker-db";
 import { readBillingConfiguration } from "@/lib/operations/billing/configuration";
 import styles from "@/components/portal/studio-client.module.css";
 import type { FssAdminContext } from "@/lib/operations/auth/staff-types";
+import type { OnboardingWorkspace } from "@/lib/operations/onboarding/workspace-types";
 
 export const dynamic = "force-dynamic";
 
@@ -69,16 +71,19 @@ export default async function StaffClientJourneyPage({
     register: AgreementRegister;
     journeys: JourneyView[];
     approvals: SigningApproval[];
-    contacts: Array<{ name: string; email: string }>;
+    contacts: Array<{ id: string; name: string; email: string }>;
     billing: JourneyBillingAccount | null;
+    workspace: OnboardingWorkspace;
   };
   try {
-    const [register, journeys, approvals, contacts] = await Promise.all([
-      listStaffAgreementRegister(db, admin, organisationId.data),
-      listStaffJourneys(db, admin, organisationId.data),
-      listStaffSigning(db, admin, organisationId.data, randomUUID()),
-      listStaffJourneyContacts(db, admin, organisationId.data),
-    ]);
+    const [register, journeys, approvals, contacts, workspace] =
+      await Promise.all([
+        listStaffAgreementRegister(db, admin, organisationId.data),
+        listStaffJourneys(db, admin, organisationId.data),
+        listStaffSigning(db, admin, organisationId.data, randomUUID()),
+        listStaffJourneyContacts(db, admin, organisationId.data),
+        loadStaffOnboardingWorkspace(db, admin, organisationId.data),
+      ]);
     if (!register) notFound();
     let billing = null;
     try {
@@ -92,7 +97,7 @@ export default async function StaffClientJourneyPage({
     } catch {
       billing = null;
     }
-    data = { register, journeys, approvals, contacts, billing };
+    data = { register, journeys, approvals, contacts, billing, workspace };
   } catch {
     return <PortalUnavailable />;
   }
@@ -104,6 +109,7 @@ export default async function StaffClientJourneyPage({
       approvals={data.approvals}
       contacts={data.contacts}
       billing={data.billing}
+      workspace={data.workspace}
     />
   );
 }

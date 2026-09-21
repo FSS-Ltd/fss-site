@@ -8,12 +8,20 @@ import type {
 } from "@/lib/operations/onboarding/command-types";
 import type { AgreementRecord } from "@/lib/operations/agreements/types";
 import type { SigningApproval } from "@/lib/operations/agreements/signing-types";
+import type { OnboardingWorkspaceJourneyDraft } from "@/lib/operations/onboarding/workspace-types";
+import { canStartOnboardingJourney } from "@/lib/operations/onboarding/readiness";
+import { portalPath } from "@/lib/operations/auth/portal-url";
 import { useJourneyCommand } from "./use-journey-command";
 import { WelcomeForm } from "./welcome-form";
 import { ProposalForm } from "./proposal-form";
 import { ProposalAccessPreview } from "./proposal-access-preview";
 import { EmailPreview } from "./email-preview";
-import { PortalButton, PortalCheckbox } from "@/components/portal/ui";
+import {
+  PortalActionLink,
+  PortalButton,
+  PortalCheckbox,
+  StatusBadge,
+} from "@/components/portal/ui";
 import ui from "../shared/operations-ui.module.css";
 import styles from "../agreements/agreements.module.css";
 function PreviewDocument({ base64 }: { base64: string }): React.JSX.Element {
@@ -39,16 +47,24 @@ function PreviewDocument({ base64 }: { base64: string }): React.JSX.Element {
     </p>
   );
 }
+
+function readinessStatus(
+  status: "failed" | "needs_action" | "passed",
+): "error" | "success" | "warning" {
+  if (status === "passed") return "success";
+  return status === "failed" ? "error" : "warning";
+}
 export interface JourneyPreviewProps {
   organisationId: string;
   organisationName: string;
   agreements: AgreementRecord[];
-  contacts: { email: string; name: string }[];
+  contacts: { id?: string; email: string; name: string }[];
   approvals: SigningApproval[];
   journeys: JourneyView[];
   billing?: JourneyBillingAccount | null;
   commandEndpoint?: string;
   signingDownloadBase?: string;
+  workspaceDrafts?: readonly OnboardingWorkspaceJourneyDraft[];
 }
 export function JourneyPreview({
   organisationId,
@@ -60,6 +76,7 @@ export function JourneyPreview({
   billing = null,
   commandEndpoint,
   signingDownloadBase = `/api/growth/operations/clients/${organisationId}/signing`,
+  workspaceDrafts,
 }: JourneyPreviewProps): React.JSX.Element {
   const { submit, pending, message } = useJourneyCommand(
     organisationId,
@@ -87,6 +104,8 @@ export function JourneyPreview({
           (c) => c.value === preview.snapshot.invoice.obligationKey,
         )?.label
       : null;
+  const welcomeCanStart =
+    preview?.kind !== "welcome" || canStartOnboardingJourney(preview.readiness);
   return (
     <article className={styles.card}>
       <h2>Prepare the next step.</h2>
@@ -105,6 +124,7 @@ export function JourneyPreview({
                 billing={billing}
                 pending={pending}
                 onPreview={prepare}
+                workspaceDrafts={workspaceDrafts}
               />
             ) : available.length ? (
               <p>
@@ -145,6 +165,26 @@ export function JourneyPreview({
           </h3>
           {preview.kind === "welcome" ? (
             <>
+              <section aria-label="Welcome activation preflight">
+                <h3>Preflight</h3>
+                <ul>
+                  {preview.readiness.map((check) => (
+                    <li key={check.id}>
+                      <StatusBadge status={readinessStatus(check.status)}>
+                        {check.reason}
+                      </StatusBadge>
+                      {check.href && check.status !== "passed" ? (
+                        <PortalActionLink
+                          href={portalPath(check.href)}
+                          variant="secondary"
+                        >
+                          Resolve this check
+                        </PortalActionLink>
+                      ) : null}
+                    </li>
+                  ))}
+                </ul>
+              </section>
               <EmailPreview email={preview.snapshot.welcome} />
               <PreviewDocument base64={preview.pdfBase64} />
               <p>PDF SHA-256: {preview.snapshot.pdfHash}</p>
@@ -210,7 +250,7 @@ export function JourneyPreview({
           />
           <div className={styles.actions}>
             <PortalButton
-              disabled={pending || !confirmed}
+              disabled={pending || !confirmed || !welcomeCanStart}
               loading={pending}
               onClick={async () => {
                 const result = await submit({
