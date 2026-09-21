@@ -67,6 +67,7 @@ const request: ClientRequestDetail = {
   reviewReminderTarget: null,
   createdAt: "2026-09-07T10:00:00Z",
   blocked: null,
+  closureReason: null,
   closureLabel: null,
   comments: [
     {
@@ -143,6 +144,22 @@ test("a completed request distinguishes client acceptance from an FSS closure", 
 
   assert.match(html, /Version v1 accepted/);
   assert.match(html, /Start a follow-up request/);
+
+  const closureHtml = renderToStaticMarkup(
+    <AppRouterContext.Provider value={router}>
+      <RequestDetail
+        request={{
+          ...request,
+          closureLabel: "Closed by FSS",
+          closureReason: "The client cancelled the agreed work.",
+          status: "done",
+        }}
+        organisationId="org"
+        canComment={false}
+      />
+    </AppRouterContext.Provider>,
+  );
+  assert.match(closureHtml, /The client cancelled the agreed work/);
 });
 
 test("a contributor can comment but cannot submit an acceptance decision", () => {

@@ -281,7 +281,9 @@ test("request lifecycle: scoped identity, concurrent idempotency, evidence, vers
       expectedVersion: 12,
       reason: "Administrative closure",
     });
-    assert.equal((await read(a.id))?.closureLabel, "Closed by FSS");
+    const fssClosed = await read(a.id);
+    assert.equal(fssClosed?.closureLabel, "Closed by FSS");
+    assert.equal(fssClosed?.closureReason, "Administrative closure");
     const closedNew = await create(newRequest(f.projectId));
     await command({
       action: "close",
@@ -300,6 +302,7 @@ test("request lifecycle: scoped identity, concurrent idempotency, evidence, vers
     const events =
       await admin`select kind from operations.request_notification_outbox where request_id=${a.id}`;
     assert.equal(events.filter((x) => x.kind === "public_comment").length, 1);
+    assert.equal(events.filter((x) => x.kind === "closed").length, 1);
     await admin`update operations.memberships set revoked_at=now() where organisation_id=${f.organisationId}`;
     await assert.rejects(() => read(a.id));
   } finally {

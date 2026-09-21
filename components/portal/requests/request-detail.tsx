@@ -131,7 +131,10 @@ export function RequestDetail({
           <p className={styles.prose}>{request.scopeReason}</p>
         )}
         {request.closureLabel && (
-          <p className={styles.noticeCopy}>{request.closureLabel}</p>
+          <p className={styles.noticeCopy}>
+            {request.closureLabel}
+            {request.closureReason ? `: ${request.closureReason}` : ""}
+          </p>
         )}
       </PortalCard>
       <RequestAllowance allowance={request.allowance} />
@@ -226,8 +229,10 @@ export function RequestDetail({
           description={
             acceptance
               ? "The final files and review history are available below."
-              : request.closureLabel ||
-                "FSS has closed this request without a client acceptance."
+              : request.closureReason
+                ? `FSS recorded this closure: ${request.closureReason}`
+                : request.closureLabel ||
+                  "FSS has closed this request without a client acceptance."
           }
           title={
             acceptance

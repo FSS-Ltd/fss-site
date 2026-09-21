@@ -52,7 +52,7 @@ export type StudioNotificationDelivery = Readonly<{
   organisationName: string;
   requestId: string;
   requestTitle: string;
-  kind: "review_requested" | "accepted";
+  kind: "review_requested" | "accepted" | "closed";
   recipientLabel: string;
   status: "pending" | "succeeded" | "held";
   attempts: number;

@@ -27,6 +27,7 @@ const reviewRequest: ClientRequestDetail = {
   actualBehaviour: "",
   allowance: null,
   blocked: null,
+  closureReason: null,
   canReview: true,
   closureLabel: null,
   comments: [

@@ -64,7 +64,7 @@ export type StaffNotificationDelivery = {
   organisationName: string;
   requestId: string;
   requestTitle: string;
-  kind: "review_requested" | "accepted";
+  kind: "review_requested" | "accepted" | "closed";
   status: z.infer<typeof notificationDeliveryStatusSchema>;
   attempts: number;
   createdAt: string;

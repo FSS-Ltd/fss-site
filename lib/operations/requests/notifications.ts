@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { z } from "zod";
+import { resolveSiteUrl } from "@/lib/config/site-url";
 import type { OperationsDb } from "../db/client";
 import { createOnboardingResendSender } from "../onboarding/resend-provider";
 import { retryAt } from "../onboarding/schedule";
@@ -8,7 +9,7 @@ export type RequestEmailDelivery = {
   id: string;
   organisationId: string;
   requestId: string;
-  kind: "review_requested" | "accepted";
+  kind: "review_requested" | "accepted" | "closed";
   recipient: string;
   attempts: number;
   requestTitle: string;
@@ -16,6 +17,8 @@ export type RequestEmailDelivery = {
   publicSummary: string;
   reviewInstructions: string;
   organisationName: string;
+  completionAt?: string | null;
+  closureReason?: string;
 };
 
 export type RequestEmailEffect = {
@@ -39,7 +42,7 @@ function providerSender(apiKey: string): RequestEmailSender {
   return (input) => send(input as never);
 }
 
-const emailKinds = new Set(["review_requested", "accepted"]);
+const emailKinds = new Set(["review_requested", "accepted", "closed"]);
 const senderCache = new Map<string, RequestEmailSender>();
 
 function senderFor(apiKey: string): RequestEmailSender {
@@ -147,34 +150,7 @@ async function sendDeliveryEmail(
   now: () => Date,
 ): Promise<RequestEmailEffect> {
   void now;
-  const subject =
-    delivery.kind === "review_requested"
-      ? `Ready for your review: ${delivery.requestTitle}`
-      : `Completed: ${delivery.requestTitle}`;
-  const paragraphs = [
-    `The ${delivery.organisationName} delivery workspace has an update about “${delivery.requestTitle}”.`,
-    delivery.kind === "review_requested"
-      ? `${delivery.publicSummary}\n\n${delivery.reviewInstructions}`
-      : delivery.publicSummary ||
-        "The work is complete and recorded in your portal.",
-    "Open your client portal, choose Requests, and select the request to review the exact version and respond.",
-    "Faithful Software Solutions",
-  ];
-  const escape = (value: string): string =>
-    value
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#39;");
-  const email = {
-    from: "FSS <hello@faithfulsoftwaresolutions.co.uk>",
-    replyTo: "j.ntagengwa@faithfulsoftware.dev",
-    to: delivery.recipient,
-    subject,
-    html: `<main style="box-sizing:border-box;width:100%;max-width:640px;margin:0 auto;padding:24px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6;color:#24322d;overflow-wrap:anywhere;">${paragraphs.map((p) => `<p style="margin:0 0 20px;">${escape(p).replaceAll("\n", "<br>")}</p>`).join("")}</main>`,
-    text: paragraphs.join("\n\n"),
-  };
+  const email = buildRequestDeliveryEmail(delivery);
   const lease = {
     id: delivery.id,
     idempotencyKey: requestEmailIdempotencyKey(
@@ -198,4 +174,109 @@ async function sendDeliveryEmail(
       uncertain: true,
     };
   }
+}
+
+type RequestDeliveryEmail = {
+  from: string;
+  replyTo: string;
+  to: string;
+  subject: string;
+  html: string;
+  text: string;
+};
+
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function completionDate(value: string | null): string | null {
+  if (!value) return null;
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "Europe/London",
+  }).format(parsed);
+}
+
+function portalRequestUrl(
+  delivery: RequestEmailDelivery,
+  page: "review" | "completed",
+  siteUrl: string,
+): string {
+  const path =
+    page === "review"
+      ? `/portal/requests/${encodeURIComponent(delivery.requestId)}/review`
+      : `/portal/requests/${encodeURIComponent(delivery.requestId)}`;
+  const url = new URL(path, siteUrl);
+  url.searchParams.set("organisationId", delivery.organisationId);
+  return url.toString();
+}
+
+/**
+ * Produces the full, public-only request email envelope. Decisions still live
+ * behind the authenticated portal routes; these messages contain no private
+ * deliverables or bearer actions.
+ */
+export function buildRequestDeliveryEmail(
+  delivery: RequestEmailDelivery,
+  siteUrl = resolveSiteUrl(),
+): RequestDeliveryEmail {
+  const review = delivery.kind === "review_requested";
+  const closed = delivery.kind === "closed";
+  const actionUrl = portalRequestUrl(
+    delivery,
+    review ? "review" : "completed",
+    siteUrl,
+  );
+  const heading = review ? "Your update is ready." : "All done.";
+  const subject = review
+    ? `Ready for your review: ${delivery.requestTitle}`
+    : closed
+      ? `FSS closed: ${delivery.requestTitle}`
+      : `Completed: ${delivery.requestTitle}`;
+  const actionLabel = review ? "Review the update" : "View completed work";
+  const acceptedOn = completionDate(delivery.completionAt ?? null);
+  const detail = review
+    ? [
+        delivery.publicSummary || "FSS has prepared an update for your review.",
+        `Review ${delivery.deliverableVersion} and let us know whether it meets the agreed outcome.`,
+        delivery.reviewInstructions
+          ? `What to check: ${delivery.reviewInstructions}`
+          : "Open the retained deliverable in your workspace before deciding.",
+      ]
+    : closed
+      ? [
+          "FSS closed this request. This is not a client acceptance.",
+          delivery.closureReason || delivery.publicSummary
+            ? `Reason: ${delivery.closureReason || delivery.publicSummary}`
+            : "The recorded closure reason is available in your workspace.",
+          "The request history and any retained final work remain available in your workspace.",
+        ]
+      : [
+          `A client reviewer accepted ${delivery.deliverableVersion}${acceptedOn ? ` on ${acceptedOn}` : ""}.`,
+          "Your final deliverable and review history are available in your workspace.",
+          delivery.publicSummary || "The accepted outcome is recorded with the request.",
+        ];
+  const paragraphs = [
+    `Hello,`,
+    `${delivery.organisationName} has an update about “${delivery.requestTitle}”.`,
+    ...detail,
+    "Faithful Software Solutions",
+  ];
+  return {
+    from: "FSS <hello@faithfulsoftwaresolutions.co.uk>",
+    replyTo: "j.ntagengwa@faithfulsoftware.dev",
+    to: delivery.recipient,
+    subject,
+    html: `<main style="box-sizing:border-box;width:100%;max-width:640px;margin:0 auto;padding:24px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6;color:#24322d;overflow-wrap:anywhere;"><h1 style="font-size:24px;line-height:1.25;margin:0 0 24px;">${escapeHtml(heading)}</h1>${paragraphs.map((paragraph) => `<p style="margin:0 0 20px;">${escapeHtml(paragraph)}</p>`).join("")}<p style="margin:28px 0 0;"><a href="${escapeHtml(actionUrl)}" style="display:inline-block;padding:12px 18px;background:#0f7078;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:700;">${escapeHtml(actionLabel)}</a></p></main>`,
+    text: [...paragraphs, `${actionLabel}: ${actionUrl}`].join("\n\n"),
+  };
 }

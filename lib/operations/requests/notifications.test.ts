@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  buildRequestDeliveryEmail,
   dispatchRequestNotifications,
   requestEmailIdempotencyKey,
   type RequestEmailDelivery,
@@ -41,6 +42,8 @@ const delivery: RequestEmailDelivery = {
   publicSummary: "Summary",
   reviewInstructions: "Check the deliverable",
   organisationName: "Client",
+  completionAt: null,
+  closureReason: "",
 };
 
 test("request email dispatcher sends due deliveries and records the receipt", async () => {
@@ -112,4 +115,32 @@ test("request email idempotency keys are deterministic per delivery and attempt"
     requestEmailIdempotencyKey(delivery.id, 1),
     requestEmailIdempotencyKey(delivery.id, 2),
   );
+});
+
+test("request email templates contain the exact authenticated review and completion actions", () => {
+  const review = buildRequestDeliveryEmail(
+    delivery,
+    "https://studio.example.test",
+  );
+  assert.match(review.subject, /Ready for your review: Synthetic request/);
+  assert.match(review.html, /Your update is ready\./);
+  assert.match(review.html, /Review v2/);
+  assert.match(
+    review.html,
+    /https:\/\/studio\.example\.test\/portal\/requests\/20000000-0000-4000-8000-000000000003\/review\?organisationId=10000000-0000-4000-8000-000000000002/,
+  );
+  assert.match(review.text, /Review the update:/);
+  assert.doesNotMatch(JSON.stringify(review), /attachments/i);
+
+  const closed = buildRequestDeliveryEmail(
+    {
+      ...delivery,
+      closureReason: "The client cancelled the agreed work.",
+      kind: "closed",
+    },
+    "https://studio.example.test",
+  );
+  assert.match(closed.subject, /FSS closed: Synthetic request/);
+  assert.match(closed.html, /This is not a client acceptance/);
+  assert.match(closed.text, /The client cancelled the agreed work/);
 });

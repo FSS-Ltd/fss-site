@@ -228,3 +228,61 @@ test("review publication queues an owner email delivery and the dispatcher compl
     await portal.end();
   }
 });
+
+test("FSS closure queues a distinct owner email delivery with its reason", async () => {
+  const admin = postgres(url, { max: 1 });
+  const founder = postgres(url, {
+    max: 4,
+    connection: { options: "-c role=operations_founder" },
+  });
+  const portal = postgres(url, {
+    max: 4,
+    connection: { options: "-c role=operations_portal" },
+  });
+  const f = await requestFixture(admin, founder);
+  try {
+    const request = await createPortalRequest(
+      portal,
+      f.identity,
+      f.organisationId,
+      newRequest(f.projectId),
+      f.correlationId,
+    );
+    const { executeFounderRequestCommand } = await import(
+      "../../../lib/operations/requests/service"
+    );
+    await executeFounderRequestCommand(
+      founder,
+      { actorId: "d".repeat(64) },
+      f.organisationId,
+      {
+        action: "close",
+        expectedVersion: request.version,
+        reason: "The client cancelled the agreed work.",
+        requestId: request.id,
+      },
+      f.correlationId,
+    );
+
+    const summary = await dispatchRequestNotifications(founder, {
+      sender: async () => ({
+        status: "succeeded",
+        receipt: { providerId: "re_closed", acceptedAt: new Date().toISOString() },
+      }),
+    });
+    assert.equal(summary.emailsClaimed, 1);
+    assert.equal(summary.emailsSent, 1);
+
+    const [delivery] = await admin<
+      { kind: string; status: string }[]
+    >`select kind, status from operations.request_email_deliveries where request_id = ${request.id}`;
+    assert.ok(delivery);
+    assert.equal(delivery.kind, "closed");
+    assert.equal(delivery.status, "succeeded");
+  } finally {
+    await removeRequestFixture(admin, f);
+    await admin.end();
+    await founder.end();
+    await portal.end();
+  }
+});
