@@ -39,6 +39,24 @@ import {
   StudioWelcomeTemplatesScenario,
   visualChecklistTaskId,
 } from "./welcome-visual-fixtures";
+import {
+  ClientBillingScenario,
+  ClientDocumentDetailScenario,
+  ClientDocumentQuarantineScenario,
+  ClientDocumentsScenario,
+  ClientHelpScenario,
+  ClientInvitationExpiredScenario,
+  ClientInvoiceScenario,
+  ClientNotificationsScenario,
+  ClientPreferencesScenario,
+  ClientProjectDetailScenario,
+  ClientProjectsScenario,
+  ClientServiceEnquiryScenario,
+  ClientServicesScenario,
+  ClientTeamScenario,
+  ClientUnavailableScenario,
+  ClientViewerAccessScenario,
+} from "./client-support-visual-fixtures";
 
 export type VisualScenarioName =
   | "client-login"
@@ -57,6 +75,22 @@ export type VisualScenarioName =
   | "client-onboarding-assets"
   | "client-onboarding-booking"
   | "client-onboarding-complete"
+  | "client-projects"
+  | "client-project-detail"
+  | "client-documents"
+  | "client-document-detail"
+  | "client-billing"
+  | "client-invoice"
+  | "client-services"
+  | "client-service-enquiry"
+  | "client-notifications"
+  | "client-help"
+  | "client-preferences"
+  | "client-team"
+  | "client-unavailable"
+  | "client-invitation-expired"
+  | "client-document-quarantine"
+  | "client-viewer-access"
   | "studio-overview"
   | "studio-shell"
   | "studio-delivery-board"
@@ -313,6 +347,70 @@ const scenarios: Record<VisualScenarioName, VisualScenario> = {
   "client-onboarding-complete": {
     name: "client-onboarding-complete",
     content: <ClientOnboardingCompleteScenario />,
+  },
+  "client-projects": {
+    name: "client-projects",
+    content: <ClientProjectsScenario />,
+  },
+  "client-project-detail": {
+    name: "client-project-detail",
+    content: <ClientProjectDetailScenario />,
+  },
+  "client-documents": {
+    name: "client-documents",
+    content: <ClientDocumentsScenario />,
+  },
+  "client-document-detail": {
+    name: "client-document-detail",
+    content: <ClientDocumentDetailScenario />,
+  },
+  "client-billing": {
+    name: "client-billing",
+    content: <ClientBillingScenario />,
+  },
+  "client-invoice": {
+    name: "client-invoice",
+    content: <ClientInvoiceScenario />,
+  },
+  "client-services": {
+    name: "client-services",
+    content: <ClientServicesScenario />,
+  },
+  "client-service-enquiry": {
+    name: "client-service-enquiry",
+    content: <ClientServiceEnquiryScenario />,
+  },
+  "client-notifications": {
+    name: "client-notifications",
+    content: <ClientNotificationsScenario />,
+  },
+  "client-help": {
+    name: "client-help",
+    content: <ClientHelpScenario />,
+  },
+  "client-preferences": {
+    name: "client-preferences",
+    content: <ClientPreferencesScenario />,
+  },
+  "client-team": {
+    name: "client-team",
+    content: <ClientTeamScenario />,
+  },
+  "client-unavailable": {
+    name: "client-unavailable",
+    content: <ClientUnavailableScenario />,
+  },
+  "client-invitation-expired": {
+    name: "client-invitation-expired",
+    content: <ClientInvitationExpiredScenario />,
+  },
+  "client-document-quarantine": {
+    name: "client-document-quarantine",
+    content: <ClientDocumentQuarantineScenario />,
+  },
+  "client-viewer-access": {
+    name: "client-viewer-access",
+    content: <ClientViewerAccessScenario />,
   },
   "studio-overview": {
     name: "studio-overview",

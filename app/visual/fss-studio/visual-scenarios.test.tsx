@@ -75,3 +75,26 @@ test("registers each Phase 4 onboarding and welcome visual fixture", () => {
     assert.ok(resolveVisualScenario(name, true, "test"));
   }
 });
+
+test("registers each Phase 5 client support visual fixture", () => {
+  for (const name of [
+    "client-projects",
+    "client-project-detail",
+    "client-documents",
+    "client-document-detail",
+    "client-billing",
+    "client-invoice",
+    "client-services",
+    "client-service-enquiry",
+    "client-notifications",
+    "client-help",
+    "client-preferences",
+    "client-team",
+    "client-unavailable",
+    "client-invitation-expired",
+    "client-document-quarantine",
+    "client-viewer-access",
+  ]) {
+    assert.ok(resolveVisualScenario(name, true, "test"));
+  }
+});
