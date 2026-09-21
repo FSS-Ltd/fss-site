@@ -46,6 +46,8 @@ export default async function AdminDeliveryPage({
   const rawStatus = Array.isArray(params.status)
     ? params.status[0]
     : params.status;
+  const moveSheet =
+    !Array.isArray(params.state) && params.state === "move-sheet";
   const filters = {
     organisationId: rawClient && rawClient !== "all" ? rawClient : "all",
     status: rawStatus && laneKeys.has(rawStatus) ? rawStatus : "all",
@@ -78,6 +80,20 @@ export default async function AdminDeliveryPage({
         requests={requests.items}
         clients={clients}
         filters={filters}
+        initialMoveRequestId={
+          moveSheet
+            ? requests.items.find((request) =>
+                [
+                  "new",
+                  "acknowledged",
+                  "planned",
+                  "in_progress",
+                  "changes_requested",
+                  "done",
+                ].includes(request.status),
+              )?.id
+            : undefined
+        }
       />
       <StudioPagination
         filter={{

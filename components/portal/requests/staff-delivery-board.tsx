@@ -106,10 +106,12 @@ export function StaffDeliveryBoard({
   requests,
   clients,
   filters,
+  initialMoveRequestId,
 }: {
   requests: StaffDeliveryBoardRequest[];
   clients: Array<{ id: string; displayName: string }>;
   filters: { organisationId: string; status: string };
+  initialMoveRequestId?: string;
 }): React.JSX.Element {
   const router = useRouter();
   const dialogRef = useRef<HTMLElement | null>(null);
@@ -117,8 +119,13 @@ export function StaffDeliveryBoard({
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [dragging, setDragging] = useState<string | null>(null);
-  const [movingRequest, setMovingRequest] =
-    useState<StaffDeliveryBoardRequest | null>(null);
+  const [movingRequest, setMovingRequest] = useState<StaffDeliveryBoardRequest | null>(
+    () => {
+      if (!initialMoveRequestId) return null;
+      const request = requests.find((item) => item.id === initialMoveRequestId);
+      return request && moveTransitions[request.status] ? request : null;
+    },
+  );
 
   const closeMoveSheet = useCallback(() => {
     setMovingRequest(null);

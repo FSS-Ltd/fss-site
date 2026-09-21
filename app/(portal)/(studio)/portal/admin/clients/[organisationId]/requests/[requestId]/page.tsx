@@ -54,6 +54,14 @@ export default async function AdminClientRequestPage({
   const requestedAction = Array.isArray(query.action)
     ? query.action[0]
     : query.action;
+  const requestedMode = Array.isArray(query.mode) ? query.mode[0] : query.mode;
+  const initialAction =
+    requestedAction ??
+    (requestedMode === "scope"
+      ? "classify_scope"
+      : requestedMode === "review"
+        ? "review"
+        : undefined);
   const { internalComments, priority, ...clientRequest } = request;
   return (
     <div className={styles.requestPage}>
@@ -92,7 +100,7 @@ export default async function AdminClientRequestPage({
                 label: agreement.draft.title,
               }))}
             currentPriority={priority}
-            initialAction={requestedAction}
+            initialAction={initialAction}
             organisationId={parsed.data.organisationId}
             request={clientRequest}
           />

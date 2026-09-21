@@ -301,6 +301,34 @@ test("founder delivery exposes a move control and separates review and public up
   assert.doesNotMatch(actionsHtml, /Accept v1/);
 });
 
+test("founder request scope and move-sheet states retain server-validated work", () => {
+  const scopeHtml = renderToStaticMarkup(
+    <AppRouterContext.Provider value={router}>
+      <StaffRequestActions
+        initialAction="classify_scope"
+        deliveryOwners={[{ id: "owner", label: "Jean-Fidele" }]}
+        organisationId="org"
+        request={{ ...request, status: "new" }}
+      />
+    </AppRouterContext.Provider>,
+  );
+  const moveHtml = renderToStaticMarkup(
+    <AppRouterContext.Provider value={router}>
+      <StaffDeliveryBoard
+        clients={[{ id: "org", displayName: "Northstar Studio" }]}
+        filters={{ organisationId: "all", status: "all" }}
+        initialMoveRequestId={staffRequest.id}
+        requests={[staffRequest]}
+      />
+    </AppRouterContext.Provider>,
+  );
+
+  assert.match(scopeHtml, /Scope decision/);
+  assert.match(scopeHtml, /Scope explanation/);
+  assert.match(moveHtml, /Nothing has moved yet/);
+  assert.match(moveHtml, /Open request workspace/);
+});
+
 test("founder priority uses a labelled native choice with the current value", () => {
   const html = renderToStaticMarkup(
     <FounderActionFields
