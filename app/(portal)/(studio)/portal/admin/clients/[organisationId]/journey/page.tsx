@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { z } from "zod";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import { StaffJourneyWorkspace } from "@/components/portal/onboarding/staff-journey-workspace";
+import { isJourneyBuilderStage } from "@/components/portal/onboarding/staff-journey-builder";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
@@ -34,8 +35,10 @@ export const dynamic = "force-dynamic";
 
 export default async function StaffClientJourneyPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ organisationId: string }>;
+  searchParams: Promise<{ step?: string }>;
 }): Promise<React.JSX.Element> {
   if (!operationsEnabled()) notFound();
   if (!portalAuthConfigured()) return <PortalUnavailable />;
@@ -43,6 +46,10 @@ export default async function StaffClientJourneyPage({
   if (!identity) return <PortalUnavailable />;
   const organisationId = z.uuid().safeParse((await params).organisationId);
   if (!organisationId.success) notFound();
+  const requestedStage = (await searchParams).step;
+  const builderStage = isJourneyBuilderStage(requestedStage)
+    ? requestedStage
+    : undefined;
   let db: OperationsDb;
   let admin: FssAdminContext;
   try {
@@ -109,6 +116,7 @@ export default async function StaffClientJourneyPage({
       approvals={data.approvals}
       contacts={data.contacts}
       billing={data.billing}
+      builderStage={builderStage}
       workspace={data.workspace}
     />
   );

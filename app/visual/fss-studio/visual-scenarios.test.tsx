@@ -52,3 +52,26 @@ test("registers each Phase 3 agreement visual fixture", () => {
   ])
     assert.ok(resolveVisualScenario(name, true, "test"));
 });
+
+test("registers each Phase 4 onboarding and welcome visual fixture", () => {
+  for (const name of [
+    "client-getting-started",
+    "client-onboarding-profile",
+    "client-onboarding-assets",
+    "client-onboarding-booking",
+    "client-onboarding-complete",
+    "studio-welcome-journeys",
+    "studio-welcome-builder",
+    "studio-welcome-content",
+    "studio-welcome-access",
+    "studio-welcome-schedule",
+    "studio-welcome-preflight",
+    "studio-welcome-active",
+    "studio-welcome-recovery",
+    "studio-welcome-templates",
+    "studio-checklist-editor",
+    "studio-checklist-task-editor",
+  ]) {
+    assert.ok(resolveVisualScenario(name, true, "test"));
+  }
+});

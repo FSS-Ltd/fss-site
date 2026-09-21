@@ -19,10 +19,10 @@ import { EmailPreview } from "./email-preview";
 import {
   PortalActionLink,
   PortalButton,
+  PortalCard,
   PortalCheckbox,
   StatusBadge,
 } from "@/components/portal/ui";
-import ui from "../shared/operations-ui.module.css";
 import styles from "../agreements/agreements.module.css";
 function PreviewDocument({ base64 }: { base64: string }): React.JSX.Element {
   const link = useRef<HTMLAnchorElement>(null);
@@ -107,12 +107,10 @@ export function JourneyPreview({
   const welcomeCanStart =
     preview?.kind !== "welcome" || canStartOnboardingJourney(preview.readiness);
   return (
-    <article className={styles.card}>
-      <h2>Prepare the next step.</h2>
-      <p className={ui.description}>
-        {organisationName}: review the exact recipients, content and access
-        before anything is queued. Welcome and proposal have separate approvals.
-      </p>
+    <PortalCard
+      description={`${organisationName}: review the exact recipients, content and access before anything is queued. Welcome and proposal have separate approvals.`}
+      title="Prepare the next step."
+    >
       {!preview && (
         <>
           <details>
@@ -284,6 +282,6 @@ export function JourneyPreview({
         </div>
       )}
       <p role="status">{message}</p>
-    </article>
+    </PortalCard>
   );
 }

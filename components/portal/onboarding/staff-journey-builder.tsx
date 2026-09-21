@@ -25,10 +25,27 @@ type BuilderAgreement = Readonly<{
 type BuilderContact = Readonly<{ id: string; name: string; email: string }>;
 type BuilderTemplate = Readonly<{ id: string; name: string; version: number }>;
 
+export const journeyBuilderStages = [
+  "setup",
+  "content",
+  "access",
+  "schedule",
+  "activate",
+] as const;
+
+export type JourneyBuilderStage = (typeof journeyBuilderStages)[number];
+
+export function isJourneyBuilderStage(
+  value: string | undefined,
+): value is JourneyBuilderStage {
+  return journeyBuilderStages.some((stage) => stage === value);
+}
+
 type StaffJourneyBuilderProps = Readonly<{
   agreements: readonly BuilderAgreement[];
   commandEndpoint: string;
   contacts: readonly BuilderContact[];
+  initialStage?: JourneyBuilderStage;
   templates: readonly BuilderTemplate[];
 }>;
 
@@ -71,6 +88,7 @@ export function StaffJourneyBuilder({
   agreements,
   commandEndpoint,
   contacts,
+  initialStage = "setup",
   templates,
 }: StaffJourneyBuilderProps): React.JSX.Element {
   const draftId = useRef<string | null>(null);
@@ -182,7 +200,7 @@ export function StaffJourneyBuilder({
             <option value="viewer">Viewer</option>
           </PortalSelect>
           <PortalSelect
-            defaultValue="setup"
+            defaultValue={initialStage}
             label="Builder stage"
             name="stage"
             required

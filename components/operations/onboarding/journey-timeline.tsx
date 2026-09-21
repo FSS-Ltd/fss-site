@@ -7,8 +7,12 @@ import { useJourneyCommand } from "./use-journey-command";
 import { RetryFailure } from "./retry-failure";
 import { StepRecovery } from "./step-recovery";
 import { EmailPreview } from "./email-preview";
-import { Notice, PortalButton, StatusBadge } from "@/components/portal/ui";
-import ui from "../shared/operations-ui.module.css";
+import {
+  Notice,
+  PortalButton,
+  PortalCard,
+  StatusBadge,
+} from "@/components/portal/ui";
 import styles from "../agreements/agreements.module.css";
 const labels = {
   welcome: "Welcome email",
@@ -19,6 +23,16 @@ const labels = {
   activation: "Additional recipient activation",
   thank_you: "Agreement thank-you",
 };
+
+function journeyStatus(
+  journey: JourneyView,
+): "error" | "info" | "success" | "warning" {
+  if (journey.failureCode || journey.state === "blocked") return "error";
+  if (journey.state === "completed") return "success";
+  if (journey.state === "paused") return "warning";
+  return "info";
+}
+
 export function JourneyTimeline({
   organisationId,
   journey,
@@ -44,9 +58,10 @@ export function JourneyTimeline({
       expectedProposalApprovalId: journey.proposalApprovalId,
     });
   return (
-    <article className={styles.card}>
-      <h2>{journey.agreementTitle || "Client journey"}</h2>
-      <p className={ui.statusChip}>Journey {journey.state}</p>
+    <PortalCard title={journey.agreementTitle || "Client journey"}>
+      <StatusBadge status={journeyStatus(journey)}>
+        Journey {journey.state}
+      </StatusBadge>
       {journey.failureCode && (
         <Notice tone="error">
           Delivery stopped: {journey.failureCode.replaceAll("_", " ")}. Review
@@ -231,6 +246,6 @@ export function JourneyTimeline({
           ))}
         </details>
       )}
-    </article>
+    </PortalCard>
   );
 }

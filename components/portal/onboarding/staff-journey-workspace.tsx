@@ -7,6 +7,7 @@ import type {
 import type { OnboardingWorkspace } from "@/lib/operations/onboarding/workspace-types";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import { StaffJourneyBuilder } from "./staff-journey-builder";
+import type { JourneyBuilderStage } from "./staff-journey-builder";
 import { StaffJourneyDetail } from "./staff-journey-detail";
 import { JourneyPreview } from "@/components/operations/onboarding/journey-preview";
 import { JourneyTimeline } from "@/components/operations/onboarding/journey-timeline";
@@ -24,6 +25,7 @@ type StaffJourneyWorkspaceProps = {
   approvals: SigningApproval[];
   contacts: Array<{ id: string; name: string; email: string }>;
   billing: JourneyBillingAccount | null;
+  builderStage?: JourneyBuilderStage;
   workspace: OnboardingWorkspace;
 };
 
@@ -34,6 +36,7 @@ export function StaffJourneyWorkspace({
   approvals,
   contacts,
   billing,
+  builderStage,
   workspace,
 }: StaffJourneyWorkspaceProps): React.JSX.Element {
   const apiRoot = `/api/portal/admin/clients/${organisationId}`;
@@ -78,6 +81,7 @@ export function StaffJourneyWorkspace({
         }))}
         commandEndpoint={`${apiRoot}/journey`}
         contacts={contacts}
+        initialStage={builderStage}
         templates={workspace.templates.map((template) => ({
           id: template.id,
           name: template.name,
