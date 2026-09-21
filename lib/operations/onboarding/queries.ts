@@ -53,6 +53,12 @@ const onboardingWorkspaceSchema = z.strictObject({
   ),
 });
 
+export function parseOnboardingWorkspace(
+  input: unknown,
+): OnboardingWorkspace {
+  return onboardingWorkspaceSchema.parse(input);
+}
+
 async function loadOnboardingWorkspace(
   tx: OperationsTransaction,
   organisationId: string,
@@ -61,7 +67,7 @@ async function loadOnboardingWorkspace(
     select operations.read_onboarding_workspace(${organisationId}) as workspace
   `;
   if (!row) throw new Error("Onboarding workspace is unavailable.");
-  return onboardingWorkspaceSchema.parse(row.workspace);
+  return parseOnboardingWorkspace(row.workspace);
 }
 
 export async function loadFounderOnboardingWorkspace(
