@@ -1,8 +1,6 @@
-export type PortalClaimDestinations = Readonly<{
-  admin: string;
-  home: string;
-  onboarding: string;
-}>;
+import type { PortalClaimDestinations } from "@/lib/operations/auth/portal-claim-destinations";
+
+export type { PortalClaimDestinations } from "@/lib/operations/auth/portal-claim-destinations";
 
 export const defaultPortalClaimDestinations: PortalClaimDestinations = {
   admin: "/admin",
