@@ -29,7 +29,15 @@ export async function onboardingFixture(
     if (cleanup.signing) {
       await cleanup.signing
         .admin`delete from operations.onboarding_access_bindings where job_id in (select id from operations.onboarding_jobs where organisation_id=${cleanup.signing.organisationId})`;
+      await cleanup.signing
+        .admin`update operations.onboarding_journeys set onboarding_template_version_id = null, onboarding_workspace_draft_id = null where organisation_id = ${cleanup.signing.organisationId}`;
       for (const table of [
+        "onboarding_journey_task_attachments",
+        "onboarding_journey_tasks",
+        "onboarding_journey_drafts",
+        "onboarding_client_profiles",
+        "onboarding_template_versions",
+        "onboarding_templates",
         "onboarding_reconciliations",
         "onboarding_delivery_events",
         "onboarding_attempts",
