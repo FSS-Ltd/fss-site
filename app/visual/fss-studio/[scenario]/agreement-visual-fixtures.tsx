@@ -63,7 +63,24 @@ const draft = {
   title: "Website & booking experience",
 };
 
-const { documentHash: _documentHash, documentReference: _documentReference, ...builderAgreement } = draft;
+const builderAgreement = {
+  assetsRequired: draft.assetsRequired,
+  billingContact: draft.billingContact,
+  currency: draft.currency,
+  goals: draft.goals,
+  installments: draft.installments,
+  lines: draft.lines,
+  minimumTermMonths: draft.minimumTermMonths,
+  noticeDays: draft.noticeDays,
+  requiredDepositPence: draft.requiredDepositPence,
+  responsibilities: draft.responsibilities,
+  scope: draft.scope,
+  signatories: draft.signatories,
+  support: draft.support,
+  taxTreatment: draft.taxTreatment,
+  terms: draft.terms,
+  title: draft.title,
+};
 
 const engagementChoices: readonly AgreementEngagementChoice[] = [
   {
