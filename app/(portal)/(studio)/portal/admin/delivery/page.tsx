@@ -1,9 +1,8 @@
-import Link from "next/link";
 import { randomUUID } from "node:crypto";
 import { notFound } from "next/navigation";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import { StaffDeliveryBoard } from "@/components/portal/requests/staff-delivery-board";
-import { PageHeader } from "@/components/portal/ui";
+import { PageHeader, PortalActionLink } from "@/components/portal/ui";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
@@ -68,9 +67,9 @@ export default async function AdminDeliveryPage({
     <div className={styles.requestPage}>
       <PageHeader
         action={
-          <Link className={styles.followUpLink} href="/admin/clients">
-            Open client workspaces
-          </Link>
+          <PortalActionLink href="/admin/delivery/new">
+            Create work
+          </PortalActionLink>
         }
         description="Cross-client work ordered so open delivery and overdue follow-ups stay visible. Every transition is validated on the server."
         eyebrow="FSS Studio / Delivery"

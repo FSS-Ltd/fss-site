@@ -569,3 +569,41 @@ test("review feedback starts selected and presents conflict recovery without ser
   assert.match(html, /Review the latest version/);
   assert.doesNotMatch(html, /name="feedback"[^>]*value=/);
 });
+
+test("staff request creation starts scope assessment without exposing client controls", () => {
+  let StaffRequestForm:
+    | ((props: {
+        clients: Array<{
+          id: string;
+          displayName: string;
+          projects: Array<{ id: string; title: string }>;
+        }>;
+      }) => React.JSX.Element)
+    | undefined;
+  try {
+    StaffRequestForm = (require("./staff-request-form") as {
+      StaffRequestForm?: typeof StaffRequestForm;
+    }).StaffRequestForm;
+  } catch {
+    StaffRequestForm = undefined;
+  }
+  assert.equal(typeof StaffRequestForm, "function");
+  if (!StaffRequestForm) return;
+
+  const html = renderToStaticMarkup(
+    <AppRouterContext.Provider value={router}>
+      <StaffRequestForm
+        clients={[
+          {
+            id: "org",
+            displayName: "Northstar Studio",
+            projects: [{ id: request.projectId, title: "Website" }],
+          },
+        ]}
+      />
+    </AppRouterContext.Provider>,
+  );
+  assert.match(html, /Assessment pending/);
+  assert.doesNotMatch(html, /Included scope/);
+  assert.doesNotMatch(html, /Accept v1|Add a comment/);
+});

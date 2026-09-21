@@ -35,6 +35,52 @@ export type StaffDeliveryBoardRequest = StaffDeliveryRequest & {
   blocked: boolean;
 };
 
+export type StaffRequestCreationClient = {
+  id: string;
+  displayName: string;
+  projects: Array<{ id: string; title: string }>;
+};
+
+type StaffRequestCreationRow = {
+  clientId: string;
+  clientName: string;
+  projectId: string | null;
+  projectTitle: string | null;
+};
+
+export async function listStaffRequestCreationClients(
+  db: OperationsDb,
+  context: FssAdminContext,
+): Promise<StaffRequestCreationClient[]> {
+  return withFssAdminTransaction(db, context, async (tx) => {
+    const rows = await tx<StaffRequestCreationRow[]>`
+      select o.id as "clientId", o.display_name as "clientName",
+        p.id as "projectId", p.title as "projectTitle"
+      from operations.organisations o
+      left join operations.projects p
+        on p.organisation_id = o.id
+        and p.visibility = 'client'
+        and p.status not in ('completed', 'paused')
+      where o.lifecycle = 'active'
+      order by o.display_name, o.id, p.title nulls last, p.id
+      limit 500
+    `;
+    const clients = new Map<string, StaffRequestCreationClient>();
+    for (const row of rows) {
+      const client = clients.get(row.clientId) ?? {
+        id: row.clientId,
+        displayName: row.clientName,
+        projects: [],
+      };
+      if (!clients.has(row.clientId)) clients.set(row.clientId, client);
+      if (row.projectId && row.projectTitle) {
+        client.projects.push({ id: row.projectId, title: row.projectTitle });
+      }
+    }
+    return [...clients.values()];
+  });
+}
+
 export async function listStaffDeliveryQueue(
   db: OperationsDb,
   context: FssAdminContext,
