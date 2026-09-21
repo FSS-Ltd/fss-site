@@ -1,6 +1,7 @@
-import { Check } from "lucide-react";
+import { CheckCircle2, Circle } from "lucide-react";
+import { Notice, StatusBadge } from "@/components/portal/ui";
 import type { ClientSetupChecklist } from "@/lib/operations/onboarding/client-checklist";
-import styles from "../projects.module.css";
+import styles from "./client-onboarding.module.css";
 
 type ClientSetupChecklistProps = {
   checklist: ClientSetupChecklist;
@@ -48,36 +49,35 @@ export function ClientSetupChecklist({
 }: ClientSetupChecklistProps): React.JSX.Element {
   if (!enabled) {
     return (
-      <section
-        className={styles.notice}
-        aria-labelledby="checklist-unavailable-heading"
-      >
-        <h2 id="checklist-unavailable-heading">
-          Getting started is unavailable
-        </h2>
+      <Notice tone="info">
+        <strong>Getting started is unavailable.</strong>
         <p>
           FSS has not enabled onboarding delivery for this workspace. Existing
           agreements and billing records remain available in their usual places.
         </p>
-      </section>
+      </Notice>
     );
   }
 
   return (
-    <ol className={styles.timeline} aria-label="Client setup checklist">
-      {checklistItems.map((item, index) => {
+    <ol className={styles.milestoneList} aria-label="Client setup checklist">
+      {checklistItems.map((item) => {
         const complete = checklist[item.key];
         return (
-          <li key={item.key}>
-            <span
-              className={`${styles.step} ${complete ? styles.complete : ""}`}
-              aria-label={complete ? "Complete" : "Not complete"}
-            >
-              {complete ? <Check size={16} aria-hidden="true" /> : index + 1}
+          <li className={styles.milestoneRow} key={item.key}>
+            <span className={styles.milestoneLabel}>
+              {complete ? (
+                <CheckCircle2 aria-hidden="true" size={18} />
+              ) : (
+                <Circle aria-hidden="true" size={18} />
+              )}
+              {item.title}
             </span>
-            <div className={styles.milestoneBody}>
-              <h2>{item.title}</h2>
-              <p className={styles.copy}>
+            <div>
+              <StatusBadge status={complete ? "success" : "neutral"}>
+                {complete ? "Complete" : "Waiting"}
+              </StatusBadge>
+              <p className={styles.taskCopy}>
                 {complete ? item.complete : item.pending}
               </p>
             </div>
