@@ -12,8 +12,13 @@ test("enquiry is bounded, idempotent-shaped and never a charge command", () => {
     context: {},
   });
   assert.equal(enquiry.interest, "We need calmer support.");
+  assert.equal(enquiry.preferredStart, null);
   assert.equal(enquiryCreatesCharge(), false);
   assert.throws(() => parseOfferEnquiry({ ...enquiry, interest: "" }));
+  assert.throws(() =>
+    parseOfferEnquiry({ ...enquiry, preferredStart: "x".repeat(1001) }),
+  );
+  assert.throws(() => parseOfferEnquiry({ ...enquiry, preferredStart: " " }));
 });
 
 test("renewal reminders follow the notice deadline and change with a revised date", () => {

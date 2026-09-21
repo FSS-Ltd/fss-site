@@ -1,119 +1,74 @@
-.grid {
+.workspace {
   display: grid;
   gap: 24px;
-  margin-top: 32px;
 }
-.card {
-  background: var(--surface-1);
-  border: 1px solid var(--portal-line);
-  border-radius: 24px;
-  box-shadow: 0 12px 40px rgba(7, 24, 46, 0.05);
-  padding: clamp(24px, 5vw, 38px);
+
+.grid,
+.enquiryGrid {
+  display: grid;
+  gap: 16px;
 }
-.card h2 {
-  font-size: clamp(1.35rem, 3vw, 1.75rem);
-  letter-spacing: -0.035em;
-  margin: 8px 0 12px;
-}
-.card h3 {
-  font-size: 0.875rem;
-  margin: 24px 0 8px;
-}
-.card ul {
-  line-height: 1.7;
-  padding-left: 20px;
-}
+
 .price {
   color: var(--portal-muted);
   font-size: 0.8125rem;
   font-weight: 600;
   margin: 0;
 }
+
 .outcome {
   font-size: 1.05rem;
   line-height: 1.6;
   margin: 0;
 }
-.audience,
-.support,
-.note,
-.empty {
-  color: var(--portal-muted);
+
+.listSection h3,
+.details h2 {
   font-size: 0.875rem;
-  line-height: 1.65;
+  margin: 24px 0 8px;
 }
+
+.listSection ul {
+  line-height: 1.7;
+  margin: 0;
+  padding-left: 20px;
+}
+
 .support {
   background: var(--surface-2);
   border-radius: 14px;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  margin: 0;
   padding: 14px 16px;
 }
-.form {
-  border-top: 1px solid var(--portal-line);
-  margin-top: 26px;
-  padding-top: 22px;
-}
-.form label {
-  display: grid;
+
+.contact,
+.note {
+  align-items: center;
+  color: var(--portal-muted);
+  display: flex;
   font-size: 0.875rem;
-  font-weight: 600;
   gap: 8px;
+  line-height: 1.65;
+  margin: 0;
 }
-.form textarea {
-  background: var(--surface-1);
-  border: 1px solid var(--portal-line);
-  border-radius: 12px;
-  color: inherit;
-  min-height: 110px;
-  padding: 12px;
-  resize: vertical;
-}
+
+.form,
 .details {
-  border: 0;
   display: grid;
-  gap: 12px;
-  margin: 18px 0 0;
-  padding: 0;
+  gap: 16px;
 }
-.details legend {
-  font-size: 0.875rem;
-  font-weight: 650;
-  margin-bottom: 10px;
+
+.details {
+  border-top: 1px solid var(--portal-line);
+  margin-top: 8px;
+  padding-top: 8px;
 }
-.details input {
-  background: var(--surface-1);
-  border: 1px solid var(--portal-line);
-  border-radius: 12px;
-  color: inherit;
-  min-height: 44px;
-  padding: 10px 12px;
-}
-.form button {
-  background: var(--portal-ink);
-  border: 0;
-  border-radius: 999px;
-  color: var(--surface-1);
-  cursor: pointer;
-  font: inherit;
-  font-weight: 600;
-  margin-top: 14px;
-  min-height: 44px;
-  padding: 10px 18px;
-}
-.form button:disabled {
-  cursor: wait;
-  opacity: 0.6;
-}
-.form :is(button, input, textarea):focus-visible,
-.card summary:focus-visible {
-  outline: 3px solid var(--portal-accent);
-  outline-offset: 3px;
-}
-.message {
-  font-size: 0.875rem;
-  min-height: 1.5em;
-}
+
 @media (min-width: 800px) {
-  .grid {
+  .grid,
+  .enquiryGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

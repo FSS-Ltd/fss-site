@@ -46,3 +46,11 @@ export type BillingInvoice = {
     | null;
   mandateState: "pending" | "active" | "inactive" | null;
 };
+
+export type BillingInvoiceDetail = BillingInvoice & {
+  issuedAt: string | null;
+  lines: ReadonlyArray<{
+    amountPence: string;
+    description: string | null;
+  }>;
+};
