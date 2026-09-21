@@ -395,6 +395,30 @@ const phaseFiveMobileScenarios = [
   ],
 ] as const;
 
+const phaseSixDesktopScenarios = [
+  ["F02", "studio-clients", "Your clients", "f02-studio-clients-desktop.png"],
+  ["F03", "studio-client-detail", "Northstar Studio", "f03-studio-client-detail-desktop.png"],
+  ["F04", "studio-client-create", "Add a client", "f04-studio-client-create-desktop.png"],
+  ["F27", "studio-billing-operations", "Billing operations", "f27-studio-billing-operations-desktop.png"],
+  ["F28", "studio-portal-access", "People and portal access", "f28-studio-portal-access-desktop.png"],
+  ["F29", "studio-notification-delivery", "Notification delivery", "f29-studio-notification-delivery-desktop.png"],
+  ["F30", "studio-settings", "Studio settings", "f30-studio-settings-desktop.png"],
+  ["F31", "studio-project-edit", "Edit project", "f31-studio-project-edit-desktop.png"],
+  ["S06", "studio-journey-blocked", "Two things need your attention", "s06-studio-journey-blocked-desktop.png"],
+] as const;
+
+const phaseSixMobileScenarios = [
+  ["F02", "studio-clients", "Your clients", "f02-studio-clients-mobile.png"],
+  ["F03", "studio-client-detail", "Northstar Studio", "f03-studio-client-detail-mobile.png"],
+  ["F04", "studio-client-create", "Add a client", "f04-studio-client-create-mobile.png"],
+  ["F27", "studio-billing-operations", "Billing operations", "f27-studio-billing-operations-mobile.png"],
+  ["F28", "studio-portal-access", "People and portal access", "f28-studio-portal-access-mobile.png"],
+  ["F29", "studio-notification-delivery", "Notification delivery", "f29-studio-notification-delivery-mobile.png"],
+  ["F30", "studio-settings", "Studio settings", "f30-studio-settings-mobile.png"],
+  ["F31", "studio-project-edit", "Edit project", "f31-studio-project-edit-mobile.png"],
+  ["S06", "studio-journey-blocked", "Two things need your attention", "s06-studio-journey-blocked-mobile.png"],
+] as const;
+
 test.describe("FSS Studio desktop visuals", () => {
   test.beforeEach(async ({ page }, testInfo) => {
     test.skip(
@@ -537,6 +561,15 @@ test.describe("FSS Studio desktop visuals", () => {
       await expect(page).toHaveScreenshot(screenshot);
     });
   }
+
+  for (const [coverageId, scenario, heading, screenshot] of phaseSixDesktopScenarios) {
+    test(`Phase 6 ${coverageId} desktop matches the Studio workspace`, async ({
+      page,
+    }) => {
+      await openScenario(page, scenario, heading);
+      await expect(page).toHaveScreenshot(screenshot);
+    });
+  }
 });
 
 test.describe("FSS Studio mobile visuals", () => {
@@ -613,6 +646,16 @@ test.describe("FSS Studio mobile visuals", () => {
       page,
     }) => {
       await openPhaseFiveScenario(page, scenario, heading);
+      await expect(page).toHaveScreenshot(screenshot);
+    });
+  }
+
+  for (const [coverageId, scenario, heading, screenshot] of phaseSixMobileScenarios) {
+    test(`Phase 6 ${coverageId} mobile matches the Studio workspace`, async ({
+      page,
+    }) => {
+      await openScenario(page, scenario, heading);
+      await expect(page.locator("summary", { hasText: "More" })).toBeVisible();
       await expect(page).toHaveScreenshot(screenshot);
     });
   }

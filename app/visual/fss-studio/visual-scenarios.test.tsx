@@ -98,3 +98,19 @@ test("registers each Phase 5 client support visual fixture", () => {
     assert.ok(resolveVisualScenario(name, true, "test"));
   }
 });
+
+test("registers each Phase 6 Studio workspace visual fixture", () => {
+  for (const name of [
+    "studio-clients",
+    "studio-client-detail",
+    "studio-client-create",
+    "studio-billing-operations",
+    "studio-portal-access",
+    "studio-notification-delivery",
+    "studio-settings",
+    "studio-project-edit",
+    "studio-journey-blocked",
+  ]) {
+    assert.ok(resolveVisualScenario(name, true, "test"));
+  }
+});

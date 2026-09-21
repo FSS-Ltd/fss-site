@@ -57,6 +57,17 @@ import {
   ClientUnavailableScenario,
   ClientViewerAccessScenario,
 } from "./client-support-visual-fixtures";
+import {
+  StudioBillingOperationsScenario,
+  StudioClientCreateScenario,
+  StudioClientDetailScenario,
+  StudioClientsScenario,
+  StudioJourneyBlockedScenario,
+  StudioNotificationDeliveryScenario,
+  StudioPortalAccessScenario,
+  StudioProjectEditScenario,
+  StudioSettingsScenario,
+} from "./studio-workspace-visual-fixtures";
 
 export type VisualScenarioName =
   | "client-login"
@@ -108,7 +119,16 @@ export type VisualScenarioName =
   | "studio-welcome-recovery"
   | "studio-welcome-templates"
   | "studio-checklist-editor"
-  | "studio-checklist-task-editor";
+  | "studio-checklist-task-editor"
+  | "studio-clients"
+  | "studio-client-detail"
+  | "studio-client-create"
+  | "studio-billing-operations"
+  | "studio-portal-access"
+  | "studio-notification-delivery"
+  | "studio-settings"
+  | "studio-project-edit"
+  | "studio-journey-blocked";
 
 export type VisualScenario = Readonly<{
   name: VisualScenarioName;
@@ -487,6 +507,42 @@ const scenarios: Record<VisualScenarioName, VisualScenario> = {
         title="Create a useful next step"
       />
     ),
+  },
+  "studio-clients": {
+    name: "studio-clients",
+    content: <StudioClientsScenario />,
+  },
+  "studio-client-detail": {
+    name: "studio-client-detail",
+    content: <StudioClientDetailScenario />,
+  },
+  "studio-client-create": {
+    name: "studio-client-create",
+    content: <StudioClientCreateScenario />,
+  },
+  "studio-billing-operations": {
+    name: "studio-billing-operations",
+    content: <StudioBillingOperationsScenario />,
+  },
+  "studio-portal-access": {
+    name: "studio-portal-access",
+    content: <StudioPortalAccessScenario />,
+  },
+  "studio-notification-delivery": {
+    name: "studio-notification-delivery",
+    content: <StudioNotificationDeliveryScenario />,
+  },
+  "studio-settings": {
+    name: "studio-settings",
+    content: <StudioSettingsScenario />,
+  },
+  "studio-project-edit": {
+    name: "studio-project-edit",
+    content: <StudioProjectEditScenario />,
+  },
+  "studio-journey-blocked": {
+    name: "studio-journey-blocked",
+    content: <StudioJourneyBlockedScenario />,
   },
 };
 

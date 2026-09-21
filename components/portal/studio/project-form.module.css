@@ -1,0 +1,47 @@
+.form,
+.sections,
+.publicPreview,
+.actions {
+  display: grid;
+}
+
+.form {
+  gap: 20px;
+}
+
+.sections {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.publicPreview {
+  gap: 8px;
+}
+
+.publicPreview h3,
+.publicPreview p {
+  margin: 0;
+}
+
+.publicPreview h3 {
+  color: var(--portal-ink, #0a1a2e);
+  font-size: 1rem;
+}
+
+.publicPreview p {
+  color: var(--portal-muted, #46566c);
+  line-height: 1.55;
+}
+
+.actions {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+}
+
+@media (max-width: 760px) {
+  .sections,
+  .actions {
+    grid-template-columns: 1fr;
+  }
+}

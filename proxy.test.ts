@@ -52,6 +52,23 @@ test("rewrites prefix-free portal UI paths to their internal routes", async () =
   );
 });
 
+test("rewrites a direct Studio admin path to the protected portal route", async () => {
+  const request = new NextRequest(
+    "https://preview.example.test/admin/clients?query=north",
+  );
+
+  const response = await proxyWithPortalResponse(request, unusedEvent);
+
+  assert.equal(
+    response?.headers.get("x-middleware-rewrite"),
+    "https://preview.example.test/portal/admin/clients?query=north",
+  );
+});
+
+test("matches direct Studio admin paths before host-specific routing", () => {
+  assert.ok(portalProxy.config.matcher.includes("/admin/:path*"));
+});
+
 test("redirects legacy portal paths while preserving search parameters", async () => {
   const request = new NextRequest(
     "https://portal.faithfulsoftware.dev/portal/login?invite=token",

@@ -1,0 +1,110 @@
+.page,
+.register,
+.list,
+.row,
+.rowSummary,
+.rowMeta,
+.pagination,
+.search {
+  display: grid;
+}
+
+.page {
+  width: min(100%, 1120px);
+  gap: 24px;
+  margin-inline: auto;
+}
+
+.register,
+.list {
+  gap: 16px;
+}
+
+.search {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 12px;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 20px;
+}
+
+.rowSummary,
+.rowMeta {
+  gap: 8px;
+}
+
+.rowSummary h2,
+.rowSummary p,
+.rowMeta dt,
+.rowMeta dd,
+.empty {
+  margin: 0;
+}
+
+.rowSummary h2 {
+  color: var(--portal-ink, #0a1a2e);
+  font-size: 1.0625rem;
+  letter-spacing: -0.02em;
+}
+
+.rowSummary p,
+.rowMeta dt,
+.empty {
+  color: var(--portal-muted, #46566c);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.rowMeta {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  min-width: min(100%, 360px);
+  margin: 0;
+}
+
+.rowMeta dd {
+  color: var(--portal-ink, #0a1a2e);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.rowAction {
+  width: fit-content;
+  margin-top: 4px;
+}
+
+.pagination {
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+}
+
+@media (max-width: 760px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+
+  .rowMeta {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .search,
+  .rowMeta {
+    grid-template-columns: 1fr;
+  }
+
+  .search button {
+    width: 100%;
+  }
+}
