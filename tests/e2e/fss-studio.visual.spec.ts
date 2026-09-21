@@ -683,6 +683,44 @@ const phaseSevenMobileScenarios = [
   ],
 ] as const;
 
+const phaseEightDesktopScenarios = [
+  ["C14", "client-agreement-list", "Your agreements", "c14-client-agreements-desktop.png"],
+  ["C15", "client-agreement-detail", "Website & booking experience", "c15-client-agreement-detail-desktop.png"],
+  ["C16", "client-agreement-signing", "Review and sign", "c16-client-agreement-signing-desktop.png"],
+  ["C30", "client-agreement-signed", "Your signed agreement", "c30-client-agreement-signed-desktop.png"],
+  ["F09", "studio-agreement-list", "Agreements", "f09-studio-agreements-desktop.png"],
+  ["F10", "studio-agreement-builder", "Create an agreement", "f10-studio-agreement-builder-desktop.png"],
+  ["F11", "studio-agreement-builder-scope", "Create an agreement", "f11-studio-agreement-scope-desktop.png"],
+  ["F12", "studio-agreement-builder-fees", "Create an agreement", "f12-studio-agreement-fees-desktop.png"],
+  ["F13", "studio-agreement-builder-people", "Create an agreement", "f13-studio-agreement-people-desktop.png"],
+  ["F14", "studio-agreement-builder-document", "Create an agreement", "f14-studio-agreement-document-desktop.png"],
+  ["F15", "studio-agreement-builder-review", "Create an agreement", "f15-studio-agreement-review-desktop.png"],
+  ["F16", "studio-agreement-no-engagement", "Create an agreement", "f16-studio-agreement-link-desktop.png"],
+  ["F17", "studio-agreement-signed", "Signed and recorded", "f17-studio-agreement-signed-desktop.png"],
+  ["F32", "studio-engagement-provenance", "Create an engagement", "f32-studio-engagement-provenance-desktop.png"],
+  ["F34", "studio-signature-evidence", "Record signed evidence", "f34-studio-signature-evidence-desktop.png"],
+  ["F37", "studio-signing-status", "Signing status", "f37-studio-signing-status-desktop.png"],
+] as const;
+
+const phaseEightMobileScenarios = [
+  ["C14", "client-agreement-list", "Your agreements", "c14-client-agreements-mobile.png"],
+  ["C15", "client-agreement-detail", "Website & booking experience", "c15-client-agreement-detail-mobile.png"],
+  ["C16", "client-agreement-signing", "Review and sign", "c16-client-agreement-signing-mobile.png"],
+  ["C30", "client-agreement-signed", "Your signed agreement", "c30-client-agreement-signed-mobile.png"],
+  ["F09", "studio-agreement-list", "Agreements", "f09-studio-agreements-mobile.png"],
+  ["F10", "studio-agreement-builder", "Create an agreement", "f10-studio-agreement-builder-mobile.png"],
+  ["F11", "studio-agreement-builder-scope", "Create an agreement", "f11-studio-agreement-scope-mobile.png"],
+  ["F12", "studio-agreement-builder-fees", "Create an agreement", "f12-studio-agreement-fees-mobile.png"],
+  ["F13", "studio-agreement-builder-people", "Create an agreement", "f13-studio-agreement-people-mobile.png"],
+  ["F14", "studio-agreement-builder-document", "Create an agreement", "f14-studio-agreement-document-mobile.png"],
+  ["F15", "studio-agreement-builder-review", "Create an agreement", "f15-studio-agreement-review-mobile.png"],
+  ["F16", "studio-agreement-no-engagement", "Create an agreement", "f16-studio-agreement-link-mobile.png"],
+  ["F17", "studio-agreement-signed", "Signed and recorded", "f17-studio-agreement-signed-mobile.png"],
+  ["F32", "studio-engagement-provenance", "Create an engagement", "f32-studio-engagement-provenance-mobile.png"],
+  ["F34", "studio-signature-evidence", "Record signed evidence", "f34-studio-signature-evidence-mobile.png"],
+  ["F37", "studio-signing-status", "Signing status", "f37-studio-signing-status-mobile.png"],
+] as const;
+
 test.describe("FSS Studio desktop visuals", () => {
   test.beforeEach(async ({ page }, testInfo) => {
     test.skip(
@@ -737,29 +775,6 @@ test.describe("FSS Studio desktop visuals", () => {
     );
   });
 
-  test("client agreement list desktop matches C14", async ({ page }) => {
-    await openScenario(page, "client-agreement-list", "Your agreements");
-    await expect(page).toHaveScreenshot("c14-client-agreements-desktop.png");
-  });
-
-  test("client agreement detail desktop matches C15", async ({ page }) => {
-    await openScenario(
-      page,
-      "client-agreement-detail",
-      "Website & booking experience",
-    );
-    await expect(page).toHaveScreenshot(
-      "c15-client-agreement-detail-desktop.png",
-    );
-  });
-
-  test("client agreement signing desktop matches C16", async ({ page }) => {
-    await openScenario(page, "client-agreement-signing", "Review and sign");
-    await expect(page).toHaveScreenshot(
-      "c16-client-agreement-signing-desktop.png",
-    );
-  });
-
   test("Studio overview desktop matches F01", async ({ page }) => {
     await openScenario(page, "studio-overview", "Your studio, in focus.");
     await expect(page).toHaveScreenshot("f01-studio-overview-desktop.png");
@@ -779,24 +794,14 @@ test.describe("FSS Studio desktop visuals", () => {
     );
   });
 
-  test("Studio agreement register desktop matches F09", async ({ page }) => {
-    await openScenario(page, "studio-agreement-list", "Agreements");
-    await expect(page).toHaveScreenshot("f09-studio-agreements-desktop.png");
-  });
-
-  test("Studio agreement builder desktop matches F10", async ({ page }) => {
-    await openScenario(page, "studio-agreement-builder", "Create an agreement");
-    await expect(page).toHaveScreenshot(
-      "f10-studio-agreement-builder-desktop.png",
-    );
-  });
-
-  test("Studio signed agreement desktop matches F17", async ({ page }) => {
-    await openScenario(page, "studio-agreement-signed", "Signed and recorded");
-    await expect(page).toHaveScreenshot(
-      "f17-studio-agreement-signed-desktop.png",
-    );
-  });
+  for (const [coverageId, scenario, heading, screenshot] of phaseEightDesktopScenarios) {
+    test(`Phase 8 ${coverageId} desktop matches the completed agreement journey`, async ({
+      page,
+    }) => {
+      await openScenario(page, scenario, heading);
+      await expect(page).toHaveScreenshot(screenshot);
+    });
+  }
 
   for (const [
     coverageId,
@@ -904,6 +909,15 @@ test.describe("FSS Studio mobile visuals", () => {
     await openScenario(page, "studio-overview", "Your studio, in focus.");
     await expect(page).toHaveScreenshot("m07-studio-overview-mobile.png");
   });
+
+  for (const [coverageId, scenario, heading, screenshot] of phaseEightMobileScenarios) {
+    test(`Phase 8 ${coverageId} mobile matches the completed agreement journey`, async ({
+      page,
+    }) => {
+      await openScenario(page, scenario, heading);
+      await expect(page).toHaveScreenshot(screenshot);
+    });
+  }
 
   for (const [
     coverageId,

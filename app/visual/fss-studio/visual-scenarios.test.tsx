@@ -53,6 +53,23 @@ test("registers each Phase 3 agreement visual fixture", () => {
     assert.ok(resolveVisualScenario(name, true, "test"));
 });
 
+test("registers every completed agreement state for Phase 8 visual evidence", () => {
+  for (const name of [
+    "client-agreement-signed",
+    "studio-agreement-builder-scope",
+    "studio-agreement-builder-fees",
+    "studio-agreement-builder-people",
+    "studio-agreement-builder-document",
+    "studio-agreement-builder-review",
+    "studio-agreement-no-engagement",
+    "studio-engagement-provenance",
+    "studio-signature-evidence",
+    "studio-signing-status",
+  ]) {
+    assert.ok(resolveVisualScenario(name, true, "test"));
+  }
+});
+
 test("registers each Phase 4 onboarding and welcome visual fixture", () => {
   for (const name of [
     "client-getting-started",
