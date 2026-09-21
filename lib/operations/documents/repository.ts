@@ -48,11 +48,6 @@ export async function listProjectDocuments(
           on p.organisation_id = d.organisation_id and p.id = d.project_id
         where d.organisation_id = ${context.organisationId}
           and d.project_id = ${projectId}
-          and p.visibility = 'client'
-          and d.visibility = 'client'
-          and d.scan_status = 'cleared'
-          and d.revoked_at is null
-          and (d.expires_at is null or d.expires_at > clock_timestamp())
         order by d.created_at desc, d.id
         limit 100
       `;
@@ -109,11 +104,6 @@ export async function getPortalDocumentDetail(
           on p.organisation_id = d.organisation_id and p.id = d.project_id
         where d.organisation_id = ${context.organisationId}
           and d.id = ${documentId}
-          and p.visibility = 'client'
-          and d.visibility = 'client'
-          and d.scan_status = 'cleared'
-          and d.revoked_at is null
-          and (d.expires_at is null or d.expires_at > clock_timestamp())
       `;
       return row?.document ?? null;
     },
@@ -152,11 +142,6 @@ export async function getAuthorisedDocumentDownload(
         where d.organisation_id = ${context.organisationId}
           and d.id = ${documentId}
           and d.kind = 'file'
-          and p.visibility = 'client'
-          and d.visibility = 'client'
-          and d.scan_status = 'cleared'
-          and d.revoked_at is null
-          and (d.expires_at is null or d.expires_at > clock_timestamp())
       `;
       return row ?? null;
     },
