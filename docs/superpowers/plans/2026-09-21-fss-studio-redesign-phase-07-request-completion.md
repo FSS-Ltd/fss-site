@@ -48,7 +48,7 @@
 ```tsx
 assert.doesNotMatch(detailHtml, /Accept v1/)
 assert.match(reviewHtml, /Accept v1/)
-assert.match(changesHtml, /What needs changing\?/) 
+assert.match(changesHtml, /What needs changing\?/)
 assert.match(conflictHtml, /Review the latest version/)
 ```
 
@@ -139,7 +139,7 @@ git commit -m "feat: complete request recovery states"
 ```tsx
 assert.match(scopeHtml, /Scope decision/)
 assert.match(scopeHtml, /Scope explanation/)
-assert.match(moveHtml, /Nothing has moved yet/) 
+assert.match(moveHtml, /Nothing has moved yet/)
 assert.match(moveHtml, /Open request workspace/)
 ```
 
@@ -188,7 +188,7 @@ git commit -m "feat: complete Studio request workspace states"
 
 ```tsx
 assert.match(html, /Assessment pending/)
-assert.doesNotMatch(html, /Included scope/) 
+assert.doesNotMatch(html, /Included scope/)
 assert.rejects(() => createStaffRequest(..., { projectId: "not-a-uuid" }, ...))
 ```
 
@@ -230,7 +230,7 @@ git commit -m "feat: add Studio request creation"
 
 ```ts
 assert.match(email.html, /Your update is ready\./)
-assert.match(email.text, /Review v3/) 
+assert.match(email.text, /Review v3/)
 assert.match(email.html, /\/portal\/requests\//)
 assert.doesNotMatch(JSON.stringify(email), /attachments/i)
 ```
