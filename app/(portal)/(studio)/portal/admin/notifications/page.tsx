@@ -6,6 +6,7 @@ import { NotificationDelivery } from "@/components/portal/studio/notification-de
 import { Notice, PageHeader } from "@/components/portal/ui";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
+import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import { listStudioNotifications } from "@/lib/operations/studio/operations-queues";
@@ -34,10 +35,12 @@ export default async function AdminNotificationsPage({
   const params = await searchParams;
   const result = await (async () => {
     const db = getOperationsDb();
-    const admin = await requireFssAdmin(db, identity, randomUUID());
+    const admin = await requireFssAdmin(getPortalDb(), identity, randomUUID());
     if (process.env.OPERATIONS_REQUEST_EMAILS_ENABLED !== "true")
       return { available: false as const };
-    const rawStatus = Array.isArray(params.status) ? "all" : (params.status ?? "all");
+    const rawStatus = Array.isArray(params.status)
+      ? "all"
+      : (params.status ?? "all");
     const selectedStatus = statusSchema.parse(rawStatus);
     return {
       available: true as const,

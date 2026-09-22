@@ -4,6 +4,7 @@ import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import { StudioSettings } from "@/components/portal/studio/studio-settings";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
+import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import { loadStudioSettings } from "@/lib/operations/studio/settings";
@@ -17,7 +18,7 @@ export default async function AdminSettingsPage(): Promise<React.JSX.Element> {
   if (!identity) return <PortalUnavailable />;
   const settings = await (async () => {
     const db = getOperationsDb();
-    const admin = await requireFssAdmin(db, identity, randomUUID());
+    const admin = await requireFssAdmin(getPortalDb(), identity, randomUUID());
     return loadStudioSettings(db, admin);
   })().catch(() => null);
   if (!settings) return <PortalUnavailable />;

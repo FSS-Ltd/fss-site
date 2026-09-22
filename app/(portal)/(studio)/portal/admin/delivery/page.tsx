@@ -6,6 +6,7 @@ import { PageHeader, PortalActionLink } from "@/components/portal/ui";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
+import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import {
   listStaffDeliveryBoard,
@@ -55,7 +56,7 @@ export default async function AdminDeliveryPage({
   try {
     const page = parseWorkspacePage(params.page);
     const db = getOperationsDb();
-    const admin = await requireFssAdmin(db, identity, randomUUID());
+    const admin = await requireFssAdmin(getPortalDb(), identity, randomUUID());
     [requests, clients] = await Promise.all([
       listStaffDeliveryBoard(db, admin, { ...filters, page }),
       listStaffDeliveryClients(db, admin),

@@ -5,6 +5,7 @@ import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import { StudioProjectForm } from "@/components/portal/studio/project-form";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
+import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import { loadStaffProjectForEdit } from "@/lib/operations/projects/staff-service";
@@ -25,7 +26,7 @@ export default async function AdminProjectEditPage({
   let project: Awaited<ReturnType<typeof loadStaffProjectForEdit>>;
   try {
     const db = getOperationsDb();
-    const admin = await requireFssAdmin(db, identity, randomUUID());
+    const admin = await requireFssAdmin(getPortalDb(), identity, randomUUID());
     project = await loadStaffProjectForEdit(db, admin, projectId.data);
   } catch {
     return <PortalUnavailable />;

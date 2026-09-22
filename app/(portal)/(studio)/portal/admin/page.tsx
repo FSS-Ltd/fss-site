@@ -4,6 +4,7 @@ import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import { StudioOverview } from "@/components/portal/overview/studio-overview";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
+import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { loadStudioOverview } from "@/lib/operations/overview/studio-overview";
@@ -18,7 +19,7 @@ export default async function FssStudioPage(): Promise<React.JSX.Element> {
   let overview: Awaited<ReturnType<typeof loadStudioOverview>>;
   try {
     const db = getOperationsDb();
-    const admin = await requireFssAdmin(db, identity, randomUUID());
+    const admin = await requireFssAdmin(getPortalDb(), identity, randomUUID());
     overview = await loadStudioOverview(db, admin);
   } catch {
     // Keep the existing non-disclosing portal response for non-staff users.

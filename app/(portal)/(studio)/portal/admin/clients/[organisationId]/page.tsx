@@ -5,6 +5,7 @@ import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import { StudioClientDetail } from "@/components/portal/studio/client-detail";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
+import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import { loadStudioClient } from "@/lib/operations/studio/clients";
@@ -25,7 +26,7 @@ export default async function AdminClientContextPage({
   const db = getOperationsDb();
   let client;
   try {
-    const admin = await requireFssAdmin(db, identity, randomUUID());
+    const admin = await requireFssAdmin(getPortalDb(), identity, randomUUID());
     client = await loadStudioClient(db, admin, parsed.data);
   } catch {
     return <PortalUnavailable />;

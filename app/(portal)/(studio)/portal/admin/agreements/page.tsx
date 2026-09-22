@@ -5,6 +5,7 @@ import { StaffAgreementOverview } from "@/components/portal/agreements/staff-agr
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
+import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import { listStaffAgreementOverview } from "@/lib/operations/agreements/repository";
 import { listStaffSigningReadiness } from "@/lib/operations/agreements/signing-repository";
@@ -19,7 +20,7 @@ export default async function AdminAgreementsPage(): Promise<React.JSX.Element> 
   let agreements, signingReadiness;
   try {
     const db = getOperationsDb();
-    const admin = await requireFssAdmin(db, identity, randomUUID());
+    const admin = await requireFssAdmin(getPortalDb(), identity, randomUUID());
     [agreements, signingReadiness] = await Promise.all([
       listStaffAgreementOverview(db, admin),
       listStaffSigningReadiness(db, admin),

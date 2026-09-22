@@ -5,6 +5,7 @@ import { BillingOperations } from "@/components/portal/studio/billing-operations
 import { Notice, PageHeader } from "@/components/portal/ui";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
+import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { readBillingConfiguration } from "@/lib/operations/billing/configuration";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
@@ -33,7 +34,7 @@ export default async function AdminBillingPage({
   const params = await searchParams;
   const result = await (async () => {
     const db = getOperationsDb();
-    const admin = await requireFssAdmin(db, identity, randomUUID());
+    const admin = await requireFssAdmin(getPortalDb(), identity, randomUUID());
     if (!billingAvailable()) return { available: false as const };
     const organisationId = Array.isArray(params.organisationId)
       ? undefined
@@ -41,8 +42,8 @@ export default async function AdminBillingPage({
     return {
       available: true as const,
       data: await listStudioBillingOperations(db, admin, {
-      organisationId,
-      page: parseWorkspacePage(params.page),
+        organisationId,
+        page: parseWorkspacePage(params.page),
       }),
     };
   })().catch(() => null);

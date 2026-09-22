@@ -10,6 +10,7 @@ import {
 } from "@/components/portal/requests/presentation";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
+import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import { listStaffClientRequests } from "@/lib/operations/requests/staff-client-repository";
@@ -34,7 +35,7 @@ export default async function AdminClientRequestsPage({
   let requests;
   try {
     const db = getOperationsDb();
-    const admin = await requireFssAdmin(db, identity, randomUUID());
+    const admin = await requireFssAdmin(getPortalDb(), identity, randomUUID());
     requests = await listStaffClientRequests(db, admin, parsed.data, {
       page: parseWorkspacePage((await searchParams).page),
     });

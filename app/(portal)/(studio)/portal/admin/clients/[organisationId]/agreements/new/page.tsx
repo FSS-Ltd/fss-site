@@ -8,6 +8,7 @@ import styles from "@/components/portal/agreements/agreements.module.css";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
+import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import { loadStaffAgreementBuilderDraft } from "@/lib/operations/agreements/builder-draft-service";
@@ -28,7 +29,10 @@ export default async function NewStaffAgreementPage({
   searchParams,
 }: {
   params: Promise<{ organisationId: string }>;
-  searchParams: Promise<{ draftId?: string | string[]; step?: string | string[] }>;
+  searchParams: Promise<{
+    draftId?: string | string[];
+    step?: string | string[];
+  }>;
 }): Promise<React.JSX.Element> {
   if (!operationsEnabled()) notFound();
   if (!portalAuthConfigured()) return <PortalUnavailable />;
@@ -43,7 +47,7 @@ export default async function NewStaffAgreementPage({
   let initialDraft;
   try {
     const db = getOperationsDb();
-    const admin = await requireFssAdmin(db, identity, randomUUID());
+    const admin = await requireFssAdmin(getPortalDb(), identity, randomUUID());
     register = await listStaffAgreementRegister(db, admin, organisationId.data);
     initialDraft = draftId
       ? await loadStaffAgreementBuilderDraft(
