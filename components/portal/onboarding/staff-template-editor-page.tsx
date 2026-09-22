@@ -5,6 +5,7 @@ import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
+import { getPortalDb } from "@/lib/operations/db/portal-client";
 import {
   getOperationsDb,
   operationsEnabled,
@@ -60,7 +61,7 @@ export async function StaffTemplateEditorPage({
   let admin: FssAdminContext;
   try {
     db = getOperationsDb();
-    admin = await requireFssAdmin(db, identity, randomUUID());
+    admin = await requireFssAdmin(getPortalDb(), identity, randomUUID());
   } catch {
     return <PortalUnavailable />;
   }

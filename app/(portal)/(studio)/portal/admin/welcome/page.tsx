@@ -7,6 +7,7 @@ import { Notice, PageHeader } from "@/components/portal/ui";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
+import { getPortalDb } from "@/lib/operations/db/portal-client";
 import {
   getOperationsDb,
   operationsEnabled,
@@ -45,7 +46,7 @@ export default async function AdminWelcomeJourneysPage({
   let admin: FssAdminContext;
   try {
     db = getOperationsDb();
-    admin = await requireFssAdmin(db, identity, randomUUID());
+    admin = await requireFssAdmin(getPortalDb(), identity, randomUUID());
   } catch {
     return <PortalUnavailable />;
   }
@@ -53,10 +54,10 @@ export default async function AdminWelcomeJourneysPage({
   const blocked = !Array.isArray(params.state) && params.state === "blocked";
   if (blocked) {
     const recovery = await loadStaffJourneyRecovery(db, admin, {
-        billingConfigured: configurationEnabled(readBillingConfiguration),
-        senderConfigured: configurationEnabled(readOnboardingConfiguration),
-        signingConfigured: process.env.OPERATIONS_SIGNING_ENABLED === "true",
-      }).catch(() => undefined);
+      billingConfigured: configurationEnabled(readBillingConfiguration),
+      senderConfigured: configurationEnabled(readOnboardingConfiguration),
+      signingConfigured: process.env.OPERATIONS_SIGNING_ENABLED === "true",
+    }).catch(() => undefined);
     if (recovery === undefined) return <PortalUnavailable />;
     return <JourneyRecovery recovery={recovery} />;
   }

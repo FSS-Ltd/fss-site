@@ -7,6 +7,7 @@ import { isJourneyBuilderStage } from "@/components/portal/onboarding/staff-jour
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
+import { getPortalDb } from "@/lib/operations/db/portal-client";
 import {
   getOperationsDb,
   operationsEnabled,
@@ -54,7 +55,7 @@ export default async function StaffClientJourneyPage({
   let admin: FssAdminContext;
   try {
     db = getOperationsDb();
-    admin = await requireFssAdmin(db, identity, randomUUID());
+    admin = await requireFssAdmin(getPortalDb(), identity, randomUUID());
   } catch {
     return <PortalUnavailable />;
   }

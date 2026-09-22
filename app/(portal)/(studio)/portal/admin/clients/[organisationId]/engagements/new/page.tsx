@@ -8,6 +8,7 @@ import styles from "@/components/portal/agreements/agreements.module.css";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
+import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import { listStaffAgreementRegister } from "@/lib/operations/agreements/repository";
@@ -35,7 +36,7 @@ export default async function StaffEngagementPage({
   let register;
   try {
     const db = getOperationsDb();
-    const admin = await requireFssAdmin(db, identity, randomUUID());
+    const admin = await requireFssAdmin(getPortalDb(), identity, randomUUID());
     register = await listStaffAgreementRegister(db, admin, organisationId.data);
   } catch {
     return <PortalUnavailable />;

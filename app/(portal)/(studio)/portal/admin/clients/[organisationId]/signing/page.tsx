@@ -4,12 +4,18 @@ import { z } from "zod";
 import { SigningForm } from "@/components/operations/signing/signing-form";
 import { StaffSigningStatus } from "@/components/portal/agreements/staff-signing-status";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
-import { Notice, PageHeader, PortalActionLink, PortalCard } from "@/components/portal/ui";
+import {
+  Notice,
+  PageHeader,
+  PortalActionLink,
+  PortalCard,
+} from "@/components/portal/ui";
 import styles from "@/components/portal/agreements/agreements.module.css";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import type { FssAdminContext } from "@/lib/operations/auth/staff-types";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
+import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import { signingEnabled } from "@/lib/operations/agreements/signing-commands";
@@ -30,16 +36,17 @@ export default async function StaffClientSigningPage({
   if (!organisationId.success) notFound();
   let admin: FssAdminContext;
   try {
-    admin = await requireFssAdmin(getOperationsDb(), identity, randomUUID());
+    admin = await requireFssAdmin(getPortalDb(), identity, randomUUID());
   } catch {
     return <PortalUnavailable />;
   }
   if (!signingEnabled()) {
     return (
-      <section className={styles.page} aria-labelledby="signing-unavailable-heading">
-        <h1 id="signing-unavailable-heading">
-          Signing unavailable
-        </h1>
+      <section
+        className={styles.page}
+        aria-labelledby="signing-unavailable-heading"
+      >
+        <h1 id="signing-unavailable-heading">Signing unavailable</h1>
         <p className={styles.prose}>
           Signing delivery is not enabled. No documents or signature requests
           can be prepared from this workspace.
@@ -66,7 +73,11 @@ export default async function StaffClientSigningPage({
   return (
     <div className={styles.page}>
       <PageHeader
-        action={<PortalActionLink href={agreementHref}>Back to agreements</PortalActionLink>}
+        action={
+          <PortalActionLink href={agreementHref}>
+            Back to agreements
+          </PortalActionLink>
+        }
         breadcrumbs={[
           { label: "Agreements", href: agreementHref },
           { label: "Signing" },
@@ -78,7 +89,9 @@ export default async function StaffClientSigningPage({
       <Notice tone="info">
         <strong>Approval is not signature.</strong>
         <p>
-          The signing register records preparation, approval and retained signature evidence. It does not infer email delivery from a queued request.
+          The signing register records preparation, approval and retained
+          signature evidence. It does not infer email delivery from a queued
+          request.
         </p>
       </Notice>
       {approvals.length === 0 ? (
@@ -97,7 +110,10 @@ export default async function StaffClientSigningPage({
             (approval.status === "approved" &&
               approval.signatures.length < approval.requiredSigners.length);
           return (
-            <section className={styles.detail} key={`${approval.id}-${approval.status}`}>
+            <section
+              className={styles.detail}
+              key={`${approval.id}-${approval.status}`}
+            >
               <StaffSigningStatus
                 approval={approval}
                 downloadBase={`${apiRoot}/${approval.id}`}
@@ -105,7 +121,11 @@ export default async function StaffClientSigningPage({
               {signingOpen ? (
                 <PortalCard
                   description="These actions use the retained approval binding and never create a second signing request."
-                  title={approval.status === "prepared" ? "Approve signing" : "Signing controls"}
+                  title={
+                    approval.status === "prepared"
+                      ? "Approve signing"
+                      : "Signing controls"
+                  }
                 >
                   <SigningForm
                     approval={approval}

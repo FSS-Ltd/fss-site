@@ -7,6 +7,7 @@ import { StudioPagination } from "@/components/portal/workspace/studio-paginatio
 import { studioDateLabel } from "@/components/portal/workspace/studio-date";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
+import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import { parseWorkspacePage } from "@/lib/operations/workspaces/pagination";
@@ -26,7 +27,7 @@ export default async function AdminDocumentsPage({
   const params = await searchParams;
   const data = await (async () => {
     const db = getOperationsDb();
-    const admin = await requireFssAdmin(db, identity, randomUUID());
+    const admin = await requireFssAdmin(getPortalDb(), identity, randomUUID());
     const organisationId = Array.isArray(params.organisationId)
       ? undefined
       : params.organisationId;

@@ -10,6 +10,7 @@ import { studioDateLabel } from "@/components/portal/workspace/studio-date";
 import workspace from "@/components/portal/workspace/workspace.module.css";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
+import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import { parseWorkspacePage } from "@/lib/operations/workspaces/pagination";
@@ -39,7 +40,7 @@ export default async function AdminProjectsPage({
   const params = await searchParams;
   const data = await (async () => {
     const db = getOperationsDb();
-    const admin = await requireFssAdmin(db, identity, randomUUID());
+    const admin = await requireFssAdmin(getPortalDb(), identity, randomUUID());
     const page = parseWorkspacePage(params.page);
     const organisationId = Array.isArray(params.organisationId)
       ? undefined

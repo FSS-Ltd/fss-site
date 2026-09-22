@@ -5,12 +5,12 @@ import type { FssAdminContext } from "./staff-types";
 import { PortalAccessDenied, type VerifiedPortalIdentity } from "./types";
 
 export async function requireFssAdmin(
-  db: OperationsDb,
+  portalDb: OperationsDb,
   identity: VerifiedPortalIdentity | null,
   correlationId: string,
 ): Promise<FssAdminContext> {
   const membership = await getActiveStaffMembership(
-    db,
+    portalDb,
     identity,
     correlationId,
   );
