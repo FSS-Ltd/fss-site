@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { z } from "zod";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import { StaffJourneyWorkspace } from "@/components/portal/onboarding/staff-journey-workspace";
-import { isJourneyBuilderStage } from "@/components/portal/onboarding/staff-journey-builder";
+import { isJourneyBuilderStage } from "@/lib/operations/onboarding/builder-stage";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
 import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
