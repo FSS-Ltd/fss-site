@@ -7,7 +7,7 @@ import type {
 import type { OnboardingWorkspace } from "@/lib/operations/onboarding/workspace-types";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import { StaffJourneyBuilder } from "./staff-journey-builder";
-import type { JourneyBuilderStage } from "./staff-journey-builder";
+import type { JourneyBuilderStage } from "@/lib/operations/onboarding/builder-stage";
 import { StaffJourneyDetail } from "./staff-journey-detail";
 import { JourneyPreview } from "@/components/operations/onboarding/journey-preview";
 import { JourneyTimeline } from "@/components/operations/onboarding/journey-timeline";
