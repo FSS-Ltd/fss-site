@@ -152,6 +152,7 @@ export function PortalLoginForm({
         </form>
       ) : phase === "email" ? (
         <form
+          key="email"
           onSubmit={submitEmail}
           className={styles.form}
           aria-busy={status.kind === "pending"}
@@ -186,6 +187,7 @@ export function PortalLoginForm({
         </form>
       ) : (
         <form
+          key="code"
           onSubmit={submitCode}
           className={styles.form}
           aria-busy={status.kind === "pending"}
