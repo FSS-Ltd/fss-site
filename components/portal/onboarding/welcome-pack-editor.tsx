@@ -6,7 +6,7 @@ import {
   welcomePackContentSchema,
   type WelcomePack,
   type WelcomePackContent,
-} from "@/lib/operations/onboarding/welcome-packs";
+} from "@/lib/operations/onboarding/welcome-pack-contract";
 import {
   Notice,
   PortalButton,
