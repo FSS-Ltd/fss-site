@@ -12,6 +12,7 @@ import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import { parseWorkspacePage } from "@/lib/operations/workspaces/pagination";
 import { listStaffDocuments } from "@/lib/operations/workspaces/staff-repository";
+import { PortalActionLink } from "@/components/portal/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -50,14 +51,28 @@ export default async function AdminDocumentsPage({
           Document register
         </h1>
         <p className={styles.description}>
-          Visibility and scan state are shown before a document reaches a client
-          workspace.
+          This register lists project documents already linked to delivery work.
+          Agreement signing documents are prepared from each agreement&#39;s
+          signing workspace.
         </p>
       </header>
       {documents.items.length === 0 ? (
-        <p className={styles.rowCopy}>
-          No retained documents match this workspace view.
-        </p>
+        <div>
+          <p className={styles.rowCopy}>
+            No project documents match this workspace view.
+          </p>
+          <p className={styles.rowCopy}>
+            Prepare agreement documents in the client&#39;s agreement workspace.
+            Project documents appear here after they are attached to a project.
+          </p>
+          {organisationId ? (
+            <PortalActionLink
+              href={`/admin/clients/${encodeURIComponent(organisationId)}/signing`}
+            >
+              Open agreement signing documents
+            </PortalActionLink>
+          ) : null}
+        </div>
       ) : (
         <ul className={styles.rowList}>
           {documents.items.map((document) => (

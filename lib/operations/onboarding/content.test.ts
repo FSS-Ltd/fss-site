@@ -27,6 +27,8 @@ test("five page accessible welcome freezes recipient, sender and PDF without pro
     /newsletter|subscribe|in two hours|contract is signed/i,
   );
   assert.equal(p.snapshot.welcome.from, "service@example.test");
+  assert.match(p.snapshot.welcome.html, /FAITHFUL SOFTWARE SOLUTIONS/);
+  assert.match(p.snapshot.welcome.html, /background:#10233f/);
   p.snapshot.welcome.subject = "changed";
   assert.throws(() => validatePreparedWelcome(p));
 });

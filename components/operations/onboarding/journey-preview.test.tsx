@@ -68,6 +68,7 @@ test("welcome form identifies FSS sender and configured billing without editable
       agreements={[]}
       contacts={[]}
       billing={{ accountId: "acct_test", livemode: false }}
+      organisationName="Northstar Studio"
       pending={false}
       onPreview={() => {}}
     />,

@@ -33,6 +33,7 @@ test("renders the scoped draft selections before preparing a welcome", () => {
           name: "Alex Owner",
         },
       ]}
+      organisationId="55555555-5555-4555-8555-555555555555"
       templates={[
         {
           id: "13db3b9b-ad10-4641-a11e-42d8e1dd74c8",
@@ -40,6 +41,7 @@ test("renders the scoped draft selections before preparing a welcome", () => {
           version: 1,
         },
       ]}
+      welcomePacks={[]}
     />,
   );
 

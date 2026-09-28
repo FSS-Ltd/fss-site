@@ -377,10 +377,12 @@ export function StudioWelcomeBuilderScenario({
               name: "Alex Morgan",
             },
           ]}
+          organisationId="5c90c28c-f1a4-4e9e-a4eb-a833af085735"
           initialStage={stage}
           templates={[
             { id: templateVersionId, name: "Project welcome", version: 1 },
           ]}
+          welcomePacks={[]}
         />
       </main>
     </StudioFrame>

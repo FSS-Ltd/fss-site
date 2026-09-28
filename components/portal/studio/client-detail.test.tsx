@@ -40,10 +40,8 @@ test("renders a selected client hub with server-owned workspace destinations", (
   assert.match(html, /Northstar Studio/);
   assert.match(html, /Review client work/);
   assert.match(html, /People &amp; access/);
-  assert.match(html, /Open agreements/);
+  assert.match(html, /Create or review agreement/);
+  assert.match(html, /Open signing documents/);
   assert.match(html, /Open projects/);
-  assert.match(
-    html,
-    /organisationId=44444444-4444-4444-8444-444444444444/,
-  );
+  assert.match(html, /organisationId=44444444-4444-4444-8444-444444444444/);
 });

@@ -40,7 +40,8 @@ export type StudioClientDetail = Readonly<{
 }>;
 
 function parseSearch(value: unknown): string {
-  if (Array.isArray(value)) throw new Error("Only one client search is allowed.");
+  if (Array.isArray(value))
+    throw new Error("Only one client search is allowed.");
   return clientSearchSchema.parse(value ?? "");
 }
 
@@ -82,6 +83,9 @@ export async function listStudioClients(
             where a.organisation_id = o.id and a.status = 'draft'
           ) then 'Finish agreement'
           when not exists (
+            select 1 from operations.agreements a where a.organisation_id = o.id
+          ) then 'Set up an agreement'
+          when not exists (
             select 1 from operations.projects p where p.organisation_id = o.id
           ) then 'Plan first project'
           else 'Open client workspace'
@@ -96,8 +100,11 @@ export async function listStudioClients(
             where a.organisation_id = o.id and a.status = 'draft'
           ) then '/portal/admin/clients/' || o.id::text || '/agreements'
           when not exists (
+            select 1 from operations.agreements a where a.organisation_id = o.id
+          ) then '/portal/admin/clients/' || o.id::text || '/agreements/new'
+          when not exists (
             select 1 from operations.projects p where p.organisation_id = o.id
-          ) then '/portal/admin/projects?organisationId=' || o.id::text
+          ) then '/portal/admin/projects/new?organisationId=' || o.id::text
           else '/portal/admin/clients/' || o.id::text
         end as "nextActionHref"
       from operations.organisations o
@@ -160,6 +167,9 @@ export async function loadStudioClient(
             where a.organisation_id = o.id and a.status = 'draft'
           ) then 'Finish agreement'
           when not exists (
+            select 1 from operations.agreements a where a.organisation_id = o.id
+          ) then 'Set up an agreement'
+          when not exists (
             select 1 from operations.projects p where p.organisation_id = o.id
           ) then 'Plan first project'
           else 'Open client workspace'
@@ -174,8 +184,11 @@ export async function loadStudioClient(
             where a.organisation_id = o.id and a.status = 'draft'
           ) then '/portal/admin/clients/' || o.id::text || '/agreements'
           when not exists (
+            select 1 from operations.agreements a where a.organisation_id = o.id
+          ) then '/portal/admin/clients/' || o.id::text || '/agreements/new'
+          when not exists (
             select 1 from operations.projects p where p.organisation_id = o.id
-          ) then '/portal/admin/projects?organisationId=' || o.id::text
+          ) then '/portal/admin/projects/new?organisationId=' || o.id::text
           else '/portal/admin/clients/' || o.id::text
         end as "nextActionHref"
       from operations.organisations o

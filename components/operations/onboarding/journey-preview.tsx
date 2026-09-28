@@ -9,6 +9,7 @@ import type {
 import type { AgreementRecord } from "@/lib/operations/agreements/types";
 import type { SigningApproval } from "@/lib/operations/agreements/signing-types";
 import type { OnboardingWorkspaceJourneyDraft } from "@/lib/operations/onboarding/workspace-types";
+import type { WelcomePack } from "@/lib/operations/onboarding/welcome-packs";
 import { canStartOnboardingJourney } from "@/lib/operations/onboarding/readiness";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import { useJourneyCommand } from "./use-journey-command";
@@ -65,6 +66,7 @@ export interface JourneyPreviewProps {
   commandEndpoint?: string;
   signingDownloadBase?: string;
   workspaceDrafts?: readonly OnboardingWorkspaceJourneyDraft[];
+  welcomePacks?: readonly WelcomePack[];
 }
 export function JourneyPreview({
   organisationId,
@@ -77,6 +79,7 @@ export function JourneyPreview({
   commandEndpoint,
   signingDownloadBase = `/api/growth/operations/clients/${organisationId}/signing`,
   workspaceDrafts,
+  welcomePacks = [],
 }: JourneyPreviewProps): React.JSX.Element {
   const { submit, pending, message } = useJourneyCommand(
     organisationId,
@@ -120,9 +123,12 @@ export function JourneyPreview({
                 agreements={available}
                 contacts={contacts}
                 billing={billing}
+                commandEndpoint={commandEndpoint}
+                organisationName={organisationName}
                 pending={pending}
                 onPreview={prepare}
                 workspaceDrafts={workspaceDrafts}
+                welcomePacks={welcomePacks}
               />
             ) : available.length ? (
               <p>

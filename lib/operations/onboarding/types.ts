@@ -32,6 +32,10 @@ export interface WelcomeContent {
   outcomeSummary: string;
   senderName: string;
   organisationName: string;
+  clientOrganisationName?: string;
+  welcomePackVersionId?: string;
+  emailSubject?: string;
+  emailBody?: string;
   from: string;
   replyTo: string;
   pages: WelcomePage[];

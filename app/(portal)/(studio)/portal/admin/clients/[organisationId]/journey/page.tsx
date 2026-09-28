@@ -31,6 +31,10 @@ import { readBillingConfiguration } from "@/lib/operations/billing/configuration
 import styles from "@/components/portal/studio-client.module.css";
 import type { FssAdminContext } from "@/lib/operations/auth/staff-types";
 import type { OnboardingWorkspace } from "@/lib/operations/onboarding/workspace-types";
+import {
+  listStaffWelcomePacks,
+  type WelcomePack,
+} from "@/lib/operations/onboarding/welcome-packs";
 
 export const dynamic = "force-dynamic";
 
@@ -82,15 +86,17 @@ export default async function StaffClientJourneyPage({
     contacts: Array<{ id: string; name: string; email: string }>;
     billing: JourneyBillingAccount | null;
     workspace: OnboardingWorkspace;
+    welcomePacks: WelcomePack[];
   };
   try {
-    const [register, journeys, approvals, contacts, workspace] =
+    const [register, journeys, approvals, contacts, workspace, welcomePacks] =
       await Promise.all([
         listStaffAgreementRegister(db, admin, organisationId.data),
         listStaffJourneys(db, admin, organisationId.data),
         listStaffSigning(db, admin, organisationId.data, randomUUID()),
         listStaffJourneyContacts(db, admin, organisationId.data),
         loadStaffOnboardingWorkspace(db, admin, organisationId.data),
+        listStaffWelcomePacks(db, admin),
       ]);
     if (!register) notFound();
     let billing = null;
@@ -105,7 +111,15 @@ export default async function StaffClientJourneyPage({
     } catch {
       billing = null;
     }
-    data = { register, journeys, approvals, contacts, billing, workspace };
+    data = {
+      register,
+      journeys,
+      approvals,
+      contacts,
+      billing,
+      workspace,
+      welcomePacks,
+    };
   } catch {
     return <PortalUnavailable />;
   }
@@ -119,6 +133,7 @@ export default async function StaffClientJourneyPage({
       billing={data.billing}
       builderStage={builderStage}
       workspace={data.workspace}
+      welcomePacks={data.welcomePacks}
     />
   );
 }
