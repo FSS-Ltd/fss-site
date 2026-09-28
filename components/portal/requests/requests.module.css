@@ -564,7 +564,12 @@ textarea.input {
 .skeletonCard {
   min-height: 132px;
   border-radius: 12px;
-  background: linear-gradient(90deg, #edf1f2 20%, #f7f8f9 50%, #edf1f2 80%);
+  background: linear-gradient(
+    90deg,
+    var(--portal-hover, #edf1f2) 20%,
+    var(--portal-soft-surface, #f7f8f9) 50%,
+    var(--portal-hover, #edf1f2) 80%
+  );
   background-size: 200% 100%;
   animation: request-skeleton 1.5s ease-in-out infinite;
 }

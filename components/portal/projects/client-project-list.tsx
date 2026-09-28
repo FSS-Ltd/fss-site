@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import {
   Notice,
@@ -139,6 +142,9 @@ export function ClientProjectList({
   organisationId,
   projects,
 }: ClientProjectListProps): React.JSX.Element {
+  const [activeView, setActiveView] = useState<
+    "all" | "active" | "awaiting" | "completed"
+  >("all");
   const awaitingYou = projects.filter(
     (project) => project.status === "waiting_for_you",
   );
@@ -149,6 +155,12 @@ export function ClientProjectList({
   const completed = projects.filter(
     (project) => project.status === "completed",
   );
+  const views = [
+    { id: "all", label: "All", count: projects.length },
+    { id: "active", label: "Active", count: current.length },
+    { id: "awaiting", label: "Awaiting you", count: awaitingYou.length },
+    { id: "completed", label: "Completed", count: completed.length },
+  ] as const;
 
   return (
     <div className={styles.page}>
@@ -167,6 +179,24 @@ export function ClientProjectList({
           ) : undefined
         }
       />
+      <div
+        className={styles.projectTabs}
+        role="group"
+        aria-label="Filter projects by status"
+      >
+        {views.map((view) => (
+          <button
+            aria-pressed={activeView === view.id}
+            className={styles.projectTab}
+            id={`projects-tab-${view.id}`}
+            key={view.id}
+            onClick={() => setActiveView(view.id)}
+            type="button"
+          >
+            {view.label} <span>{view.count}</span>
+          </button>
+        ))}
+      </div>
       {projects.length === 0 ? (
         <Notice tone="info">
           No projects are shared with your workspace yet. FSS will add your
@@ -174,27 +204,33 @@ export function ClientProjectList({
         </Notice>
       ) : (
         <>
-          <ProjectGroup
-            description="Work that is planned, in delivery, or with FSS for the next step."
-            empty="Your active projects will appear here once they are agreed."
-            organisationId={organisationId}
-            projects={current}
-            title="Active work"
-          />
-          <ProjectGroup
-            description="These projects need a decision, file, or response from your team."
-            empty="There is nothing waiting for your team right now."
-            organisationId={organisationId}
-            projects={awaitingYou}
-            title="Awaiting your response"
-          />
-          <ProjectGroup
-            description="Completed work remains available as a record of the handover."
-            empty="Completed projects will appear here after handover."
-            organisationId={organisationId}
-            projects={completed}
-            title="Completed work"
-          />
+          {activeView === "all" || activeView === "active" ? (
+            <ProjectGroup
+              description="Work that is planned, in delivery, or with FSS for the next step."
+              empty="Your active projects will appear here once they are agreed."
+              organisationId={organisationId}
+              projects={current}
+              title="Active work"
+            />
+          ) : null}
+          {activeView === "all" || activeView === "awaiting" ? (
+            <ProjectGroup
+              description="These projects need a decision, file, or response from your team."
+              empty="There is nothing waiting for your team right now."
+              organisationId={organisationId}
+              projects={awaitingYou}
+              title="Awaiting your response"
+            />
+          ) : null}
+          {activeView === "all" || activeView === "completed" ? (
+            <ProjectGroup
+              description="Completed work remains available as a record of the handover."
+              empty="Completed projects will appear here after handover."
+              organisationId={organisationId}
+              projects={completed}
+              title="Completed work"
+            />
+          ) : null}
         </>
       )}
     </div>

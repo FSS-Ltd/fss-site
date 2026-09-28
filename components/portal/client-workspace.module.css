@@ -1,7 +1,51 @@
 .page {
   display: grid;
-  gap: 24px;
+  gap: 16px;
   width: 100%;
+}
+
+.projectTabs {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--portal-border, #d9dfe5);
+}
+
+.projectTab {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  padding: 8px 12px;
+  background: transparent;
+  color: var(--portal-muted, #46566c);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.projectTab span {
+  display: inline-grid;
+  min-width: 20px;
+  min-height: 20px;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--portal-soft-surface, #f7f8f9);
+  font-size: 0.6875rem;
+}
+
+.projectTab[aria-selected="true"] {
+  border-bottom-color: var(--portal-action, #0f7078);
+  color: var(--portal-action, #0f7078);
+}
+
+.projectTab:focus-visible {
+  outline: 3px solid var(--portal-focus, #0f7078);
+  outline-offset: 2px;
 }
 
 .group {

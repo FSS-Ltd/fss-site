@@ -61,6 +61,7 @@ test("renders one real request action, the selected review and a project link", 
 
   assert.equal((html.match(/>New request</g) ?? []).length, 1);
   assert.match(html, /Review update/);
+  assert.equal((html.match(/Review booking flow/g) ?? []).length, 1);
   assert.match(html, /\/projects\/project-1\?organisationId=organisation-1/);
   assert.doesNotMatch(html, /Alex|24 Sep|£2,400/);
 });

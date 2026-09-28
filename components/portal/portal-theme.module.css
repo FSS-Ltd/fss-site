@@ -1,4 +1,5 @@
 .theme {
+  color-scheme: light;
   --portal-canvas: #f2f3f5;
   --portal-surface: #ffffff;
   --portal-soft-surface: #f7f8f9;
@@ -9,6 +10,23 @@
   --portal-navy: #07182e;
   --portal-border: #d9dfe5;
   --portal-control-boundary: #788696;
+  --portal-hover: #edf1f2;
+  --portal-focus: #0f7078;
+  --portal-overlay: rgba(7, 24, 46, 0.16);
+  --portal-success-ink: #226143;
+  --portal-success-surface: #eaf5ed;
+  --portal-warning-ink: #805300;
+  --portal-warning-surface: #fff4df;
+  --portal-error-ink: #a52d37;
+  --portal-error-surface: #fbebec;
+  --portal-info-ink: #175286;
+  --portal-info-surface: #e9f1f9;
+  --portal-on-action: #ffffff;
+  --foreground: var(--portal-ink);
+  --text-muted: var(--portal-muted);
+  --surface-1: var(--portal-surface);
+  --surface-2: var(--portal-canvas);
+  --border-soft: var(--portal-border);
   font-family:
     var(--font-portal-geist),
     "Manrope",
@@ -17,4 +35,68 @@
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
+}
+
+.theme[data-appearance="dark"] {
+  color-scheme: dark;
+  --portal-canvas: #0b1421;
+  --portal-surface: #111e2e;
+  --portal-soft-surface: #142235;
+  --portal-ink: #edf3f9;
+  --portal-muted: #b5c3d1;
+  --portal-action: #52c4c0;
+  --portal-tint: #173c43;
+  --portal-navy: #07111f;
+  --portal-border: #2b3c50;
+  --portal-control-boundary: #637a91;
+  --portal-hover: #1c2d40;
+  --portal-focus: #67d4cf;
+  --portal-overlay: rgba(0, 0, 0, 0.55);
+  --portal-success-ink: #8cdaa9;
+  --portal-success-surface: #183629;
+  --portal-warning-ink: #f0cb7c;
+  --portal-warning-surface: #3c301b;
+  --portal-error-ink: #ff9b9e;
+  --portal-error-surface: #412326;
+  --portal-info-ink: #a3cdf5;
+  --portal-info-surface: #1b3047;
+  --portal-on-action: #07182e;
+  --foreground: var(--portal-ink);
+  --text-muted: var(--portal-muted);
+  --surface-1: var(--portal-surface);
+  --surface-2: var(--portal-canvas);
+  --border-soft: var(--portal-border);
+}
+
+@media (prefers-color-scheme: dark) {
+  .theme:not([data-appearance="light"]):not([data-appearance="dark"]) {
+    color-scheme: dark;
+    --portal-canvas: #0b1421;
+    --portal-surface: #111e2e;
+    --portal-soft-surface: #142235;
+    --portal-ink: #edf3f9;
+    --portal-muted: #b5c3d1;
+    --portal-action: #52c4c0;
+    --portal-tint: #173c43;
+    --portal-navy: #07111f;
+    --portal-border: #2b3c50;
+    --portal-control-boundary: #637a91;
+    --portal-hover: #1c2d40;
+    --portal-focus: #67d4cf;
+    --portal-overlay: rgba(0, 0, 0, 0.55);
+    --portal-success-ink: #8cdaa9;
+    --portal-success-surface: #183629;
+    --portal-warning-ink: #f0cb7c;
+    --portal-warning-surface: #3c301b;
+    --portal-error-ink: #ff9b9e;
+    --portal-error-surface: #412326;
+    --portal-info-ink: #a3cdf5;
+    --portal-info-surface: #1b3047;
+    --portal-on-action: #07182e;
+    --foreground: var(--portal-ink);
+    --text-muted: var(--portal-muted);
+    --surface-1: var(--portal-surface);
+    --surface-2: var(--portal-canvas);
+    --border-soft: var(--portal-border);
+  }
 }

@@ -22,12 +22,24 @@ function clientsHref(page: number, query: string): string {
   return portalPath(`/portal/admin/clients?${search.toString()}`);
 }
 
-function lifecycleStatus(lifecycle: StudioClient["lifecycle"]): "info" | "neutral" {
+function lifecycleStatus(
+  lifecycle: StudioClient["lifecycle"],
+): "info" | "neutral" {
   return lifecycle === "active" ? "info" : "neutral";
 }
 
 function activeWorkLabel(activeWorkCount: number): string {
   return `${activeWorkCount} active ${activeWorkCount === 1 ? "item" : "items"}`;
+}
+
+function contactInitials(name: string): string {
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  return (
+    words
+      .slice(0, 2)
+      .map((word) => word[0]?.toUpperCase() ?? "")
+      .join("") || "—"
+  );
 }
 
 export function StudioClientRegister({
@@ -79,6 +91,9 @@ export function StudioClientRegister({
                 <PortalCard>
                   <div className={styles.row}>
                     <div className={styles.rowSummary}>
+                      <span className={styles.clientMark} aria-hidden="true">
+                        {contactInitials(client.primaryContactName)}
+                      </span>
                       <h2>{client.displayName}</h2>
                       <p>{client.legalName}</p>
                       <PortalActionLink
@@ -101,7 +116,9 @@ export function StudioClientRegister({
                       <div>
                         <dt>Record</dt>
                         <dd>
-                          <StatusBadge status={lifecycleStatus(client.lifecycle)}>
+                          <StatusBadge
+                            status={lifecycleStatus(client.lifecycle)}
+                          >
                             {client.lifecycle}
                           </StatusBadge>
                         </dd>

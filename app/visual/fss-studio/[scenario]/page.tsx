@@ -1,7 +1,12 @@
 import { ClerkProvider } from "@clerk/nextjs";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { portalFont } from "@/components/portal/portal-font";
 import styles from "@/components/portal/portal-theme.module.css";
+import {
+  isPortalAppearance,
+  PORTAL_APPEARANCE_COOKIE,
+} from "@/lib/operations/design/portal-appearance";
 import { resolveVisualScenario } from "./visual-scenarios";
 
 export const dynamic = "force-dynamic";
@@ -22,9 +27,18 @@ export default async function FssStudioVisualScenarioPage({
     process.env.NODE_ENV,
   );
   if (!visual) notFound();
+  const appearanceCookie = (await cookies()).get(
+    PORTAL_APPEARANCE_COOKIE,
+  )?.value;
+  const appearance = isPortalAppearance(appearanceCookie)
+    ? appearanceCookie
+    : "system";
   return (
     <ClerkProvider publishableKey={VISUAL_CLERK_PUBLISHABLE_KEY}>
-      <div className={`${portalFont.variable} ${styles.theme}`}>
+      <div
+        className={`${portalFont.variable} ${styles.theme} portal-theme`}
+        data-appearance={appearance}
+      >
         {visual.content}
       </div>
     </ClerkProvider>

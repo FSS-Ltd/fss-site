@@ -1,17 +1,24 @@
 .page {
   display: grid;
   width: min(100%, 1120px);
-  gap: 24px;
+  gap: 16px;
   margin-inline: auto;
+}
+
+.overviewPage {
+  min-width: 0;
 }
 
 .attention {
   display: grid;
-  gap: 12px;
-  padding: 24px;
-  border-radius: 16px;
-  background: var(--portal-navy, #07182e);
-  color: #ffffff;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 18px 20px;
+  border: 1px solid var(--portal-border, #d9dfe5);
+  border-radius: 12px;
+  background: var(--portal-surface, #ffffff);
+  color: var(--portal-ink, #0a1a2e);
 }
 
 .attention h2,
@@ -27,7 +34,7 @@
 }
 
 .sectionLabel {
-  color: #c4dbdf;
+  color: var(--portal-action, #0f7078);
   font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.045em;
@@ -36,14 +43,14 @@
 }
 
 .attention h2 {
-  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-size: 1.125rem;
   letter-spacing: -0.04em;
   line-height: 1.15;
 }
 
 .attention > p:not(.sectionLabel) {
   max-width: 68ch;
-  color: #e5f0f2;
+  color: var(--portal-muted, #46566c);
   font-size: 0.9375rem;
   line-height: 1.55;
 }
@@ -55,8 +62,10 @@
   align-items: center;
   border-radius: 10px;
   padding: 10px 16px;
-  background: #ffffff;
-  color: var(--portal-navy, #07182e);
+  grid-column: 2;
+  grid-row: 1 / span 3;
+  background: var(--portal-action, #0f7078);
+  color: var(--portal-on-action, #ffffff);
   font-size: 0.875rem;
   font-weight: 700;
 }
@@ -79,7 +88,7 @@
 .statCard {
   display: grid;
   gap: 8px;
-  padding: 20px;
+  padding: 16px;
 }
 
 .statCard dt,
@@ -94,7 +103,7 @@
 
 .statCard dd {
   color: var(--portal-ink, #0a1a2e);
-  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: -0.04em;
   line-height: 1;
@@ -103,7 +112,7 @@
 .panel {
   display: grid;
   gap: 16px;
-  padding: 24px;
+  padding: 18px;
 }
 
 .panel h2 {
@@ -190,6 +199,19 @@
   outline-offset: 3px;
 }
 
+@media (min-width: 960px) {
+  .overviewPage {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+  }
+
+  .overviewPage > :first-child,
+  .overviewPage > .attention,
+  .overviewPage > .statGrid {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (max-width: 760px) {
   .statGrid {
     grid-template-columns: 1fr;
@@ -200,6 +222,15 @@
   .attention,
   .panel {
     padding: 20px;
+  }
+
+  .attention {
+    grid-template-columns: 1fr;
+  }
+
+  .attentionAction {
+    grid-column: auto;
+    grid-row: auto;
   }
 
   .stepList li,

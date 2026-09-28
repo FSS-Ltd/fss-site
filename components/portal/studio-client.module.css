@@ -23,9 +23,13 @@
   padding: clamp(24px, 4vw, 40px);
   border-radius: 24px;
   background:
-    radial-gradient(circle at 92% 0%, rgba(70, 199, 216, 0.24), transparent 30%),
+    radial-gradient(
+      circle at 92% 0%,
+      rgba(70, 199, 216, 0.24),
+      transparent 30%
+    ),
     linear-gradient(120deg, #07182e, #0b3049);
-  color: #ffffff;
+  color: var(--portal-on-action, #ffffff);
 }
 
 .eyebrow {
@@ -61,7 +65,7 @@
   padding: 0 16px;
   border-radius: 12px;
   background: #0f7078;
-  color: #ffffff;
+  color: var(--portal-on-action, #ffffff);
   text-decoration: none;
 }
 
@@ -78,7 +82,7 @@
   padding: 20px;
   border: 1px solid #d9dfe5;
   border-radius: 16px;
-  background: #ffffff;
+  background: var(--portal-surface, #ffffff);
   box-shadow: 0 16px 38px -34px rgba(7, 24, 46, 0.75);
 }
 
@@ -91,7 +95,7 @@
 }
 
 .metricValue {
-  color: #0a1a2e;
+  color: var(--portal-ink, #0a1a2e);
   font-size: clamp(1.75rem, 3vw, 2.25rem);
   font-weight: 700;
   letter-spacing: -0.055em;
@@ -99,7 +103,7 @@
 }
 
 .metricLabel {
-  color: #46566c;
+  color: var(--portal-muted, #46566c);
   font-size: 0.8125rem;
   font-weight: 600;
   line-height: 1.45;
@@ -111,7 +115,7 @@
 }
 
 .sectionTitle {
-  color: #0a1a2e;
+  color: var(--portal-ink, #0a1a2e);
   font-family: "Sora", "Geist", system-ui, sans-serif;
   font-size: 1.25rem;
   letter-spacing: -0.03em;
@@ -133,7 +137,7 @@
   padding: 20px 24px;
   border: 1px solid #d9dfe5;
   border-radius: 16px;
-  background: #ffffff;
+  background: var(--portal-surface, #ffffff);
   box-shadow: 0 16px 38px -34px rgba(7, 24, 46, 0.7);
 }
 
@@ -144,14 +148,14 @@
 }
 
 .rowTitle {
-  color: #0a1a2e;
+  color: var(--portal-ink, #0a1a2e);
   font-size: 1rem;
   font-weight: 650;
   line-height: 1.4;
 }
 
 .rowCopy {
-  color: #46566c;
+  color: var(--portal-muted, #46566c);
   font-size: 0.875rem;
   line-height: 1.55;
 }
@@ -164,7 +168,7 @@
 }
 
 .unavailable {
-  color: #46566c;
+  color: var(--portal-muted, #46566c);
   font-size: 0.8125rem;
   font-weight: 600;
 }
