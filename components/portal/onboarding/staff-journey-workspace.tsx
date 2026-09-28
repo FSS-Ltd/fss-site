@@ -11,6 +11,7 @@ import type { JourneyBuilderStage } from "@/lib/operations/onboarding/builder-st
 import { StaffJourneyDetail } from "./staff-journey-detail";
 import { JourneyPreview } from "@/components/operations/onboarding/journey-preview";
 import { JourneyTimeline } from "@/components/operations/onboarding/journey-timeline";
+import type { WelcomePack } from "@/lib/operations/onboarding/welcome-packs";
 import {
   Notice,
   PageHeader,
@@ -27,6 +28,7 @@ type StaffJourneyWorkspaceProps = {
   billing: JourneyBillingAccount | null;
   builderStage?: JourneyBuilderStage;
   workspace: OnboardingWorkspace;
+  welcomePacks: readonly WelcomePack[];
 };
 
 export function StaffJourneyWorkspace({
@@ -38,6 +40,7 @@ export function StaffJourneyWorkspace({
   billing,
   builderStage,
   workspace,
+  welcomePacks,
 }: StaffJourneyWorkspaceProps): React.JSX.Element {
   const apiRoot = `/api/portal/admin/clients/${organisationId}`;
 
@@ -81,11 +84,17 @@ export function StaffJourneyWorkspace({
         }))}
         commandEndpoint={`${apiRoot}/journey`}
         contacts={contacts}
+        organisationId={organisationId}
         initialStage={builderStage}
         templates={workspace.templates.map((template) => ({
           id: template.id,
           name: template.name,
           version: template.version,
+        }))}
+        welcomePacks={welcomePacks.map((pack) => ({
+          id: pack.id,
+          title: pack.title,
+          versions: pack.versions,
         }))}
       />
       <JourneyPreview
@@ -99,6 +108,7 @@ export function StaffJourneyWorkspace({
         commandEndpoint={`${apiRoot}/journey`}
         signingDownloadBase={`${apiRoot}/signing`}
         workspaceDrafts={workspace.journeyDrafts}
+        welcomePacks={welcomePacks}
       />
       {journeys.length === 0 ? (
         <Notice tone="info">

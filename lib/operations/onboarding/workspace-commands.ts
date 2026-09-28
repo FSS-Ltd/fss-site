@@ -10,13 +10,17 @@ import {
   parseOnboardingTemplateDraft,
 } from "./workspace-schema";
 import { portalRoles } from "../auth/types";
+import { welcomeInputSchema } from "./approval";
 
 const clientCopy = z
   .string()
   .trim()
   .min(1)
   .max(10_000)
-  .refine((value) => !value.includes("\u2014"), "Use plain punctuation without em dashes.");
+  .refine(
+    (value) => !value.includes("\u2014"),
+    "Use plain punctuation without em dashes.",
+  );
 
 const reviewReference = z.string().trim().min(1).max(200);
 
@@ -24,6 +28,7 @@ const journeyDraftContentSchema = z
   .strictObject({
     welcomeSubject: clientCopy.max(160),
     welcomeBody: clientCopy,
+    reviewedWelcome: welcomeInputSchema.optional(),
     guide: z
       .strictObject({
         clientPriorities: clientCopy,
@@ -35,7 +40,8 @@ const journeyDraftContentSchema = z
       .optional(),
   })
   .refine(
-    (content) => Boolean(content.welcomeSubject || content.welcomeBody || content.guide),
+    (content) =>
+      Boolean(content.welcomeSubject || content.welcomeBody || content.guide),
     "Add reviewed welcome or guide content.",
   );
 
@@ -118,7 +124,9 @@ function workspaceConflict(error: unknown): never {
     if (
       code === "42501" ||
       (code === "23503" &&
-        /journey agreement|journey template|template organisation/i.test(message))
+        /journey agreement|journey template|template organisation/i.test(
+          message,
+        ))
     )
       throw new JourneyConflict(
         "unavailable",

@@ -5,6 +5,7 @@ import type { FssAdminContext } from "../auth/staff-types";
 import type { OperationsDb, OperationsTransaction } from "../db/client";
 import { ProjectConflict } from "./types";
 import {
+  executeStaffProjectCreateCommand,
   executeStaffProjectCommand,
   loadStaffProjectForEdit,
 } from "./staff-service";
@@ -36,7 +37,9 @@ const metadata = {
   visibility: "client",
 };
 
-function recordingDb(options: { currentVersion?: number; project?: boolean } = {}): {
+function recordingDb(
+  options: { currentVersion?: number; project?: boolean } = {},
+): {
   calls: Array<{ sql: string; values: unknown[] }>;
   db: OperationsDb;
 } {
@@ -45,10 +48,16 @@ function recordingDb(options: { currentVersion?: number; project?: boolean } = {
     const sql = parts.join("?");
     calls.push({ sql, values });
     if (sql.includes("set_config") || sql.includes("assert_active")) return [];
-    if (sql.includes("from operations.projects") && sql.includes("for update")) {
+    if (
+      sql.includes("from operations.projects") &&
+      sql.includes("for update")
+    ) {
       return [{ id: projectId, version: options.currentVersion ?? 3 }];
     }
-    if (sql.includes("from operations.projects") && !sql.includes("for update")) {
+    if (
+      sql.includes("from operations.projects") &&
+      !sql.includes("for update")
+    ) {
       return options.project === false
         ? []
         : [
@@ -106,7 +115,9 @@ test("updates the route-selected project within an FSS-admin transaction", async
     calls.map(({ sql }) => sql).join("\n"),
     /operations\.assert_active_staff_membership/,
   );
-  assert.ok(calls.some(({ sql }) => sql.includes("update operations.projects")));
+  assert.ok(
+    calls.some(({ sql }) => sql.includes("update operations.projects")),
+  );
 });
 
 test("rejects a stale version or a project ID forged outside the selected route", async () => {
@@ -161,5 +172,63 @@ test("loads project-edit data only for an existing project", async () => {
   assert.equal(
     await loadStaffProjectForEdit(missing.db, admin, projectId),
     null,
+  );
+});
+
+test("creates a project only for an agreement in the requested organisation", async () => {
+  const createdId = randomUUID();
+  const calls: Array<{ sql: string; values: unknown[] }> = [];
+  let agreementAvailable = true;
+  const query = async (parts: TemplateStringsArray, ...values: unknown[]) => {
+    const sql = parts.join("?");
+    calls.push({ sql, values });
+    if (sql.includes("assert_active_staff_membership")) return [];
+    if (sql.includes("from operations.agreements"))
+      return agreementAvailable ? [{ id: metadata.agreementId }] : [];
+    if (sql.includes("insert into operations.projects"))
+      return [{ id: createdId, version: 1 }];
+    return [];
+  };
+  const db = {
+    begin: (run: (tx: OperationsTransaction) => Promise<unknown>) =>
+      run(query as unknown as OperationsTransaction),
+  } as unknown as OperationsDb;
+  const command = {
+    action: "create",
+    metadata: { ...metadata, status: "planned" },
+    reviewReference: "Approved website project plan",
+  };
+
+  const created = await executeStaffProjectCreateCommand(
+    db,
+    admin,
+    organisationId,
+    command,
+    randomUUID(),
+  );
+  assert.deepEqual(created, { id: createdId, version: 1 });
+  const agreementScope = calls.find(({ sql }) =>
+    sql.includes("from operations.agreements"),
+  );
+  assert.deepEqual(agreementScope?.values.slice(-2), [
+    organisationId,
+    metadata.agreementId,
+  ]);
+
+  calls.length = 0;
+  agreementAvailable = false;
+  await assert.rejects(
+    executeStaffProjectCreateCommand(
+      db,
+      admin,
+      organisationId,
+      command,
+      randomUUID(),
+    ),
+    ProjectConflict,
+  );
+  assert.equal(
+    calls.some(({ sql }) => sql.includes("insert into operations.projects")),
+    false,
   );
 });

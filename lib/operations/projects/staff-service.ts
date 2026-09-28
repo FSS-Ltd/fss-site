@@ -118,3 +118,27 @@ export async function executeStaffProjectCommand(
     );
   });
 }
+
+export async function executeStaffProjectCreateCommand(
+  db: OperationsDb,
+  admin: FssAdminContext,
+  organisationId: string,
+  raw: unknown,
+  correlationId: string,
+): Promise<DeliveryCommandResult> {
+  const id = z.uuid().parse(organisationId);
+  z.uuid().parse(correlationId);
+  const command = projectCommandSchema.parse(raw);
+  if (command.action !== "create") throw new ProjectConflict();
+
+  return withFssAdminTransaction(db, admin, async (tx) => {
+    const [agreement] = await tx<Array<{ id: string }>>`
+      select id
+      from operations.agreements
+      where organisation_id = ${id} and id = ${command.metadata.agreementId}
+    `;
+    if (!agreement)
+      throw new ProjectConflict("Select an agreement for this client.");
+    return executeProjectCommandInTransaction(tx, id, command, correlationId);
+  });
+}

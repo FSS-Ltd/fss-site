@@ -75,7 +75,7 @@ export default async function StaffClientAgreementsPage({
           },
           { label: "Agreements" },
         ]}
-        description="Agreement records are created only from reviewed work and a complete server-validated draft."
+        description="Create agreements from reviewed work, then prepare and review their signing documents in the signing workspace."
         eyebrow="FSS Studio / Agreements"
         title={`${register.organisationName}: agreements`}
       />

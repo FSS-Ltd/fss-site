@@ -35,6 +35,10 @@ export const welcomeInputSchema = z
         outcomeSummary: text,
         senderName: text.max(100),
         organisationName: text.max(200),
+        clientOrganisationName: text.max(200).optional(),
+        welcomePackVersionId: z.uuid().optional(),
+        emailSubject: text.max(160).optional(),
+        emailBody: text.max(6_000).optional(),
         from: address,
         replyTo: address,
         pages: z

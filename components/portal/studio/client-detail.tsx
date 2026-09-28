@@ -19,7 +19,11 @@ function adminHref(pathname: string, organisationId: string): string {
   return `${url.pathname}${url.search}`;
 }
 
-function countLabel(count: number, singular: string, plural = `${singular}s`): string {
+function countLabel(
+  count: number,
+  singular: string,
+  plural = `${singular}s`,
+): string {
   return `${count} ${count === 1 ? singular : plural}`;
 }
 
@@ -28,10 +32,16 @@ export function StudioClientDetail({
 }: StudioClientDetailProps): React.JSX.Element {
   const workspaceRows = [
     {
-      action: "Open agreements",
+      action: "Create or review agreement",
       detail: countLabel(client.agreementCount, "agreement"),
       href: `/portal/admin/clients/${client.id}/agreements`,
       title: "Agreement & scope",
+    },
+    {
+      action: "Open signing documents",
+      detail: "Prepare, review, and track agreement documents",
+      href: `/portal/admin/clients/${client.id}/signing`,
+      title: "Agreement documents",
     },
     {
       action: "View journey",
@@ -91,8 +101,8 @@ export function StudioClientDetail({
           <div className={styles.rowCopy}>
             <h2>{client.nextAction}</h2>
             <p>
-              This client record is {client.lifecycle}. Open the current
-              action or use the workspace links below.
+              This client record is {client.lifecycle}. Open the current action
+              or use the workspace links below.
             </p>
           </div>
           <PortalActionLink href={portalPath(client.nextActionHref)}>
@@ -124,7 +134,10 @@ export function StudioClientDetail({
           </dd>
         </div>
       </dl>
-      <section className={styles.workspace} aria-labelledby="client-workspace-heading">
+      <section
+        className={styles.workspace}
+        aria-labelledby="client-workspace-heading"
+      >
         <div className={styles.workspaceHeader}>
           <h2 id="client-workspace-heading">Client workspace</h2>
           <p>

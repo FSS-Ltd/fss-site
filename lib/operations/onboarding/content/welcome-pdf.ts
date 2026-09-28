@@ -4,7 +4,8 @@ import type { WelcomeContent } from "../types";
 import { escapeHtml } from "./welcome-email";
 export const welcomePdfLimit = 2 * 1024 * 1024;
 export function welcomeAccessibleHtml(content: WelcomeContent): string {
-  return `<section aria-label="Welcome guide"><h1>${escapeHtml(content.organisationName)}: your welcome guide</h1>${content.pages.map((page) => `<section><h2>${escapeHtml(page.title)}</h2>${page.paragraphs.map((p) => `<p>${escapeHtml(p)}</p>`).join("")}</section>`).join("")}</section>`;
+  const clientName = content.clientOrganisationName ?? content.organisationName;
+  return `<section aria-label="Welcome guide"><h1>${escapeHtml(clientName)}: your welcome guide</h1>${content.pages.map((page) => `<section><h2>${escapeHtml(page.title)}</h2>${page.paragraphs.map((p) => `<p>${escapeHtml(p)}</p>`).join("")}</section>`).join("")}</section>`;
 }
 export async function renderWelcomePdf(
   content: WelcomeContent,
@@ -38,13 +39,34 @@ export async function renderWelcomePdf(
   try {
     for (const [index, page] of content.pages.entries()) {
       document.addPage();
+      const clientName =
+        content.clientOrganisationName ?? content.organisationName;
+      document.rect(0, 0, document.page.width, 118).fill("#10233F");
       document
-        .fillColor("#17372D")
+        .fillColor("#ffffff")
         .font("Helvetica-Bold")
-        .fontSize(11)
-        .text(content.organisationName.toUpperCase());
-      document.moveDown(2).fontSize(25).text(page.title);
-      document.moveDown().fillColor("#24322D").font("Helvetica").fontSize(12);
+        .fontSize(10)
+        .text("FAITHFUL SOFTWARE SOLUTIONS", 54, 52, { characterSpacing: 1.2 });
+      document
+        .fillColor("#10233F")
+        .fontSize(index === 0 ? 25 : 21)
+        .text(
+          index === 0 ? `${clientName}: your welcome guide` : page.title,
+          54,
+          150,
+          {
+            width: 487,
+            lineGap: 4,
+          },
+        );
+      if (index === 0) {
+        document
+          .moveDown(0.7)
+          .fontSize(17)
+          .fillColor("#52665D")
+          .text(page.title);
+      }
+      document.moveDown(1).fillColor("#24322D").font("Helvetica").fontSize(12);
       for (const paragraph of page.paragraphs) {
         const height = document.heightOfString(paragraph, {
           width: 487,

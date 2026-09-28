@@ -25,19 +25,31 @@ type BuilderAgreement = Readonly<{
 }>;
 type BuilderContact = Readonly<{ id: string; name: string; email: string }>;
 type BuilderTemplate = Readonly<{ id: string; name: string; version: number }>;
+type BuilderWelcomePack = Readonly<{
+  id: string;
+  title: string;
+  versions: readonly { id: string; version: number }[];
+}>;
 
 type StaffJourneyBuilderProps = Readonly<{
   agreements: readonly BuilderAgreement[];
   commandEndpoint: string;
   contacts: readonly BuilderContact[];
   initialStage?: JourneyBuilderStage;
+  organisationId: string;
   templates: readonly BuilderTemplate[];
+  welcomePacks: readonly BuilderWelcomePack[];
 }>;
 
 type JourneyDraftResult = Readonly<{
   kind: "journey_draft";
   draftId: string;
   version: number;
+}>;
+
+type AppliedWelcomePackResult = Readonly<{
+  kind: "welcome_pack_applied";
+  templateVersionId: string;
 }>;
 
 function formValue(data: FormData, name: string): string {
@@ -58,6 +70,19 @@ function isJourneyDraftResult(value: unknown): value is JourneyDraftResult {
   );
 }
 
+function isAppliedWelcomePackResult(
+  value: unknown,
+): value is AppliedWelcomePackResult {
+  return (
+    value !== null &&
+    typeof value === "object" &&
+    "kind" in value &&
+    value.kind === "welcome_pack_applied" &&
+    "templateVersionId" in value &&
+    typeof value.templateVersionId === "string"
+  );
+}
+
 function errorMessage(body: unknown): string {
   if (
     body &&
@@ -74,12 +99,73 @@ export function StaffJourneyBuilder({
   commandEndpoint,
   contacts,
   initialStage = "setup",
+  organisationId,
   templates,
+  welcomePacks,
 }: StaffJourneyBuilderProps): React.JSX.Element {
   const draftId = useRef<string | null>(null);
+  const [availableTemplates, setAvailableTemplates] = useState(templates);
   const [expectedVersion, setExpectedVersion] = useState(0);
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [selectedPackVersionId, setSelectedPackVersionId] = useState(
+    welcomePacks.find((pack) => pack.versions.length)?.versions[0]?.id ?? "",
+  );
+
+  async function applyPack(): Promise<void> {
+    if (!selectedPackVersionId || pending) return;
+    setPending(true);
+    setMessage(null);
+    try {
+      const response = await fetch("/api/portal/admin/welcome/packs", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          action: "apply_to_client",
+          organisationId,
+          packVersionId: selectedPackVersionId,
+          reviewReference: "Applied reviewed welcome pack to client",
+        }),
+      });
+      const body: unknown = await response.json().catch(() => null);
+      if (!response.ok) {
+        setMessage(errorMessage(body));
+        return;
+      }
+      if (!isAppliedWelcomePackResult(body)) {
+        setMessage(
+          "The checklist was added, but its template response was incomplete. Refresh the page.",
+        );
+        return;
+      }
+      const packTitle = welcomePacks.find((pack) =>
+        pack.versions.some((version) => version.id === selectedPackVersionId),
+      )?.title;
+      if (!packTitle) {
+        setMessage(
+          "The checklist was added. Refresh the page to load its template.",
+        );
+        return;
+      }
+      setAvailableTemplates((current) => [
+        ...current,
+        {
+          id: body.templateVersionId,
+          name: packTitle,
+          version: 1,
+        },
+      ]);
+      setMessage(
+        "Pack checklist added to this client. Select it in the journey draft below.",
+      );
+    } catch {
+      setMessage(
+        "The checklist could not be added. Check your connection and try again.",
+      );
+    } finally {
+      setPending(false);
+    }
+  }
 
   async function saveDraft(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
@@ -134,10 +220,37 @@ export function StaffJourneyBuilder({
   }
 
   const unavailable =
-    !agreements.length || !contacts.length || !templates.length;
+    !agreements.length || !contacts.length || !availableTemplates.length;
 
   return (
     <section aria-label="Journey builder">
+      <PortalCard
+        description="Choose a published service pack to add its client checklist to this organisation. The checklist is copied as an immutable client version."
+        title="Start from a shared welcome pack"
+      >
+        <PortalSelect
+          label="Published welcome pack"
+          onChange={(event) => setSelectedPackVersionId(event.target.value)}
+          value={selectedPackVersionId}
+        >
+          {welcomePacks.flatMap((pack) =>
+            pack.versions.map((version) => (
+              <option key={version.id} value={version.id}>
+                {pack.title} · version {version.version}
+              </option>
+            )),
+          )}
+        </PortalSelect>
+        <PortalButton
+          disabled={pending || !selectedPackVersionId}
+          loading={pending}
+          onClick={() => void applyPack()}
+          type="button"
+          variant="secondary"
+        >
+          Add checklist to client
+        </PortalButton>
+      </PortalCard>
       <PortalCard
         description="Save the named client, agreement, contact and immutable checklist version before you prepare the exact welcome approval."
         headingId="journey-builder-heading"
@@ -167,7 +280,7 @@ export function StaffJourneyBuilder({
             required
           >
             <option value="">Select a published template version</option>
-            {templates.map((template) => (
+            {availableTemplates.map((template) => (
               <option key={template.id} value={template.id}>
                 {template.name} · version {template.version}
               </option>

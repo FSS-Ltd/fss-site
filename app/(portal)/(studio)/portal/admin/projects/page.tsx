@@ -67,8 +67,16 @@ export default async function AdminProjectsPage({
         <p className={styles.description}>
           Cross-client delivery plans, milestones, and retained document counts.
         </p>
+        {organisationId ? (
+          <Link
+            className={styles.actionLink}
+            href={`/admin/projects/new?organisationId=${encodeURIComponent(organisationId)}`}
+          >
+            Plan a project
+          </Link>
+        ) : null}
         <Link className={styles.actionLink} href="/admin/projects/documents">
-          Open document register
+          View project document register
         </Link>
       </header>
       <form className={workspace.filterForm} method="get">
@@ -90,7 +98,17 @@ export default async function AdminProjectsPage({
         <PortalButton type="submit">Apply filter</PortalButton>
       </form>
       {projects.items.length === 0 ? (
-        <p className={styles.rowCopy}>No projects match this workspace view.</p>
+        <div>
+          <p className={styles.rowCopy}>
+            No projects match this workspace view.
+          </p>
+          {organisationId ? (
+            <p className={styles.rowCopy}>
+              Projects need a saved agreement. Once one is available, plan the
+              client&#39;s delivery here.
+            </p>
+          ) : null}
+        </div>
       ) : (
         <ul className={styles.rowList}>
           {projects.items.map((project) => (

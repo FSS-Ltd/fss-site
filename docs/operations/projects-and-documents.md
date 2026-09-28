@@ -2,6 +2,14 @@
 
 Projects belong to an organisation and agreement. Clients see only explicitly shared outcomes, summaries, deliverables, delivery contacts, target dates and milestone evidence. Missing dates remain unconfirmed; the portal never invents progress percentages. Internal notes, estimates and review references are excluded by database column grants and response DTOs.
 
+## Client setup in FSS Studio
+
+Start with the reviewed engagement and agreement from the client workspace. An agreement can be prepared before a project exists; the agreement is the parent record required to create one. After at least one agreement is saved, use **Plan a project** from the client workspace or the new-project action on the project list. Select the matching agreement and record the agreed outcome, deliverables, owner and any confirmed target date. The project starts in the planned state.
+
+Welcome journeys are optional and can be prepared without a project. In the client journey workspace, select one of the shared welcome packs, apply its published checklist to the organisation, save the journey draft, then edit and preview the client-specific email and guide. The reviewed client copy is saved with the journey draft. Preview and activation are tied to that draft version, the published pack version and the copied client checklist version. Provider readiness remains required before activation.
+
+The project document register is read-only. It lists project documents already recorded for the organisation; it is not where agreement files are prepared. Prepare and review agreement signing documents from the client's **Signing** workspace. Client uploads remain disabled until the scanner release gate is complete.
+
 The owner, contributor and viewer roles can access projects and documents. Billing contacts cannot. Every repository query rechecks live membership using the restricted portal role and transaction-local organisation. Composite foreign keys prevent cross-organisation agreement, project and milestone links. Lists return at most 100 records; pagination must be added before an organisation exceeds that launch bound.
 
 ## Reviewed founder updates
