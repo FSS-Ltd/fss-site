@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { Bell } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import { getPortalRolePresentation } from "@/lib/operations/auth/permissions";
@@ -13,9 +14,12 @@ import {
   type PortalNavigationItem,
 } from "./navigation";
 import { PortalNavigationIcon } from "./navigation-icon";
+import { PortalAppearanceControl } from "./appearance-control";
+import type { PortalAppearance } from "@/lib/operations/design/portal-appearance";
 import styles from "./portal-shell.module.css";
 
 export type ClientShellProps = Readonly<{
+  initialAppearance?: PortalAppearance;
   memberships: readonly PortalMembershipSummary[];
   children: React.ReactNode;
 }>;
@@ -114,6 +118,7 @@ function ClientMobileNavigation({
 
 export function ClientShell({
   children,
+  initialAppearance = "system",
   memberships,
 }: ClientShellProps): React.JSX.Element {
   const pathname = usePathname();
@@ -123,7 +128,10 @@ export function ClientShell({
     memberships.find(
       (membership) => membership.organisationId === requestedOrganisationId,
     ) ?? (memberships.length === 1 ? memberships[0] : undefined);
-  const navigation = getClientNavigation(activeMembership?.role ?? null, pathname);
+  const navigation = getClientNavigation(
+    activeMembership?.role ?? null,
+    pathname,
+  );
   return (
     <div className={styles.shell}>
       <a className={styles.skip} href="#portal-content">
@@ -155,14 +163,20 @@ export function ClientShell({
                     <li key={membership.organisationId}>
                       <Link
                         aria-current={
-                          membership.organisationId === activeMembership?.organisationId
+                          membership.organisationId ===
+                          activeMembership?.organisationId
                             ? "true"
                             : undefined
                         }
-                        href={appendOrganisationId("/portal", membership.organisationId)}
+                        href={appendOrganisationId(
+                          "/portal",
+                          membership.organisationId,
+                        )}
                       >
                         <span>{membership.displayName}</span>
-                        <small>{getPortalRolePresentation(membership.role).label}</small>
+                        <small>
+                          {getPortalRolePresentation(membership.role).label}
+                        </small>
                       </Link>
                     </li>
                   ))}
@@ -187,13 +201,52 @@ export function ClientShell({
       </aside>
       <div className={styles.content}>
         <header className={styles.topbar}>
-          <p className={styles.context}>
-            {activeMembership?.displayName ?? "Your FSS workspace"}
-          </p>
-          <PortalSignOutButton className={styles.signOut}>
-            Sign out
-          </PortalSignOutButton>
+          <span className={styles.context}>Client workspace</span>
+          <div className={styles.toolbarActions}>
+            {navigation.some((item) => item.id === "notifications") ? (
+              <Link
+                className={styles.toolbarIcon}
+                href={appendOrganisationId(
+                  "/portal/notifications",
+                  activeMembership?.organisationId,
+                )}
+                aria-label="Notifications"
+              >
+                <Bell aria-hidden="true" size={18} />
+              </Link>
+            ) : null}
+            <PortalAppearanceControl initialAppearance={initialAppearance} />
+            <PortalSignOutButton className={styles.signOut}>
+              Sign out
+            </PortalSignOutButton>
+          </div>
         </header>
+        {memberships.length > 1 ? (
+          <details className={styles.mobileWorkspace}>
+            <summary>
+              {activeMembership?.displayName ?? "Choose your workspace"}
+            </summary>
+            <div className={styles.mobileWorkspaceList}>
+              {memberships.map((membership) => (
+                <Link
+                  key={membership.organisationId}
+                  href={appendOrganisationId(
+                    "/portal",
+                    membership.organisationId,
+                  )}
+                  aria-current={
+                    membership.organisationId ===
+                    activeMembership?.organisationId
+                      ? "true"
+                      : undefined
+                  }
+                >
+                  {membership.displayName}
+                </Link>
+              ))}
+            </div>
+          </details>
+        ) : null}
         <main className={styles.main} id="portal-content">
           {children}
         </main>

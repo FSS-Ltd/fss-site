@@ -98,7 +98,7 @@
       }
     ],
     "primary": "New request",
-    "route": "/portal?organisationId=:org"
+    "route": "/portal?organisationId=:organisationId"
   },
   {
     "id": "C02",
@@ -267,7 +267,7 @@
       }
     ],
     "primary": "New request",
-    "route": "/portal/projects/:project"
+    "route": "/portal/projects/:projectId"
   },
   {
     "id": "C05",
@@ -492,7 +492,7 @@
       }
     ],
     "primary": "Send comment",
-    "route": "/portal/requests/:request"
+    "route": "/portal/requests/:requestId"
   },
   {
     "id": "C09",
@@ -539,7 +539,7 @@
       }
     ],
     "primary": "Open preview",
-    "route": "/portal/requests/:request/review"
+    "route": "/portal/requests/:requestId/review"
   },
   {
     "id": "C10",
@@ -570,7 +570,7 @@
       }
     ],
     "primary": "Send feedback",
-    "route": "/portal/requests/:request/review?decision=changes"
+    "route": "/portal/requests/:requestId/review?decision=changes"
   },
   {
     "id": "C11",
@@ -607,7 +607,7 @@
       }
     ],
     "primary": "Back to requests",
-    "route": "/portal/requests/:request?state=done"
+    "route": "/portal/requests/:requestId?state=done"
   },
   {
     "id": "C12",
@@ -690,7 +690,7 @@
       }
     ],
     "primary": "Download file",
-    "route": "/portal/documents/:document"
+    "route": "/portal/documents/:documentId"
   },
   {
     "id": "C14",
@@ -779,7 +779,7 @@
       }
     ],
     "primary": "Continue to signing",
-    "route": "/portal/agreements/:agreement"
+    "route": "/portal/agreements/:agreementId"
   },
   {
     "id": "C16",
@@ -825,7 +825,7 @@
       }
     ],
     "primary": "Sign agreement",
-    "route": "/portal/agreements/:agreement/sign"
+    "route": "/portal/agreements/:agreementId/sign"
   },
   {
     "id": "C17",
@@ -927,7 +927,7 @@
       }
     ],
     "primary": "Download invoice",
-    "route": "/portal/billing/invoices/:invoice"
+    "route": "/portal/billing/invoices/:invoiceId"
   },
   {
     "id": "C19",
@@ -1006,7 +1006,7 @@
       }
     ],
     "primary": "Send enquiry",
-    "route": "/portal/services/:offer/enquire"
+    "route": "/portal/services/:offerId/enquire"
   },
   {
     "id": "C21",
@@ -1302,7 +1302,7 @@
       }
     ],
     "primary": "View delivery",
-    "route": "/growth/operations"
+    "route": "/portal/admin"
   },
   {
     "id": "F02",
@@ -1351,7 +1351,7 @@
       }
     ],
     "primary": "Add client",
-    "route": "/growth/operations/clients"
+    "route": "/portal/admin/clients"
   },
   {
     "id": "F03",
@@ -1412,7 +1412,7 @@
       }
     ],
     "primary": "Prepare welcome",
-    "route": "/growth/operations/clients/:org"
+    "route": "/portal/admin/clients/:organisationId"
   },
   {
     "id": "F04",
@@ -1465,7 +1465,7 @@
       }
     ],
     "primary": "Save client",
-    "route": "/growth/operations/clients/new"
+    "route": "/portal/admin/clients/new"
   },
   {
     "id": "F05",
@@ -1486,7 +1486,7 @@
       }
     ],
     "primary": "New request",
-    "route": "/growth/operations/requests"
+    "route": "/portal/admin/delivery"
   },
   {
     "id": "F06",
@@ -1563,7 +1563,7 @@
       }
     ],
     "primary": "Post public update",
-    "route": "/growth/operations/clients/:org/requests/:request"
+    "route": "/portal/admin/clients/:organisationId/requests/:requestId"
   },
   {
     "id": "F07",
@@ -1607,7 +1607,7 @@
       }
     ],
     "primary": "Publish review",
-    "route": "/growth/operations/clients/:org/requests/:request/review"
+    "route": "/portal/admin/clients/:organisationId/requests/:requestId?mode=review"
   },
   {
     "id": "F08",
@@ -1662,7 +1662,7 @@
       }
     ],
     "primary": "Save assessment",
-    "route": "/growth/operations/clients/:org/requests/:request/scope"
+    "route": "/portal/admin/clients/:organisationId/requests/:requestId?mode=scope"
   },
   {
     "id": "F09",
@@ -1700,7 +1700,7 @@
       }
     ],
     "primary": "New agreement",
-    "route": "/growth/operations/agreements"
+    "route": "/portal/admin/agreements"
   },
   {
     "id": "F10",
@@ -1757,7 +1757,7 @@
       }
     ],
     "primary": "Continue to scope",
-    "route": "/growth/operations/clients/:org/agreements/new"
+    "route": "/portal/admin/clients/:organisationId/agreements/new"
   },
   {
     "id": "F11",
@@ -1800,7 +1800,7 @@
       }
     ],
     "primary": "Continue to fees",
-    "route": "/growth/operations/clients/:org/agreements/new?step=scope"
+    "route": "/portal/admin/clients/:organisationId/agreements/new?step=scope"
   },
   {
     "id": "F12",
@@ -1859,7 +1859,7 @@
       }
     ],
     "primary": "Continue to people",
-    "route": "/growth/operations/clients/:org/agreements/new?step=fees"
+    "route": "/portal/admin/clients/:organisationId/agreements/new?step=fees"
   },
   {
     "id": "F13",
@@ -1908,7 +1908,7 @@
       }
     ],
     "primary": "Continue to document",
-    "route": "/growth/operations/clients/:org/agreements/new?step=people"
+    "route": "/portal/admin/clients/:organisationId/agreements/new?step=people"
   },
   {
     "id": "F14",
@@ -1956,7 +1956,7 @@
       }
     ],
     "primary": "Generate & preview",
-    "route": "/growth/operations/clients/:org/agreements/new?step=document"
+    "route": "/portal/admin/clients/:organisationId/agreements/new?step=document"
   },
   {
     "id": "F15",
@@ -2028,7 +2028,7 @@
       }
     ],
     "primary": "Approve signing request",
-    "route": "/growth/operations/clients/:org/agreements/new?step=review"
+    "route": "/portal/admin/clients/:organisationId/agreements/new?step=review"
   },
   {
     "id": "F16",
@@ -2077,7 +2077,7 @@
       }
     ],
     "primary": "Link selected engagement",
-    "route": "/growth/operations/clients/:org/agreements/new?state=no-engagement"
+    "route": "/portal/admin/clients/:organisationId/agreements/new?state=no-engagement"
   },
   {
     "id": "F17",
@@ -2132,7 +2132,7 @@
       }
     ],
     "primary": "Prepare welcome",
-    "route": "/growth/operations/clients/:org/agreements/:agreement"
+    "route": "/portal/admin/clients/:organisationId/agreements/:agreementId"
   },
   {
     "id": "F18",
@@ -2181,7 +2181,7 @@
       }
     ],
     "primary": "Create journey",
-    "route": "/growth/operations/journeys"
+    "route": "/portal/admin/welcome"
   },
   {
     "id": "F19",
@@ -2234,7 +2234,7 @@
       }
     ],
     "primary": "Continue to content",
-    "route": "/growth/operations/clients/:org/journey/new"
+    "route": "/portal/admin/clients/:organisationId/journey?step=setup"
   },
   {
     "id": "F20",
@@ -2298,7 +2298,7 @@
       }
     ],
     "primary": "Continue to access",
-    "route": "/growth/operations/clients/:org/journey/new?step=content"
+    "route": "/portal/admin/clients/:organisationId/journey?step=content"
   },
   {
     "id": "F21",
@@ -2355,7 +2355,7 @@
       }
     ],
     "primary": "Continue to schedule",
-    "route": "/growth/operations/clients/:org/journey/new?step=access"
+    "route": "/portal/admin/clients/:organisationId/journey?step=access"
   },
   {
     "id": "F22",
@@ -2421,7 +2421,7 @@
       }
     ],
     "primary": "Review journey",
-    "route": "/growth/operations/clients/:org/journey/new?step=schedule"
+    "route": "/portal/admin/clients/:organisationId/journey?step=schedule"
   },
   {
     "id": "F23",
@@ -2486,7 +2486,7 @@
       }
     ],
     "primary": "Start journey",
-    "route": "/growth/operations/clients/:org/journey/new?step=activate"
+    "route": "/portal/admin/clients/:organisationId/journey?step=activate"
   },
   {
     "id": "F24",
@@ -2562,7 +2562,7 @@
       }
     ],
     "primary": "Pause journey",
-    "route": "/growth/operations/clients/:org/journey"
+    "route": "/portal/admin/clients/:organisationId/journey"
   },
   {
     "id": "F25",
@@ -2625,7 +2625,7 @@
       }
     ],
     "primary": "Check delivery",
-    "route": "/growth/operations/clients/:org/journey?view=recovery"
+    "route": "/portal/admin/clients/:organisationId/journey?view=recovery"
   },
   {
     "id": "F26",
@@ -2676,7 +2676,7 @@
       }
     ],
     "primary": "Save template draft",
-    "route": "/growth/operations/journeys/templates"
+    "route": "/portal/admin/welcome/templates?organisationId=:organisationId"
   },
   {
     "id": "F27",
@@ -2731,7 +2731,7 @@
       }
     ],
     "primary": "Open exceptions",
-    "route": "/growth/operations/billing"
+    "route": "/portal/admin/billing"
   },
   {
     "id": "F28",
@@ -2788,7 +2788,7 @@
       }
     ],
     "primary": "Review invitation",
-    "route": "/growth/operations/portal-access"
+    "route": "/portal/admin/portal-access"
   },
   {
     "id": "F29",
@@ -2843,7 +2843,7 @@
       }
     ],
     "primary": "Open failed deliveries",
-    "route": "/growth/operations/notifications"
+    "route": "/portal/admin/notifications"
   },
   {
     "id": "F30",
@@ -2904,7 +2904,7 @@
       }
     ],
     "primary": "Save settings draft",
-    "route": "/growth/operations/settings"
+    "route": "/portal/admin/settings"
   },
   {
     "id": "F31",
@@ -2973,7 +2973,7 @@
       }
     ],
     "primary": "Save project",
-    "route": "/growth/operations/clients/:org/projects/:project/edit"
+    "route": "/portal/admin/projects/:projectId/edit"
   },
   {
     "id": "F32",
@@ -3020,7 +3020,7 @@
       }
     ],
     "primary": "Create & link engagement",
-    "route": "/growth/operations/clients/:org/engagements/new"
+    "route": "/portal/admin/clients/:organisationId/engagements/new"
   },
   {
     "id": "S01",
@@ -3098,7 +3098,7 @@
       }
     ],
     "primary": "Review latest version",
-    "route": "/portal/requests/:request?state=conflict"
+    "route": "/portal/requests/:requestId?state=conflict"
   },
   {
     "id": "S04",
@@ -3196,7 +3196,7 @@
       }
     ],
     "primary": "Review missing details",
-    "route": "/growth/operations/journeys/new?state=blocked"
+    "route": "/portal/admin/welcome?state=blocked"
   },
   {
     "id": "S07",
@@ -3266,7 +3266,7 @@
       }
     ],
     "primary": "Publish review",
-    "route": "/growth/operations/requests?state=move-sheet"
+    "route": "/portal/admin/delivery?state=move-sheet"
   },
   {
     "id": "S09",
@@ -3298,7 +3298,7 @@
       }
     ],
     "primary": "View project",
-    "route": "/portal/requests?state=viewer"
+    "route": "/portal/settings?state=viewer"
   },
   {
     "id": "E01",
@@ -3406,7 +3406,7 @@
       }
     ],
     "primary": "Save checklist",
-    "route": "/growth/operations/journeys/templates/:template/tasks"
+    "route": "/portal/admin/welcome/templates/:templateId/tasks?organisationId=:organisationId"
   },
   {
     "id": "F34",
@@ -3449,7 +3449,7 @@
       }
     ],
     "primary": "Review signed evidence",
-    "route": "/growth/operations/clients/:org/agreements/:agreement/record-signature"
+    "route": "/portal/admin/clients/:organisationId/agreements/:agreementId/record-signature"
   },
   {
     "id": "M01",
@@ -3516,7 +3516,7 @@
       }
     ],
     "primary": "New request",
-    "route": "/portal?organisationId=:org",
+    "route": "/portal?organisationId=:organisationId",
     "mobile": true,
     "sourceId": "C01"
   },
@@ -3732,7 +3732,7 @@
       }
     ],
     "primary": "Open preview",
-    "route": "/portal/requests/:request/review",
+    "route": "/portal/requests/:requestId/review",
     "mobile": true,
     "sourceId": "C09"
   },
@@ -3790,7 +3790,7 @@
       }
     ],
     "primary": "Continue to signing",
-    "route": "/portal/agreements/:agreement",
+    "route": "/portal/agreements/:agreementId",
     "mobile": true,
     "sourceId": "C15"
   },
@@ -3864,7 +3864,7 @@
       }
     ],
     "primary": "View delivery",
-    "route": "/growth/operations",
+    "route": "/portal/admin",
     "mobile": true,
     "sourceId": "F01"
   },
@@ -3931,7 +3931,7 @@
       }
     ],
     "primary": "Start journey",
-    "route": "/growth/operations/clients/:org/journey/new?step=activate",
+    "route": "/portal/admin/clients/:organisationId/journey?step=activate",
     "mobile": true,
     "sourceId": "F23"
   },
@@ -3941,7 +3941,7 @@
     "nav": "Getting started",
     "title": "Tell us about your team",
     "subtitle": "Getting started \u00b7 Task 1 of 6",
-    "route": "/portal/onboarding/tasks/:task",
+    "route": "/portal/onboarding/tasks/:taskId",
     "primary": "Save profile",
     "sections": [
       {
@@ -3983,7 +3983,7 @@
     "nav": "Getting started",
     "title": "Bring your brand with you",
     "subtitle": "Getting started \u00b7 Upload approved project assets",
-    "route": "/portal/onboarding/tasks/:task/upload",
+    "route": "/portal/onboarding/tasks/:taskId/upload",
     "primary": "Submit assets",
     "sections": [
       {
@@ -4035,7 +4035,7 @@
     "nav": "Getting started",
     "title": "Let\u2019s plan the kickoff",
     "subtitle": "Getting started \u00b7 Meet your delivery lead",
-    "route": "/portal/onboarding/tasks/:task/booking",
+    "route": "/portal/onboarding/tasks/:taskId/booking",
     "primary": "Choose a time",
     "sections": [
       {
@@ -4075,7 +4075,7 @@
     "nav": "Getting started",
     "title": "You\u2019re ready for the next step.",
     "subtitle": "Your required setup tasks are complete.",
-    "route": "/portal/onboarding?state=complete",
+    "route": "/portal/getting-started?state=complete",
     "primary": "View your project",
     "sections": [
       {
@@ -4123,7 +4123,7 @@
     "nav": "Agreements",
     "title": "Signed. A clear beginning.",
     "subtitle": "Your agreement signature has been recorded.",
-    "route": "/portal/agreements/:agreement?state=signed",
+    "route": "/portal/agreements/:agreementId?state=signed",
     "primary": "Continue setup",
     "sections": [
       {
@@ -4164,7 +4164,7 @@
     "nav": "Welcome journeys",
     "title": "Create a useful next step",
     "subtitle": "Welcome checklist \u00b7 Task editor",
-    "route": "/growth/operations/journeys/templates/:template/tasks/:task",
+    "route": "/portal/admin/welcome/templates/:templateId/tasks/:taskId?organisationId=:organisationId",
     "primary": "Save task",
     "sections": [
       {
@@ -4218,7 +4218,7 @@
     "nav": "Delivery",
     "title": "Create work for a client",
     "subtitle": "Choose the right client and project before creating a request.",
-    "route": "/growth/operations/requests/new",
+    "route": "/portal/admin/delivery/new",
     "primary": "Create request",
     "sections": [
       {
@@ -4276,7 +4276,7 @@
     "nav": "Agreements",
     "title": "Signing request prepared",
     "subtitle": "The approved agreement is awaiting signatures.",
-    "route": "/growth/operations/clients/:org/agreements/:agreement?state=awaiting-signature",
+    "route": "/portal/admin/clients/:organisationId/agreements/:agreementId?state=awaiting-signature",
     "primary": "View signing status",
     "sections": [
       {
@@ -4309,5 +4309,145 @@
         "body": "This agreement becomes signed only after verified evidence for every required party. Failed delivery appears in the operations queue."
       }
     ]
+  },
+  {
+    "id": "C31",
+    "role": "Client",
+    "nav": "Onboarding",
+    "title": "Set up your FSS workspace",
+    "subtitle": "Create the organisation that the authenticated account will manage.",
+    "sections": [
+      {
+        "type": "rows",
+        "title": "Set up your FSS workspace",
+        "items": [
+          [
+            "Create the organisation that the authenticated account will manage."
+          ]
+        ]
+      }
+    ],
+    "primary": "Create organisation",
+    "route": "/portal/onboarding"
+  },
+  {
+    "id": "F38",
+    "role": "Founder",
+    "nav": "Agreements",
+    "title": "Northstar Studio: agreements",
+    "subtitle": "FSS admin reviews a client agreement register. Draft and signed records stay separate from the builder.",
+    "sections": [
+      {
+        "type": "rows",
+        "title": "Northstar Studio: agreements",
+        "items": [
+          [
+            "FSS admin reviews a client agreement register. Draft and signed records stay separate from the builder."
+          ]
+        ]
+      }
+    ],
+    "primary": "New agreement",
+    "route": "/portal/admin/clients/:organisationId/agreements"
+  },
+  {
+    "id": "F39",
+    "role": "Founder",
+    "nav": "Delivery",
+    "title": "Client requests",
+    "subtitle": "FSS admin reviews one client\u2019s requests. Open work and follow-ups appear before completed requests.",
+    "sections": [
+      {
+        "type": "rows",
+        "title": "Client requests",
+        "items": [
+          [
+            "FSS admin reviews one client\u2019s requests. Open work and follow-ups appear before completed requests."
+          ]
+        ]
+      }
+    ],
+    "primary": "Open request",
+    "route": "/portal/admin/clients/:organisationId/requests"
+  },
+  {
+    "id": "F40",
+    "role": "Founder",
+    "nav": "Agreements",
+    "title": "Signing status",
+    "subtitle": "FSS admin reviews a client\u2019s signing status. Approval, delivery and signature evidence remain distinct.",
+    "sections": [
+      {
+        "type": "rows",
+        "title": "Signing status",
+        "items": [
+          [
+            "FSS admin reviews a client\u2019s signing status. Approval, delivery and signature evidence remain distinct."
+          ]
+        ]
+      }
+    ],
+    "primary": "Back to agreements",
+    "route": "/portal/admin/clients/:organisationId/signing"
+  },
+  {
+    "id": "F41",
+    "role": "Founder",
+    "nav": "Projects",
+    "title": "Project workspace",
+    "subtitle": "FSS admin filters and reviews client projects by status, target date, milestones and documents.",
+    "sections": [
+      {
+        "type": "rows",
+        "title": "Project workspace",
+        "items": [
+          [
+            "FSS admin filters and reviews client projects by status, target date, milestones and documents."
+          ]
+        ]
+      }
+    ],
+    "primary": "Plan a project",
+    "route": "/portal/admin/projects"
+  },
+  {
+    "id": "F42",
+    "role": "Founder",
+    "nav": "Projects",
+    "title": "Plan a project",
+    "subtitle": "FSS admin creates a project from a saved agreement and its reviewed scope.",
+    "sections": [
+      {
+        "type": "rows",
+        "title": "Plan a project",
+        "items": [
+          [
+            "FSS admin creates a project from a saved agreement and its reviewed scope."
+          ]
+        ]
+      }
+    ],
+    "primary": "Create project",
+    "route": "/portal/admin/projects/new"
+  },
+  {
+    "id": "F43",
+    "role": "Founder",
+    "nav": "Projects",
+    "title": "Document register",
+    "subtitle": "FSS admin reviews documents attached to delivery work. Project documents are distinct from signing documents.",
+    "sections": [
+      {
+        "type": "rows",
+        "title": "Document register",
+        "items": [
+          [
+            "FSS admin reviews documents attached to delivery work. Project documents are distinct from signing documents."
+          ]
+        ]
+      }
+    ],
+    "primary": "Open client context",
+    "route": "/portal/admin/projects/documents"
   }
 ]

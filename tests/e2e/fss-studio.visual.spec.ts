@@ -684,41 +684,241 @@ const phaseSevenMobileScenarios = [
 ] as const;
 
 const phaseEightDesktopScenarios = [
-  ["C14", "client-agreement-list", "Your agreements", "c14-client-agreements-desktop.png"],
-  ["C15", "client-agreement-detail", "Website & booking experience", "c15-client-agreement-detail-desktop.png"],
-  ["C16", "client-agreement-signing", "Review and sign", "c16-client-agreement-signing-desktop.png"],
-  ["C30", "client-agreement-signed", "Your signed agreement", "c30-client-agreement-signed-desktop.png"],
-  ["F09", "studio-agreement-list", "Agreements", "f09-studio-agreements-desktop.png"],
-  ["F10", "studio-agreement-builder", "Create an agreement", "f10-studio-agreement-builder-desktop.png"],
-  ["F11", "studio-agreement-builder-scope", "Create an agreement", "f11-studio-agreement-scope-desktop.png"],
-  ["F12", "studio-agreement-builder-fees", "Create an agreement", "f12-studio-agreement-fees-desktop.png"],
-  ["F13", "studio-agreement-builder-people", "Create an agreement", "f13-studio-agreement-people-desktop.png"],
-  ["F14", "studio-agreement-builder-document", "Create an agreement", "f14-studio-agreement-document-desktop.png"],
-  ["F15", "studio-agreement-builder-review", "Create an agreement", "f15-studio-agreement-review-desktop.png"],
-  ["F16", "studio-agreement-no-engagement", "Create an agreement", "f16-studio-agreement-link-desktop.png"],
-  ["F17", "studio-agreement-signed", "Signed and recorded", "f17-studio-agreement-signed-desktop.png"],
-  ["F32", "studio-engagement-provenance", "Create an engagement", "f32-studio-engagement-provenance-desktop.png"],
-  ["F34", "studio-signature-evidence", "Record signed evidence", "f34-studio-signature-evidence-desktop.png"],
-  ["F37", "studio-signing-status", "Signing status", "f37-studio-signing-status-desktop.png"],
+  [
+    "C14",
+    "client-agreement-list",
+    "Your agreements",
+    "c14-client-agreements-desktop.png",
+  ],
+  [
+    "C15",
+    "client-agreement-detail",
+    "Website & booking experience",
+    "c15-client-agreement-detail-desktop.png",
+  ],
+  [
+    "C16",
+    "client-agreement-signing",
+    "Review and sign",
+    "c16-client-agreement-signing-desktop.png",
+  ],
+  [
+    "C30",
+    "client-agreement-signed",
+    "Your signed agreement",
+    "c30-client-agreement-signed-desktop.png",
+  ],
+  [
+    "F09",
+    "studio-agreement-list",
+    "Agreements",
+    "f09-studio-agreements-desktop.png",
+  ],
+  [
+    "F10",
+    "studio-agreement-builder",
+    "Create an agreement",
+    "f10-studio-agreement-builder-desktop.png",
+  ],
+  [
+    "F11",
+    "studio-agreement-builder-scope",
+    "Create an agreement",
+    "f11-studio-agreement-scope-desktop.png",
+  ],
+  [
+    "F12",
+    "studio-agreement-builder-fees",
+    "Create an agreement",
+    "f12-studio-agreement-fees-desktop.png",
+  ],
+  [
+    "F13",
+    "studio-agreement-builder-people",
+    "Create an agreement",
+    "f13-studio-agreement-people-desktop.png",
+  ],
+  [
+    "F14",
+    "studio-agreement-builder-document",
+    "Create an agreement",
+    "f14-studio-agreement-document-desktop.png",
+  ],
+  [
+    "F15",
+    "studio-agreement-builder-review",
+    "Create an agreement",
+    "f15-studio-agreement-review-desktop.png",
+  ],
+  [
+    "F16",
+    "studio-agreement-no-engagement",
+    "Create an agreement",
+    "f16-studio-agreement-link-desktop.png",
+  ],
+  [
+    "F17",
+    "studio-agreement-signed",
+    "Signed and recorded",
+    "f17-studio-agreement-signed-desktop.png",
+  ],
+  [
+    "F32",
+    "studio-engagement-provenance",
+    "Create an engagement",
+    "f32-studio-engagement-provenance-desktop.png",
+  ],
+  [
+    "F34",
+    "studio-signature-evidence",
+    "Record signed evidence",
+    "f34-studio-signature-evidence-desktop.png",
+  ],
+  [
+    "F37",
+    "studio-signing-status",
+    "Signing status",
+    "f37-studio-signing-status-desktop.png",
+  ],
 ] as const;
 
 const phaseEightMobileScenarios = [
-  ["C14", "client-agreement-list", "Your agreements", "c14-client-agreements-mobile.png"],
-  ["C15", "client-agreement-detail", "Website & booking experience", "c15-client-agreement-detail-mobile.png"],
-  ["C16", "client-agreement-signing", "Review and sign", "c16-client-agreement-signing-mobile.png"],
-  ["C30", "client-agreement-signed", "Your signed agreement", "c30-client-agreement-signed-mobile.png"],
-  ["F09", "studio-agreement-list", "Agreements", "f09-studio-agreements-mobile.png"],
-  ["F10", "studio-agreement-builder", "Create an agreement", "f10-studio-agreement-builder-mobile.png"],
-  ["F11", "studio-agreement-builder-scope", "Create an agreement", "f11-studio-agreement-scope-mobile.png"],
-  ["F12", "studio-agreement-builder-fees", "Create an agreement", "f12-studio-agreement-fees-mobile.png"],
-  ["F13", "studio-agreement-builder-people", "Create an agreement", "f13-studio-agreement-people-mobile.png"],
-  ["F14", "studio-agreement-builder-document", "Create an agreement", "f14-studio-agreement-document-mobile.png"],
-  ["F15", "studio-agreement-builder-review", "Create an agreement", "f15-studio-agreement-review-mobile.png"],
-  ["F16", "studio-agreement-no-engagement", "Create an agreement", "f16-studio-agreement-link-mobile.png"],
-  ["F17", "studio-agreement-signed", "Signed and recorded", "f17-studio-agreement-signed-mobile.png"],
-  ["F32", "studio-engagement-provenance", "Create an engagement", "f32-studio-engagement-provenance-mobile.png"],
-  ["F34", "studio-signature-evidence", "Record signed evidence", "f34-studio-signature-evidence-mobile.png"],
-  ["F37", "studio-signing-status", "Signing status", "f37-studio-signing-status-mobile.png"],
+  [
+    "C14",
+    "client-agreement-list",
+    "Your agreements",
+    "c14-client-agreements-mobile.png",
+  ],
+  [
+    "C15",
+    "client-agreement-detail",
+    "Website & booking experience",
+    "c15-client-agreement-detail-mobile.png",
+  ],
+  [
+    "C16",
+    "client-agreement-signing",
+    "Review and sign",
+    "c16-client-agreement-signing-mobile.png",
+  ],
+  [
+    "C30",
+    "client-agreement-signed",
+    "Your signed agreement",
+    "c30-client-agreement-signed-mobile.png",
+  ],
+  [
+    "F09",
+    "studio-agreement-list",
+    "Agreements",
+    "f09-studio-agreements-mobile.png",
+  ],
+  [
+    "F10",
+    "studio-agreement-builder",
+    "Create an agreement",
+    "f10-studio-agreement-builder-mobile.png",
+  ],
+  [
+    "F11",
+    "studio-agreement-builder-scope",
+    "Create an agreement",
+    "f11-studio-agreement-scope-mobile.png",
+  ],
+  [
+    "F12",
+    "studio-agreement-builder-fees",
+    "Create an agreement",
+    "f12-studio-agreement-fees-mobile.png",
+  ],
+  [
+    "F13",
+    "studio-agreement-builder-people",
+    "Create an agreement",
+    "f13-studio-agreement-people-mobile.png",
+  ],
+  [
+    "F14",
+    "studio-agreement-builder-document",
+    "Create an agreement",
+    "f14-studio-agreement-document-mobile.png",
+  ],
+  [
+    "F15",
+    "studio-agreement-builder-review",
+    "Create an agreement",
+    "f15-studio-agreement-review-mobile.png",
+  ],
+  [
+    "F16",
+    "studio-agreement-no-engagement",
+    "Create an agreement",
+    "f16-studio-agreement-link-mobile.png",
+  ],
+  [
+    "F17",
+    "studio-agreement-signed",
+    "Signed and recorded",
+    "f17-studio-agreement-signed-mobile.png",
+  ],
+  [
+    "F32",
+    "studio-engagement-provenance",
+    "Create an engagement",
+    "f32-studio-engagement-provenance-mobile.png",
+  ],
+  [
+    "F34",
+    "studio-signature-evidence",
+    "Record signed evidence",
+    "f34-studio-signature-evidence-mobile.png",
+  ],
+  [
+    "F37",
+    "studio-signing-status",
+    "Signing status",
+    "f37-studio-signing-status-mobile.png",
+  ],
+] as const;
+
+const activeRouteScenarios = [
+  [
+    "C31",
+    "client-organisation-onboarding",
+    "Set up your organisation.",
+    "c31-client-organisation-onboarding",
+  ],
+  [
+    "F38",
+    "studio-client-agreements",
+    "Northstar Studio: agreements",
+    "f38-studio-client-agreements",
+  ],
+  [
+    "F39",
+    "studio-client-requests",
+    "Client requests",
+    "f39-studio-client-requests",
+  ],
+  [
+    "F40",
+    "studio-client-signing",
+    "Signing status",
+    "f40-studio-client-signing",
+  ],
+  ["F41", "studio-projects", "Project workspace", "f41-studio-projects"],
+  [
+    "F42",
+    "studio-project-create",
+    "Plan a project",
+    "f42-studio-project-create",
+  ],
+  [
+    "F43",
+    "studio-project-documents",
+    "Document register",
+    "f43-studio-project-documents",
+  ],
 ] as const;
 
 test.describe("FSS Studio desktop visuals", () => {
@@ -734,6 +934,20 @@ test.describe("FSS Studio desktop visuals", () => {
     await openScenario(page, "client-login", "Sign in to FSS");
     await expect(page).toHaveScreenshot("c00-client-sign-in-desktop.png");
   });
+
+  for (const [
+    screenId,
+    scenario,
+    heading,
+    screenshot,
+  ] of activeRouteScenarios) {
+    test(`${screenId} active route desktop matches the FSS workspace`, async ({
+      page,
+    }) => {
+      await openScenario(page, scenario, heading);
+      await expect(page).toHaveScreenshot(`${screenshot}-desktop.png`);
+    });
+  }
 
   test("client overview desktop matches C01", async ({ page }) => {
     await openScenario(page, "client-overview", "Your workspace");
@@ -794,7 +1008,12 @@ test.describe("FSS Studio desktop visuals", () => {
     );
   });
 
-  for (const [coverageId, scenario, heading, screenshot] of phaseEightDesktopScenarios) {
+  for (const [
+    coverageId,
+    scenario,
+    heading,
+    screenshot,
+  ] of phaseEightDesktopScenarios) {
     test(`Phase 8 ${coverageId} desktop matches the completed agreement journey`, async ({
       page,
     }) => {
@@ -874,6 +1093,20 @@ test.describe("FSS Studio mobile visuals", () => {
     await expect(page).toHaveScreenshot("c00-client-sign-in-mobile.png");
   });
 
+  for (const [
+    screenId,
+    scenario,
+    heading,
+    screenshot,
+  ] of activeRouteScenarios) {
+    test(`${screenId} active route mobile reflows with FSS navigation`, async ({
+      page,
+    }) => {
+      await openScenario(page, scenario, heading);
+      await expect(page).toHaveScreenshot(`${screenshot}-mobile.png`);
+    });
+  }
+
   test("client overview mobile matches M01", async ({ page }) => {
     await openScenario(page, "client-overview", "Your workspace");
     await expect(page).toHaveScreenshot("m01-client-overview-mobile.png");
@@ -910,7 +1143,12 @@ test.describe("FSS Studio mobile visuals", () => {
     await expect(page).toHaveScreenshot("m07-studio-overview-mobile.png");
   });
 
-  for (const [coverageId, scenario, heading, screenshot] of phaseEightMobileScenarios) {
+  for (const [
+    coverageId,
+    scenario,
+    heading,
+    screenshot,
+  ] of phaseEightMobileScenarios) {
     test(`Phase 8 ${coverageId} mobile matches the completed agreement journey`, async ({
       page,
     }) => {
@@ -975,4 +1213,74 @@ test.describe("FSS Studio mobile visuals", () => {
       await expect(page).toHaveScreenshot(screenshot);
     });
   }
+});
+
+test("client project tabs filter the loaded workspace without losing route context", async ({
+  page,
+}) => {
+  await openClientScenario(page, "client-projects", "Your projects");
+  await page.getByRole("button", { name: "Completed 1" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Completed work" }),
+  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Active work" })).toHaveCount(
+    0,
+  );
+  await page.getByRole("button", { name: "Active 1" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Active work" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Brand landing page" }),
+  ).toHaveCount(0);
+});
+
+test("appearance selection updates the portal and persists between pages", async ({
+  page,
+  context,
+}) => {
+  await openScenario(page, "client-projects", "Your projects");
+  await page.getByLabel("Colour appearance").selectOption("dark");
+  await expect(page.locator(".portal-theme")).toHaveAttribute(
+    "data-appearance",
+    "dark",
+  );
+  await expect
+    .poll(() =>
+      page
+        .locator(".portal-theme")
+        .evaluate((element) =>
+          getComputedStyle(element).getPropertyValue("--portal-canvas").trim(),
+        ),
+    )
+    .toBe("#0b1421");
+  await expect(page).toHaveScreenshot("client-projects-dark.png");
+  await expect
+    .poll(
+      async () =>
+        (await context.cookies()).find(
+          (cookie) => cookie.name === "fss-portal-appearance",
+        )?.value,
+    )
+    .toBe("dark");
+  await page.goto("/visual/fss-studio/client-project-detail");
+  await expect(page.locator(".portal-theme")).toHaveAttribute(
+    "data-appearance",
+    "dark",
+  );
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.getByLabel("Colour appearance").selectOption("system");
+  await expect(page.locator(".portal-theme")).toHaveAttribute(
+    "data-appearance",
+    "system",
+  );
+  await expect
+    .poll(() =>
+      page
+        .locator(".portal-theme")
+        .evaluate((element) =>
+          getComputedStyle(element).getPropertyValue("--portal-canvas").trim(),
+        ),
+    )
+    .toBe("#0b1421");
 });

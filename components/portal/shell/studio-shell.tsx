@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { Bell } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import { PortalSignOutButton } from "../auth/portal-sign-out";
@@ -11,6 +12,8 @@ import {
   type PortalNavigationItem,
 } from "./navigation";
 import { PortalNavigationIcon } from "./navigation-icon";
+import { PortalAppearanceControl } from "./appearance-control";
+import type { PortalAppearance } from "@/lib/operations/design/portal-appearance";
 import styles from "./portal-shell.module.css";
 
 function StudioNavigationLink({
@@ -83,8 +86,10 @@ function StudioMobileNavigation({
 
 export function StudioShell({
   children,
+  initialAppearance = "system",
 }: Readonly<{
   children: React.ReactNode;
+  initialAppearance?: PortalAppearance;
 }>): React.JSX.Element {
   const pathname = usePathname();
   const navigation = getStudioNavigation(pathname);
@@ -118,9 +123,19 @@ export function StudioShell({
       <div className={styles.content}>
         <header className={styles.topbar}>
           <p className={styles.context}>FSS Studio</p>
-          <PortalSignOutButton className={styles.signOut}>
-            Sign out
-          </PortalSignOutButton>
+          <div className={styles.toolbarActions}>
+            <Link
+              className={styles.toolbarIcon}
+              href={portalPath("/portal/admin/notifications")}
+              aria-label="Notifications"
+            >
+              <Bell aria-hidden="true" size={18} />
+            </Link>
+            <PortalAppearanceControl initialAppearance={initialAppearance} />
+            <PortalSignOutButton className={styles.signOut}>
+              Sign out
+            </PortalSignOutButton>
+          </div>
         </header>
         <main className={styles.main} id="studio-content">
           {children}

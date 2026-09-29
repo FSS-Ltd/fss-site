@@ -87,6 +87,15 @@ import {
   StudioProjectEditScenario,
   StudioSettingsScenario,
 } from "./studio-workspace-visual-fixtures";
+import {
+  ClientOrganisationOnboardingScenario,
+  StudioClientAgreementRegisterScenario,
+  StudioClientRequestRegisterScenario,
+  StudioClientSigningRegisterScenario,
+  StudioProjectCreateScenario,
+  StudioProjectDocumentsScenario,
+  StudioProjectRegisterScenario,
+} from "./active-route-visual-fixtures";
 
 export type VisualScenarioName =
   | "client-login"
@@ -127,6 +136,7 @@ export type VisualScenarioName =
   | "client-help"
   | "client-preferences"
   | "client-team"
+  | "client-organisation-onboarding"
   | "client-unavailable"
   | "client-invitation-expired"
   | "client-document-quarantine"
@@ -170,7 +180,13 @@ export type VisualScenarioName =
   | "studio-notification-delivery"
   | "studio-settings"
   | "studio-project-edit"
-  | "studio-journey-blocked";
+  | "studio-journey-blocked"
+  | "studio-client-agreements"
+  | "studio-client-requests"
+  | "studio-client-signing"
+  | "studio-projects"
+  | "studio-project-create"
+  | "studio-project-documents";
 
 export type VisualScenario = Readonly<{
   name: VisualScenarioName;
@@ -498,6 +514,10 @@ const scenarios: Record<VisualScenarioName, VisualScenario> = {
     name: "client-team",
     content: <ClientTeamScenario />,
   },
+  "client-organisation-onboarding": {
+    name: "client-organisation-onboarding",
+    content: <ClientOrganisationOnboardingScenario />,
+  },
   "client-unavailable": {
     name: "client-unavailable",
     content: <ClientUnavailableScenario />,
@@ -677,6 +697,30 @@ const scenarios: Record<VisualScenarioName, VisualScenario> = {
   "studio-journey-blocked": {
     name: "studio-journey-blocked",
     content: <StudioJourneyBlockedScenario />,
+  },
+  "studio-client-agreements": {
+    name: "studio-client-agreements",
+    content: <StudioClientAgreementRegisterScenario />,
+  },
+  "studio-client-requests": {
+    name: "studio-client-requests",
+    content: <StudioClientRequestRegisterScenario />,
+  },
+  "studio-client-signing": {
+    name: "studio-client-signing",
+    content: <StudioClientSigningRegisterScenario />,
+  },
+  "studio-projects": {
+    name: "studio-projects",
+    content: <StudioProjectRegisterScenario />,
+  },
+  "studio-project-create": {
+    name: "studio-project-create",
+    content: <StudioProjectCreateScenario />,
+  },
+  "studio-project-documents": {
+    name: "studio-project-documents",
+    content: <StudioProjectDocumentsScenario />,
   },
 };
 

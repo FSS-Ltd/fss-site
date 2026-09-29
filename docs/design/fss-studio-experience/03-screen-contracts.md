@@ -2,7 +2,7 @@
 
 ## Scope and interpretation
 
-This inventory defines 88 screen references: 31 client, 37 founder, 10 shared states, 2 emails and 8 mobile layouts. Screen IDs are stable across the editable SVGs, preview browser and content manifest. Five initial screen IDs also exist as native Figma frames; the remaining references are in the local atlas pending Figma capacity.
+This inventory now defines 95 screen references: 32 client, 43 founder, 10 shared states, 2 emails and 8 mobile layouts. The seven additions cover active client onboarding, client-scoped agreements and requests, client signing status, and Studio project registers and creation. Screen IDs are stable across editable SVG references, the preview browser and content manifest. Five initial screen IDs also exist as native Figma frames; the remaining references are in the local atlas pending Figma capacity.
 
 Routes below are **proposed interface locations**, not a claim that every route exists in the checkout. The existing portal already has login, activate, projects, requests, agreements, billing, services and onboarding routes. Prefer adapting the existing `/portal/onboarding` surface for Getting started rather than duplicating it under a new route. Preserve existing founder routes and services; map the information architecture before changing URLs. `?state=` examples are design scenarios, never a trusted way to set domain state. Always resolve organisation and capabilities from authenticated server context, not a query string alone.
 
@@ -111,9 +111,16 @@ Workflow contracts take precedence over illustrative labels. The gallery is a sc
 | C28 | Client | [Let’s plan the kickoff](./wireframes.html#C28) | Choose a time |
 | C29 | Client | [You’re ready for the next step.](./wireframes.html#C29) | View your project |
 | C30 | Client | [Signed. A clear beginning.](./wireframes.html#C30) | Continue setup |
+| C31 | Client | [Set up your FSS workspace](./wireframes.html#C31) | Create organisation |
 | F35 | Founder | [Create a useful next step](./wireframes.html#F35) | Save task |
 | F36 | Founder | [Create work for a client](./wireframes.html#F36) | Create request |
 | F37 | Founder | [Signing request prepared](./wireframes.html#F37) | View signing status |
+| F38 | Founder | [Northstar Studio: agreements](./wireframes.html#F38) | New agreement |
+| F39 | Founder | [Client requests](./wireframes.html#F39) | Open request |
+| F40 | Founder | [Signing status](./wireframes.html#F40) | Back to agreements |
+| F41 | Founder | [Project workspace](./wireframes.html#F41) | Plan a project |
+| F42 | Founder | [Plan a project](./wireframes.html#F42) | Create project |
+| F43 | Founder | [Document register](./wireframes.html#F43) | Open client context |
 
 ## C00 · Welcome to your FSS workspace
 
@@ -1012,6 +1019,21 @@ Ask FSS to invite a teammate or change a role. Signer and reviewer designations 
 
 Open your invitation or request help from FSS. Signing in does not grant organisation access.
 
+
+
+## C31 · Set up your FSS workspace
+
+**Audience:** Client. **Navigation:** First-time setup.
+
+**Proposed location:** `/portal/onboarding`.
+
+**Purpose:** Create the organisation that the authenticated account will manage.
+
+**Primary action:** Create organisation.
+
+**Required behaviour and acceptance:** Keep the form limited to the organisation display name, legal name and deployment timezone. Show pending and error feedback; create no membership unless the authenticated invitation flow allows it.
+
+[Full-size editable wireframe](./wireframes/C31.svg) · [Open in screen browser](./wireframes.html#C31)
 
 ## F01 · Your studio, in focus.
 
@@ -3166,3 +3188,7 @@ Version 2 is approved and retained. The signing request has been queued; no sign
 
 This agreement becomes signed only after verified evidence for every required party. Failed delivery appears in the operations queue.
 
+
+## F38–F43 · Active FSS Studio registers
+
+The route register now includes client-scoped agreements, requests, and signing status, plus the cross-client project register, project creation form, and project document register. Each screen uses the current `/portal/admin` route family, permission boundary, and matching desktop/mobile visual case.

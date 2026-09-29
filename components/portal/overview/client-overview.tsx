@@ -8,7 +8,12 @@ import { portalPath } from "@/lib/operations/auth/portal-url";
 import { getPortalRolePresentation } from "@/lib/operations/auth/permissions";
 import type { PortalMembershipSummary } from "@/lib/operations/auth/require-member";
 import type { ProjectStatus } from "@/lib/operations/projects/types";
-import { Notice, PageHeader, PortalButton, StatusBadge } from "@/components/portal/ui";
+import {
+  Notice,
+  PageHeader,
+  PortalButton,
+  StatusBadge,
+} from "@/components/portal/ui";
 import styles from "./client-overview.module.css";
 
 type ClientOverviewProps = Readonly<{
@@ -31,14 +36,16 @@ function projectStatusTone(
 }
 
 function projectStatusLabel(status: string): string {
-  return {
-    active: "In delivery",
-    completed: "Completed",
-    paused: "Paused",
-    planned: "Planned",
-    waiting_for_us: "With FSS",
-    waiting_for_you: "Waiting for you",
-  }[status] ?? status;
+  return (
+    {
+      active: "In delivery",
+      completed: "Completed",
+      paused: "Paused",
+      planned: "Planned",
+      waiting_for_us: "With FSS",
+      waiting_for_you: "Waiting for you",
+    }[status] ?? status
+  );
 }
 
 function formatTargetDate(value: string | null): string | null {
@@ -59,7 +66,9 @@ export function ClientOverview({
   workspaceName,
 }: ClientOverviewProps): React.JSX.Element {
   const attention = selectClientAttention(overview);
-  const steps = getClientOverviewSteps(overview);
+  const steps = getClientOverviewSteps(overview).filter(
+    (step) => step.href !== attention?.href,
+  );
   const reviewCount = overview.requests?.filter(
     (request) => request.status === "ready_for_review",
   ).length;
@@ -72,7 +81,7 @@ export function ClientOverview({
   const latestUpdate = overview.notifications?.[0];
 
   return (
-    <div className={styles.page}>
+    <div className={`${styles.page} ${styles.overviewPage}`}>
       <PageHeader
         description={`Here is where things stand with ${workspaceName}.`}
         eyebrow={workspaceName}
@@ -80,7 +89,11 @@ export function ClientOverview({
         action={
           canCreateRequest ? (
             <form action={portalPath("/portal/requests/new")} method="get">
-              <input name="organisationId" type="hidden" value={overview.organisationId} />
+              <input
+                name="organisationId"
+                type="hidden"
+                value={overview.organisationId}
+              />
               <PortalButton type="submit">New request</PortalButton>
             </form>
           ) : undefined
@@ -128,9 +141,9 @@ export function ClientOverview({
         </dl>
       ) : null}
 
-      <section className={styles.panel} aria-labelledby="next-steps-heading">
-        <h2 id="next-steps-heading">Your next steps</h2>
-        {steps.length > 0 ? (
+      {steps.length > 0 ? (
+        <section className={styles.panel} aria-labelledby="next-steps-heading">
+          <h2 id="next-steps-heading">Your next steps</h2>
           <ul className={styles.stepList}>
             {steps.map((step) => (
               <li key={step.href}>
@@ -142,10 +155,8 @@ export function ClientOverview({
               </li>
             ))}
           </ul>
-        ) : (
-          <p className={styles.empty}>No next step is waiting for you.</p>
-        )}
-      </section>
+        </section>
+      ) : null}
 
       {overview.projects !== null ? (
         <section className={styles.panel} aria-labelledby="projects-heading">
@@ -183,7 +194,10 @@ export function ClientOverview({
       ) : null}
 
       {latestUpdate ? (
-        <section className={styles.panel} aria-labelledby="latest-update-heading">
+        <section
+          className={styles.panel}
+          aria-labelledby="latest-update-heading"
+        >
           <h2 id="latest-update-heading">Latest update</h2>
           <p className={styles.updateTitle}>{latestUpdate.title}</p>
           <p>{latestUpdate.body}</p>
@@ -215,17 +229,18 @@ export function ClientWorkspaceChooser({
         title="Choose your workspace"
       />
       <Notice tone="info">
-        Select an organisation to see its project updates, requests and next steps.
+        Select an organisation to see its project updates, requests and next
+        steps.
       </Notice>
       <ul className={styles.workspaceList}>
         {memberships.map((membership) => (
           <li key={membership.organisationId}>
-            <Link
-              href={organisationHref("/portal", membership.organisationId)}
-            >
+            <Link href={organisationHref("/portal", membership.organisationId)}>
               <span>
                 <strong>{membership.displayName}</strong>
-                <small>{getPortalRolePresentation(membership.role).label}</small>
+                <small>
+                  {getPortalRolePresentation(membership.role).label}
+                </small>
               </span>
               <span aria-hidden="true">Open</span>
             </Link>

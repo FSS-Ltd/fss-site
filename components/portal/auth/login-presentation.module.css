@@ -1,9 +1,22 @@
 .presentation {
   display: grid;
-  width: min(100%, 560px);
+  width: min(100%, 880px);
   gap: 12px;
   margin-inline: auto;
   color: var(--portal-ink, #0a1a2e);
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 24px;
+}
+
+.primaryColumn,
+.contextColumn {
+  display: grid;
+  gap: 16px;
 }
 
 .introduction {
@@ -16,6 +29,19 @@
   width: 46px;
   height: auto;
   margin-bottom: 10px;
+}
+
+:global(.portal-theme[data-appearance="dark"]) .brand {
+  filter: grayscale(1) brightness(0) invert(1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :global(
+      .portal-theme:not([data-appearance="light"]):not([data-appearance="dark"])
+    )
+    .brand {
+    filter: grayscale(1) brightness(0) invert(1);
+  }
 }
 
 .eyebrow,
@@ -57,12 +83,13 @@
   gap: 10px;
   padding: 20px;
   border-radius: 12px;
-  background: var(--portal-navy, #07182e);
-  color: #ffffff;
+  border: 1px solid var(--portal-border, #d9dfe5);
+  background: var(--portal-surface, #ffffff);
+  color: var(--portal-ink, #0a1a2e);
 }
 
 .nextStep .sectionLabel {
-  color: #c4dbdf;
+  color: var(--portal-action, #0f7078);
 }
 
 .nextStep h2 {
@@ -72,7 +99,7 @@
 }
 
 .nextStep > p:last-child {
-  color: #edf7f8;
+  color: var(--portal-muted, #46566c);
   font-size: 0.8125rem;
   line-height: 1.5;
 }
@@ -123,7 +150,7 @@
 }
 
 .input::placeholder {
-  color: #657183;
+  color: var(--portal-muted, #46566c);
 }
 
 .submit {
@@ -136,7 +163,7 @@
   border-radius: 10px;
   padding: 10px 16px;
   background: var(--portal-action, #0f7078);
-  color: #ffffff;
+  color: var(--portal-on-action, #ffffff);
   font: inherit;
   font-size: 0.875rem;
   font-weight: 700;
@@ -173,15 +200,15 @@
   border: 1px solid #b5dbd7;
   border-radius: 8px;
   background: var(--portal-tint, #e3f2f1);
-  color: #0b5e65;
+  color: var(--portal-action, #0b5e65);
   font-size: 0.8125rem;
   line-height: 1.5;
 }
 
 .error {
   border-color: #e7b5ae;
-  background: #fff0ed;
-  color: #9e2f22;
+  background: var(--portal-error-surface, #fff0ed);
+  color: var(--portal-error-ink, #9e2f22);
 }
 
 .feedbackIcon {
@@ -227,7 +254,7 @@
 
 .footer {
   padding: 8px 0 0;
-  font-size: 0.5625rem;
+  font-size: 0.75rem;
   letter-spacing: 0;
   text-transform: none;
 }
@@ -238,6 +265,10 @@
 }
 
 @media (max-width: 480px) {
+  .columns {
+    grid-template-columns: 1fr;
+  }
+
   .presentation {
     gap: 12px;
   }
