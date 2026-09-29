@@ -13,6 +13,7 @@ export type CronErrorReport = {
 };
 
 const SAFE_ERROR_NAME = /^[A-Za-z][A-Za-z0-9]{0,79}$/;
+const POSTGRES_SQLSTATE = /^[0-9A-Z]{5}$/;
 const SAFE_ERROR_CODES = new Set([
   "AUTHENTICATION_FAILED",
   "HISTORY_ID_EXPIRED",
@@ -22,7 +23,10 @@ const SAFE_ERROR_CODES = new Set([
   "RETRYABLE_PROVIDER_ERROR",
 ]);
 
-function readErrorString(error: unknown, property: "name" | "code"): string | undefined {
+function readErrorString(
+  error: unknown,
+  property: "name" | "code",
+): string | undefined {
   if (typeof error !== "object" || error === null) return undefined;
 
   try {
@@ -40,7 +44,10 @@ export function toCronErrorReport(error: unknown): CronErrorReport {
   return {
     errorName:
       errorName && SAFE_ERROR_NAME.test(errorName) ? errorName : "UnknownError",
-    ...(errorCode && SAFE_ERROR_CODES.has(errorCode) ? { errorCode } : {}),
+    ...(errorCode &&
+    (SAFE_ERROR_CODES.has(errorCode) || POSTGRES_SQLSTATE.test(errorCode))
+      ? { errorCode }
+      : {}),
   };
 }
 

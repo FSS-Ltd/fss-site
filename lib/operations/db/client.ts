@@ -86,7 +86,6 @@ export function createOperationsDb(
       max,
       idle_timeout: 20,
       connect_timeout: 10,
-      connection: { options: `-c role=${role}` },
     }),
     role,
   );

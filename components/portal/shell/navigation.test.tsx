@@ -29,12 +29,14 @@ const clerkMock = new Module(clerkModulePath);
 clerkMock.filename = clerkModulePath;
 clerkMock.loaded = true;
 clerkMock.exports = {
-  useClerk: () => ({ signOut: async () => undefined }),
+  SignOutButton: ({ children }: { children: React.ReactNode }) => children,
 };
 require.cache[clerkModulePath] = clerkMock;
 
-const { ClientShell } = require("./client-shell") as typeof import("./client-shell");
-const { StudioShell } = require("./studio-shell") as typeof import("./studio-shell");
+const { ClientShell } =
+  require("./client-shell") as typeof import("./client-shell");
+const { StudioShell } =
+  require("./studio-shell") as typeof import("./studio-shell");
 
 const membership = {
   displayName: "Northstar Studio",
@@ -51,9 +53,9 @@ function renderClient(
   );
 }
 
-function renderStudio(): string {
+function renderStudio(prefixFreeEnabled = true): string {
   return renderToStaticMarkup(
-    <StudioShell>
+    <StudioShell prefixFreeEnabled={prefixFreeEnabled}>
       <p>Studio content</p>
     </StudioShell>,
   );
@@ -77,4 +79,9 @@ test("marks the active client destination as the current page", () => {
 test("uses Clerk sign-out controls instead of origin-gated forms", () => {
   assert.doesNotMatch(renderClient("owner"), /api\/auth\/sign-out/);
   assert.doesNotMatch(renderStudio(), /api\/auth\/sign-out/);
+});
+
+test("keeps Studio toolbar links in the server-selected portal routing mode", () => {
+  assert.match(renderStudio(true), /href="\/admin\/notifications"/);
+  assert.match(renderStudio(false), /href="\/portal\/admin\/notifications"/);
 });

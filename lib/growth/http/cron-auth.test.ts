@@ -120,7 +120,10 @@ test("route handler reports and masks an unexpected error from the work function
     code: "internal_error",
   });
   assert.deepEqual(reported, [{ errorName: "Error" }]);
-  assert.doesNotMatch(JSON.stringify(reported), /token=secret|stack|credentials/);
+  assert.doesNotMatch(
+    JSON.stringify(reported),
+    /token=secret|stack|credentials/,
+  );
 });
 
 test("route handler preserves an allowlisted provider error code", async () => {
@@ -144,6 +147,30 @@ test("route handler preserves an allowlisted provider error code", async () => {
   assert.deepEqual(reported, [
     { errorName: "GmailClientError", errorCode: "AUTHENTICATION_FAILED" },
   ]);
+});
+
+test("route handler preserves a PostgreSQL SQLSTATE without logging its message", async () => {
+  const reported: Array<{ errorName: string; errorCode?: string }> = [];
+  const handler = createCronRouteHandler(
+    {
+      cronSecret: CRON_SECRET,
+      automationsEnabled: true,
+      reportUnexpectedError: (error) => reported.push(error),
+    },
+    async () => {
+      const error = new Error("Database detail containing private data.");
+      error.name = "PostgresError";
+      Object.assign(error, { code: "42501" });
+      throw error;
+    },
+  );
+
+  await handler(requestWithHeader(`Bearer ${CRON_SECRET}`));
+
+  assert.deepEqual(reported, [
+    { errorName: "PostgresError", errorCode: "42501" },
+  ]);
+  assert.doesNotMatch(JSON.stringify(reported), /private data/);
 });
 
 test("route handler rejects unsafe provider error codes", async () => {

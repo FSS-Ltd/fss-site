@@ -1,7 +1,10 @@
 import { StudioShell } from "@/components/portal/shell/studio-shell";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
-import { fssStudioEnabled } from "@/lib/operations/auth/release-flags";
+import {
+  fssStudioEnabled,
+  prefixFreePortalEnabled,
+} from "@/lib/operations/auth/release-flags";
 import {
   isPortalAppearance,
   PORTAL_APPEARANCE_COOKIE,
@@ -20,7 +23,12 @@ async function AdminLayout({
     ? appearanceCookie
     : "system";
   return (
-    <StudioShell initialAppearance={initialAppearance}>{children}</StudioShell>
+    <StudioShell
+      initialAppearance={initialAppearance}
+      prefixFreeEnabled={prefixFreePortalEnabled()}
+    >
+      {children}
+    </StudioShell>
   );
 }
 
