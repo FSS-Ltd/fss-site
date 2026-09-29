@@ -1,15 +1,6 @@
 "use client";
 
-import { useClerk } from "@clerk/nextjs";
-
-type PortalSignOut = (options?: { redirectUrl?: string }) => Promise<void>;
-
-export async function signOutOfPortal(
-  signOut: PortalSignOut,
-  redirectUrl: string,
-): Promise<void> {
-  await signOut({ redirectUrl });
-}
+import { SignOutButton } from "@clerk/nextjs";
 
 export function PortalSignOutButton({
   children,
@@ -20,15 +11,11 @@ export function PortalSignOutButton({
   className?: string;
   redirectUrl?: string;
 }): React.JSX.Element {
-  const { signOut } = useClerk();
-
   return (
-    <button
-      className={className}
-      onClick={() => void signOutOfPortal(signOut, redirectUrl)}
-      type="button"
-    >
-      {children}
-    </button>
+    <SignOutButton redirectUrl={redirectUrl}>
+      <button className={className} type="button">
+        {children}
+      </button>
+    </SignOutButton>
   );
 }

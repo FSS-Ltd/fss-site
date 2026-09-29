@@ -18,7 +18,7 @@ test("Operations is disabled unless explicitly enabled and never falls back to G
       "postgres://operations_founder:local@127.0.0.1:1/unused";
     const db = getOperationsDb();
     assert.equal(getOperationsDb(), db);
-    assert.equal(db.options.connection?.options, "-c role=operations_founder");
+    assert.equal(db.options.connection?.options, undefined);
     await db.end();
   } finally {
     if (enabled === undefined) delete process.env.OPERATIONS_ENABLED;

@@ -21,14 +21,16 @@ import styles from "./portal-shell.module.css";
 export type ClientShellProps = Readonly<{
   initialAppearance?: PortalAppearance;
   memberships: readonly PortalMembershipSummary[];
+  prefixFreeEnabled?: boolean;
   children: React.ReactNode;
 }>;
 
 function appendOrganisationId(
   href: string,
   organisationId: string | undefined,
+  prefixFreeEnabled: boolean,
 ): string {
-  const portalHref = portalPath(href);
+  const portalHref = portalPath(href, prefixFreeEnabled);
   if (!organisationId) return portalHref;
   const separator = portalHref.includes("?") ? "&" : "?";
   return `${portalHref}${separator}organisationId=${encodeURIComponent(organisationId)}`;
@@ -37,9 +39,11 @@ function appendOrganisationId(
 function NavigationLink({
   item,
   organisationId,
+  prefixFreeEnabled,
 }: Readonly<{
   item: PortalNavigationItem;
   organisationId?: string;
+  prefixFreeEnabled: boolean;
 }>): React.JSX.Element {
   if (!item.href) {
     return (
@@ -61,7 +65,7 @@ function NavigationLink({
     <Link
       aria-current={item.active ? "page" : undefined}
       className={`${styles.navigationLink} ${item.active ? styles.navigationCurrent : ""}`}
-      href={appendOrganisationId(item.href, organisationId)}
+      href={appendOrganisationId(item.href, organisationId, prefixFreeEnabled)}
     >
       <PortalNavigationIcon itemId={item.id} />
       <span>{item.label}</span>
@@ -72,9 +76,11 @@ function NavigationLink({
 function ClientMobileNavigation({
   items,
   organisationId,
+  prefixFreeEnabled,
 }: Readonly<{
   items: readonly PortalNavigationItem[];
   organisationId?: string;
+  prefixFreeEnabled: boolean;
 }>): React.JSX.Element {
   const primaryItems = items.filter((item) =>
     clientMobileNavigationIds.includes(
@@ -91,6 +97,7 @@ function ClientMobileNavigation({
             item={item}
             key={item.id}
             organisationId={organisationId}
+            prefixFreeEnabled={prefixFreeEnabled}
           />
         ))}
       </div>
@@ -105,6 +112,7 @@ function ClientMobileNavigation({
                     item={item}
                     key={item.id}
                     organisationId={organisationId}
+                    prefixFreeEnabled={prefixFreeEnabled}
                   />
                 ))}
               </div>
@@ -120,6 +128,7 @@ export function ClientShell({
   children,
   initialAppearance = "system",
   memberships,
+  prefixFreeEnabled = true,
 }: ClientShellProps): React.JSX.Element {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -138,7 +147,10 @@ export function ClientShell({
         Skip to content
       </a>
       <aside className={styles.sidebar} aria-label="Client workspace">
-        <Link className={styles.brand} href={portalPath("/portal")}>
+        <Link
+          className={styles.brand}
+          href={portalPath("/portal", prefixFreeEnabled)}
+        >
           <Image
             alt="FSS"
             className={styles.brandImage}
@@ -171,6 +183,7 @@ export function ClientShell({
                         href={appendOrganisationId(
                           "/portal",
                           membership.organisationId,
+                          prefixFreeEnabled,
                         )}
                       >
                         <span>{membership.displayName}</span>
@@ -195,6 +208,7 @@ export function ClientShell({
               item={item}
               key={item.id}
               organisationId={activeMembership?.organisationId}
+              prefixFreeEnabled={prefixFreeEnabled}
             />
           ))}
         </nav>
@@ -209,6 +223,7 @@ export function ClientShell({
                 href={appendOrganisationId(
                   "/portal/notifications",
                   activeMembership?.organisationId,
+                  prefixFreeEnabled,
                 )}
                 aria-label="Notifications"
               >
@@ -216,7 +231,10 @@ export function ClientShell({
               </Link>
             ) : null}
             <PortalAppearanceControl initialAppearance={initialAppearance} />
-            <PortalSignOutButton className={styles.signOut}>
+            <PortalSignOutButton
+              className={styles.signOut}
+              redirectUrl={portalPath("/portal/login", prefixFreeEnabled)}
+            >
               Sign out
             </PortalSignOutButton>
           </div>
@@ -233,6 +251,7 @@ export function ClientShell({
                   href={appendOrganisationId(
                     "/portal",
                     membership.organisationId,
+                    prefixFreeEnabled,
                   )}
                   aria-current={
                     membership.organisationId ===
@@ -254,6 +273,7 @@ export function ClientShell({
       <ClientMobileNavigation
         items={navigation}
         organisationId={activeMembership?.organisationId}
+        prefixFreeEnabled={prefixFreeEnabled}
       />
     </div>
   );

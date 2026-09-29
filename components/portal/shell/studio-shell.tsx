@@ -18,8 +18,10 @@ import styles from "./portal-shell.module.css";
 
 function StudioNavigationLink({
   item,
+  prefixFreeEnabled,
 }: Readonly<{
   item: PortalNavigationItem;
+  prefixFreeEnabled: boolean;
 }>): React.JSX.Element {
   if (!item.href) {
     return (
@@ -41,7 +43,7 @@ function StudioNavigationLink({
     <Link
       aria-current={item.active ? "page" : undefined}
       className={`${styles.navigationLink} ${item.active ? styles.navigationCurrent : ""}`}
-      href={portalPath(item.href)}
+      href={portalPath(item.href, prefixFreeEnabled)}
     >
       <PortalNavigationIcon itemId={item.id} />
       <span>{item.label}</span>
@@ -51,8 +53,10 @@ function StudioNavigationLink({
 
 function StudioMobileNavigation({
   items,
+  prefixFreeEnabled,
 }: Readonly<{
   items: readonly PortalNavigationItem[];
+  prefixFreeEnabled: boolean;
 }>): React.JSX.Element {
   const primaryItems = items.filter((item) =>
     studioMobileNavigationIds.includes(
@@ -65,7 +69,11 @@ function StudioMobileNavigation({
     <nav className={styles.mobileNavigation} aria-label="FSS Studio navigation">
       <div className={styles.mobileNavigationLinks}>
         {primaryItems.map((item) => (
-          <StudioNavigationLink item={item} key={item.id} />
+          <StudioNavigationLink
+            item={item}
+            key={item.id}
+            prefixFreeEnabled={prefixFreeEnabled}
+          />
         ))}
       </div>
       <details className={styles.mobileMore}>
@@ -74,7 +82,11 @@ function StudioMobileNavigation({
           <nav aria-label="More FSS Studio navigation">
             <div className={styles.mobileMoreList}>
               {moreItems.map((item) => (
-                <StudioNavigationLink item={item} key={item.id} />
+                <StudioNavigationLink
+                  item={item}
+                  key={item.id}
+                  prefixFreeEnabled={prefixFreeEnabled}
+                />
               ))}
             </div>
           </nav>
@@ -87,9 +99,11 @@ function StudioMobileNavigation({
 export function StudioShell({
   children,
   initialAppearance = "system",
+  prefixFreeEnabled = true,
 }: Readonly<{
   children: React.ReactNode;
   initialAppearance?: PortalAppearance;
+  prefixFreeEnabled?: boolean;
 }>): React.JSX.Element {
   const pathname = usePathname();
   const navigation = getStudioNavigation(pathname);
@@ -99,7 +113,10 @@ export function StudioShell({
         Skip to content
       </a>
       <aside className={styles.sidebar} aria-label="FSS Studio">
-        <Link className={styles.brand} href={portalPath("/portal/admin")}>
+        <Link
+          className={styles.brand}
+          href={portalPath("/portal/admin", prefixFreeEnabled)}
+        >
           <Image
             alt="FSS"
             className={styles.brandImage}
@@ -116,7 +133,11 @@ export function StudioShell({
         </div>
         <nav className={styles.navigation} aria-label="FSS Studio modules">
           {navigation.map((item) => (
-            <StudioNavigationLink item={item} key={item.id} />
+            <StudioNavigationLink
+              item={item}
+              key={item.id}
+              prefixFreeEnabled={prefixFreeEnabled}
+            />
           ))}
         </nav>
       </aside>
@@ -126,13 +147,19 @@ export function StudioShell({
           <div className={styles.toolbarActions}>
             <Link
               className={styles.toolbarIcon}
-              href={portalPath("/portal/admin/notifications")}
+              href={portalPath(
+                "/portal/admin/notifications",
+                prefixFreeEnabled,
+              )}
               aria-label="Notifications"
             >
               <Bell aria-hidden="true" size={18} />
             </Link>
             <PortalAppearanceControl initialAppearance={initialAppearance} />
-            <PortalSignOutButton className={styles.signOut}>
+            <PortalSignOutButton
+              className={styles.signOut}
+              redirectUrl={portalPath("/portal/login", prefixFreeEnabled)}
+            >
               Sign out
             </PortalSignOutButton>
           </div>
@@ -141,7 +168,10 @@ export function StudioShell({
           {children}
         </main>
       </div>
-      <StudioMobileNavigation items={navigation} />
+      <StudioMobileNavigation
+        items={navigation}
+        prefixFreeEnabled={prefixFreeEnabled}
+      />
     </div>
   );
 }

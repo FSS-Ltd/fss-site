@@ -7,6 +7,7 @@ import {
   type PortalMembershipSummary,
 } from "@/lib/operations/auth/require-member";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
+import { prefixFreePortalEnabled } from "@/lib/operations/auth/release-flags";
 import { getPortalDb } from "@/lib/operations/db/portal-client";
 import {
   isPortalAppearance,
@@ -44,6 +45,7 @@ async function ClientPortalLayout({
     <ClientShell
       initialAppearance={initialAppearance}
       memberships={memberships}
+      prefixFreeEnabled={prefixFreePortalEnabled()}
     >
       {children}
     </ClientShell>

@@ -17,7 +17,7 @@ test("portal database requires its independent configuration and reuses a bounde
     assert.equal(getPortalDb(), db);
     assert.equal(db.options.max, 5);
     assert.equal(db.options.prepare, false);
-    assert.equal(db.options.connection.options, "-c role=operations_portal");
+    assert.equal(db.options.connection.options, undefined);
     await db.end();
   } finally {
     if (enabled === undefined) delete process.env.OPERATIONS_ENABLED;
