@@ -930,6 +930,44 @@ test.describe("FSS Studio desktop visuals", () => {
     await page.setViewportSize({ width: 1440, height: 1200 });
   });
 
+  test("client search is right aligned and client creation opens a dialog", async ({
+    page,
+  }) => {
+    await openScenario(page, "studio-clients", "Your clients");
+    const resultCount = page.getByText(/\d+ shown/);
+    const search = page.getByRole("searchbox", { name: "Search clients" });
+    const countBounds = await resultCount.boundingBox();
+    const searchBounds = await search.boundingBox();
+    if (!countBounds || !searchBounds) {
+      throw new Error("Client register toolbar is not visible.");
+    }
+    expect(searchBounds.x).toBeGreaterThan(countBounds.x + countBounds.width);
+
+    await page.getByRole("button", { name: "Add client" }).click();
+    const dialog = page.getByRole("dialog", { name: "Add a client" });
+    await expect(dialog).toBeVisible();
+    await expect(
+      dialog.getByRole("textbox", { name: "Display name" }),
+    ).toBeVisible();
+    await expect(
+      dialog.getByRole("textbox", { name: "Email address" }),
+    ).toBeVisible();
+    await expect(page).toHaveScreenshot("studio-client-create-dialog.png");
+    await dialog.getByRole("button", { name: "Cancel" }).click();
+    await expect(dialog).toBeHidden();
+
+    await page.getByRole("button", { name: "Add client" }).click();
+    await dialog
+      .getByRole("textbox", { name: "Display name" })
+      .fill("Draft client");
+    page.once("dialog", (confirmation) => confirmation.dismiss());
+    await dialog.getByRole("button", { name: "Cancel" }).click();
+    await expect(dialog).toBeVisible();
+    page.once("dialog", (confirmation) => confirmation.accept());
+    await dialog.getByRole("button", { name: "Cancel" }).click();
+    await expect(dialog).toBeHidden();
+  });
+
   test("client sign-in desktop matches C00", async ({ page }) => {
     await openScenario(page, "client-login", "Sign in to FSS");
     await expect(page).toHaveScreenshot("c00-client-sign-in-desktop.png");
@@ -1086,6 +1124,21 @@ test.describe("FSS Studio mobile visuals", () => {
       "This assertion is captured at the approved mobile viewport.",
     );
     await page.setViewportSize({ width: 390, height: 844 });
+  });
+
+  test("client creation dialog reflows on a phone", async ({ page }) => {
+    await openScenario(page, "studio-clients", "Your clients");
+    await page.getByRole("button", { name: "Add client" }).click();
+    await expect(
+      page.getByRole("dialog", { name: "Add a client" }),
+    ).toBeVisible();
+    const closeBounds = await page
+      .getByRole("button", { name: "Close add client" })
+      .boundingBox();
+    expect(closeBounds?.width).toBeLessThanOrEqual(48);
+    await expect(page).toHaveScreenshot(
+      "studio-client-create-dialog-mobile.png",
+    );
   });
 
   test("client sign-in mobile reflows C00", async ({ page }) => {

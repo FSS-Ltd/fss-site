@@ -41,6 +41,9 @@ test("renders the searchable Studio client register with persisted next actions"
 
   assert.match(html, /Your clients/);
   assert.match(html, /Add client/);
+  assert.match(html, /<dialog/);
+  assert.match(html, /Save client/);
+  assert.match(html, /Cancel/);
   assert.match(html, /Northstar Studio/);
   assert.match(html, /Alex Morgan/);
   assert.match(html, /2 active items/);

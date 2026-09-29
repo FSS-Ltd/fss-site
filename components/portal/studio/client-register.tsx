@@ -11,6 +11,7 @@ import { portalPath } from "@/lib/operations/auth/portal-url";
 import type { StudioClient } from "@/lib/operations/studio/clients";
 import type { WorkspaceCollectionPage } from "@/lib/operations/workspaces/pagination";
 import styles from "./client-register.module.css";
+import { ClientCreateDialog } from "./client-create-dialog";
 
 type StudioClientRegisterProps = Readonly<{
   clients: WorkspaceCollectionPage<StudioClient>;
@@ -50,22 +51,23 @@ export function StudioClientRegister({
   return (
     <section className={styles.page} aria-labelledby="studio-clients-heading">
       <PageHeader
-        action={
-          <PortalActionLink href={portalPath("/portal/admin/clients/new")}>
-            Add client
-          </PortalActionLink>
-        }
+        action={<ClientCreateDialog />}
         eyebrow="FSS Studio · Clients"
         title="Your clients"
         titleId="studio-clients-heading"
       />
       <div className={styles.toolbar}>
+        <p className={styles.resultCount}>
+          {clients.items.length} shown
+          {clients.hasNext ? " · more available" : ""}
+        </p>
         <form className={styles.search} method="get" role="search">
           <PortalField label="Search clients">
             <input
               defaultValue={query}
               maxLength={100}
               name="query"
+              placeholder="Search clients"
               type="search"
             />
           </PortalField>
@@ -73,10 +75,6 @@ export function StudioClientRegister({
             Search
           </PortalButton>
         </form>
-        <p className={styles.resultCount}>
-          {clients.items.length} shown
-          {clients.hasNext ? " · more available" : ""}
-        </p>
       </div>
       <section className={styles.register} aria-label="Client register results">
         {clients.items.length === 0 ? (

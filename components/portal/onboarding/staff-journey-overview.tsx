@@ -8,6 +8,7 @@ import {
 } from "@/components/portal/ui";
 import type { StaffJourneyOverviewRow } from "@/lib/operations/onboarding/queries";
 import { portalPath } from "@/lib/operations/auth/portal-url";
+import styles from "./staff-journey-overview.module.css";
 
 export function StaffJourneyOverview({
   journeys,
@@ -24,7 +25,7 @@ export function StaffJourneyOverview({
   );
 
   return (
-    <main aria-labelledby="welcome-journeys-heading">
+    <section className={styles.page} aria-label="Welcome journeys">
       <PageHeader
         description="Review welcome content, signing readiness, delivery schedules, and recovery evidence from one client workspace."
         eyebrow="FSS Studio · Welcome journeys"
@@ -38,23 +39,25 @@ export function StaffJourneyOverview({
           </PortalActionLink>
         }
       />
-      <section aria-label="Welcome journey summary">
-        <PortalCard title="Draft journeys" tone="accent">
-          <dl>
-            <div>
-              <dt>Client workspaces</dt>
-              <dd>{journeys.length}</dd>
-            </div>
-            <div>
-              <dt>Journeys</dt>
-              <dd>{totals.journeys}</dd>
-            </div>
-            <div>
-              <dt>Active</dt>
-              <dd>{totals.active}</dd>
-            </div>
-          </dl>
-        </PortalCard>
+      <section
+        className={styles.summary}
+        aria-labelledby="journey-summary-title"
+      >
+        <h2 id="journey-summary-title">Draft journeys</h2>
+        <dl className={styles.metrics}>
+          <div>
+            <dt>Client workspaces</dt>
+            <dd>{journeys.length}</dd>
+          </div>
+          <div>
+            <dt>Journeys</dt>
+            <dd>{totals.journeys}</dd>
+          </div>
+          <div>
+            <dt>Active</dt>
+            <dd>{totals.active}</dd>
+          </div>
+        </dl>
       </section>
       {totals.recovery > 0 ? (
         <Notice tone="warning">
@@ -73,16 +76,24 @@ export function StaffJourneyOverview({
           </PortalActionLink>
         </PortalCard>
       ) : (
-        <ul aria-label="Client welcome workspaces">
+        <ul
+          className={styles.workspaces}
+          aria-label="Client welcome workspaces"
+        >
           {journeys.map((organisation) => (
             <li key={organisation.organisationId}>
-              <PortalCard title={organisation.organisationName}>
-                <Building2 aria-hidden="true" size={20} />
-                <p>
-                  {organisation.journeyCount === 0
-                    ? "No welcome journey has been prepared."
-                    : `${organisation.journeyCount} journey${organisation.journeyCount === 1 ? "" : "s"}, ${organisation.activeCount} active.`}
-                </p>
+              <PortalCard className={styles.workspaceCard}>
+                <span className={styles.workspaceIcon}>
+                  <Building2 aria-hidden="true" size={20} />
+                </span>
+                <div className={styles.workspaceDetails}>
+                  <h2>{organisation.organisationName}</h2>
+                  <p>
+                    {organisation.journeyCount === 0
+                      ? "No welcome journey has been prepared."
+                      : `${organisation.journeyCount} journey${organisation.journeyCount === 1 ? "" : "s"}, ${organisation.activeCount} active.`}
+                  </p>
+                </div>
                 <StatusBadge
                   status={organisation.recoveryCount ? "warning" : "info"}
                 >
@@ -94,6 +105,7 @@ export function StaffJourneyOverview({
                   href={portalPath(
                     `/portal/admin/clients/${organisation.organisationId}/journey`,
                   )}
+                  variant="secondary"
                 >
                   Open workspace
                 </PortalActionLink>
@@ -102,6 +114,6 @@ export function StaffJourneyOverview({
           ))}
         </ul>
       )}
-    </main>
+    </section>
   );
 }

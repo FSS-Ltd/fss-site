@@ -31,10 +31,11 @@
 }
 
 .search {
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(220px, 320px) auto;
   align-items: end;
   gap: 10px;
   max-width: 620px;
+  margin-left: auto;
 }
 
 .search > div > label {
@@ -179,10 +180,11 @@
 
   .search {
     max-width: none;
+    margin-left: 0;
   }
 
   .resultCount {
-    justify-self: end;
+    justify-self: start;
   }
 }
 
