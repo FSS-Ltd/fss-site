@@ -37,6 +37,39 @@
     sans-serif;
 }
 
+.theme :global(main h1) {
+  font-size: clamp(1.625rem, 2.1vw, 1.75rem);
+  font-weight: 650;
+  letter-spacing: -0.035em;
+  line-height: 1.2;
+}
+
+.theme :global(main h2) {
+  font-size: 1.125rem;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+  line-height: 1.35;
+}
+
+.theme :global(main h3) {
+  font-size: 0.9375rem;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  line-height: 1.4;
+}
+
+.theme :global(main input),
+.theme :global(main select),
+.theme :global(main textarea) {
+  border-radius: 8px;
+}
+
+.theme
+  :global(main :is(a, button, input, select, textarea, summary):focus-visible) {
+  outline: 3px solid var(--portal-focus);
+  outline-offset: 3px;
+}
+
 .theme[data-appearance="dark"] {
   color-scheme: dark;
   --portal-canvas: #0b1421;

@@ -1,6 +1,6 @@
 .page {
   display: grid;
-  width: min(100%, 1120px);
+  width: min(100%, 1380px);
   gap: 16px;
   margin-inline: auto;
 }
@@ -14,7 +14,7 @@
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 8px 16px;
-  padding: 18px 20px;
+  padding: 16px 18px;
   border: 1px solid var(--portal-border, #d9dfe5);
   border-radius: 12px;
   background: var(--portal-surface, #ffffff);
@@ -51,8 +51,8 @@
 .attention > p:not(.sectionLabel) {
   max-width: 68ch;
   color: var(--portal-muted, #46566c);
-  font-size: 0.9375rem;
-  line-height: 1.55;
+  font-size: 0.875rem;
+  line-height: 1.5;
 }
 
 .attentionAction {
@@ -60,7 +60,7 @@
   width: fit-content;
   min-height: 44px;
   align-items: center;
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 10px 16px;
   grid-column: 2;
   grid-row: 1 / span 3;
@@ -87,8 +87,8 @@
 
 .statCard {
   display: grid;
-  gap: 8px;
-  padding: 16px;
+  gap: 6px;
+  padding: 14px 16px;
 }
 
 .statCard dt,
@@ -111,8 +111,9 @@
 
 .panel {
   display: grid;
-  gap: 16px;
-  padding: 18px;
+  align-content: start;
+  gap: 12px;
+  padding: 16px;
 }
 
 .panel h2 {
@@ -134,9 +135,9 @@
 .projectList li {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 16px;
+  gap: 12px;
   align-items: center;
-  padding-top: 16px;
+  padding-top: 12px;
   border-top: 1px solid var(--portal-border, #d9dfe5);
 }
 
@@ -170,11 +171,11 @@
 
 .workspaceList a {
   display: flex;
-  min-height: 76px;
+  min-height: 60px;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 16px 20px;
+  padding: 12px 16px;
   border-radius: 12px;
   color: var(--portal-ink, #0a1a2e);
 }

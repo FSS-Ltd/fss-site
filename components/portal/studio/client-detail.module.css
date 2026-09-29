@@ -9,8 +9,8 @@
 }
 
 .page {
-  width: min(100%, 1120px);
-  gap: 24px;
+  width: min(100%, 1380px);
+  gap: 16px;
   margin-inline: auto;
 }
 
@@ -23,7 +23,7 @@
 .metrics div {
   display: grid;
   gap: 6px;
-  padding: 18px;
+  padding: 14px 16px;
   border: 1px solid var(--portal-border, #d9dfe5);
   border-radius: 12px;
   background: var(--portal-surface, #ffffff);
@@ -48,7 +48,7 @@
 
 .metrics dd {
   color: var(--portal-ink, #0a1a2e);
-  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-size: clamp(1.375rem, 2.5vw, 1.75rem);
   font-weight: 700;
   letter-spacing: -0.04em;
   line-height: 1;
@@ -71,7 +71,7 @@
 }
 
 .workspaceHeader h2 {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   letter-spacing: -0.025em;
 }
 

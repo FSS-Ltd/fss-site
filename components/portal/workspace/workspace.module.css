@@ -11,11 +11,10 @@
   grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 12px 20px;
   align-items: center;
-  padding: 20px 24px;
+  padding: 14px 16px;
   border: 1px solid var(--portal-line);
-  border-radius: 16px;
+  border-radius: 12px;
   background: var(--surface-1);
-  box-shadow: 0 16px 38px -34px rgba(7, 24, 46, 0.7);
 }
 
 .icon {
@@ -36,7 +35,7 @@
 
 .rowContent h3 {
   color: var(--portal-ink);
-  font-size: 1rem;
+  font-size: 0.9375rem;
   line-height: 1.4;
 }
 
@@ -46,8 +45,8 @@
 .feedback {
   margin-top: 7px;
   color: var(--portal-muted);
-  font-size: 0.875rem;
-  line-height: 1.55;
+  font-size: 0.8125rem;
+  line-height: 1.5;
 }
 
 .rowAction,
@@ -59,7 +58,7 @@
   gap: 7px;
   padding: 10px 12px;
   border: 1px solid var(--portal-line);
-  border-radius: 10px;
+  border-radius: 8px;
   background: var(--surface-1);
   color: var(--portal-accent);
   font-size: 0.8125rem;
@@ -104,7 +103,7 @@
 .filterForm select,
 .filterForm button {
   min-height: 44px;
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 10px 12px;
   font: inherit;
 }
@@ -129,12 +128,11 @@
 
 .preferences {
   display: grid;
-  gap: 16px;
-  padding: clamp(24px, 4vw, 32px);
+  gap: 12px;
+  padding: 18px;
   border: 1px solid var(--portal-line);
-  border-radius: 20px;
+  border-radius: 12px;
   background: var(--surface-1);
-  box-shadow: 0 16px 38px -34px rgba(7, 24, 46, 0.7);
 }
 
 .preferences fieldset {
@@ -172,7 +170,7 @@
   min-height: 44px;
   width: fit-content;
   border: 0;
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 10px 16px;
   background: var(--brand-secondary);
   color: var(--portal-on-action, #fff);
@@ -182,7 +180,7 @@
 }
 
 .preferences button:hover:not(:disabled) {
-  background: #19334f;
+  background: color-mix(in srgb, var(--portal-action, #0f7078) 88%, var(--portal-ink, #0a1a2e));
 }
 
 .preferences button:disabled {
@@ -192,7 +190,7 @@
 
 .error {
   margin: 0;
-  color: #782b23;
+  color: var(--portal-error-ink, #782b23);
   font-size: 0.875rem;
   line-height: 1.55;
 }
@@ -212,7 +210,7 @@
 @media (max-width: 640px) {
   .row {
     grid-template-columns: auto minmax(0, 1fr);
-    padding: 20px;
+    padding: 14px;
   }
 
   .rowAction,

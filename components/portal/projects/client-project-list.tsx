@@ -105,13 +105,11 @@ function ProjectCards({
 }
 
 function ProjectGroup({
-  description,
   empty,
   organisationId,
   projects,
   title,
 }: Readonly<{
-  description: string;
   empty: string;
   organisationId: string;
   projects: readonly ClientProject[];
@@ -123,7 +121,6 @@ function ProjectGroup({
       <div className={styles.groupHeading}>
         <div>
           <h2 id={headingId}>{title}</h2>
-          <p>{description}</p>
         </div>
         <span aria-label={`${projects.length} projects`}>
           {projects.length}
@@ -206,7 +203,6 @@ export function ClientProjectList({
         <>
           {activeView === "all" || activeView === "active" ? (
             <ProjectGroup
-              description="Work that is planned, in delivery, or with FSS for the next step."
               empty="Your active projects will appear here once they are agreed."
               organisationId={organisationId}
               projects={current}
@@ -215,7 +211,6 @@ export function ClientProjectList({
           ) : null}
           {activeView === "all" || activeView === "awaiting" ? (
             <ProjectGroup
-              description="These projects need a decision, file, or response from your team."
               empty="There is nothing waiting for your team right now."
               organisationId={organisationId}
               projects={awaitingYou}
@@ -224,7 +219,6 @@ export function ClientProjectList({
           ) : null}
           {activeView === "all" || activeView === "completed" ? (
             <ProjectGroup
-              description="Completed work remains available as a record of the handover."
               empty="Completed projects will appear here after handover."
               organisationId={organisationId}
               projects={completed}

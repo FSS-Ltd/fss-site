@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   PageHeader,
   PortalActionLink,
@@ -54,15 +55,12 @@ export function StudioClientRegister({
             Add client
           </PortalActionLink>
         }
-        description="Relationships, delivery and commercial readiness in one staff-scoped register."
         eyebrow="FSS Studio · Clients"
         title="Your clients"
+        titleId="studio-clients-heading"
       />
-      <PortalCard
-        description="Search display and legal names. Your search stays in the register while you move between pages."
-        title="Client register"
-      >
-        <form className={styles.search} method="get">
+      <div className={styles.toolbar}>
+        <form className={styles.search} method="get" role="search">
           <PortalField label="Search clients">
             <input
               defaultValue={query}
@@ -75,7 +73,11 @@ export function StudioClientRegister({
             Search
           </PortalButton>
         </form>
-      </PortalCard>
+        <p className={styles.resultCount}>
+          {clients.items.length} shown
+          {clients.hasNext ? " · more available" : ""}
+        </p>
+      </div>
       <section className={styles.register} aria-label="Client register results">
         {clients.items.length === 0 ? (
           <PortalCard title="No matching clients">
@@ -94,15 +96,16 @@ export function StudioClientRegister({
                       <span className={styles.clientMark} aria-hidden="true">
                         {contactInitials(client.primaryContactName)}
                       </span>
-                      <h2>{client.displayName}</h2>
+                      <h2>
+                        <Link
+                          href={portalPath(
+                            `/portal/admin/clients/${client.id}`,
+                          )}
+                        >
+                          {client.displayName}
+                        </Link>
+                      </h2>
                       <p>{client.legalName}</p>
-                      <PortalActionLink
-                        className={styles.rowAction}
-                        href={portalPath(`/portal/admin/clients/${client.id}`)}
-                        variant="quiet"
-                      >
-                        Open client
-                      </PortalActionLink>
                     </div>
                     <dl className={styles.rowMeta}>
                       <div>
@@ -124,7 +127,11 @@ export function StudioClientRegister({
                         </dd>
                       </div>
                     </dl>
-                    <PortalActionLink href={portalPath(client.nextActionHref)}>
+                    <PortalActionLink
+                      className={styles.rowAction}
+                      href={portalPath(client.nextActionHref)}
+                      variant="quiet"
+                    >
                       {client.nextAction}
                     </PortalActionLink>
                   </div>

@@ -23,7 +23,7 @@
   justify-content: center;
   gap: 8px;
   border: 1px solid transparent;
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 10px 16px;
   font: inherit;
   font-weight: 600;
@@ -48,7 +48,7 @@
 }
 
 .buttonPrimary:hover:not(:disabled) {
-  background: #0b5e65;
+  background: color-mix(in srgb, var(--portal-action) 88%, var(--portal-ink));
 }
 
 .buttonSecondary {
@@ -170,10 +170,11 @@
 
 .card {
   display: grid;
-  gap: 10px;
+  gap: 12px;
   border: 1px solid var(--portal-border, #d9dfe5);
   border-radius: 12px;
-  padding: 16px;
+  padding: 18px;
+  transition: border-color 140ms ease, background-color 140ms ease;
 }
 
 .cardDefault {
@@ -213,12 +214,12 @@
 
 .cardContent {
   display: grid;
-  gap: 14px;
+  gap: 12px;
 }
 
 .cardContent > form {
   display: grid;
-  gap: 14px;
+  gap: 12px;
 }
 
 .statusBadge {
@@ -326,7 +327,9 @@
 
 .pageHeader {
   display: grid;
-  gap: 10px;
+  gap: 8px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--portal-border, #d9dfe5);
 }
 
 .breadcrumbs {
@@ -372,17 +375,17 @@
 .title {
   margin: 0;
   color: var(--portal-ink, #0a1a2e);
-  font-size: clamp(1.625rem, 2.4vw, 1.75rem);
+  font-size: clamp(1.625rem, 2.1vw, 1.75rem);
   letter-spacing: -0.03em;
   line-height: 1.2;
 }
 
 .description {
-  max-width: 62ch;
+  max-width: 58ch;
   margin: 5px 0 0;
   color: var(--portal-muted, #46566c);
-  font-size: 0.875rem;
-  line-height: 1.55;
+  font-size: 0.8125rem;
+  line-height: 1.5;
 }
 
 @media (prefers-color-scheme: dark) {

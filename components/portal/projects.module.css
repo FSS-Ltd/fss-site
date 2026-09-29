@@ -12,11 +12,11 @@
   font-size: 0.875rem;
 }
 .title {
-  font-size: clamp(2rem, 5vw, 2.75rem);
-  font-weight: 600;
-  letter-spacing: -0.05em;
-  line-height: 1.1;
-  margin: 8px 0 16px;
+  font-size: clamp(1.625rem, 2.1vw, 1.75rem);
+  font-weight: 650;
+  letter-spacing: -0.035em;
+  line-height: 1.2;
+  margin: 8px 0 12px;
   text-wrap: balance;
 }
 .eyebrow,
@@ -35,13 +35,13 @@
 }
 .overview {
   background: var(--surface-1);
-  border-radius: 24px;
-  padding: 32px;
-  margin-top: 32px;
-  box-shadow: 0 6px 32px rgba(7, 24, 46, 0.035);
+  border: 1px solid var(--portal-border, #d9dfe5);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
 }
 .section {
-  margin-top: 44px;
+  margin-top: 24px;
 }
 .sectionHeading {
   display: flex;
@@ -72,18 +72,18 @@
   line-height: 1.4;
 }
 .outcome {
-  font-size: 1.25rem;
-  line-height: 1.5;
+  font-size: 1.0625rem;
+  line-height: 1.45;
   letter-spacing: -0.02em;
-  margin: 24px 0 12px;
+  margin: 16px 0 10px;
   white-space: pre-line;
 }
 .facts {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  padding-block: 24px;
-  margin-top: 20px;
+  gap: 16px;
+  padding-block: 16px;
+  margin-top: 16px;
   border-block: 1px solid var(--portal-line);
 }
 .facts dt {
@@ -97,7 +97,7 @@
   font-weight: 550;
 }
 .deliverables {
-  margin-block: 24px;
+  margin-block: 16px;
 }
 .deliverables h3,
 .notice h3 {
@@ -115,9 +115,10 @@
 }
 .notice {
   background: var(--surface-2);
-  padding: 20px;
-  border-radius: 16px;
-  margin-block: 24px;
+  padding: 16px;
+  border: 1px solid var(--portal-border, #d9dfe5);
+  border-radius: 12px;
+  margin-block: 16px;
 }
 .empty {
   padding: 28px 0;
@@ -185,7 +186,7 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 20px 0;
+  padding: 14px 0;
   border-top: 1px solid var(--portal-line);
 }
 .fileIcon {
@@ -214,14 +215,14 @@
 .projectList {
   list-style: none;
   padding: 0;
-  margin: 32px 0 0;
+  margin: 20px 0 0;
 }
 .projectList li {
   border-top: 1px solid var(--portal-line);
 }
 .projectLink {
   display: block;
-  padding: 26px 4px;
+  padding: 16px 4px;
 }
 .projectLink:hover h2 {
   color: var(--portal-accent);
@@ -233,7 +234,7 @@
 }
 @media (max-width: 480px) {
   .overview {
-    padding: 24px;
+    padding: 16px;
   }
   .facts {
     grid-template-columns: 1fr;

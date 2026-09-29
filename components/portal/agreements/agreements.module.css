@@ -2,13 +2,13 @@
 .listPage,
 .detail {
   display: grid;
-  gap: 24px;
+  gap: 16px;
   min-width: 0;
 }
 
 .builder {
   display: grid;
-  gap: 20px;
+  gap: 16px;
 }
 
 .builderCard,
@@ -97,7 +97,7 @@
   gap: 14px;
   padding: 16px;
   border: 1px solid var(--portal-border, #d9dfe5);
-  border-radius: 10px;
+  border-radius: 8px;
   background: var(--portal-soft-surface, #f7f8f9);
 }
 
@@ -146,7 +146,7 @@
 .builderHeading h2 {
   margin: 4px 0 8px;
   color: var(--portal-ink, #0a1a2e);
-  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-size: clamp(1.25rem, 2.2vw, 1.5rem);
   font-weight: 650;
   letter-spacing: -0.035em;
 }
@@ -305,7 +305,7 @@
 
 .metric {
   color: var(--portal-ink, #0a1a2e);
-  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  font-size: clamp(1.25rem, 2.2vw, 1.5rem);
   font-weight: 650;
   letter-spacing: -0.045em;
   line-height: 1;

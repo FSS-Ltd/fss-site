@@ -4,61 +4,92 @@
 .row,
 .rowSummary,
 .rowMeta,
-.pagination,
-.search {
+.toolbar,
+.search,
+.pagination {
   display: grid;
 }
 
 .page {
-  width: min(100%, 1280px);
+  width: min(100%, 1380px);
   gap: 16px;
   margin-inline: auto;
 }
 
-.register,
-.list {
+.register {
   gap: 12px;
+}
+
+.toolbar {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--portal-border, #d9dfe5);
+  border-radius: 12px;
+  background: var(--portal-surface, #ffffff);
 }
 
 .search {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: end;
-  gap: 12px;
+  gap: 10px;
+  max-width: 620px;
+}
+
+.search > div > label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.resultCount {
+  margin: 0;
+  color: var(--portal-muted, #46566c);
+  font-size: 0.75rem;
+  white-space: nowrap;
 }
 
 .list {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: 12px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.row {
-  grid-template-columns: 1fr;
-  align-items: start;
-  gap: 12px;
+.list > li {
+  min-width: 0;
 }
 
-.rowSummary,
-.rowMeta {
-  gap: 8px;
+.row {
+  height: 100%;
+  align-content: start;
+  gap: 14px;
 }
 
 .rowSummary {
-  grid-template-columns: 36px minmax(0, 1fr);
+  grid-template-columns: 40px minmax(0, 1fr);
   align-items: center;
+  gap: 2px 10px;
+  min-width: 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--portal-border, #d9dfe5);
 }
 
 .clientMark {
   display: grid;
-  width: 36px;
-  height: 36px;
-  grid-row: 1 / span 3;
+  width: 40px;
+  height: 40px;
+  grid-row: 1 / span 2;
   place-items: center;
   border-radius: 50%;
   background: var(--portal-tint, #e3f2f1);
   color: var(--portal-action, #0f7078);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 700;
 }
 
@@ -67,45 +98,67 @@
 .rowMeta dt,
 .rowMeta dd,
 .empty {
+  min-width: 0;
   margin: 0;
 }
 
 .rowSummary h2 {
-  grid-column: 2;
+  overflow: hidden;
   color: var(--portal-ink, #0a1a2e);
-  font-size: 1.0625rem;
-  letter-spacing: -0.02em;
+  font-size: 0.9375rem;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowSummary h2 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.rowSummary h2 a:hover {
+  color: var(--portal-action, #0f7078);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .rowSummary p,
 .rowMeta dt,
 .empty {
   color: var(--portal-muted, #46566c);
-  font-size: 0.875rem;
-  line-height: 1.5;
-}
-
-.rowSummary p,
-.rowSummary .rowAction {
-  grid-column: 2;
+  font-size: 0.75rem;
+  line-height: 1.45;
 }
 
 .rowMeta {
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  min-width: 0;
+  gap: 12px;
   margin: 0;
 }
 
+.rowMeta div:last-child {
+  grid-column: 1 / -1;
+}
+
 .rowMeta dd {
+  margin-top: 4px;
   color: var(--portal-ink, #0a1a2e);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 600;
-  line-height: 1.45;
+  line-height: 1.4;
 }
 
 .rowAction {
   width: fit-content;
-  margin-top: 4px;
+  min-height: 36px;
+  margin-top: auto;
+  padding-inline: 0;
+  font-size: 0.75rem;
+}
+
+.empty {
+  line-height: 1.55;
 }
 
 .pagination {
@@ -113,24 +166,40 @@
   gap: 12px;
 }
 
-.row > :last-child {
-  width: fit-content;
-  min-height: 38px;
+.page :is(a, button, input):focus-visible {
+  outline: 3px solid var(--portal-focus, #0f7078);
+  outline-offset: 3px;
 }
 
-@media (max-width: 760px) {
-  .rowMeta {
-    min-width: 0;
+@media (max-width: 600px) {
+  .toolbar {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .search {
+    max-width: none;
+  }
+
+  .resultCount {
+    justify-self: end;
   }
 }
 
-@media (max-width: 480px) {
-  .search,
-  .rowMeta {
+@media (max-width: 380px) {
+  .search {
     grid-template-columns: 1fr;
   }
 
   .search button {
     width: 100%;
+  }
+
+  .rowMeta {
+    grid-template-columns: 1fr;
+  }
+
+  .rowMeta div:last-child {
+    grid-column: auto;
   }
 }

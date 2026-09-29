@@ -41,6 +41,17 @@ const overview: StudioOverviewData = {
         status: "ready_for_review",
         title: "Review booking flow",
       },
+      {
+        blocked: false,
+        id: "c4562797-1eb2-47bf-98a8-0636a829ac0b",
+        nextAction: "Continue implementation.",
+        organisationId: "e96ea1ca-5e3a-41ae-a3e7-097c09c45e98",
+        organisationName: "Northstar Studio",
+        priority: "normal",
+        reviewReminderTarget: null,
+        status: "in_progress",
+        title: "Build booking integration",
+      },
     ],
     reviewCount: 1,
   },
@@ -74,7 +85,9 @@ test("renders the Studio action queue without client navigation controls", () =>
 
   assert.match(html, /Needs your attention/);
   assert.match(html, /Overdue review: Review booking flow/);
-  assert.match(html, /Open action queue/);
+  assert.match(html, /View queue/);
+  assert.match(html, /Build booking integration/);
+  assert.equal((html.match(/Review booking flow/g) ?? []).length, 1);
   assert.match(html, /href="\/admin\/delivery\?status=ready_for_review"/);
   assert.doesNotMatch(html, /Choose your workspace|Your Studio workspace/);
 });

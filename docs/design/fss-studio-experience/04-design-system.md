@@ -40,7 +40,9 @@ Use the existing brighter brand teal as a brand/accent asset where appropriate; 
 
 Typography: Geist 400/500/600/700, with existing system fallback. Page title 26–28, section 18–20, body 14–16, label 13–14, metadata 12–13 px. Allow wrapping rather than fixed-height text clipping. Explicitly load the intended production font; naming it in a fallback stack alone does not guarantee it is available.
 
-Spacing: 4, 8, 12, 16, 20, 24, 32, 40, 48, 64 px. Page padding 40–48 desktop, 24 tablet, 20 mobile. Card padding 24 desktop and 20 mobile. Radii 8 fields, 12 controls, 16 cards, 24 large feature surfaces.
+Spacing: 4, 8, 12, 16, 20, 24, 32, 40, 48, 64 px. Main content padding 28–48 desktop, 24 tablet, 20 mobile. Card padding 18 desktop and 16 mobile. Radii 8 fields and controls, 12 cards and feature surfaces.
+
+For the live portal, favour the compact registers and contact cards in the FSS client-provided reference set: 26–28 px page titles, 18 px section headings, 14–16 px body text, 12–13 px supporting text, 8 px fields and controls, and 12 px cards. Use an 18 px desktop card inset and 16 px mobile inset. Keep summary cards short, put related work into two columns when space permits, and reserve shadows for overlays. Treat these as responsive web choices informed by HIG principles.
 
 ## Component anatomy and states
 

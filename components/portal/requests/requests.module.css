@@ -13,27 +13,27 @@
 }
 .requestPage {
   display: grid;
-  gap: 24px;
+  gap: 16px;
 }
 .deliveryWorkspace {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.8fr);
+  grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.8fr);
   align-items: start;
-  gap: 24px;
+  gap: 16px;
 }
 .deliveryControls {
   display: grid;
-  gap: 20px;
+  gap: 14px;
 }
 .requestPage > .workspace {
   margin-top: 8px;
 }
 .title {
-  font-size: clamp(2rem, 5vw, 2.75rem);
-  font-weight: 600;
-  letter-spacing: -0.05em;
-  line-height: 1.12;
-  margin: 18px 0 14px;
+  font-size: clamp(1.625rem, 2.1vw, 1.75rem);
+  font-weight: 650;
+  letter-spacing: -0.035em;
+  line-height: 1.2;
+  margin: 8px 0 10px;
   text-wrap: balance;
 }
 .row {
@@ -46,7 +46,7 @@
   margin-left: auto;
 }
 .section {
-  margin-top: 40px;
+  margin-top: 22px;
 }
 .detail > .section {
   margin-top: 4px;
@@ -60,7 +60,7 @@
 .subheading {
   font-size: 0.9375rem;
   font-weight: 600;
-  margin: 26px 0 10px;
+  margin: 18px 0 8px;
 }
 .eyebrow,
 .note {
@@ -74,9 +74,9 @@
 }
 .copy {
   color: var(--portal-muted);
-  font-size: 0.9375rem;
-  line-height: 1.7;
-  margin: 12px 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  margin: 8px 0;
   white-space: pre-line;
 }
 .noticeCopy {
@@ -113,17 +113,17 @@
 }
 .requestLink {
   display: block;
-  padding: 25px 4px;
+  padding: 16px 4px;
   border-radius: 8px;
 }
 .requestLink:hover .itemTitle {
   color: var(--portal-accent);
 }
 .itemTitle {
-  font-size: 1.125rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   letter-spacing: -0.025em;
-  margin: 14px 0 8px;
+  margin: 8px 0 5px;
 }
 .arrow {
   color: var(--portal-muted);
@@ -148,8 +148,8 @@
 .filters {
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
-  gap: 18px;
-  margin: 30px 0 22px;
+  gap: 12px;
+  margin: 18px 0 14px;
 }
 .field {
   display: flex;
@@ -175,7 +175,7 @@
   border: 1px solid var(--portal-line);
   background: var(--surface-1);
   color: inherit;
-  border-radius: 12px;
+  border-radius: 8px;
   padding: 12px 14px;
   font: inherit;
   font-weight: 400;

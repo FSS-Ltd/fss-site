@@ -990,7 +990,7 @@ test.describe("FSS Studio desktop visuals", () => {
   });
 
   test("Studio overview desktop matches F01", async ({ page }) => {
-    await openScenario(page, "studio-overview", "Your studio, in focus.");
+    await openScenario(page, "studio-overview", "Studio overview");
     await expect(page).toHaveScreenshot("f01-studio-overview-desktop.png");
   });
 
@@ -1139,7 +1139,7 @@ test.describe("FSS Studio mobile visuals", () => {
   });
 
   test("Studio overview mobile matches M07", async ({ page }) => {
-    await openScenario(page, "studio-overview", "Your studio, in focus.");
+    await openScenario(page, "studio-overview", "Studio overview");
     await expect(page).toHaveScreenshot("m07-studio-overview-mobile.png");
   });
 
