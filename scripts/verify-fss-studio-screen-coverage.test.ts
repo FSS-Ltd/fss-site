@@ -4,9 +4,12 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 import { SCREEN_COVERAGE_CSV_HEADER } from "../lib/operations/design/screen-coverage";
-import { verifyFssStudioScreenCoverage } from "./verify-fss-studio-screen-coverage";
+import {
+  findUncoveredPortalRoutes,
+  verifyFssStudioScreenCoverage,
+} from "./verify-fss-studio-screen-coverage";
 
-test("rejects a repository package that does not contain all 88 screens", async () => {
+test("rejects a repository package that does not contain all 95 screens", async () => {
   const workspace = await mkdtemp(join(tmpdir(), "fss-screen-coverage-"));
   const designDirectory = join(workspace, "docs/design/fss-studio-experience");
 
@@ -34,7 +37,7 @@ test("rejects a repository package that does not contain all 88 screens", async 
     );
 
     assert.deepEqual(await verifyFssStudioScreenCoverage(workspace), [
-      "FSS Studio screen manifest must contain 88 screens.",
+      "FSS Studio screen manifest must contain 95 screens.",
     ]);
   } finally {
     await rm(workspace, { recursive: true, force: true });
@@ -69,9 +72,32 @@ test("accepts a null primary action for a loading screen contract", async () => 
     );
 
     assert.deepEqual(await verifyFssStudioScreenCoverage(workspace), [
-      "FSS Studio screen manifest must contain 88 screens.",
+      "FSS Studio screen manifest must contain 95 screens.",
     ]);
   } finally {
     await rm(workspace, { recursive: true, force: true });
   }
+});
+
+test("requires every active portal route to appear in the screen register", () => {
+  assert.deepEqual(
+    findUncoveredPortalRoutes(
+      ["/portal/projects", "/portal/projects/:projectId", "/portal/team"],
+      [
+        "/portal/projects",
+        "/portal/projects/:id?state=active",
+        "/portal/settings/team",
+      ],
+    ),
+    [],
+  );
+  assert.deepEqual(
+    findUncoveredPortalRoutes(
+      ["/portal/admin/projects/documents"],
+      ["/portal/admin/projects"],
+    ),
+    [
+      "Active portal route /portal/admin/projects/documents has no screen coverage row.",
+    ],
+  );
 });

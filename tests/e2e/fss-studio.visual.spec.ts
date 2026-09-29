@@ -881,6 +881,46 @@ const phaseEightMobileScenarios = [
   ],
 ] as const;
 
+const activeRouteScenarios = [
+  [
+    "C31",
+    "client-organisation-onboarding",
+    "Set up your organisation.",
+    "c31-client-organisation-onboarding",
+  ],
+  [
+    "F38",
+    "studio-client-agreements",
+    "Northstar Studio: agreements",
+    "f38-studio-client-agreements",
+  ],
+  [
+    "F39",
+    "studio-client-requests",
+    "Client requests",
+    "f39-studio-client-requests",
+  ],
+  [
+    "F40",
+    "studio-client-signing",
+    "Signing status",
+    "f40-studio-client-signing",
+  ],
+  ["F41", "studio-projects", "Project workspace", "f41-studio-projects"],
+  [
+    "F42",
+    "studio-project-create",
+    "Plan a project",
+    "f42-studio-project-create",
+  ],
+  [
+    "F43",
+    "studio-project-documents",
+    "Document register",
+    "f43-studio-project-documents",
+  ],
+] as const;
+
 test.describe("FSS Studio desktop visuals", () => {
   test.beforeEach(async ({ page }, testInfo) => {
     test.skip(
@@ -894,6 +934,20 @@ test.describe("FSS Studio desktop visuals", () => {
     await openScenario(page, "client-login", "Sign in to FSS");
     await expect(page).toHaveScreenshot("c00-client-sign-in-desktop.png");
   });
+
+  for (const [
+    screenId,
+    scenario,
+    heading,
+    screenshot,
+  ] of activeRouteScenarios) {
+    test(`${screenId} active route desktop matches the FSS workspace`, async ({
+      page,
+    }) => {
+      await openScenario(page, scenario, heading);
+      await expect(page).toHaveScreenshot(`${screenshot}-desktop.png`);
+    });
+  }
 
   test("client overview desktop matches C01", async ({ page }) => {
     await openScenario(page, "client-overview", "Your workspace");
@@ -1038,6 +1092,20 @@ test.describe("FSS Studio mobile visuals", () => {
     await openScenario(page, "client-login", "Sign in to FSS");
     await expect(page).toHaveScreenshot("c00-client-sign-in-mobile.png");
   });
+
+  for (const [
+    screenId,
+    scenario,
+    heading,
+    screenshot,
+  ] of activeRouteScenarios) {
+    test(`${screenId} active route mobile reflows with FSS navigation`, async ({
+      page,
+    }) => {
+      await openScenario(page, scenario, heading);
+      await expect(page).toHaveScreenshot(`${screenshot}-mobile.png`);
+    });
+  }
 
   test("client overview mobile matches M01", async ({ page }) => {
     await openScenario(page, "client-overview", "Your workspace");

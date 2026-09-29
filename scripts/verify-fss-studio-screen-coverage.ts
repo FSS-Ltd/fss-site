@@ -1,5 +1,5 @@
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
+import { readdir, readFile } from "node:fs/promises";
+import { join, relative, sep } from "node:path";
 import {
   parseCoverageCsv,
   type ScreenCoverageViolation,
@@ -8,7 +8,8 @@ import {
 } from "../lib/operations/design/screen-coverage";
 
 const designDirectory = "docs/design/fss-studio-experience";
-const expectedScreenCount = 88;
+const expectedScreenCount = 95;
+const portalRouteAliases = new Map([["/portal/team", "/portal/settings/team"]]);
 
 export async function verifyFssStudioScreenCoverage(
   repositoryRoot: string,
@@ -20,7 +21,8 @@ export async function verifyFssStudioScreenCoverage(
   ]);
 
   const manifest = parseScreenManifest(manifestSource);
-  const violations = validateScreenCoverage(manifest, parseCoverageCsv(coverageSource));
+  const coverage = parseCoverageCsv(coverageSource);
+  const violations = validateScreenCoverage(manifest, coverage);
 
   if (manifest.length !== expectedScreenCount) {
     violations.unshift(
@@ -28,7 +30,90 @@ export async function verifyFssStudioScreenCoverage(
     );
   }
 
+  if (manifest.length === expectedScreenCount) {
+    const portalRoot = join(repositoryRoot, "app/(portal)");
+    const pagePaths = await readPortalPagePaths(portalRoot, portalRoot);
+    violations.push(
+      ...findUncoveredPortalRoutes(
+        pagePaths,
+        coverage.map((row) => row.route),
+      ),
+    );
+  }
+
   return violations;
+}
+
+export function findUncoveredPortalRoutes(
+  pagePaths: readonly string[],
+  coveredRoutes: readonly string[],
+): ScreenCoverageViolation[] {
+  const covered = new Set(coveredRoutes.map(normalizeRoute));
+
+  return pagePaths
+    .map((route) => normalizeRoute(route))
+    .filter((route) => {
+      const target = portalRouteAliases.get(route);
+      return !covered.has(route) && !(target && covered.has(target));
+    })
+    .map((route) => `Active portal route ${route} has no screen coverage row.`);
+}
+
+async function readPortalPagePaths(
+  directory: string,
+  portalRoot: string,
+): Promise<string[]> {
+  let entries;
+
+  try {
+    entries = await readdir(directory, { withFileTypes: true });
+  } catch (error) {
+    if (isMissingDirectory(error)) return [];
+    throw error;
+  }
+
+  const routes = await Promise.all(
+    entries.map(async (entry) => {
+      const path = join(directory, entry.name);
+
+      if (entry.isDirectory()) return readPortalPagePaths(path, portalRoot);
+      if (entry.name !== "page.tsx") return [];
+
+      const relativePath = relative(portalRoot, path)
+        .split(sep)
+        .slice(0, -1)
+        .join("/");
+      const segments = relativePath
+        .split("/")
+        .filter((segment) => !/^\(.*\)$/.test(segment))
+        .map((segment) => {
+          const parameter = /^\[(.+)\]$/.exec(segment);
+          return parameter ? `:${parameter[1]}` : segment;
+        });
+
+      return [`/${segments.join("/")}`.replace(/\/$/, "") || "/"];
+    }),
+  );
+
+  return routes.flat();
+}
+
+function normalizeRoute(route: string): string {
+  return (
+    route
+      .split("?", 1)[0]
+      .replace(/:[^/]+/g, ":parameter")
+      .replace(/\/$/, "") || "/"
+  );
+}
+
+function isMissingDirectory(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    error.code === "ENOENT"
+  );
 }
 
 function parseScreenManifest(source: string): ScreenManifestEntry[] {
@@ -105,7 +190,9 @@ async function main(): Promise<void> {
       return;
     }
 
-    console.log("FSS Studio screen coverage verified: 88 screens.");
+    console.log(
+      "FSS Studio screen coverage verified: 95 screens and active portal routes.",
+    );
   } catch {
     console.error("FSS Studio screen coverage verification failed.");
     process.exitCode = 1;

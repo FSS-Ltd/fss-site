@@ -2,7 +2,7 @@
 
 ## Deliverables
 
-The complete local atlas contains **88 references**: 31 client screens, 37 founder screens, 10 shared states, 2 notification emails and 8 mobile layouts. Each has an editable SVG, a PNG preview and an explicit behavioural contract. The local browser supports search, collection filters and direct screen links. Forms in the drawings are illustrations, not functional application controls.
+The complete local atlas contains **95 references**: 32 client screens, 43 founder screens, 10 shared states, 2 notification emails and 8 mobile layouts. Each has an editable SVG, a PNG preview and an explicit behavioural contract. The local browser supports search, collection filters and direct screen links. Forms in the drawings are illustrations, not functional application controls.
 
 Start with the product specification, then the workflow contracts, then the screen contracts and design system. Implement a complete vertical slice at a time. A visually accurate screen with a no-op primary action fails acceptance.
 
@@ -32,7 +32,7 @@ Implement the FSS Studio Experience described in this pack, using the current re
 
 ## Validation scope
 
-**Checks completed:** 88 unique screen IDs with matching acceptance contracts; all SVGs parse; reference links resolve; measured text overflow is zero; relative document links resolve; production-tool Python syntax and gallery JavaScript syntax pass. Figma script fragments parse in their intended async connector context. All screen layouts were reviewed in contact sheets, with selected key screens inspected at larger size. Browser verification confirmed gallery loading, screen search, detail opening and the eight-screen mobile collection.
+**Checks completed:** 95 unique screen IDs with matching acceptance contracts; all SVGs parse; reference links resolve; measured text overflow is zero; relative document links resolve; production-tool Python syntax and gallery JavaScript syntax pass. Figma script fragments parse in their intended async connector context. All screen layouts were reviewed in contact sheets, with selected key screens inspected at larger size. Browser verification confirmed gallery loading, screen search, detail opening and the eight-screen mobile collection.
 
 The accompanying validation report records every screen's size and text bounds. Additional pack checks verify unique IDs, valid SVG XML, matching screen/rule coverage and reference targets. Selected desktop, mobile and email previews are inspected visually; the gallery is checked in a browser. This is design-artifact validation, not application accessibility certification or an end-to-end test of the deployed portal.
 

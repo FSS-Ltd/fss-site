@@ -8,11 +8,11 @@ Status: proposed product and design specification, grounded in the local FSS-Ltd
 - [Workflow contracts](./02-workflow-contracts.md)
 - [Screen-by-screen acceptance criteria](./03-screen-contracts.md)
 - [Design system and interaction rules](./04-design-system.md)
-- [Browse all 88 wireframes](./wireframes.html)
+- [Browse all 95 wireframes](./wireframes.html)
 - [Handoff, validation and Figma status](./05-handoff-and-validation.md)
 - [Figma foundations and five initial screens](https://www.figma.com/design/mfccE8T0vYDxTIpQUGBkFV)
 
-Screen IDs match the local SVG atlas and the five initial named Figma frames. Figma's Starter MCP limit blocked the remaining upload. The complete local pack contains 88 editable SVG references, 88 rendered previews and exact screen contracts. Example organisations, people, dates and money shown in the wireframes are synthetic design content.
+Screen IDs match the local SVG atlas and the five initial named Figma frames. Figma's Starter MCP limit blocked the remaining upload. The complete local pack contains 95 editable SVG references, 95 rendered previews and exact screen contracts. Example organisations, people, dates and money shown in the wireframes are synthetic design content.
 
 ## Read this first
 
@@ -22,6 +22,6 @@ Keep the existing domain services and security boundaries. Build the new experie
 
 ## Implementation coverage
 
-`screen-coverage.csv` is the required implementation index for this handoff. It contains one unique row for each of the 88 screen IDs and records the implementation route, authorised read model, primary command or event, visual assertion, functional test, delivery phase and status.
+`screen-coverage.csv` is the required implementation index for this handoff. It contains one unique row for each of the 95 screen IDs and records the implementation route, authorised read model, primary command or event, visual assertion, functional test, delivery phase and status.
 
 Run `pnpm verify:fss-studio-coverage` after changing the matrix or manifest. The final release requires every row to be `verified`; a planned or blocked row is not release evidence.
