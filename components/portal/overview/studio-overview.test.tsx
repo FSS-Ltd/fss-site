@@ -47,7 +47,7 @@ const overview: StudioOverviewData = {
         nextAction: "Continue implementation.",
         organisationId: "e96ea1ca-5e3a-41ae-a3e7-097c09c45e98",
         organisationName: "Northstar Studio",
-        priority: "medium",
+        priority: "normal",
         reviewReminderTarget: null,
         status: "in_progress",
         title: "Build booking integration",
