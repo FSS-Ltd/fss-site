@@ -38,7 +38,7 @@
   font-size: 0.6875rem;
 }
 
-.projectTab[aria-selected="true"] {
+.projectTab[aria-pressed="true"] {
   border-bottom-color: var(--portal-action, #0f7078);
   color: var(--portal-action, #0f7078);
 }
@@ -50,7 +50,7 @@
 
 .group {
   display: grid;
-  gap: 16px;
+  gap: 10px;
 }
 
 .groupHeading,
@@ -71,7 +71,7 @@
 }
 
 .groupHeading h2 {
-  font-size: 1.125rem;
+  font-size: 1rem;
   line-height: 1.35;
 }
 
@@ -80,7 +80,7 @@
 .documentHeading p {
   margin: 6px 0 0;
   color: var(--portal-muted, #46566c);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   line-height: 1.55;
 }
 
@@ -107,6 +107,7 @@
 
 .cardList {
   display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr));
   gap: 12px;
   padding: 0;
   margin: 0;
@@ -115,6 +116,21 @@
 
 .card {
   height: 100%;
+  align-content: start;
+}
+
+.cardHeader {
+  align-items: center;
+}
+
+.cardHeader h3 {
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
+
+.card :global(a) {
+  width: fit-content;
+  min-height: 38px;
 }
 
 .metadata {
@@ -161,6 +177,17 @@
   color: var(--portal-muted, #46566c);
   font-size: 0.9375rem;
   line-height: 1.6;
+}
+
+@media (max-width: 640px) {
+  .projectTabs {
+    margin-inline: -4px;
+    padding-inline: 4px;
+  }
+
+  .groupHeading {
+    align-items: center;
+  }
 }
 
 .timeline {

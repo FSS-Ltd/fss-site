@@ -38,9 +38,9 @@
   flex: 1;
   display: grid;
   align-content: center;
-  width: min(100%, 760px);
+  width: min(100%, 960px);
   margin-inline: auto;
-  padding: 64px 32px 88px;
+  padding: 40px 32px 56px;
 }
 .authPanel {
   width: min(100%, 420px);
@@ -51,22 +51,18 @@
 .identityMark {
   display: grid;
   place-items: center;
-  width: 100px;
-  height: 88px;
-  margin: 0 auto 32px;
+  width: 72px;
+  height: 64px;
+  margin: 0 auto 20px;
   background: var(--surface-1, #fff);
   border: 1px solid rgba(255, 255, 255, 0.9);
-  border-radius: 24px;
-  box-shadow:
-    0 2px 4px rgba(7, 24, 46, 0.03),
-    0 12px 32px rgba(7, 24, 46, 0.07),
-    inset 0 -1px 1px rgba(7, 24, 46, 0.05);
+  border-radius: 16px;
 }
 .card {
-  padding: 40px;
+  padding: 24px;
   background: var(--surface-1, #fff);
-  border-radius: 24px;
-  box-shadow: 0 8px 40px rgba(7, 24, 46, 0.04);
+  border: 1px solid var(--portal-border, rgba(10, 26, 46, 0.12));
+  border-radius: 12px;
   overflow-wrap: anywhere;
 }
 .eyebrow {
@@ -76,11 +72,11 @@
   margin: 0 0 12px;
 }
 .heading {
-  font-size: clamp(2rem, 5vw, 2.75rem);
-  line-height: 1.08;
-  font-weight: 600;
-  margin: 0 0 18px;
-  letter-spacing: -0.055em;
+  font-size: clamp(1.625rem, 2.1vw, 1.75rem);
+  line-height: 1.2;
+  font-weight: 650;
+  margin: 0 0 12px;
+  letter-spacing: -0.035em;
   text-wrap: balance;
 }
 .copy {
@@ -97,7 +93,7 @@
 .form {
   display: grid;
   gap: 10px;
-  margin-top: 32px;
+  margin-top: 20px;
   text-align: start;
 }
 .label {
@@ -107,10 +103,10 @@
 }
 .input {
   width: 100%;
-  min-height: 56px;
+  min-height: 44px;
   border: 1px solid var(--border-strong, rgba(10, 26, 46, 0.22));
-  border-radius: 13px;
-  padding: 15px 17px;
+  border-radius: 8px;
+  padding: 10px 12px;
   background: var(--surface-1, #fff);
   color: var(--portal-ink);
   font: inherit;
@@ -125,10 +121,10 @@
   justify-content: center;
   gap: 12px;
   width: 100%;
-  min-height: 54px;
+  min-height: 44px;
   margin-top: 4px;
   border: 1px solid transparent;
-  border-radius: 13px;
+  border-radius: 8px;
   background: var(--brand-secondary, #07182e);
   padding: 14px 20px;
   font: inherit;
@@ -186,9 +182,9 @@
 }
 .feedback {
   margin: 8px 0 0;
-  padding: 18px;
+  padding: 14px;
   background: var(--surface-3, #eef0f2);
-  border-radius: 13px;
+  border-radius: 10px;
   font-size: 0.875rem;
   line-height: 1.6;
 }
@@ -211,7 +207,7 @@
   margin: 28px 0 0;
 }
 .row {
-  padding-block: 22px;
+  padding-block: 14px;
   border-top: 1px solid var(--portal-line);
 }
 .name {
@@ -256,7 +252,7 @@
     padding: 40px 24px 56px;
   }
   .card {
-    padding: 28px 24px;
+    padding: 20px 16px;
   }
   .footer {
     padding: 20px 24px;

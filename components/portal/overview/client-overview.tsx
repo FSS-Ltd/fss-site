@@ -83,7 +83,6 @@ export function ClientOverview({
   return (
     <div className={`${styles.page} ${styles.overviewPage}`}>
       <PageHeader
-        description={`Here is where things stand with ${workspaceName}.`}
         eyebrow={workspaceName}
         title="Your workspace"
         action={

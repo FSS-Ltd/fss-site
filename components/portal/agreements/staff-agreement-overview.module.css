@@ -3,7 +3,7 @@
 .workspaceList,
 .workspaceCard {
   display: grid;
-  gap: 20px;
+  gap: 14px;
 }
 
 .metrics {
@@ -16,7 +16,7 @@
 .metric {
   margin: 0;
   color: var(--portal-ink, #0a1a2e);
-  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-size: clamp(1.375rem, 2.5vw, 1.75rem);
   font-weight: 650;
   letter-spacing: -0.045em;
   line-height: 1;
@@ -39,7 +39,7 @@
 }
 
 .group h2 {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
 }
 
 .workspaceList {
@@ -68,8 +68,8 @@
 .cardCopy,
 .empty {
   color: var(--portal-muted, #46566c);
-  font-size: 0.875rem;
-  line-height: 1.6;
+  font-size: 0.8125rem;
+  line-height: 1.5;
 }
 
 @media (max-width: 780px) {

@@ -1,6 +1,6 @@
 .presentation {
   display: grid;
-  width: min(100%, 880px);
+  width: min(100%, 1040px);
   gap: 12px;
   margin-inline: auto;
   color: var(--portal-ink, #0a1a2e);
@@ -8,9 +8,9 @@
 
 .columns {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
   align-items: start;
-  gap: 24px;
+  gap: 32px;
 }
 
 .primaryColumn,
@@ -66,7 +66,7 @@
 }
 
 .introduction h1 {
-  font-size: clamp(1.875rem, 5vw, 2.5rem);
+  font-size: clamp(1.75rem, 3vw, 2.125rem);
   letter-spacing: -0.045em;
   line-height: 1.15;
 }
@@ -160,7 +160,7 @@
   justify-content: center;
   gap: 8px;
   border: 1px solid transparent;
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 10px 16px;
   background: var(--portal-action, #0f7078);
   color: var(--portal-on-action, #ffffff);
@@ -171,7 +171,7 @@
 }
 
 .submit:hover:not(:disabled) {
-  background: #0b5e65;
+  background: color-mix(in srgb, var(--portal-action) 88%, var(--portal-ink));
 }
 
 .submit:disabled {
@@ -197,7 +197,7 @@
 .feedback {
   margin: 0;
   padding: 12px;
-  border: 1px solid #b5dbd7;
+  border: 1px solid var(--portal-border, #b5dbd7);
   border-radius: 8px;
   background: var(--portal-tint, #e3f2f1);
   color: var(--portal-action, #0b5e65);
@@ -206,7 +206,7 @@
 }
 
 .error {
-  border-color: #e7b5ae;
+  border-color: var(--portal-error-ink, #e7b5ae);
   background: var(--portal-error-surface, #fff0ed);
   color: var(--portal-error-ink, #9e2f22);
 }
@@ -230,7 +230,7 @@
   display: grid;
   gap: 5px;
   padding: 16px 20px;
-  border: 1px solid #b5dbd7;
+  border: 1px solid var(--portal-border, #b5dbd7);
   border-radius: 12px;
   background: var(--portal-tint, #e3f2f1);
   color: var(--portal-ink, #0a1a2e);

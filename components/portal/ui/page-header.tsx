@@ -7,6 +7,7 @@ export type PortalBreadcrumb = Readonly<{
 
 export type PageHeaderProps = Readonly<{
   title: string;
+  titleId?: string;
   description?: string;
   eyebrow?: string;
   breadcrumbs?: readonly PortalBreadcrumb[];
@@ -19,6 +20,7 @@ export function PageHeader({
   description,
   eyebrow,
   title,
+  titleId,
 }: PageHeaderProps): React.JSX.Element {
   return (
     <header className={styles.pageHeader}>
@@ -42,8 +44,12 @@ export function PageHeader({
       <div className={styles.headerContent}>
         <div>
           {eyebrow ? <p className={styles.eyebrow}>{eyebrow}</p> : null}
-          <h1 className={styles.title}>{title}</h1>
-          {description ? <p className={styles.description}>{description}</p> : null}
+          <h1 className={styles.title} id={titleId}>
+            {title}
+          </h1>
+          {description ? (
+            <p className={styles.description}>{description}</p>
+          ) : null}
         </div>
         {action ? <div className={styles.headerAction}>{action}</div> : null}
       </div>

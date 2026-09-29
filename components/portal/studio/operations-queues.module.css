@@ -10,8 +10,8 @@
 }
 
 .page {
-  width: min(100%, 1120px);
-  gap: 24px;
+  width: min(100%, 1380px);
+  gap: 16px;
   margin-inline: auto;
 }
 
@@ -23,7 +23,7 @@
 .metric {
   margin: 0;
   color: var(--portal-ink, #0a1a2e);
-  font-size: 1.5rem;
+  font-size: 1.375rem;
   font-weight: 700;
 }
 
@@ -34,12 +34,12 @@
 .empty {
   margin: 0;
   color: var(--portal-muted, #46566c);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   line-height: 1.5;
 }
 
 .list {
-  gap: 16px;
+  gap: 10px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -48,7 +48,7 @@
 .row {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 20px;
+  gap: 14px;
 }
 
 .rowSummary,
@@ -59,7 +59,7 @@
 .rowSummary h2 {
   margin: 0;
   color: var(--portal-ink, #0a1a2e);
-  font-size: 1.0625rem;
+  font-size: 0.9375rem;
   letter-spacing: -0.02em;
 }
 

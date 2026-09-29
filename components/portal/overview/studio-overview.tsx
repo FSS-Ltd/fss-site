@@ -35,8 +35,6 @@ function attentionLabel(item: StudioAttentionItem): string {
 function deliveryStateLabel(
   item: StudioOverviewData["delivery"]["items"][number],
 ): string {
-  if (item.blocked) return "Blocked";
-  if (item.status === "ready_for_review") return "Waiting on client";
   return item.status.replaceAll("_", " ");
 }
 
@@ -46,23 +44,34 @@ export function StudioOverview({
 }: StudioOverviewProps): React.JSX.Element {
   const attention = selectStudioAttention(overview, asOf);
   const metrics = getStudioOverviewMetrics(overview);
+  const reviewId = overview.delivery.items.find(
+    (item) => item.status === "ready_for_review",
+  )?.id;
+  const blockedId = overview.delivery.items.find(
+    (item) => item.blocked && item.id !== reviewId,
+  )?.id;
+  const activeDelivery = overview.delivery.items
+    .filter((item) => item.id !== reviewId && item.id !== blockedId)
+    .slice(0, 4);
 
   return (
     <div className={styles.page}>
-      <PageHeader
-        action={
-          <Link className={styles.primaryAction} href={adminHref("/delivery")}>
-            Open action queue
-          </Link>
-        }
-        description="Live staff-scoped queues show work that needs a decision. Counts are defined by the queue labels below."
-        eyebrow="FSS Studio"
-        title="Your studio, in focus."
-      />
+      <PageHeader eyebrow="FSS Studio" title="Studio overview" />
+
+      <dl className={styles.metricGrid} aria-label="Studio queue summary">
+        {metrics.map((metric) => (
+          <div className={styles.metric} key={metric.label}>
+            <dt>{metric.label}</dt>
+            <dd>{metric.value}</dd>
+            <Link href={metric.href} aria-label={`Open ${metric.label}`}>
+              View queue <span aria-hidden="true">↗</span>
+            </Link>
+          </div>
+        ))}
+      </dl>
 
       <section className={styles.attention} aria-labelledby="attention-heading">
         <div className={styles.attentionHeader}>
-          <p className={styles.sectionLabel}>Action queue</p>
           <h2 id="attention-heading">Needs your attention</h2>
         </div>
         {attention.length > 0 ? (
@@ -88,27 +97,16 @@ export function StudioOverview({
         )}
       </section>
 
-      <dl className={styles.metricGrid} aria-label="Studio queue definitions">
-        {metrics.map((metric) => (
-          <div className={styles.metric} key={metric.label}>
-            <dt>{metric.label}</dt>
-            <dd>{metric.value}</dd>
-            <Link href={metric.href}>Open queue</Link>
-          </div>
-        ))}
-      </dl>
-
       <section className={styles.panel} aria-labelledby="delivery-focus-heading">
         <div className={styles.panelHeader}>
           <div>
-            <p className={styles.sectionLabel}>Delivery focus</p>
-            <h2 id="delivery-focus-heading">Work already in motion</h2>
+            <h2 id="delivery-focus-heading">Active delivery</h2>
           </div>
           <Link href={adminHref("/delivery")}>View delivery</Link>
         </div>
-        {overview.delivery.items.length > 0 ? (
+        {activeDelivery.length > 0 ? (
           <ul className={styles.deliveryList}>
-            {overview.delivery.items.slice(0, 3).map((item) => (
+            {activeDelivery.map((item) => (
               <li key={item.id}>
                 <div>
                   <h3>{item.title}</h3>
