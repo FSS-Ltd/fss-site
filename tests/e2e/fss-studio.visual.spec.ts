@@ -1012,7 +1012,13 @@ test.describe("FSS Studio desktop visuals", () => {
       "client-request-form",
       "What would you like us to do?",
     );
-    await expect(page).toHaveScreenshot("c06-client-request-form-desktop.png");
+    await expect(
+      page.getByRole("combobox", { name: /Project/ }).locator("option:checked"),
+    ).toHaveText("Website & booking experience");
+    // Chromium rasterizes native select labels inconsistently on Ubuntu.
+    await expect(page).toHaveScreenshot("c06-client-request-form-desktop.png", {
+      maxDiffPixels: 750,
+    });
   });
 
   test("client bug report desktop matches C07", async ({ page }) => {
@@ -1167,7 +1173,15 @@ test.describe("FSS Studio mobile visuals", () => {
 
   test("client request board mobile matches M03", async ({ page }) => {
     await openScenario(page, "client-request-board", "Requests & feedback");
-    await expect(page).toHaveScreenshot("m03-client-request-board-mobile.png");
+    await expect(
+      page
+        .getByRole("combobox", { name: "Request state" })
+        .locator("option:checked"),
+    ).toHaveText("All states");
+    // Chromium rasterizes native select labels inconsistently on Ubuntu.
+    await expect(page).toHaveScreenshot("m03-client-request-board-mobile.png", {
+      maxDiffPixels: 250,
+    });
   });
 
   test("client bug report mobile matches M04", async ({ page }) => {
