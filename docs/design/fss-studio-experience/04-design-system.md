@@ -82,6 +82,8 @@ Unread marker + clear event title + project/reference + time + direct action. An
 
 Solid reading surfaces are the default. Subtle depth may distinguish overlays from content. Do not add glass effects behind long documents, dense forms or status text. Modal sheets have a clear title, close/back action, focus trap and restored focus on dismissal.
 
+Client register search sits at the right edge of the results toolbar. Creating a client is a scoped dialog with Cancel, validation, and unsaved-change protection. Keep the direct `/portal/admin/clients/new` route for deep links. Complex agreement and journey builders remain full workspaces. Welcome journey counts use compact metrics; each client workspace presents identity, state, and action in one row.
+
 ## Motion and feedback
 
 Suggested timing: 120–160 ms button feedback; 180–220 ms menu/sheet transitions; card movement tied to pointer position. These values are design choices. Respect reduced motion by removing translations, parallax, bounce and decorative effects. No delayed entrance sequence on operational screens.

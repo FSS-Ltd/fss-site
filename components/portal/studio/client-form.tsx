@@ -25,7 +25,13 @@ function formValue(data: FormData, name: string): string {
   return String(data.get(name) ?? "").trim();
 }
 
-export function StudioClientForm(): React.JSX.Element {
+export function StudioClientForm({
+  embedded = false,
+  onCancel,
+}: Readonly<{
+  embedded?: boolean;
+  onCancel?: () => void;
+}> = {}): React.JSX.Element {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [message, setMessage] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -86,13 +92,18 @@ export function StudioClientForm(): React.JSX.Element {
   }
 
   return (
-    <section aria-labelledby="add-client-heading">
-      <PageHeader
-        breadcrumbs={[{ href: portalPath("/portal/admin/clients"), label: "Clients" }, { label: "Add a client" }]}
-        description="Start with the organisation and its primary contact. Access, invitations and messages are reviewed separately."
-        eyebrow="FSS Studio · Clients"
-        title="Add a client"
-      />
+    <section aria-label={embedded ? "New client details" : undefined}>
+      {!embedded && (
+        <PageHeader
+          breadcrumbs={[
+            { href: portalPath("/portal/admin/clients"), label: "Clients" },
+            { label: "Add a client" },
+          ]}
+          description="Start with the organisation and its primary contact. Access, invitations and messages are reviewed separately."
+          eyebrow="FSS Studio · Clients"
+          title="Add a client"
+        />
+      )}
       <form className={styles.form} onSubmit={submit} aria-busy={pending}>
         <div className={styles.formSections}>
           <PortalCard
@@ -131,7 +142,11 @@ export function StudioClientForm(): React.JSX.Element {
               label="Full name"
               required
             >
-              <input disabled={pending} maxLength={200} name="primaryContactName" />
+              <input
+                disabled={pending}
+                maxLength={200}
+                name="primaryContactName"
+              />
             </PortalField>
             <PortalField
               error={errors["primaryContact.email"]}
@@ -150,7 +165,11 @@ export function StudioClientForm(): React.JSX.Element {
               label="Role"
               required
             >
-              <input disabled={pending} maxLength={200} name="primaryContactRole" />
+              <input
+                disabled={pending}
+                maxLength={200}
+                name="primaryContactRole"
+              />
             </PortalField>
           </PortalCard>
         </div>
@@ -171,13 +190,25 @@ export function StudioClientForm(): React.JSX.Element {
             />
           </PortalField>
         </PortalCard>
-        <Notice tone="info">
-          <strong>What saving does</strong>
-          <br />
-          Creates the client record only. Invitations, agreements and welcome
-          messages each have their own review step.
-        </Notice>
+        {!embedded ? (
+          <Notice tone="info">
+            <strong>What saving does</strong>
+            <br />
+            Creates the client record only. Invitations, agreements and welcome
+            messages each have their own review step.
+          </Notice>
+        ) : null}
         <div className={styles.formActions}>
+          {onCancel ? (
+            <PortalButton
+              disabled={pending}
+              onClick={onCancel}
+              type="button"
+              variant="secondary"
+            >
+              Cancel
+            </PortalButton>
+          ) : null}
           <PortalButton loading={pending} type="submit">
             Save client
           </PortalButton>

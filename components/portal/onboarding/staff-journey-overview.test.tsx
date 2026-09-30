@@ -31,6 +31,7 @@ test("renders journey and recovery work from staff-scoped overview rows", () => 
   );
 
   assert.match(html, /Draft journeys/);
+  assert.match(html, /aria-labelledby="journey-summary-title"/);
   assert.match(html, /Needs attention/);
   assert.match(html, /Harbour Foundation/);
   assert.match(html, /Open workspace/);

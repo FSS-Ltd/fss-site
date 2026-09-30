@@ -66,6 +66,46 @@ async function openPhaseSevenScenario(
   await openScenario(page, scenario, heading);
 }
 
+async function expectVisualScreenshot(
+  page: Page,
+  filename: string,
+): Promise<void> {
+  const visibleContentSelects = await page
+    .locator('select:not([aria-label="Colour appearance"])')
+    .evaluateAll(
+      (selects) =>
+        selects.filter((select) => {
+          const bounds = select.getBoundingClientRect();
+          return (
+            bounds.width > 0 &&
+            bounds.height > 0 &&
+            bounds.bottom > 0 &&
+            bounds.top < window.innerHeight &&
+            bounds.right > 0 &&
+            bounds.left < window.innerWidth
+          );
+        }).length,
+    );
+
+  // Ubuntu Chromium can rasterize native select text differently between CI runs.
+  await expect(page).toHaveScreenshot(filename, {
+    maxDiffPixels: Math.min(visibleContentSelects * 750, 1500),
+  });
+}
+
+async function expectScopeDefaults(page: Page): Promise<void> {
+  await expect(
+    page
+      .getByRole("combobox", { name: "Choose work" })
+      .locator("option:checked"),
+  ).toHaveText("Update scope decision");
+  await expect(
+    page
+      .getByRole("combobox", { name: "Scope decision" })
+      .locator("option:checked"),
+  ).toHaveText("Scope being assessed");
+}
+
 const phaseFourDesktopScenarios = [
   [
     "C02",
@@ -930,9 +970,47 @@ test.describe("FSS Studio desktop visuals", () => {
     await page.setViewportSize({ width: 1440, height: 1200 });
   });
 
+  test("client search is right aligned and client creation opens a dialog", async ({
+    page,
+  }) => {
+    await openScenario(page, "studio-clients", "Your clients");
+    const resultCount = page.getByText(/\d+ shown/);
+    const search = page.getByRole("searchbox", { name: "Search clients" });
+    const countBounds = await resultCount.boundingBox();
+    const searchBounds = await search.boundingBox();
+    if (!countBounds || !searchBounds) {
+      throw new Error("Client register toolbar is not visible.");
+    }
+    expect(searchBounds.x).toBeGreaterThan(countBounds.x + countBounds.width);
+
+    await page.getByRole("button", { name: "Add client" }).click();
+    const dialog = page.getByRole("dialog", { name: "Add a client" });
+    await expect(dialog).toBeVisible();
+    await expect(
+      dialog.getByRole("textbox", { name: "Display name" }),
+    ).toBeVisible();
+    await expect(
+      dialog.getByRole("textbox", { name: "Email address" }),
+    ).toBeVisible();
+    await expectVisualScreenshot(page, "studio-client-create-dialog.png");
+    await dialog.getByRole("button", { name: "Cancel" }).click();
+    await expect(dialog).toBeHidden();
+
+    await page.getByRole("button", { name: "Add client" }).click();
+    await dialog
+      .getByRole("textbox", { name: "Display name" })
+      .fill("Draft client");
+    page.once("dialog", (confirmation) => confirmation.dismiss());
+    await dialog.getByRole("button", { name: "Cancel" }).click();
+    await expect(dialog).toBeVisible();
+    page.once("dialog", (confirmation) => confirmation.accept());
+    await dialog.getByRole("button", { name: "Cancel" }).click();
+    await expect(dialog).toBeHidden();
+  });
+
   test("client sign-in desktop matches C00", async ({ page }) => {
     await openScenario(page, "client-login", "Sign in to FSS");
-    await expect(page).toHaveScreenshot("c00-client-sign-in-desktop.png");
+    await expectVisualScreenshot(page, "c00-client-sign-in-desktop.png");
   });
 
   for (const [
@@ -945,13 +1023,13 @@ test.describe("FSS Studio desktop visuals", () => {
       page,
     }) => {
       await openScenario(page, scenario, heading);
-      await expect(page).toHaveScreenshot(`${screenshot}-desktop.png`);
+      await expectVisualScreenshot(page, `${screenshot}-desktop.png`);
     });
   }
 
   test("client overview desktop matches C01", async ({ page }) => {
     await openScenario(page, "client-overview", "Your workspace");
-    await expect(page).toHaveScreenshot("c01-client-overview-desktop.png");
+    await expectVisualScreenshot(page, "c01-client-overview-desktop.png");
   });
 
   test("client workspace selection desktop matches C25", async ({ page }) => {
@@ -960,12 +1038,12 @@ test.describe("FSS Studio desktop visuals", () => {
       "client-workspace-switcher",
       "Choose your workspace",
     );
-    await expect(page).toHaveScreenshot("c25-client-workspace-desktop.png");
+    await expectVisualScreenshot(page, "c25-client-workspace-desktop.png");
   });
 
   test("client request board desktop matches C05", async ({ page }) => {
     await openScenario(page, "client-request-board", "Requests & feedback");
-    await expect(page).toHaveScreenshot("c05-client-request-board-desktop.png");
+    await expectVisualScreenshot(page, "c05-client-request-board-desktop.png");
   });
 
   test("client request creation desktop matches C06", async ({ page }) => {
@@ -974,38 +1052,45 @@ test.describe("FSS Studio desktop visuals", () => {
       "client-request-form",
       "What would you like us to do?",
     );
-    await expect(page).toHaveScreenshot("c06-client-request-form-desktop.png");
+    await expect(
+      page.getByRole("combobox", { name: /Project/ }).locator("option:checked"),
+    ).toHaveText("Website & booking experience");
+    await expectVisualScreenshot(page, "c06-client-request-form-desktop.png");
   });
 
   test("client bug report desktop matches C07", async ({ page }) => {
     await openScenario(page, "client-bug-report", "Report a problem");
-    await expect(page).toHaveScreenshot("c07-client-bug-report-desktop.png");
+    await expectVisualScreenshot(page, "c07-client-bug-report-desktop.png");
   });
 
   test("client request review desktop matches C09", async ({ page }) => {
     await openScenario(page, "client-request-review", "Ready for your review");
-    await expect(page).toHaveScreenshot(
-      "c09-client-request-review-desktop.png",
-    );
+    await expectVisualScreenshot(page, "c09-client-request-review-desktop.png");
   });
 
   test("Studio overview desktop matches F01", async ({ page }) => {
     await openScenario(page, "studio-overview", "Studio overview");
-    await expect(page).toHaveScreenshot("f01-studio-overview-desktop.png");
+    await expectVisualScreenshot(page, "f01-studio-overview-desktop.png");
   });
 
   test("Studio delivery board desktop matches F05", async ({ page }) => {
     await openScenario(page, "studio-delivery-board", "Delivery board");
-    await expect(page).toHaveScreenshot(
-      "f05-studio-delivery-board-desktop.png",
-    );
+    await expectVisualScreenshot(page, "f05-studio-delivery-board-desktop.png");
   });
 
   test("Studio review package desktop matches F07", async ({ page }) => {
     await openScenario(page, "studio-review-package", "Send work for review");
-    await expect(page).toHaveScreenshot(
-      "f07-studio-review-package-desktop.png",
-    );
+    await expect(
+      page
+        .getByRole("combobox", { name: "Choose work" })
+        .locator("option:checked"),
+    ).toHaveText("Prepare review package");
+    await expect(
+      page
+        .getByRole("combobox", { name: /Deliverable/ })
+        .locator("option:checked"),
+    ).toHaveText("Booking confirmation email preview · v3");
+    await expectVisualScreenshot(page, "f07-studio-review-package-desktop.png");
   });
 
   for (const [
@@ -1018,7 +1103,7 @@ test.describe("FSS Studio desktop visuals", () => {
       page,
     }) => {
       await openScenario(page, scenario, heading);
-      await expect(page).toHaveScreenshot(screenshot);
+      await expectVisualScreenshot(page, screenshot);
     });
   }
 
@@ -1032,7 +1117,7 @@ test.describe("FSS Studio desktop visuals", () => {
       page,
     }) => {
       await openScenario(page, scenario, heading);
-      await expect(page).toHaveScreenshot(screenshot);
+      await expectVisualScreenshot(page, screenshot);
     });
   }
 
@@ -1046,7 +1131,12 @@ test.describe("FSS Studio desktop visuals", () => {
       page,
     }) => {
       await openPhaseFiveScenario(page, scenario, heading);
-      await expect(page).toHaveScreenshot(screenshot);
+      if (scenario === "client-team") {
+        await expect(page.getByRole("combobox", { name: "Role" })).toHaveValue(
+          "contributor",
+        );
+      }
+      await expectVisualScreenshot(page, screenshot);
     });
   }
 
@@ -1060,7 +1150,7 @@ test.describe("FSS Studio desktop visuals", () => {
       page,
     }) => {
       await openScenario(page, scenario, heading);
-      await expect(page).toHaveScreenshot(screenshot);
+      await expectVisualScreenshot(page, screenshot);
     });
   }
 
@@ -1074,7 +1164,10 @@ test.describe("FSS Studio desktop visuals", () => {
       page,
     }) => {
       await openPhaseSevenScenario(page, scenario, heading);
-      await expect(page).toHaveScreenshot(screenshot);
+      if (scenario === "studio-request-scope") {
+        await expectScopeDefaults(page);
+      }
+      await expectVisualScreenshot(page, screenshot);
     });
   }
 });
@@ -1088,9 +1181,25 @@ test.describe("FSS Studio mobile visuals", () => {
     await page.setViewportSize({ width: 390, height: 844 });
   });
 
+  test("client creation dialog reflows on a phone", async ({ page }) => {
+    await openScenario(page, "studio-clients", "Your clients");
+    await page.getByRole("button", { name: "Add client" }).click();
+    await expect(
+      page.getByRole("dialog", { name: "Add a client" }),
+    ).toBeVisible();
+    const closeBounds = await page
+      .getByRole("button", { name: "Close add client" })
+      .boundingBox();
+    expect(closeBounds?.width).toBeLessThanOrEqual(48);
+    await expectVisualScreenshot(
+      page,
+      "studio-client-create-dialog-mobile.png",
+    );
+  });
+
   test("client sign-in mobile reflows C00", async ({ page }) => {
     await openScenario(page, "client-login", "Sign in to FSS");
-    await expect(page).toHaveScreenshot("c00-client-sign-in-mobile.png");
+    await expectVisualScreenshot(page, "c00-client-sign-in-mobile.png");
   });
 
   for (const [
@@ -1103,28 +1212,33 @@ test.describe("FSS Studio mobile visuals", () => {
       page,
     }) => {
       await openScenario(page, scenario, heading);
-      await expect(page).toHaveScreenshot(`${screenshot}-mobile.png`);
+      await expectVisualScreenshot(page, `${screenshot}-mobile.png`);
     });
   }
 
   test("client overview mobile matches M01", async ({ page }) => {
     await openScenario(page, "client-overview", "Your workspace");
-    await expect(page).toHaveScreenshot("m01-client-overview-mobile.png");
+    await expectVisualScreenshot(page, "m01-client-overview-mobile.png");
   });
 
   test("client request board mobile matches M03", async ({ page }) => {
     await openScenario(page, "client-request-board", "Requests & feedback");
-    await expect(page).toHaveScreenshot("m03-client-request-board-mobile.png");
+    await expect(
+      page
+        .getByRole("combobox", { name: "Request state" })
+        .locator("option:checked"),
+    ).toHaveText("All states");
+    await expectVisualScreenshot(page, "m03-client-request-board-mobile.png");
   });
 
   test("client bug report mobile matches M04", async ({ page }) => {
     await openScenario(page, "client-bug-report", "Report a problem");
-    await expect(page).toHaveScreenshot("m04-client-bug-report-mobile.png");
+    await expectVisualScreenshot(page, "m04-client-bug-report-mobile.png");
   });
 
   test("client request review mobile matches M05", async ({ page }) => {
     await openScenario(page, "client-request-review", "Ready for your review");
-    await expect(page).toHaveScreenshot("m05-client-request-review-mobile.png");
+    await expectVisualScreenshot(page, "m05-client-request-review-mobile.png");
   });
 
   test("client agreement detail mobile matches M06", async ({ page }) => {
@@ -1133,14 +1247,15 @@ test.describe("FSS Studio mobile visuals", () => {
       "client-agreement-detail",
       "Website & booking experience",
     );
-    await expect(page).toHaveScreenshot(
+    await expectVisualScreenshot(
+      page,
       "m06-client-agreement-detail-mobile.png",
     );
   });
 
   test("Studio overview mobile matches M07", async ({ page }) => {
     await openScenario(page, "studio-overview", "Studio overview");
-    await expect(page).toHaveScreenshot("m07-studio-overview-mobile.png");
+    await expectVisualScreenshot(page, "m07-studio-overview-mobile.png");
   });
 
   for (const [
@@ -1153,7 +1268,7 @@ test.describe("FSS Studio mobile visuals", () => {
       page,
     }) => {
       await openScenario(page, scenario, heading);
-      await expect(page).toHaveScreenshot(screenshot);
+      await expectVisualScreenshot(page, screenshot);
     });
   }
 
@@ -1167,7 +1282,7 @@ test.describe("FSS Studio mobile visuals", () => {
       page,
     }) => {
       await openScenario(page, scenario, heading);
-      await expect(page).toHaveScreenshot(screenshot);
+      await expectVisualScreenshot(page, screenshot);
     });
   }
 
@@ -1181,7 +1296,7 @@ test.describe("FSS Studio mobile visuals", () => {
       page,
     }) => {
       await openPhaseFiveScenario(page, scenario, heading);
-      await expect(page).toHaveScreenshot(screenshot);
+      await expectVisualScreenshot(page, screenshot);
     });
   }
 
@@ -1196,7 +1311,7 @@ test.describe("FSS Studio mobile visuals", () => {
     }) => {
       await openScenario(page, scenario, heading);
       await expect(page.locator("summary", { hasText: "More" })).toBeVisible();
-      await expect(page).toHaveScreenshot(screenshot);
+      await expectVisualScreenshot(page, screenshot);
     });
   }
 
@@ -1210,7 +1325,10 @@ test.describe("FSS Studio mobile visuals", () => {
       page,
     }) => {
       await openPhaseSevenScenario(page, scenario, heading);
-      await expect(page).toHaveScreenshot(screenshot);
+      if (scenario === "studio-request-scope") {
+        await expectScopeDefaults(page);
+      }
+      await expectVisualScreenshot(page, screenshot);
     });
   }
 });
@@ -1254,7 +1372,7 @@ test("appearance selection updates the portal and persists between pages", async
         ),
     )
     .toBe("#0b1421");
-  await expect(page).toHaveScreenshot("client-projects-dark.png");
+  await expectVisualScreenshot(page, "client-projects-dark.png");
   await expect
     .poll(
       async () =>

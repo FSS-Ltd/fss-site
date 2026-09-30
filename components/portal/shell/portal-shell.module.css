@@ -1,7 +1,7 @@
 .shell {
   min-height: 100dvh;
   display: grid;
-  grid-template-columns: 240px minmax(0, 1fr);
+  grid-template-columns: 252px minmax(0, 1fr);
   overflow-x: clip;
   background: var(--portal-canvas, #f2f3f5);
   color: var(--portal-ink, #0a1a2e);
@@ -29,7 +29,7 @@
 
 .sidebar {
   min-width: 0;
-  padding: 24px 14px;
+  padding: 22px 14px;
   border-right: 1px solid var(--portal-border, #d9dfe5);
   background: var(--portal-soft-surface, #f7f8f9);
 }
@@ -38,7 +38,7 @@
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  margin: 0 8px 20px;
+  margin: 0 10px 24px;
 }
 
 .brandImage {
@@ -159,14 +159,16 @@
 .studioIdentityName {
   margin: 0;
   color: var(--portal-ink, #0a1a2e);
-  font-size: 0.8125rem;
+  font-size: 0.9375rem;
   font-weight: 700;
   line-height: 1.35;
 }
 
 .navigation {
   display: grid;
-  gap: 2px;
+  gap: 3px;
+  padding-top: 14px;
+  border-top: 1px solid var(--portal-border, #d9dfe5);
 }
 
 .navigationLink,
@@ -175,9 +177,9 @@
   min-height: 44px;
   align-items: center;
   gap: 9px;
-  border-radius: 8px;
-  padding: 9px 10px;
-  font-size: 0.8125rem;
+  border-radius: 9px;
+  padding: 9px 12px;
+  font-size: 0.875rem;
   font-weight: 600;
   line-height: 1.25;
 }
@@ -192,8 +194,11 @@
 }
 
 .navigationCurrent {
-  background: var(--portal-tint, #e3f2f1);
+  background: var(--portal-surface, #ffffff);
   color: var(--portal-action, #0f7078);
+  box-shadow:
+    inset 3px 0 0 var(--portal-action, #0f7078),
+    0 1px 3px rgba(7, 24, 46, 0.06);
 }
 
 .navigationUnavailable {
@@ -233,7 +238,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  min-height: 64px;
+  min-height: 72px;
   border-bottom: 1px solid var(--portal-border, #d9dfe5);
   padding: 8px clamp(24px, 3.2vw, 48px);
   background: var(--portal-surface, #ffffff);
@@ -321,7 +326,7 @@
 
 .main {
   min-width: 0;
-  padding: 28px clamp(24px, 3.2vw, 48px) 48px;
+  padding: 32px clamp(24px, 3.2vw, 48px) 56px;
 }
 
 .shell :is(a, button, summary):focus-visible {
@@ -401,7 +406,7 @@
   }
 
   .main {
-    padding: 24px 20px 32px;
+    padding: 24px 20px 96px;
   }
 
   .mobileNavigation {

@@ -174,7 +174,9 @@
   border: 1px solid var(--portal-border, #d9dfe5);
   border-radius: 12px;
   padding: 18px;
-  transition: border-color 140ms ease, background-color 140ms ease;
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease;
 }
 
 .cardDefault {
@@ -411,7 +413,7 @@
     width: 100%;
   }
 
-  .headerAction :global(button) {
+  .headerAction > .buttonGroup > :global(button) {
     width: 100%;
   }
 }

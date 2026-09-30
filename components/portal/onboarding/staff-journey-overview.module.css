@@ -1,0 +1,146 @@
+.page {
+  display: grid;
+  width: min(100%, 1280px);
+  gap: 22px;
+  margin-inline: auto;
+}
+
+.summary {
+  display: grid;
+  gap: 14px;
+}
+
+.summary h2 {
+  margin: 0;
+  font-size: 1.0625rem;
+  letter-spacing: -0.02em;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.metrics > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 18px 20px;
+  border: 1px solid var(--portal-border);
+  border-radius: 14px;
+  background: var(--portal-surface);
+}
+
+.metrics dt {
+  color: var(--portal-muted);
+  font-size: 0.8125rem;
+}
+
+.metrics dd {
+  margin: 0;
+  color: var(--portal-ink);
+  font-size: 1.625rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.2;
+}
+
+.workspaces {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.workspaceCard > div:last-child {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.workspaceIcon {
+  display: grid;
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--portal-tint);
+  color: var(--portal-action);
+}
+
+.workspaceDetails {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.workspaceDetails h2,
+.workspaceDetails p {
+  margin: 0;
+}
+
+.workspaceToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 18px 20px;
+  border: 1px solid var(--portal-border);
+  border-radius: 14px;
+  background: var(--portal-surface);
+}
+
+.workspaceToolbar h2,
+.workspaceToolbar p {
+  margin: 0;
+}
+
+.workspaceToolbar h2 {
+  font-size: 1.0625rem;
+}
+
+.workspaceToolbar p {
+  margin-top: 3px;
+  color: var(--portal-muted);
+  font-size: 0.875rem;
+}
+
+.workspaceActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.journeyDetail {
+  display: grid;
+  gap: 18px;
+}
+
+.workspaceDetails h2 {
+  font-size: 1rem;
+}
+
+.workspaceDetails p {
+  margin-top: 3px;
+  color: var(--portal-muted);
+  font-size: 0.875rem;
+}
+
+@media (max-width: 640px) {
+  .metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .workspaceCard > div:last-child {
+    align-items: flex-start;
+  }
+
+  .workspaceDetails {
+    flex-basis: calc(100% - 58px);
+  }
+}

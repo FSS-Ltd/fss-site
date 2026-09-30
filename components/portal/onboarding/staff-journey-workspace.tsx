@@ -12,12 +12,8 @@ import { StaffJourneyDetail } from "./staff-journey-detail";
 import { JourneyPreview } from "@/components/operations/onboarding/journey-preview";
 import { JourneyTimeline } from "@/components/operations/onboarding/journey-timeline";
 import type { WelcomePack } from "@/lib/operations/onboarding/welcome-packs";
-import {
-  Notice,
-  PageHeader,
-  PortalActionLink,
-  PortalCard,
-} from "@/components/portal/ui";
+import { Notice, PageHeader, PortalActionLink } from "@/components/portal/ui";
+import styles from "./staff-journey-overview.module.css";
 
 type StaffJourneyWorkspaceProps = {
   organisationId: string;
@@ -45,7 +41,7 @@ export function StaffJourneyWorkspace({
   const apiRoot = `/api/portal/admin/clients/${organisationId}`;
 
   return (
-    <main>
+    <section className={styles.page} aria-label="Client welcome workspace">
       <PageHeader
         eyebrow="FSS Studio · Welcome journeys"
         title="A deliberate first step."
@@ -59,23 +55,28 @@ export function StaffJourneyWorkspace({
           </PortalActionLink>
         }
       />
-      <PortalCard title="Draft journeys" tone="accent">
-        <p>
-          {journeys.length} journey{journeys.length === 1 ? "" : "s"} shown.
-        </p>
-        <PortalActionLink
-          href={portalPath(`/portal/admin/clients/${organisationId}/signing`)}
-          variant="secondary"
-        >
-          Review signing documents
-        </PortalActionLink>
-        <PortalActionLink
-          href={`${portalPath("/portal/admin/welcome/templates")}?organisationId=${encodeURIComponent(organisationId)}`}
-          variant="secondary"
-        >
-          Manage welcome templates
-        </PortalActionLink>
-      </PortalCard>
+      <div className={styles.workspaceToolbar}>
+        <div>
+          <h2>Draft journeys</h2>
+          <p>
+            {journeys.length} journey{journeys.length === 1 ? "" : "s"} shown.
+          </p>
+        </div>
+        <div className={styles.workspaceActions}>
+          <PortalActionLink
+            href={portalPath(`/portal/admin/clients/${organisationId}/signing`)}
+            variant="secondary"
+          >
+            Review signing documents
+          </PortalActionLink>
+          <PortalActionLink
+            href={`${portalPath("/portal/admin/welcome/templates")}?organisationId=${encodeURIComponent(organisationId)}`}
+            variant="secondary"
+          >
+            Manage welcome templates
+          </PortalActionLink>
+        </div>
+      </div>
       <StaffJourneyBuilder
         agreements={register.agreements.map((agreement) => ({
           id: agreement.id,
@@ -117,6 +118,7 @@ export function StaffJourneyWorkspace({
       ) : (
         journeys.map((journey) => (
           <section
+            className={styles.journeyDetail}
             key={`${journey.id}-${journey.generation}-${journey.proposalApprovalId}`}
           >
             <StaffJourneyDetail journey={journey} />
@@ -137,6 +139,6 @@ export function StaffJourneyWorkspace({
           shown.
         </Notice>
       )}
-    </main>
+    </section>
   );
 }
