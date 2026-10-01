@@ -26,6 +26,7 @@ Billing schedules, Stripe customers, invoices, reconciliation, amendments, refun
 - Commercial lifecycle covers fixed selections, retained PDFs, approval/rejection/resubmission, exact allocations, expiry, concurrent selections, null/stale versions, revoked access, organisation boundaries, actual reviewer attribution, immutable audit history, builder finalisation bypass, currency preservation, signing, service activation and setup-only billing.
 - Desktop/mobile browser checks passed for unselected alternatives, invalid/valid proposal floors, stale response feedback, setup fees, exact tax/discount allocations and responsive layout. Final screens reviewed visually.
 - Type checking, production build, repository-wide lint (excluding separate local worktrees), formatting and diff whitespace checks passed.
+- PR #282 CI repair: reviewed the 17 failing Linux visual artifacts from run `36929927497`. Updated only the corresponding Linux and macOS baselines for the new currency controls, compensation form and monetary formatting. The affected local comparison run passed 19 tests without snapshot updates. Screenshot tolerances and application code remain unchanged.
 
 ## Release and rollback
 

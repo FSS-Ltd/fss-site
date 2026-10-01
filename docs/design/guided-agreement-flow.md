@@ -1,14 +1,15 @@
 # Guided agreement flow and creation repair
 
 Owner: Technical Agent
-Status: Prepared for draft PR review; Linux visual baselines pending
+Status: Draft PR #283; Linux visual baselines pending
+Last updated: 2026-10-02
 Created: 2026-10-01
 
 ## Problem and scope
 
 The staff agreement builder needs focused prompts, fewer repeated labels and readable document previews in both appearances. Final creation also failed at 21:19 Europe/London on 2026-10-01: database error `42501` identified an explicit `FOR KEY SHARE` read against `operations.engagement_links`, where the runtime role lacks UPDATE permission.
 
-This change retains the six stages, existing draft schema and endpoints, commercial terms, client signing and FSS styling. It adds no dependencies, permission grants or migrations. The review branch is based on PR #282 (`feat/client-commercial-terms`) because the Fees stage uses its currency and compensation controls. Unrelated local welcome, settings, access and engagement changes are excluded.
+This change retains the six stages, existing draft schema and endpoints, commercial terms, client signing and FSS styling. It adds no dependencies, permission grants or migrations. PR #282 has merged into `main`; this PR now targets `main` and retains its currency and compensation controls in Fees. Unrelated local welcome, settings, access and engagement changes are excluded.
 
 ## Implementation
 
@@ -45,4 +46,6 @@ pnpm exec playwright test --config=playwright.agreement.config.ts --workers=1 --
 pnpm exec playwright test --config=playwright.agreement.config.ts --workers=1 --grep 'agreement-builder.spec.ts|Phase 8 F1[0-5] '
 ```
 
-Retarget the PR to `main` after #282 merges. Review the changed modules and screenshots, resolve Linux visual checks, and obtain explicit approval before production deployment. Rollback is a code revert; this repair changes no database schema or runtime grants. The isolated worktree is retained for PR feedback.
+PR #282 merged on 2026-10-02 Europe/London. The four overlapping macOS Fees and Review baselines were resolved in favour of the guided flow; other commercial screenshots from `main` were retained. Review the changed modules and screenshots, resolve Linux visual checks, and obtain explicit approval before production deployment. Rollback is a code revert; this repair changes no database schema or runtime grants. The isolated worktree is retained for PR feedback.
+
+Conflict repair verification (2026-10-02): type checking, documentation formatting and all eight affected macOS Fees/Review comparisons passed in light and dark appearances across desktop/mobile. Runtime source files were unchanged, so unit, database and build checks were not repeated for this image/documentation-only merge.
