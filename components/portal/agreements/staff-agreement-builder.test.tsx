@@ -19,7 +19,9 @@ const engagementId = "22222222-2222-4222-8222-222222222222";
 
 function renderBuilder(
   engagements: readonly { id: string; name: string }[],
-  initialDraft: Parameters<typeof StaffAgreementBuilder>[0]["initialDraft"] = null,
+  initialDraft: Parameters<
+    typeof StaffAgreementBuilder
+  >[0]["initialDraft"] = null,
 ) {
   return renderToStaticMarkup(
     <StaffAgreementBuilder
@@ -28,6 +30,7 @@ function renderBuilder(
       engagementHref={`/portal/admin/clients/${organisationId}/engagements/new`}
       engagements={engagements}
       initialDraft={initialDraft}
+      onNavigate={() => undefined}
       organisationName="Northstar Studio"
     />,
   );
@@ -35,7 +38,10 @@ function renderBuilder(
 
 test("the link step presents reviewed work and a saved-draft continuation", () => {
   const html = renderBuilder([
-    { id: engagementId, name: "Website & booking experience · Discovery complete" },
+    {
+      id: engagementId,
+      name: "Website & booking experience · Discovery complete",
+    },
   ]);
 
   assert.match(html, /Link the right work/);

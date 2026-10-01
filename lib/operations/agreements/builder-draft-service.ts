@@ -73,9 +73,10 @@ export class AgreementBuilderDraftValidationError extends Error {
   }
 }
 
-function toAgreementDraft(
-  content: AgreementBuilderDraftContent,
-): { draft: AgreementRecord["draft"]; engagementId: string } {
+function toAgreementDraft(content: AgreementBuilderDraftContent): {
+  draft: AgreementRecord["draft"];
+  engagementId: string;
+} {
   const parsed = completeAgreementBuilderDraftContentSchema.safeParse(content);
   if (!parsed.success) throw new AgreementBuilderDraftValidationError();
 
@@ -110,21 +111,21 @@ async function saveDraft(
   command: SaveAgreementBuilderDraftCommand,
 ): Promise<AgreementBuilderDraft> {
   const [saved] = await tx<AgreementBuilderDraftRow[]>`
-    select id,
-      organisation_id as "organisationId",
-      engagement_id as "engagementId",
-      step,
-      content,
-      version,
-      created_at::text as "createdAt",
-      updated_at::text as "updatedAt"
+    select saved_draft.id,
+      saved_draft.organisation_id as "organisationId",
+      saved_draft.engagement_id as "engagementId",
+      saved_draft.step,
+      saved_draft.content,
+      saved_draft.version,
+      saved_draft.created_at::text as "createdAt",
+      saved_draft.updated_at::text as "updatedAt"
     from operations.save_agreement_builder_draft(
       ${command.draftId},
       ${organisationId},
       ${command.step},
       ${tx.json(command.content)},
       ${command.expectedVersion}
-    )
+    ) as saved_draft
   `;
   if (!saved) throw new Error("Agreement builder draft was not saved.");
   return agreementBuilderDraftSchema.parse(saved);

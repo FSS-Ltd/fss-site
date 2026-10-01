@@ -48,6 +48,19 @@ export async function signingFixture(
     try {
       await admin.begin(async (tx) => {
         await tx`set constraints all deferred`;
+        const studioEngagements = await tx<{ id: string }[]>`
+          select id from growth.delivery_engagements
+          where studio_organisation_id=${organisationId}
+        `;
+        const studioEngagementIds = studioEngagements.map((row) => row.id);
+        await tx`delete from operations.staff_engagement_commands where organisation_id=${organisationId}`;
+        await tx`delete from operations.studio_engagement_reviews where organisation_id=${organisationId}`;
+        await tx`delete from operations.agreement_builder_drafts where organisation_id=${organisationId}`;
+        if (studioEngagementIds.length) {
+          await tx`delete from operations.engagement_links where engagement_id=any(${studioEngagementIds}::uuid[])`;
+          await tx`delete from growth.commercial_stage_events where engagement_id=any(${studioEngagementIds}::uuid[])`;
+          await tx`delete from growth.delivery_engagements where id=any(${studioEngagementIds}::uuid[])`;
+        }
         for (const table of [
           "signing_completion_outbox",
           "signing_audit_events",

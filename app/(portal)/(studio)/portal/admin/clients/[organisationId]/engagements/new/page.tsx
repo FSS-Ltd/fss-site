@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { notFound } from "next/navigation";
 import { z } from "zod";
-import { EngagementForm } from "@/components/portal/agreements/engagement-form";
+import { RoutedEngagementForm } from "@/components/portal/agreements/routed-engagement-form";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import { PageHeader } from "@/components/portal/ui";
 import styles from "@/components/portal/agreements/agreements.module.css";
@@ -12,6 +12,7 @@ import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import { listStaffAgreementRegister } from "@/lib/operations/agreements/repository";
+import { loadStaffAgreementBuilderDraft } from "@/lib/operations/agreements/builder-draft-service";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +21,10 @@ export default async function StaffEngagementPage({
   searchParams,
 }: {
   params: Promise<{ organisationId: string }>;
-  searchParams: Promise<{ draftId?: string | string[] }>;
+  searchParams: Promise<{
+    draftId?: string | string[];
+    expectedVersion?: string | string[];
+  }>;
 }): Promise<React.JSX.Element> {
   if (!operationsEnabled()) notFound();
   if (!portalAuthConfigured()) return <PortalUnavailable />;
@@ -29,29 +33,51 @@ export default async function StaffEngagementPage({
   const organisationId = z.uuid().safeParse((await params).organisationId);
   if (!organisationId.success) notFound();
   const rawDraftId = (await searchParams).draftId;
+  const rawExpectedVersion = (await searchParams).expectedVersion;
   if (Array.isArray(rawDraftId)) notFound();
+  if (Array.isArray(rawExpectedVersion)) notFound();
   const draftId = rawDraftId ? z.uuid().safeParse(rawDraftId) : null;
   if (rawDraftId && !draftId?.success) notFound();
+  const expectedVersion =
+    rawExpectedVersion === undefined
+      ? null
+      : z.coerce.number().int().positive().safeParse(rawExpectedVersion);
+  if (rawExpectedVersion !== undefined && !expectedVersion?.success) notFound();
+  if (Boolean(draftId) !== Boolean(expectedVersion)) notFound();
 
   let register;
+  let initialDraft;
   try {
     const db = getOperationsDb();
     const admin = await requireFssAdmin(getPortalDb(), identity, randomUUID());
     register = await listStaffAgreementRegister(db, admin, organisationId.data);
+    initialDraft = draftId?.success
+      ? await loadStaffAgreementBuilderDraft(
+          db,
+          admin,
+          organisationId.data,
+          draftId.data,
+        )
+      : null;
   } catch {
     return <PortalUnavailable />;
   }
-  if (!register) notFound();
+  if (
+    !register ||
+    (draftId?.success &&
+      (!initialDraft || initialDraft.version !== expectedVersion?.data))
+  )
+    notFound();
 
   const agreementBaseHref = portalPath(
     `/portal/admin/clients/${organisationId.data}/agreements`,
   );
   const agreementHref = draftId?.success
     ? `${agreementBaseHref}/new?${new URLSearchParams({ draftId: draftId.data }).toString()}`
-    : agreementBaseHref;
-  const growthWorkflowHref = `/growth/pipeline?${new URLSearchParams({
-    returnTo: agreementHref,
-  }).toString()}`;
+    : `${agreementBaseHref}/new`;
+  const agreementBuilderHref = portalPath(
+    `/portal/admin/clients/${organisationId.data}/agreements/new`,
+  );
   return (
     <div className={styles.page}>
       <PageHeader
@@ -63,10 +89,17 @@ export default async function StaffEngagementPage({
         eyebrow="FSS Studio / Agreements"
         title="Create an engagement"
       />
-      <EngagementForm
+      <RoutedEngagementForm
         agreementHref={agreementHref}
+        commandEndpoint={`/api/portal/admin/clients/${organisationId.data}/engagements`}
+        draft={
+          initialDraft
+            ? { id: initialDraft.id, version: initialDraft.version }
+            : null
+        }
         engagementChoices={register.engagementChoices ?? []}
-        growthWorkflowHref={growthWorkflowHref}
+        organisationName={register.organisationName}
+        returnBaseHref={agreementBuilderHref}
       />
     </div>
   );

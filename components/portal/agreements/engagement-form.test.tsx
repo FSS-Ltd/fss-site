@@ -29,40 +29,50 @@ const router: AppRouterInstance = {
   replace: () => undefined,
 };
 
-test("shows reviewed provenance instead of accepting a free-form engagement", () => {
+test("shows reviewed engagement fields and a selectable existing engagement", () => {
   const html = renderToStaticMarkup(
     <EngagementForm
       agreementHref="/admin/clients/example/agreements"
+      commandEndpoint="/api/portal/admin/clients/example/engagements"
+      draft={null}
       engagementChoices={[
         {
           id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
           name: "Website & booking experience · Discovery complete",
         },
       ]}
-      growthWorkflowHref="/growth/pipeline"
+      onComplete={() => undefined}
+      organisationName="Northstar Studio"
     />,
   );
 
-  assert.match(html, /Review status/);
+  assert.match(html, /Primary goal/);
+  assert.match(html, /Proposed scope/);
+  assert.match(html, /Reviewed source or reference/);
+  assert.match(html, /I have reviewed this work/);
+  assert.match(html, /Create &amp; continue to agreement/);
+  assert.match(html, /Use this engagement/);
   assert.match(html, /Discovery complete/);
-  assert.doesNotMatch(html, /<input[^>]*name="engagement"/);
+  assert.doesNotMatch(html, /growth\/pipeline/);
 });
 
-test("returns to the saved draft after directing staff to the Growth workflow", () => {
+test("offers a cancel destination while retaining a versioned agreement draft", () => {
   const agreementHref =
     "/portal/admin/clients/example/agreements/new?draftId=aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
   const html = renderToStaticMarkup(
     <EngagementForm
       agreementHref={agreementHref}
+      commandEndpoint="/api/portal/admin/clients/example/engagements"
+      draft={{ id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", version: 3 }}
       engagementChoices={[]}
-      growthWorkflowHref={`/growth/pipeline?returnTo=${encodeURIComponent(agreementHref)}`}
+      onComplete={() => undefined}
+      organisationName="Northstar Studio"
     />,
   );
 
-  assert.match(html, /Open Growth delivery workflow/);
+  assert.match(html, /Cancel and return/);
   assert.match(html, /draftId=aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/);
-  assert.match(html, /authoritative Growth workflow/);
-  assert.doesNotMatch(html, /<input[^>]*name="engagement"/);
+  assert.match(html, /name="reviewed"/);
 });
 
 test("labels manual signature evidence without claiming provider verification", () => {

@@ -146,7 +146,9 @@ async function fetchPipelineColumn(
   stage: OpenPipelineStage,
   afterCursorValue: string | undefined,
 ): Promise<PipelineColumn> {
-  const cursor = afterCursorValue ? decodePipelineCursor(afterCursorValue) : null;
+  const cursor = afterCursorValue
+    ? decodePipelineCursor(afterCursorValue)
+    : null;
   const cursorFragment = cursor
     ? (() => {
         const sortValue = sortValueFragment(db, cursor.nextActionSortValue);
@@ -189,6 +191,7 @@ async function fetchPipelineColumn(
       inner join growth.businesses b on b.id = p.business_id
       left join growth.contacts c on c.id = p.primary_contact_id
       where de.stage = ${stage}
+        and de.prospect_id is not null
         ${cursorFragment}
       order by coalesce(p.next_action_due_at, 'infinity') asc, de.updated_at desc, de.id asc
       limit ${STAGE_PAGE_SIZE + 1}
@@ -202,6 +205,7 @@ async function fetchPipelineColumn(
         )::int as "valueTotalPence"
       from growth.delivery_engagements de
       where de.stage = ${stage}
+        and de.prospect_id is not null
     `,
   ]);
 
@@ -210,7 +214,9 @@ async function fetchPipelineColumn(
   const shapedRows = page.map((row) => ({
     ...row,
     lastActivityAt: row.lastActivityAt.toISOString(),
-    nextActionDueAt: row.nextActionDueAt ? row.nextActionDueAt.toISOString() : null,
+    nextActionDueAt: row.nextActionDueAt
+      ? row.nextActionDueAt.toISOString()
+      : null,
   }));
   const last = shapedRows.at(-1);
 

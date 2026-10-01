@@ -34,7 +34,7 @@ export function StaffAgreementBuilder({
   engagementHref: string;
   engagements: readonly AgreementEngagementChoice[];
   initialDraft: AgreementBuilderDraft | null;
-  onNavigate?: (href: string) => void;
+  onNavigate: (href: string) => void;
   organisationName: string;
 }>): React.JSX.Element {
   const listHref = agreementListHref ?? baseHref.replace(/\/new$/, "");
@@ -64,8 +64,25 @@ export function StaffAgreementBuilder({
     setStep(saved.step);
   }
 
+  async function beginEngagement(
+    nextContent: AgreementBuilderDraftContent,
+  ): Promise<void> {
+    const saved = await save("link", nextContent);
+    if (!saved) return;
+    setContent(saved.content);
+    setStep(saved.step);
+    const destination = new URL(engagementHref, window.location.origin);
+    destination.searchParams.set("draftId", saved.id);
+    destination.searchParams.set("expectedVersion", String(saved.version));
+    const href = `${destination.pathname}${destination.search}`;
+    onNavigate(href);
+  }
+
   return (
-    <section className={styles.builder} aria-labelledby="staff-agreement-builder-heading">
+    <section
+      className={styles.builder}
+      aria-labelledby="staff-agreement-builder-heading"
+    >
       <div className={styles.builderHeading}>
         <div>
           <p className={styles.version}>{organisationName}</p>
@@ -88,9 +105,14 @@ export function StaffAgreementBuilder({
         ))}
       </ol>
       <p className={styles.stepCaption}>
-        Step {currentStepIndex} of 6 / {agreementBuilderStepDetail(step).summary}
+        Step {currentStepIndex} of 6 /{" "}
+        {agreementBuilderStepDetail(step).summary}
       </p>
-      {message ? <Notice tone="info"><p>{message}</p></Notice> : null}
+      {message ? (
+        <Notice tone="info">
+          <p>{message}</p>
+        </Notice>
+      ) : null}
       <AgreementBuilderStepPanel
         agreement={agreement}
         content={content}
@@ -99,6 +121,7 @@ export function StaffAgreementBuilder({
         engagements={engagements}
         finalise={finalise}
         onSave={persist}
+        onBeginEngagement={beginEngagement}
         organisationName={organisationName}
         pending={pending}
         step={step}
