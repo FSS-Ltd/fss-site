@@ -38,3 +38,37 @@ test("rejects unallocated one-off amounts and dates before signing", () => {
     /signed/,
   );
 });
+
+test("obligations retain the signed currency", () => {
+  for (const currency of ["USD", "EUR"] as const) {
+    const draft = { ...agreementDraft(), currency };
+    assert.ok(
+      deriveBillingObligations(draft, "2026-09-06").every(
+        (item) => item.currency === currency,
+      ),
+    );
+  }
+});
+
+test("signed revenue share retains one-off installments without a recurring collection obligation", () => {
+  const draft = agreementDraft();
+  draft.revenueShare = {
+    percentageBps: 1000,
+    revenueSource: "Product receipts",
+    calculationBasis: "Net receipts",
+    duration: "Twelve months",
+    reportingRequirements: "Monthly statements",
+    paymentTerms: "Monthly after approval",
+  };
+  draft.lines.push({
+    ...draft.lines[0],
+    unitPence: "0",
+    discountPence: "0",
+    taxPence: "0",
+    recurrenceMonths: 1,
+  });
+  assert.deepEqual(
+    deriveBillingObligations(draft, "2026-09-06").map((item) => item.owner),
+    ["invoice", "invoice"],
+  );
+});

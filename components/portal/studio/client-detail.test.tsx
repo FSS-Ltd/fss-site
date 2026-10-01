@@ -23,6 +23,8 @@ test("renders a selected client hub with server-owned workspace destinations", (
         activeProjectCount: 1,
         agreementCount: 1,
         billingExceptionCount: 0,
+        billingCurrency: "USD",
+        currencyVersion: 1,
         displayName: "Northstar Studio",
         id: "44444444-4444-4444-8444-444444444444",
         legalName: "Northstar Studio Ltd",
@@ -38,6 +40,9 @@ test("renders a selected client hub with server-owned workspace destinations", (
   );
 
   assert.match(html, /Northstar Studio/);
+  assert.match(html, /Billing currency/);
+  assert.match(html, /value="USD" selected=""/);
+  assert.match(html, /future drafts/);
   assert.match(html, /Review client work/);
   assert.match(html, /People &amp; access/);
   assert.match(html, /Create or review agreement/);

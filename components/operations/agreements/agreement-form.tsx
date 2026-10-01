@@ -1,7 +1,11 @@
 "use client";
 import { useState } from "react";
 import type { AgreementRecord } from "@/lib/operations/agreements/types";
-import { penceToGbp as penceToPounds } from "@/lib/operations/agreements/money-input";
+import {
+  minorToDecimal as penceToPounds,
+  currencySymbol,
+  type Currency,
+} from "@/lib/operations/money";
 import {
   PortalButton,
   PortalCheckbox,
@@ -18,6 +22,7 @@ export function AgreementForm({
   record,
   endpoint,
   evidenceMode = "manual",
+  currency = "GBP",
 }: {
   organisationId: string;
   engagementIds: string[];
@@ -25,10 +30,12 @@ export function AgreementForm({
   record?: AgreementRecord;
   endpoint?: string;
   evidenceMode?: "manual" | "generated";
+  currency?: Currency;
 }): React.JSX.Element {
   const state = useAgreementSubmit(organisationId, endpoint);
   const [formVersion, setFormVersion] = useState(0);
   const draft = record?.draft;
+  const retainedCurrency = draft?.currency ?? currency;
   return (
     <form
       key={formVersion}
@@ -64,7 +71,10 @@ export function AgreementForm({
               terms: value(data, "draft.terms"),
               support: value(data, "draft.support"),
               responsibilities: value(data, "draft.responsibilities"),
-              currency: "GBP",
+              currency: retainedCurrency,
+              ...(draft?.revenueShare
+                ? { revenueShare: draft.revenueShare }
+                : {}),
               taxTreatment: value(data, "draft.taxTreatment"),
               billingContact: value(data, "draft.billingContact"),
               signatories: emails(data, "draft.signatories"),
@@ -226,7 +236,7 @@ export function AgreementForm({
           />
           <Field
             issues={state.issues}
-            label="Required cleared deposit (£)"
+            label={`Required cleared deposit (${currencySymbol(retainedCurrency)})`}
             name="draft.requiredDepositPence"
             inputMode="decimal"
             defaultValue={
@@ -246,7 +256,11 @@ export function AgreementForm({
           label="Client assets are required before service starts"
           name="draft.assetsRequired"
         />
-        <AgreementLines draft={draft} issues={state.issues} />
+        <AgreementLines
+          draft={draft}
+          currency={retainedCurrency}
+          issues={state.issues}
+        />
         <PortalButton loading={state.pending} type="submit">
           {record ? "Save new revision" : "Save agreement"}
         </PortalButton>

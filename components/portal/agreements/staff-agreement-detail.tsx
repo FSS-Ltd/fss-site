@@ -6,11 +6,14 @@ import {
   PortalCard,
   StatusBadge,
 } from "@/components/portal/ui";
-import { penceToGbp } from "@/lib/operations/agreements/money-input";
+import { formatMoney } from "@/lib/operations/money";
 import { totalLinePence } from "@/lib/operations/agreements/validation";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import type { SigningApproval } from "@/lib/operations/agreements/signing-types";
-import { AgreementStatusCard, hasCompleteSigningEvidence } from "./presentation";
+import {
+  AgreementStatusCard,
+  hasCompleteSigningEvidence,
+} from "./presentation";
 import styles from "./agreements.module.css";
 
 export function StaffAgreementDetail({
@@ -54,7 +57,9 @@ export function StaffAgreementDetail({
       {signed ? (
         <Notice tone="success">
           <strong>
-            {completedSigning ? "Both signatures are complete." : "Signed and recorded."}
+            {completedSigning
+              ? "Both signatures are complete."
+              : "Signed and recorded."}
           </strong>
           <p>
             {evidenceLabel} is retained for this exact revision. Service
@@ -86,7 +91,9 @@ export function StaffAgreementDetail({
           </div>
           <div>
             <dt>Evidence provenance</dt>
-            <dd>{signed ? evidenceLabel : "No signing evidence is recorded."}</dd>
+            <dd>
+              {signed ? evidenceLabel : "No signing evidence is recorded."}
+            </dd>
           </div>
         </dl>
       </PortalCard>
@@ -95,7 +102,11 @@ export function StaffAgreementDetail({
           {record.draft.lines.map((line, index) => (
             <li key={`${line.serviceCode}-${index}`}>
               <span>{line.description}</span>
-              <span>£{penceToGbp(totalLinePence(line))}</span>
+              <span>
+                {record.draft.revenueShare && line.recurrenceMonths
+                  ? "Compensated by revenue share"
+                  : formatMoney(totalLinePence(line), record.draft.currency)}
+              </span>
             </li>
           ))}
         </ul>
@@ -107,7 +118,8 @@ export function StaffAgreementDetail({
               <div key={signature.email}>
                 <dt>{signature.email}</dt>
                 <dd>
-                  {signature.typedName} · {new Intl.DateTimeFormat("en-GB", {
+                  {signature.typedName} ·{" "}
+                  {new Intl.DateTimeFormat("en-GB", {
                     dateStyle: "long",
                     timeStyle: "short",
                     timeZone: "Europe/London",
@@ -117,15 +129,24 @@ export function StaffAgreementDetail({
             ))}
             <div>
               <dt>Retained signed document</dt>
-              <dd>Verified signing evidence and the exact approved source are retained.</dd>
+              <dd>
+                Verified signing evidence and the exact approved source are
+                retained.
+              </dd>
             </div>
           </dl>
           {signingDownloadBase ? (
             <div className={styles.actionRow}>
-              <PortalActionLink href={`${signingDownloadBase}/signed`} variant="secondary">
+              <PortalActionLink
+                href={`${signingDownloadBase}/signed`}
+                variant="secondary"
+              >
                 Open signed copy
               </PortalActionLink>
-              <PortalActionLink href={`${signingDownloadBase}/audit`} variant="quiet">
+              <PortalActionLink
+                href={`${signingDownloadBase}/audit`}
+                variant="quiet"
+              >
                 Open signing record
               </PortalActionLink>
             </div>

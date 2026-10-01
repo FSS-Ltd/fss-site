@@ -40,12 +40,16 @@ export function InvoiceList({
               <h3>{invoice.number ?? "Invoice being prepared"}</h3>
               <PaymentStatus invoice={invoice} />
             </div>
-            <p className={styles.amount}>{billingAmount(invoice.totalPence)}</p>
+            <p className={styles.amount}>
+              {billingAmount(invoice.totalPence, invoice.currency)}
+            </p>
             <dl className={styles.details}>
               {invoice.amountDuePence !== invoice.totalPence ? (
                 <div>
                   <dt>Amount due, including account balance</dt>
-                  <dd>{billingAmount(invoice.amountDuePence)}</dd>
+                  <dd>
+                    {billingAmount(invoice.amountDuePence, invoice.currency)}
+                  </dd>
                 </div>
               ) : null}
               {invoice.dueDate ? (
@@ -60,18 +64,30 @@ export function InvoiceList({
               ) : null}
               <div>
                 <dt>Paid</dt>
-                <dd>{billingAmount(invoice.amountPaidPence)}</dd>
+                <dd>
+                  {billingAmount(invoice.amountPaidPence, invoice.currency)}
+                </dd>
               </div>
               {BigInt(invoice.amountOverpaidPence) > BigInt(0) ? (
                 <div>
                   <dt>Overpaid</dt>
-                  <dd>{billingAmount(invoice.amountOverpaidPence)}</dd>
+                  <dd>
+                    {billingAmount(
+                      invoice.amountOverpaidPence,
+                      invoice.currency,
+                    )}
+                  </dd>
                 </div>
               ) : null}
               {invoice.status === "open" ? (
                 <div>
                   <dt>Remaining</dt>
-                  <dd>{billingAmount(invoice.amountRemainingPence)}</dd>
+                  <dd>
+                    {billingAmount(
+                      invoice.amountRemainingPence,
+                      invoice.currency,
+                    )}
+                  </dd>
                 </div>
               ) : null}
             </dl>

@@ -97,6 +97,7 @@ test("released subscription schedule is recovered without overwriting its stored
   };
   fixture.records["/v1/subscriptions/sub_test"] = {
     id: "sub_test",
+    currency: "gbp",
     livemode: false,
     customer: "cus_test",
     schedule: null,

@@ -24,3 +24,15 @@ test("client form explains its scoped, non-invitation save action", () => {
   assert.match(html, /Save client/);
   assert.doesNotMatch(html, /Send invitation/);
 });
+
+test("client form offers supported billing currencies with GBP selected", () => {
+  const html = renderToStaticMarkup(<StudioClientForm />);
+  assert.match(html, /Billing currency/);
+  assert.match(html, /name="billingCurrency"/);
+  assert.match(html, /value="GBP" selected=""/);
+  assert.match(html, /value="USD"/);
+  assert.match(html, /value="EUR"/);
+  assert.match(html, /British pound \(GBP\)/);
+  assert.match(html, /US dollar \(USD\)/);
+  assert.match(html, /Euro \(EUR\)/);
+});

@@ -12,7 +12,7 @@ import {
   loadInvoicePage,
   loadInvoices,
 } from "@/lib/operations/billing/invoice-repository";
-import { loadBillingCustomer } from "@/lib/operations/billing/customer-repository";
+import { loadBillingCustomerCurrencies } from "@/lib/operations/billing/customer-repository";
 import { ClientBillingOverview } from "@/components/portal/billing/client-billing-overview";
 import {
   nextOpenInvoice,
@@ -53,16 +53,17 @@ export default async function BillingPage({
       async (tx, membership) => {
         if (!hasPortalCapability(membership.role, "billing.read"))
           throw new PortalAccessDenied();
-        const [invoices, allInvoices, customer] = await Promise.all([
+        const [invoices, allInvoices, currencies] = await Promise.all([
           loadInvoicePage(tx, scope, page),
           loadInvoices(tx, scope),
-          loadBillingCustomer(tx, scope),
+          loadBillingCustomerCurrencies(tx, scope),
         ]);
         return {
           allInvoices,
+          currencies,
           invoices,
           canManage:
-            Boolean(customer) &&
+            currencies.length > 0 &&
             hasPortalCapability(membership.role, "billing.manage"),
         };
       },
@@ -74,6 +75,7 @@ export default async function BillingPage({
   return (
     <ClientBillingOverview
       canManage={data.canManage}
+      managementCurrencies={data.currencies}
       invoices={data.invoices.items.map(toInvoiceSummary)}
       nextPayment={nextOpenInvoice(data.allInvoices.map(toInvoiceSummary))}
       organisationId={context.organisationId}

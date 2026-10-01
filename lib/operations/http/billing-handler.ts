@@ -1,3 +1,4 @@
+import { currencySchema } from "../money";
 import { z } from "zod";
 import {
   PayloadTooLargeError,
@@ -12,7 +13,11 @@ import {
 } from "../auth/http";
 
 const commandSchema = z.discriminatedUnion("action", [
-  z.strictObject({ action: z.literal("manage"), organisationId: z.uuid() }),
+  z.strictObject({
+    action: z.literal("manage"),
+    organisationId: z.uuid(),
+    currency: currencySchema.optional(),
+  }),
   z.strictObject({
     action: z.literal("invoice"),
     organisationId: z.uuid(),

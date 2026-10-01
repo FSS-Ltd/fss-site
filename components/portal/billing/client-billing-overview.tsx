@@ -1,3 +1,4 @@
+import type { Currency } from "@/lib/operations/money";
 import { CreditCard } from "lucide-react";
 import { Notice, PageHeader, PortalCard } from "@/components/portal/ui";
 import { portalPath } from "@/lib/operations/auth/portal-url";
@@ -13,12 +14,14 @@ import styles from "./billing.module.css";
 
 export function ClientBillingOverview({
   canManage,
+  managementCurrencies = ["GBP"],
   invoices,
   nextPayment,
   organisationId,
   pagination,
 }: {
   canManage: boolean;
+  managementCurrencies?: readonly Currency[];
   invoices: readonly InvoiceSummary[];
   nextPayment?: InvoiceSummary | null;
   organisationId: string;
@@ -41,7 +44,9 @@ export function ClientBillingOverview({
         <PortalCard title="Next payment">
           {payment ? (
             <div className={styles.summaryValue}>
-              <strong>{billingAmount(payment.amountRemainingPence)}</strong>
+              <strong>
+                {billingAmount(payment.amountRemainingPence, payment.currency)}
+              </strong>
               <span>
                 {payment.dueDate
                   ? `Due ${billingDate(payment.dueDate)}`
@@ -60,15 +65,19 @@ export function ClientBillingOverview({
           }
           title="Payment details"
         >
-          {canManage ? (
-            <HostedBillingAction
-              command={{ action: "manage", organisationId }}
-              variant="primary"
-            >
-              <CreditCard aria-hidden="true" size={16} />
-              Manage payment method
-            </HostedBillingAction>
-          ) : null}
+          {canManage
+            ? managementCurrencies.map((currency) => (
+                <HostedBillingAction
+                  key={currency}
+                  command={{ action: "manage", organisationId, currency }}
+                  variant="primary"
+                >
+                  <CreditCard aria-hidden="true" size={16} />
+                  Manage payment method
+                  {managementCurrencies.length > 1 ? ` (${currency})` : ""}
+                </HostedBillingAction>
+              ))
+            : null}
         </PortalCard>
       </div>
       <Notice tone="info">

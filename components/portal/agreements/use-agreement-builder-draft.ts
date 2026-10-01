@@ -120,7 +120,9 @@ export function useAgreementBuilderDraft({
         step,
       });
       if (!isDraftRouteResponse(response)) {
-        throw new Error("The saved draft response was incomplete. Refresh and try again.");
+        throw new Error(
+          "The saved draft response was incomplete. Refresh and try again.",
+        );
       }
       draftId.current = response.id;
       const nextDraft: SavedAgreementBuilderDraft = {
@@ -154,21 +156,27 @@ export function useAgreementBuilderDraft({
 
   async function finalise(): Promise<void> {
     if (!draftId.current || !draft) {
-      setMessage("Save the agreement draft before creating its agreement record.");
+      setMessage(
+        "Save the agreement draft before creating its agreement record.",
+      );
       return;
     }
     setPending(true);
     setMessage(null);
     try {
       const response = await request({
-        action: "finalise",
+        action: draft.content.commercialOffer ? "publish" : "finalise",
         draftId: draftId.current,
         expectedVersion: draft.version,
       });
       if (!isFinalisedAgreementResponse(response)) {
-        throw new Error("The agreement response was incomplete. Refresh and try again.");
+        throw new Error(
+          "The agreement response was incomplete. Refresh and try again.",
+        );
       }
-      const destination = `${agreementListHref}/${encodeURIComponent(response.id)}`;
+      const destination = draft.content.commercialOffer
+        ? `${agreementListHref.replace(/\/agreements$/, "/commercial-offers")}/${encodeURIComponent(response.id)}`
+        : `${agreementListHref}/${encodeURIComponent(response.id)}`;
       if (!navigate) {
         setMessage("Agreement created. Reload this page to open its record.");
         return;

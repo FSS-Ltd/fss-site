@@ -5,7 +5,7 @@ import {
   StatusBadge,
 } from "@/components/portal/ui";
 import { portalPath } from "@/lib/operations/auth/portal-url";
-import { penceToGbp } from "@/lib/operations/agreements/money-input";
+import { formatMoney } from "@/lib/operations/money";
 import { totalLinePence } from "@/lib/operations/agreements/validation";
 import type { SigningApproval } from "@/lib/operations/agreements/signing-types";
 import {
@@ -35,10 +35,6 @@ function downloadPath(
   kind: "source" | "signed" | "audit",
 ): string {
   return `/api/portal/organisations/${encodeURIComponent(approval.organisationId)}/signing/${encodeURIComponent(approval.id)}/${kind}`;
-}
-
-function formatGbp(pence: string): string {
-  return `£${penceToGbp(pence)}`;
 }
 
 function oneOffTotal(approval: SigningApproval): string {
@@ -119,7 +115,10 @@ function CompletionNotice({
     return (
       <Notice
         action={
-          <PortalActionLink href={downloadPath(approval, "signed")} variant="secondary">
+          <PortalActionLink
+            href={downloadPath(approval, "signed")}
+            variant="secondary"
+          >
             Download signed agreement
           </PortalActionLink>
         }
@@ -127,7 +126,8 @@ function CompletionNotice({
       >
         <strong>Your signed agreement is ready.</strong>
         <p>
-          Revision {approval.revision}. All required parties have signed this agreement.
+          Revision {approval.revision}. All required parties have signed this
+          agreement.
         </p>
       </Notice>
     );
@@ -136,7 +136,9 @@ function CompletionNotice({
   if (ownSignature) {
     return (
       <Notice tone="info">
-        <strong>Your signature is recorded, awaiting the remaining signers.</strong>
+        <strong>
+          Your signature is recorded, awaiting the remaining signers.
+        </strong>
         <p>
           We will retain the signed copy once every required signature has been
           verified.
@@ -149,7 +151,9 @@ function CompletionNotice({
     return (
       <Notice
         action={
-          <PortalActionLink href={agreementPath(approval.id, approval.organisationId, "/sign")}>
+          <PortalActionLink
+            href={agreementPath(approval.id, approval.organisationId, "/sign")}
+          >
             Continue to signing
           </PortalActionLink>
         }
@@ -170,6 +174,8 @@ export function ClientAgreementDetail({
   approval,
   email,
 }: ClientAgreementDetailProps): React.JSX.Element {
+  const formatGbp = (amount: string): string =>
+    formatMoney(amount, approval.draft.currency);
   const complete = hasCompleteSigningEvidence(approval);
   const status = toPortalAgreementStatus({
     allRequiredSignaturesRecorded: complete,
@@ -195,7 +201,9 @@ export function ClientAgreementDetail({
           <p className={styles.metric}>{formatGbp(oneOff)}</p>
         </PortalCard>
         <PortalCard title="Initial deposit">
-          <p className={styles.metric}>{formatGbp(approval.draft.requiredDepositPence)}</p>
+          <p className={styles.metric}>
+            {formatGbp(approval.draft.requiredDepositPence)}
+          </p>
         </PortalCard>
         <PortalCard title="Delivery milestones">
           <p className={styles.metric}>{milestones}</p>
@@ -228,18 +236,38 @@ export function ClientAgreementDetail({
           </div>
         </dl>
       </PortalCard>
+      {approval.draft.revenueShare ? (
+        <PortalCard title="Ongoing revenue share">
+          <p>
+            {(approval.draft.revenueShare.percentageBps / 100).toFixed(2)}% of{" "}
+            {approval.draft.revenueShare.revenueSource}
+          </p>
+          <p>{approval.draft.revenueShare.calculationBasis}</p>
+          <p>Duration: {approval.draft.revenueShare.duration}</p>
+          <p>Reporting: {approval.draft.revenueShare.reportingRequirements}</p>
+          <p>Payment terms: {approval.draft.revenueShare.paymentTerms}</p>
+          <p>
+            The setup fee remains payable. Revenue share replaces recurring cash
+            charges.
+          </p>
+        </PortalCard>
+      ) : null}
       <PortalCard title="Payment schedule">
         {approval.draft.installments.length ? (
           <ul className={styles.schedule}>
             {approval.draft.installments.map((installment) => (
               <li key={`${installment.dueDate}-${installment.amountPence}`}>
                 <span>{formatGbp(installment.amountPence)}</span>
-                <time dateTime={installment.dueDate}>{formatDate(installment.dueDate)}</time>
+                <time dateTime={installment.dueDate}>
+                  {formatDate(installment.dueDate)}
+                </time>
               </li>
             ))}
           </ul>
         ) : (
-          <p className={styles.muted}>No one-off payment schedule is recorded.</p>
+          <p className={styles.muted}>
+            No one-off payment schedule is recorded.
+          </p>
         )}
       </PortalCard>
       <PortalCard title="Parties and responsibilities">
@@ -266,11 +294,17 @@ export function ClientAgreementDetail({
         <p className={styles.prose}>{approval.draft.terms}</p>
         <p className={styles.prose}>{approval.draft.goals}</p>
         <div className={styles.actionRow}>
-          <PortalActionLink href={downloadPath(approval, "source")} variant="secondary">
+          <PortalActionLink
+            href={downloadPath(approval, "source")}
+            variant="secondary"
+          >
             Download agreement PDF
           </PortalActionLink>
           {complete ? (
-            <PortalActionLink href={downloadPath(approval, "audit")} variant="quiet">
+            <PortalActionLink
+              href={downloadPath(approval, "audit")}
+              variant="quiet"
+            >
               Download signing record
             </PortalActionLink>
           ) : null}
@@ -281,7 +315,10 @@ export function ClientAgreementDetail({
       {complete ? (
         <Notice
           action={
-            <PortalActionLink href={agreementPath(approval.id, approval.organisationId)} variant="secondary">
+            <PortalActionLink
+              href={agreementPath(approval.id, approval.organisationId)}
+              variant="secondary"
+            >
               View agreement
             </PortalActionLink>
           }

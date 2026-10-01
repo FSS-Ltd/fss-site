@@ -1,6 +1,6 @@
 import type { SigningApproval } from "@/lib/operations/agreements/signing-types";
 import { totalLinePence } from "@/lib/operations/agreements/validation";
-import { penceToGbp } from "@/lib/operations/agreements/money-input";
+import { formatMoney } from "@/lib/operations/money";
 import { SigningForm } from "./signing-form";
 import ui from "../shared/operations-ui.module.css";
 import signingStyles from "./signing.module.css";
@@ -77,7 +77,7 @@ export function SigningReview({
             "Tax treatment": d.taxTreatment,
             "Notice period": `${d.noticeDays} days`,
             "Minimum term": `${d.minimumTermMonths} months`,
-            "Required deposit": `£${penceToGbp(d.requiredDepositPence)}`,
+            "Required deposit": formatMoney(d.requiredDepositPence, d.currency),
             "Client assets": d.assetsRequired ? "Required" : "Not required",
           }).map(([label, value]) => (
             <div key={label}>
@@ -86,18 +86,31 @@ export function SigningReview({
             </div>
           ))}
         </dl>
+        {d.revenueShare ? (
+          <section>
+            <h3>Ongoing revenue share</h3>
+            <p>
+              {(d.revenueShare.percentageBps / 100).toFixed(2)}% of{" "}
+              {d.revenueShare.revenueSource}
+            </p>
+            <p>{d.revenueShare.calculationBasis}</p>
+            <p>{d.revenueShare.duration}</p>
+            <p>{d.revenueShare.reportingRequirements}</p>
+            <p>{d.revenueShare.paymentTerms}</p>
+          </section>
+        ) : null}
         <h3>Services and charges</h3>
         {d.lines.map((line, index) => (
           <section key={index}>
             <h4>{line.description}</h4>
             <p>
-              {line.serviceCode} · {line.quantity} × £
-              {penceToGbp(line.unitPence)} · Discount £
-              {penceToGbp(line.discountPence)} · Tax £
-              {penceToGbp(line.taxPence)}
+              {line.serviceCode} · {line.quantity} ×{" "}
+              {formatMoney(line.unitPence, d.currency)} · Discount{" "}
+              {formatMoney(line.discountPence, d.currency)} · Tax{" "}
+              {formatMoney(line.taxPence, d.currency)}
             </p>
             <p>
-              Total £{penceToGbp(totalLinePence(line))},{" "}
+              Total {formatMoney(totalLinePence(line), d.currency)},{" "}
               {line.recurrenceMonths === 0
                 ? "one-off"
                 : `every ${line.recurrenceMonths} month(s)`}
@@ -111,7 +124,7 @@ export function SigningReview({
           <ul>
             {d.installments.map((item, index) => (
               <li key={index}>
-                £{penceToGbp(item.amountPence)} due {item.dueDate}
+                {formatMoney(item.amountPence, d.currency)} due {item.dueDate}
               </li>
             ))}
           </ul>

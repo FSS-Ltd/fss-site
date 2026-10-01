@@ -5,20 +5,31 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 const require = createRequire(import.meta.url);
 require.extensions[".css"] = (module) => {
-  module.exports = { __esModule: true, default: new Proxy({}, { get: (_, key) => String(key) }) };
+  module.exports = {
+    __esModule: true,
+    default: new Proxy({}, { get: (_, key) => String(key) }),
+  };
 };
 
-const { BillingOperations } = require("./billing-operations") as typeof import("./billing-operations");
+const { BillingOperations } =
+  require("./billing-operations") as typeof import("./billing-operations");
 
 test("renders retained billing figures without a payment-completion action", () => {
   const html = renderToStaticMarkup(
     <BillingOperations
       data={{
-        dueThisMonthPence: "720000",
+        totalsByCurrency: [
+          {
+            currency: "GBP",
+            dueThisMonthPence: "720000",
+            overduePence: "240000",
+          },
+        ],
         hasNext: false,
         items: [
           {
             amountPence: "240000",
+            currency: "GBP",
             category: "overdue_review",
             dueDate: "2026-09-12",
             id: "55555555-5555-4555-8555-555555555555",
@@ -28,7 +39,6 @@ test("renders retained billing figures without a payment-completion action", () 
             providerReference: "in_test123",
           },
         ],
-        overduePence: "240000",
         page: 1,
         reconciliationCount: 1,
       }}
@@ -40,4 +50,26 @@ test("renders retained billing figures without a payment-completion action", () 
   assert.match(html, /in_test123/);
   assert.match(html, /Provider reconciliation required/);
   assert.doesNotMatch(html, /Mark paid/);
+});
+
+test("renders separate currency totals without combining balances", () => {
+  const html = renderToStaticMarkup(
+    <BillingOperations
+      data={{
+        totalsByCurrency: [
+          { currency: "GBP", dueThisMonthPence: "1000", overduePence: "0" },
+          { currency: "USD", dueThisMonthPence: "2500", overduePence: "100" },
+          { currency: "EUR", dueThisMonthPence: "3000", overduePence: "200" },
+        ],
+        items: [],
+        hasNext: false,
+        page: 1,
+        reconciliationCount: 0,
+      }}
+    />,
+  );
+  assert.match(html, /£10.00/);
+  assert.match(html, /\$25.00/);
+  assert.match(html, /€30.00/);
+  assert.doesNotMatch(html, /65.00/);
 });

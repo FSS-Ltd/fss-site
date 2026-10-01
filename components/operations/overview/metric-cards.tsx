@@ -1,3 +1,4 @@
+import type { Currency } from "@/lib/operations/money";
 import {
   formatMoney,
   formatRatio,
@@ -13,19 +14,20 @@ import sharedStyles from "@/components/operations/shared/operations-ui.module.cs
 function movementSignal(
   current: bigint,
   previous: bigint,
+  currency: Currency,
 ): { label: string; tone: DashboardTone } {
   const change = current - previous;
 
   if (change > BigInt(0)) {
     return {
-      label: `${formatMoney(change, BigInt(12))} higher than period start`,
+      label: `${formatMoney(change, BigInt(12), currency)} higher than period start`,
       tone: "positive",
     };
   }
 
   if (change < BigInt(0)) {
     return {
-      label: `${formatMoney(-change, BigInt(12))} lower than period start`,
+      label: `${formatMoney(-change, BigInt(12), currency)} lower than period start`,
       tone: "critical",
     };
   }
@@ -38,12 +40,16 @@ export function MetricCards({
   data: MetricsSnapshot;
 }): React.JSX.Element {
   const r = data.revenue;
-  const mrrSignal = movementSignal(BigInt(r.active), BigInt(r.start));
+  const mrrSignal = movementSignal(
+    BigInt(r.active),
+    BigInt(r.start),
+    data.filters.currency,
+  );
   const overdue = data.receivables ? BigInt(data.receivables.overdue) : null;
   const cards = [
     {
       label: "Active MRR",
-      value: formatMoney(BigInt(r.active), BigInt(12)),
+      value: formatMoney(BigInt(r.active), BigInt(12), data.filters.currency),
       supportingText: `Contracted recurring revenue at ${data.filters.to}.`,
       signal: mrrSignal,
       definition:
@@ -52,7 +58,11 @@ export function MetricCards({
     },
     {
       label: "Annualised run-rate ARR",
-      value: formatMoney(BigInt(r.active) * BigInt(12), BigInt(12)),
+      value: formatMoney(
+        BigInt(r.active) * BigInt(12),
+        BigInt(12),
+        data.filters.currency,
+      ),
       supportingText:
         "A 12-month view of current active MRR, not cash received.",
       signal: mrrSignal,
@@ -62,7 +72,7 @@ export function MetricCards({
     },
     {
       label: "Signed, awaiting activation",
-      value: formatMoney(BigInt(r.awaiting), BigInt(12)),
+      value: formatMoney(BigInt(r.awaiting), BigInt(12), data.filters.currency),
       supportingText:
         "Signed recurring work that is not yet contributing to active MRR.",
       signal:
@@ -80,7 +90,11 @@ export function MetricCards({
       label: "Overdue balance",
       value:
         data.receivables && data.freshness !== "unknown"
-          ? formatMoney(BigInt(data.receivables.overdue))
+          ? formatMoney(
+              BigInt(data.receivables.overdue),
+              BigInt(1),
+              data.filters.currency,
+            )
           : "Unavailable",
       supportingText:
         data.receivables && data.freshness !== "unknown"

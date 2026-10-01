@@ -1,3 +1,4 @@
+import { stripeCurrency } from "../money";
 import type Stripe from "stripe";
 import { previewFutureAmendment } from "./future-amendment";
 import { z } from "zod";
@@ -39,7 +40,7 @@ export async function previewBillingAmendment(
   z.uuid().parse(correlationId);
   const context = await withAgreementTransaction(db, founder, async (tx) => {
     const schedule = await loadBillingSchedule(tx, scope, input.scheduleId);
-    const customer = await loadBillingCustomer(tx, scope);
+    const customer = await loadBillingCustomer(tx, scope, schedule.currency);
     const [signed] = await tx<
       { snapshot: unknown }[]
     >`select r.snapshot from operations.agreement_revisions r join operations.signature_evidence e using(organisation_id,agreement_id,revision) where r.organisation_id=${scope.organisationId} and r.agreement_id=${input.agreementId} and r.revision=${input.revision}`;
@@ -52,9 +53,12 @@ export async function previewBillingAmendment(
       throw new Error(
         "Signed recurring amendment and existing subscription required.",
       );
-    const line = parseAgreementDraft(signed.snapshot).lines[
-      input.lineNumber - 1
-    ];
+    const draft = parseAgreementDraft(signed.snapshot);
+    if (draft.currency !== schedule.currency || draft.revenueShare)
+      throw new Error(
+        "Amendments require matching currencies and fixed recurring prices.",
+      );
+    const line = draft.lines[input.lineNumber - 1];
     if (!line || line.recurrenceMonths === 0)
       throw new Error("Signed recurring amendment line required.");
     if (BigInt(line.taxPence) > BigInt(0))
@@ -98,6 +102,7 @@ export async function previewBillingAmendment(
     if (
       subscription.customer !== context.customer.providerCustomerId ||
       subscription.livemode !== (scope.mode === "live") ||
+      subscription.currency !== stripeCurrency(context.schedule.currency) ||
       subscription.items.data.length !== 1
     )
       throw new Error("Provider subscription context mismatch.");
@@ -118,7 +123,7 @@ export async function previewBillingAmendment(
             quantity: 1,
             price_data: {
               product,
-              currency: "gbp",
+              currency: stripeCurrency(context.schedule.currency),
               unit_amount: stripeAmount(totalLinePence(context.line)),
               recurring: {
                 interval: "month",
@@ -131,13 +136,16 @@ export async function previewBillingAmendment(
       },
     });
   }
-  if (preview.currency !== "gbp" || preview.lines.has_more)
-    throw new Error("Complete GBP amendment preview required.");
+  if (
+    preview.currency !== stripeCurrency(context.schedule.currency) ||
+    preview.lines.has_more
+  )
+    throw new Error("Complete same-currency amendment preview required.");
   const snapshot = {
     change,
     providerPreviewId: preview.id,
     totalPence: String(preview.total),
-    currency: "GBP",
+    currency: context.schedule.currency,
     lines: preview.lines.data.map((line) => ({
       amountPence: String(line.amount),
       description: line.description,

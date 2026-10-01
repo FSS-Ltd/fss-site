@@ -8,6 +8,59 @@ import {
 } from "./validation";
 import { agreementDraft, signatureEvidence } from "./fixtures";
 
+test("agreement currency is restricted to GBP, USD and EUR", () => {
+  for (const currency of ["GBP", "USD", "EUR"]) {
+    assert.equal(
+      parseAgreementDraft({ ...agreementDraft(), currency }).currency,
+      currency,
+    );
+  }
+  assert.throws(() =>
+    parseAgreementDraft({ ...agreementDraft(), currency: "CAD" }),
+  );
+});
+
+test("revenue share requires terms and cannot also charge ongoing cash", () => {
+  const revenueShare = {
+    percentageBps: 1000,
+    revenueSource: "Product sales",
+    calculationBasis: "Received revenue",
+    duration: "24 months",
+    reportingRequirements: "Monthly reports",
+    paymentTerms: "Monthly within 14 days",
+  };
+  const draft = agreementDraft();
+  const lines = [
+    ...draft.lines,
+    {
+      ...draft.lines[0],
+      recurrenceMonths: 1,
+      unitPence: "0",
+      discountPence: "0",
+      taxPence: "0",
+    },
+  ];
+  assert.equal(
+    parseAgreementDraft({ ...draft, lines, revenueShare }).revenueShare
+      ?.percentageBps,
+    1000,
+  );
+  assert.throws(() =>
+    parseAgreementDraft({
+      ...draft,
+      lines,
+      revenueShare: { ...revenueShare, percentageBps: 10001 },
+    }),
+  );
+  assert.throws(() =>
+    parseAgreementDraft({
+      ...draft,
+      lines: [...draft.lines, { ...lines[1], unitPence: "20" }],
+      revenueShare,
+    }),
+  );
+});
+
 test("one-off, quarterly and annual prices preserve exact pence and recurrence", () => {
   for (const recurrenceMonths of [0, 3, 12] as const) {
     const input = agreementDraft();

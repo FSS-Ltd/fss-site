@@ -1,3 +1,4 @@
+import type { Currency } from "../money";
 import type Stripe from "stripe";
 import type { BillingMode } from "./types";
 
@@ -10,6 +11,7 @@ export type BillingEventReceipt = ProviderScope & {
   occurredAt: string;
 };
 export type PaymentProjection = {
+  currency: Currency;
   providerId: string;
   customerId: string;
   state: "pending" | "processing" | "succeeded" | "failed" | "canceled";
@@ -23,8 +25,18 @@ export type PaymentProjection = {
   observedAt: string;
   allocationId: string;
   allocationPence: string;
-  refunds: { providerId: string; amountPence: string; status: string }[];
-  disputes: { providerId: string; amountPence: string; status: string }[];
+  refunds: {
+    providerId: string;
+    currency: Currency;
+    amountPence: string;
+    status: string;
+  }[];
+  disputes: {
+    providerId: string;
+    currency: Currency;
+    amountPence: string;
+    status: string;
+  }[];
 };
 export type MandateProjection = {
   providerId: string;
@@ -39,7 +51,12 @@ export type InvoiceReconciliation = {
   subscriptionScheduleId: string | null;
   payments: PaymentProjection[];
   mandates: MandateProjection[];
-  credits: { providerId: string; amountPence: string; status: string }[];
+  credits: {
+    providerId: string;
+    currency: Currency;
+    amountPence: string;
+    status: string;
+  }[];
 };
 export type BillingReconciliationProvider = {
   scope: ProviderScope;

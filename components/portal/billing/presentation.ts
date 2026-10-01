@@ -2,7 +2,7 @@ import type {
   BillingInvoice,
   BillingInvoiceDetail,
 } from "@/lib/operations/billing/domain-types";
-import { penceToGbp } from "@/lib/operations/agreements/money-input";
+import { formatMoney, type Currency } from "@/lib/operations/money";
 
 export type InvoiceSummary = Omit<BillingInvoice, "providerInvoiceId">;
 export type InvoiceDetail = Omit<BillingInvoiceDetail, "providerInvoiceId">;
@@ -46,9 +46,11 @@ export function nextOpenInvoice(
     })[0] ?? null
   );
 }
-export function billingAmount(pence: string): string {
-  const [whole, fraction] = penceToGbp(pence).split(".");
-  return `£${new Intl.NumberFormat("en-GB").format(BigInt(whole))}.${fraction}`;
+export function billingAmount(
+  pence: string,
+  currency: Currency = "GBP",
+): string {
+  return formatMoney(pence, currency);
 }
 export function billingDate(date: string): string {
   return new Intl.DateTimeFormat("en-GB", {

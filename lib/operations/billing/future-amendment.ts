@@ -1,3 +1,4 @@
+import { stripeCurrency } from "../money";
 import type Stripe from "stripe";
 import type { AgreementLine } from "../agreements/types";
 import { totalLinePence } from "../agreements/validation";
@@ -53,12 +54,14 @@ export async function previewFutureAmendment(
       : item.price;
   if (
     price.deleted ||
-    price.currency !== "gbp" ||
+    price.currency !== stripeCurrency(schedule.currency) ||
     price.unit_amount === null ||
     !price.recurring ||
     item.quantity !== 1
   )
-    throw new Error("A fixed GBP recurring schedule price is required.");
+    throw new Error(
+      "A fixed same-currency recurring schedule price is required.",
+    );
   const start = Date.parse(`${line.startDate}T00:00:00Z`) / 1000;
   if (
     start <= Date.parse(effectiveAt) / 1000 ||
@@ -92,7 +95,7 @@ export async function previewFutureAmendment(
               quantity: 1,
               price_data: {
                 product,
-                currency: "gbp",
+                currency: stripeCurrency(schedule.currency),
                 unit_amount: amount,
                 tax_behavior: "inclusive",
                 recurring: {

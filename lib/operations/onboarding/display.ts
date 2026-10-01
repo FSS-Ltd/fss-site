@@ -1,5 +1,5 @@
 import type { AgreementDraft } from "../agreements/types";
-import { penceToGbp } from "../agreements/money-input";
+import { formatMoney } from "../money";
 export function journeyTime(value: string | null): string {
   if (!value) return "Not scheduled";
   return (
@@ -16,10 +16,10 @@ export function invoiceChoices(
   return [
     ...draft.installments.map((part, index) => ({
       value: `installment:${index + 1}`,
-      label: `Installment ${index + 1}: £${penceToGbp(part.amountPence)} due ${part.dueDate}`,
+      label: `Installment ${index + 1}: ${formatMoney(part.amountPence, draft.currency)} due ${part.dueDate}`,
     })),
     ...draft.lines.flatMap((line, index) =>
-      line.recurrenceMonths > 0
+      line.recurrenceMonths > 0 && !draft.revenueShare
         ? [
             {
               value: `line:${index + 1}`,

@@ -1,3 +1,4 @@
+import type { Currency } from "../money";
 import { z } from "zod";
 import { withFssAdminTransaction } from "../auth/staff-transaction";
 import type { FssAdminContext } from "../auth/staff-types";
@@ -15,6 +16,8 @@ import {
   type SaveAgreementBuilderDraftCommand,
 } from "./builder-draft-schema";
 import { draftSchema } from "./validation";
+import { publishStaffCommercialOffer } from "./commercial-service";
+import type { CommercialOffer } from "./commercial-types";
 
 export type AgreementBuilderDraft = Readonly<{
   content: AgreementBuilderDraftContent;
@@ -110,6 +113,16 @@ async function saveDraft(
   organisationId: string,
   command: SaveAgreementBuilderDraftCommand,
 ): Promise<AgreementBuilderDraft> {
+  let content = command.content;
+  if (command.expectedVersion === 0) {
+    const [client] = await tx<
+      Array<{ currency: Currency }>
+    >`select billing_currency as currency from operations.organisations where id=${organisationId}`;
+    content = {
+      ...content,
+      agreement: { ...content.agreement, currency: client?.currency ?? "GBP" },
+    };
+  }
   const [saved] = await tx<AgreementBuilderDraftRow[]>`
     select saved_draft.id,
       saved_draft.organisation_id as "organisationId",
@@ -123,7 +136,7 @@ async function saveDraft(
       ${command.draftId},
       ${organisationId},
       ${command.step},
-      ${tx.json(command.content)},
+      ${tx.json(content)},
       ${command.expectedVersion}
     ) as saved_draft
   `;
@@ -159,6 +172,10 @@ async function finaliseDraft(
     );
 
   const builderDraft = agreementBuilderDraftSchema.parse(stored);
+  if (builderDraft.content.commercialOffer)
+    throw new AgreementBuilderDraftConflict(
+      "Publish this payment offer before choosing its final agreement terms.",
+    );
   const complete = toAgreementDraft(builderDraft.content);
   const [linkedEngagement] = await tx<Array<{ engagementId: string }>>`
     select engagement_id as "engagementId"
@@ -213,19 +230,47 @@ export function saveStaffAgreementBuilderDraft(
   organisationId: string,
   command: unknown,
   correlationId: string,
-): Promise<AgreementBuilderDraft | AgreementRecord>;
+): Promise<AgreementBuilderDraft | AgreementRecord | CommercialOffer>;
 export async function saveStaffAgreementBuilderDraft(
   db: OperationsDb,
   admin: FssAdminContext,
   organisationId: string,
   raw: unknown,
   correlationId: string,
-): Promise<AgreementBuilderDraft | AgreementRecord> {
+): Promise<AgreementBuilderDraft | AgreementRecord | CommercialOffer> {
   z.uuid().parse(organisationId);
   z.uuid().parse(correlationId);
   const command = agreementBuilderDraftCommandSchema.parse(raw);
 
   try {
+    if (command.action === "publish") {
+      const stored = await loadStaffAgreementBuilderDraft(
+        db,
+        admin,
+        organisationId,
+        command.draftId,
+      );
+      if (!stored || stored.version !== command.expectedVersion)
+        throw new AgreementBuilderDraftConflict(
+          "This offer draft changed. Reload before publishing.",
+        );
+      const complete = toAgreementDraft(stored.content);
+      if (!stored.content.commercialOffer)
+        throw new AgreementBuilderDraftValidationError();
+      return await publishStaffCommercialOffer(
+        db,
+        admin,
+        organisationId,
+        {
+          draft: complete.draft,
+          engagementId: complete.engagementId,
+          ...stored.content.commercialOffer,
+          sourceDraftId: stored.id,
+          sourceDraftVersion: stored.version,
+        },
+        correlationId,
+      );
+    }
     if (command.action === "save") {
       return await withFssAdminTransaction(db, admin, (tx) =>
         saveDraft(tx, organisationId, command),

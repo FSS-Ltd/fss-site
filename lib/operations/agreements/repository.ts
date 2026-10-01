@@ -1,3 +1,4 @@
+import type { Currency } from "../money";
 import { z } from "zod";
 import type { OperationsDb, OperationsTransaction } from "../db/client";
 import { requireOperationsFounder } from "../organisations/link-engagement";
@@ -96,8 +97,8 @@ async function readAgreementRegister(
   cursor: string | null,
 ): Promise<AgreementRegister | null> {
   const [organisation] = await tx<
-    { display_name: string }[]
-  >`select display_name from operations.organisations where id=${organisationId}`;
+    { display_name: string; billing_currency: Currency }[]
+  >`select display_name,billing_currency from operations.organisations where id=${organisationId}`;
   if (!organisation) return null;
   const links = await tx<
     { engagement_id: string }[]
@@ -105,6 +106,7 @@ async function readAgreementRegister(
   const rows = await loadAgreements(tx, organisationId, null, cursor);
   return {
     organisationName: organisation.display_name,
+    billingCurrency: organisation.billing_currency,
     engagementIds: links.slice(0, 100).map((link) => link.engagement_id),
     moreEngagements: links.length > 100,
     agreements: rows.slice(0, 50),

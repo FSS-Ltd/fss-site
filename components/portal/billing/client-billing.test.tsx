@@ -83,3 +83,26 @@ test("offers a receipt only for paid invoices and hides hosted actions without b
   assert.match(paidHtml, /Payment confirmed/);
   assert.doesNotMatch(readOnlyHtml, /Pay securely/);
 });
+
+test("retained invoice currencies and distinct payment management mappings are presented accurately", () => {
+  const html = renderToStaticMarkup(
+    <ClientBillingOverview
+      canManage
+      managementCurrencies={["USD", "EUR"]}
+      invoices={[
+        { ...openInvoice, currency: "USD" },
+        {
+          ...openInvoice,
+          id: "33333333-3333-4333-8333-333333333333",
+          currency: "EUR",
+        },
+      ]}
+      organisationId={organisationId}
+    />,
+  );
+  assert.match(html, /\$1,200\.00/);
+  assert.match(html, /€1,200\.00/);
+  assert.match(html, /Manage payment method \(USD\)/);
+  assert.match(html, /Manage payment method \(EUR\)/);
+  assert.doesNotMatch(html, /£1,200/);
+});

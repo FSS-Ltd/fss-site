@@ -59,6 +59,7 @@ export async function executeBillingObligation(
     scope,
     stripe,
     correlationId,
+    schedule.currency,
   );
   const result = await createStripeObligation(
     stripe,
