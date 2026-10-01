@@ -24,7 +24,7 @@ export default defineConfig({
   snapshotPathTemplate:
     "{testDir}/{testFilePath}-snapshots/{arg}-{projectName}-{platform}{ext}",
   testDir: "tests/e2e",
-  testMatch: "fss-studio.visual.spec.ts",
+  testMatch: ["agreement-builder.spec.ts", "fss-studio.visual.spec.ts"],
   timeout: 30_000,
   use: {
     baseURL: visualBaseUrl,

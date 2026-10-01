@@ -193,7 +193,7 @@
 .cardDark {
   border-color: var(--portal-navy, #07182e);
   background: var(--portal-navy, #07182e);
-  color: var(--portal-ink, #ffffff);
+  color: var(--portal-dark-ink, #f4f8fc);
 }
 
 .cardTitle,

@@ -40,6 +40,10 @@ const hstsHeader = {
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 const nextConfig: NextConfig = {
+  // Isolate agreement browser fixtures from an active development server.
+  ...(process.env.FSS_AGREEMENT_TESTS_ENABLED === "true"
+    ? { distDir: ".next/agreement-tests" }
+    : {}),
   // The local screenshot runner uses 127.0.0.1 rather than localhost. This
   // development-only allow-list keeps HMR requests inside the test origin.
   allowedDevOrigins: ["127.0.0.1"],

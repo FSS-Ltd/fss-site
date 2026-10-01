@@ -14,13 +14,17 @@ type DraftRouteResponse = Readonly<{
   version: number;
 }>;
 
+export type AgreementBuilderFeedback =
+  | Readonly<{ tone: "success"; message: string }>
+  | Readonly<{ tone: "error"; message: string }>;
+
 type FinalisedAgreementResponse = Readonly<{ id: string }>;
 
 export type SavedAgreementBuilderDraft = Readonly<
   Pick<AgreementBuilderDraft, "content" | "id" | "step" | "version">
 >;
 
-function errorMessage(body: unknown): string {
+function errorMessage(body: unknown, fallback: string): string {
   if (
     body !== null &&
     typeof body === "object" &&
@@ -29,7 +33,7 @@ function errorMessage(body: unknown): string {
   ) {
     return body.error;
   }
-  return "The agreement draft could not be saved. Please try again.";
+  return fallback;
 }
 
 function isDraftRouteResponse(value: unknown): value is DraftRouteResponse {
@@ -72,8 +76,9 @@ export function useAgreementBuilderDraft({
 }>): Readonly<{
   draft: SavedAgreementBuilderDraft | null;
   finalise: () => Promise<void>;
-  message: string | null;
+  feedback: AgreementBuilderFeedback | null;
   pending: boolean;
+  pendingMessage: string;
   save: (
     step: AgreementBuilderStep,
     content: AgreementBuilderDraftContent,
@@ -90,17 +95,23 @@ export function useAgreementBuilderDraft({
         }
       : null,
   );
-  const [message, setMessage] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<AgreementBuilderFeedback | null>(
+    null,
+  );
+  const requestInFlight = useRef(false);
   const [pending, setPending] = useState(false);
+  const [pendingMessage, setPendingMessage] = useState("Saving draft…");
 
-  async function request(payload: unknown): Promise<unknown> {
+  async function request(payload: unknown, fallback: string): Promise<unknown> {
     const response = await fetch(commandEndpoint, {
       body: JSON.stringify(payload),
       headers: { "content-type": "application/json" },
       method: "POST",
+    }).catch(() => {
+      throw new Error(fallback);
     });
     const body: unknown = await response.json().catch(() => null);
-    if (!response.ok) throw new Error(errorMessage(body));
+    if (!response.ok) throw new Error(errorMessage(body, fallback));
     return body;
   }
 
@@ -108,17 +119,23 @@ export function useAgreementBuilderDraft({
     step: AgreementBuilderStep,
     content: AgreementBuilderDraftContent,
   ): Promise<SavedAgreementBuilderDraft | null> {
+    if (requestInFlight.current) return null;
+    requestInFlight.current = true;
     const nextDraftId = draftId.current ?? crypto.randomUUID();
+    setPendingMessage("Saving draft…");
     setPending(true);
-    setMessage(null);
+    setFeedback(null);
     try {
-      const response = await request({
-        action: "save",
-        content,
-        draftId: nextDraftId,
-        expectedVersion: draft?.version ?? 0,
-        step,
-      });
+      const response = await request(
+        {
+          action: "save",
+          content,
+          draftId: nextDraftId,
+          expectedVersion: draft?.version ?? 0,
+          step,
+        },
+        "The agreement draft could not be saved. Your edits are still here. Please try again.",
+      );
       if (!isDraftRouteResponse(response)) {
         throw new Error(
           "The saved draft response was incomplete. Refresh and try again.",
@@ -140,35 +157,53 @@ export function useAgreementBuilderDraft({
           step: response.step,
         }).toString()}`,
       );
-      setMessage(`Draft version ${response.version} saved.`);
+      setFeedback({ tone: "success", message: "Draft saved." });
       return nextDraft;
     } catch (error) {
-      setMessage(
-        error instanceof Error
-          ? error.message
-          : "The agreement draft could not be saved. Please try again.",
-      );
+      setFeedback({
+        tone: "error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "The agreement draft could not be saved. Please try again.",
+      });
       return null;
     } finally {
+      requestInFlight.current = false;
       setPending(false);
     }
   }
 
   async function finalise(): Promise<void> {
     if (!draftId.current || !draft) {
-      setMessage(
-        "Save the agreement draft before creating its agreement record.",
-      );
+      setFeedback({
+        tone: "error",
+        message:
+          "Save the agreement draft before creating its agreement record.",
+      });
       return;
     }
+    if (requestInFlight.current) return;
+    requestInFlight.current = true;
+    setPendingMessage(
+      draft.content.commercialOffer
+        ? "Publishing payment offer…"
+        : "Creating agreement…",
+    );
     setPending(true);
-    setMessage(null);
+    setFeedback(null);
+    const failureMessage = draft.content.commercialOffer
+      ? "The payment offer could not be published. Your saved draft is still available. Please try again."
+      : "The agreement could not be created. Your saved draft is still available. Please try again.";
     try {
-      const response = await request({
-        action: draft.content.commercialOffer ? "publish" : "finalise",
-        draftId: draftId.current,
-        expectedVersion: draft.version,
-      });
+      const response = await request(
+        {
+          action: draft.content.commercialOffer ? "publish" : "finalise",
+          draftId: draftId.current,
+          expectedVersion: draft.version,
+        },
+        failureMessage,
+      );
       if (!isFinalisedAgreementResponse(response)) {
         throw new Error(
           "The agreement response was incomplete. Refresh and try again.",
@@ -178,20 +213,23 @@ export function useAgreementBuilderDraft({
         ? `${agreementListHref.replace(/\/agreements$/, "/commercial-offers")}/${encodeURIComponent(response.id)}`
         : `${agreementListHref}/${encodeURIComponent(response.id)}`;
       if (!navigate) {
-        setMessage("Agreement created. Reload this page to open its record.");
+        setFeedback({
+          tone: "success",
+          message: "Agreement created. Reload this page to open its record.",
+        });
         return;
       }
       navigate(destination);
     } catch (error) {
-      setMessage(
-        error instanceof Error
-          ? error.message
-          : "The agreement could not be created. Please try again.",
-      );
+      setFeedback({
+        tone: "error",
+        message: error instanceof Error ? error.message : failureMessage,
+      });
     } finally {
+      requestInFlight.current = false;
       setPending(false);
     }
   }
 
-  return { draft, finalise, message, pending, save };
+  return { draft, finalise, feedback, pending, pendingMessage, save };
 }

@@ -1,8 +1,8 @@
 "use client";
 
 import type { Currency } from "@/lib/operations/money";
-import { useState } from "react";
-import { Notice, StatusBadge } from "@/components/portal/ui";
+import { useEffect, useRef, useState } from "react";
+import { Notice } from "@/components/portal/ui";
 import type {
   AgreementBuilderDraftContent,
   AgreementBuilderStep,
@@ -16,6 +16,7 @@ import {
 } from "./agreement-builder-step-panel";
 import { useAgreementBuilderDraft } from "./use-agreement-builder-draft";
 import styles from "./agreements.module.css";
+import guidedStyles from "./agreement-builder.module.css";
 
 export type { AgreementEngagementChoice } from "./agreement-builder-step-panel";
 
@@ -41,19 +42,27 @@ export function StaffAgreementBuilder({
   currency?: Currency;
 }>): React.JSX.Element {
   const listHref = agreementListHref ?? baseHref.replace(/\/new$/, "");
-  const { draft, finalise, message, pending, save } = useAgreementBuilderDraft({
-    agreementListHref: listHref,
-    baseHref,
-    commandEndpoint,
-    initialDraft,
-    navigate: onNavigate,
-  });
+  const { draft, finalise, feedback, pending, pendingMessage, save } =
+    useAgreementBuilderDraft({
+      agreementListHref: listHref,
+      baseHref,
+      commandEndpoint,
+      initialDraft,
+      navigate: onNavigate,
+    });
   const [content, setContent] = useState<AgreementBuilderDraftContent>(
     initialDraft?.content ?? { agreement: { currency } },
   );
   const [step, setStep] = useState<AgreementBuilderStep>(
     initialDraft?.step ?? "link",
   );
+  const [direction, setDirection] = useState<"forward" | "backward">("forward");
+  const stageRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (step === "document" || step === "review") {
+      stageRef.current?.querySelector<HTMLElement>("h2")?.focus();
+    }
+  }, [step]);
   const agreement = content.agreement ?? {};
   const currentStepIndex = agreementBuilderSteps.indexOf(step) + 1;
 
@@ -63,6 +72,11 @@ export function StaffAgreementBuilder({
   ): Promise<void> {
     const saved = await save(nextStep, nextContent);
     if (!saved) return;
+    setDirection(
+      agreementBuilderSteps.indexOf(saved.step) < currentStepIndex - 1
+        ? "backward"
+        : "forward",
+    );
     setContent(saved.content);
     setStep(saved.step);
   }
@@ -72,6 +86,11 @@ export function StaffAgreementBuilder({
   ): Promise<void> {
     const saved = await save("link", nextContent);
     if (!saved) return;
+    setDirection(
+      agreementBuilderSteps.indexOf(saved.step) < currentStepIndex - 1
+        ? "backward"
+        : "forward",
+    );
     setContent(saved.content);
     setStep(saved.step);
     const destination = new URL(engagementHref, window.location.origin);
@@ -86,49 +105,61 @@ export function StaffAgreementBuilder({
       className={styles.builder}
       aria-labelledby="staff-agreement-builder-heading"
     >
-      <div className={styles.builderHeading}>
-        <div>
-          <p className={styles.version}>{organisationName}</p>
-          <h2 id="staff-agreement-builder-heading">Create an agreement</h2>
-          <p className={styles.muted}>
-            Saved drafts stay scoped to this client and are checked again before
-            they become an agreement record.
-          </p>
-        </div>
-        <StatusBadge status="info">
-          Step {currentStepIndex} of {agreementBuilderSteps.length}
-        </StatusBadge>
+      <div>
+        <p className={styles.version}>{organisationName}</p>
+        <h2
+          className={guidedStyles.visuallyHidden}
+          id="staff-agreement-builder-heading"
+        >
+          Create an agreement
+        </h2>
       </div>
-      <ol className={styles.builderSteps} aria-label="Agreement builder steps">
+      <ol
+        className={guidedStyles.progress}
+        aria-label="Agreement builder steps"
+      >
         {agreementBuilderSteps.map((item, index) => (
-          <li aria-current={item === step ? "step" : undefined} key={item}>
-            <span>{index + 1}</span>
+          <li
+            aria-current={item === step ? "step" : undefined}
+            data-complete={index < currentStepIndex - 1}
+            key={item}
+          >
             {agreementBuilderStepDetail(item).label}
           </li>
         ))}
       </ol>
-      <p className={styles.stepCaption}>
-        Step {currentStepIndex} of 6 /{" "}
-        {agreementBuilderStepDetail(step).summary}
-      </p>
-      {message ? (
-        <Notice tone="info">
-          <p>{message}</p>
+      {feedback?.tone === "error" ? (
+        <Notice tone="error">
+          <p>{feedback.message}</p>
         </Notice>
       ) : null}
-      <AgreementBuilderStepPanel
-        agreement={agreement}
-        content={content}
-        draftExists={Boolean(draft)}
-        engagementHref={engagementHref}
-        engagements={engagements}
-        finalise={finalise}
-        onSave={persist}
-        onBeginEngagement={beginEngagement}
-        organisationName={organisationName}
-        pending={pending}
-        step={step}
-      />
+      <p aria-live="polite" className={guidedStyles.saveStatus} role="status">
+        {pending
+          ? pendingMessage
+          : feedback?.tone === "success"
+            ? feedback.message
+            : ""}
+      </p>
+      <div
+        className={guidedStyles.stage}
+        data-direction={direction}
+        key={step}
+        ref={stageRef}
+      >
+        <AgreementBuilderStepPanel
+          agreement={agreement}
+          content={content}
+          draftExists={Boolean(draft)}
+          engagementHref={engagementHref}
+          engagements={engagements}
+          finalise={finalise}
+          onSave={persist}
+          onBeginEngagement={beginEngagement}
+          organisationName={organisationName}
+          pending={pending}
+          step={step}
+        />
+      </div>
     </section>
   );
 }

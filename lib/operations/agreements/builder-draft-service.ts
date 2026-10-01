@@ -182,7 +182,6 @@ async function finaliseDraft(
     from operations.engagement_links
     where organisation_id = ${organisationId}
       and engagement_id = ${complete.engagementId}
-    for key share
   `;
   if (!linkedEngagement)
     throw new AgreementBuilderDraftConflict(

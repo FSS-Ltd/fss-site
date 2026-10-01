@@ -180,3 +180,73 @@ test("staff agreement draft route binds a save to the organisation selected by t
     version: 1,
   });
 });
+
+test("creation failures identify the operation and log only safe diagnostics", async () => {
+  const reports: unknown[] = [];
+  const handler = createStaffAgreementDraftRouteHandler({
+    authorize: async () => ({ id: "admin" }),
+    createCorrelationId: () => "11111111-1111-4111-8111-111111111111",
+    enabled: true,
+    execute: async () => {
+      throw Object.assign(new Error("private contact and agreement contents"), {
+        code: "42501",
+      });
+    },
+    origin,
+    reportUnexpectedError: (report) => reports.push(report),
+  });
+  const response = await handler(
+    new Request(
+      `${origin}/api/portal/admin/clients/${organisationId}/agreement-drafts`,
+      {
+        body: JSON.stringify({ action: "finalise" }),
+        headers: { "content-type": "application/json", origin },
+        method: "POST",
+      },
+    ),
+    organisationId,
+  );
+  assert.equal(response.status, 503);
+  assert.deepEqual(await response.json(), {
+    error:
+      "We could not create this agreement. Your saved draft is still available. Please try again.",
+  });
+  assert.deepEqual(reports, [
+    {
+      correlationId: "11111111-1111-4111-8111-111111111111",
+      errorName: "Error",
+      errorCode: "42501",
+      operation: "finalise",
+    },
+  ]);
+});
+
+test("unexpected diagnostics discard untrusted error codes and action values", async () => {
+  const reports: unknown[] = [];
+  const handler = createStaffAgreementDraftRouteHandler({
+    authorize: async () => ({ id: "admin" }),
+    createCorrelationId: () => "11111111-1111-4111-8111-111111111111",
+    enabled: true,
+    execute: async () => {
+      throw { code: "secret@example.test" };
+    },
+    origin,
+    reportUnexpectedError: (report) => reports.push(report),
+  });
+  await handler(
+    new Request(`${origin}/agreement-drafts`, {
+      body: JSON.stringify({ action: "private agreement" }),
+      headers: { "content-type": "application/json", origin },
+      method: "POST",
+    }),
+    organisationId,
+  );
+  assert.deepEqual(reports, [
+    {
+      correlationId: "11111111-1111-4111-8111-111111111111",
+      errorName: "UnknownError",
+      errorCode: "UNKNOWN",
+      operation: "unknown",
+    },
+  ]);
+});

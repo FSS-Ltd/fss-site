@@ -273,7 +273,17 @@ export function StudioAgreementBuilderScenario({
         baseHref={`/portal/admin/clients/${organisationId}/agreements/new`}
         commandEndpoint={`/api/portal/admin/clients/${organisationId}/agreement-drafts`}
         engagementHref={`/portal/admin/clients/${organisationId}/engagements/new?draftId=${currentDraft.id}`}
-        engagements={noEngagement ? [] : engagementChoices}
+        engagements={
+          noEngagement
+            ? []
+            : [
+                ...engagementChoices,
+                {
+                  id: "92d68fbd-dbe8-44da-96b2-35da77283e40",
+                  name: "Client portal · Discovery complete",
+                },
+              ]
+        }
         initialDraft={currentDraft}
         organisationName="Northstar Studio"
       />
