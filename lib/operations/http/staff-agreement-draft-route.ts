@@ -1,12 +1,12 @@
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
-import { resolveSiteUrl } from "@/lib/config/site-url";
 import {
   PayloadTooLargeError,
   readJsonRequestBody,
   requestHasRegisteredOrigin,
 } from "@/lib/growth/http/founder-request";
 import { privateAuthHeaders } from "../auth/http";
+import { resolvePortalOrigin } from "../auth/configuration";
 import { fssStudioEnabled } from "../auth/release-flags";
 import { requireFssAdmin } from "../auth/require-admin";
 import { getPortalIdentity } from "../auth/server";
@@ -105,11 +105,8 @@ export function createStaffAgreementDraftRouteHandler<TActor>(
   };
 }
 
-export function staffAgreementDraftRoute(): (
-  request: Request,
-  organisationId: string,
-) => Promise<Response> {
-  return createStaffAgreementDraftRouteHandler<FssAdminContext>({
+export function createStaffAgreementDraftRouteDependencies(): StaffAgreementDraftRouteDependencies<FssAdminContext> {
+  return {
     authorize: async () => {
       const identity = await getPortalIdentity();
       if (!identity) throw new Error("unauthorized");
@@ -125,8 +122,17 @@ export function staffAgreementDraftRoute(): (
         input,
         correlationId,
       ),
-    origin: new URL(resolveSiteUrl()).origin,
+    origin: resolvePortalOrigin(),
     reportUnexpectedError: (report) =>
       console.error("Staff agreement draft save failed.", report),
-  });
+  };
+}
+
+export function staffAgreementDraftRoute(): (
+  request: Request,
+  organisationId: string,
+) => Promise<Response> {
+  return createStaffAgreementDraftRouteHandler(
+    createStaffAgreementDraftRouteDependencies(),
+  );
 }
