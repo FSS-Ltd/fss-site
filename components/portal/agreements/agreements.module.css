@@ -6,6 +6,34 @@
   min-width: 0;
 }
 
+.engagementForm {
+  display: grid;
+  gap: 16px;
+}
+
+.engagementReview {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--portal-ink, #0a1a2e);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.engagementReview input {
+  width: 18px;
+  height: 18px;
+  margin: 2px 0 0;
+  accent-color: var(--portal-action, #0f7078);
+}
+
+.engagementActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .builder {
   display: grid;
   gap: 16px;

@@ -91,7 +91,7 @@ export type TransitionEngagementContext = { correlationId: string } & (
 
 export type LockedEngagement = {
   id: string;
-  prospectId: string;
+  prospectId: string | null;
   version: number;
   stage: CommercialStage;
   deliveryStatus: DeliveryStatus;
@@ -291,7 +291,10 @@ export function createEngagementTransitioner({
           correlationId: context.correlationId,
         });
 
-        if (COMMERCIAL_STAGES_THAT_STOP_OUTREACH.has(input.toStage)) {
+        if (
+          COMMERCIAL_STAGES_THAT_STOP_OUTREACH.has(input.toStage) &&
+          engagement.prospectId
+        ) {
           await transaction.stopActiveOutreachForProspect(
             engagement.prospectId,
           );

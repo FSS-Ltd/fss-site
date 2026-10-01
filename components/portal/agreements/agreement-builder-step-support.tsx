@@ -1,11 +1,5 @@
-import {
-  ArrowLeft,
-  ArrowRight,
-} from "lucide-react";
-import {
-  PortalButton,
-  PortalCard,
-} from "@/components/portal/ui";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { PortalButton, PortalCard } from "@/components/portal/ui";
 import type {
   AgreementBuilderDraftContent,
   AgreementBuilderStep,
@@ -24,6 +18,7 @@ export type BuilderStepProps = Readonly<{
     step: AgreementBuilderStep,
     content: AgreementBuilderDraftContent,
   ) => Promise<void>;
+  onBeginEngagement?: (content: AgreementBuilderDraftContent) => Promise<void>;
   pending: boolean;
 }>;
 

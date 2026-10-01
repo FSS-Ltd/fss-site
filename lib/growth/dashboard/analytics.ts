@@ -41,10 +41,15 @@ export function parseAnalyticsQuery(
   now: Date,
 ): AnalyticsQuery {
   const raw = (firstValue(searchParams.month) ?? "").trim();
-  return { month: MONTH_KEY_PATTERN.test(raw) ? raw : currentLondonMonthKey(now) };
+  return {
+    month: MONTH_KEY_PATTERN.test(raw) ? raw : currentLondonMonthKey(now),
+  };
 }
 
-export function shiftAnalyticsMonth(month: string, deltaMonths: 1 | -1): string {
+export function shiftAnalyticsMonth(
+  month: string,
+  deltaMonths: 1 | -1,
+): string {
   const [year, monthNumber] = month.split("-").map(Number) as [number, number];
   const zeroIndexed = monthNumber - 1 + deltaMonths;
   const nextYear = year + Math.floor(zeroIndexed / 12);
@@ -140,17 +145,19 @@ async function fetchValues(
       coalesce((
         select sum(coalesce(de.one_off_value_pence, 0) + coalesce(de.monthly_value_pence, 0))::int
         from growth.delivery_engagements de
-        where ${db.unsafe(OPEN_PIPELINE_STAGE_SQL)}
+        where de.prospect_id is not null
+          and ${db.unsafe(OPEN_PIPELINE_STAGE_SQL)}
       ), 0) as "openPipelineValuePence",
       coalesce((
         select sum(coalesce(one_off_value_pence, 0) + coalesce(monthly_value_pence, 0))::int
         from growth.delivery_engagements
-        where stage = 'won' and won_at >= ${window.startUtc} and won_at < ${window.endUtc}
+        where prospect_id is not null and stage = 'won'
+          and won_at >= ${window.startUtc} and won_at < ${window.endUtc}
       ), 0) as "agreedWonValuePence",
       coalesce((
         select sum(coalesce(de.one_off_value_pence, 0) + coalesce(de.monthly_value_pence, 0))::int
         from growth.delivery_engagements de
-        where exists (
+        where de.prospect_id is not null and exists (
           select 1 from growth.commercial_stage_events cse
           where cse.engagement_id = de.id
             and cse.dimension = 'delivery'
@@ -183,7 +190,10 @@ async function fetchMeetingsCount(
   return rows[0]?.count ?? 0;
 }
 
-function buildRates(funnel: AnalyticsFunnel, meetingsCount: number): AnalyticsRates {
+function buildRates(
+  funnel: AnalyticsFunnel,
+  meetingsCount: number,
+): AnalyticsRates {
   return {
     meetingsCount,
     replyRate: computeRate(funnel.replies, funnel.approvedFirstEmails),

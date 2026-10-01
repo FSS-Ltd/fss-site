@@ -70,6 +70,7 @@ function LinkStep({
   content,
   engagements,
   engagementHref,
+  onBeginEngagement,
   onSave,
   organisationName,
   pending,
@@ -77,12 +78,17 @@ function LinkStep({
   Readonly<{
     engagements: readonly AgreementEngagementChoice[];
     engagementHref: string;
+    onBeginEngagement?: (
+      content: AgreementBuilderDraftContent,
+    ) => Promise<void>;
     organisationName: string;
   }>): React.JSX.Element {
   const formRef = useRef<HTMLFormElement>(null);
   const [query, setQuery] = useState("");
   const visibleEngagements = engagements.filter((engagement) =>
-    engagement.name.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()),
+    engagement.name
+      .toLocaleLowerCase()
+      .includes(query.trim().toLocaleLowerCase()),
   );
 
   function contentFromForm(): AgreementBuilderDraftContent | null {
@@ -131,7 +137,12 @@ function LinkStep({
             </PortalSelect>
           ) : null}
           <PortalField label="Agreement title" required>
-            <input defaultValue={agreement.title ?? ""} maxLength={200} name="title" />
+            <input
+              defaultValue={agreement.title ?? ""}
+              maxLength={200}
+              name="title"
+              required
+            />
           </PortalField>
           <PortalField label="Find an engagement">
             <input
@@ -145,7 +156,7 @@ function LinkStep({
         {hasEngagements && visibleEngagements.length === 0 ? (
           <Notice tone="info">
             <strong>No reviewed engagement matches that search.</strong>
-            <p>Clear the search or create reviewed work in the delivery workflow.</p>
+            <p>Clear the search or create reviewed work for this client.</p>
           </Notice>
         ) : null}
         {hasEngagements ? (
@@ -154,14 +165,33 @@ function LinkStep({
               {visibleEngagements.map((engagement) => (
                 <li key={engagement.id}>
                   <span>{engagement.name}</span>
-                  <StatusBadge status="success">Reviewed &amp; linked</StatusBadge>
+                  <StatusBadge status="success">
+                    Reviewed &amp; linked
+                  </StatusBadge>
                 </li>
               ))}
             </ul>
           </PortalCard>
         ) : (
           <Notice
-            action={<PortalActionLink href={engagementHref}>Create engagement</PortalActionLink>}
+            action={
+              onBeginEngagement ? (
+                <PortalButton
+                  disabled={pending}
+                  onClick={() => {
+                    const nextContent = contentFromForm();
+                    if (nextContent) void onBeginEngagement(nextContent);
+                  }}
+                  type="button"
+                >
+                  Create engagement
+                </PortalButton>
+              ) : (
+                <PortalActionLink href={engagementHref}>
+                  Create engagement
+                </PortalActionLink>
+              )
+            }
             tone="warning"
           >
             <strong>No engagement is linked.</strong>
@@ -183,7 +213,12 @@ function LinkStep({
   );
 }
 
-function ScopeStep({ agreement, content, onSave, pending }: BuilderStepProps): React.JSX.Element {
+function ScopeStep({
+  agreement,
+  content,
+  onSave,
+  pending,
+}: BuilderStepProps): React.JSX.Element {
   const formRef = useRef<HTMLFormElement>(null);
 
   function contentFromForm(): AgreementBuilderDraftContent | null {
@@ -218,8 +253,18 @@ function ScopeStep({ agreement, content, onSave, pending }: BuilderStepProps): R
         ref={formRef}
       >
         <div className={styles.builderFormFields}>
-          <PortalTextarea defaultValue={agreement.goals ?? ""} label="Client goals" name="goals" required />
-          <PortalTextarea defaultValue={agreement.scope ?? ""} label="Included deliverables" name="scope" required />
+          <PortalTextarea
+            defaultValue={agreement.goals ?? ""}
+            label="Client goals"
+            name="goals"
+            required
+          />
+          <PortalTextarea
+            defaultValue={agreement.scope ?? ""}
+            label="Included deliverables"
+            name="scope"
+            required
+          />
           <PortalTextarea
             defaultValue={agreement.terms ?? ""}
             hint="State exclusions, assumptions and acceptance criteria together."
@@ -227,8 +272,18 @@ function ScopeStep({ agreement, content, onSave, pending }: BuilderStepProps): R
             name="terms"
             required
           />
-          <PortalTextarea defaultValue={agreement.responsibilities ?? ""} label="Client responsibilities" name="responsibilities" required />
-          <PortalTextarea defaultValue={agreement.support ?? ""} label="Support expectations" name="support" required />
+          <PortalTextarea
+            defaultValue={agreement.responsibilities ?? ""}
+            label="Client responsibilities"
+            name="responsibilities"
+            required
+          />
+          <PortalTextarea
+            defaultValue={agreement.support ?? ""}
+            label="Support expectations"
+            name="support"
+            required
+          />
         </div>
         <FormActions
           backLabel="Back to work"
@@ -242,7 +297,12 @@ function ScopeStep({ agreement, content, onSave, pending }: BuilderStepProps): R
   );
 }
 
-function PeopleStep({ agreement, content, onSave, pending }: BuilderStepProps): React.JSX.Element {
+function PeopleStep({
+  agreement,
+  content,
+  onSave,
+  pending,
+}: BuilderStepProps): React.JSX.Element {
   const formRef = useRef<HTMLFormElement>(null);
 
   function contentFromForm(): AgreementBuilderDraftContent | null {
@@ -267,7 +327,10 @@ function PeopleStep({ agreement, content, onSave, pending }: BuilderStepProps): 
   }
 
   return (
-    <BuilderSection icon={<UsersRound size={20} />} title="People and responsibilities">
+    <BuilderSection
+      icon={<UsersRound size={20} />}
+      title="People and responsibilities"
+    >
       <p className={styles.muted}>Make it clear who signs, pays and reviews.</p>
       <form
         onSubmit={(event) => {
@@ -278,20 +341,37 @@ function PeopleStep({ agreement, content, onSave, pending }: BuilderStepProps): 
       >
         <div className={styles.builderFormFields}>
           <PortalField label="Billing contact email" required>
-            <input defaultValue={agreement.billingContact ?? ""} name="billingContact" type="email" />
+            <input
+              defaultValue={agreement.billingContact ?? ""}
+              name="billingContact"
+              type="email"
+            />
           </PortalField>
           <PortalField
             hint="Separate addresses with commas. Duplicate or inactive signers are rejected by the server."
             label="Required client signer emails"
             required
           >
-            <input defaultValue={agreement.signatories?.join(", ") ?? ""} name="signatories" type="email" multiple />
+            <input
+              defaultValue={agreement.signatories?.join(", ") ?? ""}
+              name="signatories"
+              type="email"
+              multiple
+            />
           </PortalField>
-          <PortalTextarea defaultValue={agreement.responsibilities ?? ""} label="Client responsibilities" name="responsibilities" required />
+          <PortalTextarea
+            defaultValue={agreement.responsibilities ?? ""}
+            label="Client responsibilities"
+            name="responsibilities"
+            required
+          />
         </div>
         <Notice tone="info">
           <strong>Separate permissions.</strong>
-          <p>Being a signer does not grant owner access, billing permissions or a portal invitation.</p>
+          <p>
+            Being a signer does not grant owner access, billing permissions or a
+            portal invitation.
+          </p>
         </Notice>
         <FormActions
           backLabel="Back to fees"
@@ -305,27 +385,53 @@ function PeopleStep({ agreement, content, onSave, pending }: BuilderStepProps): 
   );
 }
 
-function DocumentStep({ agreement, content, onSave, pending }: BuilderStepProps): React.JSX.Element {
+function DocumentStep({
+  agreement,
+  content,
+  onSave,
+  pending,
+}: BuilderStepProps): React.JSX.Element {
   return (
-    <BuilderSection icon={<ShieldCheck size={20} />} title="Prepare the agreement document">
-      <p className={styles.muted}>The exact version reviewed is retained before any signing request is prepared.</p>
+    <BuilderSection
+      icon={<ShieldCheck size={20} />}
+      title="Prepare the agreement document"
+    >
+      <p className={styles.muted}>
+        The exact version reviewed is retained before any signing request is
+        prepared.
+      </p>
       <PortalCard className={styles.documentPreview} tone="dark">
         <p className={styles.version}>FSS Studio / Agreement draft</p>
         <h3>{agreement.title || "Untitled agreement"}</h3>
-        <p>Scope, fees, responsibilities and agreed terms are prepared from this saved draft.</p>
+        <p>
+          Scope, fees, responsibilities and agreed terms are prepared from this
+          saved draft.
+        </p>
       </PortalCard>
       <Notice tone="info">
         <strong>Document fingerprint is generated server-side.</strong>
         <p>
-          FSS Studio derives the SHA-256 fingerprint from immutable final document bytes. A browser never supplies a hash or private document reference.
+          FSS Studio derives the SHA-256 fingerprint from immutable final
+          document bytes. A browser never supplies a hash or private document
+          reference.
         </p>
       </Notice>
       <div className={styles.actionRow}>
-        <PortalButton disabled={pending} loading={pending} onClick={() => void onSave("review", content)} type="button">
+        <PortalButton
+          disabled={pending}
+          loading={pending}
+          onClick={() => void onSave("review", content)}
+          type="button"
+        >
           Generate &amp; preview
           <ArrowRight aria-hidden="true" size={16} />
         </PortalButton>
-        <PortalButton disabled={pending} onClick={() => void onSave("document", content)} type="button" variant="quiet">
+        <PortalButton
+          disabled={pending}
+          onClick={() => void onSave("document", content)}
+          type="button"
+          variant="quiet"
+        >
           Save draft
         </PortalButton>
       </div>
@@ -341,7 +447,10 @@ function ReviewStep({
   onSave,
   pending,
 }: BuilderStepProps &
-  Readonly<{ draftExists: boolean; finalise: () => Promise<void> }>): React.JSX.Element {
+  Readonly<{
+    draftExists: boolean;
+    finalise: () => Promise<void>;
+  }>): React.JSX.Element {
   const total = useMemo(() => {
     if (!agreement.lines) return "0";
     try {
@@ -354,25 +463,70 @@ function ReviewStep({
   }, [agreement.lines]);
 
   return (
-    <BuilderSection icon={<CheckCircle2 size={20} />} title="Review before sending">
+    <BuilderSection
+      icon={<CheckCircle2 size={20} />}
+      title="Review before sending"
+    >
       <div className={styles.metrics}>
-        <div><p className={styles.metric}>{formatGbp(total)}</p><span>Agreement total</span></div>
-        <div><p className={styles.metric}>{formatGbp(agreement.requiredDepositPence)}</p><span>Initial deposit</span></div>
-        <div><p className={styles.metric}>{agreement.signatories?.length ?? 0}</p><span>Required signers</span></div>
+        <div>
+          <p className={styles.metric}>{formatGbp(total)}</p>
+          <span>Agreement total</span>
+        </div>
+        <div>
+          <p className={styles.metric}>
+            {formatGbp(agreement.requiredDepositPence)}
+          </p>
+          <span>Initial deposit</span>
+        </div>
+        <div>
+          <p className={styles.metric}>{agreement.signatories?.length ?? 0}</p>
+          <span>Required signers</span>
+        </div>
       </div>
-      <PortalCard className={styles.documentPreview} title={agreement.title || "Agreement draft"}>
+      <PortalCard
+        className={styles.documentPreview}
+        title={agreement.title || "Agreement draft"}
+      >
         <dl className={styles.summaryList}>
-          <div><dt>Client outcome</dt><dd>{agreement.goals || "Needs review"}</dd></div>
-          <div><dt>Scope</dt><dd>{agreement.scope || "Needs review"}</dd></div>
-          <div><dt>Payment</dt><dd>{formatGbp(agreement.requiredDepositPence)} deposit, then the saved payment schedule.</dd></div>
+          <div>
+            <dt>Client outcome</dt>
+            <dd>{agreement.goals || "Needs review"}</dd>
+          </div>
+          <div>
+            <dt>Scope</dt>
+            <dd>{agreement.scope || "Needs review"}</dd>
+          </div>
+          <div>
+            <dt>Payment</dt>
+            <dd>
+              {formatGbp(agreement.requiredDepositPence)} deposit, then the
+              saved payment schedule.
+            </dd>
+          </div>
         </dl>
       </PortalCard>
       <PortalCard title="Readiness checks">
         <ul className={styles.checkList}>
-          <li><CheckCircle2 aria-hidden="true" size={18} /> <span>Engagement linked</span><strong>{content.engagementId ? "Ready" : "Required"}</strong></li>
-          <li><CheckCircle2 aria-hidden="true" size={18} /> <span>Fees and schedule reconcile</span><strong>Validated on creation</strong></li>
-          <li><CheckCircle2 aria-hidden="true" size={18} /> <span>Signers and access reviewed</span><strong>{agreement.signatories?.length ?? 0} selected</strong></li>
-          <li><CheckCircle2 aria-hidden="true" size={18} /> <span>Document preview reviewed</span><strong>Prepared from draft</strong></li>
+          <li>
+            <CheckCircle2 aria-hidden="true" size={18} />{" "}
+            <span>Engagement linked</span>
+            <strong>{content.engagementId ? "Ready" : "Required"}</strong>
+          </li>
+          <li>
+            <CheckCircle2 aria-hidden="true" size={18} />{" "}
+            <span>Fees and schedule reconcile</span>
+            <strong>Validated on creation</strong>
+          </li>
+          <li>
+            <CheckCircle2 aria-hidden="true" size={18} />{" "}
+            <span>Signers and access reviewed</span>
+            <strong>{agreement.signatories?.length ?? 0} selected</strong>
+          </li>
+          <li>
+            <CheckCircle2 aria-hidden="true" size={18} />{" "}
+            <span>Document preview reviewed</span>
+            <strong>Prepared from draft</strong>
+          </li>
         </ul>
       </PortalCard>
       <Notice tone="warning">
@@ -384,13 +538,33 @@ function ReviewStep({
         </p>
       </Notice>
       <div className={styles.actionRow}>
-        <PortalButton disabled={!draftExists || pending} disabledReason={!draftExists ? "Save this review before creating the agreement record." : undefined} loading={pending} onClick={() => void finalise()} type="button">
+        <PortalButton
+          disabled={!draftExists || pending}
+          disabledReason={
+            !draftExists
+              ? "Save this review before creating the agreement record."
+              : undefined
+          }
+          loading={pending}
+          onClick={() => void finalise()}
+          type="button"
+        >
           Create agreement
         </PortalButton>
-        <PortalButton disabled={pending} onClick={() => void onSave("review", content)} type="button" variant="quiet">
+        <PortalButton
+          disabled={pending}
+          onClick={() => void onSave("review", content)}
+          type="button"
+          variant="quiet"
+        >
           Save draft
         </PortalButton>
-        <PortalButton disabled={pending} onClick={() => void onSave("document", content)} type="button" variant="secondary">
+        <PortalButton
+          disabled={pending}
+          onClick={() => void onSave("document", content)}
+          type="button"
+          variant="secondary"
+        >
           <ArrowLeft aria-hidden="true" size={16} /> Back to document
         </PortalButton>
       </div>
@@ -405,6 +579,7 @@ export function AgreementBuilderStepPanel({
   engagementHref,
   engagements,
   finalise,
+  onBeginEngagement,
   onSave,
   organisationName,
   pending,
@@ -420,16 +595,64 @@ export function AgreementBuilderStepPanel({
   }>): React.JSX.Element {
   switch (step) {
     case "scope":
-      return <ScopeStep agreement={agreement} content={content} onSave={onSave} pending={pending} />;
+      return (
+        <ScopeStep
+          agreement={agreement}
+          content={content}
+          onSave={onSave}
+          pending={pending}
+        />
+      );
     case "fees":
-      return <AgreementBuilderFeesStep agreement={agreement} content={content} onSave={onSave} pending={pending} />;
+      return (
+        <AgreementBuilderFeesStep
+          agreement={agreement}
+          content={content}
+          onSave={onSave}
+          pending={pending}
+        />
+      );
     case "people":
-      return <PeopleStep agreement={agreement} content={content} onSave={onSave} pending={pending} />;
+      return (
+        <PeopleStep
+          agreement={agreement}
+          content={content}
+          onSave={onSave}
+          pending={pending}
+        />
+      );
     case "document":
-      return <DocumentStep agreement={agreement} content={content} onSave={onSave} pending={pending} />;
+      return (
+        <DocumentStep
+          agreement={agreement}
+          content={content}
+          onSave={onSave}
+          pending={pending}
+        />
+      );
     case "review":
-      return <ReviewStep agreement={agreement} content={content} draftExists={draftExists} finalise={finalise} onSave={onSave} pending={pending} />;
+      return (
+        <ReviewStep
+          agreement={agreement}
+          content={content}
+          draftExists={draftExists}
+          finalise={finalise}
+          onSave={onSave}
+          pending={pending}
+        />
+      );
     case "link":
-      return <LinkStep agreement={agreement} content={content} engagementHref={engagementHref} engagements={engagements} onSave={onSave} organisationName={organisationName} pending={pending} />;
+      return (
+        <LinkStep
+          agreement={agreement}
+          content={content}
+          engagementHref={engagementHref}
+          engagements={engagements}
+          onBeginEngagement={onBeginEngagement}
+          onSave={onSave}
+          organisationName={organisationName}
+          pending={pending}
+        />
+      );
   }
 }
