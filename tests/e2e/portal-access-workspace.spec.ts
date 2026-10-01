@@ -1,0 +1,144 @@
+import { expect, test } from "@playwright/test";
+
+test.beforeEach(async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/visual/fss-studio/studio-portal-access");
+  await expect(
+    page.getByRole("heading", { level: 1, name: "People and portal access" }),
+  ).toBeVisible();
+});
+
+test("invitation dialog traps keyboard focus and restores its trigger on Escape", async ({
+  page,
+}) => {
+  const trigger = page.getByRole("button", {
+    name: "Invite client",
+    exact: true,
+  });
+  await expect(
+    page.getByRole("textbox", { name: "Review reference" }),
+  ).not.toBeVisible();
+  await trigger.click();
+  const dialog = page.getByRole("dialog", {
+    name: "Invite client",
+    exact: true,
+  });
+  await expect(dialog).toBeVisible();
+  await dialog.getByLabel("Review reference").fill("review-42");
+  for (let index = 0; index < 8; index += 1) await page.keyboard.press("Tab");
+  expect(
+    await dialog.evaluate((element) =>
+      element.contains(document.activeElement),
+    ),
+  ).toBe(true);
+  await page.keyboard.press("Escape");
+  await expect(dialog).not.toBeVisible();
+  await expect(trigger).toBeFocused();
+});
+
+test("failed invitation keeps entered review details and success refreshes after acknowledgement", async ({
+  page,
+}) => {
+  let requests = 0;
+  await page.route("**/api/portal/admin/portal-access", async (route) => {
+    requests += 1;
+    const command = route.request().postDataJSON();
+    expect(command.action).toBe("invite_existing_client");
+    expect(command.reviewReference).toBe("review-42");
+    await route.fulfill({
+      status: requests === 1 ? 409 : 200,
+      contentType: "application/json",
+      body: JSON.stringify(
+        requests === 1
+          ? { error: "Contact changed. Review and retry." }
+          : { status: "sent" },
+      ),
+    });
+  });
+  await page
+    .getByRole("button", { name: "Invite client", exact: true })
+    .click();
+  const dialog = page.getByRole("dialog", {
+    name: "Invite client",
+    exact: true,
+  });
+  await dialog.getByLabel("Review reference").fill("review-42");
+  await dialog.getByRole("button", { name: "Request invitation" }).click();
+  await expect(dialog.getByRole("alert")).toContainText("Contact changed");
+  await expect(dialog.getByLabel("Review reference")).toHaveValue("review-42");
+  await dialog.getByRole("button", { name: "Request invitation" }).click();
+  await expect(dialog.getByRole("status")).toContainText(
+    "accepted by the provider",
+  );
+  await dialog.getByRole("button", { name: "Done" }).click();
+  await expect(dialog).not.toBeVisible();
+  await expect(page.locator("#portal-access-result")).toBeFocused();
+  await expect(page.getByRole("status")).toContainText(
+    "accepted by the provider",
+  );
+});
+
+test("removal has scoped review and busy controls prevent dismissal", async ({
+  page,
+}) => {
+  let finish: (() => void) | undefined;
+  const waiting = new Promise<void>((resolve) => {
+    finish = resolve;
+  });
+  await page.route("**/api/portal/admin/portal-access", async (route) => {
+    expect(route.request().postDataJSON().action).toBe("revoke_membership");
+    await waiting;
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ status: "revoked" }),
+    });
+  });
+  await page
+    .getByRole("button", { name: "Remove access", exact: true })
+    .click();
+  const dialog = page.getByRole("dialog", {
+    name: "Remove access",
+    exact: true,
+  });
+  await expect(dialog).toContainText(
+    "memberships in other organisations remain separate",
+  );
+  await dialog.getByLabel("Review reference").fill("removal-42");
+  await dialog.getByRole("button", { name: "Confirm removal" }).click();
+  await expect(
+    dialog.getByRole("button", { name: "Confirm removal" }),
+  ).toBeDisabled();
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeVisible();
+  finish?.();
+  await expect(dialog.getByRole("status")).toContainText("Access removed");
+  await dialog.getByRole("button", { name: "Done" }).click();
+  await expect(dialog).not.toBeVisible();
+});
+
+test("dashboard and dialogs reflow without horizontal overflow at enlarged text", async ({
+  page,
+}) => {
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = "200%";
+  });
+  await page
+    .getByRole("button", { name: "Invite client", exact: true })
+    .click();
+  const dialog = page.getByRole("dialog", {
+    name: "Invite client",
+    exact: true,
+  });
+  await expect(dialog).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+  expect(
+    await dialog.evaluate(
+      (element) => element.scrollWidth <= element.clientWidth,
+    ),
+  ).toBe(true);
+});

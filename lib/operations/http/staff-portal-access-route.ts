@@ -11,6 +11,7 @@ import { privateAuthHeaders } from "../auth/http";
 import { fssStudioEnabled } from "../auth/release-flags";
 import { requireFssAdmin } from "../auth/require-admin";
 import { getPortalIdentity } from "../auth/server";
+import { PortalAccessDenied, type VerifiedPortalIdentity } from "../auth/types";
 import type { FssAdminContext } from "../auth/staff-types";
 import { resolvePortalOrigin } from "../auth/configuration";
 import { getOperationsDb, operationsEnabled } from "../db/client";
@@ -42,7 +43,10 @@ export function createStaffPortalAccessRouteHandler<TActor>(
   return async (request) => {
     const correlationId = deps.createCorrelationId();
     const reply = (body: object, status: number) =>
-      Response.json(body, { headers: privateAuthHeaders(correlationId), status });
+      Response.json(body, {
+        headers: privateAuthHeaders(correlationId),
+        status,
+      });
     const failure = (error: string, status: number) => reply({ error }, status);
     if (!deps.enabled) return failure("FSS Studio is unavailable.", 404);
     let actor: TActor;
@@ -53,7 +57,10 @@ export function createStaffPortalAccessRouteHandler<TActor>(
     }
     if (!requestHasRegisteredOrigin(request, deps.origin))
       return failure("The request origin is not allowed.", 403);
-    if (request.headers.get("content-type")?.split(";")[0].trim() !== "application/json")
+    if (
+      request.headers.get("content-type")?.split(";")[0].trim() !==
+      "application/json"
+    )
       return failure("Send a JSON request.", 415);
     try {
       return reply(
@@ -65,6 +72,11 @@ export function createStaffPortalAccessRouteHandler<TActor>(
         200,
       );
     } catch (error) {
+      if (error instanceof PortalAccessDenied)
+        return failure(
+          "Founder authorization is required for FSS staff access.",
+          403,
+        );
       if (error instanceof PortalAccessConflict)
         return failure(error.message, 409);
       if (error instanceof z.ZodError)
@@ -76,31 +88,45 @@ export function createStaffPortalAccessRouteHandler<TActor>(
       const errorName = error instanceof Error ? error.name : "UnknownError";
       deps.reportUnexpectedError({
         correlationId,
-        errorName: /^[A-Za-z]{1,80}$/.test(errorName) ? errorName : "UnknownError",
+        errorName: /^[A-Za-z]{1,80}$/.test(errorName)
+          ? errorName
+          : "UnknownError",
       });
       return failure(
-        "The invitation outcome could not be confirmed. Refresh the access register before trying again.",
+        "The access outcome could not be confirmed. Refresh the access register before trying again.",
         503,
       );
     }
   };
 }
 
-export function staffPortalAccessRoute(): (request: Request) => Promise<Response> {
-  return createStaffPortalAccessRouteHandler<FssAdminContext>({
+export function staffPortalAccessRoute(): (
+  request: Request,
+) => Promise<Response> {
+  return createStaffPortalAccessRouteHandler<{
+    admin: FssAdminContext;
+    identity: VerifiedPortalIdentity;
+  }>({
     authorize: async () => {
       const identity = await getPortalIdentity();
       if (!identity) throw new Error("unauthorized");
-      return requireFssAdmin(getPortalDb(), identity, randomUUID());
+      const admin = await requireFssAdmin(
+        getPortalDb(),
+        identity,
+        randomUUID(),
+      );
+      return { admin, identity };
     },
     createCorrelationId: randomUUID,
     enabled: operationsEnabled() && fssStudioEnabled(),
-    execute: (admin, input) =>
+    execute: ({ admin, identity }, input) =>
       applyStaffPortalAccessOperation(
         getOperationsDb(),
         admin,
         input,
         resolvePortalOrigin(),
+        undefined,
+        identity,
       ),
     origin: new URL(resolveSiteUrl()).origin,
     reportUnexpectedError: (report) =>
