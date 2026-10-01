@@ -17,5 +17,7 @@ export function activationEmail(
     ],
     "",
     content,
+    false,
+    { label: "Activate portal access", url: "{{portal_access_url}}" },
   );
 }

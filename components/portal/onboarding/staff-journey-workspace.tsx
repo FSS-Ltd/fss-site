@@ -1,3 +1,4 @@
+import type { ActiveStudioSettings } from "@/lib/operations/studio/active-settings-types";
 import type { AgreementRegister } from "@/lib/operations/agreements/types";
 import type { SigningApproval } from "@/lib/operations/agreements/signing-types";
 import type {
@@ -25,6 +26,7 @@ type StaffJourneyWorkspaceProps = {
   builderStage?: JourneyBuilderStage;
   workspace: OnboardingWorkspace;
   welcomePacks: readonly WelcomePack[];
+  settings?: ActiveStudioSettings;
 };
 
 export function StaffJourneyWorkspace({
@@ -37,6 +39,7 @@ export function StaffJourneyWorkspace({
   builderStage,
   workspace,
   welcomePacks,
+  settings,
 }: StaffJourneyWorkspaceProps): React.JSX.Element {
   const apiRoot = `/api/portal/admin/clients/${organisationId}`;
 
@@ -83,6 +86,11 @@ export function StaffJourneyWorkspace({
           label: agreement.draft.title,
           version: agreement.version,
         }))}
+        agreementRecords={register.agreements}
+        organisationName={register.organisationName}
+        settings={settings}
+        drafts={workspace.journeyDrafts}
+        billing={billing}
         commandEndpoint={`${apiRoot}/journey`}
         contacts={contacts}
         organisationId={organisationId}
@@ -92,13 +100,10 @@ export function StaffJourneyWorkspace({
           name: template.name,
           version: template.version,
         }))}
-        welcomePacks={welcomePacks.map((pack) => ({
-          id: pack.id,
-          title: pack.title,
-          versions: pack.versions,
-        }))}
+        welcomePacks={welcomePacks}
       />
       <JourneyPreview
+        hideWelcomeForm
         organisationId={organisationId}
         organisationName={register.organisationName}
         agreements={register.agreements}

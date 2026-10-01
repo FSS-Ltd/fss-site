@@ -24,16 +24,23 @@ export default defineConfig({
   snapshotPathTemplate:
     "{testDir}/{testFilePath}-snapshots/{arg}-{projectName}-{platform}{ext}",
   testDir: "tests/e2e",
-  testMatch: "fss-studio.visual.spec.ts",
+  testMatch: [
+    "fss-studio.visual.spec.ts",
+    "portal-access-workspace.spec.ts",
+    "welcome-composer.spec.ts",
+    "welcome-rendered-review.spec.ts",
+    "studio-settings.spec.ts",
+  ],
   timeout: 30_000,
   use: {
     baseURL: visualBaseUrl,
     trace: "retain-on-failure",
   },
   webServer: {
-    command: `FSS_VISUAL_TESTS_ENABLED=true pnpm exec next dev --webpack --port ${visualServerPort}`,
+    command: `FSS_VISUAL_TESTS_ENABLED=true npm run dev -- --port ${visualServerPort}`,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
-    url: visualBaseUrl,
+    // Wait for the shared fixture route to compile before interaction timers begin.
+    url: `${visualBaseUrl}/visual/fss-studio/studio-portal-access`,
   },
 });

@@ -1,0 +1,85 @@
+.cover {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: center;
+}
+.artwork {
+  position: relative;
+  width: 240px;
+  height: 180px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.artwork img,
+.sectionArtwork img {
+  object-fit: cover;
+}
+.coverCopy {
+  display: grid;
+  gap: 12px;
+  flex: 1 1 260px;
+}
+.coverCopy h3,
+.coverCopy p {
+  margin: 0;
+}
+.coverCopy p {
+  color: var(--portal-muted);
+  line-height: 1.6;
+}
+.coverCopy a {
+  width: fit-content;
+}
+.reader {
+  margin-top: 24px;
+  border-top: 1px solid var(--portal-line);
+}
+.reader summary {
+  cursor: pointer;
+  padding: 16px 0;
+  min-height: 44px;
+  font-weight: 600;
+}
+.reader summary:focus-visible {
+  outline: 2px solid var(--portal-accent);
+  outline-offset: 4px;
+}
+.pages {
+  display: grid;
+  gap: 24px;
+  max-width: 760px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.pages section {
+  padding-top: 16px;
+  border-top: 1px solid var(--portal-line);
+}
+.pages h4 {
+  font-size: 1.25rem;
+  margin: 0 0 16px;
+}
+.sectionNumber {
+  color: var(--portal-muted);
+  font-size: 0.875rem;
+  margin: 0 0 8px;
+}
+.sectionArtwork {
+  position: relative;
+  height: 220px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.pages li + li {
+  margin-top: 12px;
+}
+@media (max-width: 680px) {
+  .artwork {
+    width: 100%;
+  }
+  .coverCopy a {
+    width: 100%;
+  }
+}

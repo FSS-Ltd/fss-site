@@ -19,5 +19,7 @@ export function thankYouEmail(
     ],
     "",
     snapshot.content,
+    false,
+    { label: "Open client workspace", url: portalUrl },
   );
 }

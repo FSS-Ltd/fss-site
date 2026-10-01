@@ -1,9 +1,21 @@
+import { readClientWelcomePacket } from "./client-packet";
+import type { ClientWelcomePacket } from "./client-packet-contract";
 import { z } from "zod";
-import { hasPortalCapability, getPortalRolePresentation } from "../auth/permissions";
-import { PortalAccessDenied, type PortalRole, type VerifiedPortalIdentity } from "../auth/types";
+import {
+  hasPortalCapability,
+  getPortalRolePresentation,
+} from "../auth/permissions";
+import {
+  PortalAccessDenied,
+  type PortalRole,
+  type VerifiedPortalIdentity,
+} from "../auth/types";
 import type { OperationsDb, OperationsTransaction } from "../db/client";
 import { withPortalTransaction } from "../db/portal-client";
-import { loadClientSetupChecklist, type ClientSetupChecklist } from "./client-checklist";
+import {
+  loadClientSetupChecklist,
+  type ClientSetupChecklist,
+} from "./client-checklist";
 import { parseOnboardingWorkspace } from "./queries";
 import type { OnboardingWorkspaceTask } from "./workspace-types";
 
@@ -71,6 +83,7 @@ export type ClientOnboardingTask = Readonly<{
 }>;
 
 export type ClientOnboardingWorkspace = Readonly<{
+  welcomePacket?: ClientWelcomePacket | null;
   checklist: ClientSetupChecklist;
   tasks: readonly ClientOnboardingTask[];
   requiredTasksComplete: boolean;
@@ -103,7 +116,9 @@ function actionForTask(task: OnboardingWorkspaceTask): ClientTaskAction {
   return { type: "wait_for_fss" };
 }
 
-function projectClientTask(task: OnboardingWorkspaceTask): ClientOnboardingTask {
+function projectClientTask(
+  task: OnboardingWorkspaceTask,
+): ClientOnboardingTask {
   return {
     id: task.id,
     templateVersionId: task.templateVersionId,
@@ -205,7 +220,10 @@ export async function loadClientOnboardingWorkspace(
       if (!hasPortalCapability(context.role, "onboarding.read"))
         throw new PortalAccessDenied();
       try {
-        return await loadClientWorkspaceInTransaction(tx, organisationId);
+        return {
+          ...(await loadClientWorkspaceInTransaction(tx, organisationId)),
+          welcomePacket: await readClientWelcomePacket(tx, organisationId),
+        };
       } catch (error) {
         return mapPortalScopeError(error);
       }
@@ -237,13 +255,7 @@ export async function completeClientProfile(
           "profile",
         );
         if (task.state !== "complete")
-          await completeTask(
-            tx,
-            organisationId,
-            task.id,
-            command.profile,
-            [],
-          );
+          await completeTask(tx, organisationId, task.id, command.profile, []);
         return { taskId: task.id, state: "complete" };
       } catch (error) {
         return mapPortalScopeError(error);

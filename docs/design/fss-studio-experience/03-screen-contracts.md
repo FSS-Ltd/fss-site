@@ -3192,3 +3192,12 @@ This agreement becomes signed only after verified evidence for every required pa
 ## F38–F43 · Active FSS Studio registers
 
 The route register now includes client-scoped agreements, requests, and signing status, plus the cross-client project register, project creation form, and project document register. Each screen uses the current `/portal/admin` route family, permission boundary, and matching desktop/mobile visual case.
+
+## Welcome and operations implementation contract · 2026-10-01
+
+- **F19–F23:** one persistent five-stage composer (Setup, Content, Access, Schedule, Review). Published packet selection applies content and checklist together. Saved packet edits, recipient, permission, invoice choice and stage restore from the scoped draft. Review uses the generated email and exact PDF, and rechecks agreement, settings revision, contact and checklist provenance at the server boundary.
+- **F26:** a cover-card library for Website Build, Website + SEO and Systems Portal. Editing opens inside the chosen packet, with desktop editing beside preview and explicit mobile Edit/Preview controls. Email, Packet and Checklist previews are available. Designed editions enter the existing save/publish process; existing published packs and edited drafts are preserved.
+- **F28:** aggregate access cards count the complete authorised dataset independently of filters and pagination. Clients, FSS staff and Invitations views contain identity cards. Invitations and removals use focused dialogs with retained errors, pending dismissal protection and restored focus. Verified founder capability gates staff administration on the server.
+- **F30:** active Identity, Communication, Timezone and Delivery cards expose contextual edits with Save and apply. Conflicting revisions retain edits until the administrator reviews current values. Availability reports deployment configuration, rather than provider health. Historical drafts do not apply automatically.
+- **Client Getting started:** the approved welcome packet appears before progress and the next available task, with an equivalent semantic reading view and tenant-authorised download of the retained PDF.
+- **Compatibility:** legacy five-section packs and approved bytes remain readable and valid. New ten-page approvals retain renderer version, resolved content, active settings revision and PDF hash. Welcome scheduling remains 09:00 Europe/London regardless of display timezone.

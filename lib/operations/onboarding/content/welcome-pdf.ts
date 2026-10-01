@@ -1,15 +1,19 @@
+import { packetAccessibleHtml } from "./packet-html";
+import { renderPacketPdf } from "./packet-pdf";
 import PDFDocument from "pdfkit";
 import { supportsSigningText } from "../../agreements/signing-text";
 import type { WelcomeContent } from "../types";
 import { escapeHtml } from "./welcome-email";
 export const welcomePdfLimit = 2 * 1024 * 1024;
 export function welcomeAccessibleHtml(content: WelcomeContent): string {
+  if (content.rendererVersion === 2) return packetAccessibleHtml(content);
   const clientName = content.clientOrganisationName ?? content.organisationName;
   return `<section aria-label="Welcome guide"><h1>${escapeHtml(clientName)}: your welcome guide</h1>${content.pages.map((page) => `<section><h2>${escapeHtml(page.title)}</h2>${page.paragraphs.map((p) => `<p>${escapeHtml(p)}</p>`).join("")}</section>`).join("")}</section>`;
 }
 export async function renderWelcomePdf(
   content: WelcomeContent,
 ): Promise<Buffer> {
+  if (content.rendererVersion === 2) return renderPacketPdf(content);
   if (
     content.pages.length < 4 ||
     content.pages.length > 6 ||

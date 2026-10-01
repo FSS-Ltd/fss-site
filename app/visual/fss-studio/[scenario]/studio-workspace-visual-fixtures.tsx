@@ -113,6 +113,9 @@ export function StudioPortalAccessScenario(): React.JSX.Element {
     <StudioFixture>
       <PortalAccessWorkspace
         data={{
+          view: "clients",
+          canManageStaff: true,
+          metrics: { activeClientUsers: 24, activeStaff: 3, pendingInvitations: 4, attentionInvitations: 1 },
           contacts: [
             {
               email: "a***@northstar.example",
@@ -125,6 +128,8 @@ export function StudioPortalAccessScenario(): React.JSX.Element {
           hasNext: false,
           items: [
             {
+              accessType: "client",
+              joinedAt: "2026-09-20T10:00:00.000Z",
               contactId: "1496e680-481d-4f84-9dc3-f68659520852",
               email: "alex@northstar.example",
               expiresAt: null,
@@ -183,6 +188,14 @@ export function StudioSettingsScenario(): React.JSX.Element {
     <StudioFixture>
       <StudioSettings
         settings={{
+          active: {
+            deliveryCapacity: "standard",
+            displayName: "Faithful Software Solutions",
+            replyTo: null,
+            responseExpectationHours: 48,
+            revision: 1,
+            timezone: "Europe/London",
+          },
           approvedReplyTo: [],
           draft: {
             createdAt: "2026-09-20T10:00:00.000Z",
@@ -193,7 +206,7 @@ export function StudioSettingsScenario(): React.JSX.Element {
             revision: 2,
             timezone: "Europe/London",
           },
-          integrationHealth: [
+          integrationConfiguration: [
             { available: true, detail: "Identity is managed by the portal deployment.", name: "Authentication" },
             { available: false, detail: "Request email delivery is deployment-managed.", name: "Email" },
             { available: true, detail: "Agreement signing uses retained approval evidence.", name: "Signing" },

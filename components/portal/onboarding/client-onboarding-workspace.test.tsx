@@ -137,3 +137,48 @@ test("renders truthful task-specific guidance without membership controls", () =
   assert.match(blockedHtml, /Complete the previous required step first/);
   assert.doesNotMatch(profileHtml, /Owner role.*select/i);
 });
+
+test("shows the approved welcome packet with authenticated download and semantic reading", () => {
+  const html = renderToStaticMarkup(
+    <ClientOnboardingWorkspaceView
+      organisationId="73da6acb-e24f-4e2f-bd90-13d58634ad39"
+      workspace={{
+        ...workspace,
+        welcomePacket: {
+          approvalId: "fbe3b65b-1d8c-4ffd-8f7d-fcb7a56d72cb",
+          approvedAt: "2026-10-01T09:00:00Z",
+          title: "Clear Harbour: your welcome guide",
+          organisationName: "Faithful Software Solutions",
+          senderName: "Jean",
+          pages: [
+            {
+              title: "Your priorities",
+              paragraphs: ["The approved priorities are clear."],
+            },
+          ],
+        },
+      }}
+    />,
+  );
+  assert.match(html, /Read your welcome packet/);
+  assert.match(
+    html,
+    /\/api\/portal\/organisations\/73da6acb-e24f-4e2f-bd90-13d58634ad39\/onboarding\/packet\/fbe3b65b-1d8c-4ffd-8f7d-fcb7a56d72cb\/download/,
+  );
+  assert.match(html, /The approved priorities are clear\./);
+  assert.doesNotMatch(html, /dangerouslySetInnerHTML/);
+});
+
+test("explains when the approved client packet is not yet available", () => {
+  const html = renderToStaticMarkup(
+    <ClientOnboardingWorkspaceView
+      organisationId="73da6acb-e24f-4e2f-bd90-13d58634ad39"
+      workspace={{ ...workspace, welcomePacket: null }}
+    />,
+  );
+  assert.match(
+    html,
+    /FSS will add your packet once the welcome materials are approved/,
+  );
+  assert.doesNotMatch(html, /Download PDF/);
+});

@@ -1,4 +1,8 @@
 import { z } from "zod";
+import {
+  packetPageMetadataShape,
+  validatePacketPages,
+} from "./packet-metadata";
 import { onboardingTaskDefinitionSchema } from "./workspace-schema";
 
 export const welcomePackIds = [
@@ -31,43 +35,56 @@ const copy = z
     "Use only supported client detail placeholders.",
   );
 
-export const welcomePackContentSchema = z.strictObject({
-  emailSubject: copy.max(160),
-  emailBody: copy,
-  guide: z
-    .array(
-      z.strictObject({
-        title: copy.max(100),
-        paragraphs: z.array(copy.max(2_000)).min(1).max(8),
-      }),
-    )
-    .length(5),
-  thankYou: z.strictObject({
-    subject: copy.max(200),
-    intro: copy.max(2_000),
-    nextStep: copy.max(2_000),
-    requiredAction: copy.max(2_000),
-  }),
-  tasks: z
-    .array(onboardingTaskDefinitionSchema)
-    .min(1)
-    .max(30)
-    .superRefine((tasks, context) => {
-      for (const [index, task] of tasks.entries()) {
-        if (
-          /{{[^{}]+}}/.test(task.title) ||
-          /{{[^{}]+}}/.test(task.instructions)
-        ) {
-          context.addIssue({
-            code: "custom",
-            path: [index],
-            message:
-              "Checklist tasks use fixed client instructions without template placeholders.",
-          });
-        }
-      }
+export const welcomePackContentSchema = z
+  .strictObject({
+    rendererVersion: z.literal(2).optional(),
+    edition: z.enum(welcomePackIds).optional(),
+    emailSubject: copy.max(160),
+    emailBody: copy,
+    guide: z
+      .array(
+        z.strictObject({
+          title: copy.max(100),
+          ...packetPageMetadataShape,
+          paragraphs: z.array(copy.max(2_000)).min(1).max(8),
+        }),
+      )
+      .min(1)
+      .max(9),
+    thankYou: z.strictObject({
+      subject: copy.max(200),
+      intro: copy.max(2_000),
+      nextStep: copy.max(2_000),
+      requiredAction: copy.max(2_000),
     }),
-});
+    tasks: z
+      .array(onboardingTaskDefinitionSchema)
+      .min(1)
+      .max(30)
+      .superRefine((tasks, context) => {
+        for (const [index, task] of tasks.entries()) {
+          if (
+            /{{[^{}]+}}/.test(task.title) ||
+            /{{[^{}]+}}/.test(task.instructions)
+          ) {
+            context.addIssue({
+              code: "custom",
+              path: [index],
+              message:
+                "Checklist tasks use fixed client instructions without template placeholders.",
+            });
+          }
+        }
+      }),
+  })
+  .superRefine((value, context) => {
+    validatePacketPages(
+      { ...value, pages: value.guide },
+      context,
+      [5, 5],
+      "guide",
+    );
+  });
 
 export type WelcomePackContent = z.infer<typeof welcomePackContentSchema>;
 export type WelcomePackVersion = Readonly<{

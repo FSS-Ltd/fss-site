@@ -15,7 +15,7 @@
   min-height: 44px;
   padding: 11px 14px;
   border-radius: 10px;
-  background: var(--portal-navy, #07182e);
+  background: var(--portal-action, #0f7078);
   color: var(--portal-on-action, #ffffff);
   font-size: 0.875rem;
   font-weight: 700;

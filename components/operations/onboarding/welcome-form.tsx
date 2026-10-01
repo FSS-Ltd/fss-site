@@ -88,7 +88,8 @@ export function WelcomeForm({
     if (selectedPack && !selectedWorkspaceDraft) return;
 
     const pages = selectedPack
-      ? selectedPack.version.content.guide.map((_page, index) => ({
+      ? selectedPack.version.content.guide.map((page, index) => ({
+          ...page,
           title: value(`page-title-${index}`),
           paragraphs: value(`page-${index}`)
             .split(/\n\s*\n/)
@@ -125,6 +126,8 @@ export function WelcomeForm({
           replyTo: value("replyTo"),
           ...(selectedPack
             ? {
+                rendererVersion: selectedPack.version.content.rendererVersion,
+                edition: selectedPack.version.content.edition,
                 welcomePackVersionId: selectedPack.version.id,
                 emailSubject: value("emailSubject"),
                 emailBody: value("emailBody"),
