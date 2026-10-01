@@ -1,6 +1,6 @@
 # FSS welcome and operations implementation handoff
 
-Updated: 2026-10-01. Status: implemented and verified locally; production rollout requires explicit approval.
+Updated: 2026-10-02. Status: implemented and verified locally; production rollout requires explicit approval.
 
 ## Delivered
 
@@ -24,6 +24,16 @@ Next.js and eslint-config-next are patched to 16.3.8. Existing React Email Butto
 - Desktop/mobile browser flows: 36/36 passed on patched Next.js, including keyboard focus restoration, real PDF preview/download and hash, draft restore, settings consumers/conflicts, dark appearance and 200% text. The first cold run exposed two navigation timeouts during initial compilation; the runner now waits for the fixture route before starting interaction timers.
 - All 30 PDF pages and four desktop/mobile welcome-message families were rendered and visually inspected. Blocked images, narrow email layouts, semantic reading, actual PDF bytes/hash, missing facts, overflow, legacy approvals, tenant boundaries, founder capability, settings conflicts and consumers were verified.
 - Dependency production audit: no known vulnerabilities. git diff --check: passed.
+
+## Unique imagery refinement, 2026-10-02
+
+New designed editions use each photograph exactly once across the set: three distinct covers and the Systems Portal service overview. Other sections use searchable editorial text and native process diagrams. The twelve service/stage email variants each use an original diagram composition, served as a small email-compatible PNG. No cropped or tinted duplicates are used. `scripts/generate-welcome-email-artwork.ts` reproduces these assets with the existing Sharp dependency.
+
+The typed `text` section layout permits image-free pages; image layouts still require approved image identifiers. New packet drafts carry `emailArtworkVersion: 1` through personalisation, draft saves and approvals. Missing artwork version retains the original renderer-2 email header. Retained renderer-2 PDF and email bytes were compared against the previous commit and remain identical; regression hashes now enforce this. Edited drafts and published versions require deliberate replacement through the existing draft/publish flow.
+
+Refinement checks: 82 onboarding/component unit tests and 20 desktop/mobile welcome browser tests passed; TypeScript, scoped ESLint, changed-file formatting and the production build passed. All 30 PDF pages and all 12 email variants were rendered and inspected, including 24 desktop/mobile email captures with blocked images. Asset paths and content hashes are unique across all 16 material images. The PDFs remain ten pages, searchable and below 2 MB. Database integration tests were not repeated for this presentation-only refinement; the previous 148-test integration run remains recorded above. CI, live mail-client delivery and production rollout remain unexecuted.
+
+Refinement files: packet contract/metadata/copy, PDF/editorial/HTML/email renderers, `email-artwork.ts`, journey draft propagation and preview, packet and browser regression tests, the artwork generator, twelve files in `public/images/welcome/`, and this handoff/rollout guidance. Unrelated commercial changes were preserved.
 
 ## Remaining release conditions
 

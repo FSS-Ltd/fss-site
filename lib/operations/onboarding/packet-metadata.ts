@@ -12,6 +12,7 @@ export const packetSectionIds = [
   "next_steps",
 ] as const;
 export const packetLayouts = [
+  "text",
   "image_top",
   "image_left",
   "image_right",
@@ -54,9 +55,18 @@ export const packetPageMetadataShape = {
   imageId: z.enum(packetImageIds).optional(),
 };
 
+export function packetLayoutNeedsImage(layout: PacketLayout): boolean {
+  return (
+    layout === "image_top" ||
+    layout === "image_left" ||
+    layout === "image_right"
+  );
+}
+
 export function validatePacketPages(
   value: {
     rendererVersion?: 2;
+    emailArtworkVersion?: 1;
     edition?: string;
     pages: {
       sectionId?: PacketSectionId;
@@ -81,6 +91,7 @@ export function validatePacketPages(
     }
     if (
       value.edition ||
+      value.emailArtworkVersion ||
       value.pages.some((page) => page.sectionId || page.layout || page.imageId)
     ) {
       context.addIssue({
@@ -106,7 +117,7 @@ export function validatePacketPages(
     if (
       page.sectionId !== packetSectionIds[index] ||
       !page.layout ||
-      !page.imageId
+      (packetLayoutNeedsImage(page.layout) && !page.imageId)
     ) {
       context.addIssue({
         code: "custom",

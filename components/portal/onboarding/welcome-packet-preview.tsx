@@ -9,6 +9,7 @@ import {
   packetAssets,
 } from "@/lib/operations/onboarding/packet-editions";
 import styles from "./welcome-packet.module.css";
+import { getEmailArtwork } from "@/lib/operations/onboarding/email-artwork";
 
 export function WelcomePacketPreview({
   content,
@@ -28,7 +29,17 @@ export function WelcomePacketPreview({
   const imageId =
     cover && content.edition
       ? getPacketEdition(content.edition).coverImageId
-      : (section?.imageId ?? "workflow");
+      : section?.imageId;
+  const emailArtwork = getEmailArtwork(
+    content.edition ?? "website_build",
+    "welcome",
+  );
+  const emailImage =
+    content.emailArtworkVersion === 1
+      ? emailArtwork
+      : packetAssets[
+          getPacketEdition(content.edition ?? "website_build").coverImageId
+        ];
   const diagram =
     !cover && (section?.layout === "process" || section?.layout === "timeline");
   const previewCopy = (value: string) =>
@@ -79,11 +90,11 @@ export function WelcomePacketPreview({
               <h3>{previewCopy(content.emailSubject)}</h3>
             </div>
             <Image
-              alt=""
-              className={styles.pageImage}
-              src="/images/editorial/services-workflow-v1.webp"
+              alt={emailImage.alt}
+              className={styles.emailArtwork}
+              src={emailImage.src}
               width={640}
-              height={400}
+              height={content.emailArtworkVersion === 1 ? 280 : 400}
             />
             <div className={styles.emailBody}>
               {previewCopy(content.emailBody)
@@ -104,7 +115,7 @@ export function WelcomePacketPreview({
             className={`${styles.page} ${cover ? styles.pageCover : ""}`}
             data-layout={section?.layout}
           >
-            {!diagram ? (
+            {imageId && !diagram ? (
               <Image
                 alt={packetAssets[imageId].alt}
                 className={styles.pageImage}

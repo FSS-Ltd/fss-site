@@ -64,6 +64,7 @@ export function createDesignedWelcomePack(
     `${prefix}-0000-4000-8000-00000000000${number}`;
   return {
     rendererVersion: 2,
+    emailArtworkVersion: 1,
     edition: packId,
     emailSubject: `${edition.title}: next steps for {{client_name}}`,
     emailBody: `Hello {{contact_first_name}},\n\nYour ${edition.title.toLowerCase()} welcome packet explains how we will approach {{agreement_goal}}. The proposed scope is {{agreement_scope}}.\n\nRead the attached packet, check the priorities, and prepare the inputs described in your checklist. We will send the proposal separately for review and signature. Dates and milestones remain to be agreed.\n\nReply if a priority needs changing so we can confirm the plan before work begins.\n\n{{sender_name}}\nFaithful Software Solutions`,

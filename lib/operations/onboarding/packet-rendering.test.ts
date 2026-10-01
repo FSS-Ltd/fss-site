@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { createHash } from "node:crypto";
 import { welcomePackContentSchema } from "./welcome-pack-contract";
 import { welcomeFixtureInput } from "./fixtures";
 import { prepareWelcome, validatePreparedWelcome } from "./approval";
@@ -39,6 +40,32 @@ const modernInput = () => {
     },
   };
 };
+
+test("retained renderer-2 packets and emails keep their original bytes", async () => {
+  const { renderPacketPdf } = await import("./content/packet-pdf");
+  const { packetEmail } = await import("./content/packet-email");
+  const prepared = await prepareWelcome(modernInput());
+  const hash = (value: Buffer | string) =>
+    createHash("sha256").update(value).digest("hex");
+  assert.equal(
+    hash(await renderPacketPdf(prepared.snapshot.content)),
+    "144abe352956ec5c271420c9cfbe7842f697e352d737808fe4dc69abefa6a8c3",
+  );
+  assert.equal(
+    hash(
+      JSON.stringify(
+        packetEmail(
+          "sam@example.test",
+          "Welcome",
+          ["Hello Sam,", "Your project starts with a clear plan."],
+          "",
+          prepared.snapshot.content,
+        ),
+      ),
+    ),
+    "11f21d37156aac7019182e7f31258600e740a9e94d9eb152e8bd6eee77e3e4ed",
+  );
+});
 
 test("modern approval accepts nine typed sections and generates ten pages", async () => {
   const prepared = await prepareWelcome(modernInput());
@@ -92,8 +119,8 @@ test("modern pack publishing accepts nine typed sections", () => {
 });
 
 test("every edition renders a deterministic ten-page packet with editable complete copy", async () => {
-  const { createDesignedWelcomePack, getPacketEdition, packetAssets } =
-    await import("./packet-editions");
+  const { createDesignedWelcomePack } = await import("./packet-editions");
+  const { getEmailArtwork } = await import("./email-artwork");
   for (const edition of [
     "website_build",
     "website_seo",
@@ -113,6 +140,7 @@ test("every edition renders a deterministic ten-page packet with editable comple
     const content = {
       ...input.content,
       edition,
+      emailArtworkVersion: pack.emailArtworkVersion,
       pages: pack.guide.map((page) => ({
         ...page,
         title: resolveCopy(page.title),
@@ -131,7 +159,7 @@ test("every edition renders a deterministic ten-page packet with editable comple
     assert.ok(prepared.pdf.length < 2 * 1024 * 1024);
     assert.ok(
       prepared.snapshot.welcome.html.includes(
-        `src="https://faithfulsoftware.dev${packetAssets[getPacketEdition(edition).coverImageId].src}"`,
+        `src="https://faithfulsoftware.dev${getEmailArtwork(edition, "welcome").src}"`,
       ),
     );
     for (const page of content.pages)

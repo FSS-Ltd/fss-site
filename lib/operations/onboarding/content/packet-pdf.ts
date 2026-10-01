@@ -9,6 +9,8 @@ import {
 } from "../packet-editions";
 import type { PacketImageId } from "../packet-editions";
 import type { WelcomeContent, WelcomePage } from "../types";
+import { packetLayoutNeedsImage } from "../packet-metadata";
+import { editorialSectionBody } from "./packet-editorial-page";
 
 const navy = "#10233F";
 const teal = "#276B65";
@@ -63,7 +65,7 @@ function sectionPage(
   document: PDFKit.PDFDocument,
   page: WelcomePage,
   index: number,
-  image: Buffer,
+  image?: Buffer,
 ): void {
   document.addPage();
   document.rect(0, 0, document.page.width, 92).fill(navy);
@@ -87,6 +89,11 @@ function sectionPage(
   );
   document.text(page.title, 48, 120, { width: 499, lineGap: 4 });
   const top = 138 + titleHeight;
+  if (!image) {
+    editorialSectionBody(document, page, index + 1, top);
+    footer(document, index + 2);
+    return;
+  }
   const side = page.layout === "image_left" || page.layout === "image_right";
   const imageLeft = page.layout === "image_left";
   const imageX = side ? (imageLeft ? 48 : 319) : 48;
@@ -147,9 +154,9 @@ export async function renderPacketPdf(
   for (const [index, page] of content.pages.entries()) {
     if (
       page.sectionId !== packetSectionIds[index] ||
-      !page.imageId ||
       !page.layout ||
-      !Object.hasOwn(packetAssets, page.imageId)
+      (packetLayoutNeedsImage(page.layout) && !page.imageId) ||
+      (page.imageId && !Object.hasOwn(packetAssets, page.imageId))
     )
       throw new Error(`Packet section ${page.title} needs approved metadata.`);
   }
@@ -224,7 +231,7 @@ export async function renderPacketPdf(
     footer(document, 1);
     content.pages.forEach((page, index) => {
       const image = page.imageId ? loaded.get(page.imageId) : undefined;
-      if (!image)
+      if (page.imageId && !image)
         throw new Error(`Packet section ${page.title} image is unavailable.`);
       sectionPage(document, page, index, image);
     });

@@ -1,10 +1,12 @@
 import type { ApprovedEmail } from "../types";
 import type { WelcomePackId } from "../welcome-pack-contract";
 import { getPacketEdition } from "../packet-editions";
+import type { WelcomeEmailKind } from "../email-artwork";
 import { escapeHtml, paragraphHtml } from "./email-html";
 import {
   emailActionHtml,
   emailImageHtml,
+  emailArtworkHtml,
   type EmailPrimaryAction,
 } from "./email-fragments.node";
 
@@ -18,13 +20,17 @@ export function packetEmail(
     replyTo: string;
     organisationName?: string;
     edition?: WelcomePackId;
+    emailArtworkVersion?: 1;
   },
   primaryAction?: EmailPrimaryAction,
+  kind: WelcomeEmailKind = "welcome",
 ): ApprovedEmail {
   const brand = sender.organisationName ?? "Faithful Software Solutions";
-  const image = emailImageHtml(
-    getPacketEdition(sender.edition ?? "website_build").coverImageId,
-  );
+  const edition = sender.edition ?? "website_build";
+  const image =
+    sender.emailArtworkVersion === 1
+      ? emailArtworkHtml(edition, kind)
+      : emailImageHtml(getPacketEdition(edition).coverImageId);
   const body = paragraphs
     .map(
       (paragraph) =>

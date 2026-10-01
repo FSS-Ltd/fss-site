@@ -126,6 +126,32 @@ test("packet editing survives all five stages and save records the chosen conten
   expect(JSON.stringify(commands[0].content)).toContain(
     "A personal welcome for Northstar",
   );
+  expect(JSON.stringify(commands[0].content)).toContain(
+    '"emailArtworkVersion":1',
+  );
+});
+
+test("packet preview has no fallback photograph and the email has its own artwork", async ({
+  page,
+}, testInfo) => {
+  await mockCommands(page);
+  await openBuilder(page);
+  await choosePacket(page);
+  if (testInfo.project.name.includes("mobile"))
+    await page.getByRole("button", { name: "Preview", exact: true }).click();
+  const preview = page.getByRole("region", { name: "Welcome packet preview" });
+  await expect(preview.getByRole("img")).toHaveCount(1);
+  await preview.getByRole("button", { name: "Next", exact: true }).click();
+  await expect(preview.getByRole("img")).toHaveCount(0);
+  await preview.getByRole("button", { name: "Email", exact: true }).click();
+  await expect(preview.getByRole("img")).toHaveAttribute(
+    "alt",
+    "Website structure and content planning",
+  );
+  await expect(preview.getByRole("img")).toHaveAttribute(
+    "src",
+    /website-build-welcome-v1/,
+  );
 });
 
 test("restoring a saved draft restores personalised content, permissions and stage", async ({

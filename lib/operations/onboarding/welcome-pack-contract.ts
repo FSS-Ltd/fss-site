@@ -38,6 +38,7 @@ const copy = z
 export const welcomePackContentSchema = z
   .strictObject({
     rendererVersion: z.literal(2).optional(),
+    emailArtworkVersion: z.literal(1).optional(),
     edition: z.enum(welcomePackIds).optional(),
     emailSubject: copy.max(160),
     emailBody: copy,

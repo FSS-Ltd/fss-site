@@ -2,6 +2,12 @@ import * as nodeModule from "node:module";
 import { resolve } from "node:path";
 import { organisation } from "../../../seo/organisation";
 import { packetAssets, type PacketImageId } from "../packet-editions";
+import {
+  getEmailArtwork,
+  type EmailArtwork,
+  type WelcomeEmailKind,
+} from "../email-artwork";
+import type { WelcomePackId } from "../welcome-pack-contract";
 
 type EmailRuntime = Pick<typeof import("react"), "createElement"> &
   Pick<typeof import("react-dom/server.node"), "renderToStaticMarkup"> &
@@ -37,15 +43,25 @@ function emailRuntime(): EmailRuntime {
 }
 
 export function emailImageHtml(imageId: PacketImageId): string {
+  return imageHtml(packetAssets[imageId]);
+}
+
+export function emailArtworkHtml(
+  edition: WelcomePackId,
+  kind: WelcomeEmailKind,
+): string {
+  return imageHtml(getEmailArtwork(edition, kind), 280);
+}
+
+function imageHtml(asset: EmailArtwork, height = 400): string {
   const { createElement, renderToStaticMarkup, Img } = emailRuntime();
-  const asset = packetAssets[imageId];
   const url = new URL(asset.src, organisation.url).href;
   return renderToStaticMarkup(
     createElement(Img, {
       src: url,
       alt: asset.alt,
       width: 640,
-      height: 400,
+      height,
       fetchPriority: "low",
       style: {
         display: "block",

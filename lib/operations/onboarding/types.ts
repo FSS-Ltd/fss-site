@@ -37,6 +37,7 @@ export interface WelcomePage {
 }
 export interface WelcomeContent {
   rendererVersion?: 2;
+  emailArtworkVersion?: 1;
   edition?: WelcomePackId;
   settingsRevision?: number;
   responseExpectationHours?: number;

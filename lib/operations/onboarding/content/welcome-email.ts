@@ -3,6 +3,7 @@ import type { WelcomePackId } from "../welcome-pack-contract";
 import { escapeHtml, paragraphHtml } from "./email-html";
 import type { EmailPrimaryAction } from "./email-fragments.node";
 import { packetEmail } from "./packet-email";
+import type { WelcomeEmailKind } from "../email-artwork";
 export { escapeHtml } from "./email-html";
 
 export function emailFromParagraphs(
@@ -15,10 +16,12 @@ export function emailFromParagraphs(
     replyTo: string;
     rendererVersion?: 2;
     edition?: WelcomePackId;
+    emailArtworkVersion?: 1;
     organisationName?: string;
   },
   branded = false,
   primaryAction?: EmailPrimaryAction,
+  kind: WelcomeEmailKind = "welcome",
 ): ApprovedEmail {
   if (sender.rendererVersion === 2)
     return packetEmail(
@@ -28,6 +31,7 @@ export function emailFromParagraphs(
       appendix,
       sender,
       primaryAction,
+      kind,
     );
   const brandHeader = branded
     ? `<header style="margin:-24px -24px 28px;padding:28px 24px;background:#10233f;color:#ffffff;border-bottom:4px solid #8ca998;"><p style="margin:0;font-size:12px;letter-spacing:1.4px;font-weight:700;">FAITHFUL SOFTWARE SOLUTIONS</p><p style="margin:10px 0 0;font-size:22px;line-height:1.3;font-weight:700;">A clear start to your project</p></header>`

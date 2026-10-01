@@ -28,6 +28,7 @@ export const welcomeInputSchema = z
     content: z
       .object({
         rendererVersion: z.literal(2).optional(),
+        emailArtworkVersion: z.literal(1).optional(),
         edition: z.enum(welcomePackIds).optional(),
         settingsRevision: z.number().int().nonnegative().optional(),
         responseExpectationHours: z.number().int().min(1).max(168).optional(),

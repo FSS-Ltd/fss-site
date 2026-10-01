@@ -11,8 +11,7 @@ export function designedPacketGuide(
   return [
     {
       sectionId: "welcome",
-      layout: "image_top",
-      imageId: "human_craft",
+      layout: "text",
       title: "Welcome and your guide",
       paragraphs: [
         "Hello {{contact_first_name}}. This guide gives {{client_name}} a practical starting point for the work ahead. We will make decisions against your agreed priorities and confirm details with you before delivery begins.",
@@ -22,8 +21,7 @@ export function designedPacketGuide(
     },
     {
       sectionId: "project",
-      layout: "image_left",
-      imageId: "mission_systems",
+      layout: "text",
       title: "Your project at a glance",
       paragraphs: [
         "Client: {{client_name}}. Your project contact: {{contact_first_name}}. FSS contact: {{sender_name}}.",
@@ -34,8 +32,8 @@ export function designedPacketGuide(
     },
     {
       sectionId: "services",
-      layout: "image_right",
-      imageId: portal ? "community_portal" : "workflow",
+      layout: portal ? "image_right" : "text",
+      ...(portal ? { imageId: "community_portal" as const } : {}),
       title: "Your service overview",
       paragraphs: [
         portal
@@ -50,7 +48,6 @@ export function designedPacketGuide(
     {
       sectionId: "process",
       layout: "process",
-      imageId: "workflow",
       title: "How the work moves forward",
       paragraphs: [
         "Discover: confirm priorities, inputs and the people who will approve decisions.",
@@ -65,7 +62,6 @@ export function designedPacketGuide(
     {
       sectionId: "timeline",
       layout: "timeline",
-      imageId: "mission_systems",
       title: "Milestones and review points",
       paragraphs: [
         "Kickoff and inputs confirmed: To be agreed.",
@@ -80,8 +76,7 @@ export function designedPacketGuide(
     },
     {
       sectionId: "responsibilities",
-      layout: "image_left",
-      imageId: "human_craft",
+      layout: "text",
       title: "What we need from you",
       paragraphs: [
         "Nominate a project contact and the people authorised to approve the work. Consolidate feedback so we can act on clear decisions.",
@@ -96,8 +91,7 @@ export function designedPacketGuide(
     },
     {
       sectionId: "deliverables",
-      layout: "image_right",
-      imageId: portal ? "community_portal" : "workflow",
+      layout: "text",
       title: "What you will receive",
       paragraphs: [
         "The agreed deliverables: {{agreement_scope}}.",
@@ -111,8 +105,7 @@ export function designedPacketGuide(
     },
     {
       sectionId: "communication",
-      layout: "image_top",
-      imageId: "human_craft",
+      layout: "text",
       title: "Keeping the work clear",
       paragraphs: [
         "Your FSS contact is {{sender_name}}. Reply to project emails when you need clarification, and use the client workspace for the agreed reviews, requests and documents.",
@@ -122,8 +115,7 @@ export function designedPacketGuide(
     },
     {
       sectionId: "next_steps",
-      layout: "image_right",
-      imageId: "mission_systems",
+      layout: "text",
       title: "Your next steps",
       paragraphs: [
         "Read the proposal when it arrives. Check the scope, fees, payment schedule and responsibilities before signing.",

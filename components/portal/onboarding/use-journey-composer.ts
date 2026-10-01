@@ -225,6 +225,7 @@ export function useJourneyComposer(props: JourneyComposerProps) {
       invoice: { ...props.billing, obligationKey },
       content: {
         rendererVersion: packet.rendererVersion,
+        emailArtworkVersion: packet.emailArtworkVersion,
         edition: packet.edition,
         settingsRevision,
         timezone: props.settings.timezone,

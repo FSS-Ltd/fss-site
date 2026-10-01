@@ -20,6 +20,8 @@ Settings apply to separate revisioned active records, with an audit entry for ea
 
 ## Rollback
 
+The unique-imagery editions must be deliberately loaded, saved and published through the existing packet workspace. This replaces the selected draft's complete content and checklist; retain any wanted edits before loading designed content. Existing published packs and client drafts are preserved. New editions carry `emailArtworkVersion: 1`; approvals without this field retain their original headers and PDF bytes. Deploy all twelve `/images/welcome/*-v1.png` files with the application. The vector-artwork generator uses the existing Sharp dependency and does not require a migration.
+
 Roll back the application release while retaining additive tables and functions. Legacy welcome rendering and existing approval bytes remain available. Reapply prior ordinary settings values through the revisioned API to create an auditable settings rollback. Do not rewrite approvals, delete active journeys or revert published packet versions in place.
 
 ## Verification evidence
