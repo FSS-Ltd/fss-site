@@ -19,7 +19,7 @@ Next.js and eslint-config-next are patched to 16.3.8. Existing React Email Butto
 - Final packet/client focused suite: 42 passed. New packet/client line coverage: 96.62%; branch coverage: 88.85%.
 - Production Next.js 16.3.8 webpack build: passed, including type checking and page generation.
 - Repository TypeScript, ESLint and six blog-cover checks: passed.
-- Prettier: supported owned files passed. Existing mixed client-form, fixture and screen-contract files were preserved and staged only by their task hunks. SQL/CSV use migration policy, schema/coverage and git whitespace checks rather than an unavailable Prettier parser.
+- Prettier: supported owned files passed. Existing mixed client-form, fixture and screen-contract files were preserved and staged only by their task hunks. The pnpm lockfile retains package-manager formatting. SQL/CSV use migration policy, schema/coverage and git whitespace checks rather than an unavailable Prettier parser.
 - Migration policy: all 67 current migrations passed. Task migrations were exercised only against the isolated local database.
 - Desktop/mobile browser flows: 36/36 passed on patched Next.js, including keyboard focus restoration, real PDF preview/download and hash, draft restore, settings consumers/conflicts, dark appearance and 200% text. The first cold run exposed two navigation timeouts during initial compilation; the runner now waits for the fixture route before starting interaction timers.
 - All 30 PDF pages and four desktop/mobile welcome-message families were rendered and visually inspected. Blocked images, narrow email layouts, semantic reading, actual PDF bytes/hash, missing facts, overflow, legacy approvals, tenant boundaries, founder capability, settings conflicts and consumers were verified.
