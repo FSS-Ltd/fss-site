@@ -1,5 +1,6 @@
 "use client";
 
+import type { Currency } from "@/lib/operations/money";
 import { useState } from "react";
 import { Notice, StatusBadge } from "@/components/portal/ui";
 import type {
@@ -27,6 +28,7 @@ export function StaffAgreementBuilder({
   initialDraft,
   onNavigate,
   organisationName,
+  currency = "GBP",
 }: Readonly<{
   agreementListHref?: string;
   baseHref: string;
@@ -36,6 +38,7 @@ export function StaffAgreementBuilder({
   initialDraft: AgreementBuilderDraft | null;
   onNavigate: (href: string) => void;
   organisationName: string;
+  currency?: Currency;
 }>): React.JSX.Element {
   const listHref = agreementListHref ?? baseHref.replace(/\/new$/, "");
   const { draft, finalise, message, pending, save } = useAgreementBuilderDraft({
@@ -46,7 +49,7 @@ export function StaffAgreementBuilder({
     navigate: onNavigate,
   });
   const [content, setContent] = useState<AgreementBuilderDraftContent>(
-    initialDraft?.content ?? {},
+    initialDraft?.content ?? { agreement: { currency } },
   );
   const [step, setStep] = useState<AgreementBuilderStep>(
     initialDraft?.step ?? "link",

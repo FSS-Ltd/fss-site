@@ -1,10 +1,13 @@
+import { formatMoney, type Currency } from "../money";
 import type { AgreementDraft } from "./types";
 import { totalLinePence } from "./validation";
 import { SIGNING_CONSENT, type SigningApproval } from "./signing-types";
 
-export function signingPounds(value: string): string {
-  const amount = BigInt(value);
-  return `£${(amount / BigInt(100)).toLocaleString("en-GB")}.${(amount % BigInt(100)).toString().padStart(2, "0")}`;
+export function signingPounds(
+  value: string,
+  currency: Currency = "GBP",
+): string {
+  return formatMoney(value, currency);
 }
 function section(document: PDFKit.PDFDocument, title: string): void {
   if (document.y > document.page.height - 140) document.addPage();
@@ -54,10 +57,18 @@ export function writeAgreementContent(
       .font("Helvetica")
       .text(line.description, { paragraphGap: 6 });
     term(document, "Quantity", String(line.quantity));
-    term(document, "Unit price", signingPounds(line.unitPence));
-    term(document, "Line discount", signingPounds(line.discountPence));
-    term(document, "Line tax", signingPounds(line.taxPence));
-    term(document, "Line total", signingPounds(totalLinePence(line)));
+    term(document, "Unit price", signingPounds(line.unitPence, draft.currency));
+    term(
+      document,
+      "Line discount",
+      signingPounds(line.discountPence, draft.currency),
+    );
+    term(document, "Line tax", signingPounds(line.taxPence, draft.currency));
+    term(
+      document,
+      "Line total",
+      signingPounds(totalLinePence(line), draft.currency),
+    );
     term(
       document,
       "Recurrence",
@@ -72,11 +83,35 @@ export function writeAgreementContent(
     );
     document.moveDown(0.5);
   }
+  if (draft.revenueShare) {
+    section(document, "Ongoing revenue share");
+    term(
+      document,
+      "Percentage",
+      `${(draft.revenueShare.percentageBps / 100).toFixed(2)}%`,
+    );
+    term(document, "Revenue source", draft.revenueShare.revenueSource);
+    term(document, "Calculation basis", draft.revenueShare.calculationBasis);
+    term(document, "Duration", draft.revenueShare.duration);
+    term(
+      document,
+      "Reporting requirements",
+      draft.revenueShare.reportingRequirements,
+    );
+    term(document, "Payment terms", draft.revenueShare.paymentTerms);
+    document.text(
+      "Revenue share replaces ongoing cash charges. One-off fees remain payable.",
+    );
+  }
   section(document, "Billing and commencement");
   term(document, "Currency", draft.currency);
   term(document, "Tax treatment", draft.taxTreatment);
   term(document, "Billing contact", draft.billingContact);
-  term(document, "Required deposit", signingPounds(draft.requiredDepositPence));
+  term(
+    document,
+    "Required deposit",
+    signingPounds(draft.requiredDepositPence, draft.currency),
+  );
   term(
     document,
     "Assets required before activation",
@@ -87,7 +122,11 @@ export function writeAgreementContent(
   section(document, "Installments");
   if (!draft.installments.length) document.text("No one-off installments.");
   for (const installment of draft.installments)
-    term(document, installment.dueDate, signingPounds(installment.amountPence));
+    term(
+      document,
+      installment.dueDate,
+      signingPounds(installment.amountPence, draft.currency),
+    );
   section(document, "Required signers");
   for (const email of draft.signatories) document.text(email);
 }

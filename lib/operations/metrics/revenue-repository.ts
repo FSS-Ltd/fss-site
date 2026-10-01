@@ -8,16 +8,18 @@ export async function loadRevenue(
 ): Promise<RevenueSummary> {
   const [result] = await tx<RevenueSummary[]>`
   with terms as materialized (
-    select l.id,l.organisation_id,o.display_name as client,l.service_code as service,l.end_date,
+    select l.id,l.organisation_id,r.snapshot->>'currency' as currency,o.display_name as client,l.service_code as service,l.end_date,
       case when l.recurrence_months>0 then (l.quantity::numeric*l.unit_pence-l.discount_pence)*(12/l.recurrence_months) else 0 end as units,
       s.effective_date, coalesce(s.end_date,l.end_date) as effective_end,
       (e.evidence->>'signedDate')::date as signed_date,l.recurrence_months,
       l.quantity::numeric*l.unit_pence-l.discount_pence as net,l.agreement_id
     from operations.agreement_lines l
+    join operations.agreement_revisions r using(organisation_id,agreement_id,revision)
     join operations.signature_evidence e using(organisation_id,agreement_id,revision)
     join operations.organisations o on o.id=l.organisation_id
     left join operations.service_instances s using(organisation_id,agreement_id,revision,line_number)
-    where (${f.organisationId ?? null}::uuid is null or l.organisation_id=${f.organisationId ?? null}::uuid)
+    where r.snapshot->>'currency'=${f.currency}
+      and (${f.organisationId ?? null}::uuid is null or l.organisation_id=${f.organisationId ?? null}::uuid)
       and (${f.client ?? null}::text is null or l.organisation_id in (select id from operations.organisations where display_name ilike ${`%${f.client ?? ""}%`}))
       and (${f.service ?? null}::text is null or (l.service_code ilike ${`%${f.service ?? ""}%`} or l.description ilike ${`%${f.service ?? ""}%`}))
       and (${f.owner ?? null}::text is null or exists(select 1 from operations.projects p where p.organisation_id=l.organisation_id and p.agreement_id=l.agreement_id and p.owner_display=${f.owner ?? null}))

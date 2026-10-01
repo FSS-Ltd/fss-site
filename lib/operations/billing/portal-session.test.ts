@@ -29,6 +29,7 @@ function provider(
     retrieveInvoice: async () => ({
       customer: "cus_synthetic",
       livemode: false,
+      currency: "gbp",
       hosted_invoice_url: "https://invoice.stripe.com/i/synthetic",
     }),
     ...overrides,
@@ -120,17 +121,25 @@ test("invoice lookup checks provider customer and environment before returning a
     {
       customer: "cus_other",
       livemode: false,
+      currency: "gbp",
       hosted_invoice_url: "https://invoice.stripe.com/i/synthetic",
     },
     {
       customer: "cus_synthetic",
       livemode: true,
+      currency: "gbp",
       hosted_invoice_url: "https://invoice.stripe.com/i/synthetic",
     },
-    { customer: "cus_synthetic", livemode: false, hosted_invoice_url: null },
     {
       customer: "cus_synthetic",
       livemode: false,
+      currency: "gbp",
+      hosted_invoice_url: null,
+    },
+    {
+      customer: "cus_synthetic",
+      livemode: false,
+      currency: "gbp",
       hosted_invoice_url: "https://invoice.stripe.com.evil.test/i/synthetic",
     },
   ])

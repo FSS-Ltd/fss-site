@@ -1,5 +1,6 @@
 import type { z } from "zod";
 import type { draftSchema, lineSchema, signatureSchema } from "./validation";
+import type { Currency } from "../money";
 import type { ServiceInstance } from "../services/types";
 export type AgreementDraft = z.infer<typeof draftSchema>;
 export type AgreementLine = z.infer<typeof lineSchema>;
@@ -20,6 +21,7 @@ export type AgreementRecord = {
 };
 export type AgreementRegister = {
   organisationName: string;
+  billingCurrency?: Currency;
   engagementIds: string[];
   engagementChoices?: Array<{ id: string; name: string }>;
   agreements: AgreementRecord[];

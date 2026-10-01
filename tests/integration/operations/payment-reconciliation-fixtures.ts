@@ -1,3 +1,5 @@
+import type { Currency } from "../../../lib/operations/money";
+import { agreementDraft } from "../../../lib/operations/agreements/fixtures";
 import type Stripe from "stripe";
 import type { InvoiceReconciliation } from "../../../lib/operations/billing/reconciliation-types";
 export function invoiceSnapshot(
@@ -32,6 +34,7 @@ export function invoiceSnapshot(
     mandates: [],
     payments: [
       {
+        currency: "GBP",
         providerId: `pi_${id.slice(3)}`,
         customerId,
         state: "succeeded",
@@ -61,7 +64,7 @@ import {
 import { createBillingSchedule } from "../../../lib/operations/billing/schedules";
 import { withAgreementTransaction } from "../../../lib/operations/agreements/repository";
 import { requireOperationsTestDatabaseUrl } from "../../../scripts/require-operations-database-env";
-export async function createReconciliationFixture() {
+export async function createReconciliationFixture(currency: Currency = "GBP") {
   const url = requireOperationsTestDatabaseUrl(
     process.env.OPERATIONS_TEST_DATABASE_URL,
   );
@@ -74,7 +77,11 @@ export async function createReconciliationFixture() {
     max: 5,
     connection: { options: "-c role=operations_billing_worker" },
   });
-  const fixture = await createBillingFixture(admin, founder);
+  const draft = agreementDraft();
+  draft.currency = currency;
+  draft.lines[0].taxPence = "0";
+  draft.lines[0].unitPence = "12000";
+  const fixture = await createBillingFixture(admin, founder, draft);
   const suffix = randomUUID().replaceAll("-", "");
   const invoiceIds = [`in_first${suffix}`, `in_second${suffix}`];
   const customerId = `cus_${suffix}`;
@@ -87,7 +94,7 @@ export async function createReconciliationFixture() {
     fixture.correlationId,
   );
   await withAgreementTransaction(founder, billingFounder, async (tx, actor) => {
-    await tx`insert into operations.billing_customers(organisation_id,account_id,environment,provider_customer_id,created_by,correlation_id) values(${fixture.organisationId},${fixture.scope.accountId},'test',${customerId},${actor.actorId},${fixture.correlationId})`;
+    await tx`insert into operations.billing_customers(organisation_id,account_id,environment,currency,provider_customer_id,created_by,correlation_id) values(${fixture.organisationId},${fixture.scope.accountId},'test',${currency},${customerId},${actor.actorId},${fixture.correlationId})`;
     for (let index = 0; index < schedules.length; index++)
       await tx`update operations.billing_schedules set provider_reference=${invoiceIds[index]} where id=${schedules[index]}`;
   });

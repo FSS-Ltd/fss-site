@@ -20,6 +20,8 @@ export function OperationsOverview({
   data: MetricsSnapshot;
 }): React.JSX.Element {
   const f = data.filters;
+  const money = (value: bigint, units = BigInt(1)) =>
+    formatMoney(value, units, f.currency);
   function pageHref(page: number): string {
     const params = new URLSearchParams();
     for (const [key, value] of Object.entries({ ...f, page }))
@@ -69,8 +71,10 @@ export function OperationsOverview({
         </label>
         <label>
           Currency
-          <select name="currency" defaultValue="GBP">
+          <select name="currency" defaultValue={f.currency}>
             <option>GBP</option>
+            <option>USD</option>
+            <option>EUR</option>
           </select>
         </label>
         <label>
@@ -125,7 +129,7 @@ export function OperationsOverview({
         total={data.exceptionCount}
         observedAt={data.generatedAt}
       />
-      <RevenueMovements data={data.revenue} />
+      <RevenueMovements data={data.revenue} currency={f.currency} />
       <section
         id="services"
         className={`${sharedStyles.panel} ${styles.section}`}
@@ -133,17 +137,17 @@ export function OperationsOverview({
         <h2>Recurring contract drill-down</h2>
         <p>
           All matching lines: {data.revenue.totalRows.toLocaleString("en-GB")}.
-          Active total: {formatMoney(BigInt(data.revenue.active), BigInt(12))}.
+          Active total: {money(BigInt(data.revenue.active), BigInt(12))}.
           Awaiting activation total:{" "}
-          {formatMoney(BigInt(data.revenue.awaiting), BigInt(12))}. ARR is 12 ×
-          the active total.
+          {money(BigInt(data.revenue.awaiting), BigInt(12))}. ARR is 12 × the
+          active total.
         </p>
         <details>
           <summary>Exact reconciliation details</summary>
           <p>
-            Active total: {data.revenue.active} twelfths of a penny. Awaiting
-            total: {data.revenue.awaiting}. Totals round only after aggregation.
-            Individual display rounding is reconciled below.
+            Active total: {data.revenue.active} twelfths of a minor unit.
+            Awaiting total: {data.revenue.awaiting}. Totals round only after
+            aggregation. Individual display rounding is reconciled below.
           </p>
           {data.revenue.rows.map((r) => (
             <p key={r.id}>
@@ -153,7 +157,7 @@ export function OperationsOverview({
         </details>
         <p>
           Page active total:{" "}
-          {formatMoney(
+          {money(
             data.revenue.rows.reduce(
               (sum, r) => sum + BigInt(r.end),
               BigInt(0),
@@ -161,7 +165,7 @@ export function OperationsOverview({
             BigInt(12),
           )}
           . Display rounding adjustment:{" "}
-          {formatMoney(
+          {money(
             (data.revenue.rows.reduce(
               (sum, r) => sum + BigInt(r.end),
               BigInt(0),
@@ -182,7 +186,7 @@ export function OperationsOverview({
           aria-label="Recurring contracts table, scroll horizontally"
         >
           <table>
-            <caption>Contract line monthly equivalents, GBP</caption>
+            <caption>Contract line monthly equivalents, {f.currency}</caption>
             <thead>
               <tr>
                 <th scope="col">Client / service</th>
@@ -202,9 +206,9 @@ export function OperationsOverview({
                       {r.client} · {r.service}
                     </Link>
                   </th>
-                  <td>{formatMoney(BigInt(r.start), BigInt(12))}</td>
-                  <td>{formatMoney(BigInt(r.end), BigInt(12))}</td>
-                  <td>{formatMoney(BigInt(r.awaiting), BigInt(12))}</td>
+                  <td>{money(BigInt(r.start), BigInt(12))}</td>
+                  <td>{money(BigInt(r.end), BigInt(12))}</td>
+                  <td>{money(BigInt(r.awaiting), BigInt(12))}</td>
                   <td>{r.endDate ?? "Open ended"}</td>
                 </tr>
               ))}
@@ -215,14 +219,14 @@ export function OperationsOverview({
           <p>No recurring contract lines on this page.</p>
         ) : null}
       </section>
-      <ReceivablesTable data={data.receivables} />
+      <ReceivablesTable data={data.receivables} currency={f.currency} />
       <section className={`${sharedStyles.panel} ${styles.section}`}>
         <h2>Collections and signed work</h2>
         <p>
           Confirmed cash in period:{" "}
-          {data.cash === null ? "Unavailable" : formatMoney(BigInt(data.cash))}.
+          {data.cash === null ? "Unavailable" : money(BigInt(data.cash))}.
           Signed agreements: {data.revenue.signedDeals}. Signed one-off net
-          value: {formatMoney(BigInt(data.revenue.signedOneOff))}.
+          value: {money(BigInt(data.revenue.signedOneOff))}.
         </p>
         <h2>Current requests by state</h2>
         <RequestStatusDistribution requests={data.requests} />

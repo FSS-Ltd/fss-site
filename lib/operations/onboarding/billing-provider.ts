@@ -1,3 +1,4 @@
+import { currencySchema } from "../money";
 import type Stripe from "stripe";
 import { z } from "zod";
 import type { OperationsDb } from "../db/client";
@@ -26,6 +27,7 @@ const contextSchema = z.object({
     mode: z.enum(["test", "live"]),
     key: z.string(),
     owner: z.enum(["invoice", "subscription"]),
+    currency: currencySchema,
     amountPence: z.string().regex(/^\d+$/),
     dueDate: z.iso.date(),
     endDate: z.iso.date().nullable(),
@@ -128,6 +130,7 @@ export function createOnboardingBillingProvider(
               metadata: {
                 operations_command: context.customerCommand.id,
                 operations_organisation: lease.organisationId,
+                operations_currency: context.schedule.currency,
               },
             },
             {
@@ -160,6 +163,7 @@ export function createOnboardingBillingProvider(
         invoice && snapshot
           ? {
               providerInvoiceId: invoice.id,
+              currency: context.schedule.currency,
               number: invoice.number,
               status: invoice.status,
               totalPence: String(invoice.total),

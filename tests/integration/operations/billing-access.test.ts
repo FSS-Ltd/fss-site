@@ -55,6 +55,7 @@ test("billing hosted access enforces tenant, billing roles, revoked membership a
       return {
         customer: "cus_accessTest",
         livemode: false,
+        currency: "gbp",
         hosted_invoice_url: "https://invoice.stripe.com/i/synthetic",
       };
     },

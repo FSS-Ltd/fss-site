@@ -5,7 +5,7 @@ import type {
   AgreementRecord,
 } from "@/lib/operations/agreements/types";
 import { totalLinePence } from "@/lib/operations/agreements/validation";
-import { penceToGbp } from "@/lib/operations/agreements/money-input";
+import { formatMoney } from "@/lib/operations/money";
 import { AgreementForm } from "./agreement-form";
 import { SignatureForm } from "./signature-form";
 import { ActivationForm } from "./activation-form";
@@ -54,7 +54,7 @@ function Terms({
             : {}),
           "Notice period": `${d.noticeDays} days`,
           "Minimum term": `${d.minimumTermMonths} months`,
-          "Required deposit": `£${penceToGbp(d.requiredDepositPence)}`,
+          "Required deposit": formatMoney(d.requiredDepositPence, d.currency),
           "Client assets": d.assetsRequired ? "Required" : "Not required",
         }).map(([label, v]) => (
           <div key={label}>
@@ -68,7 +68,7 @@ function Terms({
         <ul>
           {d.installments.map((i, n) => (
             <li key={n}>
-              £{penceToGbp(i.amountPence)} due {i.dueDate}
+              {formatMoney(i.amountPence, d.currency)} due {i.dueDate}
             </li>
           ))}
         </ul>
@@ -167,7 +167,8 @@ export function AgreementRegister({
               <section key={index}>
                 <h3>{line.description}</h3>
                 <p>
-                  £{penceToGbp(totalLinePence(line))} including tax{" "}
+                  {formatMoney(totalLinePence(line), record.draft.currency)}{" "}
+                  including tax{" "}
                   {line.recurrenceMonths === 0
                     ? "one-off"
                     : `every ${line.recurrenceMonths} month${line.recurrenceMonths === 1 ? "" : "s"}`}
@@ -235,6 +236,7 @@ export function AgreementRegister({
                 <AgreementForm
                   organisationId={organisationId}
                   engagementIds={register.engagementIds}
+                  currency={register.billingCurrency}
                   engagementChoices={register.engagementChoices}
                   record={record}
                   endpoint={routes.agreementEndpoint}
@@ -271,6 +273,7 @@ export function AgreementRegister({
         <AgreementForm
           organisationId={organisationId}
           engagementIds={register.engagementIds}
+          currency={register.billingCurrency}
           engagementChoices={register.engagementChoices}
           endpoint={routes.agreementEndpoint}
           evidenceMode={routes.evidenceMode}

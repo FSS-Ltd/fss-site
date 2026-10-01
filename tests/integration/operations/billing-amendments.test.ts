@@ -165,7 +165,7 @@ test("production amendment persists founder hold and preview while preserving cu
         p.stripe,
         f.correlationId,
       ),
-      /GBP/,
+      /same-currency/,
     );
     assert.equal(
       (

@@ -68,7 +68,7 @@ export function ClientInvoiceDetail({
         <PortalCard title="Payment summary">
           <div className={styles.detailHeading}>
             <strong className={styles.detailAmount}>
-              {billingAmount(invoice.totalPence)}
+              {billingAmount(invoice.totalPence, invoice.currency)}
             </strong>
             <PaymentStatus invoice={invoice} />
           </div>
@@ -85,11 +85,15 @@ export function ClientInvoiceDetail({
             ) : null}
             <div>
               <dt>Paid</dt>
-              <dd>{billingAmount(invoice.amountPaidPence)}</dd>
+              <dd>
+                {billingAmount(invoice.amountPaidPence, invoice.currency)}
+              </dd>
             </div>
             <div>
               <dt>Remaining</dt>
-              <dd>{billingAmount(invoice.amountRemainingPence)}</dd>
+              <dd>
+                {billingAmount(invoice.amountRemainingPence, invoice.currency)}
+              </dd>
             </div>
             {invoice.issuedAt ? (
               <div>
@@ -129,7 +133,9 @@ export function ClientInvoiceDetail({
               {invoice.lines.map((line, index) => (
                 <li key={`${line.description ?? "line"}-${index}`}>
                   <span>{line.description ?? "Invoice item"}</span>
-                  <strong>{billingAmount(line.amountPence)}</strong>
+                  <strong>
+                    {billingAmount(line.amountPence, invoice.currency)}
+                  </strong>
                 </li>
               ))}
             </ul>

@@ -28,6 +28,7 @@ test("duplicate card/debit settlement retains both confirmed payments and separa
     snapshot.invoice.amount_overpaid = 6000;
     snapshot.payments.push({
       ...snapshot.payments[0],
+      currency: "GBP",
       providerId: `pi_debit${f.organisationId.replaceAll("-", "")}`,
       allocationId: `inpay_debit${f.organisationId.replaceAll("-", "")}`,
       method: "bacs_debit",
@@ -117,6 +118,7 @@ test("newer shared-payment refund and dispute observations survive reversed comm
     snapshot.payments[0].receivedPence = "12000";
     snapshot.payments[0].refunds = [
       {
+        currency: "GBP",
         providerId: `re_${f.organisationId.replaceAll("-", "")}`,
         amountPence: "1000",
         status: "pending",
@@ -124,6 +126,7 @@ test("newer shared-payment refund and dispute observations survive reversed comm
     ];
     snapshot.payments[0].disputes = [
       {
+        currency: "GBP",
         providerId: `dp_${f.organisationId.replaceAll("-", "")}`,
         amountPence: "3000",
         status: "needs_response",
@@ -226,6 +229,7 @@ test("mandate observation ordering and separate credit evidence remain intact fo
   ];
   snapshot.credits = [
     {
+      currency: "GBP",
       providerId: `cn_${f.organisationId.replaceAll("-", "")}`,
       amountPence: "1000",
       status: "issued",

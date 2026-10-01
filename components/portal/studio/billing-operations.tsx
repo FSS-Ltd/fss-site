@@ -1,3 +1,4 @@
+import { formatMoney } from "@/lib/operations/money";
 import {
   Notice,
   PageHeader,
@@ -9,21 +10,13 @@ import { portalPath } from "@/lib/operations/auth/portal-url";
 import type { StudioBillingOperations } from "@/lib/operations/studio/operations-queues";
 import styles from "./operations-queues.module.css";
 
-function money(value: string): string {
-  const pence = Number(value);
-  if (!Number.isSafeInteger(pence)) return "Amount unavailable";
-  return new Intl.NumberFormat("en-GB", {
-    currency: "GBP",
-    maximumFractionDigits: 0,
-    style: "currency",
-  }).format(pence / 100);
-}
-
 function date(value: string | null): string {
   if (!value) return "Due date unavailable";
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) return "Date unavailable";
-  return new Intl.DateTimeFormat("en-GB", { dateStyle: "medium" }).format(parsed);
+  return new Intl.DateTimeFormat("en-GB", { dateStyle: "medium" }).format(
+    parsed,
+  );
 }
 
 function exceptionTone(category: string): "warning" | "error" {
@@ -44,10 +37,28 @@ export function BillingOperations({
       />
       <section className={styles.metrics} aria-label="Billing totals">
         <PortalCard title="Due this month">
-          <p className={styles.metric}>{money(data.dueThisMonthPence)}</p>
+          {data.totalsByCurrency.length ? (
+            data.totalsByCurrency.map((total) => (
+              <p className={styles.metric} key={total.currency}>
+                {formatMoney(total.dueThisMonthPence, total.currency)}{" "}
+                <small>{total.currency}</small>
+              </p>
+            ))
+          ) : (
+            <p className={styles.metric}>No invoices</p>
+          )}
         </PortalCard>
         <PortalCard title="Overdue">
-          <p className={styles.metric}>{money(data.overduePence)}</p>
+          {data.totalsByCurrency.length ? (
+            data.totalsByCurrency.map((total) => (
+              <p className={styles.metric} key={total.currency}>
+                {formatMoney(total.overduePence, total.currency)}{" "}
+                <small>{total.currency}</small>
+              </p>
+            ))
+          ) : (
+            <p className={styles.metric}>No invoices</p>
+          )}
         </PortalCard>
         <PortalCard title="Needs reconciliation">
           <p className={styles.metric}>{data.reconciliationCount}</p>
@@ -60,7 +71,9 @@ export function BillingOperations({
       </Notice>
       {data.items.length === 0 ? (
         <PortalCard title="No open billing exceptions">
-          <p className={styles.empty}>There are no unresolved billing exceptions in this workspace.</p>
+          <p className={styles.empty}>
+            There are no unresolved billing exceptions in this workspace.
+          </p>
         </PortalCard>
       ) : (
         <ul className={styles.list} aria-label="Billing exception queue">
@@ -69,19 +82,38 @@ export function BillingOperations({
               <PortalCard>
                 <div className={styles.row}>
                   <div className={styles.rowSummary}>
-                    <h2>{item.organisationName ?? "Unassigned organisation"}</h2>
+                    <h2>
+                      {item.organisationName ?? "Unassigned organisation"}
+                    </h2>
                     <p>{item.category.replaceAll("_", " ")}</p>
                     <StatusBadge status={exceptionTone(item.category)}>
                       Needs review
                     </StatusBadge>
                   </div>
                   <dl className={styles.rowMeta}>
-                    <div><dt>Invoice</dt><dd>{item.providerReference ?? "Not retained"}</dd></div>
-                    <div><dt>Outstanding</dt><dd>{item.amountPence ? money(item.amountPence) : "Unavailable"}</dd></div>
-                    <div><dt>Due</dt><dd>{date(item.dueDate)}</dd></div>
+                    <div>
+                      <dt>Invoice</dt>
+                      <dd>{item.providerReference ?? "Not retained"}</dd>
+                    </div>
+                    <div>
+                      <dt>Outstanding</dt>
+                      <dd>
+                        {item.amountPence && item.currency
+                          ? formatMoney(item.amountPence, item.currency)
+                          : "Unavailable"}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Due</dt>
+                      <dd>{date(item.dueDate)}</dd>
+                    </div>
                   </dl>
                   {item.organisationId ? (
-                    <PortalActionLink href={portalPath(`/portal/admin/clients/${item.organisationId}`)}>
+                    <PortalActionLink
+                      href={portalPath(
+                        `/portal/admin/clients/${item.organisationId}`,
+                      )}
+                    >
                       Client context
                     </PortalActionLink>
                   ) : null}

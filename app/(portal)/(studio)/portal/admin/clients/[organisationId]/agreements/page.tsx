@@ -15,6 +15,10 @@ import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
 import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
+import { listStaffCommercialOffers } from "@/lib/operations/agreements/commercial-service";
+import { signingEnabled } from "@/lib/operations/agreements/signing-worker";
+import { CommercialOfferList } from "@/components/portal/agreements/commercial-offer-list";
+import type { CommercialOffer } from "@/lib/operations/agreements/commercial-types";
 import { listStaffAgreementRegister } from "@/lib/operations/agreements/repository";
 
 export const dynamic = "force-dynamic";
@@ -37,9 +41,12 @@ export default async function StaffClientAgreementsPage({
   const after = query.after;
   if (!organisationId.success || Array.isArray(after)) notFound();
   let register;
+  let offers: CommercialOffer[] = [];
   try {
     const db = getOperationsDb();
     const admin = await requireFssAdmin(getPortalDb(), identity, randomUUID());
+    if (signingEnabled())
+      offers = await listStaffCommercialOffers(db, admin, organisationId.data);
     register = await listStaffAgreementRegister(
       db,
       admin,
@@ -79,6 +86,7 @@ export default async function StaffClientAgreementsPage({
         eyebrow="FSS Studio / Agreements"
         title={`${register.organisationName}: agreements`}
       />
+      <CommercialOfferList offers={offers} audience="staff" />
       <section
         className={styles.group}
         aria-labelledby="existing-agreements-heading"

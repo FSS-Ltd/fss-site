@@ -6,6 +6,7 @@ import {
 } from "@/components/portal/ui";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import type { StudioClientDetail as StudioClientDetailData } from "@/lib/operations/studio/clients";
+import { StudioClientCurrencyForm } from "./client-currency-form";
 import styles from "./client-detail.module.css";
 
 type StudioClientDetailProps = Readonly<{
@@ -134,6 +135,11 @@ export function StudioClientDetail({
           </dd>
         </div>
       </dl>
+      <StudioClientCurrencyForm
+        billingCurrency={client.billingCurrency}
+        currencyVersion={client.currencyVersion}
+        organisationId={client.id}
+      />
       <section
         className={styles.workspace}
         aria-labelledby="client-workspace-heading"

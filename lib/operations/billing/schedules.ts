@@ -14,6 +14,7 @@ export function deriveBillingObligations(
   z.iso.date().parse(signedDate);
   const obligations: BillingObligation[] = draft.installments.map(
     (item, index) => ({
+      currency: draft.currency,
       key: `installment:${index + 1}`,
       owner: "invoice",
       amountPence: item.amountPence,
@@ -24,8 +25,9 @@ export function deriveBillingObligations(
     }),
   );
   draft.lines.forEach((line, index) => {
-    if (line.recurrenceMonths === 0) return;
+    if (draft.revenueShare || line.recurrenceMonths === 0) return;
     obligations.push({
+      currency: draft.currency,
       key: `line:${index + 1}`,
       owner: "subscription",
       amountPence: totalLinePence(line),
@@ -64,7 +66,7 @@ export async function createBillingSchedule(
     )) {
       const [row] = await tx<
         { id: string }[]
-      >`insert into operations.billing_schedules(organisation_id,agreement_id,revision,account_id,environment,obligation_key,owner,amount_pence,due_date,end_date,recurrence_months,description,signed_snapshot,created_by,correlation_id) values(${scope.organisationId},${agreementId},${revision},${scope.accountId},${scope.mode},${obligation.key},${obligation.owner},${obligation.amountPence},${obligation.dueDate},${obligation.endDate},${obligation.recurrenceMonths},${obligation.description},${tx.json(snapshot)},${actor.actorId},${correlationId}) on conflict(organisation_id,agreement_id,revision,environment,obligation_key) do nothing returning id`;
+      >`insert into operations.billing_schedules(organisation_id,agreement_id,revision,account_id,environment,obligation_key,owner,amount_pence,currency,due_date,end_date,recurrence_months,description,signed_snapshot,created_by,correlation_id) values(${scope.organisationId},${agreementId},${revision},${scope.accountId},${scope.mode},${obligation.key},${obligation.owner},${obligation.amountPence},${obligation.currency},${obligation.dueDate},${obligation.endDate},${obligation.recurrenceMonths},${obligation.description},${tx.json(snapshot)},${actor.actorId},${correlationId}) on conflict(organisation_id,agreement_id,revision,environment,obligation_key) do nothing returning id`;
       if (row) ids.push(row.id);
       else {
         const [existing] = await tx<

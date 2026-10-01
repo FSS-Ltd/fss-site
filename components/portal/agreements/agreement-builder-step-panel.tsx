@@ -469,12 +469,18 @@ function ReviewStep({
     >
       <div className={styles.metrics}>
         <div>
-          <p className={styles.metric}>{formatGbp(total)}</p>
-          <span>Agreement total</span>
+          <p className={styles.metric}>
+            {formatGbp(total, agreement.currency)}
+          </p>
+          <span>
+            {content.commercialOffer
+              ? "Priced fees before selection"
+              : "Agreement total"}
+          </span>
         </div>
         <div>
           <p className={styles.metric}>
-            {formatGbp(agreement.requiredDepositPence)}
+            {formatGbp(agreement.requiredDepositPence, agreement.currency)}
           </p>
           <span>Initial deposit</span>
         </div>
@@ -499,8 +505,8 @@ function ReviewStep({
           <div>
             <dt>Payment</dt>
             <dd>
-              {formatGbp(agreement.requiredDepositPence)} deposit, then the
-              saved payment schedule.
+              {formatGbp(agreement.requiredDepositPence, agreement.currency)}{" "}
+              deposit, then the saved payment schedule.
             </dd>
           </div>
         </dl>
@@ -530,11 +536,15 @@ function ReviewStep({
         </ul>
       </PortalCard>
       <Notice tone="warning">
-        <strong>Prepare signing, not signed.</strong>
+        <strong>
+          {content.commercialOffer
+            ? "Publish reviewed choices"
+            : "Prepare signing, not signed."}
+        </strong>
         <p>
-          Creating this agreement preserves the reviewed draft. Prepare its
-          signing document on the agreement record before opening it for the
-          required signers.
+          {content.commercialOffer
+            ? "Publishing retains these terms and prepares exact signing documents for fixed choices. Client proposals need your approval before signing."
+            : "Creating this agreement preserves the reviewed draft. Prepare its signing document on the agreement record before opening it for the required signers."}
         </p>
       </Notice>
       <div className={styles.actionRow}>
@@ -549,7 +559,9 @@ function ReviewStep({
           onClick={() => void finalise()}
           type="button"
         >
-          Create agreement
+          {content.commercialOffer
+            ? "Publish payment offer"
+            : "Create agreement"}
         </PortalButton>
         <PortalButton
           disabled={pending}

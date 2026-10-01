@@ -109,10 +109,16 @@ test("durable replay, authoritative ordering, refund/dispute, immutable paid evi
       1,
     );
     snapshot.payments[0].refunds = [
-      { providerId: `re_${suffix}`, amountPence: "1000", status: "succeeded" },
+      {
+        currency: "GBP",
+        providerId: `re_${suffix}`,
+        amountPence: "1000",
+        status: "succeeded",
+      },
     ];
     snapshot.payments[0].disputes = [
       {
+        currency: "GBP",
         providerId: `dp_${suffix}`,
         amountPence: "2000",
         status: "needs_response",

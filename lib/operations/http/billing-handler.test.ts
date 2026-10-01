@@ -162,3 +162,27 @@ test("oversized and malformed JSON are rejected", async () => {
   );
   assert.deepEqual(calls, []);
 });
+
+test("management accepts supported explicit currency and rejects unsupported currency", async () => {
+  const { handler, calls } = setup();
+  assert.equal(
+    (
+      await handler(
+        request({ organisationId, action: "manage", currency: "USD" }),
+      )
+    ).status,
+    200,
+  );
+  assert.deepEqual(calls[0], [
+    identity,
+    { organisationId, action: "manage", currency: "USD" },
+  ]);
+  assert.equal(
+    (
+      await handler(
+        request({ organisationId, action: "manage", currency: "JPY" }),
+      )
+    ).status,
+    400,
+  );
+});

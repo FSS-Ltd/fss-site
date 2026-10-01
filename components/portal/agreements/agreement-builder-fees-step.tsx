@@ -9,7 +9,16 @@ import {
   PortalField,
   PortalSelect,
 } from "@/components/portal/ui";
-import { gbpToPence, penceToGbp } from "@/lib/operations/agreements/money-input";
+import {
+  decimalToMinor,
+  minorToDecimal,
+  currencySymbol,
+} from "@/lib/operations/money";
+import {
+  CommercialOfferFields,
+  readCommercialOffer,
+} from "./commercial-offer-fields";
+import type { CommercialOfferSpec } from "@/lib/operations/agreements/commercial-types";
 import type { AgreementLine } from "@/lib/operations/agreements/types";
 import { totalLinePence } from "@/lib/operations/agreements/validation";
 import {
@@ -55,14 +64,16 @@ function emptyLine(): EditableLine {
 function toEditableLine(line: AgreementLine): EditableLine {
   return {
     description: line.description,
-    discount: penceToGbp(line.discountPence),
+    discount: minorToDecimal(line.discountPence),
     endDate: line.endDate ?? "",
     quantity: String(line.quantity),
-    recurrenceMonths: String(line.recurrenceMonths) as EditableLine["recurrenceMonths"],
+    recurrenceMonths: String(
+      line.recurrenceMonths,
+    ) as EditableLine["recurrenceMonths"],
     serviceCode: line.serviceCode,
     startDate: line.startDate,
-    tax: penceToGbp(line.taxPence),
-    unitPrice: penceToGbp(line.unitPence),
+    tax: minorToDecimal(line.taxPence),
+    unitPrice: minorToDecimal(line.unitPence),
   };
 }
 
@@ -70,7 +81,7 @@ function toEditableInstallment(
   installment: NonNullable<BuilderAgreement["installments"]>[number],
 ): EditableInstallment {
   return {
-    amount: penceToGbp(installment.amountPence),
+    amount: minorToDecimal(installment.amountPence),
     dueDate: installment.dueDate,
   };
 }
@@ -78,14 +89,16 @@ function toEditableInstallment(
 function parseFeeLines(lines: readonly EditableLine[]): AgreementLine[] {
   return lines.map((line) => ({
     description: line.description.trim(),
-    discountPence: gbpToPence(line.discount),
+    discountPence: decimalToMinor(line.discount),
     endDate: line.endDate || null,
     quantity: Number(line.quantity),
-    recurrenceMonths: Number(line.recurrenceMonths) as AgreementLine["recurrenceMonths"],
+    recurrenceMonths: Number(
+      line.recurrenceMonths,
+    ) as AgreementLine["recurrenceMonths"],
     serviceCode: line.serviceCode.trim(),
     startDate: line.startDate,
-    taxPence: gbpToPence(line.tax),
-    unitPence: gbpToPence(line.unitPrice),
+    taxPence: decimalToMinor(line.tax),
+    unitPence: decimalToMinor(line.unitPrice),
   }));
 }
 
@@ -93,7 +106,7 @@ function parseInstallments(
   installments: readonly EditableInstallment[],
 ): NonNullable<BuilderAgreement["installments"]> {
   return installments.map((installment) => ({
-    amountPence: gbpToPence(installment.amount),
+    amountPence: decimalToMinor(installment.amount),
     dueDate: installment.dueDate,
   }));
 }
@@ -102,7 +115,8 @@ function feeTotal(lines: readonly EditableLine[]): string | null {
   try {
     return lines
       .reduce(
-        (total, line) => total + BigInt(totalLinePence(parseFeeLines([line])[0])),
+        (total, line) =>
+          total + BigInt(totalLinePence(parseFeeLines([line])[0])),
         BigInt(0),
       )
       .toString();
@@ -118,8 +132,18 @@ export function AgreementBuilderFeesStep({
   pending,
 }: BuilderStepProps): React.JSX.Element {
   const formRef = useRef<HTMLFormElement>(null);
+  const currency = agreement.currency ?? "GBP";
+  const symbol = currencySymbol(currency);
+  const [spec, setSpec] = useState<CommercialOfferSpec>(
+    content.commercialOffer?.spec ?? {
+      cash: { mode: "fixed" },
+      revenueShare: null,
+    },
+  );
   const [lines, setLines] = useState<EditableLine[]>(() =>
-    agreement.lines?.length ? agreement.lines.map(toEditableLine) : [emptyLine()],
+    agreement.lines?.length
+      ? agreement.lines.map(toEditableLine)
+      : [emptyLine()],
   );
   const [installments, setInstallments] = useState<EditableInstallment[]>(() =>
     agreement.installments?.length
@@ -127,7 +151,16 @@ export function AgreementBuilderFeesStep({
       : [],
   );
   const [formError, setFormError] = useState<string | null>(null);
-  const total = useMemo(() => feeTotal(lines), [lines]);
+  const total = useMemo(
+    () =>
+      feeTotal(
+        lines.filter(
+          (line) =>
+            line.recurrenceMonths === "0" || spec.cash?.mode === "fixed",
+        ),
+      ),
+    [lines, spec.cash?.mode],
+  );
 
   function updateLine(
     index: number,
@@ -136,7 +169,9 @@ export function AgreementBuilderFeesStep({
   ): void {
     setLines((current) =>
       current.map((line, lineIndex) =>
-        lineIndex === index ? ({ ...line, [field]: value } as EditableLine) : line,
+        lineIndex === index
+          ? ({ ...line, [field]: value } as EditableLine)
+          : line,
       ),
     );
   }
@@ -161,22 +196,33 @@ export function AgreementBuilderFeesStep({
     const data = new FormData(form);
     try {
       setFormError(null);
-      return mergeContent(content, {
+      const offer = readCommercialOffer(data);
+      const feeLines = parseFeeLines(
+        lines.map((line) =>
+          line.recurrenceMonths !== "0" && spec.cash?.mode !== "fixed"
+            ? { ...line, unitPrice: "0", discount: "0", tax: "0" }
+            : line,
+        ),
+      );
+      const nextContent = mergeContent(content, {
         ...agreement,
         assetsRequired: data.has("assetsRequired"),
-        currency: "GBP",
+        currency,
         installments: parseInstallments(installments),
-        lines: parseFeeLines(lines),
+        lines: feeLines,
         minimumTermMonths: numberValue(data, "minimumTermMonths"),
         noticeDays: numberValue(data, "noticeDays"),
-        requiredDepositPence: gbpToPence(textValue(data, "requiredDeposit")),
+        requiredDepositPence: decimalToMinor(
+          textValue(data, "requiredDeposit"),
+        ),
         taxTreatment: textValue(data, "taxTreatment"),
       });
+      return { ...nextContent, commercialOffer: offer };
     } catch (error) {
       setFormError(
         error instanceof Error
           ? error.message
-          : "Complete each GBP amount before saving fees.",
+          : "Complete each amount before saving fees.",
       );
       return null;
     }
@@ -188,8 +234,13 @@ export function AgreementBuilderFeesStep({
   }
 
   return (
-    <BuilderSection icon={<ReceiptPoundSterling size={20} />} title="Fees, schedule and terms">
-      <p className={styles.muted}>All amounts are entered and displayed in GBP.</p>
+    <BuilderSection
+      icon={<ReceiptPoundSterling size={20} />}
+      title="Fees, schedule and terms"
+    >
+      <p className={styles.muted}>
+        All amounts are entered and displayed in {currency}.
+      </p>
       <form
         onSubmit={(event) => {
           event.preventDefault();
@@ -198,7 +249,7 @@ export function AgreementBuilderFeesStep({
         ref={formRef}
       >
         <fieldset className={styles.feeFieldset}>
-          <legend>Agreed fees</legend>
+          <legend>One-off fees and service lines</legend>
           <div className={styles.feeLineList}>
             {lines.map((line, index) => (
               <section className={styles.feeLine} key={index}>
@@ -220,26 +271,81 @@ export function AgreementBuilderFeesStep({
                 </div>
                 <div className={styles.fieldGrid}>
                   <PortalField label="Service code" required>
-                    <input onChange={(event) => updateLine(index, "serviceCode", event.target.value)} value={line.serviceCode} />
+                    <input
+                      onChange={(event) =>
+                        updateLine(index, "serviceCode", event.target.value)
+                      }
+                      value={line.serviceCode}
+                    />
                   </PortalField>
                   <PortalField label="Description" required>
-                    <input onChange={(event) => updateLine(index, "description", event.target.value)} value={line.description} />
+                    <input
+                      onChange={(event) =>
+                        updateLine(index, "description", event.target.value)
+                      }
+                      value={line.description}
+                    />
                   </PortalField>
                   <PortalField label="Quantity" required>
-                    <input min="1" onChange={(event) => updateLine(index, "quantity", event.target.value)} type="number" value={line.quantity} />
+                    <input
+                      min="1"
+                      onChange={(event) =>
+                        updateLine(index, "quantity", event.target.value)
+                      }
+                      type="number"
+                      value={line.quantity}
+                    />
                   </PortalField>
-                  <PortalField label="Rate (£)" required>
-                    <input inputMode="decimal" onChange={(event) => updateLine(index, "unitPrice", event.target.value)} value={line.unitPrice} />
+                  <PortalField
+                    label={`Rate (${symbol})`}
+                    required={
+                      line.recurrenceMonths === "0" ||
+                      spec.cash?.mode === "fixed"
+                    }
+                  >
+                    <input
+                      disabled={
+                        line.recurrenceMonths !== "0" &&
+                        spec.cash?.mode !== "fixed"
+                      }
+                      inputMode="decimal"
+                      onChange={(event) =>
+                        updateLine(index, "unitPrice", event.target.value)
+                      }
+                      value={line.unitPrice}
+                    />
                   </PortalField>
-                  <PortalField label="Discount (£)" required>
-                    <input inputMode="decimal" onChange={(event) => updateLine(index, "discount", event.target.value)} value={line.discount} />
+                  <PortalField label={`Discount (${symbol})`} required>
+                    <input
+                      disabled={
+                        line.recurrenceMonths !== "0" &&
+                        spec.cash?.mode !== "fixed"
+                      }
+                      inputMode="decimal"
+                      onChange={(event) =>
+                        updateLine(index, "discount", event.target.value)
+                      }
+                      value={line.discount}
+                    />
                   </PortalField>
-                  <PortalField label="Tax amount (£)" required>
-                    <input inputMode="decimal" onChange={(event) => updateLine(index, "tax", event.target.value)} value={line.tax} />
+                  <PortalField label={`Tax amount (${symbol})`} required>
+                    <input
+                      disabled={
+                        line.recurrenceMonths !== "0" &&
+                        spec.cash?.mode !== "fixed"
+                      }
+                      inputMode="decimal"
+                      onChange={(event) =>
+                        updateLine(index, "tax", event.target.value)
+                      }
+                      value={line.tax}
+                    />
                   </PortalField>
                   <PortalSelect
                     label="Billing interval"
-                    onChange={(event) => updateLine(index, "recurrenceMonths", event.target.value)}
+                    onChange={(event) =>
+                      updateLine(index, "recurrenceMonths", event.target.value)
+                    }
                     value={line.recurrenceMonths}
                   >
                     <option value="0">One-off</option>
@@ -248,10 +354,22 @@ export function AgreementBuilderFeesStep({
                     <option value="12">Annual</option>
                   </PortalSelect>
                   <PortalField label="Contract start date" required>
-                    <input onChange={(event) => updateLine(index, "startDate", event.target.value)} type="date" value={line.startDate} />
+                    <input
+                      onChange={(event) =>
+                        updateLine(index, "startDate", event.target.value)
+                      }
+                      type="date"
+                      value={line.startDate}
+                    />
                   </PortalField>
                   <PortalField label="Contract end date">
-                    <input onChange={(event) => updateLine(index, "endDate", event.target.value)} type="date" value={line.endDate} />
+                    <input
+                      onChange={(event) =>
+                        updateLine(index, "endDate", event.target.value)
+                      }
+                      type="date"
+                      value={line.endDate}
+                    />
                   </PortalField>
                 </div>
               </section>
@@ -266,50 +384,97 @@ export function AgreementBuilderFeesStep({
             Add line item
           </PortalButton>
           <p className={styles.totalLine}>
-            Agreement total <strong>{total ? formatGbp(total) : "Complete fee lines"}</strong>
+            Priced service fees{" "}
+            <strong>
+              {total ? formatGbp(total, currency) : "Complete fee lines"}
+            </strong>
           </p>
         </fieldset>
+        <CommercialOfferFields
+          spec={spec}
+          currency={currency}
+          expiresAt={content.commercialOffer?.expiresAt}
+          onChange={setSpec}
+        />
         <fieldset className={styles.feeFieldset}>
           <legend>Payment terms</legend>
           <div className={styles.fieldGrid}>
             <PortalField label="Tax treatment" required>
-              <input defaultValue={agreement.taxTreatment ?? ""} name="taxTreatment" />
-            </PortalField>
-            <PortalField label="Required deposit (£)" required>
               <input
-                defaultValue={agreement.requiredDepositPence ? penceToGbp(agreement.requiredDepositPence) : "0.00"}
+                defaultValue={agreement.taxTreatment ?? ""}
+                name="taxTreatment"
+              />
+            </PortalField>
+            <PortalField label={`Required deposit (${symbol})`} required>
+              <input
+                defaultValue={
+                  agreement.requiredDepositPence
+                    ? minorToDecimal(agreement.requiredDepositPence)
+                    : "0.00"
+                }
                 inputMode="decimal"
                 name="requiredDeposit"
               />
             </PortalField>
             <PortalField label="Minimum term (months)" required>
-              <input defaultValue={agreement.minimumTermMonths ?? 0} max="120" min="0" name="minimumTermMonths" type="number" />
+              <input
+                defaultValue={agreement.minimumTermMonths ?? 0}
+                max="120"
+                min="0"
+                name="minimumTermMonths"
+                type="number"
+              />
             </PortalField>
             <PortalField label="Notice period (days)" required>
-              <input defaultValue={agreement.noticeDays ?? 0} max="3650" min="0" name="noticeDays" type="number" />
+              <input
+                defaultValue={agreement.noticeDays ?? 0}
+                max="3650"
+                min="0"
+                name="noticeDays"
+                type="number"
+              />
             </PortalField>
           </div>
           <p className={styles.muted}>
-            Select the applicable reviewed tax policy. FSS Studio does not infer tax, deposits or late fees.
+            Select the applicable reviewed tax policy. FSS Studio does not infer
+            tax, deposits or late fees.
           </p>
         </fieldset>
         <fieldset className={styles.feeFieldset}>
           <legend>One-off payment schedule</legend>
           <p className={styles.muted}>
-            Installments must allocate the exact one-off total including tax. Recurring-only agreements do not need installments.
+            Installments must allocate the exact one-off total including tax.
+            Recurring-only agreements do not need installments.
           </p>
           {installments.map((installment, index) => (
             <div className={styles.fieldGrid} key={index}>
               <PortalField label={`Installment ${index + 1} due date`} required>
-                <input onChange={(event) => updateInstallment(index, "dueDate", event.target.value)} type="date" value={installment.dueDate} />
+                <input
+                  onChange={(event) =>
+                    updateInstallment(index, "dueDate", event.target.value)
+                  }
+                  type="date"
+                  value={installment.dueDate}
+                />
               </PortalField>
-              <PortalField label={`Installment ${index + 1} amount (£)`} required>
-                <input inputMode="decimal" onChange={(event) => updateInstallment(index, "amount", event.target.value)} value={installment.amount} />
+              <PortalField
+                label={`Installment ${index + 1} amount (${symbol})`}
+                required
+              >
+                <input
+                  inputMode="decimal"
+                  onChange={(event) =>
+                    updateInstallment(index, "amount", event.target.value)
+                  }
+                  value={installment.amount}
+                />
               </PortalField>
               <PortalButton
                 onClick={() =>
                   setInstallments((current) =>
-                    current.filter((_, installmentIndex) => installmentIndex !== index),
+                    current.filter(
+                      (_, installmentIndex) => installmentIndex !== index,
+                    ),
                   )
                 }
                 type="button"
@@ -322,7 +487,10 @@ export function AgreementBuilderFeesStep({
           <PortalButton
             disabled={installments.length >= 30}
             onClick={() =>
-              setInstallments((current) => [...current, { amount: "", dueDate: "" }])
+              setInstallments((current) => [
+                ...current,
+                { amount: "", dueDate: "" },
+              ])
             }
             type="button"
             variant="secondary"
@@ -336,11 +504,16 @@ export function AgreementBuilderFeesStep({
           name="assetsRequired"
         />
         {formError ? (
-          <Notice tone="error"><p>{formError}</p></Notice>
+          <Notice tone="error">
+            <p>{formError}</p>
+          </Notice>
         ) : null}
         <Notice tone="info">
           <strong>Validation happens before an agreement is created.</strong>
-          <p>Payment amounts must reconcile and recurring lines need a cadence and start policy.</p>
+          <p>
+            Payment amounts must reconcile and recurring lines need a cadence
+            and start policy.
+          </p>
         </Notice>
         <FormActions
           backLabel="Back to scope"

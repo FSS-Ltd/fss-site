@@ -1,15 +1,21 @@
 "use client";
 import { useState } from "react";
 import type { AgreementDraft } from "@/lib/operations/agreements/types";
-import { penceToGbp as penceToPounds } from "@/lib/operations/agreements/money-input";
+import {
+  minorToDecimal as penceToPounds,
+  currencySymbol,
+  type Currency,
+} from "@/lib/operations/money";
 import { Field, type FieldIssues } from "./form-fields";
 import styles from "./agreements.module.css";
 export function AgreementLines({
   draft,
   issues,
+  currency = "GBP",
 }: {
   draft?: AgreementDraft;
   issues: FieldIssues;
+  currency?: Currency;
 }): React.JSX.Element {
   const [count, setCount] = useState(draft?.lines.length ?? 1);
   const [installments, setInstallments] = useState(
@@ -56,9 +62,9 @@ export function AgreementLines({
                     issues={issues}
                     label={
                       [
-                        "Unit price (£)",
-                        "Line discount (£)",
-                        "Line tax amount (£)",
+                        `Unit price (${currencySymbol(currency)})`,
+                        `Line discount (${currencySymbol(currency)})`,
+                        `Line tax amount (${currencySymbol(currency)})`,
                       ][i]
                     }
                     name={`${prefix}.${key}`}
@@ -145,7 +151,7 @@ export function AgreementLines({
             />
             <Field
               issues={issues}
-              label={`Installment ${index + 1} amount (£)`}
+              label={`Installment ${index + 1} amount (${currencySymbol(currency)})`}
               name={`draft.installments.${index}.amountPence`}
               inputMode="decimal"
               defaultValue={

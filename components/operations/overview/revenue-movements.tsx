@@ -1,3 +1,4 @@
+import type { Currency } from "@/lib/operations/money";
 import {
   formatMoney,
   formatRatio,
@@ -13,8 +14,10 @@ function absolute(value: bigint): bigint {
 
 export function RevenueMovements({
   data,
+  currency = "GBP",
 }: {
   data: RevenueSummary;
+  currency?: Currency;
 }): React.JSX.Element {
   const items = [
     { name: "Start", value: data.start, reduction: false },
@@ -58,7 +61,7 @@ export function RevenueMovements({
                 <div className={styles.movementLabel}>
                   <span>{item.name}</span>
                   <strong className={item.reduction ? styles.reduction : ""}>
-                    {formatMoney(displayValue, BigInt(12))}
+                    {formatMoney(displayValue, BigInt(12), currency)}
                   </strong>
                 </div>
                 <span className={styles.movementTrack} aria-hidden="true">
@@ -80,12 +83,13 @@ export function RevenueMovements({
       >
         <table>
           <caption>
-            Monthly revenue in GBP; exact units are twelfths of a penny.
+            Monthly revenue in {currency}; exact units are twelfths of a minor
+            unit.
           </caption>
           <thead>
             <tr>
               <th scope="col">Movement</th>
-              <th scope="col">GBP</th>
+              <th scope="col">{currency}</th>
               <th scope="col">Exact units</th>
             </tr>
           </thead>
@@ -93,7 +97,7 @@ export function RevenueMovements({
             {items.map((item) => (
               <tr key={item.name}>
                 <th scope="row">{item.name}</th>
-                <td>{formatMoney(BigInt(item.value), BigInt(12))}</td>
+                <td>{formatMoney(BigInt(item.value), BigInt(12), currency)}</td>
                 <td>{item.value}</td>
               </tr>
             ))}
@@ -105,7 +109,8 @@ export function RevenueMovements({
         {formatRatio(ratio(BigInt(data.capped), BigInt(data.start)))} · Net
         revenue retention:{" "}
         {formatRatio(ratio(BigInt(data.cohortEnd), BigInt(data.start)))} ·
-        Starting MRR denominator: {formatMoney(BigInt(data.start), BigInt(12))}
+        Starting MRR denominator:{" "}
+        {formatMoney(BigInt(data.start), BigInt(12), currency)}
       </p>
     </section>
   );

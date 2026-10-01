@@ -1,3 +1,4 @@
+import { currencySchema, type Currency } from "../money";
 import type Stripe from "stripe";
 import {
   BillingReconciliationError,
@@ -15,6 +16,17 @@ export function requireProviderMode(
 ): void {
   if (value.livemode !== (scope.mode === "live"))
     throw new BillingReconciliationError("scope_mismatch");
+}
+export function providerCurrency(
+  value: unknown,
+  expected?: Currency,
+): Currency {
+  const parsed = currencySchema.safeParse(
+    typeof value === "string" ? value.toUpperCase() : value,
+  );
+  if (!parsed.success || (expected && parsed.data !== expected))
+    throw new BillingReconciliationError("scope_mismatch");
+  return parsed.data;
 }
 function money(value: number): string {
   if (!Number.isSafeInteger(value) || value < 0)
@@ -59,11 +71,12 @@ async function fetchPayment(
   scope: ProviderScope,
   allocation: Stripe.InvoicePayment,
   customerId: string,
+  currency: Currency,
 ): Promise<{ payment: PaymentProjection; mandate: MandateProjection | null }> {
   const observedAt = new Date().toISOString();
   requireProviderMode(allocation, scope);
+  providerCurrency(allocation.currency, currency);
   if (
-    allocation.currency !== "gbp" ||
     allocation.payment.type !== "payment_intent" ||
     !allocation.payment.payment_intent
   )
@@ -72,17 +85,15 @@ async function fetchPayment(
     providerId(allocation.payment.payment_intent),
   );
   requireProviderMode(intent, scope);
-  if (
-    intent.currency !== "gbp" ||
-    !intent.customer ||
-    providerId(intent.customer) !== customerId
-  )
+  providerCurrency(intent.currency, currency);
+  if (!intent.customer || providerId(intent.customer) !== customerId)
     throw new BillingReconciliationError("scope_mismatch");
   const charge = intent.latest_charge
     ? await client.charges.retrieve(providerId(intent.latest_charge))
     : null;
   if (charge) {
     requireProviderMode(charge, scope);
+    providerCurrency(charge.currency, currency);
     if (
       providerId(charge.payment_intent ?? "") !== intent.id ||
       providerId(charge.customer ?? "") !== customerId
@@ -95,7 +106,16 @@ async function fetchPayment(
   const disputes = complete(
     await client.disputes.list({ payment_intent: intent.id, limit: 20 }),
   );
+  for (const refund of refunds) {
+    providerCurrency(refund.currency, currency);
+    if (
+      providerId(refund.charge ?? "") !== charge?.id ||
+      providerId(refund.payment_intent ?? "") !== intent.id
+    )
+      throw new BillingReconciliationError("scope_mismatch");
+  }
   for (const dispute of disputes) {
+    providerCurrency(dispute.currency, currency);
     requireProviderMode(dispute, scope);
     if (providerId(dispute.payment_intent ?? "") !== intent.id)
       throw new BillingReconciliationError("scope_mismatch");
@@ -120,6 +140,7 @@ async function fetchPayment(
   return {
     mandate,
     payment: {
+      currency,
       providerId: intent.id,
       customerId,
       state,
@@ -149,11 +170,13 @@ async function fetchPayment(
       allocationPence: money(allocation.amount_paid ?? 0),
       refunds: refunds.map((refund) => ({
         providerId: refund.id,
+        currency,
         amountPence: money(refund.amount),
         status: refund.status ?? "pending",
       })),
       disputes: disputes.map((dispute) => ({
         providerId: dispute.id,
+        currency,
         amountPence: money(dispute.amount),
         status: dispute.status,
       })),
@@ -167,8 +190,8 @@ export async function fetchStripeInvoiceProjection(
 ): Promise<InvoiceReconciliation> {
   const invoice = await client.invoices.retrieve(id);
   requireProviderMode(invoice, scope);
-  if (invoice.currency !== "gbp" || !invoice.customer)
-    throw new BillingReconciliationError("scope_mismatch");
+  const currency = providerCurrency(invoice.currency);
+  if (!invoice.customer) throw new BillingReconciliationError("scope_mismatch");
   money(invoice.total);
   money(invoice.amount_due);
   money(invoice.amount_overpaid);
@@ -177,6 +200,8 @@ export async function fetchStripeInvoiceProjection(
   if (invoice.lines.has_more)
     invoice.lines = await client.invoices.listLineItems(id, { limit: 100 });
   complete(invoice.lines);
+  for (const line of invoice.lines.data)
+    providerCurrency(line.currency, currency);
   const customerId = providerId(invoice.customer);
   const subscriptionId = invoice.parent?.subscription_details?.subscription
     ? providerId(invoice.parent.subscription_details.subscription)
@@ -185,6 +210,7 @@ export async function fetchStripeInvoiceProjection(
   if (subscriptionId) {
     const subscription = await client.subscriptions.retrieve(subscriptionId);
     requireProviderMode(subscription, scope);
+    providerCurrency(subscription.currency, currency);
     if (providerId(subscription.customer) !== customerId)
       throw new BillingReconciliationError("scope_mismatch");
     subscriptionScheduleId = subscription.schedule
@@ -217,7 +243,13 @@ export async function fetchStripeInvoiceProjection(
   for (const allocation of allocations) {
     if (providerId(allocation.invoice) !== id)
       throw new BillingReconciliationError("scope_mismatch");
-    const result = await fetchPayment(client, scope, allocation, customerId);
+    const result = await fetchPayment(
+      client,
+      scope,
+      allocation,
+      customerId,
+      currency,
+    );
     payments.push(result.payment);
     if (result.mandate) mandates.push(result.mandate);
   }
@@ -226,6 +258,7 @@ export async function fetchStripeInvoiceProjection(
   );
   for (const credit of credits) {
     requireProviderMode(credit, scope);
+    providerCurrency(credit.currency, currency);
     if (providerId(credit.invoice) !== id)
       throw new BillingReconciliationError("scope_mismatch");
   }
@@ -238,6 +271,7 @@ export async function fetchStripeInvoiceProjection(
     mandates,
     credits: credits.map((credit) => ({
       providerId: credit.id,
+      currency,
       amountPence: money(credit.amount),
       status: credit.status,
     })),

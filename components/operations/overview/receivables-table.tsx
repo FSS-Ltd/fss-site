@@ -1,3 +1,4 @@
+import type { Currency } from "@/lib/operations/money";
 import Link from "next/link";
 import {
   formatMoney,
@@ -34,8 +35,10 @@ function PaymentTimingChart({
 }
 export function ReceivablesTable({
   data,
+  currency = "GBP",
 }: {
   data: ReceivableSummary | null;
+  currency?: Currency;
 }): React.JSX.Element {
   return (
     <section id="receivables" className={styles.section}>
@@ -49,8 +52,9 @@ export function ReceivablesTable({
         <>
           <p>
             All matching invoices: {data.totalRows.toLocaleString("en-GB")}.
-            Outstanding total: {formatMoney(BigInt(data.outstanding))}. Overdue:{" "}
-            {formatMoney(BigInt(data.overdue))}.
+            Outstanding total:{" "}
+            {formatMoney(BigInt(data.outstanding), BigInt(1), currency)}.
+            Overdue: {formatMoney(BigInt(data.overdue), BigInt(1), currency)}.
           </p>
           <p>
             On-time payment:{" "}
@@ -77,7 +81,9 @@ export function ReceivablesTable({
                 {data.ageing.map((b) => (
                   <li key={b.band}>
                     <span>{b.band} days</span>
-                    <strong>{formatMoney(BigInt(b.total))}</strong>
+                    <strong>
+                      {formatMoney(BigInt(b.total), BigInt(1), currency)}
+                    </strong>
                   </li>
                 ))}
               </ul>
@@ -91,8 +97,8 @@ export function ReceivablesTable({
           >
             <table>
               <caption>
-                Current projected balances, GBP. Totals include every matching
-                invoice, across all pages.
+                Current projected balances, {currency}. Totals include every
+                matching invoice, across all pages.
               </caption>
               <thead>
                 <tr>
@@ -128,7 +134,9 @@ export function ReceivablesTable({
                     </td>
                     {[row.gross, row.credit, row.paid, row.remaining].map(
                       (v, i) => (
-                        <td key={i}>{formatMoney(BigInt(v))}</td>
+                        <td key={i}>
+                          {formatMoney(BigInt(v), BigInt(1), currency)}
+                        </td>
                       ),
                     )}
                     <td>{row.daysLate ?? "Unknown"}</td>

@@ -1,3 +1,4 @@
+import type { Currency } from "../money";
 import type { ReceivableRow } from "./snapshot-types";
 /** Quote every field, neutralize formulas even after whitespace/control prefixes. */
 export function csvCell(value: string): string {
@@ -11,19 +12,20 @@ export function receivablesCsv(
   rows: readonly ReceivableRow[],
   generatedAt: string,
   definitionVersion: string,
+  currency: Currency = "GBP",
 ): string {
   const table = [
     ["Generated at", generatedAt],
     ["Definition version", definitionVersion],
-    ["Currency", "GBP"],
+    ["Currency", currency],
     [
       "Invoice",
       "Client",
       "Due date",
-      "Gross pence",
-      "Credit pence",
-      "Paid pence",
-      "Remaining pence",
+      "Gross minor units",
+      "Credit minor units",
+      "Paid minor units",
+      "Remaining minor units",
       "Payment state",
       "Disputed",
       "Owner",

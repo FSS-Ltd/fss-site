@@ -47,7 +47,7 @@ export async function loadMetricsSnapshot(
       >`
       select (select completed_at::text from operations.billing_reconciliation_cursors where account_id=${scope?.accountId ?? null} and environment=${scope?.mode ?? null}) as last,
       (select max(completed_at)::text from operations.billing_provider_events where account_id=${scope?.accountId ?? null} and environment=${scope?.mode ?? null} and state='completed' and (occurred_at at time zone 'Europe/London')::date between ${filters.from}::date and ${filters.to}::date and (received_at at time zone 'Europe/London')::date>(occurred_at at time zone 'Europe/London')::date) as corrected,
-      (select coalesce(sum(p.received_pence),0)::text from operations.payments p where p.account_id=${scope?.accountId ?? null} and p.environment=${scope?.mode ?? null} and p.state='succeeded'
+      (select coalesce(sum(p.received_pence),0)::text from operations.payments p where p.account_id=${scope?.accountId ?? null} and p.environment=${scope?.mode ?? null} and p.state='succeeded' and p.currency=${filters.currency}
        and (p.confirmed_at at time zone 'Europe/London')::date between ${filters.from}::date and ${filters.to}::date
        and (${filters.organisationId ?? null}::uuid is null or p.organisation_id=${filters.organisationId ?? null}::uuid)
        and (${filters.client ?? null}::text is null or p.organisation_id in (select id from operations.organisations where display_name ilike ${`%${filters.client ?? ""}%`}))
@@ -57,7 +57,7 @@ export async function loadMetricsSnapshot(
         "Contract metrics use recorded activation and inclusive contract end dates. Unrecorded pauses, amendments and temporary discounts are unavailable.",
         "Period refunds and net cash are unavailable: refund confirmation timestamps are not captured.",
         "Request cycle and blocked durations are unavailable: history does not retain complete state intervals.",
-        "Each service amount is exact to 1/12 penny; totals round once to two decimals. Rounded rows may differ by a penny.",
+        "Each service amount is exact to 1/12 minor currency unit; totals round once to two decimals. Rounded rows may differ by one minor unit.",
         "Payment-state filters apply to receivables. Contract revenue and the current action queue remain independent of collection state.",
       ];
       if (!scope)

@@ -4,7 +4,7 @@ import type {
   AgreementBuilderDraftContent,
   AgreementBuilderStep,
 } from "@/lib/operations/agreements/builder-draft-schema";
-import { penceToGbp } from "@/lib/operations/agreements/money-input";
+import { formatMoney, type Currency } from "@/lib/operations/money";
 import styles from "./agreements.module.css";
 
 export type BuilderAgreement = NonNullable<
@@ -36,17 +36,21 @@ export function mergeContent(
   engagementId: string | undefined = content.engagementId,
 ): AgreementBuilderDraftContent {
   return {
+    ...content,
     agreement,
     ...(engagementId ? { engagementId } : {}),
   };
 }
 
-export function formatGbp(pence: string | undefined): string {
-  if (!pence) return "£0.00";
+export function formatGbp(
+  pence: string | undefined,
+  currency: Currency = "GBP",
+): string {
+  if (!pence) return formatMoney("0", currency);
   try {
-    return `£${penceToGbp(pence)}`;
+    return formatMoney(pence, currency);
   } catch {
-    return "£0.00";
+    return formatMoney("0", currency);
   }
 }
 

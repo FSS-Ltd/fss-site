@@ -1,3 +1,4 @@
+import { stripeCurrency } from "../money";
 import type Stripe from "stripe";
 import type { BillingCommand } from "./command-repository";
 import {
@@ -14,7 +15,7 @@ export function stripeAmount(pence: string): number {
   const value = BigInt(pence);
   if (value < BigInt(0) || value > BigInt(99999999))
     throw new Error(
-      "Signed billing amount exceeds the supported Stripe GBP amount range.",
+      "Signed billing amount exceeds the supported Stripe amount range.",
     );
   return Number(value);
 }
@@ -29,6 +30,7 @@ export async function createStripeObligation(
   beforeWrite: () => Promise<void> = async () => {},
 ): Promise<ProviderObligation> {
   const amount = stripeAmount(schedule.amountPence);
+  const currency = stripeCurrency(schedule.currency);
   const metadata = {
     operations_command: command.id,
     operations_schedule: schedule.id,
@@ -50,7 +52,7 @@ export async function createStripeObligation(
       invoice &&
       (invoice.customer !== customerId ||
         invoice.livemode !== (schedule.mode === "live") ||
-        invoice.currency !== "gbp")
+        invoice.currency !== currency)
     )
       throw new Error("Provider invoice context mismatch.");
     return { providerId: reference, invoice };
@@ -63,7 +65,8 @@ export async function createStripeObligation(
   ): Promise<Stripe.Invoice | null> => {
     if (
       subscription.customer !== customerId ||
-      subscription.livemode !== (schedule.mode === "live")
+      subscription.livemode !== (schedule.mode === "live") ||
+      subscription.currency !== currency
     )
       throw new Error("Provider subscription context mismatch.");
     const invoiceId =
@@ -79,7 +82,7 @@ export async function createStripeObligation(
     if (
       invoice.customer !== customerId ||
       invoice.livemode !== (schedule.mode === "live") ||
-      invoice.currency !== "gbp" ||
+      invoice.currency !== currency ||
       invoice.total !== amount
     )
       throw new Error(
@@ -116,7 +119,7 @@ export async function createStripeObligation(
       invoice = await stripe.invoices.create(
         {
           customer: customerId,
-          currency: "gbp",
+          currency,
           collection_method: "send_invoice",
           due_date: timestamp(schedule.dueDate),
           auto_advance: false,
@@ -129,7 +132,8 @@ export async function createStripeObligation(
     }
     if (
       invoice.customer !== customerId ||
-      invoice.livemode !== (schedule.mode === "live")
+      invoice.livemode !== (schedule.mode === "live") ||
+      invoice.currency !== currency
     )
       throw new Error("Provider invoice context mismatch.");
     if (invoice.status === "draft") {
@@ -149,7 +153,7 @@ export async function createStripeObligation(
           {
             customer: customerId,
             invoice: invoice.id,
-            currency: "gbp",
+            currency,
             amount,
             description: schedule.description,
             metadata,
@@ -205,6 +209,16 @@ export async function createStripeObligation(
         provider.livemode !== (schedule.mode === "live")
       )
         throw new Error("Provider schedule context mismatch.");
+      for (const phase of provider.phases) {
+        for (const item of phase.items) {
+          const price =
+            typeof item.price === "string"
+              ? await stripe.prices.retrieve(item.price)
+              : item.price;
+          if (price.deleted || price.currency !== currency)
+            throw new Error("Provider schedule currency mismatch.");
+        }
+      }
       return { providerId: provider.id, invoice: null };
     }
   } else {
@@ -239,7 +253,7 @@ export async function createStripeObligation(
     key("product"),
   );
   const priceData = {
-    currency: "gbp",
+    currency,
     product: product.id,
     unit_amount: amount,
     tax_behavior: "inclusive" as const,
