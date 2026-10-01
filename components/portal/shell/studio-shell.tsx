@@ -14,7 +14,12 @@ import {
 import { PortalNavigationIcon } from "./navigation-icon";
 import { PortalAppearanceControl } from "./appearance-control";
 import type { PortalAppearance } from "@/lib/operations/design/portal-appearance";
+import {
+  defaultActiveStudioSettings,
+  type ActiveStudioSettings,
+} from "@/lib/operations/studio/active-settings-types";
 import styles from "./portal-shell.module.css";
+import settingsStyles from "./studio-settings-context.module.css";
 
 function StudioNavigationLink({
   item,
@@ -100,13 +105,23 @@ export function StudioShell({
   children,
   initialAppearance = "system",
   prefixFreeEnabled = true,
+  studioSettings = defaultActiveStudioSettings,
 }: Readonly<{
   children: React.ReactNode;
+  studioSettings?: Pick<
+    ActiveStudioSettings,
+    "displayName" | "timezone" | "deliveryCapacity"
+  >;
   initialAppearance?: PortalAppearance;
   prefixFreeEnabled?: boolean;
 }>): React.JSX.Element {
   const pathname = usePathname();
   const navigation = getStudioNavigation(pathname);
+  const capacityLabel = {
+    standard: "Standard capacity",
+    limited: "Limited capacity",
+    priority: "Priority capacity",
+  }[studioSettings.deliveryCapacity];
   return (
     <div className={styles.shell}>
       <a className={styles.skip} href="#studio-content">
@@ -128,8 +143,11 @@ export function StudioShell({
         </Link>
         <div className={styles.studioIdentity}>
           <p className={styles.sidebarLabel}>Studio operations</p>
-          <p className={styles.studioIdentityName}>Founder workspace</p>
-          <span>All clients</span>
+          <p className={styles.studioIdentityName}>
+            {studioSettings.displayName}
+          </p>
+          <span>All clients · {studioSettings.timezone}</span>
+          <span>{capacityLabel}</span>
         </div>
         <nav className={styles.navigation} aria-label="FSS Studio modules">
           {navigation.map((item) => (
@@ -143,8 +161,10 @@ export function StudioShell({
       </aside>
       <div className={styles.content}>
         <header className={styles.topbar}>
-          <p className={styles.context}>FSS Studio</p>
-          <div className={styles.toolbarActions}>
+          <p className={styles.context}>{studioSettings.displayName}</p>
+          <div
+            className={`${styles.toolbarActions} ${settingsStyles.toolbarActions}`}
+          >
             <Link
               className={styles.toolbarIcon}
               href={portalPath(
@@ -164,6 +184,16 @@ export function StudioShell({
             </PortalSignOutButton>
           </div>
         </header>
+        <div
+          className={settingsStyles.mobileContext}
+          role="group"
+          aria-label="Applied Studio settings"
+        >
+          <p>{studioSettings.displayName}</p>
+          <span>
+            {studioSettings.timezone} · {capacityLabel}
+          </span>
+        </div>
         <main className={styles.main} id="studio-content">
           {children}
         </main>

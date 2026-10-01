@@ -1,0 +1,28 @@
+.toolbarActions {
+  flex-wrap: wrap;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.mobileContext {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .mobileContext {
+    display: grid;
+    gap: 4px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--portal-border, #e1e6e9);
+    color: var(--portal-muted, #46566c);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  .mobileContext p {
+    margin: 0;
+    color: var(--portal-ink, #0a1a2e);
+    font-weight: 600;
+  }
+}

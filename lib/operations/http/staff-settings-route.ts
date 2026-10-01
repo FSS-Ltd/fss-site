@@ -12,18 +12,29 @@ import { requireFssAdmin } from "../auth/require-admin";
 import { getPortalIdentity } from "../auth/server";
 import type { FssAdminContext } from "../auth/staff-types";
 import { getOperationsDb, operationsEnabled } from "../db/client";
-import { saveStudioSettingsDraft, StudioSettingsConflict } from "../studio/settings";
+import {
+  applyActiveStudioSettings,
+  ActiveStudioSettingsConflict,
+} from "../studio/active-settings";
+import type { ActiveStudioSettings } from "../studio/active-settings-types";
 import { getPortalDb } from "../db/portal-client";
 
-type SavedDraft = Readonly<{ revision: number; createdAt: string }>;
+type SavedSettings = ActiveStudioSettings;
 
 export type StaffSettingsRouteDependencies<TActor> = Readonly<{
   authorize: () => Promise<TActor>;
   createCorrelationId: () => string;
   enabled: boolean;
-  execute: (actor: TActor, input: unknown, correlationId: string) => Promise<SavedDraft>;
+  execute: (
+    actor: TActor,
+    input: unknown,
+    correlationId: string,
+  ) => Promise<SavedSettings>;
   origin: string;
-  reportUnexpectedError: (report: { correlationId: string; errorName: string }) => void;
+  reportUnexpectedError: (report: {
+    correlationId: string;
+    errorName: string;
+  }) => void;
 }>;
 
 export function createStaffSettingsRouteHandler<TActor>(
@@ -32,7 +43,10 @@ export function createStaffSettingsRouteHandler<TActor>(
   return async (request) => {
     const correlationId = deps.createCorrelationId();
     const reply = (body: object, status: number) =>
-      Response.json(body, { headers: privateAuthHeaders(correlationId), status });
+      Response.json(body, {
+        headers: privateAuthHeaders(correlationId),
+        status,
+      });
     const failure = (error: string, status: number) => reply({ error }, status);
     if (!deps.enabled) return failure("FSS Studio is unavailable.", 404);
     let actor: TActor;
@@ -43,7 +57,10 @@ export function createStaffSettingsRouteHandler<TActor>(
     }
     if (!requestHasRegisteredOrigin(request, deps.origin))
       return failure("The request origin is not allowed.", 403);
-    if (request.headers.get("content-type")?.split(";")[0].trim() !== "application/json")
+    if (
+      request.headers.get("content-type")?.split(";")[0].trim() !==
+      "application/json"
+    )
       return failure("Send a JSON request.", 415);
     try {
       return reply(
@@ -55,20 +72,25 @@ export function createStaffSettingsRouteHandler<TActor>(
         200,
       );
     } catch (error) {
-      if (error instanceof StudioSettingsConflict)
-        return failure(error.message, 409);
+      if (error instanceof ActiveStudioSettingsConflict)
+        return reply({ current: error.current, error: error.message }, 409);
       if (error instanceof z.ZodError)
-        return failure("Check the settings draft and try again.", 400);
+        return failure("Check the settings section and try again.", 400);
       if (error instanceof PayloadTooLargeError)
-        return failure("The settings draft is too large.", 413);
+        return failure("The settings section is too large.", 413);
       if (error instanceof SyntaxError)
         return failure("The request must contain valid JSON.", 400);
       const errorName = error instanceof Error ? error.name : "UnknownError";
       deps.reportUnexpectedError({
         correlationId,
-        errorName: /^[A-Za-z]{1,80}$/.test(errorName) ? errorName : "UnknownError",
+        errorName: /^[A-Za-z]{1,80}$/.test(errorName)
+          ? errorName
+          : "UnknownError",
       });
-      return failure("We could not save this settings draft. Your edits are still here.", 503);
+      return failure(
+        "We could not apply these settings. Your edits are still here.",
+        503,
+      );
     }
   };
 }
@@ -83,9 +105,9 @@ export function staffSettingsRoute(): (request: Request) => Promise<Response> {
     createCorrelationId: randomUUID,
     enabled: operationsEnabled() && fssStudioEnabled(),
     execute: (admin, input, correlationId) =>
-      saveStudioSettingsDraft(getOperationsDb(), admin, input, correlationId),
+      applyActiveStudioSettings(getOperationsDb(), admin, input, correlationId),
     origin: new URL(resolveSiteUrl()).origin,
     reportUnexpectedError: (report) =>
-      console.error("Studio settings draft failed.", report),
+      console.error("Studio settings apply failed.", report),
   });
 }

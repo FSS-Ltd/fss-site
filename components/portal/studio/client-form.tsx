@@ -27,9 +27,11 @@ function formValue(data: FormData, name: string): string {
 
 export function StudioClientForm({
   embedded = false,
+  defaultTimezone = "Europe/London",
   onCancel,
 }: Readonly<{
   embedded?: boolean;
+  defaultTimezone?: string;
   onCancel?: () => void;
 }> = {}): React.JSX.Element {
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -126,7 +128,7 @@ export function StudioClientForm({
             </PortalField>
             <PortalField error={errors.timezone} label="Time zone" required>
               <input
-                defaultValue="Europe/London"
+                defaultValue={defaultTimezone}
                 disabled={pending}
                 maxLength={100}
                 name="timezone"

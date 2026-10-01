@@ -16,6 +16,7 @@ import { ClientCreateDialog } from "./client-create-dialog";
 type StudioClientRegisterProps = Readonly<{
   clients: WorkspaceCollectionPage<StudioClient>;
   query: string;
+  defaultTimezone?: string;
 }>;
 
 function clientsHref(page: number, query: string): string {
@@ -47,11 +48,12 @@ function contactInitials(name: string): string {
 export function StudioClientRegister({
   clients,
   query,
+  defaultTimezone,
 }: StudioClientRegisterProps): React.JSX.Element {
   return (
     <section className={styles.page} aria-labelledby="studio-clients-heading">
       <PageHeader
-        action={<ClientCreateDialog />}
+        action={<ClientCreateDialog defaultTimezone={defaultTimezone} />}
         eyebrow="FSS Studio · Clients"
         title="Your clients"
         titleId="studio-clients-heading"

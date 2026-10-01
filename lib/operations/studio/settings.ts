@@ -3,6 +3,22 @@ import { withFssAdminTransaction } from "../auth/staff-transaction";
 import type { FssAdminContext } from "../auth/staff-types";
 import { readBillingConfiguration } from "../billing/configuration";
 import type { OperationsDb } from "../db/client";
+import { readActiveStudioSettings } from "./active-settings";
+import type { ActiveStudioSettings } from "./active-settings-types";
+import { approvedStudioReplyToAddresses } from "./settings-reply-to";
+export { approvedStudioReplyToAddresses } from "./settings-reply-to";
+export {
+  applyActiveStudioSettings,
+  loadActiveStudioSettings,
+  readActiveStudioSettings,
+  readPortalStudioPresentationSettings,
+  ActiveStudioSettingsConflict,
+} from "./active-settings";
+export type {
+  ActiveStudioSettings,
+  StudioPresentationSettings,
+  StudioSettingsSectionUpdate,
+} from "./active-settings-types";
 
 const capacitySchema = z.enum(["standard", "limited", "priority"]);
 const draftSchema = z.strictObject({
@@ -11,14 +27,19 @@ const draftSchema = z.strictObject({
   expectedRevision: z.coerce.number().int().min(0),
   replyTo: z.string().trim().email().max(254).nullable(),
   responseExpectationHours: z.coerce.number().int().min(1).max(168),
-  timezone: z.string().trim().min(1).max(100).refine((value) => {
-    try {
-      new Intl.DateTimeFormat("en", { timeZone: value });
-      return true;
-    } catch {
-      return false;
-    }
-  }, "Choose a valid IANA timezone."),
+  timezone: z
+    .string()
+    .trim()
+    .min(1)
+    .max(100)
+    .refine((value) => {
+      try {
+        new Intl.DateTimeFormat("en", { timeZone: value });
+        return true;
+      } catch {
+        return false;
+      }
+    }, "Choose a valid IANA timezone."),
 });
 
 export type StudioSettingsDraft = Readonly<{
@@ -31,23 +52,26 @@ export type StudioSettingsDraft = Readonly<{
   createdAt: string;
 }>;
 
-export type StudioIntegrationHealth = Readonly<{
+export type StudioIntegrationConfiguration = Readonly<{
   name: "Authentication" | "Email" | "Signing" | "Billing" | "File scanning";
   available: boolean;
   detail: string;
 }>;
 
 export type StudioSettings = Readonly<{
+  active: ActiveStudioSettings;
   draft: StudioSettingsDraft | null;
   approvedReplyTo: readonly string[];
-  integrationHealth: readonly StudioIntegrationHealth[];
+  integrationConfiguration: readonly StudioIntegrationConfiguration[];
 }>;
 
 type SettingsRow = StudioSettingsDraft;
 
 export class StudioSettingsConflict extends Error {
   constructor() {
-    super("This settings draft changed. Refresh before saving another revision.");
+    super(
+      "This settings draft changed. Refresh before saving another revision.",
+    );
     this.name = "StudioSettingsConflict";
   }
 }
@@ -60,11 +84,13 @@ function billingAvailable(): boolean {
   }
 }
 
-/** Deployment controls are read-only health signals, never form inputs. */
-export function studioIntegrationHealth(): readonly StudioIntegrationHealth[] {
+/** Configuration availability is not a live provider-health probe. */
+export function studioIntegrationConfiguration(): readonly StudioIntegrationConfiguration[] {
   return [
     {
-      available: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith("pk_") === true,
+      available:
+        process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith("pk_") ===
+        true,
       detail: "Identity is managed by the portal deployment.",
       name: "Authentication",
     },
@@ -91,11 +117,6 @@ export function studioIntegrationHealth(): readonly StudioIntegrationHealth[] {
   ];
 }
 
-/** No sender identity is sourced from runtime secrets or browser input. */
-export function approvedStudioReplyToAddresses(): readonly string[] {
-  return [];
-}
-
 export async function loadStudioSettings(
   db: OperationsDb,
   admin: FssAdminContext,
@@ -110,9 +131,10 @@ export async function loadStudioSettings(
       limit 1
     `;
     return {
+      active: await readActiveStudioSettings(tx),
       approvedReplyTo: approvedStudioReplyToAddresses(),
       draft: draft ?? null,
-      integrationHealth: studioIntegrationHealth(),
+      integrationConfiguration: studioIntegrationConfiguration(),
     };
   });
 }
@@ -150,7 +172,8 @@ export async function saveStudioSettingsDraft(
       for update
     `;
     const currentRevision = latest?.revision ?? 0;
-    if (currentRevision !== draft.expectedRevision) throw new StudioSettingsConflict();
+    if (currentRevision !== draft.expectedRevision)
+      throw new StudioSettingsConflict();
     const [saved] = await tx<Array<{ revision: number; createdAt: string }>>`
       insert into operations.studio_settings_drafts (
         revision, display_name, reply_to, timezone, response_expectation_hours,

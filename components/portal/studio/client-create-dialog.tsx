@@ -6,7 +6,9 @@ import { PortalButton } from "@/components/portal/ui";
 import { StudioClientForm } from "./client-form";
 import styles from "./client-create-dialog.module.css";
 
-export function ClientCreateDialog(): React.JSX.Element {
+export function ClientCreateDialog({
+  defaultTimezone = "Europe/London",
+}: Readonly<{ defaultTimezone?: string }>): React.JSX.Element {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [dirty, setDirty] = useState(false);
   const [formKey, setFormKey] = useState(0);
@@ -64,7 +66,12 @@ export function ClientCreateDialog(): React.JSX.Element {
           </button>
         </div>
         <div className={styles.body} onInput={() => setDirty(true)}>
-          <StudioClientForm embedded key={formKey} onCancel={close} />
+          <StudioClientForm
+            defaultTimezone={defaultTimezone}
+            embedded
+            key={formKey}
+            onCancel={close}
+          />
         </div>
       </dialog>
     </>
