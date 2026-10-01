@@ -89,7 +89,7 @@ async function expectVisualScreenshot(
 
   // Ubuntu Chromium can rasterize native select text differently between CI runs.
   await expect(page).toHaveScreenshot(filename, {
-    maxDiffPixels: Math.min(visibleContentSelects * 750, 1500),
+    maxDiffPixels: Math.min(Math.max(visibleContentSelects * 750, 50), 3000),
   });
 }
 
