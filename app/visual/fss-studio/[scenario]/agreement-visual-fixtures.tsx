@@ -3,10 +3,8 @@ import { ClientAgreementList } from "@/components/portal/agreements/client-agree
 import { ClientSigningReview } from "@/components/portal/agreements/client-signing-review";
 import { RoutedEngagementForm } from "@/components/portal/agreements/routed-engagement-form";
 import { StaffAgreementDetail } from "@/components/portal/agreements/staff-agreement-detail";
-import {
-  StaffAgreementBuilder,
-  type AgreementEngagementChoice,
-} from "@/components/portal/agreements/staff-agreement-builder";
+import { RoutedStaffAgreementBuilder } from "@/components/portal/agreements/routed-staff-agreement-builder";
+import type { AgreementEngagementChoice } from "@/components/portal/agreements/staff-agreement-builder";
 import { StaffAgreementOverview } from "@/components/portal/agreements/staff-agreement-overview";
 import { StaffSigningStatus } from "@/components/portal/agreements/staff-signing-status";
 import { SignatureEvidenceForm } from "@/components/portal/agreements/signature-evidence-form";
@@ -270,14 +268,13 @@ export function StudioAgreementBuilderScenario({
         eyebrow="FSS Studio / Agreements"
         title="Create an agreement"
       />
-      <StaffAgreementBuilder
+      <RoutedStaffAgreementBuilder
         agreementListHref={`/portal/admin/clients/${organisationId}/agreements`}
         baseHref={`/portal/admin/clients/${organisationId}/agreements/new`}
         commandEndpoint={`/api/portal/admin/clients/${organisationId}/agreement-drafts`}
         engagementHref={`/portal/admin/clients/${organisationId}/engagements/new?draftId=${currentDraft.id}`}
         engagements={noEngagement ? [] : engagementChoices}
         initialDraft={currentDraft}
-        onNavigate={(href) => window.history.pushState(null, "", href)}
         organisationName="Northstar Studio"
       />
     </StudioShell>
