@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { ResourceThankYouPage } from "@/components/resources/resource-thank-you-page";
+import { PlumberPromptKitThankYou } from "@/components/resources/plumber-prompt-kit-thank-you";
 import { getAllResources, getResourceBySlug } from "@/lib/resources";
 
 type ResourceThankYouRouteProps = {
@@ -48,5 +49,9 @@ export default async function ResourceThankYouRoutePage({
     notFound();
   }
 
-  return <ResourceThankYouPage resource={resource.meta} />;
+  return slug === "ai-prompts-for-plumbers" ? (
+    <PlumberPromptKitThankYou resource={resource.meta} />
+  ) : (
+    <ResourceThankYouPage resource={resource.meta} />
+  );
 }

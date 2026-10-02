@@ -1,0 +1,343 @@
+.page {
+  background: linear-gradient(180deg, #f5f6f6 0%, #ffffff 58%, #f5f6f6 100%);
+  color: #142030;
+  padding: 7rem 0 6rem;
+}
+
+.hero {
+  display: grid;
+  grid-template-areas: "intro form" "preview form";
+  grid-template-columns: minmax(0, 1.1fr) minmax(360px, 0.9fr);
+  gap: 2rem 5rem;
+  align-items: start;
+}
+
+.intro {
+  grid-area: intro;
+}
+
+.backLink {
+  display: inline-block;
+  color: #0f7078;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 2.5rem;
+  text-underline-offset: 0.2em;
+}
+
+.backLink:hover,
+.backLink:focus-visible {
+  text-decoration: underline;
+}
+
+.eyebrow,
+.formEyebrow {
+  color: #a64224;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.intro h1 {
+  color: #141414;
+  font-size: clamp(3.1rem, 5.7vw, 5.7rem);
+  font-weight: 750;
+  letter-spacing: -0.06em;
+  line-height: 1.02;
+  margin: 1.1rem 0 1.6rem;
+  max-width: 10ch;
+  text-wrap: balance;
+}
+
+.lead {
+  color: #334355;
+  font-size: clamp(1.1rem, 1.7vw, 1.33rem);
+  line-height: 1.58;
+  max-width: 37rem;
+}
+
+.credit {
+  color: #536173;
+  font-size: 0.89rem;
+  margin-top: 1.5rem;
+}
+
+.formCard {
+  grid-area: form;
+  background: #ffffff;
+  border: 1px solid rgba(10, 26, 46, 0.12);
+  border-radius: 1.5rem;
+  box-shadow: 0 24px 60px -36px rgba(10, 26, 46, 0.26);
+  padding: clamp(1.5rem, 3vw, 2.3rem);
+}
+
+.formCard h2 {
+  color: #141414;
+  font-size: clamp(1.7rem, 2.4vw, 2.2rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.15;
+  margin: 0.8rem 0 0.7rem;
+}
+
+.formIntro {
+  color: #46566c;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  margin-bottom: 1.5rem;
+}
+
+.preview {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  grid-area: preview;
+  margin: 0;
+}
+
+.previewImage {
+  background: #f2e8d9;
+  border: 1px solid rgba(10, 26, 46, 0.14);
+  box-shadow: 0 12px 30px -16px rgba(10, 26, 46, 0.3);
+  flex: 0 0 9rem;
+  overflow: hidden;
+  transform: rotate(-2deg);
+}
+
+.previewImage img {
+  display: block;
+  height: auto;
+  width: 100%;
+}
+
+.preview figcaption {
+  color: #536173;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  max-width: 9rem;
+}
+
+.contentSection {
+  margin-top: clamp(5rem, 9vw, 8rem);
+}
+
+.sectionIntro {
+  max-width: 41rem;
+}
+
+.sectionIntro h2,
+.exampleSection h2 {
+  color: #141414;
+  font-size: clamp(2rem, 3.7vw, 3.2rem);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 1.1;
+  margin: 0.8rem 0 1rem;
+  text-wrap: balance;
+}
+
+.sectionIntro > p:last-child,
+.exampleSection > div > p:last-child {
+  color: #46566c;
+  font-size: 1.05rem;
+  line-height: 1.65;
+}
+
+.taskGrid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  list-style: none;
+  margin: 2.5rem 0 0;
+  padding: 0;
+}
+
+.taskGrid li {
+  background: #ffffff;
+  border: 1px solid rgba(10, 26, 46, 0.1);
+  border-radius: 1rem;
+  font-size: 1.05rem;
+  font-weight: 650;
+  line-height: 1.4;
+  min-height: 9rem;
+  padding: 1.25rem;
+}
+
+.taskGrid span,
+.stepGrid span {
+  color: #a64224;
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  margin-bottom: 1.35rem;
+}
+
+.exampleSection {
+  align-items: center;
+  background: #f6eee5;
+  border-radius: 1.5rem;
+  display: grid;
+  gap: 3rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: clamp(5rem, 9vw, 8rem);
+  padding: clamp(1.5rem, 4vw, 3.5rem);
+}
+
+.exampleSection blockquote {
+  border-left: 3px solid #b54e2c;
+  color: #242424;
+  font-size: clamp(1.15rem, 1.8vw, 1.5rem);
+  font-weight: 500;
+  line-height: 1.55;
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.exampleSection cite {
+  color: #615b55;
+  display: block;
+  font-size: 0.8rem;
+  font-style: normal;
+  font-weight: 600;
+  margin-top: 1.5rem;
+}
+
+.stepGrid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  list-style: none;
+  margin: 2.5rem 0 0;
+  padding: 0;
+}
+
+.stepGrid li {
+  border-top: 2px solid #b54e2c;
+  padding-top: 1.2rem;
+}
+
+.stepGrid h3 {
+  color: #141414;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.stepGrid p,
+.safetyNote {
+  color: #46566c;
+  line-height: 1.65;
+  margin-top: 0.6rem;
+}
+
+.safetyNote {
+  border-top: 1px solid rgba(10, 26, 46, 0.12);
+  font-size: 0.9rem;
+  margin-top: 3rem;
+  max-width: 48rem;
+  padding-top: 1.5rem;
+}
+
+.thankYou {
+  background: #ffffff;
+  border: 1px solid rgba(10, 26, 46, 0.12);
+  border-radius: 1.5rem;
+  margin: 0 auto;
+  max-width: 43rem;
+  padding: clamp(2rem, 6vw, 4rem);
+  text-align: center;
+}
+
+.thankYou h1 {
+  color: #141414;
+  font-size: clamp(2.8rem, 5vw, 4rem);
+  font-weight: 750;
+  letter-spacing: -0.05em;
+  line-height: 1.1;
+  margin: 1rem 0;
+}
+
+.thankYou > p:not(.eyebrow) {
+  color: #46566c;
+  line-height: 1.6;
+}
+
+.downloadButton {
+  align-items: center;
+  background: #0a1a2e;
+  border-radius: 999px;
+  color: #ffffff;
+  display: inline-flex;
+  font-size: 1rem;
+  font-weight: 700;
+  justify-content: center;
+  margin-top: 2rem;
+  min-height: 3rem;
+  padding: 0.75rem 1.5rem;
+}
+
+.downloadButton:hover {
+  background: #143758;
+}
+
+.downloadButton:focus-visible {
+  outline: 3px solid #0f7078;
+  outline-offset: 4px;
+}
+
+.thankYou .downloadHelp {
+  font-size: 0.85rem;
+  margin: 1rem 0 2rem;
+}
+
+.thankYou .backLink {
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .hero {
+    gap: 2rem 3rem;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 0.9fr);
+  }
+
+  .taskGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .page {
+    padding-top: 6rem;
+  }
+
+  .hero {
+    grid-template-areas: "intro" "form" "preview";
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .backLink {
+    margin-bottom: 2rem;
+  }
+
+  .intro h1 {
+    max-width: 12ch;
+  }
+
+  .exampleSection,
+  .stepGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .taskGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .taskGrid li {
+    min-height: 0;
+  }
+}
