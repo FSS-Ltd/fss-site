@@ -43,11 +43,15 @@ Merge verification: 85 focused onboarding/client-form units, 38 desktop/mobile w
 
 ## Remaining release conditions
 
-CI repair, 2026-10-02: three real-signing integration scenarios had expired fixed October 1 activation/payment dates. The shared signing fixture now derives service and payment dates from the database clock, and commercial activation records today's verified evidence. Production date guards remain unchanged. The failing files pass all 12 tests; the exact Operations CI coverage command passes all 590 tests (92.34% lines, 88.34% branches, 93.46% functions). TypeScript, scoped ESLint, formatting and whitespace checks pass. GitHub verification and redesigned visual-baseline review are in progress.
+CI repair, 2026-10-02: three real-signing integration scenarios had expired fixed October 1 activation/payment dates. The shared signing fixture now derives service and payment dates from the database clock, and commercial activation records today's verified evidence. Production date guards remain unchanged. The failing files pass all 12 tests; the exact Operations CI coverage command passes all 590 tests (92.34% lines, 88.34% branches, 93.46% functions). GitHub's Linux runner also passes Operations and Growth coverage. TypeScript, repository lint, formatting and whitespace checks pass.
+
+The redesigned pages and applied Studio identity/capacity required refreshed visual baselines. All 104 changed macOS captures were reviewed; the complete browser run now passes 259 applicable tests, with 173 deliberate opposite-viewport skips. Settings screenshots use Playwright's portable per-test output directory. All 104 Linux captures were reviewed from CI artifacts: 92 replace outdated references and 12 supply missing dark agreement baselines. The four Linux settings failures were exactly the two nonportable capture paths across both viewports. The final GitHub rerun remains the release gate.
+
+The production build exposed an unused responsive Tailwind utility generated from a JavaScript parameter named `container`. Renaming it to the existing agreement-form `group` terminology removes 267 unused bytes without changing validation behaviour. The production build, existing 66 KB CSS budget (65.9 KB actual), and all 42 agreement browser tests pass. The budget and screenshot tolerances remain unchanged.
 
 The repository screen-coverage command still reports two routes introduced by unrelated commercial work without coverage rows: `/portal/agreements/offers/:parameter` and `/portal/admin/clients/:parameter/commercial-offers/:parameter`. This task updated all welcome, access and settings rows and preserved the commercial edits.
 
-CI and real Outlook/Gmail delivery were not exercised. No production migrations, deployment, invitations or outbound emails were performed. Before rollout, follow [the rollout guide](./fss-welcome-rollout.md), configure the approved reply-to list, apply active settings, and save/publish the three designed editions through the existing template workflow. Existing edited drafts are deliberately not converted or published automatically.
+Final GitHub CI verification is in progress; real Outlook/Gmail delivery remains unexercised. No production migrations, deployment, invitations or outbound emails were performed. Before rollout, follow [the rollout guide](./fss-welcome-rollout.md), configure the approved reply-to list, apply active settings, and save/publish the three designed editions through the existing template workflow. Existing edited drafts are deliberately not converted or published automatically.
 
 The historical settings draft writer retains a pre-existing database grant mismatch; historical drafts remain readable and inactive. The new active settings writer passed real database tests. Browser-history transitions within the same App Router document are not directly trapped by the dirty guard; explicit page links, cancel/discard and reload/unload are covered.
 
@@ -55,7 +59,7 @@ The historical settings draft writer retains a pre-existing database grant misma
 
 Prepared PDFs and desktop contact sheets are retained under `/Users/JeanFidele/.codex/visualizations/2026/10/01/01a0f8de-bf5b-7411-b606-acf9017c02ba/welcome-packets/`.
 
-Detailed logs, visual captures, hashes, coverage, ownership manifests and agent reports are under `/private/tmp/fss-welcome-redesign/`. The original worktree dependency directory was preserved; this checkout now owns its patched node_modules. No temporary Git worktree was created.
+Detailed logs, visual captures, hashes, coverage, ownership manifests and agent reports are under `/private/tmp/fss-welcome-redesign/`. The original worktree dependency directory was preserved; this checkout now owns its patched node_modules. PR integration and CI repair use isolated temporary Git worktrees, retained until their commits are safely pushed.
 
 ## Changed files
 

@@ -15,7 +15,7 @@ test("keyboard editor retains dirty values until explicit discard and restores f
   page,
 }, testInfo) => {
   await page.screenshot({
-    path: `/private/tmp/fss-welcome-redesign/settings-summary-${testInfo.project.name}.png`,
+    path: testInfo.outputPath("settings-summary.png"),
     fullPage: true,
   });
   const edit = page.getByRole("button", { name: "Edit identity", exact: true });
@@ -210,7 +210,7 @@ test("dark appearance at 200 percent keeps controls visible without horizontal o
     page.getByRole("button", { name: "Save and apply" }),
   ).toBeVisible();
   await page.screenshot({
-    path: `/private/tmp/fss-welcome-redesign/settings-dark-200-${testInfo.project.name}.png`,
+    path: testInfo.outputPath("settings-dark-200.png"),
     fullPage: true,
   });
   const heading = await page
