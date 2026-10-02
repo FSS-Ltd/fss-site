@@ -614,6 +614,9 @@ test("selected revenue share signs, activates ongoing service and bills retained
     const [record] = await f.admin<
       { version: number }[]
     >`select version from operations.agreements where id=${selected.agreementId}`;
+    const [dates] = await f.admin<
+      { today: string }[]
+    >`select current_date::text as today`;
     const activated = await executeAgreementCommand(
       f.founderDb,
       f.founder,
@@ -624,11 +627,11 @@ test("selected revenue share signs, activates ongoing service and bills retained
         expectedVersion: record.version,
         lineNumber: 2,
         evidence: {
-          effectiveDate: "2026-10-01",
+          effectiveDate: dates.today,
           assetsReady: true,
           deposit: {
             amountPence: f.draft.requiredDepositPence,
-            verifiedDate: "2026-10-01",
+            verifiedDate: dates.today,
             reference: "Verified setup deposit",
           },
         },

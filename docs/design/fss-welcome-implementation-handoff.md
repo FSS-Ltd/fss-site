@@ -43,6 +43,8 @@ Merge verification: 85 focused onboarding/client-form units, 38 desktop/mobile w
 
 ## Remaining release conditions
 
+CI repair, 2026-10-02: three real-signing integration scenarios had expired fixed October 1 activation/payment dates. The shared signing fixture now derives service and payment dates from the database clock, and commercial activation records today's verified evidence. Production date guards remain unchanged. The failing files pass all 12 tests; the exact Operations CI coverage command passes all 590 tests (92.34% lines, 88.34% branches, 93.46% functions). TypeScript, scoped ESLint, formatting and whitespace checks pass. GitHub verification and redesigned visual-baseline review are in progress.
+
 The repository screen-coverage command still reports two routes introduced by unrelated commercial work without coverage rows: `/portal/agreements/offers/:parameter` and `/portal/admin/clients/:parameter/commercial-offers/:parameter`. This task updated all welcome, access and settings rows and preserved the commercial edits.
 
 CI and real Outlook/Gmail delivery were not exercised. No production migrations, deployment, invitations or outbound emails were performed. Before rollout, follow [the rollout guide](./fss-welcome-rollout.md), configure the approved reply-to list, apply active settings, and save/publish the three designed editions through the existing template workflow. Existing edited drafts are deliberately not converted or published automatically.
