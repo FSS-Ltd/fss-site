@@ -184,3 +184,40 @@ test("domain conflict adapter only masks expected race errors", async () => {
     (error) => error === original,
   );
 });
+
+test("retained PDFs bind supported currencies and complete revenue-share terms", async () => {
+  const hashes = new Set<string>();
+  for (const currency of ["GBP", "USD", "EUR"] as const) {
+    const draft = {
+      ...agreementDraft(),
+      currency,
+      revenueShare: {
+        percentageBps: 1000,
+        revenueSource: "Product sales",
+        calculationBasis: "Collected receipts",
+        duration: "12 months",
+        reportingRequirements: "Monthly",
+        paymentTerms: "14 days",
+      },
+    };
+    const source = await renderAgreementSource(draft, "Example Limited");
+    assert.equal(source.subarray(0, 5).toString(), "%PDF-");
+    hashes.add(signingHash(source));
+    assert.deepEqual(agreementContent(draft).revenueShare, draft.revenueShare);
+    assert.notEqual(
+      signingHash(source),
+      signingHash(
+        await renderAgreementSource(
+          {
+            ...draft,
+            revenueShare: { ...draft.revenueShare, paymentTerms: "30 days" },
+          },
+          "Example Limited",
+        ),
+      ),
+    );
+  }
+  assert.equal(hashes.size, 3);
+  assert.equal(signingPounds("2000", "USD"), "$20.00");
+  assert.equal(signingPounds("2000", "EUR"), "€20.00");
+});

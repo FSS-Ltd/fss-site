@@ -19,7 +19,9 @@ const engagementId = "22222222-2222-4222-8222-222222222222";
 
 function renderBuilder(
   engagements: readonly { id: string; name: string }[],
-  initialDraft: Parameters<typeof StaffAgreementBuilder>[0]["initialDraft"] = null,
+  initialDraft: Parameters<
+    typeof StaffAgreementBuilder
+  >[0]["initialDraft"] = null,
 ) {
   return renderToStaticMarkup(
     <StaffAgreementBuilder
@@ -28,6 +30,7 @@ function renderBuilder(
       engagementHref={`/portal/admin/clients/${organisationId}/engagements/new`}
       engagements={engagements}
       initialDraft={initialDraft}
+      onNavigate={() => undefined}
       organisationName="Northstar Studio"
     />,
   );
@@ -35,12 +38,16 @@ function renderBuilder(
 
 test("the link step presents reviewed work and a saved-draft continuation", () => {
   const html = renderBuilder([
-    { id: engagementId, name: "Website & booking experience · Discovery complete" },
+    {
+      id: engagementId,
+      name: "Website & booking experience · Discovery complete",
+    },
   ]);
 
   assert.match(html, /Link the right work/);
   assert.match(html, /Discovery complete/);
-  assert.match(html, /Continue to scope/);
+  assert.match(html, />Continue<svg/);
+  assert.match(html, /data-builder-group="1" hidden/);
   assert.doesNotMatch(html, /New agreement<\/legend>/);
 });
 
@@ -75,7 +82,8 @@ test("a server-loaded saved draft opens at its persisted builder step", () => {
   });
 
   assert.match(html, /Define the work/);
-  assert.match(html, /Continue to fees/);
+  assert.match(html, />Continue<svg/);
+  assert.match(html, /data-builder-group="1" hidden/);
   assert.doesNotMatch(html, /Link the right work/);
 });
 
@@ -97,3 +105,63 @@ test("the review step does not claim that creating an agreement also prepares si
   assert.match(html, />Create agreement</);
   assert.doesNotMatch(html, /Create agreement &amp; prepare signing/);
 });
+
+for (const mode of ["client_proposed", "revenue_share"] as const) {
+  test(`review describes ${mode} recurring services without a zero-price promise`, () => {
+    const html = renderBuilder([], {
+      content: {
+        engagementId,
+        agreement: {
+          currency: "GBP",
+          title: "Recurring support",
+          lines: [
+            {
+              description: "Support",
+              serviceCode: "support",
+              quantity: 1,
+              unitPence: "0",
+              discountPence: "0",
+              taxPence: "0",
+              recurrenceMonths: 1,
+              startDate: "2026-10-01",
+              endDate: null,
+            },
+          ],
+        },
+        commercialOffer: {
+          expiresAt: "2026-11-01T00:00:00.000Z",
+          spec: {
+            cash:
+              mode === "client_proposed" ? { mode: "client_proposed" } : null,
+            revenueShare:
+              mode === "revenue_share"
+                ? {
+                    mode: "fixed",
+                    percentageBps: 1000,
+                    revenueSource: "Bookings",
+                    calculationBasis: "Gross revenue",
+                    duration: "One year",
+                    reportingRequirements: "Monthly report",
+                    paymentTerms: "Monthly settlement",
+                  }
+                : null,
+          },
+        },
+      },
+      id: "33333333-3333-4333-8333-333333333333",
+      organisationId,
+      engagementId,
+      createdAt: "2026-10-01T00:00:00.000Z",
+      updatedAt: "2026-10-01T00:00:00.000Z",
+      step: "review",
+      version: 2,
+    });
+    assert.doesNotMatch(html, /£0\.00 every/);
+    assert.match(
+      html,
+      mode === "client_proposed"
+        ? /Support: Amount proposed by client/
+        : /Support: Covered by revenue share/,
+    );
+  });
+}

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { FieldIssues } from "./form-fields";
-import { gbpToPence as poundsToPence } from "@/lib/operations/agreements/money-input";
+import { decimalToMinor } from "@/lib/operations/money";
 export function useAgreementSubmit(
   organisationId: string,
   endpoint = `/api/growth/operations/clients/${organisationId}/agreements`,
@@ -54,12 +54,12 @@ export function useAgreementSubmit(
 }
 class MoneyFieldError extends Error {
   constructor(readonly path: string) {
-    super("Enter a GBP amount with no more than two decimal places.");
+    super("Enter an amount with no more than two decimal places.");
   }
 }
 export function moneyValue(data: FormData, name: string): string {
   try {
-    return poundsToPence(String(data.get(name) ?? "").trim());
+    return decimalToMinor(String(data.get(name) ?? "").trim());
   } catch {
     throw new MoneyFieldError(name);
   }

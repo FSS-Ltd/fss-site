@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { dateOnly, lineSchema, money } from "./validation";
+import { currencySchema } from "../money";
+import { commercialOfferSpecSchema } from "./commercial-types";
 
 export const agreementBuilderSteps = [
   "link",
@@ -24,7 +26,7 @@ const installmentSchema = z.strictObject({
 const partialAgreementSchema = z.strictObject({
   assetsRequired: z.boolean().optional(),
   billingContact: contactEmail.optional(),
-  currency: z.literal("GBP").optional(),
+  currency: currencySchema.optional(),
   goals: text.optional(),
   installments: z.array(installmentSchema).max(30).optional(),
   lines: z.array(lineSchema).max(30).optional(),
@@ -43,7 +45,7 @@ const partialAgreementSchema = z.strictObject({
 const completeAgreementSchema = z.strictObject({
   assetsRequired: z.boolean(),
   billingContact: contactEmail,
-  currency: z.literal("GBP"),
+  currency: currencySchema,
   goals: text,
   installments: z.array(installmentSchema).max(30),
   lines: z.array(lineSchema).min(1).max(30),
@@ -62,11 +64,23 @@ const completeAgreementSchema = z.strictObject({
 export const agreementBuilderDraftContentSchema = z.strictObject({
   agreement: partialAgreementSchema.optional(),
   engagementId: z.uuid().optional(),
+  commercialOffer: z
+    .strictObject({
+      spec: commercialOfferSpecSchema,
+      expiresAt: z.iso.datetime(),
+    })
+    .optional(),
 });
 
 export const completeAgreementBuilderDraftContentSchema = z.strictObject({
   agreement: completeAgreementSchema,
   engagementId: z.uuid(),
+  commercialOffer: z
+    .strictObject({
+      spec: commercialOfferSpecSchema,
+      expiresAt: z.iso.datetime(),
+    })
+    .optional(),
 });
 
 export type AgreementBuilderDraftContent = z.infer<
@@ -85,6 +99,11 @@ export const agreementBuilderDraftCommandSchema = z.discriminatedUnion(
     }),
     z.strictObject({
       action: z.literal("finalise"),
+      draftId: z.uuid(),
+      expectedVersion: z.number().int().positive(),
+    }),
+    z.strictObject({
+      action: z.literal("publish"),
       draftId: z.uuid(),
       expectedVersion: z.number().int().positive(),
     }),

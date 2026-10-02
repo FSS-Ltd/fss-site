@@ -10,6 +10,7 @@ function schedule(overrides: Partial<BillingSchedule> = {}): BillingSchedule {
     organisationId: "org",
     accountId: "acct_test",
     mode: "test",
+    currency: "GBP",
     agreementId: "agreement",
     revision: 1,
     key: "installment:1",
@@ -29,7 +30,7 @@ const command = () => ({
   result: null,
   target: "schedule",
 });
-function providerFixture(timeout = false) {
+function providerFixture(timeout = false, currency = "gbp") {
   const requests: {
     path: string;
     params: URLSearchParams;
@@ -42,7 +43,7 @@ function providerFixture(timeout = false) {
     id: "in_one",
     customer: "cus_one",
     livemode: false,
-    currency: "gbp",
+    currency,
     billing_reason: "subscription_create",
     status: finalized ? "open" : "draft",
     total: item ? 6000 : 0,
@@ -95,6 +96,7 @@ function providerFixture(timeout = false) {
         item = true;
         result = {
           id: "sub_one",
+          currency,
           customer: "cus_one",
           livemode: false,
           latest_invoice: "in_one",
@@ -216,5 +218,38 @@ test("completed subscription retry retrieves only the original invoice without f
   assert.deepEqual(
     f.requests.map((request) => request.path),
     ["/v1/invoices/in_one"],
+  );
+});
+
+test("issued USD and EUR obligations use the signed currency for invoice and price requests", async () => {
+  for (const currency of ["USD", "EUR"] as const) {
+    const f = providerFixture(false, currency.toLowerCase());
+    const result = await createStripeObligation(
+      f.stripe,
+      schedule({ currency }),
+      "cus_one",
+      command(),
+    );
+    assert.equal(result.invoice?.currency, currency.toLowerCase());
+    const invoiceWrite = f.requests.find(
+      (item) => item.path === "/v1/invoices" && item.params.has("currency"),
+    );
+    const itemWrite = f.requests.find(
+      (item) => item.path === "/v1/invoiceitems" && item.params.has("currency"),
+    );
+    assert.equal(invoiceWrite?.params.get("currency"), currency.toLowerCase());
+    assert.equal(itemWrite?.params.get("currency"), currency.toLowerCase());
+  }
+});
+test("a provider currency mismatch prevents issuing the signed obligation", async () => {
+  const f = providerFixture();
+  await assert.rejects(
+    createStripeObligation(
+      f.stripe,
+      schedule({ currency: "USD" }),
+      "cus_one",
+      command(),
+    ),
+    /context mismatch/,
   );
 });

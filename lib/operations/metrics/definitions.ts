@@ -1,3 +1,4 @@
+import { currencySymbol, type Currency } from "../money";
 /** Exact twelfths of a penny support every contracted recurrence without rounding. */
 export const METRIC_DEFINITION_VERSION = "operations-2026-09-08.1";
 export const MRR_UNITS_PER_PENNY = BigInt(12);
@@ -12,11 +13,15 @@ export function formatRatio(value: Ratio): string {
     value.denominator;
   return `${tenths / BigInt(10)}${tenths % BigInt(10) ? `.${tenths % BigInt(10)}` : ""}%`;
 }
-export function formatMoney(pence: bigint, unitsPerPenny = BigInt(1)): string {
+export function formatMoney(
+  pence: bigint,
+  unitsPerPenny = BigInt(1),
+  currency: Currency = "GBP",
+): string {
   const negative = pence < BigInt(0);
   const absolute = negative ? -pence : pence;
   const rounded = (absolute + unitsPerPenny / BigInt(2)) / unitsPerPenny;
-  return `${negative ? "−" : ""}£${(rounded / BigInt(100)).toLocaleString("en-GB")}.${String(rounded % BigInt(100)).padStart(2, "0")}`;
+  return `${negative ? "−" : ""}${currencySymbol(currency)}${(rounded / BigInt(100)).toLocaleString("en-GB")}.${String(rounded % BigInt(100)).padStart(2, "0")}`;
 }
 export function londonDate(instant: string | Date): string {
   const date = new Date(instant);

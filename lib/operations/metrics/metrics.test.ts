@@ -248,3 +248,23 @@ test("fractional annual display has an explicit reconciled rounding adjustment",
   assert.equal(result.totalPence, BigInt(250));
   assert.equal(result.adjustmentPence, BigInt(1));
 });
+
+test("reports accept supported currencies and format monetary values in the selected currency", () => {
+  for (const [currency, symbol] of [
+    ["GBP", "£"],
+    ["USD", "$"],
+    ["EUR", "€"],
+  ] as const) {
+    assert.equal(
+      parseMetricFilters({ currency }, "2026-09-08T00:00:00Z").currency,
+      currency,
+    );
+    assert.equal(
+      formatMoney(BigInt(12000), BigInt(12), currency),
+      `${symbol}10.00`,
+    );
+  }
+  assert.throws(() =>
+    parseMetricFilters({ currency: "JPY" }, "2026-09-08T00:00:00Z"),
+  );
+});

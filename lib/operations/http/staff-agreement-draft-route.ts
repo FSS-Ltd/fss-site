@@ -1,12 +1,12 @@
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
-import { resolveSiteUrl } from "@/lib/config/site-url";
 import {
   PayloadTooLargeError,
   readJsonRequestBody,
   requestHasRegisteredOrigin,
 } from "@/lib/growth/http/founder-request";
 import { privateAuthHeaders } from "../auth/http";
+import { resolvePortalOrigin } from "../auth/configuration";
 import { fssStudioEnabled } from "../auth/release-flags";
 import { requireFssAdmin } from "../auth/require-admin";
 import { getPortalIdentity } from "../auth/server";
@@ -26,6 +26,29 @@ type AgreementDraftRouteResult = Readonly<{
   version: number;
 }>;
 
+type DraftOperation = "save" | "finalise" | "publish" | "unknown";
+
+function draftOperation(input: unknown): DraftOperation {
+  if (input !== null && typeof input === "object" && "action" in input) {
+    const action = input.action;
+    if (action === "save" || action === "finalise" || action === "publish")
+      return action;
+  }
+  return "unknown";
+}
+
+function safeErrorCode(error: unknown): string {
+  if (
+    error !== null &&
+    typeof error === "object" &&
+    "code" in error &&
+    typeof error.code === "string" &&
+    /^[A-Z0-9]{5}$/.test(error.code)
+  )
+    return error.code;
+  return "UNKNOWN";
+}
+
 export type StaffAgreementDraftRouteDependencies<TActor> = Readonly<{
   authorize: () => Promise<TActor>;
   createCorrelationId: () => string;
@@ -40,6 +63,8 @@ export type StaffAgreementDraftRouteDependencies<TActor> = Readonly<{
   reportUnexpectedError: (report: {
     correlationId: string;
     errorName: string;
+    errorCode: string;
+    operation: DraftOperation;
   }) => void;
 }>;
 
@@ -71,11 +96,14 @@ export function createStaffAgreementDraftRouteHandler<TActor>(
       return failure("Send a JSON request.", 415);
     }
 
+    let operation: DraftOperation = "unknown";
     try {
+      const input = await readJsonRequestBody(request, 64 * 1024);
+      operation = draftOperation(input);
       const draft = await deps.execute(
         actor,
         z.uuid().parse(organisationId),
-        await readJsonRequestBody(request, 64 * 1024),
+        input,
         correlationId,
       );
       return reply(draft, 200);
@@ -96,20 +124,23 @@ export function createStaffAgreementDraftRouteHandler<TActor>(
         errorName: /^[A-Za-z]{1,80}$/.test(errorName)
           ? errorName
           : "UnknownError",
+        errorCode: safeErrorCode(error),
+        operation,
       });
       return failure(
-        "We could not save this agreement draft. Your edits are still here. Please try again.",
+        operation === "finalise"
+          ? "We could not create this agreement. Your saved draft is still available. Please try again."
+          : operation === "publish"
+            ? "We could not publish this payment offer. Your saved draft is still available. Please try again."
+            : "We could not save this agreement draft. Your edits are still here. Please try again.",
         503,
       );
     }
   };
 }
 
-export function staffAgreementDraftRoute(): (
-  request: Request,
-  organisationId: string,
-) => Promise<Response> {
-  return createStaffAgreementDraftRouteHandler<FssAdminContext>({
+export function createStaffAgreementDraftRouteDependencies(): StaffAgreementDraftRouteDependencies<FssAdminContext> {
+  return {
     authorize: async () => {
       const identity = await getPortalIdentity();
       if (!identity) throw new Error("unauthorized");
@@ -125,8 +156,17 @@ export function staffAgreementDraftRoute(): (
         input,
         correlationId,
       ),
-    origin: new URL(resolveSiteUrl()).origin,
+    origin: resolvePortalOrigin(),
     reportUnexpectedError: (report) =>
-      console.error("Staff agreement draft save failed.", report),
-  });
+      console.error("Staff agreement draft command failed.", report),
+  };
+}
+
+export function staffAgreementDraftRoute(): (
+  request: Request,
+  organisationId: string,
+) => Promise<Response> {
+  return createStaffAgreementDraftRouteHandler(
+    createStaffAgreementDraftRouteDependencies(),
+  );
 }

@@ -55,6 +55,7 @@ export function billingProviderFixture() {
   });
   const subscription = () => ({
     id: "sub_synthetic",
+    currency: "gbp",
     customer: state.subscriptionCustomer,
     livemode: state.livemode,
     latest_invoice: state.latestInvoiceId,
@@ -65,6 +66,7 @@ export function billingProviderFixture() {
           id: "si_synthetic",
           price: {
             id: "price_original",
+            currency: "gbp",
             product: "prod_synthetic",
             unit_amount: state.pricePence,
           },

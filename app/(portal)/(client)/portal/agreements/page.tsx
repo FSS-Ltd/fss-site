@@ -6,6 +6,8 @@ import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { signingEnabled } from "@/lib/operations/agreements/signing-commands";
 import { listPortalSigning } from "@/lib/operations/agreements/signing-service";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
+import { listPortalCommercialOffers } from "@/lib/operations/agreements/commercial-service";
+import { CommercialOfferList } from "@/components/portal/agreements/commercial-offer-list";
 import { ClientAgreementList } from "@/components/portal/agreements/client-agreement-list";
 import { PageHeader } from "@/components/portal/ui";
 import { portalPath } from "@/lib/operations/auth/portal-url";
@@ -22,7 +24,14 @@ export default async function AgreementsPage({
   );
   if (!context) return <PortalUnavailable />;
   let approvals;
+  let offers;
   try {
+    offers = await listPortalCommercialOffers(
+      getPortalDb(),
+      context.identity,
+      context.organisationId,
+      randomUUID(),
+    );
     approvals = await listPortalSigning(
       getPortalDb(),
       context.identity,
@@ -44,12 +53,15 @@ export default async function AgreementsPage({
         eyebrow="FSS Studio / Agreements"
         title="Your agreements"
       />
+      <CommercialOfferList offers={offers} audience="client" />
       <ClientAgreementList
         approvals={approvals}
         organisationId={context.organisationId}
       />
       {approvals.length === 100 ? (
-        <p className={styles.muted}>The latest 100 signing requests are shown.</p>
+        <p className={styles.muted}>
+          The latest 100 signing requests are shown.
+        </p>
       ) : null}
     </div>
   );

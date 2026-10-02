@@ -53,6 +53,7 @@ export function clientFixture(overrides: Record<string, unknown> = {}) {
       last_payment_error: null,
     },
     "/v1/charges/ch_test": {
+      currency: "gbp",
       id: "ch_test",
       livemode: false,
       customer: "cus_test",
@@ -68,13 +69,23 @@ export function clientFixture(overrides: Record<string, unknown> = {}) {
       },
     },
     "/v1/refunds": {
-      data: [{ id: "re_test", amount: 1000, status: "succeeded" }],
+      data: [
+        {
+          id: "re_test",
+          currency: "gbp",
+          charge: "ch_test",
+          payment_intent: "pi_test",
+          amount: 1000,
+          status: "succeeded",
+        },
+      ],
       has_more: false,
     },
     "/v1/disputes": {
       data: [
         {
           id: "dp_test",
+          currency: "gbp",
           livemode: false,
           payment_intent: "pi_test",
           amount: 2000,
@@ -100,6 +111,7 @@ export function clientFixture(overrides: Record<string, unknown> = {}) {
       data: [
         {
           id: "cn_test",
+          currency: "gbp",
           livemode: false,
           invoice: "in_test",
           amount: 500,

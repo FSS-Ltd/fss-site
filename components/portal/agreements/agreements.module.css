@@ -6,6 +6,34 @@
   min-width: 0;
 }
 
+.engagementForm {
+  display: grid;
+  gap: 16px;
+}
+
+.engagementReview {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--portal-ink, #0a1a2e);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.engagementReview input {
+  width: 18px;
+  height: 18px;
+  margin: 2px 0 0;
+  accent-color: var(--portal-action, #0f7078);
+}
+
+.engagementActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .builder {
   display: grid;
   gap: 16px;
@@ -393,4 +421,71 @@
     grid-column: 2;
     text-align: left;
   }
+}
+
+.compensationFields {
+  display: grid;
+  gap: 16px;
+}
+
+.compensationChoice {
+  display: block;
+  min-height: 44px;
+  padding: 12px;
+  border: 1px solid var(--portal-border, #d9e1e7);
+  border-radius: 12px;
+  cursor: pointer;
+  line-height: 1.6;
+}
+
+.compensationChoice input {
+  width: 18px;
+  height: 18px;
+  margin: 0 8px 0 0;
+  vertical-align: middle;
+  accent-color: var(--portal-action, #0f7078);
+}
+
+.compensationChoice:has(input:checked) {
+  border-color: var(--portal-action, #0f7078);
+}
+
+.compensationChoice:focus-within {
+  outline: 2px solid var(--portal-action, #0f7078);
+  outline-offset: 3px;
+}
+
+.documentPreviewDark,
+.documentPreviewDark h3 {
+  color: var(--portal-dark-ink, #f4f8fc);
+}
+
+.documentPreviewDark .version,
+.documentPreviewDark .muted {
+  color: var(--portal-dark-muted, #c1cddd);
+}
+
+.builderCardHeading {
+  justify-content: flex-start;
+}
+
+.documentPreviewDark .summaryList dd {
+  color: var(--portal-dark-ink, #f4f8fc);
+}
+
+.documentPreviewDark .summaryList dt {
+  color: var(--portal-dark-muted, #c1cddd);
+}
+
+.documentPreviewDark .summaryList div {
+  border-color: #394d66;
+}
+
+.summaryList dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.summaryList dd p {
+  margin: 0 0 8px;
 }

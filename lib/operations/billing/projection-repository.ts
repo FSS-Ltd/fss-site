@@ -1,3 +1,5 @@
+import type { Currency } from "../money";
+import { providerCurrency } from "./stripe-projections";
 import { randomUUID } from "node:crypto";
 import type { OperationsTransaction } from "../db/client";
 import type { BillingCustomer, BillingSchedule } from "./domain-types";
@@ -17,7 +19,7 @@ export async function mappedCustomer(
 ): Promise<BillingCustomer> {
   const [customer] = await tx<
     BillingCustomer[]
-  >`select id,organisation_id as "organisationId",account_id as "accountId",environment as mode,provider_customer_id as "providerCustomerId" from operations.billing_customers where account_id=${scope.accountId} and environment=${scope.mode} and provider_customer_id=${customerId}`;
+  >`select id,organisation_id as "organisationId",account_id as "accountId",environment as mode,currency,provider_customer_id as "providerCustomerId" from operations.billing_customers where account_id=${scope.accountId} and environment=${scope.mode} and provider_customer_id=${customerId}`;
   if (!customer) throw new BillingReconciliationError("unknown_mapping");
   return customer;
 }
@@ -44,25 +46,36 @@ export async function applyInvoiceProjection(
   snapshot: InvoiceReconciliation,
 ): Promise<string> {
   const { invoice } = snapshot;
-  if (
-    invoice.livemode !== (scope.mode === "live") ||
-    invoice.currency !== "gbp"
-  )
+  if (invoice.livemode !== (scope.mode === "live"))
     throw new BillingReconciliationError("scope_mismatch");
   if (invoice.status === "draft")
     throw new BillingReconciliationError("invalid_projection");
+  const currency = providerCurrency(invoice.currency);
   const customer = await mappedCustomer(tx, scope, snapshot.customerId);
+  if (customer.currency !== currency)
+    throw new BillingReconciliationError("scope_mismatch");
   const [existing] = await tx<
-    { id: string; organisationId: string; scheduleId: string }[]
-  >`select id,organisation_id as "organisationId",schedule_id as "scheduleId" from operations.invoices where account_id=${scope.accountId} and environment=${scope.mode} and provider_invoice_id=${invoice.id} for update`;
-  if (existing && existing.organisationId !== customer.organisationId)
+    {
+      id: string;
+      organisationId: string;
+      scheduleId: string;
+      currency: Currency;
+    }[]
+  >`select id,organisation_id as "organisationId",schedule_id as "scheduleId",currency from operations.invoices where account_id=${scope.accountId} and environment=${scope.mode} and provider_invoice_id=${invoice.id} for update`;
+  if (
+    existing &&
+    (existing.organisationId !== customer.organisationId ||
+      existing.currency !== currency)
+  )
     throw new BillingReconciliationError("scope_mismatch");
   if (!existing) {
     const schedules = await tx<
       BillingSchedule[]
-    >`select id,organisation_id as "organisationId",account_id as "accountId",environment as mode,agreement_id as "agreementId",revision,obligation_key as key,owner,amount_pence::text as "amountPence",due_date::text as "dueDate",end_date::text as "endDate",recurrence_months as "recurrenceMonths",description,provider_reference as "providerReference" from operations.billing_schedules where organisation_id=${customer.organisationId} and account_id=${scope.accountId} and environment=${scope.mode} and (provider_reference=${invoice.id} or (owner='subscription' and (provider_reference=${snapshot.subscriptionId} or provider_reference=${snapshot.subscriptionScheduleId})))`;
+    >`select id,organisation_id as "organisationId",account_id as "accountId",environment as mode,agreement_id as "agreementId",revision,obligation_key as key,currency,owner,amount_pence::text as "amountPence",due_date::text as "dueDate",end_date::text as "endDate",recurrence_months as "recurrenceMonths",description,provider_reference as "providerReference" from operations.billing_schedules where organisation_id=${customer.organisationId} and account_id=${scope.accountId} and environment=${scope.mode} and (provider_reference=${invoice.id} or (owner='subscription' and (provider_reference=${snapshot.subscriptionId} or provider_reference=${snapshot.subscriptionScheduleId})))`;
     if (schedules.length !== 1)
       throw new BillingReconciliationError("unknown_mapping");
+    if (schedules[0].currency !== currency)
+      throw new BillingReconciliationError("scope_mismatch");
     await recordInvoice(
       tx,
       schedules[0],
@@ -78,7 +91,10 @@ export async function applyInvoiceProjection(
   for (const payment of [...snapshot.payments].sort((left, right) =>
     left.providerId.localeCompare(right.providerId),
   )) {
-    if (payment.customerId !== customer.providerCustomerId)
+    if (
+      payment.customerId !== customer.providerCustomerId ||
+      payment.currency !== currency
+    )
       throw new BillingReconciliationError("scope_mismatch");
     await applyPaymentProjection(
       tx,
@@ -115,8 +131,11 @@ export async function applyInvoiceProjection(
       invoice.id,
       "overpayment_review",
     );
-  for (const credit of snapshot.credits)
-    await tx`insert into operations.invoice_credits(organisation_id,account_id,environment,invoice_id,provider_credit_id,amount_pence,status) values(${customer.organisationId},${scope.accountId},${scope.mode},${row.id},${credit.providerId},${credit.amountPence},${credit.status}) on conflict(invoice_id,provider_credit_id) do update set status=excluded.status,projected_at=now()`;
+  for (const credit of snapshot.credits) {
+    if (credit.currency !== currency)
+      throw new BillingReconciliationError("scope_mismatch");
+    await tx`insert into operations.invoice_credits(organisation_id,account_id,environment,invoice_id,provider_credit_id,currency,amount_pence,status) values(${customer.organisationId},${scope.accountId},${scope.mode},${row.id},${credit.providerId},${credit.currency},${credit.amountPence},${credit.status}) on conflict(invoice_id,provider_credit_id) do update set status=excluded.status,projected_at=now()`;
+  }
   for (const mandate of snapshot.mandates) {
     if (mandate.customerId !== customer.providerCustomerId)
       throw new BillingReconciliationError("scope_mismatch");

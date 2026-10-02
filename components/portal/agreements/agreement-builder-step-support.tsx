@@ -1,16 +1,10 @@
-import {
-  ArrowLeft,
-  ArrowRight,
-} from "lucide-react";
-import {
-  PortalButton,
-  PortalCard,
-} from "@/components/portal/ui";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { PortalButton, PortalCard } from "@/components/portal/ui";
 import type {
   AgreementBuilderDraftContent,
   AgreementBuilderStep,
 } from "@/lib/operations/agreements/builder-draft-schema";
-import { penceToGbp } from "@/lib/operations/agreements/money-input";
+import { formatMoney, type Currency } from "@/lib/operations/money";
 import styles from "./agreements.module.css";
 
 export type BuilderAgreement = NonNullable<
@@ -24,6 +18,7 @@ export type BuilderStepProps = Readonly<{
     step: AgreementBuilderStep,
     content: AgreementBuilderDraftContent,
   ) => Promise<void>;
+  onBeginEngagement?: (content: AgreementBuilderDraftContent) => Promise<void>;
   pending: boolean;
 }>;
 
@@ -41,17 +36,21 @@ export function mergeContent(
   engagementId: string | undefined = content.engagementId,
 ): AgreementBuilderDraftContent {
   return {
+    ...content,
     agreement,
     ...(engagementId ? { engagementId } : {}),
   };
 }
 
-export function formatGbp(pence: string | undefined): string {
-  if (!pence) return "£0.00";
+export function formatGbp(
+  pence: string | undefined,
+  currency: Currency = "GBP",
+): string {
+  if (!pence) return formatMoney("0", currency);
   try {
-    return `£${penceToGbp(pence)}`;
+    return formatMoney(pence, currency);
   } catch {
-    return "£0.00";
+    return formatMoney("0", currency);
   }
 }
 
@@ -121,7 +120,7 @@ export function BuilderSection({
         <span aria-hidden="true" className={styles.builderIcon}>
           {icon}
         </span>
-        <h2>{title}</h2>
+        <h2 tabIndex={-1}>{title}</h2>
       </div>
       {children}
     </PortalCard>

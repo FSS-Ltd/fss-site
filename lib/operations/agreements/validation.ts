@@ -1,9 +1,10 @@
 import { z } from "zod";
 import type { AgreementDraft, AgreementLine, SignatureEvidence } from "./types";
+import { currencySchema } from "../money";
 
 export const money = z
   .string()
-  .regex(/^(0|[1-9]\d{0,17})$/, "Use whole GBP pence, without decimals.");
+  .regex(/^(0|[1-9]\d{0,17})$/, "Use whole minor units, without decimals.");
 export const dateOnly = z.iso.date();
 export const privateReference = z
   .string()
@@ -14,6 +15,14 @@ export const privateReference = z
   )
   .refine((v) => !v.includes(".."));
 const text = z.string().trim().min(1).max(4000);
+export const revenueShareSchema = z.strictObject({
+  percentageBps: z.number().int().min(1).max(10000),
+  revenueSource: text,
+  calculationBasis: text,
+  duration: text,
+  reportingRequirements: text,
+  paymentTerms: text,
+});
 const signatories = z
   .array(z.email().toLowerCase())
   .min(1)
@@ -79,7 +88,8 @@ export const draftSchema = z
         "Use the SHA-256 hash of the reviewed source document.",
       ),
     documentReference: privateReference,
-    currency: z.literal("GBP"),
+    currency: currencySchema,
+    revenueShare: revenueShareSchema.optional(),
     taxTreatment: text,
     noticeDays: z.number().int().min(0).max(3650),
     minimumTermMonths: z.number().int().min(0).max(120),
@@ -99,6 +109,22 @@ export const draftSchema = z
       .max(30),
   })
   .superRefine((draft, ctx) => {
+    if (
+      draft.revenueShare &&
+      draft.lines.some(
+        (line) =>
+          line.recurrenceMonths !== 0 &&
+          [line.unitPence, line.discountPence, line.taxPence].some(
+            (value) => value !== "0",
+          ),
+      )
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["lines"],
+        message: "Revenue share replaces all ongoing cash charges.",
+      });
+    }
     if (
       !draft.lines.every((l) => lineSchema.safeParse(l).success) ||
       !draft.installments.every((i) => money.safeParse(i.amountPence).success)

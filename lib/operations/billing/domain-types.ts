@@ -1,3 +1,4 @@
+import type { Currency } from "../money";
 import type { BillingMode } from "./types";
 export type BillingScope = {
   organisationId: string;
@@ -5,10 +6,12 @@ export type BillingScope = {
   mode: BillingMode;
 };
 export type BillingCustomer = BillingScope & {
+  currency: Currency;
   id: string;
   providerCustomerId: string;
 };
 export type BillingObligation = {
+  currency: Currency;
   key: string;
   owner: "invoice" | "subscription";
   amountPence: string;
@@ -29,7 +32,7 @@ export type BillingInvoice = {
   providerInvoiceId: string;
   number: string | null;
   status: "draft" | "open" | "paid" | "void" | "uncollectible";
-  currency: "GBP";
+  currency: Currency;
   totalPence: string;
   amountDuePence: string;
   amountOverpaidPence: string;

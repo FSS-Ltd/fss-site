@@ -1378,7 +1378,7 @@ This request can be acknowledged now. Planning and delivery need approved scope.
 
 **No linked engagement?** (notice)
 
-Link an existing engagement or create one here. Your draft stays saved.
+Link an existing reviewed engagement or create one here. The agreement draft is saved before opening the Studio engagement form and resumes at scope after selection.
 
 **Related work** (rows)
 
@@ -2164,13 +2164,15 @@ Only published milestones and public updates appear in the client portal. Intern
 
 **Audience:** Founder. **Navigation:** Clients.
 
-**Proposed location:** `/growth/operations/clients/:org/engagements/new`.
+**Proposed location:** `/portal/admin/clients/:org/engagements/new`.
 
 **Purpose:** Connect the client’s goals to a defined piece of work.
 
-**Primary action:** Create & link engagement.
+**Primary action:** Create & continue to agreement.
 
-**Required behaviour and acceptance:** Create/link the engagement through the existing reviewed-work provenance model. Require title, client/project, reviewed source and status appropriate to the repository. Do not invent a free-form replacement record that bypasses review. Return the new eligible linkage to the saved agreement draft.
+**Required behaviour and acceptance:** Keep the client fixed. Require engagement name, primary goal, proposed scope, reviewed source/reference and explicit review confirmation. Create direct client work without requiring a Growth prospect, or select existing reviewed work already linked to this client. Save the existing agreement draft before leaving its builder; preserve its contents, select the engagement and resume at scope. Return to a server-generated Studio URL through the portal path helper. Do not hand off to the Growth pipeline route.
+
+**Schema and rollback:** Preserve engagement IDs and agreement foreign keys. Direct Studio engagements use the existing Growth delivery record with no prospect and a required client organisation link; goal, scope, source, reviewer and review time live in an Operations review record. They start at negotiation with delivery not started; signing moves them to won. Growth lists and aggregates include prospect-backed records only. If rollout needs to stop, disable creation through the release flag and retain saved engagements, review evidence and agreements.
 
 [Full-size editable wireframe](./wireframes/F32.svg) · [Open in screen browser](./wireframes.html#F32)
 
@@ -2186,13 +2188,15 @@ Only published milestones and public updates appear in the client portal. Intern
 
 - Proposed scope — Website pages and a booking workflow
 
-- Source — Founder discovery  ⌄
+- Reviewed source or reference — Founder discovery review
 
-- Review status — Ready for founder review  ⌄
+- I have reviewed this work and confirmed the goal and proposed scope — ☐
 
-**Save and return** (notice)
+**Actions**
 
-Create the engagement, link it to this client and return to the saved agreement draft. Review status is recorded explicitly.
+- Create & continue to agreement — Primary action
+- Cancel and return — Secondary action
+- Use this engagement — Available for existing reviewed work linked to this client
 
 
 ## S01 · Your first request starts here.

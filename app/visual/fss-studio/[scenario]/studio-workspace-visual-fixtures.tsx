@@ -12,7 +12,9 @@ import { StudioShell } from "@/components/portal/shell/studio-shell";
 const northstarId = "f10e9fc0-8c60-4f8e-8772-3d01a2bdfc55";
 const projectId = "584a707c-7072-4f5a-92d0-5b1447f05db5";
 
-function StudioFixture({ children }: Readonly<{ children: React.ReactNode }>): React.JSX.Element {
+function StudioFixture({
+  children,
+}: Readonly<{ children: React.ReactNode }>): React.JSX.Element {
   return <StudioShell>{children}</StudioShell>;
 }
 
@@ -58,6 +60,8 @@ export function StudioClientDetailScenario(): React.JSX.Element {
       <StudioClientDetail
         client={{
           activeJourneyCount: 1,
+          billingCurrency: "GBP",
+          currencyVersion: 1,
           activeProjectCount: 1,
           agreementCount: 1,
           billingExceptionCount: 1,
@@ -77,7 +81,11 @@ export function StudioClientDetailScenario(): React.JSX.Element {
 }
 
 export function StudioClientCreateScenario(): React.JSX.Element {
-  return <StudioFixture><StudioClientForm /></StudioFixture>;
+  return (
+    <StudioFixture>
+      <StudioClientForm />
+    </StudioFixture>
+  );
 }
 
 export function StudioBillingOperationsScenario(): React.JSX.Element {
@@ -85,11 +93,18 @@ export function StudioBillingOperationsScenario(): React.JSX.Element {
     <StudioFixture>
       <BillingOperations
         data={{
-          dueThisMonthPence: "720000",
+          totalsByCurrency: [
+            {
+              currency: "GBP",
+              dueThisMonthPence: "720000",
+              overduePence: "240000",
+            },
+          ],
           hasNext: false,
           items: [
             {
               amountPence: "240000",
+              currency: "GBP",
               category: "overdue_review",
               dueDate: "2026-09-12",
               id: "8f015e60-5af4-4d16-8ba2-7cc95bd962b4",
@@ -99,7 +114,6 @@ export function StudioBillingOperationsScenario(): React.JSX.Element {
               providerReference: "in_test_northstar",
             },
           ],
-          overduePence: "240000",
           page: 1,
           reconciliationCount: 1,
         }}
@@ -115,7 +129,12 @@ export function StudioPortalAccessScenario(): React.JSX.Element {
         data={{
           view: "clients",
           canManageStaff: true,
-          metrics: { activeClientUsers: 24, activeStaff: 3, pendingInvitations: 4, attentionInvitations: 1 },
+          metrics: {
+            activeClientUsers: 24,
+            activeStaff: 3,
+            pendingInvitations: 4,
+            attentionInvitations: 1,
+          },
           contacts: [
             {
               email: "a***@northstar.example",
@@ -207,11 +226,31 @@ export function StudioSettingsScenario(): React.JSX.Element {
             timezone: "Europe/London",
           },
           integrationConfiguration: [
-            { available: true, detail: "Identity is managed by the portal deployment.", name: "Authentication" },
-            { available: false, detail: "Request email delivery is deployment-managed.", name: "Email" },
-            { available: true, detail: "Agreement signing uses retained approval evidence.", name: "Signing" },
-            { available: false, detail: "Billing remains provider-owned.", name: "Billing" },
-            { available: true, detail: "File safety status is supplied by the scanning worker.", name: "File scanning" },
+            {
+              available: true,
+              detail: "Identity is managed by the portal deployment.",
+              name: "Authentication",
+            },
+            {
+              available: false,
+              detail: "Request email delivery is deployment-managed.",
+              name: "Email",
+            },
+            {
+              available: true,
+              detail: "Agreement signing uses retained approval evidence.",
+              name: "Signing",
+            },
+            {
+              available: false,
+              detail: "Billing remains provider-owned.",
+              name: "Billing",
+            },
+            {
+              available: true,
+              detail: "File safety status is supplied by the scanning worker.",
+              name: "File scanning",
+            },
           ],
         }}
       />
@@ -228,7 +267,8 @@ export function StudioProjectEditScenario(): React.JSX.Element {
           deliverables: ["Booking flow", "Team handover"],
           id: projectId,
           internalEstimateMinutes: 960,
-          internalNotes: "Confirm the client’s content review window before publishing.",
+          internalNotes:
+            "Confirm the client’s content review window before publishing.",
           milestones: [],
           organisationId: northstarId,
           outcome: "Make it easier for customers to book online.",
@@ -255,8 +295,19 @@ export function StudioJourneyBlockedScenario(): React.JSX.Element {
           canStart: false,
           checks: [
             { href: null, id: "contact", reason: "Ready.", status: "passed" },
-            { href: "/portal/admin/agreements", id: "agreement", reason: "Refresh the current agreement before starting this journey.", status: "needs_action" },
-            { href: "/portal/admin/settings", id: "sender", reason: "Choose an authorised FSS sender.", status: "needs_action" },
+            {
+              href: "/portal/admin/agreements",
+              id: "agreement",
+              reason:
+                "Refresh the current agreement before starting this journey.",
+              status: "needs_action",
+            },
+            {
+              href: "/portal/admin/settings",
+              id: "sender",
+              reason: "Choose an authorised FSS sender.",
+              status: "needs_action",
+            },
             { href: null, id: "template", reason: "Ready.", status: "passed" },
           ],
           draftId: "b9141c6d-565c-4e03-8f25-b90c0647730a",

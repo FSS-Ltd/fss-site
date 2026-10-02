@@ -81,7 +81,9 @@ function createFakeState(overrides: Partial<FakeState> = {}): FakeState {
   };
 }
 
-function createFakeRepository(state: FakeState): EngagementTransitionRepository {
+function createFakeRepository(
+  state: FakeState,
+): EngagementTransitionRepository {
   return {
     async withTransaction<T>(
       _db: GrowthDb,
@@ -170,11 +172,37 @@ test("leaving new for qualified stops active outreach", async () => {
 
   await transition(
     db,
-    { dimension: "commercial", engagementId, expectedVersion: 3, toStage: "qualified" },
+    {
+      dimension: "commercial",
+      engagementId,
+      expectedVersion: 3,
+      toStage: "qualified",
+    },
     { founder, correlationId: "c" },
   );
 
   assert.deepEqual(state.stopOutreachCalls, [prospectId]);
+});
+
+test("direct Studio engagements transition without prospect outreach", async () => {
+  const state = createFakeState({
+    engagement: lockedEngagement({ prospectId: null }),
+  });
+  const transition = createTransitioner(state);
+
+  await transition(
+    db,
+    {
+      dimension: "commercial",
+      engagementId,
+      expectedVersion: 3,
+      toStage: "qualified",
+    },
+    { founder, correlationId: "c" },
+  );
+
+  assert.equal(state.commercialApplications.length, 1);
+  assert.deepEqual(state.stopOutreachCalls, []);
 });
 
 test("a delivery transition never stops outreach", async () => {
@@ -189,7 +217,12 @@ test("a delivery transition never stops outreach", async () => {
 
   await transition(
     db,
-    { dimension: "delivery", engagementId, expectedVersion: 5, toStatus: "discovery" },
+    {
+      dimension: "delivery",
+      engagementId,
+      expectedVersion: 5,
+      toStatus: "discovery",
+    },
     { founder, correlationId: "c" },
   );
 
@@ -216,7 +249,10 @@ test("won requires a value and sets won_at", async () => {
   );
 
   assert.equal(result.stage, "won");
-  assert.equal(state.commercialApplications[0]?.wonAt?.getTime(), fixedNow.getTime());
+  assert.equal(
+    state.commercialApplications[0]?.wonAt?.getTime(),
+    fixedNow.getTime(),
+  );
   assert.equal(state.commercialApplications[0]?.oneOffValuePence, 500000);
 });
 
@@ -229,7 +265,12 @@ test("won without any value is rejected before touching the transaction", async 
   await assert.rejects(
     transition(
       db,
-      { dimension: "commercial", engagementId, expectedVersion: 4, toStage: "won" },
+      {
+        dimension: "commercial",
+        engagementId,
+        expectedVersion: 4,
+        toStage: "won",
+      },
       { founder, correlationId: "c" },
     ),
   );
@@ -255,7 +296,10 @@ test("lost requires a reason and stores it as the loss reason", async () => {
   );
 
   assert.equal(state.commercialApplications[0]?.lossReason, "budget");
-  assert.equal(state.commercialApplications[0]?.lostAt?.getTime(), fixedNow.getTime());
+  assert.equal(
+    state.commercialApplications[0]?.lostAt?.getTime(),
+    fixedNow.getTime(),
+  );
 });
 
 test("lost without a reason is rejected", async () => {
@@ -267,7 +311,12 @@ test("lost without a reason is rejected", async () => {
   await assert.rejects(
     transition(
       db,
-      { dimension: "commercial", engagementId, expectedVersion: 2, toStage: "lost" },
+      {
+        dimension: "commercial",
+        engagementId,
+        expectedVersion: 2,
+        toStage: "lost",
+      },
       { founder, correlationId: "c" },
     ),
   );
@@ -275,14 +324,23 @@ test("lost without a reason is rejected", async () => {
 
 test("cancelled delivery without a reason is rejected", async () => {
   const state = createFakeState({
-    engagement: lockedEngagement({ stage: "won", deliveryStatus: "discovery", version: 6 }),
+    engagement: lockedEngagement({
+      stage: "won",
+      deliveryStatus: "discovery",
+      version: 6,
+    }),
   });
   const transition = createTransitioner(state);
 
   await assert.rejects(
     transition(
       db,
-      { dimension: "delivery", engagementId, expectedVersion: 6, toStatus: "cancelled" },
+      {
+        dimension: "delivery",
+        engagementId,
+        expectedVersion: 6,
+        toStatus: "cancelled",
+      },
       { founder, correlationId: "c" },
     ),
   );
@@ -290,7 +348,11 @@ test("cancelled delivery without a reason is rejected", async () => {
 
 test("cancelled delivery with a reason is recorded on the event, not the engagement row", async () => {
   const state = createFakeState({
-    engagement: lockedEngagement({ stage: "won", deliveryStatus: "discovery", version: 6 }),
+    engagement: lockedEngagement({
+      stage: "won",
+      deliveryStatus: "discovery",
+      version: 6,
+    }),
   });
   const transition = createTransitioner(state);
 
@@ -311,14 +373,23 @@ test("cancelled delivery with a reason is recorded on the event, not the engagem
 
 test("delivery cannot start before the commercial stage is won", async () => {
   const state = createFakeState({
-    engagement: lockedEngagement({ stage: "negotiation", deliveryStatus: "not_started", version: 4 }),
+    engagement: lockedEngagement({
+      stage: "negotiation",
+      deliveryStatus: "not_started",
+      version: 4,
+    }),
   });
   const transition = createTransitioner(state);
 
   await assert.rejects(
     transition(
       db,
-      { dimension: "delivery", engagementId, expectedVersion: 4, toStatus: "discovery" },
+      {
+        dimension: "delivery",
+        engagementId,
+        expectedVersion: 4,
+        toStatus: "discovery",
+      },
       { founder, correlationId: "c" },
     ),
     (error: unknown) =>
@@ -336,7 +407,12 @@ test("an invalid commercial jump is rejected", async () => {
   await assert.rejects(
     transition(
       db,
-      { dimension: "commercial", engagementId, expectedVersion: 1, toStage: "negotiation" },
+      {
+        dimension: "commercial",
+        engagementId,
+        expectedVersion: 1,
+        toStage: "negotiation",
+      },
       { founder, correlationId: "c" },
     ),
     (error: unknown) =>
@@ -354,7 +430,12 @@ test("a terminal commercial stage cannot be reopened", async () => {
   await assert.rejects(
     transition(
       db,
-      { dimension: "commercial", engagementId, expectedVersion: 4, toStage: "qualified" },
+      {
+        dimension: "commercial",
+        engagementId,
+        expectedVersion: 4,
+        toStage: "qualified",
+      },
       { founder, correlationId: "c" },
     ),
     (error: unknown) =>
@@ -371,7 +452,12 @@ test("repeating the same commercial transition is idempotent and does not requir
 
   const result = await transition(
     db,
-    { dimension: "commercial", engagementId, expectedVersion: 1, toStage: "qualified" },
+    {
+      dimension: "commercial",
+      engagementId,
+      expectedVersion: 1,
+      toStage: "qualified",
+    },
     { founder, correlationId: "c" },
   );
 
@@ -389,7 +475,12 @@ test("rejects a stale version with a conflict error", async () => {
   await assert.rejects(
     transition(
       db,
-      { dimension: "commercial", engagementId, expectedVersion: 3, toStage: "proposal" },
+      {
+        dimension: "commercial",
+        engagementId,
+        expectedVersion: 3,
+        toStage: "proposal",
+      },
       { founder, correlationId: "c" },
     ),
     (error: unknown) =>
@@ -406,7 +497,12 @@ test("rejects an unknown engagement", async () => {
   await assert.rejects(
     transition(
       db,
-      { dimension: "commercial", engagementId, expectedVersion: 1, toStage: "qualified" },
+      {
+        dimension: "commercial",
+        engagementId,
+        expectedVersion: 1,
+        toStage: "qualified",
+      },
       { founder, correlationId: "c" },
     ),
     (error: unknown) =>
@@ -421,14 +517,24 @@ test("rejects malformed request input", async () => {
   await assert.rejects(
     transition(
       db,
-      { dimension: "commercial", engagementId: "not-a-uuid", expectedVersion: 1, toStage: "qualified" },
+      {
+        dimension: "commercial",
+        engagementId: "not-a-uuid",
+        expectedVersion: 1,
+        toStage: "qualified",
+      },
       { founder, correlationId: "c" },
     ),
   );
   await assert.rejects(
     transition(
       db,
-      { dimension: "commercial", engagementId, expectedVersion: 0, toStage: "qualified" },
+      {
+        dimension: "commercial",
+        engagementId,
+        expectedVersion: 0,
+        toStage: "qualified",
+      },
       { founder, correlationId: "c" },
     ),
   );
@@ -436,7 +542,11 @@ test("rejects malformed request input", async () => {
 
 test("the first transition to complete creates a pending client thank-you", async () => {
   const state = createFakeState({
-    engagement: lockedEngagement({ stage: "won", deliveryStatus: "review", version: 7 }),
+    engagement: lockedEngagement({
+      stage: "won",
+      deliveryStatus: "review",
+      version: 7,
+    }),
   });
   const transition = createTransitioner(state);
 
@@ -462,14 +572,23 @@ test("the first transition to complete creates a pending client thank-you", asyn
 
 test("a repeated transition to complete does not create a second thank-you", async () => {
   const state = createFakeState({
-    engagement: lockedEngagement({ stage: "won", deliveryStatus: "review", version: 7 }),
+    engagement: lockedEngagement({
+      stage: "won",
+      deliveryStatus: "review",
+      version: 7,
+    }),
     existingClientThankYou: true,
   });
   const transition = createTransitioner(state);
 
   await transition(
     db,
-    { dimension: "delivery", engagementId, expectedVersion: 7, toStatus: "complete" },
+    {
+      dimension: "delivery",
+      engagementId,
+      expectedVersion: 7,
+      toStatus: "complete",
+    },
     { founder, correlationId: "c" },
   );
 
@@ -478,7 +597,11 @@ test("a repeated transition to complete does not create a second thank-you", asy
 
 test("an already-subscribed client never gets the newsletter invite, even if requested", async () => {
   const state = createFakeState({
-    engagement: lockedEngagement({ stage: "won", deliveryStatus: "review", version: 7 }),
+    engagement: lockedEngagement({
+      stage: "won",
+      deliveryStatus: "review",
+      version: 7,
+    }),
     wonRecipient: wonRecipient({ alreadySubscribed: true }),
   });
   const transition = createTransitioner(state);
@@ -500,14 +623,23 @@ test("an already-subscribed client never gets the newsletter invite, even if req
 
 test("no thank-you is created when there is no resolvable recipient", async () => {
   const state = createFakeState({
-    engagement: lockedEngagement({ stage: "won", deliveryStatus: "review", version: 7 }),
+    engagement: lockedEngagement({
+      stage: "won",
+      deliveryStatus: "review",
+      version: 7,
+    }),
     wonRecipient: null,
   });
   const transition = createTransitioner(state);
 
   await transition(
     db,
-    { dimension: "delivery", engagementId, expectedVersion: 7, toStatus: "complete" },
+    {
+      dimension: "delivery",
+      engagementId,
+      expectedVersion: 7,
+      toStatus: "complete",
+    },
     { founder, correlationId: "c" },
   );
 
@@ -521,8 +653,16 @@ test("rejects an invalid founder context even with valid input", async () => {
   await assert.rejects(
     transition(
       db,
-      { dimension: "commercial", engagementId, expectedVersion: 3, toStage: "qualified" },
-      { founder: { email: "founder@example.test", actorId: "not-hex" }, correlationId: "c" },
+      {
+        dimension: "commercial",
+        engagementId,
+        expectedVersion: 3,
+        toStage: "qualified",
+      },
+      {
+        founder: { email: "founder@example.test", actorId: "not-hex" },
+        correlationId: "c",
+      },
     ),
     TypeError,
   );

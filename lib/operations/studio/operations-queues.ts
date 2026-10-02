@@ -1,3 +1,4 @@
+import type { Currency } from "../money";
 import { z } from "zod";
 import { withFssAdminTransaction } from "../auth/staff-transaction";
 import type { FssAdminContext } from "../auth/staff-types";
@@ -34,17 +35,22 @@ export type StudioBillingOperation = Readonly<{
   organisationName: string | null;
   providerReference: string | null;
   amountPence: string | null;
+  currency: Currency | null;
   dueDate: string | null;
   category: string;
   lastObservedAt: string;
 }>;
 
-export type StudioBillingOperations = WorkspaceCollectionPage<StudioBillingOperation> &
-  Readonly<{
-    dueThisMonthPence: string;
-    overduePence: string;
-    reconciliationCount: number;
-  }>;
+export type StudioBillingOperations =
+  WorkspaceCollectionPage<StudioBillingOperation> &
+    Readonly<{
+      totalsByCurrency: readonly {
+        currency: Currency;
+        dueThisMonthPence: string;
+        overduePence: string;
+      }[];
+      reconciliationCount: number;
+    }>;
 
 export type StudioNotificationDelivery = Readonly<{
   id: string;
@@ -87,32 +93,35 @@ export async function listStudioBillingOperations(
   return withFssAdminTransaction(db, admin, async (tx) => {
     const [totals] = await tx<
       Array<{
-        dueThisMonthPence: string | null;
-        overduePence: string | null;
+        totalsByCurrency: StudioBillingOperations["totalsByCurrency"];
         reconciliationCount: number;
       }>
     >`
       select
-        coalesce(sum(i.amount_remaining_pence) filter (
-          where i.status = 'open'
-            and i.due_date >= date_trunc('month', current_date)::date
-            and i.due_date < (date_trunc('month', current_date) + interval '1 month')::date
-        ), 0)::text as "dueThisMonthPence",
-        coalesce(sum(i.amount_remaining_pence) filter (
-          where i.status = 'open' and i.due_date < current_date
-        ), 0)::text as "overduePence",
+        (select coalesce(jsonb_agg(t order by t.currency), '[]'::jsonb) from (
+          select i.currency,
+            coalesce(sum(i.amount_remaining_pence) filter (
+              where i.status='open'
+                and i.due_date >= date_trunc('month',current_date)::date
+                and i.due_date < (date_trunc('month',current_date)+interval '1 month')::date
+            ),0)::text as "dueThisMonthPence",
+            coalesce(sum(i.amount_remaining_pence) filter (
+              where i.status='open' and i.due_date<current_date
+            ),0)::text as "overduePence"
+          from operations.invoices i
+          where (${organisationId}::uuid is null or i.organisation_id=${organisationId}::uuid)
+          group by i.currency
+        ) t) as "totalsByCurrency",
         (select count(*)::integer from operations.billing_exceptions e
           where e.resolved_at is null
-            and (${organisationId}::uuid is null or e.organisation_id = ${organisationId}::uuid)
+            and (${organisationId}::uuid is null or e.organisation_id=${organisationId}::uuid)
         ) as "reconciliationCount"
-      from operations.invoices i
-      where (${organisationId}::uuid is null or i.organisation_id = ${organisationId}::uuid)
     `;
     const rows = await tx<StudioBillingOperation[]>`
       select e.id, e.organisation_id as "organisationId",
         o.display_name as "organisationName",
         i.provider_invoice_id as "providerReference",
-        i.amount_remaining_pence::text as "amountPence",
+        i.amount_remaining_pence::text as "amountPence", i.currency,
         i.due_date::text as "dueDate",
         e.category, e.last_seen_at::text as "lastObservedAt"
       from operations.billing_exceptions e
@@ -126,16 +135,10 @@ export async function listStudioBillingOperations(
       order by e.last_seen_at desc, e.id desc
       limit ${workspacePageSize + 1} offset ${offset}
     `;
-    const total = totals ?? {
-      dueThisMonthPence: "0",
-      overduePence: "0",
-      reconciliationCount: 0,
-    };
     return {
       ...toWorkspaceCollectionPage(rows, parsed.page),
-      dueThisMonthPence: total.dueThisMonthPence ?? "0",
-      overduePence: total.overduePence ?? "0",
-      reconciliationCount: total.reconciliationCount,
+      totalsByCurrency: totals?.totalsByCurrency ?? [],
+      reconciliationCount: totals?.reconciliationCount ?? 0,
     };
   });
 }
@@ -150,7 +153,11 @@ export async function listStudioNotifications(
   const offset = workspacePageOffset(parsed.page);
   return withFssAdminTransaction(db, admin, async (tx) => {
     const rows = await tx<
-      Array<Omit<StudioNotificationDelivery, "recipientLabel"> & { recipient: string }>
+      Array<
+        Omit<StudioNotificationDelivery, "recipientLabel"> & {
+          recipient: string;
+        }
+      >
     >`
       select d.id, d.organisation_id as "organisationId",
         o.display_name as "organisationName", d.request_id as "requestId",

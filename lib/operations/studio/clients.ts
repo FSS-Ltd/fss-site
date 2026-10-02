@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { Currency } from "../money";
 import { withFssAdminTransaction } from "../auth/staff-transaction";
 import type { FssAdminContext } from "../auth/staff-types";
 import type { OperationsDb } from "../db/client";
@@ -24,6 +25,8 @@ export type StudioClient = Readonly<{
 }>;
 
 export type StudioClientDetail = Readonly<{
+  billingCurrency: Currency;
+  currencyVersion: number;
   activeJourneyCount: number;
   activeProjectCount: number;
   agreementCount: number;
@@ -140,6 +143,8 @@ export async function loadStudioClient(
         o.display_name as "displayName",
         o.legal_name as "legalName",
         o.timezone,
+        o.billing_currency as "billingCurrency",
+        o.currency_version as "currencyVersion",
         o.lifecycle,
         coalesce(primary_contact.name, 'No primary contact') as "primaryContactName",
         (select count(*)::integer from operations.projects p

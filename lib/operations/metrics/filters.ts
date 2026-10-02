@@ -1,3 +1,4 @@
+import { currencySchema } from "../money";
 import { z } from "zod";
 import { londonDate } from "./definitions";
 const optionalText = z.preprocess(
@@ -19,7 +20,7 @@ export function parseMetricFilters(raw: unknown, observedAt: string) {
       client: optionalText,
       service: optionalText,
       owner: optionalText,
-      currency: z.literal("GBP").default("GBP"),
+      currency: currencySchema.default("GBP"),
       paymentState: z
         .enum([
           "all",

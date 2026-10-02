@@ -1,5 +1,6 @@
 "use client";
 
+import type { Currency } from "@/lib/operations/money";
 import { useRouter } from "next/navigation";
 import {
   StaffAgreementBuilder,
@@ -16,6 +17,7 @@ export function RoutedStaffAgreementBuilder(
     engagements: readonly AgreementEngagementChoice[];
     initialDraft: AgreementBuilderDraft | null;
     organisationName: string;
+    currency?: Currency;
   }>,
 ): React.JSX.Element {
   const router = useRouter();

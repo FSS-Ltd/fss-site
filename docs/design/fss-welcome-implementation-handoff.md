@@ -35,6 +35,12 @@ Refinement checks: 82 onboarding/component unit tests and 20 desktop/mobile welc
 
 Refinement files: packet contract/metadata/copy, PDF/editorial/HTML/email renderers, `email-artwork.ts`, journey draft propagation and preview, packet and browser regression tests, the artwork generator, twelve files in `public/images/welcome/`, and this handoff/rollout guidance. Unrelated commercial changes were preserved.
 
+## PR integration with current main, 2026-10-02
+
+The PR branch `feat/welcome-operations-redesign` merges current main in an isolated checkout. Shared fixture metadata retains the accurate integration-configuration wording; the client form preserves both new billing currencies and applied timezone defaults; both regression tests remain; the browser runner includes agreement and welcome/access/settings coverage. Next.js 16.3.8 and the matching lockfile remain in place. The original checkout and its uncommitted commercial work were untouched.
+
+Merge verification: 85 focused onboarding/client-form units, 38 desktop/mobile welcome/access/settings browser tests, TypeScript, merge-file lint/formatting and all 67 migration-policy checks passed. The merged production Next.js 16.3.8 build passed. The two pre-existing commercial-offer screen-coverage gaps remain unchanged.
+
 ## Remaining release conditions
 
 The repository screen-coverage command still reports two routes introduced by unrelated commercial work without coverage rows: `/portal/agreements/offers/:parameter` and `/portal/admin/clients/:parameter/commercial-offers/:parameter`. This task updated all welcome, access and settings rows and preserved the commercial edits.

@@ -1,3 +1,4 @@
+import { stripeCurrency, type Currency } from "../money";
 import type Stripe from "stripe";
 import type { BillingMode } from "./types";
 
@@ -26,7 +27,10 @@ export type HostedBillingProvider = {
   retrieveInvoice: (
     id: string,
   ) => Promise<
-    Pick<Stripe.Invoice, "customer" | "livemode" | "hosted_invoice_url">
+    Pick<
+      Stripe.Invoice,
+      "customer" | "livemode" | "hosted_invoice_url" | "currency"
+    >
   >;
 };
 
@@ -94,7 +98,12 @@ export async function createHostedBillingSession(
 
 export async function getHostedInvoiceUrl(
   provider: HostedBillingProvider,
-  input: { customerId: string; providerInvoiceId: string; mode: BillingMode },
+  input: {
+    customerId: string;
+    providerInvoiceId: string;
+    mode: BillingMode;
+    currency?: Currency;
+  },
 ): Promise<string> {
   const invoice = await provider.retrieveInvoice(input.providerInvoiceId);
   const customerId =
@@ -103,7 +112,8 @@ export async function getHostedInvoiceUrl(
       : invoice.customer?.id;
   if (
     customerId !== input.customerId ||
-    invoice.livemode !== (input.mode === "live")
+    invoice.livemode !== (input.mode === "live") ||
+    invoice.currency !== stripeCurrency(input.currency ?? "GBP")
   )
     throw new Error("Hosted invoice is unavailable.");
   return trustedHostedUrl(invoice.hosted_invoice_url, "invoice.stripe.com");

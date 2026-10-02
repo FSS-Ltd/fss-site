@@ -1,12 +1,10 @@
 import { ClientAgreementDetail } from "@/components/portal/agreements/client-agreement-detail";
 import { ClientAgreementList } from "@/components/portal/agreements/client-agreement-list";
 import { ClientSigningReview } from "@/components/portal/agreements/client-signing-review";
-import { EngagementForm } from "@/components/portal/agreements/engagement-form";
+import { RoutedEngagementForm } from "@/components/portal/agreements/routed-engagement-form";
 import { StaffAgreementDetail } from "@/components/portal/agreements/staff-agreement-detail";
-import {
-  StaffAgreementBuilder,
-  type AgreementEngagementChoice,
-} from "@/components/portal/agreements/staff-agreement-builder";
+import { RoutedStaffAgreementBuilder } from "@/components/portal/agreements/routed-staff-agreement-builder";
+import type { AgreementEngagementChoice } from "@/components/portal/agreements/staff-agreement-builder";
 import { StaffAgreementOverview } from "@/components/portal/agreements/staff-agreement-overview";
 import { StaffSigningStatus } from "@/components/portal/agreements/staff-signing-status";
 import { SignatureEvidenceForm } from "@/components/portal/agreements/signature-evidence-form";
@@ -160,7 +158,10 @@ function builderDraft(
   return {
     content: noEngagement
       ? { agreement: { title: draft.title } }
-      : { agreement: builderAgreement, engagementId: signedRecord.engagementId },
+      : {
+          agreement: builderAgreement,
+          engagementId: signedRecord.engagementId,
+        },
     createdAt: "2026-09-15T09:00:00.000Z",
     engagementId: noEngagement ? null : signedRecord.engagementId,
     id: "e5d6e353-c33d-488f-9cb0-1d7b05e07050",
@@ -267,12 +268,22 @@ export function StudioAgreementBuilderScenario({
         eyebrow="FSS Studio / Agreements"
         title="Create an agreement"
       />
-      <StaffAgreementBuilder
+      <RoutedStaffAgreementBuilder
         agreementListHref={`/portal/admin/clients/${organisationId}/agreements`}
         baseHref={`/portal/admin/clients/${organisationId}/agreements/new`}
         commandEndpoint={`/api/portal/admin/clients/${organisationId}/agreement-drafts`}
         engagementHref={`/portal/admin/clients/${organisationId}/engagements/new?draftId=${currentDraft.id}`}
-        engagements={noEngagement ? [] : engagementChoices}
+        engagements={
+          noEngagement
+            ? []
+            : [
+                ...engagementChoices,
+                {
+                  id: "92d68fbd-dbe8-44da-96b2-35da77283e40",
+                  name: "Client portal · Discovery complete",
+                },
+              ]
+        }
         initialDraft={currentDraft}
         organisationName="Northstar Studio"
       />
@@ -301,11 +312,17 @@ export function StudioEngagementProvenanceScenario(): React.JSX.Element {
   const agreementHref = `/portal/admin/clients/${organisationId}/agreements/new?draftId=e5d6e353-c33d-488f-9cb0-1d7b05e07050`;
   return (
     <StudioShell>
-      <PageHeader eyebrow="FSS Studio / Agreements" title="Create an engagement" />
-      <EngagementForm
+      <PageHeader
+        eyebrow="FSS Studio / Agreements"
+        title="Create an engagement"
+      />
+      <RoutedEngagementForm
         agreementHref={agreementHref}
+        commandEndpoint={`/api/portal/admin/clients/${organisationId}/engagements`}
+        draft={{ id: "e5d6e353-c33d-488f-9cb0-1d7b05e07050", version: 1 }}
         engagementChoices={engagementChoices}
-        growthWorkflowHref={`/growth/pipeline?returnTo=${encodeURIComponent(agreementHref)}`}
+        organisationName="Northstar Studio"
+        returnBaseHref={`/portal/admin/clients/${organisationId}/agreements/new`}
       />
     </StudioShell>
   );
@@ -314,8 +331,14 @@ export function StudioEngagementProvenanceScenario(): React.JSX.Element {
 export function StudioSignatureEvidenceScenario(): React.JSX.Element {
   return (
     <StudioShell>
-      <PageHeader eyebrow="FSS Studio / Agreements" title="Record signed evidence" />
-      <SignatureEvidenceForm organisationId={organisationId} record={signedRecord} />
+      <PageHeader
+        eyebrow="FSS Studio / Agreements"
+        title="Record signed evidence"
+      />
+      <SignatureEvidenceForm
+        organisationId={organisationId}
+        record={signedRecord}
+      />
     </StudioShell>
   );
 }

@@ -8,7 +8,9 @@ import {
   PortalButton,
   PortalCard,
   PortalField,
+  PortalSelect,
 } from "@/components/portal/ui";
+import { currencies, currencyLabel } from "@/lib/operations/money";
 import styles from "./client-form.module.css";
 
 type CreateClientResponse = Readonly<{
@@ -45,6 +47,7 @@ export function StudioClientForm({
     const form = event.currentTarget;
     const data = new FormData(form);
     const client = {
+      billingCurrency: formValue(data, "billingCurrency"),
       displayName: formValue(data, "displayName"),
       legalName: formValue(data, "legalName"),
       primaryContact: {
@@ -126,6 +129,20 @@ export function StudioClientForm({
             >
               <input disabled={pending} maxLength={200} name="legalName" />
             </PortalField>
+            <PortalSelect
+              error={errors.billingCurrency}
+              label="Billing currency"
+              required
+              defaultValue="GBP"
+              disabled={pending}
+              name="billingCurrency"
+            >
+              {currencies.map((currency) => (
+                <option key={currency} value={currency}>
+                  {currencyLabel(currency)}
+                </option>
+              ))}
+            </PortalSelect>
             <PortalField error={errors.timezone} label="Time zone" required>
               <input
                 defaultValue={defaultTimezone}

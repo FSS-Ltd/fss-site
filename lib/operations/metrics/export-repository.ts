@@ -115,7 +115,7 @@ export async function runMetricExport(
       }
       const csv = failure
         ? null
-        : receivablesCsv(rows, now, job.definition_version);
+        : receivablesCsv(rows, now, job.definition_version, filters.currency);
       await tx`update operations.metric_export_jobs set state=${failure ? "failed" : "complete"},failure=${failure},csv=${csv},completed_at=now() where id=${jobId}`;
       await tx`insert into operations.metric_export_audit(job_id,actor_id,action) values(${jobId},${actor.actorId},${failure ? "failed" : "completed"})`;
       return { value: true };

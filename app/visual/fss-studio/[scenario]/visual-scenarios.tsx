@@ -1,3 +1,7 @@
+import {
+  ClientCommercialScenario,
+  StaffCommercialScenario,
+} from "./commercial-visual-fixtures";
 import { PortalLoginPresentation } from "@/components/portal/auth/login-presentation";
 import {
   ClientOverview,
@@ -98,6 +102,8 @@ import {
 } from "./active-route-visual-fixtures";
 
 export type VisualScenarioName =
+  | "client-commercial-offer"
+  | "staff-commercial-offer"
   | "client-login"
   | "client-overview"
   | "client-workspace-switcher"
@@ -368,6 +374,14 @@ function StudioShellScenario(): React.JSX.Element {
 }
 
 const scenarios: Record<VisualScenarioName, VisualScenario> = {
+  "client-commercial-offer": {
+    name: "client-commercial-offer",
+    content: <ClientCommercialScenario />,
+  },
+  "staff-commercial-offer": {
+    name: "staff-commercial-offer",
+    content: <StaffCommercialScenario />,
+  },
   "client-login": { name: "client-login", content: <ClientLoginScenario /> },
   "client-overview": {
     name: "client-overview",

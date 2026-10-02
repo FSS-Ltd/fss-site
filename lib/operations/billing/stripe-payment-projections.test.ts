@@ -136,7 +136,7 @@ test("invalid money and inconsistent invoice/payment/adjustment ownership fail c
     },
     {
       overrides: {
-        "/v1/invoices/in_test": { ...base.invoice, currency: "usd" },
+        "/v1/invoices/in_test": { ...base.invoice, currency: "jpy" },
       },
       error: /scope_mismatch/,
     },
@@ -240,11 +240,12 @@ test("invoice lines are fetched completely and an active subscription schedule a
     parent: { subscription_details: { subscription: { id: "sub_test" } } },
   };
   f.records["/v1/invoices/in_test/lines"] = {
-    data: [{ id: "il_test" }],
+    data: [{ id: "il_test", currency: "gbp" }],
     has_more: false,
   };
   f.records["/v1/subscriptions/sub_test"] = {
     id: "sub_test",
+    currency: "gbp",
     livemode: false,
     customer: { id: "cus_test" },
     schedule: { id: "sub_sched_test" },
@@ -269,6 +270,7 @@ test("ambiguous schedule matches and cross-customer subscriptions cannot attach 
   };
   f.records["/v1/subscriptions/sub_test"] = {
     id: "sub_test",
+    currency: "gbp",
     livemode: false,
     customer: "cus_other",
     schedule: null,
@@ -279,6 +281,7 @@ test("ambiguous schedule matches and cross-customer subscriptions cannot attach 
   );
   f.records["/v1/subscriptions/sub_test"] = {
     id: "sub_test",
+    currency: "gbp",
     livemode: false,
     customer: "cus_test",
     schedule: null,
@@ -298,4 +301,54 @@ test("ambiguous schedule matches and cross-customer subscriptions cannot attach 
     fetchStripeInvoiceProjection(f.client, scope, "in_test"),
     /invalid_projection/,
   );
+});
+
+test("supported invoice currencies still reject cross-currency allocations", async () => {
+  const f = clientFixture();
+  f.records["/v1/invoices/in_test"] = { ...f.invoice, currency: "usd" };
+  await assert.rejects(
+    fetchStripeInvoiceProjection(f.client, scope, "in_test"),
+    /scope_mismatch/,
+  );
+});
+
+test("USD and EUR retain currency through payment and adjustment projections", async () => {
+  for (const currency of ["usd", "eur"]) {
+    const f = clientFixture();
+    for (const path of [
+      "/v1/invoices/in_test",
+      "/v1/payment_intents/pi_test",
+      "/v1/charges/ch_test",
+    ]) {
+      const value = f.records[path];
+      if (typeof value === "object" && value !== null)
+        f.records[path] = { ...value, currency };
+    }
+    for (const path of [
+      "/v1/invoice_payments",
+      "/v1/refunds",
+      "/v1/disputes",
+      "/v1/credit_notes",
+    ]) {
+      const value = f.records[path] as {
+        data: Record<string, unknown>[];
+        has_more: boolean;
+      };
+      f.records[path] = {
+        ...value,
+        data: value.data.map((item) => ({ ...item, currency })),
+      };
+    }
+    const result = await fetchStripeInvoiceProjection(
+      f.client,
+      scope,
+      "in_test",
+    );
+    assert.equal(result.payments[0].currency, currency.toUpperCase());
+    assert.equal(
+      result.payments[0].refunds[0].currency,
+      currency.toUpperCase(),
+    );
+    assert.equal(result.credits[0].currency, currency.toUpperCase());
+  }
 });

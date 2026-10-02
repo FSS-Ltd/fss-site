@@ -1,6 +1,6 @@
 "use client";
 import type { AgreementRecord } from "@/lib/operations/agreements/types";
-import { penceToGbp } from "@/lib/operations/agreements/money-input";
+import { formatMoney, currencySymbol } from "@/lib/operations/money";
 import { Field, value } from "./form-fields";
 import { useAgreementSubmit, moneyValue } from "./use-agreement-submit";
 import styles from "./agreements.module.css";
@@ -58,13 +58,16 @@ export function ActivationForm({
         {depositRequired && (
           <>
             <p>
-              Required cleared deposit: £
-              {penceToGbp(record.draft.requiredDepositPence)}
+              Required cleared deposit:{" "}
+              {formatMoney(
+                record.draft.requiredDepositPence,
+                record.draft.currency,
+              )}
             </p>
             <div className={styles.grid}>
               <Field
                 issues={state.issues}
-                label="Verified cleared deposit (£)"
+                label={`Verified cleared deposit (${currencySymbol(record.draft.currency)})`}
                 name="evidence.deposit.amountPence"
                 inputMode="decimal"
                 required

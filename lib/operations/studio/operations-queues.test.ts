@@ -40,7 +40,19 @@ function recordingDb(rows: readonly unknown[][]): {
 test("lists retained billing totals and exceptions through the Staff boundary", async () => {
   const organisationId = "44444444-4444-4444-8444-444444444444";
   const { calls, db } = recordingDb([
-    [{ dueThisMonthPence: "720000", overduePence: "240000", reconciliationCount: 1 }],
+    [
+      {
+        totalsByCurrency: [
+          {
+            currency: "GBP",
+            dueThisMonthPence: "720000",
+            overduePence: "240000",
+          },
+          { currency: "USD", dueThisMonthPence: "10000", overduePence: "0" },
+        ],
+        reconciliationCount: 1,
+      },
+    ],
     [
       {
         amountPence: "240000",
@@ -57,11 +69,16 @@ test("lists retained billing totals and exceptions through the Staff boundary", 
 
   const queue = await listStudioBillingOperations(db, admin, { page: 1 });
 
-  assert.equal(queue.dueThisMonthPence, "720000");
-  assert.equal(queue.overduePence, "240000");
+  assert.equal(queue.totalsByCurrency[0]?.dueThisMonthPence, "720000");
+  assert.equal(queue.totalsByCurrency[0]?.overduePence, "240000");
   assert.equal(queue.reconciliationCount, 1);
+  assert.equal(queue.totalsByCurrency[1]?.currency, "USD");
+  assert.match(calls.map(({ sql }) => sql).join("\n"), /group by i.currency/);
   assert.equal(queue.items[0]?.providerReference, "in_test123");
-  assert.match(calls.map(({ sql }) => sql).join("\n"), /operations\.assert_active_staff_membership/);
+  assert.match(
+    calls.map(({ sql }) => sql).join("\n"),
+    /operations\.assert_active_staff_membership/,
+  );
 });
 
 test("filters notification deliveries without trusting browser status values", async () => {
@@ -92,5 +109,7 @@ test("filters notification deliveries without trusting browser status values", a
   assert.equal(page.items[0]?.recipientLabel, "a***@elm.example");
   assert.equal(page.items[0]?.status, "pending");
   assert.ok(calls.some(({ values }) => values.includes("pending")));
-  await assert.rejects(listStudioNotifications(db, admin, { page: 1, status: "bogus" }));
+  await assert.rejects(
+    listStudioNotifications(db, admin, { page: 1, status: "bogus" }),
+  );
 });

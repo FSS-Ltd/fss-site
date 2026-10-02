@@ -1,3 +1,4 @@
+import type { Currency } from "../money";
 import type { OperationsTransaction } from "../db/client";
 import {
   BillingReconciliationError,
@@ -13,14 +14,36 @@ export async function applyPaymentProjection(
   invoiceId: string,
   payment: PaymentProjection,
 ): Promise<void> {
+  const [invoice] = await tx<
+    {
+      currency: Currency;
+      organisationId: string;
+      accountId: string;
+      mode: string;
+    }[]
+  >`select currency,organisation_id as "organisationId",account_id as "accountId",environment as mode from operations.invoices where id=${invoiceId}`;
+  if (
+    !invoice ||
+    invoice.currency !== payment.currency ||
+    invoice.organisationId !== organisationId ||
+    invoice.accountId !== scope.accountId ||
+    invoice.mode !== scope.mode ||
+    payment.refunds.some((item) => item.currency !== payment.currency) ||
+    payment.disputes.some((item) => item.currency !== payment.currency)
+  )
+    throw new BillingReconciliationError("scope_mismatch");
   const [prior] = await tx<
-    { id: string; organisationId: string }[]
-  >`select id,organisation_id as "organisationId" from operations.payments where account_id=${scope.accountId} and environment=${scope.mode} and provider_payment_id=${payment.providerId}`;
-  if (prior && prior.organisationId !== organisationId)
+    { id: string; organisationId: string; currency: Currency }[]
+  >`select id,organisation_id as "organisationId",currency from operations.payments where account_id=${scope.accountId} and environment=${scope.mode} and provider_payment_id=${payment.providerId}`;
+  if (
+    prior &&
+    (prior.organisationId !== organisationId ||
+      prior.currency !== payment.currency)
+  )
     throw new BillingReconciliationError("scope_mismatch");
   const [updated] = await tx<
     { id: string }[]
-  >`insert into operations.payments(organisation_id,account_id,environment,provider_payment_id,state,method,amount_pence,received_pence,confirmed_at,failure_code,provider_mandate_id,provider_created_at,projected_at) values(${organisationId},${scope.accountId},${scope.mode},${payment.providerId},${payment.state},${payment.method},${payment.amountPence},${payment.receivedPence},${payment.confirmedAt},${payment.failureCode},${payment.providerMandateId},${payment.createdAt},${payment.observedAt}) on conflict(account_id,environment,provider_payment_id) do update set state=excluded.state,method=excluded.method,received_pence=excluded.received_pence,confirmed_at=coalesce(payments.confirmed_at,excluded.confirmed_at),failure_code=excluded.failure_code,provider_mandate_id=excluded.provider_mandate_id,projected_at=excluded.projected_at where payments.projected_at<excluded.projected_at returning id`;
+  >`insert into operations.payments(organisation_id,account_id,environment,provider_payment_id,state,method,currency,amount_pence,received_pence,confirmed_at,failure_code,provider_mandate_id,provider_created_at,projected_at) values(${organisationId},${scope.accountId},${scope.mode},${payment.providerId},${payment.state},${payment.method},${payment.currency},${payment.amountPence},${payment.receivedPence},${payment.confirmedAt},${payment.failureCode},${payment.providerMandateId},${payment.createdAt},${payment.observedAt}) on conflict(account_id,environment,provider_payment_id) do update set state=excluded.state,method=excluded.method,received_pence=excluded.received_pence,confirmed_at=coalesce(payments.confirmed_at,excluded.confirmed_at),failure_code=excluded.failure_code,provider_mandate_id=excluded.provider_mandate_id,projected_at=excluded.projected_at where payments.projected_at<excluded.projected_at returning id`;
   const [stored] = updated
     ? [updated]
     : await tx<
@@ -38,7 +61,7 @@ export async function applyPaymentProjection(
       : (confirmed < available ? confirmed : available).toString();
   await tx`insert into operations.payment_allocations(organisation_id,invoice_id,payment_id,provider_allocation_id,amount_pence,provider_paid_pence) values(${organisationId},${invoiceId},${stored.id},${payment.allocationId},${applied},${payment.allocationPence}) on conflict(payment_id,invoice_id) do update set amount_pence=excluded.amount_pence,provider_paid_pence=excluded.provider_paid_pence`;
   for (const refund of payment.refunds)
-    await tx`insert into operations.payment_refunds(organisation_id,account_id,environment,payment_id,provider_refund_id,amount_pence,status,projected_at) values(${organisationId},${scope.accountId},${scope.mode},${stored.id},${refund.providerId},${refund.amountPence},${refund.status},${payment.observedAt}) on conflict(payment_id,provider_refund_id) do update set status=excluded.status,projected_at=excluded.projected_at where payment_refunds.projected_at<excluded.projected_at`;
+    await tx`insert into operations.payment_refunds(organisation_id,account_id,environment,payment_id,provider_refund_id,currency,amount_pence,status,projected_at) values(${organisationId},${scope.accountId},${scope.mode},${stored.id},${refund.providerId},${refund.currency},${refund.amountPence},${refund.status},${payment.observedAt}) on conflict(payment_id,provider_refund_id) do update set status=excluded.status,projected_at=excluded.projected_at where payment_refunds.projected_at<excluded.projected_at`;
   for (const dispute of payment.disputes)
-    await tx`insert into operations.payment_disputes(organisation_id,account_id,environment,payment_id,provider_dispute_id,amount_pence,status,projected_at) values(${organisationId},${scope.accountId},${scope.mode},${stored.id},${dispute.providerId},${dispute.amountPence},${dispute.status},${payment.observedAt}) on conflict(payment_id,provider_dispute_id) do update set status=excluded.status,projected_at=excluded.projected_at where payment_disputes.projected_at<excluded.projected_at`;
+    await tx`insert into operations.payment_disputes(organisation_id,account_id,environment,payment_id,provider_dispute_id,currency,amount_pence,status,projected_at) values(${organisationId},${scope.accountId},${scope.mode},${stored.id},${dispute.providerId},${dispute.currency},${dispute.amountPence},${dispute.status},${payment.observedAt}) on conflict(payment_id,provider_dispute_id) do update set status=excluded.status,projected_at=excluded.projected_at where payment_disputes.projected_at<excluded.projected_at`;
 }

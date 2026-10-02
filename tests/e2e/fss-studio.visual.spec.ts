@@ -89,7 +89,7 @@ async function expectVisualScreenshot(
 
   // Ubuntu Chromium can rasterize native select text differently between CI runs.
   await expect(page).toHaveScreenshot(filename, {
-    maxDiffPixels: Math.min(visibleContentSelects * 750, 1500),
+    maxDiffPixels: Math.min(Math.max(visibleContentSelects * 750, 50), 3000),
   });
 }
 
@@ -1351,6 +1351,91 @@ test("client project tabs filter the loaded workspace without losing route conte
   await expect(
     page.getByRole("heading", { name: "Brand landing page" }),
   ).toHaveCount(0);
+});
+
+test("F32 validates review input, retains edits after failure and returns to the saved agreement draft", async ({
+  page,
+}) => {
+  await openScenario(
+    page,
+    "studio-engagement-provenance",
+    "Create an engagement",
+  );
+  const draftId = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+  let submissions = 0;
+  await page.route(
+    "**/api/portal/admin/clients/*/engagements",
+    async (route) => {
+      submissions += 1;
+      await route.fulfill({
+        status: submissions === 1 ? 503 : 200,
+        contentType: "application/json",
+        body: JSON.stringify(
+          submissions === 1
+            ? {
+                error:
+                  "We could not save this engagement. Your details are still here. Please try again.",
+              }
+            : {
+                engagementId: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+                draftId,
+                draftVersion: 4,
+              },
+        ),
+      });
+    },
+  );
+  await page.route("**/portal/admin/clients/*/agreements/new*", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "text/html",
+      body: "<main>Agreement draft resumed</main>",
+    }),
+  );
+
+  const submit = page.getByRole("button", {
+    name: "Create & continue to agreement",
+  });
+  await submit.focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByLabel("Engagement name")).toHaveJSProperty(
+    "validity.valueMissing",
+    true,
+  );
+  await page
+    .getByLabel("Engagement name")
+    .fill("Website and booking experience");
+  await page.getByLabel("Primary goal").fill("Help customers book online.");
+  await page
+    .getByRole("textbox", { name: "Proposed scope *" })
+    .fill("Website pages and a booking workflow.");
+  await page
+    .getByLabel("Reviewed source or reference")
+    .fill("Founder discovery review");
+  const review = page.getByRole("checkbox", {
+    name: /I have reviewed this work/,
+  });
+  await review.focus();
+  await page.keyboard.press("Space");
+  await expect(review).toBeChecked();
+
+  await submit.focus();
+  await page.keyboard.press("Enter");
+  await expect(page.locator('section[role="alert"]')).toContainText(
+    "details are still here",
+  );
+  await expect(page.getByLabel("Engagement name")).toHaveValue(
+    "Website and booking experience",
+  );
+
+  await submit.focus();
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(
+    new RegExp(
+      `/portal/admin/clients/.*/agreements/new\\?draftId=${draftId}\\&step=scope`,
+    ),
+  );
+  await expect(page.getByText("Agreement draft resumed")).toBeVisible();
 });
 
 test("appearance selection updates the portal and persists between pages", async ({

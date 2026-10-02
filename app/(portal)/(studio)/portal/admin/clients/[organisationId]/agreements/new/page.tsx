@@ -97,6 +97,7 @@ export default async function NewStaffAgreementPage({
         engagements={register.engagementChoices ?? []}
         initialDraft={initialDraft}
         organisationName={register.organisationName}
+        currency={register.billingCurrency}
       />
     </div>
   );
