@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { AgreementBuilderDraftValidationError } from "../agreements/builder-draft-validation";
 import {
   createStaffAgreementDraftRouteDependencies,
   createStaffAgreementDraftRouteHandler,
@@ -249,4 +250,30 @@ test("unexpected diagnostics discard untrusted error codes and action values", a
       operation: "unknown",
     },
   ]);
+});
+
+test("draft validation returns actionable stage issues without unexpected-error reporting", async () => {
+  const issues = [
+    {
+      step: "fees" as const,
+      message: "Fees: Add a recurring service or choose fixed payment.",
+    },
+  ];
+  let reports = 0;
+  const handler = createStaffAgreementDraftRouteHandler({
+    authorize: async () => ({ id: "admin" }),
+    createCorrelationId: () => "11111111-1111-4111-8111-111111111111",
+    enabled: true,
+    execute: async () => {
+      throw new AgreementBuilderDraftValidationError(issues);
+    },
+    origin,
+    reportUnexpectedError: () => {
+      reports += 1;
+    },
+  });
+  const response = await handler(request(origin, origin), organisationId);
+  assert.equal(response.status, 400);
+  assert.deepEqual(await response.json(), { error: issues[0].message, issues });
+  assert.equal(reports, 0);
 });

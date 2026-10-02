@@ -11,6 +11,7 @@ import {
   commercialOfferSpecSchema,
   type CommercialOfferSpec,
 } from "@/lib/operations/agreements/commercial-types";
+import styles from "./agreements.module.css";
 import type { AgreementBuilderDraftContent } from "@/lib/operations/agreements/builder-draft-schema";
 
 export function readCommercialOffer(
@@ -69,7 +70,7 @@ export function CommercialOfferFields({
   const share = spec.revenueShare;
   const needsOffer = Boolean(share) || spec.cash?.mode !== "fixed";
   return (
-    <fieldset>
+    <fieldset className={styles.compensationFields}>
       <legend>Ongoing compensation</legend>
       <p>
         One-off fees remain fixed and payable whichever ongoing option the

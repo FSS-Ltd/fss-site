@@ -111,7 +111,7 @@ export function createStaffAgreementDraftRouteHandler<TActor>(
       if (error instanceof AgreementBuilderDraftConflict)
         return failure(error.message, 409);
       if (error instanceof AgreementBuilderDraftValidationError)
-        return failure(error.message, 400);
+        return reply({ error: error.message, issues: error.issues }, 400);
       if (error instanceof z.ZodError)
         return failure("Check the agreement draft and try again.", 400);
       if (error instanceof PayloadTooLargeError)

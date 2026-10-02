@@ -3,12 +3,14 @@
 import { useMemo } from "react";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import { Notice, PortalButton, PortalCard } from "@/components/portal/ui";
+import { validateAgreementBuilderDraft } from "@/lib/operations/agreements/builder-draft-validation";
 import { totalLinePence } from "@/lib/operations/agreements/validation";
 import {
   BuilderSection,
   type BuilderStepProps,
   formatGbp,
 } from "./agreement-builder-step-support";
+import { AgreementBuilderReadinessChecks } from "./agreement-builder-readiness-checks";
 import { AgreementBuilderSummary } from "./agreement-builder-summary";
 import styles from "./agreements.module.css";
 export function AgreementBuilderReviewStep({
@@ -23,6 +25,10 @@ export function AgreementBuilderReviewStep({
     draftExists: boolean;
     finalise: () => Promise<void>;
   }>): React.JSX.Element {
+  const readiness = useMemo(
+    () => validateAgreementBuilderDraft(content),
+    [content],
+  );
   const total = useMemo(() => {
     if (!agreement.lines) return "0";
     try {
@@ -70,30 +76,13 @@ export function AgreementBuilderReviewStep({
           commercialOffer={content.commercialOffer}
         />
       </PortalCard>
-      <PortalCard title="Readiness checks">
-        <ul className={styles.checkList}>
-          <li>
-            <CheckCircle2 aria-hidden="true" size={18} />{" "}
-            <span>Engagement linked</span>
-            <strong>{content.engagementId ? "Ready" : "Required"}</strong>
-          </li>
-          <li>
-            <CheckCircle2 aria-hidden="true" size={18} />{" "}
-            <span>Fees and schedule reconcile</span>
-            <strong>Validated on creation</strong>
-          </li>
-          <li>
-            <CheckCircle2 aria-hidden="true" size={18} />{" "}
-            <span>Signers and access reviewed</span>
-            <strong>{agreement.signatories?.length ?? 0} selected</strong>
-          </li>
-          <li>
-            <CheckCircle2 aria-hidden="true" size={18} />{" "}
-            <span>Document preview reviewed</span>
-            <strong>Prepared from draft</strong>
-          </li>
-        </ul>
-      </PortalCard>
+      <AgreementBuilderReadinessChecks
+        readiness={readiness}
+        engagementLinked={Boolean(content.engagementId)}
+        signerCount={agreement.signatories?.length ?? 0}
+        pending={pending}
+        onRepair={(step) => onSave(step, content)}
+      />
       <Notice tone="warning">
         <strong>
           {content.commercialOffer
@@ -108,11 +97,13 @@ export function AgreementBuilderReviewStep({
       </Notice>
       <div className={styles.actionRow}>
         <PortalButton
-          disabled={!draftExists || pending}
+          disabled={!draftExists || pending || !readiness.success}
           disabledReason={
             !draftExists
               ? "Save this review before creating the agreement record."
-              : undefined
+              : !readiness.success
+                ? "Complete the listed details before sending."
+                : undefined
           }
           loading={pending}
           onClick={() => void finalise()}
