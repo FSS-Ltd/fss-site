@@ -1,0 +1,202 @@
+.card {
+  padding: clamp(22px, 4vw, 40px);
+}
+
+.guidedForm,
+.groupFields {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+}
+
+.controls {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+.groupPanel {
+  display: grid;
+  gap: 24px;
+  animation: group-forward 200ms ease-out;
+}
+
+.groupPanel[hidden] {
+  display: none;
+}
+
+.guidedForm[data-direction="backward"] .groupPanel {
+  animation-name: group-backward;
+}
+
+.prompt {
+  display: grid;
+  gap: 8px;
+}
+
+.card .prompt h2 {
+  margin: 0;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 650;
+  letter-spacing: -0.035em;
+  line-height: 1.2;
+  color: var(--portal-ink);
+}
+
+.prompt p,
+.saveStatus {
+  margin: 0;
+  color: var(--portal-muted);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.workChoices {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+.workChoice {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid var(--portal-control-boundary);
+  border-radius: 12px;
+  padding: 18px;
+  background: var(--portal-soft-surface);
+  color: var(--portal-ink);
+  cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease;
+}
+
+.workChoice[hidden] {
+  display: none;
+}
+
+.workChoice:has(input:checked) {
+  border-color: var(--portal-action);
+  background: var(--portal-tint);
+}
+
+.workChoice input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  flex-shrink: 0;
+  accent-color: var(--portal-action);
+}
+
+.workChoice span {
+  display: grid;
+  gap: 4px;
+}
+
+.workChoice small {
+  color: var(--portal-muted);
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.progress {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 8px;
+}
+
+.progress li {
+  display: grid;
+  gap: 9px;
+  color: var(--portal-muted);
+  font-size: 0.75rem;
+}
+
+.progress li::before {
+  content: "";
+  height: 3px;
+  border-radius: 99px;
+  background: var(--portal-border);
+  transition: background-color 200ms ease;
+}
+
+.progress li[data-complete="true"]::before,
+.progress li[aria-current="step"]::before {
+  background: var(--portal-action);
+}
+
+.progress li[aria-current="step"] {
+  color: var(--portal-ink);
+  font-weight: 650;
+}
+
+.stage {
+  min-width: 0;
+  animation: group-forward 200ms ease-out;
+}
+
+.stage[data-direction="backward"] {
+  animation-name: group-backward;
+}
+
+@keyframes group-forward {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes group-backward {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (max-width: 600px) {
+  .card {
+    padding: 22px 18px;
+  }
+  .progress {
+    gap: 7px;
+  }
+  .progress li {
+    font-size: 0.6875rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .groupPanel,
+  .stage {
+    animation: none;
+  }
+  .progress li::before,
+  .workChoice {
+    transition: none;
+  }
+}

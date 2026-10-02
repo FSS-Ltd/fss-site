@@ -120,7 +120,7 @@ export function BuilderSection({
         <span aria-hidden="true" className={styles.builderIcon}>
           {icon}
         </span>
-        <h2>{title}</h2>
+        <h2 tabIndex={-1}>{title}</h2>
       </div>
       {children}
     </PortalCard>

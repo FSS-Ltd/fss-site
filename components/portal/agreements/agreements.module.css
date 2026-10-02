@@ -454,3 +454,38 @@
   outline: 2px solid var(--portal-action, #0f7078);
   outline-offset: 3px;
 }
+
+.documentPreviewDark,
+.documentPreviewDark h3 {
+  color: var(--portal-dark-ink, #f4f8fc);
+}
+
+.documentPreviewDark .version,
+.documentPreviewDark .muted {
+  color: var(--portal-dark-muted, #c1cddd);
+}
+
+.builderCardHeading {
+  justify-content: flex-start;
+}
+
+.documentPreviewDark .summaryList dd {
+  color: var(--portal-dark-ink, #f4f8fc);
+}
+
+.documentPreviewDark .summaryList dt {
+  color: var(--portal-dark-muted, #c1cddd);
+}
+
+.documentPreviewDark .summaryList div {
+  border-color: #394d66;
+}
+
+.summaryList dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.summaryList dd p {
+  margin: 0 0 8px;
+}

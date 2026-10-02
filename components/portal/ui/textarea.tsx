@@ -6,6 +6,7 @@ export type PortalTextareaProps = Readonly<
     error?: string;
     hint?: string;
     label: string;
+    labelVisibility?: "visible" | "hidden";
   }
 >;
 
@@ -15,6 +16,7 @@ export function PortalTextarea({
   hint,
   id,
   label,
+  labelVisibility = "visible",
   required,
   "aria-describedby": describedBy,
   ...props
@@ -31,7 +33,12 @@ export function PortalTextarea({
 
   return (
     <div className={styles.field}>
-      <label className={styles.label} htmlFor={textareaId}>
+      <label
+        className={
+          labelVisibility === "hidden" ? styles.visuallyHidden : styles.label
+        }
+        htmlFor={textareaId}
+      >
         {label}
         {required ? <span className={styles.required}> *</span> : null}
       </label>
