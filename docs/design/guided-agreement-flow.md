@@ -1,7 +1,7 @@
 # Guided agreement flow and creation repair
 
 Owner: Technical Agent
-Status: Draft PR #283; Linux visual baselines pending
+Status: Guided flow merged in PR #283; publication guidance and spacing follow-up prepared for review
 Last updated: 2026-10-02
 Created: 2026-10-01
 
@@ -49,3 +49,17 @@ pnpm exec playwright test --config=playwright.agreement.config.ts --workers=1 --
 PR #282 merged on 2026-10-02 Europe/London. The four overlapping macOS Fees and Review baselines were resolved in favour of the guided flow; other commercial screenshots from `main` were retained. Review the changed modules and screenshots, resolve Linux visual checks, and obtain explicit approval before production deployment. Rollback is a code revert; this repair changes no database schema or runtime grants. The isolated worktree is retained for PR feedback.
 
 Conflict repair verification (2026-10-02): type checking, documentation formatting and all eight affected macOS Fees/Review comparisons passed in light and dark appearances across desktop/mobile. Runtime source files were unchanged, so unit, database and build checks were not repeated for this image/documentation-only merge.
+
+## Publication guidance and compensation spacing follow-up
+
+The deployed publication request at 20:25 Europe/London on 2026-10-02 returned HTTP 400. Vercel confirmed the request; a read-only lookup scoped to its client returned redacted validation flags: client-proposed recurring cash was selected, but the draft contained no recurring service. Required text fields and signers were present. No production draft was changed.
+
+The publishing schema correctly rejects this combination, but the route previously converted its validation error into a generic instruction to check the draft. Review now uses the same complete-draft and publication schemas as the saved-draft command. It lists unfinished details with their stages, offers repair actions and disables publication or creation while those details are incomplete. Repair actions save through the existing draft API and retain agreement values. The server returns safe, actionable issue messages, without reflecting contact details, content or unexpected input keys.
+
+For one-off work, use Fees → Ongoing compensation → Recurring payment → “Set the recurring amount.” For ongoing work with a client-proposed amount, add a monthly, quarterly or annual service; recurring services must share their interval and dates. The existing commercial rule, tenant boundaries, transactions and version checks remain intact. The compensation fieldset now uses the shared 16 px grid gap between its dropdown, explanation, checkbox and subsequent fields.
+
+Follow-up validation uses Node 24 and pnpm 9.7. The local dependency tree was reused after verifying identical package manifests and lockfiles; the fresh download was slow. Unit tests: 2,197 passed. Operations integration tests: 149 passed against a fresh temporary local PostgreSQL cluster with the current migrations. The new database regression confirms that invalid publication retains the saved content/version and creates neither an offer nor an agreement.
+
+All 36 agreement interaction, contrast and spacing checks passed in installed Chrome across desktop/mobile. The matching Playwright browser download did not finish, so the existing pixel baseline comparisons were not rerun. Four new compensation previews are captured as browser-test artifacts in light/dark appearances. Spacing assertions measure the real dropdown, helper text and checkbox rectangles, rather than relying on platform-specific image baselines. The repair action returns focus to Fees and preserves the service description.
+
+The Operations coverage gate passed all 599 tests: 92.41% lines, 88.51% branches and 93.54% functions overall; both new validation modules have 100% line coverage. Type checking, lint, changed-file formatting, production dependency security audit and production build passed. The full Growth database suite is outside this follow-up's scope. Production release still requires explicit approval. Rollback is a code revert; there are no migrations, grants or new dependencies. The isolated follow-up worktree is retained for review.

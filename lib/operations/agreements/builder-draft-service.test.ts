@@ -3,6 +3,7 @@ import test from "node:test";
 import type { FssAdminContext } from "../auth/staff-types";
 import type { OperationsDb, OperationsTransaction } from "../db/client";
 import {
+  AgreementBuilderDraftValidationError,
   loadStaffAgreementBuilderDraft,
   saveStaffAgreementBuilderDraft,
   type AgreementBuilderDraft,
@@ -53,21 +54,21 @@ function completeDraft(): AgreementBuilderDraft {
   };
 }
 
-function recordingDb(
-  stored: AgreementBuilderDraft | null = null,
-): {
+function recordingDb(stored: AgreementBuilderDraft | null = null): {
   calls: Array<{ sql: string; values: unknown[] }>;
   db: OperationsDb;
 } {
   const calls: Array<{ sql: string; values: unknown[] }> = [];
   const query = Object.assign(
     async (parts: TemplateStringsArray, ...values: unknown[]) => {
-    const sql = parts.join("?");
-    calls.push({ sql, values });
-    if (sql.includes("set_config") || sql.includes("assert_active")) return [];
-    if (sql.includes("save_agreement_builder_draft")) return [savedDraft()];
-    if (sql.includes("load_agreement_builder_draft")) return stored ? [stored] : [];
-    return [];
+      const sql = parts.join("?");
+      calls.push({ sql, values });
+      if (sql.includes("set_config") || sql.includes("assert_active"))
+        return [];
+      if (sql.includes("save_agreement_builder_draft")) return [savedDraft()];
+      if (sql.includes("load_agreement_builder_draft"))
+        return stored ? [stored] : [];
+      return [];
     },
     { json: <T>(value: T) => value },
   );
@@ -124,7 +125,7 @@ test("finalising an incomplete builder draft never creates an agreement", async 
       { action: "finalise", draftId, expectedVersion: 1 },
       correlationId,
     ),
-    /Check the agreement details before finalising/,
+    /Scope: Complete the client outcome/,
   );
 
   assert.match(
@@ -171,5 +172,38 @@ test("finalising checks that the saved engagement is still linked to the organis
   assert.match(
     calls.map(({ sql }) => sql).join("\n"),
     /from operations\.engagement_links/,
+  );
+});
+
+test("publishing client-proposed cash without recurring work explains how to finish", async () => {
+  const stored = completeDraft();
+  const { db, calls } = recordingDb({
+    ...stored,
+    content: {
+      ...stored.content,
+      commercialOffer: {
+        spec: { cash: { mode: "client_proposed" }, revenueShare: null },
+        expiresAt: "2026-11-01T00:00:00.000Z",
+      },
+    },
+  });
+  await assert.rejects(
+    saveStaffAgreementBuilderDraft(
+      db,
+      admin,
+      organisationId,
+      { action: "publish", draftId, expectedVersion: 1 },
+      correlationId,
+    ),
+    (error: unknown) =>
+      error instanceof AgreementBuilderDraftValidationError &&
+      error.message ===
+        "Fees: Client-proposed amounts apply to recurring services. Add a recurring service or choose fixed payment.",
+  );
+  assert.equal(
+    calls.some(({ sql }) =>
+      sql.includes("insert into operations.commercial_offers"),
+    ),
+    false,
   );
 });

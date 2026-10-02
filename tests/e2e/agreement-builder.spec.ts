@@ -1,4 +1,8 @@
 import { expect, test } from "@playwright/test";
+import type {
+  AgreementBuilderDraftContent,
+  AgreementBuilderStep,
+} from "@/lib/operations/agreements/builder-draft-schema";
 
 test("scope shows focused groups and retains edits while moving backward", async ({
   page,
@@ -375,5 +379,98 @@ for (const stage of ["scope", "review"] as const) {
             : "agreement could not be created",
       }),
     ).toBeVisible();
+  });
+}
+
+test("an incomplete saved offer explains what is missing and opens Fees to repair it", async ({
+  page,
+}) => {
+  await page.route(
+    "**/api/portal/admin/clients/*/agreement-drafts",
+    async (route) => {
+      const input: {
+        content: AgreementBuilderDraftContent;
+        draftId: string;
+        step: AgreementBuilderStep;
+        expectedVersion: number;
+      } = route.request().postDataJSON();
+      await route.fulfill({
+        status: 200,
+        json: {
+          id: input.draftId,
+          version: input.expectedVersion + 1,
+          step: input.step,
+          content: {
+            ...input.content,
+            commercialOffer: {
+              spec: { cash: { mode: "client_proposed" }, revenueShare: null },
+              expiresAt: "2026-11-01T00:00:00.000Z",
+            },
+          },
+        },
+      });
+    },
+  );
+  await page.goto("/visual/fss-studio/studio-agreement-builder-review");
+  await page.getByRole("button", { name: "Save draft", exact: true }).click();
+  await expect(
+    page.getByRole("alert").filter({
+      hasText: "Client-proposed amounts apply to recurring services",
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Publish payment offer", exact: true }),
+  ).toBeDisabled();
+  await page.getByRole("button", { name: "Edit fees", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Price the services" }),
+  ).toBeFocused();
+  await expect(
+    page.getByRole("textbox", { name: "Description" }).first(),
+  ).toHaveValue("Website & booking experience");
+});
+
+for (const appearance of ["light", "dark"] as const) {
+  test(`ongoing compensation has clear spacing in ${appearance} appearance`, async ({
+    page,
+    baseURL,
+  }, testInfo) => {
+    await page.context().addCookies([
+      {
+        name: "fss-portal-appearance",
+        value: appearance,
+        url: baseURL ?? "http://127.0.0.1:3219",
+      },
+    ]);
+    await page.goto("/visual/fss-studio/studio-agreement-builder-fees");
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
+    const heading = page.getByRole("heading", {
+      name: "Set ongoing compensation",
+    });
+    await expect(heading).toBeFocused();
+    const dropdown = page.getByRole("combobox", { name: "Recurring payment" });
+    await dropdown.selectOption("client_proposed");
+    const info = page.getByText("The client proposes one combined amount", {
+      exact: false,
+    });
+    const checkbox = page.getByRole("checkbox", {
+      name: "Offer revenue share for this agreement",
+    });
+    const dropdownBox = await dropdown.boundingBox();
+    const infoBox = await info.boundingBox();
+    const checkboxBox = await checkbox.boundingBox();
+    expect(dropdownBox && infoBox && checkboxBox).toBeTruthy();
+    if (!dropdownBox || !infoBox || !checkboxBox) return;
+    expect(
+      infoBox.y - dropdownBox.y - dropdownBox.height,
+    ).toBeGreaterThanOrEqual(12);
+    expect(checkboxBox.y - infoBox.y - infoBox.height).toBeGreaterThanOrEqual(
+      12,
+    );
+    await heading.blur();
+    await page.locator("[data-builder-group]:visible").screenshot({
+      path: testInfo.outputPath(`ongoing-compensation-${appearance}.png`),
+      animations: "disabled",
+    });
   });
 }

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import test from "node:test";
+import { agreementDraft } from "@/lib/operations/agreements/fixtures";
 import { renderToStaticMarkup } from "react-dom/server";
 
 const require = createRequire(import.meta.url);
@@ -165,3 +166,28 @@ for (const mode of ["client_proposed", "revenue_share"] as const) {
     );
   });
 }
+
+test("review lists the missing recurring work, blocks publication and offers a Fees repair", () => {
+  const { documentHash, documentReference, ...agreement } = agreementDraft();
+  assert.ok(documentHash && documentReference);
+  const html = renderBuilder([], {
+    id: "33333333-3333-4333-8333-333333333333",
+    organisationId,
+    engagementId,
+    content: {
+      agreement,
+      engagementId,
+      commercialOffer: {
+        spec: { cash: { mode: "client_proposed" }, revenueShare: null },
+        expiresAt: "2026-11-01T00:00:00.000Z",
+      },
+    },
+    createdAt: "2026-10-01T00:00:00.000Z",
+    updatedAt: "2026-10-01T00:00:00.000Z",
+    step: "review",
+    version: 1,
+  });
+  assert.match(html, /Client-proposed amounts apply to recurring services/);
+  assert.match(html, /Edit fees/);
+  assert.match(html, /<button[^>]*disabled=""[^>]*>Publish payment offer/);
+});

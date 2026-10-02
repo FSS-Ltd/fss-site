@@ -5,6 +5,7 @@ import { claimStaffInvitationForVerifiedEmail } from "../../../lib/operations/au
 import { requireFssAdmin } from "../../../lib/operations/auth/require-admin";
 import {
   AgreementBuilderDraftConflict,
+  AgreementBuilderDraftValidationError,
   loadStaffAgreementBuilderDraft,
   saveStaffAgreementBuilderDraft,
 } from "../../../lib/operations/agreements/builder-draft-service";
@@ -163,4 +164,60 @@ test("a failure after revision insertion rolls back creation and retains the dra
   } finally {
     await f.admin`grant insert on operations.agreement_lines to operations_founder`;
   }
+});
+
+test("invalid client-proposed offers retain the saved draft and explain the missing recurring work", async (t) => {
+  const f = await builderFixture(t);
+  const saved = await saveStaffAgreementBuilderDraft(
+    f.founderDb,
+    f.staff,
+    f.organisationId,
+    {
+      action: "save",
+      draftId: f.saved.id,
+      expectedVersion: f.saved.version,
+      step: "review",
+      content: {
+        ...f.saved.content,
+        commercialOffer: {
+          spec: { cash: { mode: "client_proposed" }, revenueShare: null },
+          expiresAt: new Date(Date.now() + 86400000).toISOString(),
+        },
+      },
+    },
+    f.correlationId,
+  );
+  await assert.rejects(
+    saveStaffAgreementBuilderDraft(
+      f.founderDb,
+      f.staff,
+      f.organisationId,
+      {
+        action: "publish",
+        draftId: saved.id,
+        expectedVersion: saved.version,
+      },
+      f.correlationId,
+    ),
+    (error: unknown) =>
+      error instanceof AgreementBuilderDraftValidationError &&
+      error.issues.some(
+        (issue) =>
+          issue.step === "fees" &&
+          issue.message.includes("Add a recurring service"),
+      ),
+  );
+  const retained = await loadStaffAgreementBuilderDraft(
+    f.founderDb,
+    f.staff,
+    f.organisationId,
+    saved.id,
+  );
+  assert.deepEqual(retained?.content, saved.content);
+  assert.equal(retained?.version, saved.version);
+  const [offers] = await f.admin<
+    { count: number }[]
+  >`select count(*)::int as count from operations.commercial_offers where organisation_id=${f.organisationId}`;
+  assert.equal(offers.count, 0);
+  assert.equal(await f.agreementCount(), 1);
 });

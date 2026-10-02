@@ -9,15 +9,19 @@ import {
   agreementBuilderDraftContentSchema,
   agreementBuilderDraftCommandSchema,
   agreementBuilderStepSchema,
-  completeAgreementBuilderDraftContentSchema,
   type AgreementBuilderDraftContent,
   type AgreementBuilderStep,
   type FinaliseAgreementBuilderDraftCommand,
   type SaveAgreementBuilderDraftCommand,
 } from "./builder-draft-schema";
-import { draftSchema } from "./validation";
+import {
+  AgreementBuilderDraftValidationError,
+  validateAgreementBuilderDraft,
+} from "./builder-draft-validation";
 import { publishStaffCommercialOffer } from "./commercial-service";
 import type { CommercialOffer } from "./commercial-types";
+
+export { AgreementBuilderDraftValidationError } from "./builder-draft-validation";
 
 export type AgreementBuilderDraft = Readonly<{
   content: AgreementBuilderDraftContent;
@@ -69,28 +73,14 @@ export class AgreementBuilderDraftConflict extends Error {
   }
 }
 
-export class AgreementBuilderDraftValidationError extends Error {
-  constructor() {
-    super("Check the agreement details before finalising.");
-    this.name = "AgreementBuilderDraftValidationError";
-  }
-}
-
 function toAgreementDraft(content: AgreementBuilderDraftContent): {
   draft: AgreementRecord["draft"];
   engagementId: string;
 } {
-  const parsed = completeAgreementBuilderDraftContentSchema.safeParse(content);
-  if (!parsed.success) throw new AgreementBuilderDraftValidationError();
-
-  const draft = draftSchema.safeParse({
-    ...parsed.data.agreement,
-    documentHash: "0".repeat(64),
-    documentReference: "private:agreement-drafts/unbound.pdf",
-  });
-  if (!draft.success) throw new AgreementBuilderDraftValidationError();
-
-  return { draft: draft.data, engagementId: parsed.data.engagementId };
+  const result = validateAgreementBuilderDraft(content);
+  if (!result.success)
+    throw new AgreementBuilderDraftValidationError(result.issues);
+  return { draft: result.draft, engagementId: result.engagementId };
 }
 
 function draftConflict(error: unknown): never {
@@ -255,7 +245,12 @@ export async function saveStaffAgreementBuilderDraft(
         );
       const complete = toAgreementDraft(stored.content);
       if (!stored.content.commercialOffer)
-        throw new AgreementBuilderDraftValidationError();
+        throw new AgreementBuilderDraftValidationError([
+          {
+            step: "fees",
+            message: "Fees: Choose payment options before publishing.",
+          },
+        ]);
       return await publishStaffCommercialOffer(
         db,
         admin,
