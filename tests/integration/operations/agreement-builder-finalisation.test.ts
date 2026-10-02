@@ -9,6 +9,7 @@ import {
   loadStaffAgreementBuilderDraft,
   saveStaffAgreementBuilderDraft,
 } from "../../../lib/operations/agreements/builder-draft-service";
+import { listStaffAgreementBuilderDrafts } from "../../../lib/operations/agreements/builder-draft-repository";
 import { requireOperationsTestDatabaseUrl } from "../../../scripts/require-operations-database-env";
 import { signingFixture } from "./signing-fixtures";
 
@@ -220,4 +221,143 @@ test("invalid client-proposed offers retain the saved draft and explain the miss
   >`select count(*)::int as count from operations.commercial_offers where organisation_id=${f.organisationId}`;
   assert.equal(offers.count, 0);
   assert.equal(await f.agreementCount(), 1);
+});
+
+test("saved drafts are discoverable after leaving and retain the latest Fees edits", async (t) => {
+  const f = await builderFixture(t);
+  const saved = await saveStaffAgreementBuilderDraft(
+    f.founderDb,
+    f.staff,
+    f.organisationId,
+    {
+      action: "save",
+      draftId: f.saved.id,
+      expectedVersion: f.saved.version,
+      step: "fees",
+      content: {
+        ...f.saved.content,
+        agreement: {
+          ...f.saved.content.agreement,
+          title: "Edited agreement",
+          noticeDays: 45,
+        },
+      },
+    },
+    f.correlationId,
+  );
+  const page = await listStaffAgreementBuilderDrafts(
+    f.founderDb,
+    f.staff,
+    f.organisationId,
+  );
+  assert.equal(page.items.length, 1);
+  assert.equal(page.items[0].id, saved.id);
+  assert.equal(page.items[0].title, "Edited agreement");
+  assert.equal(page.items[0].step, "fees");
+  assert.equal(page.items[0].version, saved.version);
+  assert.equal(Object.hasOwn(page.items[0], "content"), false);
+  const resumed = await loadStaffAgreementBuilderDraft(
+    f.founderDb,
+    f.staff,
+    f.organisationId,
+    page.items[0].id,
+  );
+  assert.equal(resumed?.content.agreement?.noticeDays, 45);
+  assert.equal(resumed?.step, "fees");
+  const otherClient = await listStaffAgreementBuilderDrafts(
+    f.founderDb,
+    f.staff,
+    randomUUID(),
+  );
+  assert.deepEqual(otherClient.items, []);
+});
+
+test("completed drafts leave the working list and table access remains restricted", async (t) => {
+  const f = await builderFixture(t);
+  await f.finalise();
+  const page = await listStaffAgreementBuilderDrafts(
+    f.founderDb,
+    f.staff,
+    f.organisationId,
+  );
+  assert.deepEqual(page.items, []);
+  await assert.rejects(
+    f.founderDb`select * from operations.agreement_builder_drafts`,
+    /permission denied/,
+  );
+  const [boundary] = await f.admin<
+    { portalCanRead: boolean; founderCanSelect: boolean }[]
+  >`
+    select has_function_privilege('operations_portal', 'operations.list_agreement_builder_drafts(uuid,integer)', 'EXECUTE') as "portalCanRead",
+      has_table_privilege('operations_founder', 'operations.agreement_builder_drafts', 'SELECT') as "founderCanSelect"
+  `;
+  assert.equal(boundary.portalCanRead, false);
+  assert.equal(boundary.founderCanSelect, false);
+});
+
+test("draft discovery rechecks staff membership and excludes browser and worker roles", async (t) => {
+  const f = await builderFixture(t);
+  const roles = await f.admin<{ role: string; canRead: boolean }[]>`
+    select role, has_function_privilege(role, 'operations.list_agreement_builder_drafts(uuid,integer)', 'EXECUTE') as "canRead"
+    from unnest(array['anon','authenticated','service_role','growth_app','operations_portal','operations_signing_worker','operations_billing_worker','operations_onboarding_worker']) role
+  `;
+  assert.equal(
+    roles.every((role) => !role.canRead),
+    true,
+  );
+  await assert.rejects(
+    f.founderDb`select * from operations.list_agreement_builder_drafts(${f.organisationId}, 1)`,
+    /Staff authorization/,
+  );
+  await f.admin`update operations.staff_memberships set revoked_at=clock_timestamp() where id=${f.staff.membershipId}`;
+  try {
+    await assert.rejects(
+      listStaffAgreementBuilderDrafts(f.founderDb, f.staff, f.organisationId),
+      /Staff authorization/,
+    );
+  } finally {
+    await f.admin`update operations.staff_memberships set revoked_at=null where id=${f.staff.membershipId}`;
+  }
+});
+
+test("draft discovery pages are bounded, ordered and include untitled drafts", async (t) => {
+  const f = await builderFixture(t);
+  for (let index = 0; index < 26; index++) {
+    await saveStaffAgreementBuilderDraft(
+      f.founderDb,
+      f.staff,
+      f.organisationId,
+      {
+        action: "save",
+        draftId: randomUUID(),
+        expectedVersion: 0,
+        step: "link",
+        content: {
+          agreement: index === 25 ? {} : { title: `Draft ${index}` },
+          engagementId: f.engagement.engagementId,
+        },
+      },
+      f.correlationId,
+    );
+  }
+  const first = await listStaffAgreementBuilderDrafts(
+    f.founderDb,
+    f.staff,
+    f.organisationId,
+  );
+  const second = await listStaffAgreementBuilderDrafts(
+    f.founderDb,
+    f.staff,
+    f.organisationId,
+    2,
+  );
+  assert.equal(first.items.length, 25);
+  assert.equal(first.items[0].title, null);
+  assert.equal(first.hasNext, true);
+  assert.equal(second.items.length, 2);
+  assert.equal(second.hasNext, false);
+  assert.equal(
+    new Set([...first.items, ...second.items].map((draft) => draft.id)).size,
+    27,
+  );
 });

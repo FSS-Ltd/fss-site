@@ -1,3 +1,4 @@
+import { StudioSavedAgreementDraftsScenario } from "./agreement-draft-visual-fixture";
 import {
   ClientCommercialScenario,
   StaffCommercialScenario,
@@ -155,6 +156,7 @@ export type VisualScenarioName =
   | "studio-request-scope"
   | "studio-request-create"
   | "studio-request-move"
+  | "studio-agreement-drafts"
   | "studio-agreement-list"
   | "studio-agreement-builder"
   | "studio-agreement-builder-scope"
@@ -577,6 +579,10 @@ const scenarios: Record<VisualScenarioName, VisualScenario> = {
   "studio-request-move": {
     name: "studio-request-move",
     content: <StudioRequestMoveScenario />,
+  },
+  "studio-agreement-drafts": {
+    name: "studio-agreement-drafts",
+    content: <StudioSavedAgreementDraftsScenario />,
   },
   "studio-agreement-list": {
     name: "studio-agreement-list",
