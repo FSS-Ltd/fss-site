@@ -36,7 +36,7 @@ Rollback application code first, then optionally remove only `operations.list_ag
 Validation on Node 24 and pnpm 9.7:
 
 - Type checking, repository lint, changed-file formatting and all 68 migration policy checks passed.
-- All 2,203 unit tests passed; the fixture-registration check was rerun after adding the chooser scenario.
+- All 2,205 unit tests passed after rebasing onto current main (including PR #286); the fixture-registration check was also rerun after adding the chooser scenario.
 - All 153 Operations integration tests passed against the disposable local database. The Operations coverage gate passed 603 tests at 92.37% lines, 88.38% branches and 93.56% functions; the new repository reaches 97.67% lines and 100% functions.
 - All 40 agreement browser interaction checks passed in installed Chrome across desktop/mobile. An initial cold development-server compile exhausted the first existing test's timeout; the complete rerun passed. The new chooser artifacts were inspected in both appearances.
 - The production dependency audit found no known vulnerabilities, and the production build passed.
