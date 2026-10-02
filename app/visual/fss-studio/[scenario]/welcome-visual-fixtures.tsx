@@ -361,8 +361,10 @@ export function StudioWelcomeJourneysScenario(): React.JSX.Element {
 
 export function StudioWelcomeBuilderScenario({
   stage,
+  billingConfigured = true,
 }: Readonly<{
   stage: "access" | "content" | "schedule" | "setup";
+  billingConfigured?: boolean;
 }>): React.JSX.Element {
   return (
     <StudioFrame>
@@ -393,7 +395,11 @@ export function StudioWelcomeBuilderScenario({
           agreementRecords={[welcomeVisualAgreement]}
           organisationName="Northstar Studio"
           settings={welcomeVisualSettings}
-          billing={{ accountId: "acct_fixture", livemode: false }}
+          billing={
+            billingConfigured
+              ? { accountId: "acct_fixture", livemode: false }
+              : null
+          }
           drafts={welcomeVisualDrafts}
           organisationId="5c90c28c-f1a4-4e9e-a4eb-a833af085735"
           initialStage={stage}

@@ -172,6 +172,7 @@ export type VisualScenarioName =
   | "studio-welcome-content"
   | "studio-welcome-access"
   | "studio-welcome-schedule"
+  | "studio-welcome-without-billing"
   | "studio-welcome-preflight"
   | "studio-welcome-active"
   | "studio-welcome-recovery"
@@ -644,6 +645,15 @@ const scenarios: Record<VisualScenarioName, VisualScenario> = {
   "studio-welcome-schedule": {
     name: "studio-welcome-schedule",
     content: <StudioWelcomeBuilderScenario stage="schedule" />,
+  },
+  "studio-welcome-without-billing": {
+    name: "studio-welcome-without-billing",
+    content: (
+      <StudioWelcomeBuilderScenario
+        stage="schedule"
+        billingConfigured={false}
+      />
+    ),
   },
   "studio-welcome-preflight": {
     name: "studio-welcome-preflight",
