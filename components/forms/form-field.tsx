@@ -8,7 +8,15 @@ type FormFieldProps = InputHTMLAttributes<HTMLInputElement> & {
   error?: string;
 };
 
-export function FormField({ id, label, className, error, ...props }: FormFieldProps) {
+export function FormField({
+  id,
+  label,
+  className,
+  error,
+  ...props
+}: FormFieldProps) {
+  const errorId = `${id}-error`;
+
   return (
     <div className="space-y-2">
       <label className="block text-sm font-medium text-foreground" htmlFor={id}>
@@ -16,13 +24,19 @@ export function FormField({ id, label, className, error, ...props }: FormFieldPr
       </label>
       <input
         className={cn(
-          "h-11 w-full rounded-xl border border-border-soft bg-surface-2 px-3 text-sm text-foreground placeholder:text-text-subtle focus:border-brand-primary/70 focus:outline-none",
+          "h-11 w-full rounded-xl border border-border-soft bg-surface-2 px-3 text-sm text-foreground placeholder:text-text-subtle focus:border-brand-primary/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/60",
           className,
         )}
         id={id}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? errorId : undefined}
         {...props}
       />
-      {error ? <p className="text-xs text-rose-300">{error}</p> : null}
+      {error ? (
+        <p id={errorId} className="text-xs text-red-700">
+          {error}
+        </p>
+      ) : null}
     </div>
   );
 }

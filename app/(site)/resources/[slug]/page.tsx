@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { BreadcrumbSchema } from "@/components/seo/breadcrumb-schema";
 import { ResourceDetailPage } from "@/components/resources/resource-detail-page";
+import { PlumberPromptKitPage } from "@/components/resources/plumber-prompt-kit-page";
 import {
   getAllResources,
   getRelatedResources,
@@ -60,10 +61,14 @@ export default async function ResourceRoutePage({
           },
         ]}
       />
-      <ResourceDetailPage
-        resource={resource}
-        relatedResources={relatedResources}
-      />
+      {slug === "ai-prompts-for-plumbers" ? (
+        <PlumberPromptKitPage resource={resource.meta} />
+      ) : (
+        <ResourceDetailPage
+          resource={resource}
+          relatedResources={relatedResources}
+        />
+      )}
     </>
   );
 }

@@ -1,11 +1,14 @@
 import { z } from "zod";
 
 export const leadMagnetCaptureSchema = z.object({
-  firstName: z.string().min(2, "Please enter your first name."),
-  lastName: z.string().min(2, "Please enter your last name."),
-  workEmail: z.string().email("Please enter a valid work email."),
-  company: z.string().min(2, "Please enter your company name."),
-  challenge: z.string().max(600, "Please keep this under 600 characters.").optional(),
+  firstName: z.string().trim().min(2, "Please enter your first name."),
+  lastName: z.string().trim().min(2, "Please enter your last name."),
+  workEmail: z.string().trim().email("Please enter a valid work email."),
+  company: z.string().trim().min(2, "Please enter your company name."),
+  challenge: z
+    .string()
+    .max(600, "Please keep this under 600 characters.")
+    .optional(),
 });
 
 export type LeadMagnetCaptureValues = z.infer<typeof leadMagnetCaptureSchema>;
@@ -43,7 +46,8 @@ export async function submitLeadCapture(
     if (!response.ok || !result.ok) {
       return {
         ok: false,
-        errorMessage: result.errorMessage ?? "We could not submit your request right now.",
+        errorMessage:
+          result.errorMessage ?? "We could not submit your request right now.",
       };
     }
 
