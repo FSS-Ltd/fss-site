@@ -7,9 +7,9 @@ import styles from "./agreement-builder.module.css";
 
 type FormControl = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 
-function invalidControl(container: Element): FormControl | undefined {
+function invalidControl(group: Element): FormControl | undefined {
   return Array.from(
-    container.querySelectorAll<FormControl>("input, select, textarea"),
+    group.querySelectorAll<FormControl>("input, select, textarea"),
   ).find((control) => control.willValidate && !control.validity.valid);
 }
 
