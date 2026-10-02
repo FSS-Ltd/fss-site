@@ -150,7 +150,8 @@ export function LeadMagnetCaptureForm({
         <input
           id="newsletterOptIn"
           type="checkbox"
-          className="mt-1 h-5 w-5 shrink-0 rounded border-border-soft accent-brand-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary"
+          className="mt-1 h-5 w-5 shrink-0 rounded border-border-soft focus-visible:outline-2"
+          style={{ accentColor: "var(--brand-primary)" }}
           checked={newsletterOptIn}
           onChange={(event) => setNewsletterOptIn(event.target.checked)}
         />
@@ -160,11 +161,11 @@ export function LeadMagnetCaptureForm({
         </span>
       </label>
       {isCompactDownload ? (
-        <p className="text-xs leading-5 text-text-muted">
+        <p className="text-xs leading-6 text-text-muted">
           Newsletter signup is optional. Unsubscribe anytime. Read our{" "}
           <Link
             href="/privacy"
-            className="font-medium text-[#0f7078] underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary"
+            className="font-medium text-foreground underline focus-visible:outline-2"
           >
             privacy policy
           </Link>

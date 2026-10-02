@@ -24,7 +24,7 @@ export function FormField({
       </label>
       <input
         className={cn(
-          "h-11 w-full rounded-xl border border-border-soft bg-surface-2 px-3 text-sm text-foreground placeholder:text-text-subtle focus:border-brand-primary/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/60",
+          "h-11 w-full rounded-xl border border-border-soft bg-surface-2 px-3 text-sm text-foreground placeholder:text-text-subtle focus:border-brand-primary/70 focus:outline-none focus-visible:ring-2",
           className,
         )}
         id={id}
