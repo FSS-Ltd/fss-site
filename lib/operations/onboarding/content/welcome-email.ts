@@ -1,31 +1,38 @@
 import type { ApprovedEmail, WelcomeContent } from "../types";
-export function escapeHtml(value: string): string {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-}
-function paragraphHtml(paragraph: string): string {
-  return paragraph
-    .split(/(https:\/\/[^\s]+|\{\{portal_access_url\}\})/g)
-    .map((part, index) => {
-      if (index % 2 === 0) return escapeHtml(part);
-      const url = part.replace(/[.,;:!?]+$/, "");
-      return `<a href="${escapeHtml(url)}" style="color:#17372d;text-decoration:underline;overflow-wrap:anywhere;word-break:break-all;">${escapeHtml(url)}</a>${escapeHtml(part.slice(url.length))}`;
-    })
-    .join("");
-}
+import type { WelcomePackId } from "../welcome-pack-contract";
+import { escapeHtml, paragraphHtml } from "./email-html";
+import type { EmailPrimaryAction } from "./email-fragments.node";
+import { packetEmail } from "./packet-email";
+import type { WelcomeEmailKind } from "../email-artwork";
+export { escapeHtml } from "./email-html";
 
 export function emailFromParagraphs(
   to: string,
   subject: string,
   paragraphs: string[],
   appendix = "",
-  sender: { from: string; replyTo: string },
+  sender: {
+    from: string;
+    replyTo: string;
+    rendererVersion?: 2;
+    edition?: WelcomePackId;
+    emailArtworkVersion?: 1;
+    organisationName?: string;
+  },
   branded = false,
+  primaryAction?: EmailPrimaryAction,
+  kind: WelcomeEmailKind = "welcome",
 ): ApprovedEmail {
+  if (sender.rendererVersion === 2)
+    return packetEmail(
+      to,
+      subject,
+      paragraphs,
+      appendix,
+      sender,
+      primaryAction,
+      kind,
+    );
   const brandHeader = branded
     ? `<header style="margin:-24px -24px 28px;padding:28px 24px;background:#10233f;color:#ffffff;border-bottom:4px solid #8ca998;"><p style="margin:0;font-size:12px;letter-spacing:1.4px;font-weight:700;">FAITHFUL SOFTWARE SOLUTIONS</p><p style="margin:10px 0 0;font-size:22px;line-height:1.3;font-weight:700;">A clear start to your project</p></header>`
     : "";
@@ -59,10 +66,15 @@ export function welcomeEmail(
     to,
     content.emailSubject ?? "Your next steps with FSS",
     paragraphs,
-    accessibleHtml,
+    content.rendererVersion === 2
+      ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#eaf1ee;"><tr><td style="padding:20px;color:#24322d;"><h2 style="margin:0 0 12px;font-size:20px;color:#10233f;">Your welcome packet</h2><p style="margin:0 0 12px;">Read the attached PDF before reviewing the proposal.</p><p style="margin:0 0 12px;">Inside: ${content.pages.map((page) => escapeHtml(page.title)).join(" · ")}.</p><p style="margin:0;">Next step: check the priorities and prepare the inputs in your checklist. Reply if a priority needs changing.</p></td></tr></table>`
+      : accessibleHtml,
     content,
     true,
   );
-  email.text += `\n\n${content.pages.map((page) => `${page.title}\n\n${page.paragraphs.join("\n\n")}`).join("\n\n")}`;
+  email.text +=
+    content.rendererVersion === 2
+      ? `\n\nYour welcome packet\nRead the attached PDF before reviewing the proposal.\nInside: ${content.pages.map((page) => page.title).join(" · ")}.\nNext step: check the priorities and prepare the inputs in your checklist. Reply if a priority needs changing.`
+      : `\n\n${content.pages.map((page) => `${page.title}\n\n${page.paragraphs.join("\n\n")}`).join("\n\n")}`;
   return email;
 }

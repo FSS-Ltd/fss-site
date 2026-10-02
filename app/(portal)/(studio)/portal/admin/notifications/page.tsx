@@ -10,6 +10,7 @@ import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import { listStudioNotifications } from "@/lib/operations/studio/operations-queues";
+import { loadActiveStudioSettings } from "@/lib/operations/studio/settings";
 import { parseWorkspacePage } from "@/lib/operations/workspaces/pagination";
 
 export const dynamic = "force-dynamic";
@@ -49,6 +50,7 @@ export default async function AdminNotificationsPage({
         status: selectedStatus,
       }),
       selectedStatus,
+      timezone: (await loadActiveStudioSettings(db, admin)).timezone,
     };
   })().catch(() => null);
   if (!result) return <PortalUnavailable />;
@@ -70,6 +72,7 @@ export default async function AdminNotificationsPage({
     <NotificationDelivery
       data={result.data}
       selectedStatus={result.selectedStatus}
+      timezone={result.timezone}
     />
   );
 }

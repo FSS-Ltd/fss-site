@@ -10,7 +10,8 @@ import {
   parseOnboardingTemplateDraft,
 } from "./workspace-schema";
 import { portalRoles } from "../auth/types";
-import { welcomeInputSchema } from "./approval";
+import { welcomeInputSchema } from "./approval-schema";
+import { journeyComposerSchema } from "./journey-composer-contract";
 
 const clientCopy = z
   .string()
@@ -29,6 +30,7 @@ const journeyDraftContentSchema = z
     welcomeSubject: clientCopy.max(160),
     welcomeBody: clientCopy,
     reviewedWelcome: welcomeInputSchema.optional(),
+    composer: journeyComposerSchema.optional(),
     guide: z
       .strictObject({
         clientPriorities: clientCopy,

@@ -27,25 +27,37 @@ import {
 import styles from "../agreements/agreements.module.css";
 function PreviewDocument({ base64 }: { base64: string }): React.JSX.Element {
   const link = useRef<HTMLAnchorElement>(null);
+  const document = useRef<HTMLIFrameElement>(null);
   useEffect(() => {
     const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
     const url = URL.createObjectURL(
       new Blob([bytes], { type: "application/pdf" }),
     );
     if (link.current) link.current.href = url;
+    if (document.current) document.current.src = url;
     return () => URL.revokeObjectURL(url);
   }, [base64]);
   return (
-    <p>
-      <a
-        ref={link}
-        target="_blank"
-        rel="noreferrer"
-        download="welcome-preview.pdf"
-      >
-        Download exact welcome PDF
-      </a>
-    </p>
+    <section aria-label="Exact generated welcome PDF">
+      <iframe
+        ref={document}
+        title="Exact generated welcome PDF"
+        sandbox="allow-same-origin"
+        referrerPolicy="no-referrer"
+        style={{ width: "100%", height: "min(75vh, 800px)" }}
+        aria-label="Generated welcome packet"
+      />
+      <p>
+        <a
+          ref={link}
+          target="_blank"
+          rel="noreferrer"
+          download="welcome-preview.pdf"
+        >
+          Download exact welcome PDF
+        </a>
+      </p>
+    </section>
   );
 }
 
@@ -67,6 +79,11 @@ export interface JourneyPreviewProps {
   signingDownloadBase?: string;
   workspaceDrafts?: readonly OnboardingWorkspaceJourneyDraft[];
   welcomePacks?: readonly WelcomePack[];
+  renderWelcomePreparation?: (
+    prepare: (command: unknown) => Promise<void>,
+    pending: boolean,
+  ) => React.ReactNode;
+  hideWelcomeForm?: boolean;
 }
 export function JourneyPreview({
   organisationId,
@@ -80,6 +97,8 @@ export function JourneyPreview({
   signingDownloadBase = `/api/growth/operations/clients/${organisationId}/signing`,
   workspaceDrafts,
   welcomePacks = [],
+  renderWelcomePreparation,
+  hideWelcomeForm = false,
 }: JourneyPreviewProps): React.JSX.Element {
   const { submit, pending, message } = useJourneyCommand(
     organisationId,
@@ -116,32 +135,37 @@ export function JourneyPreview({
     >
       {!preview && (
         <>
-          <details>
-            <summary>Prepare a welcome journey</summary>
-            {available.length && billing ? (
-              <WelcomeForm
-                agreements={available}
-                contacts={contacts}
-                billing={billing}
-                commandEndpoint={commandEndpoint}
-                organisationName={organisationName}
-                pending={pending}
-                onPreview={prepare}
-                workspaceDrafts={workspaceDrafts}
-                welcomePacks={welcomePacks}
-              />
-            ) : available.length ? (
-              <p>
-                Configure billing before preparing a welcome journey. Your
-                existing agreements are ready to use once billing is available.
-              </p>
-            ) : (
-              <p>
-                Create an agreement to prepare another journey. Existing
-                agreements retain their permanent effects.
-              </p>
-            )}
-          </details>
+          {renderWelcomePreparation ? (
+            renderWelcomePreparation(prepare, pending)
+          ) : !hideWelcomeForm ? (
+            <details>
+              <summary>Prepare a welcome journey</summary>
+              {available.length && billing ? (
+                <WelcomeForm
+                  agreements={available}
+                  contacts={contacts}
+                  billing={billing}
+                  commandEndpoint={commandEndpoint}
+                  organisationName={organisationName}
+                  pending={pending}
+                  onPreview={prepare}
+                  workspaceDrafts={workspaceDrafts}
+                  welcomePacks={welcomePacks}
+                />
+              ) : available.length ? (
+                <p>
+                  Configure billing before preparing a welcome journey. Your
+                  existing agreements are ready to use once billing is
+                  available.
+                </p>
+              ) : (
+                <p>
+                  Create an agreement to prepare another journey. Existing
+                  agreements retain their permanent effects.
+                </p>
+              )}
+            </details>
+          ) : null}
           {journeys
             .filter((j) => !["completed", "cancelled"].includes(j.state))
             .map((j) => (

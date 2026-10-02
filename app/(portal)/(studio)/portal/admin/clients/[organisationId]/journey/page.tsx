@@ -1,3 +1,7 @@
+import {
+  loadActiveStudioSettings,
+  type ActiveStudioSettings,
+} from "@/lib/operations/studio/settings";
 import { randomUUID } from "node:crypto";
 import { notFound } from "next/navigation";
 import { z } from "zod";
@@ -87,17 +91,26 @@ export default async function StaffClientJourneyPage({
     billing: JourneyBillingAccount | null;
     workspace: OnboardingWorkspace;
     welcomePacks: WelcomePack[];
+    settings: ActiveStudioSettings;
   };
   try {
-    const [register, journeys, approvals, contacts, workspace, welcomePacks] =
-      await Promise.all([
-        listStaffAgreementRegister(db, admin, organisationId.data),
-        listStaffJourneys(db, admin, organisationId.data),
-        listStaffSigning(db, admin, organisationId.data, randomUUID()),
-        listStaffJourneyContacts(db, admin, organisationId.data),
-        loadStaffOnboardingWorkspace(db, admin, organisationId.data),
-        listStaffWelcomePacks(db, admin),
-      ]);
+    const [
+      register,
+      journeys,
+      approvals,
+      contacts,
+      workspace,
+      welcomePacks,
+      settings,
+    ] = await Promise.all([
+      listStaffAgreementRegister(db, admin, organisationId.data),
+      listStaffJourneys(db, admin, organisationId.data),
+      listStaffSigning(db, admin, organisationId.data, randomUUID()),
+      listStaffJourneyContacts(db, admin, organisationId.data),
+      loadStaffOnboardingWorkspace(db, admin, organisationId.data),
+      listStaffWelcomePacks(db, admin),
+      loadActiveStudioSettings(db, admin),
+    ]);
     if (!register) notFound();
     let billing = null;
     try {
@@ -119,6 +132,7 @@ export default async function StaffClientJourneyPage({
       billing,
       workspace,
       welcomePacks,
+      settings,
     };
   } catch {
     return <PortalUnavailable />;
@@ -134,6 +148,7 @@ export default async function StaffClientJourneyPage({
       builderStage={builderStage}
       workspace={data.workspace}
       welcomePacks={data.welcomePacks}
+      settings={data.settings}
     />
   );
 }

@@ -1,3 +1,4 @@
+import { readActiveStudioSettings } from "../studio/active-settings";
 import { invoiceChoices } from "./display";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
@@ -103,6 +104,27 @@ export async function prepareWelcomePreview(
       "stale_preview",
       "The agreement changed. Refresh and prepare a new welcome preview.",
     );
+  if (command.welcome.content.rendererVersion === 2) {
+    const active = await readActiveStudioSettings(tx);
+    const content = command.welcome.content;
+    if (
+      content.settingsRevision !== active.revision ||
+      content.senderName !== active.displayName ||
+      content.replyTo !== active.replyTo ||
+      content.timezone !== active.timezone ||
+      content.responseExpectationHours !== active.responseExpectationHours
+    ) {
+      throw new JourneyConflict(
+        "stale_preview",
+        "Studio settings changed or no longer match this packet. Apply the current settings and prepare a new preview.",
+      );
+    }
+    if (!content.welcomePackVersionId)
+      throw new JourneyConflict(
+        "approval_conflict",
+        "Select a published packet before preparing this welcome.",
+      );
+  }
   const welcomePackVersionId = command.welcome.content.welcomePackVersionId;
   if (welcomePackVersionId) {
     if (!command.workspace)
@@ -176,7 +198,12 @@ export async function prepareWelcomePreview(
     if (error instanceof z.ZodError) throw error;
     throw new JourneyConflict(
       "approval_conflict",
-      "The welcome PDF could not be prepared. Use supported Western European text and shorten pages that exceed their readable limit.",
+      error instanceof Error &&
+        /^Packet section ".+" exceeds the readable page limit\./.test(
+          error.message,
+        )
+        ? error.message
+        : "The welcome PDF could not be prepared. Use supported Western European text and shorten pages that exceed their readable limit.",
     );
   }
   const data: PreviewEnvelope = {

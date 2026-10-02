@@ -82,3 +82,27 @@ test("pending counts normalize email, exclude existing active people and history
   );
   assert.equal(metrics.pendingInvitations, 1);
 });
+
+test("attention counts invitation identities once and excludes membership history", () => {
+  const metrics = getFounderAccessMetrics(
+    [
+      entry({
+        id: "client-invitation:expired",
+        membershipId: null,
+        userId: null,
+        state: "expired",
+        email: " New@Example.test ",
+      }),
+      entry({
+        id: "staff:failed",
+        membershipId: null,
+        userId: null,
+        state: "provider_failed",
+        email: "new@example.test",
+      }),
+      entry({ id: "membership:revoked", state: "revoked" }),
+    ],
+    1,
+  );
+  assert.equal(Reflect.get(metrics, "attentionInvitations"), 1);
+});

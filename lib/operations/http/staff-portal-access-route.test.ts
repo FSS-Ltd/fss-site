@@ -20,7 +20,10 @@ test("rejects a forged origin before executing a Studio portal-access command", 
   const response = await handler(
     new Request("https://portal.example.test/api/portal/admin/portal-access", {
       body: JSON.stringify({}),
-      headers: { "content-type": "application/json", origin: "https://evil.example.test" },
+      headers: {
+        "content-type": "application/json",
+        origin: "https://evil.example.test",
+      },
       method: "POST",
     }),
   );
@@ -45,4 +48,29 @@ test("returns only a narrow provider-safe invitation outcome", async () => {
     }),
   );
   assert.deepEqual(await response.json(), { status: "sent" });
+});
+
+test("returns a permission error for founder-only commands without exposing details", async () => {
+  const { PortalAccessDenied } = await import("../auth/types");
+  const handler = createStaffPortalAccessRouteHandler({
+    authorize: async () => ({ id: "admin" }),
+    createCorrelationId: () => "reference",
+    enabled: true,
+    execute: async () => {
+      throw new PortalAccessDenied();
+    },
+    origin,
+    reportUnexpectedError: () => undefined,
+  });
+  const response = await handler(
+    new Request(`${origin}/api/portal/admin/portal-access`, {
+      method: "POST",
+      headers: { "content-type": "application/json", origin },
+      body: JSON.stringify({ action: "invite_admin" }),
+    }),
+  );
+  assert.equal(response.status, 403);
+  assert.deepEqual(await response.json(), {
+    error: "Founder authorization is required for FSS staff access.",
+  });
 });

@@ -40,6 +40,7 @@ export type FounderAccessMetrics = {
   clientUsers: number;
   admins: number;
   pendingInvitations: number;
+  attentionInvitations?: number;
   organisations: number;
   roleCounts: readonly {
     value: PortalRole | "admin";
@@ -78,6 +79,15 @@ export function getFounderAccessMetrics(
           (entry) =>
             entry.state === "pending" &&
             !activeEmails.has(normalizedEmail(entry.email)),
+        )
+        .map((entry) => normalizedEmail(entry.email)),
+    ).size,
+    attentionInvitations: new Set(
+      entries
+        .filter(
+          (entry) =>
+            !entry.membershipId &&
+            (entry.state === "expired" || entry.state === "provider_failed"),
         )
         .map((entry) => normalizedEmail(entry.email)),
     ).size,

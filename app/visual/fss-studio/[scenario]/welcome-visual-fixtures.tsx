@@ -1,3 +1,12 @@
+import { WelcomePackEditor } from "@/components/portal/onboarding/welcome-pack-editor";
+import {
+  welcomeVisualAgreement,
+  welcomeVisualContacts,
+  welcomeVisualDrafts,
+  welcomeVisualPacks,
+  welcomeVisualSettings,
+  personalisedVisualPacket,
+} from "./welcome-experience-visual-data";
 import { ClientOnboardingTaskDetail } from "@/components/portal/onboarding/client-onboarding-task";
 import { ClientOnboardingWorkspaceView } from "@/components/portal/onboarding/client-onboarding-workspace";
 import { JourneyTemplateEditor } from "@/components/portal/onboarding/journey-template-editor";
@@ -88,6 +97,16 @@ const completedTask: ClientOnboardingTask = {
 };
 
 const clientWorkspace: ClientOnboardingWorkspace = {
+  welcomePacket: {
+    approvalId: "6931bafc-353b-4008-adb9-7f9a42721a21",
+    approvedAt: "2026-10-01T09:00:00Z",
+    title: "Northstar Studio: your welcome packet",
+    organisationName: "Faithful Software Solutions",
+    senderName: "Jean-Fidele",
+    rendererVersion: 2,
+    edition: "website_build",
+    pages: personalisedVisualPacket.guide,
+  },
   checklist: {
     agreementSigned: true,
     billingReady: true,
@@ -370,19 +389,18 @@ export function StudioWelcomeBuilderScenario({
             },
           ]}
           commandEndpoint="/visual/no-command"
-          contacts={[
-            {
-              email: "alex@northstar.example.test",
-              id: "5a4c051b-88ec-4d00-a634-ea16da5d6c17",
-              name: "Alex Morgan",
-            },
-          ]}
+          contacts={welcomeVisualContacts}
+          agreementRecords={[welcomeVisualAgreement]}
+          organisationName="Northstar Studio"
+          settings={welcomeVisualSettings}
+          billing={{ accountId: "acct_fixture", livemode: false }}
+          drafts={welcomeVisualDrafts}
           organisationId="5c90c28c-f1a4-4e9e-a4eb-a833af085735"
           initialStage={stage}
           templates={[
             { id: templateVersionId, name: "Project welcome", version: 1 },
           ]}
-          welcomePacks={[]}
+          welcomePacks={welcomeVisualPacks}
         />
       </main>
     </StudioFrame>
@@ -490,12 +508,16 @@ export function StudioWelcomeTemplatesScenario({
           eyebrow="FSS Studio · Welcome journeys"
           title={title}
         />
-        <JourneyTemplateEditor
-          commandEndpoint="/visual/no-command"
-          initialTaskId={taskId}
-          initialTemplateId={templateId}
-          templates={templateDrafts}
-        />
+        {taskId ? (
+          <JourneyTemplateEditor
+            commandEndpoint="/visual/no-command"
+            initialTaskId={taskId}
+            initialTemplateId={templateId}
+            templates={templateDrafts}
+          />
+        ) : (
+          <WelcomePackEditor packs={welcomeVisualPacks} />
+        )}
       </main>
     </StudioFrame>
   );

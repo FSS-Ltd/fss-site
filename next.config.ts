@@ -17,7 +17,7 @@ const contentSecurityPolicy = [
   `script-src 'self' 'unsafe-inline'${developmentScriptSources} https://www.googletagmanager.com https://www.google-analytics.com https://clerk.faithfulsoftware.dev https://challenges.cloudflare.com https://*.protect.clerk.com`,
   "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://clerk.faithfulsoftware.dev https://*.protect.clerk.com:*",
   "worker-src 'self' blob:",
-  "frame-src 'self' https://challenges.cloudflare.com https://*.protect.clerk.com",
+  "frame-src 'self' blob: https://challenges.cloudflare.com https://*.protect.clerk.com",
 ].join("; ");
 
 const securityHeaders = [
@@ -39,6 +39,13 @@ const hstsHeader = {
 
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
+const emailRuntimeTraceFiles = [
+  "node_modules/react/**/*",
+  "node_modules/react-dom/**/*",
+  "node_modules/@react-email/button/**/*",
+  "node_modules/@react-email/img/**/*",
+];
+
 const nextConfig: NextConfig = {
   // Isolate agreement browser fixtures from an active development server.
   ...(process.env.FSS_AGREEMENT_TESTS_ENABLED === "true"
@@ -55,6 +62,12 @@ const nextConfig: NextConfig = {
     cssChunking: false,
   },
   serverExternalPackages: ["pdfkit"],
+  // Native synchronous email rendering must be retained in server deployments.
+  outputFileTracingIncludes: {
+    "/api/portal/admin/clients/**/journey": emailRuntimeTraceFiles,
+    "/api/growth/operations/clients/**/journey": emailRuntimeTraceFiles,
+    "/api/cron/operations-dispatch": emailRuntimeTraceFiles,
+  },
   turbopack: {
     root: projectRoot,
   },

@@ -18,5 +18,8 @@ export function proposalEmail(
     ],
     "",
     content,
+    false,
+    { label: "Review and sign proposal", url: portalUrl },
+    "proposal",
   );
 }

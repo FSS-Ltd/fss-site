@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { welcomeInputSchema } from "./approval-schema";
+import { journeyComposerSchema } from "./journey-composer-contract";
 import type { OperationsDb, OperationsTransaction } from "../db/client";
 import type { OperationsFounder } from "../organisations/types";
 import { portalRoles } from "../auth/types";
@@ -13,7 +15,10 @@ import {
   type OnboardingReadinessCheck,
   type OnboardingWorkspace,
 } from "./workspace-types";
-import { buildOnboardingReadiness, canStartOnboardingJourney } from "./readiness";
+import {
+  buildOnboardingReadiness,
+  canStartOnboardingJourney,
+} from "./readiness";
 
 const onboardingWorkspaceSchema = z.strictObject({
   templates: z.array(
@@ -46,6 +51,15 @@ const onboardingWorkspaceSchema = z.strictObject({
       recipientRole: z.enum(portalRoles).nullable(),
       version: z.number().int().positive(),
       updatedAt: z.string().min(1),
+      content: z
+        .object({
+          reviewedWelcome: welcomeInputSchema.optional(),
+          composer: journeyComposerSchema.optional(),
+          welcomeSubject: z.string().max(160).optional(),
+          welcomeBody: z.string().max(10000).optional(),
+        })
+        .passthrough()
+        .optional(),
     }),
   ),
   tasks: z.array(

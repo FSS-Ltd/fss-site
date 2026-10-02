@@ -25,6 +25,13 @@ test("client form explains its scoped, non-invitation save action", () => {
   assert.doesNotMatch(html, /Send invitation/);
 });
 
+test("new client form uses applied Studio timezone without rewriting entered defaults", () => {
+  const html = renderToStaticMarkup(
+    <StudioClientForm defaultTimezone="America/New_York" />,
+  );
+  assert.match(html, /name="timezone"[^>]*value="America\/New_York"/);
+});
+
 test("client form offers supported billing currencies with GBP selected", () => {
   const html = renderToStaticMarkup(<StudioClientForm />);
   assert.match(html, /Billing currency/);

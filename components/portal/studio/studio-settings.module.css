@@ -1,0 +1,144 @@
+.page {
+  display: grid;
+  gap: 20px;
+  width: min(100%, 1180px);
+  min-width: 0;
+  margin-inline: auto;
+}
+
+.page > * {
+  min-width: 0;
+}
+
+.page :global(h1) {
+  overflow-wrap: anywhere;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 16px;
+}
+
+.cardHeader,
+.cardHeading,
+.actions,
+.integration {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cardHeader,
+.integration {
+  justify-content: space-between;
+}
+
+.cardHeader {
+  flex-wrap: wrap;
+}
+
+.cardHeading {
+  min-width: 0;
+  flex: 1 1 150px;
+}
+
+.cardHeading h2 {
+  overflow-wrap: anywhere;
+}
+
+.cardHeading h2,
+.integration h3 {
+  margin: 0;
+  color: var(--portal-ink, #0a1a2e);
+  font-size: 1rem;
+  font-weight: 650;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  border-radius: 12px;
+  background: var(--portal-tint, #e3f2f1);
+  color: var(--portal-action, #0f7078);
+}
+
+.value {
+  margin: 4px 0 0;
+  color: var(--portal-ink, #0a1a2e);
+  font-size: clamp(1.125rem, 2vw, 1.5rem);
+  font-weight: 650;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.description,
+.integration p,
+.summary dt {
+  margin: 0;
+  color: var(--portal-muted, #46566c);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+.summary {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.summary dd {
+  margin: 0;
+  color: var(--portal-ink, #0a1a2e);
+  font-size: 1rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.editor {
+  display: grid;
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--portal-border, #dbe3eb);
+}
+
+.editingCard {
+  outline: 2px solid var(--portal-action, #0f7078);
+  outline-offset: 2px;
+}
+
+.actions {
+  flex-wrap: wrap;
+}
+
+.integrations {
+  display: grid;
+  gap: 16px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.integration {
+  gap: 16px;
+}
+
+.integration > div {
+  min-width: 0;
+}
+
+@media (max-width: 760px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .integration {
+    align-items: start;
+    flex-direction: column;
+    gap: 8px;
+  }
+}

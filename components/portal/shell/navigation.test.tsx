@@ -85,3 +85,20 @@ test("keeps Studio toolbar links in the server-selected portal routing mode", ()
   assert.match(renderStudio(true), /href="\/admin\/notifications"/);
   assert.match(renderStudio(false), /href="\/portal\/admin\/notifications"/);
 });
+
+test("Studio shell uses applied identity, timezone, and delivery capacity", () => {
+  const html = renderToStaticMarkup(
+    <StudioShell
+      studioSettings={{
+        displayName: "Applied FSS identity",
+        timezone: "America/New_York",
+        deliveryCapacity: "limited",
+      }}
+    >
+      <p>Workspace</p>
+    </StudioShell>,
+  );
+  assert.match(html, /Applied FSS identity/);
+  assert.match(html, /America\/New_York/);
+  assert.match(html, /Limited capacity/);
+});

@@ -1,5 +1,11 @@
 import { createHash } from "node:crypto";
 import { z } from "zod";
+import {
+  welcomeInputSchema,
+  approvalTextSchema as text,
+  approvalAddressSchema as address,
+} from "./approval-schema";
+export { welcomeInputSchema } from "./approval-schema";
 import type {
   ProposalApprovalSnapshot,
   WelcomeApprovalSnapshot,
@@ -8,62 +14,6 @@ import { renderWelcomePdf, welcomeAccessibleHtml } from "./content/welcome-pdf";
 import { welcomeEmail } from "./content/welcome-email";
 import { activationEmail } from "./content/activation-email";
 import { proposalEmail } from "./content/proposal-email";
-const text = z
-  .string()
-  .trim()
-  .min(1)
-  .max(2000)
-  .refine(
-    (s) => !s.includes("\u2014"),
-    "Use plain punctuation without em dashes.",
-  );
-const address = z.email().transform((s) => s.toLowerCase());
-export const welcomeInputSchema = z
-  .object({
-    recipient: address,
-    invoice: z
-      .object({
-        obligationKey: z.string().min(1).max(200),
-        accountId: z.string().regex(/^acct_[a-zA-Z0-9]+$/),
-        livemode: z.boolean(),
-      })
-      .strict(),
-    content: z
-      .object({
-        contactFirstName: text.max(100),
-        primaryGoal: text,
-        outcomeSummary: text,
-        senderName: text.max(100),
-        organisationName: text.max(200),
-        clientOrganisationName: text.max(200).optional(),
-        welcomePackVersionId: z.uuid().optional(),
-        emailSubject: text.max(160).optional(),
-        emailBody: text.max(6_000).optional(),
-        from: address,
-        replyTo: address,
-        pages: z
-          .array(
-            z
-              .object({
-                title: text.max(100),
-                paragraphs: z.array(text).min(1).max(8),
-              })
-              .strict(),
-          )
-          .min(4)
-          .max(6),
-      })
-      .strict(),
-    thankYou: z
-      .object({
-        subject: text.max(200),
-        intro: text,
-        nextStep: text,
-        requiredAction: text,
-      })
-      .strict(),
-  })
-  .strict();
 export interface PreparedWelcome {
   snapshot: WelcomeApprovalSnapshot;
   pdf: Buffer;

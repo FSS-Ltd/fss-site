@@ -10,6 +10,7 @@ import type {
   ClientOnboardingWorkspace,
 } from "@/lib/operations/onboarding/client-workspace";
 import { portalPath } from "@/lib/operations/auth/portal-url";
+import { ClientWelcomePacketCard } from "./client-welcome-packet";
 import { ClientSetupChecklist } from "./client-setup-checklist";
 import styles from "./client-onboarding.module.css";
 
@@ -77,6 +78,19 @@ export function ClientOnboardingWorkspaceView({
         eyebrow="Getting started"
         title="Your launch checklist"
       />
+
+      {workspace.welcomePacket ? (
+        <ClientWelcomePacketCard
+          organisationId={organisationId}
+          packet={workspace.welcomePacket}
+        />
+      ) : workspace.welcomePacket === null ? (
+        <PortalCard title="Your welcome packet">
+          <p className={styles.leadCopy}>
+            FSS will add your packet once the welcome materials are approved.
+          </p>
+        </PortalCard>
+      ) : null}
 
       {workspace.requiredTasksComplete ? (
         <PortalCard

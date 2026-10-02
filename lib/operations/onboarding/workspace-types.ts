@@ -1,3 +1,5 @@
+import type { WelcomeApprovalSnapshot } from "./types";
+import type { JourneyComposer } from "./journey-composer-contract";
 import type { PortalRole } from "../auth/types";
 
 export const onboardingTaskKinds = [
@@ -116,6 +118,15 @@ export type OnboardingWorkspaceJourneyDraft = Readonly<{
   recipientRole: PortalRole | null;
   version: number;
   updatedAt: string;
+  content?: Readonly<{
+    reviewedWelcome?: Pick<
+      WelcomeApprovalSnapshot,
+      "recipient" | "invoice" | "content" | "thankYou"
+    >;
+    composer?: JourneyComposer;
+    welcomeSubject?: string;
+    welcomeBody?: string;
+  }>;
 }>;
 
 export type OnboardingWorkspaceTask = Readonly<{

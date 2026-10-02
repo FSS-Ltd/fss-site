@@ -1,3 +1,9 @@
+import type {
+  PacketSectionId,
+  PacketLayout,
+  PacketImageId,
+} from "./packet-metadata";
+import type { WelcomePackId } from "./welcome-pack-contract";
 export const onboardingSteps = [
   "welcome",
   "proposal_access",
@@ -23,10 +29,19 @@ export interface ApprovedEmail {
   text: string;
 }
 export interface WelcomePage {
+  sectionId?: PacketSectionId;
+  layout?: PacketLayout;
+  imageId?: PacketImageId;
   title: string;
   paragraphs: string[];
 }
 export interface WelcomeContent {
+  rendererVersion?: 2;
+  emailArtworkVersion?: 1;
+  edition?: WelcomePackId;
+  settingsRevision?: number;
+  responseExpectationHours?: number;
+  timezone?: string;
   contactFirstName: string;
   primaryGoal: string;
   outcomeSummary: string;

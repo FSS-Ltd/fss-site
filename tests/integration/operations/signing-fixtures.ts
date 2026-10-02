@@ -114,8 +114,21 @@ export async function signingFixture(
     >`insert into operations.contacts(organisation_id,name,email,created_by,review_reference) values(${organisationId},'Test Signer',${identity.email},${founder.actorId},'signing-test') returning id`;
     await admin`insert into operations.memberships(organisation_id,contact_id,user_id,role) values(${organisationId},${contact.id},${identity.userId},'owner')`;
   }
+  // Real signatures use the database clock. Keep contract dates valid as the
+  // suite ages, with tomorrow's first payment also safe across midnight.
+  const [dates] = await admin<
+    { today: string; firstPayment: string; secondPayment: string }[]
+  >`select current_date::text as today,
+      (current_date + 1)::text as "firstPayment",
+      (current_date + 31)::text as "secondPayment"`;
+  const baseDraft = agreementDraft();
   const draft = {
-    ...agreementDraft(),
+    ...baseDraft,
+    lines: baseDraft.lines.map((line) => ({ ...line, startDate: dates.today })),
+    installments: baseDraft.installments.map((installment, index) => ({
+      ...installment,
+      dueDate: index === 0 ? dates.firstPayment : dates.secondPayment,
+    })),
     signatories: identities.map((i) => i.email),
   };
   if (options.taxFree)

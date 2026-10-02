@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { welcomeInputSchema } from "./approval";
+import { welcomeInputSchema } from "./approval-schema";
 const access = z
   .array(
     z.strictObject({

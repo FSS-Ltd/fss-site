@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { welcomeInputSchema } from "./approval";
+import { welcomeInputSchema } from "./approval-schema";
 import { welcomeWorkspaceBindingSchema } from "./command-schema";
 import { JourneyConflict, type JourneyActor } from "./command-types";
 const email = z.strictObject({
