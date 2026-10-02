@@ -2,6 +2,14 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import test from "node:test";
 import postgres from "postgres";
+import { applyStaffPortalAccessOperation } from "../../../lib/operations/studio/portal-access";
+import { claimClerkPortalInvitation } from "../../../lib/operations/auth/invites";
+import { claimStaffInvitationForVerifiedEmail } from "../../../lib/operations/auth/staff-invitations";
+import { requireFssAdmin } from "../../../lib/operations/auth/require-admin";
+import type {
+  PortalInvitationClaim,
+  PortalInvitationMetadata,
+} from "../../../lib/operations/auth/clerk-invitation";
 import { requireOperationsTestDatabaseUrl } from "../../../scripts/require-operations-database-env";
 
 test("a verified invitee creates their organisation exactly once during portal onboarding", async () => {
@@ -18,29 +26,70 @@ test("a verified invitee creates their organisation exactly once during portal o
     connection: { options: "-c role=operations_portal" },
   });
   const actorId = "a".repeat(64);
-  const invitationId = randomUUID();
+  const staffInvitationId = randomUUID();
+  let invitationId: string | null = null;
   const userId = randomUUID();
   const email = `${randomUUID()}@example.test`;
+  const staffIdentity = {
+    userId: randomUUID(),
+    email: `${randomUUID()}@example.test`,
+    emailVerified: true as const,
+  };
   const correlationId = randomUUID();
   let organisationId: string | null = null;
 
   try {
-    const [issued] = await founder.begin(async (tx) => {
+    await founder.begin(async (tx) => {
       await tx`select set_config('operations.actor_id', ${actorId}, true)`;
-      return tx<{ id: string; expiresAt: Date }[]>`
-        select id, expires_at as "expiresAt"
-        from operations.issue_pending_portal_invitation(
-          ${invitationId},
-          'Invited Owner',
-          ${email},
-          'owner',
-          'founder-approved-test-invitation',
-          ${correlationId}
-        )
-      `;
+      await tx`select * from operations.issue_staff_invitation(
+        ${staffInvitationId}, 'Onboarding Test Admin', ${staffIdentity.email},
+        'onboarding-staff-fixture', ${correlationId}
+      )`;
     });
-    assert.equal(issued.id, invitationId);
-    assert.ok(issued.expiresAt > new Date());
+    assert.equal(
+      await claimStaffInvitationForVerifiedEmail(
+        portal,
+        staffIdentity,
+        correlationId,
+      ),
+      true,
+    );
+    const staffAdmin = await requireFssAdmin(
+      portal,
+      staffIdentity,
+      correlationId,
+    );
+    let resolveInvitationMetadata: (
+      metadata: PortalInvitationMetadata,
+    ) => void = () => {
+      throw new Error("New client invitation was not provisioned.");
+    };
+    const invitationMetadataPromise = new Promise<PortalInvitationMetadata>(
+      (resolve) => {
+        resolveInvitationMetadata = resolve;
+      },
+    );
+    await applyStaffPortalAccessOperation(
+      founder,
+      staffAdmin,
+      {
+        action: "invite_client",
+        name: "Invited Owner",
+        email,
+        reviewReference: "founder-approved-test-invitation",
+      },
+      "https://portal.example.test",
+      async (_email, _redirectUrl, metadata) => {
+        if (!metadata)
+          throw new Error("New client invitation metadata is missing.");
+        resolveInvitationMetadata(metadata);
+      },
+    );
+    const invitationMetadata = await invitationMetadataPromise;
+    assert.equal(invitationMetadata.version, 2);
+    if (invitationMetadata.version !== 2)
+      throw new Error("New client invitation metadata was not issued.");
+    invitationId = invitationMetadata.invitationId;
 
     const [stored] = await admin<
       { organisationId: string | null; email: string; state: string }[]
@@ -54,6 +103,49 @@ test("a verified invitee creates their organisation exactly once during portal o
       email,
       state: "pending",
     });
+    const [issuedAudit] = await admin<{ actorId: string; action: string }[]>`
+      select actor_id as "actorId", action
+      from operations.portal_invitation_audit
+      where invitation_id = ${invitationId} and action = 'issued'
+    `;
+    assert.deepEqual(issuedAudit, {
+      actorId: staffAdmin.actorId,
+      action: "issued",
+    });
+
+    const claim: PortalInvitationClaim = {
+      clerkUserId: "user_2zOnboardingOwner",
+      identity: { userId, email, emailVerified: true },
+      invitation: invitationMetadata,
+    };
+    assert.equal(
+      await claimClerkPortalInvitation(
+        portal,
+        {
+          ...claim,
+          identity: {
+            userId,
+            email: `mismatch-${email}`,
+            emailVerified: true,
+          },
+        },
+        correlationId,
+      ),
+      false,
+    );
+    const [unclaimed] = await admin<{ state: string }[]>`
+      select state from operations.pending_portal_invitations where id = ${invitationId}
+    `;
+    assert.equal(unclaimed.state, "pending");
+    assert.equal(
+      await claimClerkPortalInvitation(portal, claim, correlationId),
+      false,
+    );
+    const [accepted] = await admin<{ state: string; claimedUserId: string }[]>`
+      select state, claimed_user_id as "claimedUserId"
+      from operations.pending_portal_invitations where id = ${invitationId}
+    `;
+    assert.deepEqual(accepted, { state: "accepted", claimedUserId: userId });
 
     const unrelatedNeedsOnboarding = await portal.begin(async (tx) => {
       await tx`
@@ -77,7 +169,7 @@ test("a verified invitee creates their organisation exactly once during portal o
           set_config('operations.correlation_id', ${randomUUID()}, true)
       `;
       const [pending] = await tx<{ needed: boolean }[]>`
-        select operations.pending_portal_onboarding() as needed
+      select operations.pending_portal_onboarding() as needed
       `;
       assert.equal(pending.needed, true);
       const [completed] = await tx<{ organisationId: string }[]>`
@@ -131,20 +223,28 @@ test("a verified invitee creates their organisation exactly once during portal o
     });
   } finally {
     if (organisationId) {
-      await admin`delete from operations.portal_invitation_audit where invitation_id = ${invitationId}`;
-      await admin`delete from operations.pending_portal_invitations where id = ${invitationId}`;
+      if (invitationId) {
+        await admin`delete from operations.portal_invitation_audit where invitation_id = ${invitationId}`;
+        await admin`delete from operations.pending_portal_invitations where id = ${invitationId}`;
+      }
       await admin`delete from operations.memberships where organisation_id = ${organisationId}`;
       await admin`delete from operations.contacts where organisation_id = ${organisationId}`;
       await admin`delete from operations.audit_events where organisation_id = ${organisationId}`;
       await admin`delete from operations.organisations where id = ${organisationId}`;
     } else {
-      await admin`delete from operations.portal_invitation_audit where invitation_id = ${invitationId}`.catch(
-        () => undefined,
-      );
-      await admin`delete from operations.pending_portal_invitations where id = ${invitationId}`.catch(
-        () => undefined,
-      );
+      if (invitationId) {
+        await admin`delete from operations.portal_invitation_audit where invitation_id = ${invitationId}`.catch(
+          () => undefined,
+        );
+        await admin`delete from operations.pending_portal_invitations where id = ${invitationId}`.catch(
+          () => undefined,
+        );
+      }
     }
+    await admin`delete from operations.staff_invitation_audit where invitation_id = ${staffInvitationId}`;
+    await admin`delete from operations.staff_memberships where invitation_id = ${staffInvitationId}`;
+    await admin`delete from operations.pending_staff_invitations where id = ${staffInvitationId}`;
+    await admin`delete from operations.user_profiles where user_id in (${userId}, ${staffIdentity.userId})`;
     await Promise.all([admin.end(), founder.end(), portal.end()]);
   }
 });

@@ -19,18 +19,27 @@ const admin: FssAdminContext = {
 
 function recordingDb(rows: readonly unknown[][]): {
   calls: string[];
+  parameters: unknown[][];
   db: OperationsDb;
 } {
   const calls: string[] = [];
+  const parameters: unknown[][] = [];
   let index = 0;
-  const query = async (parts: TemplateStringsArray) => {
+  const query = async (parts: TemplateStringsArray, ...values: unknown[]) => {
     const sql = parts.join("?");
     calls.push(sql);
+    parameters.push(values);
     if (sql.includes("set_config") || sql.includes("assert_active")) return [];
+    if (sql.includes("issue_pending_portal_invitation")) {
+      return [
+        { id: "77777777-7777-4777-8777-777777777777", expiresAt: new Date() },
+      ];
+    }
     return rows[index++] ?? [];
   };
   return {
     calls,
+    parameters,
     db: {
       begin: (run: (tx: OperationsTransaction) => Promise<unknown>) =>
         run(query as unknown as OperationsTransaction),
@@ -86,6 +95,106 @@ test("rejects invented roles and browser-supplied contact details", () => {
       reviewReference: "review",
       role: "admin",
     }),
+  );
+});
+
+test("new-client invitations accept only identity and review details", () => {
+  assert.deepEqual(
+    staffPortalAccessOperationSchema.parse({
+      action: "invite_client",
+      name: "Sam Example",
+      email: "sam@example.test",
+      reviewReference: "review-42",
+    }),
+    {
+      action: "invite_client",
+      name: "Sam Example",
+      email: "sam@example.test",
+      reviewReference: "review-42",
+    },
+  );
+  for (const extra of [
+    { role: "viewer" },
+    { organisationId: "55555555-5555-4555-8555-555555555555" },
+  ]) {
+    assert.throws(() =>
+      staffPortalAccessOperationSchema.parse({
+        action: "invite_client",
+        name: "Sam Example",
+        email: "sam@example.test",
+        reviewReference: "review-42",
+        ...extra,
+      }),
+    );
+  }
+});
+
+test("active admins issue audited owner invitations without selecting an organisation", async () => {
+  const { db, calls, parameters } = recordingDb([]);
+  const delivered: string[] = [];
+  const result = await applyStaffPortalAccessOperation(
+    db,
+    admin,
+    {
+      action: "invite_client",
+      name: "Sam Example",
+      email: " SAM@EXAMPLE.TEST ",
+      reviewReference: "review-42",
+    },
+    "https://portal.example.test",
+    async (email, redirectUrl, metadata) => {
+      delivered.push(email, redirectUrl, JSON.stringify(metadata));
+    },
+  );
+  assert.deepEqual(result, { status: "sent" });
+  assert.equal(delivered[0], "sam@example.test");
+  const redirect = new URL(delivered[1] ?? "");
+  assert.equal(redirect.origin, "https://portal.example.test");
+  assert.equal(redirect.pathname, "/activate");
+  assert.equal(redirect.searchParams.get("name"), "Sam Example");
+  assert.equal(redirect.searchParams.get("email"), "sam@example.test");
+  const issueIndex = calls.findIndex((sql) =>
+    sql.includes("issue_pending_portal_invitation"),
+  );
+  const metadata: unknown = JSON.parse(delivered[2] ?? "null");
+  assert.deepEqual(metadata, {
+    version: 2,
+    invitationId: parameters[issueIndex]?.[0],
+    email: "sam@example.test",
+  });
+  assert.ok(
+    calls.some((sql) => sql.includes("assert_active_staff_membership")),
+  );
+  assert.ok(
+    issueIndex >
+      calls.findIndex((sql) => sql.includes("assert_active_staff_membership")),
+  );
+  assert.ok(parameters[issueIndex]?.includes("owner"));
+  assert.ok(parameters.some((values) => values.includes(admin.actorId)));
+  assert.ok(parameters[issueIndex]?.includes("review-42"));
+});
+
+test("failed new-client delivery marks its audited invitation as failed", async () => {
+  const { db, calls } = recordingDb([]);
+  await assert.rejects(
+    applyStaffPortalAccessOperation(
+      db,
+      admin,
+      {
+        action: "invite_client",
+        name: "Sam Example",
+        email: "sam@example.test",
+        reviewReference: "review-42",
+      },
+      "https://portal.example.test",
+      async () => {
+        throw new Error("provider unavailable");
+      },
+    ),
+    /provider unavailable/,
+  );
+  assert.ok(
+    calls.some((sql) => sql.includes("fail_pending_portal_invitation")),
   );
 });
 
@@ -209,6 +318,54 @@ test("all views retain tenant-matched joins and full aggregate counts", async ()
     assert.match(aggregate, /count\(distinct p.email\)/);
     assert.match(calls.join("\n"), /c\.organisation_id = m\.organisation_id/);
   }
+});
+
+test("ordinary admins can review unscoped accepted invitations outside the pending total", async () => {
+  const { db, calls, parameters } = recordingDb([
+    [],
+    [
+      {
+        accessType: "client",
+        contactId: null,
+        email: "new-owner@example.test",
+        expiresAt: "2026-10-03T09:00:00.000Z",
+        id: "client-invitation:66666666-6666-4666-8666-666666666666",
+        invitedAt: "2026-10-02T09:00:00.000Z",
+        joinedAt: null,
+        lastVerifiedAt: null,
+        membershipId: null,
+        name: "New Owner",
+        organisationId: null,
+        organisationName: null,
+        role: "owner",
+        state: "accepted",
+      },
+    ],
+    [
+      {
+        clientUsers: 0,
+        admins: 0,
+        pendingInvitations: 0,
+        attentionInvitations: 0,
+      },
+    ],
+  ]);
+  const result = await listStudioPortalAccess(db, admin, {
+    page: 1,
+    view: "invitations",
+  });
+  assert.equal(result.items[0]?.state, "accepted");
+  assert.equal(result.metrics.pendingInvitations, 0);
+  const registerQuery =
+    calls.find((sql) => sql.includes("client-invitation:")) ?? "";
+  assert.match(registerQuery, /p\.state <> 'completed'/);
+  const metricsQuery =
+    calls.find((sql) => sql.includes("pending_access")) ?? "";
+  assert.match(
+    metricsQuery,
+    /p\.state = 'pending' and p\.expires_at > now\(\)/,
+  );
+  assert.ok(parameters.some((values) => values.includes(true)));
 });
 
 test("verified founder uses the existing audited staff invitation operator after an active grant recheck", async () => {

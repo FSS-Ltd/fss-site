@@ -63,13 +63,21 @@ export function AccessIdentityCard({
           </dd>
         </div>
         <div>
-          <dt>{entry.membershipId ? "Scope" : "Expires"}</dt>
+          <dt>
+            {entry.membershipId
+              ? "Scope"
+              : entry.state === "accepted"
+                ? "Next step"
+                : "Expires"}
+          </dt>
           <dd>
             {entry.membershipId
               ? entry.accessType === "admin"
                 ? "FSS operations"
                 : "Client organisation"
-              : accessDate(entry.expiresAt, timezone)}
+              : entry.state === "accepted"
+                ? "Create organisation"
+                : accessDate(entry.expiresAt, timezone)}
           </dd>
         </div>
       </dl>

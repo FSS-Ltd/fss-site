@@ -2,12 +2,18 @@
 
 import { useId, useRef, useState, type FormEvent } from "react";
 import { X } from "lucide-react";
-import { Notice, PortalButton, PortalField } from "@/components/portal/ui";
+import {
+  Notice,
+  PortalButton,
+  PortalField,
+  PortalSelect,
+} from "@/components/portal/ui";
 import { type PortalRole } from "@/lib/operations/auth/types";
 import type { StaffPortalAccessOperation } from "@/lib/operations/studio/portal-access";
 import {
   AccessDialogFields,
   type AccessDialogTarget,
+  type ClientInvitationType,
 } from "./access-dialog-fields";
 import { sendAccessOperation } from "./access-operation";
 import styles from "./portal-access.module.css";
@@ -23,6 +29,8 @@ export function AccessDialog(props: DialogProps): React.JSX.Element {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [role, setRole] = useState<PortalRole>("contributor");
+  const [clientInvitationType, setClientInvitationType] =
+    useState<ClientInvitationType>("new_client");
   const [formKey, setFormKey] = useState(0);
   const removing = props.kind === "remove";
   const title = removing
@@ -30,7 +38,6 @@ export function AccessDialog(props: DialogProps): React.JSX.Element {
     : props.kind === "staff"
       ? "Invite FSS staff"
       : "Invite client";
-  const available = props.kind !== "client" || props.contacts.length > 0;
 
   async function submit(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
@@ -39,20 +46,29 @@ export function AccessDialog(props: DialogProps): React.JSX.Element {
     const reviewReference = String(form.get("reviewReference") ?? "").trim();
     let operation: StaffPortalAccessOperation;
     if (props.kind === "client") {
-      const contact = props.contacts.find(
-        (item) => item.id === form.get("contact"),
-      );
-      if (!contact) {
-        setError("Choose an active client contact.");
-        return;
+      if (clientInvitationType === "new_client") {
+        operation = {
+          action: "invite_client",
+          name: String(form.get("name") ?? "").trim(),
+          email: String(form.get("email") ?? "").trim(),
+          reviewReference,
+        };
+      } else {
+        const contact = props.contacts.find(
+          (item) => item.id === form.get("contact"),
+        );
+        if (!contact) {
+          setError("Choose an active client contact.");
+          return;
+        }
+        operation = {
+          action: "invite_existing_client",
+          contactId: contact.id,
+          organisationId: contact.organisationId,
+          reviewReference,
+          role,
+        };
       }
-      operation = {
-        action: "invite_existing_client",
-        contactId: contact.id,
-        organisationId: contact.organisationId,
-        reviewReference,
-        role,
-      };
     } else if (props.kind === "staff") {
       operation = {
         action: "invite_admin",
@@ -85,7 +101,9 @@ export function AccessDialog(props: DialogProps): React.JSX.Element {
       await sendAccessOperation(operation);
       const message = removing
         ? `Access removed for ${props.entry.name}.`
-        : "Invitation request accepted by the provider. Access begins after the recipient accepts it.";
+        : props.kind === "client" && clientInvitationType === "new_client"
+          ? "Invitation request accepted by the provider. The owner will create their organisation after accepting."
+          : "Invitation request accepted by the provider. Access begins after the recipient accepts it.";
       setSuccess(message);
     } catch (failure) {
       setError(
@@ -101,10 +119,6 @@ export function AccessDialog(props: DialogProps): React.JSX.Element {
   return (
     <>
       <PortalButton
-        disabled={!available}
-        disabledReason={
-          !available ? "No active client contacts are available." : undefined
-        }
         onClick={(event) => {
           trigger.current = event.currentTarget;
           dialog.current?.showModal();
@@ -126,6 +140,7 @@ export function AccessDialog(props: DialogProps): React.JSX.Element {
           setError(null);
           setSuccess(null);
           setRole("contributor");
+          setClientInvitationType("new_client");
           setFormKey((key) => key + 1);
           trigger.current?.focus();
           if (success) props.onComplete(success);
@@ -168,8 +183,33 @@ export function AccessDialog(props: DialogProps): React.JSX.Element {
               key={formKey}
               onSubmit={submit}
             >
+              {props.kind === "client" ? (
+                <PortalSelect
+                  disabled={pending}
+                  label="Invitation type"
+                  name="invitationType"
+                  onChange={(event) =>
+                    setClientInvitationType(
+                      event.currentTarget.value === "existing_client"
+                        ? "existing_client"
+                        : "new_client",
+                    )
+                  }
+                  required
+                  value={clientInvitationType}
+                >
+                  <option value="new_client">New client owner</option>
+                  <option
+                    disabled={props.contacts.length === 0}
+                    value="existing_client"
+                  >
+                    Existing client user
+                  </option>
+                </PortalSelect>
+              ) : null}
               <AccessDialogFields
                 target={props}
+                clientInvitationType={clientInvitationType}
                 pending={pending}
                 role={role}
                 setRole={setRole}

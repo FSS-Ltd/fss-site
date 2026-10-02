@@ -5,6 +5,7 @@ import {
   staffInvitationSchema,
   revokeStaffMembershipSchema,
 } from "../auth/staff-invitations";
+import { pendingPortalInvitationSchema } from "../auth/pending-invitations";
 import { portalRoles } from "../auth/types";
 import {
   applyPortalOperation,
@@ -19,6 +20,7 @@ import type { WorkspaceCollectionPage } from "../workspaces/pagination";
 const accessStateSchema = z.enum([
   "active",
   "pending",
+  "accepted",
   "revoked",
   "expired",
   "provider_failed",
@@ -40,6 +42,10 @@ const inviteOperationSchema = z.strictObject({
   role: z.enum(portalRoles),
 });
 
+const inviteNewClientOperationSchema = pendingPortalInvitationSchema
+  .omit({ role: true })
+  .extend({ action: z.literal("invite_client") });
+
 const revokeOperationSchema = z.strictObject({
   action: z.literal("revoke_membership"),
   membershipId: z.uuid(),
@@ -48,6 +54,7 @@ const revokeOperationSchema = z.strictObject({
 });
 
 export const staffPortalAccessOperationSchema = z.discriminatedUnion("action", [
+  inviteNewClientOperationSchema,
   inviteOperationSchema,
   revokeOperationSchema,
   staffInvitationSchema.extend({ action: z.literal("invite_admin") }),
@@ -183,6 +190,23 @@ export async function applyStaffPortalAccessOperation(
       provision,
     );
     return { status: operation.action === "invite_admin" ? "sent" : "revoked" };
+  }
+  if (operation.action === "invite_client") {
+    await withFssAdminTransaction(db, admin, async () => undefined);
+    await applyPortalOperation(
+      db,
+      { actorId: admin.actorId },
+      {
+        action: "invite_client",
+        email: operation.email,
+        name: operation.name,
+        role: "owner",
+        reviewReference: operation.reviewReference,
+      },
+      origin,
+      provision,
+    );
+    return { status: "sent" };
   }
   if (operation.action === "invite_existing_client") {
     const contact = await loadInviteTarget(db, admin, operation);

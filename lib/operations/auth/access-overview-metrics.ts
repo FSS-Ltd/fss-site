@@ -13,6 +13,7 @@ export type AccessOverviewMetricRow = Readonly<{
 export async function readAccessOverviewMetrics(
   tx: OperationsTransaction,
   includeStaff: boolean,
+  includeUnscopedInvitations = includeStaff,
 ): Promise<AccessOverviewMetricRow> {
   const rows = await tx<AccessOverviewMetricRow[]>`
         with active_access as (
@@ -32,7 +33,7 @@ export async function readAccessOverviewMetrics(
           select lower(trim(p.email)) as email
           from operations.pending_portal_invitations p
           where p.state = 'pending' and p.expires_at > now()
-            and (${includeStaff} or coalesce(p.target_organisation_id, p.organisation_id) is not null)
+            and (${includeUnscopedInvitations} or coalesce(p.target_organisation_id, p.organisation_id) is not null)
           union all
           select lower(trim(c.email))
           from operations.portal_invites i
@@ -49,7 +50,7 @@ export async function readAccessOverviewMetrics(
           select lower(trim(p.email)) as email
           from operations.pending_portal_invitations p
           where (p.state = 'provider_failed' or (p.state = 'pending' and p.expires_at <= now()))
-            and (${includeStaff} or coalesce(p.target_organisation_id, p.organisation_id) is not null)
+            and (${includeUnscopedInvitations} or coalesce(p.target_organisation_id, p.organisation_id) is not null)
           union all
           select lower(trim(c.email))
           from operations.portal_invites i

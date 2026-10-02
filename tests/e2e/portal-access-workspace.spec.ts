@@ -62,6 +62,7 @@ test("failed invitation keeps entered review details and success refreshes after
     name: "Invite client",
     exact: true,
   });
+  await dialog.getByLabel("Invitation type").selectOption("existing_client");
   await dialog.getByLabel("Review reference").fill("review-42");
   await dialog.getByRole("button", { name: "Request invitation" }).click();
   await expect(dialog.getByRole("alert")).toContainText("Contact changed");
@@ -76,6 +77,52 @@ test("failed invitation keeps entered review details and success refreshes after
   await expect(page.getByRole("status")).toContainText(
     "accepted by the provider",
   );
+});
+
+test("new client invitation fixes the owner role and disables controls while pending", async ({
+  page,
+}) => {
+  let finish: (() => void) | undefined;
+  const waiting = new Promise<void>((resolve) => {
+    finish = resolve;
+  });
+  await page.route("**/api/portal/admin/portal-access", async (route) => {
+    const command = route.request().postDataJSON();
+    expect(command).toEqual({
+      action: "invite_client",
+      email: "sam@example.test",
+      name: "Sam Example",
+      reviewReference: "new-client-review-42",
+    });
+    await waiting;
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ status: "sent" }),
+    });
+  });
+  await page
+    .getByRole("button", { name: "Invite client", exact: true })
+    .click();
+  const dialog = page.getByRole("dialog", {
+    name: "Invite client",
+    exact: true,
+  });
+  await expect(dialog.getByLabel("Invitation type")).toHaveValue("new_client");
+  await dialog.getByLabel("Full name").fill("Sam Example");
+  await dialog.getByLabel("Email address").fill("sam@example.test");
+  await dialog.getByLabel("Review reference").fill("new-client-review-42");
+  await dialog.getByRole("button", { name: "Request invitation" }).click();
+  await expect(
+    dialog.getByRole("button", { name: "Request invitation" }),
+  ).toBeDisabled();
+  await expect(dialog.getByLabel("Invitation type")).toBeDisabled();
+  finish?.();
+  await expect(dialog.getByRole("status")).toContainText(
+    "create their organisation after accepting",
+  );
+  await dialog.getByRole("button", { name: "Done" }).click();
+  await expect(dialog).not.toBeVisible();
 });
 
 test("removal has scoped review and busy controls prevent dismissal", async ({
