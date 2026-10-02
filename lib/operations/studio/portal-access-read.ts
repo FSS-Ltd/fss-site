@@ -78,7 +78,7 @@ export async function listStudioPortalAccess(
           left join operations.organisations o on o.id = coalesce(p.target_organisation_id, p.organisation_id)
           left join operations.contacts c
             on c.organisation_id = coalesce(p.target_organisation_id, p.organisation_id) and lower(c.email) = lower(p.email)
-          where (${canManageStaff} or coalesce(p.target_organisation_id, p.organisation_id) is not null) and p.state <> 'completed'
+          where p.state <> 'completed'
           union all
           select
             'legacy-invitation:' || i.id, 'client', null::text, o.id, o.display_name,
@@ -115,7 +115,7 @@ export async function listStudioPortalAccess(
         order by name, email, id
         limit ${workspacePageSize + 1} offset ${offset}
       `,
-      readAccessOverviewMetrics(tx, canManageStaff),
+      readAccessOverviewMetrics(tx, canManageStaff, true),
     ]);
     return {
       ...toWorkspaceCollectionPage(rows, parsed.page),

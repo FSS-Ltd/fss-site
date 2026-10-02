@@ -11,6 +11,7 @@ export const accessStateLabels: Record<
 > = {
   active: "Active",
   pending: "Invitation pending",
+  accepted: "Accepted, awaiting onboarding",
   expired: "Expired",
   provider_failed: "Delivery failed",
   revoked: "Revoked",
@@ -21,7 +22,7 @@ export function accessStateTone(
   state: StudioPortalAccessEntry["state"],
 ): "success" | "info" | "error" | "neutral" | "warning" {
   if (state === "active") return "success";
-  if (state === "pending") return "info";
+  if (state === "pending" || state === "accepted") return "info";
   if (state === "expired" || state === "provider_failed") return "error";
   return state === "revoked" ? "neutral" : "warning";
 }

@@ -22,53 +22,84 @@ export type AccessDialogTarget =
       contacts?: never;
     }>;
 
+export type ClientInvitationType = "new_client" | "existing_client";
+
 export function AccessDialogFields({
   target: props,
+  clientInvitationType,
   pending,
   role,
   setRole,
 }: Readonly<{
   target: AccessDialogTarget;
+  clientInvitationType: ClientInvitationType;
   pending: boolean;
   role: PortalRole;
   setRole: (role: PortalRole) => void;
 }>): React.JSX.Element {
   return props.kind === "client" ? (
-    <>
-      <PortalSelect
-        disabled={pending}
-        label="Client contact"
-        name="contact"
-        required
-      >
-        {props.contacts.map((contact) => (
-          <option key={contact.id} value={contact.id}>
-            {contact.organisationName} · {contact.name} · {contact.email}
-          </option>
-        ))}
-      </PortalSelect>
-      <PortalSelect
-        disabled={pending}
-        label="Portal role"
-        name="role"
-        onChange={(event) =>
-          setRole(
-            portalRoles.find((value) => value === event.currentTarget.value) ??
-              "contributor",
-          )
-        }
-        value={role}
-      >
-        {portalRoles.map((value) => (
-          <option key={value} value={value}>
-            {accessRole(value).label}
-          </option>
-        ))}
-      </PortalSelect>
-      <p className={styles.detail}>
-        {accessRole(role).detail} Scope: the selected client organisation.
-      </p>
-    </>
+    clientInvitationType === "new_client" ? (
+      <>
+        <PortalField label="Full name" required>
+          <input
+            autoComplete="name"
+            disabled={pending}
+            maxLength={200}
+            name="name"
+          />
+        </PortalField>
+        <PortalField label="Email address" required>
+          <input
+            autoComplete="email"
+            disabled={pending}
+            maxLength={254}
+            name="email"
+            type="email"
+          />
+        </PortalField>
+        <Notice tone="info">
+          The recipient will create their organisation during onboarding and
+          receive the Owner role.
+        </Notice>
+      </>
+    ) : (
+      <>
+        <PortalSelect
+          disabled={pending}
+          label="Client contact"
+          name="contact"
+          required
+        >
+          {props.contacts.map((contact) => (
+            <option key={contact.id} value={contact.id}>
+              {contact.organisationName} · {contact.name} · {contact.email}
+            </option>
+          ))}
+        </PortalSelect>
+        <PortalSelect
+          disabled={pending}
+          label="Portal role"
+          name="role"
+          onChange={(event) =>
+            setRole(
+              portalRoles.find(
+                (value) => value === event.currentTarget.value,
+              ) ?? "contributor",
+            )
+          }
+          value={role}
+        >
+          {portalRoles.map((value) => (
+            <option key={value} value={value}>
+              {accessRole(value).label}
+            </option>
+          ))}
+        </PortalSelect>
+        <p className={styles.detail}>
+          {accessRole(role).detail} Scope: the selected client organisation.
+        </p>
+      </>
+    )
   ) : props.kind === "staff" ? (
     <>
       <PortalField label="Full name" required>

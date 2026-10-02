@@ -57,6 +57,22 @@ test("renders client access controls without leaking provider activation URLs", 
             role: "owner",
             state: "active",
           },
+          {
+            accessType: "client",
+            joinedAt: null,
+            contactId: null,
+            email: "sam@example.test",
+            expiresAt: "2026-09-21T10:00:00.000Z",
+            id: "client-invitation:77777777-7777-4777-8777-777777777777",
+            invitedAt: "2026-09-20T10:00:00.000Z",
+            lastVerifiedAt: null,
+            membershipId: null,
+            name: "Sam Example",
+            organisationId: null,
+            organisationName: null,
+            role: "owner",
+            state: "accepted",
+          },
         ],
         page: 1,
         query: "",
@@ -69,6 +85,10 @@ test("renders client access controls without leaking provider activation URLs", 
   assert.match(html, /Invitations needing attention/);
   assert.match(html, /<dialog/);
   assert.match(html, /Provider acceptance/);
+  assert.match(html, /Accepted, awaiting onboarding/);
+  assert.match(html, /Next step/);
+  assert.match(html, /Create organisation/);
+  assert.doesNotMatch(html, /Expires/);
   assert.doesNotMatch(html, /Invite FSS staff/);
   assert.match(html, /aria-current="page"/);
   assert.match(html, /Remove access/);
@@ -98,9 +118,37 @@ test("empty founder dashboard offers scoped invitations and hides removal contro
   );
   assert.match(html, /Invite FSS staff/);
   assert.match(html, /No access records yet/);
-  assert.match(html, /No active client contacts are available/);
+  assert.match(html, /Existing client user/);
   assert.doesNotMatch(html, /Confirm removal/);
   assert.match(html, /Operations access across client organisations/);
+});
+
+test("client invitation stays available when there are no contacts", () => {
+  const html = renderToStaticMarkup(
+    <PortalAccessWorkspace
+      data={{
+        contacts: [],
+        items: [],
+        hasNext: false,
+        page: 1,
+        query: "",
+        state: null,
+        view: "clients",
+        canManageStaff: false,
+        metrics: {
+          activeClientUsers: 0,
+          activeStaff: 0,
+          pendingInvitations: 0,
+          attentionInvitations: 0,
+        },
+      }}
+    />,
+  );
+  assert.match(html, /Invite client/);
+  assert.match(html, /New client owner/);
+  assert.match(html, /Existing client user/);
+  assert.match(html, /<option[^>]*disabled[^>]*>Existing client user/);
+  assert.match(html, /create their organisation during onboarding/);
 });
 
 test("filtered empty dashboard preserves filters, page and independent totals", () => {
