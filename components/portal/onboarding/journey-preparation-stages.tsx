@@ -127,6 +127,14 @@ export function JourneyScheduleStage({
   props,
   composer,
 }: StageProps): React.JSX.Element {
+  const choices = composer.agreement
+    ? invoiceChoices(composer.agreement.draft)
+    : [];
+  const invoiceHint = !composer.agreement
+    ? "Select a client agreement in Setup to load its agreed invoices."
+    : choices.length === 0
+      ? "This agreement has no agreed installments or recurring charges. Review its billing terms before preparing the welcome."
+      : undefined;
   return (
     <div className={styles.editor}>
       <div className={styles.facts}>
@@ -144,25 +152,24 @@ export function JourneyScheduleStage({
       <PortalSelect
         label="First agreed invoice"
         value={composer.obligationKey}
-        disabled={composer.pending || !props.billing}
+        disabled={composer.pending || choices.length === 0}
+        hint={invoiceHint}
         onChange={(e) => {
           composer.setObligationKey(e.target.value);
           composer.setDirty(true);
         }}
       >
         <option value="">Select an obligation</option>
-        {composer.agreement
-          ? invoiceChoices(composer.agreement.draft).map((choice) => (
-              <option key={choice.value} value={choice.value}>
-                {choice.label}
-              </option>
-            ))
-          : null}
+        {choices.map((choice) => (
+          <option key={choice.value} value={choice.value}>
+            {choice.label}
+          </option>
+        ))}
       </PortalSelect>
       {!props.billing ? (
         <Notice tone="warning">
-          Configure billing before preparing the welcome. You can save this
-          draft.
+          You can select an invoice and save this draft. Configure billing
+          before preparing the welcome.
         </Notice>
       ) : null}
       <p>

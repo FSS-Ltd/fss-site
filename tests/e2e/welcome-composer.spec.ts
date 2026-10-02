@@ -347,3 +347,54 @@ test("packet editor preserves saved and published content when reopened from its
     page.getByText("Published v2", { exact: false }).first(),
   ).toBeVisible();
 });
+
+test("invoice selection can be saved without billing while exact review remains blocked", async ({
+  page,
+}) => {
+  const commands = await mockCommands(page);
+  await page.goto("/visual/fss-studio/studio-welcome-without-billing");
+  await choosePacket(page);
+  await stage(page, "Schedule");
+  const invoiceChoice = page.getByLabel("First agreed invoice");
+  await expect(invoiceChoice).toBeEnabled();
+  await invoiceChoice.selectOption("installment:1");
+  await expect(invoiceChoice).toHaveValue("installment:1");
+  await page.getByRole("button", { name: "Save journey draft" }).click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Draft version" }),
+  ).toBeVisible();
+  expect(JSON.stringify(commands[0].content)).toContain(
+    '"obligationKey":"installment:1"',
+  );
+  await stage(page, "Access");
+  await stage(page, "Schedule");
+  await expect(invoiceChoice).toHaveValue("installment:1");
+  await stage(page, "Review");
+  await expect(
+    page.getByText("Configure billing", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Generate exact email and PDF preview" }),
+  ).toBeDisabled();
+  expect(commands).toHaveLength(1);
+});
+
+test("schedule explains the missing agreement rather than offering an empty dropdown", async ({
+  page,
+}) => {
+  await mockCommands(page);
+  await openBuilder(page);
+  await page.getByLabel("Client agreement").selectOption("");
+  await stage(page, "Schedule");
+  const invoiceChoice = page.getByLabel("First agreed invoice");
+  await expect(invoiceChoice).toBeDisabled();
+  await expect(invoiceChoice).toHaveAccessibleDescription(
+    "Select a client agreement in Setup to load its agreed invoices.",
+  );
+  await stage(page, "Setup");
+  await page.getByLabel("Client agreement").selectOption({ index: 1 });
+  await stage(page, "Schedule");
+  await expect(invoiceChoice).toBeEnabled();
+  await invoiceChoice.selectOption("installment:1");
+  await expect(invoiceChoice).toHaveValue("installment:1");
+});
