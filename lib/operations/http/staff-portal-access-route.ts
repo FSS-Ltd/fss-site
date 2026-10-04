@@ -1,6 +1,5 @@
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
-import { resolveSiteUrl } from "@/lib/config/site-url";
 import {
   PayloadTooLargeError,
   readJsonRequestBody,
@@ -128,7 +127,7 @@ export function staffPortalAccessRoute(): (
         undefined,
         identity,
       ),
-    origin: new URL(resolveSiteUrl()).origin,
+    origin: resolvePortalOrigin(),
     reportUnexpectedError: (report) =>
       console.error("Staff portal access update failed.", report),
   });
