@@ -47,6 +47,7 @@ test("registers each Phase 3 agreement visual fixture", () => {
     "client-agreement-detail",
     "client-agreement-signing",
     "studio-agreement-list",
+    "studio-agreement-drafts",
     "studio-agreement-builder",
     "studio-agreement-signed",
   ])

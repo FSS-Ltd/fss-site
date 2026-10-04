@@ -12,6 +12,9 @@ import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import { loadStaffAgreementBuilderDraft } from "@/lib/operations/agreements/builder-draft-service";
+import { SavedAgreementDrafts } from "@/components/portal/agreements/saved-agreement-drafts";
+import { listStaffAgreementBuilderDrafts } from "@/lib/operations/agreements/builder-draft-repository";
+import { parseWorkspacePage } from "@/lib/operations/workspaces/pagination";
 import { listStaffAgreementRegister } from "@/lib/operations/agreements/repository";
 
 export const dynamic = "force-dynamic";
@@ -31,6 +34,8 @@ export default async function NewStaffAgreementPage({
   params: Promise<{ organisationId: string }>;
   searchParams: Promise<{
     draftId?: string | string[];
+    draftPage?: string | string[];
+    new?: string | string[];
     step?: string | string[];
   }>;
 }): Promise<React.JSX.Element> {
@@ -40,15 +45,32 @@ export default async function NewStaffAgreementPage({
   if (!identity) return <PortalUnavailable />;
 
   const organisationId = z.uuid().safeParse((await params).organisationId);
-  const draftId = parseDraftId((await searchParams).draftId);
+  const query = await searchParams;
+  const draftId = parseDraftId(query.draftId);
+  const startNew = z.literal("1").optional().safeParse(query.new);
+  if (!startNew.success || (draftId && query.new !== undefined)) notFound();
+  let draftPage;
+  try {
+    draftPage = parseWorkspacePage(query.draftPage);
+  } catch {
+    notFound();
+  }
   if (!organisationId.success) notFound();
 
   let register;
   let initialDraft;
+  let savedDrafts;
   try {
     const db = getOperationsDb();
     const admin = await requireFssAdmin(getPortalDb(), identity, randomUUID());
     register = await listStaffAgreementRegister(db, admin, organisationId.data);
+    if (!draftId && startNew.data !== "1")
+      savedDrafts = await listStaffAgreementBuilderDrafts(
+        db,
+        admin,
+        organisationId.data,
+        draftPage,
+      );
     initialDraft = draftId
       ? await loadStaffAgreementBuilderDraft(
           db,
@@ -89,16 +111,25 @@ export default async function NewStaffAgreementPage({
         eyebrow="FSS Studio / Agreements"
         title="Create an agreement"
       />
-      <RoutedStaffAgreementBuilder
-        agreementListHref={agreementListHref}
-        baseHref={baseHref}
-        commandEndpoint={`/api/portal/admin/clients/${organisationId.data}/agreement-drafts`}
-        engagementHref={engagementHref}
-        engagements={register.engagementChoices ?? []}
-        initialDraft={initialDraft}
-        organisationName={register.organisationName}
-        currency={register.billingCurrency}
-      />
+      {savedDrafts && (savedDrafts.items.length > 0 || savedDrafts.page > 1) ? (
+        <SavedAgreementDrafts
+          drafts={savedDrafts}
+          builderHref={baseHref}
+          listHref={baseHref}
+          startNewHref={`${baseHref}?new=1`}
+        />
+      ) : (
+        <RoutedStaffAgreementBuilder
+          agreementListHref={agreementListHref}
+          baseHref={baseHref}
+          commandEndpoint={`/api/portal/admin/clients/${organisationId.data}/agreement-drafts`}
+          engagementHref={engagementHref}
+          engagements={register.engagementChoices ?? []}
+          initialDraft={initialDraft}
+          organisationName={register.organisationName}
+          currency={register.billingCurrency}
+        />
+      )}
     </div>
   );
 }

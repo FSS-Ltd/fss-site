@@ -474,3 +474,51 @@ for (const appearance of ["light", "dark"] as const) {
     });
   });
 }
+
+for (const appearance of ["light", "dark"] as const) {
+  test(`saved drafts can be resumed by keyboard in ${appearance} appearance`, async ({
+    page,
+    baseURL,
+  }, testInfo) => {
+    await page.context().addCookies([
+      {
+        name: "fss-portal-appearance",
+        value: appearance,
+        url: baseURL ?? "http://127.0.0.1:3219",
+      },
+    ]);
+    await page.goto("/visual/fss-studio/studio-agreement-drafts");
+    const list = page.getByRole("region", { name: "Saved agreement drafts" });
+    await expect(list).toBeVisible();
+    await expect(list).toContainText("Continue at Fees");
+    await expect(list).toContainText("Website & booking experience");
+    const resume = list.getByRole("link", { name: "Continue draft" });
+    await expect(resume).toHaveAttribute(
+      "href",
+      /draftId=e5d6e353-c33d-488f-9cb0-1d7b05e07050/,
+    );
+    await expect(
+      page.getByRole("link", { name: "Start new agreement" }),
+    ).toHaveAttribute("href", /new=1/);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
+    await list.screenshot({
+      path: testInfo.outputPath(`saved-agreement-drafts-${appearance}.png`),
+      animations: "disabled",
+    });
+    await resume.focus();
+    await page.keyboard.press("Enter");
+    await expect(
+      page.getByRole("heading", { name: "Price the services" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("textbox", { name: "Description" }).first(),
+    ).toHaveValue("Website & booking experience");
+    await expect(
+      page.getByRole("textbox", { name: "Rate (£)" }).first(),
+    ).toHaveValue("4800.00");
+  });
+}
