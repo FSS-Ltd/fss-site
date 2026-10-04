@@ -14,7 +14,7 @@ export function ResourceCard({ resource }: ResourceCardProps) {
   return (
     <article
       data-lift-light
-      className="group flex h-full flex-col overflow-hidden rounded-[18px] border border-[rgba(10,26,46,.08)] bg-white transition-[border-color,box-shadow,transform] duration-300"
+      className="group flex h-full flex-col overflow-hidden rounded-[18px] border border-border-soft/70 bg-white transition-[border-color,box-shadow,transform] duration-300"
     >
       <Link
         aria-label={`View ${resource.title}`}
@@ -31,27 +31,30 @@ export function ResourceCard({ resource }: ResourceCardProps) {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-white/45 to-transparent" />
           {resource.featured ? (
-            <span className="absolute top-4 left-4 rounded-full bg-white/90 px-3 py-1.5 font-mono text-[10px] font-semibold tracking-[0.12em] text-[#0f7a83]">
+            <span className="absolute top-4 left-4 rounded-full bg-white/90 px-3 py-1.5 font-mono text-[10px] font-semibold tracking-[0.12em] text-brand-primary">
               FEATURED
             </span>
           ) : null}
         </div>
       </Link>
       <div className="flex flex-1 flex-col p-6 sm:p-7">
-        <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#0f7a83]">
+        <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-brand-primary">
           {resource.category} / {resource.format}
         </p>
-        <h2 className="mt-4 text-[22px] leading-tight font-semibold text-[#0a1a2e]">
-          <Link href={resourceHref} className="transition hover:text-[#0f7a83]">
+        <h2 className="mt-4 text-[22px] leading-tight font-semibold text-foreground">
+          <Link
+            href={resourceHref}
+            className="transition hover:text-brand-primary"
+          >
             {resource.title}
           </Link>
         </h2>
-        <p className="mt-3 text-sm leading-6 text-[#56657a]">
+        <p className="mt-3 text-sm leading-6 text-text-muted">
           {resource.shortDescription}
         </p>
         <Link
           href={resourceHref}
-          className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[#0f7a83] transition hover:text-[#0a1a2e] sm:mt-auto sm:pt-6"
+          className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-brand-primary transition hover:text-foreground sm:mt-auto sm:pt-6"
         >
           {resource.ctaLabel}{" "}
           <ArrowRight className="size-4" aria-hidden="true" />

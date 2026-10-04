@@ -71,7 +71,7 @@
     inset: -6% auto -6% -8%;
     width: 16%;
     background:
-      radial-gradient(circle, #80dce5 1px, transparent 2px) 0 0 / 11px 13px,
+      radial-gradient(circle, #e6a07f 1px, transparent 2px) 0 0 / 11px 13px,
       radial-gradient(circle, #fff 1px, transparent 2px) 5px 7px / 19px 23px;
     mask-image: linear-gradient(90deg, transparent, #000, transparent);
     transform: translate3d(var(--particle-x, 0px), 0, 0);
@@ -105,12 +105,12 @@
     left: 5%;
     right: 5%;
     height: 1px;
-    background: #355063;
+    background: #51423a;
   }
   [data-story-progress] span {
     display: block;
     height: 100%;
-    background: #80dce5;
+    background: var(--brand-fss-cyan);
     transform-origin: left;
     transform: scaleX(var(--story-progress, 0));
   }

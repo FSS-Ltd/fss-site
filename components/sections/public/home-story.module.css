@@ -1,6 +1,6 @@
 .story {
   position: relative;
-  background: #07182e;
+  background: #211b17;
   color: #fff;
 }
 .stage {
@@ -21,7 +21,7 @@
 }
 .story .chapter p {
   max-width: 410px;
-  color: #bcd2e2;
+  color: #d8cdc4;
   font-size: 1.05rem;
   line-height: 1.65;
 }
@@ -30,7 +30,7 @@
   font-family: var(--font-geist-mono), monospace;
   font-size: 0.65rem;
   letter-spacing: 0.12em;
-  color: #80dce5;
+  color: #e6a07f;
 }
 .visual {
   position: relative;
@@ -52,14 +52,14 @@
   border-radius: 12px;
 }
 .underlay {
-  border: 1px solid #387485;
-  background: #0d2943;
+  border: 1px solid #755548;
+  background: #302722;
   transform: translate3d(-18px, 24px, -35px);
 }
 .blueprint {
-  stroke: #80dce5;
+  stroke: #e6a07f;
   stroke-width: 1.2;
-  background: #0a2138;
+  background: #2b241f;
 }
 .finished {
   object-fit: cover;
@@ -71,7 +71,7 @@
 }
 .caption span {
   display: block;
-  color: #bcd2e2;
+  color: #d8cdc4;
 }
 .orbit {
   position: absolute;
@@ -82,7 +82,7 @@
 .orbit i {
   position: absolute;
   inset: 0 15%;
-  border: 1px solid #3994a4;
+  border: 1px solid #a6745e;
   border-radius: 50%;
   transform: rotateX(62deg) rotateY(-25deg);
 }
@@ -106,13 +106,17 @@
 }
 .values {
   background: #e3efed;
-  color: #07182e;
+  color: #211b17;
 }
 .values .chapter h2 {
-  color: #07182e;
+  color: #211b17;
+}
+.values .chapter .label,
+.values .caption {
+  color: var(--brand-fss-teal-ink);
 }
 .values .chapter p {
-  color: #46566c;
+  color: #554b45;
 }
 @media (min-width: 901px) and (min-height: 650px) and (prefers-reduced-motion: no-preference) {
   .values {

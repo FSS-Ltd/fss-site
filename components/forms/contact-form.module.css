@@ -62,7 +62,7 @@
 }
 .choice:has(input:checked) {
   border-color: var(--foreground);
-  background: #e5f1f2;
+  background: #f6e9e4;
 }
 .choice input,
 .consent input {

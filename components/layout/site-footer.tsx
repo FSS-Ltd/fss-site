@@ -20,8 +20,8 @@ export function SiteFooter() {
   return (
     <footer
       style={{
-        background: "#07182e",
-        color: "#9fb1c6",
+        background: "#211b17",
+        color: "#d8cdc4",
         padding: "clamp(56px,7vw,84px) 28px 36px",
         borderTop: "1px solid rgba(255,255,255,.07)",
       }}
@@ -77,7 +77,7 @@ export function SiteFooter() {
                   width: "6px",
                   height: "6px",
                   borderRadius: "50%",
-                  background: "#14989e",
+                  background: "#b55937",
                 }}
               />
               Start a conversation
@@ -91,7 +91,7 @@ export function SiteFooter() {
                 fontFamily: "'Geist Mono','JetBrains Mono',monospace",
                 fontSize: "11px",
                 letterSpacing: ".14em",
-                color: "#8aa0b8",
+                color: "var(--brand-fss-cyan)",
               }}
             >
               SITEMAP
@@ -124,7 +124,7 @@ export function SiteFooter() {
                 fontFamily: "'Geist Mono','JetBrains Mono',monospace",
                 fontSize: "11px",
                 letterSpacing: ".14em",
-                color: "#8aa0b8",
+                color: "var(--brand-fss-cyan)",
               }}
             >
               CONNECT
@@ -170,16 +170,16 @@ export function SiteFooter() {
               flexWrap: "wrap",
             }}
           >
-            <span style={{ fontSize: "13px", color: "#8aa0b8" }}>
+            <span style={{ fontSize: "13px", color: "#b5a59b" }}>
               © 2026 Faithful Software Solutions Ltd. All rights reserved.
             </span>
             <Link
               href="/privacy"
               style={{
-                color: "#8aa0b8",
+                color: "#b5a59b",
                 fontSize: "13px",
                 textDecoration: "underline",
-                textDecorationColor: "rgba(138,160,184,.45)",
+                textDecorationColor: "rgba(181,165,155,.45)",
                 textUnderlineOffset: "3px",
               }}
             >
@@ -192,7 +192,7 @@ export function SiteFooter() {
               fontFamily: "'Geist Mono','JetBrains Mono',monospace",
               fontSize: "11px",
               letterSpacing: ".1em",
-              color: "#8aa0b8",
+              color: "#b5a59b",
             }}
           >
             FAITHFUL · SOFTWARE · SOLUTIONS

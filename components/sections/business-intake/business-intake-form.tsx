@@ -50,7 +50,7 @@ function IntakeSelectField({
 }) {
   return (
     <fieldset className="space-y-3">
-      <legend className="block text-sm font-semibold text-[#0a1a2e]">{field.label}</legend>
+      <legend className="block text-sm font-semibold text-foreground">{field.label}</legend>
       <div className="grid gap-3">
         {field.options?.map((option) => {
           const selected = value === option.id;
@@ -61,10 +61,10 @@ function IntakeSelectField({
               type="button"
               aria-pressed={selected}
               className={cn(
-                "group rounded-xl border p-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#14989e]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+                "group rounded-xl border p-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
                 selected
-                  ? "border-[#14989e] bg-[rgba(20,152,158,.1)] text-[#0a1a2e]"
-                  : "border-[rgba(10,26,46,.1)] bg-[#f7f8f9] text-[#56657a] hover:border-[rgba(20,152,158,.45)] hover:bg-white",
+                  ? "border-brand-accent bg-brand-accent/10 text-foreground"
+                  : "border-border-soft/80 bg-[#f7f8f9] text-text-muted hover:border-brand-accent/45 hover:bg-white",
               )}
               onClick={() => onSelect(option.id)}
             >
@@ -73,19 +73,19 @@ function IntakeSelectField({
                   className={cn(
                     "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border",
                     selected
-                      ? "border-[#14989e] bg-[#14989e] text-[#fff]"
-                      : "border-[rgba(10,26,46,.24)] text-transparent group-hover:border-[#14989e]",
+                      ? "border-brand-accent bg-brand-accent text-[#fff]"
+                      : "border-border-strong text-transparent group-hover:border-brand-accent",
                   )}
                   aria-hidden="true"
                 >
                   <CheckCircle2 className="size-3.5" />
                 </span>
                 <span>
-                  <span className="block text-sm font-semibold text-[#0a1a2e]">
+                  <span className="block text-sm font-semibold text-foreground">
                     {option.label}
                   </span>
                   {option.description ? (
-                    <span className="mt-1 block text-sm leading-6 text-[#56657a]">
+                    <span className="mt-1 block text-sm leading-6 text-text-muted">
                       {option.description}
                     </span>
                   ) : null}
@@ -159,13 +159,13 @@ export function BusinessIntakeForm() {
     return (
       <div
         data-lift-light
-        className="rounded-[22px] border border-[rgba(10,26,46,.08)] bg-white p-7 text-center shadow-[0_40px_90px_-55px_rgba(10,26,46,.45)] sm:p-10"
+        className="rounded-[22px] border border-border-soft/70 bg-white p-7 text-center shadow-[0_40px_90px_-55px_rgba(33,27,23,.45)] sm:p-10"
       >
         <span className="mx-auto flex size-11 items-center justify-center rounded-full bg-[rgba(20,152,158,.12)] text-[#0f7a83]">
           <PartyPopper className="size-5" aria-hidden="true" />
         </span>
-        <h3 className="mt-4 text-2xl font-semibold text-[#0a1a2e]">Thanks — we&apos;ve got it.</h3>
-        <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-[#56657a]">
+        <h3 className="mt-4 text-2xl font-semibold text-foreground">Thanks — we&apos;ve got it.</h3>
+        <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-text-muted">
           We received your idea and will review it. If it makes sense to talk further,
           we&apos;ll be in touch at the email you shared.
         </p>
@@ -176,26 +176,26 @@ export function BusinessIntakeForm() {
   return (
     <div
       data-lift-light
-      className="rounded-[22px] border border-[rgba(10,26,46,.08)] bg-white p-5 shadow-[0_40px_90px_-55px_rgba(10,26,46,.45)] sm:p-7"
+      className="rounded-[22px] border border-border-soft/70 bg-white p-5 shadow-[0_40px_90px_-55px_rgba(33,27,23,.45)] sm:p-7"
     >
-      <div className="flex flex-col gap-4 border-b border-[rgba(10,26,46,.08)] pb-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 border-b border-border-soft/70 pb-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="font-mono text-xs uppercase tracking-[0.14em] text-[#0f7a83]">
+          <p className="font-mono text-xs uppercase tracking-[0.14em] text-brand-primary">
             {step.eyebrow}
           </p>
-          <h2 className="mt-2 text-2xl font-semibold text-[#0a1a2e] sm:text-3xl">{step.title}</h2>
+          <h2 className="mt-2 text-2xl font-semibold text-foreground sm:text-3xl">{step.title}</h2>
           {step.description ? (
-            <p className="mt-2 text-sm leading-6 text-[#56657a]">{step.description}</p>
+            <p className="mt-2 text-sm leading-6 text-text-muted">{step.description}</p>
           ) : null}
         </div>
-        <p className="rounded-full border border-[rgba(10,26,46,.1)] bg-[#f7f8f9] px-4 py-2 text-sm whitespace-nowrap text-[#56657a]">
+        <p className="rounded-full border border-border-soft/80 bg-[#f7f8f9] px-4 py-2 text-sm whitespace-nowrap text-text-muted">
           Step {stepIndex + 1} of {intakeSteps.length}
         </p>
       </div>
 
       <div className="mt-5 h-1.5 w-full overflow-hidden rounded-full bg-[#eef0f2]">
         <div
-          className="h-full rounded-full bg-[#14989e] transition-all duration-300"
+          className="h-full rounded-full bg-brand-accent transition-all duration-300"
           style={{ width: `${progressPercent}%` }}
         />
       </div>
@@ -259,13 +259,13 @@ export function BusinessIntakeForm() {
           );
         })}
 
-        <div className="flex flex-col gap-3 border-t border-[rgba(10,26,46,.08)] pt-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 border-t border-border-soft/70 pt-5 sm:flex-row sm:items-center sm:justify-between">
           {isFirstStep ? (
             <span />
           ) : (
             <button
               type="button"
-              className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-[#56657a] transition hover:text-[#0f7a83]"
+              className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-text-muted transition hover:text-brand-primary"
               onClick={goBack}
             >
               <ArrowLeft className="size-4" aria-hidden="true" />

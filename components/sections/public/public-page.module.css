@@ -11,8 +11,18 @@
   opacity: 0.62;
   pointer-events: none;
   background:
-    radial-gradient(circle at 88% 4%, rgb(70 199 216 / 0.14), transparent 32%),
-    radial-gradient(circle at 12% 0%, rgb(20 152 158 / 0.09), transparent 26%);
+    radial-gradient(circle at 88% 4%, rgb(230 160 127 / 0.14), transparent 32%),
+    radial-gradient(
+      circle at 78% 20%,
+      color-mix(in srgb, var(--brand-fss-navy) 4.5%, transparent),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 12% 42%,
+      color-mix(in srgb, var(--brand-fss-teal) 5.5%, transparent),
+      transparent 24%
+    ),
+    radial-gradient(circle at 12% 0%, rgb(181 89 55 / 0.09), transparent 26%);
   content: "";
 }
 .hero {
@@ -32,7 +42,7 @@
   position: relative;
   overflow: hidden;
   aspect-ratio: 8 / 5;
-  border: 1px solid rgb(10 26 46 / 0.12);
+  border: 1px solid rgb(33 27 23 / 0.12);
   border-radius: 24px;
 }
 .editorialImage {
@@ -56,7 +66,7 @@
   z-index: 1;
 }
 .eyebrow {
-  color: #0f7078;
+  color: var(--brand-fss-teal-ink);
   font-size: 0.875rem;
   font-weight: 650;
   margin-bottom: 18px;
@@ -102,18 +112,18 @@
 }
 .grid > div {
   padding: clamp(22px, 3vw, 32px);
-  border: 1px solid rgb(10 26 46 / 0.1);
+  border: 1px solid rgb(33 27 23 / 0.1);
   border-radius: 18px;
   background: rgb(255 255 255 / 0.62);
-  box-shadow: 0 24px 52px -44px rgb(10 26 46 / 0.5);
+  box-shadow: 0 24px 52px -44px rgb(33 27 23 / 0.5);
   transition:
     transform 180ms ease,
     border-color 180ms ease,
     box-shadow 180ms ease;
 }
 .grid > div:hover {
-  border-color: rgb(15 122 131 / 0.36);
-  box-shadow: 0 32px 62px -44px rgb(10 26 46 / 0.58);
+  border-color: rgb(166 66 36 / 0.36);
+  box-shadow: 0 32px 62px -44px rgb(33 27 23 / 0.58);
   transform: translateY(-3px);
 }
 .proof {
@@ -136,6 +146,18 @@
   gap: 28px;
   list-style: decimal-leading-zero;
   padding-left: 24px;
+}
+.steps li::marker {
+  color: var(--brand-fss-teal-ink);
+  font-weight: 650;
+}
+.page .section > h2::after {
+  display: block;
+  width: 32px;
+  height: 2px;
+  margin-top: 12px;
+  background: var(--brand-fss-teal);
+  content: "";
 }
 @media (min-width: 901px) and (min-height: 650px) and (prefers-reduced-motion: no-preference) {
   .section[data-motion-delivery="cinematic"] {

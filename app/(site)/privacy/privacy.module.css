@@ -12,12 +12,12 @@
 
 .hero {
   padding-bottom: clamp(42px, 6vw, 68px);
-  border-bottom: 1px solid rgba(10, 26, 46, 0.15);
+  border-bottom: 1px solid rgba(33, 27, 23, 0.15);
 }
 
 .eyebrow {
   margin: 0 0 18px;
-  color: #14989e;
+  color: #a64224;
   font-family: "Geist Mono", "JetBrains Mono", monospace;
   font-size: 0.7rem;
   font-weight: 650;
@@ -27,7 +27,7 @@
 .hero h1 {
   max-width: 650px;
   margin: 0;
-  color: #07182e;
+  color: #211b17;
   font-size: clamp(2.5rem, 7vw, 5rem);
   font-weight: 520;
   letter-spacing: -0.055em;
@@ -37,14 +37,14 @@
 .intro {
   max-width: 620px;
   margin: 26px 0 0;
-  color: #46566c;
+  color: #554b45;
   font-size: clamp(1rem, 2vw, 1.18rem);
   line-height: 1.65;
 }
 
 .effective {
   margin: 22px 0 0;
-  color: #8593a4;
+  color: #877d76;
   font-family: "Geist Mono", "JetBrains Mono", monospace;
   font-size: 0.72rem;
   letter-spacing: 0.08em;
@@ -57,12 +57,12 @@
 
 .content section {
   padding: clamp(36px, 5vw, 54px) 0;
-  border-bottom: 1px solid rgba(10, 26, 46, 0.12);
+  border-bottom: 1px solid rgba(33, 27, 23, 0.12);
 }
 
 .content h2 {
   margin: 0 0 18px;
-  color: #07182e;
+  color: #211b17;
   font-size: clamp(1.25rem, 2.5vw, 1.55rem);
   font-weight: 680;
   letter-spacing: -0.025em;
@@ -71,7 +71,7 @@
 .content p,
 .content li,
 .content dd {
-  color: #46566c;
+  color: #554b45;
   font-size: 0.98rem;
   line-height: 1.75;
 }
@@ -92,14 +92,14 @@
 }
 
 .content a {
-  color: #087f88;
+  color: #a64224;
   text-decoration: underline;
-  text-decoration-color: rgba(8, 127, 136, 0.35);
+  text-decoration-color: rgba(166, 66, 36, 0.35);
   text-underline-offset: 3px;
 }
 
 .content a:focus-visible {
-  outline: 3px solid #14989e;
+  outline: 3px solid #a64224;
   outline-offset: 3px;
 }
 
@@ -107,7 +107,7 @@
   display: grid;
   gap: 0;
   margin: 18px 0 22px;
-  border-top: 1px solid rgba(10, 26, 46, 0.12);
+  border-top: 1px solid rgba(33, 27, 23, 0.12);
 }
 
 .providers div {
@@ -115,11 +115,11 @@
   grid-template-columns: minmax(110px, 0.28fr) 1fr;
   gap: 20px;
   padding: 15px 0;
-  border-bottom: 1px solid rgba(10, 26, 46, 0.12);
+  border-bottom: 1px solid rgba(33, 27, 23, 0.12);
 }
 
 .providers dt {
-  color: #07182e;
+  color: #211b17;
   font-weight: 680;
 }
 

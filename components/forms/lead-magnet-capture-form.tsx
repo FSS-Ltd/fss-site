@@ -165,7 +165,7 @@ export function LeadMagnetCaptureForm({
           Newsletter signup is optional. Unsubscribe anytime. Read our{" "}
           <Link
             href="/privacy"
-            className="font-medium text-foreground underline focus-visible:outline-2"
+            className="font-medium text-brand-primary underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary"
           >
             privacy policy
           </Link>
