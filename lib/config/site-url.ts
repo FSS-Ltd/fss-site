@@ -38,3 +38,25 @@ export function resolveSiteUrl(env: SiteEnvironment = process.env): string {
 
   return FALLBACK_SITE_URL;
 }
+
+export function resolveAllowedSiteOrigins(
+  env: SiteEnvironment = process.env,
+): readonly string[] {
+  const canonicalOrigin = new URL(resolveSiteUrl(env)).origin;
+  const previewDeploymentUrls = [env.VERCEL_URL, env.VERCEL_BRANCH_URL]
+    .map((url) => url?.trim())
+    .filter((url): url is string => Boolean(url));
+
+  if (!isPreviewDeployment(env) || previewDeploymentUrls.length === 0) {
+    return [canonicalOrigin];
+  }
+
+  return [
+    ...new Set([
+      canonicalOrigin,
+      ...previewDeploymentUrls.map(
+        (deploymentUrl) => new URL(`https://${deploymentUrl}`).origin,
+      ),
+    ]),
+  ];
+}

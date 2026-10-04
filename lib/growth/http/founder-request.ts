@@ -2,11 +2,14 @@ export class PayloadTooLargeError extends Error {}
 
 export function requestHasRegisteredOrigin(
   request: Request,
-  origin: string,
+  origin: string | readonly string[],
 ): boolean {
+  const requestOrigin = new URL(request.url).origin;
+  const allowedOrigins = typeof origin === "string" ? [origin] : origin;
+
   return (
-    new URL(request.url).origin === origin &&
-    request.headers.get("origin") === origin
+    request.headers.get("origin") === requestOrigin &&
+    allowedOrigins.includes(requestOrigin)
   );
 }
 

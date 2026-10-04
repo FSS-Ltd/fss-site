@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { PortalAccessDenied } from "../auth/types";
 import { createStaffPortalAccessRouteHandler } from "./staff-portal-access-route";
 
 const origin = "https://portal.example.test";
@@ -50,8 +51,36 @@ test("returns only a narrow provider-safe invitation outcome", async () => {
   assert.deepEqual(await response.json(), { status: "sent" });
 });
 
+test("allows the exact configured Vercel preview origin for Studio commands", async () => {
+  const previewOrigin = "https://fss-site-git-portal-invite.vercel.app";
+  let called = false;
+  const handler = createStaffPortalAccessRouteHandler({
+    authorize: async () => ({ id: "admin" }),
+    createCorrelationId: () => "11111111-1111-4111-8111-111111111111",
+    enabled: true,
+    execute: async () => {
+      called = true;
+      return { status: "sent" as const };
+    },
+    origin: [origin, previewOrigin],
+    reportUnexpectedError: () => undefined,
+  });
+  const response = await handler(
+    new Request(`${previewOrigin}/api/portal/admin/portal-access`, {
+      body: JSON.stringify({ action: "invite_client" }),
+      headers: {
+        "content-type": "application/json",
+        origin: previewOrigin,
+      },
+      method: "POST",
+    }),
+  );
+
+  assert.equal(response.status, 200);
+  assert.equal(called, true);
+});
+
 test("returns a permission error for founder-only commands without exposing details", async () => {
-  const { PortalAccessDenied } = await import("../auth/types");
   const handler = createStaffPortalAccessRouteHandler({
     authorize: async () => ({ id: "admin" }),
     createCorrelationId: () => "reference",

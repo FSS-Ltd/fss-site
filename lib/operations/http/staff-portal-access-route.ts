@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
-import { resolveSiteUrl } from "@/lib/config/site-url";
+import { resolveAllowedSiteOrigins } from "@/lib/config/site-url";
 import {
   PayloadTooLargeError,
   readJsonRequestBody,
@@ -30,7 +30,7 @@ export type StaffPortalAccessRouteDependencies<TActor> = Readonly<{
     input: unknown,
     correlationId: string,
   ) => Promise<StaffPortalAccessOutcome>;
-  origin: string;
+  origin: string | readonly string[];
   reportUnexpectedError: (report: {
     correlationId: string;
     errorName: string;
@@ -128,7 +128,7 @@ export function staffPortalAccessRoute(): (
         undefined,
         identity,
       ),
-    origin: new URL(resolveSiteUrl()).origin,
+    origin: resolveAllowedSiteOrigins(),
     reportUnexpectedError: (report) =>
       console.error("Staff portal access update failed.", report),
   });
