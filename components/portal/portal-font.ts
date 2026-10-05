@@ -1,8 +1,8 @@
-import { Geist } from "next/font/google";
+import localFont from "next/font/local";
 
-export const portalFont = Geist({
+export const portalFont = localFont({
+  src: "./fonts/Geist-Variable.woff2",
   display: "swap",
-  subsets: ["latin"],
   variable: "--font-portal-geist",
-  weight: ["400", "500", "600", "700"],
+  weight: "100 900",
 });
