@@ -81,8 +81,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-next-24-${{ hashFiles('pnpm-lock.yaml', 'next.config.ts') }}-
 
-
-
       - name: Audit production dependencies
         run: pnpm audit --prod --audit-level high
 
