@@ -26,7 +26,7 @@ export function DeliverySteps({ cinematic = false }: { cinematic?: boolean }) {
             y1="10"
             x2="1000"
             y2="10"
-            stroke="#14989e"
+            stroke="#b55937"
             strokeWidth="2"
             strokeLinecap="round"
           />

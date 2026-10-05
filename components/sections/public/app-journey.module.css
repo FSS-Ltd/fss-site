@@ -19,7 +19,7 @@
 }
 .copy .caption {
   font-size: 0.75rem;
-  color: #46566c;
+  color: #554b45;
 }
 .phone {
   position: relative;
@@ -27,9 +27,9 @@
   aspect-ratio: 4 / 7;
   margin: auto;
   border-radius: 28px;
-  border: 6px solid #0a1a2e;
-  background: #07182e;
-  box-shadow: 0 32px 70px -30px #32535a;
+  border: 6px solid #211b17;
+  background: #211b17;
+  box-shadow: 0 32px 70px -30px rgb(33 27 23 / 0.48);
 }
 .image {
   position: relative;
@@ -45,7 +45,7 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  stroke: #80dce5;
+  stroke: #e6a07f;
   stroke-width: 1;
 }
 .atoms {

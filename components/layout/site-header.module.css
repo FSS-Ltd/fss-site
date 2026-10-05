@@ -19,6 +19,13 @@
   background: white;
   font-weight: 650;
 }
+.desktop a[aria-current="page"] {
+  box-shadow: inset 0 -2px var(--brand-fss-teal);
+}
+.mobilePanel a[aria-current="page"] {
+  border-left: 3px solid var(--brand-fss-teal);
+  padding-left: 9px;
+}
 .desktop a:hover,
 .mobilePanel a:hover {
   text-decoration: underline;

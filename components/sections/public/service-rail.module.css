@@ -11,12 +11,12 @@
 }
 .rail article {
   padding: clamp(24px, 3vw, 34px);
-  border: 1px solid rgb(10 26 46 / 0.1);
+  border: 1px solid rgb(33 27 23 / 0.1);
   border-radius: 22px;
   background: rgb(255 255 255 / 0.72);
 }
 .rail article > span {
-  color: #0f7a83;
+  color: #a64224;
   font-size: 0.72rem;
 }
 .rail h2 {

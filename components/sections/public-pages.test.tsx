@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import test from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -10,6 +11,26 @@ require.extensions[".css"] = (module) => {
     default: new Proxy({}, { get: (_target, key) => String(key) }),
   };
 };
+
+test("personal brand colours stay scoped to the public site shell", () => {
+  const css = readFileSync(
+    new URL("../../app/globals.css", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(css, /:root\s*\{[^}]*--brand-primary:\s*#14989e/);
+  assert.match(css, /#fssroot\s*\{[^}]*--brand-primary:\s*#a64224/);
+  assert.match(css, /#fssroot\s*\{[^}]*--brand-accent:\s*#b55937/);
+  assert.match(css, /#fssroot\s*\{[^}]*--brand-fss-teal:\s*#14989e/);
+  assert.match(css, /#fssroot\s*\{[^}]*--brand-fss-cyan:\s*#46c7d8/);
+  assert.match(css, /#fssroot\s*\{[^}]*--brand-fss-navy:\s*#07182e/);
+  assert.match(css, /#fssroot\s*\{[^}]*--foreground:\s*#211b17/);
+  assert.match(css, /#fssroot\s*\{[^}]*--brand-secondary:\s*#211b17/);
+  assert.match(
+    css,
+    /#fssroot\s*\{[^}]*--button-shadow:\s*rgba\(33, 27, 23, 0\.65\)/,
+  );
+});
 
 test("public foundations render readable motion-enhanced content", () => {
   for (const route of ["", "services/", "about/", "contact/"]) {

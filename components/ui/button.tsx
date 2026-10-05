@@ -10,10 +10,11 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          "bg-[#0a1a2e] px-5 py-2.5 text-[#fff] shadow-[0_20px_40px_-24px_rgba(10,26,46,.65)] hover:bg-[#102642]",
+          "bg-[var(--button-primary)] px-5 py-2.5 text-cta-text shadow-[0_20px_40px_-24px_var(--button-shadow)] hover:bg-[var(--button-primary-hover)]",
         secondary:
-          "border border-[rgba(10,26,46,.14)] bg-white px-5 py-2.5 text-[#0a1a2e] hover:border-[rgba(10,26,46,.28)] hover:bg-white",
-        ghost: "px-0 py-0 text-[#0f7a83] hover:text-[#0a1a2e]",
+          "border border-[var(--button-secondary-border)] bg-white px-5 py-2.5 text-foreground hover:border-[var(--button-secondary-hover-border)] hover:bg-white",
+        ghost:
+          "px-0 py-0 text-[var(--button-ghost-text)] hover:text-foreground",
       },
       size: {
         default: "h-10",

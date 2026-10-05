@@ -20,6 +20,33 @@
   --text-muted: #46566c;
   --text-subtle: #8593a4;
   --cta-text: #ffffff;
+  --button-shadow: rgba(10, 26, 46, 0.65);
+  --button-primary: #0a1a2e;
+  --button-primary-hover: #102642;
+  --button-secondary-border: rgba(10, 26, 46, 0.14);
+  --button-secondary-hover-border: rgba(10, 26, 46, 0.28);
+  --button-ghost-text: #0f7a83;
+}
+
+#fssroot {
+  --foreground: #211b17;
+  --brand-primary: #a64224;
+  --brand-accent: #b55937;
+  --brand-secondary: #211b17;
+  --brand-fss-navy: #07182e;
+  --brand-fss-teal: #14989e;
+  --brand-fss-teal-ink: #0f7078;
+  --brand-fss-cyan: #46c7d8;
+  --border-soft: rgba(33, 27, 23, 0.12);
+  --border-strong: rgba(33, 27, 23, 0.22);
+  --text-muted: #554b45;
+  --text-subtle: #877d76;
+  --button-shadow: rgba(33, 27, 23, 0.65);
+  --button-primary: #211b17;
+  --button-primary-hover: #302722;
+  --button-secondary-border: rgba(33, 27, 23, 0.14);
+  --button-secondary-hover-border: rgba(33, 27, 23, 0.28);
+  --button-ghost-text: #a64224;
 }
 
 @theme inline {
@@ -56,7 +83,7 @@ body {
 }
 
 *::selection {
-  background: #14989e;
+  background: var(--brand-primary);
   color: #ffffff;
 }
 
@@ -93,7 +120,7 @@ html {
 }
 
 #fssroot :focus-visible {
-  outline: 3px solid #0f7078;
+  outline: 3px solid var(--brand-fss-teal-ink);
   outline-offset: 4px;
 }
 
@@ -126,7 +153,7 @@ html {
 }
 
 #fssroot footer :focus-visible {
-  outline-color: #46c7d8;
+  outline-color: var(--brand-fss-cyan);
 }
 
 @media (max-width: 939px) {

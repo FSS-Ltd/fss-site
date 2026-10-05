@@ -86,7 +86,7 @@ export function bindValueNetwork(
     });
     points.forEach((point) => {
       if (!point.opacity) return;
-      context.fillStyle = `rgba(15,122,131,${0.6 * point.opacity})`;
+      context.fillStyle = `rgba(166,66,36,${0.6 * point.opacity})`;
       context.beginPath();
       context.arc(point.x, point.y, 1.8 * point.opacity, 0, Math.PI * 2);
       context.fill();

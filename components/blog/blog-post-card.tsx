@@ -13,7 +13,7 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
   return (
     <article
       data-lift-light
-      className="group overflow-hidden rounded-[18px] border border-[rgba(10,26,46,.08)] bg-white transition-[border-color,box-shadow,transform] duration-300"
+      className="group overflow-hidden rounded-[18px] border border-border-soft/70 bg-white transition-[border-color,box-shadow,transform] duration-300"
     >
       <Link className="block" href={`/blog/${post.slug}`}>
         <div className="relative h-52 overflow-hidden bg-[#eef0f2]">
@@ -28,24 +28,24 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
         </div>
       </Link>
       <div className="p-6 sm:p-7">
-        <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#0f7a83]">
+        <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-brand-primary">
           {format(new Date(post.publishDate), "MMM d, yyyy")} /{" "}
           {post.readingMinutes} min read
         </p>
-        <h2 className="mt-4 text-[22px] font-semibold leading-tight text-[#0a1a2e]">
+        <h2 className="mt-4 text-[22px] font-semibold leading-tight text-foreground">
           <Link
-            className="transition hover:text-[#0f7a83]"
+            className="transition hover:text-brand-primary"
             href={`/blog/${post.slug}`}
           >
             {post.title}
           </Link>
         </h2>
-        <p className="mt-3 text-sm leading-6 text-[#56657a]">{post.excerpt}</p>
+        <p className="mt-3 text-sm leading-6 text-text-muted">{post.excerpt}</p>
         <div className="mt-4 flex flex-wrap gap-2">
           {post.tags.slice(0, 3).map((tag) => (
             <span
               key={tag}
-              className="rounded-md bg-[rgba(20,152,158,.08)] px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.06em] text-[#0f7a83]"
+              className="rounded-md bg-brand-accent/8 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.06em] text-brand-primary"
             >
               {tag}
             </span>
@@ -53,7 +53,7 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
         </div>
         <Link
           href={`/blog/${post.slug}`}
-          className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[#0f7a83] transition hover:text-[#0a1a2e]"
+          className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-brand-primary transition hover:text-foreground"
         >
           Read article <ArrowRight className="size-4" aria-hidden="true" />
         </Link>

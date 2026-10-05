@@ -23,7 +23,7 @@ export function SiteHeader() {
             width={128}
             height={57}
             decoding="async"
-            className="h-auto w-[59px]"
+            className="h-auto w-[59px] [filter:brightness(0)]"
           />
           <span className="hidden max-w-32 text-sm leading-tight font-semibold xl:block">
             Faithful Software Solutions

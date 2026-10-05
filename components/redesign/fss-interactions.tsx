@@ -96,9 +96,9 @@ function setRevealed(element: HTMLElement) {
 }
 
 function setChoiceState(button: HTMLElement, active: boolean) {
-  button.style.background = active ? "#0a1a2e" : "#f7f8f9";
-  button.style.borderColor = active ? "#0a1a2e" : "rgba(10,26,46,.14)";
-  button.style.color = active ? "#fff" : "#41506a";
+  button.style.background = active ? "#211b17" : "#f7f8f9";
+  button.style.borderColor = active ? "#211b17" : "rgba(33,27,23,.14)";
+  button.style.color = active ? "#fff" : "#514740";
 }
 
 function setFaqState(button: HTMLElement, open: boolean) {
@@ -113,8 +113,8 @@ function setFaqState(button: HTMLElement, open: boolean) {
   if (icon) {
     icon.textContent = open ? "-" : "+";
     icon.style.transform = open ? "rotate(180deg)" : "none";
-    icon.style.background = open ? "#0a1a2e" : "transparent";
-    icon.style.color = open ? "#fff" : "#0f7a83";
+    icon.style.background = open ? "#211b17" : "transparent";
+    icon.style.color = open ? "#fff" : "#a64224";
   }
 }
 
@@ -311,11 +311,11 @@ export function FssInteractions({
       bindHover(
         "[data-navlink]",
         (element) => {
-          element.style.color = "#0a1a2e";
-          element.style.background = "rgba(10,26,46,.05)";
+          element.style.color = "#211b17";
+          element.style.background = "rgba(33,27,23,.05)";
         },
         (element) => {
-          element.style.color = "#41506a";
+          element.style.color = "#554b45";
           element.style.background = "transparent";
         },
       );
@@ -323,11 +323,11 @@ export function FssInteractions({
         "[data-ghost]",
         (element) => {
           element.style.background = "#fff";
-          element.style.borderColor = "rgba(10,26,46,.28)";
+          element.style.borderColor = "rgba(33,27,23,.28)";
         },
         (element) => {
           element.style.background = "rgba(255,255,255,.7)";
-          element.style.borderColor = "rgba(10,26,46,.14)";
+          element.style.borderColor = "rgba(33,27,23,.14)";
         },
       );
       bindHover(
@@ -343,17 +343,17 @@ export function FssInteractions({
       bindHover(
         "[data-foot]",
         (element) => {
-          element.style.color = "#46c7d8";
+          element.style.color = "#e6a07f";
         },
         (element) => {
-          element.style.color = "#9fb1c6";
+          element.style.color = "#d8cdc4";
         },
       );
       bindHover(
         "[data-lift]",
         (element) => {
           element.style.transform = "translateY(-5px)";
-          element.style.boxShadow = "0 24px 48px -28px rgba(10,26,46,.4)";
+          element.style.boxShadow = "0 24px 48px -28px rgba(33,27,23,.4)";
         },
         (element) => {
           element.style.transform = "none";
@@ -365,12 +365,12 @@ export function FssInteractions({
         "[data-lift-light]",
         (element) => {
           element.style.transform = "translateY(-5px)";
-          element.style.borderColor = "rgba(20,152,158,.4)";
-          element.style.boxShadow = "0 26px 50px -30px rgba(10,26,46,.35)";
+          element.style.borderColor = "rgba(181,89,55,.4)";
+          element.style.boxShadow = "0 26px 50px -30px rgba(33,27,23,.35)";
         },
         (element) => {
           element.style.transform = "none";
-          element.style.borderColor = "rgba(10,26,46,.08)";
+          element.style.borderColor = "rgba(33,27,23,.08)";
           element.style.boxShadow = "none";
         },
       );
@@ -378,17 +378,17 @@ export function FssInteractions({
         "[data-chip]",
         (element) => {
           element.style.transform = "translateY(-3px)";
-          element.style.borderColor = "rgba(20,152,158,.35)";
+          element.style.borderColor = "rgba(181,89,55,.35)";
         },
         (element) => {
           element.style.transform = "none";
-          element.style.borderColor = "rgba(10,26,46,.1)";
+          element.style.borderColor = "rgba(33,27,23,.1)";
         },
       );
       bindHover(
         ".fss-card",
         (element) => {
-          element.style.borderColor = "rgba(70,199,216,.4)";
+          element.style.borderColor = "rgba(230,160,127,.4)";
         },
         (element) => {
           element.style.borderColor =
@@ -420,7 +420,7 @@ export function FssInteractions({
           (event) => {
             const mouse = event as MouseEvent;
             const rect = card.getBoundingClientRect();
-            glow.style.background = `radial-gradient(220px circle at ${mouse.clientX - rect.left}px ${mouse.clientY - rect.top}px, rgba(70,199,216,.16), transparent 68%)`;
+            glow.style.background = `radial-gradient(220px circle at ${mouse.clientX - rect.left}px ${mouse.clientY - rect.top}px, rgba(230,160,127,.16), transparent 68%)`;
           },
           cleanups,
         );
@@ -552,8 +552,8 @@ export function FssInteractions({
             const nearMouse =
               Math.hypot(point.x - mouse.x, point.y - mouse.y) < 150;
             context.fillStyle = nearMouse
-              ? "rgba(15,122,131,.85)"
-              : "rgba(20,152,158,.32)";
+              ? "rgba(166,66,36,.85)"
+              : "rgba(181,89,55,.32)";
             context.beginPath();
             context.arc(
               point.x,
@@ -779,7 +779,7 @@ export function FssInteractions({
           feature.style.opacity = active ? "1" : "0.4";
           const number = feature.children[0];
           if (number instanceof HTMLElement)
-            number.style.color = active ? "#0f7a83" : "#9fb1c6";
+            number.style.color = active ? "#a64224" : "#d8cdc4";
         });
       }
     };
@@ -813,11 +813,9 @@ export function FssInteractions({
 
         const active =
           step.getBoundingClientRect().top < window.innerHeight * 0.62;
-        dot.style.borderColor = active ? "#14989e" : "rgba(255,255,255,.2)";
-        dot.style.boxShadow = active
-          ? "0 0 0 5px rgba(20,152,158,.18)"
-          : "none";
-        dot.style.background = active ? "#14989e" : "#0a1a2e";
+        dot.style.borderColor = active ? "#b55937" : "rgba(255,255,255,.2)";
+        dot.style.boxShadow = active ? "0 0 0 5px rgba(181,89,55,.18)" : "none";
+        dot.style.background = active ? "#b55937" : "#211b17";
       });
     };
 
@@ -837,10 +835,10 @@ export function FssInteractions({
           ? "rgba(242,243,245,.82)"
           : "rgba(242,243,245,.55)";
         header.style.borderBottomColor = scrolled
-          ? "rgba(10,26,46,.08)"
+          ? "rgba(33,27,23,.08)"
           : "transparent";
         header.style.boxShadow = scrolled
-          ? "0 10px 30px -22px rgba(10,26,46,.35)"
+          ? "0 10px 30px -22px rgba(33,27,23,.35)"
           : "none";
       };
 
@@ -912,9 +910,9 @@ export function FssInteractions({
           field,
           "focus",
           () => {
-            field.style.borderColor = "#14989e";
+            field.style.borderColor = "#b55937";
             field.style.background = "#fff";
-            field.style.boxShadow = "0 0 0 4px rgba(20,152,158,.12)";
+            field.style.boxShadow = "0 0 0 4px rgba(181,89,55,.12)";
           },
           cleanups,
         );
@@ -922,7 +920,7 @@ export function FssInteractions({
           field,
           "blur",
           () => {
-            field.style.borderColor = "rgba(10,26,46,.14)";
+            field.style.borderColor = "rgba(33,27,23,.14)";
             field.style.background = "#f7f8f9";
             field.style.boxShadow = "none";
           },

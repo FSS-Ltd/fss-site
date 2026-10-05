@@ -12,9 +12,9 @@ const homepageHtmlPath = path.join(projectRoot, ".next", "server", "app", "index
 const budgets = {
   maxJsRawBytes: 180 * 1024,
   maxJsGzipBytes: 65 * 1024,
-  // The homepage owns its FSS visual system. Keep it bounded without forcing
-  // that server-rendered brand expression into a client-side dependency.
-  maxCssRawBytes: 66 * 1024,
+  // The public palette adds small, shared colour utilities while the gzip
+  // limit continues to bound the delivered stylesheet size.
+  maxCssRawBytes: 72 * 1024,
   maxCssGzipBytes: 15 * 1024,
 };
 

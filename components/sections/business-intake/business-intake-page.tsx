@@ -40,21 +40,21 @@ export function BusinessIntakePage() {
           className="pointer-events-none absolute inset-0 h-full w-full opacity-70"
           aria-hidden="true"
         />
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(10,26,46,.026)_1px,transparent_1px),linear-gradient(90deg,rgba(10,26,46,.026)_1px,transparent_1px)] bg-[length:64px_64px] [mask-image:radial-gradient(120%_90%_at_42%_12%,#000,transparent_76%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(33,27,23,.026)_1px,transparent_1px),linear-gradient(90deg,rgba(33,27,23,.026)_1px,transparent_1px)] bg-[length:64px_64px] [mask-image:radial-gradient(120%_90%_at_42%_12%,#000,transparent_76%)]" />
         <div
           className="relative mx-auto max-w-[760px] text-center"
           data-motion-reveal="mask"
         >
-          <div className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-[rgba(10,26,46,.12)] bg-white/60 py-1.5 pr-3.5 pl-2.5">
-            <span className="h-2 w-2 rounded-full bg-[#14989e] shadow-[0_0_0_4px_rgba(20,152,158,.18)]" />
-            <span className="font-mono text-[11px] font-medium tracking-[0.12em] text-[#41506a]">
+          <div className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-border-soft bg-white/60 py-1.5 pr-3.5 pl-2.5">
+            <span className="h-2 w-2 rounded-full bg-brand-accent shadow-[0_0_0_4px_rgba(181,89,55,.18)]" />
+            <span className="font-mono text-[11px] font-medium tracking-[0.12em] text-text-muted">
               BUSINESS IDEA REVIEW
             </span>
           </div>
-          <h1 className="text-[clamp(36px,5.5vw,58px)] leading-[1.03] font-bold text-[#0a1a2e]">
+          <h1 className="text-[clamp(36px,5.5vw,58px)] leading-[1.03] font-bold text-foreground">
             Tell us about your idea. We&apos;ll tell you what to build first.
           </h1>
-          <p className="mx-auto mt-6 max-w-[560px] text-[clamp(16px,1.6vw,19px)] leading-[1.6] text-[#46566c]">
+          <p className="mx-auto mt-6 max-w-[560px] text-[clamp(16px,1.6vw,19px)] leading-[1.6] text-text-muted">
             Answer a few questions about your idea, your goals, and the evidence
             you have so far. We&apos;ll review it and tell you whether the right
             first move is a website, an app, or building an audience before you
@@ -77,10 +77,10 @@ export function BusinessIntakePage() {
         </div>
       </section>
 
-      <section className="bg-[#0a1a2e] px-7 py-[clamp(80px,10vw,130px)] text-[#e9eef5]">
+      <section className="bg-brand-secondary px-7 py-[clamp(80px,10vw,130px)] text-[#e9eef5]">
         <div className="mx-auto grid max-w-[1180px] gap-10 lg:grid-cols-[.9fr_1.1fr] lg:items-start">
           <div data-motion-reveal="left">
-            <p className="font-mono text-xs tracking-[0.14em] text-[#46c7d8]">
+            <p className="font-mono text-xs tracking-[0.14em] text-[#e6a07f]">
               QUESTIONS
             </p>
             <h2 className="mt-4 text-[clamp(30px,4.4vw,52px)] leading-[1.04] font-semibold">
@@ -104,7 +104,7 @@ export function BusinessIntakePage() {
                   <h3 className="text-xl font-semibold text-[#fff]">
                     {faq.question}
                   </h3>
-                  <p className="mt-3 text-sm leading-6 text-[#9fb1c6]">
+                  <p className="mt-3 text-sm leading-6 text-[#c7b9ae]">
                     {faq.answer}
                   </p>
                 </div>
