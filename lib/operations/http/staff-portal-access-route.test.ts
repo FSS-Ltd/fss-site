@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { PortalAccessDenied } from "../auth/types";
+import { resolvePortalOrigin } from "../auth/configuration";
 import { createStaffPortalAccessRouteHandler } from "./staff-portal-access-route";
 
-const origin = "https://portal.example.test";
+const origin = resolvePortalOrigin({});
 
 test("rejects a forged origin before executing a Studio portal-access command", async () => {
   let called = false;
@@ -18,7 +20,7 @@ test("rejects a forged origin before executing a Studio portal-access command", 
     reportUnexpectedError: () => undefined,
   });
   const response = await handler(
-    new Request("https://portal.example.test/api/portal/admin/portal-access", {
+    new Request(`${origin}/api/portal/admin/portal-access`, {
       body: JSON.stringify({}),
       headers: {
         "content-type": "application/json",
@@ -41,7 +43,7 @@ test("returns only a narrow provider-safe invitation outcome", async () => {
     reportUnexpectedError: () => undefined,
   });
   const response = await handler(
-    new Request("https://portal.example.test/api/portal/admin/portal-access", {
+    new Request(`${origin}/api/portal/admin/portal-access`, {
       body: JSON.stringify({ action: "invite_existing_client" }),
       headers: { "content-type": "application/json", origin },
       method: "POST",
@@ -51,7 +53,6 @@ test("returns only a narrow provider-safe invitation outcome", async () => {
 });
 
 test("returns a permission error for founder-only commands without exposing details", async () => {
-  const { PortalAccessDenied } = await import("../auth/types");
   const handler = createStaffPortalAccessRouteHandler({
     authorize: async () => ({ id: "admin" }),
     createCorrelationId: () => "reference",
