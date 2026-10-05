@@ -11,6 +11,8 @@ export default defineConfig({
     },
   },
   outputDir: "output/playwright",
+  fullyParallel: true,
+  workers: process.env.CI ? 2 : undefined,
   projects: [
     {
       name: "fss-studio-desktop",
