@@ -255,7 +255,7 @@ test("access pages use ten rows and clamp a page emptied by deletion", async () 
   const registerSql =
     first.calls.find((sql) => sql.includes("with access as")) ?? "";
   assert.match(registerSql, /limit \?/);
-  assert.match(registerSql, /offset \(\(least\(/);
+  assert.match(registerSql, /offset \(select \(least\(/);
   assert.match(registerSql, /p\.state not in \('accepted', 'completed'\)/);
   assert.match(registerSql, /p\.dismissed_at is null/);
 

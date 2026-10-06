@@ -127,10 +127,13 @@ test("reviewed operator scopes provisioning, creates claimable invitations and r
       "decline_token",
     );
     assert.match(declineToken ?? "", /^[A-Za-z0-9_-]{43}$/);
+    const retryMetadata = retryProvision?.metadata;
+    if (retryMetadata?.version !== 2)
+      throw new Error("Expected a client invitation with an exact ID");
     const [storedToken] = await admin<{ declineTokenHash: string }[]>`
       select decline_token_hash as "declineTokenHash"
       from operations.pending_portal_invitations
-      where email=${retryEmail}
+      where id=${retryMetadata.invitationId}
     `;
     assert.equal(
       storedToken.declineTokenHash,
