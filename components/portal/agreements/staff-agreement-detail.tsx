@@ -186,7 +186,14 @@ export function StaffAgreementDetail({
                 successRedirect={signingSuccessRedirect}
               />
             </PortalCard>
-          ) : null}
+          ) : (
+            <Notice tone="info">
+              <p>
+                Electronic signing is unavailable until the signing feature is
+                configured.
+              </p>
+            </Notice>
+          )}
           <PortalCard
             description="Use this only when retained manual evidence is available for every required signer. The server checks its fingerprints against this exact source; this path does not represent provider verification."
             title="Manual evidence"

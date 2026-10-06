@@ -15,8 +15,10 @@ require.extensions[".css"] = (module) => {
   };
 };
 
-const { StaffAgreementDetail } = require("./staff-agreement-detail") as typeof import("./staff-agreement-detail");
-const { AppRouterContext } = require("next/dist/shared/lib/app-router-context.shared-runtime") as typeof import("next/dist/shared/lib/app-router-context.shared-runtime");
+const { StaffAgreementDetail } =
+  require("./staff-agreement-detail") as typeof import("./staff-agreement-detail");
+const { AppRouterContext } =
+  require("next/dist/shared/lib/app-router-context.shared-runtime") as typeof import("next/dist/shared/lib/app-router-context.shared-runtime");
 
 const router: AppRouterInstance = {
   back: () => undefined,
@@ -110,4 +112,17 @@ test("gives an unsigned Studio agreement the authenticated signing preparation c
   assert.match(html, /Prepare signing document/);
   assert.match(html, /Prepare a frozen PDF from this revision/);
   assert.doesNotMatch(html, /Both signatures are complete/);
+});
+
+test("explains when signing is unavailable without offering a failing command", () => {
+  const html = renderDetail(
+    <StaffAgreementDetail
+      organisationId={completedApproval.organisationId}
+      record={{ ...record, status: "draft", version: 2 }}
+    />,
+  );
+
+  assert.match(html, /Electronic signing is unavailable/);
+  assert.doesNotMatch(html, /Prepare signing document/);
+  assert.match(html, /Record signed evidence/);
 });

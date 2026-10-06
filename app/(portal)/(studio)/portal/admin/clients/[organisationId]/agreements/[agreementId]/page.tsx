@@ -11,6 +11,7 @@ import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import { getStaffAgreement } from "@/lib/operations/agreements/repository";
+import { signingEnabled } from "@/lib/operations/agreements/signing-worker";
 import { listStaffSigning } from "@/lib/operations/agreements/signing-service";
 import type { SigningApproval } from "@/lib/operations/agreements/signing-types";
 import type { AgreementRecord } from "@/lib/operations/agreements/types";
@@ -64,6 +65,7 @@ export default async function StaffAgreementPage({
   const workspaceHref = portalPath(
     `/portal/admin/clients/${organisationId.data}/agreements`,
   );
+  const signingAvailable = signingEnabled();
   return (
     <div className={styles.page}>
       <PageHeader
@@ -78,16 +80,22 @@ export default async function StaffAgreementPage({
       <StaffAgreementDetail
         organisationId={organisationId.data}
         record={record}
-        signingCommandEndpoint={`/api/portal/admin/clients/${organisationId.data}/signing`}
+        signingCommandEndpoint={
+          signingAvailable
+            ? `/api/portal/admin/clients/${organisationId.data}/signing`
+            : undefined
+        }
         signingApproval={signingApproval}
         signingDownloadBase={
-          signingApproval
+          signingAvailable && signingApproval
             ? `/api/portal/admin/clients/${organisationId.data}/signing/${signingApproval.id}`
             : undefined
         }
-        signingSuccessRedirect={portalPath(
-          `/portal/admin/clients/${organisationId.data}/signing`,
-        )}
+        signingSuccessRedirect={
+          signingAvailable
+            ? portalPath(`/portal/admin/clients/${organisationId.data}/signing`)
+            : undefined
+        }
       />
     </div>
   );
