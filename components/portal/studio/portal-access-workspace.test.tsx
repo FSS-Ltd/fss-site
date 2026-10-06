@@ -77,6 +77,7 @@ test("renders client access controls without leaking provider activation URLs", 
         page: 1,
         query: "",
         state: null,
+        totalPages: 1,
       }}
     />,
   );
@@ -105,6 +106,7 @@ test("empty founder dashboard offers scoped invitations and hides removal contro
         page: 1,
         query: "",
         state: null,
+        totalPages: 1,
         view: "staff",
         canManageStaff: true,
         metrics: {
@@ -133,6 +135,7 @@ test("client invitation stays available when there are no contacts", () => {
         page: 1,
         query: "",
         state: null,
+        totalPages: 1,
         view: "clients",
         canManageStaff: false,
         metrics: {
@@ -161,6 +164,7 @@ test("filtered empty dashboard preserves filters, page and independent totals", 
         page: 2,
         query: "nobody",
         state: "expired",
+        totalPages: 3,
         view: "invitations",
         canManageStaff: false,
         metrics: {
@@ -175,6 +179,10 @@ test("filtered empty dashboard preserves filters, page and independent totals", 
   assert.match(html, /No matching people/);
   assert.match(html, /Clear filters/);
   assert.match(html, /Page 2/);
+  assert.match(html, /Page 2 of 3/);
+  assert.match(html, /page=1&amp;view=invitations/);
+  assert.match(html, /page=3&amp;view=invitations/);
+  assert.match(html, /page=1&amp;view=clients/);
   assert.match(html, /view=invitations/);
   assert.match(html, /state=expired/);
   assert.match(html, /value="nobody"/);

@@ -7,7 +7,12 @@ const ownerInviteRoles = ["contributor", "billing_contact", "viewer"] as const;
 
 export const ownerInvitationSchema = z.strictObject({
   name: z.string().trim().min(1).max(200),
-  email: z.string().trim().email().max(254).transform((email) => email.toLowerCase()),
+  email: z
+    .string()
+    .trim()
+    .email()
+    .max(254)
+    .transform((email) => email.toLowerCase()),
   role: z.enum(ownerInviteRoles),
 });
 
@@ -20,15 +25,30 @@ export async function issueOwnerInvitation(
   input: unknown,
   invitationId: string,
   correlationId: string,
+  declineTokenHash?: string,
 ): Promise<void> {
   const invitation = ownerInvitationSchema.parse(input);
-  const ids = z.strictObject({ organisationId: z.uuid(), invitationId: z.uuid(), correlationId: z.uuid() }).parse({ organisationId, invitationId, correlationId });
-  await withVerifiedPortalIdentity(db, identity, ids.correlationId, async (tx) => {
-    await tx`select operations.issue_owner_portal_invitation(
+  const ids = z
+    .strictObject({
+      organisationId: z.uuid(),
+      invitationId: z.uuid(),
+      correlationId: z.uuid(),
+    })
+    .parse({ organisationId, invitationId, correlationId });
+  await withVerifiedPortalIdentity(
+    db,
+    identity,
+    ids.correlationId,
+    async (tx) => {
+      await tx`select operations.issue_owner_portal_invitation(
       ${ids.invitationId}, ${invitation.name}, ${invitation.email}, ${invitation.role},
       ${ids.organisationId}, ${ids.correlationId}
     )`;
-  });
+      if (declineTokenHash) {
+        await tx`select operations.attach_portal_decline_token(${ids.invitationId}, ${declineTokenHash}, ${ids.correlationId})`;
+      }
+    },
+  );
 }
 
 export async function failOwnerInvitation(

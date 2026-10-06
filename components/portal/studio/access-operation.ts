@@ -22,7 +22,12 @@ export async function sendAccessOperation(
         : "The access outcome could not be confirmed. Refresh before trying again.";
     throw new Error(message);
   }
-  const expected = operation.action.startsWith("revoke_") ? "revoked" : "sent";
+  const expected =
+    operation.action === "delete_invitation"
+      ? "deleted"
+      : operation.action.startsWith("revoke_")
+        ? "revoked"
+        : "sent";
   if (
     !body ||
     typeof body !== "object" ||

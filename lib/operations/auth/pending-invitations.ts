@@ -47,6 +47,7 @@ export async function issuePendingPortalInvitation(
   input: unknown,
   invitationId: string,
   correlationId: string,
+  declineTokenHash?: string,
 ): Promise<{ invitationId: string; expiresAt: Date }> {
   const founder = requireOperationsFounder(context);
   const invitation = z
@@ -66,6 +67,9 @@ export async function issuePendingPortalInvitation(
       )
     `;
     if (!row) throw new Error("Portal invitation could not be recorded.");
+    if (declineTokenHash) {
+      await tx`select operations.attach_portal_decline_token(${ids.invitationId}, ${declineTokenHash}, ${ids.correlationId})`;
+    }
     return { value: row };
   });
   return { invitationId: result.value.id, expiresAt: result.value.expiresAt };

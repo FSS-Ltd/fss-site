@@ -101,3 +101,17 @@ test("signed-out invitations do not render recipient email addresses", () => {
   );
   assert.match(html, /Create account and continue/);
 });
+
+test("only new client links offer a decline action without showing its bearer token", () => {
+  loaded = true;
+  signedIn = false;
+  query = `__clerk_ticket=fixture-ticket&decline_token=${"x".repeat(43)}`;
+  const html = renderToStaticMarkup(<PortalInvitationActivation />);
+  assert.match(html, /Decline invitation/);
+  assert.doesNotMatch(html, /x{43}/);
+  query = "__clerk_ticket=fixture-ticket";
+  assert.doesNotMatch(
+    renderToStaticMarkup(<PortalInvitationActivation />),
+    /Decline invitation/,
+  );
+});

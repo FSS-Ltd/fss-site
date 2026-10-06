@@ -114,6 +114,20 @@ export async function revokePendingClerkPortalInvitations(
   );
 }
 
+export async function revokePendingClerkInvitationById(
+  email: string,
+  invitationId: string,
+  realm: "portal" | "staff",
+  clientFactory: ClerkInvitationClientFactory = clerkClient,
+): Promise<void> {
+  await reconcilePendingInvitations(
+    email,
+    [z.uuid().parse(invitationId)],
+    realm === "staff" ? isStaffInvitationForEmail : isPortalInvitationForEmail,
+    clientFactory,
+  );
+}
+
 async function reconcilePendingInvitations(
   email: string,
   claimedInvitationIds: readonly string[],

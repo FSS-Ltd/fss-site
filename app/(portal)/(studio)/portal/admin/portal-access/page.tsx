@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import { PortalAccessWorkspace } from "@/components/portal/studio/portal-access-workspace";
 import { portalAuthConfigured } from "@/lib/operations/auth/configuration";
@@ -10,6 +10,7 @@ import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import { listStudioPortalAccess } from "@/lib/operations/studio/portal-access";
 import { loadActiveStudioSettings } from "@/lib/operations/studio/settings";
 import { parseWorkspacePage } from "@/lib/operations/workspaces/pagination";
+import { accessPageHref } from "@/components/portal/studio/access-presentation";
 
 export const dynamic = "force-dynamic";
 
@@ -44,6 +45,8 @@ export default async function AdminPortalAccessPage({
     return { data, timezone: settings.timezone };
   })().catch(() => null);
   if (!result) return <PortalUnavailable />;
+  if (params.page && parseWorkspacePage(params.page) !== result.data.page)
+    redirect(accessPageHref(result.data, result.data.page));
   return (
     <PortalAccessWorkspace data={result.data} timezone={result.timezone} />
   );

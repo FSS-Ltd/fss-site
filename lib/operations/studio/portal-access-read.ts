@@ -3,11 +3,6 @@ import type { FssAdminContext } from "../auth/staff-types";
 import { PortalAccessDenied, type VerifiedPortalIdentity } from "../auth/types";
 import { withFssAdminTransaction } from "../auth/staff-transaction";
 import type { OperationsDb } from "../db/client";
-import {
-  toWorkspaceCollectionPage,
-  workspacePageOffset,
-  workspacePageSize,
-} from "../workspaces/pagination";
 import { hasStudioFounderCapability } from "./access-capability";
 import {
   studioAccessListInputSchema,
@@ -24,6 +19,7 @@ function maskContactEmail(email: string): string {
 }
 
 type AccessRow = StudioPortalAccessEntry;
+const accessPageSize = 10;
 
 export async function listStudioPortalAccess(
   db: OperationsDb,
@@ -37,9 +33,8 @@ export async function listStudioPortalAccess(
     throw new PortalAccessDenied();
   const query = parsed.query ?? "";
   const state = parsed.state ?? null;
-  const offset = workspacePageOffset(parsed.page);
   return withFssAdminTransaction(db, admin, async (tx) => {
-    const [contacts, rows, metrics] = await Promise.all([
+    const [contacts, [register], metrics] = await Promise.all([
       tx<StudioPortalContact[]>`
         select c.id, c.organisation_id as "organisationId",
           o.display_name as "organisationName", c.name, c.email
@@ -49,8 +44,8 @@ export async function listStudioPortalAccess(
         order by o.display_name, c.name, c.email
         limit 200
       `,
-      tx<AccessRow[]>`
-        select * from (
+      tx<{ total: number; items: AccessRow[] }[]>`
+        with access as (
           select
             'membership:' || m.id as id, 'client'::text as "accessType", m.created_at::text as "joinedAt",
             o.id as "organisationId", o.display_name as "organisationName",
@@ -78,7 +73,8 @@ export async function listStudioPortalAccess(
           left join operations.organisations o on o.id = coalesce(p.target_organisation_id, p.organisation_id)
           left join operations.contacts c
             on c.organisation_id = coalesce(p.target_organisation_id, p.organisation_id) and lower(c.email) = lower(p.email)
-          where p.state <> 'completed'
+          where (${canManageStaff} or coalesce(p.target_organisation_id, p.organisation_id) is not null)
+            and p.state not in ('accepted', 'completed') and p.dismissed_at is null
           union all
           select
             'legacy-invitation:' || i.id, 'client', null::text, o.id, o.display_name,
@@ -93,15 +89,15 @@ export async function listStudioPortalAccess(
           from operations.portal_invites i
           join operations.contacts c on c.id = i.contact_id and c.organisation_id = i.organisation_id
           join operations.organisations o on o.id = i.organisation_id
-          where i.claimed_at is null
+          where i.claimed_at is null and i.dismissed_at is null
           union all
           select 'staff:' || s.id, 'admin', s.joined_at::text,
             null::uuid, 'FSS'::text, null::uuid, s.name, s.email, s.membership_id,
             'admin', s.state, s.invited_at::text, null::text, s.joined_at::text
           from operations.founder_staff_access_register() s
           where ${canManageStaff}
-        ) access
-        where (
+        ), filtered as (
+          select * from access where (
           (${parsed.view} = 'clients' and access."accessType" = 'client' and access."membershipId" is not null)
           or (${parsed.view} = 'staff' and access."accessType" = 'admin' and access."membershipId" is not null)
           or (${parsed.view} = 'invitations' and access."membershipId" is null)
@@ -112,13 +108,29 @@ export async function listStudioPortalAccess(
             or lower(concat_ws(' ', access.name, access.email, access."organisationName"))
               like '%' || lower(${query}) || '%'
           )
-        order by name, email, id
-        limit ${workspacePageSize + 1} offset ${offset}
+        ), totals as (
+          select count(*)::integer as total from filtered
+        ), paged as (
+          select filtered.* from filtered cross join totals
+          order by name, email, id
+          limit ${accessPageSize}
+          offset (select (least(${parsed.page}, greatest(1, ceil(total::numeric / ${accessPageSize})::integer)) - 1) * ${accessPageSize} from totals)
+        )
+        select totals.total, coalesce(
+          (select jsonb_agg(to_jsonb(paged) order by name, email, id) from paged),
+          '[]'::jsonb
+        ) as items from totals
       `,
       readAccessOverviewMetrics(tx, canManageStaff, true),
     ]);
+    const total = register?.total ?? 0;
+    const totalPages = Math.max(1, Math.ceil(total / accessPageSize));
+    const page = Math.min(parsed.page, totalPages);
     return {
-      ...toWorkspaceCollectionPage(rows, parsed.page),
+      items: register?.items ?? [],
+      page,
+      hasNext: page < totalPages,
+      totalPages,
       contacts: contacts.map((contact) => ({
         ...contact,
         email: maskContactEmail(contact.email),

@@ -3,6 +3,7 @@ type InvitationContext = Readonly<{
   name: string;
   email: string;
   clerkStatus: string | null;
+  declineToken?: string | null;
 }>;
 
 export async function switchInvitationAccount(
@@ -18,6 +19,8 @@ export async function switchInvitationAccount(
   if (invitation.email) query.set("email", invitation.email);
   if (invitation.clerkStatus)
     query.set("__clerk_status", invitation.clerkStatus);
+  if (invitation.declineToken)
+    query.set("decline_token", invitation.declineToken);
   // Suppress Clerk's same-route SPA navigation, which keeps pending form state.
   await signOut(() => undefined);
   reload(`${activationPath}?${query}`);

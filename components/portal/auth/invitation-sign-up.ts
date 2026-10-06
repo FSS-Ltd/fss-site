@@ -37,6 +37,7 @@ export function invitationAddressWithoutPersonalDetails(
   const params = new URLSearchParams(query);
   params.delete("name");
   params.delete("email");
+  params.delete("decline_token");
   return params.size ? `${path}?${params}` : path;
 }
 

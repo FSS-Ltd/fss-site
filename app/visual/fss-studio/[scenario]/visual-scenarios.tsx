@@ -4,6 +4,7 @@ import {
   StaffCommercialScenario,
 } from "./commercial-visual-fixtures";
 import { PortalLoginPresentation } from "@/components/portal/auth/login-presentation";
+import { PortalInvitationActivation } from "@/components/portal/auth/invitation-activation";
 import {
   ClientOverview,
   ClientWorkspaceChooser,
@@ -89,6 +90,7 @@ import {
   StudioJourneyBlockedScenario,
   StudioNotificationDeliveryScenario,
   StudioPortalAccessScenario,
+  StudioPortalAccessInvitationScenario,
   StudioProjectEditScenario,
   StudioSettingsScenario,
 } from "./studio-workspace-visual-fixtures";
@@ -106,6 +108,7 @@ export type VisualScenarioName =
   | "client-commercial-offer"
   | "staff-commercial-offer"
   | "client-login"
+  | "client-invitation-activation"
   | "client-overview"
   | "client-workspace-switcher"
   | "client-shell"
@@ -186,6 +189,7 @@ export type VisualScenarioName =
   | "studio-client-create"
   | "studio-billing-operations"
   | "studio-portal-access"
+  | "studio-portal-access-invitation"
   | "studio-notification-delivery"
   | "studio-settings"
   | "studio-project-edit"
@@ -711,6 +715,14 @@ const scenarios: Record<VisualScenarioName, VisualScenario> = {
   "studio-portal-access": {
     name: "studio-portal-access",
     content: <StudioPortalAccessScenario />,
+  },
+  "studio-portal-access-invitation": {
+    name: "studio-portal-access-invitation",
+    content: <StudioPortalAccessInvitationScenario />,
+  },
+  "client-invitation-activation": {
+    name: "client-invitation-activation",
+    content: <PortalInvitationActivation />,
   },
   "studio-notification-delivery": {
     name: "studio-notification-delivery",

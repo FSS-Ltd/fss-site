@@ -4,6 +4,7 @@ import { createPortalInvitationMetadata } from "./clerk-invitation";
 import {
   provisionPortalAccount,
   readPortalProvisionConfig,
+  revokePendingClerkInvitationById,
   revokePendingClerkStaffInvitations,
   toPortalProvisioningErrorReport,
 } from "./provision";
@@ -24,6 +25,54 @@ test("provisioning requires a dedicated server secret and enabled portal configu
   assert.throws(() =>
     readPortalProvisionConfig({ ...env, OPERATIONS_ENABLED: "false" }),
   );
+});
+
+test("single-invitation cleanup never revokes a different invitation for the same email", async () => {
+  const revoked: string[] = [];
+  await revokePendingClerkInvitationById(
+    "client@example.test",
+    "2e83e9c3-b021-4a55-b117-78c05b456c15",
+    "portal",
+    async () => ({
+      invitations: {
+        getInvitationList: async () => ({
+          data: [
+            {
+              id: "wrong-id",
+              emailAddress: "client@example.test",
+              publicMetadata: {
+                fssPortalInvitation: {
+                  version: 2,
+                  invitationId: "11111111-1111-4111-8111-111111111111",
+                  email: "client@example.test",
+                },
+              },
+            },
+            {
+              id: "exact-id",
+              emailAddress: "client@example.test",
+              publicMetadata: {
+                fssPortalInvitation: {
+                  version: 2,
+                  invitationId: "2e83e9c3-b021-4a55-b117-78c05b456c15",
+                  email: "client@example.test",
+                },
+              },
+            },
+            {
+              id: "missing-metadata",
+              emailAddress: "client@example.test",
+              publicMetadata: null,
+            },
+          ],
+        }),
+        revokeInvitation: async (id) => {
+          revoked.push(id);
+        },
+      },
+    }),
+  );
+  assert.deepEqual(revoked, ["exact-id"]);
 });
 test("provisioning creates a Clerk invitation with a fixed activation redirect", async () => {
   const inputs: unknown[] = [];

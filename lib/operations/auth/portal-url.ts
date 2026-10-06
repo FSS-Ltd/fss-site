@@ -42,9 +42,11 @@ export function createInvitationActivationUrl(
   origin: string,
   name: string,
   email: string,
+  declineToken?: string,
 ): URL {
   const url = portalUrl("/activate", origin);
   url.searchParams.set("name", name);
   url.searchParams.set("email", email);
+  if (declineToken) url.searchParams.set("decline_token", declineToken);
   return url;
 }

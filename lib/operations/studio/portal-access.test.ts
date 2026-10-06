@@ -60,18 +60,23 @@ test("lists tenant-scoped client memberships and invitations after a Staff reche
     ],
     [
       {
-        contactId: "44444444-4444-4444-8444-444444444444",
-        email: "alex@northstar.example",
-        expiresAt: null,
-        id: "membership:66666666-6666-4666-8666-666666666666",
-        invitedAt: "2026-09-20T10:00:00.000Z",
-        lastVerifiedAt: "2026-09-20T10:00:00.000Z",
-        membershipId: "66666666-6666-4666-8666-666666666666",
-        name: "Alex",
-        organisationId: "55555555-5555-4555-8555-555555555555",
-        organisationName: "Northstar",
-        role: "owner",
-        state: "active",
+        total: 1,
+        items: [
+          {
+            contactId: "44444444-4444-4444-8444-444444444444",
+            email: "alex@northstar.example",
+            expiresAt: null,
+            id: "membership:66666666-6666-4666-8666-666666666666",
+            invitedAt: "2026-09-20T10:00:00.000Z",
+            lastVerifiedAt: "2026-09-20T10:00:00.000Z",
+            membershipId: "66666666-6666-4666-8666-666666666666",
+            name: "Alex",
+            organisationId: "55555555-5555-4555-8555-555555555555",
+            organisationName: "Northstar",
+            role: "owner",
+            state: "active",
+          },
+        ],
       },
     ],
   ]);
@@ -80,6 +85,7 @@ test("lists tenant-scoped client memberships and invitations after a Staff reche
     query: "north",
   });
   assert.equal(result.items[0]?.state, "active");
+  assert.equal(result.totalPages, 1);
   assert.equal(result.contacts[0]?.email, "a***@northstar.example");
   assert.match(calls.join("\n"), /operations\.assert_active_staff_membership/);
 });
@@ -94,6 +100,14 @@ test("rejects invented roles and browser-supplied contact details", () => {
       organisationId: "55555555-5555-4555-8555-555555555555",
       reviewReference: "review",
       role: "admin",
+    }),
+  );
+  assert.throws(() =>
+    staffPortalAccessOperationSchema.parse({
+      action: "delete_invitation",
+      invitationId: "44444444-4444-4444-8444-444444444444",
+      kind: "client",
+      reviewReference: " ",
     }),
   );
 });
@@ -201,7 +215,7 @@ test("failed new-client delivery marks its audited invitation as failed", async 
 test("dashboard totals come from a full aggregate, not the visible page", async () => {
   const { db } = recordingDb([
     [],
-    [],
+    [{ total: 0, items: [] }],
     [
       {
         clientUsers: 41,
@@ -222,6 +236,37 @@ test("dashboard totals come from a full aggregate, not the visible page", async 
     attentionInvitations: 3,
   });
   assert.equal(Reflect.get(result, "canManageStaff"), false);
+});
+
+test("access pages use ten rows and clamp a page emptied by deletion", async () => {
+  const items = Array.from({ length: 10 }, (_, index) => ({
+    id: `client-invitation:${String(index).padStart(2, "0")}`,
+    state: "pending",
+  }));
+  const first = recordingDb([[], [{ total: 21, items }], []]);
+  const overview = await listStudioPortalAccess(first.db, admin, {
+    page: 2,
+    view: "invitations",
+  });
+  assert.equal(overview.items.length, 10);
+  assert.equal(overview.page, 2);
+  assert.equal(overview.totalPages, 3);
+  assert.equal(overview.hasNext, true);
+  const registerSql =
+    first.calls.find((sql) => sql.includes("with access as")) ?? "";
+  assert.match(registerSql, /limit \?/);
+  assert.match(registerSql, /offset \(\(least\(/);
+  assert.match(registerSql, /p\.state not in \('accepted', 'completed'\)/);
+  assert.match(registerSql, /p\.dismissed_at is null/);
+
+  const afterDelete = recordingDb([[], [{ total: 20, items }], []]);
+  const clamped = await listStudioPortalAccess(afterDelete.db, admin, {
+    page: 3,
+    view: "invitations",
+  });
+  assert.equal(clamped.page, 2);
+  assert.equal(clamped.totalPages, 2);
+  assert.equal(clamped.hasNext, false);
 });
 
 test("ordinary admins cannot read staff or issue staff invitations", async () => {
@@ -294,7 +339,7 @@ test("all views retain tenant-matched joins and full aggregate counts", async ()
   for (const view of ["clients", "invitations"] as const) {
     const { db, calls } = recordingDb([
       [],
-      [],
+      [{ total: 0, items: [] }],
       [
         {
           clientUsers: 100,
@@ -320,27 +365,10 @@ test("all views retain tenant-matched joins and full aggregate counts", async ()
   }
 });
 
-test("ordinary admins can review unscoped accepted invitations outside the pending total", async () => {
+test("accepted invitations leave the register without entering the pending total", async () => {
   const { db, calls, parameters } = recordingDb([
     [],
-    [
-      {
-        accessType: "client",
-        contactId: null,
-        email: "new-owner@example.test",
-        expiresAt: "2026-10-03T09:00:00.000Z",
-        id: "client-invitation:66666666-6666-4666-8666-666666666666",
-        invitedAt: "2026-10-02T09:00:00.000Z",
-        joinedAt: null,
-        lastVerifiedAt: null,
-        membershipId: null,
-        name: "New Owner",
-        organisationId: null,
-        organisationName: null,
-        role: "owner",
-        state: "accepted",
-      },
-    ],
+    [{ total: 0, items: [] }],
     [
       {
         clientUsers: 0,
@@ -354,11 +382,15 @@ test("ordinary admins can review unscoped accepted invitations outside the pendi
     page: 1,
     view: "invitations",
   });
-  assert.equal(result.items[0]?.state, "accepted");
+  assert.equal(result.items.length, 0);
   assert.equal(result.metrics.pendingInvitations, 0);
   const registerQuery =
     calls.find((sql) => sql.includes("client-invitation:")) ?? "";
-  assert.match(registerQuery, /p\.state <> 'completed'/);
+  assert.match(registerQuery, /p\.state not in \('accepted', 'completed'\)/);
+  assert.match(
+    registerQuery,
+    /coalesce\(p\.target_organisation_id, p\.organisation_id\) is not null/,
+  );
   const metricsQuery =
     calls.find((sql) => sql.includes("pending_access")) ?? "";
   assert.match(
