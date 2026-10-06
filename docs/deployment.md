@@ -6,8 +6,9 @@ GitHub validates changes and Vercel hosts preview and production deployments.
 
 - Feature work happens on feature branches.
 - Changes enter `main` through reviewed pull requests.
-- GitHub Actions runs the repository's lint, tests, coverage gate, build, and
-  Lighthouse checks.
+- GitHub Actions runs the repository's type check, lint, database-backed
+  coverage gates, migration policy check, dependency audit, build, and bundle
+  budget check. Lighthouse is available as a manual workflow.
 - Vercel creates an isolated preview deployment for each pull request.
 - A merge to `main` creates a Vercel production deployment.
 
@@ -46,12 +47,15 @@ variables from the environment matrix. Server-only names must never use a
 
 Before merging a production-affecting pull request:
 
-1. Confirm all required GitHub checks and the Vercel preview pass.
-2. Complete the Growth OS preview checklist when Growth OS code or provider
+1. Run `pnpm test:visual` locally before committing UI changes. Playwright
+   compares screenshots against baselines for the local operating system.
+2. Confirm the required GitHub CI check and Vercel preview pass. Run the manual
+   Lighthouse workflow when reviewing performance-sensitive changes.
+3. Complete the Growth OS preview checklist when Growth OS code or provider
    configuration changes.
-3. Keep `GROWTH_OS_AUTOMATIONS_ENABLED=false` until the provider rollout gates
+4. Keep `GROWTH_OS_AUTOMATIONS_ENABLED=false` until the provider rollout gates
    pass.
-4. Obtain Jean-Fidele's explicit approval for production deployment or domain
+5. Obtain Jean-Fidele's explicit approval for production deployment or domain
    changes.
 
 Use [`docs/runbooks/growth-os-rollback.md`](runbooks/growth-os-rollback.md) to

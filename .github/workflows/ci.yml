@@ -19,9 +19,6 @@ jobs:
   validate:
     name: Lint and Build
     runs-on: ubuntu-latest
-    # The Operations, Growth, and full visual suites run serially. Allow the
-    # visual regression check to complete after the data-backed suites rather
-    # than cancelling the validation job before it can upload failures.
     timeout-minutes: 35
     services:
       postgres:
@@ -58,20 +55,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
-      - name: Restore Playwright browser cache
-        id: playwright-cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
-
-      - name: Install Playwright system dependencies
-        run: pnpm exec playwright install-deps chromium
-
-      - name: Install Playwright Chromium
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install chromium
 
       - name: Restore Next.js build cache
         uses: actions/cache@v4
@@ -124,9 +107,6 @@ jobs:
       - name: Validate public redesign shell
         run: pnpm test:public-redesign
 
-      - name: Run FSS Studio visual comparisons
-        run: pnpm test:visual
-
       - name: Run lint
         run: pnpm lint
 
@@ -135,14 +115,6 @@ jobs:
 
       - name: Check homepage bundle budget
         run: pnpm perf:budget:homepage
-
-      - name: Upload FSS Studio visual artifacts
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: fss-studio-visual-artifacts
-          path: output/playwright
-          if-no-files-found: ignore
 
   migrate-production:
     name: Apply production migrations
