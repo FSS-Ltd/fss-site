@@ -47,8 +47,9 @@ variables from the environment matrix. Server-only names must never use a
 
 Before merging a production-affecting pull request:
 
-1. Run `pnpm test:visual` locally before committing UI changes. Playwright
-   compares screenshots against baselines for the local operating system.
+1. Install Chromium once with `pnpm exec playwright install chromium`, then run
+   `pnpm test:visual` locally before committing UI changes. Playwright compares
+   screenshots against baselines for the local operating system.
 2. Confirm the required GitHub CI check and Vercel preview pass. Run the manual
    Lighthouse workflow when reviewing performance-sensitive changes.
 3. Complete the Growth OS preview checklist when Growth OS code or provider
