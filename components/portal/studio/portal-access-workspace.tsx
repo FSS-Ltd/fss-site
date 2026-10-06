@@ -171,31 +171,35 @@ export function PortalAccessWorkspace({
           ))}
         </ul>
       )}
-      {data.page > 1 || data.hasNext ? (
-        <nav aria-label="Access register pages" className={styles.pagination}>
-          {data.page > 1 ? (
-            <PortalActionLink
-              href={accessPageHref(data, data.page - 1)}
-              variant="secondary"
-            >
-              Previous page
-            </PortalActionLink>
-          ) : (
-            <span />
-          )}
-          <span>Page {data.page}</span>
-          {data.hasNext ? (
-            <PortalActionLink
-              href={accessPageHref(data, data.page + 1)}
-              variant="secondary"
-            >
-              Next page
-            </PortalActionLink>
-          ) : (
-            <span />
-          )}
-        </nav>
-      ) : null}
+      <nav aria-label="Access register pages" className={styles.pagination}>
+        {data.page > 1 ? (
+          <PortalActionLink
+            href={accessPageHref(data, data.page - 1)}
+            variant="secondary"
+          >
+            Previous page
+          </PortalActionLink>
+        ) : (
+          <PortalButton disabled type="button" variant="secondary">
+            Previous page
+          </PortalButton>
+        )}
+        <span>
+          Page {data.page} of {data.totalPages}
+        </span>
+        {data.hasNext ? (
+          <PortalActionLink
+            href={accessPageHref(data, data.page + 1)}
+            variant="secondary"
+          >
+            Next page
+          </PortalActionLink>
+        ) : (
+          <PortalButton disabled type="button" variant="secondary">
+            Next page
+          </PortalButton>
+        )}
+      </nav>
     </section>
   );
 }

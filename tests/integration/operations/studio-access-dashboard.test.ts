@@ -115,8 +115,18 @@ test("Studio access SQL deduplicates the full dataset, keeps filters independent
       { page: 1, view: "clients", query: clientEmail },
       identity,
     );
-    assert.equal(full.items.length, 25);
+    assert.equal(full.items.length, 10);
+    assert.equal(full.totalPages, 3);
     assert.equal(full.hasNext, true);
+    const finalPage = await listStudioPortalAccess(
+      db,
+      admin,
+      { page: 3, view: "clients", query: clientEmail },
+      identity,
+    );
+    assert.equal(finalPage.items.length, 7);
+    assert.equal(finalPage.totalPages, 3);
+    assert.equal(finalPage.hasNext, false);
     assert.equal(
       full.metrics.activeClientUsers,
       baseline.metrics.activeClientUsers + 1,

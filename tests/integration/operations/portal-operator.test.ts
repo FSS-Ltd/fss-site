@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import test from "node:test";
 import postgres from "postgres";
 import { requireOperationsTestDatabaseUrl } from "../../../scripts/require-operations-database-env";
@@ -123,6 +123,24 @@ test("reviewed operator scopes provisioning, creates claimable invitations and r
       new URL(retryProvision?.redirectUrl).searchParams.get("email"),
       retryEmail,
     );
+    const declineToken = new URL(retryProvision?.redirectUrl).searchParams.get(
+      "decline_token",
+    );
+    assert.match(declineToken ?? "", /^[A-Za-z0-9_-]{43}$/);
+    const retryMetadata = retryProvision?.metadata;
+    if (retryMetadata?.version !== 2)
+      throw new Error("Expected a client invitation with an exact ID");
+    const [storedToken] = await admin<{ declineTokenHash: string }[]>`
+      select decline_token_hash as "declineTokenHash"
+      from operations.pending_portal_invitations
+      where id=${retryMetadata.invitationId}
+    `;
+    assert.equal(
+      storedToken.declineTokenHash,
+      createHash("sha256")
+        .update(declineToken ?? "")
+        .digest("hex"),
+    );
     assert.equal(retryProvision?.metadata?.email, retryEmail);
     const [retriedContact] = await admin<{ count: number }[]>`
       select count(*)::integer as count
@@ -171,14 +189,11 @@ test("reviewed operator scopes provisioning, creates claimable invitations and r
     assert.equal(issued.action, "issue_invite");
     if (issued.action !== "issue_invite")
       throw new Error("Unexpected operation result");
-    assert.deepEqual(provisioned, [
-      {
-        email: retryEmail,
-        redirectUrl: `https://portal.example.test/activate?name=Retry+Contact&email=${encodeURIComponent(retryEmail)}`,
-        metadata: retryProvision?.metadata,
-      },
-      { email, redirectUrl: "https://portal.example.test/activate" },
-    ]);
+    assert.equal(provisioned.length, 2);
+    assert.deepEqual(provisioned[1], {
+      email,
+      redirectUrl: "https://portal.example.test/activate",
+    });
     const activation = new URL(issued.activationUrl);
     assert.equal(activation.origin, "https://portal.example.test");
     assert.equal(activation.pathname, "/activate");

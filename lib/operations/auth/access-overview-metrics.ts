@@ -33,6 +33,7 @@ export async function readAccessOverviewMetrics(
           select lower(trim(p.email)) as email
           from operations.pending_portal_invitations p
           where p.state = 'pending' and p.expires_at > now()
+            and p.dismissed_at is null
             and (${includeUnscopedInvitations} or coalesce(p.target_organisation_id, p.organisation_id) is not null)
           union all
           select lower(trim(c.email))
@@ -40,6 +41,7 @@ export async function readAccessOverviewMetrics(
           join operations.contacts c on c.id = i.contact_id and c.organisation_id = i.organisation_id
           join operations.organisations o on o.id = i.organisation_id
           where i.claimed_at is null and i.revoked_at is null
+            and i.dismissed_at is null
             and i.expires_at > now() and o.lifecycle = 'active'
           union all
           select lower(trim(s.email))
@@ -49,13 +51,14 @@ export async function readAccessOverviewMetrics(
         , attention_access as (
           select lower(trim(p.email)) as email
           from operations.pending_portal_invitations p
-          where (p.state = 'provider_failed' or (p.state = 'pending' and p.expires_at <= now()))
+          where (p.state in ('provider_failed', 'declined') or (p.state = 'pending' and p.expires_at <= now()))
+            and p.dismissed_at is null
             and (${includeUnscopedInvitations} or coalesce(p.target_organisation_id, p.organisation_id) is not null)
           union all
           select lower(trim(c.email))
           from operations.portal_invites i
           join operations.contacts c on c.id = i.contact_id and c.organisation_id = i.organisation_id
-          where i.claimed_at is null and i.revoked_at is null and i.expires_at <= now()
+          where i.claimed_at is null and i.revoked_at is null and i.dismissed_at is null and i.expires_at <= now()
           union all
           select lower(trim(s.email)) from operations.founder_staff_access_register() s
           where ${includeStaff} and s.state in ('expired', 'provider_failed')

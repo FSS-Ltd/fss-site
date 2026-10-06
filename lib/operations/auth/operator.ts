@@ -33,6 +33,7 @@ import {
   revokeStaffMembershipSchema,
 } from "./staff-invitations";
 import { createInvitationActivationUrl, portalUrl } from "./portal-url";
+import { createDeclineToken } from "./decline-token";
 import { requireOperationsFounder } from "../organisations/link-engagement";
 
 export const grantAccessSchema = contactSchema.extend({
@@ -172,6 +173,7 @@ export async function applyPortalOperation(
   }
   if (action === "invite_client") {
     const invitation = inviteClientSchema.parse(operation);
+    const decline = createDeclineToken();
     const invitationId = dependencies.createId();
     const correlationId = dependencies.createId();
     await dependencies.issuePending(
@@ -185,11 +187,13 @@ export async function applyPortalOperation(
       },
       invitationId,
       correlationId,
+      decline.hash,
     );
     const url = createInvitationActivationUrl(
       origin,
       invitation.name,
       invitation.email,
+      decline.token,
     );
     try {
       await provision(
@@ -212,6 +216,7 @@ export async function applyPortalOperation(
         ? grantAccessSchema.parse(operation)
         : inviteExistingClientSchema.parse(operation);
     const invitationId = dependencies.createId();
+    const decline = createDeclineToken();
     const correlationId = dependencies.createId();
     await dependencies.issuePending(
       db,
@@ -225,12 +230,17 @@ export async function applyPortalOperation(
       },
       invitationId,
       correlationId,
+      decline.hash,
     );
     try {
       await provision(
         invitation.email,
-        createInvitationActivationUrl(origin, invitation.name, invitation.email)
-          .href,
+        createInvitationActivationUrl(
+          origin,
+          invitation.name,
+          invitation.email,
+          decline.token,
+        ).href,
         createPortalInvitationMetadata({
           invitationId,
           email: invitation.email,

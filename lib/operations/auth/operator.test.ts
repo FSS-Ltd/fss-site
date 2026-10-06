@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import test from "node:test";
 import type { OperationsDb } from "../db/client";
 import { applyPortalOperation, portalOperationSchema } from "./operator";
@@ -44,8 +44,13 @@ test("existing-client invitations require an organisation and keep the selected 
 
 test("client invitation records the pending grant and sends organisation-free Clerk metadata", async () => {
   const invitationId = randomUUID();
-  const provisioned: unknown[] = [];
+  const provisioned: Array<{
+    email: string;
+    redirectUrl: string;
+    metadata: unknown;
+  }> = [];
   const issued: unknown[] = [];
+  let declineHash: string | undefined;
   const result = await applyPortalOperation(
     {} as OperationsDb,
     { actorId: "a".repeat(64) },
@@ -62,7 +67,15 @@ test("client invitation records the pending grant and sends organisation-free Cl
     },
     {
       createId: () => invitationId,
-      issuePending: async (_db, _founder, input, id, correlationId) => {
+      issuePending: async (
+        _db,
+        _founder,
+        input,
+        id,
+        correlationId,
+        tokenHash,
+      ) => {
+        declineHash = tokenHash;
         issued.push({ input, id, correlationId });
         return {
           invitationId: id,
@@ -75,18 +88,27 @@ test("client invitation records the pending grant and sends organisation-free Cl
 
   assert.deepEqual(result, { action: "invite_client" });
   assert.equal(issued.length, 1);
-  assert.deepEqual(provisioned, [
-    {
-      email: "client@example.test",
-      redirectUrl:
-        "https://portal.example.test/activate?name=Client+Owner&email=client%40example.test",
-      metadata: {
-        version: 2,
-        invitationId,
-        email: "client@example.test",
-      },
-    },
-  ]);
+  assert.equal(provisioned.length, 1);
+  const delivery = provisioned[0];
+  assert.equal(delivery.email, "client@example.test");
+  assert.deepEqual(delivery.metadata, {
+    version: 2,
+    invitationId,
+    email: "client@example.test",
+  });
+  const redirect = new URL(delivery.redirectUrl);
+  assert.equal(redirect.origin, "https://portal.example.test");
+  assert.equal(redirect.pathname, "/activate");
+  assert.equal(redirect.searchParams.get("name"), "Client Owner");
+  assert.equal(redirect.searchParams.get("email"), "client@example.test");
+  const token = redirect.searchParams.get("decline_token");
+  assert.match(token ?? "", /^[A-Za-z0-9_-]{43}$/);
+  assert.equal(
+    declineHash,
+    createHash("sha256")
+      .update(token ?? "")
+      .digest("hex"),
+  );
 });
 
 test("Admin invitation rejects role or organisation and fixes staff metadata server-side", async () => {

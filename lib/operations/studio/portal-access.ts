@@ -16,6 +16,7 @@ import { withFssAdminTransaction } from "../auth/staff-transaction";
 import type { FssAdminContext } from "../auth/staff-types";
 import type { OperationsDb } from "../db/client";
 import type { WorkspaceCollectionPage } from "../workspaces/pagination";
+import { deleteStudioInvitation } from "./portal-invitation-delete";
 
 const accessStateSchema = z.enum([
   "active",
@@ -25,6 +26,7 @@ const accessStateSchema = z.enum([
   "expired",
   "provider_failed",
   "inactive",
+  "declined",
 ]);
 
 export const studioAccessListInputSchema = z.strictObject({
@@ -53,12 +55,20 @@ const revokeOperationSchema = z.strictObject({
   reviewReference: z.string().trim().min(1).max(200),
 });
 
+const deleteInvitationSchema = z.strictObject({
+  action: z.literal("delete_invitation"),
+  invitationId: z.uuid(),
+  kind: z.enum(["client", "staff", "legacy"]),
+  reviewReference: z.string().trim().min(1).max(200),
+});
+
 export const staffPortalAccessOperationSchema = z.discriminatedUnion("action", [
   inviteNewClientOperationSchema,
   inviteOperationSchema,
   revokeOperationSchema,
   staffInvitationSchema.extend({ action: z.literal("invite_admin") }),
   revokeStaffMembershipSchema.extend({ action: z.literal("revoke_admin") }),
+  deleteInvitationSchema,
 ]);
 
 export type StaffPortalAccessOperation = z.infer<
@@ -104,6 +114,7 @@ export type StudioPortalAccessOverview =
       }>;
       query: string;
       state: z.infer<typeof accessStateSchema> | null;
+      totalPages: number;
     }>;
 
 export { listStudioPortalAccess } from "./portal-access-read";
@@ -158,7 +169,7 @@ async function assertRevocableMembership(
 }
 
 export type StaffPortalAccessOutcome = Readonly<{
-  status: "sent" | "revoked";
+  status: "sent" | "revoked" | "deleted";
 }>;
 
 /**
@@ -175,6 +186,10 @@ export async function applyStaffPortalAccessOperation(
   identity?: VerifiedPortalIdentity | null,
 ): Promise<StaffPortalAccessOutcome> {
   const operation = staffPortalAccessOperationSchema.parse(raw);
+  if (operation.action === "delete_invitation") {
+    await deleteStudioInvitation(db, admin, identity, operation);
+    return { status: "deleted" };
+  }
   if (
     operation.action === "invite_admin" ||
     operation.action === "revoke_admin"

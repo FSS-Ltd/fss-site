@@ -27,7 +27,7 @@ import {
 import { isExpiredInvitationStatus } from "./invitation-state";
 
 type Status = {
-  kind: "idle" | "pending" | "error";
+  kind: "idle" | "pending" | "error" | "declined";
   message?: string;
 };
 
@@ -47,11 +47,13 @@ export function PortalInvitationActivation({
     name: searchParams.get("name") ?? "",
     email: searchParams.get("email") ?? "",
     clerkStatus: searchParams.get("__clerk_status"),
+    declineToken: searchParams.get("decline_token"),
   }));
   const { signOut } = useClerk();
   const { signUp, fetchStatus } = useSignUp();
   const { isLoaded, isSignedIn, user } = useUser();
   const [status, setStatus] = useState<Status>({ kind: "idle" });
+  const [confirmDecline, setConfirmDecline] = useState(false);
   const ticket = initialValues.ticket;
   const invitedEmail = initialValues.email.trim().toLowerCase();
   const accountSwitchRequired =
@@ -65,7 +67,7 @@ export function PortalInvitationActivation({
   );
 
   useEffect(() => {
-    if (initialValues.name || initialValues.email)
+    if (initialValues.name || initialValues.email || initialValues.declineToken)
       window.history.replaceState(
         {},
         "",
@@ -74,9 +76,38 @@ export function PortalInvitationActivation({
           window.location.search,
         ),
       );
-  }, [activationPath, initialValues.name, initialValues.email]);
+  }, [
+    activationPath,
+    initialValues.name,
+    initialValues.email,
+    initialValues.declineToken,
+  ]);
 
   if (invitationExpired) return <InvitationExpired loginHref={loginPath} />;
+
+  async function decline(): Promise<void> {
+    if (!initialValues.declineToken || status.kind === "pending") return;
+    setStatus({ kind: "pending" });
+    try {
+      const response = await fetch("/api/portal/access/decline", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ token: initialValues.declineToken }),
+      });
+      if (!response.ok)
+        throw new Error(
+          "The decline could not be confirmed. Try again or contact FSS.",
+        );
+      setStatus({ kind: "declined" });
+      setConfirmDecline(false);
+    } catch {
+      setStatus({
+        kind: "error",
+        message:
+          "The decline could not be confirmed. Try again or contact FSS.",
+      });
+    }
+  }
 
   async function switchAccount(): Promise<void> {
     if (!ticket || busy) return;
@@ -209,54 +240,60 @@ export function PortalInvitationActivation({
             ? "Continue to activate the access approved for this invitation."
             : "Confirm your name and choose a password to activate your workspace access."}
       </p>
-      <form onSubmit={submit} className={styles.form} aria-busy={busy}>
-        {!isSignedIn && (
-          <>
-            <PortalField label="Full name" required>
-              <input
-                autoComplete="name"
-                autoFocus
-                className={styles.input}
-                defaultValue={initialValues.name}
-                maxLength={200}
-                name="name"
-                disabled={busy}
-              />
-            </PortalField>
-            <PortalField label="Create a password" required>
-              <input
-                autoComplete="new-password"
-                className={styles.input}
-                minLength={8}
-                name="password"
-                type="password"
-                disabled={busy}
-              />
-            </PortalField>
-            <PortalField label="Confirm password" required>
-              <input
-                autoComplete="new-password"
-                className={styles.input}
-                minLength={8}
-                name="confirmation"
-                type="password"
-                disabled={busy}
-              />
-            </PortalField>
-          </>
-        )}
-        <PortalButton className={styles.button} loading={busy} type="submit">
-          <span>
-            {accountSwitchRequired
-              ? "Sign out and continue with invitation"
-              : isSignedIn
-                ? "Accept invitation and continue"
-                : "Create account and continue"}
-          </span>
-          <ArrowRight size={18} aria-hidden="true" />
-        </PortalButton>
-        <div id="clerk-captcha" />
-      </form>
+      {status.kind === "declined" ? (
+        <Notice tone="success">
+          You declined this invitation. FSS can follow up if needed.
+        </Notice>
+      ) : (
+        <form onSubmit={submit} className={styles.form} aria-busy={busy}>
+          {!isSignedIn && (
+            <>
+              <PortalField label="Full name" required>
+                <input
+                  autoComplete="name"
+                  autoFocus
+                  className={styles.input}
+                  defaultValue={initialValues.name}
+                  maxLength={200}
+                  name="name"
+                  disabled={busy}
+                />
+              </PortalField>
+              <PortalField label="Create a password" required>
+                <input
+                  autoComplete="new-password"
+                  className={styles.input}
+                  minLength={8}
+                  name="password"
+                  type="password"
+                  disabled={busy}
+                />
+              </PortalField>
+              <PortalField label="Confirm password" required>
+                <input
+                  autoComplete="new-password"
+                  className={styles.input}
+                  minLength={8}
+                  name="confirmation"
+                  type="password"
+                  disabled={busy}
+                />
+              </PortalField>
+            </>
+          )}
+          <PortalButton className={styles.button} loading={busy} type="submit">
+            <span>
+              {accountSwitchRequired
+                ? "Sign out and continue with invitation"
+                : isSignedIn
+                  ? "Accept invitation and continue"
+                  : "Create account and continue"}
+            </span>
+            <ArrowRight size={18} aria-hidden="true" />
+          </PortalButton>
+          <div id="clerk-captcha" />
+        </form>
+      )}
       <div aria-live="polite" aria-atomic="true">
         {status.kind === "error" && (
           <Notice tone="error">{status.message}</Notice>
@@ -266,6 +303,42 @@ export function PortalInvitationActivation({
         <LockKeyhole size={14} aria-hidden="true" /> Your role is set by FSS
         when this invitation is accepted.
       </p>
+      {initialValues.declineToken && status.kind !== "declined" ? (
+        <div className={styles.actions}>
+          {confirmDecline ? (
+            <>
+              <Notice tone="warning">
+                Declining will make this invitation unusable.
+              </Notice>
+              <PortalButton
+                disabled={status.kind === "pending"}
+                onClick={decline}
+                type="button"
+                variant="destructive"
+              >
+                Confirm decline
+              </PortalButton>
+              <PortalButton
+                disabled={status.kind === "pending"}
+                onClick={() => setConfirmDecline(false)}
+                type="button"
+                variant="secondary"
+              >
+                Keep invitation
+              </PortalButton>
+            </>
+          ) : (
+            <PortalButton
+              disabled={status.kind === "pending"}
+              onClick={() => setConfirmDecline(true)}
+              type="button"
+              variant="quiet"
+            >
+              Decline invitation
+            </PortalButton>
+          )}
+        </div>
+      ) : null}
       {isSignedIn && !accountSwitchRequired && (
         <p className={styles.actions}>
           <PortalButton

@@ -1,6 +1,7 @@
 import { PortalCard, StatusBadge } from "@/components/portal/ui";
 import type { StudioPortalAccessEntry } from "@/lib/operations/studio/portal-access";
 import { AccessDialog } from "./access-dialog";
+import { DeleteInvitationDialog } from "./delete-invitation-dialog";
 import {
   accessDate,
   accessRole,
@@ -49,6 +50,9 @@ export function AccessIdentityCard({
         <div className={styles.identityAction}>
           {removable ? (
             <AccessDialog entry={entry} kind="remove" onComplete={onComplete} />
+          ) : !entry.membershipId &&
+            (entry.accessType === "client" || canManageStaff) ? (
+            <DeleteInvitationDialog entry={entry} onComplete={onComplete} />
           ) : null}
         </div>
       </div>

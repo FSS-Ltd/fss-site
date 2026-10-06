@@ -166,6 +166,50 @@ export function StudioPortalAccessScenario(): React.JSX.Element {
           page: 1,
           query: "",
           state: null,
+          totalPages: 1,
+        }}
+      />
+    </StudioFixture>
+  );
+}
+
+export function StudioPortalAccessInvitationScenario(): React.JSX.Element {
+  return (
+    <StudioFixture>
+      <PortalAccessWorkspace
+        data={{
+          view: "invitations",
+          canManageStaff: false,
+          metrics: {
+            activeClientUsers: 0,
+            activeStaff: 0,
+            pendingInvitations: 1,
+            attentionInvitations: 0,
+          },
+          contacts: [],
+          hasNext: false,
+          items: [
+            {
+              accessType: "client",
+              joinedAt: null,
+              contactId: null,
+              email: "client@example.test",
+              expiresAt: "2026-10-09T10:00:00.000Z",
+              id: "client-invitation:2e83e9c3-b021-4a55-b117-78c05b456c15",
+              invitedAt: "2026-10-06T10:00:00.000Z",
+              lastVerifiedAt: null,
+              membershipId: null,
+              name: "Client Example",
+              organisationId: northstarId,
+              organisationName: "Northstar Studio",
+              role: "viewer",
+              state: "pending",
+            },
+          ],
+          page: 1,
+          query: "",
+          state: null,
+          totalPages: 1,
         }}
       />
     </StudioFixture>

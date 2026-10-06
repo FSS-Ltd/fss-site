@@ -164,6 +164,48 @@ test("removal has scoped review and busy controls prevent dismissal", async ({
   await expect(dialog).not.toBeVisible();
 });
 
+test("invitation deletion requires a review reference and restores keyboard focus", async ({
+  page,
+}) => {
+  await page.goto("/visual/fss-studio/studio-portal-access-invitation");
+  const trigger = page.getByRole("button", { name: "Delete invitation" });
+  await trigger.click();
+  const dialog = page.getByRole("dialog", { name: "Delete invitation" });
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toContainText("client@example.test");
+  await expect(
+    dialog.getByRole("button", { name: "Confirm deletion" }),
+  ).toBeVisible();
+  await dialog.getByRole("button", { name: "Confirm deletion" }).click();
+  await expect(dialog.getByLabel("Review reference")).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(dialog).not.toBeVisible();
+  await expect(trigger).toBeFocused();
+});
+
+test("client can decline from a new link without submitting account details", async ({
+  page,
+}) => {
+  const token = "a".repeat(43);
+  await page.route("**/api/portal/access/decline", async (route) => {
+    expect(route.request().postDataJSON()).toEqual({ token });
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ status: "declined" }),
+    });
+  });
+  await page.goto(
+    `/visual/fss-studio/client-invitation-activation?__clerk_ticket=fixture-ticket&decline_token=${token}`,
+  );
+  await expect(page).not.toHaveURL(/decline_token/);
+  await page
+    .getByRole("button", { name: "Decline invitation", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Confirm decline" }).click();
+  await expect(page.getByText("You declined this invitation.")).toBeVisible();
+});
+
 test("dashboard and dialogs reflow without horizontal overflow at enlarged text", async ({
   page,
 }) => {

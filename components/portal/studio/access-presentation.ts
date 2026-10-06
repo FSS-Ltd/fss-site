@@ -16,6 +16,7 @@ export const accessStateLabels: Record<
   provider_failed: "Delivery failed",
   revoked: "Revoked",
   inactive: "Client inactive",
+  declined: "Declined",
 };
 
 export function accessStateTone(
@@ -24,6 +25,7 @@ export function accessStateTone(
   if (state === "active") return "success";
   if (state === "pending" || state === "accepted") return "info";
   if (state === "expired" || state === "provider_failed") return "error";
+  if (state === "declined") return "warning";
   return state === "revoked" ? "neutral" : "warning";
 }
 
