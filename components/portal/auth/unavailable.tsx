@@ -1,5 +1,8 @@
 import { Notice, PageHeader, PortalActionLink } from "@/components/portal/ui";
 
+import { portalPath } from "@/lib/operations/auth/portal-url";
+import styles from "./recovery.module.css";
+
 export function PortalUnavailable({
   reference,
   retryHref,
@@ -8,19 +11,28 @@ export function PortalUnavailable({
   retryHref?: string;
 }): React.JSX.Element {
   return (
-    <div>
+    <div className={styles.page}>
       <PageHeader
-        description="Your work is safe. Try again in a moment."
+        description="Try again, or return to your workspace to continue."
         eyebrow="Client portal"
-        title="We couldn’t load your workspace"
+        title="We couldn’t load this page"
       />
       <Notice tone="error">
-        The portal is temporarily unavailable. If this continues, contact FSS
+        This page could not be loaded. If this continues, contact FSS
         {reference ? ` with reference ${reference}.` : "."}
       </Notice>
-      {retryHref ? (
-        <PortalActionLink href={retryHref}>Try again</PortalActionLink>
-      ) : null}
+      <div className={styles.actions}>
+        {retryHref ? (
+          <PortalActionLink href={retryHref}>Try again</PortalActionLink>
+        ) : (
+          <PortalActionLink href={portalPath("/portal")} variant="secondary">
+            Back to workspace
+          </PortalActionLink>
+        )}
+        <PortalActionLink href={portalPath("/portal/help")} variant="quiet">
+          Get help
+        </PortalActionLink>
+      </div>
     </div>
   );
 }

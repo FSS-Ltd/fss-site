@@ -18,6 +18,7 @@ import {
   nextOpenInvoice,
   toInvoiceSummary,
 } from "@/components/portal/billing/presentation";
+import { PortalFeatureUnavailable } from "@/components/portal/auth/feature-unavailable";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import { CollectionPagination } from "@/components/portal/workspace/collection-pagination";
 import { parseWorkspacePage } from "@/lib/operations/workspaces/pagination";
@@ -36,7 +37,13 @@ export default async function BillingPage({
   } catch {
     return <PortalUnavailable />;
   }
-  if (!configuration.enabled) return <PortalUnavailable />;
+  if (!configuration.enabled)
+    return (
+      <PortalFeatureUnavailable
+        feature="billing"
+        organisationId={context.organisationId}
+      />
+    );
   let data;
   try {
     const page = parseWorkspacePage(params.page);

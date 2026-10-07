@@ -15,6 +15,7 @@ import {
   listProjectDocuments,
   getAuthorisedDocumentDownload,
 } from "../../../lib/operations/documents/repository";
+import { listPortalWorkspaceDocuments } from "../../../lib/operations/workspaces/portal-repository";
 import { withPortalTransaction } from "../../../lib/operations/db/portal-client";
 import {
   createDeliveryFixture,
@@ -48,6 +49,14 @@ test("real portal role exposes only scoped public delivery metadata and rechecks
     );
   const read = (id: string) =>
     getPortalProject(portal, a.identity, a.organisationId, id, a.correlationId);
+  const workspaceDocuments = () =>
+    listPortalWorkspaceDocuments(
+      portal,
+      a.identity,
+      a.organisationId,
+      a.correlationId,
+      1,
+    );
   const documents = (id: string) =>
     listProjectDocuments(
       portal,
@@ -233,6 +242,10 @@ test("real portal role exposes only scoped public delivery metadata and rechecks
     assert.equal(await download(fileId), null);
     assert.equal(await documentDetail(fileId), null);
     assert.equal((await documents(project.id)).length, 1);
+    assert.deepEqual(
+      (await workspaceDocuments()).items.map((item) => item.id),
+      [linkId],
+    );
     await writeDocument({
       action: "update",
       documentId: fileId,
@@ -305,6 +318,12 @@ test("real portal role exposes only scoped public delivery metadata and rechecks
     );
     const listed = await documents(project.id);
     assert.equal(listed.length, 2);
+    const workspace = await workspaceDocuments();
+    assert.deepEqual(
+      new Set(workspace.items.map((item) => item.id)),
+      new Set([linkId, fileId]),
+    );
+    assert.equal(JSON.stringify(workspace).includes("objectKey"), false);
     assert.equal(JSON.stringify(listed).includes("objectKey"), false);
     assert.equal(JSON.stringify(listed).includes(metadata.contentHash), false);
     assert.equal(await download(linkId), null);
@@ -329,6 +348,35 @@ test("real portal role exposes only scoped public delivery metadata and rechecks
       null,
     );
     assert.deepEqual(await documents(other.id), []);
+    assert.deepEqual(
+      (
+        await listPortalWorkspaceDocuments(
+          portal,
+          b.identity,
+          b.organisationId,
+          b.correlationId,
+          1,
+        )
+      ).items,
+      [],
+    );
+    await withAgreementTransaction(founder, deliveryFounder, async (tx) => {
+      await tx`update operations.projects set visibility='internal' where id=${project.id}`;
+    });
+    assert.deepEqual((await workspaceDocuments()).items, []);
+    await withAgreementTransaction(founder, deliveryFounder, async (tx) => {
+      await tx`update operations.projects set visibility='client' where id=${project.id}`;
+    });
+    await withAgreementTransaction(founder, deliveryFounder, async (tx) => {
+      await tx`update operations.documents set visibility='internal' where id=${fileId}`;
+    });
+    assert.deepEqual(
+      (await workspaceDocuments()).items.map((item) => item.id),
+      [linkId],
+    );
+    await withAgreementTransaction(founder, deliveryFounder, async (tx) => {
+      await tx`update operations.documents set visibility='client' where id=${fileId}`;
+    });
     for (const role of ["owner", "contributor", "viewer"]) {
       await admin`update operations.memberships set role=${role} where organisation_id=${a.organisationId}`;
       assert.ok(await read(project.id));
@@ -337,6 +385,7 @@ test("real portal role exposes only scoped public delivery metadata and rechecks
     await admin`update operations.memberships set role='billing_contact' where organisation_id=${a.organisationId}`;
     await assert.rejects(read(project.id), /Portal access/);
     await assert.rejects(download(fileId), /Portal access/);
+    await assert.rejects(workspaceDocuments(), /Portal access/);
     await withPortalTransaction(
       portal,
       a.identity,
@@ -368,6 +417,7 @@ test("real portal role exposes only scoped public delivery metadata and rechecks
       reviewReference: "revoked",
     });
     assert.deepEqual(await documents(project.id), []);
+    assert.deepEqual((await workspaceDocuments()).items, []);
     assert.equal(await documentDetail(linkId), null);
     await assert.rejects(
       writeDocument({
@@ -387,9 +437,11 @@ test("real portal role exposes only scoped public delivery metadata and rechecks
     });
     assert.equal(await read(project.id), null);
     assert.deepEqual(await documents(project.id), []);
+    assert.deepEqual((await workspaceDocuments()).items, []);
     await admin`update operations.memberships set revoked_at=now() where organisation_id=${a.organisationId}`;
     await assert.rejects(read(project.id), /Portal access/);
     await assert.rejects(download(fileId), /Portal access/);
+    await assert.rejects(workspaceDocuments(), /Portal access/);
     assert.equal((await portal`select id from operations.projects`).length, 0);
     assert.equal((await portal`select id from operations.documents`).length, 0);
     const [audit] = await admin<

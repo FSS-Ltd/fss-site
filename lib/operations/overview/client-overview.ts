@@ -41,6 +41,7 @@ export type ClientOverviewNotification = Readonly<{
 }>;
 
 export type ClientOverview = Readonly<{
+  canReadAgreements?: boolean;
   checklist: ClientSetupChecklist | null;
   notifications: readonly ClientOverviewNotification[] | null;
   organisationId: string;
@@ -69,8 +70,9 @@ const setupItems: readonly Readonly<{
 }>[] = [
   {
     complete: "agreementSigned",
-    description: "Review and sign your agreement so delivery can continue.",
-    title: "Review your agreement",
+    description:
+      "Check agreements shared by FSS and see whether a signature is needed.",
+    title: "Check your agreement",
   },
   {
     complete: "billingReady",
@@ -125,7 +127,9 @@ export async function loadClientOverview(
       ? listPortalProjects(db, identity, organisationId, correlationId)
       : Promise.resolve(null),
     hasCapability(role, "requests.comment")
-      ? listPortalRequests(db, identity, organisationId, correlationId, { page: 1 })
+      ? listPortalRequests(db, identity, organisationId, correlationId, {
+          page: 1,
+        })
       : Promise.resolve(null),
     hasCapability(role, "notifications.read")
       ? listPortalNotifications(
@@ -143,29 +147,33 @@ export async function loadClientOverview(
   ]);
 
   return {
+    canReadAgreements: hasCapability(role, "agreements.read"),
     checklist,
-    notifications: notifications?.items.map((notification) => ({
-      body: notification.body,
-      id: notification.id,
-      requestId: notification.requestId,
-      title: notification.title,
-    })) ?? null,
+    notifications:
+      notifications?.items.map((notification) => ({
+        body: notification.body,
+        id: notification.id,
+        requestId: notification.requestId,
+        title: notification.title,
+      })) ?? null,
     organisationId,
-    projects: projects?.map((project) => ({
-      id: project.id,
-      status: project.status,
-      summary: project.summary,
-      targetDate: project.targetDate,
-      title: project.title,
-    })) ?? null,
-    requests: requests?.items.map((request) => ({
-      id: request.id,
-      nextAction: request.nextAction,
-      publicSummary: request.publicSummary,
-      status: request.status,
-      targetDate: request.targetDate,
-      title: request.title,
-    })) ?? null,
+    projects:
+      projects?.map((project) => ({
+        id: project.id,
+        status: project.status,
+        summary: project.summary,
+        targetDate: project.targetDate,
+        title: project.title,
+      })) ?? null,
+    requests:
+      requests?.items.map((request) => ({
+        id: request.id,
+        nextAction: request.nextAction,
+        publicSummary: request.publicSummary,
+        status: request.status,
+        targetDate: request.targetDate,
+        title: request.title,
+      })) ?? null,
   };
 }
 
@@ -179,8 +187,13 @@ export function selectClientAttention(
     return {
       actionLabel: "Review update",
       description:
-        review.publicSummary || review.nextAction || "Review the latest delivery.",
-      href: organisationHref(`/portal/requests/${review.id}`, overview.organisationId),
+        review.publicSummary ||
+        review.nextAction ||
+        "Review the latest delivery.",
+      href: organisationHref(
+        `/portal/requests/${review.id}`,
+        overview.organisationId,
+      ),
       kind: "review",
       title: review.title,
     };
@@ -189,22 +202,34 @@ export function selectClientAttention(
   const setup = firstIncompleteSetupItem(overview.checklist);
   if (setup) {
     return {
-      actionLabel: "Continue setup",
+      actionLabel:
+        setup.complete === "agreementSigned" && overview.canReadAgreements
+          ? "View agreements"
+          : "Continue setup",
       description: setup.description,
-      href: organisationHref("/portal/getting-started", overview.organisationId),
+      href: organisationHref(
+        setup.complete === "agreementSigned" && overview.canReadAgreements
+          ? "/portal/agreements"
+          : "/portal/getting-started",
+        overview.organisationId,
+      ),
       kind: "setup",
       title: setup.title,
     };
   }
 
   const project = overview.projects?.find(
-    (candidate) => candidate.status !== "completed" && candidate.status !== "paused",
+    (candidate) =>
+      candidate.status !== "completed" && candidate.status !== "paused",
   );
   if (project) {
     return {
       actionLabel: "View project",
       description: project.summary,
-      href: organisationHref(`/portal/projects/${project.id}`, overview.organisationId),
+      href: organisationHref(
+        `/portal/projects/${project.id}`,
+        overview.organisationId,
+      ),
       kind: "project",
       title: project.title,
     };
@@ -240,9 +265,11 @@ export function getClientOverviewSteps(
   ];
   const seen = new Set<string>();
 
-  return steps.filter((step) => {
-    if (seen.has(step.href)) return false;
-    seen.add(step.href);
-    return true;
-  }).slice(0, 3);
+  return steps
+    .filter((step) => {
+      if (seen.has(step.href)) return false;
+      seen.add(step.href);
+      return true;
+    })
+    .slice(0, 3);
 }

@@ -12,6 +12,7 @@ import { portalPath } from "@/lib/operations/auth/portal-url";
 import type { SigningApproval } from "@/lib/operations/agreements/signing-types";
 import {
   AgreementStatusCard,
+  toPortalAgreementStatus,
   hasCompleteSigningEvidence,
 } from "./presentation";
 import styles from "./agreements.module.css";
@@ -31,11 +32,20 @@ export function StaffAgreementDetail({
   signingDownloadBase?: string;
   signingSuccessRedirect?: string;
 }>): React.JSX.Element {
-  const completedSigning =
+  const currentApproval =
     signingApproval?.agreementId === record.id &&
-    signingApproval.revision === record.revision &&
-    hasCompleteSigningEvidence(signingApproval)
+    signingApproval.revision === record.revision
       ? signingApproval
+      : null;
+  const openApproval =
+    currentApproval &&
+    (currentApproval.status === "prepared" ||
+      currentApproval.status === "approved")
+      ? currentApproval
+      : null;
+  const completedSigning =
+    currentApproval && hasCompleteSigningEvidence(currentApproval)
+      ? currentApproval
       : null;
   const manualEvidence = record.status === "signed" && record.evidence !== null;
   const signed = manualEvidence || completedSigning !== null;
@@ -50,7 +60,13 @@ export function StaffAgreementDetail({
     <article className={styles.detail}>
       <div className={styles.detailStatus}>
         <StatusBadge status={signed ? "success" : "warning"}>
-          {signed ? "Signed" : "Draft"}
+          {signed
+            ? "Signed"
+            : openApproval?.status === "prepared"
+              ? "Ready to publish"
+              : openApproval?.status === "approved"
+                ? "Open for signing"
+                : "Draft"}
         </StatusBadge>
         <span>Revision {record.revision}</span>
       </div>
@@ -64,6 +80,30 @@ export function StaffAgreementDetail({
           <p>
             {evidenceLabel} is retained for this exact revision. Service
             activation remains a separate operational step.
+          </p>
+        </Notice>
+      ) : openApproval ? (
+        <Notice
+          tone="info"
+          action={
+            signingSuccessRedirect ? (
+              <PortalActionLink href={signingSuccessRedirect}>
+                {openApproval.status === "prepared"
+                  ? "Review and publish for signing"
+                  : "View signing progress"}
+              </PortalActionLink>
+            ) : undefined
+          }
+        >
+          <strong>
+            {openApproval.status === "prepared"
+              ? "Ready for your review."
+              : "Published for signing."}
+          </strong>
+          <p>
+            {openApproval.status === "prepared"
+              ? "Review the prepared PDF and named signers, then approve it to make it visible in the client portal."
+              : "The named signers can now open this agreement in their client portal. Publishing does not record a signature."}
           </p>
         </Notice>
       ) : (
@@ -170,8 +210,21 @@ export function StaffAgreementDetail({
           </dl>
         </PortalCard>
       ) : null}
-      <AgreementStatusCard status={signed ? "signed" : "draft"} />
-      {!signed ? (
+      {!openApproval ? (
+        <AgreementStatusCard
+          status={
+            signed
+              ? "signed"
+              : currentApproval
+                ? toPortalAgreementStatus({
+                    status: currentApproval.status,
+                    allRequiredSignaturesRecorded: false,
+                  })
+                : "draft"
+          }
+        />
+      ) : null}
+      {!signed && !openApproval ? (
         <>
           {signingCommandEndpoint && signingSuccessRedirect ? (
             <PortalCard

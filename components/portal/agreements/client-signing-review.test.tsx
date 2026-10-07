@@ -13,8 +13,10 @@ require.extensions[".css"] = (module) => {
   };
 };
 
-const { ClientSigningReview } = require("./client-signing-review") as typeof import("./client-signing-review");
-const { AppRouterContext } = require("next/dist/shared/lib/app-router-context.shared-runtime") as typeof import("next/dist/shared/lib/app-router-context.shared-runtime");
+const { ClientSigningReview } =
+  require("./client-signing-review") as typeof import("./client-signing-review");
+const { AppRouterContext } =
+  require("next/dist/shared/lib/app-router-context.shared-runtime") as typeof import("next/dist/shared/lib/app-router-context.shared-runtime");
 
 const router: AppRouterInstance = {
   back: () => undefined,
@@ -66,7 +68,8 @@ const approval: SigningApproval = {
     noticeDays: 30,
     requiredDepositPence: "120000",
     responsibilities: "Provide approved assets and one authorised reviewer.",
-    scope: "Five content pages, booking workflow, confirmation email and handover.",
+    scope:
+      "Five content pages, booking workflow, confirmation email and handover.",
     signatories: ["alex@northstar.example"],
     support: "Defect support is included.",
     taxTreatment: "Tax follows the agreement.",
@@ -124,6 +127,6 @@ test("does not render an open signing form after the signer has signed", () => {
     />,
   );
 
-  assert.match(html, /Your signature is already recorded/);
+  assert.match(html, /Preparing your signed agreement/);
   assert.doesNotMatch(html, /<button[^>]*>Sign agreement/);
 });

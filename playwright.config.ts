@@ -26,6 +26,7 @@ export default defineConfig({
   testDir: "tests/e2e",
   testMatch: [
     "agreement-builder.spec.ts",
+    "client-portal-recovery.spec.ts",
     "fss-studio.visual.spec.ts",
     "portal-access-workspace.spec.ts",
     "welcome-composer.spec.ts",

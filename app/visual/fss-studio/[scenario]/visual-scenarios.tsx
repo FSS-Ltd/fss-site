@@ -1,3 +1,4 @@
+import { ClientFeatureUnavailableScenario } from "./portal-recovery-visual-fixtures";
 import { StudioSavedAgreementDraftsScenario } from "./agreement-draft-visual-fixture";
 import {
   ClientCommercialScenario,
@@ -39,6 +40,7 @@ import {
   StudioRequestScopeScenario,
 } from "./request-completion-visual-fixtures";
 import {
+  StudioAgreementPreparedScenario,
   ClientAgreementDetailScenario,
   ClientAgreementListScenario,
   ClientAgreementSignedScenario,
@@ -105,6 +107,11 @@ import {
 } from "./active-route-visual-fixtures";
 
 export type VisualScenarioName =
+  | "client-agreement-empty"
+  | "client-agreement-recorded"
+  | "client-agreements-disabled"
+  | "client-billing-disabled"
+  | "studio-agreement-prepared"
   | "client-commercial-offer"
   | "staff-commercial-offer"
   | "client-login"
@@ -450,6 +457,26 @@ const scenarios: Record<VisualScenarioName, VisualScenario> = {
   "client-work-completed-email": {
     name: "client-work-completed-email",
     content: <ClientWorkCompletedEmailScenario />,
+  },
+  "client-agreement-empty": {
+    name: "client-agreement-empty",
+    content: <ClientAgreementListScenario state="empty" />,
+  },
+  "client-agreement-recorded": {
+    name: "client-agreement-recorded",
+    content: <ClientAgreementListScenario state="recorded" />,
+  },
+  "client-agreements-disabled": {
+    name: "client-agreements-disabled",
+    content: <ClientFeatureUnavailableScenario feature="agreements" />,
+  },
+  "client-billing-disabled": {
+    name: "client-billing-disabled",
+    content: <ClientFeatureUnavailableScenario feature="billing" />,
+  },
+  "studio-agreement-prepared": {
+    name: "studio-agreement-prepared",
+    content: <StudioAgreementPreparedScenario />,
   },
   "client-agreement-list": {
     name: "client-agreement-list",

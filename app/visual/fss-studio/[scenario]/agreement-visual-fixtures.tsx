@@ -172,12 +172,26 @@ function builderDraft(
   };
 }
 
-export function ClientAgreementListScenario(): React.JSX.Element {
+export function ClientAgreementListScenario({
+  state = "ready",
+}: Readonly<{ state?: "ready" | "empty" | "recorded" }>): React.JSX.Element {
   return (
     <ClientShell memberships={memberships}>
       <PageHeader eyebrow="FSS Studio / Agreements" title="Your agreements" />
       <ClientAgreementList
-        approvals={[approval]}
+        email="alex@northstar.example"
+        approvals={
+          state === "empty"
+            ? []
+            : state === "recorded"
+              ? [
+                  {
+                    ...approval,
+                    signatures: completedApproval.signatures.slice(0, 1),
+                  },
+                ]
+              : [approval]
+        }
         organisationId={organisationId}
       />
     </ClientShell>
@@ -350,6 +364,21 @@ export function StudioSigningStatusScenario(): React.JSX.Element {
       <StaffSigningStatus
         approval={approval}
         downloadBase={`/api/portal/admin/clients/${organisationId}/signing/${approvalId}`}
+      />
+    </StudioShell>
+  );
+}
+
+export function StudioAgreementPreparedScenario(): React.JSX.Element {
+  return (
+    <StudioShell>
+      <PageHeader title="Review your agreement" />
+      <StaffAgreementDetail
+        organisationId={organisationId}
+        record={{ ...signedRecord, status: "draft", evidence: null }}
+        signingApproval={{ ...approval, status: "prepared", approvedAt: null }}
+        signingSuccessRedirect={`/portal/admin/clients/${organisationId}/signing`}
+        signingCommandEndpoint={`/api/portal/admin/clients/${organisationId}/signing`}
       />
     </StudioShell>
   );

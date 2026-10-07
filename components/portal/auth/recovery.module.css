@@ -1,0 +1,11 @@
+.page {
+  display: grid;
+  gap: 24px;
+  max-width: 760px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}

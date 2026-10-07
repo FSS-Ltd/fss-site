@@ -10,6 +10,7 @@ import { totalLinePence } from "@/lib/operations/agreements/validation";
 import type { SigningApproval } from "@/lib/operations/agreements/signing-types";
 import {
   AgreementStatusCard,
+  clientSigningProgress,
   hasCompleteSigningEvidence,
   toPortalAgreementStatus,
 } from "./presentation";
@@ -107,8 +108,10 @@ function SigningRecord({
 function CompletionNotice({
   approval,
   ownSignature,
+  email,
 }: Readonly<{
   approval: SigningApproval;
+  email: string;
   ownSignature: SigningApproval["signatures"][number] | undefined;
 }>): React.JSX.Element | null {
   if (hasCompleteSigningEvidence(approval)) {
@@ -133,7 +136,18 @@ function CompletionNotice({
     );
   }
 
-  if (ownSignature) {
+  if (clientSigningProgress(approval, email) === "processing") {
+    return (
+      <Notice tone="info">
+        <strong>Preparing your signed agreement.</strong>
+        <p>
+          All required signatures are recorded. Your final copy will appear here
+          when processing is complete.
+        </p>
+      </Notice>
+    );
+  }
+  if (ownSignature && approval.status === "approved") {
     return (
       <Notice tone="info">
         <strong>
@@ -147,7 +161,7 @@ function CompletionNotice({
     );
   }
 
-  if (approval.status === "approved") {
+  if (clientSigningProgress(approval, email) === "ready") {
     return (
       <Notice
         action={
@@ -195,7 +209,11 @@ export function ClientAgreementDetail({
         </StatusBadge>
         <span>{approval.organisationLegalName}</span>
       </div>
-      <CompletionNotice approval={approval} ownSignature={ownSignature} />
+      <CompletionNotice
+        approval={approval}
+        ownSignature={ownSignature}
+        email={email}
+      />
       <div className={styles.metrics} aria-label="Agreement financial summary">
         <PortalCard title="One-off total">
           <p className={styles.metric}>{formatGbp(oneOff)}</p>
@@ -311,15 +329,21 @@ export function ClientAgreementDetail({
         </div>
       </PortalCard>
       <SigningRecord approval={approval} />
-      <AgreementStatusCard status={status} />
+      <AgreementStatusCard
+        status={
+          clientSigningProgress(approval, email) === "processing"
+            ? "processing"
+            : status
+        }
+      />
       {complete ? (
         <Notice
           action={
             <PortalActionLink
-              href={agreementPath(approval.id, approval.organisationId)}
+              href={`${portalPath("/portal/getting-started")}?organisationId=${encodeURIComponent(approval.organisationId)}`}
               variant="secondary"
             >
-              View agreement
+              Continue setup
             </PortalActionLink>
           }
           tone="info"
