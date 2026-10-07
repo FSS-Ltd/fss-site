@@ -126,3 +126,52 @@ test("explains when signing is unavailable without offering a failing command", 
   assert.doesNotMatch(html, /Prepare signing document/);
   assert.match(html, /Record signed evidence/);
 });
+
+for (const status of ["prepared", "approved"] as const) {
+  test(`resumes ${status} signing instead of preparing a second document`, () => {
+    const html = renderDetail(
+      <StaffAgreementDetail
+        organisationId={completedApproval.organisationId}
+        record={{ ...record, status: "draft" }}
+        signingApproval={{
+          ...completedApproval,
+          status,
+          signatures: [],
+          completedAt: null,
+        }}
+        signingCommandEndpoint="/api/portal/admin/clients/example/signing"
+        signingSuccessRedirect="/portal/admin/clients/example/signing"
+      />,
+    );
+    assert.match(
+      html,
+      status === "prepared"
+        ? /Review and publish for signing/
+        : /View signing progress/,
+    );
+    assert.match(html, /href="\/portal\/admin\/clients\/example\/signing/);
+    assert.doesNotMatch(
+      html,
+      /Prepare signing document|This agreement is still a draft/,
+    );
+  });
+}
+
+test("an approval from an older revision cannot publish the current draft", () => {
+  const html = renderDetail(
+    <StaffAgreementDetail
+      organisationId={completedApproval.organisationId}
+      record={{ ...record, status: "draft" }}
+      signingApproval={{
+        ...completedApproval,
+        revision: 1,
+        status: "prepared",
+        signatures: [],
+      }}
+      signingCommandEndpoint="/api/portal/admin/clients/example/signing"
+      signingSuccessRedirect="/portal/admin/clients/example/signing"
+    />,
+  );
+  assert.match(html, /Prepare signing document/);
+  assert.doesNotMatch(html, /Review and publish for signing/);
+});

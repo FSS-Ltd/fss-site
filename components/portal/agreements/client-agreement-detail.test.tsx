@@ -12,8 +12,10 @@ require.extensions[".css"] = (module) => {
   };
 };
 
-const { ClientAgreementList } = require("./client-agreement-list") as typeof import("./client-agreement-list");
-const { ClientAgreementDetail } = require("./client-agreement-detail") as typeof import("./client-agreement-detail");
+const { ClientAgreementList } =
+  require("./client-agreement-list") as typeof import("./client-agreement-list");
+const { ClientAgreementDetail } =
+  require("./client-agreement-detail") as typeof import("./client-agreement-detail");
 
 const approval: SigningApproval = {
   agreementId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
@@ -50,9 +52,11 @@ const approval: SigningApproval = {
     noticeDays: 30,
     requiredDepositPence: "120000",
     responsibilities: "Provide approved assets and one authorised reviewer.",
-    scope: "Five content pages, booking workflow, confirmation email and handover.",
+    scope:
+      "Five content pages, booking workflow, confirmation email and handover.",
     signatories: ["alex@northstar.example", "fss@faithful.software"],
-    support: "Defect support is included. Additional scope needs a separate quote.",
+    support:
+      "Defect support is included. Additional scope needs a separate quote.",
     taxTreatment: "Tax follows the agreement.",
     terms: "The retained agreement is the governing version.",
     title: "Website & booking experience",
@@ -72,6 +76,7 @@ const approval: SigningApproval = {
 test("separates agreements needing a signature from signed records", () => {
   const html = renderToStaticMarkup(
     <ClientAgreementList
+      email="alex@northstar.example"
       approvals={[approval]}
       organisationId={approval.organisationId}
     />,
@@ -117,7 +122,10 @@ test("does not show an all-parties-signed result for a partial signature", () =>
     />,
   );
 
-  assert.match(html, /Your signature is recorded, awaiting the remaining signers/);
+  assert.match(
+    html,
+    /Your signature is recorded, awaiting the remaining signers/,
+  );
   assert.doesNotMatch(html, /All required parties have signed this agreement/);
 });
 
@@ -155,4 +163,93 @@ test("shows the signed result only after every required signature is retained", 
   assert.match(html, /Alex Morgan/);
   assert.match(html, /FSS authorised signer/);
   assert.match(html, /Retained copy/);
+});
+
+test("shows one useful empty state before FSS publishes an agreement", () => {
+  const html = renderToStaticMarkup(
+    <ClientAgreementList
+      email="alex@northstar.example"
+      approvals={[]}
+      organisationId={approval.organisationId}
+    />,
+  );
+  assert.match(html, /No agreements shared yet/);
+  assert.match(html, /FSS.*reviewed.*published/);
+  assert.doesNotMatch(html, /Action needed|Signed agreements/);
+});
+
+test("keeps a recorded client signature out of action needed", () => {
+  const html = renderToStaticMarkup(
+    <ClientAgreementList
+      email="alex@northstar.example"
+      approvals={[
+        {
+          ...approval,
+          signatures: [
+            {
+              email: "alex@northstar.example",
+              typedName: "Alex",
+              signedAt: "2026-09-16T10:00:00Z",
+              userId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+            },
+          ],
+        },
+      ]}
+      organisationId={approval.organisationId}
+    />,
+  );
+  assert.match(html, /In progress/);
+  assert.match(html, /Your signature is recorded/);
+  assert.doesNotMatch(html, /Review agreement/);
+});
+
+test("says final documents are processing when all signatures are recorded", () => {
+  const signatures = approval.requiredSigners.map((email) => ({
+    email,
+    typedName: email,
+    signedAt: "2026-09-16T10:00:00Z",
+    userId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+  }));
+  const html = renderToStaticMarkup(
+    <ClientAgreementDetail
+      approval={{ ...approval, signatures }}
+      email="alex@northstar.example"
+      organisationId={approval.organisationId}
+    />,
+  );
+  assert.match(html, /Preparing your signed agreement/);
+  assert.doesNotMatch(html, /awaiting the remaining signers/);
+});
+
+const { clientSigningProgress } =
+  require("./presentation") as typeof import("./presentation");
+
+test("signing readiness requires a named signer and an open approval", () => {
+  assert.equal(
+    clientSigningProgress(approval, " ALEX@NORTHSTAR.EXAMPLE "),
+    "ready",
+  );
+  assert.equal(
+    clientSigningProgress(approval, "someone@example.test"),
+    "unavailable",
+  );
+  for (const status of [
+    "prepared",
+    "cancelled",
+    "declined",
+    "expired",
+    "superseded",
+  ] as const) {
+    assert.equal(
+      clientSigningProgress({ ...approval, status }, "alex@northstar.example"),
+      "unavailable",
+    );
+  }
+  assert.equal(
+    clientSigningProgress(
+      { ...approval, requiredSigners: [] },
+      "alex@northstar.example",
+    ),
+    "unavailable",
+  );
 });

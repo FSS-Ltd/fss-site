@@ -360,7 +360,7 @@ const phaseFiveDesktopScenarios = [
   [
     "S04",
     "client-unavailable",
-    "We couldn’t load your workspace",
+    "We couldn’t load this page",
     "s04-client-unavailable-desktop.png",
   ],
   [
@@ -434,7 +434,7 @@ const phaseFiveMobileScenarios = [
   [
     "S04",
     "client-unavailable",
-    "We couldn’t load your workspace",
+    "We couldn’t load this page",
     "s04-client-unavailable-mobile.png",
   ],
   [

@@ -6,6 +6,7 @@ import {
 import type { SigningApproval } from "@/lib/operations/agreements/signing-types";
 
 export type PortalAgreementStatus =
+  | "processing"
   | "draft"
   | "awaiting_signature"
   | "signed"
@@ -53,18 +54,27 @@ const statusPresentation: Record<
   PortalAgreementStatus,
   AgreementStatusPresentation
 > = {
+  processing: {
+    description:
+      "All signatures are recorded. The final signed copy is being prepared.",
+    label: "Preparing signed copy",
+    tone: "info",
+  },
   awaiting_signature: {
-    description: "The exact approved version is waiting for the required signatures.",
+    description:
+      "The exact approved version is waiting for the required signatures.",
     label: "Awaiting signature",
     tone: "warning",
   },
   draft: {
-    description: "This agreement is still being prepared and is not ready to sign.",
+    description:
+      "This agreement is still being prepared and is not ready to sign.",
     label: "Draft",
     tone: "neutral",
   },
   signed: {
-    description: "All required signatures have been recorded for this retained version.",
+    description:
+      "All required signatures have been recorded for this retained version.",
     label: "Signed and complete",
     tone: "success",
   },
@@ -111,4 +121,25 @@ export function AgreementStatusCard({
       <StatusBadge status={presentation.tone}>{presentation.label}</StatusBadge>
     </PortalCard>
   );
+}
+
+export function clientSigningProgress(
+  approval: SigningApproval,
+  email: string,
+): "complete" | "processing" | "recorded" | "ready" | "unavailable" {
+  if (hasCompleteSigningEvidence(approval)) return "complete";
+  if (approval.status !== "approved") return "unavailable";
+  if (
+    approval.requiredSigners.length > 0 &&
+    approval.requiredSigners.every((signer) =>
+      approval.signatures.some((signature) => signature.email === signer),
+    )
+  )
+    return "processing";
+  const signerEmail = email.trim().toLowerCase();
+  if (approval.signatures.some((signature) => signature.email === signerEmail))
+    return "recorded";
+  return approval.requiredSigners.includes(signerEmail)
+    ? "ready"
+    : "unavailable";
 }

@@ -22,7 +22,14 @@ test("gives an unavailable workspace a safe retry route and support reference", 
     />,
   );
 
-  assert.match(html, /We couldn.t load your workspace/);
+  assert.match(html, /We couldn.t load this page/);
   assert.match(html, /FSS-DEMO-042/);
   assert.match(html, /Try again/);
+});
+
+test("a page load failure does not claim the entire portal is down", () => {
+  const html = renderToStaticMarkup(<PortalUnavailable />);
+  assert.doesNotMatch(html, /portal is temporarily unavailable/);
+  assert.match(html, /couldn.t load this page/);
+  assert.match(html, /Get help/);
 });

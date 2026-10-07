@@ -7,7 +7,11 @@ import {
 } from "@/components/portal/ui";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import type { SigningApproval } from "@/lib/operations/agreements/signing-types";
-import { AgreementStatusCard, hasCompleteSigningEvidence } from "./presentation";
+import {
+  AgreementStatusCard,
+  hasCompleteSigningEvidence,
+  clientSigningProgress,
+} from "./presentation";
 import styles from "./agreements.module.css";
 
 type ClientSigningReviewProps = Readonly<{
@@ -37,7 +41,8 @@ export function ClientSigningReview({
     (signature) => signature.email === normalisedEmail,
   );
   const complete = hasCompleteSigningEvidence(approval);
-  const signingOpen = approval.status === "approved" && !ownSignature;
+  const progress = clientSigningProgress(approval, email);
+  const signingOpen = progress === "ready";
   const shownName = signerName?.trim() || normalisedEmail;
   const backHref = agreementPath(approval.id, organisationId);
 
@@ -56,7 +61,10 @@ export function ClientSigningReview({
       >
         <p className={styles.prose}>{approval.draft.terms}</p>
         <div className={styles.actionRow}>
-          <PortalActionLink href={sourceDownloadPath(approval)} variant="secondary">
+          <PortalActionLink
+            href={sourceDownloadPath(approval)}
+            variant="secondary"
+          >
             Download agreement PDF
           </PortalActionLink>
           <PortalActionLink href={backHref} variant="quiet">
@@ -75,7 +83,15 @@ export function ClientSigningReview({
             organisationId={organisationId}
           />
         </PortalCard>
-      ) : ownSignature ? (
+      ) : progress === "processing" ? (
+        <Notice tone="info">
+          <strong>Preparing your signed agreement.</strong>
+          <p>
+            All required signatures are recorded. Return to the agreement for
+            your final copy when processing is complete.
+          </p>
+        </Notice>
+      ) : ownSignature && (complete || progress === "recorded") ? (
         <Notice tone={complete ? "success" : "info"}>
           <strong>
             {complete
@@ -107,9 +123,11 @@ export function ClientSigningReview({
         status={
           complete
             ? "signed"
-            : approval.status === "approved"
-              ? "awaiting_signature"
-              : "voided"
+            : progress === "processing"
+              ? "processing"
+              : approval.status === "approved"
+                ? "awaiting_signature"
+                : "voided"
         }
       />
     </article>

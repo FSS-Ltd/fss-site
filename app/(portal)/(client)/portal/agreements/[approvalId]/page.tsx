@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { ClientAgreementDetail } from "@/components/portal/agreements/client-agreement-detail";
+import { PortalFeatureUnavailable } from "@/components/portal/auth/feature-unavailable";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import { PageHeader } from "@/components/portal/ui";
 import { getPortalPageContext } from "@/lib/operations/auth/page-context";
@@ -21,9 +22,17 @@ export default async function ClientAgreementPage({
   params: Promise<{ approvalId: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }): Promise<React.JSX.Element> {
-  if (!signingEnabled()) notFound();
-  const context = await getPortalPageContext((await searchParams).organisationId);
+  const context = await getPortalPageContext(
+    (await searchParams).organisationId,
+  );
   if (!context) return <PortalUnavailable />;
+  if (!signingEnabled())
+    return (
+      <PortalFeatureUnavailable
+        feature="agreements"
+        organisationId={context.organisationId}
+      />
+    );
   const approvalId = z.uuid().safeParse((await params).approvalId);
   if (!approvalId.success) notFound();
 

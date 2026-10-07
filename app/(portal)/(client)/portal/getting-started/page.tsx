@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { notFound } from "next/navigation";
 import { ClientOnboardingWorkspaceView } from "@/components/portal/onboarding/client-onboarding-workspace";
+import { PortalFeatureUnavailable } from "@/components/portal/auth/feature-unavailable";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import { getPortalPageContext } from "@/lib/operations/auth/page-context";
 import { PortalAccessDenied } from "@/lib/operations/auth/types";
@@ -21,7 +22,14 @@ export default async function GettingStartedPage({
   const context = await getPortalPageContext(
     (await searchParams).organisationId,
   );
-  if (!context || !onboardingEnabled()) return <PortalUnavailable />;
+  if (!context) return <PortalUnavailable />;
+  if (!onboardingEnabled())
+    return (
+      <PortalFeatureUnavailable
+        feature="onboarding"
+        organisationId={context.organisationId}
+      />
+    );
   let workspace: ClientOnboardingWorkspace;
   try {
     workspace = await loadClientOnboardingWorkspace(

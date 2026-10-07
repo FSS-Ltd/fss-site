@@ -5,6 +5,7 @@ import { PortalAccessDenied } from "@/lib/operations/auth/types";
 import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { signingEnabled } from "@/lib/operations/agreements/signing-commands";
 import { listPortalSigning } from "@/lib/operations/agreements/signing-service";
+import { PortalFeatureUnavailable } from "@/components/portal/auth/feature-unavailable";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import { listPortalCommercialOffers } from "@/lib/operations/agreements/commercial-service";
 import { CommercialOfferList } from "@/components/portal/agreements/commercial-offer-list";
@@ -18,11 +19,17 @@ export default async function AgreementsPage({
 }: {
   searchParams: Promise<{ organisationId?: string | string[] }>;
 }): Promise<React.JSX.Element> {
-  if (!signingEnabled()) notFound();
   const context = await getPortalPageContext(
     (await searchParams).organisationId,
   );
   if (!context) return <PortalUnavailable />;
+  if (!signingEnabled())
+    return (
+      <PortalFeatureUnavailable
+        feature="agreements"
+        organisationId={context.organisationId}
+      />
+    );
   let approvals;
   let offers;
   try {
@@ -55,6 +62,7 @@ export default async function AgreementsPage({
       />
       <CommercialOfferList offers={offers} audience="client" />
       <ClientAgreementList
+        email={context.identity.email}
         approvals={approvals}
         organisationId={context.organisationId}
       />

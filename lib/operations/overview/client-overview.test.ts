@@ -1,11 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import {
-  selectClientAttention,
-  type ClientOverview,
-} from "./client-overview";
+import { selectClientAttention, type ClientOverview } from "./client-overview";
 
 const overview: ClientOverview = {
+  canReadAgreements: true,
   checklist: {
     agreementSigned: false,
     billingReady: true,
@@ -63,4 +61,22 @@ test("prioritises an authorised review over setup and project summaries", () => 
     "project",
   );
   assert.equal(selectClientAttention(emptyOverview), null);
+});
+
+test("takes the agreement setup step straight to agreements without assuming a document is published", () => {
+  const attention = selectClientAttention({ ...overview, requests: [] });
+  assert.match(attention?.href ?? "", /\/agreements\?organisationId=/);
+  assert.equal(attention?.actionLabel, "View agreements");
+  assert.doesNotMatch(attention?.description ?? "", /sign your agreement/);
+});
+
+test("keeps agreement-restricted roles in their authorised setup journey", () => {
+  assert.match(
+    selectClientAttention({
+      ...overview,
+      requests: [],
+      canReadAgreements: false,
+    })?.href ?? "",
+    /getting-started/,
+  );
 });
