@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { resolveSiteUrl } from "../../config/site-url";
 import { requireFounder } from "../../growth/auth/require-founder";
 import { getPortalIdentity } from "../auth/server";
+import { resolvePortalOrigin } from "../auth/configuration";
 import { requireFssAdmin } from "../auth/require-admin";
 import { getOperationsDb } from "../db/client";
 import { getPortalDb } from "../db/portal-client";
@@ -23,10 +24,10 @@ import {
 } from "./signing-service";
 import { fssStudioEnabled } from "../auth/release-flags";
 
-function configuration() {
+function configuration(origin: string) {
   return {
     enabled: signingEnabled(),
-    origin: new URL(resolveSiteUrl()).origin,
+    origin,
     createCorrelationId: randomUUID,
     reportUnexpectedError: (report: {
       correlationId: string;
@@ -43,7 +44,7 @@ async function authorizeFounder() {
 }
 export function founderSigningRoute() {
   return createSigningCommandHandler({
-    ...configuration(),
+    ...configuration(new URL(resolveSiteUrl()).origin),
     authorize: authorizeFounder,
     execute: (identity, organisationId, command, correlationId) =>
       executeFounderSigningCommand(
@@ -57,7 +58,7 @@ export function founderSigningRoute() {
 }
 export function portalSigningRoute() {
   return createSigningCommandHandler({
-    ...configuration(),
+    ...configuration(resolvePortalOrigin()),
     authorize: getPortalIdentity,
     consumeRateLimit: (identity, organisationId, correlationId) =>
       consumeRequestRateLimit(
@@ -87,7 +88,7 @@ async function authorizeStaff() {
 }
 export function staffSigningRoute() {
   return createSigningCommandHandler({
-    ...configuration(),
+    ...configuration(resolvePortalOrigin()),
     enabled: signingEnabled() && fssStudioEnabled(),
     authorize: authorizeStaff,
     execute: (admin, organisationId, command, correlationId) =>
@@ -102,7 +103,7 @@ export function staffSigningRoute() {
 }
 export function founderSigningDownloadRoute() {
   return createSigningDownloadHandler({
-    ...configuration(),
+    ...configuration(new URL(resolveSiteUrl()).origin),
     authorize: authorizeFounder,
     download: (identity, organisationId, approvalId, kind, correlationId) =>
       downloadFounderSigningArtifact(
@@ -117,7 +118,7 @@ export function founderSigningDownloadRoute() {
 }
 export function portalSigningDownloadRoute() {
   return createSigningDownloadHandler({
-    ...configuration(),
+    ...configuration(resolvePortalOrigin()),
     authorize: getPortalIdentity,
     download: (identity, organisationId, approvalId, kind, correlationId) =>
       downloadPortalSigningArtifact(
@@ -132,7 +133,7 @@ export function portalSigningDownloadRoute() {
 }
 export function staffSigningDownloadRoute() {
   return createSigningDownloadHandler({
-    ...configuration(),
+    ...configuration(resolvePortalOrigin()),
     enabled: signingEnabled() && fssStudioEnabled(),
     authorize: authorizeStaff,
     download: (admin, organisationId, approvalId, kind, correlationId) =>
