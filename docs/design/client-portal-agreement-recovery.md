@@ -1,6 +1,6 @@
 # Client portal agreement recovery
 
-Status: Implemented locally; production signing connection correction pending approval
+Status: Portal recovery merged; signing origin fix in review; production signing connection correction pending approval
 Date: 2026-10-07
 
 ## Problem and scope
@@ -42,7 +42,7 @@ An authenticated admin register visit also returned the existing generic unavail
 - Dependency audit: no high or critical advisories; one existing moderate `sprintf-js` denial-of-service advisory through `gray-matter`/`js-yaml` has no published patched version. No dependency changes in this branch.
 - Linux verification: started the installed Docker runtime and used the official Playwright 1.63.0 image against the local fixture server. All 42 selected desktop/mobile visual checks passed after reviewing and updating the two S04 recovery baselines. Coverage includes Agreements, Billing, Documents, project and support screens. All 10 recovery/publication/mocked signing interaction checks also passed with the same loopback origin as the repository test configuration. The initial container hostname did not hydrate the signing form; using the established 127.0.0.1 development origin resolved the harness failure without application changes.
 
-The application fixes remain on `fix/client-portal-agreements`, separate from the user's dirty working checkout. They require review and deployment. The production feature-flag activation is independent of this branch. To roll it back, set `OPERATIONS_SIGNING_ENABLED=false` and redeploy; signed data is unaffected.
+The client portal recovery changes were merged in PR #295 on 2026-10-07. The subsequent signing origin correction is isolated on `fix/portal-signing-origin`, separate from the user's dirty checkout, and requires review and deployment. The production feature-flag activation is independent of this branch. To roll it back, set `OPERATIONS_SIGNING_ENABLED=false` and redeploy; signed data is unaffected.
 
 ## Signing origin correction
 
