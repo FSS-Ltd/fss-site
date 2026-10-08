@@ -132,14 +132,22 @@ export function clientSigningProgress(
   if (
     approval.requiredSigners.length > 0 &&
     approval.requiredSigners.every((signer) =>
-      approval.signatures.some((signature) => signature.email === signer),
+      approval.signatures.some(
+        (signature) => signature.email.toLowerCase() === signer.toLowerCase(),
+      ),
     )
   )
     return "processing";
   const signerEmail = email.trim().toLowerCase();
-  if (approval.signatures.some((signature) => signature.email === signerEmail))
+  if (
+    approval.signatures.some(
+      (signature) => signature.email.toLowerCase() === signerEmail,
+    )
+  )
     return "recorded";
-  return approval.requiredSigners.includes(signerEmail)
+  return approval.requiredSigners.some(
+    (signer) => signer.toLowerCase() === signerEmail,
+  )
     ? "ready"
     : "unavailable";
 }

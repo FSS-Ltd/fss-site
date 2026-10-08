@@ -34,7 +34,9 @@ function statusLabel(approval: SigningApproval, email: string): string {
   });
 
   if (status === "signed") return "All signatures complete";
-  if (status === "awaiting_signature") return "Awaiting signature";
+  if (progress === "ready") return "Your signature needed";
+  if (approval.status === "completed") return "Evidence needs review";
+  if (status === "awaiting_signature") return "Waiting for signatures";
   if (status === "superseded") return "Superseded";
   if (status === "voided") return "Unavailable for signing";
   return "Preparing agreement";
@@ -60,7 +62,7 @@ function AgreementRow({
       ? "info"
       : status === "signed"
         ? "success"
-        : status === "awaiting_signature"
+        : progress === "ready"
           ? "warning"
           : status === "voided"
             ? "error"
@@ -162,13 +164,22 @@ export function ClientAgreementList({
     (approval) => clientSigningProgress(approval, email) === "ready",
   );
   const signed = approvals.filter(hasCompleteSigningEvidence);
-  const inProgress = approvals.filter((approval) =>
-    ["recorded", "processing"].includes(clientSigningProgress(approval, email)),
+  const waiting = approvals.filter(
+    (approval) =>
+      approval.status === "approved" &&
+      !actionNeeded.includes(approval) &&
+      !signed.includes(approval),
   );
-  const archived = approvals.filter(
+  const inProgress = approvals.filter(
+    (approval) =>
+      approval.status === "prepared" ||
+      (approval.status === "completed" && !signed.includes(approval)),
+  );
+  const closed = approvals.filter(
     (approval) =>
       !actionNeeded.includes(approval) &&
       !signed.includes(approval) &&
+      !waiting.includes(approval) &&
       !inProgress.includes(approval),
   );
 
@@ -180,12 +191,22 @@ export function ClientAgreementList({
         empty="There are no agreements waiting for your signature."
         organisationId={organisationId}
         email={email}
-        title="Action needed"
+        title="Your action"
       />
+      {waiting.length ? (
+        <AgreementGroup
+          approvals={waiting}
+          description="No action is needed from you. Named signers are completing these revisions."
+          empty=""
+          organisationId={organisationId}
+          email={email}
+          title="Waiting for others"
+        />
+      ) : null}
       {inProgress.length ? (
         <AgreementGroup
           approvals={inProgress}
-          description="Your part is complete. Follow the remaining signatures and final document here."
+          description="These revisions are being prepared or need evidence review."
           empty=""
           organisationId={organisationId}
           email={email}
@@ -200,14 +221,14 @@ export function ClientAgreementList({
         email={email}
         title="Signed agreements"
       />
-      {archived.length ? (
+      {closed.length ? (
         <AgreementGroup
-          approvals={archived}
+          approvals={closed}
           description="These versions cannot be signed."
           empty=""
           organisationId={organisationId}
           email={email}
-          title="Archived agreements"
+          title="Closed agreements"
         />
       ) : null}
     </div>

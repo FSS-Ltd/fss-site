@@ -82,7 +82,7 @@ test("separates agreements needing a signature from signed records", () => {
     />,
   );
 
-  assert.match(html, /Action needed/);
+  assert.match(html, /Your action/);
   assert.match(html, /Signed agreements/);
   assert.match(html, /Review agreement/);
 });
@@ -198,9 +198,33 @@ test("keeps a recorded client signature out of action needed", () => {
       organisationId={approval.organisationId}
     />,
   );
-  assert.match(html, /In progress/);
+  assert.match(html, /Waiting for others/);
   assert.match(html, /Your signature is recorded/);
   assert.doesNotMatch(html, /Review agreement/);
+});
+
+test("shows an approved agreement read-only to a non-signer", () => {
+  const html = renderToStaticMarkup(
+    <ClientAgreementDetail
+      approval={approval}
+      email="viewer@northstar.example"
+      organisationId={approval.organisationId}
+    />,
+  );
+  assert.match(html, /Waiting for the named signers/);
+  assert.doesNotMatch(html, /Continue to signing/);
+});
+
+test("places declined requests outside the personal signing queue", () => {
+  const html = renderToStaticMarkup(
+    <ClientAgreementList
+      approvals={[{ ...approval, status: "declined" }]}
+      email="alex@northstar.example"
+      organisationId={approval.organisationId}
+    />,
+  );
+  assert.match(html, /Closed agreements/);
+  assert.doesNotMatch(html, /Your signature needed/);
 });
 
 test("says final documents are processing when all signatures are recorded", () => {

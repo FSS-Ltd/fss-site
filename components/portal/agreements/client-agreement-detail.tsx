@@ -9,10 +9,8 @@ import { formatMoney } from "@/lib/operations/money";
 import { totalLinePence } from "@/lib/operations/agreements/validation";
 import type { SigningApproval } from "@/lib/operations/agreements/signing-types";
 import {
-  AgreementStatusCard,
   clientSigningProgress,
   hasCompleteSigningEvidence,
-  toPortalAgreementStatus,
 } from "./presentation";
 import styles from "./agreements.module.css";
 
@@ -181,7 +179,41 @@ function CompletionNotice({
     );
   }
 
-  return null;
+  if (approval.status === "approved") {
+    return (
+      <Notice tone="info">
+        <strong>Waiting for the named signers.</strong>
+        <p>No signature is needed from your account for this revision.</p>
+      </Notice>
+    );
+  }
+
+  if (approval.status === "prepared") {
+    return (
+      <Notice tone="info">
+        <strong>This revision is not yet open for signing.</strong>
+        <p>FSS is reviewing the exact document and named signers.</p>
+      </Notice>
+    );
+  }
+
+  if (approval.status === "completed") {
+    return (
+      <Notice tone="info">
+        <strong>Signing evidence is being reviewed.</strong>
+        <p>
+          The signed copy will appear when every required signature is verified.
+        </p>
+      </Notice>
+    );
+  }
+
+  return (
+    <Notice tone="info">
+      <strong>This signing request is closed.</strong>
+      <p>Contact FSS if you need a revised agreement.</p>
+    </Notice>
+  );
 }
 
 export function ClientAgreementDetail({
@@ -191,12 +223,8 @@ export function ClientAgreementDetail({
   const formatGbp = (amount: string): string =>
     formatMoney(amount, approval.draft.currency);
   const complete = hasCompleteSigningEvidence(approval);
-  const status = toPortalAgreementStatus({
-    allRequiredSignaturesRecorded: complete,
-    status: approval.status,
-  });
   const ownSignature = approval.signatures.find(
-    (signature) => signature.email === email.trim().toLowerCase(),
+    (signature) => signature.email.toLowerCase() === email.trim().toLowerCase(),
   );
   const oneOff = oneOffTotal(approval);
   const milestones = approval.draft.installments.length;
@@ -329,13 +357,6 @@ export function ClientAgreementDetail({
         </div>
       </PortalCard>
       <SigningRecord approval={approval} />
-      <AgreementStatusCard
-        status={
-          clientSigningProgress(approval, email) === "processing"
-            ? "processing"
-            : status
-        }
-      />
       {complete ? (
         <Notice
           action={

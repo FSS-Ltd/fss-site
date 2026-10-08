@@ -7,10 +7,11 @@ import { RoutedStaffAgreementBuilder } from "@/components/portal/agreements/rout
 import type { AgreementEngagementChoice } from "@/components/portal/agreements/staff-agreement-builder";
 import { StaffAgreementOverview } from "@/components/portal/agreements/staff-agreement-overview";
 import { StaffSigningStatus } from "@/components/portal/agreements/staff-signing-status";
+import { SigningForm } from "@/components/operations/signing/signing-form";
 import { SignatureEvidenceForm } from "@/components/portal/agreements/signature-evidence-form";
 import { ClientShell } from "@/components/portal/shell/client-shell";
 import { StudioShell } from "@/components/portal/shell/studio-shell";
-import { PageHeader } from "@/components/portal/ui";
+import { PageHeader, PortalCard } from "@/components/portal/ui";
 import type { AgreementBuilderStep } from "@/lib/operations/agreements/builder-draft-schema";
 import type { AgreementBuilderDraft } from "@/lib/operations/agreements/builder-draft-service";
 import type { AgreementRecord } from "@/lib/operations/agreements/types";
@@ -364,6 +365,36 @@ export function StudioSigningStatusScenario(): React.JSX.Element {
       <StaffSigningStatus
         approval={approval}
         downloadBase={`/api/portal/admin/clients/${organisationId}/signing/${approvalId}`}
+      />
+    </StudioShell>
+  );
+}
+
+export function StudioSigningPreparedScenario(): React.JSX.Element {
+  const prepared = {
+    ...approval,
+    status: "prepared" as const,
+    approvedAt: null,
+  };
+  return (
+    <StudioShell>
+      <PageHeader eyebrow="FSS Studio / Agreements" title="Signing status" />
+      <StaffSigningStatus
+        approval={prepared}
+        downloadBase={`/api/portal/admin/clients/${organisationId}/signing/${approvalId}`}
+        controls={
+          <PortalCard
+            description="Review the retained document and named signers before approval. Approval opens signing but does not record a signature."
+            title="Approve signing"
+          >
+            <SigningForm
+              approval={prepared}
+              audience="staff"
+              commandEndpoint={`/api/portal/admin/clients/${organisationId}/signing`}
+              organisationId={organisationId}
+            />
+          </PortalCard>
+        }
       />
     </StudioShell>
   );

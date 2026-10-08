@@ -51,6 +51,7 @@ import {
   StudioAgreementSignedScenario,
   StudioSignatureEvidenceScenario,
   StudioSigningStatusScenario,
+  StudioSigningPreparedScenario,
 } from "./agreement-visual-fixtures";
 import {
   ClientGettingStartedScenario,
@@ -179,6 +180,7 @@ export type VisualScenarioName =
   | "studio-engagement-provenance"
   | "studio-signature-evidence"
   | "studio-signing-status"
+  | "studio-signing-prepared"
   | "studio-welcome-journeys"
   | "studio-welcome-builder"
   | "studio-welcome-content"
@@ -662,6 +664,10 @@ const scenarios: Record<VisualScenarioName, VisualScenario> = {
   "studio-signing-status": {
     name: "studio-signing-status",
     content: <StudioSigningStatusScenario />,
+  },
+  "studio-signing-prepared": {
+    name: "studio-signing-prepared",
+    content: <StudioSigningPreparedScenario />,
   },
   "studio-welcome-journeys": {
     name: "studio-welcome-journeys",

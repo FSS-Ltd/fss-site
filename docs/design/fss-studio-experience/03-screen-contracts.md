@@ -636,13 +636,13 @@ Action: **View final deliverable**.
 
 **Primary action:** Review agreement.
 
-**Required behaviour and acceptance:** Separate awaiting review/signature, active and archived agreements. Show title, project, version, parties and status with the correct next action. Do not treat viewed as signed.
+**Required behaviour and acceptance:** Group requests by the authenticated person's next action: Your action, Waiting for others, In progress, Signed agreements, and Closed agreements. Show revision, parties, and status. Only a named signer without a recorded signature receives a signing call to action; viewing never records consent.
 
 [Full-size editable wireframe](./wireframes/C14.svg) · [Open in screen browser](./wireframes.html#C14)
 
 ### Exact illustrated content
 
-**Action needed** (rows)
+**Your action** (rows)
 
 - Website & booking experience — Revision 2 · awaiting your signature · Alex Morgan — Review agreement
 
@@ -698,7 +698,7 @@ Scope, fees, delivery assumptions, responsibilities, support and terms.
 
 **Primary action:** Sign agreement.
 
-**Required behaviour and acceptance:** Use the existing approved signing path for the named signer and exact immutable agreement version. Show consent, identity and confirmation before submission. Signed success requires verified signing evidence; cancel and provider failure preserve the unsigned state. Unauthorised users can read only when otherwise entitled.
+**Required behaviour and acceptance:** Lead with the exact revision and document download, then show signer identity, authority, consent, and the primary action. Only a named signer without a recorded signature can sign. Confirm before declining. Signed success requires verified signing evidence; cancel and provider failure preserve the unsigned state. Unauthorised users can read only when otherwise entitled.
 
 [Full-size editable wireframe](./wireframes/C16.svg) · [Open in screen browser](./wireframes.html#C16)
 
@@ -715,8 +715,6 @@ The exact document you are signing is shown here. Download an accessible copy or
 **Your signature** (fields)
 
 - Full legal name — Alex Morgan
-
-- Role / position — Director
 
 **Confirm your agreement** (review)
 
@@ -3170,7 +3168,7 @@ The client sees the request and its public updates. Internal priority and founde
 
 **Primary action:** View signing status.
 
-**Required behaviour and acceptance:** Show real delivery state separately from signing state. Queue acceptance is not email delivery and is not signature. Retry or reconcile failed/unknown sends through F29/F25 without duplicating the signing request.
+**Required behaviour and acceptance:** Show the exact document and staff approval controls before signer evidence. Distinguish a prepared request that is not yet open from a pending signature. Show delivery as unconfirmed without evidence. Queue acceptance is not email delivery or signature. Confirm cancellation. Retry or reconcile failed/unknown sends through F29/F25 without duplicating the signing request.
 
 [Full-size editable wireframe](./wireframes/F37.svg) · [Open in screen browser](./wireframes.html#F37)
 
@@ -3182,7 +3180,7 @@ Version 2 is approved and retained. The signing request has been queued; no sign
 
 **Delivery and signing** (rows)
 
-- Alex Morgan — Signing email queued · Signature pending
+- Alex Morgan — Delivery unconfirmed · Signature pending
 
 - FSS authorised signer — Signature pending
 
