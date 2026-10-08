@@ -10,11 +10,7 @@ import { formatMoney } from "@/lib/operations/money";
 import { totalLinePence } from "@/lib/operations/agreements/validation";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import type { SigningApproval } from "@/lib/operations/agreements/signing-types";
-import {
-  AgreementStatusCard,
-  toPortalAgreementStatus,
-  hasCompleteSigningEvidence,
-} from "./presentation";
+import { hasCompleteSigningEvidence } from "./presentation";
 import styles from "./agreements.module.css";
 
 export function StaffAgreementDetail({
@@ -37,18 +33,21 @@ export function StaffAgreementDetail({
     signingApproval.revision === record.revision
       ? signingApproval
       : null;
-  const openApproval =
-    currentApproval &&
-    (currentApproval.status === "prepared" ||
-      currentApproval.status === "approved")
-      ? currentApproval
-      : null;
   const completedSigning =
     currentApproval && hasCompleteSigningEvidence(currentApproval)
       ? currentApproval
       : null;
   const manualEvidence = record.status === "signed" && record.evidence !== null;
   const signed = manualEvidence || completedSigning !== null;
+  const signingState = currentApproval
+    ? currentApproval.status === "prepared"
+      ? "Awaiting FSS approval"
+      : currentApproval.status === "approved"
+        ? "Open for signing"
+        : currentApproval.status === "completed"
+          ? "Evidence needs review"
+          : "Signing request closed"
+    : null;
   const workspaceHref = portalPath(
     `/portal/admin/clients/${encodeURIComponent(organisationId)}/agreements`,
   );
@@ -59,16 +58,14 @@ export function StaffAgreementDetail({
   return (
     <article className={styles.detail}>
       <div className={styles.detailStatus}>
-        <StatusBadge status={signed ? "success" : "warning"}>
-          {signed
-            ? "Signed"
-            : openApproval?.status === "prepared"
-              ? "Ready to publish"
-              : openApproval?.status === "approved"
-                ? "Open for signing"
-                : "Draft"}
+        <StatusBadge
+          status={signed ? "success" : currentApproval ? "info" : "warning"}
+        >
+          {signed ? "Signed" : (signingState ?? "Draft")}
         </StatusBadge>
-        <span>Revision {record.revision}</span>
+        <span>
+          {record.draft.title} · Revision {record.revision}
+        </span>
       </div>
       {signed ? (
         <Notice tone="success">
@@ -82,30 +79,17 @@ export function StaffAgreementDetail({
             activation remains a separate operational step.
           </p>
         </Notice>
-      ) : openApproval ? (
-        <Notice
-          tone="info"
-          action={
-            signingSuccessRedirect ? (
-              <PortalActionLink href={signingSuccessRedirect}>
-                {openApproval.status === "prepared"
-                  ? "Review and publish for signing"
-                  : "View signing progress"}
-              </PortalActionLink>
-            ) : undefined
-          }
+      ) : currentApproval ? (
+        <PortalCard
+          description="This revision already has a signing request. Review its exact document and signer evidence before taking another action."
+          title={signingState ?? "Signing request"}
         >
-          <strong>
-            {openApproval.status === "prepared"
-              ? "Ready for your review."
-              : "Published for signing."}
-          </strong>
-          <p>
-            {openApproval.status === "prepared"
-              ? "Review the prepared PDF and named signers, then approve it to make it visible in the client portal."
-              : "The named signers can now open this agreement in their client portal. Publishing does not record a signature."}
-          </p>
-        </Notice>
+          {signingSuccessRedirect ? (
+            <PortalActionLink href={signingSuccessRedirect}>
+              Review signing status
+            </PortalActionLink>
+          ) : null}
+        </PortalCard>
       ) : (
         <Notice tone="warning">
           <strong>This agreement is still a draft.</strong>
@@ -115,6 +99,23 @@ export function StaffAgreementDetail({
           </p>
         </Notice>
       )}
+      {!signed &&
+      !currentApproval &&
+      signingCommandEndpoint &&
+      signingSuccessRedirect ? (
+        <PortalCard
+          description="Create the retained signing source from this exact revision, then review and approve the named signers."
+          title="Prepare signing"
+        >
+          <SigningForm
+            agreement={{ id: record.id, version: record.version }}
+            audience="staff"
+            commandEndpoint={signingCommandEndpoint}
+            organisationId={organisationId}
+            successRedirect={signingSuccessRedirect}
+          />
+        </PortalCard>
+      ) : null}
       <PortalCard title="Agreement summary">
         <dl className={styles.summaryList}>
           <div>
@@ -210,43 +211,16 @@ export function StaffAgreementDetail({
           </dl>
         </PortalCard>
       ) : null}
-      {!openApproval ? (
-        <AgreementStatusCard
-          status={
-            signed
-              ? "signed"
-              : currentApproval
-                ? toPortalAgreementStatus({
-                    status: currentApproval.status,
-                    allRequiredSignaturesRecorded: false,
-                  })
-                : "draft"
-          }
-        />
-      ) : null}
-      {!signed && !openApproval ? (
+      {!signed && !currentApproval ? (
         <>
-          {signingCommandEndpoint && signingSuccessRedirect ? (
-            <PortalCard
-              description="Create the retained signing source from this exact revision, then review and approve the named signers in the signing workspace."
-              title="Prepare signing"
-            >
-              <SigningForm
-                agreement={{ id: record.id, version: record.version }}
-                audience="staff"
-                commandEndpoint={signingCommandEndpoint}
-                organisationId={organisationId}
-                successRedirect={signingSuccessRedirect}
-              />
-            </PortalCard>
-          ) : (
+          {!signingCommandEndpoint || !signingSuccessRedirect ? (
             <Notice tone="info">
               <p>
                 Electronic signing is unavailable until the signing feature is
                 configured.
               </p>
             </Notice>
-          )}
+          ) : null}
           <PortalCard
             description="Use this only when retained manual evidence is available for every required signer. The server checks its fingerprints against this exact source; this path does not represent provider verification."
             title="Manual evidence"

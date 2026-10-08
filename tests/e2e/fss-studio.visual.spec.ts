@@ -1107,6 +1107,58 @@ test.describe("FSS Studio desktop visuals", () => {
     });
   }
 
+  test("declining an agreement requires confirmation and restores focus", async ({
+    page,
+  }) => {
+    await openScenario(page, "client-agreement-signing", "Review and sign");
+    let requests = 0;
+    await page.route(
+      "**/api/portal/organisations/**/signing",
+      async (route) => {
+        requests += 1;
+        await route.fulfill({
+          status: 409,
+          contentType: "application/json",
+          body: JSON.stringify({ message: "The signing request changed." }),
+        });
+      },
+    );
+
+    const trigger = page.getByRole("button", { name: "Decline agreement" });
+    await trigger.click();
+    const dialog = page.getByRole("dialog", { name: "Decline agreement?" });
+    await expect(dialog).toBeVisible();
+    expect(requests).toBe(0);
+    await dialog.getByRole("button", { name: "Keep request" }).click();
+    await expect(trigger).toBeFocused();
+
+    await trigger.click();
+    await dialog.getByRole("button", { name: "Confirm decline" }).click();
+    await expect.poll(() => requests).toBe(1);
+    await expect(page.getByText("The signing request changed.")).toBeVisible();
+  });
+
+  test("prepared signing puts approval before evidence and confirms cancellation", async ({
+    page,
+  }) => {
+    await openScenario(page, "studio-signing-prepared", "Signing status");
+    const headings = await page.locator("main h2").allTextContents();
+    expect(headings.indexOf("Approve signing")).toBeLessThan(
+      headings.indexOf("Delivery and signing"),
+    );
+    await expect(page.getByText("Not yet open").first()).toBeVisible();
+    await expect(page.getByText("Not started")).toBeVisible();
+
+    const trigger = page.getByRole("button", { name: "Cancel signing" });
+    await trigger.click();
+    const dialog = page.getByRole("dialog", {
+      name: "Cancel signing request?",
+    });
+    await expect(dialog).toBeVisible();
+    await dialog.getByRole("button", { name: "Keep request" }).click();
+    await expect(trigger).toBeFocused();
+  });
+
   for (const [
     coverageId,
     scenario,
@@ -1271,6 +1323,35 @@ test.describe("FSS Studio mobile visuals", () => {
       await expectVisualScreenshot(page, screenshot);
     });
   }
+
+  test("signing and approval remain usable in dark mode with enlarged mobile text", async ({
+    page,
+  }) => {
+    for (const [scenario, heading, action] of [
+      ["client-agreement-signing", "Review and sign", "Sign agreement"],
+      [
+        "studio-signing-prepared",
+        "Signing status",
+        "Approve and open for signing",
+      ],
+    ] as const) {
+      await openScenario(page, scenario, heading);
+      await page.getByLabel("Colour appearance").selectOption("dark");
+      await page.evaluate(() => {
+        document.documentElement.style.zoom = "1.5";
+      });
+      await expect(page.getByRole("button", { name: action })).toBeVisible();
+      expect(
+        await page.evaluate(() => {
+          const main = document.querySelector("main");
+          return main ? main.scrollWidth <= main.clientWidth + 1 : false;
+        }),
+      ).toBe(true);
+      await page.evaluate(() => {
+        document.documentElement.style.zoom = "1";
+      });
+    }
+  });
 
   for (const [
     coverageId,

@@ -12,7 +12,8 @@ require.extensions[".css"] = (module) => {
   };
 };
 
-const { StaffSigningStatus } = require("./staff-signing-status") as typeof import("./staff-signing-status");
+const { StaffSigningStatus } =
+  require("./staff-signing-status") as typeof import("./staff-signing-status");
 
 const preparedApproval: SigningApproval = {
   agreementId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
@@ -29,22 +30,25 @@ const preparedApproval: SigningApproval = {
     documentReference: "private:signing/example/source.pdf",
     goals: "Create a reliable booking journey.",
     installments: [{ amountPence: "240000", dueDate: "2026-09-15" }],
-    lines: [{
-      description: "Website and booking experience",
-      discountPence: "0",
-      endDate: null,
-      quantity: 1,
-      recurrenceMonths: 0,
-      serviceCode: "website",
-      startDate: "2026-09-15",
-      taxPence: "0",
-      unitPence: "240000",
-    }],
+    lines: [
+      {
+        description: "Website and booking experience",
+        discountPence: "0",
+        endDate: null,
+        quantity: 1,
+        recurrenceMonths: 0,
+        serviceCode: "website",
+        startDate: "2026-09-15",
+        taxPence: "0",
+        unitPence: "240000",
+      },
+    ],
     minimumTermMonths: 0,
     noticeDays: 30,
     requiredDepositPence: "120000",
     responsibilities: "Provide approved assets and one authorised reviewer.",
-    scope: "Five content pages, booking workflow, confirmation email and handover.",
+    scope:
+      "Five content pages, booking workflow, confirmation email and handover.",
     signatories: ["alex@northstar.example", "fss@faithful.software"],
     support: "Defect support is included.",
     taxTreatment: "Tax follows the agreement.",
@@ -88,4 +92,17 @@ test("keeps a founder-review request out of the open signing state", () => {
 
   assert.match(html, /Awaiting FSS approval/);
   assert.doesNotMatch(html, /Ready for the named signers/);
+});
+
+test("does not describe a cancelled request as awaiting a signature", () => {
+  const html = renderToStaticMarkup(
+    <StaffSigningStatus
+      approval={{ ...preparedApproval, status: "cancelled" }}
+      downloadBase="/api/portal/admin/clients/example/signing/example"
+    />,
+  );
+
+  assert.match(html, /Cancelled/);
+  assert.match(html, /No signature retained/);
+  assert.doesNotMatch(html, /Signature pending/);
 });

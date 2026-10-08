@@ -74,7 +74,7 @@ export default async function StaffClientSigningPage({
     <div className={styles.page}>
       <PageHeader
         action={
-          <PortalActionLink href={agreementHref}>
+          <PortalActionLink href={agreementHref} variant="secondary">
             Back to agreements
           </PortalActionLink>
         }
@@ -86,14 +86,6 @@ export default async function StaffClientSigningPage({
         eyebrow="FSS Studio / Agreements"
         title="Signing status"
       />
-      <Notice tone="info">
-        <strong>Approval is not signature.</strong>
-        <p>
-          The signing register records preparation, approval and retained
-          signature evidence. It does not infer email delivery from a queued
-          request.
-        </p>
-      </Notice>
       {approvals.length === 0 ? (
         <PortalCard
           description="Prepare a document from an agreement record before it appears here."
@@ -117,24 +109,26 @@ export default async function StaffClientSigningPage({
               <StaffSigningStatus
                 approval={approval}
                 downloadBase={`${apiRoot}/${approval.id}`}
+                controls={
+                  signingOpen ? (
+                    <PortalCard
+                      description="Review the retained document and named signers before approval. Approval opens signing but does not record a signature."
+                      title={
+                        approval.status === "prepared"
+                          ? "Approve signing"
+                          : "Signing controls"
+                      }
+                    >
+                      <SigningForm
+                        approval={approval}
+                        audience="staff"
+                        commandEndpoint={apiRoot}
+                        organisationId={organisationId.data}
+                      />
+                    </PortalCard>
+                  ) : undefined
+                }
               />
-              {signingOpen ? (
-                <PortalCard
-                  description="These actions use the retained approval binding and never create a second signing request."
-                  title={
-                    approval.status === "prepared"
-                      ? "Approve signing"
-                      : "Signing controls"
-                  }
-                >
-                  <SigningForm
-                    approval={approval}
-                    audience="staff"
-                    commandEndpoint={apiRoot}
-                    organisationId={organisationId.data}
-                  />
-                </PortalCard>
-              ) : null}
             </section>
           );
         })

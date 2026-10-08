@@ -143,12 +143,7 @@ for (const status of ["prepared", "approved"] as const) {
         signingSuccessRedirect="/portal/admin/clients/example/signing"
       />,
     );
-    assert.match(
-      html,
-      status === "prepared"
-        ? /Review and publish for signing/
-        : /View signing progress/,
-    );
+    assert.match(html, /Review signing status/);
     assert.match(html, /href="\/portal\/admin\/clients\/example\/signing/);
     assert.doesNotMatch(
       html,

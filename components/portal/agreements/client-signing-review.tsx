@@ -1,14 +1,8 @@
 import { SigningForm } from "@/components/operations/signing/signing-form";
-import {
-  Notice,
-  PortalActionLink,
-  PortalCard,
-  StatusBadge,
-} from "@/components/portal/ui";
+import { Notice, PortalActionLink, PortalCard } from "@/components/portal/ui";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import type { SigningApproval } from "@/lib/operations/agreements/signing-types";
 import {
-  AgreementStatusCard,
   hasCompleteSigningEvidence,
   clientSigningProgress,
 } from "./presentation";
@@ -38,7 +32,10 @@ export function ClientSigningReview({
 }: ClientSigningReviewProps): React.JSX.Element {
   const normalisedEmail = email.trim().toLowerCase();
   const ownSignature = approval.signatures.find(
-    (signature) => signature.email === normalisedEmail,
+    (signature) => signature.email.toLowerCase() === normalisedEmail,
+  );
+  const isNamedSigner = approval.requiredSigners.some(
+    (signer) => signer.toLowerCase() === normalisedEmail,
   );
   const complete = hasCompleteSigningEvidence(approval);
   const progress = clientSigningProgress(approval, email);
@@ -48,15 +45,8 @@ export function ClientSigningReview({
 
   return (
     <article className={styles.detail}>
-      <Notice tone="info">
-        <strong>Signing as {shownName}</strong>
-        <p>
-          You are a designated signer for {approval.organisationLegalName}. Your
-          verified email is {normalisedEmail}.
-        </p>
-      </Notice>
       <PortalCard
-        description="The exact document you are signing is retained against this revision. Download an accessible copy before confirming."
+        description="The exact document is retained against this revision. Download an accessible copy before taking an action."
         title={`Agreement revision ${approval.revision}`}
       >
         <p className={styles.prose}>{approval.draft.terms}</p>
@@ -72,6 +62,18 @@ export function ClientSigningReview({
           </PortalActionLink>
         </div>
       </PortalCard>
+      <Notice tone="info">
+        <strong>
+          {isNamedSigner
+            ? `Signing as ${shownName}`
+            : "Read-only agreement review"}
+        </strong>
+        <p>
+          {isNamedSigner
+            ? `You are a designated signer for ${approval.organisationLegalName}. Your verified email is ${normalisedEmail}.`
+            : `You can review this agreement for ${approval.organisationLegalName}, but ${normalisedEmail} is not a named signer.`}
+        </p>
+      </Notice>
       {signingOpen ? (
         <PortalCard
           description="Your signature is recorded only after the approved signing command confirms it."
@@ -104,6 +106,11 @@ export function ClientSigningReview({
               : "We are awaiting the remaining signers before the final document is retained."}
           </p>
         </Notice>
+      ) : !isNamedSigner ? (
+        <Notice tone="info">
+          <strong>No signature is needed from your account.</strong>
+          <p>Only the named signers can sign this revision.</p>
+        </Notice>
       ) : (
         <Notice tone="warning">
           <strong>This signing request is not open.</strong>
@@ -113,23 +120,6 @@ export function ClientSigningReview({
           </p>
         </Notice>
       )}
-      <div className={styles.detailStatus}>
-        <StatusBadge status={complete ? "success" : "info"}>
-          {complete ? "Signed and complete" : "Exact revision"}
-        </StatusBadge>
-        <span>Version {approval.agreementVersion}</span>
-      </div>
-      <AgreementStatusCard
-        status={
-          complete
-            ? "signed"
-            : progress === "processing"
-              ? "processing"
-              : approval.status === "approved"
-                ? "awaiting_signature"
-                : "voided"
-        }
-      />
     </article>
   );
 }

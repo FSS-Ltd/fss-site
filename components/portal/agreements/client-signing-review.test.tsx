@@ -100,11 +100,27 @@ test("binds the signer to the exact approved revision", () => {
 
   assert.match(html, /Signing as Alex Morgan/);
   assert.match(html, /Agreement revision 2/);
+  assert.ok(
+    html.indexOf("Agreement revision 2") <
+      html.indexOf("Signing as Alex Morgan"),
+  );
   assert.match(html, /Full legal name/);
-  assert.match(html, /Role \/ position/);
+  assert.doesNotMatch(html, /Role \/ position/);
   assert.match(html, /Confirm your agreement/);
   assert.match(html, /Sign agreement/);
   assert.doesNotMatch(html, /Sign agreement[\s\S]*Revision 1/);
+});
+
+test("keeps signing read-only for a portal member who is not a named signer", () => {
+  const html = renderReview(
+    <ClientSigningReview
+      approval={approval}
+      email="viewer@northstar.example"
+      organisationId={approval.organisationId}
+    />,
+  );
+  assert.match(html, /Read-only agreement review/);
+  assert.doesNotMatch(html, /<button[^>]*value="sign"/);
 });
 
 test("does not render an open signing form after the signer has signed", () => {
