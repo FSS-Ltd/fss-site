@@ -5,6 +5,7 @@ import {
   writeAgreementContent,
   writeExecutionRecord,
 } from "./signing-pdf-content";
+import { finishSigningPdf } from "./signing-pdf-layout";
 import { supportsSigningText, SIGNING_TEXT_ERROR } from "./signing-text";
 import { AgreementConflict } from "./types";
 import {
@@ -37,7 +38,8 @@ async function pdf(
 ): Promise<Buffer> {
   const document = new PDFDocument({
     size: "A4",
-    margin: 48,
+    margins: { top: 104, right: 48, bottom: 100, left: 48 },
+    bufferPages: true,
   });
   const result = new Promise<Buffer>((resolve, reject) => {
     const chunks: Buffer[] = [];
@@ -56,6 +58,7 @@ async function pdf(
     document.on("end", () => resolve(Buffer.concat(chunks)));
   });
   write(document);
+  finishSigningPdf(document);
   document.end();
   return result;
 }
