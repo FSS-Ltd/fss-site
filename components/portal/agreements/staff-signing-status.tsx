@@ -140,14 +140,19 @@ export function StaffSigningStatus({
       </PortalCard>
       {controls}
       <PortalCard title="Delivery and signing">
-        <ul className={styles.schedule} aria-label="Required signing status">
+        <ul
+          className={`${styles.schedule} ${styles.signingSchedule}`}
+          aria-label="Required signing status"
+        >
           {approval.requiredSigners.map((signer) => {
             const signature = approval.signatures.find(
               (item) => item.email.toLowerCase() === signer.toLowerCase(),
             );
             return (
               <li key={signer}>
-                <span>{signature?.typedName ?? signer}</span>
+                <span className={styles.signingScheduleLabel}>
+                  {signature?.typedName ?? signer}
+                </span>
                 {signature ? (
                   <StatusBadge status="success">
                     Signed {formatSignedAt(signature.signedAt)}
@@ -169,8 +174,9 @@ export function StaffSigningStatus({
             );
           })}
           <li>
-            <span>
-              <MailQuestion aria-hidden="true" size={16} /> Delivery
+            <span className={styles.signingScheduleLabel}>
+              <MailQuestion aria-hidden="true" size={16} />
+              <span>Delivery</span>
             </span>
             <StatusBadge status="neutral">
               {approval.status === "prepared"
@@ -179,8 +185,9 @@ export function StaffSigningStatus({
             </StatusBadge>
           </li>
           <li>
-            <span>
-              <PenLine aria-hidden="true" size={16} /> Signing evidence
+            <span className={styles.signingScheduleLabel}>
+              <PenLine aria-hidden="true" size={16} />
+              <span>Signing evidence</span>
             </span>
             <StatusBadge
               status={

@@ -390,11 +390,86 @@
   font-weight: 650;
 }
 
+.signingSchedule li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.signingScheduleLabel {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  overflow-wrap: anywhere;
+}
+
+.signingScheduleLabel svg {
+  flex: none;
+}
+
+.signingReview {
+  width: min(100%, 880px);
+  margin-inline: auto;
+}
+
+.clientSigningForm {
+  display: grid;
+  gap: 20px;
+}
+
+.signingConsent {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 18px;
+  border: 1px solid var(--portal-border, #d9dfe5);
+  border-radius: 12px;
+  background: var(--portal-soft-surface, #f8f9fa);
+}
+
+.signingConsent legend {
+  padding-inline: 4px;
+  color: var(--portal-ink, #0a1a2e);
+  font-size: 1rem;
+  font-weight: 650;
+}
+
+.signingConsent p,
+.signingDecline p {
+  margin: 0;
+  color: var(--portal-muted, #46566c);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.signingDecline {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  padding-top: 18px;
+  border-top: 1px solid var(--portal-border, #d9dfe5);
+}
+
+.signingDecline h3 {
+  margin: 0;
+  color: var(--portal-ink, #0a1a2e);
+}
+
 .actionRow {
   margin-top: 20px;
 }
 
 @media (max-width: 720px) {
+  .signingSchedule li {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .signingSchedule li > :last-child {
+    justify-self: start;
+  }
+
   .fieldGrid {
     grid-template-columns: 1fr;
   }

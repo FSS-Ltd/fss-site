@@ -111,6 +111,9 @@
 }
 .identityAction {
   grid-column: 2 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 .identityAction:empty {
   display: none;

@@ -12,7 +12,7 @@ export type PortalInvitation = {
   emailAddress: string;
   notify: true;
   ignoreExisting: true;
-  expiresInDays: 3;
+  expiresInDays: 30;
   redirectUrl: string;
   publicMetadata?: { fssPortalInvitation: PortalInvitationMetadata };
 };
@@ -179,7 +179,7 @@ export async function provisionPortalAccount(
       emailAddress: normalizedEmail,
       notify: true,
       ignoreExisting: true,
-      expiresInDays: 3,
+      expiresInDays: 30,
       redirectUrl: parsedRedirectUrl,
       ...(metadata
         ? { publicMetadata: { fssPortalInvitation: metadata } }
