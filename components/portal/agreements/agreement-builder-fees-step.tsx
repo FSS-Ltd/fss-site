@@ -28,12 +28,21 @@ import {
   type EditableLine,
   type EditableInstallment,
   emptyLine,
+  ensureClientProposedRecurringService,
+  linesForAgreementDraft,
   toEditableLine,
   toEditableInstallment,
-  parseFeeLines,
   parseInstallments,
   feeTotal,
+  monthlyRecurringLine,
+  separateOneOffFeeLines,
 } from "./agreement-builder-fee-inputs";
+
+type FeeLineState = Readonly<{
+  includeOneOffFees: boolean;
+  lines: EditableLine[];
+  suspendedOneOffLines: EditableLine[];
+}>;
 
 export function AgreementBuilderFeesStep({
   agreement,
@@ -41,25 +50,37 @@ export function AgreementBuilderFeesStep({
   onSave,
   pending,
 }: BuilderStepProps): React.JSX.Element {
-  const flow = useAgreementBuilderGroups(4);
   const currency = agreement.currency ?? "GBP";
-  const [spec, setSpec] = useState<CommercialOfferSpec>(
-    content.commercialOffer?.spec ?? {
-      cash: { mode: "fixed" },
-      revenueShare: null,
-    },
-  );
-  const [lines, setLines] = useState<EditableLine[]>(() =>
-    agreement.lines?.length
+  const initialSpec: CommercialOfferSpec = content.commercialOffer?.spec ?? {
+    cash: { mode: "fixed" },
+    revenueShare: null,
+  };
+  const [spec, setSpec] = useState<CommercialOfferSpec>(initialSpec);
+  const [feeLines, setFeeLines] = useState<FeeLineState>(() => {
+    const includeOneOffFees = Boolean(
+      agreement.lines?.some((line) => line.recurrenceMonths === 0),
+    );
+    const initialLines = agreement.lines?.length
       ? agreement.lines.map(toEditableLine)
-      : [emptyLine()],
-  );
+      : [includeOneOffFees ? emptyLine() : monthlyRecurringLine()];
+    const lines =
+      initialSpec.cash?.mode === "client_proposed"
+        ? ensureClientProposedRecurringService(initialLines)
+        : initialLines;
+    return {
+      includeOneOffFees,
+      lines,
+      suspendedOneOffLines: [],
+    };
+  });
   const [installments, setInstallments] = useState<EditableInstallment[]>(() =>
     agreement.installments?.length
       ? agreement.installments.map(toEditableInstallment)
       : [],
   );
   const [formError, setFormError] = useState<string | null>(null);
+  const { includeOneOffFees, lines } = feeLines;
+  const flow = useAgreementBuilderGroups(includeOneOffFees ? 4 : 3);
   const total = useMemo(
     () =>
       feeTotal(
@@ -76,13 +97,82 @@ export function AgreementBuilderFeesStep({
     field: keyof EditableLine,
     value: string,
   ): void {
-    setLines((current) =>
-      current.map((line, lineIndex) =>
+    setFeeLines((current) => ({
+      ...current,
+      lines: current.lines.map((line, lineIndex) =>
         lineIndex === index
           ? ({ ...line, [field]: value } as EditableLine)
           : line,
       ),
-    );
+    }));
+  }
+
+  function updateSpec(nextSpec: CommercialOfferSpec): void {
+    setSpec(nextSpec);
+    if (nextSpec.cash?.mode !== "client_proposed") return;
+    setFeeLines((current) => {
+      const activeLines = current.includeOneOffFees
+        ? current.lines
+        : [...current.lines, ...current.suspendedOneOffLines];
+      const lines = ensureClientProposedRecurringService(activeLines);
+      const { oneOff, recurring } = separateOneOffFeeLines(lines);
+      return {
+        includeOneOffFees: current.includeOneOffFees,
+        lines: current.includeOneOffFees ? lines : recurring,
+        suspendedOneOffLines: current.includeOneOffFees ? [] : oneOff,
+      };
+    });
+  }
+
+  function updateIncludeOneOffFees(include: boolean): void {
+    setFeeLines((current) => {
+      if (include) {
+        const lines = [...current.suspendedOneOffLines, ...current.lines];
+        return {
+          includeOneOffFees: true,
+          lines:
+            current.suspendedOneOffLines.length === 0
+              ? lines.some((line) => line.recurrenceMonths === "0")
+                ? lines
+                : [...lines, emptyLine()]
+              : lines,
+          suspendedOneOffLines: [],
+        };
+      }
+      const { oneOff, recurring } = separateOneOffFeeLines(current.lines);
+      return {
+        includeOneOffFees: false,
+        lines: recurring.length ? recurring : [monthlyRecurringLine()],
+        suspendedOneOffLines: oneOff,
+      };
+    });
+  }
+
+  function addLine(): void {
+    setFeeLines((current) => ({
+      ...current,
+      lines: [
+        ...current.lines,
+        spec.cash?.mode === "client_proposed" || !current.includeOneOffFees
+          ? monthlyRecurringLine()
+          : emptyLine(),
+      ],
+    }));
+  }
+
+  function removeLine(index: number): void {
+    setFeeLines((current) => ({
+      ...current,
+      lines:
+        current.lines.length === 1
+          ? [
+              spec.cash?.mode === "client_proposed" ||
+              !current.includeOneOffFees
+                ? monthlyRecurringLine()
+                : emptyLine(),
+            ]
+          : current.lines.filter((_, lineIndex) => lineIndex !== index),
+    }));
   }
 
   function updateInstallment(
@@ -100,29 +190,56 @@ export function AgreementBuilderFeesStep({
   }
 
   function contentFromForm(): AgreementBuilderDraftContent | null {
-    const data = flow.read();
-    if (!data) return null;
-    let errorGroup = 1;
+    let invalidGroup = 0;
+    const data = flow.read((groupIndex) => {
+      invalidGroup = groupIndex;
+    });
+    if (!data) {
+      if (invalidGroup >= 0)
+        setFormError("Complete the highlighted field before saving fees.");
+      return null;
+    }
+    let errorGroup = invalidGroup;
     try {
       setFormError(null);
+      errorGroup = 1;
       const offer = readCommercialOffer(data);
       errorGroup = 0;
-      const feeLines = parseFeeLines(
-        lines.map((line) =>
-          line.recurrenceMonths !== "0" && spec.cash?.mode !== "fixed"
-            ? { ...line, unitPrice: "0", discount: "0", tax: "0" }
-            : line,
-        ),
+      const clientProposed = spec.cash?.mode === "client_proposed";
+      if (!offer && spec.cash?.mode !== "fixed") {
+        errorGroup = 1;
+        throw new Error("Choose ongoing compensation before saving fees.");
+      }
+      const parsedFeeLines = linesForAgreementDraft(
+        lines,
+        includeOneOffFees,
+        clientProposed,
       );
-      errorGroup = 3;
-      const nextInstallments = parseInstallments(installments);
+      if (
+        !parsedFeeLines.length ||
+        (!includeOneOffFees &&
+          !parsedFeeLines.some((line) => line.recurrenceMonths > 0)) ||
+        (clientProposed &&
+          !parsedFeeLines.some((line) => line.recurrenceMonths > 0))
+      ) {
+        errorGroup = 0;
+        throw new Error(
+          includeOneOffFees
+            ? "Add at least one service fee before saving."
+            : "Add at least one recurring service when no one-off fee is included.",
+        );
+      }
+      errorGroup = includeOneOffFees ? 3 : 2;
+      const nextInstallments = includeOneOffFees
+        ? parseInstallments(installments)
+        : [];
       errorGroup = 2;
       const nextContent = mergeContent(content, {
         ...agreement,
         assetsRequired: data.has("assetsRequired"),
         currency,
         installments: nextInstallments,
-        lines: feeLines,
+        lines: parsedFeeLines,
         minimumTermMonths: numberValue(data, "minimumTermMonths"),
         noticeDays: numberValue(data, "noticeDays"),
         requiredDepositPence: decimalToMinor(
@@ -147,6 +264,74 @@ export function AgreementBuilderFeesStep({
     if (nextContent) await onSave(step, nextContent);
   }
 
+  const groups = [
+    {
+      title: "Price the services",
+      description: `Enter service amounts in ${currency}.`,
+      children: (
+        <AgreementBuilderFeeLines
+          currency={currency}
+          clientProposed={spec.cash?.mode === "client_proposed"}
+          fixed={spec.cash?.mode === "fixed"}
+          includeOneOffFees={includeOneOffFees}
+          lines={lines}
+          onAdd={addLine}
+          onIncludeOneOffFeesChange={updateIncludeOneOffFees}
+          onRemove={removeLine}
+          total={total}
+          updateLine={updateLine}
+        />
+      ),
+    },
+    {
+      title: "Set ongoing compensation",
+      children: (
+        <CommercialOfferFields
+          currency={currency}
+          expiresAt={content.commercialOffer?.expiresAt}
+          onChange={updateSpec}
+          spec={spec}
+        />
+      ),
+    },
+    {
+      title: "Set the payment terms",
+      children: (
+        <AgreementBuilderPaymentTerms
+          agreement={agreement}
+          currency={currency}
+        />
+      ),
+    },
+    ...(includeOneOffFees
+      ? [
+          {
+            title: "Plan the payments",
+            children: (
+              <AgreementBuilderPaymentSchedule
+                currency={currency}
+                installments={installments}
+                onAdd={() =>
+                  setInstallments((current) => [
+                    ...current,
+                    { amount: "", dueDate: "" },
+                  ])
+                }
+                onRemove={(index) =>
+                  setInstallments((current) =>
+                    current.filter(
+                      (_, installmentIndex) => installmentIndex !== index,
+                    ),
+                  )
+                }
+                updateInstallment={updateInstallment}
+              />
+            ),
+          },
+        ]
+      : []),
+  ];
+
   return (
     <AgreementBuilderGroupForm
       flow={flow}
@@ -156,70 +341,7 @@ export function AgreementBuilderFeesStep({
       continueLabel="Continue to people"
       onContinue={() => void save("people")}
       onSave={() => void save("fees")}
-      groups={[
-        {
-          title: "Price the services",
-          description: `Enter service amounts in ${currency}.`,
-          children: (
-            <AgreementBuilderFeeLines
-              lines={lines}
-              fixed={spec.cash?.mode === "fixed"}
-              total={total}
-              currency={currency}
-              updateLine={updateLine}
-              onAdd={() => setLines((current) => [...current, emptyLine()])}
-              onRemove={(index) =>
-                setLines((current) =>
-                  current.filter((_, lineIndex) => lineIndex !== index),
-                )
-              }
-            />
-          ),
-        },
-        {
-          title: "Set ongoing compensation",
-          children: (
-            <CommercialOfferFields
-              spec={spec}
-              currency={currency}
-              expiresAt={content.commercialOffer?.expiresAt}
-              onChange={setSpec}
-            />
-          ),
-        },
-        {
-          title: "Set the payment terms",
-          children: (
-            <AgreementBuilderPaymentTerms
-              agreement={agreement}
-              currency={currency}
-            />
-          ),
-        },
-        {
-          title: "Plan the payments",
-          children: (
-            <AgreementBuilderPaymentSchedule
-              installments={installments}
-              currency={currency}
-              updateInstallment={updateInstallment}
-              onAdd={() =>
-                setInstallments((current) => [
-                  ...current,
-                  { amount: "", dueDate: "" },
-                ])
-              }
-              onRemove={(index) =>
-                setInstallments((current) =>
-                  current.filter(
-                    (_, installmentIndex) => installmentIndex !== index,
-                  ),
-                )
-              }
-            />
-          ),
-        },
-      ]}
+      groups={groups}
     >
       {formError ? (
         <Notice tone="error">

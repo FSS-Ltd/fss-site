@@ -57,7 +57,7 @@ test("offers require an option and every revenue share term", () => {
     false,
   );
 });
-test("proposed recurring fees require one shared interval and date range", () => {
+test("client-proposed recurring amounts accept monthly service drafts and actionably reject missing or mismatched services", () => {
   const input = {
     engagementId: randomUUID(),
     draft: recurringDraft(),
@@ -65,6 +65,7 @@ test("proposed recurring fees require one shared interval and date range", () =>
     expiresAt: new Date(Date.now() + 86400000).toISOString(),
   };
   assert.equal(publishCommercialOfferSchema.safeParse(input).success, true);
+  assert.equal(input.draft.lines[1].recurrenceMonths, 1);
   const extra = { ...input.draft.lines[1], recurrenceMonths: 3 as const };
   assert.equal(
     publishCommercialOfferSchema.safeParse({
@@ -73,10 +74,30 @@ test("proposed recurring fees require one shared interval and date range", () =>
     }).success,
     false,
   );
+  const noRecurring = publishCommercialOfferSchema.safeParse({
+    ...input,
+    draft: agreementDraft(),
+  });
+  assert.equal(noRecurring.success, false);
+  if (!noRecurring.success)
+    assert.match(
+      noRecurring.error.issues[0]?.message ?? "",
+      /add a recurring service with the same billing interval and date range, then publish the client-proposed monthly amount/i,
+    );
   assert.equal(
     publishCommercialOfferSchema.safeParse({
       ...input,
-      draft: agreementDraft(),
+      draft: {
+        ...input.draft,
+        lines: [
+          ...input.draft.lines,
+          {
+            ...input.draft.lines[1],
+            recurrenceMonths: 3 as const,
+            serviceCode: "different_interval",
+          },
+        ],
+      },
     }).success,
     false,
   );

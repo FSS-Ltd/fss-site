@@ -86,13 +86,13 @@ export function builderValidationIssues(
     if (
       issue.code === "custom" &&
       issue.message ===
-        "Client-proposed recurring fees require one shared interval and date range."
+        "Add a recurring service with the same billing interval and date range, then publish the client-proposed monthly amount."
     ) {
       message = content.agreement?.lines?.some(
         (line) => line.recurrenceMonths > 0,
       )
         ? "Use the same billing interval, start date and end date for all client-proposed recurring services."
-        : "Client-proposed amounts apply to recurring services. Add a recurring service or choose fixed payment.";
+        : "Add a recurring service, then publish the client-proposed monthly amount.";
     }
     return { step, message: `${stageNames[step]}: ${message}` };
   });

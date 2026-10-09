@@ -61,7 +61,7 @@ export const publishCommercialOfferSchema = z
         code: "custom",
         path: ["draft", "lines"],
         message:
-          "Client-proposed recurring fees require one shared interval and date range.",
+          "Add a recurring service with the same billing interval and date range, then publish the client-proposed monthly amount.",
       });
     }
   });

@@ -329,7 +329,7 @@ for (const stage of [
 test("recurring services reach compensation choices without a temporary rate", async ({
   page,
 }) => {
-  await page.goto("/visual/fss-studio/studio-agreement-builder-fees");
+  await page.goto("/visual/fss-studio/studio-agreement-builder-recurring-only");
   await page
     .getByRole("combobox", { name: "Billing interval" })
     .selectOption("1");
@@ -341,46 +341,150 @@ test("recurring services reach compensation choices without a temporary rate", a
   // Retaining fixed compensation still requires a real recurring amount on save.
   await page.getByRole("button", { name: "Save draft" }).click();
   await expect(
-    page.getByRole("heading", { name: "Price the services" }),
-  ).toBeFocused();
-  await expect(
-    page.getByRole("alert").filter({ hasText: /amount/i }),
+    page.getByRole("alert").filter({ hasText: /highlighted field/i }),
   ).toBeVisible();
+  await expect(page.getByLabel(/^Rate \(£\)/)).toBeVisible();
 });
 
-test("explicit assistive activation advances reviewed work", async ({
+test("client-proposed compensation publishes a monthly service without removing setup fees", async ({
   page,
 }) => {
-  await page.goto("/visual/fss-studio/studio-agreement-builder");
-  await page.getByRole("radio").first().dispatchEvent("click", { detail: 0 });
-  await expect(page.locator('[data-builder-group="1"]')).toBeVisible();
+  const commands: Array<Record<string, unknown>> = [];
+  let version = 3;
+  await page.route(
+    "**/api/portal/admin/clients/*/agreement-drafts",
+    async (route) => {
+      const command = route.request().postDataJSON();
+      commands.push(command);
+      if (command.action === "publish") {
+        await route.fulfill({
+          json: { id: "88bd0e6d-710f-40d7-9379-9d46247f2e8d" },
+        });
+        return;
+      }
+      version += 1;
+      await route.fulfill({
+        json: {
+          content: command.content,
+          id: command.draftId,
+          step: command.step,
+          version,
+        },
+      });
+    },
+  );
+  await page.goto("/visual/fss-studio/studio-agreement-builder-fees");
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await page
+    .getByRole("combobox", { name: "Recurring payment" })
+    .selectOption("client_proposed");
+  await page.getByLabel("Offer expiry").fill("2026-11-01T09:00");
+  await page.getByRole("button", { name: "Back", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Fee line 2" })).toBeVisible();
+  await expect(
+    page.getByRole("combobox", { name: "Billing interval" }).nth(1),
+  ).toHaveValue("1");
+  await expect(page.getByLabel("Rate (£)").nth(1)).toBeDisabled();
+  await expect(page.getByLabel("Discount (£)").nth(1)).toBeDisabled();
+  await expect(page.getByLabel("Tax amount (£)").nth(1)).toBeDisabled();
+  await page.getByLabel("Service code").nth(1).fill("support");
+  await page.getByLabel("Description").nth(1).fill("Ongoing support");
+  await page.getByLabel("Contract start date").nth(1).fill("2026-10-01");
+  await page.getByLabel("Include a one-off fee").uncheck();
+  await page.getByLabel("Include a one-off fee").check();
+  await expect(page.getByLabel("Service code").first()).toHaveValue("website");
+  await expect(page.getByLabel("Description").first()).toHaveValue(
+    "Website & booking experience",
+  );
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Set ongoing compensation" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Set the payment terms" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Plan the payments" }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Continue to people", exact: true })
+    .click();
+  const feesSave = commands.find((command) => command.step === "people");
+  expect(feesSave?.content).toMatchObject({
+    agreement: {
+      lines: [
+        { recurrenceMonths: 0, unitPence: "480000" },
+        { recurrenceMonths: 1, unitPence: "0" },
+      ],
+    },
+    commercialOffer: { spec: { cash: { mode: "client_proposed" } } },
+  });
+  await page
+    .getByRole("button", { name: "Continue to document", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Review agreement", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Publish payment offer", exact: true })
+    .click();
+  expect(commands.at(-1)).toMatchObject({
+    action: "publish",
+    expectedVersion: version,
+  });
 });
 
-for (const stage of ["scope", "review"] as const) {
-  test(`network failures retain a distinct ${stage === "scope" ? "save" : "creation"} message`, async ({
-    page,
-  }) => {
-    await page.route(
-      "**/api/portal/admin/clients/*/agreement-drafts",
-      (route) => route.abort("failed"),
-    );
-    await page.goto(`/visual/fss-studio/studio-agreement-builder-${stage}`);
-    await page
-      .getByRole("button", {
-        name: stage === "scope" ? "Save draft" : "Create agreement",
-        exact: true,
-      })
-      .click();
-    await expect(
-      page.getByRole("alert").filter({
-        hasText:
-          stage === "scope"
-            ? "draft could not be saved"
-            : "agreement could not be created",
-      }),
-    ).toBeVisible();
+test("agreements without a one-off fee hide the schedule and omit setup lines and installments on save", async ({
+  page,
+}) => {
+  const commands: Array<Record<string, unknown>> = [];
+  let version = 3;
+  await page.route(
+    "**/api/portal/admin/clients/*/agreement-drafts",
+    async (route) => {
+      const command = route.request().postDataJSON();
+      commands.push(command);
+      version += 1;
+      await route.fulfill({
+        json: {
+          content: command.content,
+          id: command.draftId,
+          step: command.step,
+          version,
+        },
+      });
+    },
+  );
+  await page.goto("/visual/fss-studio/studio-agreement-builder-recurring-only");
+  await page.getByLabel("Include a one-off fee").uncheck();
+  await expect(page.getByLabel("Include a one-off fee")).not.toBeChecked();
+  await expect(
+    page.getByRole("combobox", { name: "Billing interval" }),
+  ).toHaveValue("1");
+  await page.getByLabel("Service code").fill("support");
+  await page.getByLabel("Description").fill("Ongoing support");
+  await page.getByLabel("Rate (£)").fill("250.00");
+  await page.getByLabel("Contract start date").fill("2026-09-15");
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Plan the payments" }),
+  ).not.toBeAttached();
+  await page.getByRole("button", { name: "Back", exact: true }).click();
+  await page.getByRole("button", { name: "Back", exact: true }).click();
+  await expect(page.getByLabel("Service code")).toHaveValue("support");
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await page.getByRole("button", { name: "Save draft" }).click();
+  expect(commands.at(-1)?.content).toMatchObject({
+    agreement: {
+      installments: [],
+      lines: [{ recurrenceMonths: 1, serviceCode: "support" }],
+    },
   });
-}
+});
 
 test("an incomplete saved offer explains what is missing and opens Fees to repair it", async ({
   page,
@@ -415,7 +519,8 @@ test("an incomplete saved offer explains what is missing and opens Fees to repai
   await page.getByRole("button", { name: "Save draft", exact: true }).click();
   await expect(
     page.getByRole("alert").filter({
-      hasText: "Client-proposed amounts apply to recurring services",
+      hasText:
+        "Add a recurring service, then publish the client-proposed monthly amount",
     }),
   ).toBeVisible();
   await expect(
@@ -520,5 +625,39 @@ for (const appearance of ["light", "dark"] as const) {
     await expect(
       page.getByRole("textbox", { name: "Rate (£)" }).first(),
     ).toHaveValue("4800.00");
+  });
+}
+
+test("explicit assistive activation advances reviewed work", async ({
+  page,
+}) => {
+  await page.goto("/visual/fss-studio/studio-agreement-builder");
+  await page.getByRole("radio").first().dispatchEvent("click", { detail: 0 });
+  await expect(page.locator('[data-builder-group="1"]')).toBeVisible();
+});
+
+for (const stage of ["scope", "review"] as const) {
+  test(`network failures retain a distinct ${stage === "scope" ? "save" : "creation"} message`, async ({
+    page,
+  }) => {
+    await page.route(
+      "**/api/portal/admin/clients/*/agreement-drafts",
+      (route) => route.abort("failed"),
+    );
+    await page.goto(`/visual/fss-studio/studio-agreement-builder-${stage}`);
+    await page
+      .getByRole("button", {
+        name: stage === "scope" ? "Save draft" : "Create agreement",
+        exact: true,
+      })
+      .click();
+    await expect(
+      page.getByRole("alert").filter({
+        hasText:
+          stage === "scope"
+            ? "draft could not be saved"
+            : "agreement could not be created",
+      }),
+    ).toBeVisible();
   });
 }

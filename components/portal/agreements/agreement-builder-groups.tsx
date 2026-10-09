@@ -7,10 +7,19 @@ import styles from "./agreement-builder.module.css";
 
 type FormControl = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 
-function invalidControl(group: Element): FormControl | undefined {
+function invalidControl(
+  container: Element,
+  continueOnly = false,
+): FormControl | undefined {
   return Array.from(
-    group.querySelectorAll<FormControl>("input, select, textarea"),
-  ).find((control) => control.willValidate && !control.validity.valid);
+    container.querySelectorAll<FormControl>("input, select, textarea"),
+  ).find(
+    (control) =>
+      control.willValidate &&
+      !control.validity.valid &&
+      (!continueOnly ||
+        !control.closest("[data-builder-validate-on-save-only]")),
+  );
 }
 
 function focusInvalidControl(control: FormControl): void {
@@ -25,7 +34,7 @@ type AgreementBuilderGroupFlow = Readonly<{
   index: number;
   direction: "forward" | "backward";
   next: () => boolean;
-  read: () => FormData | null;
+  read: (onInvalid?: (groupIndex: number) => void) => FormData | null;
   show: (index: number, invalid?: FormControl) => void;
   headingId: (index: number) => string;
 }>;
@@ -34,7 +43,8 @@ export function useAgreementBuilderGroups(
   count: number,
 ): AgreementBuilderGroupFlow {
   const formRef = useRef<HTMLFormElement>(null);
-  const [index, setIndex] = useState(0);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const index = Math.min(selectedIndex, Math.max(0, count - 1));
   const [direction, setDirection] = useState<"forward" | "backward">("forward");
   const focusTarget = useRef<FormControl | null>(null);
   const id = useId();
@@ -57,7 +67,7 @@ export function useAgreementBuilderGroups(
     }
     focusTarget.current = invalid ?? null;
     setDirection(next < index ? "backward" : "forward");
-    setIndex(next);
+    setSelectedIndex(next);
   }
 
   function next(): boolean {
@@ -65,7 +75,7 @@ export function useAgreementBuilderGroups(
       `[data-builder-group="${index}"]`,
     );
     if (!group) return false;
-    const invalid = invalidControl(group);
+    const invalid = invalidControl(group, true);
     if (invalid) {
       focusInvalidControl(invalid);
       return false;
@@ -77,7 +87,7 @@ export function useAgreementBuilderGroups(
     return true;
   }
 
-  function read(): FormData | null {
+  function read(onInvalid?: (groupIndex: number) => void): FormData | null {
     const form = formRef.current;
     if (!form) return null;
     const groups = form.querySelectorAll("[data-builder-group]");
@@ -85,6 +95,7 @@ export function useAgreementBuilderGroups(
       const invalid = invalidControl(groups[groupIndex]);
       if (invalid) {
         show(groupIndex, invalid);
+        onInvalid?.(groupIndex);
         return null;
       }
     }
