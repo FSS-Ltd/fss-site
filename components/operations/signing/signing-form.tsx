@@ -14,11 +14,11 @@ import {
 import {
   Notice,
   PortalButton,
-  PortalCard,
   PortalCheckbox,
   PortalField,
 } from "@/components/portal/ui";
 import styles from "../agreements/agreements.module.css";
+import portalStyles from "../../portal/agreements/agreements.module.css";
 
 export function SigningForm({
   organisationId,
@@ -146,7 +146,13 @@ export function SigningForm({
   }
   return (
     <>
-      <form aria-busy={pending} onSubmit={submit} className={styles.form}>
+      <form
+        aria-busy={pending}
+        onSubmit={submit}
+        className={
+          audience === "portal" ? portalStyles.clientSigningForm : styles.form
+        }
+      >
         {agreement ? (
           <>
             <p>
@@ -219,10 +225,12 @@ export function SigningForm({
               name="authority"
               required
             />
-            <PortalCard
-              description="Confirming records your consent only after the approved signing command succeeds."
-              title="Confirm your agreement"
-            >
+            <fieldset className={portalStyles.signingConsent}>
+              <legend>Confirm your agreement</legend>
+              <p>
+                Confirming records your consent only after the approved signing
+                command succeeds.
+              </p>
               <PortalCheckbox
                 disabled={pending || Boolean(success)}
                 label={SIGNING_CONSENT}
@@ -237,11 +245,13 @@ export function SigningForm({
               >
                 Sign agreement
               </PortalButton>
-            </PortalCard>
-            <PortalCard
-              description="Declining closes this signing request for everyone. Contact your FSS team to discuss revised terms."
-              title="Need a revised agreement?"
-            >
+            </fieldset>
+            <div className={portalStyles.signingDecline}>
+              <h3>Need a revised agreement?</h3>
+              <p>
+                Declining closes this signing request for everyone. Contact your
+                FSS team to discuss revised terms.
+              </p>
               <PortalButton
                 disabled={pending || Boolean(success)}
                 onClick={(event) => openConfirmation("decline", event)}
@@ -250,7 +260,7 @@ export function SigningForm({
               >
                 Decline agreement
               </PortalButton>
-            </PortalCard>
+            </div>
           </>
         )}
         {error ? (

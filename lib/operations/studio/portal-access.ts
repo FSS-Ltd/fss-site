@@ -17,6 +17,10 @@ import type { FssAdminContext } from "../auth/staff-types";
 import type { OperationsDb } from "../db/client";
 import type { WorkspaceCollectionPage } from "../workspaces/pagination";
 import { deleteStudioInvitation } from "./portal-invitation-delete";
+import {
+  resendInvitationSchema,
+  resendStudioInvitation,
+} from "./portal-invitation-resend";
 
 const accessStateSchema = z.enum([
   "active",
@@ -69,6 +73,7 @@ export const staffPortalAccessOperationSchema = z.discriminatedUnion("action", [
   staffInvitationSchema.extend({ action: z.literal("invite_admin") }),
   revokeStaffMembershipSchema.extend({ action: z.literal("revoke_admin") }),
   deleteInvitationSchema,
+  resendInvitationSchema,
 ]);
 
 export type StaffPortalAccessOperation = z.infer<
@@ -189,6 +194,17 @@ export async function applyStaffPortalAccessOperation(
   if (operation.action === "delete_invitation") {
     await deleteStudioInvitation(db, admin, identity, operation);
     return { status: "deleted" };
+  }
+  if (operation.action === "resend_invitation") {
+    await resendStudioInvitation(
+      db,
+      admin,
+      identity,
+      operation,
+      origin,
+      provision,
+    );
+    return { status: "sent" };
   }
   if (
     operation.action === "invite_admin" ||

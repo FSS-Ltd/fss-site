@@ -93,7 +93,7 @@ export async function listStudioPortalAccess(
           union all
           select 'staff:' || s.id, 'admin', s.joined_at::text,
             null::uuid, 'FSS'::text, null::uuid, s.name, s.email, s.membership_id,
-            'admin', s.state, s.invited_at::text, null::text, s.joined_at::text
+            'admin', s.state, s.invited_at::text, s.expires_at::text, s.joined_at::text
           from operations.founder_staff_access_register() s
           where ${canManageStaff}
         ), filtered as (

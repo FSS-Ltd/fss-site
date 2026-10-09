@@ -183,6 +183,37 @@ test("invitation deletion requires a review reference and restores keyboard focu
   await expect(trigger).toBeFocused();
 });
 
+test("resending a current invitation requires review and confirms provider acceptance", async ({
+  page,
+}) => {
+  await page.goto("/visual/fss-studio/studio-portal-access-invitation");
+  await page.route("**/api/portal/admin/portal-access", async (route) => {
+    expect(route.request().postDataJSON()).toEqual({
+      action: "resend_invitation",
+      invitationId: "2e83e9c3-b021-4a55-b117-78c05b456c15",
+      kind: "client",
+      reviewReference: "review-42",
+    });
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ status: "sent" }),
+    });
+  });
+  const trigger = page.getByRole("button", { name: "Resend invitation" });
+  await trigger.click();
+  const dialog = page.getByRole("dialog", { name: "Resend invitation" });
+  await dialog.getByRole("button", { name: "Send new invitation" }).click();
+  await expect(dialog.getByLabel("Review reference")).toBeFocused();
+  await dialog.getByLabel("Review reference").fill("review-42");
+  await dialog.getByRole("button", { name: "Send new invitation" }).click();
+  await expect(dialog.getByRole("status")).toContainText(
+    "accepted by the provider",
+  );
+  await dialog.getByRole("button", { name: "Done" }).click();
+  await expect(page.locator("#portal-access-result")).toBeFocused();
+});
+
 test("client can decline from a new link without submitting account details", async ({
   page,
 }) => {

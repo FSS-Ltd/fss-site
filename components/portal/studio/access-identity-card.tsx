@@ -2,6 +2,7 @@ import { PortalCard, StatusBadge } from "@/components/portal/ui";
 import type { StudioPortalAccessEntry } from "@/lib/operations/studio/portal-access";
 import { AccessDialog } from "./access-dialog";
 import { DeleteInvitationDialog } from "./delete-invitation-dialog";
+import { ResendInvitationDialog } from "./resend-invitation-dialog";
 import {
   accessDate,
   accessRole,
@@ -25,6 +26,19 @@ export function AccessIdentityCard({
     entry.state === "active" &&
     entry.membershipId &&
     (entry.accessType === "client" || canManageStaff);
+  const [prefix, invitationId] = entry.id.split(":");
+  const resendKind =
+    prefix === "client-invitation"
+      ? "client"
+      : prefix === "staff"
+        ? "staff"
+        : null;
+  const canResend =
+    !entry.membershipId &&
+    (entry.state === "pending" || entry.state === "expired") &&
+    resendKind !== null &&
+    Boolean(invitationId) &&
+    (resendKind === "client" || canManageStaff);
   return (
     <PortalCard>
       <div className={styles.identity}>
@@ -48,6 +62,14 @@ export function AccessIdentityCard({
           {accessStateLabels[entry.state]}
         </StatusBadge>
         <div className={styles.identityAction}>
+          {canResend && resendKind && invitationId ? (
+            <ResendInvitationDialog
+              entry={entry}
+              invitationId={invitationId}
+              kind={resendKind}
+              onComplete={onComplete}
+            />
+          ) : null}
           {removable ? (
             <AccessDialog entry={entry} kind="remove" onComplete={onComplete} />
           ) : !entry.membershipId &&

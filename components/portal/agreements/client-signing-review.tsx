@@ -44,7 +44,7 @@ export function ClientSigningReview({
   const backHref = agreementPath(approval.id, organisationId);
 
   return (
-    <article className={styles.detail}>
+    <article className={`${styles.detail} ${styles.signingReview}`}>
       <PortalCard
         description="The exact document is retained against this revision. Download an accessible copy before taking an action."
         title={`Agreement revision ${approval.revision}`}
