@@ -16,6 +16,8 @@ A signer explicitly supplies their name and confirms authority and consent. The 
 
 Source PDFs, signed PDFs and audit records remain private in bounded database artifacts. Each artifact is limited to 1 MiB. The bundled PDF font supports Western European characters; unsupported names or terms are rejected before approval or consent, with a manual-workflow alternative. Full Unicode font embedding is a later extension. The signed document includes the original source PDF and audit record as attachments. Download handlers authenticate every request and return private, non-cacheable attachments. The database enforces append-only evidence and immutable revisions, independently of UI controls.
 
+New source and signed PDFs use the FSS portal colours and monogram, numbered agreement sections, structured fees and a separate execution record. All agreement text remains selectable. A signed PDF still embeds the exact source bytes each signer approved, so already retained approvals keep their original source even if a later signing uses the updated presentation.
+
 ## Completion and Growth
 
 Every required signature must exist before the dedicated signing worker retains final evidence and atomically marks the agreement signed. A five-minute authenticated cron retries document completion and processes the durable Growth outbox. The portal shows signatures recorded while final documents are pending.
