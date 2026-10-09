@@ -110,7 +110,7 @@ test("real restricted portal role enforces invitation lifecycle, exact identity 
     const invitation = await issuePortalInvite(founderDb, founder, input);
     assert.ok(
       Math.abs(
-        invitation.expiresAt.getTime() - Date.now() - 72 * 60 * 60 * 1000,
+        invitation.expiresAt.getTime() - Date.now() - 30 * 24 * 60 * 60 * 1000,
       ) < 10000,
     );
     const [stored] = await admin<
