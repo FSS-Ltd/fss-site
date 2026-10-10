@@ -71,6 +71,7 @@ function command(): Extract<JourneyCommand, { action: "preview_welcome" }> {
 function transaction(
   active: ActiveStudioSettings = settings,
   isCurrent: () => boolean = () => true,
+  reviewedWelcomeMatches = true,
 ): OperationsTransaction {
   const packet = createDesignedWelcomePack("website_build");
   const query = Object.assign(
@@ -90,9 +91,8 @@ function transaction(
         return isCurrent()
           ? [{ packId: "website_build", content: packet }]
           : [];
-      if (sql.includes("from operations.onboarding_template_versions"))
-        return [{ id: templateVersionId }];
-      if (sql.includes("reviewedWelcome")) return [{ matches: true }];
+      if (sql.includes("matches_reviewed_welcome_packet"))
+        return [{ matches: reviewedWelcomeMatches }];
       if (sql.includes("from operations.contacts"))
         return [{ id: contactId, email: "signer0@example.test" }];
       if (sql.includes("read_onboarding_workspace"))
@@ -204,6 +204,21 @@ test("modern previews reject stale settings and mismatched resolved settings fac
         error instanceof JourneyConflict && error.code === "stale_preview",
     );
   }
+});
+
+test("a packet without its reviewed checklist and welcome cannot be previewed", async () => {
+  await assert.rejects(
+    prepareWelcomePreview(
+      transaction(settings, () => true, false),
+      actor,
+      organisationId,
+      command(),
+      options,
+      now,
+    ),
+    (error) =>
+      error instanceof JourneyConflict && error.code === "approval_conflict",
+  );
 });
 
 test("approved preview freezes current settings and full modern packet into its signed envelope", async () => {

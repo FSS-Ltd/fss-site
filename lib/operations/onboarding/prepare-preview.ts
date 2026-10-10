@@ -143,30 +143,18 @@ export async function prepareWelcomePreview(
       welcomePackVersionId,
       command.welcome.content.edition,
     );
-    const [checklistVersion] = await tx<Array<{ id: string }>>`
-      select id from operations.onboarding_template_versions
-      where organisation_id = ${organisationId}
-        and id = ${command.workspace.templateVersionId}
-        and source_welcome_pack_version_id = ${welcomePackVersionId}
-    `;
-    if (!checklistVersion)
-      throw new JourneyConflict(
-        "approval_conflict",
-        "The selected pack or its client checklist has changed. Apply the current published pack and prepare a new welcome preview.",
-      );
     const [reviewedContent] = await tx<Array<{ matches: boolean }>>`
-      select content -> 'reviewedWelcome' = ${tx.json(command.welcome)}::jsonb as matches
-      from operations.onboarding_journey_drafts
-      where id = ${command.workspace.draftId}
-        and organisation_id = ${organisationId}
-        and agreement_id = ${command.agreementId}
-        and contact_id = ${command.workspace.contactId}
-        and template_version_id = ${command.workspace.templateVersionId}
+      select operations.matches_reviewed_welcome_packet(
+        ${organisationId}, ${command.workspace.templateVersionId},
+        ${welcomePackVersionId}, ${command.workspace.draftId},
+        ${command.agreementId}, ${command.workspace.contactId},
+        ${tx.json(command.welcome)}::jsonb
+      ) as matches
     `;
     if (!reviewedContent?.matches)
       throw new JourneyConflict(
         "approval_conflict",
-        "The reviewed client welcome changed. Save the current welcome content to the journey draft and prepare a new preview.",
+        "The selected pack, checklist, or reviewed client welcome changed. Apply the current published pack and save the welcome before preparing a new preview.",
       );
   }
   const [contact] =
