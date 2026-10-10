@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
-import { resolveSiteUrl } from "@/lib/config/site-url";
+import { resolvePortalOrigin } from "../auth/configuration";
 import {
   PayloadTooLargeError,
   readJsonRequestBody,
@@ -101,10 +101,12 @@ export function createCommercialOfferRouteHandler<Actor>(
     }
   };
 }
-function configuration() {
+export function commercialOfferRouteConfiguration(
+  env: Record<string, string | undefined> = process.env,
+) {
   return {
-    enabled: signingEnabled(),
-    origin: new URL(resolveSiteUrl()).origin,
+    enabled: signingEnabled(env),
+    origin: resolvePortalOrigin(env),
     createCorrelationId: randomUUID,
     reportUnexpectedError: (report: {
       correlationId: string;
@@ -114,7 +116,7 @@ function configuration() {
 }
 export function staffCommercialOfferRoute() {
   return createCommercialOfferRouteHandler({
-    ...configuration(),
+    ...commercialOfferRouteConfiguration(),
     enabled: signingEnabled() && fssStudioEnabled(),
     authorize: async () => {
       const identity = await getPortalIdentity();
@@ -137,7 +139,7 @@ export function staffCommercialOfferRoute() {
 }
 export function portalCommercialOfferRoute() {
   return createCommercialOfferRouteHandler({
-    ...configuration(),
+    ...commercialOfferRouteConfiguration(),
     authorize: getPortalIdentity,
     consumeRateLimit: (identity, organisationId, correlationId) =>
       consumeRequestRateLimit(

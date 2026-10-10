@@ -30,12 +30,18 @@ export function StaffCommercialOffer({
   return (
     <article className={styles.detail}>
       <CommercialOfferSummary offer={offer} />
-      <PortalCard title="Client offer link">
-        <p>Share this within the client&apos;s existing portal access.</p>
+      <PortalCard title="Read-only client preview">
+        <p>
+          Review the client-facing terms without submitting a choice on the
+          client&apos;s behalf.
+        </p>
         <PortalActionLink
-          href={`${portalPath(`/portal/agreements/offers/${offer.id}`)}?organisationId=${offer.organisationId}`}
+          href={portalPath(
+            `/portal/admin/clients/${offer.organisationId}/commercial-offers/${offer.id}/preview`,
+          )}
+          variant="secondary"
         >
-          Open client offer
+          Preview client offer
         </PortalActionLink>
       </PortalCard>
       {offer.status === "proposed" && proposal ? (

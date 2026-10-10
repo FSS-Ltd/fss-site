@@ -73,28 +73,61 @@ test("rejects ambiguous or oversized Studio client searches before database acce
   assert.equal(calls.length, 0);
 });
 
-test("loads a selected client hub through the FSS-admin boundary", async () => {
+test("published offers become the client-register next action", async () => {
   const id = "44444444-4444-4444-8444-444444444444";
+  const offerId = "55555555-5555-4555-8555-555555555555";
   const row = {
-    activeJourneyCount: 1,
-    activeProjectCount: 1,
-    agreementCount: 1,
-    billingExceptionCount: 0,
+    activeWorkCount: 0,
     displayName: "Northstar Studio",
     id,
     legalName: "Northstar Studio Ltd",
     lifecycle: "active" as const,
-    nextAction: "Review client work",
-    nextActionHref: `/portal/admin/clients/${id}/requests`,
-    openRequestCount: 2,
+    nextAction: "Review client offer",
+    nextActionHref: `/portal/admin/clients/${id}/commercial-offers/${offerId}/preview`,
+    primaryContactName: "Alex Morgan",
+  };
+  const { calls, db } = recordingDb([row]);
+
+  const result = await listStudioClients(db, admin);
+  const query = calls.map(({ sql }) => sql).join("\n");
+
+  assert.equal(result.items[0].nextAction, "Review client offer");
+  assert.equal(result.items[0].nextActionHref, row.nextActionHref);
+  assert.match(query, /operations\.commercial_offers/);
+  assert.match(query, /f\.status in \('published', 'proposed', 'rejected'\)/);
+  assert.match(query, /f\.expires_at > clock_timestamp\(\)/);
+});
+
+test("loads a selected client hub through the FSS-admin boundary and keeps offer separate from agreement count", async () => {
+  const id = "44444444-4444-4444-8444-444444444444";
+  const offerId = "55555555-5555-4555-8555-555555555555";
+  const row = {
+    activeJourneyCount: 1,
+    activeProjectCount: 1,
+    agreementCount: 0,
+    billingExceptionCount: 0,
+    billingCurrency: "USD" as const,
+    currencyVersion: 1,
+    displayName: "Northstar Studio",
+    id,
+    legalName: "Northstar Studio Ltd",
+    lifecycle: "active" as const,
+    nextAction: "Review client offer",
+    nextActionHref: `/portal/admin/clients/${id}/commercial-offers/${offerId}/preview`,
+    openRequestCount: 0,
     primaryContactName: "Alex Morgan",
     timezone: "Europe/London",
   };
   const { calls, db } = recordingDb([row]);
 
-  assert.deepEqual(await loadStudioClient(db, admin, id), row);
-  assert.match(
-    calls.map(({ sql }) => sql).join("\n"),
-    /operations\.assert_active_staff_membership/,
-  );
+  const result = await loadStudioClient(db, admin, id);
+  const query = calls.map(({ sql }) => sql).join("\n");
+
+  assert.deepEqual(result, row);
+  assert.equal(result?.agreementCount, 0);
+  assert.match(query, /operations\.commercial_offers/);
+  assert.match(query, /f\.status in \('published', 'proposed', 'rejected'\)/);
+  assert.match(query, /f\.expires_at > clock_timestamp\(\)/);
+  assert.match(query, /select count\(\*\)::integer from operations\.agreements a/);
+  assert.match(query, /operations\.assert_active_staff_membership/);
 });
