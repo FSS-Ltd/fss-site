@@ -1,12 +1,12 @@
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
-import { resolveSiteUrl } from "@/lib/config/site-url";
 import {
   PayloadTooLargeError,
   readJsonRequestBody,
   requestHasRegisteredOrigin,
 } from "@/lib/growth/http/founder-request";
 import { privateAuthHeaders } from "../auth/http";
+import { resolvePortalOrigin } from "../auth/configuration";
 import { fssStudioEnabled } from "../auth/release-flags";
 import { requireFssAdmin } from "../auth/require-admin";
 import { getPortalIdentity } from "../auth/server";
@@ -40,7 +40,7 @@ export function staffWelcomePackRoute(deps?: {
       }
     },
     enabled: operationsEnabled() && fssStudioEnabled(),
-    origin: new URL(resolveSiteUrl()).origin,
+    origin: resolvePortalOrigin(),
     execute: (admin: FssAdminContext, input: unknown) =>
       executeStaffWelcomePackCommand(getOperationsDb(), admin, input),
     createCorrelationId: randomUUID,

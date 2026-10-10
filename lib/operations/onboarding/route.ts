@@ -6,6 +6,7 @@ import {
 import { randomUUID } from "node:crypto";
 import { requireFounder } from "../../growth/auth/require-founder";
 import { resolveSiteUrl } from "../../config/site-url";
+import { resolvePortalOrigin } from "../auth/configuration";
 import { getPortalIdentity } from "../auth/server";
 import { requireFssAdmin } from "../auth/require-admin";
 import { getOperationsDb } from "../db/client";
@@ -77,7 +78,7 @@ async function authorizeStaff(): Promise<FssAdminContext | null> {
 export function staffJourneyRoute() {
   return createJourneyCommandHandler({
     enabled: onboardingEnabled() && fssStudioEnabled(),
-    origin: new URL(resolveSiteUrl()).origin,
+    origin: resolvePortalOrigin(),
     createCorrelationId: randomUUID,
     authorize: authorizeStaff,
     reportUnexpectedError: (report) =>
@@ -117,7 +118,7 @@ export function staffOnboardingRoute() {
     JourneyCommandResult | OnboardingWorkspaceCommandResult
   >({
     enabled: onboardingEnabled() && fssStudioEnabled(),
-    origin: new URL(resolveSiteUrl()).origin,
+    origin: resolvePortalOrigin(),
     createCorrelationId: randomUUID,
     authorize: authorizeStaff,
     reportUnexpectedError: (report) =>
@@ -147,7 +148,7 @@ export function staffOnboardingWorkspaceRoute() {
     OnboardingWorkspaceCommandResult
   >({
     enabled: onboardingEnabled() && fssStudioEnabled(),
-    origin: new URL(resolveSiteUrl()).origin,
+    origin: resolvePortalOrigin(),
     createCorrelationId: randomUUID,
     authorize: authorizeStaff,
     reportUnexpectedError: (report) =>
