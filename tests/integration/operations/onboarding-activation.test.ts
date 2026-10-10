@@ -1,10 +1,24 @@
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import test from "node:test";
+import postgres from "postgres";
+import { requireOperationsTestDatabaseUrl } from "../../../scripts/require-operations-database-env";
 import { onboardingFixture } from "./onboarding-fixtures";
 import { approveJourneyProposal } from "../../../lib/operations/onboarding/repository";
-import { executeJourneyCommand } from "../../../lib/operations/onboarding/commands";
+import { executeStaffJourneyCommand } from "../../../lib/operations/onboarding/commands";
 import { runOnboardingWorker } from "../../../lib/operations/onboarding/worker";
+import { createDesignedWelcomePack } from "../../../lib/operations/onboarding/packet-editions";
+import { resolveWelcomePack } from "../../../lib/operations/onboarding/welcome-personalisation";
+import { withWelcomeAgreementCallouts } from "../../../lib/operations/onboarding/welcome-agreement-callouts";
+import {
+  executeStaffWelcomePackCommand,
+  listStaffWelcomePacks,
+} from "../../../lib/operations/onboarding/welcome-packs";
+import {
+  applyActiveStudioSettings,
+  loadActiveStudioSettings,
+} from "../../../lib/operations/studio/active-settings";
+import type { FssAdminContext } from "../../../lib/operations/auth/staff-types";
 import {
   createOnboardingAccessProvider,
   resolveOnboardingAccess,
@@ -150,10 +164,7 @@ test("separate signer, billing recipient and owner receive exactly their approve
   assert.equal(ownerMessages[0].key, ownerMessages[1].key);
   assert.equal(ownerMessages[0].html, ownerMessages[1].html);
   assert.equal(ownerMessages[0].text, ownerMessages[1].text);
-  assert.match(
-    ownerMessages[0].text,
-    /https:\/\/example\.test\/activate/,
-  );
+  assert.match(ownerMessages[0].text, /https:\/\/example\.test\/activate/);
   assert.doesNotMatch(ownerMessages[0].text, /#invite=/);
   assert.doesNotMatch(ownerMessages[0].text, /proposal|sign it/i);
   assert.equal(messages.filter((m) => m.step === "proposal").length, 1);
@@ -183,56 +194,136 @@ test("activation instantiates the reviewed workspace snapshot and rejects a revi
   assert.ok(agreement);
   assert.ok(contact);
 
-  const templateId = randomUUID();
-  const taskId = randomUUID();
-  const templateContent = {
-    tasks: [
-      {
-        id: taskId,
-        title: "Confirm project contact",
-        instructions: "Confirm the details for the project delivery team.",
-        kind: "profile",
-        ownerRole: "owner",
-        required: true,
-        dependsOnTaskId: null,
-        dueRule: "activation",
-        evidenceRule: "profile_saved",
-        bookingUrl: null,
-      },
-    ],
+  const userId = randomUUID();
+  const invitationId = randomUUID();
+  const membershipId = randomUUID();
+  const staff: FssAdminContext = {
+    realm: "staff",
+    role: "admin",
+    actorId: f.founder.actorId,
+    userId,
+    membershipId,
+    correlationId: f.correlationId,
   };
-  const [templateDraft] = await f.founderDb.begin(async (tx) => {
-    await tx`select set_config('operations.actor_id', ${f.founder.actorId}, true)`;
-    return tx<Array<{ id: string; draftVersion: number }>>`
-      select id, draft_version as "draftVersion"
-      from operations.save_onboarding_template_draft(
-        ${templateId},
-        ${f.organisationId},
-        ${"Activation workspace"},
-        ${tx.json(templateContent)}::jsonb,
-        ${0},
-        ${"onboarding-activation-test"}
-      )
-    `;
+  await f.admin`insert into operations.pending_staff_invitations(
+    id, name, email, state, claimed_user_id, completed_at, created_by,
+    review_reference, correlation_id
+  ) values (
+    ${invitationId}, 'Activation test', ${`${userId}@example.test`},
+    'completed', ${userId}, now(), ${staff.actorId},
+    'onboarding-activation-test', ${staff.correlationId}
+  )`;
+  await f.admin`insert into operations.staff_memberships(id, invitation_id, user_id)
+    values (${membershipId}, ${invitationId}, ${userId})`;
+  const packId = "website_build";
+  const designed = createDesignedWelcomePack(packId);
+  const [pack] = await listStaffWelcomePacks(f.founderDb, staff);
+  assert.ok(pack);
+  const savedPack = await executeStaffWelcomePackCommand(f.founderDb, staff, {
+    action: "save_draft",
+    packId,
+    content: designed,
+    expectedVersion: pack.draftVersion,
+    reviewReference: "onboarding-activation-test",
   });
-  assert.ok(templateDraft);
-  const [templateVersion] = await f.founderDb.begin(async (tx) => {
-    await tx`select set_config('operations.actor_id', ${f.founder.actorId}, true)`;
-    return tx<Array<{ id: string }>>`
-      select id
-      from operations.publish_onboarding_template_version(
-        ${templateId},
-        ${templateDraft.draftVersion},
-        ${"onboarding-activation-test"}
-      )
-    `;
+  if (savedPack.kind !== "welcome_pack_draft")
+    throw new Error("Expected a saved packet draft.");
+  const published = await executeStaffWelcomePackCommand(f.founderDb, staff, {
+    action: "publish",
+    packId,
+    expectedDraftVersion: savedPack.draftVersion,
+    reviewReference: "onboarding-activation-test",
   });
+  if (published.kind !== "welcome_pack_version")
+    throw new Error("Expected a published packet version.");
+  const templateId = randomUUID();
+  const templateContent = { tasks: designed.tasks };
+  await f.admin`insert into operations.onboarding_templates(
+    id, organisation_id, title, draft_content, draft_version, published_version, created_by
+  ) values (
+    ${templateId}, ${f.organisationId}, ${pack.title}, ${f.admin.json(templateContent)},
+    1, 1, ${f.founder.actorId}
+  )`;
+  const [templateVersion] = await f.admin<Array<{ id: string }>>`
+    insert into operations.onboarding_template_versions(
+      template_id, organisation_id, version, title, content, published_by,
+      source_welcome_pack_version_id
+    ) values (
+      ${templateId}, ${f.organisationId}, 1, ${pack.title},
+      ${f.admin.json(templateContent)}, ${f.founder.actorId}, ${published.id}
+    ) returning id
+  `;
   assert.ok(templateVersion);
+  const currentSettings = await loadActiveStudioSettings(f.founderDb, staff);
+  const settings = await applyActiveStudioSettings(
+    f.founderDb,
+    staff,
+    {
+      section: "communication",
+      expectedRevision: currentSettings.revision,
+      values: { replyTo: "owner@example.test", responseExpectationHours: 48 },
+    },
+    staff.correlationId,
+    ["owner@example.test"],
+  );
+  t.after(async () => {
+    const cleanup = postgres(
+      requireOperationsTestDatabaseUrl(
+        process.env.OPERATIONS_TEST_DATABASE_URL,
+      ),
+    );
+    try {
+      await cleanup`delete from operations.studio_settings_audit
+        where revision = ${settings.revision} and actor_id = ${staff.actorId}`;
+      await cleanup`delete from operations.studio_settings_active
+        where revision = ${settings.revision} and applied_by = ${staff.actorId}`;
+      await cleanup`delete from operations.staff_memberships where id = ${membershipId}`;
+      await cleanup`delete from operations.pending_staff_invitations where id = ${invitationId}`;
+    } finally {
+      await cleanup.end();
+    }
+  });
+  const personalised = resolveWelcomePack(
+    designed,
+    {
+      client_name: "Activation client",
+      contact_first_name: "Alex",
+      agreement_goal: "A simpler request process",
+      sender_name: settings.displayName,
+    },
+    settings.responseExpectationHours,
+  );
+  const reviewed = withWelcomeAgreementCallouts(personalised, {
+    scopeSummary: "A reviewed request process",
+    responsibilitiesSummary: "Nominate one reviewer and supply content",
+  });
 
   const draftId = randomUUID();
+  const { recipient, invoice, content } = f.prepared.snapshot;
+  const welcome = {
+    recipient,
+    invoice,
+    content: {
+      ...content,
+      rendererVersion: 2 as const,
+      emailArtworkVersion: 1 as const,
+      edition: packId,
+      settingsRevision: settings.revision,
+      timezone: settings.timezone,
+      responseExpectationHours: settings.responseExpectationHours,
+      senderName: settings.displayName,
+      replyTo: settings.replyTo ?? "owner@example.test",
+      welcomePackVersionId: published.id,
+      emailSubject: personalised.emailSubject,
+      emailBody: personalised.emailBody,
+      pages: reviewed.guide,
+    },
+    thankYou: personalised.thankYou,
+  };
   const draftContent = {
     welcomeSubject: "Welcome to the project",
     welcomeBody: "Your project workspace is ready.",
+    reviewedWelcome: welcome,
     expectedAgreementVersion: agreement.version,
     recipientRole: "owner",
   };
@@ -257,24 +348,32 @@ test("activation instantiates the reviewed workspace snapshot and rejects a revi
   const [initialDraft] = await saveDraft(0);
   assert.ok(initialDraft);
 
-  const { recipient, invoice, content, thankYou } = f.prepared.snapshot;
   const previewWelcome = (expectedDraftVersion: number) =>
-    executeJourneyCommand(f.founderDb, f.founder, f.organisationId, {
-      action: "preview_welcome",
-      agreementId: f.record.id,
-      expectedVersion: agreement.version,
-      welcome: { recipient, invoice, content, thankYou },
-      workspace: {
-        draftId,
-        expectedDraftVersion,
-        templateVersionId: templateVersion.id,
-        contactId: contact.id,
-        recipientRole: "owner",
+    executeStaffJourneyCommand(
+      f.founderDb,
+      staff,
+      f.organisationId,
+      {
+        action: "preview_welcome",
+        agreementId: f.record.id,
+        expectedVersion: agreement.version,
+        welcome,
+        workspace: {
+          draftId,
+          expectedDraftVersion,
+          templateVersionId: templateVersion.id,
+          contactId: contact.id,
+          recipientRole: "owner",
+        },
       },
-    }, journeyOptions);
+      journeyOptions,
+    );
 
   const initialPreview = await previewWelcome(initialDraft.version);
-  if (!("preview" in initialPreview) || initialPreview.preview.kind !== "welcome")
+  if (
+    !("preview" in initialPreview) ||
+    initialPreview.preview.kind !== "welcome"
+  )
     throw new Error("Expected a welcome preview.");
   assert.equal(
     initialPreview.preview.readiness.every(
@@ -289,11 +388,17 @@ test("activation instantiates the reviewed workspace snapshot and rejects a revi
   });
   assert.ok(revisedDraft);
   await assert.rejects(
-    executeJourneyCommand(f.founderDb, f.founder, f.organisationId, {
-      action: "start",
-      token: initialPreview.preview.token,
-      confirmed: true,
-    }, journeyOptions),
+    executeStaffJourneyCommand(
+      f.founderDb,
+      staff,
+      f.organisationId,
+      {
+        action: "start",
+        token: initialPreview.preview.token,
+        confirmed: true,
+      },
+      journeyOptions,
+    ),
     /welcome setup changed/i,
   );
   const [beforeStart] = await f.admin<Array<{ count: number }>>`
@@ -304,23 +409,26 @@ test("activation instantiates the reviewed workspace snapshot and rejects a revi
   assert.equal(beforeStart?.count, 0);
 
   const refreshedPreview = await previewWelcome(revisedDraft.version);
-  if (!("preview" in refreshedPreview) || refreshedPreview.preview.kind !== "welcome")
+  if (
+    !("preview" in refreshedPreview) ||
+    refreshedPreview.preview.kind !== "welcome"
+  )
     throw new Error("Expected a refreshed welcome preview.");
   const start = {
     action: "start" as const,
     token: refreshedPreview.preview.token,
     confirmed: true as const,
   };
-  const firstStart = await executeJourneyCommand(
+  const firstStart = await executeStaffJourneyCommand(
     f.founderDb,
-    f.founder,
+    staff,
     f.organisationId,
     start,
     journeyOptions,
   );
-  const secondStart = await executeJourneyCommand(
+  const secondStart = await executeStaffJourneyCommand(
     f.founderDb,
-    f.founder,
+    staff,
     f.organisationId,
     start,
     journeyOptions,
@@ -348,6 +456,6 @@ test("activation instantiates the reviewed workspace snapshot and rejects a revi
   assert.deepEqual(snapshot, {
     workspaceDraftId: draftId,
     templateVersionId: templateVersion.id,
-    taskCount: 1,
+    taskCount: designed.tasks.length,
   });
 });

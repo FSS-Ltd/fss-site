@@ -67,7 +67,7 @@ export function createDesignedWelcomePack(
     emailArtworkVersion: 1,
     edition: packId,
     emailSubject: `${edition.title}: next steps for {{client_name}}`,
-    emailBody: `Hello {{contact_first_name}},\n\nYour ${edition.title.toLowerCase()} welcome packet explains how we will approach {{agreement_goal}}. The proposed scope is {{agreement_scope}}.\n\nRead the attached packet, check the priorities, and prepare the inputs described in your checklist. We will send the proposal separately for review and signature. Dates and milestones remain to be agreed.\n\nReply if a priority needs changing so we can confirm the plan before work begins.\n\n{{sender_name}}\nFaithful Software Solutions`,
+    emailBody: `Hello {{contact_first_name}},\n\nYour ${edition.title.toLowerCase()} welcome packet explains how we will approach {{agreement_goal}}. It gives you a practical view of the work and the decisions we will make together.\n\nRead the attached packet, check the priorities, and prepare the inputs described in your checklist. We will send the proposal separately for review and signature. It will set out the full scope, responsibilities, fees and terms. Dates and milestones remain to be agreed.\n\nReply if a priority needs changing so we can confirm the plan before work begins.\n\n{{sender_name}}\nFaithful Software Solutions`,
     guide: designedPacketGuide(packId),
     thankYou: {
       subject: `${edition.title}: your next step`,

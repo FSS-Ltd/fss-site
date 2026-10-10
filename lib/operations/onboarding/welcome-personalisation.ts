@@ -18,11 +18,6 @@ export function resolveWelcomePack(
   content: WelcomePackContent,
   facts: Readonly<Record<string, string>>,
   responseHours: number,
-  projectFacts?: Readonly<{
-    responsibilities: string;
-    support: string;
-    serviceDates: string;
-  }>,
 ): WelcomePackContent {
   const copy = (value: string) => interpolateWelcomeCopy(value, facts);
   return {
@@ -33,32 +28,11 @@ export function resolveWelcomePack(
       ...page,
       title: copy(page.title),
       paragraphs: page.paragraphs.map(copy),
-      ...(page.sectionId === "responsibilities" && projectFacts
-        ? {
-            paragraphs: [
-              ...page.paragraphs.map(copy),
-              `Your agreement records these responsibilities: ${projectFacts.responsibilities}`,
-            ],
-          }
-        : {}),
-      ...(page.sectionId === "timeline" && projectFacts
-        ? {
-            paragraphs: [
-              ...page.paragraphs.map(copy),
-              projectFacts.serviceDates,
-            ],
-          }
-        : {}),
       ...("sectionId" in page && page.sectionId === "communication"
         ? {
             paragraphs: [
               ...page.paragraphs.map(copy),
               `Our usual response expectation is ${responseHours} hours. Any response terms in your agreement take precedence.`,
-              ...(projectFacts
-                ? [
-                    `Support recorded in your agreement: ${projectFacts.support}`,
-                  ]
-                : []),
             ],
           }
         : {}),

@@ -103,6 +103,12 @@ async function prepareReview(page: Page): Promise<{
   await page
     .getByLabel("Email subject")
     .fill("Your reviewed Northstar welcome");
+  await page
+    .getByLabel("Proposed scope summary")
+    .fill("A new site and a simpler booking path.");
+  await page
+    .getByLabel("Client responsibilities summary")
+    .fill("Provide the content and nominate one reviewer.");
   await stages.getByRole("button", { name: /Schedule$/ }).click();
   await page.getByLabel("First agreed invoice").selectOption({ index: 1 });
   await stages.getByRole("button", { name: /Review$/ }).click();
@@ -120,6 +126,12 @@ test("exact rendered email and PDF are retained through review and approval", as
   page,
 }) => {
   const { prepared, token, commands } = await prepareReview(page);
+  expect(prepared.snapshot.accessibleHtml).toContain(
+    "Proposed scope in brief: A new site and a simpler booking path.",
+  );
+  expect(prepared.snapshot.accessibleHtml).toContain(
+    "Your part in the proposed work: Provide the content and nominate one reviewer.",
+  );
   const email = prepared.snapshot.welcome;
   const summary = page
     .locator("summary")

@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Notice, PortalButton } from "@/components/portal/ui";
+import { Notice, PortalButton, PortalTextarea } from "@/components/portal/ui";
 import type { JourneyComposerProps } from "./journey-composer-types";
 import type { useJourneyComposer } from "./use-journey-composer";
 import { WelcomePacketPreview } from "./welcome-packet-preview";
@@ -23,6 +23,7 @@ export function JourneyContentStage({
         <WelcomePackLibrary
           packs={props.welcomePacks}
           actionLabel="Use packet"
+          requireDesignedPublished
           disabled={pending}
           onChoose={async (pack) => {
             await composer.choosePack(pack);
@@ -91,10 +92,44 @@ export function JourneyContentStage({
             disabled={pending}
             editChecklist={false}
           />
+          <div className={styles.editor}>
+            <h3>Agreement details in brief</h3>
+            <p>
+              These short callouts help the client recognise the proposed work.
+              The agreement contains the full scope and responsibilities.
+            </p>
+            <PortalTextarea
+              label="Proposed scope summary"
+              value={composer.scopeSummary}
+              maxLength={200}
+              required
+              rows={3}
+              disabled={pending}
+              onChange={(event) => composer.setScopeSummary(event.target.value)}
+            />
+            <PortalTextarea
+              label="Client responsibilities summary"
+              value={composer.responsibilitiesSummary}
+              maxLength={200}
+              required
+              rows={3}
+              disabled={pending}
+              onChange={(event) =>
+                composer.setResponsibilitiesSummary(event.target.value)
+              }
+            />
+            <details>
+              <summary>Review the agreement wording</summary>
+              <h4>Full proposed scope</h4>
+              <p>{composer.agreement?.draft.scope}</p>
+              <h4>Full client responsibilities</h4>
+              <p>{composer.agreement?.draft.responsibilities}</p>
+            </details>
+          </div>
         </div>
         <div className={styles.previewPane}>
           <WelcomePacketPreview
-            content={packet}
+            content={composer.previewPacket ?? packet}
             clientName={props.organisationName}
           />
         </div>

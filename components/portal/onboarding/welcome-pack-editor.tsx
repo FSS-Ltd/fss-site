@@ -57,19 +57,19 @@ function PacketWorkspace({
           Packet library
         </PortalButton>
       </div>
-      {editor.content.rendererVersion !== 2 ? (
+      {JSON.stringify(editor.content) !==
+      JSON.stringify(createDesignedWelcomePack(pack.id)) ? (
         <Notice tone="info">
-          A complete ten-page edition is available for this service. Loading it
-          replaces only these unsaved fields. Published versions remain
-          available.
+          The current designed edition is available for this service. Loading it
+          replaces this draft&apos;s copy and checklist. Published versions
+          remain available.
           <PortalButton
             type="button"
             variant="secondary"
             onClick={() => {
               if (
-                !editor.dirty ||
                 window.confirm(
-                  "Replace your unsaved edits with the designed edition?",
+                  "Replace this packet draft and checklist with the current designed edition?",
                 )
               )
                 editor.update(createDesignedWelcomePack(pack.id));
