@@ -1,4 +1,5 @@
 import { readActiveStudioSettings } from "../studio/active-settings";
+import { assertCurrentDesignedWelcomeVersion } from "./current-welcome-version";
 import { invoiceChoices } from "./display";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
@@ -104,6 +105,11 @@ export async function prepareWelcomePreview(
       "stale_preview",
       "The agreement changed. Refresh and prepare a new welcome preview.",
     );
+  if (command.workspace && command.welcome.content.rendererVersion !== 2)
+    throw new JourneyConflict(
+      "stale_preview",
+      "Select a current published ten-page packet before preparing this journey.",
+    );
   if (command.welcome.content.rendererVersion === 2) {
     const active = await readActiveStudioSettings(tx);
     const content = command.welcome.content;
@@ -132,17 +138,18 @@ export async function prepareWelcomePreview(
         "approval_conflict",
         "Apply the selected welcome pack to this client and save its checklist before preparing the welcome.",
       );
-    const [packVersion] = await tx<Array<{ id: string }>>`
-      select id from operations.welcome_pack_versions
-      where id = ${welcomePackVersionId}
-    `;
+    await assertCurrentDesignedWelcomeVersion(
+      tx,
+      welcomePackVersionId,
+      command.welcome.content.edition,
+    );
     const [checklistVersion] = await tx<Array<{ id: string }>>`
       select id from operations.onboarding_template_versions
       where organisation_id = ${organisationId}
         and id = ${command.workspace.templateVersionId}
         and source_welcome_pack_version_id = ${welcomePackVersionId}
     `;
-    if (!packVersion || !checklistVersion)
+    if (!checklistVersion)
       throw new JourneyConflict(
         "approval_conflict",
         "The selected pack or its client checklist has changed. Apply the current published pack and prepare a new welcome preview.",

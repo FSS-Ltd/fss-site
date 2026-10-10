@@ -49,7 +49,7 @@ test("personalisation resolves a legacy pack without mutating its published copy
   assert.equal(resolved.emailSubject, "Hello Northstar");
 });
 
-test("designed personalisation retains approved layouts and recorded service facts", async () => {
+test("designed personalisation keeps the narrative without full agreement terms", async () => {
   const { createDesignedWelcomePack } = await import("./packet-editions");
   const source = createDesignedWelcomePack("website_build");
   const resolved = resolveWelcomePack(
@@ -62,33 +62,13 @@ test("designed personalisation retains approved layouts and recorded service fac
       sender_name: "Jean-Fidele",
     },
     24,
-    {
-      responsibilities: "One authorised reviewer",
-      support: "Agreed defect support",
-      serviceDates:
-        "Recorded service start: 2026-10-15. Review dates: To be agreed.",
-    },
   );
   assert.equal(resolved.rendererVersion, 2);
   assert.equal(resolved.guide.length, 9);
   assert.equal(resolved.guide[4].layout, "timeline");
-  assert.ok(
-    resolved.guide[4].paragraphs.includes(
-      "Recorded service start: 2026-10-15. Review dates: To be agreed.",
-    ),
-  );
-  assert.ok(
-    resolved.guide[5].paragraphs.some((copy) =>
-      copy.includes("One authorised reviewer"),
-    ),
-  );
+  assert.ok(!JSON.stringify(resolved.guide).includes("Website and booking"));
   assert.ok(
     resolved.guide[7].paragraphs.some((copy) => copy.includes("24 hours")),
-  );
-  assert.ok(
-    resolved.guide[7].paragraphs.some((copy) =>
-      copy.includes("Agreed defect support"),
-    ),
   );
   assert.ok(
     !source.guide[7].paragraphs.some((copy) => copy.includes("24 hours")),

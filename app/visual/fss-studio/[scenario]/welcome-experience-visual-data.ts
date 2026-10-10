@@ -132,6 +132,8 @@ export const welcomeVisualDrafts: readonly OnboardingWorkspaceJourneyDraft[] = [
           emailSubject: "Restored welcome for Northstar",
         },
         packVersionId: welcomeVisualPacks[0].versions[0].id,
+        scopeSummary: "Website and booking journey",
+        responsibilitiesSummary: "Supply approved copy and one reviewer",
         obligationKey: "installment:1",
         settingsRevision: 3,
       },

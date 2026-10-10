@@ -4,7 +4,9 @@ Status: implemented locally; production rollout requires approval.
 
 ## Delivery
 
-The welcome template area is a library of three service editions. Open an edition, load its designed content if the retained draft is legacy, review it, save the draft and publish. This deliberate conversion preserves edited drafts and immutable published versions. New client journeys use the chosen published content and checklist together, with personalised facts and retained editing state. Existing approvals use their legacy renderer and retained bytes.
+The welcome template area is a library of three service editions. Open each edition, load its current ten-page designed content, review the exact preview, save the draft and publish a new immutable version. Loading designed content replaces that edition's draft copy and checklist, even if its draft already uses the ten-page renderer. Published versions and existing approval snapshots retain their original bytes.
+
+The journey library reports the latest published version and page count. A new journey can select only a published ten-page edition. Staff review two required, editable summaries for proposed scope and client responsibilities against the full agreement text. Each summary prefills from the first agreement paragraph only when it is at most 200 characters; otherwise staff write it. The packet includes those concise callouts while directing readers to the agreement for full scope, responsibilities, fees and terms. Changing the agreement revision requires selecting the packet and reviewing the summaries again. Preview preparation and journey start both reject a superseded packet version.
 
 Studio access now uses aggregate cards, identity views and scoped dialogs. Staff actions require active staff membership plus a verified identity matching the configured founder (`GROWTH_OS_OWNER_EMAIL`). Ordinary administrators retain organisation-scoped client management.
 
@@ -15,8 +17,9 @@ Settings apply to separate revisioned active records, with an audit entry for ea
 1. Review and apply the additive migrations in timestamp order: `20261001150000_operations_active_studio_settings.sql`, `20261001151000_operations_welcome_draft_restoration.sql`, and `20261001153000_operations_client_welcome_packets.sql`. Run the repository migration checks against the deployment's complete migration history.
 2. Configure `OPERATIONS_STUDIO_APPROVED_REPLY_TO_ADDRESSES` with a comma-separated approved list. This is an allowlist of public email addresses; credentials and provider enablement remain under existing deployment controls.
 3. Apply Identity and Communication settings explicitly. A new designed welcome requires an approved reply-to and current active values. Existing drafts remain drafts.
-4. Save and publish each reviewed designed packet through the template workspace, then exercise a synthetic journey without external sends.
-5. Confirm tenant isolation, founder staff administration, invitation provider outcomes, settings conflicts, PDF overflow errors, client reading/download and legacy approvals before enabling delivery.
+4. Recheck the production unapproved journey draft count. If any appear, discard their old packet copy, apply the current published edition and checklist, and review the summaries before preparing them. Leave approved snapshots unchanged.
+5. Save and publish each reviewed designed packet through the audited template workspace. Confirm each latest published version has nine guide sections plus its cover, then exercise a synthetic journey without external sends.
+6. Confirm tenant isolation, founder staff administration, invitation provider outcomes, settings conflicts, PDF overflow errors, client reading/download and legacy approvals before enabling delivery.
 
 ## Rollback
 

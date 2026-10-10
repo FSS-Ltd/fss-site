@@ -8,6 +8,7 @@ import { journeyCommandSchema, type JourneyCommand } from "./command-schema";
 import { welcomeFixtureInput } from "./fixtures";
 import { createDesignedWelcomePack } from "./packet-editions";
 import { prepareWelcomePreview } from "./prepare-preview";
+import { runJourneyCommand } from "./commands";
 import { envelope } from "./preview-envelope";
 import { verifyPreview } from "./preview-token";
 
@@ -69,6 +70,7 @@ function command(): Extract<JourneyCommand, { action: "preview_welcome" }> {
 }
 function transaction(
   active: ActiveStudioSettings = settings,
+  isCurrent: () => boolean = () => true,
 ): OperationsTransaction {
   const packet = createDesignedWelcomePack("website_build");
   const query = Object.assign(
@@ -85,7 +87,9 @@ function transaction(
         ];
       if (sql.includes("studio_settings_active")) return [active];
       if (sql.includes("from operations.welcome_pack_versions"))
-        return [{ id: packVersionId }];
+        return isCurrent()
+          ? [{ packId: "website_build", content: packet }]
+          : [];
       if (sql.includes("from operations.onboarding_template_versions"))
         return [{ id: templateVersionId }];
       if (sql.includes("reviewedWelcome")) return [{ matches: true }];
@@ -130,6 +134,54 @@ function transaction(
   // The real preview preparation consumes deterministic rows without outbound effects.
   return query as unknown as OperationsTransaction;
 }
+
+test("a five-section packet cannot enter a Studio welcome preview", async () => {
+  const modern = command();
+  await assert.rejects(
+    prepareWelcomePreview(
+      transaction(),
+      actor,
+      organisationId,
+      {
+        ...modern,
+        welcome: {
+          ...modern.welcome,
+          content: { ...modern.welcome.content, rendererVersion: undefined },
+        },
+      },
+      options,
+      now,
+    ),
+    (error) =>
+      error instanceof JourneyConflict && error.code === "stale_preview",
+  );
+});
+
+test("publishing a newer edition invalidates a previously prepared start token", async () => {
+  let current = true;
+  const tx = transaction(settings, () => current);
+  const prepared = await prepareWelcomePreview(
+    tx,
+    actor,
+    organisationId,
+    command(),
+    options,
+    now,
+  );
+  assert.ok("preview" in prepared && prepared.preview.kind === "welcome");
+  current = false;
+  await assert.rejects(
+    runJourneyCommand(
+      tx,
+      actor,
+      organisationId,
+      { action: "start", token: prepared.preview.token, confirmed: true },
+      { ...options, now: () => now },
+    ),
+    (error) =>
+      error instanceof JourneyConflict && error.code === "stale_preview",
+  );
+});
 
 test("modern previews reject stale settings and mismatched resolved settings facts", async () => {
   for (const changed of [

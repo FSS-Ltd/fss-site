@@ -9,6 +9,12 @@ import type {
   WelcomePackContent,
 } from "@/lib/operations/onboarding/welcome-pack-contract";
 import { resolveWelcomePack } from "@/lib/operations/onboarding/welcome-personalisation";
+import { hasCurrentWelcomePacket } from "@/lib/operations/onboarding/journey-draft-version";
+import {
+  prefillWelcomeSummary,
+  withWelcomeAgreementCallouts,
+  welcomeSummarySchema,
+} from "@/lib/operations/onboarding/welcome-agreement-callouts";
 import type { JourneyComposerProps } from "./journey-composer-types";
 
 function errorText(body: unknown): string {
@@ -21,11 +27,15 @@ function errorText(body: unknown): string {
 }
 export function useJourneyComposer(props: JourneyComposerProps) {
   const saved = props.drafts?.[0];
-  const [legacyCopy, setLegacyCopy] = useState(
-    saved?.content?.composer ? null : (saved?.content ?? null),
+  const savedComposer = saved?.content?.composer;
+  const restoreSavedPacket = hasCurrentWelcomePacket(
+    saved,
+    props.welcomePacks,
+    props.agreements,
   );
   const [stage, setStage] = useState<JourneyBuilderStage>(
-    props.initialStage ?? saved?.stage ?? "setup",
+    props.initialStage ??
+      (saved ? (restoreSavedPacket ? saved.stage : "content") : "setup"),
   );
   const [agreementId, setAgreementId] = useState(
     saved?.agreementId ?? props.agreements[0]?.id ?? "",
@@ -38,10 +48,16 @@ export function useJourneyComposer(props: JourneyComposerProps) {
   );
   const [role, setRole] = useState<PortalRole>(saved?.recipientRole ?? "owner");
   const [packet, setPacket] = useState<WelcomePackContent | null>(
-    saved?.content?.composer?.packet ?? null,
+    restoreSavedPacket ? (savedComposer?.packet ?? null) : null,
   );
   const [packVersionId, setPackVersionId] = useState(
-    saved?.content?.composer?.packVersionId ?? "",
+    restoreSavedPacket ? (savedComposer?.packVersionId ?? "") : "",
+  );
+  const [scopeSummary, setScopeSummary] = useState(
+    restoreSavedPacket ? (savedComposer?.scopeSummary ?? "") : "",
+  );
+  const [responsibilitiesSummary, setResponsibilitiesSummary] = useState(
+    restoreSavedPacket ? (savedComposer?.responsibilitiesSummary ?? "") : "",
   );
   const [obligationKey, setObligationKey] = useState(
     saved?.content?.composer?.obligationKey ?? "",
@@ -54,12 +70,19 @@ export function useJourneyComposer(props: JourneyComposerProps) {
   const [packetAgreementId, setPacketAgreementId] = useState(
     saved?.agreementId ?? "",
   );
+  const [packetAgreementVersion, setPacketAgreementVersion] = useState(
+    saved?.expectedAgreementVersion ?? 0,
+  );
   const [packetContactId, setPacketContactId] = useState(
     saved?.contactId ?? "",
   );
   const [dirty, setDirty] = useState(false);
   const [pending, setPending] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(
+    saved && !restoreSavedPacket
+      ? "The saved packet or agreement changed. Select the current published packet and review its summaries again."
+      : "",
+  );
   const busy = useRef(false);
   const stableDraftId = useRef(saved?.id ?? null);
   const agreement = props.agreementRecords?.find((a) => a.id === agreementId);
@@ -70,22 +93,37 @@ export function useJourneyComposer(props: JourneyComposerProps) {
     setPacket(next);
     setDirty(true);
   }
+  function selectAgreement(id: string): void {
+    setAgreementId(id);
+    setPacket(null);
+    setPackVersionId("");
+    setScopeSummary("");
+    setResponsibilitiesSummary("");
+    setDirty(true);
+  }
   function newDraft(): void {
     stableDraftId.current = null;
     setDraftId("");
     setVersion(0);
     setPacket(null);
     setPackVersionId("");
+    setScopeSummary("");
+    setResponsibilitiesSummary("");
     setObligationKey("");
     setStage("setup");
     setDirty(false);
-    setLegacyCopy(null);
     setMessage("New journey ready for setup.");
   }
   function restore(draft: OnboardingWorkspaceJourneyDraft): void {
-    setLegacyCopy(draft.content?.composer ? null : (draft.content ?? null));
+    const composer = draft.content?.composer;
+    const useSavedPacket = hasCurrentWelcomePacket(
+      draft,
+      props.welcomePacks,
+      props.agreements,
+    );
     stableDraftId.current = draft.id;
     setPacketAgreementId(draft.agreementId);
+    setPacketAgreementVersion(draft.expectedAgreementVersion ?? 0);
     setPacketContactId(draft.contactId);
     setDraftId(draft.id);
     setVersion(draft.version);
@@ -93,9 +131,13 @@ export function useJourneyComposer(props: JourneyComposerProps) {
     setContactId(draft.contactId);
     setTemplateId(draft.templateVersionId);
     setRole(draft.recipientRole ?? "owner");
-    setStage(draft.stage);
-    setPacket(draft.content?.composer?.packet ?? null);
-    setPackVersionId(draft.content?.composer?.packVersionId ?? "");
+    setStage(useSavedPacket ? draft.stage : "content");
+    setPacket(useSavedPacket ? (composer?.packet ?? null) : null);
+    setPackVersionId(useSavedPacket ? (composer?.packVersionId ?? "") : "");
+    setScopeSummary(useSavedPacket ? (composer?.scopeSummary ?? "") : "");
+    setResponsibilitiesSummary(
+      useSavedPacket ? (composer?.responsibilitiesSummary ?? "") : "",
+    );
     setObligationKey(draft.content?.composer?.obligationKey ?? "");
     setSettingsRevision(
       draft.content?.composer?.settingsRevision ??
@@ -104,15 +146,17 @@ export function useJourneyComposer(props: JourneyComposerProps) {
     );
     setDirty(false);
     setMessage(
-      "Saved draft restored. Review the current agreement and settings before preparing.",
+      useSavedPacket
+        ? "Saved draft restored. Review the current agreement and settings before preparing."
+        : "The saved packet or agreement changed. Select the current published packet and review its summaries again.",
     );
   }
   async function choosePack(pack: WelcomePack): Promise<void> {
     const published = pack.versions[0];
     if (busy.current) return;
-    if (!published) {
+    if (!published || published.content.rendererVersion !== 2) {
       setMessage(
-        "Publish this packet in the template library before using it.",
+        "Publish the current ten-page edition in the template library before using it.",
       );
       return;
     }
@@ -133,11 +177,6 @@ export function useJourneyComposer(props: JourneyComposerProps) {
             props.settings?.displayName ?? "Faithful Software Solutions",
         },
         props.settings?.responseExpectationHours ?? 48,
-        {
-          responsibilities: agreement.draft.responsibilities,
-          support: agreement.draft.support,
-          serviceDates: `Service dates recorded in your agreement: ${agreement.draft.lines.map((line) => `${line.description}: starts ${line.startDate}${line.endDate ? `, ends ${line.endDate}` : ""}`).join("; ")}. These service dates do not confirm project review milestones.`,
-        },
       );
     } catch (error) {
       setMessage(
@@ -147,12 +186,6 @@ export function useJourneyComposer(props: JourneyComposerProps) {
       );
       return;
     }
-    if (legacyCopy)
-      resolved = {
-        ...resolved,
-        emailSubject: legacyCopy.welcomeSubject || resolved.emailSubject,
-        emailBody: legacyCopy.welcomeBody || resolved.emailBody,
-      };
     busy.current = true;
     setPending(true);
     setMessage("");
@@ -183,9 +216,14 @@ export function useJourneyComposer(props: JourneyComposerProps) {
         );
       setTemplateId(body.templateVersionId);
       setPacketAgreementId(agreementId);
+      setPacketAgreementVersion(agreement.version);
       setPacketContactId(contactId);
       setPacket(resolved);
       setPackVersionId(published.id);
+      setScopeSummary(prefillWelcomeSummary(agreement.draft.scope));
+      setResponsibilitiesSummary(
+        prefillWelcomeSummary(agreement.draft.responsibilities),
+      );
       setSettingsRevision(props.settings?.revision ?? 0);
       setDirty(true);
       setMessage("Packet content and its complete checklist applied together.");
@@ -216,6 +254,16 @@ export function useJourneyComposer(props: JourneyComposerProps) {
       throw new Error(
         "The agreement or contact changed. Select the packet again to personalise the current facts.",
       );
+    if (packetAgreementVersion !== agreement.version)
+      throw new Error(
+        "The agreement changed. Select the packet again and review its summaries.",
+      );
+    const reviewedPacket = withWelcomeAgreementCallouts(packet, {
+      scopeSummary: welcomeSummarySchema.parse(scopeSummary),
+      responsibilitiesSummary: welcomeSummarySchema.parse(
+        responsibilitiesSummary,
+      ),
+    });
     if (settingsRevision !== props.settings.revision)
       throw new Error(
         "Settings changed since this packet was prepared. Select the packet again to apply current values.",
@@ -232,7 +280,7 @@ export function useJourneyComposer(props: JourneyComposerProps) {
         responseExpectationHours: props.settings.responseExpectationHours,
         contactFirstName: contact.name.split(/\s+/)[0] ?? contact.name,
         primaryGoal: agreement.draft.goals,
-        outcomeSummary: agreement.draft.scope,
+        outcomeSummary: scopeSummary,
         senderName: props.settings.displayName,
         organisationName: "Faithful Software Solutions",
         clientOrganisationName: props.organisationName,
@@ -241,7 +289,7 @@ export function useJourneyComposer(props: JourneyComposerProps) {
         welcomePackVersionId: packVersionId,
         emailSubject: packet.emailSubject,
         emailBody: packet.emailBody,
-        pages: packet.guide,
+        pages: reviewedPacket.guide,
       },
       thankYou: packet.thankYou,
     };
@@ -256,7 +304,11 @@ export function useJourneyComposer(props: JourneyComposerProps) {
       );
       return null;
     }
-    if (packetAgreementId !== agreementId || packetContactId !== contactId) {
+    if (
+      packetAgreementId !== agreementId ||
+      packetAgreementVersion !== selection.version ||
+      packetContactId !== contactId
+    ) {
       setMessage(
         "Select the packet again to apply the changed agreement or contact before saving.",
       );
@@ -292,6 +344,8 @@ export function useJourneyComposer(props: JourneyComposerProps) {
             composer: {
               packet,
               packVersionId,
+              scopeSummary,
+              responsibilitiesSummary,
               obligationKey,
               settingsRevision,
             },
@@ -361,7 +415,7 @@ export function useJourneyComposer(props: JourneyComposerProps) {
     stage,
     setStage,
     agreementId,
-    setAgreementId,
+    setAgreementId: selectAgreement,
     contactId,
     setContactId,
     templateId,
@@ -369,6 +423,25 @@ export function useJourneyComposer(props: JourneyComposerProps) {
     role,
     setRole,
     packet,
+    previewPacket:
+      packet &&
+      welcomeSummarySchema.safeParse(scopeSummary).success &&
+      welcomeSummarySchema.safeParse(responsibilitiesSummary).success
+        ? withWelcomeAgreementCallouts(packet, {
+            scopeSummary,
+            responsibilitiesSummary,
+          })
+        : packet,
+    scopeSummary,
+    setScopeSummary: (value: string) => {
+      setScopeSummary(value);
+      setDirty(true);
+    },
+    responsibilitiesSummary,
+    setResponsibilitiesSummary: (value: string) => {
+      setResponsibilitiesSummary(value);
+      setDirty(true);
+    },
     changePacket,
     packVersionId,
     obligationKey,

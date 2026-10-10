@@ -58,10 +58,7 @@ export function JourneySetupStage({
           {composer.agreement?.draft.goals ||
             "Select an agreement to load the project goal."}
         </p>
-        <p>
-          {composer.agreement?.draft.scope ||
-            "The recorded scope will populate the packet."}
-        </p>
+        <p>{composer.agreement?.draft.scope || "Review the proposed scope."}</p>
         <p>Unconfirmed milestone dates: To be agreed.</p>
       </div>
       {!props.agreements.length || !props.contacts.length ? (
@@ -112,7 +109,7 @@ export function JourneyAccessStage({
       </p>
       {composer.packet ? (
         <WelcomePacketPreview
-          content={composer.packet}
+          content={composer.previewPacket ?? composer.packet}
           clientName={props.organisationName}
         />
       ) : (

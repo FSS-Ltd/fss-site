@@ -14,6 +14,7 @@ import {
   type JourneyBillingAccount,
 } from "./command-types";
 import { verifyPreview } from "./preview-token";
+import { assertCurrentDesignedWelcomeVersion } from "./current-welcome-version";
 import { journeyCommandSchema, type JourneyCommand } from "./command-schema";
 import { lockJourney } from "./command-lock";
 import { envelope } from "./preview-envelope";
@@ -86,6 +87,12 @@ export async function runJourneyCommand(
         "The agreement changed after preview. Prepare and review it again.",
       );
     if (data.kind === "welcome") {
+      if (data.workspace)
+        await assertCurrentDesignedWelcomeVersion(
+          tx,
+          data.snapshot.content.welcomePackVersionId,
+          data.snapshot.content.edition,
+        );
       if (
         data.workspace &&
         !canStartOnboardingJourney(

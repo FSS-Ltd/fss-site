@@ -26,7 +26,7 @@ export function designedPacketGuide(
       paragraphs: [
         "Client: {{client_name}}. Your project contact: {{contact_first_name}}. FSS contact: {{sender_name}}.",
         "The goal: {{agreement_goal}}.",
-        "The proposed scope: {{agreement_scope}}.",
+        "We will confirm the proposed scope with you against the agreement before work begins. The agreement contains the complete services, fees and terms.",
         "Kickoff: To be agreed. First review: To be agreed. Delivery: To be agreed. We will confirm dates after the required decisions, materials and access are ready.",
       ],
     },
@@ -42,7 +42,7 @@ export function designedPacketGuide(
         seo
           ? "Where included, we will establish the SEO starting point using authorised search and analytics access. Ongoing work and reporting follow the service scope agreed with you."
           : "Each service is limited to the agreed scope. If a new requirement appears, we will discuss its effect on effort, fees and dates before adding it.",
-        "The scope we will review together: {{agreement_scope}}.",
+        "We will review what is included and what is outside the proposed scope before delivery begins.",
       ],
     },
     {
@@ -94,7 +94,7 @@ export function designedPacketGuide(
       layout: "text",
       title: "What you will receive",
       paragraphs: [
-        "The agreed deliverables: {{agreement_scope}}.",
+        "Your agreement names the deliverables and acceptance criteria. We will use those details at each review point.",
         portal
           ? "The handover covers the portal features, roles and operating instructions included in your agreement. We will review acceptance criteria with the nominated stakeholders."
           : "The handover covers the website pages, functionality and operating instructions included in your agreement. We will review the agreed launch checks together.",
