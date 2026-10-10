@@ -4,7 +4,10 @@ import { completeAgreementSigning } from "../../../lib/operations/agreements/sig
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import test, { type TestContext } from "node:test";
-import { signingFixture } from "./signing-fixtures";
+import {
+  deleteAgreementNotifications,
+  signingFixture,
+} from "./signing-fixtures";
 import { claimStaffInvitationForVerifiedEmail } from "../../../lib/operations/auth/staff-invitations";
 import { requireFssAdmin } from "../../../lib/operations/auth/require-admin";
 import {
@@ -97,6 +100,7 @@ async function fixture(t: TestContext) {
       f.correlationId,
     );
   const cleanup = async () => {
+    await deleteAgreementNotifications(f.admin, f.organisationId);
     await f.admin`delete from operations.commercial_offer_branches where offer_id in(select id from operations.commercial_offers where organisation_id=${f.organisationId})`;
     await f.admin`delete from operations.commercial_offer_events where organisation_id=${f.organisationId}`;
     await f.admin`delete from operations.commercial_offers where organisation_id=${f.organisationId}`;
