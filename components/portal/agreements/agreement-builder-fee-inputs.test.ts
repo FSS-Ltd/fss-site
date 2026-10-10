@@ -175,3 +175,50 @@ test("installments preserve exact minor units and reject malformed amounts", () 
   assert.deepEqual(toEditableInstallment(installment), input);
   assert.throws(() => parseInstallments([{ ...input, amount: "invalid" }]));
 });
+
+test("setup and recurring charges retain one service identity", () => {
+  const service = {
+    id: "11111111-1111-4111-8111-111111111111",
+    code: "website",
+    name: "Website delivery",
+    description: "Design, build and ongoing support",
+  };
+  const lines = [
+    { ...emptyLine(service.id), unitPrice: "500.00", startDate: "2026-11-01" },
+    {
+      ...monthlyRecurringLine(service.id),
+      unitPrice: "120.00",
+      startDate: "2026-11-01",
+    },
+  ];
+  const saved = linesForAgreementDraft(lines, true, false, [service]);
+  assert.deepEqual(
+    saved.map(({ serviceCode, description, recurrenceMonths }) => ({
+      serviceCode,
+      description,
+      recurrenceMonths,
+    })),
+    [
+      {
+        serviceCode: "website",
+        description: "Website delivery: Design, build and ongoing support",
+        recurrenceMonths: 0,
+      },
+      {
+        serviceCode: "website",
+        description: "Website delivery: Design, build and ongoing support",
+        recurrenceMonths: 1,
+      },
+    ],
+  );
+  assert.throws(
+    () =>
+      linesForAgreementDraft(
+        [{ ...lines[0], serviceGroupId: undefined }],
+        true,
+        false,
+        [service],
+      ),
+    /Assign every fee line/,
+  );
+});

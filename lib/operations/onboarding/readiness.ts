@@ -96,5 +96,7 @@ export function buildOnboardingReadiness(
 export function canStartOnboardingJourney(
   checks: readonly OnboardingReadinessCheck[],
 ): boolean {
-  return checks.length > 0 && checks.every((check) => check.status === "passed");
+  return (
+    checks.length > 0 && checks.every((check) => check.status === "passed")
+  );
 }

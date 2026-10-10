@@ -23,6 +23,13 @@ const commandSchema = z.discriminatedUnion("action", [
     organisationId: z.uuid(),
     invoiceId: z.uuid(),
   }),
+  z.strictObject({
+    action: z.literal("setup"),
+    organisationId: z.uuid(),
+    currency: currencySchema,
+    method: z.enum(["card", "bacs_debit"]),
+    automaticConsent: z.boolean(),
+  }),
 ]);
 export type PortalBillingCommand = z.infer<typeof commandSchema>;
 export type PortalBillingDependencies = PortalAuthHandlerDependencies & {
@@ -85,10 +92,7 @@ export function createPortalBillingHandler(
       if (error instanceof PayloadTooLargeError)
         return failure("The request is too large.", 413);
       if (error instanceof z.ZodError || error instanceof SyntaxError)
-        return failure(
-          "Choose an invoice or payment management from this page.",
-          400,
-        );
+        return failure("Choose a valid payment action from this page.", 400);
       reportAuthError(deps, correlationId, error);
       return failure("We couldn’t open billing. Please try again.", 503);
     }

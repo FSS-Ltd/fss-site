@@ -22,6 +22,62 @@ const installmentSchema = z.strictObject({
   amountPence: money,
   dueDate: dateOnly,
 });
+const serviceGroupSchema = z.strictObject({
+  id: z.uuid(),
+  code: z.string().trim().min(1).max(100),
+  name: z.string().trim().min(1).max(160),
+  description: z.string().trim().min(1).max(3_700),
+});
+const serviceGrouping = {
+  services: z.array(serviceGroupSchema).min(1).max(30).optional(),
+  lineServiceIds: z.array(z.uuid()).min(1).max(30).optional(),
+};
+
+function validateGrouping(
+  content: {
+    agreement?: { lines?: readonly unknown[] };
+    services?: readonly { id: string; code: string }[];
+    lineServiceIds?: readonly string[];
+  },
+  ctx: z.RefinementCtx,
+): void {
+  if (content.services === undefined && content.lineServiceIds === undefined)
+    return;
+  if (
+    !content.services ||
+    !content.lineServiceIds ||
+    content.lineServiceIds.length !== content.agreement?.lines?.length ||
+    content.lineServiceIds.some(
+      (id) => !content.services?.some((service) => service.id === id),
+    )
+  ) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["lineServiceIds"],
+      message: "Assign every fee line to a saved service.",
+    });
+  }
+  if (
+    content.services &&
+    new Set(content.services.map((service) => service.id)).size !==
+      content.services.length
+  )
+    ctx.addIssue({
+      code: "custom",
+      path: ["services"],
+      message: "Each service needs a unique identity.",
+    });
+  if (
+    content.services &&
+    new Set(content.services.map((service) => service.code.toLowerCase()))
+      .size !== content.services.length
+  )
+    ctx.addIssue({
+      code: "custom",
+      path: ["services"],
+      message: "Give each service a distinct code.",
+    });
+}
 
 const partialAgreementSchema = z.strictObject({
   assetsRequired: z.boolean().optional(),
@@ -61,27 +117,33 @@ const completeAgreementSchema = z.strictObject({
   title: z.string().trim().min(1).max(200),
 });
 
-export const agreementBuilderDraftContentSchema = z.strictObject({
-  agreement: partialAgreementSchema.optional(),
-  engagementId: z.uuid().optional(),
-  commercialOffer: z
-    .strictObject({
-      spec: commercialOfferSpecSchema,
-      expiresAt: z.iso.datetime(),
-    })
-    .optional(),
-});
+export const agreementBuilderDraftContentSchema = z
+  .strictObject({
+    agreement: partialAgreementSchema.optional(),
+    engagementId: z.uuid().optional(),
+    commercialOffer: z
+      .strictObject({
+        spec: commercialOfferSpecSchema,
+        expiresAt: z.iso.datetime(),
+      })
+      .optional(),
+    ...serviceGrouping,
+  })
+  .superRefine(validateGrouping);
 
-export const completeAgreementBuilderDraftContentSchema = z.strictObject({
-  agreement: completeAgreementSchema,
-  engagementId: z.uuid(),
-  commercialOffer: z
-    .strictObject({
-      spec: commercialOfferSpecSchema,
-      expiresAt: z.iso.datetime(),
-    })
-    .optional(),
-});
+export const completeAgreementBuilderDraftContentSchema = z
+  .strictObject({
+    agreement: completeAgreementSchema,
+    engagementId: z.uuid(),
+    commercialOffer: z
+      .strictObject({
+        spec: commercialOfferSpecSchema,
+        expiresAt: z.iso.datetime(),
+      })
+      .optional(),
+    ...serviceGrouping,
+  })
+  .superRefine(validateGrouping);
 
 export type AgreementBuilderDraftContent = z.infer<
   typeof agreementBuilderDraftContentSchema

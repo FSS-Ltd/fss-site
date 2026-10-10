@@ -9,6 +9,7 @@ import { requireFssAdmin } from "@/lib/operations/auth/require-admin";
 import { getOperationsDb } from "@/lib/operations/db/client";
 import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { getStaffCommercialOffer } from "@/lib/operations/agreements/commercial-service";
+import { listStaffOfferDeliveries } from "@/lib/operations/agreements/agreement-notification-repository";
 import { signingEnabled } from "@/lib/operations/agreements/signing-worker";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 
@@ -27,10 +28,13 @@ export default async function StaffOfferPage({
   if (!identifiers.success) notFound();
   const { organisationId, offerId } = identifiers.data;
   let offer;
+  let deliveries;
   try {
     const admin = await requireFssAdmin(getPortalDb(), identity, randomUUID());
-    offer = await getStaffCommercialOffer(
-      getOperationsDb(),
+    const db = getOperationsDb();
+    offer = await getStaffCommercialOffer(db, admin, organisationId, offerId);
+    deliveries = await listStaffOfferDeliveries(
+      db,
       admin,
       organisationId,
       offerId,
@@ -55,7 +59,7 @@ export default async function StaffOfferPage({
           { label: "Payment offer" },
         ]}
       />
-      <StaffCommercialOffer offer={offer} />
+      <StaffCommercialOffer offer={offer} deliveries={deliveries} />
     </>
   );
 }

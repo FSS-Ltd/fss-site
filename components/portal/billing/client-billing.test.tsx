@@ -38,6 +38,14 @@ test("summarises the next persisted payment without implying provider confirmati
   const html = renderToStaticMarkup(
     <ClientBillingOverview
       canManage
+      setupCurrency="GBP"
+      setup={{
+        method: null,
+        status: "not_started",
+        brand: null,
+        last4: null,
+        automaticConsent: false,
+      }}
       invoices={[openInvoice]}
       organisationId={organisationId}
     />,
@@ -89,6 +97,14 @@ test("retained invoice currencies and distinct payment management mappings are p
     <ClientBillingOverview
       canManage
       managementCurrencies={["USD", "EUR"]}
+      setupCurrency="USD"
+      setup={{
+        method: null,
+        status: "not_started",
+        brand: null,
+        last4: null,
+        automaticConsent: false,
+      }}
       invoices={[
         { ...openInvoice, currency: "USD" },
         {
@@ -102,7 +118,7 @@ test("retained invoice currencies and distinct payment management mappings are p
   );
   assert.match(html, /\$1,200\.00/);
   assert.match(html, /€1,200\.00/);
-  assert.match(html, /Manage payment method \(USD\)/);
-  assert.match(html, /Manage payment method \(EUR\)/);
+  assert.match(html, /Open billing management \(USD\)/);
+  assert.match(html, /Open billing management \(EUR\)/);
   assert.doesNotMatch(html, /£1,200/);
 });

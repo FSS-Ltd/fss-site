@@ -7,6 +7,7 @@ import {
   applyOnboardingDeliveryEvent,
   createOnboardingWebhookHandler,
 } from "@/lib/operations/onboarding/resend-webhook";
+import { applyAgreementDeliveryEvent } from "@/lib/operations/agreements/agreement-delivery-webhook";
 export const runtime = "nodejs";
 export async function POST(request: Request): Promise<Response> {
   return createOnboardingWebhookHandler({
@@ -22,12 +23,10 @@ export async function POST(request: Request): Promise<Response> {
         .max(200)
         .parse(process.env.OPERATIONS_RESEND_ACCOUNT_SCOPE),
     }),
-    record: (account, event, payload) =>
-      applyOnboardingDeliveryEvent(
-        getOnboardingWorkerDb(),
-        account,
-        event,
-        payload,
-      ),
+    record: async (account, event, payload) => {
+      const db = getOnboardingWorkerDb();
+      await applyOnboardingDeliveryEvent(db, account, event, payload);
+      await applyAgreementDeliveryEvent(db, event, payload);
+    },
   })(request);
 }

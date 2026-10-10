@@ -59,6 +59,7 @@ test("client choices have no default, validate cash/share floors and preserve se
     action: "select",
     percentageBps: 1000,
   });
+  await page.getByText("Review agreement terms and fee history").click();
   await expect(
     page.getByRole("heading", { name: "Fixed setup fee" }),
   ).toBeVisible();
@@ -79,7 +80,7 @@ test("staff reviews exact combined amount and supplies a rejection reason", asyn
   const total = page.getByLabel("Ongoing support: total per period (EUR)");
   await total.fill("19.99");
   await page
-    .getByRole("button", { name: "Approve proposal and prepare signing" })
+    .getByRole("button", { name: "Approve and send for signing" })
     .click();
   await expect(
     page.getByText("Allocations must equal the client's exact proposed total."),
@@ -111,7 +112,7 @@ test("staff reviews exact combined amount and supplies a rejection reason", asyn
     },
   );
   await page
-    .getByRole("button", { name: "Approve proposal and prepare signing" })
+    .getByRole("button", { name: "Approve and send for signing" })
     .click();
   await expect.poll(() => approved).toBe(true);
   await expect(page.getByText("Review changed. Reload.")).toBeVisible();

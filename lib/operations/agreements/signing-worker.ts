@@ -52,6 +52,19 @@ export async function completeAgreementSigning(
   });
   return result.completed;
 }
+export async function recordSigningCompletionFailure(
+  db: OperationsDb,
+  approvalId: string,
+): Promise<void> {
+  z.uuid().parse(approvalId);
+  await db`
+    update operations.signing_approvals
+    set completion_attempts = completion_attempts + 1,
+        completion_failure_code = 'document_processing_failed',
+        completion_next_attempt_at = now() + interval '15 minutes'
+    where id = ${approvalId} and status = 'approved'
+  `;
+}
 export async function runSigningCompletionWorker(
   db: OperationsDb,
   options: { limit?: number } = {},
@@ -74,7 +87,7 @@ export async function runSigningCompletionWorker(
     try {
       if (await completeAgreementSigning(db, row.id, randomUUID())) completed++;
     } catch {
-      await db`update operations.signing_approvals set completion_attempts=completion_attempts+1,completion_next_attempt_at=now()+interval '15 minutes' where id=${row.id} and status='approved'`;
+      await recordSigningCompletionFailure(db, row.id);
       failed++;
     }
   }

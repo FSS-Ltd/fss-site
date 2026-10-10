@@ -39,6 +39,7 @@ function renderDetail(children: React.ReactNode): string {
 }
 
 const record: AgreementRecord = {
+  archivedAt: null,
   draft: agreementDraft(),
   engagementId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
   evidence: null,
@@ -56,6 +57,8 @@ const completedApproval: SigningApproval = {
   approvalHash: "b".repeat(64),
   approvedAt: "2026-09-15T10:00:00.000Z",
   completedAt: "2026-09-15T11:25:00.000Z",
+  completionAttempts: 0,
+  completionFailureCode: null,
   createdAt: "2026-09-15T09:00:00.000Z",
   draft: record.draft,
   expiresAt: "2026-10-15T10:00:00.000Z",
@@ -93,7 +96,7 @@ test("shows retained electronic signer evidence only from the completed signing 
     />,
   );
 
-  assert.match(html, /Both signatures are complete/);
+  assert.match(html, /All required signatures are complete/);
   assert.match(html, /Alex Morgan/);
   assert.match(html, /FSS authorised signer/);
   assert.match(html, /Retained signed document/);
@@ -111,7 +114,7 @@ test("gives an unsigned Studio agreement the authenticated signing preparation c
 
   assert.match(html, /Prepare signing document/);
   assert.match(html, /Prepare a frozen PDF from this revision/);
-  assert.doesNotMatch(html, /Both signatures are complete/);
+  assert.doesNotMatch(html, /All required signatures are complete/);
 });
 
 test("explains when signing is unavailable without offering a failing command", () => {

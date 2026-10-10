@@ -14,6 +14,8 @@ import {
   type HostedBillingProvider,
 } from "../billing/portal-session";
 import type { PortalBillingCommand } from "./billing-handler";
+import type Stripe from "stripe";
+import { createBillingSetupSession } from "../billing/setup-service";
 
 export async function executePortalBillingCommand(
   db: OperationsDb,
@@ -24,11 +26,27 @@ export async function executePortalBillingCommand(
   configurationId: string | undefined,
   returnUrl: string,
   correlationId: string,
+  stripe?: Stripe,
 ): Promise<string> {
   if (command.organisationId !== scope.organisationId)
     throw new PortalAccessDenied();
   const capability =
-    command.action === "manage" ? "billing.manage" : "billing.read";
+    command.action === "invoice" ? "billing.read" : "billing.manage";
+  if (command.action === "setup") {
+    if (!stripe) throw new Error("Billing setup is not configured.");
+    return createBillingSetupSession(
+      db,
+      identity,
+      scope,
+      stripe,
+      command,
+      {
+        success: `${returnUrl}&setup=return`,
+        cancel: `${returnUrl}&setup=cancelled`,
+      },
+      correlationId,
+    );
+  }
   const stored = await withPortalTransaction(
     db,
     identity,

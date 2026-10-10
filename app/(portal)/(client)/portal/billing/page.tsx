@@ -13,6 +13,8 @@ import {
   loadInvoices,
 } from "@/lib/operations/billing/invoice-repository";
 import { loadBillingCustomerCurrencies } from "@/lib/operations/billing/customer-repository";
+import { loadBillingSetupStatus } from "@/lib/operations/billing/setup-service";
+import { currencySchema } from "@/lib/operations/money";
 import { ClientBillingOverview } from "@/components/portal/billing/client-billing-overview";
 import {
   nextOpenInvoice,
@@ -60,18 +62,24 @@ export default async function BillingPage({
       async (tx, membership) => {
         if (!hasPortalCapability(membership.role, "billing.read"))
           throw new PortalAccessDenied();
-        const [invoices, allInvoices, currencies] = await Promise.all([
-          loadInvoicePage(tx, scope, page),
-          loadInvoices(tx, scope),
-          loadBillingCustomerCurrencies(tx, scope),
-        ]);
+        const [invoices, allInvoices, currencies, organisation] =
+          await Promise.all([
+            loadInvoicePage(tx, scope, page),
+            loadInvoices(tx, scope),
+            loadBillingCustomerCurrencies(tx, scope),
+            tx<
+              { billingCurrency: string }[]
+            >`select billing_currency as "billingCurrency" from operations.organisations where id=${context.organisationId}`,
+          ]);
+        const currency = currencySchema.parse(organisation[0]?.billingCurrency);
+        const setup = await loadBillingSetupStatus(tx, scope, currency);
         return {
           allInvoices,
           currencies,
+          currency,
+          setup,
           invoices,
-          canManage:
-            currencies.length > 0 &&
-            hasPortalCapability(membership.role, "billing.manage"),
+          canManage: hasPortalCapability(membership.role, "billing.manage"),
         };
       },
     );
@@ -83,6 +91,8 @@ export default async function BillingPage({
     <ClientBillingOverview
       canManage={data.canManage}
       managementCurrencies={data.currencies}
+      setupCurrency={data.currency}
+      setup={data.setup}
       invoices={data.invoices.items.map(toInvoiceSummary)}
       nextPayment={nextOpenInvoice(data.allInvoices.map(toInvoiceSummary))}
       organisationId={context.organisationId}

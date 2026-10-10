@@ -73,6 +73,8 @@ test("signed PDF embeds the exact original source and auditable consent without 
     approvedAt: "2026-09-08T10:00:00.000Z",
     expiresAt: "2026-09-09T10:00:00.000Z",
     completedAt: null,
+    completionAttempts: 0,
+    completionFailureCode: null,
     signatures: [
       {
         email: draft.signatories[0],

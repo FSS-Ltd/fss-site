@@ -11,7 +11,8 @@ require.extensions[".css"] = (module) => {
   };
 };
 
-const { AgreementStatusCard, toPortalAgreementStatus } = require("./presentation") as typeof import("./presentation");
+const { AgreementStatusCard, toPortalAgreementStatus } =
+  require("./presentation") as typeof import("./presentation");
 
 test("maps an approved agreement with outstanding signatures to awaiting signature", () => {
   assert.equal(
@@ -30,6 +31,16 @@ test("maps a completed agreement with every signature to signed", () => {
       status: "completed",
     }),
     "signed",
+  );
+});
+
+test("shows signed document processing after every signature is recorded", () => {
+  assert.equal(
+    toPortalAgreementStatus({
+      allRequiredSignaturesRecorded: true,
+      status: "approved",
+    }),
+    "processing",
   );
 });
 

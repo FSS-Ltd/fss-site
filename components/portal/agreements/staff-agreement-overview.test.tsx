@@ -11,7 +11,8 @@ require.extensions[".css"] = (module) => {
   };
 };
 
-const { StaffAgreementOverview } = require("./staff-agreement-overview") as typeof import("./staff-agreement-overview");
+const { StaffAgreementOverview } =
+  require("./staff-agreement-overview") as typeof import("./staff-agreement-overview");
 
 test("groups FSS Studio agreement work by actionable status", () => {
   const html = renderToStaticMarkup(

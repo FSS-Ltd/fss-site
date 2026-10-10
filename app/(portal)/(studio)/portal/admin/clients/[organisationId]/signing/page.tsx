@@ -20,6 +20,7 @@ import { portalPath } from "@/lib/operations/auth/portal-url";
 import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import { signingEnabled } from "@/lib/operations/agreements/signing-commands";
 import { listStaffSigning } from "@/lib/operations/agreements/signing-service";
+import { listStaffAgreementDeliveries } from "@/lib/operations/agreements/agreement-notification-repository";
 
 export const dynamic = "force-dynamic";
 
@@ -55,6 +56,7 @@ export default async function StaffClientSigningPage({
     );
   }
   let approvals;
+  let deliveries;
   try {
     const db = getOperationsDb();
     approvals = await listStaffSigning(
@@ -62,6 +64,11 @@ export default async function StaffClientSigningPage({
       admin,
       organisationId.data,
       randomUUID(),
+    );
+    deliveries = await listStaffAgreementDeliveries(
+      db,
+      admin,
+      organisationId.data,
     );
   } catch {
     return <PortalUnavailable />;
@@ -98,9 +105,7 @@ export default async function StaffClientSigningPage({
       ) : (
         approvals.map((approval) => {
           const signingOpen =
-            approval.status === "prepared" ||
-            (approval.status === "approved" &&
-              approval.signatures.length < approval.requiredSigners.length);
+            approval.status === "prepared" || approval.status === "approved";
           return (
             <section
               className={styles.detail}
@@ -108,7 +113,11 @@ export default async function StaffClientSigningPage({
             >
               <StaffSigningStatus
                 approval={approval}
+                deliveries={deliveries.filter(
+                  (delivery) => delivery.approvalId === approval.id,
+                )}
                 downloadBase={`${apiRoot}/${approval.id}`}
+                commandEndpoint={apiRoot}
                 controls={
                   signingOpen ? (
                     <PortalCard
@@ -116,7 +125,10 @@ export default async function StaffClientSigningPage({
                       title={
                         approval.status === "prepared"
                           ? "Approve signing"
-                          : "Signing controls"
+                          : approval.signatures.length ===
+                              approval.requiredSigners.length
+                            ? "Complete signed copy"
+                            : "Signing controls"
                       }
                     >
                       <SigningForm

@@ -145,9 +145,34 @@ async function loadClientWorkspaceInTransaction(
   `;
   if (!workspaceRow) throw new PortalAccessDenied();
   const workspace = parseOnboardingWorkspace(workspaceRow.workspace);
-  const tasks = workspace.tasks.map(projectClientTask);
+  const checklist = await loadClientSetupChecklist(tx, organisationId);
+  const [journey] = await tx<{ id: string | null }[]>`
+    select operations.portal_current_onboarding_journey(${organisationId}) as id
+  `;
+  const agreementSigned = checklist.agreementSigned;
+  const tasks = workspace.tasks
+    .filter((task) => task.journeyId === journey?.id)
+    .map((task) => {
+      if (task.kind !== "agreement") return projectClientTask(task);
+      const evidenceDerived =
+        task.completionDetail === "Signed agreement recorded.";
+      const state = agreementSigned
+        ? "complete"
+        : evidenceDerived
+          ? "available"
+          : task.state;
+      return projectClientTask({
+        ...task,
+        state,
+        completionDetail: agreementSigned
+          ? "Signed agreement recorded."
+          : evidenceDerived
+            ? null
+            : task.completionDetail,
+      });
+    });
   return {
-    checklist: await loadClientSetupChecklist(tx, organisationId),
+    checklist,
     tasks,
     requiredTasksComplete:
       tasks.length > 0 &&

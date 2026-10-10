@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { after } from "next/server";
 import { resolveSiteUrl } from "../../config/site-url";
 import { requireFounder } from "../../growth/auth/require-founder";
 import { getPortalIdentity } from "../auth/server";
@@ -23,6 +24,11 @@ import {
   downloadStaffSigningArtifact,
 } from "./signing-service";
 import { fssStudioEnabled } from "../auth/release-flags";
+import {
+  completeAgreementSigning,
+  getSigningWorkerDb,
+  recordSigningCompletionFailure,
+} from "./signing-worker";
 
 function configuration(origin: string) {
   return {
@@ -67,14 +73,62 @@ export function portalSigningRoute() {
         organisationId,
         correlationId,
       ),
-    execute: (identity, organisationId, command, correlationId) =>
-      executePortalSigningCommand(
+    execute: async (identity, organisationId, command, correlationId) => {
+      const approval = await executePortalSigningCommand(
         getPortalDb(),
         identity,
         organisationId,
         command,
         correlationId,
-      ),
+      );
+      if (
+        typeof command === "object" &&
+        command !== null &&
+        "action" in command &&
+        command.action === "sign" &&
+        approval.status === "approved" &&
+        approval.requiredSigners.length > 0 &&
+        approval.requiredSigners.every((email) =>
+          approval.signatures.some((signature) => signature.email === email),
+        )
+      ) {
+        after(async () => {
+          try {
+            await completeAgreementSigning(
+              getSigningWorkerDb(),
+              approval.id,
+              correlationId,
+            );
+          } catch (error) {
+            console.error(
+              "Agreement completion will be retried by the signing worker.",
+              {
+                correlationId,
+                errorName: error instanceof Error ? error.name : "UnknownError",
+              },
+            );
+            try {
+              await recordSigningCompletionFailure(
+                getSigningWorkerDb(),
+                approval.id,
+              );
+            } catch (recordError) {
+              console.error(
+                "Agreement completion failure could not be recorded.",
+                {
+                  correlationId,
+                  errorName:
+                    recordError instanceof Error
+                      ? recordError.name
+                      : "UnknownError",
+                },
+              );
+            }
+          }
+        });
+      }
+      return approval;
+    },
   });
 }
 async function authorizeStaff() {
@@ -91,14 +145,54 @@ export function staffSigningRoute() {
     ...configuration(resolvePortalOrigin()),
     enabled: signingEnabled() && fssStudioEnabled(),
     authorize: authorizeStaff,
-    execute: (admin, organisationId, command, correlationId) =>
-      executeStaffSigningCommand(
+    execute: async (admin, organisationId, command, correlationId) => {
+      const approval = await executeStaffSigningCommand(
         getOperationsDb(),
         admin,
         organisationId,
         command,
         correlationId,
-      ),
+      );
+      if (
+        typeof command === "object" &&
+        command !== null &&
+        "action" in command &&
+        command.action === "retry"
+      ) {
+        after(async () => {
+          try {
+            await completeAgreementSigning(
+              getSigningWorkerDb(),
+              approval.id,
+              correlationId,
+            );
+          } catch (error) {
+            console.error("Agreement completion retry failed.", {
+              correlationId,
+              errorName: error instanceof Error ? error.name : "UnknownError",
+            });
+            try {
+              await recordSigningCompletionFailure(
+                getSigningWorkerDb(),
+                approval.id,
+              );
+            } catch (recordError) {
+              console.error(
+                "Agreement completion failure could not be recorded.",
+                {
+                  correlationId,
+                  errorName:
+                    recordError instanceof Error
+                      ? recordError.name
+                      : "UnknownError",
+                },
+              );
+            }
+          }
+        });
+      }
+      return approval;
+    },
   });
 }
 export function founderSigningDownloadRoute() {

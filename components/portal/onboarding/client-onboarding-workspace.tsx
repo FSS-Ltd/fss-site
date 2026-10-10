@@ -137,7 +137,11 @@ export function ClientOnboardingWorkspaceView({
         description="These milestones are derived from your agreement, billing, documents and service records."
         title="Recorded milestones"
       >
-        <ClientSetupChecklist checklist={workspace.checklist} enabled />
+        <ClientSetupChecklist
+          checklist={workspace.checklist}
+          enabled
+          organisationId={organisationId}
+        />
       </PortalCard>
 
       <section aria-labelledby="launch-tasks-heading">

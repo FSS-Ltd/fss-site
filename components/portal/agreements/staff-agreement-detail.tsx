@@ -10,7 +10,11 @@ import { formatMoney } from "@/lib/operations/money";
 import { totalLinePence } from "@/lib/operations/agreements/validation";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import type { SigningApproval } from "@/lib/operations/agreements/signing-types";
-import { hasCompleteSigningEvidence } from "./presentation";
+import { AgreementLifecycleActions } from "./agreement-lifecycle-actions";
+import {
+  allRequiredSignaturesRecorded,
+  hasCompleteSigningEvidence,
+} from "./presentation";
 import styles from "./agreements.module.css";
 
 export function StaffAgreementDetail({
@@ -18,6 +22,7 @@ export function StaffAgreementDetail({
   record,
   signingCommandEndpoint,
   signingApproval,
+  hasSigningRequest = false,
   signingDownloadBase,
   signingSuccessRedirect,
 }: Readonly<{
@@ -25,29 +30,35 @@ export function StaffAgreementDetail({
   record: AgreementRecord;
   signingCommandEndpoint?: string;
   signingApproval?: SigningApproval | null;
+  hasSigningRequest?: boolean;
   signingDownloadBase?: string;
   signingSuccessRedirect?: string;
 }>): React.JSX.Element {
-  const currentApproval =
+  const currentSigning =
     signingApproval?.agreementId === record.id &&
     signingApproval.revision === record.revision
       ? signingApproval
       : null;
   const completedSigning =
-    currentApproval && hasCompleteSigningEvidence(currentApproval)
-      ? currentApproval
+    currentSigning && hasCompleteSigningEvidence(currentSigning)
+      ? currentSigning
       : null;
   const manualEvidence = record.status === "signed" && record.evidence !== null;
   const signed = manualEvidence || completedSigning !== null;
-  const signingState = currentApproval
-    ? currentApproval.status === "prepared"
-      ? "Awaiting FSS approval"
-      : currentApproval.status === "approved"
-        ? "Open for signing"
-        : currentApproval.status === "completed"
-          ? "Evidence needs review"
-          : "Signing request closed"
-    : null;
+  const signingState =
+    record.status === "withdrawn"
+      ? "Withdrawn"
+      : currentSigning
+        ? currentSigning.status === "prepared"
+          ? "Awaiting FSS approval"
+          : currentSigning.status === "approved"
+            ? allRequiredSignaturesRecorded(currentSigning)
+              ? "Preparing signed copy"
+              : "Open for signing"
+            : currentSigning.status === "completed"
+              ? "Evidence needs review"
+              : "Signing request closed"
+        : null;
   const workspaceHref = portalPath(
     `/portal/admin/clients/${encodeURIComponent(organisationId)}/agreements`,
   );
@@ -59,19 +70,29 @@ export function StaffAgreementDetail({
     <article className={styles.detail}>
       <div className={styles.detailStatus}>
         <StatusBadge
-          status={signed ? "success" : currentApproval ? "info" : "warning"}
+          status={signed ? "success" : currentSigning ? "info" : "warning"}
         >
-          {signed ? "Signed" : (signingState ?? "Draft")}
+          {record.archivedAt
+            ? "Archived"
+            : signed
+              ? "Signed"
+              : (signingState ?? "Draft")}
         </StatusBadge>
         <span>
           {record.draft.title} · Revision {record.revision}
         </span>
       </div>
+      <AgreementLifecycleActions
+        record={record}
+        organisationId={organisationId}
+        hasSigningRequest={hasSigningRequest}
+        listHref={workspaceHref}
+      />
       {signed ? (
         <Notice tone="success">
           <strong>
             {completedSigning
-              ? "Both signatures are complete."
+              ? "All required signatures are complete."
               : "Signed and recorded."}
           </strong>
           <p>
@@ -79,7 +100,7 @@ export function StaffAgreementDetail({
             activation remains a separate operational step.
           </p>
         </Notice>
-      ) : currentApproval ? (
+      ) : currentSigning ? (
         <PortalCard
           description="This revision already has a signing request. Review its exact document and signer evidence before taking another action."
           title={signingState ?? "Signing request"}
@@ -90,6 +111,11 @@ export function StaffAgreementDetail({
             </PortalActionLink>
           ) : null}
         </PortalCard>
+      ) : record.status === "withdrawn" ? (
+        <Notice tone="info">
+          This issued agreement was withdrawn. Its history remains available for
+          review.
+        </Notice>
       ) : (
         <Notice tone="warning">
           <strong>This agreement is still a draft.</strong>
@@ -100,7 +126,8 @@ export function StaffAgreementDetail({
         </Notice>
       )}
       {!signed &&
-      !currentApproval &&
+      record.status === "draft" &&
+      !currentSigning &&
       signingCommandEndpoint &&
       signingSuccessRedirect ? (
         <PortalCard
@@ -179,6 +206,13 @@ export function StaffAgreementDetail({
           {signingDownloadBase ? (
             <div className={styles.actionRow}>
               <PortalActionLink
+                href={portalPath(
+                  `/portal/admin/clients/${encodeURIComponent(organisationId)}/journey`,
+                )}
+              >
+                Continue client setup
+              </PortalActionLink>
+              <PortalActionLink
                 href={`${signingDownloadBase}/signed`}
                 variant="secondary"
               >
@@ -211,9 +245,9 @@ export function StaffAgreementDetail({
           </dl>
         </PortalCard>
       ) : null}
-      {!signed && !currentApproval ? (
+      {!signed && record.status === "draft" ? (
         <>
-          {!signingCommandEndpoint || !signingSuccessRedirect ? (
+          {!signingCommandEndpoint && !currentSigning ? (
             <Notice tone="info">
               <p>
                 Electronic signing is unavailable until the signing feature is

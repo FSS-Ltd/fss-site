@@ -17,12 +17,15 @@ test("readiness reports the exact server-owned repair path", () => {
     signingReady: true,
   });
 
-  assert.deepEqual(checks.find((check) => check.id === "sender"), {
-    id: "sender",
-    status: "needs_action",
-    reason: "Choose an authorised FSS sender.",
-    href: "/portal/admin/settings",
-  });
+  assert.deepEqual(
+    checks.find((check) => check.id === "sender"),
+    {
+      id: "sender",
+      status: "needs_action",
+      reason: "Choose an authorised FSS sender.",
+      href: "/portal/admin/settings",
+    },
+  );
   assert.equal(canStartOnboardingJourney(checks), false);
 });
 

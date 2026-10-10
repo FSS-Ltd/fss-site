@@ -18,6 +18,7 @@ const record: AgreementRecord = {
   version: 1,
   revision: 1,
   status: "draft",
+  archivedAt: null,
   draft: agreementDraft(),
   evidence: null,
   services: [],

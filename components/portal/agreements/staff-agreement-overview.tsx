@@ -44,7 +44,8 @@ function AgreementWorkspaceRow({
           <div>
             <h3>{organisation.organisationName}</h3>
             <p>
-              {count} {draft ? "draft" : "signed"} {count === 1 ? "agreement" : "agreements"}
+              {count} {draft ? "draft" : "signed"}{" "}
+              {count === 1 ? "agreement" : "agreements"}
             </p>
           </div>
           <StatusBadge status={draft ? "warning" : "success"}>
@@ -77,7 +78,10 @@ function AgreementGroup({
   title: string;
 }>): React.JSX.Element {
   return (
-    <section className={styles.group} aria-labelledby={`${status}-agreements-heading`}>
+    <section
+      className={styles.group}
+      aria-labelledby={`${status}-agreements-heading`}
+    >
       <h2 id={`${status}-agreements-heading`}>{title}</h2>
       {organisations.length ? (
         <ul className={styles.workspaceList}>
@@ -100,7 +104,9 @@ function AgreementGroup({
   );
 }
 
-function signingTone(status: StaffSigningReadiness["status"]): "error" | "info" | "warning" {
+function signingTone(
+  status: StaffSigningReadiness["status"],
+): "error" | "info" | "warning" {
   if (status === "expired") return "error";
   if (status === "approved") return "info";
   return "warning";
@@ -124,8 +130,12 @@ export function StaffAgreementOverview({
     }),
     { agreements: 0, drafts: 0, signed: 0 },
   );
-  const drafts = agreements.filter((organisation) => organisation.draftCount > 0);
-  const signed = agreements.filter((organisation) => organisation.signedCount > 0);
+  const drafts = agreements.filter(
+    (organisation) => organisation.draftCount > 0,
+  );
+  const signed = agreements.filter(
+    (organisation) => organisation.signedCount > 0,
+  );
 
   return (
     <div className={styles.page}>
@@ -140,7 +150,10 @@ export function StaffAgreementOverview({
         eyebrow="FSS Studio / Agreements"
         title="Agreements"
       />
-      <section className={styles.metrics} aria-label="Agreement portfolio summary">
+      <section
+        className={styles.metrics}
+        aria-label="Agreement portfolio summary"
+      >
         <PortalCard title="Client workspaces">
           <p className={styles.metric}>{agreements.length}</p>
         </PortalCard>
@@ -157,8 +170,8 @@ export function StaffAgreementOverview({
       <Notice tone="info">
         <strong>Approval is not signature.</strong>
         <p>
-          A document can be approved and queued for signing before every required
-          signature and retained final document are complete.
+          A document can be approved and queued for signing before every
+          required signature and retained final document are complete.
         </p>
       </Notice>
       <AgreementGroup
@@ -168,7 +181,10 @@ export function StaffAgreementOverview({
       />
       <AgreementGroup organisations={signed} status="signed" title="Signed" />
       {signingReadiness.length ? (
-        <section className={styles.group} aria-labelledby="signing-activity-heading">
+        <section
+          className={styles.group}
+          aria-labelledby="signing-activity-heading"
+        >
           <h2 id="signing-activity-heading">Signing activity</h2>
           <ul className={styles.workspaceList}>
             {signingReadiness.map((approval) => (

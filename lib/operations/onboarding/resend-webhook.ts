@@ -4,7 +4,8 @@ import { verifyResendWebhookSignature } from "../../growth/integrations/resend/w
 import { readWebhookBytes, WebhookBodyTooLarge } from "../http/webhook-body";
 import { recordOnboardingDeliveryFailure } from "./repository";
 const payloadSchema = z.object({
-  type: z.enum(["email.bounced", "email.complained"]),
+  type: z.enum(["email.delivered", "email.bounced", "email.complained"]),
+  created_at: z.iso.datetime().optional(),
   data: z.object({
     email_id: z.string().min(1).max(300),
     from: z.string().max(320),
@@ -18,6 +19,7 @@ export async function applyOnboardingDeliveryEvent(
   eventId: string,
   payload: z.infer<typeof payloadSchema>,
 ): Promise<void> {
+  if (payload.type === "email.delivered") return;
   const data = payload.data;
   const [job] = await db<
     { recipient: string; from: string; providerId: string | null }[]

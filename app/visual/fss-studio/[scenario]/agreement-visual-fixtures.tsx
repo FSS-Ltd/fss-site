@@ -94,6 +94,8 @@ const approval: SigningApproval = {
   approvalHash: "b".repeat(64),
   approvedAt: "2026-09-15T10:00:00.000Z",
   completedAt: null,
+  completionAttempts: 0,
+  completionFailureCode: null,
   createdAt: "2026-09-15T09:00:00.000Z",
   draft,
   expiresAt: "2026-10-15T10:00:00.000Z",
@@ -129,6 +131,7 @@ const completedApproval: SigningApproval = {
 };
 
 const signedRecord: AgreementRecord = {
+  archivedAt: null,
   draft,
   engagementId: "9d8be1e3-f8d8-4fe1-b15d-01e78c438384",
   evidence: {

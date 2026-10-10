@@ -22,6 +22,27 @@ const { ClientOnboardingTaskDetail } =
 const { ClientOnboardingWorkspaceView } =
   require("./client-onboarding-workspace") as typeof import("./client-onboarding-workspace");
 
+test("recorded signatures show document processing separately from invoice readiness", () => {
+  const html = renderToStaticMarkup(
+    <ClientOnboardingWorkspaceView
+      organisationId="11111111-1111-4111-8111-111111111111"
+      workspace={{
+        ...workspace,
+        checklist: {
+          ...workspace.checklist,
+          agreementSigned: false,
+          agreementState: "document_processing",
+        },
+      }}
+    />,
+  );
+  assert.match(html, /Preparing copy/);
+  assert.match(html, /Every required signature is recorded/);
+  assert.match(html, /Payment method setup/);
+  assert.match(html, /First invoice ready/);
+  assert.doesNotMatch(html, /Agreement signed[\s\S]{0,300}Complete/);
+});
+
 const profileTask: ClientOnboardingTask = {
   id: "5c4ca4d0-d7ce-4966-ab8a-7842f44ae673",
   templateVersionId: "62bd1fe5-34b8-4ba3-aa16-eaf0f4df8550",

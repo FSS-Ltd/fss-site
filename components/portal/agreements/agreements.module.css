@@ -460,6 +460,32 @@
   margin-top: 20px;
 }
 
+.signingConfirmDialog {
+  width: min(100% - 32px, 480px);
+  border: 1px solid var(--portal-border);
+  border-radius: 12px;
+  padding: 24px;
+  background: var(--portal-surface);
+  color: var(--portal-ink);
+  box-shadow: 0 20px 60px var(--portal-overlay);
+}
+
+.signingConfirmDialog::backdrop {
+  background: var(--portal-overlay);
+}
+
+.signingConfirmDialog h2,
+.signingConfirmDialog p {
+  margin: 0 0 16px;
+}
+
+.signingConfirmActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 @media (max-width: 720px) {
   .signingSchedule li {
     grid-template-columns: minmax(0, 1fr);
@@ -564,29 +590,65 @@
 .summaryList dd p {
   margin: 0 0 8px;
 }
-
-.signingConfirmDialog {
-  width: min(100% - 32px, 480px);
-  border: 1px solid var(--portal-border);
-  border-radius: 12px;
-  padding: 24px;
-  background: var(--portal-surface);
-  color: var(--portal-ink);
-  box-shadow: 0 20px 60px var(--portal-overlay);
+.offerDetails {
+  display: grid;
+  gap: 14px;
 }
 
-.signingConfirmDialog::backdrop {
-  background: var(--portal-overlay);
+.offerDetails > summary {
+  cursor: pointer;
+  font-weight: 650;
+  padding: 10px 0;
 }
 
-.signingConfirmDialog h2,
-.signingConfirmDialog p {
-  margin: 0 0 16px;
+.offerDetails[open] > * + * {
+  margin-top: 14px;
+}
+.agreementTimeline {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-.signingConfirmActions {
+.agreementTimeline li {
+  align-items: flex-start;
+  color: var(--portal-muted);
   display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  flex-wrap: wrap;
+  font-size: 0.8125rem;
+  gap: 8px;
+  line-height: 1.35;
+}
+
+.timelineIndex {
+  align-items: center;
+  border: 1px solid var(--portal-line);
+  border-radius: 50%;
+  display: inline-flex;
+  flex: 0 0 24px;
+  height: 24px;
+  justify-content: center;
+}
+
+.agreementTimeline .timelineDone,
+.agreementTimeline .timelineCurrent {
+  color: var(--portal-ink);
+}
+
+.timelineDone .timelineIndex,
+.timelineCurrent .timelineIndex {
+  border-color: var(--portal-action);
+}
+
+.timelineCurrent .timelineIndex {
+  background: var(--portal-action);
+  color: var(--portal-on-action);
+}
+
+@media (max-width: 700px) {
+  .agreementTimeline {
+    grid-template-columns: 1fr;
+  }
 }

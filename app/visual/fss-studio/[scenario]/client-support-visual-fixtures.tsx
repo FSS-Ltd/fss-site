@@ -265,6 +265,14 @@ export function ClientBillingScenario(): React.JSX.Element {
     <ClientFrame>
       <ClientBillingOverview
         canManage
+        setupCurrency="GBP"
+        setup={{
+          method: null,
+          status: "not_started",
+          brand: null,
+          last4: null,
+          automaticConsent: false,
+        }}
         invoices={[openInvoice]}
         organisationId={organisationId}
       />

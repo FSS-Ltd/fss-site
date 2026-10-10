@@ -102,6 +102,21 @@ export async function runBillingEventWorker(
           await tx`select id from operations.billing_provider_events where id=${event.id} and lease_token=${event.leaseToken} and lease_until>now() for update`;
         if (!active.length) throw new Error("Event lease expired.");
         if (resolved.mandate) await applyMandate(tx, scope, resolved.mandate);
+        if (resolved.setup) {
+          const setup = resolved.setup;
+          await tx`select operations.record_billing_setup_event(
+            ${setup.setupId}::uuid,${event.eventId},${setup.kind},${setup.occurredAt}::timestamptz,
+            ${setup.providerCustomerId},${setup.providerSessionId},${setup.setupIntentId},
+            ${setup.providerMethodId},${setup.mandateId},${setup.method},
+            ${setup.metadataOrganisationId}::uuid,${setup.metadataCurrency},
+            ${setup.brand},${setup.last4},
+            ${setup.expiresMonth},${setup.expiresYear}
+          )`;
+        }
+        if (resolved.detachedMethodId)
+          await tx`select operations.revoke_billing_payment_method(
+            ${scope.accountId},${scope.mode},${resolved.detachedMethodId},${event.occurredAt}::timestamptz
+          )`;
         await tx`update operations.billing_provider_events set state='completed',completed_at=now(),lease_token=null,lease_until=null where id=${event.id}`;
       });
       result.processed++;

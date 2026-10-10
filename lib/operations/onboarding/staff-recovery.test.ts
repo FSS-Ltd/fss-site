@@ -49,11 +49,17 @@ test("derives blocked checks from the saved server draft rather than browser sta
   );
 
   assert.equal(recovery?.canStart, false);
-  assert.deepEqual(recovery?.checks.find((check) => check.id === "agreement"), {
-    href: "/portal/admin/agreements",
-    id: "agreement",
-    reason: "Refresh the current agreement before starting this journey.",
-    status: "needs_action",
-  });
-  assert.equal(recovery?.checks.find((check) => check.id === "sender")?.status, "needs_action");
+  assert.deepEqual(
+    recovery?.checks.find((check) => check.id === "agreement"),
+    {
+      href: "/portal/admin/agreements",
+      id: "agreement",
+      reason: "Refresh the current agreement before starting this journey.",
+      status: "needs_action",
+    },
+  );
+  assert.equal(
+    recovery?.checks.find((check) => check.id === "sender")?.status,
+    "needs_action",
+  );
 });

@@ -16,20 +16,67 @@ import {
 } from "@/lib/operations/money";
 import { totalLinePence } from "@/lib/operations/agreements/validation";
 import type { CommercialOffer } from "@/lib/operations/agreements/commercial-types";
+import type { OfferDeliveryStatus } from "@/lib/operations/agreements/agreement-notification-repository";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import { useCommercialOfferCommand } from "./use-commercial-offer-command";
 import { CommercialOfferSummary } from "./commercial-offer-summary";
+import { AgreementDeliveryAction } from "./agreement-delivery-action";
 import styles from "./agreements.module.css";
 
 export function StaffCommercialOffer({
   offer,
-}: Readonly<{ offer: CommercialOffer }>): React.JSX.Element {
+  deliveries = [],
+}: Readonly<{
+  offer: CommercialOffer;
+  deliveries?: readonly OfferDeliveryStatus[];
+}>): React.JSX.Element {
   const { pending, error, send } = useCommercialOfferCommand(offer, "staff");
   const [validationError, setValidationError] = useState<string | null>(null);
   const proposal = offer.selection;
   return (
     <article className={styles.detail}>
       <CommercialOfferSummary offer={offer} />
+      <PortalCard
+        title="Offer delivery"
+        description="Each recipient has a separate email record. Sent means the provider accepted it; delivery is confirmed only after its delivery event."
+      >
+        {deliveries.length ? (
+          <ul className={styles.schedule}>
+            {deliveries.map((delivery) => (
+              <li key={delivery.id}>
+                <span>{delivery.recipient}</span>
+                <span>
+                  {delivery.status === "delivered"
+                    ? "Delivered"
+                    : delivery.status === "sent"
+                      ? "Sent; delivery unconfirmed"
+                      : delivery.status === "queued" ||
+                          delivery.status === "sending"
+                        ? "Queued"
+                        : delivery.status === "failed"
+                          ? "Delivery failed"
+                          : delivery.status === "suppressed"
+                            ? "No longer required"
+                            : "Delivery unknown"}
+                </span>
+                {(offer.status === "published" ||
+                  offer.status === "rejected") &&
+                (delivery.status === "sent" ||
+                  delivery.status === "failed" ||
+                  delivery.status === "unknown") ? (
+                  <AgreementDeliveryAction
+                    source={{ type: "offer", id: offer.id }}
+                    delivery={delivery}
+                    endpoint={`/api/portal/admin/clients/${offer.organisationId}/notifications/${delivery.id}/resend`}
+                  />
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No email delivery has been recorded for this offer.</p>
+        )}
+      </PortalCard>
       <PortalCard title="Read-only client preview">
         <p>
           Review the client-facing terms without submitting a choice on the
@@ -50,6 +97,14 @@ export function StaffCommercialOffer({
             {proposal.option === "cash"
               ? `${formatMoney(proposal.recurringAmountMinor ?? "0", offer.draft.currency)} per billing period`
               : `${(Number(proposal.percentageBps) / 100).toFixed(2)}% revenue share`}
+          </p>
+          <p>
+            Final agreement: {offer.draft.title}. The approved allocation below
+            becomes the retained signing document.
+          </p>
+          <p>
+            Recipients: {offer.draft.signatories.join(", ")}. Signing closes 30
+            days after approval.
           </p>
           <form
             aria-busy={pending}
@@ -166,7 +221,7 @@ export function StaffCommercialOffer({
                 </p>
               )}
               <PortalButton loading={pending} type="submit">
-                Approve proposal and prepare signing
+                Approve and send for signing
               </PortalButton>
             </fieldset>
           </form>

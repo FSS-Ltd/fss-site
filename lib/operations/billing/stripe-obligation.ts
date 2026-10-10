@@ -28,6 +28,7 @@ export async function createStripeObligation(
   customerId: string,
   command: BillingCommand,
   beforeWrite: () => Promise<void> = async () => {},
+  automaticPaymentMethodId: string | null = null,
 ): Promise<ProviderObligation> {
   const amount = stripeAmount(schedule.amountPence);
   const currency = stripeCurrency(schedule.currency);
@@ -271,8 +272,12 @@ export async function createStripeObligation(
         end_behavior: schedule.endDate ? "cancel" : "release",
         metadata,
         default_settings: {
-          collection_method: "send_invoice",
-          invoice_settings: { days_until_due: 0 },
+          collection_method: automaticPaymentMethodId
+            ? "charge_automatically"
+            : "send_invoice",
+          ...(automaticPaymentMethodId
+            ? { default_payment_method: automaticPaymentMethodId }
+            : { invoice_settings: { days_until_due: 0 } }),
           automatic_tax: { enabled: false },
         },
         phases: [

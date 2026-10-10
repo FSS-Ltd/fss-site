@@ -29,14 +29,38 @@ export function AgreementBuilderReviewStep({
     () => validateAgreementBuilderDraft(content),
     [content],
   );
-  const total = useMemo(() => {
-    if (!agreement.lines) return "0";
+  const totals = useMemo(() => {
+    if (!agreement.lines)
+      return {
+        setup: "0",
+        recurring: [] as { interval: number; amount: string }[],
+      };
     try {
-      return agreement.lines
-        .reduce((sum, line) => sum + BigInt(totalLinePence(line)), BigInt(0))
-        .toString();
+      const setup = agreement.lines
+        .filter((line) => !line.recurrenceMonths)
+        .reduce((sum, line) => sum + BigInt(totalLinePence(line)), BigInt(0));
+      const recurring = new Map<number, bigint>();
+      for (const line of agreement.lines.filter(
+        (line) => line.recurrenceMonths,
+      )) {
+        recurring.set(
+          line.recurrenceMonths,
+          (recurring.get(line.recurrenceMonths) ?? BigInt(0)) +
+            BigInt(totalLinePence(line)),
+        );
+      }
+      return {
+        setup: setup.toString(),
+        recurring: [...recurring].map(([interval, amount]) => ({
+          interval,
+          amount: amount.toString(),
+        })),
+      };
     } catch {
-      return "0";
+      return {
+        setup: "0",
+        recurring: [] as { interval: number; amount: string }[],
+      };
     }
   }, [agreement.lines]);
 
@@ -48,14 +72,20 @@ export function AgreementBuilderReviewStep({
       <div className={styles.metrics}>
         <div>
           <p className={styles.metric}>
-            {formatGbp(total, agreement.currency)}
+            {formatGbp(totals.setup, agreement.currency)}
           </p>
-          <span>
-            {content.commercialOffer
-              ? "Priced fees before selection"
-              : "Agreement total"}
-          </span>
+          <span>One-off setup fees</span>
         </div>
+        {totals.recurring.map(({ interval, amount }) => (
+          <div key={interval}>
+            <p className={styles.metric}>
+              {formatGbp(amount, agreement.currency)}
+            </p>
+            <span>
+              Every {interval} {interval === 1 ? "month" : "months"}
+            </span>
+          </div>
+        ))}
         <div>
           <p className={styles.metric}>
             {formatGbp(agreement.requiredDepositPence, agreement.currency)}
@@ -86,12 +116,16 @@ export function AgreementBuilderReviewStep({
       <Notice tone="warning">
         <strong>
           {content.commercialOffer
-            ? "Publish reviewed choices"
+            ? content.commercialOffer.spec.cash?.mode === "client_proposed" ||
+              content.commercialOffer.spec.revenueShare?.mode ===
+                "client_proposed"
+              ? "Request the client's budget"
+              : "Publish reviewed choices"
             : "Prepare signing, not signed."}
         </strong>
         <p>
           {content.commercialOffer
-            ? "Publishing retains these terms and prepares exact signing documents for fixed choices. Client proposals need your approval before signing."
+            ? "The client will see these terms and available pricing choices. Any client proposal remains pending until FSS approves and sends the final agreement for signing."
             : "Creating this agreement preserves the reviewed draft. Prepare its signing document on the agreement record before opening it for the required signers."}
         </p>
       </Notice>
@@ -110,7 +144,11 @@ export function AgreementBuilderReviewStep({
           type="button"
         >
           {content.commercialOffer
-            ? "Publish payment offer"
+            ? content.commercialOffer.spec.cash?.mode === "client_proposed" ||
+              content.commercialOffer.spec.revenueShare?.mode ===
+                "client_proposed"
+              ? "Send budget request"
+              : "Publish payment offer"
             : "Create agreement"}
         </PortalButton>
         <PortalButton

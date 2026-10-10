@@ -8,6 +8,16 @@ import {
 import { z } from "zod";
 import type { EffectResult, OnboardingEmailInput } from "./types";
 
+export type ResendEmailInput = Pick<
+  OnboardingEmailInput,
+  "email" | "attachment"
+> & {
+  lease: Pick<
+    OnboardingEmailInput["lease"],
+    "idempotencyKey" | "journeyId" | "jobId"
+  >;
+};
+
 type Send = (
   body: CreateEmailOptions,
   options?: CreateEmailRequestOptions,
@@ -62,7 +72,7 @@ function providerDelay(
 export function createOnboardingResendSender(
   apiKey: string,
   dependencies: SenderDependencies = {},
-): (input: OnboardingEmailInput) => Promise<EffectResult> {
+): (input: ResendEmailInput) => Promise<EffectResult> {
   const provider = dependencies.provider ?? new Resend(apiKey).emails;
   const now = dependencies.now ?? (() => new Date());
   const timeoutMs = dependencies.timeoutMs ?? 10000;

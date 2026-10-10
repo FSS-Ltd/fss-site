@@ -148,12 +148,16 @@ export function createOnboardingBillingProvider(
       throw new Error("Provider customer scope mismatch.");
     await record(db, lease, "customer", { providerId: customerId });
     await requireCurrentEffect(db, lease);
+    const [collection] = await db<{ paymentMethodId: string | null }[]>`
+      select operations.authorised_future_payment_method(${lease.organisationId},${context.schedule.id}) as "paymentMethodId"
+    `;
     const result = await createStripeObligation(
       stripe,
       context.schedule,
       customerId,
       context.invoiceCommand,
       () => requireCurrentEffect(db, lease),
+      collection?.paymentMethodId ?? null,
     );
     const invoice = result.invoice;
     const snapshot = invoice ? issuedInvoiceSnapshot(invoice) : null;

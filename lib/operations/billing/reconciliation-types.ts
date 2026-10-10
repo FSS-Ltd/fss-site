@@ -44,6 +44,26 @@ export type MandateProjection = {
   status: "active" | "inactive" | "pending";
   observedAt: string;
 };
+export type BillingSetupProjection = {
+  setupId: string;
+  kind:
+    | "setup_intent.succeeded"
+    | "setup_intent.setup_failed"
+    | "checkout.session.expired";
+  occurredAt: string;
+  providerCustomerId: string;
+  providerSessionId: string | null;
+  setupIntentId: string | null;
+  providerMethodId: string | null;
+  mandateId: string | null;
+  method: "card" | "bacs_debit" | null;
+  metadataOrganisationId: string;
+  metadataCurrency: string;
+  brand: string | null;
+  last4: string | null;
+  expiresMonth: number | null;
+  expiresYear: number | null;
+};
 export type InvoiceReconciliation = {
   invoice: Stripe.Invoice;
   customerId: string;
@@ -60,9 +80,12 @@ export type InvoiceReconciliation = {
 };
 export type BillingReconciliationProvider = {
   scope: ProviderScope;
-  resolveEvent(
-    receipt: BillingEventReceipt,
-  ): Promise<{ invoiceIds: string[]; mandate: MandateProjection | null }>;
+  resolveEvent(receipt: BillingEventReceipt): Promise<{
+    invoiceIds: string[];
+    mandate: MandateProjection | null;
+    setup?: BillingSetupProjection | null;
+    detachedMethodId?: string | null;
+  }>;
   fetchInvoice(invoiceId: string): Promise<InvoiceReconciliation>;
   listInvoices(
     cursor: string | null,

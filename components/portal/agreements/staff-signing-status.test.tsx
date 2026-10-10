@@ -21,6 +21,8 @@ const preparedApproval: SigningApproval = {
   approvalHash: "b".repeat(64),
   approvedAt: "2026-09-15T10:00:00.000Z",
   completedAt: null,
+  completionAttempts: 0,
+  completionFailureCode: null,
   createdAt: "2026-09-15T09:00:00.000Z",
   draft: {
     assetsRequired: true,
@@ -77,7 +79,7 @@ test("shows approval and delivery as separate facts before any signature", () =>
 
   assert.match(html, /Ready for the named signers/);
   assert.match(html, /Signature pending/);
-  assert.match(html, /Delivery status is not confirmed/);
+  assert.match(html, /Delivery unknown/);
   assert.match(html, /Approval is not signature/);
   assert.doesNotMatch(html, /Signed and recorded/);
 });
@@ -91,6 +93,8 @@ test("keeps a founder-review request out of the open signing state", () => {
   );
 
   assert.match(html, /Awaiting FSS approval/);
+  assert.match(html, /Not yet open/);
+  assert.match(html, /Not started/);
   assert.doesNotMatch(html, /Ready for the named signers/);
 });
 
@@ -104,5 +108,27 @@ test("does not describe a cancelled request as awaiting a signature", () => {
 
   assert.match(html, /Cancelled/);
   assert.match(html, /No signature retained/);
+  assert.doesNotMatch(html, /Signature pending/);
+});
+
+test("shows document processing when all required signers have signed", () => {
+  const html = renderToStaticMarkup(
+    <StaffSigningStatus
+      approval={{
+        ...preparedApproval,
+        requiredSigners: ["alex@northstar.example"],
+        signatures: [
+          {
+            email: "alex@northstar.example",
+            typedName: "Alex",
+            userId: "user-1",
+            signedAt: "2026-10-10T14:09:00.000Z",
+          },
+        ],
+      }}
+      downloadBase="/api/portal/admin/clients/example/signing/example"
+    />,
+  );
+  assert.match(html, /Preparing signed copy/);
   assert.doesNotMatch(html, /Signature pending/);
 });

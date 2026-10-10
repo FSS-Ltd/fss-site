@@ -60,6 +60,7 @@ export function portalBillingRoute(): (request: Request) => Promise<Response> {
           origin,
         ).href,
         correlationId,
+        stripe,
       );
     },
     reportUnexpectedError: (report) =>

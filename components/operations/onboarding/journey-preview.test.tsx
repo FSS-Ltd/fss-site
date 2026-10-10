@@ -94,6 +94,7 @@ import { AppRouterContext } from "next/dist/shared/lib/app-router-context.shared
 import type { AgreementRecord } from "@/lib/operations/agreements/types";
 test("welcome preparation distinguishes missing billing from no eligible agreements", () => {
   const agreement: AgreementRecord = {
+    archivedAt: null,
     id: "agreement",
     engagementId: "engagement",
     version: 1,

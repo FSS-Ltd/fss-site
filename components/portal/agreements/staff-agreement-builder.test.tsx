@@ -192,5 +192,5 @@ test("review lists the missing recurring work, blocks publication and offers a F
     /Fees: Add a recurring service, then publish the client-proposed monthly amount/,
   );
   assert.match(html, /Edit fees/);
-  assert.match(html, /<button[^>]*disabled=""[^>]*>Publish payment offer/);
+  assert.match(html, /<button[^>]*disabled=""[^>]*>Send budget request/);
 });

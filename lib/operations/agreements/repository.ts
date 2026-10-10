@@ -58,15 +58,19 @@ async function loadAgreements(
   organisationId: string,
   agreementId: string | null,
   after: string | null,
+  archived: boolean | null = null,
 ): Promise<AgreementRecord[]> {
   const rows = await tx<
     AgreementRecord[]
-  >`select a.id,a.engagement_id as "engagementId",a.version,a.current_revision as revision,a.status,r.snapshot as draft,
+  >`select a.id,a.engagement_id as "engagementId",a.version,a.current_revision as revision,a.status,a.archived_at::text as "archivedAt",r.snapshot as draft,
+    exists(select 1 from operations.signing_approvals p where p.organisation_id=a.organisation_id and p.agreement_id=a.id) as "hasSigningRequest",
     (select evidence from operations.signature_evidence e where e.organisation_id=a.organisation_id and e.agreement_id=a.id and e.revision=a.current_revision) as evidence,
     (select provenance from operations.signature_evidence e where e.organisation_id=a.organisation_id and e.agreement_id=a.id and e.revision=a.current_revision) as "evidenceProvenance",
     coalesce((select jsonb_agg(jsonb_build_object('lineNumber',s.line_number,'effectiveDate',s.effective_date::text,'endDate',s.end_date::text,'status',s.status) order by s.line_number) from operations.service_instances s where s.organisation_id=a.organisation_id and s.agreement_id=a.id and s.revision=a.current_revision),'[]'::jsonb) as services
     from operations.agreements a join operations.agreement_revisions r on r.organisation_id=a.organisation_id and r.agreement_id=a.id and r.revision=a.current_revision
-    where a.organisation_id=${organisationId} and (${agreementId}::uuid is null or a.id=${agreementId}::uuid) and (${after}::uuid is null or a.id>${after}::uuid) order by a.id limit 51`;
+    where a.organisation_id=${organisationId} and (${agreementId}::uuid is null or a.id=${agreementId}::uuid) and (${after}::uuid is null or a.id>${after}::uuid)
+      and (${archived}::boolean is null or (a.archived_at is not null)=${archived}::boolean)
+    order by a.id limit 51`;
   return rows;
 }
 export async function loadAgreement(
@@ -95,6 +99,7 @@ async function readAgreementRegister(
   tx: OperationsTransaction,
   organisationId: string,
   cursor: string | null,
+  archived: boolean | null = null,
 ): Promise<AgreementRegister | null> {
   const [organisation] = await tx<
     { display_name: string; billing_currency: Currency }[]
@@ -103,7 +108,7 @@ async function readAgreementRegister(
   const links = await tx<
     { engagement_id: string }[]
   >`select engagement_id from operations.engagement_links where organisation_id=${organisationId} order by engagement_id limit 101`;
-  const rows = await loadAgreements(tx, organisationId, null, cursor);
+  const rows = await loadAgreements(tx, organisationId, null, cursor, archived);
   return {
     organisationName: organisation.display_name,
     billingCurrency: organisation.billing_currency,
@@ -127,11 +132,17 @@ export async function listStaffAgreementRegister(
   admin: FssAdminContext,
   organisationId: string,
   after?: string,
+  archived = false,
 ): Promise<AgreementRegister | null> {
   z.uuid().parse(organisationId);
   const cursor = after ? z.uuid().parse(after) : null;
   return withFssAdminTransaction(db, admin, async (tx) => {
-    const register = await readAgreementRegister(tx, organisationId, cursor);
+    const register = await readAgreementRegister(
+      tx,
+      organisationId,
+      cursor,
+      archived,
+    );
     if (!register) return null;
     const choices = await tx<Array<{ id: string; name: string }>>`
       select id, name from operations.staff_linked_engagements(${organisationId})

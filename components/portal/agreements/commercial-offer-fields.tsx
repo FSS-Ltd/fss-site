@@ -70,7 +70,7 @@ export function CommercialOfferFields({
   const share = spec.revenueShare;
   const needsOffer = Boolean(share) || spec.cash?.mode !== "fixed";
   return (
-    <fieldset className={styles.compensationFields}>
+    <fieldset className={styles.feeFieldset}>
       <legend>Ongoing compensation</legend>
       <p>
         One-off fees remain fixed and payable whichever ongoing option the

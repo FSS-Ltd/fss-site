@@ -4,6 +4,9 @@ import {
   type PortalStatus,
 } from "@/components/portal/ui";
 import type { SigningApproval } from "@/lib/operations/agreements/signing-types";
+import { allRequiredSignaturesRecorded } from "@/lib/operations/agreements/signing-state";
+
+export { allRequiredSignaturesRecorded } from "@/lib/operations/agreements/signing-state";
 
 export type PortalAgreementStatus =
   | "processing"
@@ -19,13 +22,7 @@ export type SigningStatusInput = Pick<SigningApproval, "status"> & {
 
 export function hasCompleteSigningEvidence(approval: SigningApproval): boolean {
   return (
-    approval.status === "completed" &&
-    approval.requiredSigners.length > 0 &&
-    approval.requiredSigners.every((requiredSigner) =>
-      approval.signatures.some(
-        (signature) => signature.email === requiredSigner,
-      ),
-    )
+    approval.status === "completed" && allRequiredSignaturesRecorded(approval)
   );
 }
 
@@ -97,6 +94,9 @@ export function toPortalAgreementStatus({
   if (status === "completed" && allRequiredSignaturesRecorded) {
     return "signed";
   }
+
+  if (status === "approved" && allRequiredSignaturesRecorded)
+    return "processing";
 
   if (status === "superseded") return "superseded";
   if (status === "declined" || status === "cancelled" || status === "expired") {

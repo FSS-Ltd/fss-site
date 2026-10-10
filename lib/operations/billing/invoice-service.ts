@@ -61,11 +61,21 @@ export async function executeBillingObligation(
     correlationId,
     schedule.currency,
   );
+  const [collection] = await withAgreementTransaction(
+    db,
+    founder,
+    (tx) =>
+      tx<{ paymentMethodId: string | null }[]>`
+      select operations.authorised_future_payment_method(${scope.organisationId},${schedule.id}) as "paymentMethodId"
+    `,
+  );
   const result = await createStripeObligation(
     stripe,
     schedule,
     customer.providerCustomerId,
     command,
+    async () => {},
+    collection?.paymentMethodId ?? null,
   );
   await withAgreementTransaction(db, founder, async (tx, actor) => {
     const current = await loadBillingSchedule(tx, scope, scheduleId);

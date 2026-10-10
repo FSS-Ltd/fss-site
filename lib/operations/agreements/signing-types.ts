@@ -51,6 +51,8 @@ export type SigningApproval = {
   approvedAt: string | null;
   expiresAt: string | null;
   completedAt: string | null;
+  completionAttempts: number;
+  completionFailureCode: "document_processing_failed" | null;
   signatures: SigningSignature[];
 };
 export type SigningArtifact = {

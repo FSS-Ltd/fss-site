@@ -90,11 +90,42 @@ test("commercial commands accept the configured portal origin, not the public si
   });
 
   assert.equal(configuration.origin, portalOrigin);
-  assert.equal((await handler(requestAt(portalOrigin, portalOrigin), organisationId)).status, 200);
-  assert.equal((await handler(requestAt(portalOrigin, undefined), organisationId)).status, 403);
-  assert.equal((await handler(requestAt(portalOrigin, "https://forged.example"), organisationId)).status, 403);
-  assert.equal((await handler(requestAt("https://example.test", "https://example.test"), organisationId)).status, 403);
-  assert.equal((await handler(requestAt("https://forged.example", portalOrigin), organisationId)).status, 403);
+  assert.equal(
+    (await handler(requestAt(portalOrigin, portalOrigin), organisationId))
+      .status,
+    200,
+  );
+  assert.equal(
+    (await handler(requestAt(portalOrigin, undefined), organisationId)).status,
+    403,
+  );
+  assert.equal(
+    (
+      await handler(
+        requestAt(portalOrigin, "https://forged.example"),
+        organisationId,
+      )
+    ).status,
+    403,
+  );
+  assert.equal(
+    (
+      await handler(
+        requestAt("https://example.test", "https://example.test"),
+        organisationId,
+      )
+    ).status,
+    403,
+  );
+  assert.equal(
+    (
+      await handler(
+        requestAt("https://forged.example", portalOrigin),
+        organisationId,
+      )
+    ).status,
+    403,
+  );
   assert.equal(executed, 1);
 });
 
