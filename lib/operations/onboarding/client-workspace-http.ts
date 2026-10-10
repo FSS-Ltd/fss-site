@@ -5,7 +5,7 @@ import {
   readJsonRequestBody,
   requestHasRegisteredOrigin,
 } from "../../growth/http/founder-request";
-import { resolveSiteUrl } from "../../config/site-url";
+import { resolvePortalOrigin } from "../auth/configuration";
 import { privateAuthHeaders, reportAuthError } from "../auth/http";
 import { fssStudioEnabled } from "../auth/release-flags";
 import { getPortalIdentity } from "../auth/server";
@@ -93,7 +93,7 @@ export function createClientOnboardingTaskHandler(
 export function portalOnboardingTaskRoute() {
   return createClientOnboardingTaskHandler({
     enabled: onboardingEnabled() && fssStudioEnabled(),
-    origin: new URL(resolveSiteUrl()).origin,
+    origin: resolvePortalOrigin(),
     createCorrelationId: randomUUID,
     authorize: getPortalIdentity,
     reportUnexpectedError: (report) =>
