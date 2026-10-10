@@ -161,8 +161,8 @@ for (const mode of ["client_proposed", "revenue_share"] as const) {
     assert.match(
       html,
       mode === "client_proposed"
-        ? /Support: Amount proposed by client/
-        : /Support: Covered by revenue share/,
+        ? /Support: amount proposed by the client monthly/
+        : /Services covered by revenue share<\/dt><dd>Support/,
     );
   });
 }
@@ -187,7 +187,10 @@ test("review lists the missing recurring work, blocks publication and offers a F
     step: "review",
     version: 1,
   });
-  assert.match(html, /Client-proposed amounts apply to recurring services/);
+  assert.match(
+    html,
+    /Fees: Add a recurring service, then publish the client-proposed monthly amount/,
+  );
   assert.match(html, /Edit fees/);
   assert.match(html, /<button[^>]*disabled=""[^>]*>Publish payment offer/);
 });
