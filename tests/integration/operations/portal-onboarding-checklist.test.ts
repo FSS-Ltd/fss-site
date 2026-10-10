@@ -13,6 +13,7 @@ test("client setup checklist exposes only evidence-derived state to the authoris
   );
   assert.deepEqual(checklist, {
     agreementSigned: false,
+    agreementState: "awaiting_signature",
     billingReady: false,
     filesReady: false,
     serviceReady: false,

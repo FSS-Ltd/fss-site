@@ -55,6 +55,7 @@ test("renders the scoped draft selections before preparing a welcome", () => {
 
 function scheduleHtml(draft: AgreementRecord["draft"]): string {
   const agreement: AgreementRecord = {
+    archivedAt: null,
     id: "7795e784-a909-45fd-b205-67fb508a181f",
     engagementId: "13db3b9b-ad10-4641-a11e-42d8e1dd74c8",
     version: 3,

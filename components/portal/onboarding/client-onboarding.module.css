@@ -71,15 +71,20 @@
 }
 
 .milestoneList {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
 }
 
 .milestoneRow {
   border: 1px solid var(--portal-line);
   border-radius: 10px;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(11rem, 1fr) minmax(0, 2fr) auto;
   min-height: 52px;
-  padding: 10px 12px;
+  padding: 14px 16px;
+}
+
+.milestoneRow > div {
+  min-width: 0;
 }
 
 .milestoneLabel {
@@ -140,6 +145,10 @@
   }
 
   .milestoneList {
+    grid-template-columns: 1fr;
+  }
+
+  .milestoneRow {
     grid-template-columns: 1fr;
   }
 

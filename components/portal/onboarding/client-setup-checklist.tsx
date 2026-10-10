@@ -1,11 +1,13 @@
 import { CheckCircle2, Circle } from "lucide-react";
-import { Notice, StatusBadge } from "@/components/portal/ui";
+import { Notice, PortalActionLink, StatusBadge } from "@/components/portal/ui";
 import type { ClientSetupChecklist } from "@/lib/operations/onboarding/client-checklist";
+import { portalPath } from "@/lib/operations/auth/portal-url";
 import styles from "./client-onboarding.module.css";
 
 type ClientSetupChecklistProps = {
   checklist: ClientSetupChecklist;
   enabled: boolean;
+  organisationId: string;
 };
 
 const checklistItems = [
@@ -46,6 +48,7 @@ const checklistItems = [
 export function ClientSetupChecklist({
   checklist,
   enabled,
+  organisationId,
 }: ClientSetupChecklistProps): React.JSX.Element {
   if (!enabled) {
     return (
@@ -59,10 +62,55 @@ export function ClientSetupChecklist({
     );
   }
 
+  const agreementCopy = {
+    awaiting_signature: [
+      "Waiting",
+      "Review and sign the approved agreement when it is ready.",
+    ],
+    partially_signed: [
+      "Partly signed",
+      "A signature is recorded. Remaining signers still need to sign.",
+    ],
+    signatures_recorded: [
+      "Signatures recorded",
+      "Every required signature is recorded.",
+    ],
+    document_processing: [
+      "Preparing copy",
+      "Every required signature is recorded. Your signed copy is being prepared.",
+    ],
+    completed: [
+      "Complete",
+      "Your signed agreement is retained in your workspace.",
+    ],
+    attention_required: [
+      "Needs review",
+      "Signatures are recorded, but the final document needs FSS review.",
+    ],
+  } as const;
+  const query = `?organisationId=${encodeURIComponent(organisationId)}`;
   return (
     <ol className={styles.milestoneList} aria-label="Client setup checklist">
       {checklistItems.map((item) => {
         const complete = checklist[item.key];
+        const agreementState =
+          item.key === "agreementSigned" ? checklist.agreementState : undefined;
+        const statusLabel = agreementState
+          ? agreementCopy[agreementState][0]
+          : complete
+            ? "Complete"
+            : "Waiting";
+        const description = agreementState
+          ? agreementCopy[agreementState][1]
+          : complete
+            ? item.complete
+            : item.pending;
+        const href =
+          item.key === "agreementSigned"
+            ? `${portalPath("/portal/agreements")}${query}`
+            : item.key === "billingReady"
+              ? `${portalPath("/portal/billing")}${query}`
+              : null;
         return (
           <li className={styles.milestoneRow} key={item.key}>
             <span className={styles.milestoneLabel}>
@@ -74,16 +122,48 @@ export function ClientSetupChecklist({
               {item.title}
             </span>
             <div>
-              <StatusBadge status={complete ? "success" : "neutral"}>
-                {complete ? "Complete" : "Waiting"}
+              <StatusBadge
+                status={
+                  complete
+                    ? "success"
+                    : agreementState === "attention_required"
+                      ? "warning"
+                      : agreementState === "document_processing" ||
+                          agreementState === "signatures_recorded"
+                        ? "info"
+                        : "neutral"
+                }
+              >
+                {statusLabel}
               </StatusBadge>
-              <p className={styles.taskCopy}>
-                {complete ? item.complete : item.pending}
-              </p>
+              <p className={styles.taskCopy}>{description}</p>
             </div>
+            {href ? (
+              <PortalActionLink href={href} variant="secondary">
+                {item.key === "agreementSigned"
+                  ? "View agreement"
+                  : "View invoices"}
+              </PortalActionLink>
+            ) : null}
           </li>
         );
       })}
+      <li className={styles.milestoneRow}>
+        <span className={styles.milestoneLabel}>Payment method setup</span>
+        <div>
+          <StatusBadge status="info">Available</StatusBadge>
+          <p className={styles.taskCopy}>
+            Choose a method for future payments. Adding details makes no charge
+            today.
+          </p>
+        </div>
+        <PortalActionLink
+          href={`${portalPath("/portal/billing")}${query}`}
+          variant="secondary"
+        >
+          View payment options
+        </PortalActionLink>
+      </li>
     </ol>
   );
 }

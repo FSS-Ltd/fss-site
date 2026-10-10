@@ -3,6 +3,8 @@ import { CreditCard } from "lucide-react";
 import { Notice, PageHeader, PortalCard } from "@/components/portal/ui";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import { HostedBillingAction } from "./hosted-action";
+import { BillingSetupPanel } from "./billing-setup-panel";
+import type { BillingSetupStatus } from "@/lib/operations/billing/setup-service";
 import { InvoiceList } from "./invoice-list";
 import {
   billingAmount,
@@ -15,6 +17,8 @@ import styles from "./billing.module.css";
 export function ClientBillingOverview({
   canManage,
   managementCurrencies = ["GBP"],
+  setupCurrency,
+  setup,
   invoices,
   nextPayment,
   organisationId,
@@ -22,6 +26,8 @@ export function ClientBillingOverview({
 }: {
   canManage: boolean;
   managementCurrencies?: readonly Currency[];
+  setupCurrency: Currency;
+  setup: BillingSetupStatus;
   invoices: readonly InvoiceSummary[];
   nextPayment?: InvoiceSummary | null;
   organisationId: string;
@@ -58,22 +64,26 @@ export function ClientBillingOverview({
           )}
         </PortalCard>
         <PortalCard
-          description={
-            canManage
-              ? "Update your payment method securely with Stripe."
-              : "Payment management is available when billing is set up."
-          }
-          title="Payment details"
+          title="Payment setup"
+          description="Choose how to pay future invoices. Adding details through Stripe makes no charge today."
         >
-          {canManage
+          <BillingSetupPanel
+            canManage={canManage}
+            currency={setupCurrency}
+            status={setup}
+            organisationId={organisationId}
+          />
+          {canManage && managementCurrencies.length > 0
             ? managementCurrencies.map((currency) => (
                 <HostedBillingAction
                   key={currency}
                   command={{ action: "manage", organisationId, currency }}
-                  variant="primary"
+                  variant="secondary"
                 >
                   <CreditCard aria-hidden="true" size={16} />
-                  Manage payment method
+                  {setup.status === "not_started"
+                    ? "Open billing management"
+                    : "Manage saved payment method"}
                   {managementCurrencies.length > 1 ? ` (${currency})` : ""}
                 </HostedBillingAction>
               ))

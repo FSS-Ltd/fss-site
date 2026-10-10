@@ -13,6 +13,31 @@ import {
 } from "../../../lib/operations/agreements/signing-service";
 import type { SigningApproval } from "../../../lib/operations/agreements/signing-types";
 import { registerFixtureCleanup } from "./fixture-cleanup";
+
+export async function deleteAgreementNotifications(
+  admin: postgres.ISql,
+  organisationId: string,
+): Promise<void> {
+  await admin`
+    delete from operations.agreement_delivery_events
+    where notification_id in (
+      select id from operations.agreement_notifications
+      where organisation_id=${organisationId}
+    )
+  `;
+  await admin`
+    delete from operations.agreement_notification_attempts
+    where notification_id in (
+      select id from operations.agreement_notifications
+      where organisation_id=${organisationId}
+    )
+  `;
+  await admin`
+    delete from operations.agreement_notifications
+    where organisation_id=${organisationId}
+  `;
+}
+
 export async function signingFixture(
   t: TestContext,
   signerCount = 2,
@@ -56,6 +81,7 @@ export async function signingFixture(
         await tx`delete from operations.staff_engagement_commands where organisation_id=${organisationId}`;
         await tx`delete from operations.studio_engagement_reviews where organisation_id=${organisationId}`;
         await tx`delete from operations.agreement_builder_drafts where organisation_id=${organisationId}`;
+        await deleteAgreementNotifications(tx, organisationId);
         if (studioEngagementIds.length) {
           await tx`delete from operations.engagement_links where engagement_id=any(${studioEngagementIds}::uuid[])`;
           await tx`delete from growth.commercial_stage_events where engagement_id=any(${studioEngagementIds}::uuid[])`;

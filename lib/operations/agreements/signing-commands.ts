@@ -4,6 +4,9 @@ import type { OperationsDb } from "../db/client";
 import type { OperationsFounder } from "../organisations/types";
 import type { FssAdminContext } from "../auth/staff-types";
 import { approvalBindingSchema, signingConsentSchema } from "./signing-types";
+import { resendStaffAgreementNotification } from "./agreement-notification-service";
+import { loadSigningApprovals } from "./signing-repository";
+import { withFssAdminTransaction } from "../auth/staff-transaction";
 import {
   prepareAgreementSigning,
   approveAgreementSigning,
@@ -11,6 +14,7 @@ import {
   prepareStaffAgreementSigning,
   approveStaffAgreementSigning,
   cancelStaffAgreementSigning,
+  retryStaffAgreementSigning,
   signPortalAgreement,
   declinePortalAgreement,
 } from "./signing-service";
@@ -30,6 +34,17 @@ const founderCommand = z.discriminatedUnion("action", [
 const portalCommand = z.discriminatedUnion("action", [
   signingConsentSchema.extend({ action: z.literal("sign") }),
   approvalBindingSchema.extend({ action: z.literal("decline") }),
+]);
+const staffCommand = z.discriminatedUnion("action", [
+  ...founderCommand.options,
+  z.strictObject({ action: z.literal("retry"), approvalId: z.uuid() }),
+  z.strictObject({
+    action: z.literal("resend_delivery"),
+    approvalId: z.uuid(),
+    notificationId: z.uuid(),
+    expectedVersion: z.number().int().positive(),
+    requestId: z.uuid(),
+  }),
 ]);
 export { signingEnabled } from "./signing-worker";
 export async function executeFounderSigningCommand(
@@ -71,28 +86,59 @@ export async function executeStaffSigningCommand(
   raw: unknown,
   correlationId: string,
 ) {
-  const { action, ...input } = founderCommand.parse(raw);
-  if (action === "prepare")
+  const command = staffCommand.parse(raw);
+  if (command.action === "prepare")
     return prepareStaffAgreementSigning(
       db,
       admin,
       organisationId,
-      input,
+      {
+        agreementId: command.agreementId,
+        expectedVersion: command.expectedVersion,
+      },
       correlationId,
     );
-  if (action === "approve")
+  if (command.action === "approve")
     return approveStaffAgreementSigning(
       db,
       admin,
       organisationId,
-      input,
+      {
+        approvalId: command.approvalId,
+        approvalHash: command.approvalHash,
+        expiresAt: command.expiresAt,
+      },
       correlationId,
     );
+  if (command.action === "retry")
+    return retryStaffAgreementSigning(
+      db,
+      admin,
+      organisationId,
+      command.approvalId,
+      correlationId,
+    );
+  if (command.action === "resend_delivery") {
+    await resendStaffAgreementNotification(
+      db,
+      admin,
+      organisationId,
+      command.approvalId,
+      command.notificationId,
+      command.expectedVersion,
+      command.requestId,
+      correlationId,
+    );
+    const [approval] = await withFssAdminTransaction(db, admin, (tx) =>
+      loadSigningApprovals(tx, organisationId, command.approvalId),
+    );
+    return approval;
+  }
   return cancelStaffAgreementSigning(
     db,
     admin,
     organisationId,
-    input,
+    { approvalId: command.approvalId },
     correlationId,
   );
 }

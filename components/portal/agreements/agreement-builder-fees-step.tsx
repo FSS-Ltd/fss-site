@@ -56,13 +56,34 @@ export function AgreementBuilderFeesStep({
     revenueShare: null,
   };
   const [spec, setSpec] = useState<CommercialOfferSpec>(initialSpec);
+  const [services, setServices] = useState<
+    NonNullable<AgreementBuilderDraftContent["services"]>
+  >(
+    () =>
+      content.services ??
+      (agreement.lines?.length
+        ? []
+        : [
+            {
+              id: "00000000-0000-4000-8000-000000000001",
+              code: "",
+              name: "",
+              description: "",
+            },
+          ]),
+  );
   const [feeLines, setFeeLines] = useState<FeeLineState>(() => {
     const includeOneOffFees = Boolean(
       agreement.lines?.some((line) => line.recurrenceMonths === 0),
     );
     const initialLines = agreement.lines?.length
-      ? agreement.lines.map(toEditableLine)
-      : [includeOneOffFees ? emptyLine() : monthlyRecurringLine()];
+      ? agreement.lines.map((line, index) => ({
+          ...toEditableLine(line),
+          ...(content.lineServiceIds?.[index]
+            ? { serviceGroupId: content.lineServiceIds[index] }
+            : {}),
+        }))
+      : [monthlyRecurringLine(services[0]?.id)];
     const lines =
       initialSpec.cash?.mode === "client_proposed"
         ? ensureClientProposedRecurringService(initialLines)
@@ -79,16 +100,30 @@ export function AgreementBuilderFeesStep({
       : [],
   );
   const [formError, setFormError] = useState<string | null>(null);
+  const [feeLinesVisited, setFeeLinesVisited] = useState(false);
   const { includeOneOffFees, lines } = feeLines;
   const flow = useAgreementBuilderGroups(includeOneOffFees ? 4 : 3);
-  const total = useMemo(
-    () =>
-      feeTotal(
-        lines.filter(
-          (line) =>
-            line.recurrenceMonths === "0" || spec.cash?.mode === "fixed",
+  const totals = useMemo(
+    () => ({
+      setup:
+        feeTotal(lines.filter((line) => line.recurrenceMonths === "0")) ??
+        (lines.some((line) => line.recurrenceMonths === "0") ? null : "0"),
+      recurring: [
+        ...new Set(
+          lines
+            .filter((line) => line.recurrenceMonths !== "0")
+            .map((line) => line.recurrenceMonths),
         ),
-      ),
+      ].map((interval) => ({
+        interval: Number(interval),
+        amount:
+          spec.cash?.mode === "fixed"
+            ? feeTotal(
+                lines.filter((line) => line.recurrenceMonths === interval),
+              )
+            : null,
+      })),
+    }),
     [lines, spec.cash?.mode],
   );
 
@@ -97,6 +132,7 @@ export function AgreementBuilderFeesStep({
     field: keyof EditableLine,
     value: string,
   ): void {
+    setFeeLinesVisited(true);
     setFeeLines((current) => ({
       ...current,
       lines: current.lines.map((line, lineIndex) =>
@@ -108,6 +144,7 @@ export function AgreementBuilderFeesStep({
   }
 
   function updateSpec(nextSpec: CommercialOfferSpec): void {
+    setFeeLinesVisited(true);
     setSpec(nextSpec);
     if (nextSpec.cash?.mode !== "client_proposed") return;
     setFeeLines((current) => {
@@ -134,7 +171,7 @@ export function AgreementBuilderFeesStep({
             current.suspendedOneOffLines.length === 0
               ? lines.some((line) => line.recurrenceMonths === "0")
                 ? lines
-                : [...lines, emptyLine()]
+                : [...lines, emptyLine(services[0]?.id)]
               : lines,
           suspendedOneOffLines: [],
         };
@@ -142,25 +179,29 @@ export function AgreementBuilderFeesStep({
       const { oneOff, recurring } = separateOneOffFeeLines(current.lines);
       return {
         includeOneOffFees: false,
-        lines: recurring.length ? recurring : [monthlyRecurringLine()],
+        lines: recurring.length
+          ? recurring
+          : [monthlyRecurringLine(services[0]?.id)],
         suspendedOneOffLines: oneOff,
       };
     });
   }
 
   function addLine(): void {
+    setFeeLinesVisited(true);
     setFeeLines((current) => ({
       ...current,
       lines: [
         ...current.lines,
         spec.cash?.mode === "client_proposed" || !current.includeOneOffFees
-          ? monthlyRecurringLine()
-          : emptyLine(),
+          ? monthlyRecurringLine(services[0]?.id)
+          : emptyLine(services[0]?.id),
       ],
     }));
   }
 
   function removeLine(index: number): void {
+    setFeeLinesVisited(true);
     setFeeLines((current) => ({
       ...current,
       lines:
@@ -168,8 +209,8 @@ export function AgreementBuilderFeesStep({
           ? [
               spec.cash?.mode === "client_proposed" ||
               !current.includeOneOffFees
-                ? monthlyRecurringLine()
-                : emptyLine(),
+                ? monthlyRecurringLine(services[0]?.id)
+                : emptyLine(services[0]?.id),
             ]
           : current.lines.filter((_, lineIndex) => lineIndex !== index),
     }));
@@ -180,6 +221,7 @@ export function AgreementBuilderFeesStep({
     field: keyof EditableInstallment,
     value: string,
   ): void {
+    setFeeLinesVisited(true);
     setInstallments((current) =>
       current.map((installment, installmentIndex) =>
         installmentIndex === index
@@ -214,6 +256,7 @@ export function AgreementBuilderFeesStep({
         lines,
         includeOneOffFees,
         clientProposed,
+        services.length ? services : undefined,
       );
       if (
         !parsedFeeLines.length ||
@@ -247,7 +290,23 @@ export function AgreementBuilderFeesStep({
         ),
         taxTreatment: textValue(data, "taxTreatment"),
       });
-      return { ...nextContent, commercialOffer: offer };
+      const activeLines = lines.filter(
+        (line) => includeOneOffFees || line.recurrenceMonths !== "0",
+      );
+      return {
+        ...nextContent,
+        commercialOffer: offer,
+        ...(services.length
+          ? {
+              services,
+              lineServiceIds: activeLines.map((line) => {
+                if (!line.serviceGroupId)
+                  throw new Error("Assign every fee line to a service.");
+                return line.serviceGroupId;
+              }),
+            }
+          : {}),
+      };
     } catch (error) {
       flow.show(errorGroup);
       setFormError(
@@ -271,14 +330,34 @@ export function AgreementBuilderFeesStep({
       children: (
         <AgreementBuilderFeeLines
           currency={currency}
+          onInteraction={() => setFeeLinesVisited(true)}
           clientProposed={spec.cash?.mode === "client_proposed"}
           fixed={spec.cash?.mode === "fixed"}
           includeOneOffFees={includeOneOffFees}
           lines={lines}
+          services={services}
+          onAddService={() =>
+            setServices((current) => [
+              ...current,
+              { id: crypto.randomUUID(), code: "", name: "", description: "" },
+            ])
+          }
+          onUpdateService={(id, field, value) =>
+            setServices((current) =>
+              current.map((service) =>
+                service.id === id ? { ...service, [field]: value } : service,
+              ),
+            )
+          }
+          onRemoveService={(id) =>
+            setServices((current) =>
+              current.filter((service) => service.id !== id),
+            )
+          }
           onAdd={addLine}
           onIncludeOneOffFeesChange={updateIncludeOneOffFees}
           onRemove={removeLine}
-          total={total}
+          totals={totals}
           updateLine={updateLine}
         />
       ),
@@ -336,6 +415,11 @@ export function AgreementBuilderFeesStep({
     <AgreementBuilderGroupForm
       flow={flow}
       pending={pending}
+      onGroupsChange={() => {
+        if (!feeLinesVisited) return;
+        setFeeLinesVisited(false);
+        updateIncludeOneOffFees(includeOneOffFees);
+      }}
       backLabel="Back to scope"
       onBack={() => void save("scope")}
       continueLabel="Continue to people"

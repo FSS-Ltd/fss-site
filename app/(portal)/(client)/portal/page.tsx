@@ -23,6 +23,8 @@ import type { VerifiedPortalIdentity } from "@/lib/operations/auth/types";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import { fssStudioEnabled } from "@/lib/operations/auth/release-flags";
 import { operationsEnabled } from "@/lib/operations/db/client";
+import { getPortalSigning } from "@/lib/operations/agreements/signing-service";
+import { z } from "zod";
 import { getPortalDb } from "@/lib/operations/db/portal-client";
 import { loadClientOverview } from "@/lib/operations/overview/client-overview";
 
@@ -108,6 +110,7 @@ export default async function PortalHomePage({
   }
 
   let overview: Awaited<ReturnType<typeof loadClientOverview>>;
+  let signatureNotice: string | undefined;
   try {
     overview = await loadClientOverview(
       db,
@@ -115,6 +118,29 @@ export default async function PortalHomePage({
       selectedMembership.organisationId,
       randomUUID(),
     );
+    const signedApproval = z
+      .uuid()
+      .safeParse((await searchParams).signedApproval);
+    if (signedApproval.success) {
+      const approval = await getPortalSigning(
+        db,
+        identity,
+        selectedMembership.organisationId,
+        signedApproval.data,
+        randomUUID(),
+      );
+      if (
+        approval?.signatures.some(
+          (signature) =>
+            signature.email.toLowerCase() === identity.email.toLowerCase(),
+        )
+      ) {
+        signatureNotice =
+          approval.status === "completed"
+            ? "Your signature is recorded and the signed agreement is ready."
+            : "Your signature is recorded. We are preparing the signed copy.";
+      }
+    }
   } catch {
     return <PortalUnavailable />;
   }
@@ -125,6 +151,7 @@ export default async function PortalHomePage({
         "requests.create",
       )}
       overview={overview}
+      signatureNotice={signatureNotice}
       workspaceName={selectedMembership.displayName}
     />
   );

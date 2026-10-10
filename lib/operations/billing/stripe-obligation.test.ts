@@ -206,6 +206,51 @@ test("future retainer schedules signed start separately and never creates an imm
   );
 });
 
+test("authorised payment details affect only a new future recurring schedule", async () => {
+  const future = providerFixture();
+  await createStripeObligation(
+    future.stripe,
+    schedule({
+      owner: "subscription",
+      recurrenceMonths: 1,
+      dueDate: "2099-01-01",
+    }),
+    "cus_one",
+    command(),
+    async () => undefined,
+    "pm_authorised",
+  );
+  const recurring = future.requests.find(
+    (request) =>
+      request.path === "/v1/subscription_schedules" &&
+      request.params.has("customer"),
+  );
+  assert.equal(
+    recurring?.params.get("default_settings[collection_method]"),
+    "charge_automatically",
+  );
+  assert.equal(
+    recurring?.params.get("default_settings[default_payment_method]"),
+    "pm_authorised",
+  );
+
+  const existingInvoice = providerFixture();
+  await createStripeObligation(
+    existingInvoice.stripe,
+    schedule(),
+    "cus_one",
+    command(),
+    async () => undefined,
+    "pm_authorised",
+  );
+  const invoice = existingInvoice.requests.find(
+    (request) =>
+      request.path === "/v1/invoices" && request.params.has("customer"),
+  );
+  assert.equal(invoice?.params.get("collection_method"), "send_invoice");
+  assert.equal(invoice?.params.has("default_payment_method"), false);
+});
+
 test("completed subscription retry retrieves only the original invoice without finalization or latest subscription lookup", async () => {
   const f = providerFixture();
   const result = await createStripeObligation(

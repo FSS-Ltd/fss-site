@@ -26,6 +26,7 @@ export async function loadSigningApprovals(
     to_char(p.approved_at at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') as "approvedAt",
     to_char(p.expires_at at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') as "expiresAt",
     to_char(p.completed_at at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') as "completedAt",
+    p.completion_attempts as "completionAttempts",p.completion_failure_code as "completionFailureCode",
     coalesce((select jsonb_agg(jsonb_build_object('email',s.email,'typedName',s.typed_name,'userId',s.user_id::text,'signedAt',to_char(s.signed_at at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')) order by s.email) from operations.signing_signatures s where s.approval_id=p.id),'[]'::jsonb) as signatures
     from operations.signing_approvals p where (${organisationId}::uuid is null or p.organisation_id=${organisationId}::uuid) and (${approvalId}::uuid is null or p.id=${approvalId}::uuid) order by p.created_at desc,p.id limit 100`;
   return [...rows];

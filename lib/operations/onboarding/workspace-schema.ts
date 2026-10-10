@@ -17,7 +17,10 @@ const clientCopy = z
   .trim()
   .min(1)
   .max(4_000)
-  .refine((value) => !value.includes("\u2014"), "Use plain punctuation without em dashes.");
+  .refine(
+    (value) => !value.includes("\u2014"),
+    "Use plain punctuation without em dashes.",
+  );
 
 const evidenceRulesByKind: Readonly<
   Record<OnboardingTaskKind, readonly OnboardingEvidenceRule[]>
@@ -31,12 +34,10 @@ const evidenceRulesByKind: Readonly<
   custom: ["staff_confirmed"],
 };
 
-const trustedBookingUrl = z
-  .url()
-  .refine((value) => {
-    const url = new URL(value);
-    return url.protocol === "https:" && !url.username && !url.password;
-  }, "Use a trusted HTTPS booking destination.");
+const trustedBookingUrl = z.url().refine((value) => {
+  const url = new URL(value);
+  return url.protocol === "https:" && !url.username && !url.password;
+}, "Use a trusted HTTPS booking destination.");
 
 export const onboardingTaskDefinitionSchema = z
   .strictObject({
@@ -103,7 +104,8 @@ export const onboardingTemplateDraftSchema = z
         context.addIssue({
           code: "custom",
           path: ["tasks"],
-          message: "A checklist dependency must reference another task in this template.",
+          message:
+            "A checklist dependency must reference another task in this template.",
         });
       }
     }

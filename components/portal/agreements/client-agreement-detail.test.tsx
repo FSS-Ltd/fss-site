@@ -23,6 +23,8 @@ const approval: SigningApproval = {
   approvalHash: "b".repeat(64),
   approvedAt: "2026-09-15T10:00:00.000Z",
   completedAt: null,
+  completionAttempts: 0,
+  completionFailureCode: null,
   createdAt: "2026-09-15T09:00:00.000Z",
   draft: {
     assetsRequired: true,
@@ -76,8 +78,8 @@ const approval: SigningApproval = {
 test("separates agreements needing a signature from signed records", () => {
   const html = renderToStaticMarkup(
     <ClientAgreementList
-      email="alex@northstar.example"
       approvals={[approval]}
+      email="alex@northstar.example"
       organisationId={approval.organisationId}
     />,
   );
@@ -85,6 +87,57 @@ test("separates agreements needing a signature from signed records", () => {
   assert.match(html, /Your action/);
   assert.match(html, /Signed agreements/);
   assert.match(html, /Review agreement/);
+});
+
+test("does not request another signature from someone who has already signed", () => {
+  const html = renderToStaticMarkup(
+    <ClientAgreementList
+      approvals={[
+        {
+          ...approval,
+          signatures: [
+            {
+              email: "alex@northstar.example",
+              signedAt: "2026-09-15T11:24:00.000Z",
+              typedName: "Alex Morgan",
+              userId: "ffffffff-ffff-4fff-8fff-ffffffffffff",
+            },
+          ],
+        },
+      ]}
+      email="alex@northstar.example"
+      organisationId={approval.organisationId}
+    />,
+  );
+  assert.match(html, /Waiting for others/);
+  assert.doesNotMatch(html, /Your signature needed/);
+  assert.doesNotMatch(html, /buttonPrimary/);
+});
+
+test("places closed requests outside the personal signing queue", () => {
+  const html = renderToStaticMarkup(
+    <ClientAgreementList
+      approvals={[{ ...approval, status: "declined" }]}
+      email="alex@northstar.example"
+      organisationId={approval.organisationId}
+    />,
+  );
+
+  assert.match(html, /Closed agreements/);
+  assert.doesNotMatch(html, /Your signature needed/);
+  assert.doesNotMatch(html, /buttonPrimary/);
+});
+
+test("shows an approved agreement read-only to a non-signer", () => {
+  const html = renderToStaticMarkup(
+    <ClientAgreementDetail
+      approval={approval}
+      email="viewer@northstar.example"
+      organisationId={approval.organisationId}
+    />,
+  );
+  assert.match(html, /Waiting for the named signers/);
+  assert.doesNotMatch(html, /Continue to signing/);
 });
 
 test("renders the exact agreement summary and routes the signer to its revision", () => {

@@ -12,6 +12,11 @@ import {
   clientSigningProgress,
   hasCompleteSigningEvidence,
 } from "./presentation";
+import {
+  agreementStage,
+  stagePresentation,
+} from "@/lib/operations/agreements/stage";
+import { AgreementStageTimeline } from "./agreement-stage-timeline";
 import styles from "./agreements.module.css";
 
 type ClientAgreementDetailProps = Readonly<{
@@ -228,6 +233,11 @@ export function ClientAgreementDetail({
   );
   const oneOff = oneOffTotal(approval);
   const milestones = approval.draft.installments.length;
+  const stage = agreementStage({
+    signing: approval,
+    completeEvidence: complete,
+  });
+  const currentStage = stagePresentation(stage, "client");
 
   return (
     <article className={styles.detail}>
@@ -237,6 +247,12 @@ export function ClientAgreementDetail({
         </StatusBadge>
         <span>{approval.organisationLegalName}</span>
       </div>
+      <PortalCard
+        title={currentStage.label}
+        description={currentStage.description}
+      >
+        <AgreementStageTimeline stage={stage} fixedTerms />
+      </PortalCard>
       <CompletionNotice
         approval={approval}
         ownSignature={ownSignature}
@@ -364,7 +380,7 @@ export function ClientAgreementDetail({
               href={`${portalPath("/portal/getting-started")}?organisationId=${encodeURIComponent(approval.organisationId)}`}
               variant="secondary"
             >
-              Continue setup
+              Continue client setup
             </PortalActionLink>
           }
           tone="info"

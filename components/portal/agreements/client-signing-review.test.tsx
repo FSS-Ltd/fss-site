@@ -42,6 +42,8 @@ const approval: SigningApproval = {
   approvalHash: "b".repeat(64),
   approvedAt: "2026-09-15T10:00:00.000Z",
   completedAt: null,
+  completionAttempts: 0,
+  completionFailureCode: null,
   createdAt: "2026-09-15T09:00:00.000Z",
   draft: {
     assetsRequired: true,

@@ -380,7 +380,9 @@ test("client-proposed compensation publishes a monthly service without removing 
     .selectOption("client_proposed");
   await page.getByLabel("Offer expiry").fill("2026-11-01T09:00");
   await page.getByRole("button", { name: "Back", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Fee line 2" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Ongoing compensation 2" }),
+  ).toBeVisible();
   await expect(
     page.getByRole("combobox", { name: "Billing interval" }).nth(1),
   ).toHaveValue("1");
@@ -388,12 +390,15 @@ test("client-proposed compensation publishes a monthly service without removing 
   await expect(page.getByLabel("Discount (£)").nth(1)).toBeDisabled();
   await expect(page.getByLabel("Tax amount (£)").nth(1)).toBeDisabled();
   await page.getByLabel("Service code").nth(1).fill("support");
-  await page.getByLabel("Description").nth(1).fill("Ongoing support");
+  await page
+    .getByLabel("What this service covers")
+    .nth(1)
+    .fill("Ongoing support");
   await page.getByLabel("Contract start date").nth(1).fill("2026-10-01");
   await page.getByLabel("Include a one-off fee").uncheck();
   await page.getByLabel("Include a one-off fee").check();
   await expect(page.getByLabel("Service code").first()).toHaveValue("website");
-  await expect(page.getByLabel("Description").first()).toHaveValue(
+  await expect(page.getByLabel("What this service covers").first()).toHaveValue(
     "Website & booking experience",
   );
   await page.getByRole("button", { name: "Continue", exact: true }).click();
@@ -428,7 +433,7 @@ test("client-proposed compensation publishes a monthly service without removing 
     .getByRole("button", { name: "Review agreement", exact: true })
     .click();
   await page
-    .getByRole("button", { name: "Publish payment offer", exact: true })
+    .getByRole("button", { name: "Send budget request", exact: true })
     .click();
   expect(commands.at(-1)).toMatchObject({
     action: "publish",
@@ -464,7 +469,7 @@ test("agreements without a one-off fee hide the schedule and omit setup lines an
     page.getByRole("combobox", { name: "Billing interval" }),
   ).toHaveValue("1");
   await page.getByLabel("Service code").fill("support");
-  await page.getByLabel("Description").fill("Ongoing support");
+  await page.getByLabel("What this service covers").fill("Ongoing support");
   await page.getByLabel("Rate (£)").fill("250.00");
   await page.getByLabel("Contract start date").fill("2026-09-15");
   await page.getByRole("button", { name: "Continue", exact: true }).click();
@@ -524,14 +529,14 @@ test("an incomplete saved offer explains what is missing and opens Fees to repai
     }),
   ).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Publish payment offer", exact: true }),
+    page.getByRole("button", { name: "Send budget request", exact: true }),
   ).toBeDisabled();
   await page.getByRole("button", { name: "Edit fees", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Price the services" }),
   ).toBeFocused();
   await expect(
-    page.getByRole("textbox", { name: "Description" }).first(),
+    page.getByRole("textbox", { name: "What this service covers" }).first(),
   ).toHaveValue("Website & booking experience");
 });
 
@@ -620,7 +625,7 @@ for (const appearance of ["light", "dark"] as const) {
       page.getByRole("heading", { name: "Price the services" }),
     ).toBeVisible();
     await expect(
-      page.getByRole("textbox", { name: "Description" }).first(),
+      page.getByRole("textbox", { name: "What this service covers" }).first(),
     ).toHaveValue("Website & booking experience");
     await expect(
       page.getByRole("textbox", { name: "Rate (£)" }).first(),

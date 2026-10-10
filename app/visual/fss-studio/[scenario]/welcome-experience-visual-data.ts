@@ -47,6 +47,7 @@ export const welcomeVisualPacks: readonly WelcomePack[] = packetEditions.map(
   },
 );
 export const welcomeVisualAgreement: AgreementRecord = {
+  archivedAt: null,
   id: "fbb253c0-1632-43c1-bc5a-d5998df765cc",
   engagementId: "1bbc8d1c-fae7-423b-b95e-833cd373bc39",
   version: 3,

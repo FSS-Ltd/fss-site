@@ -10,7 +10,9 @@ export type AgreementRecord = {
   engagementId: string;
   version: number;
   revision: number;
-  status: "draft" | "signed";
+  status: "draft" | "withdrawn" | "signed";
+  archivedAt: string | null;
+  hasSigningRequest?: boolean;
   draft: AgreementDraft;
   evidence: SignatureEvidence | null;
   evidenceProvenance?:

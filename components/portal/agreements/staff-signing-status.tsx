@@ -6,13 +6,22 @@ import {
   type PortalStatus,
 } from "@/components/portal/ui";
 import type { SigningApproval } from "@/lib/operations/agreements/signing-types";
-import { hasCompleteSigningEvidence } from "./presentation";
+import type { AgreementDeliveryStatus } from "@/lib/operations/agreements/agreement-notification-repository";
+import {
+  allRequiredSignaturesRecorded,
+  hasCompleteSigningEvidence,
+} from "./presentation";
+import { AgreementDeliveryAction } from "./agreement-delivery-action";
+import { agreementStage } from "@/lib/operations/agreements/stage";
+import { AgreementStageTimeline } from "./agreement-stage-timeline";
 import styles from "./agreements.module.css";
 
 type StaffSigningStatusProps = Readonly<{
   approval: SigningApproval;
   controls?: React.ReactNode;
   downloadBase: string;
+  deliveries?: readonly AgreementDeliveryStatus[];
+  commandEndpoint?: string;
 }>;
 
 type SigningPresentation = Readonly<{
@@ -28,6 +37,26 @@ function presentationFor(approval: SigningApproval): SigningPresentation {
         "Every named signer has verified evidence on the retained agreement revision.",
       label: "Signed and recorded",
       tone: "success",
+    };
+  }
+
+  if (
+    approval.status === "approved" &&
+    allRequiredSignaturesRecorded(approval)
+  ) {
+    if (approval.completionFailureCode) {
+      return {
+        description:
+          "Every signature is recorded, but preparing the signed copy failed. Retry document processing or ask FSS support to review the worker.",
+        label: "Document needs attention",
+        tone: "warning",
+      };
+    }
+    return {
+      description:
+        "Every required signer has signed. The final PDF and retained evidence are being prepared.",
+      label: "Preparing signed copy",
+      tone: "info",
     };
   }
 
@@ -94,10 +123,13 @@ function formatSignedAt(value: string): string {
 export function StaffSigningStatus({
   approval,
   controls,
+  deliveries = [],
   downloadBase,
+  commandEndpoint,
 }: StaffSigningStatusProps): React.JSX.Element {
   const presentation = presentationFor(approval);
   const complete = hasCompleteSigningEvidence(approval);
+  const signaturesRecorded = allRequiredSignaturesRecorded(approval);
 
   return (
     <article
@@ -117,6 +149,13 @@ export function StaffSigningStatus({
         headingId={`signing-status-${approval.id}`}
         title={approval.title}
       >
+        <AgreementStageTimeline
+          stage={agreementStage({
+            signing: approval,
+            completeEvidence: complete,
+          })}
+          fixedTerms
+        />
         <p className={styles.prose}>
           Retained agreement version {approval.agreementVersion} ·{" "}
           {approval.requiredSigners.length} required{" "}
@@ -173,17 +212,56 @@ export function StaffSigningStatus({
               </li>
             );
           })}
-          <li>
-            <span className={styles.signingScheduleLabel}>
-              <MailQuestion aria-hidden="true" size={16} />
-              <span>Delivery</span>
-            </span>
-            <StatusBadge status="neutral">
-              {approval.status === "prepared"
-                ? "Not started"
-                : "Delivery status is not confirmed"}
-            </StatusBadge>
-          </li>
+          {approval.requiredSigners.map((recipient) => {
+            const delivery = deliveries.find(
+              (item) => item.recipient === recipient,
+            );
+            const label =
+              delivery?.status === "delivered"
+                ? "Delivered"
+                : delivery?.status === "sent"
+                  ? "Sent; delivery unconfirmed"
+                  : delivery?.status === "queued" ||
+                      delivery?.status === "sending"
+                    ? "Queued"
+                    : delivery?.status === "failed"
+                      ? "Delivery failed"
+                      : delivery?.status === "suppressed"
+                        ? "No longer required"
+                        : "Delivery unknown";
+            return (
+              <li key={`delivery-${recipient}`}>
+                <span className={styles.signingScheduleLabel}>
+                  <MailQuestion aria-hidden="true" size={16} />
+                  <span>Delivery to {recipient}</span>
+                </span>
+                <StatusBadge
+                  status={
+                    delivery?.status === "delivered"
+                      ? "success"
+                      : delivery?.status === "failed"
+                        ? "error"
+                        : "neutral"
+                  }
+                >
+                  {approval.status === "prepared" ? "Not started" : label}
+                </StatusBadge>
+                {commandEndpoint &&
+                delivery &&
+                approval.status === "approved" &&
+                !approval.signatures.some((item) => item.email === recipient) &&
+                (delivery.status === "sent" ||
+                  delivery.status === "failed" ||
+                  delivery.status === "unknown") ? (
+                  <AgreementDeliveryAction
+                    source={{ type: "signing", id: approval.id }}
+                    delivery={delivery}
+                    endpoint={commandEndpoint}
+                  />
+                ) : null}
+              </li>
+            );
+          })}
           <li>
             <span className={styles.signingScheduleLabel}>
               <PenLine aria-hidden="true" size={16} />
@@ -200,11 +278,13 @@ export function StaffSigningStatus({
             >
               {complete
                 ? "All required signatures retained"
-                : approval.status === "prepared"
-                  ? "No signatures yet"
-                  : approval.status === "approved"
-                    ? "Signature pending"
-                    : "Evidence incomplete"}
+                : signaturesRecorded
+                  ? "All signatures recorded; final copy processing"
+                  : approval.status === "prepared"
+                    ? "No signatures yet"
+                    : approval.status === "approved"
+                      ? "Signature pending"
+                      : "Evidence incomplete"}
             </StatusBadge>
           </li>
         </ul>

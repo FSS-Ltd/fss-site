@@ -18,10 +18,11 @@ import { getOperationsDb, operationsEnabled } from "@/lib/operations/db/client";
 import { listStaffCommercialOffers } from "@/lib/operations/agreements/commercial-service";
 import { signingEnabled } from "@/lib/operations/agreements/signing-worker";
 import { CommercialOfferList } from "@/components/portal/agreements/commercial-offer-list";
-import type { CommercialOffer } from "@/lib/operations/agreements/commercial-types";
+import { AgreementLifecycleActions } from "@/components/portal/agreements/agreement-lifecycle-actions";
 import { SavedAgreementDrafts } from "@/components/portal/agreements/saved-agreement-drafts";
 import { listStaffAgreementBuilderDrafts } from "@/lib/operations/agreements/builder-draft-repository";
 import { parseWorkspacePage } from "@/lib/operations/workspaces/pagination";
+import type { CommercialOffer } from "@/lib/operations/agreements/commercial-types";
 import { listStaffAgreementRegister } from "@/lib/operations/agreements/repository";
 
 export const dynamic = "force-dynamic";
@@ -34,6 +35,7 @@ export default async function StaffClientAgreementsPage({
   searchParams: Promise<{
     after?: string | string[];
     draftPage?: string | string[];
+    view?: string | string[];
   }>;
 }): Promise<React.JSX.Element> {
   if (!operationsEnabled()) notFound();
@@ -43,7 +45,14 @@ export default async function StaffClientAgreementsPage({
   const organisationId = z.uuid().safeParse((await params).organisationId);
   const query = await searchParams;
   const after = query.after;
-  if (!organisationId.success || Array.isArray(after)) notFound();
+  const archived = query.view === "archived";
+  if (
+    !organisationId.success ||
+    Array.isArray(after) ||
+    Array.isArray(query.view) ||
+    (query.view && !archived)
+  )
+    notFound();
   let draftPage;
   try {
     draftPage = parseWorkspacePage(query.draftPage);
@@ -56,19 +65,21 @@ export default async function StaffClientAgreementsPage({
   try {
     const db = getOperationsDb();
     const admin = await requireFssAdmin(getPortalDb(), identity, randomUUID());
-    savedDrafts = await listStaffAgreementBuilderDrafts(
-      db,
-      admin,
-      organisationId.data,
-      draftPage,
-    );
-    if (signingEnabled())
+    if (!archived)
+      savedDrafts = await listStaffAgreementBuilderDrafts(
+        db,
+        admin,
+        organisationId.data,
+        draftPage,
+      );
+    if (signingEnabled() && !archived)
       offers = await listStaffCommercialOffers(db, admin, organisationId.data);
     register = await listStaffAgreementRegister(
       db,
       admin,
       organisationId.data,
       after,
+      archived,
     );
   } catch {
     return <PortalUnavailable />;
@@ -103,23 +114,36 @@ export default async function StaffClientAgreementsPage({
         eyebrow="FSS Studio / Agreements"
         title={`${register.organisationName}: agreements`}
       />
-      <SavedAgreementDrafts
-        drafts={savedDrafts}
-        builderHref={newAgreementHref}
-        listHref={
-          after ? `${baseHref}?after=${encodeURIComponent(after)}` : baseHref
-        }
-      />
-      <CommercialOfferList offers={offers} audience="staff" />
+      {!archived && savedDrafts ? (
+        <SavedAgreementDrafts
+          drafts={savedDrafts}
+          builderHref={newAgreementHref}
+          listHref={
+            after ? `${baseHref}?after=${encodeURIComponent(after)}` : baseHref
+          }
+        />
+      ) : null}
+      {!archived ? (
+        <CommercialOfferList offers={offers} audience="staff" />
+      ) : null}
+      <PortalActionLink
+        href={archived ? baseHref : `${baseHref}?view=archived`}
+        variant="secondary"
+      >
+        {archived ? "View active agreements" : "View archived agreements"}
+      </PortalActionLink>
       <section
         className={styles.group}
         aria-labelledby="existing-agreements-heading"
       >
         <div className={styles.groupHeading}>
           <div>
-            <h2 id="existing-agreements-heading">Existing agreement records</h2>
+            <h2 id="existing-agreements-heading">
+              {archived ? "Archived agreements" : "Active agreement records"}
+            </h2>
             <p>
-              Agreement records are created after you review a builder draft.
+              Drafts and signed records remain separate from the builder
+              workspace.
             </p>
           </div>
           <PortalActionLink href={signingHref} variant="secondary">
@@ -143,7 +167,13 @@ export default async function StaffClientAgreementsPage({
                         record.status === "signed" ? "success" : "warning"
                       }
                     >
-                      {record.status === "signed" ? "Signed" : "Draft"}
+                      {record.archivedAt
+                        ? "Archived"
+                        : record.status === "signed"
+                          ? "Signed"
+                          : record.status === "withdrawn"
+                            ? "Withdrawn"
+                            : "Draft"}
                     </StatusBadge>
                   </div>
                   <p className={styles.muted}>{record.draft.scope}</p>
@@ -157,23 +187,37 @@ export default async function StaffClientAgreementsPage({
                       ? "View agreement"
                       : "Review agreement"}
                   </PortalActionLink>
+                  <AgreementLifecycleActions
+                    record={record}
+                    organisationId={organisationId.data}
+                    hasSigningRequest={Boolean(record.hasSigningRequest)}
+                    listHref={baseHref}
+                  />
                 </PortalCard>
               </li>
             ))}
           </ul>
         ) : (
-          <PortalCard title="No agreement records yet">
+          <PortalCard
+            title={
+              archived ? "No archived agreements" : "No agreement records yet"
+            }
+          >
             <p className={styles.muted}>
-              Start a saved builder draft from reviewed work when you are ready.
+              {archived
+                ? "Signed agreements you archive will appear here."
+                : "Start a saved builder draft from reviewed work when you are ready."}
             </p>
-            <PortalActionLink href={newAgreementHref} variant="primary">
-              New agreement
-            </PortalActionLink>
+            {!archived ? (
+              <PortalActionLink href={newAgreementHref} variant="primary">
+                New agreement
+              </PortalActionLink>
+            ) : null}
           </PortalCard>
         )}
         {register.nextCursor ? (
           <PortalActionLink
-            href={`${baseHref}?after=${encodeURIComponent(register.nextCursor)}`}
+            href={`${baseHref}?${archived ? "view=archived&" : ""}after=${encodeURIComponent(register.nextCursor)}`}
             variant="secondary"
           >
             Next agreement page

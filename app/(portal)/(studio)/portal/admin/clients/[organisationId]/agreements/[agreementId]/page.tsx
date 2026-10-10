@@ -36,6 +36,7 @@ export default async function StaffAgreementPage({
 
   let record: AgreementRecord | null;
   let signingApproval: SigningApproval | null;
+  let hasSigningRequest = false;
   try {
     const db = getOperationsDb();
     const admin = await requireFssAdmin(getPortalDb(), identity, randomUUID());
@@ -57,6 +58,9 @@ export default async function StaffAgreementPage({
           approval.agreementId === agreementId.data &&
           approval.revision === record?.revision,
       ) ?? null;
+    hasSigningRequest = approvals.some(
+      (approval) => approval.agreementId === agreementId.data,
+    );
   } catch {
     return <PortalUnavailable />;
   }
@@ -86,6 +90,7 @@ export default async function StaffAgreementPage({
             : undefined
         }
         signingApproval={signingApproval}
+        hasSigningRequest={hasSigningRequest}
         signingDownloadBase={
           signingAvailable && signingApproval
             ? `/api/portal/admin/clients/${organisationId.data}/signing/${signingApproval.id}`

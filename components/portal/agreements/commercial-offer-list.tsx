@@ -5,6 +5,10 @@ import {
 } from "@/components/portal/ui";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import type { CommercialOffer } from "@/lib/operations/agreements/commercial-types";
+import {
+  agreementStage,
+  stagePresentation,
+} from "@/lib/operations/agreements/stage";
 import styles from "./agreements.module.css";
 
 export function CommercialOfferList({
@@ -22,10 +26,12 @@ export function CommercialOfferList({
         {offers.map((offer) => (
           <li key={offer.id}>
             <PortalCard title={offer.draft.title}>
-              <StatusBadge status="info">{offer.status}</StatusBadge>
+              <StatusBadge status="info">
+                {stagePresentation(agreementStage({ offer }), audience).label}
+              </StatusBadge>
               <p>
-                {offer.draft.currency} · Fixed setup fee and reviewed ongoing
-                options
+                {offer.draft.currency} · Setup and ongoing terms are shown
+                separately
               </p>
               <PortalActionLink
                 href={

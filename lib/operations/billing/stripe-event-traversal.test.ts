@@ -96,6 +96,76 @@ test("mandate and setup events resolve current mandate status without retaining 
   });
   assert.equal((await f.provider.resolveEvent(f.receipt)).mandate, null);
 });
+test("verified setup events bind the saved method to its customer and tenant metadata", async () => {
+  const setupId = "11111111-1111-4111-8111-111111111111";
+  const f = eventFixture("setup_intent", "seti_test", {
+    "/v1/setup_intents/seti_test": {
+      id: "seti_test",
+      livemode: false,
+      status: "succeeded",
+      customer: "cus_test",
+      payment_method: "pm_test",
+      mandate: null,
+      metadata: {
+        operations_setup: setupId,
+        operations_organisation: setupId,
+        operations_currency: "GBP",
+      },
+    },
+    "/v1/payment_methods/pm_test": {
+      id: "pm_test",
+      livemode: false,
+      customer: "cus_test",
+      type: "card",
+      card: { brand: "visa", last4: "4242", exp_month: 12, exp_year: 2028 },
+    },
+  });
+  f.receipt.eventType = "setup_intent.succeeded";
+  f.records["/v1/events/evt_test"] = {
+    id: "evt_test",
+    type: f.receipt.eventType,
+    livemode: false,
+    data: { object: { id: "seti_test", object: "setup_intent" } },
+  };
+  const result = await f.provider.resolveEvent(f.receipt);
+  assert.equal(result.setup?.setupId, setupId);
+  assert.equal(result.setup?.providerCustomerId, "cus_test");
+  assert.equal(result.setup?.providerMethodId, "pm_test");
+  assert.equal(result.setup?.last4, "4242");
+  assert.equal(JSON.stringify(result).includes("sensitive"), false);
+});
+
+test("detached payment methods are projected without trusting stale customer data", async () => {
+  const f = eventFixture("payment_method", "pm_test", {
+    "/v1/payment_methods/pm_test": {
+      id: "pm_test",
+      livemode: false,
+      customer: null,
+      type: "card",
+    },
+  });
+  f.receipt.eventType = "payment_method.detached";
+  f.records["/v1/events/evt_test"] = {
+    id: "evt_test",
+    type: f.receipt.eventType,
+    livemode: false,
+    data: { object: { id: "pm_test", object: "payment_method" } },
+  };
+  assert.equal(
+    (await f.provider.resolveEvent(f.receipt)).detachedMethodId,
+    "pm_test",
+  );
+  f.records["/v1/payment_methods/pm_test"] = {
+    id: "pm_test",
+    livemode: false,
+    customer: "cus_test",
+    type: "card",
+  };
+  await assert.rejects(
+    f.provider.resolveEvent(f.receipt),
+    /invalid_projection/,
+  );
+});
 test("subscription events reconcile issued invoices and ignore drafts", async () => {
   const f = eventFixture("subscription", "sub_test", {
     "/v1/subscriptions/sub_test": { id: "sub_test", livemode: false },

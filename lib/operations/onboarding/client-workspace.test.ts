@@ -1,9 +1,7 @@
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import test from "node:test";
-import {
-  clientOnboardingTaskCommandSchema,
-} from "./client-workspace";
+import { clientOnboardingTaskCommandSchema } from "./client-workspace";
 import { createClientOnboardingTaskHandler } from "./client-workspace-http";
 
 const organisationId = "a85e5e49-dff3-4816-a2be-155f39101868";

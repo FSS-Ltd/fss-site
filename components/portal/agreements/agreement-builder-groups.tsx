@@ -121,6 +121,7 @@ export type AgreementBuilderGroup = Readonly<{
 
 export function AgreementBuilderGroupForm({
   flow: { formRef, index: activeIndex, direction, next, show, headingId },
+  onGroupsChange,
   groups,
   pending,
   continueLabel,
@@ -134,6 +135,7 @@ export function AgreementBuilderGroupForm({
 }: Readonly<{
   flow: ReturnType<typeof useAgreementBuilderGroups>;
   groups: readonly AgreementBuilderGroup[];
+  onGroupsChange?: () => void;
   pending: boolean;
   continueLabel: string;
   onContinue: () => void;
@@ -149,6 +151,7 @@ export function AgreementBuilderGroupForm({
       <form
         className={styles.guidedForm}
         data-direction={direction}
+        onFocusCapture={onGroupsChange}
         noValidate
         ref={formRef}
         onSubmit={(event) => {

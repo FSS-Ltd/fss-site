@@ -19,6 +19,7 @@ import styles from "./client-overview.module.css";
 type ClientOverviewProps = Readonly<{
   canCreateRequest: boolean;
   overview: ClientOverviewData;
+  signatureNotice?: string;
   workspaceName: string;
 }>;
 
@@ -63,6 +64,7 @@ function formatTargetDate(value: string | null): string | null {
 export function ClientOverview({
   canCreateRequest,
   overview,
+  signatureNotice,
   workspaceName,
 }: ClientOverviewProps): React.JSX.Element {
   const attention = selectClientAttention(overview);
@@ -98,6 +100,9 @@ export function ClientOverview({
           ) : undefined
         }
       />
+      {signatureNotice ? (
+        <Notice tone="success">{signatureNotice}</Notice>
+      ) : null}
 
       <section className={styles.attention} aria-labelledby="attention-heading">
         <p className={styles.sectionLabel}>Your next step</p>

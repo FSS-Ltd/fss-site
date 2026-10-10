@@ -214,6 +214,23 @@ export async function cancelStaffAgreementSigning(
     }),
   );
 }
+export async function retryStaffAgreementSigning(
+  db: OperationsDb,
+  admin: FssAdminContext,
+  organisationId: string,
+  approvalId: string,
+  correlationId: string,
+): Promise<SigningApproval> {
+  z.uuid().parse(organisationId);
+  z.uuid().parse(approvalId);
+  z.uuid().parse(correlationId);
+  return signingOperation(() =>
+    withFssAdminTransaction(db, admin, async (tx) => {
+      await tx`select operations.retry_agreement_signing(${organisationId},${approvalId},${correlationId})`;
+      return (await loadSigningApprovals(tx, organisationId, approvalId))[0];
+    }),
+  );
+}
 export async function signPortalAgreement(
   db: OperationsDb,
   identity: VerifiedPortalIdentity | null,
