@@ -14,7 +14,7 @@ Settings apply to separate revisioned active records, with an audit entry for ea
 
 ## Deployment sequence
 
-1. Review and apply the additive migrations in timestamp order: `20261001150000_operations_active_studio_settings.sql`, `20261001151000_operations_welcome_draft_restoration.sql`, and `20261001153000_operations_client_welcome_packets.sql`. Run the repository migration checks against the deployment's complete migration history.
+1. Review and apply the additive migrations in timestamp order: `20261001150000_operations_active_studio_settings.sql`, `20261001151000_operations_welcome_draft_restoration.sql`, `20261001153000_operations_client_welcome_packets.sql`, and `20261010170000_operations_reviewed_welcome_packet.sql`. Run the repository migration checks against the deployment's complete migration history.
 2. Configure `OPERATIONS_STUDIO_APPROVED_REPLY_TO_ADDRESSES` with a comma-separated approved list. This is an allowlist of public email addresses; credentials and provider enablement remain under existing deployment controls.
 3. Apply Identity and Communication settings explicitly. A new designed welcome requires an approved reply-to and current active values. Existing drafts remain drafts.
 4. Recheck the production unapproved journey draft count. If any appear, discard their old packet copy, apply the current published edition and checklist, and review the summaries before preparing them. Leave approved snapshots unchanged.
