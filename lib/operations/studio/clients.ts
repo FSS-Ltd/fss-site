@@ -85,6 +85,7 @@ export async function listStudioClients(
             select 1 from operations.agreements a
             where a.organisation_id = o.id and a.status = 'draft'
           ) then 'Finish agreement'
+          when active_offer.id is not null then 'Review client offer'
           when not exists (
             select 1 from operations.agreements a where a.organisation_id = o.id
           ) then 'Set up an agreement'
@@ -102,6 +103,8 @@ export async function listStudioClients(
             select 1 from operations.agreements a
             where a.organisation_id = o.id and a.status = 'draft'
           ) then '/portal/admin/clients/' || o.id::text || '/agreements'
+          when active_offer.id is not null then
+            '/portal/admin/clients/' || o.id::text || '/commercial-offers/' || active_offer.id::text || '/preview'
           when not exists (
             select 1 from operations.agreements a where a.organisation_id = o.id
           ) then '/portal/admin/clients/' || o.id::text || '/agreements/new'
@@ -118,6 +121,15 @@ export async function listStudioClients(
         order by c.created_at asc, c.id asc
         limit 1
       ) primary_contact on true
+      left join lateral (
+        select f.id
+        from operations.commercial_offers f
+        where f.organisation_id = o.id
+          and f.status in ('published', 'proposed', 'rejected')
+          and f.expires_at > clock_timestamp()
+        order by f.created_at desc, f.id
+        limit 1
+      ) active_offer on true
       where (
         ${query}::text = ''
         or lower(o.display_name) like '%' || lower(${query}) || '%'
@@ -171,6 +183,7 @@ export async function loadStudioClient(
             select 1 from operations.agreements a
             where a.organisation_id = o.id and a.status = 'draft'
           ) then 'Finish agreement'
+          when active_offer.id is not null then 'Review client offer'
           when not exists (
             select 1 from operations.agreements a where a.organisation_id = o.id
           ) then 'Set up an agreement'
@@ -188,6 +201,8 @@ export async function loadStudioClient(
             select 1 from operations.agreements a
             where a.organisation_id = o.id and a.status = 'draft'
           ) then '/portal/admin/clients/' || o.id::text || '/agreements'
+          when active_offer.id is not null then
+            '/portal/admin/clients/' || o.id::text || '/commercial-offers/' || active_offer.id::text || '/preview'
           when not exists (
             select 1 from operations.agreements a where a.organisation_id = o.id
           ) then '/portal/admin/clients/' || o.id::text || '/agreements/new'
@@ -204,6 +219,15 @@ export async function loadStudioClient(
         order by c.created_at asc, c.id asc
         limit 1
       ) primary_contact on true
+      left join lateral (
+        select f.id
+        from operations.commercial_offers f
+        where f.organisation_id = o.id
+          and f.status in ('published', 'proposed', 'rejected')
+          and f.expires_at > clock_timestamp()
+        order by f.created_at desc, f.id
+        limit 1
+      ) active_offer on true
       where o.id = ${id}
     `;
     return client ?? null;

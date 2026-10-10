@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { randomUUID } from "node:crypto";
-import { createCommercialOfferRouteHandler } from "./commercial-offer-route";
+import {
+  commercialOfferRouteConfiguration,
+  createCommercialOfferRouteHandler,
+} from "./commercial-offer-route";
 import { AgreementConflict } from "../agreements/types";
 import { PortalAccessDenied } from "../auth/types";
 import { agreementDraft } from "../agreements/fixtures";
@@ -26,6 +29,18 @@ function request(origin = "https://example.test", body = "{}") {
     method: "POST",
     headers: { origin, "content-type": "application/json" },
     body,
+  });
+}
+function requestAt(
+  urlOrigin: string,
+  requestOrigin: string | undefined,
+): Request {
+  const headers = new Headers({ "content-type": "application/json" });
+  if (requestOrigin) headers.set("origin", requestOrigin);
+  return new Request(`${urlOrigin}/api`, {
+    method: "POST",
+    headers,
+    body: "{}",
   });
 }
 function handler(
@@ -55,6 +70,34 @@ test("commercial command authenticates, enforces origin, and returns private res
   assert.match(response.headers.get("cache-control") ?? "", /no-store/);
   assert.equal((await response.json()).offer.id, offer.id);
 });
+test("commercial commands accept the configured portal origin, not the public site origin", async () => {
+  const portalOrigin = "https://portal.example.test";
+  const configuration = commercialOfferRouteConfiguration({
+    OPERATIONS_ENABLED: "true",
+    OPERATIONS_SIGNING_ENABLED: "true",
+    OPERATIONS_PORTAL_ORIGIN: portalOrigin,
+    NEXT_PUBLIC_SITE_URL: "https://example.test",
+  });
+  let executed = 0;
+  const handler = createCommercialOfferRouteHandler({
+    ...configuration,
+    authorize: async () => ({ userId: randomUUID() }),
+    execute: async () => {
+      executed += 1;
+      return offer;
+    },
+    reportUnexpectedError: () => {},
+  });
+
+  assert.equal(configuration.origin, portalOrigin);
+  assert.equal((await handler(requestAt(portalOrigin, portalOrigin), organisationId)).status, 200);
+  assert.equal((await handler(requestAt(portalOrigin, undefined), organisationId)).status, 403);
+  assert.equal((await handler(requestAt(portalOrigin, "https://forged.example"), organisationId)).status, 403);
+  assert.equal((await handler(requestAt("https://example.test", "https://example.test"), organisationId)).status, 403);
+  assert.equal((await handler(requestAt("https://forged.example", portalOrigin), organisationId)).status, 403);
+  assert.equal(executed, 1);
+});
+
 test("conflicts and unavailable offers return safe scoped failures", async () => {
   assert.equal(
     (
