@@ -172,6 +172,7 @@ export type VisualScenarioName =
   | "studio-agreement-builder"
   | "studio-agreement-builder-scope"
   | "studio-agreement-builder-fees"
+  | "studio-agreement-builder-recurring-only"
   | "studio-agreement-builder-people"
   | "studio-agreement-builder-document"
   | "studio-agreement-builder-review"
@@ -632,6 +633,10 @@ const scenarios: Record<VisualScenarioName, VisualScenario> = {
   "studio-agreement-builder-fees": {
     name: "studio-agreement-builder-fees",
     content: <StudioAgreementBuilderScenario step="fees" />,
+  },
+  "studio-agreement-builder-recurring-only": {
+    name: "studio-agreement-builder-recurring-only",
+    content: <StudioAgreementBuilderScenario step="fees" recurringOnly />,
   },
   "studio-agreement-builder-people": {
     name: "studio-agreement-builder-people",

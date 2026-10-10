@@ -1,5 +1,6 @@
 import {
   PortalButton,
+  PortalCheckbox,
   PortalField,
   PortalSelect,
 } from "@/components/portal/ui";
@@ -9,26 +10,43 @@ import type { EditableLine } from "./agreement-builder-fee-inputs";
 import styles from "./agreements.module.css";
 
 export function AgreementBuilderFeeLines({
+  onInteraction,
+  includeOneOffFees,
   lines,
   fixed,
+  clientProposed,
   total,
   currency,
   updateLine,
+  onIncludeOneOffFeesChange,
   onAdd,
   onRemove,
 }: Readonly<{
+  onInteraction?: () => void;
+  includeOneOffFees: boolean;
   lines: readonly EditableLine[];
   fixed: boolean;
+  clientProposed: boolean;
   total: string | null;
   currency: Currency;
   updateLine: (index: number, field: keyof EditableLine, value: string) => void;
+  onIncludeOneOffFeesChange: (include: boolean) => void;
   onAdd: () => void;
   onRemove: (index: number) => void;
 }>): React.JSX.Element {
   const symbol = currencySymbol(currency);
   return (
-    <fieldset className={styles.feeFieldset}>
-      <legend>One-off fees and service lines</legend>
+    <fieldset className={styles.feeFieldset} data-builder-validate-on-save-only>
+      <legend>Service fees</legend>
+      <PortalCheckbox
+        checked={includeOneOffFees}
+        hint="Turn this off when the agreement has no setup charge. One-off installments are then removed from the saved draft."
+        label="Include a one-off fee"
+        onChange={(event) => {
+          onInteraction?.();
+          onIncludeOneOffFeesChange(event.target.checked);
+        }}
+      />
       <div className={styles.feeLineList}>
         {lines.map((line, index) => (
           <section className={styles.feeLine} key={index}>
@@ -47,6 +65,7 @@ export function AgreementBuilderFeeLines({
             <div className={styles.fieldGrid}>
               <PortalField label="Service code" required>
                 <input
+                  required
                   onChange={(event) =>
                     updateLine(index, "serviceCode", event.target.value)
                   }
@@ -55,6 +74,7 @@ export function AgreementBuilderFeeLines({
               </PortalField>
               <PortalField label="Description" required>
                 <input
+                  required
                   onChange={(event) =>
                     updateLine(index, "description", event.target.value)
                   }
@@ -73,11 +93,13 @@ export function AgreementBuilderFeeLines({
               </PortalField>
               <PortalField
                 label={`Rate (${symbol})`}
-                required={line.recurrenceMonths === "0"}
+                required={line.recurrenceMonths === "0" || fixed}
                 hint={
-                  line.recurrenceMonths !== "0" && fixed
-                    ? "Required for fixed recurring fees. Choose compensation on the next screen."
-                    : undefined
+                  clientProposed && line.recurrenceMonths !== "0"
+                    ? "The client proposes the combined amount for each billing period."
+                    : line.recurrenceMonths !== "0" && fixed
+                      ? "Enter a fixed amount for this recurring service."
+                      : undefined
                 }
               >
                 <input
@@ -89,7 +111,10 @@ export function AgreementBuilderFeeLines({
                   value={line.unitPrice}
                 />
               </PortalField>
-              <PortalField label={`Discount (${symbol})`} required>
+              <PortalField
+                label={`Discount (${symbol})`}
+                required={line.recurrenceMonths === "0" || fixed}
+              >
                 <input
                   disabled={line.recurrenceMonths !== "0" && !fixed}
                   inputMode="decimal"
@@ -99,7 +124,10 @@ export function AgreementBuilderFeeLines({
                   value={line.discount}
                 />
               </PortalField>
-              <PortalField label={`Tax amount (${symbol})`} required>
+              <PortalField
+                label={`Tax amount (${symbol})`}
+                required={line.recurrenceMonths === "0" || fixed}
+              >
                 <input
                   disabled={line.recurrenceMonths !== "0" && !fixed}
                   inputMode="decimal"
@@ -111,18 +139,22 @@ export function AgreementBuilderFeeLines({
               </PortalField>
               <PortalSelect
                 label="Billing interval"
+                onFocus={onInteraction}
                 onChange={(event) =>
                   updateLine(index, "recurrenceMonths", event.target.value)
                 }
                 value={line.recurrenceMonths}
               >
-                <option value="0">One-off</option>
+                <option disabled={!includeOneOffFees} value="0">
+                  One-off
+                </option>
                 <option value="1">Monthly</option>
                 <option value="3">Quarterly</option>
                 <option value="12">Annual</option>
               </PortalSelect>
               <PortalField label="Contract start date" required>
                 <input
+                  required
                   onChange={(event) =>
                     updateLine(index, "startDate", event.target.value)
                   }
@@ -152,7 +184,11 @@ export function AgreementBuilderFeeLines({
         Add line item
       </PortalButton>
       <p className={styles.totalLine}>
-        Priced service fees{" "}
+        {fixed
+          ? "One-off fees and fixed recurring services"
+          : clientProposed
+            ? "One-off fees; client-proposed recurring amounts"
+            : "One-off service fees"}{" "}
         <strong>
           {total ? formatGbp(total, currency) : "Complete fee lines"}
         </strong>

@@ -11,8 +11,8 @@ import {
   commercialOfferSpecSchema,
   type CommercialOfferSpec,
 } from "@/lib/operations/agreements/commercial-types";
-import styles from "./agreements.module.css";
 import type { AgreementBuilderDraftContent } from "@/lib/operations/agreements/builder-draft-schema";
+import styles from "./agreements.module.css";
 
 export function readCommercialOffer(
   data: FormData,
@@ -97,15 +97,15 @@ export function CommercialOfferFields({
       >
         <option value="fixed">Set the recurring amount</option>
         <option value="client_proposed">
-          Let the client propose an amount
+          Let the client propose a recurring amount
         </option>
         <option value="disabled">Revenue share only</option>
       </PortalSelect>
       {spec.cash?.mode === "client_proposed" ? (
         <p>
-          The client proposes one combined amount, minimum 20 {currency} per
-          billing period. You review it before signing. Use matching intervals
-          and service dates for all ongoing lines.
+          The client proposes one combined amount per billing period, minimum 20{" "}
+          {currency}. You review it before signing. Ongoing services use
+          matching intervals and service dates.
         </p>
       ) : null}
       <PortalCheckbox

@@ -31,6 +31,50 @@ export function emptyLine(): EditableLine {
   };
 }
 
+export function monthlyRecurringLine(): EditableLine {
+  return { ...emptyLine(), recurrenceMonths: "1" };
+}
+
+function isUntouchedStarterLine(line: EditableLine): boolean {
+  return JSON.stringify(line) === JSON.stringify(emptyLine());
+}
+
+export function ensureClientProposedRecurringService(
+  lines: readonly EditableLine[],
+): EditableLine[] {
+  if (lines.length === 0) return [monthlyRecurringLine()];
+  if (lines.some((line) => line.recurrenceMonths !== "0"))
+    return lines.map((line) => ({ ...line }));
+  if (lines.length === 1 && isUntouchedStarterLine(lines[0]))
+    return [monthlyRecurringLine()];
+  return [...lines, monthlyRecurringLine()];
+}
+
+export function separateOneOffFeeLines(
+  lines: readonly EditableLine[],
+): Readonly<{ oneOff: EditableLine[]; recurring: EditableLine[] }> {
+  return {
+    oneOff: lines.filter((line) => line.recurrenceMonths === "0"),
+    recurring: lines.filter((line) => line.recurrenceMonths !== "0"),
+  };
+}
+
+export function linesForAgreementDraft(
+  lines: readonly EditableLine[],
+  includeOneOffFees: boolean,
+  clientProposed: boolean,
+): AgreementLine[] {
+  return parseFeeLines(
+    lines
+      .filter((line) => includeOneOffFees || line.recurrenceMonths !== "0")
+      .map((line) =>
+        line.recurrenceMonths !== "0" && clientProposed
+          ? { ...line, unitPrice: "0", discount: "0", tax: "0" }
+          : line,
+      ),
+  );
+}
+
 export function toEditableLine(line: AgreementLine): EditableLine {
   return {
     description: line.description,

@@ -198,7 +198,7 @@ test("publishing client-proposed cash without recurring work explains how to fin
     (error: unknown) =>
       error instanceof AgreementBuilderDraftValidationError &&
       error.message ===
-        "Fees: Client-proposed amounts apply to recurring services. Add a recurring service or choose fixed payment.",
+        "Fees: Add a recurring service, then publish the client-proposed monthly amount.",
   );
   assert.equal(
     calls.some(({ sql }) =>

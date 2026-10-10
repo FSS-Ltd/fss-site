@@ -271,12 +271,33 @@ export function StudioAgreementListScenario(): React.JSX.Element {
 
 export function StudioAgreementBuilderScenario({
   noEngagement = false,
+  recurringOnly = false,
   step = "link",
 }: Readonly<{
   noEngagement?: boolean;
+  recurringOnly?: boolean;
   step?: AgreementBuilderStep;
 }>): React.JSX.Element {
   const currentDraft = builderDraft(step, noEngagement);
+  const initialDraft = recurringOnly
+    ? {
+        ...currentDraft,
+        content: {
+          ...currentDraft.content,
+          agreement: {
+            ...currentDraft.content.agreement,
+            installments: [],
+            lines: [
+              {
+                ...draft.lines[0],
+                recurrenceMonths: 1 as const,
+                unitPence: "25000",
+              },
+            ],
+          },
+        },
+      }
+    : currentDraft;
   return (
     <StudioShell>
       <PageHeader
@@ -299,7 +320,7 @@ export function StudioAgreementBuilderScenario({
                 },
               ]
         }
-        initialDraft={currentDraft}
+        initialDraft={initialDraft}
         organisationName="Northstar Studio"
       />
     </StudioShell>

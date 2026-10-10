@@ -14,6 +14,21 @@ export function AgreementBuilderSummary({
   commercialOffer?: AgreementBuilderDraftContent["commercialOffer"];
 }>): React.JSX.Element {
   const share = commercialOffer?.spec.revenueShare;
+  const lines = agreement.lines ?? [];
+  const oneOffLines = lines.filter((line) => line.recurrenceMonths === 0);
+  const recurringLines = lines.filter((line) => line.recurrenceMonths > 0);
+  const fixedRecurringLines =
+    !commercialOffer || commercialOffer.spec.cash?.mode === "fixed"
+      ? recurringLines
+      : [];
+  const clientProposedLines =
+    commercialOffer?.spec.cash?.mode === "client_proposed"
+      ? recurringLines
+      : [];
+  const revenueShareLines =
+    commercialOffer && commercialOffer.spec.cash === null && share
+      ? recurringLines
+      : [];
   return (
     <dl className={styles.summaryList}>
       <div>
@@ -37,29 +52,59 @@ export function AgreementBuilderSummary({
         </dd>
       </div>
       <div>
-        <dt>Service fees</dt>
+        <dt>One-off fees</dt>
         <dd>
-          {agreement.lines?.map((line, index) => (
-            <p key={index}>
-              {line.description}:{" "}
-              {line.recurrenceMonths > 0 &&
-              commercialOffer &&
-              commercialOffer.spec.cash?.mode !== "fixed"
-                ? commercialOffer.spec.cash
-                  ? "Amount proposed by client"
-                  : "Covered by revenue share"
-                : formatGbp(totalLinePence(line), agreement.currency)}
-              {line.recurrenceMonths > 0
-                ? ` every ${line.recurrenceMonths} month(s)`
-                : " one-off"}
-              {` · from ${line.startDate}`}
-              {line.endDate ? ` to ${line.endDate}` : ""}
-            </p>
-          ))}
+          {oneOffLines.length
+            ? oneOffLines.map((line, index) => (
+                <p key={index}>
+                  {line.description}:{" "}
+                  {formatGbp(totalLinePence(line), agreement.currency)}
+                  {` · from ${line.startDate}`}
+                  {line.endDate ? ` to ${line.endDate}` : ""}
+                </p>
+              ))
+            : "No one-off fee included."}
         </dd>
       </div>
+      {fixedRecurringLines.length ? (
+        <div>
+          <dt>Fixed recurring services</dt>
+          <dd>
+            {fixedRecurringLines.map((line, index) => (
+              <p key={index}>
+                {line.description}:{" "}
+                {formatGbp(totalLinePence(line), agreement.currency)}
+                {` every ${line.recurrenceMonths} month(s) · from ${line.startDate}`}
+                {line.endDate ? ` to ${line.endDate}` : ""}
+              </p>
+            ))}
+          </dd>
+        </div>
+      ) : null}
+      {clientProposedLines.length ? (
+        <div>
+          <dt>Client-proposed monthly services</dt>
+          <dd>
+            {clientProposedLines.map((line, index) => (
+              <p key={index}>
+                {line.description}: amount proposed by the client monthly
+                {` · from ${line.startDate}`}
+                {line.endDate ? ` to ${line.endDate}` : ""}
+              </p>
+            ))}
+          </dd>
+        </div>
+      ) : null}
+      {revenueShareLines.length ? (
+        <div>
+          <dt>Services covered by revenue share</dt>
+          <dd>
+            {revenueShareLines.map((line) => line.description).join(", ")}
+          </dd>
+        </div>
+      ) : null}
       <div>
-        <dt>Payment schedule</dt>
+        <dt>One-off payment schedule</dt>
         <dd>
           {agreement.installments?.length
             ? agreement.installments.map((item, index) => (
@@ -86,9 +131,9 @@ export function AgreementBuilderSummary({
           <dt>Ongoing choices</dt>
           <dd>
             {commercialOffer.spec.cash?.mode === "client_proposed"
-              ? "Client proposes the recurring amount for staff approval."
+              ? "Client proposes the monthly recurring amount for staff approval."
               : commercialOffer.spec.cash
-                ? "Recurring amounts are fixed."
+                ? "Recurring service amounts are fixed."
                 : "Revenue share only."}
             {share ? (
               <>
