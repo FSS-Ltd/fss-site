@@ -41,7 +41,9 @@ async function execute(
     case "invitation":
       return effects.ensureInvitation(lease);
     case "thank_you": {
-      if (!lease.invoice?.url || !lease.proposal?.portalUrl)
+      const approvedUrl =
+        lease.snapshot.postSignature?.portalUrl ?? lease.proposal?.portalUrl;
+      if (!lease.invoice?.url || !approvedUrl)
         return {
           status: "failed",
           code: "invalid_contract",
@@ -50,11 +52,7 @@ async function execute(
         };
       return effects.sendEmail({
         lease,
-        email: thankYouEmail(
-          lease.snapshot,
-          lease.invoice.url,
-          lease.proposal.portalUrl,
-        ),
+        email: thankYouEmail(lease.snapshot, lease.invoice.url, approvedUrl),
       });
     }
   }

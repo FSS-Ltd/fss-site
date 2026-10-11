@@ -95,11 +95,11 @@ export function JourneyContentStage({
           <div className={styles.editor}>
             <h3>Agreement details in brief</h3>
             <p>
-              These short callouts help the client recognise the proposed work.
+              These short callouts help the client recognise the signed work.
               The agreement contains the full scope and responsibilities.
             </p>
             <PortalTextarea
-              label="Proposed scope summary"
+              label="Signed scope summary"
               value={composer.scopeSummary}
               maxLength={200}
               required
@@ -120,7 +120,7 @@ export function JourneyContentStage({
             />
             <details>
               <summary>Review the agreement wording</summary>
-              <h4>Full proposed scope</h4>
+              <h4>Full signed scope</h4>
               <p>{composer.agreement?.draft.scope}</p>
               <h4>Full client responsibilities</h4>
               <p>{composer.agreement?.draft.responsibilities}</p>

@@ -26,7 +26,7 @@ export function designedPacketGuide(
       paragraphs: [
         "Client: {{client_name}}. Your project contact: {{contact_first_name}}. FSS contact: {{sender_name}}.",
         "The goal: {{agreement_goal}}.",
-        "We will confirm the proposed scope with you against the agreement before work begins. The agreement contains the complete services, fees and terms.",
+        "We will use the signed scope to guide the work before delivery begins. The agreement contains the complete services, fees and terms.",
         "Kickoff: To be agreed. First review: To be agreed. Delivery: To be agreed. We will confirm dates after the required decisions, materials and access are ready.",
       ],
     },
@@ -42,7 +42,7 @@ export function designedPacketGuide(
         seo
           ? "Where included, we will establish the SEO starting point using authorised search and analytics access. Ongoing work and reporting follow the service scope agreed with you."
           : "Each service is limited to the agreed scope. If a new requirement appears, we will discuss its effect on effort, fees and dates before adding it.",
-        "We will review what is included and what is outside the proposed scope before delivery begins.",
+        "We will review what is included and what is outside the signed scope before delivery begins.",
       ],
     },
     {
@@ -118,7 +118,7 @@ export function designedPacketGuide(
       layout: "text",
       title: "Your next steps",
       paragraphs: [
-        "Read the proposal when it arrives. Check the scope, fees, payment schedule and responsibilities before signing.",
+        "Review your signed agreement and the project checklist. Check the scope, fees, payment schedule and responsibilities before kickoff.",
         "Confirm your project contact and prepare the requested inputs in your checklist. Use only the secure sharing method agreed with FSS.",
         "We will confirm kickoff and milestone dates after the agreed prerequisites are complete. Until then: To be agreed.",
         "If this guide misses a priority, reply to {{sender_name}} so we can confirm the plan together.",

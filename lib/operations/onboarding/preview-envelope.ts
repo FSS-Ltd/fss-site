@@ -24,6 +24,18 @@ const schema = z.discriminatedUnion("kind", [
     ...base,
     kind: z.literal("welcome"),
     snapshot: welcomeInputSchema.extend({
+      postSignature: z
+        .strictObject({
+          evidenceId: z.uuid(),
+          revision: z.number().int().positive(),
+          provenance: z.enum([
+            "manual_founder_confirmation",
+            "authenticated_portal_electronic_signature",
+          ]),
+          recipientRole: z.enum(["owner", "billing_contact"]),
+          portalUrl: z.url(),
+        })
+        .optional(),
       welcome: email,
       accessibleHtml: z.string(),
       pdfHash: z.string().regex(/^[a-f0-9]{64}$/),

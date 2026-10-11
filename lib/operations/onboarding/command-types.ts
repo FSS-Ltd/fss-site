@@ -44,6 +44,7 @@ export interface JourneyJob {
   acceptedAt: string | null;
 }
 export interface JourneyView {
+  journeyMode?: "legacy_pre_signature" | "post_signature";
   id: string;
   agreementId: string;
   agreementTitle: string;

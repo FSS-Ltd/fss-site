@@ -47,8 +47,11 @@ export function onboardingEffects(db: OperationsDb): OnboardingEffects {
       const lease = input.lease;
       if (
         input.email.to !== lease.recipient ||
-        (lease.proposal &&
-          new URL(lease.proposal.portalUrl).origin !== config.portalOrigin)
+        ((lease.snapshot.postSignature || lease.proposal) &&
+          new URL(
+            lease.snapshot.postSignature?.portalUrl ??
+              lease.proposal!.portalUrl,
+          ).origin !== config.portalOrigin)
       )
         return {
           status: "failed",

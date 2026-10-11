@@ -22,10 +22,9 @@ export function createOnboardingAccessProvider(
   provision = provisionPortalAccount,
 ): (lease: OnboardingLease) => Promise<EffectResult> {
   return async (lease) => {
-    if (
-      !lease.proposal ||
-      new URL(lease.proposal.portalUrl).origin !== portalOrigin
-    )
+    const approvedUrl =
+      lease.snapshot.postSignature?.portalUrl ?? lease.proposal?.portalUrl;
+    if (!approvedUrl || new URL(approvedUrl).origin !== portalOrigin)
       return {
         status: "failed",
         code: "configuration",

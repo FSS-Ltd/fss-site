@@ -179,6 +179,12 @@ test("activation instantiates the reviewed workspace snapshot and rejects a revi
   await f.admin`delete from operations.onboarding_jobs where journey_id=${f.journeyId}`;
   await f.admin`delete from operations.onboarding_journeys where id=${f.journeyId}`;
   await f.admin`delete from operations.onboarding_approvals where id=${f.approvalId}`;
+  await f.sign(f.signingApproval);
+  await completeAgreementSigning(
+    f.signingWorker,
+    f.signingApproval.id,
+    f.correlationId,
+  );
 
   const [agreement] = await f.admin<Array<{ version: number }>>`
     select version
@@ -305,6 +311,7 @@ test("activation instantiates the reviewed workspace snapshot and rejects a revi
     invoice,
     content: {
       ...content,
+      journeyPhase: "post_signature" as const,
       rendererVersion: 2 as const,
       emailArtworkVersion: 1 as const,
       edition: packId,

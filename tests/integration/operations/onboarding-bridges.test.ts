@@ -88,7 +88,10 @@ test("access bridge requires approved scope, binds encrypted token, and preserve
   );
 });
 test("invoice bridge reuses permanent billing owner and records accepted outcome after cancellation", async (t) => {
-  const f = await onboardingFixture(t, 1, { taxFree: true });
+  const f = await onboardingFixture(t, 1, {
+    taxFree: true,
+    futureBillingDates: true,
+  });
   await welcome(f);
   await f.sign(f.signingApproval);
   await completeAgreementSigning(

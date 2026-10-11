@@ -13,7 +13,7 @@ import {
   PortalCard,
   StatusBadge,
 } from "@/components/portal/ui";
-import styles from "../agreements/agreements.module.css";
+import styles from "./journey-review.module.css";
 const labels = {
   welcome: "Welcome email",
   proposal_access: "Portal access for signing",
@@ -68,7 +68,7 @@ export function JourneyTimeline({
           delivery evidence before continuing.
         </Notice>
       )}
-      {!journey.proposal && (
+      {journey.journeyMode !== "post_signature" && !journey.proposal && (
         <p>Welcome approved. Proposal is held until its separate approval.</p>
       )}
       {journey.proposal && !journey.currentProposal && !journey.signatureAt && (
@@ -79,22 +79,26 @@ export function JourneyTimeline({
         </Notice>
       )}
       <dl className={styles.facts}>
-        <div>
-          <dt>Proposal eligible</dt>
-          <dd>
-            {(journey.proposalDueAt
-              ? journeyTime(journey.proposalDueAt)
-              : null) ??
-              "Two hours after welcome acceptance, with separate approval"}
-          </dd>
-        </div>
+        {journey.journeyMode !== "post_signature" && (
+          <div>
+            <dt>Proposal eligible</dt>
+            <dd>
+              {(journey.proposalDueAt
+                ? journeyTime(journey.proposalDueAt)
+                : null) ??
+                "Two hours after welcome acceptance, with separate approval"}
+            </dd>
+          </div>
+        )}
         <div>
           <dt>Invoice and access eligible</dt>
           <dd>
             {(journey.postSignatureDueAt
               ? journeyTime(journey.postSignatureDueAt)
               : null) ??
-              "Following calendar day at 09:00 London after every required signature and retained evidence"}
+              (journey.journeyMode === "post_signature"
+                ? "Next 09:00 Europe/London after confirmed welcome delivery"
+                : "Following calendar day at 09:00 London after every required signature and retained evidence")}
           </dd>
         </div>
       </dl>
@@ -197,7 +201,7 @@ export function JourneyTimeline({
           </li>
         ))}
       </ol>
-      {!journey.signatureAt && (
+      {journey.journeyMode !== "post_signature" && !journey.signatureAt && (
         <p>
           Invoice, post-signature access and thank-you wait for every required
           signature and retained evidence.

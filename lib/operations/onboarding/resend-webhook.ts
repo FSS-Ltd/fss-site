@@ -2,7 +2,10 @@ import { z } from "zod";
 import type { OperationsDb } from "../db/client";
 import { verifyResendWebhookSignature } from "../../growth/integrations/resend/webhook";
 import { readWebhookBytes, WebhookBodyTooLarge } from "../http/webhook-body";
-import { recordOnboardingDeliveryFailure } from "./repository";
+import {
+  recordOnboardingDeliveryFailure,
+  recordOnboardingDeliverySuccess,
+} from "./repository";
 const payloadSchema = z.object({
   type: z.enum(["email.delivered", "email.bounced", "email.complained"]),
   created_at: z.iso.datetime().optional(),
@@ -19,7 +22,6 @@ export async function applyOnboardingDeliveryEvent(
   eventId: string,
   payload: z.infer<typeof payloadSchema>,
 ): Promise<void> {
-  if (payload.type === "email.delivered") return;
   const data = payload.data;
   const [job] = await db<
     { recipient: string; from: string; providerId: string | null }[]
@@ -34,6 +36,15 @@ export async function applyOnboardingDeliveryEvent(
     (job.providerId !== null && job.providerId !== data.email_id)
   )
     return;
+  if (payload.type === "email.delivered") {
+    await recordOnboardingDeliverySuccess(db, {
+      accountScope,
+      eventId,
+      jobId: data.tags.operations_job,
+      providerId: data.email_id,
+    });
+    return;
+  }
   await recordOnboardingDeliveryFailure(db, {
     accountScope,
     eventId,

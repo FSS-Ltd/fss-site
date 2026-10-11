@@ -72,6 +72,22 @@ export async function recordOnboardingDeliveryFailure(
   return row.changed;
 }
 
+export async function recordOnboardingDeliverySuccess(
+  db: OperationsDb,
+  event: {
+    accountScope: string;
+    eventId: string;
+    jobId: string;
+    providerId: string;
+  },
+): Promise<boolean> {
+  z.uuid().parse(event.jobId);
+  const [row] = await db<
+    { changed: boolean }[]
+  >`select operations.confirm_onboarding_delivery(${event.accountScope},${event.eventId},${event.jobId},${event.providerId}) as changed`;
+  return row.changed;
+}
+
 export async function reconcileJourneyAcceptance(
   db: OperationsDb,
   founder: OperationsFounder | null,

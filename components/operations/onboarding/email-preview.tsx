@@ -1,5 +1,5 @@
 import type { ApprovedEmail } from "@/lib/operations/onboarding/types";
-import styles from "../agreements/agreements.module.css";
+import styles from "./journey-review.module.css";
 export function EmailPreview({
   email,
 }: {

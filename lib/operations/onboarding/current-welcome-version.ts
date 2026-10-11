@@ -20,7 +20,8 @@ export async function assertCurrentDesignedWelcomeVersion(
     version?.packId !== edition ||
     !parsed.success ||
     parsed.data.rendererVersion !== 2 ||
-    parsed.data.edition !== edition
+    parsed.data.edition !== edition ||
+    parsed.data.journeyPhase !== "post_signature"
   )
     throw stalePacket();
 }

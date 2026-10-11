@@ -73,7 +73,8 @@ const readinessRules: readonly ReadinessRule[] = [
     id: "signing",
     ready: (input) => input.signingReady,
     status: "needs_action",
-    reason: "Prepare the current agreement for signing before starting.",
+    reason:
+      "Sign the current agreement and retain its signature evidence before starting.",
     href: "/portal/admin/agreements",
   },
 ];

@@ -18,6 +18,7 @@ export async function onboardingFixture(
   signers = 2,
   options: {
     taxFree?: boolean;
+    futureBillingDates?: boolean;
     welcomeRecipient?: string;
     accessContacts?: ProposalApprovalSnapshot["access"];
   } = {},
@@ -88,7 +89,42 @@ export async function onboardingFixture(
   };
   const start = () =>
     startApprovedJourney(signing.founderDb, signing.founder, input);
-  await start();
+  // Represent a journey approved before the post-signature migration. New
+  // starts use the signed-only command; this fixture protects historical flow.
+  const snapshot = JSON.stringify(prepared.snapshot);
+  await signing.admin.begin(async (tx) => {
+    await tx`
+      insert into operations.onboarding_approvals
+        (id,organisation_id,agreement_id,approved_by,snapshot,pdf,pdf_hash,approval_hash)
+      values
+        (${approvalId},${signing.organisationId},${signing.record.id},${signing.founder.actorId},
+         ${snapshot}::text::jsonb,${prepared.pdf},encode(sha256(${prepared.pdf}),'hex'),
+         encode(sha256(convert_to(${snapshot}::text::jsonb::text,'UTF8')||${prepared.pdf}),'hex'))
+    `;
+    await tx`
+      insert into operations.onboarding_journeys
+        (id,organisation_id,agreement_id,approval_id)
+      values (${journeyId},${signing.organisationId},${signing.record.id},${approvalId})
+    `;
+    await tx`
+      select operations.onboarding_enqueue(j,'welcome',${prepared.snapshot.recipient},clock_timestamp())
+      from operations.onboarding_journeys j where j.id=${journeyId}
+    `;
+  });
+  const [seed] = await signing.admin<
+    { sameSnapshot: boolean; samePdf: boolean; sameApproval: boolean }[]
+  >`
+    select a.snapshot=${snapshot}::text::jsonb as "sameSnapshot",
+      a.pdf=${prepared.pdf} as "samePdf",
+      j.approval_id=${approvalId} as "sameApproval"
+    from operations.onboarding_approvals a
+    join operations.onboarding_journeys j on j.approval_id=a.id
+    where j.id=${journeyId}
+  `;
+  if (!seed?.sameSnapshot || !seed.samePdf || !seed.sameApproval)
+    throw new Error(
+      `Legacy journey fixture did not retain its approval: ${JSON.stringify(seed)}`,
+    );
   const signingApproval = await signing.approve(await signing.prepare());
   const proposal = prepareProposal(
     {

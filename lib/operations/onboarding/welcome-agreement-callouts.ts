@@ -32,17 +32,21 @@ export function withWelcomeAgreementCallouts(
   const responsibilities = welcomeSummarySchema.parse(
     callouts.responsibilitiesSummary,
   );
+  const signed = content.journeyPhase === "post_signature";
   return {
     ...content,
     guide: content.guide.map((page) => ({
       ...page,
       paragraphs:
         page.sectionId === "project"
-          ? [...page.paragraphs, `Proposed scope in brief: ${scope}`]
+          ? [
+              ...page.paragraphs,
+              `${signed ? "Signed scope" : "Proposed scope"} in brief: ${scope}`,
+            ]
           : page.sectionId === "responsibilities"
             ? [
                 ...page.paragraphs,
-                `Your part in the proposed work: ${responsibilities}`,
+                `Your part in the ${signed ? "signed project" : "proposed work"}: ${responsibilities}`,
               ]
             : page.paragraphs,
     })),
