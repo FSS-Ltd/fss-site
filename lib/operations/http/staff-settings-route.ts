@@ -1,12 +1,12 @@
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
-import { resolveSiteUrl } from "@/lib/config/site-url";
 import {
   PayloadTooLargeError,
   readJsonRequestBody,
   requestHasRegisteredOrigin,
 } from "@/lib/growth/http/founder-request";
 import { privateAuthHeaders } from "../auth/http";
+import { resolvePortalOrigin } from "../auth/configuration";
 import { fssStudioEnabled } from "../auth/release-flags";
 import { requireFssAdmin } from "../auth/require-admin";
 import { getPortalIdentity } from "../auth/server";
@@ -95,8 +95,8 @@ export function createStaffSettingsRouteHandler<TActor>(
   };
 }
 
-export function staffSettingsRoute(): (request: Request) => Promise<Response> {
-  return createStaffSettingsRouteHandler<FssAdminContext>({
+export function createStaffSettingsRouteDependencies(): StaffSettingsRouteDependencies<FssAdminContext> {
+  return {
     authorize: async () => {
       const identity = await getPortalIdentity();
       if (!identity) throw new Error("unauthorized");
@@ -106,8 +106,14 @@ export function staffSettingsRoute(): (request: Request) => Promise<Response> {
     enabled: operationsEnabled() && fssStudioEnabled(),
     execute: (admin, input, correlationId) =>
       applyActiveStudioSettings(getOperationsDb(), admin, input, correlationId),
-    origin: new URL(resolveSiteUrl()).origin,
+    origin: resolvePortalOrigin(),
     reportUnexpectedError: (report) =>
       console.error("Studio settings apply failed.", report),
-  });
+  };
+}
+
+export function staffSettingsRoute(): (request: Request) => Promise<Response> {
+  return createStaffSettingsRouteHandler(
+    createStaffSettingsRouteDependencies(),
+  );
 }
