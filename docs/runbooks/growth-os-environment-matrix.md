@@ -74,6 +74,13 @@ verification.
 | Signing    | `OPERATIONS_SIGNING_ENABLED=false`    | `OPERATIONS_SIGNING_DATABASE_URL` using the dedicated least-privilege worker role, plus a reviewed signing release gate       |
 | Billing    | `OPERATIONS_BILLING_ENABLED=false`    | `OPERATIONS_BILLING_DATABASE_URL`, reviewed Stripe account/mode/webhook configuration, and a billing release gate             |
 
+Request email dispatch shares the onboarding cron and worker database. Set
+`OPERATIONS_REQUEST_EMAILS_ENABLED=true` only with the dedicated Operations
+Resend credential and active onboarding worker. Every other value disables
+request email dispatch. The Studio reply-to selector reads the separate
+`OPERATIONS_STUDIO_APPROVED_REPLY_TO_ADDRESSES` allowlist described in the
+[Studio settings runbook](./operations-studio-settings.md).
+
 The flags and connection-string names are server-only. Do not place a value in
 source control or expose any of them through `NEXT_PUBLIC_*`.
 

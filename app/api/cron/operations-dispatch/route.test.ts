@@ -1,6 +1,19 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { requestEmailsEnabled } from "@/lib/operations/requests/configuration";
 import { GET } from "./route";
+
+test("request email dispatch requires the exact enabled value", () => {
+  assert.equal(requestEmailsEnabled({}), false);
+  assert.equal(
+    requestEmailsEnabled({ OPERATIONS_REQUEST_EMAILS_ENABLED: "false" }),
+    false,
+  );
+  assert.equal(
+    requestEmailsEnabled({ OPERATIONS_REQUEST_EMAILS_ENABLED: "true" }),
+    true,
+  );
+});
 
 test("exported onboarding cron authenticates and gates work before onboarding worker or database access", async () => {
   const names = [

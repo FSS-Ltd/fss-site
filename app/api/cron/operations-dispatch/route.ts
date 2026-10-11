@@ -7,6 +7,7 @@ import { onboardingStore } from "@/lib/operations/onboarding/outbox";
 import { onboardingEffects } from "@/lib/operations/onboarding/effects";
 import { runOnboardingWorker } from "@/lib/operations/onboarding/worker";
 import { dispatchRequestNotifications } from "@/lib/operations/requests/notifications";
+import { requestEmailsEnabled } from "@/lib/operations/requests/configuration";
 import { dispatchAgreementNotifications } from "@/lib/operations/agreements/agreement-notifications";
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -28,7 +29,7 @@ export async function GET(request: Request): Promise<Response> {
           limit: 5,
         },
       );
-      const requestEmails = process.env.OPERATIONS_REQUEST_EMAILS_ENABLED
+      const requestEmails = requestEmailsEnabled()
         ? await dispatchRequestNotifications(db, {
             resendApiKey: process.env.OPERATIONS_RESEND_API_KEY,
           }).catch((error: unknown) => {
