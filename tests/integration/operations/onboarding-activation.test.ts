@@ -388,6 +388,20 @@ test("activation instantiates the reviewed workspace snapshot and rejects a revi
     ),
     true,
   );
+  await assert.rejects(
+    executeStaffJourneyCommand(
+      f.founderDb,
+      staff,
+      f.organisationId,
+      {
+        action: "start",
+        token: initialPreview.preview.token,
+        confirmed: true,
+      },
+      { ...journeyOptions, now: () => Date.now() + 31 * 60 * 1000 },
+    ),
+    /expired/,
+  );
 
   const [revisedDraft] = await saveDraft(initialDraft.version, {
     ...draftContent,
@@ -441,6 +455,15 @@ test("activation instantiates the reviewed workspace snapshot and rejects a revi
     journeyOptions,
   );
   assert.deepEqual(firstStart, secondStart);
+  const [approval] = await f.admin<Array<{ pdf: Buffer }>>`
+    select a.pdf from operations.onboarding_approvals a
+    join operations.onboarding_journeys j on j.approval_id=a.id
+    where j.organisation_id=${f.organisationId}
+  `;
+  assert.equal(
+    approval.pdf.toString("base64"),
+    refreshedPreview.preview.pdfBase64,
+  );
 
   const [snapshot] = await f.admin<
     Array<{
@@ -465,4 +488,15 @@ test("activation instantiates the reviewed workspace snapshot and rejects a revi
     templateVersionId: templateVersion.id,
     taskCount: designed.tasks.length,
   });
+  await f.admin`update operations.agreements set version=version+1 where id=${f.record.id}`;
+  await assert.rejects(
+    executeStaffJourneyCommand(
+      f.founderDb,
+      staff,
+      f.organisationId,
+      start,
+      journeyOptions,
+    ),
+    /changed after preview/,
+  );
 });

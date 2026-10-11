@@ -109,24 +109,7 @@ test("synthetic HTTP journey issues one invoice and appropriate per-recipient me
     assert.equal(response.status, 200, await response.clone().text());
     return response.json();
   };
-  await f.admin`delete from operations.onboarding_jobs where journey_id=${f.journeyId}`;
-  await f.admin`delete from operations.onboarding_journeys where id=${f.journeyId}`;
-  await f.admin`delete from operations.onboarding_approvals where id=${f.approvalId}`;
-  const { recipient, invoice, content, thankYou } = f.prepared.snapshot;
-  const welcome = await post({
-    action: "preview_welcome",
-    agreementId: f.record.id,
-    expectedVersion: f.signingApproval.agreementVersion,
-    welcome: { recipient, invoice, content, thankYou },
-  });
-  assert.ok("preview" in welcome);
-  const start = await post({
-    action: "start",
-    token: welcome.preview.token,
-    confirmed: true,
-  });
-  assert.ok("journeyId" in start);
-  const journeyId = start.journeyId;
+  const journeyId = f.journeyId;
   const provider = billingProviderFixture();
   const access = createOnboardingAccessProvider(
     f.worker,
