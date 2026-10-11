@@ -27,7 +27,7 @@ export function StaffJourneyOverview({
   return (
     <section className={styles.page} aria-label="Welcome journeys">
       <PageHeader
-        description="Review welcome content, signing readiness, delivery schedules, and recovery evidence from one client workspace."
+        description="Review signed agreements, welcome content, delivery schedules, and recovery evidence from one client workspace."
         eyebrow="FSS Studio · Welcome journeys"
         title="A clear start for every client"
         action={

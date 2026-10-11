@@ -179,6 +179,12 @@ test("activation instantiates the reviewed workspace snapshot and rejects a revi
   await f.admin`delete from operations.onboarding_jobs where journey_id=${f.journeyId}`;
   await f.admin`delete from operations.onboarding_journeys where id=${f.journeyId}`;
   await f.admin`delete from operations.onboarding_approvals where id=${f.approvalId}`;
+  await f.sign(f.signingApproval);
+  await completeAgreementSigning(
+    f.signingWorker,
+    f.signingApproval.id,
+    f.correlationId,
+  );
 
   const [agreement] = await f.admin<Array<{ version: number }>>`
     select version
@@ -305,6 +311,7 @@ test("activation instantiates the reviewed workspace snapshot and rejects a revi
     invoice,
     content: {
       ...content,
+      journeyPhase: "post_signature" as const,
       rendererVersion: 2 as const,
       emailArtworkVersion: 1 as const,
       edition: packId,
@@ -381,6 +388,20 @@ test("activation instantiates the reviewed workspace snapshot and rejects a revi
     ),
     true,
   );
+  await assert.rejects(
+    executeStaffJourneyCommand(
+      f.founderDb,
+      staff,
+      f.organisationId,
+      {
+        action: "start",
+        token: initialPreview.preview.token,
+        confirmed: true,
+      },
+      { ...journeyOptions, now: () => Date.now() + 31 * 60 * 1000 },
+    ),
+    /expired/,
+  );
 
   const [revisedDraft] = await saveDraft(initialDraft.version, {
     ...draftContent,
@@ -434,6 +455,15 @@ test("activation instantiates the reviewed workspace snapshot and rejects a revi
     journeyOptions,
   );
   assert.deepEqual(firstStart, secondStart);
+  const [approval] = await f.admin<Array<{ pdf: Buffer }>>`
+    select a.pdf from operations.onboarding_approvals a
+    join operations.onboarding_journeys j on j.approval_id=a.id
+    where j.organisation_id=${f.organisationId}
+  `;
+  assert.equal(
+    approval.pdf.toString("base64"),
+    refreshedPreview.preview.pdfBase64,
+  );
 
   const [snapshot] = await f.admin<
     Array<{
@@ -458,4 +488,15 @@ test("activation instantiates the reviewed workspace snapshot and rejects a revi
     templateVersionId: templateVersion.id,
     taskCount: designed.tasks.length,
   });
+  await f.admin`update operations.agreements set version=version+1 where id=${f.record.id}`;
+  await assert.rejects(
+    executeStaffJourneyCommand(
+      f.founderDb,
+      staff,
+      f.organisationId,
+      start,
+      journeyOptions,
+    ),
+    /changed after preview/,
+  );
 });

@@ -18,6 +18,7 @@ const packVersionId = "23c9f3cb-77f7-4c05-b859-f319c88b14a0";
 const templateVersionId = "3021c49a-4eb9-430c-a80f-5d8434f071aa";
 const contactId = "e94053c4-b1f1-4270-8c6b-4d9414e7b8a9";
 const draftId = "5e0e3f99-f2e1-41af-9a4c-ddb563a6a3f2";
+const evidenceId = "a2237d4a-b253-44db-92c4-7c2d53ae7201";
 const actor = { actorId: "c".repeat(64) };
 const settings: ActiveStudioSettings = {
   revision: 2,
@@ -51,6 +52,7 @@ function command(): Extract<JourneyCommand, { action: "preview_welcome" }> {
     welcome: {
       ...input,
       content: {
+        journeyPhase: "post_signature",
         ...input.content,
         rendererVersion: 2,
         edition: "website_build",
@@ -72,6 +74,11 @@ function transaction(
   active: ActiveStudioSettings = settings,
   isCurrent: () => boolean = () => true,
   reviewedWelcomeMatches = true,
+  agreementState: () => {
+    status: string;
+    version: number;
+    archivedAt: string | null;
+  } = () => ({ status: "signed", version: 1, archivedAt: null }),
 ): OperationsTransaction {
   const packet = createDesignedWelcomePack("website_build");
   const query = Object.assign(
@@ -81,9 +88,17 @@ function transaction(
         return [
           {
             id: agreementId,
-            version: 1,
-            status: "draft",
+            ...agreementState(),
+            revision: 1,
             draft: agreementDraft(),
+          },
+        ];
+      if (sql.includes("from operations.signature_evidence"))
+        return [
+          {
+            id: evidenceId,
+            revision: 1,
+            provenance: "manual_founder_confirmation",
           },
         ];
       if (sql.includes("studio_settings_active")) return [active];
@@ -151,6 +166,42 @@ test("a five-section packet cannot enter a Studio welcome preview", async () => 
       },
       options,
       now,
+    ),
+    (error) =>
+      error instanceof JourneyConflict && error.code === "stale_preview",
+  );
+});
+
+test("signing after a draft preview requires staff to review a fresh signed preview", async () => {
+  let state = { status: "draft", version: 1, archivedAt: null };
+  const tx = transaction(
+    settings,
+    () => true,
+    true,
+    () => state,
+  );
+  const prepared = await prepareWelcomePreview(
+    tx,
+    actor,
+    organisationId,
+    command(),
+    options,
+    now,
+  );
+  assert.ok("preview" in prepared && prepared.preview.kind === "welcome");
+  assert.equal(prepared.preview.snapshot.postSignature, undefined);
+  assert.equal(
+    prepared.preview.readiness.find((check) => check.id === "signing")?.status,
+    "needs_action",
+  );
+  state = { status: "signed", version: 2, archivedAt: null };
+  await assert.rejects(
+    runJourneyCommand(
+      tx,
+      actor,
+      organisationId,
+      { action: "start", token: prepared.preview.token, confirmed: true },
+      { ...options, now: () => now },
     ),
     (error) =>
       error instanceof JourneyConflict && error.code === "stale_preview",
@@ -243,6 +294,7 @@ test("approved preview freezes current settings and full modern packet into its 
   assert.equal(frozen.snapshot.content.senderName, "FSS delivery");
   assert.equal(frozen.snapshot.content.responseExpectationHours, 48);
   assert.equal(frozen.snapshot.content.welcomePackVersionId, packVersionId);
+  assert.equal(frozen.snapshot.postSignature?.evidenceId, evidenceId);
   assert.equal(frozen.snapshot.content.pages.length, 9);
   assert.equal(
     (

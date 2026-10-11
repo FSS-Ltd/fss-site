@@ -104,7 +104,7 @@ async function prepareReview(page: Page): Promise<{
     .getByLabel("Email subject")
     .fill("Your reviewed Northstar welcome");
   await page
-    .getByLabel("Proposed scope summary")
+    .getByLabel("Signed scope summary")
     .fill("A new site and a simpler booking path.");
   await page
     .getByLabel("Client responsibilities summary")
@@ -127,10 +127,10 @@ test("exact rendered email and PDF are retained through review and approval", as
 }) => {
   const { prepared, token, commands } = await prepareReview(page);
   expect(prepared.snapshot.accessibleHtml).toContain(
-    "Proposed scope in brief: A new site and a simpler booking path.",
+    "Signed scope in brief: A new site and a simpler booking path.",
   );
   expect(prepared.snapshot.accessibleHtml).toContain(
-    "Your part in the proposed work: Provide the content and nominate one reviewer.",
+    "Your part in the signed project: Provide the content and nominate one reviewer.",
   );
   const email = prepared.snapshot.welcome;
   const summary = page
@@ -147,6 +147,10 @@ test("exact rendered email and PDF are retained through review and approval", as
   await expect(htmlFrame).toHaveAttribute("sandbox", "");
   const pdfFrame = page.getByTitle("Exact generated welcome PDF");
   await expect(pdfFrame).toHaveAttribute("src", /^blob:/);
+  await expect(pdfFrame).not.toHaveAttribute("sandbox", /.+/);
+  await expect(
+    page.getByRole("link", { name: "Open exact welcome PDF in a new tab" }),
+  ).toHaveAttribute("href", (await pdfFrame.getAttribute("src")) ?? "");
   const pdfLink = page.getByRole("link", {
     name: "Download exact welcome PDF",
   });
@@ -188,6 +192,40 @@ test("exact rendered email and PDF are retained through review and approval", as
   expect(commands.filter((command) => command.action === "start")).toEqual([
     { action: "start", token, confirmed: true },
   ]);
+});
+
+test("exact welcome review remains readable in both appearances at 200% zoom", async ({
+  page,
+}) => {
+  await prepareReview(page);
+  const heading = page.getByRole("heading", {
+    name: "Welcome approval preview",
+  });
+  for (const [appearance, expectedInk] of [
+    ["light", "rgb(10, 26, 46)"],
+    ["dark", "rgb(237, 243, 249)"],
+  ] as const) {
+    await page.getByLabel("Colour appearance").selectOption(appearance);
+    await expect(heading).toHaveCSS("color", expectedInk);
+    await expect(page.getByTitle("Exact generated welcome PDF")).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Download exact welcome PDF" }),
+    ).toBeVisible();
+    await page.evaluate(() => {
+      document.documentElement.style.zoom = "2";
+    });
+    await expect(heading).toBeVisible();
+    expect(
+      await page.evaluate(
+        () =>
+          document.documentElement.scrollWidth <=
+          document.documentElement.clientWidth + 1,
+      ),
+    ).toBe(true);
+    await page.evaluate(() => {
+      document.documentElement.style.zoom = "1";
+    });
+  }
 });
 
 test("client packet reader and download keep the organisation and approved document scope", async ({

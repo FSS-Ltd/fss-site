@@ -36,6 +36,7 @@ export interface WelcomePage {
   paragraphs: string[];
 }
 export interface WelcomeContent {
+  journeyPhase?: "post_signature";
   rendererVersion?: 2;
   emailArtworkVersion?: 1;
   edition?: WelcomePackId;
@@ -56,6 +57,15 @@ export interface WelcomeContent {
   pages: WelcomePage[];
 }
 export interface WelcomeApprovalSnapshot {
+  postSignature?: {
+    evidenceId: string;
+    revision: number;
+    provenance:
+      | "manual_founder_confirmation"
+      | "authenticated_portal_electronic_signature";
+    recipientRole: "owner" | "billing_contact";
+    portalUrl: string;
+  };
   recipient: string;
   invoice: { obligationKey: string; accountId: string; livemode: boolean };
   content: WelcomeContent;

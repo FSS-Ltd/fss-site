@@ -63,11 +63,12 @@ export function createDesignedWelcomePack(
   const taskId = (number: number): string =>
     `${prefix}-0000-4000-8000-00000000000${number}`;
   return {
+    journeyPhase: "post_signature",
     rendererVersion: 2,
     emailArtworkVersion: 1,
     edition: packId,
     emailSubject: `${edition.title}: next steps for {{client_name}}`,
-    emailBody: `Hello {{contact_first_name}},\n\nYour ${edition.title.toLowerCase()} welcome packet explains how we will approach {{agreement_goal}}. It gives you a practical view of the work and the decisions we will make together.\n\nRead the attached packet, check the priorities, and prepare the inputs described in your checklist. We will send the proposal separately for review and signature. It will set out the full scope, responsibilities, fees and terms. Dates and milestones remain to be agreed.\n\nReply if a priority needs changing so we can confirm the plan before work begins.\n\n{{sender_name}}\nFaithful Software Solutions`,
+    emailBody: `Hello {{contact_first_name}},\n\nWelcome to your ${edition.title.toLowerCase()} project. Your signed agreement sets out the scope, responsibilities, fees and terms. This packet explains how we will approach {{agreement_goal}} and the decisions we will make together.\n\nRead the attached packet, check the priorities, and prepare the inputs described in your checklist. We will confirm kickoff and milestone dates after the agreed prerequisites are ready.\n\nReply if a priority needs changing so we can review the plan together.\n\n{{sender_name}}\nFaithful Software Solutions`,
     guide: designedPacketGuide(packId),
     thankYou: {
       subject: `${edition.title}: your next step`,
@@ -95,7 +96,7 @@ export function createDesignedWelcomePack(
         id: taskId(2),
         title: "Review scope and responsibilities",
         instructions:
-          "Read the agreement and confirm the proposed scope, responsibilities and acceptance criteria.",
+          "Review the signed agreement's scope, responsibilities and acceptance criteria.",
         kind: "acknowledgement",
         ownerRole: "owner",
         required: true,

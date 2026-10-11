@@ -24,9 +24,10 @@ import {
   PortalCheckbox,
   StatusBadge,
 } from "@/components/portal/ui";
-import styles from "../agreements/agreements.module.css";
+import styles from "./journey-review.module.css";
 function PreviewDocument({ base64 }: { base64: string }): React.JSX.Element {
   const link = useRef<HTMLAnchorElement>(null);
+  const open = useRef<HTMLAnchorElement>(null);
   const document = useRef<HTMLIFrameElement>(null);
   useEffect(() => {
     const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
@@ -34,6 +35,7 @@ function PreviewDocument({ base64 }: { base64: string }): React.JSX.Element {
       new Blob([bytes], { type: "application/pdf" }),
     );
     if (link.current) link.current.href = url;
+    if (open.current) open.current.href = url;
     if (document.current) document.current.src = url;
     return () => URL.revokeObjectURL(url);
   }, [base64]);
@@ -42,18 +44,15 @@ function PreviewDocument({ base64 }: { base64: string }): React.JSX.Element {
       <iframe
         ref={document}
         title="Exact generated welcome PDF"
-        sandbox="allow-same-origin"
         referrerPolicy="no-referrer"
         style={{ width: "100%", height: "min(75vh, 800px)" }}
         aria-label="Generated welcome packet"
       />
       <p>
-        <a
-          ref={link}
-          target="_blank"
-          rel="noreferrer"
-          download="welcome-preview.pdf"
-        >
+        <a ref={open} target="_blank" rel="noreferrer">
+          Open exact welcome PDF in a new tab
+        </a>{" "}
+        <a ref={link} download="welcome-preview.pdf">
           Download exact welcome PDF
         </a>
       </p>
@@ -130,7 +129,7 @@ export function JourneyPreview({
     preview?.kind !== "welcome" || canStartOnboardingJourney(preview.readiness);
   return (
     <PortalCard
-      description={`${organisationName}: review the exact recipients, content and access before anything is queued. Welcome and proposal have separate approvals.`}
+      description={`${organisationName}: review the signed agreement, exact recipient, content and access before anything is queued.`}
       title="Prepare the next step."
     >
       {!preview && (
@@ -167,7 +166,11 @@ export function JourneyPreview({
             </details>
           ) : null}
           {journeys
-            .filter((j) => !["completed", "cancelled"].includes(j.state))
+            .filter(
+              (j) =>
+                j.journeyMode !== "post_signature" &&
+                !["completed", "cancelled"].includes(j.state),
+            )
             .map((j) => (
               <details key={j.id}>
                 <summary>
@@ -231,10 +234,9 @@ export function JourneyPreview({
                 {preview.snapshot.invoice.livemode ? "Live" : "Test"}
               </p>
               <p>
-                Invoice and access follow all signatures on the next calendar
-                day at 09:00 London. Amounts and due dates come from the
-                retained signed agreement. The proposal remains held until
-                separately approved.
+                After confirmed welcome delivery, the invoice and approved
+                portal access become eligible at the next 09:00 Europe/London.
+                Amounts and due dates come from the signed agreement.
               </p>
               <h4>{preview.snapshot.thankYou.subject}</h4>
               <p>{preview.snapshot.thankYou.intro}</p>

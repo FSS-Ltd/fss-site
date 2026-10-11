@@ -122,7 +122,7 @@ export async function loadJourneys(
 ): Promise<JourneyView[]> {
   const journeys = await tx<
     JourneyView[]
-  >`select j.id,j.agreement_id as "agreementId",r.snapshot->>'title' as "agreementTitle",j.state,j.generation,j.proposal_approval_id as "proposalApprovalId",a.snapshot as welcome,p.snapshot as proposal,exists(select 1 from operations.signing_approvals s where s.id=p.signing_approval_id and s.status='approved' and s.expires_at>clock_timestamp() and s.approval_hash=p.snapshot->>'approvalHash' and g.current_revision=s.revision) as "currentProposal",j.proposal_due_at::text as "proposalDueAt",j.post_signature_due_at::text as "postSignatureDueAt",j.signature_at::text as "signatureAt",j.failure_code as "failureCode",'[]'::jsonb as jobs from operations.onboarding_journeys j join operations.onboarding_approvals a on a.id=j.approval_id join operations.agreements g on g.id=j.agreement_id join operations.agreement_revisions r on r.agreement_id=g.id and r.revision=g.current_revision left join operations.onboarding_proposal_approvals p on p.id=j.proposal_approval_id where j.organisation_id=${organisationId} order by j.created_at desc limit 50`;
+  >`select j.id,j.agreement_id as "agreementId",r.snapshot->>'title' as "agreementTitle",j.state,j.journey_mode as "journeyMode",j.generation,j.proposal_approval_id as "proposalApprovalId",a.snapshot as welcome,p.snapshot as proposal,exists(select 1 from operations.signing_approvals s where s.id=p.signing_approval_id and s.status='approved' and s.expires_at>clock_timestamp() and s.approval_hash=p.snapshot->>'approvalHash' and g.current_revision=s.revision) as "currentProposal",j.proposal_due_at::text as "proposalDueAt",j.post_signature_due_at::text as "postSignatureDueAt",j.signature_at::text as "signatureAt",j.failure_code as "failureCode",'[]'::jsonb as jobs from operations.onboarding_journeys j join operations.onboarding_approvals a on a.id=j.approval_id join operations.agreements g on g.id=j.agreement_id join operations.agreement_revisions r on r.agreement_id=g.id and r.revision=g.current_revision left join operations.onboarding_proposal_approvals p on p.id=j.proposal_approval_id where j.organisation_id=${organisationId} order by j.created_at desc limit 50`;
   if (!journeys.length) return [];
   const jobs = await tx<
     (JourneyJob & { journeyId: string })[]
@@ -231,6 +231,7 @@ type StaffJourneyRecoveryRow = Readonly<{
   recipientRole: string | null;
   agreementVersion: number | null;
   agreementStatus: string | null;
+  signedEvidenceAvailable: boolean;
   contactAvailable: boolean;
   templateVersionAvailable: boolean;
   existingJourney: boolean;
@@ -257,6 +258,12 @@ export async function loadStaffJourneyRecovery(
         d.content ->> 'recipientRole' as "recipientRole",
         a.current_revision as "agreementVersion",
         a.status as "agreementStatus",
+        coalesce(a.status = 'signed' and a.archived_at is null and exists(
+          select 1 from operations.signature_evidence e
+          where e.organisation_id = a.organisation_id
+            and e.agreement_id = a.id
+            and e.revision = a.current_revision
+        ), false) as "signedEvidenceAvailable",
         exists(
           select 1 from operations.contacts c
           where c.organisation_id = d.organisation_id and c.id = d.contact_id
@@ -288,8 +295,7 @@ export async function loadStaffJourneyRecovery(
         row.recipientRole !== null &&
         portalRoles.includes(row.recipientRole as (typeof portalRoles)[number]),
       senderConfigured: availability.senderConfigured,
-      signingReady:
-        availability.signingConfigured && row.agreementStatus === "draft",
+      signingReady: row.signedEvidenceAvailable,
       templateVersionAvailable: row.templateVersionAvailable,
     });
     return {

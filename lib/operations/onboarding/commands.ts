@@ -24,6 +24,7 @@ import {
   workspaceReadiness,
 } from "./prepare-preview";
 import { canStartOnboardingJourney } from "./readiness";
+import { loadCurrentSignedEvidence } from "./signed-agreement";
 export interface JourneyCommandOptions {
   previewKey: Buffer;
   portalOrigin: string;
@@ -87,14 +88,31 @@ export async function runJourneyCommand(
         "The agreement changed after preview. Prepare and review it again.",
       );
     if (data.kind === "welcome") {
-      if (data.workspace)
-        await assertCurrentDesignedWelcomeVersion(
-          tx,
-          data.snapshot.content.welcomePackVersionId,
-          data.snapshot.content.edition,
+      await assertCurrentDesignedWelcomeVersion(
+        tx,
+        data.snapshot.content.welcomePackVersionId,
+        data.snapshot.content.edition,
+      );
+      const evidence = await loadCurrentSignedEvidence(
+        tx,
+        organisationId,
+        record,
+      );
+      if (
+        !data.workspace ||
+        !evidence ||
+        !data.snapshot.postSignature ||
+        data.snapshot.postSignature.evidenceId !== evidence.id ||
+        data.snapshot.postSignature.revision !== evidence.revision ||
+        data.snapshot.postSignature.provenance !== evidence.provenance ||
+        data.snapshot.postSignature.recipientRole !==
+          data.workspace.recipientRole
+      )
+        throw new JourneyConflict(
+          "stale_preview",
+          "The signed agreement or approved recipient role changed. Prepare and review a new welcome preview.",
         );
       if (
-        data.workspace &&
         !canStartOnboardingJourney(
           await workspaceReadiness(
             tx,
@@ -113,8 +131,7 @@ export async function runJourneyCommand(
       const snapshot = JSON.stringify(data.snapshot);
       const pdf = Buffer.from(data.pdfBase64 ?? "", "base64");
       await tx`select operations.start_onboarding(${data.approvalId},${data.journeyId},${organisationId},${data.agreementId},${snapshot}::text::jsonb,${pdf},encode(sha256(convert_to(${snapshot}::text::jsonb::text,'UTF8')||${pdf}),'hex'))`;
-      if (data.workspace)
-        await tx`select operations.bind_onboarding_journey_workspace_snapshot(
+      await tx`select operations.bind_onboarding_journey_workspace_snapshot(
           ${data.journeyId},
           ${data.workspace.templateVersionId},
           ${data.workspace.draftId},

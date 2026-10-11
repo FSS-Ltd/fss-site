@@ -272,6 +272,7 @@ export function useJourneyComposer(props: JourneyComposerProps) {
       recipient: contact.email,
       invoice: { ...props.billing, obligationKey },
       content: {
+        journeyPhase: packet.journeyPhase,
         rendererVersion: packet.rendererVersion,
         emailArtworkVersion: packet.emailArtworkVersion,
         edition: packet.edition,

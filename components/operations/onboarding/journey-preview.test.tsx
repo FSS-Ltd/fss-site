@@ -94,12 +94,12 @@ import { AppRouterContext } from "next/dist/shared/lib/app-router-context.shared
 import type { AgreementRecord } from "@/lib/operations/agreements/types";
 test("welcome preparation distinguishes missing billing from no eligible agreements", () => {
   const agreement: AgreementRecord = {
-    archivedAt: null,
     id: "agreement",
     engagementId: "engagement",
     version: 1,
     revision: 1,
     status: "draft",
+    archivedAt: null,
     draft: agreementDraft(),
     evidence: null,
     services: [],
@@ -129,7 +129,10 @@ test("welcome preparation distinguishes missing billing from no eligible agreeme
       </AppRouterContext.Provider>,
     );
   const unconfigured = render([agreement]);
-  assert.match(unconfigured, /Welcome and proposal have separate approvals/);
+  assert.match(
+    unconfigured,
+    /review the signed agreement, exact recipient, content and access/,
+  );
   assert.match(
     unconfigured,
     /Configure billing before preparing a welcome journey/,

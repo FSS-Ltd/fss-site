@@ -55,26 +55,33 @@ export function welcomeEmail(
         .split(/\n\s*\n/)
         .map((paragraph) => paragraph.trim())
         .filter(Boolean)
-    : [
-        `Hello ${content.contactFirstName},`,
-        `Thank you for talking through ${content.primaryGoal} with us. Our proposed work will focus on ${content.outcomeSummary}.`,
-        "The attached welcome guide explains the process, what we will need from you and how we will keep you informed. We will send the proposal separately for your review and signature. It will set out the services, fees and terms before work begins.",
-        "If we have misunderstood a priority, reply and tell us. We will use your goals to guide the work and review progress with you.",
-        `${content.senderName}\n${content.organisationName}`,
-      ];
+    : content.journeyPhase === "post_signature"
+      ? [
+          `Hello ${content.contactFirstName},`,
+          `Welcome to your project. Your signed agreement sets the scope for ${content.primaryGoal}. We will focus on ${content.outcomeSummary}.`,
+          "The attached welcome guide explains the process and what we need from you. Review your checklist and prepare the agreed inputs before kickoff.",
+          `If a priority needs review, reply to this email.\n\n${content.senderName}\n${content.organisationName}`,
+        ]
+      : [
+          `Hello ${content.contactFirstName},`,
+          `Thank you for talking through ${content.primaryGoal} with us. Our proposed work will focus on ${content.outcomeSummary}.`,
+          "The attached welcome guide explains the process, what we will need from you and how we will keep you informed. We will send the proposal separately for your review and signature. It will set out the services, fees and terms before work begins.",
+          "If we have misunderstood a priority, reply and tell us. We will use your goals to guide the work and review progress with you.",
+          `${content.senderName}\n${content.organisationName}`,
+        ];
   const email = emailFromParagraphs(
     to,
     content.emailSubject ?? "Your next steps with FSS",
     paragraphs,
     content.rendererVersion === 2
-      ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#eaf1ee;"><tr><td style="padding:20px;color:#24322d;"><h2 style="margin:0 0 12px;font-size:20px;color:#10233f;">Your welcome packet</h2><p style="margin:0 0 12px;">Read the attached PDF before reviewing the proposal.</p><p style="margin:0 0 12px;">Inside: ${content.pages.map((page) => escapeHtml(page.title)).join(" · ")}.</p><p style="margin:0;">Next step: check the priorities and prepare the inputs in your checklist. Reply if a priority needs changing.</p></td></tr></table>`
+      ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#eaf1ee;"><tr><td style="padding:20px;color:#24322d;"><h2 style="margin:0 0 12px;font-size:20px;color:#10233f;">Your welcome packet</h2><p style="margin:0 0 12px;">${content.journeyPhase === "post_signature" ? "Read the attached PDF alongside your signed agreement." : "Read the attached PDF before reviewing the proposal."}</p><p style="margin:0 0 12px;">Inside: ${content.pages.map((page) => escapeHtml(page.title)).join(" · ")}.</p><p style="margin:0;">Next step: check the priorities and prepare the inputs in your checklist. Reply if a priority needs changing.</p></td></tr></table>`
       : accessibleHtml,
     content,
     true,
   );
   email.text +=
     content.rendererVersion === 2
-      ? `\n\nYour welcome packet\nRead the attached PDF before reviewing the proposal.\nInside: ${content.pages.map((page) => page.title).join(" · ")}.\nNext step: check the priorities and prepare the inputs in your checklist. Reply if a priority needs changing.`
+      ? `\n\nYour welcome packet\n${content.journeyPhase === "post_signature" ? "Read the attached PDF alongside your signed agreement." : "Read the attached PDF before reviewing the proposal."}\nInside: ${content.pages.map((page) => page.title).join(" · ")}.\nNext step: check the priorities and prepare the inputs in your checklist. Reply if a priority needs changing.`
       : `\n\n${content.pages.map((page) => `${page.title}\n\n${page.paragraphs.join("\n\n")}`).join("\n\n")}`;
   return email;
 }

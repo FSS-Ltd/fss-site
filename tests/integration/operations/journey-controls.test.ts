@@ -8,7 +8,6 @@ import { createJourneyCommandHandler } from "../../../lib/operations/onboarding/
 import type {
   JourneyCommandResult,
   ProposalPreview,
-  WelcomePreview,
 } from "../../../lib/operations/onboarding/command-types";
 const options = {
   billing: { accountId: "acct_billingTest", livemode: false },
@@ -141,38 +140,29 @@ test("HTTP separates welcome/proposal approvals and rejects stale or cross-organ
   assert.equal(after.proposal?.signers[0], f.identities[0].email);
   assert.equal(after.currentProposal, true);
 });
-test("welcome starts exact PDF once; stale preview cannot start after agreement changes", async (t) => {
+test("legacy packet cannot prepare a new post-signature welcome", async (t) => {
   const f = await onboardingFixture(t, 1);
   const http = handler(f);
   await f.admin`delete from operations.onboarding_jobs where journey_id=${f.journeyId}`;
   await f.admin`delete from operations.onboarding_journeys where id=${f.journeyId}`;
   await f.admin`delete from operations.onboarding_approvals where id=${f.approvalId}`;
   const { recipient, invoice, content, thankYou } = f.prepared.snapshot;
-  const result = await body(
-    await http(
-      request({
-        action: "preview_welcome",
-        agreementId: f.record.id,
-        expectedVersion: f.signingApproval.agreementVersion,
-        welcome: { recipient, invoice, content, thankYou },
-      }),
-      f.organisationId,
-    ),
+  const response = await http(
+    request({
+      action: "preview_welcome",
+      agreementId: f.record.id,
+      expectedVersion: f.signingApproval.agreementVersion,
+      welcome: { recipient, invoice, content, thankYou },
+    }),
+    f.organisationId,
   );
-  assert.ok("preview" in result && result.preview.kind === "welcome");
-  const preview = result.preview as WelcomePreview;
-  assert.doesNotMatch(
-    JSON.stringify(preview.snapshot),
-    /newsletter|subscribe/i,
-  );
-  const start = { action: "start", token: preview.token, confirmed: true };
-  await body(await http(request(start), f.organisationId));
-  await body(await http(request(start), f.organisationId));
-  const [saved] = await f.admin<
-    { pdf: Buffer; n: number }[]
-  >`select pdf,(select count(*)::int from operations.onboarding_journeys where organisation_id=${f.organisationId}) as n from operations.onboarding_approvals where organisation_id=${f.organisationId}`;
-  assert.equal(saved.pdf.toString("base64"), preview.pdfBase64);
-  assert.equal(saved.n, 1);
+  assert.equal(response.status, 409);
+  assert.match(await response.text(), /newly published post-signature packet/);
+  const [count] = await f.admin<{ n: number }[]>`
+    select count(*)::int as n from operations.onboarding_journeys
+    where organisation_id=${f.organisationId}
+  `;
+  assert.equal(count.n, 0);
 });
 test("HTTP cancellation retains in-flight known acceptance and safe pause/resume never replays completed effects", async (t) => {
   const f = await onboardingFixture(t, 1);
@@ -275,42 +265,24 @@ test("held definite failure recovery retains permanent key and rejects uncertain
   assert.equal((await http(request(command), f.organisationId)).status, 409);
 });
 
-test("expired previews and changed agreement versions require fresh review", async (t) => {
+test("changed agreement versions are rejected before preparing a welcome preview", async (t) => {
   const f = await onboardingFixture(t, 1);
   const { recipient, invoice, content, thankYou } = f.prepared.snapshot;
-  const preview = await executeJourneyCommand(
-    f.founderDb,
-    f.founder,
-    f.organisationId,
-    {
-      action: "preview_welcome",
-      agreementId: f.record.id,
-      expectedVersion: f.signingApproval.agreementVersion,
-      welcome: { recipient, invoice, content, thankYou },
-    },
-    { ...options, now: () => 100 },
-  );
-  assert.ok("preview" in preview);
-  await assert.rejects(
-    executeJourneyCommand(
-      f.founderDb,
-      f.founder,
-      f.organisationId,
-      { action: "start", token: preview.preview.token, confirmed: true },
-      { ...options, now: () => 1_800_100 },
-    ),
-    /expired/,
-  );
   await f.admin`update operations.agreements set version=version+1 where id=${f.record.id}`;
   await assert.rejects(
     executeJourneyCommand(
       f.founderDb,
       f.founder,
       f.organisationId,
-      { action: "start", token: preview.preview.token, confirmed: true },
-      { ...options, now: () => 101 },
+      {
+        action: "preview_welcome",
+        agreementId: f.record.id,
+        expectedVersion: f.signingApproval.agreementVersion,
+        welcome: { recipient, invoice, content, thankYou },
+      },
+      { ...options, now: () => 100 },
     ),
-    /changed after preview/,
+    /agreement changed/,
   );
 });
 

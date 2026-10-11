@@ -26,6 +26,7 @@ import type {
 import type { JourneyCommand } from "./command-schema";
 import type { JourneyCommandOptions } from "./commands";
 import type { OnboardingReadinessCheck } from "./workspace-types";
+import { loadCurrentSignedEvidence } from "./signed-agreement";
 
 type WorkspaceReadinessContext = Readonly<{
   workspace?: Extract<
@@ -38,11 +39,19 @@ type WorkspaceReadinessContext = Readonly<{
 export async function workspaceReadiness(
   tx: OperationsTransaction,
   organisationId: string,
-  agreement: { id: string; version: number; status: string },
+  agreement: {
+    id: string;
+    version: number;
+    revision: number;
+    status: string;
+    archivedAt: string | null;
+  },
   command: WorkspaceReadinessContext,
   options: JourneyCommandOptions,
   expectedJourneyId?: string,
 ): Promise<readonly OnboardingReadinessCheck[]> {
+  const signingReady =
+    (await loadCurrentSignedEvidence(tx, organisationId, agreement)) !== null;
   if (!command.workspace)
     return buildOnboardingReadiness({
       senderConfigured: true,
@@ -52,7 +61,7 @@ export async function workspaceReadiness(
       templateVersionAvailable: true,
       recipientRoleAllowed: true,
       billingConfigured: options.billing !== null,
-      signingReady: agreement.status === "draft",
+      signingReady,
     });
   const [row] = await tx<Array<{ workspace: unknown }>>`
     select operations.read_onboarding_workspace(${organisationId}) as workspace
@@ -87,7 +96,7 @@ export async function workspaceReadiness(
     recipientRoleAllowed:
       draft?.recipientRole === command.workspace.recipientRole,
     billingConfigured: options.billing !== null,
-    signingReady: agreement.status === "draft",
+    signingReady,
   };
   return buildOnboardingReadiness(input);
 }
@@ -104,6 +113,14 @@ export async function prepareWelcomePreview(
     throw new JourneyConflict(
       "stale_preview",
       "The agreement changed. Refresh and prepare a new welcome preview.",
+    );
+  if (
+    !command.workspace ||
+    command.welcome.content.journeyPhase !== "post_signature"
+  )
+    throw new JourneyConflict(
+      "approval_conflict",
+      "Select a newly published post-signature packet and save its client checklist before preparing this journey.",
     );
   if (command.workspace && command.welcome.content.rendererVersion !== 2)
     throw new JourneyConflict(
@@ -200,6 +217,27 @@ export async function prepareWelcomePreview(
         ? error.message
         : "The welcome PDF could not be prepared. Use supported Western European text and shorten pages that exceed their readable limit.",
     );
+  }
+  const evidence = await loadCurrentSignedEvidence(tx, organisationId, record);
+  if (evidence) {
+    if (
+      !(["owner", "billing_contact"] as const).some(
+        (role) => role === command.workspace?.recipientRole,
+      )
+    )
+      throw new JourneyConflict(
+        "approval_conflict",
+        "Choose an owner or billing contact as the welcome recipient.",
+      );
+    prepared.snapshot.postSignature = {
+      evidenceId: evidence.id,
+      revision: evidence.revision,
+      provenance: evidence.provenance,
+      recipientRole: command.workspace.recipientRole as
+        | "owner"
+        | "billing_contact",
+      portalUrl: portalUrl("/", options.portalOrigin).href,
+    };
   }
   const data: PreviewEnvelope = {
     kind: "welcome",

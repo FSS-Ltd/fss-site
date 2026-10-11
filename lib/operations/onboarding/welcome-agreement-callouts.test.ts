@@ -37,16 +37,14 @@ test("every designed edition includes concise callouts once without changing its
     assert.equal(welcomePackContentSchema.parse(personalised).guide.length, 9);
     assert.equal(
       personalised.guide.filter((page) =>
-        page.paragraphs.some((text) =>
-          text.includes("Proposed scope in brief:"),
-        ),
+        page.paragraphs.some((text) => text.includes("Signed scope in brief:")),
       ).length,
       1,
     );
     assert.equal(
       personalised.guide.filter((page) =>
         page.paragraphs.some((text) =>
-          text.includes("Your part in the proposed work:"),
+          text.includes("Your part in the signed project:"),
         ),
       ).length,
       1,

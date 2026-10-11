@@ -58,7 +58,7 @@ export function JourneySetupStage({
           {composer.agreement?.draft.goals ||
             "Select an agreement to load the project goal."}
         </p>
-        <p>{composer.agreement?.draft.scope || "Review the proposed scope."}</p>
+        <p>{composer.agreement?.draft.scope || "Review the signed scope."}</p>
         <p>Unconfirmed milestone dates: To be agreed.</p>
       </div>
       {!props.agreements.length || !props.contacts.length ? (
@@ -104,8 +104,8 @@ export function JourneyAccessStage({
           ))}
       </PortalSelect>
       <p>
-        Proposal recipients and their permissions receive a separate review
-        before access is approved.
+        The selected recipient and portal role are approved with the exact
+        welcome preview. Access follows confirmed welcome delivery.
       </p>
       {composer.packet ? (
         <WelcomePacketPreview
@@ -137,8 +137,8 @@ export function JourneyScheduleStage({
       <div className={styles.facts}>
         <h3>Delivery schedule</h3>
         <p>
-          The welcome is queued after approval. Invoice and access follow all
-          signatures on the next calendar day at{" "}
+          The signed agreement is required before approval. After confirmed
+          welcome delivery, invoice and access become eligible at the next{" "}
           <strong>09:00 Europe/London</strong>.
         </p>
         <p>

@@ -64,9 +64,11 @@ export function createOnboardingBillingProvider(
   },
 ): (lease: OnboardingLease) => Promise<EffectResult> {
   return async (lease) => {
+    const approvedUrl =
+      lease.snapshot.postSignature?.portalUrl ?? lease.proposal?.portalUrl;
     if (
-      !lease.proposal ||
-      new URL(lease.proposal.portalUrl).origin !== configuration.portalOrigin
+      !approvedUrl ||
+      new URL(approvedUrl).origin !== configuration.portalOrigin
     )
       return {
         status: "failed",

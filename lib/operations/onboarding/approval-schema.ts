@@ -27,6 +27,7 @@ export const welcomeInputSchema = z
       .strict(),
     content: z
       .object({
+        journeyPhase: z.literal("post_signature").optional(),
         rendererVersion: z.literal(2).optional(),
         emailArtworkVersion: z.literal(1).optional(),
         edition: z.enum(welcomePackIds).optional(),

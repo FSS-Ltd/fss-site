@@ -1,0 +1,67 @@
+.form {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+  color: var(--portal-ink, #0a1a2e);
+}
+
+.form section,
+.form details,
+.form pre {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.form a,
+.facts a {
+  color: var(--portal-action, #0f7078);
+}
+
+.form summary {
+  cursor: pointer;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  color: var(--portal-ink, #0a1a2e);
+}
+
+.facts dt {
+  color: var(--portal-muted, #46566c);
+}
+
+.facts dd {
+  min-width: 0;
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.timeline {
+  display: grid;
+  gap: 16px;
+  padding-left: 24px;
+  color: var(--portal-ink, #0a1a2e);
+}
+
+.timeline > li {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--portal-border, #e1e6e9);
+  border-radius: 8px;
+  background: var(--portal-soft-surface, #f8f9fa);
+}
+
+@media (max-width: 640px) {
+  .facts {
+    grid-template-columns: 1fr;
+  }
+}

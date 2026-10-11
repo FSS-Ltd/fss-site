@@ -29,11 +29,11 @@ export function JourneyActivateStage({
         <div className={styles.facts}>
           <h3>Agreement callouts for final review</h3>
           <p>
-            Proposed scope in brief:{" "}
+            Signed scope in brief:{" "}
             {composer.scopeSummary || "Add a summary in Content."}
           </p>
           <p>
-            Your part in the proposed work:{" "}
+            Your part in the signed project:{" "}
             {composer.responsibilitiesSummary || "Add a summary in Content."}
           </p>
           <details>
