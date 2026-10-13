@@ -56,6 +56,8 @@ removes the resource and restores the original header on these URLs.
 
 - The original PDF and published asset have identical SHA-256 checksums:
   `cd7ddabdd929d04c5f4c5d9275c4f649364fa696d3e2e97e367496d062416ff8`.
+  A file-specific Git binary attribute prevents text normalisation and
+  meaningless whitespace warnings in the unchanged PDF's internal objects.
 - The four optimised WebP previews use original pages 1, 5, 10 and 21.
 - All 2,288 unit tests pass, including delivery, consent, metadata and new
   guide/schema/error-association checks.
