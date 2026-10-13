@@ -1,0 +1,190 @@
+.page {
+  overflow-wrap: anywhere;
+  padding-top: 72px;
+  background: #f5f2ed;
+  color: var(--foreground);
+}
+.facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  max-width: 1184px;
+  margin: 0 auto;
+  padding: 36px 0;
+  border-bottom: 1px solid var(--border-strong);
+}
+.facts > div {
+  padding: 0 34px;
+  border-right: 1px solid var(--border-strong);
+}
+.facts > div:first-child {
+  padding-left: 0;
+}
+.facts > div:last-child {
+  border-right: 0;
+}
+.facts span {
+  display: block;
+  font-size: 2rem;
+  line-height: 1.2;
+  font-weight: 520;
+  letter-spacing: -0.045em;
+}
+.facts p {
+  margin: 8px 0 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+.faq {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 80px;
+  max-width: 1184px;
+  margin: 0 auto;
+  padding: 100px 0 90px;
+}
+.eyebrow {
+  color: var(--brand-primary);
+  font: 0.625rem monospace;
+  letter-spacing: 0.13em;
+  margin: 0 0 20px;
+}
+.faq h2 {
+  margin: 0;
+  font-size: clamp(2rem, 3.6vw, 3.2rem);
+  line-height: 1.08;
+  font-weight: 560;
+  letter-spacing: -0.05em;
+}
+.faqIntro {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  line-height: 1.8;
+  margin-top: 24px;
+}
+.questions details {
+  border-top: 1px solid var(--border-strong);
+}
+.questions details:last-child {
+  border-bottom: 1px solid var(--border-strong);
+}
+.questions summary {
+  position: relative;
+  cursor: pointer;
+  padding: 24px 30px 24px 0;
+  list-style: none;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  font-weight: 560;
+}
+.questions summary::-webkit-details-marker {
+  display: none;
+}
+.questions summary::after {
+  position: absolute;
+  right: 0;
+  top: 24px;
+  color: var(--brand-primary);
+  content: "+";
+  font-size: 1.2rem;
+  font-weight: 400;
+}
+.questions details[open] summary::after {
+  content: "−";
+}
+.questions p {
+  margin: 0 0 26px;
+  max-width: 540px;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  line-height: 1.85;
+}
+.questions a {
+  color: var(--brand-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.closing {
+  max-width: 1184px;
+  margin: 0 auto;
+  padding: 45px 0 75px;
+  border-top: 1px solid var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+.closing h2 {
+  margin: 0;
+  font-size: clamp(1.65rem, 2.6vw, 2.4rem);
+  font-weight: 550;
+  letter-spacing: -0.04em;
+}
+.closing a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  min-height: 52px;
+  flex-shrink: 0;
+  padding: 14px 24px;
+  border: 1px solid var(--foreground);
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition:
+    background 200ms ease,
+    color 200ms ease;
+}
+.closing a:hover {
+  background: var(--foreground);
+  color: white;
+}
+
+@media (max-width: 1280px) {
+  .facts,
+  .faq,
+  .closing {
+    margin-inline: 48px;
+  }
+}
+@media (max-width: 960px) {
+  .facts,
+  .faq,
+  .closing {
+    margin-inline: 28px;
+  }
+  .faq {
+    gap: 40px;
+  }
+}
+@media (max-width: 760px) {
+  .facts,
+  .faq,
+  .closing {
+    margin-inline: 24px;
+  }
+  .facts {
+    padding: 26px 0;
+    gap: 18px;
+  }
+  .facts > div {
+    padding: 0 10px 0 0;
+  }
+  .facts span {
+    font-size: 1.25rem;
+  }
+  .facts p {
+    font-size: 0.6875rem;
+    line-height: 1.6;
+  }
+  .faq {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding-block: 65px;
+  }
+  .closing {
+    flex-direction: column;
+    align-items: start;
+    padding-bottom: 55px;
+  }
+}

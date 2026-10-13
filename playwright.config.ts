@@ -25,6 +25,8 @@ export default defineConfig({
     "{testDir}/{testFilePath}-snapshots/{arg}-{projectName}-{platform}{ext}",
   testDir: "tests/e2e",
   testMatch: [
+    "ai-receptionist-guide.spec.ts",
+    "plumber-prompt-kit.spec.ts",
     "agreement-builder.spec.ts",
     "client-portal-recovery.spec.ts",
     "fss-studio.visual.spec.ts",

@@ -1,0 +1,193 @@
+.section {
+  background: #211b17;
+  color: #f7f2eb;
+  padding: 90px 48px;
+  scroll-margin-top: 72px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+  max-width: 1120px;
+  margin: auto;
+  gap: clamp(50px, 7vw, 100px);
+}
+.intro {
+  padding-top: 24px;
+}
+.eyebrow {
+  color: #e6a07f;
+  margin: 0 0 25px;
+  font: 0.6875rem monospace;
+  letter-spacing: 0.15em;
+}
+.intro h2 {
+  margin: 0;
+  font-size: clamp(2.7rem, 4.8vw, 4.25rem);
+  line-height: 1.04;
+  font-weight: 520;
+  letter-spacing: -0.05em;
+}
+.intro h2 em {
+  font-weight: 450;
+  color: #e6a07f;
+}
+.description {
+  max-width: 375px;
+  margin: 30px 0;
+  color: #c7bcb3;
+  font-size: 1rem;
+  line-height: 1.8;
+}
+.included {
+  margin-top: 45px;
+  padding: 30px 0;
+  border-block: 1px solid rgb(255 255 255 / 0.15);
+}
+.included > span {
+  font: 0.5625rem monospace;
+  color: #e6a07f;
+  letter-spacing: 0.12em;
+}
+.included p {
+  font-size: 1.0625rem;
+  margin: 13px 0 0;
+}
+.included p:last-child {
+  font-size: 0.8125rem;
+  line-height: 1.8;
+  color: #c7bcb3;
+}
+.author {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 45px;
+}
+.monogram {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border: 1px solid #7d6555;
+  border-radius: 50%;
+  color: #e6a07f;
+  font:
+    1.2rem Georgia,
+    serif;
+}
+.author p {
+  margin: 0 0 5px;
+  font-size: 0.875rem;
+}
+.author span:not(.monogram) {
+  display: block;
+  font-size: 0.75rem;
+  color: #c7bcb3;
+}
+.author a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 44px;
+  font-size: 0.75rem;
+  color: #e6a07f;
+}
+.formCard {
+  scroll-margin-top: 100px;
+  border-radius: 16px;
+  padding: 36px;
+  background: #faf8f5;
+  color: #211b17;
+  --surface-2: #fff;
+  --text-subtle: #766a62;
+}
+.formEyebrow {
+  margin: 0 0 15px;
+  color: var(--brand-primary);
+  font: 0.625rem monospace;
+  letter-spacing: 0.12em;
+}
+.formCard h3 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 580;
+  letter-spacing: -0.04em;
+}
+.formIntro {
+  margin: 12px 0 18px;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+.formCard input:not([type="checkbox"]),
+.formCard textarea {
+  font-size: 1rem;
+}
+.formCard input:not([type="checkbox"]) {
+  min-height: 48px;
+}
+.formCard textarea {
+  min-height: 88px;
+}
+.formCard button {
+  min-height: 50px;
+}
+.privacy {
+  color: var(--text-muted);
+  font-size: 0.6875rem;
+  line-height: 1.8;
+  margin: 18px 0;
+}
+.privacy:last-child {
+  margin-bottom: 0;
+  text-align: center;
+}
+.privacy a {
+  color: var(--brand-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 960px) {
+  .section {
+    padding-inline: 28px;
+  }
+  .grid {
+    gap: 35px;
+  }
+  .formCard {
+    padding: 28px;
+  }
+}
+@media (max-width: 760px) {
+  .section {
+    padding: 60px 24px;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 35px;
+  }
+  .intro {
+    padding-top: 0;
+  }
+  .intro h2 {
+    font-size: clamp(2.6rem, 10vw, 3.7rem);
+  }
+  .included {
+    margin-top: 25px;
+    padding-block: 22px;
+  }
+  .author {
+    margin-top: 25px;
+  }
+  .formCard {
+    padding: 26px 22px;
+  }
+}
+.formCard input::placeholder,
+.formCard textarea::placeholder {
+  color: #766a62;
+  opacity: 1;
+}

@@ -6,6 +6,10 @@ import { useRef, useState } from "react";
 import { navItems } from "./site-header-nav-items";
 import styles from "./site-header.module.css";
 import { ButtonLink } from "@/components/ui/button";
+import {
+  AI_RECEPTIONIST_GUIDE_PATH,
+  isAiReceptionistGuidePath,
+} from "@/lib/ai-receptionist-guide";
 
 function HeaderLinks({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
@@ -60,6 +64,19 @@ function MobileNavigation() {
 
 export function SiteHeaderNavigation() {
   const pathname = usePathname();
+  if (isAiReceptionistGuidePath(pathname)) {
+    return (
+      <nav aria-label="Free guide">
+        <ButtonLink
+          href={`${AI_RECEPTIONIST_GUIDE_PATH}#download-form`}
+          className="px-4 text-sm sm:px-6"
+          prefetch={false}
+        >
+          Get the free guide
+        </ButtonLink>
+      </nav>
+    );
+  }
   return (
     <div className="flex items-center gap-1.5">
       <nav className={styles.desktop} aria-label="Primary">

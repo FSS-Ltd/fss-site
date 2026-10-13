@@ -85,7 +85,8 @@ export function LeadMagnetCaptureForm({
     setNewsletterOptIn(false);
   };
 
-  const companyField = (
+  // Register in rendered order so validation focuses the first visible error.
+  const renderCompanyField = () => (
     <FormField
       id="company"
       label={isCompactDownload ? "Business name" : "Company"}
@@ -97,7 +98,7 @@ export function LeadMagnetCaptureForm({
     />
   );
 
-  const emailField = (
+  const renderEmailField = () => (
     <FormField
       id="workEmail"
       label={isCompactDownload ? "Email" : "Work email"}
@@ -132,8 +133,8 @@ export function LeadMagnetCaptureForm({
           {...register("lastName")}
         />
       </div>
-      {isCompactDownload ? companyField : emailField}
-      {isCompactDownload ? emailField : companyField}
+      {isCompactDownload ? renderCompanyField() : renderEmailField()}
+      {isCompactDownload ? renderEmailField() : renderCompanyField()}
       {!isCompactDownload ? (
         <TextareaField
           id="challenge"
