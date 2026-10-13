@@ -5,6 +5,8 @@ import { notFound } from "next/navigation";
 import { BreadcrumbSchema } from "@/components/seo/breadcrumb-schema";
 import { ResourceDetailPage } from "@/components/resources/resource-detail-page";
 import { PlumberPromptKitPage } from "@/components/resources/plumber-prompt-kit-page";
+import { AiReceptionistGuidePage } from "@/components/resources/ai-receptionist/guide-page";
+import { AI_RECEPTIONIST_GUIDE_SLUG } from "@/lib/ai-receptionist-guide";
 import {
   getAllResources,
   getRelatedResources,
@@ -61,7 +63,9 @@ export default async function ResourceRoutePage({
           },
         ]}
       />
-      {slug === "ai-prompts-for-plumbers" ? (
+      {slug === AI_RECEPTIONIST_GUIDE_SLUG ? (
+        <AiReceptionistGuidePage resource={resource} />
+      ) : slug === "ai-prompts-for-plumbers" ? (
         <PlumberPromptKitPage resource={resource.meta} />
       ) : (
         <ResourceDetailPage

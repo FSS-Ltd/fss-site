@@ -8,7 +8,14 @@ type TextareaFieldProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
   error?: string;
 };
 
-export function TextareaField({ id, label, className, error, ...props }: TextareaFieldProps) {
+export function TextareaField({
+  id,
+  label,
+  className,
+  error,
+  ...props
+}: TextareaFieldProps) {
+  const errorId = `${id}-error`;
   return (
     <div className="space-y-2">
       <label className="block text-sm font-medium text-foreground" htmlFor={id}>
@@ -20,9 +27,15 @@ export function TextareaField({ id, label, className, error, ...props }: Textare
           className,
         )}
         id={id}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? errorId : undefined}
         {...props}
       />
-      {error ? <p className="text-xs text-rose-300">{error}</p> : null}
+      {error ? (
+        <p id={errorId} className="text-xs text-red-700">
+          {error}
+        </p>
+      ) : null}
     </div>
   );
 }

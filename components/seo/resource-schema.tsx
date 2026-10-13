@@ -2,7 +2,13 @@ import type { ResourceMeta } from "@/lib/types/resource";
 import { canonicalUrl } from "@/lib/seo/metadata";
 import { JsonLd } from "./json-ld";
 
-export function ResourceSchema({ resource }: { resource: ResourceMeta }) {
+export function ResourceSchema({
+  resource,
+  authorType = "Organization",
+}: {
+  resource: ResourceMeta;
+  authorType?: "Person" | "Organization";
+}) {
   const file = resource.delivery;
   if (file.type !== "direct_download" || !file.url || !file.encodingFormat)
     return null;
@@ -21,7 +27,7 @@ export function ResourceSchema({ resource }: { resource: ResourceMeta }) {
           encodingFormat: file.encodingFormat,
         },
         author: {
-          "@type": "Organization",
+          "@type": authorType,
           name: resource.author,
           url: resource.authorUrl,
         },
