@@ -10,6 +10,7 @@ import {
   saveStaffAgreementBuilderDraft,
 } from "../../../lib/operations/agreements/builder-draft-service";
 import { listStaffAgreementBuilderDrafts } from "../../../lib/operations/agreements/builder-draft-repository";
+import { listStaffAgreementRegister } from "../../../lib/operations/agreements/repository";
 import { requireOperationsTestDatabaseUrl } from "../../../scripts/require-operations-database-env";
 import { signingFixture } from "./signing-fixtures";
 
@@ -96,6 +97,22 @@ test("complete builder finalisation succeeds without UPDATE permission on engage
   assert.equal(agreement.engagementId, f.engagement.engagementId);
   assert.equal(agreement.draft.scope, f.saved.content.agreement?.scope);
   assert.equal(await f.agreementCount(), 2);
+  const register = await listStaffAgreementRegister(
+    f.founderDb,
+    f.staff,
+    f.organisationId,
+  );
+  assert.ok(register?.agreements.some((record) => record.id === agreement.id));
+  assert.deepEqual(
+    (
+      await listStaffAgreementBuilderDrafts(
+        f.founderDb,
+        f.staff,
+        f.organisationId,
+      )
+    ).items,
+    [],
+  );
   const [closed] = await f.admin<{ agreementId: string; finalised: boolean }[]>`
     select finalised_agreement_id as "agreementId", finalised_at is not null as finalised
     from operations.agreement_builder_drafts where id=${f.saved.id}

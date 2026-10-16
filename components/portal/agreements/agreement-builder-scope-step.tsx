@@ -1,6 +1,6 @@
 "use client";
 
-import { PortalTextarea } from "@/components/portal/ui";
+import { Notice, PortalTextarea } from "@/components/portal/ui";
 import {
   AgreementBuilderGroupForm,
   useAgreementBuilderGroups,
@@ -51,6 +51,12 @@ export function AgreementBuilderScopeStep({
             "Start with the outcome, then describe what you’ll deliver.",
           children: (
             <>
+              {!agreement.goals && !agreement.scope ? (
+                <Notice tone="info">
+                  This linked work has no reviewed goal or scope on record.
+                  Enter both to continue.
+                </Notice>
+              ) : null}
               <PortalTextarea
                 label="Client goals"
                 name="goals"

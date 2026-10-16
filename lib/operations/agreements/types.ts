@@ -25,7 +25,12 @@ export type AgreementRegister = {
   organisationName: string;
   billingCurrency?: Currency;
   engagementIds: string[];
-  engagementChoices?: Array<{ id: string; name: string }>;
+  engagementChoices?: Array<{
+    id: string;
+    name: string;
+    primaryGoal: string | null;
+    proposedScope: string | null;
+  }>;
   agreements: AgreementRecord[];
   nextCursor: string | null;
   moreEngagements: boolean;

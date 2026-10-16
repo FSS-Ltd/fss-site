@@ -124,6 +124,7 @@ export type StaffAgreementOverviewRow = {
   organisationName: string;
   agreementCount: number;
   draftCount: number;
+  builderDraftCount: number;
   signedCount: number;
 };
 
@@ -144,8 +145,11 @@ export async function listStaffAgreementRegister(
       archived,
     );
     if (!register) return null;
-    const choices = await tx<Array<{ id: string; name: string }>>`
-      select id, name from operations.staff_linked_engagements(${organisationId})
+    const choices = await tx<
+      NonNullable<AgreementRegister["engagementChoices"]>
+    >`
+      select id, name, primary_goal as "primaryGoal", proposed_scope as "proposedScope"
+      from operations.staff_reviewed_engagements(${organisationId})
       limit 101
     `;
     return {
@@ -181,9 +185,11 @@ export async function listStaffAgreementOverview(
       select o.id as "organisationId", o.display_name as "organisationName",
         count(a.id)::integer as "agreementCount",
         count(a.id) filter (where a.status = 'draft')::integer as "draftCount",
-        count(a.id) filter (where a.status = 'signed')::integer as "signedCount"
+        count(a.id) filter (where a.status = 'signed')::integer as "signedCount",
+        coalesce(max(b.builder_draft_count), 0)::integer as "builderDraftCount"
       from operations.organisations o
       left join operations.agreements a on a.organisation_id = o.id
+      left join operations.staff_agreement_builder_draft_counts() b on b.organisation_id = o.id
       where o.lifecycle = 'active'
       group by o.id, o.display_name
       order by o.display_name, o.id

@@ -32,10 +32,15 @@ function AgreementWorkspaceRow({
   status,
 }: Readonly<{
   organisation: StaffAgreementOverviewRow;
-  status: "draft" | "signed";
+  status: "builder" | "draft" | "signed";
 }>): React.JSX.Element {
   const draft = status === "draft";
-  const count = draft ? organisation.draftCount : organisation.signedCount;
+  const count =
+    status === "builder"
+      ? organisation.builderDraftCount
+      : draft
+        ? organisation.draftCount
+        : organisation.signedCount;
 
   return (
     <li>
@@ -44,24 +49,41 @@ function AgreementWorkspaceRow({
           <div>
             <h3>{organisation.organisationName}</h3>
             <p>
-              {count} {draft ? "draft" : "signed"}{" "}
-              {count === 1 ? "agreement" : "agreements"}
+              {count}{" "}
+              {status === "builder" ? "unfinished" : draft ? "draft" : "signed"}{" "}
+              {status === "builder"
+                ? count === 1
+                  ? "draft"
+                  : "drafts"
+                : count === 1
+                  ? "agreement"
+                  : "agreements"}
             </p>
           </div>
-          <StatusBadge status={draft ? "warning" : "success"}>
-            {draft ? "Draft work" : "Signed evidence"}
+          <StatusBadge status={status === "signed" ? "success" : "warning"}>
+            {status === "builder"
+              ? "Builder draft"
+              : draft
+                ? "Draft agreement"
+                : "Signed evidence"}
           </StatusBadge>
         </div>
         <p className={styles.cardCopy}>
-          {draft
-            ? "Resume the saved agreement workspace. Signing approval is distinct from a recorded signature."
-            : "Signed evidence is complete. Review the organisation workspace for the retained record and service activation."}
+          {status === "builder"
+            ? "Continue an unfinished builder draft from the client Agreements page. No agreement record exists yet."
+            : draft
+              ? "Resume the saved agreement workspace. Signing approval is distinct from a recorded signature."
+              : "Signed evidence is complete. Review the organisation workspace for the retained record and service activation."}
         </p>
         <PortalActionLink
           href={agreementWorkspaceHref(organisation.organisationId)}
-          variant={draft ? "primary" : "secondary"}
+          variant={status === "signed" ? "secondary" : "primary"}
         >
-          {draft ? "Continue draft" : "View agreements"}
+          {status === "builder"
+            ? "View builder drafts"
+            : draft
+              ? "Continue draft"
+              : "View agreements"}
         </PortalActionLink>
       </PortalCard>
     </li>
@@ -74,7 +96,7 @@ function AgreementGroup({
   title,
 }: Readonly<{
   organisations: readonly StaffAgreementOverviewRow[];
-  status: "draft" | "signed";
+  status: "builder" | "draft" | "signed";
   title: string;
 }>): React.JSX.Element {
   return (
@@ -95,9 +117,11 @@ function AgreementGroup({
         </ul>
       ) : (
         <p className={styles.empty}>
-          {status === "draft"
-            ? "No client drafts need attention."
-            : "No signed agreements are recorded yet."}
+          {status === "builder"
+            ? "No saved builder drafts need attention."
+            : status === "draft"
+              ? "No client drafts need attention."
+              : "No signed agreements are recorded yet."}
         </p>
       )}
     </section>
@@ -126,9 +150,13 @@ export function StaffAgreementOverview({
     (result, organisation) => ({
       agreements: result.agreements + organisation.agreementCount,
       drafts: result.drafts + organisation.draftCount,
+      builderDrafts: result.builderDrafts + organisation.builderDraftCount,
       signed: result.signed + organisation.signedCount,
     }),
-    { agreements: 0, drafts: 0, signed: 0 },
+    { agreements: 0, drafts: 0, builderDrafts: 0, signed: 0 },
+  );
+  const builderDrafts = agreements.filter(
+    (organisation) => organisation.builderDraftCount > 0,
   );
   const drafts = agreements.filter(
     (organisation) => organisation.draftCount > 0,
@@ -160,7 +188,10 @@ export function StaffAgreementOverview({
         <PortalCard title="Agreements">
           <p className={styles.metric}>{totals.agreements}</p>
         </PortalCard>
-        <PortalCard title="Drafts to review">
+        <PortalCard title="Builder drafts">
+          <p className={styles.metric}>{totals.builderDrafts}</p>
+        </PortalCard>
+        <PortalCard title="Draft agreements">
           <p className={styles.metric}>{totals.drafts}</p>
         </PortalCard>
         <PortalCard title="Signed revisions">
@@ -174,6 +205,11 @@ export function StaffAgreementOverview({
           required signature and retained final document are complete.
         </p>
       </Notice>
+      <AgreementGroup
+        organisations={builderDrafts}
+        status="builder"
+        title="Agreement builder drafts"
+      />
       <AgreementGroup
         organisations={drafts}
         status="draft"

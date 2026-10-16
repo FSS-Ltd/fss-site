@@ -21,6 +21,7 @@ test("groups FSS Studio agreement work by actionable status", () => {
         {
           agreementCount: 2,
           draftCount: 1,
+          builderDraftCount: 2,
           organisationId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
           organisationName: "Harbour Foundation",
           signedCount: 1,
@@ -39,6 +40,8 @@ test("groups FSS Studio agreement work by actionable status", () => {
   );
 
   assert.match(html, /Draft &amp; awaiting signature/);
+  assert.match(html, /Agreement builder drafts/);
+  assert.match(html, /2 unfinished drafts/);
   assert.match(html, /Signed/);
   assert.match(html, /Continue draft/);
   assert.match(html, /Approval is not signature/);
@@ -53,6 +56,7 @@ test("describes signed records as completed evidence rather than an approval", (
         {
           agreementCount: 1,
           draftCount: 0,
+          builderDraftCount: 0,
           organisationId: "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
           organisationName: "Elm &amp; Co",
           signedCount: 1,
