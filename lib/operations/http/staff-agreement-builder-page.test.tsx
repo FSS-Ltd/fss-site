@@ -68,8 +68,15 @@ const query = async (parts: TemplateStringsArray) => {
   if (sql.includes("load_agreement_builder_draft")) return [stored];
   if (sql.includes("from operations.organisations"))
     return [{ display_name: "Example Studio", billing_currency: "GBP" }];
-  if (sql.includes("staff_linked_engagements"))
-    return [{ id: engagementId, name: "Initial project" }];
+  if (sql.includes("staff_reviewed_engagements"))
+    return [
+      {
+        id: engagementId,
+        name: "Initial project",
+        primaryGoal: "Make booking simpler.",
+        proposedScope: "Build a booking flow.",
+      },
+    ];
   return [];
 };
 // The SQL test double implements the transaction boundary used by these readers.
@@ -129,7 +136,7 @@ async function renderPage(
 
 test("returning to New agreement offers saved drafts instead of restarting at project selection", async () => {
   const html = await renderPage(Promise.resolve({}));
-  assert.match(html, /Saved agreement drafts/);
+  assert.match(html, /Saved agreement builder drafts/);
   assert.match(html, /Website work in progress/);
   assert.match(html, new RegExp(`draftId=${draftId}`));
   assert.match(html, /Continue draft/);
@@ -153,14 +160,15 @@ test("the client agreement register exposes working drafts separately from creat
       {element}
     </AppRouterContext.Provider>,
   );
-  assert.match(html, /Saved agreement drafts/);
+  assert.match(html, /Saved agreement builder drafts/);
   assert.match(html, /Continue draft/);
+  assert.match(html, new RegExp(`/agreements/new\\?draftId=${draftId}`));
 });
 
 test("Start new agreement intentionally bypasses saved drafts", async () => {
   const html = await renderPage(Promise.resolve({ new: "1" }));
   assert.match(html, /Link the right work/);
-  assert.doesNotMatch(html, /Saved agreement drafts/);
+  assert.doesNotMatch(html, /Saved agreement builder drafts/);
   assert.match(html, /name="title" value=""/);
 });
 

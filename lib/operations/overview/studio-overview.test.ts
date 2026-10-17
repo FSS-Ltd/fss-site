@@ -1,15 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import {
-  selectStudioAttention,
-  type StudioOverview,
-} from "./studio-overview";
+import { selectStudioAttention, type StudioOverview } from "./studio-overview";
 
 const overview: StudioOverview = {
   agreements: [
     {
       agreementCount: 1,
       draftCount: 1,
+      builderDraftCount: 0,
       organisationId: "a8e2f019-6ab1-49b2-a396-23bec152c465",
       organisationName: "Northstar Studio",
       signedCount: 0,
@@ -61,8 +59,7 @@ test("orders founder actions without manufacturing queue counts", () => {
     ["review", "journey", "signing"],
   );
   assert.match(
-    selectStudioAttention(overview, new Date("2026-09-20T12:00:00Z"))[0]
-      .title,
+    selectStudioAttention(overview, new Date("2026-09-20T12:00:00Z"))[0].title,
     /Overdue review/,
   );
   assert.deepEqual(

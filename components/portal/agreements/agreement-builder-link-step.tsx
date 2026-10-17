@@ -25,12 +25,14 @@ export function AgreementBuilderLinkStep({
   engagements,
   engagementHref,
   onBeginEngagement,
+  onSelectEngagement,
   onSave,
   pending,
 }: BuilderStepProps &
   Readonly<{
     engagements: readonly AgreementEngagementChoice[];
     engagementHref: string;
+    onSelectEngagement: (engagement: AgreementEngagementChoice) => boolean;
   }>): React.JSX.Element {
   const flow = useAgreementBuilderGroups(2);
   const [engagementId, setEngagementId] = useState(content.engagementId ?? "");
@@ -99,7 +101,13 @@ export function AgreementBuilderLinkStep({
                 </PortalField>
               ) : null}
               {hasEngagements ? (
-                <fieldset className={styles.workChoices}>
+                <fieldset
+                  className={styles.workChoices}
+                  onBlur={(event) => {
+                    if (!event.currentTarget.contains(event.relatedTarget))
+                      setEngagementId(content.engagementId ?? "");
+                  }}
+                >
                   <legend className={styles.visuallyHidden}>
                     Reviewed engagement
                   </legend>
@@ -115,12 +123,23 @@ export function AgreementBuilderLinkStep({
                         value={engagement.id}
                         required
                         checked={engagementId === engagement.id}
-                        onChange={() => setEngagementId(engagement.id)}
+                        onChange={() => {
+                          if (exploringWithArrows.current) {
+                            setEngagementId(engagement.id);
+                          } else if (onSelectEngagement(engagement)) {
+                            setEngagementId(engagement.id);
+                            flow.show(1);
+                          }
+                        }}
                         onPointerDown={() => {
                           exploringWithArrows.current = false;
                         }}
                         onClick={() => {
-                          if (!exploringWithArrows.current) flow.show(1);
+                          if (
+                            !exploringWithArrows.current &&
+                            engagementId === engagement.id
+                          )
+                            flow.show(1);
                         }}
                         onKeyUp={() => {
                           exploringWithArrows.current = false;
@@ -130,14 +149,20 @@ export function AgreementBuilderLinkStep({
                             event.key.startsWith("Arrow");
                           if (event.key === "Enter" || event.key === " ") {
                             event.preventDefault();
-                            setEngagementId(engagement.id);
-                            flow.show(1);
+                            if (onSelectEngagement(engagement)) {
+                              setEngagementId(engagement.id);
+                              flow.show(1);
+                            }
                           }
                         }}
                       />
                       <span>
                         {engagement.name}
-                        <small>Reviewed &amp; linked</small>
+                        <small>
+                          {engagement.primaryGoal && engagement.proposedScope
+                            ? "Reviewed work · ready for agreement"
+                            : "Linked work · add goal and scope"}
+                        </small>
                       </span>
                     </label>
                   ))}
@@ -184,6 +209,7 @@ export function AgreementBuilderLinkStep({
               required
             >
               <input
+                key={content.engagementId ?? "unlinked"}
                 aria-labelledby={flow.headingId(1)}
                 name="title"
                 defaultValue={agreement.title ?? ""}

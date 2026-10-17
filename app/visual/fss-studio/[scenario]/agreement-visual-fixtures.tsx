@@ -253,6 +253,7 @@ export function StudioAgreementListScenario(): React.JSX.Element {
           {
             agreementCount: 2,
             draftCount: 1,
+            builderDraftCount: 2,
             organisationId,
             organisationName: "Northstar Studio",
             signedCount: 1,
@@ -320,6 +321,9 @@ export function StudioAgreementBuilderScenario({
                 {
                   id: "92d68fbd-dbe8-44da-96b2-35da77283e40",
                   name: "Client portal · Discovery complete",
+                  primaryGoal:
+                    "Give clients a clearer place to track their work.",
+                  proposedScope: "Build a client portal and handover guide.",
                 },
               ]
         }

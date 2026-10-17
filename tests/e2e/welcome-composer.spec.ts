@@ -66,6 +66,18 @@ async function openBuilder(page: Page): Promise<void> {
   ).toBeVisible();
 }
 
+test("welcome agreement picker offers created records only", async ({
+  page,
+}) => {
+  await openBuilder(page);
+  const agreement = page.getByLabel("Client agreement");
+  await expect(agreement.locator("option")).toHaveCount(2);
+  await expect(agreement.locator("option").last()).toHaveText(
+    "Website & booking experience · revision 3",
+  );
+  await expect(agreement).not.toContainText("Saved agreement builder drafts");
+});
+
 async function stage(
   page: Page,
   name: "Setup" | "Content" | "Access" | "Schedule" | "Review",

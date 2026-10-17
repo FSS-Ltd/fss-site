@@ -19,7 +19,12 @@ const organisationId = "11111111-1111-4111-8111-111111111111";
 const engagementId = "22222222-2222-4222-8222-222222222222";
 
 function renderBuilder(
-  engagements: readonly { id: string; name: string }[],
+  engagements: readonly {
+    id: string;
+    name: string;
+    primaryGoal?: string | null;
+    proposedScope?: string | null;
+  }[],
   initialDraft: Parameters<
     typeof StaffAgreementBuilder
   >[0]["initialDraft"] = null,
@@ -86,6 +91,50 @@ test("a server-loaded saved draft opens at its persisted builder step", () => {
   assert.match(html, />Continue<svg/);
   assert.match(html, /data-builder-group="1" hidden/);
   assert.doesNotMatch(html, /Link the right work/);
+});
+
+test("a saved draft with empty scope restores reviewed engagement details", () => {
+  const html = renderBuilder(
+    [
+      {
+        id: engagementId,
+        name: "Website and booking",
+        primaryGoal: "Make online booking easier.",
+        proposedScope: "Build a five-page site and booking flow.",
+      },
+    ],
+    {
+      content: { agreement: { currency: "GBP" }, engagementId },
+      createdAt: "2026-10-01T10:00:00.000Z",
+      engagementId,
+      id: "33333333-3333-4333-8333-333333333333",
+      organisationId,
+      step: "scope",
+      updatedAt: "2026-10-01T10:05:00.000Z",
+      version: 1,
+    },
+  );
+
+  assert.match(html, /Make online booking easier\./);
+  assert.match(html, /Build a five-page site and booking flow\./);
+});
+
+test("older linked work explains why its goal and scope are empty", () => {
+  const html = renderBuilder(
+    [{ id: engagementId, name: "Legacy linked work" }],
+    {
+      content: { agreement: { currency: "GBP" }, engagementId },
+      createdAt: "2026-10-01T10:00:00.000Z",
+      engagementId,
+      id: "33333333-3333-4333-8333-333333333333",
+      organisationId,
+      step: "scope",
+      updatedAt: "2026-10-01T10:05:00.000Z",
+      version: 1,
+    },
+  );
+  assert.match(html, /no reviewed goal or scope on record/);
+  assert.match(html, /Enter both to continue/);
 });
 
 test("the review step does not claim that creating an agreement also prepares signing", () => {

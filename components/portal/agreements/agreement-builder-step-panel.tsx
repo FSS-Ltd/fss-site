@@ -9,7 +9,12 @@ import { AgreementBuilderReviewStep } from "./agreement-builder-review-step";
 import type { AgreementBuilderStep } from "@/lib/operations/agreements/builder-draft-schema";
 import type { BuilderStepProps } from "./agreement-builder-step-support";
 
-export type AgreementEngagementChoice = Readonly<{ id: string; name: string }>;
+export type AgreementEngagementChoice = Readonly<{
+  id: string;
+  name: string;
+  primaryGoal?: string | null;
+  proposedScope?: string | null;
+}>;
 
 export const agreementBuilderSteps = [
   "link",
@@ -45,6 +50,7 @@ export function AgreementBuilderStepPanel(
       engagementHref: string;
       engagements: readonly AgreementEngagementChoice[];
       finalise: () => Promise<void>;
+      onSelectEngagement: (engagement: AgreementEngagementChoice) => boolean;
       organisationName: string;
       step: AgreementBuilderStep;
     }>,

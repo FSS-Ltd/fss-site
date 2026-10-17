@@ -271,6 +271,7 @@ const studioOverview: StudioOverviewData = {
     {
       agreementCount: 1,
       draftCount: 1,
+      builderDraftCount: 1,
       organisationId: clientMemberships[1].organisationId,
       organisationName: clientMemberships[1].displayName,
       signedCount: 0,

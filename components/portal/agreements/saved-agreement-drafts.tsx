@@ -32,10 +32,12 @@ export function SavedAgreementDrafts({
     >
       <div className={styles.groupHeading}>
         <div>
-          <h2 id="saved-agreement-drafts-heading">Saved agreement drafts</h2>
+          <h2 id="saved-agreement-drafts-heading">
+            Saved agreement builder drafts
+          </h2>
           <p>
-            Continue where you left off. Your saved details and stage are
-            restored.
+            Continue where you left off. These are unfinished builder drafts; an
+            agreement record appears below after creation.
           </p>
         </div>
         {startNewHref ? (

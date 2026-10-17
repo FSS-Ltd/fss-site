@@ -38,6 +38,41 @@ test("reviewed work advances on deliberate activation, never keyboard arrow expl
   await expect(page.locator("[data-builder-group]:visible h2")).toBeFocused();
 });
 
+test("changing engagement confirms and replaces work-specific draft details", async ({
+  page,
+}) => {
+  await page.route(
+    "**/api/portal/admin/clients/*/agreement-drafts",
+    async (route) => {
+      const command = route.request().postDataJSON();
+      await route.fulfill({
+        json: {
+          id: command.draftId,
+          step: command.step,
+          version: command.expectedVersion + 1,
+          content: command.content,
+        },
+      });
+    },
+  );
+  await page.goto("/visual/fss-studio/studio-agreement-builder");
+  page.once("dialog", async (dialog) => {
+    expect(dialog.message()).toContain("clear this draft’s agreement details");
+    await dialog.accept();
+  });
+  await page.getByRole("radio").last().click();
+  await expect(
+    page.getByRole("textbox", { name: "Give this agreement a name" }),
+  ).toHaveValue("Client portal · Discovery complete");
+  await page.getByRole("button", { name: "Continue to scope" }).click();
+  await expect(page.getByLabel("Client goals")).toHaveValue(
+    "Give clients a clearer place to track their work.",
+  );
+  await expect(page.getByLabel("Included deliverables")).toHaveValue(
+    "Build a client portal and handover guide.",
+  );
+});
+
 test("failed saves show an error and keep the current stage and edits", async ({
   page,
 }) => {
@@ -106,6 +141,9 @@ test("saved stages resume at their first group and keyboard activation works", a
   await page.keyboard.press("ArrowDown");
   await expect(choices.last()).toBeChecked();
   await expect(page.locator('[data-builder-group="0"]')).toBeVisible();
+  page.once("dialog", async (dialog) => {
+    await dialog.accept();
+  });
   await page.keyboard.press("Space");
   await expect(page.locator('[data-builder-group="1"]')).toBeVisible();
   await page.reload();
@@ -598,7 +636,9 @@ for (const appearance of ["light", "dark"] as const) {
       },
     ]);
     await page.goto("/visual/fss-studio/studio-agreement-drafts");
-    const list = page.getByRole("region", { name: "Saved agreement drafts" });
+    const list = page.getByRole("region", {
+      name: "Saved agreement builder drafts",
+    });
     await expect(list).toBeVisible();
     await expect(list).toContainText("Continue at Fees");
     await expect(list).toContainText("Website & booking experience");

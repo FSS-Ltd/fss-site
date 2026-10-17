@@ -15,6 +15,7 @@ import {
   type AgreementEngagementChoice,
 } from "./agreement-builder-step-panel";
 import { useAgreementBuilderDraft } from "./use-agreement-builder-draft";
+import { prefillFromEngagement, replaceEngagement } from "./engagement-prefill";
 import styles from "./agreements.module.css";
 import guidedStyles from "./agreement-builder.module.css";
 
@@ -51,7 +52,12 @@ export function StaffAgreementBuilder({
       navigate: onNavigate,
     });
   const [content, setContent] = useState<AgreementBuilderDraftContent>(
-    initialDraft?.content ?? { agreement: { currency } },
+    prefillFromEngagement(
+      initialDraft?.content ?? { agreement: { currency } },
+      engagements.find(
+        (item) => item.id === initialDraft?.content.engagementId,
+      ),
+    ),
   );
   const [step, setStep] = useState<AgreementBuilderStep>(
     initialDraft?.step ?? "link",
@@ -98,6 +104,23 @@ export function StaffAgreementBuilder({
     destination.searchParams.set("expectedVersion", String(saved.version));
     const href = `${destination.pathname}${destination.search}`;
     onNavigate(href);
+  }
+
+  function selectEngagement(engagement: AgreementEngagementChoice): boolean {
+    if (engagement.id === content.engagementId) return true;
+    if (
+      content.engagementId &&
+      !window.confirm(
+        "Changing engagement will clear this draft’s agreement details. Continue?",
+      )
+    )
+      return false;
+    setContent(
+      content.engagementId
+        ? replaceEngagement(content, engagement)
+        : prefillFromEngagement(content, engagement),
+    );
+    return true;
   }
 
   return (
@@ -155,6 +178,7 @@ export function StaffAgreementBuilder({
           finalise={finalise}
           onSave={persist}
           onBeginEngagement={beginEngagement}
+          onSelectEngagement={selectEngagement}
           organisationName={organisationName}
           pending={pending}
           step={step}

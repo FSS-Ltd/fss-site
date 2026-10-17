@@ -9,6 +9,10 @@ import {
 } from "../../../lib/operations/agreements/engagement-service";
 import { loadStaffAgreementBuilderDraft } from "../../../lib/operations/agreements/builder-draft-service";
 import { saveStaffAgreementBuilderDraft } from "../../../lib/operations/agreements/builder-draft-service";
+import {
+  listStaffAgreementOverview,
+  listStaffAgreementRegister,
+} from "../../../lib/operations/agreements/repository";
 import type { FssAdminContext } from "../../../lib/operations/auth/staff-types";
 import { signingFixture } from "./signing-fixtures";
 
@@ -38,6 +42,11 @@ async function staffAdminFixture(
 test("creates reviewed direct work atomically, resumes the saved agreement draft and reuses an identical command", async (t) => {
   const fixture = await signingFixture(t, 1);
   const admin = await staffAdminFixture(fixture);
+  const initialAgreementCount = (
+    await listStaffAgreementOverview(fixture.founderDb, admin)
+  ).find(
+    (row) => row.organisationId === fixture.organisationId,
+  )?.agreementCount;
   const draftId = randomUUID();
   const savedDraft = await saveStaffAgreementBuilderDraft(
     fixture.founderDb,
@@ -87,7 +96,6 @@ test("creates reviewed direct work atomically, resumes the saved agreement draft
     ),
     result,
   );
-
   const [engagement] = await fixture.admin<
     {
       prospectId: string | null;
@@ -110,6 +118,34 @@ test("creates reviewed direct work atomically, resumes the saved agreement draft
   assert.equal(review.primaryGoal, command.primaryGoal);
   assert.equal(review.proposedScope, command.proposedScope);
   assert.equal(review.reviewedBy, admin.actorId);
+  const register = await listStaffAgreementRegister(
+    fixture.founderDb,
+    admin,
+    fixture.organisationId,
+  );
+  const legacyChoice = register?.engagementChoices?.find(
+    (choice) => choice.id === fixture.engagement.engagementId,
+  );
+  assert.equal(legacyChoice?.name, "Test");
+  assert.equal(legacyChoice?.primaryGoal, null);
+  assert.equal(legacyChoice?.proposedScope, null);
+  assert.deepEqual(
+    register?.engagementChoices?.find(
+      (choice) => choice.id === result.engagementId,
+    ),
+    {
+      id: result.engagementId,
+      name: command.name,
+      primaryGoal: command.primaryGoal,
+      proposedScope: command.proposedScope,
+    },
+  );
+  const otherRegister = await listStaffAgreementRegister(
+    fixture.founderDb,
+    admin,
+    randomUUID(),
+  );
+  assert.equal(otherRegister, null);
 
   const draft = await loadStaffAgreementBuilderDraft(
     fixture.founderDb,
@@ -143,7 +179,67 @@ test("creates reviewed direct work atomically, resumes the saved agreement draft
   );
   assert.equal(selectedDraft?.engagementId, result.engagementId);
   assert.equal(selectedDraft?.step, "scope");
+  assert.equal(selectedDraft?.content.agreement?.title, command.name);
+  assert.equal(selectedDraft?.content.agreement?.goals, command.primaryGoal);
+  assert.equal(selectedDraft?.content.agreement?.scope, command.proposedScope);
   assert.equal(selected.draftVersion, 1);
+  const overview = await listStaffAgreementOverview(fixture.founderDb, admin);
+  const organisation = overview.find(
+    (row) => row.organisationId === fixture.organisationId,
+  );
+  assert.equal(organisation?.builderDraftCount, 2);
+  assert.equal(organisation?.agreementCount, initialAgreementCount);
+
+  const sameEngagement = await completeStaffEngagementCommand(
+    fixture.founderDb,
+    admin,
+    fixture.organisationId,
+    {
+      action: "select",
+      commandId: randomUUID(),
+      engagementId: result.engagementId,
+      draftId: result.draftId,
+      expectedVersion: result.draftVersion,
+    },
+    fixture.correlationId,
+  );
+  const preserved = await loadStaffAgreementBuilderDraft(
+    fixture.founderDb,
+    admin,
+    fixture.organisationId,
+    sameEngagement.draftId,
+  );
+  assert.equal(
+    preserved?.content.agreement?.title,
+    "Preserved agreement title",
+  );
+  assert.equal(
+    preserved?.content.agreement?.goals,
+    "Preserved agreement goal.",
+  );
+
+  const legacy = await completeStaffEngagementCommand(
+    fixture.founderDb,
+    admin,
+    fixture.organisationId,
+    {
+      action: "select",
+      commandId: randomUUID(),
+      engagementId: fixture.engagement.engagementId,
+      draftId: sameEngagement.draftId,
+      expectedVersion: sameEngagement.draftVersion,
+    },
+    fixture.correlationId,
+  );
+  const replaced = await loadStaffAgreementBuilderDraft(
+    fixture.founderDb,
+    admin,
+    fixture.organisationId,
+    legacy.draftId,
+  );
+  assert.equal(replaced?.content.agreement?.title, "Test");
+  assert.equal(replaced?.content.agreement?.goals, undefined);
+  assert.equal(replaced?.content.agreement?.scope, undefined);
 });
 
 test("rolls back engagement creation when the saved agreement draft is stale", async (t) => {
