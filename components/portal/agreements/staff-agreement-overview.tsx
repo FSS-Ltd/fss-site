@@ -32,7 +32,7 @@ function AgreementWorkspaceRow({
   status,
 }: Readonly<{
   organisation: StaffAgreementOverviewRow;
-  status: "builder" | "draft" | "signed";
+  status: "builder" | "draft" | "signed" | "offer";
 }>): React.JSX.Element {
   const draft = status === "draft";
   const count =
@@ -40,7 +40,9 @@ function AgreementWorkspaceRow({
       ? organisation.builderDraftCount
       : draft
         ? organisation.draftCount
-        : organisation.signedCount;
+        : status === "signed"
+          ? organisation.signedCount
+          : organisation.commercialOfferCount;
 
   return (
     <li>
@@ -50,30 +52,44 @@ function AgreementWorkspaceRow({
             <h3>{organisation.organisationName}</h3>
             <p>
               {count}{" "}
-              {status === "builder" ? "unfinished" : draft ? "draft" : "signed"}{" "}
+              {status === "builder"
+                ? "unfinished"
+                : draft
+                  ? "draft"
+                  : status === "signed"
+                    ? "signed"
+                    : "open"}{" "}
               {status === "builder"
                 ? count === 1
                   ? "draft"
                   : "drafts"
-                : count === 1
-                  ? "agreement"
-                  : "agreements"}
+                : status === "offer"
+                  ? count === 1
+                    ? "offer"
+                    : "offers"
+                  : count === 1
+                    ? "agreement"
+                    : "agreements"}
             </p>
           </div>
           <StatusBadge status={status === "signed" ? "success" : "warning"}>
-            {status === "builder"
-              ? "Builder draft"
-              : draft
-                ? "Draft agreement"
-                : "Signed evidence"}
+            {status === "offer" && organisation.expiredOfferCount > 0
+              ? `${organisation.expiredOfferCount} deadline expired: extend or withdraw. Submitted offers remain in the client workspace.`
+              : status === "builder"
+                ? "Builder draft"
+                : draft
+                  ? "Draft agreement"
+                  : "Signed evidence"}
           </StatusBadge>
         </div>
         <p className={styles.cardCopy}>
-          {status === "builder"
-            ? "Continue an unfinished builder draft from the client Agreements page. No agreement record exists yet."
-            : draft
-              ? "Resume the saved agreement workspace. Signing approval is distinct from a recorded signature."
-              : "Signed evidence is complete. Review the organisation workspace for the retained record and service activation."}
+          {status === "offer"
+            ? "Review offers"
+            : status === "builder"
+              ? "Continue an unfinished builder draft from the client Agreements page. No agreement record exists yet."
+              : draft
+                ? "Resume the saved agreement workspace. Signing approval is distinct from a recorded signature."
+                : "Signed evidence is complete. Review the organisation workspace for the retained record and service activation."}
         </p>
         <PortalActionLink
           href={agreementWorkspaceHref(organisation.organisationId)}
@@ -96,7 +112,7 @@ function AgreementGroup({
   title,
 }: Readonly<{
   organisations: readonly StaffAgreementOverviewRow[];
-  status: "builder" | "draft" | "signed";
+  status: "builder" | "draft" | "signed" | "offer";
   title: string;
 }>): React.JSX.Element {
   return (
@@ -117,11 +133,13 @@ function AgreementGroup({
         </ul>
       ) : (
         <p className={styles.empty}>
-          {status === "builder"
-            ? "No saved builder drafts need attention."
-            : status === "draft"
-              ? "No client drafts need attention."
-              : "No signed agreements are recorded yet."}
+          {status === "offer"
+            ? "No open payment offers need review."
+            : status === "builder"
+              ? "No saved builder drafts need attention."
+              : status === "draft"
+                ? "No client drafts need attention."
+                : "No signed agreements are recorded yet."}
         </p>
       )}
     </section>
@@ -152,8 +170,9 @@ export function StaffAgreementOverview({
       drafts: result.drafts + organisation.draftCount,
       builderDrafts: result.builderDrafts + organisation.builderDraftCount,
       signed: result.signed + organisation.signedCount,
+      offers: result.offers + organisation.commercialOfferCount,
     }),
-    { agreements: 0, drafts: 0, builderDrafts: 0, signed: 0 },
+    { agreements: 0, drafts: 0, builderDrafts: 0, signed: 0, offers: 0 },
   );
   const builderDrafts = agreements.filter(
     (organisation) => organisation.builderDraftCount > 0,
@@ -163,6 +182,9 @@ export function StaffAgreementOverview({
   );
   const signed = agreements.filter(
     (organisation) => organisation.signedCount > 0,
+  );
+  const offers = agreements.filter(
+    (organisation) => organisation.commercialOfferCount > 0,
   );
 
   return (
@@ -187,6 +209,9 @@ export function StaffAgreementOverview({
         </PortalCard>
         <PortalCard title="Agreements">
           <p className={styles.metric}>{totals.agreements}</p>
+        </PortalCard>
+        <PortalCard title="Open payment offers">
+          <p className={styles.metric}>{totals.offers}</p>
         </PortalCard>
         <PortalCard title="Builder drafts">
           <p className={styles.metric}>{totals.builderDrafts}</p>
@@ -216,6 +241,11 @@ export function StaffAgreementOverview({
         title="Draft & awaiting signature"
       />
       <AgreementGroup organisations={signed} status="signed" title="Signed" />
+      <AgreementGroup
+        organisations={offers}
+        status="offer"
+        title="Payment offers"
+      />
       {signingReadiness.length ? (
         <section
           className={styles.group}

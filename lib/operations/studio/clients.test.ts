@@ -42,7 +42,8 @@ test("lists authorised Studio clients with contact, active-work and next-action 
     legalName: "Northstar Studio Ltd",
     lifecycle: "active",
     nextAction: "Review client work",
-    nextActionHref: "/portal/admin/clients/44444444-4444-4444-8444-444444444444/requests",
+    nextActionHref:
+      "/portal/admin/clients/44444444-4444-4444-8444-444444444444/requests",
     primaryContactName: "Alex Morgan",
   };
   const { calls, db } = recordingDb([row]);
@@ -83,7 +84,7 @@ test("published offers become the client-register next action", async () => {
     legalName: "Northstar Studio Ltd",
     lifecycle: "active" as const,
     nextAction: "Review client offer",
-    nextActionHref: `/portal/admin/clients/${id}/commercial-offers/${offerId}/preview`,
+    nextActionHref: `/portal/admin/clients/${id}/commercial-offers/${offerId}`,
     primaryContactName: "Alex Morgan",
   };
   const { calls, db } = recordingDb([row]);
@@ -95,7 +96,7 @@ test("published offers become the client-register next action", async () => {
   assert.equal(result.items[0].nextActionHref, row.nextActionHref);
   assert.match(query, /operations\.commercial_offers/);
   assert.match(query, /f\.status in \('published', 'proposed', 'rejected'\)/);
-  assert.match(query, /f\.expires_at > clock_timestamp\(\)/);
+  assert.match(query, /f\.expires_at <= clock_timestamp\(\)/);
 });
 
 test("loads a selected client hub through the FSS-admin boundary and keeps offer separate from agreement count", async () => {
@@ -113,7 +114,7 @@ test("loads a selected client hub through the FSS-admin boundary and keeps offer
     legalName: "Northstar Studio Ltd",
     lifecycle: "active" as const,
     nextAction: "Review client offer",
-    nextActionHref: `/portal/admin/clients/${id}/commercial-offers/${offerId}/preview`,
+    nextActionHref: `/portal/admin/clients/${id}/commercial-offers/${offerId}`,
     openRequestCount: 0,
     primaryContactName: "Alex Morgan",
     timezone: "Europe/London",
@@ -127,7 +128,10 @@ test("loads a selected client hub through the FSS-admin boundary and keeps offer
   assert.equal(result?.agreementCount, 0);
   assert.match(query, /operations\.commercial_offers/);
   assert.match(query, /f\.status in \('published', 'proposed', 'rejected'\)/);
-  assert.match(query, /f\.expires_at > clock_timestamp\(\)/);
-  assert.match(query, /select count\(\*\)::integer from operations\.agreements a/);
+  assert.match(query, /f\.expires_at <= clock_timestamp\(\)/);
+  assert.match(
+    query,
+    /select count\(\*\)::integer from operations\.agreements a/,
+  );
   assert.match(query, /operations\.assert_active_staff_membership/);
 });

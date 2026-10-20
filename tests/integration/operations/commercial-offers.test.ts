@@ -409,6 +409,119 @@ test("expired offers cannot select and read with explicit expired state", async 
   }
 });
 
+test("expired submitted proposals retain their terms through extension and resume review", async (t) => {
+  const f = await fixture(t);
+  try {
+    const offer = await publishStaffCommercialOffer(
+      f.founderDb,
+      f.staff,
+      f.organisationId,
+      {
+        engagementId: f.engagement.engagementId,
+        draft: f.draft,
+        spec: { cash: { mode: "client_proposed" }, revenueShare: null },
+        expiresAt: new Date(Date.now() + 800).toISOString(),
+      },
+      f.correlationId,
+    );
+    const submitted = await f.select(offer.id, offer.version, {
+      option: "cash",
+      recurringAmountMinor: "2000",
+    });
+    await f.admin`select pg_sleep(0.9)`;
+    const expired = await executeStaffCommercialOfferCommand(
+      f.founderDb,
+      f.staff,
+      f.organisationId,
+      {
+        action: "extend",
+        offerId: submitted.id,
+        expectedVersion: submitted.version,
+        expiresAt: new Date(Date.now() + 86400000).toISOString(),
+      },
+      f.correlationId,
+    );
+    assert.equal(expired.status, "proposed");
+    assert.equal(expired.recordedStatus, "proposed");
+    assert.deepEqual(expired.selection, submitted.selection);
+    assert.deepEqual(expired.draft, submitted.draft);
+    const [extension] = await f.admin<
+      {
+        action: string;
+        previous_expires_at: string;
+        expires_at: string;
+        actor_id: string;
+        correlation_id: string;
+      }[]
+    >`select action,previous_expires_at::text,expires_at::text,actor_id,correlation_id::text from operations.commercial_offer_events where offer_id=${offer.id} and action='deadline_extended'`;
+    assert.equal(extension?.action, "deadline_extended");
+    assert.equal(extension?.actor_id, f.staff.actorId);
+    assert.equal(extension?.correlation_id, f.correlationId);
+    assert.ok(extension?.expires_at > extension?.previous_expires_at);
+    await assert.rejects(
+      executeStaffCommercialOfferCommand(
+        f.founderDb,
+        f.staff,
+        f.organisationId,
+        {
+          action: "extend",
+          offerId: submitted.id,
+          expectedVersion: submitted.version,
+          expiresAt: new Date(Date.now() + 86400000).toISOString(),
+        },
+        f.correlationId,
+      ),
+      AgreementConflict,
+    );
+    const reviewed = await executeStaffCommercialOfferCommand(
+      f.founderDb,
+      f.staff,
+      f.organisationId,
+      {
+        action: "reject",
+        offerId: expired.id,
+        expectedVersion: expired.version,
+        reason: "Reviewed after deadline extension",
+      },
+      f.correlationId,
+    );
+    assert.equal(reviewed.status, "rejected");
+  } finally {
+    await f.cleanup();
+  }
+});
+
+test("expired unanswered offers can be withdrawn without changing their terms", async (t) => {
+  const f = await fixture(t);
+  try {
+    const offer = await publishStaffCommercialOffer(
+      f.founderDb,
+      f.staff,
+      f.organisationId,
+      {
+        engagementId: f.engagement.engagementId,
+        draft: f.draft,
+        spec: { cash: { mode: "fixed" }, revenueShare: null },
+        expiresAt: new Date(Date.now() + 500).toISOString(),
+      },
+      f.correlationId,
+    );
+    await f.admin`select pg_sleep(0.6)`;
+    const withdrawn = await executeStaffCommercialOfferCommand(
+      f.founderDb,
+      f.staff,
+      f.organisationId,
+      { action: "withdraw", offerId: offer.id, expectedVersion: offer.version },
+      f.correlationId,
+    );
+    assert.equal(withdrawn.status, "withdrawn");
+    assert.deepEqual(withdrawn.draft, offer.draft);
+    assert.equal(withdrawn.expiresAt, offer.expiresAt);
+  } finally {
+    await f.cleanup();
+  }
+});
+
 test("direct granted commands reject null versions and retain the actual custom reviewer", async (t) => {
   const f = await fixture(t);
   try {

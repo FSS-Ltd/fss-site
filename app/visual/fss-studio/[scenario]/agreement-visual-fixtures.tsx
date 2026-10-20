@@ -254,6 +254,8 @@ export function StudioAgreementListScenario(): React.JSX.Element {
             agreementCount: 2,
             draftCount: 1,
             builderDraftCount: 2,
+            commercialOfferCount: 0,
+            expiredOfferCount: 0,
             organisationId,
             organisationName: "Northstar Studio",
             signedCount: 1,

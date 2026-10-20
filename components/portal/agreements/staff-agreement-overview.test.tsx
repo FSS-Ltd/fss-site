@@ -22,6 +22,8 @@ test("groups FSS Studio agreement work by actionable status", () => {
           agreementCount: 2,
           draftCount: 1,
           builderDraftCount: 2,
+          commercialOfferCount: 0,
+          expiredOfferCount: 0,
           organisationId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
           organisationName: "Harbour Foundation",
           signedCount: 1,
@@ -57,6 +59,8 @@ test("describes signed records as completed evidence rather than an approval", (
           agreementCount: 1,
           draftCount: 0,
           builderDraftCount: 0,
+          commercialOfferCount: 0,
+          expiredOfferCount: 0,
           organisationId: "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
           organisationName: "Elm &amp; Co",
           signedCount: 1,
@@ -67,4 +71,30 @@ test("describes signed records as completed evidence rather than an approval", (
   );
 
   assert.match(html, /Signed evidence is complete/);
+});
+
+test("surfaces payment offers and expired deadlines in the agreement overview", () => {
+  const html = renderToStaticMarkup(
+    <StaffAgreementOverview
+      agreements={[
+        {
+          agreementCount: 0,
+          draftCount: 0,
+          builderDraftCount: 0,
+          commercialOfferCount: 2,
+          expiredOfferCount: 1,
+          organisationId: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+          organisationName: "Nina Mutamba",
+          signedCount: 0,
+        },
+      ]}
+      signingReadiness={[]}
+    />,
+  );
+
+  assert.match(html, /Payment offers/);
+  assert.match(html, /2 open offers/);
+  assert.match(html, /1 deadline expired: extend or withdraw/);
+  assert.match(html, /Review offers/);
+  assert.match(html, /New agreement/);
 });

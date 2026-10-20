@@ -90,6 +90,11 @@ export const staffCommercialOfferCommandSchema = z.discriminatedUnion(
   "action",
   [
     publishCommercialOfferSchema.extend({ action: z.literal("publish") }),
+    z.strictObject({
+      action: z.literal("extend"),
+      ...binding,
+      expiresAt: z.iso.datetime(),
+    }),
     z.strictObject({ action: z.literal("withdraw"), ...binding }),
     z.strictObject({
       action: z.literal("reject"),
@@ -116,18 +121,20 @@ export type CommercialOfferMutation = {
   >;
 }[OfferMutationCommand["action"]];
 
+export type CommercialOfferStatus =
+  | "published"
+  | "proposed"
+  | "rejected"
+  | "selected"
+  | "withdrawn";
+
 export type CommercialOffer = {
   id: string;
   organisationId: string;
   engagementId: string;
   version: number;
-  status:
-    | "published"
-    | "proposed"
-    | "rejected"
-    | "selected"
-    | "withdrawn"
-    | "expired";
+  status: CommercialOfferStatus | "expired";
+  recordedStatus: CommercialOfferStatus;
   draft: AgreementDraft;
   spec: CommercialOfferSpec;
   expiresAt: string;

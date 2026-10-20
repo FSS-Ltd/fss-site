@@ -16,6 +16,7 @@ import {
 } from "@/lib/operations/money";
 import { totalLinePence } from "@/lib/operations/agreements/validation";
 import type { CommercialOffer } from "@/lib/operations/agreements/commercial-types";
+import { submittedCommercialTerms } from "@/lib/operations/agreements/commercial-presentation";
 import type { OfferDeliveryStatus } from "@/lib/operations/agreements/agreement-notification-repository";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import { useCommercialOfferCommand } from "./use-commercial-offer-command";
@@ -33,9 +34,67 @@ export function StaffCommercialOffer({
   const { pending, error, send } = useCommercialOfferCommand(offer, "staff");
   const [validationError, setValidationError] = useState<string | null>(null);
   const proposal = offer.selection;
+  const recurringMonths =
+    offer.draft.lines.find((line) => line.recurrenceMonths > 0)
+      ?.recurrenceMonths ?? 1;
+  const recurringInterval =
+    recurringMonths === 1 ? "per month" : `every ${recurringMonths} months`;
   return (
     <article className={styles.detail}>
       <CommercialOfferSummary offer={offer} />
+      {offer.status === "expired" ? (
+        <PortalCard
+          title="Deadline expired: extend or withdraw"
+          description="FSS staff will communicate with the client about any deadline change. No message is sent automatically."
+        >
+          {offer.recordedStatus === "proposed" && proposal ? (
+            <p>Submitted proposal: {submittedCommercialTerms(offer)}</p>
+          ) : null}
+          <p>
+            Request deadline:{" "}
+            {new Date(offer.expiresAt).toLocaleString("en-GB", {
+              timeZone: "UTC",
+            })}{" "}
+            UTC
+          </p>
+          <form
+            aria-busy={pending}
+            onSubmit={(event) => {
+              event.preventDefault();
+              setValidationError(null);
+              const value = String(
+                new FormData(event.currentTarget).get("expiresAt") ?? "",
+              );
+              try {
+                const expiresAt = new Date(value).toISOString();
+                void send({ action: "extend", expiresAt });
+              } catch {
+                setValidationError("Choose a valid future deadline.");
+              }
+            }}
+          >
+            <fieldset disabled={pending}>
+              <legend>New response deadline</legend>
+              <PortalField label="Extend until" required>
+                <input name="expiresAt" type="datetime-local" required />
+              </PortalField>
+              <PortalButton loading={pending} type="submit">
+                Extend deadline
+              </PortalButton>
+              <PortalButton
+                type="button"
+                variant="secondary"
+                onClick={() => void send({ action: "withdraw" })}
+              >
+                Withdraw proposal
+              </PortalButton>
+            </fieldset>
+          </form>
+          {error || validationError ? (
+            <Notice tone="error">{validationError ?? error}</Notice>
+          ) : null}
+        </PortalCard>
+      ) : null}
       <PortalCard
         title="Offer delivery"
         description="Each recipient has a separate email record. Sent means the provider accepted it; delivery is confirmed only after its delivery event."
@@ -95,7 +154,7 @@ export function StaffCommercialOffer({
         <PortalCard title="Review client proposal">
           <p>
             {proposal.option === "cash"
-              ? `${formatMoney(proposal.recurringAmountMinor ?? "0", offer.draft.currency)} per billing period`
+              ? `${formatMoney(proposal.recurringAmountMinor ?? "0", offer.draft.currency)} ${offer.draft.currency} ${recurringInterval}`
               : `${(Number(proposal.percentageBps) / 100).toFixed(2)}% revenue share`}
           </p>
           <p>
@@ -260,7 +319,8 @@ export function StaffCommercialOffer({
           Open selected agreement
         </PortalActionLink>
       ) : null}
-      {["published", "proposed", "rejected"].includes(offer.status) ? (
+      {offer.status !== "expired" &&
+      ["published", "proposed", "rejected"].includes(offer.status) ? (
         <PortalButton
           type="button"
           variant="secondary"
