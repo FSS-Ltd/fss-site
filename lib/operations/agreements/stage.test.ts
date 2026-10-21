@@ -4,6 +4,7 @@ import { agreementStage, stagePresentation } from "./stage";
 
 const offer = {
   status: "published" as const,
+  recordedStatus: "published" as const,
   spec: {
     cash: { mode: "client_proposed" as const },
     revenueShare: null,
@@ -69,5 +70,21 @@ test("commercial and signing stages distinguish proposal, signature and retained
       },
     }),
     "attention_required",
+  );
+});
+
+test("expired submitted commercial proposals remain in the proposal review stage", () => {
+  assert.equal(
+    agreementStage({
+      offer: {
+        status: "expired",
+        recordedStatus: "proposed",
+        spec: {
+          cash: { mode: "client_proposed" },
+          revenueShare: null,
+        },
+      },
+    }),
+    "proposal_submitted",
   );
 });

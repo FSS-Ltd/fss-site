@@ -126,6 +126,8 @@ export type StaffAgreementOverviewRow = {
   draftCount: number;
   builderDraftCount: number;
   signedCount: number;
+  commercialOfferCount: number;
+  expiredOfferCount: number;
 };
 
 export async function listStaffAgreementRegister(
@@ -186,10 +188,18 @@ export async function listStaffAgreementOverview(
         count(a.id)::integer as "agreementCount",
         count(a.id) filter (where a.status = 'draft')::integer as "draftCount",
         count(a.id) filter (where a.status = 'signed')::integer as "signedCount",
-        coalesce(max(b.builder_draft_count), 0)::integer as "builderDraftCount"
+        coalesce(max(b.builder_draft_count), 0)::integer as "builderDraftCount",
+        coalesce(max(f.offer_count), 0)::integer as "commercialOfferCount",
+        coalesce(max(f.expired_count), 0)::integer as "expiredOfferCount"
       from operations.organisations o
       left join operations.agreements a on a.organisation_id = o.id
       left join operations.staff_agreement_builder_draft_counts() b on b.organisation_id = o.id
+      left join lateral (
+        select count(*)::integer as offer_count,
+          count(*) filter (where expires_at <= clock_timestamp())::integer as expired_count
+        from operations.commercial_offers
+        where organisation_id = o.id and status in ('published','proposed','rejected')
+      ) f on true
       where o.lifecycle = 'active'
       group by o.id, o.display_name
       order by o.display_name, o.id

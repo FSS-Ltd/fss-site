@@ -8,6 +8,8 @@ const overview: StudioOverview = {
       agreementCount: 1,
       draftCount: 1,
       builderDraftCount: 0,
+      commercialOfferCount: 0,
+      expiredOfferCount: 0,
       organisationId: "a8e2f019-6ab1-49b2-a396-23bec152c465",
       organisationName: "Northstar Studio",
       signedCount: 0,

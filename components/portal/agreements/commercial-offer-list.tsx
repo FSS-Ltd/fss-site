@@ -5,6 +5,7 @@ import {
 } from "@/components/portal/ui";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import type { CommercialOffer } from "@/lib/operations/agreements/commercial-types";
+import { submittedCommercialTerms } from "@/lib/operations/agreements/commercial-presentation";
 import {
   agreementStage,
   stagePresentation,
@@ -27,11 +28,14 @@ export function CommercialOfferList({
           <li key={offer.id}>
             <PortalCard title={offer.draft.title}>
               <StatusBadge status="info">
-                {stagePresentation(agreementStage({ offer }), audience).label}
+                {audience === "staff" && offer.status === "expired"
+                  ? "Deadline expired: extend or withdraw"
+                  : stagePresentation(agreementStage({ offer }), audience)
+                      .label}
               </StatusBadge>
               <p>
-                {offer.draft.currency} · Setup and ongoing terms are shown
-                separately
+                {submittedCommercialTerms(offer) ??
+                  `${offer.draft.currency} · Setup and ongoing terms are shown separately`}
               </p>
               <PortalActionLink
                 href={
@@ -43,7 +47,9 @@ export function CommercialOfferList({
                 }
               >
                 {audience === "staff"
-                  ? "Review offer"
+                  ? offer.status === "expired"
+                    ? "Extend or withdraw"
+                    : "Review offer"
                   : "Review payment options"}
               </PortalActionLink>
             </PortalCard>

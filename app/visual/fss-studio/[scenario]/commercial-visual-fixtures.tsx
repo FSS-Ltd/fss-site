@@ -13,6 +13,7 @@ const offer: CommercialOffer = {
   engagementId: "33333333-3333-4333-8333-333333333333",
   version: 1,
   status: "published",
+  recordedStatus: "published",
   draft: {
     ...agreementDraft(),
     currency: "EUR",

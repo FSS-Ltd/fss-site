@@ -6,6 +6,7 @@ import {
   commercialOfferSpecSchema,
   commercialSelectionDraft,
   portalCommercialOfferCommandSchema,
+  staffCommercialOfferCommandSchema,
   publishCommercialOfferSchema,
   recurringTotalMinor,
 } from "./commercial-types";
@@ -163,6 +164,30 @@ test("client proposals enforce floors and reject additional payload fields", () 
       ...binding,
       option: "cash",
       actorId: "spoof",
+    }).success,
+    false,
+  );
+});
+
+test("staff can request an explicit deadline extension with optimistic version binding", () => {
+  const command = {
+    action: "extend",
+    offerId: randomUUID(),
+    expectedVersion: 2,
+    expiresAt: "2026-11-01T12:00:00.000Z",
+  };
+  assert.deepEqual(staffCommercialOfferCommandSchema.parse(command), command);
+  assert.equal(
+    staffCommercialOfferCommandSchema.safeParse({
+      ...command,
+      actorId: "spoof",
+    }).success,
+    false,
+  );
+  assert.equal(
+    staffCommercialOfferCommandSchema.safeParse({
+      ...command,
+      expiresAt: "not-a-date",
     }).success,
     false,
   );

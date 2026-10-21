@@ -14,7 +14,7 @@ export type AgreementStage =
   | "withdrawn";
 
 export function agreementStage(input: {
-  offer?: Pick<CommercialOffer, "status" | "spec"> | null;
+  offer?: Pick<CommercialOffer, "status" | "recordedStatus" | "spec"> | null;
   signing?: Pick<
     SigningApproval,
     "status" | "requiredSigners" | "signatures" | "completionFailureCode"
@@ -43,7 +43,12 @@ export function agreementStage(input: {
       return "withdrawn";
   }
   if (input.offer) {
-    if (input.offer.status === "proposed") return "proposal_submitted";
+    if (
+      input.offer.status === "proposed" ||
+      (input.offer.status === "expired" &&
+        input.offer.recordedStatus === "proposed")
+    )
+      return "proposal_submitted";
     if (input.offer.status === "selected") return "approved";
     if (input.offer.status === "withdrawn" || input.offer.status === "expired")
       return "withdrawn";

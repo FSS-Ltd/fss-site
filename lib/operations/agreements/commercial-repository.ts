@@ -14,6 +14,7 @@ export async function loadCommercialOffers(
     CommercialOffer[]
   >`select id, organisation_id as "organisationId", engagement_id as "engagementId", version,
     case when status in ('published','proposed','rejected') and expires_at<=clock_timestamp() then 'expired' else status end as status,
+    status as "recordedStatus",
     draft, spec, expires_at::text as "expiresAt", selection, rejection_reason as "rejectionReason", approval_id as "approvalId", agreement_id as "agreementId"
     from operations.commercial_offers where organisation_id=${organisationId} and (${offerId}::uuid is null or id=${offerId}::uuid) order by created_at desc,id limit 100`;
 }

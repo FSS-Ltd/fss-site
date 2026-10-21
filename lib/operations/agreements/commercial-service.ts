@@ -121,6 +121,22 @@ export async function executeStaffCommercialOfferCommand(
       )[0];
       if (!offer || offer.version !== command.expectedVersion)
         throw new AgreementConflict();
+      if (command.action === "extend") {
+        if (offer.status !== "expired") throw new AgreementConflict();
+        const expiresAt = new Date(command.expiresAt);
+        const now = Date.now();
+        if (
+          expiresAt.getTime() <= now ||
+          expiresAt.getTime() > now + 90 * 24 * 60 * 60 * 1000
+        )
+          throw new AgreementConflict(
+            "Choose a future deadline within 90 days.",
+          );
+        await tx`select operations.extend_commercial_offer(${organisationId},${command.offerId},${command.expectedVersion},${expiresAt.toISOString()},${correlationId})`;
+        return (
+          await loadCommercialOffers(tx, organisationId, command.offerId)
+        )[0];
+      }
       if (command.action === "approve") {
         if (offer.status !== "proposed" || !offer.selection)
           throw new AgreementConflict();

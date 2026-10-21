@@ -16,6 +16,7 @@ const offer: CommercialOffer = {
   engagementId: randomUUID(),
   version: 1,
   status: "published",
+  recordedStatus: "published",
   draft: agreementDraft(),
   spec: { cash: { mode: "fixed" }, revenueShare: null },
   expiresAt: new Date(Date.now() + 86400000).toISOString(),
