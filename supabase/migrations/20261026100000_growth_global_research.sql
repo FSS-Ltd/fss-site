@@ -19,8 +19,7 @@ create unique index businesses_country_company_number_unique_idx
   where company_number is not null;
 
 create index businesses_website_host_idx
-  on growth.businesses ((substring(lower(website_url) from '^https?://(?:www\.)?([^/:?#]+)')))
-  where website_url is not null;
+  on growth.businesses ((substring(lower(coalesce(website_url, first_party_source_url)) from '^https?://(?:www[.])?([^/:?#]+)')));
 
 alter table growth.contacts
   alter column first_name drop not null,
