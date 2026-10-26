@@ -1,6 +1,6 @@
 import { ExternalLink, Mail, MapPin } from "lucide-react";
 import Link from "next/link";
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import {
   formatGrowthCurrency,
@@ -22,10 +22,12 @@ export function ProspectDetailView({
   integrations,
   now,
   prospect,
+  workspace,
 }: {
   integrations: readonly IntegrationHealth[];
   now: string;
   prospect: ProspectDetailData;
+  workspace?: ReactNode;
 }) {
   const researchOnly = prospect.contact?.lawfulBasis === "research_only";
 
@@ -76,6 +78,7 @@ export function ProspectDetailView({
         </div>
       </div>
 
+      {workspace}
       <div className={styles.detailGrid}>
         <div className={styles.detailColumn}>
           <div className={styles.card}>
@@ -155,7 +158,9 @@ export function ProspectDetailView({
                   <a href={`mailto:${prospect.contact.email}`}>
                     {prospect.contact.email}
                   </a>
-                  <span className={styles.pill}>Source verified</span>
+                  <span className={styles.pill}>
+                    {researchOnly ? "Source verified" : prospect.contact.subscriberType === "corporate" ? "Verified" : "Needs review"}
+                  </span>
                 </p>
               </div>
             </div>
@@ -228,7 +233,9 @@ export function ProspectDetailView({
               </p>
             )}
             <p className={styles.contactField}>
-              Verified {formatGrowthDate(prospect.business.verifiedAt)}
+              {prospect.business.verifiedAt
+                ? `Verified ${formatGrowthDate(prospect.business.verifiedAt)}`
+                : "Corporate verification pending"}
             </p>
           </div>
         </div>

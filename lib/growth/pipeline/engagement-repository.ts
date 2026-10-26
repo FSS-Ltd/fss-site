@@ -14,6 +14,11 @@ function createTransaction(
 ): EngagementTransitionTransaction {
   return {
     async lockEngagement(engagementId) {
+      // CRM edits lock the prospect before its engagement. Keep the same order
+      // when synchronizing the commercial lifecycle to avoid lock inversion.
+      await transaction`select p.id from growth.prospects p
+        inner join growth.delivery_engagements de on de.prospect_id=p.id
+        where de.id=${engagementId} for update of p`;
       const rows = await transaction<Array<LockedEngagement>>`
         select
           id,
@@ -41,6 +46,12 @@ function createTransaction(
             updated_at = now()
         where id = ${input.engagementId}
       `;
+      await transaction`update growth.prospects p
+        set status=${input.toStage}::growth.prospect_status,version=p.version+1,updated_at=now()
+        from growth.delivery_engagements de
+        where de.id=${input.engagementId} and p.id=de.prospect_id
+          and p.status not in ('rejected','suppressed')
+          and p.status is distinct from ${input.toStage}::growth.prospect_status`;
     },
 
     async applyDeliveryTransition(input) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { publishCrmChange } from "@/lib/growth/crm/change-events";
 import { useState } from "react";
 
 import type { ProspectDetail } from "@/lib/growth/dashboard/prospect-detail";
@@ -55,7 +55,10 @@ export function evaluateApprovalReadiness(
   }
 
   const businessAgeMs =
-    new Date(now).getTime() - new Date(prospect.business.verifiedAt).getTime();
+    new Date(now).getTime() -
+    (prospect.business.verifiedAt
+      ? new Date(prospect.business.verifiedAt).getTime()
+      : 0);
   if (businessAgeMs > STALE_RESEARCH_DAYS * 24 * 60 * 60 * 1000) {
     reasons.push("Research is more than 30 days old and should be refreshed.");
   }
@@ -296,6 +299,5 @@ export function ProspectActions(props: {
   now: string;
   prospect: ProspectDetail;
 }) {
-  const router = useRouter();
-  return <ProspectActionsFrame {...props} onSuccess={() => router.refresh()} />;
+  return <ProspectActionsFrame {...props} onSuccess={publishCrmChange} />;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { publishCrmChange } from "@/lib/growth/crm/change-events";
 import { type FormEvent, useState } from "react";
 
 import { StageTransitionFormFrame } from "@/components/growth/pipeline/stage-transition-form";
@@ -63,7 +63,9 @@ export function DealActionsFrame({
     setBusy(true);
     setFeedback(null);
     try {
-      const dueAtIso = new Date(`${nextActionDueAt}T09:00:00.000Z`).toISOString();
+      const dueAtIso = new Date(
+        `${nextActionDueAt}T09:00:00.000Z`,
+      ).toISOString();
       const response = await postAction(
         `/api/growth/prospects/${prospectId}/next-action`,
         {
@@ -88,9 +90,9 @@ export function DealActionsFrame({
         return;
       }
 
-      const responseBody = (await response.json().catch(() => null)) as
-        | { message?: string }
-        | null;
+      const responseBody = (await response.json().catch(() => null)) as {
+        message?: string;
+      } | null;
       setFeedback({
         tone: "error",
         message: responseBody?.message ?? "The next step could not be saved.",
@@ -119,7 +121,11 @@ export function DealActionsFrame({
 
       <form className={styles.nextActionForm} onSubmit={submitNextAction}>
         {feedback && (
-          <p className={styles.actionFeedback} data-tone={feedback.tone} role="alert">
+          <p
+            className={styles.actionFeedback}
+            data-tone={feedback.tone}
+            role="alert"
+          >
             {feedback.message}
           </p>
         )}
@@ -163,6 +169,5 @@ export function DealActions(props: {
   currentNextAction: string | null;
   currentNextActionDueAt: string | null;
 }) {
-  const router = useRouter();
-  return <DealActionsFrame {...props} onSuccess={() => router.refresh()} />;
+  return <DealActionsFrame {...props} onSuccess={publishCrmChange} />;
 }
