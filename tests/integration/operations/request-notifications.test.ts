@@ -46,7 +46,10 @@ test("request outbox events fan out to members with owner email records, idempot
     const summary = await dispatchRequestNotifications(founder, {
       sender: async () => ({
         status: "succeeded",
-        receipt: { providerId: "re_test", acceptedAt: new Date().toISOString() },
+        receipt: {
+          providerId: "re_test",
+          acceptedAt: new Date().toISOString(),
+        },
       }),
     });
     assert.equal(summary.fannedOut, 1);
@@ -69,7 +72,10 @@ test("request outbox events fan out to members with owner email records, idempot
     const repeat = await dispatchRequestNotifications(founder, {
       sender: async () => ({
         status: "succeeded",
-        receipt: { providerId: "re_test", acceptedAt: new Date().toISOString() },
+        receipt: {
+          providerId: "re_test",
+          acceptedAt: new Date().toISOString(),
+        },
       }),
     });
     assert.equal(repeat.fannedOut, 0);
@@ -86,7 +92,9 @@ test("request outbox events fan out to members with owner email records, idempot
       f.organisationId,
       f.correlationId,
       async (tx) =>
-        tx<{ id: string }[]>`select id from operations.request_notifications where user_id = ${f.identity.userId}`,
+        tx<
+          { id: string }[]
+        >`select id from operations.request_notifications where user_id = ${f.identity.userId}`,
     );
     assert.equal(visible.length, 1);
   } finally {
@@ -144,7 +152,7 @@ test("request notifications exclude billing-only contacts", async () => {
   }
 });
 
-test("review publication queues an owner email delivery and the dispatcher completes it", async () => {
+test("the onboarding worker dispatches owner review emails without founder privileges", async () => {
   const admin = postgres(url, { max: 1 });
   const founder = postgres(url, {
     max: 4,
@@ -153,6 +161,10 @@ test("review publication queues an owner email delivery and the dispatcher compl
   const portal = postgres(url, {
     max: 4,
     connection: { options: "-c role=operations_portal" },
+  });
+  const worker = postgres(url, {
+    max: 2,
+    connection: { options: "-c role=operations_onboarding_worker" },
   });
   const f = await requestFixture(admin, founder);
   try {
@@ -165,9 +177,8 @@ test("review publication queues an owner email delivery and the dispatcher compl
       f.correlationId,
     );
     // Drive the request to ready_for_review through the founder engine.
-    const { executeFounderRequestCommand } = await import(
-      "../../../lib/operations/requests/service"
-    );
+    const { executeFounderRequestCommand } =
+      await import("../../../lib/operations/requests/service");
     const run = (raw: Record<string, unknown>) =>
       executeFounderRequestCommand(
         founder,
@@ -203,10 +214,13 @@ test("review publication queues an owner email delivery and the dispatcher compl
       publicSummary: "First deliverable",
       documentIds: [],
     });
-    const review = await dispatchRequestNotifications(founder, {
+    const review = await dispatchRequestNotifications(worker, {
       sender: async () => ({
         status: "succeeded",
-        receipt: { providerId: "re_review", acceptedAt: new Date().toISOString() },
+        receipt: {
+          providerId: "re_review",
+          acceptedAt: new Date().toISOString(),
+        },
       }),
     });
     // Creation plus each acknowledged/plan/start transition also fans out.
@@ -214,7 +228,12 @@ test("review publication queues an owner email delivery and the dispatcher compl
     assert.equal(review.emailsClaimed, 1);
     assert.equal(review.emailsSent, 1);
     const [delivery] = await admin<
-      { kind: string; status: string; providerId: string | null; recipient: string }[]
+      {
+        kind: string;
+        status: string;
+        providerId: string | null;
+        recipient: string;
+      }[]
     >`select kind, status, provider_id as "providerId", recipient from operations.request_email_deliveries where request_id = ${request.id}`;
     assert.ok(delivery);
     assert.equal(delivery.kind, "review_requested");
@@ -226,6 +245,7 @@ test("review publication queues an owner email delivery and the dispatcher compl
     await admin.end();
     await founder.end();
     await portal.end();
+    await worker.end();
   }
 });
 
@@ -248,9 +268,8 @@ test("FSS closure queues a distinct owner email delivery with its reason", async
       newRequest(f.projectId),
       f.correlationId,
     );
-    const { executeFounderRequestCommand } = await import(
-      "../../../lib/operations/requests/service"
-    );
+    const { executeFounderRequestCommand } =
+      await import("../../../lib/operations/requests/service");
     await executeFounderRequestCommand(
       founder,
       { actorId: "d".repeat(64) },
@@ -267,7 +286,10 @@ test("FSS closure queues a distinct owner email delivery with its reason", async
     const summary = await dispatchRequestNotifications(founder, {
       sender: async () => ({
         status: "succeeded",
-        receipt: { providerId: "re_closed", acceptedAt: new Date().toISOString() },
+        receipt: {
+          providerId: "re_closed",
+          acceptedAt: new Date().toISOString(),
+        },
       }),
     });
     assert.equal(summary.emailsClaimed, 1);
@@ -284,5 +306,54 @@ test("FSS closure queues a distinct owner email delivery with its reason", async
     await admin.end();
     await founder.end();
     await portal.end();
+  }
+});
+
+test("request notification worker access is limited to delivery procedures", async () => {
+  const admin = postgres(url, { max: 1 });
+  const signatures = [
+    "operations.dispatch_request_notifications(integer)",
+    "operations.claim_request_emails(integer)",
+    "operations.complete_request_email(uuid,text,timestamp with time zone)",
+    "operations.fail_request_email(uuid,text,timestamp with time zone,boolean)",
+  ];
+  const roles = [
+    "operations_onboarding_worker",
+    "operations_founder",
+    "operations_portal",
+    "anon",
+    "authenticated",
+    "service_role",
+    "growth_app",
+    "operations_billing_worker",
+    "operations_signing_worker",
+  ];
+  try {
+    const permissions = await admin<
+      { role: string; signature: string; allowed: boolean }[]
+    >`
+      select r.name as role,f.signature,has_function_privilege(r.name,f.signature,'execute') as allowed
+      from unnest(${roles}::text[]) as r(name)
+      cross join unnest(${signatures}::text[]) as f(signature)
+    `;
+    assert.equal(permissions.length, roles.length * signatures.length);
+    for (const permission of permissions) {
+      assert.equal(
+        permission.allowed,
+        permission.role === "operations_onboarding_worker" ||
+          permission.role === "operations_founder",
+        `${permission.role}: ${permission.signature}`,
+      );
+    }
+    const direct = await admin<{ tableName: string; allowed: boolean }[]>`
+      select name as "tableName",has_table_privilege('operations_onboarding_worker',name,'select,insert,update,delete') as allowed
+      from unnest(array['operations.request_notifications','operations.request_email_deliveries']) as t(name)
+    `;
+    assert.deepEqual(
+      direct.map((row) => row.allowed),
+      [false, false],
+    );
+  } finally {
+    await admin.end();
   }
 });

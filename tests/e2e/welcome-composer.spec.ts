@@ -410,3 +410,33 @@ test("schedule explains the missing agreement rather than offering an empty drop
   await invoiceChoice.selectOption("installment:1");
   await expect(invoiceChoice).toHaveValue("installment:1");
 });
+
+test("exact welcome review uses the current portal sender domain", async ({
+  page,
+}) => {
+  const commands = await mockCommands(page);
+  await openBuilder(page);
+  await choosePacket(page);
+  await invoice(page);
+  await stage(page, "Review");
+  await page
+    .getByRole("button", { name: "Generate exact email and PDF preview" })
+    .click();
+  await expect
+    .poll(() =>
+      commands.some((command) => command.action === "preview_welcome"),
+    )
+    .toBe(true);
+  const save = commands.find(
+    (command) => command.action === "save_journey_draft",
+  );
+  const preview = commands.find(
+    (command) => command.action === "preview_welcome",
+  );
+  expect(save?.content).toMatchObject({
+    reviewedWelcome: { content: { from: "hello@faithfulsoftware.dev" } },
+  });
+  expect(preview?.welcome).toMatchObject({
+    content: { from: "hello@faithfulsoftware.dev" },
+  });
+});

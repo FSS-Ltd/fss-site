@@ -1,3 +1,4 @@
+import { OPERATIONS_EMAIL_FROM } from "../email-identity";
 import { createHash } from "node:crypto";
 import { resolveSiteUrl } from "@/lib/config/site-url";
 import type { OperationsDb } from "../db/client";
@@ -60,7 +61,7 @@ export function agreementNotificationEmail(
       : "Review and sign";
   const text = `${message}\n\n${action}: ${url.href}\n\nFaithful Software Solutions`;
   return {
-    from: "FSS <hello@faithfulsoftwaresolutions.co.uk>",
+    from: OPERATIONS_EMAIL_FROM,
     replyTo: "j.ntagengwa@faithfulsoftware.dev",
     to: notification.recipient,
     subject,

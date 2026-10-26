@@ -1,3 +1,4 @@
+import { OPERATIONS_EMAIL_FROM } from "../email-identity";
 import type { OperationsDb } from "../db/client";
 
 export async function applyAgreementDeliveryEvent(
@@ -14,7 +15,11 @@ export async function applyAgreementDeliveryEvent(
     };
   },
 ): Promise<void> {
-  if (payload.data.from !== "FSS <hello@faithfulsoftwaresolutions.co.uk>")
+  // Previously sent messages can still deliver events after the sender changes.
+  if (
+    payload.data.from !== OPERATIONS_EMAIL_FROM &&
+    payload.data.from !== "FSS <hello@faithfulsoftwaresolutions.co.uk>"
+  )
     return;
   const kind = payload.type.slice("email.".length);
   await db`

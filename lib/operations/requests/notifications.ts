@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { z } from "zod";
 import { resolveSiteUrl } from "@/lib/config/site-url";
+import { OPERATIONS_EMAIL_FROM } from "../email-identity";
 import type { OperationsDb } from "../db/client";
 import { createOnboardingResendSender } from "../onboarding/resend-provider";
 import { retryAt } from "../onboarding/schedule";
@@ -272,7 +273,7 @@ export function buildRequestDeliveryEmail(
     "Faithful Software Solutions",
   ];
   return {
-    from: "FSS <hello@faithfulsoftwaresolutions.co.uk>",
+    from: OPERATIONS_EMAIL_FROM,
     replyTo: "j.ntagengwa@faithfulsoftware.dev",
     to: delivery.recipient,
     subject,
