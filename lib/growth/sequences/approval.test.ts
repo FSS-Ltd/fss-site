@@ -72,6 +72,8 @@ function lockedDraft(
     normalisedEmail: "contact@example.test",
     subscriberType: "corporate",
     corporateStatus: "active",
+    prospectStatus: "ready_for_email_review",
+    prospectVersion: 1,
     status: "completed",
     completedAt: new Date("2026-08-17T06:00:00.000Z"),
     hasEnrollment: false,
@@ -125,6 +127,7 @@ function createFakeRepository(state: FakeState): FirstEmailApprovalRepository {
       operation: (transaction: FirstEmailApprovalTransaction) => Promise<T>,
     ) {
       const transaction: FirstEmailApprovalTransaction = {
+        authorizeResearchContact: async () => {},
         async lockDraft(draftTaskId) {
           if (!state.draft || state.draft.id !== draftTaskId) return null;
           return state.draft;

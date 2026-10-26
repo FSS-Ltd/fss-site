@@ -1,3 +1,4 @@
+import { ResearchEmailReviewScenario } from "./research-email-visual-fixture";
 import { ClientFeatureUnavailableScenario } from "./portal-recovery-visual-fixtures";
 import { StudioSavedAgreementDraftsScenario } from "./agreement-draft-visual-fixture";
 import {
@@ -108,6 +109,7 @@ import {
 } from "./active-route-visual-fixtures";
 
 export type VisualScenarioName =
+  | "growth-research-email-review"
   | "client-agreement-empty"
   | "client-agreement-recorded"
   | "client-agreements-disabled"
@@ -394,6 +396,10 @@ function StudioShellScenario(): React.JSX.Element {
 }
 
 const scenarios: Record<VisualScenarioName, VisualScenario> = {
+  "growth-research-email-review": {
+    name: "growth-research-email-review",
+    content: <ResearchEmailReviewScenario />,
+  },
   "client-commercial-offer": {
     name: "client-commercial-offer",
     content: <ClientCommercialScenario />,

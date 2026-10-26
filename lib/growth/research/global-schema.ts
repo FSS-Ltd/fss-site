@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { emailHtmlVisibleText, isSafeEmailHtml } from "../email/html-policy";
+import { offersEmailOptOut } from "../email/copy-policy";
 import { MAX_RESEARCH_BUNDLE_BYTES } from "./limits";
 
 const COUNTRY_CODES = new Set(
@@ -35,7 +36,7 @@ export const globalFirstEmailSchema = z
     ),
     html: text(50_000),
     text: text(20_000),
-    wordCount: z.number().int().min(20).max(220),
+    wordCount: z.number().int().positive().max(2000),
     optOutSentence: text(500),
   })
   .strict()
@@ -59,9 +60,7 @@ export const globalFirstEmailSchema = z
       });
     }
     if (
-      !/opt[ -]?out|no further emails|not hear from me/i.test(
-        email.optOutSentence,
-      ) ||
+      !offersEmailOptOut(email.optOutSentence) ||
       !email.text.includes(email.optOutSentence)
     ) {
       context.addIssue({

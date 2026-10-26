@@ -453,3 +453,52 @@ test("respects the maximum messages per run", async () => {
   assert.equal(summary.claimed, 2);
   assert.equal(state.queue.length, 1);
 });
+
+test("single-email approvals send without automatic follow-ups", async () => {
+  const state = createFakeState({
+    queue: [
+      claimedFirstEmail({
+        manualOnly: true,
+        approvedRecipient: "contact@example.test",
+      }),
+    ],
+  });
+  const item = state.queue[0]!;
+  state.contexts.set(
+    item.sequenceEnrollmentId,
+    sendContext({
+      lawfulBasis: "consent",
+      corporateStatus: "active",
+      prospectStatus: "ready_for_email_review",
+    }),
+  );
+  const summary = await createDispatch(state)(db, NOW);
+  assert.equal(summary.sent, 1);
+  assert.equal(state.sent[0]?.followUps, null);
+});
+
+test("single-email delivery rechecks permission and exact approved recipient", async () => {
+  for (const override of [
+    { normalisedEmail: "replacement@example.test" },
+    { lawfulBasis: "research_only" },
+    { prospectStatus: "rejected" },
+  ]) {
+    const item = claimedFirstEmail({
+      manualOnly: true,
+      approvedRecipient: "contact@example.test",
+    });
+    const state = createFakeState({ queue: [item] });
+    state.contexts.set(
+      item.sequenceEnrollmentId,
+      sendContext({
+        lawfulBasis: "consent",
+        corporateStatus: "active",
+        prospectStatus: "ready_for_email_review",
+        ...override,
+      }),
+    );
+    const summary = await createDispatch(state)(db, NOW);
+    assert.equal(summary.cancelled, 1);
+    assert.equal(state.sent.length, 0);
+  }
+});

@@ -1,5 +1,7 @@
 # Global Growth research intake
 
+> The initial intake-only scope below is extended by [Research email editing and approval](../../design/research-email-approval-restoration.md). Intake remains research-only by default; the founder may now edit and explicitly approve one reviewed email for immediate sending.
+
 ## Intent and scope
 
 Accept verified businesses worldwide, including sole traders, into Growth OS for internal draft review. The user explicitly requested removing geographic and corporate intake blockers and researching 100 leads. Existing 1.0/1.1 intake and sending authorization remain intact. No deployment or production migration is part of implementation.

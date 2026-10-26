@@ -175,7 +175,7 @@ test("returns a validation error when the revised email content is invalid", asy
     ok: false,
     code: "invalid_content",
     message:
-      "The first-email content must use 140 to 220 words and retain the opt-out and concept disclaimer exactly once.",
+      "Use a subject, clear copy and an email opt-out. Drafts with a concept visual also need a concept disclosure.",
     correlationId: "correlation-id",
   });
 });

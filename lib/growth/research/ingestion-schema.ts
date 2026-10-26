@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { offersEmailOptOut } from "../email/copy-policy";
 
 import {
   hasCanonicalEmailHtmlText,
@@ -260,8 +261,8 @@ const firstEmailCandidateSchema: z.ZodType<FirstEmailCandidate> = z
     wordCount: z
       .number()
       .int("Email word count must be an integer.")
-      .min(140, "First email must contain at least 140 words.")
-      .max(220, "First email must contain no more than 220 words."),
+      .min(1, "First email must contain some text.")
+      .max(2000, "First email must contain no more than 2000 words."),
     optOutSentence: requiredText("Email opt-out sentence", 500),
     conceptDisclaimer: requiredText("Email concept disclaimer", 500),
   })
@@ -284,11 +285,7 @@ const firstEmailCandidateSchema: z.ZodType<FirstEmailCandidate> = z
       });
     }
 
-    if (
-      !/opt[ -]?out|no further emails|not hear from me/i.test(
-        email.optOutSentence,
-      )
-    ) {
+    if (!offersEmailOptOut(email.optOutSentence)) {
       context.addIssue({
         code: "custom",
         path: ["optOutSentence"],
@@ -608,12 +605,7 @@ const researchProspectCandidateSchema: z.ZodType<ResearchProspectCandidate> = z
         requireEvidenceKind(
           [experienceBrief.visual.onSiteImageEvidenceId],
           ["on-site-image"],
-          [
-            "assessment",
-            "experienceBrief",
-            "visual",
-            "onSiteImageEvidenceId",
-          ],
+          ["assessment", "experienceBrief", "visual", "onSiteImageEvidenceId"],
           "On-site image evidence",
         );
       }
@@ -710,7 +702,12 @@ export const researchRunIngestionSchema: z.ZodType<ResearchRunIngestion> = z
         if (candidate.assessment.experienceBrief === undefined) {
           context.addIssue({
             code: "custom",
-            path: ["prospects", candidateIndex, "assessment", "experienceBrief"],
+            path: [
+              "prospects",
+              candidateIndex,
+              "assessment",
+              "experienceBrief",
+            ],
             message:
               "Evidence-backed preview research requires an experience brief.",
           });

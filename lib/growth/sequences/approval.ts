@@ -29,6 +29,8 @@ export type LockedApprovalDraft = StoredFirstEmailDraft & {
   normalisedEmail: string;
   subscriberType: string;
   corporateStatus: string;
+  prospectStatus: string;
+  prospectVersion: number;
 };
 
 export type ApprovedVisualAsset = {
@@ -56,6 +58,8 @@ export type CreateEnrollmentAndMessageInput = {
   prospectId: string;
   contactId: string;
   enrollmentStatus: "active" | "pending_approval";
+  followUpPolicy?: "manual_only";
+  approvedRecipient?: string;
   message: FirstEmailMessageWrite;
 };
 
@@ -69,9 +73,15 @@ export type AppendApprovalAuditInput = {
   correlationId: string;
   actorId: string;
   draftTaskId: string;
+  reasonCode?: string;
 };
 
 export interface FirstEmailApprovalTransaction {
+  authorizeResearchContact(input: {
+    contactId: string;
+    prospectId: string;
+    basis: "corporate_legitimate_interests" | "consent";
+  }): Promise<void>;
   lockDraft(draftTaskId: string): Promise<LockedApprovalDraft | null>;
   isSuppressed(normalisedEmail: string): Promise<boolean>;
   getApprovedAsset(

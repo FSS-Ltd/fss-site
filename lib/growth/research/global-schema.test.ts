@@ -65,3 +65,15 @@ test("Maps references must use Maps hosts and discovery-only claims", () => {
     false,
   );
 });
+
+test("accepts short reviewed copy and a natural-language opt-out", () => {
+  const fixture = createGlobalResearchFixture();
+  const email = fixture.prospects[0]!.firstEmail;
+  email.text =
+    "A booking portal could help. If you would rather I did not contact you again, reply and I will leave it there.";
+  email.html = `<p>${email.text}</p>`;
+  email.wordCount = email.text.split(/\s+/).length;
+  email.optOutSentence =
+    "If you would rather I did not contact you again, reply and I will leave it there.";
+  assert.equal(globalResearchRunSchema.safeParse(fixture).success, true);
+});

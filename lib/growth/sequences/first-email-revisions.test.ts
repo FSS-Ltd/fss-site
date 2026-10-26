@@ -347,3 +347,37 @@ test("bounds revision history before the JSON snapshot can grow indefinitely", a
   });
   assert.equal(fake.savedSnapshots.length, 0);
 });
+
+test("research draft edits persist concise copy and reject stale versions", async () => {
+  const { createGlobalResearchFixture } =
+    await import("../research/global-test-fixture");
+  const fake = createRepository(
+    storedDraft({
+      outputSnapshot: {
+        schemaVersion: "2.0",
+        reviewState: "research_only",
+        email: createGlobalResearchFixture().prospects[0]!.firstEmail,
+      },
+    }),
+  );
+  const revise = createFirstEmailDraftReviser({ repository: fake.repository });
+  const input = {
+    ...revisionInput(),
+    subject: "A short reviewed idea",
+    paragraphs: ["A portal could help.", "Reply unsubscribe if you prefer."],
+  };
+  const result = await revise({} as GrowthDb, input);
+  assert.equal(result.version, 2);
+  assert.equal(
+    result.email.text,
+    "A portal could help.\n\nReply unsubscribe if you prefer.",
+  );
+  assert.equal(fake.audits.length, 1);
+  await assert.rejects(
+    revise({} as GrowthDb, input),
+    (error: unknown) =>
+      error instanceof FirstEmailRevisionError &&
+      error.code === "version_conflict",
+  );
+  assert.equal(fake.savedSnapshots.length, 1);
+});

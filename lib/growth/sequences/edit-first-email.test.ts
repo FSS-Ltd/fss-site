@@ -73,8 +73,8 @@ test("rejects blank, oversized, or control-bearing subjects", () => {
   }
 });
 
-test("enforces the 140 to 220 word content standard", () => {
-  for (const bodyWordCount of [119, 201]) {
+test("rejects copy beyond the content size limit", () => {
+  for (const bodyWordCount of [2001]) {
     const input = validInput();
     input.paragraphs[0] = words(bodyWordCount);
     assert.throws(() => createFounderFirstEmailRevision(input), TypeError);
@@ -188,5 +188,26 @@ test("rejects malformed paragraph structures and retained standards", () => {
         paragraphs: Array.from({ length: 21 }, () => "paragraph"),
       }),
     TypeError,
+  );
+});
+
+test("allows concise founder edits with reworded opt-out and concept disclosure", () => {
+  const revision = createFounderFirstEmailRevision({
+    subject: "A short idea",
+    paragraphs: [
+      "A booking portal could help your team.",
+      "Reply unsubscribe if this is not useful.",
+      "This is an example concept, for discussion only.",
+    ],
+    retained: { optOutSentence, conceptDisclaimer },
+  });
+  assert.equal(revision.wordCount, 22);
+  assert.equal(
+    revision.optOutSentence,
+    "Reply unsubscribe if this is not useful.",
+  );
+  assert.equal(
+    revision.conceptDisclaimer,
+    "This is an example concept, for discussion only.",
   );
 });

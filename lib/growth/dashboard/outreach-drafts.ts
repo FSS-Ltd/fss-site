@@ -44,7 +44,7 @@ export async function getOutreachDrafts(
         limit 1
       ) draft on true
       where p.status = 'ready_for_email_review'
-        and coalesce(draft.output_snapshot ->> 'reviewState', 'draft') = 'draft'
+        and coalesce(draft.output_snapshot ->> 'reviewState', 'draft') in ('draft', 'research_only')
         and not exists (
           select 1 from growth.sequence_enrollments se
           where se.prospect_id = p.id

@@ -97,7 +97,7 @@ export function createEditDraftHandler(
               status: 422,
               code: "invalid_content",
               message:
-                "The first-email content must use 140 to 220 words and retain the opt-out and concept disclaimer exactly once.",
+                "Use a subject, clear copy and an email opt-out. Drafts with a concept visual also need a concept disclosure.",
             }
           : null,
   });
