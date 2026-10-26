@@ -46,7 +46,7 @@ export function OutreachList({ result }: { result: OutreachListResult }) {
     <div className={styles.page}>
       <div className={styles.header}>
         <div>
-          <h1 className={styles.heading}>Outreach</h1>
+          <h2 className={styles.sectionTitle}>Outreach sequences</h2>
           <p className={styles.subtitle}>
             Every active and stopped Gmail sequence for founder-approved
             prospects.
@@ -56,7 +56,9 @@ export function OutreachList({ result }: { result: OutreachListResult }) {
 
       <div className={styles.card}>
         <table className={styles.table}>
-          <caption className={styles.visuallyHidden}>Outreach sequences</caption>
+          <caption className={styles.visuallyHidden}>
+            Outreach sequences
+          </caption>
           <thead>
             <tr>
               <th scope="col">Business</th>
@@ -73,7 +75,10 @@ export function OutreachList({ result }: { result: OutreachListResult }) {
                 <td>{row.businessName}</td>
                 <td>{row.contactName}</td>
                 <td>
-                  <span className={styles.pill} data-tone={statusTone(row.status)}>
+                  <span
+                    className={styles.pill}
+                    data-tone={statusTone(row.status)}
+                  >
                     {formatGrowthStatusLabel(row.status)}
                   </span>
                 </td>
@@ -99,7 +104,10 @@ export function OutreachList({ result }: { result: OutreachListResult }) {
                 <p className={styles.timelineTitle}>{row.businessName}</p>
                 <p className={styles.timelineMeta}>
                   {row.contactName} ·{" "}
-                  <span className={styles.pill} data-tone={statusTone(row.status)}>
+                  <span
+                    className={styles.pill}
+                    data-tone={statusTone(row.status)}
+                  >
                     {formatGrowthStatusLabel(row.status)}
                   </span>
                 </p>
