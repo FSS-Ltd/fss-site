@@ -80,50 +80,45 @@ export async function StaffTemplateEditorPage({
       </main>
     );
   }
+  let workspace: Awaited<ReturnType<typeof loadStaffOnboardingWorkspace>>;
   try {
-    const workspace = await loadStaffOnboardingWorkspace(
-      db,
-      admin,
-      organisationId,
-    );
-    const selectedTemplate = initialTemplateId
-      ? workspace.templateDrafts.find(
-          (template) => template.id === initialTemplateId,
-        )
-      : undefined;
-    if (initialTemplateId && !selectedTemplate) return <PortalUnavailable />;
-    if (
-      initialTaskId &&
-      !selectedTemplate?.tasks.some((task) => task.id === initialTaskId)
-    ) {
-      return <PortalUnavailable />;
-    }
-    return (
-      <main>
-        <PageHeader
-          action={
-            <PortalActionLink
-              href={portalPath(
-                `/portal/admin/clients/${organisationId}/journey`,
-              )}
-              variant="secondary"
-            >
-              Back to welcome journey
-            </PortalActionLink>
-          }
-          description="Draft the client checklist, then publish a reviewed immutable version for future welcome journeys."
-          eyebrow="FSS Studio · Welcome journeys"
-          title="A consistent start, tailored to this client"
-        />
-        <JourneyTemplateEditor
-          commandEndpoint={`/api/portal/admin/welcome/templates?organisationId=${organisationId}`}
-          initialTaskId={initialTaskId}
-          initialTemplateId={initialTemplateId}
-          templates={workspace.templateDrafts}
-        />
-      </main>
-    );
+    workspace = await loadStaffOnboardingWorkspace(db, admin, organisationId);
   } catch {
     return <PortalUnavailable />;
   }
+  const selectedTemplate = initialTemplateId
+    ? workspace.templateDrafts.find(
+        (template) => template.id === initialTemplateId,
+      )
+    : undefined;
+  if (initialTemplateId && !selectedTemplate) return <PortalUnavailable />;
+  if (
+    initialTaskId &&
+    !selectedTemplate?.tasks.some((task) => task.id === initialTaskId)
+  ) {
+    return <PortalUnavailable />;
+  }
+  return (
+    <main>
+      <PageHeader
+        action={
+          <PortalActionLink
+            href={portalPath(`/portal/admin/clients/${organisationId}/journey`)}
+            variant="secondary"
+          >
+            Back to welcome journey
+          </PortalActionLink>
+        }
+        description="Draft the client checklist, then publish a reviewed immutable version for future welcome journeys."
+        eyebrow="FSS Studio · Welcome journeys"
+        title="A consistent start, tailored to this client"
+      />
+      <JourneyTemplateEditor
+        commandEndpoint={`/api/portal/admin/welcome/templates?organisationId=${organisationId}`}
+        initialTaskId={initialTaskId}
+        initialTemplateId={initialTemplateId}
+        templates={workspace.templateDrafts}
+      />
+    </main>
+  );
 }

@@ -58,7 +58,7 @@
     "date-fns": "^4.1.0",
     "gray-matter": "^4.0.3",
     "lucide-react": "^1.7.0",
-    "next": "16.3.8",
+    "next": "16.4.1",
     "next-auth": "5.0.0-beta.32",
     "next-mdx-remote": "^6.0.0",
     "pdfkit": "^0.20.2",
@@ -72,7 +72,7 @@
     "stripe": "22.6.1",
     "svix": "^1.99.1",
     "tailwind-merge": "^3.5.0",
-    "zod": "^4.3.6"
+    "zod": "^4.6.6"
   },
   "devDependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
@@ -84,7 +84,7 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "eslint": "^9",
-    "eslint-config-next": "16.3.8",
+    "eslint-config-next": "16.4.1",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "tailwindcss": "^4",
@@ -97,7 +97,9 @@
       "browserslist": "4.28.7",
       "js-yaml@^3.13.0": "3.15.2",
       "baseline-browser-mapping": "2.11.0",
-      "source-map-js": "1.2.2"
+      "source-map-js": "1.2.2",
+      "zod@>=4.0.0 <4.6.6": "4.6.6",
+      "undici@>=6.23.0 <6.29.1": "6.29.1"
     }
   },
   "browserslist": [
