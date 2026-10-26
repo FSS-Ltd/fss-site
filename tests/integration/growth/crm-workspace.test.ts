@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import test from "node:test";
 import { executeCrmCommand } from "../../../lib/growth/crm/commands";
 import { CrmError } from "../../../lib/growth/crm/errors";
+import { getCrmEnquiries } from "../../../lib/growth/dashboard/crm-enquiries";
 import { getCrmWorkspace } from "../../../lib/growth/crm/workspace-query";
 import {
   crmTestFounder as founder,
@@ -278,6 +279,29 @@ test(
       } finally {
         await sql`delete from growth.crm_saved_views where id=${id}`;
         await sql`delete from growth.audit_log where entity_id=${id}`;
+      }
+    }),
+);
+
+test(
+  "enquiry pagination preserves sub-millisecond timestamps",
+  { skip: !connection },
+  async () =>
+    withCrmTestDatabase(async (sql) => {
+      const marker = randomUUID();
+      try {
+        await sql`insert into growth.inbound_leads(submission_id,submission_type,first_name,last_name,work_email,business_name,source_path,source_context,submitted_at) select gen_random_uuid(),'site_enquiry','Ada','Example','ada@example.test',${marker},'/contact',${marker},'2099-10-26T12:00:00.123456Z'::timestamptz from generate_series(1,25)`;
+        const first = await getCrmEnquiries(sql);
+        assert.equal(first.rows.length, 20);
+        assert.ok(first.nextCursor);
+        const second = await getCrmEnquiries(sql, first.nextCursor!);
+        const owned = [...first.rows, ...second.rows].filter(
+          (row) => row.businessName === marker,
+        );
+        assert.equal(owned.length, 25);
+        assert.equal(new Set(owned.map((row) => row.id)).size, 25);
+      } finally {
+        await sql`delete from growth.inbound_leads where source_context=${marker}`;
       }
     }),
 );

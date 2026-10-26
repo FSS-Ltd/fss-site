@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import test from "node:test";
 import { executeCrmCommand } from "../../../lib/growth/crm/commands";
+import { captureBusiness } from "../../../lib/growth/crm/lead-repository";
 import { CrmError } from "../../../lib/growth/crm/errors";
 
 const connection = process.env.DIRECT_DATABASE_URL;
@@ -383,4 +384,96 @@ test(
       assert.equal(permissions.authenticated, false);
       assert.equal(permissions.rls, true);
     }),
+);
+
+test(
+  "cross-company contact conflicts link the existing CRM identity",
+  { skip: !connection },
+  async () =>
+    withCrmTestDatabase(async (sql, lead) => {
+      const contact = {
+        firstName: "Ada",
+        lastName: "Example",
+        roleTitle: null,
+        email: randomUUID() + "@example.test",
+        sourceUrl: "https://example.test/team",
+        verifiedAt: "2026-10-25T12:00:00Z",
+        lawfulBasis: "legitimate_interests" as const,
+      };
+      const first = await executeCrmCommand(
+        sql,
+        { ...lead(), contact },
+        founder,
+        randomUUID(),
+      );
+      await assert.rejects(
+        executeCrmCommand(sql, { ...lead(), contact }, founder, randomUUID()),
+        (error: unknown) =>
+          error instanceof CrmError &&
+          error.code === "duplicate" &&
+          error.prospectId === first.prospectId,
+      );
+    }),
+);
+
+test(
+  "capture reconciles historical closed deals before creating another opportunity",
+  { skip: !connection },
+  async () =>
+    withCrmTestDatabase(async (sql, lead) => {
+      const input = lead();
+      const first = await executeCrmCommand(sql, input, founder, randomUUID());
+      await sql`insert into growth.delivery_engagements(prospect_id,name,stage,won_at,one_off_value_pence,monthly_value_pence) values (${first.prospectId!},'Historical deal','won',now(),10000,0)`;
+      const next = await executeCrmCommand(
+        sql,
+        { ...input, requestId: randomUUID() },
+        founder,
+        randomUUID(),
+      );
+      assert.notEqual(next.prospectId, first.prospectId);
+      const [old] =
+        await sql`select status,version from growth.prospects where id=${first.prospectId!}`;
+      assert.equal(old.status, "won");
+      assert.equal(old.version, 2);
+      const [audit] =
+        await sql`select count(*)::int count from growth.audit_log where entity_id=${first.prospectId!} and action='crm.reconcile_commercial_status'`;
+      assert.equal(audit.count, 1);
+    }),
+);
+
+test(
+  "business identity lookup does not invert record-editor row locks",
+  { skip: !connection },
+  async () =>
+    withCrmTestDatabase(
+      async (sql, lead) => {
+        const input = lead();
+        const first = await executeCrmCommand(
+          sql,
+          input,
+          founder,
+          randomUUID(),
+        );
+        await sql.begin(async (editor) => {
+          await editor`select id from growth.prospects where id=${first.prospectId!} for update`;
+          const lookedUp = Promise.withResolvers<void>();
+          const release = Promise.withResolvers<void>();
+          const capture = sql.begin(async (tx) => {
+            await captureBusiness(tx, input);
+            lookedUp.resolve();
+            await release.promise;
+          });
+          try {
+            await lookedUp.promise;
+            await editor`set local lock_timeout='500ms'`;
+            await editor`update growth.businesses set trading_name='Concurrent edit' where company_number=${input.companyNumber}`;
+          } finally {
+            release.resolve();
+            await capture;
+          }
+        });
+      },
+      connection,
+      3,
+    ),
 );

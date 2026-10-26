@@ -10,7 +10,7 @@ Growth remains the authoritative CRM. Twenty's local development references info
 - `/growth/prospects/:id` and `/growth/deals/:id`: shared record overview, properties, activity and tasks alongside existing evidence and commercial controls.
 - `/growth/pipeline`: filtered board/list, separate forecast measures and private saved views.
 
-Company numbers normalize whitespace and case. An existing business is reused; an existing open prospect returns a conflict and a record link. Contacts normalize email and can only be reused for their existing business. A closed commercial lifecycle permits a new prospect on that same business. Won/lost engagement history is retained.
+Company numbers normalize whitespace and case. An existing business is reused; an existing open prospect returns a conflict and a record link. Contacts normalize email and can only be reused for their existing business. A closed commercial lifecycle permits a new prospect on that same business. Won/lost engagement history is retained. If a historical closed engagement still has an open prospect status, capture repairs that projection under the prospect lock with a content-free audit event before creating the new prospect. Existing rejected/suppressed status remains unchanged.
 
 Manual leads start at `needs_review`, with fit score zero and corporate status `uncertain`. Their corporate verification date is null. A supplied contact requires a source, a checked date and an explicit holding basis; its subscriber type remains `uncertain`. Manual capture/conversion cannot create newsletter consent, approve outreach, or enroll a sequence. Existing verification and outreach gates continue to apply. Evidence-controlled identity fields are not exposed as ordinary editable properties.
 
@@ -26,7 +26,7 @@ Board and list use the same server filters and per-stage pagination. Saved views
 
 ## Forecast definitions
 
-One-off and monthly values are integer pence in storage and separate fields in every upgraded display. The open forecast excludes won/lost engagements. Probability-weighted one-off/monthly forecasts sum each deal's corresponding value multiplied by its probability, rounded per deal to pence. They are estimates, not recognised revenue or an annual contract value. The existing Deals minimum-value filter retains its one-off-plus-one-month comparison; its displayed amounts are separate.
+One-off and monthly values are integer pence in storage and separate fields in every upgraded display. The open forecast excludes won/lost engagements. Probability-weighted one-off/monthly forecasts sum each deal's corresponding value multiplied by its probability, rounded per deal to pence. They are estimates, not recognised revenue or an annual contract value. CRM commands cap combined one-off/monthly input at 2,147,483,647 pence to remain compatible with existing integer-based commercial checks. The existing Deals minimum-value filter retains its one-off-plus-one-month comparison; its displayed amounts are separate.
 
 ## Updates, reconnect and privacy
 
@@ -67,6 +67,23 @@ Domain coverage is measured with Node's test coverage across `lib/growth/crm/**/
 
 ## Verification status and known limits
 
-Final command results are recorded below after the final review. Nine existing deployed-preview contract checks require external preview configuration; local runs skip them. OAuth provider sign-in, production provider delivery and Production deployment are outside these local tests.
+Verified locally on 2026-10-26:
+
+| Check                                           | Result                                                                                                            |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Full `pnpm test`                                | 2,161 unit tests and 57 Growth database tests passed                                                              |
+| Desktop/mobile browser journeys                 | 16 passed on actual protected routes                                                                              |
+| TypeScript and ESLint                           | Passed, no new warnings                                                                                           |
+| Changed TypeScript/CSS/Markdown/JSON formatting | Passed                                                                                                            |
+| Production build                                | Final rebuild pending                                                                                             |
+| Migration policy                                | All 64 migrations passed                                                                                          |
+| Fresh disposable cluster bootstrap              | All ordered migrations applied successfully                                                                       |
+| Production dependency audit                     | Zero vulnerabilities at all severity levels                                                                       |
+| CRM domain coverage                             | 97.81% lines, 86.31% branches, 96.75% functions                                                                   |
+| Independent code review                         | All changed production files reviewed; six findings fixed and regression-tested; no remaining actionable findings |
+
+Nine existing deployed-preview contract checks require external preview configuration and were skipped. Remote CI, OAuth provider sign-in, production provider delivery, independent screen-reader testing and Production deployment were not run. Keyboard workflows, real desktop/mobile screens and responsive layout were checked with synthetic data.
+
+The review fixes cover lossless timestamp pagination, same-route filter-control state, contact-conflict recovery links, historical deal closure, row-lock ordering and integer money bounds. The earlier task timing regression also has a gated-response browser test: controls remain disabled through the authoritative post-commit refresh. No review finding was deferred.
 
 The broader Operations integration suite has two inherited billing failures reproduced on base source `b74be239` in the same local environment: `synthetic HTTP journey issues one invoice and appropriate per-recipient messages after all signatures, preserving newsletter opt-out` and `invoice bridge reuses permanent billing owner and records accepted outcome after cancellation`. The second reports `Billing date precedes signing`; 129 other Operations checks passed. No Operations billing source was changed for this CRM work.

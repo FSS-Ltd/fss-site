@@ -54,7 +54,11 @@ export const captureLeadSchema = z
   .refine((value) => value.oneOffMinPence <= value.oneOffMaxPence, {
     message: "Maximum value must cover the minimum.",
     path: ["oneOffMaxPence"],
-  });
+  })
+  .refine(
+    (value) => value.oneOffMaxPence + value.monthlyPence <= 2_147_483_647,
+    "Amounts exceed the supported commercial value.",
+  );
 export const pipelineFiltersSchema = z.strictObject({
   q: z.string().trim().max(120).default(""),
   stage: z
@@ -77,7 +81,11 @@ const updateProspect = z
     oneOffMaxPence: pence,
     monthlyPence: pence,
   })
-  .refine((value) => value.oneOffMinPence <= value.oneOffMaxPence);
+  .refine((value) => value.oneOffMinPence <= value.oneOffMaxPence)
+  .refine(
+    (value) => value.oneOffMaxPence + value.monthlyPence <= 2_147_483_647,
+    "Amounts exceed the supported commercial value.",
+  );
 const updateBusiness = z.strictObject({
   kind: z.literal("update_business"),
   prospectId: id,
@@ -95,17 +103,23 @@ const updateContact = z.strictObject({
   lastName: text(100),
   roleTitle: text(150).nullable(),
 });
-const updateOpportunity = z.strictObject({
-  kind: z.literal("update_opportunity"),
-  prospectId: id,
-  engagementId: id,
-  expectedVersion: version,
-  name: text(300),
-  oneOffValuePence: pence,
-  monthlyValuePence: pence,
-  probabilityPercent: z.number().int().min(0).max(100),
-  expectedCloseDate: z.iso.date().nullable(),
-});
+const updateOpportunity = z
+  .strictObject({
+    kind: z.literal("update_opportunity"),
+    prospectId: id,
+    engagementId: id,
+    expectedVersion: version,
+    name: text(300),
+    oneOffValuePence: pence,
+    monthlyValuePence: pence,
+    probabilityPercent: z.number().int().min(0).max(100),
+    expectedCloseDate: z.iso.date().nullable(),
+  })
+  .refine(
+    (value) =>
+      value.oneOffValuePence + value.monthlyValuePence <= 2_147_483_647,
+    "Amounts exceed the supported commercial value.",
+  );
 const taskFields = {
   title: text(300),
   dueAt: z.iso.datetime({ offset: true }),

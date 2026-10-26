@@ -90,3 +90,44 @@ test(
         assert.equal(closed.data.columns.qualified.totalCount, 0);
     }),
 );
+
+test(
+  "pipeline pagination preserves sub-millisecond sort timestamps",
+  { skip: !process.env.DIRECT_DATABASE_URL },
+  async () =>
+    withCrmTestDatabase(async (sql, newLead) => {
+      const name = "Precision " + randomUUID();
+      for (let index = 0; index < 25; index++) {
+        const created = await executeCrmCommand(
+          sql,
+          { ...newLead(), businessName: name },
+          founder,
+          randomUUID(),
+        );
+        await sql`insert into growth.delivery_engagements(prospect_id,name,updated_at) values (${created.prospectId!},'Website','2026-10-26T12:00:00.123456Z'::timestamptz)`;
+        await sql`update growth.prospects set next_action_due_at='2026-11-01T12:00:00.654321Z'::timestamptz where id=${created.prospectId!}`;
+      }
+      const filters = pipelineFiltersSchema.parse({ q: name });
+      const first = await getPipelineBoardResult({ after: {}, filters }, sql);
+      assert.equal(first.status, "ready");
+      if (first.status !== "ready") return;
+      const column = first.data.columns.new;
+      assert.equal(column.rows.length, 20);
+      assert.ok(column.nextCursor);
+      const second = await getPipelineBoardResult(
+        { after: { new: column.nextCursor! }, filters },
+        sql,
+      );
+      assert.equal(second.status, "ready");
+      if (second.status !== "ready") return;
+      assert.equal(second.data.columns.new.rows.length, 5);
+      assert.equal(
+        new Set(
+          [...column.rows, ...second.data.columns.new.rows].map(
+            (row) => row.engagementId,
+          ),
+        ).size,
+        25,
+      );
+    }),
+);

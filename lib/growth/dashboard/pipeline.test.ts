@@ -126,6 +126,8 @@ function sampleDbRow(overrides: Partial<PipelineCardRow> = {}): object {
   return {
     ...row,
     lastActivityAt: new Date(row.lastActivityAt),
+    cursorUpdatedAt: row.lastActivityAt,
+    cursorNextAction: row.nextActionDueAt,
     nextActionDueAt: row.nextActionDueAt ? new Date(row.nextActionDueAt) : null,
   };
 }
@@ -326,7 +328,7 @@ test("getPipelineBoardResult applies the decoded per-stage cursor as a keyset pr
   assert.ok(qualifiedQuery);
   assert.match(
     qualifiedQuery.text,
-    /coalesce\(p\.next_action_due_at, 'infinity'\) > \?::timestamptz/,
+    /coalesce\(p\.next_action_due_at, 'infinity'\) > \?::text::timestamptz/,
   );
   assert.ok(
     qualifiedQuery.values.includes("00000000-0000-4000-8000-000000000019"),
@@ -336,7 +338,7 @@ test("getPipelineBoardResult applies the decoded per-stage cursor as a keyset pr
   assert.ok(newQuery);
   assert.doesNotMatch(
     newQuery.text,
-    /coalesce\(p\.next_action_due_at, 'infinity'\) > \?::timestamptz/,
+    /coalesce\(p\.next_action_due_at, 'infinity'\) > \?::text::timestamptz/,
   );
 });
 

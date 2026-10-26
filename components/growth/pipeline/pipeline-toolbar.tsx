@@ -35,6 +35,7 @@ export function PipelineToolbar({ filters }: { filters: PipelineFilters }) {
         </Link>
       </nav>
       <form
+        key={JSON.stringify(filters)}
         aria-label="Filter pipeline"
         className={styles.filterForm}
         method="GET"

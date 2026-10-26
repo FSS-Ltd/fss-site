@@ -32,7 +32,7 @@ export async function executeCrmCommand(
       let result: CrmCommandResult;
       switch (command.kind) {
         case "capture":
-          result = await captureLead(tx, command, founder);
+          result = await captureLead(tx, command, founder, correlationId);
           break;
         case "update_prospect":
         case "update_business":

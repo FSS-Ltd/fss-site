@@ -82,3 +82,41 @@ test("task promotion requires independent positive versions for prospect and tas
     false,
   );
 });
+
+test("CRM money cannot overflow legacy combined integer-pence calculations", () => {
+  assert.equal(
+    captureLeadSchema.safeParse({
+      ...capture,
+      oneOffMaxPence: 1_200_000_000,
+      monthlyPence: 1_200_000_000,
+    }).success,
+    false,
+  );
+  assert.equal(
+    crmCommandSchema.safeParse({
+      kind: "update_prospect",
+      prospectId: capture.requestId,
+      expectedVersion: 1,
+      opportunitySummary: "Review",
+      recommendedOffer: "Website",
+      oneOffMinPence: 0,
+      oneOffMaxPence: 1_200_000_000,
+      monthlyPence: 1_200_000_000,
+    }).success,
+    false,
+  );
+  assert.equal(
+    crmCommandSchema.safeParse({
+      kind: "update_opportunity",
+      prospectId: capture.requestId,
+      engagementId: capture.requestId,
+      expectedVersion: 1,
+      name: "Scope",
+      oneOffValuePence: 1_200_000_000,
+      monthlyValuePence: 1_200_000_000,
+      probabilityPercent: 50,
+      expectedCloseDate: null,
+    }).success,
+    false,
+  );
+});

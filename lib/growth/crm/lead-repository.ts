@@ -24,10 +24,11 @@ export async function captureBusiness(
   tx: GrowthTransaction,
   input: CaptureLead,
 ): Promise<string> {
-  // Serialize this identity even when no row yet exists. The unique index remains the final guard.
+  // Serialize captures without locking an existing business before its prospect.
+  // Record editors lock prospect first, then business; uniqueness is the final guard.
   await tx`select pg_advisory_xact_lock(hashtextextended(${input.companyNumber}, 0))`;
   const [business] = await tx<{ id: string }[]>`select id from growth.businesses
-    where upper(regexp_replace(company_number,'[[:space:]]+','','g'))=${input.companyNumber} for update`;
+    where upper(regexp_replace(company_number,'[[:space:]]+','','g'))=${input.companyNumber}`;
   if (business) return business.id;
   const [created] = await tx<{ id: string }[]>`insert into growth.businesses
     (legal_name,company_number,corporate_type,corporate_status,sector,locality,county,website_url,first_party_source_url,verified_at)
@@ -48,7 +49,13 @@ export async function captureContact(
     { id: string; businessId: string }[]
   >`select id,business_id as "businessId" from growth.contacts where normalised_email=${contact.email} for update`;
   if (existing) {
-    if (existing.businessId !== businessId) throw new CrmError("duplicate");
+    if (existing.businessId !== businessId) {
+      const [owner] = await tx<
+        { id: string }[]
+      >`select id from growth.prospects where business_id=${existing.businessId}
+        order by (status not in ('won','lost','rejected','suppressed')) desc,created_at desc,id limit 1`;
+      throw new CrmError(owner ? "duplicate" : "contact_conflict", owner?.id);
+    }
     return existing.id;
   }
   const [created] = await tx<{ id: string }[]>`insert into growth.contacts

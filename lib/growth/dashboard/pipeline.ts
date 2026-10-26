@@ -161,7 +161,7 @@ export function decodePipelineCursor(value: string): Cursor | null {
 function sortValueFragment(db: GrowthQueryExecutor, value: string) {
   return value === NEXT_ACTION_SORT_INFINITY
     ? db.unsafe("'infinity'::timestamptz")
-    : db`${value}::timestamptz`;
+    : db`${value}::text::timestamptz`;
 }
 
 function pipelineFilterFragment(
@@ -205,11 +205,11 @@ async function fetchPipelineColumn(
           coalesce(p.next_action_due_at, 'infinity') > ${sortValue}
           or (
             coalesce(p.next_action_due_at, 'infinity') = ${sortValue}
-            and de.updated_at < ${cursor.updatedAt}::timestamptz
+            and de.updated_at < ${cursor.updatedAt}::text::timestamptz
           )
           or (
             coalesce(p.next_action_due_at, 'infinity') = ${sortValue}
-            and de.updated_at = ${cursor.updatedAt}::timestamptz
+            and de.updated_at = ${cursor.updatedAt}::text::timestamptz
             and de.id > ${cursor.engagementId}
           )
         )`;
@@ -220,6 +220,8 @@ async function fetchPipelineColumn(
     db<
       (Omit<PipelineCardRow, "lastActivityAt" | "nextActionDueAt"> & {
         lastActivityAt: Date;
+        cursorUpdatedAt: string;
+        cursorNextAction: string | null;
         nextActionDueAt: Date | null;
       })[]
     >`
@@ -238,6 +240,8 @@ async function fetchPipelineColumn(
         b.sector, b.locality as location,
         (coalesce(de.one_off_value_pence, 0) + coalesce(de.monthly_value_pence, 0)) as "estimatedValuePence",
         de.updated_at as "lastActivityAt",
+        to_char(de.updated_at at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') as "cursorUpdatedAt",
+        to_char(p.next_action_due_at at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') as "cursorNextAction",
         p.next_action as "nextAction",
         p.next_action_due_at as "nextActionDueAt"
       from growth.delivery_engagements de
@@ -290,7 +294,7 @@ async function fetchPipelineColumn(
       ? row.nextActionDueAt.toISOString()
       : null,
   }));
-  const last = shapedRows.at(-1);
+  const last = page.at(-1);
 
   return {
     stage,
@@ -301,7 +305,14 @@ async function fetchPipelineColumn(
     monthlyTotalPence: aggregateRows[0]?.monthlyTotalPence ?? 0,
     weightedOneOffPence: aggregateRows[0]?.weightedOneOffPence ?? 0,
     weightedMonthlyPence: aggregateRows[0]?.weightedMonthlyPence ?? 0,
-    nextCursor: hasNextPage && last ? encodePipelineCursor(last) : null,
+    nextCursor:
+      hasNextPage && last
+        ? encodePipelineCursor({
+            ...shapedRows[shapedRows.length - 1],
+            lastActivityAt: last.cursorUpdatedAt,
+            nextActionDueAt: last.cursorNextAction,
+          })
+        : null,
   };
 }
 

@@ -437,3 +437,67 @@ test("private saved views can be renamed and deleted with cancellation", async (
       await sql`delete from growth.audit_log where entity_id=${id}`;
     }
   }, databaseUrl));
+
+test("pipeline controls follow built-in and private view navigation", async ({
+  page,
+  context,
+}) =>
+  withCrmTestDatabase(async (sql) => {
+    await signIn(context);
+    const id = randomUUID();
+    const name = "Navigation " + id;
+    try {
+      await executeCrmCommand(
+        sql,
+        {
+          kind: "save_view",
+          requestId: id,
+          name,
+          filters: {
+            q: "View search",
+            stage: "qualified",
+            sector: "Engineering",
+            location: "Maidstone",
+            nextAction: "upcoming",
+            view: "list",
+          },
+        },
+        founder,
+        randomUUID(),
+      );
+      await page.goto("/growth/pipeline?stage=proposal&nextAction=overdue");
+      const form = page.getByRole("form", { name: "Filter pipeline" });
+      await expect(
+        form.getByRole("combobox", { name: "Next step", exact: true }),
+      ).toHaveValue("overdue");
+      await page
+        .getByRole("link", { name: "Missing next step", exact: true })
+        .click();
+      await expect(
+        form.getByRole("combobox", { name: "Next step", exact: true }),
+      ).toHaveValue("missing");
+      await page.getByRole("link", { name, exact: true }).click();
+      await expect(
+        form.getByRole("combobox", { name: "Stage", exact: true }),
+      ).toHaveValue("qualified");
+      await expect(
+        form.getByRole("combobox", { name: "Next step", exact: true }),
+      ).toHaveValue("upcoming");
+      await expect(form.getByLabel("Search", { exact: true })).toHaveValue(
+        "View search",
+      );
+      await page
+        .getByRole("link", { name: "Open opportunities", exact: true })
+        .click();
+      await expect(
+        form.getByRole("combobox", { name: "Stage", exact: true }),
+      ).toHaveValue("all");
+      await expect(
+        form.getByRole("combobox", { name: "Next step", exact: true }),
+      ).toHaveValue("all");
+      await expect(form.getByLabel("Search", { exact: true })).toHaveValue("");
+    } finally {
+      await sql`delete from growth.crm_saved_views where id=${id}`;
+      await sql`delete from growth.audit_log where entity_id=${id}`;
+    }
+  }, databaseUrl));

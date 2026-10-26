@@ -1,6 +1,6 @@
 # Growth CRM Upgrade Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Deliver lead capture/editing, enquiry conversion, saved views, pipeline board/list, opportunity editing, notes, tasks and activity within Growth.
 
@@ -33,11 +33,11 @@
 
 **Interfaces:** Consume `GrowthDb`, `FounderSession`, `withGrowthTransaction` and existing message-action HTTP wrapper. Produce validated `CrmCommand`, `executeCrmCommand(db, command, founder, correlationId): Promise<CrmCommandResult>` and `CrmError` with safe status/code. Lead capture returns `prospectId`; duplicate/conflict errors expose only scoped record links.
 
-- [ ] Write failing schema/record tests for bounded input, safe URLs, duplicate company/contact, stale versions, repeat enquiry conversion, closed-record protection and unchanged consent.
-- [ ] Run `node --import tsx --test lib/growth/crm/*.test.ts`; confirm the new behavior fails.
-- [ ] Generate additive tables for capture request idempotency/enquiry links, tasks, activities and private views with grants/RLS/indexes. Implement transactional identity commands and shared authenticated command route.
-- [ ] Run the unit tests and disposable PostgreSQL integration tests; inspect real stored identity, audit and permission effects.
-- [ ] Commit the tested domain slice and record exact checks/limitations in the ledger.
+- [x] Write failing schema/record tests for bounded input, safe URLs, duplicate company/contact, stale versions, repeat enquiry conversion, closed-record protection and unchanged consent.
+- [x] Run `node --import tsx --test lib/growth/crm/*.test.ts`; confirm the new behavior fails.
+- [x] Generate additive tables for capture request idempotency/enquiry links, tasks, activities and private views with grants/RLS/indexes. Implement transactional identity commands and shared authenticated command route.
+- [x] Run the unit tests and disposable PostgreSQL integration tests; inspect real stored identity, audit and permission effects.
+- [x] Commit the tested domain slice and record exact checks/limitations in the ledger.
 
 ### Task 2: Activity, tasks and saved views
 
@@ -45,11 +45,11 @@
 
 **Interfaces:** Extend `CrmCommand` with append activity, create/update task, set task status, promote task to next step, save/rename/delete view. Produce `getCrmWorkspace(db, prospectId, query)` with bounded keyset activity and task pages and private saved views. Use separate expected prospect/task versions on promotion.
 
-- [ ] Write failing tests for task lifecycle, chronological activity, cross-prospect protection, transaction rollback on stale promotion, view privacy and validated filters.
-- [ ] Run focused tests to see the missing behavior fail.
-- [ ] Implement narrow SQL services, immutable activity and audit entries, and bounded workspace queries.
-- [ ] Run focused tests plus integration tests under the runtime role.
-- [ ] Commit and ledger the verification.
+- [x] Write failing tests for task lifecycle, chronological activity, cross-prospect protection, transaction rollback on stale promotion, view privacy and validated filters.
+- [x] Run focused tests to see the missing behavior fail.
+- [x] Implement narrow SQL services, immutable activity and audit entries, and bounded workspace queries.
+- [x] Run focused tests plus integration tests under the runtime role.
+- [x] Commit and ledger the verification.
 
 ### Task 3: Filtered pipeline board and table
 
@@ -57,11 +57,11 @@
 
 **Interfaces:** Parse one validated `PipelineBoardQuery` for search/stage/sector/location/next-step/view and per-stage cursors. Extend column aggregates with separate one-off/monthly and weighted pence. Keep old aggregate fields for existing consumers until updated. Saved views store filters without cursors.
 
-- [ ] Write failing tests for filter preservation, cursor validation, board/table equivalence and filtered aggregate reconciliation.
-- [ ] Run tests; confirm failure.
-- [ ] Share SQL filter fragments across rows and aggregates. Add typed opportunity update command guarded against closed stages. Build labelled toolbar, built-in/private views and board/table states.
-- [ ] Run focused tests and real database reconciliation tests.
-- [ ] Commit and ledger verification.
+- [x] Write failing tests for filter preservation, cursor validation, board/table equivalence and filtered aggregate reconciliation.
+- [x] Run tests; confirm failure.
+- [x] Share SQL filter fragments across rows and aggregates. Add typed opportunity update command guarded against closed stages. Build labelled toolbar, built-in/private views and board/table states.
+- [x] Run focused tests and real database reconciliation tests.
+- [x] Commit and ledger verification.
 
 ### Task 4: Complete record UI and enquiry workflow
 
@@ -69,19 +69,23 @@
 
 **Interfaces:** Read edit defaults with business/contact/prospect versions separately. Render `CrmWorkspace` on both record types using the same prospect identity. All forms use the authenticated command route and announce pending/error/conflict/success results. Reconciliation subscribes to local committed events/BroadcastChannel and refreshes on focus/online with listener cleanup.
 
-- [ ] Write behavior tests for form validation/payloads, safe rendering and reconciliation cleanup/no idle requests.
-- [ ] Run the tests to observe failures.
-- [ ] Build compact Growth UI, source-aware capture/contact fields, enquiry review/convert, ordinary property editing, task/activity forms and pagination. Preserve original research and stage controls.
-- [ ] Verify unit tests, types and keyboard/mobile browser flows using synthetic records.
-- [ ] Commit and ledger verification.
+- [x] Write behavior tests for form validation/payloads, safe rendering and reconciliation cleanup/no idle requests.
+- [x] Run the tests to observe failures.
+- [x] Build compact Growth UI, source-aware capture/contact fields, enquiry review/convert, ordinary property editing, task/activity forms and pagination. Preserve original research and stage controls.
+- [x] Verify unit tests, types and keyboard/mobile browser flows using synthetic records.
+- [x] Commit and ledger verification.
 
 ### Task 5: Release verification and handoff
 
-**Files:** Add `tests/e2e/growth-crm.spec.ts` and a dedicated local browser configuration/fixture route guarded consistently with existing fixtures; add `docs/runbooks/growth-crm.md`; update design status and plan checks.
+**Files:** Add `tests/e2e/growth-crm.spec.ts` and a dedicated local browser configuration using signed disposable founder sessions; add `docs/runbooks/growth-crm.md`; update design status and plan checks.
 
 **Interfaces:** Exercise public UI commands against synthetic isolated database records through existing founder fixture conventions; no Production credentials/data in tests or screenshots.
 
-- [ ] Add browser flows for capture/edit/duplicate conflict, saved filters and board/list, opportunity editing, notes/calls/meetings, task complete/reopen/promote and enquiry conversion.
-- [ ] Run relevant Growth integration suite, full unit suite, `pnpm typecheck`, `pnpm lint`, changed-file Prettier checks, `pnpm build`, `pnpm verify:migrations`, dependency audit and desktop/mobile browser checks. Record failures by name.
-- [ ] Inspect every changed file and the full diff for identity, security, money, history, accessibility and modularity. Dispatch one independent whole-branch reviewer; fix material findings with regression tests.
-- [ ] Document additive migration rollout, data-preserving rollback, explicit refresh limitations, test commands and results. Commit final changes; preserve the worktree until safely handed off.
+- [x] Add browser flows for capture/edit/duplicate conflict, saved filters and board/list, opportunity editing, notes/calls/meetings, task complete/reopen/promote and enquiry conversion.
+- [x] Run relevant Growth integration suite, full unit suite, `pnpm typecheck`, `pnpm lint`, changed-file Prettier checks, `pnpm build`, `pnpm verify:migrations`, dependency audit and desktop/mobile browser checks. Record failures by name.
+- [x] Inspect every changed file and the full diff for identity, security, money, history, accessibility and modularity. Dispatch one independent whole-branch reviewer; fix material findings with regression tests.
+- [x] Document additive migration rollout, data-preserving rollback, explicit refresh limitations, test commands and results. Commit final changes; preserve the worktree until safely handed off.
+
+## Implementation record
+
+Tasks 1 and 2 share the command/migration domain commit `bfbae828`; Tasks 3 and 4 and the browser/runbook slice are committed in `127b57a5`. Small services keep SQL together with each command rather than adding empty repository shells. The existing authenticated routes are exercised directly; no fixture route or auth bypass was introduced. Final verification and six independent-review repairs are recorded in the CRM runbook and final commit. Production migration/deployment remains a separate approval gate.

@@ -3,6 +3,7 @@ export type CrmErrorCode =
   | "version_conflict"
   | "duplicate"
   | "duplicate_view"
+  | "contact_conflict"
   | "closed"
   | "invalid";
 const messages: Record<CrmErrorCode, string> = {
@@ -11,6 +12,8 @@ const messages: Record<CrmErrorCode, string> = {
     "This record changed. Refresh and review the latest version before saving.",
   duplicate:
     "This identity already has an open lead, or the contact belongs to another company. Open the existing record.",
+  contact_conflict:
+    "This contact belongs to another company. Review the company and contact identity before saving.",
   duplicate_view: "A saved view already uses this name. Choose another name.",
   closed:
     "Closed opportunities retain their agreed terms. Create another opportunity instead.",
