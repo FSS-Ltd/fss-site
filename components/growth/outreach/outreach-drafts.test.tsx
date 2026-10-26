@@ -39,7 +39,10 @@ test("offers draft review on desktop and mobile before any sequence has started"
   assert.match(html, /class="mobileList"/);
   assert.match(html, /Example Plumbing Ltd/);
   assert.match(html, /Alex Example/);
-  assert.doesNotMatch(html, /<button/);
+  assert.match(
+    html,
+    /<button[^>]*aria-haspopup="dialog"[^>]*>Send all<\/button>/,
+  );
 });
 
 test("keeps draft empty and failure states visible", () => {

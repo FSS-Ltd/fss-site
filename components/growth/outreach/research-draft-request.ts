@@ -40,3 +40,16 @@ export async function postResearchDraftAction(
         : undefined,
   };
 }
+
+export function draftDeliveryLabel(result: ResearchDraftResponse): string {
+  switch (result.status) {
+    case "sent":
+      return "Email sent.";
+    case "failed":
+      return "Delivery failed. Open delivery status for details.";
+    case "cancelled":
+      return "Sending was cancelled because the recipient or permission changed.";
+    default:
+      return "Approval saved. Delivery has not yet been confirmed.";
+  }
+}
