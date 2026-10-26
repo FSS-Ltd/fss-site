@@ -1,3 +1,4 @@
+import { crmCountryName } from "@/lib/growth/crm/countries";
 import Link from "next/link";
 import type { CrmRecord } from "@/lib/growth/dashboard/crm-record";
 import { AttachContactForm, CreateDealForm } from "./record-capture-actions";
@@ -15,6 +16,9 @@ export function RecordProperties({ record }: { record: CrmRecord }) {
     <section className={styles.panel} id="record-overview">
       <h2>Record overview</h2>
       <p className={styles.muted}>Company, contact and commercial details.</p>
+      <p>
+        {business.locality}, {crmCountryName(business.countryCode)}
+      </p>
       <details>
         <summary>Edit company details</summary>
         <CompanyEditor

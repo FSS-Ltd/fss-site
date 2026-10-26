@@ -26,13 +26,13 @@ export async function captureBusiness(
 ): Promise<string> {
   // Serialize captures without locking an existing business before its prospect.
   // Record editors lock prospect first, then business; uniqueness is the final guard.
-  await tx`select pg_advisory_xact_lock(hashtextextended(${input.companyNumber}, 0))`;
+  await tx`select pg_advisory_xact_lock(hashtextextended(${input.countryCode + ":" + input.companyNumber}, 0))`;
   const [business] = await tx<{ id: string }[]>`select id from growth.businesses
-    where upper(regexp_replace(company_number,'[[:space:]]+','','g'))=${input.companyNumber}`;
+    where country_code=${input.countryCode} and upper(regexp_replace(company_number,'[[:space:]]+','','g'))=${input.companyNumber}`;
   if (business) return business.id;
   const [created] = await tx<{ id: string }[]>`insert into growth.businesses
-    (legal_name,company_number,corporate_type,corporate_status,sector,locality,county,website_url,first_party_source_url,verified_at)
-    values (${input.businessName},${input.companyNumber},${input.corporateType},'uncertain',${input.sector},${input.locality},'Kent',${input.websiteUrl},${input.sourceUrl},null) returning id`;
+    (legal_name,company_number,country_code,corporate_type,corporate_status,sector,locality,county,website_url,first_party_source_url,verified_at)
+    values (${input.businessName},${input.companyNumber},${input.countryCode},${input.corporateType},'uncertain',${input.sector},${input.locality},null,${input.websiteUrl},${input.sourceUrl},null) returning id`;
   return created.id;
 }
 

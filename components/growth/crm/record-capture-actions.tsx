@@ -2,7 +2,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CommandForm } from "./command-form";
-import { ContactSourceFields, sourcedContact } from "./contact-source-fields";
+import { ContactSourceFields } from "./contact-source-fields";
+import { sourcedContact } from "./contact-form-values";
 import styles from "./crm.module.css";
 export function AttachContactForm({
   prospectId,

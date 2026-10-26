@@ -40,10 +40,10 @@ async function fillCapture(
     .getByLabel("Legal business name", { exact: true })
     .fill(input.businessName);
   await page
-    .getByLabel("Company number", { exact: true })
+    .getByLabel("Company registration number", { exact: true })
     .fill(input.companyNumber);
   await page.getByLabel("Sector", { exact: true }).fill("Engineering");
-  await page.getByLabel("Kent town", { exact: true }).fill("Maidstone");
+  await page.getByLabel("City", { exact: true }).fill("Maidstone");
   await page
     .getByLabel("Business source URL", { exact: true })
     .fill("https://example.test/about");
@@ -500,4 +500,84 @@ test("pipeline controls follow built-in and private view navigation", async ({
       await sql`delete from growth.crm_saved_views where id=${id}`;
       await sql`delete from growth.audit_log where entity_id=${id}`;
     }
+  }, databaseUrl));
+
+test("company-number validation is readable and international leads use their selected country", async ({
+  page,
+  context,
+}) =>
+  withCrmTestDatabase(async (sql, newLead) => {
+    await signIn(context);
+    const input = {
+      ...newLead(),
+      businessName: "Global browser " + randomUUID().slice(0, 8),
+    };
+    await page.goto("/growth/prospects/new");
+    await fillCapture(page, input);
+    const registration = page.getByLabel("Company registration number", {
+      exact: true,
+    });
+    await registration.fill("123");
+    await page
+      .getByRole("button", { name: "Create lead", exact: true })
+      .click();
+    await expect(registration).toHaveAttribute("aria-invalid", "true");
+    await expect(
+      page.getByRole("form", { name: "Capture lead" }).getByRole("alert"),
+    ).toContainText("8-character UK company number");
+    await expect(
+      page.getByRole("form", { name: "Capture lead" }).getByRole("alert"),
+    ).not.toContainText("invalid_format");
+    await expect(
+      page.getByRole("form", { name: "Capture lead" }).getByRole("alert"),
+    ).not.toContainText("pattern");
+    await expect(
+      page.getByRole("button", { name: "Refresh record" }),
+    ).toHaveCount(0);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.screenshot({
+      path: `output/growth-crm-${test.info().project.name}-validation.png`,
+      fullPage: true,
+    });
+    await registration.fill(input.companyNumber);
+    await page.getByLabel("Add a sourced contact").check();
+    await page.getByLabel("First name", { exact: true }).fill("Ada");
+    await page.getByLabel("Last name", { exact: true }).fill("Demo");
+    await page
+      .getByLabel("Email", { exact: true })
+      .fill(input.companyNumber.toLowerCase() + "@example.test");
+    const contactSource = page.getByLabel("Contact source URL", {
+      exact: true,
+    });
+    await contactSource.fill("https://user:password@example.test");
+    await page
+      .getByLabel("Contact checked (your device time)")
+      .fill("2026-10-25T12:00");
+    await page
+      .getByLabel("Lawful basis for holding this contact")
+      .selectOption("legitimate_interests");
+    await page
+      .getByRole("button", { name: "Create lead", exact: true })
+      .click();
+    await expect(contactSource).toHaveAttribute("aria-invalid", "true");
+    await expect(
+      page.getByLabel("Business source URL", { exact: true }),
+    ).not.toHaveAttribute("aria-invalid", "true");
+    await contactSource.fill("https://example.test/team");
+    await page
+      .getByRole("combobox", { name: "Country", exact: true })
+      .selectOption("US");
+    await registration.fill(input.companyNumber);
+    await page.getByLabel("City", { exact: true }).fill("New York");
+    await page
+      .getByRole("button", { name: "Create lead", exact: true })
+      .click();
+    await expect(page).toHaveURL(/\/growth\/prospects\/[a-f0-9-]{36}$/);
+    await expect(
+      page.getByText("New York, United States").first(),
+    ).toBeVisible();
+    const [stored] =
+      await sql`select country_code,county from growth.businesses where company_number=${input.companyNumber}`;
+    expect(stored.country_code).toBe("US");
+    expect(stored.county).toBeNull();
   }, databaseUrl));

@@ -1,3 +1,4 @@
+import { crmCountryName } from "@/lib/growth/crm/countries";
 import { ExternalLink, Mail, MapPin } from "lucide-react";
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
@@ -57,13 +58,7 @@ export function ProspectDetailView({
                   size={13}
                   style={{ marginRight: 3, verticalAlign: "-2px" }}
                 />
-                {[
-                  prospect.business.locality,
-                  prospect.business.county,
-                  prospect.business.countryCode,
-                ]
-                  .filter(Boolean)
-                  .join(", ")}
+                {[prospect.business.locality, prospect.business.county, crmCountryName(prospect.business.countryCode ?? "GB")].filter(Boolean).join(", ")}
               </span>
               <span>
                 {prospect.business.corporateStatus === "active"

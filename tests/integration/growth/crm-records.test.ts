@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import test from "node:test";
 import { executeCrmCommand } from "../../../lib/growth/crm/commands";
+import { findBusinessIdentityByCompanyNumber } from "../../../lib/growth/db/repositories/businesses";
 import { captureBusiness } from "../../../lib/growth/crm/lead-repository";
 import { CrmError } from "../../../lib/growth/crm/errors";
 
@@ -476,4 +477,61 @@ test(
       connection,
       3,
     ),
+);
+
+test(
+  "global capture scopes registration identity by country and does not invent Kent",
+  { skip: !connection },
+  async () =>
+    withCrmTestDatabase(async (sql, lead) => {
+      const input = lead();
+      const first = await executeCrmCommand(
+        sql,
+        { ...input, countryCode: "US", locality: "New York" },
+        founder,
+        randomUUID(),
+      );
+      const second = await executeCrmCommand(
+        sql,
+        {
+          ...input,
+          requestId: randomUUID(),
+          countryCode: "CA",
+          locality: "Toronto",
+        },
+        founder,
+        randomUUID(),
+      );
+      assert.notEqual(first.prospectId, second.prospectId);
+      const rows =
+        await sql`select b.country_code,b.county,b.locality from growth.businesses b join growth.prospects p on p.business_id=b.id where p.id in (${first.prospectId!},${second.prospectId!}) order by b.country_code`;
+      assert.deepEqual(
+        rows.map((row) => row.country_code),
+        ["CA", "US"],
+      );
+      assert.ok(rows.every((row) => row.county === null));
+      assert.equal(
+        await findBusinessIdentityByCompanyNumber(sql, input.companyNumber),
+        null,
+      );
+      assert.ok(
+        await findBusinessIdentityByCompanyNumber(
+          sql,
+          input.companyNumber,
+          "US",
+        ),
+      );
+      await assert.rejects(
+        executeCrmCommand(
+          sql,
+          { ...input, requestId: randomUUID(), countryCode: "US" },
+          founder,
+          randomUUID(),
+        ),
+        (error: unknown) =>
+          error instanceof CrmError &&
+          error.code === "duplicate" &&
+          error.prospectId === first.prospectId,
+      );
+    }),
 );

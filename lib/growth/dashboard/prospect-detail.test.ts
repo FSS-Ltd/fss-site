@@ -39,6 +39,7 @@ const coreRow = {
   businessCorporateStatus: "active",
   businessSector: "Plumbing",
   businessLocality: "Maidstone",
+  businessCountryCode: "GB",
   businessWebsiteUrl: null,
   businessGooglePlaceId: "place-1",
   businessGoogleMapsReferenceUrl: "https://maps.example/place-1",

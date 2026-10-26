@@ -1,4 +1,5 @@
 "use client";
+import { crmCountryName } from "@/lib/growth/crm/countries";
 import type { CrmRecord } from "@/lib/growth/dashboard/crm-record";
 import { CommandForm } from "./command-form";
 import { FieldGroup, FormField } from "./form-field";
@@ -24,6 +25,7 @@ export function CompanyEditor({
         websiteUrl: nullableText(data, "websiteUrl"),
       })}
     >
+      <p>Country: {crmCountryName(business.countryCode)}</p>
       <FormField
         label="Trading name"
         name="tradingName"
@@ -39,7 +41,7 @@ export function CompanyEditor({
           maxLength={120}
         />
         <FormField
-          label="Kent town"
+          label="City"
           name="locality"
           defaultValue={business.locality}
           required

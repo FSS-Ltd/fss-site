@@ -1,19 +1,6 @@
-import { contactSchema } from "@/lib/growth/crm/schemas";
 import { FieldGroup, FormField } from "./form-field";
-import { fieldText, localInstant, nullableText } from "./form-values";
 import styles from "./crm.module.css";
 
-export function sourcedContact(data: FormData) {
-  return contactSchema.parse({
-    firstName: fieldText(data, "firstName"),
-    lastName: fieldText(data, "lastName"),
-    email: fieldText(data, "email"),
-    roleTitle: nullableText(data, "roleTitle"),
-    sourceUrl: fieldText(data, "emailSource"),
-    verifiedAt: localInstant(fieldText(data, "verifiedAt")),
-    lawfulBasis: fieldText(data, "lawfulBasis"),
-  });
-}
 export function ContactSourceFields({
   defaults,
 }: {

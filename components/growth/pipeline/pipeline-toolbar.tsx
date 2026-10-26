@@ -71,12 +71,12 @@ export function PipelineToolbar({ filters }: { filters: PipelineFilters }) {
           />
         </label>
         <label>
-          Town
+          City
           <input
             name="location"
             defaultValue={filters.location}
             maxLength={120}
-            placeholder="Any Kent town"
+            placeholder="Any city"
           />
         </label>
         <label>

@@ -41,7 +41,7 @@ export function ProspectList({
         <div>
           <h1 className={styles.heading}>Prospects</h1>
           <p className={styles.subtitle}>
-            Research, qualify, and move Kent businesses into outreach.
+            Research, qualify, and move businesses into outreach.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-4">

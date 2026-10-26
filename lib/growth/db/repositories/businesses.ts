@@ -26,8 +26,7 @@ export async function findBusinessIdentityByCompanyNumber(
       b.corporate_status as "corporateStatus",
       b.version
     from growth.businesses b
-    where b.country_code = ${countryCode}
-      and upper(regexp_replace(b.company_number, '\s+', '', 'g')) = ${normalisedCompanyNumber}
+    where b.country_code = ${countryCode.trim().toUpperCase()} and upper(regexp_replace(b.company_number, '\s+', '', 'g')) = ${normalisedCompanyNumber}
     limit 1
   `;
 

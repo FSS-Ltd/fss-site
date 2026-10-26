@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isCrmCountryCode } from "./countries";
 
 const id = z.uuid();
 const version = z.number().int().positive();
@@ -32,8 +33,16 @@ export const captureLeadSchema = z
     businessName: text(200),
     companyNumber: z
       .string()
-      .transform((value) => value.replace(/\s/g, "").toUpperCase())
-      .pipe(z.string().regex(/^[A-Z0-9]{8}$/)),
+      .trim()
+      .min(1, "Enter the company’s registration number.")
+      .max(80, "Use 80 characters or fewer.")
+      .transform((value) => value.replace(/\s/g, "").toUpperCase()),
+    countryCode: z
+      .string()
+      .trim()
+      .toUpperCase()
+      .refine(isCrmCountryCode, "Choose a country from the list.")
+      .default("GB"),
     corporateType: z.enum([
       "limited_company",
       "llp",
@@ -51,6 +60,15 @@ export const captureLeadSchema = z
     monthlyPence: pence,
     contact: contactSchema.optional(),
   })
+  .refine(
+    (value) =>
+      value.countryCode !== "GB" || /^[A-Z0-9]{8}$/.test(value.companyNumber),
+    {
+      message:
+        "Enter an 8-character UK company number, such as 01234567. For an overseas company, choose its country first.",
+      path: ["companyNumber"],
+    },
+  )
   .refine((value) => value.oneOffMinPence <= value.oneOffMaxPence, {
     message: "Maximum value must cover the minimum.",
     path: ["oneOffMaxPence"],

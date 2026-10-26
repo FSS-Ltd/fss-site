@@ -38,6 +38,7 @@ export async function withCrmTestDatabase(
       requestId: randomUUID(),
       businessName: "CRM Test Company",
       companyNumber,
+      countryCode: "GB",
       corporateType: "limited_company",
       sector: "Engineering",
       locality: "Maidstone",

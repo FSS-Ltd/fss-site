@@ -51,6 +51,7 @@ function baseProspect(overrides: Partial<ProspectDetail> = {}): ProspectDetail {
       corporateStatus: "active",
       sector: "Plumbing",
       locality: "Maidstone",
+      countryCode: "GB",
       websiteUrl: null,
       googlePlaceId: "place-1",
       googleMapsReferenceUrl: "https://maps.example/place-1",

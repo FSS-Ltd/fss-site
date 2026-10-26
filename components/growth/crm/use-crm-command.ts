@@ -1,5 +1,9 @@
 "use client";
 import { useState } from "react";
+import {
+  crmValidationFeedback,
+  type CrmFeedback,
+} from "@/lib/growth/crm/validation-feedback";
 import { useCrmRefresh } from "./crm-refresh-provider";
 import { z } from "zod";
 import { publishCrmChange } from "@/lib/growth/crm/change-events";
@@ -21,11 +25,7 @@ export function useCrmCommand() {
   const [saving, setBusy] = useState(false);
   const shared = useCrmRefresh();
   const busy = saving || shared.busy;
-  const [feedback, setFeedback] = useState<{
-    error: boolean;
-    message: string;
-    href?: string;
-  } | null>(null);
+  const [feedback, setFeedback] = useState<CrmFeedback | null>(null);
   async function run(command: CrmCommand): Promise<CrmCommandResult | null> {
     if (busy) return null;
     setBusy(true);
@@ -34,12 +34,7 @@ export function useCrmCommand() {
     try {
       const parsed = crmCommandSchema.safeParse(command);
       if (!parsed.success) {
-        setFeedback({
-          error: true,
-          message: parsed.error.issues
-            .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
-            .join(" "),
-        });
+        setFeedback(crmValidationFeedback(parsed.error));
         return null;
       }
       const target =
@@ -59,9 +54,13 @@ export function useCrmCommand() {
         const location = response.headers.get("location");
         setFeedback({
           error: true,
-          message: error.success
-            ? error.data.message
-            : "Could not save. Try again.",
+          message:
+            response.status === 401
+              ? "Your session has expired. Sign in again to save your changes."
+              : error.success && response.status !== 422
+                ? error.data.message
+                : "Some details could not be saved. Check the form fields and try again.",
+          refresh: response.status === 409 || response.status >= 500,
           href:
             location && /^\/growth\/prospects\/[a-f0-9-]{36}$/.test(location)
               ? location
@@ -85,8 +84,17 @@ export function useCrmCommand() {
       shared.endCommand();
     }
   }
-  function report(message: string) {
-    setFeedback({ error: true, message });
+  function report(error: unknown) {
+    const message = crmValidationFeedback(error);
+    setFeedback(message);
+    return message;
   }
-  return { busy, saving, feedback, run, report };
+  return {
+    busy,
+    saving,
+    feedback,
+    run,
+    report,
+    clearFeedback: () => setFeedback(null),
+  };
 }
