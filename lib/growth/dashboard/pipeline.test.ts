@@ -108,6 +108,12 @@ function sampleRow(overrides: Partial<PipelineCardRow> = {}): PipelineCardRow {
     offerFocus: "Website + AI Enquiry Agent",
     stage: "new",
     estimatedValuePence: 650_000,
+    oneOffValuePence: 600_000,
+    monthlyValuePence: 50_000,
+    probabilityPercent: 25,
+    expectedCloseDate: null,
+    sector: "Plumbing",
+    location: "Maidstone",
     lastActivityAt: "2026-08-20T09:00:00.000Z",
     nextAction: "Review scope",
     nextActionDueAt: "2026-08-21T09:00:00.000Z",
@@ -120,6 +126,8 @@ function sampleDbRow(overrides: Partial<PipelineCardRow> = {}): object {
   return {
     ...row,
     lastActivityAt: new Date(row.lastActivityAt),
+    cursorUpdatedAt: row.lastActivityAt,
+    cursorNextAction: row.nextActionDueAt,
     nextActionDueAt: row.nextActionDueAt ? new Date(row.nextActionDueAt) : null,
   };
 }
@@ -134,7 +142,9 @@ function emptyBoardRoutes(): FakeRoute[] {
   ];
 }
 
-function baseQuery(overrides: Partial<PipelineBoardQuery> = {}): PipelineBoardQuery {
+function baseQuery(
+  overrides: Partial<PipelineBoardQuery> = {},
+): PipelineBoardQuery {
   return { after: {}, ...overrides };
 }
 
@@ -198,14 +208,20 @@ test("getPipelineBoardResult queries only the open pipeline stages, never won or
 });
 
 test("getPipelineBoardResult reconciles each column's count and value total with its rows", async () => {
-  const stageTotals: Record<string, { totalCount: number; valueTotalPence: number }> = {
+  const stageTotals: Record<
+    string,
+    { totalCount: number; valueTotalPence: number }
+  > = {
     new: { totalCount: 5, valueTotalPence: 1_200_000 },
     qualified: { totalCount: 2, valueTotalPence: 400_000 },
     proposal: { totalCount: 0, valueTotalPence: 0 },
     negotiation: { totalCount: 1, valueTotalPence: 900_000 },
   };
   const stageRows: Record<string, object[]> = {
-    new: [sampleDbRow({ stage: "new" }), sampleDbRow({ stage: "new", engagementId: "row-2" })],
+    new: [
+      sampleDbRow({ stage: "new" }),
+      sampleDbRow({ stage: "new", engagementId: "row-2" }),
+    ],
     qualified: [sampleDbRow({ stage: "qualified" })],
     proposal: [],
     negotiation: [sampleDbRow({ stage: "negotiation" })],
@@ -229,7 +245,10 @@ test("getPipelineBoardResult reconciles each column's count and value total with
   for (const stage of OPEN_PIPELINE_STAGES) {
     const expected = stageTotals[stage];
     assert.equal(state.data.columns[stage].totalCount, expected?.totalCount);
-    assert.equal(state.data.columns[stage].valueTotalPence, expected?.valueTotalPence);
+    assert.equal(
+      state.data.columns[stage].valueTotalPence,
+      expected?.valueTotalPence,
+    );
   }
   assert.equal(state.data.columns.new.rows.length, 2);
   assert.equal(state.data.columns.proposal.rows.length, 0);
@@ -240,7 +259,9 @@ test("getPipelineBoardResult orders by next action due date, then last activity,
 
   await getPipelineBoardResult(baseQuery(), db);
 
-  const listQuery = queries.find((query) => query.text.includes('"engagementId"'));
+  const listQuery = queries.find((query) =>
+    query.text.includes('"engagementId"'),
+  );
   assert.ok(listQuery);
   assert.match(
     listQuery.text,
@@ -250,7 +271,10 @@ test("getPipelineBoardResult orders by next action due date, then last activity,
 
 test("getPipelineBoardResult bounds each column to the page size and reports a next cursor", async () => {
   const rows = Array.from({ length: 21 }, (_, index) =>
-    sampleDbRow({ stage: "new", engagementId: `row-${index}` }),
+    sampleDbRow({
+      stage: "new",
+      engagementId: `00000000-0000-4000-8000-${String(index).padStart(12, "0")}`,
+    }),
   );
 
   const { db } = createFakeGrowthDb([
@@ -272,8 +296,10 @@ test("getPipelineBoardResult bounds each column to the page size and reports a n
   assert.equal(state.data.columns.new.totalCount, 128);
   assert.ok(state.data.columns.new.nextCursor);
 
-  const decoded = decodePipelineCursor(state.data.columns.new.nextCursor as string);
-  assert.equal(decoded?.engagementId, "row-19");
+  const decoded = decodePipelineCursor(
+    state.data.columns.new.nextCursor as string,
+  );
+  assert.equal(decoded?.engagementId, "00000000-0000-4000-8000-000000000019");
 
   for (const stage of ["qualified", "proposal", "negotiation"] as const) {
     assert.equal(state.data.columns[stage].nextCursor, null);
@@ -285,7 +311,7 @@ test("getPipelineBoardResult applies the decoded per-stage cursor as a keyset pr
   const after = encodePipelineCursor(
     sampleRow({
       stage: "qualified",
-      engagementId: "prospect-19",
+      engagementId: "00000000-0000-4000-8000-000000000019",
       lastActivityAt: "2026-08-19T09:00:00.000Z",
       nextActionDueAt: "2026-08-20T09:00:00.000Z",
     }),
@@ -293,17 +319,27 @@ test("getPipelineBoardResult applies the decoded per-stage cursor as a keyset pr
 
   await getPipelineBoardResult(baseQuery({ after: { qualified: after } }), db);
 
-  const listQueries = queries.filter((query) => query.text.includes('"engagementId"'));
+  const listQueries = queries.filter((query) =>
+    query.text.includes('"engagementId"'),
+  );
   const qualifiedQuery = listQueries.find((query) =>
     query.values.includes("2026-08-20T09:00:00.000Z"),
   );
   assert.ok(qualifiedQuery);
-  assert.match(qualifiedQuery.text, /coalesce\(p\.next_action_due_at, 'infinity'\) > \?::timestamptz/);
-  assert.ok(qualifiedQuery.values.includes("prospect-19"));
+  assert.match(
+    qualifiedQuery.text,
+    /coalesce\(p\.next_action_due_at, 'infinity'\) > \?::text::timestamptz/,
+  );
+  assert.ok(
+    qualifiedQuery.values.includes("00000000-0000-4000-8000-000000000019"),
+  );
 
   const newQuery = listQueries.find((query) => query.values[0] === "new");
   assert.ok(newQuery);
-  assert.doesNotMatch(newQuery.text, /coalesce\(p\.next_action_due_at, 'infinity'\) > \?::timestamptz/);
+  assert.doesNotMatch(
+    newQuery.text,
+    /coalesce\(p\.next_action_due_at, 'infinity'\) > \?::text::timestamptz/,
+  );
 });
 
 test("getPipelineBoardResult fails safe with a correlation ID when a query throws", async () => {
@@ -311,10 +347,29 @@ test("getPipelineBoardResult fails safe with a correlation ID when a query throw
     throw new Error("connection refused");
   }) as unknown as GrowthQueryExecutor;
 
-  const state = await getPipelineBoardResult(baseQuery(), db, () => "fixed-correlation-id");
+  const state = await getPipelineBoardResult(
+    baseQuery(),
+    db,
+    () => "fixed-correlation-id",
+  );
   assert.deepEqual(state, {
     status: "error",
     message: "The pipeline board could not load.",
     correlationId: "fixed-correlation-id",
   });
+});
+
+test("cursor decoding rejects invalid timestamps and non-UUID record identifiers", () => {
+  const encode = (value: unknown) =>
+    Buffer.from(JSON.stringify(value)).toString("base64url");
+  assert.equal(
+    decodePipelineCursor(
+      encode({
+        nextActionSortValue: "today",
+        updatedAt: "yesterday",
+        engagementId: "anything",
+      }),
+    ),
+    null,
+  );
 });

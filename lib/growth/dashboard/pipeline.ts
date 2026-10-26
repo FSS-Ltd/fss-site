@@ -1,4 +1,7 @@
 import { randomUUID } from "node:crypto";
+import { z } from "zod";
+import { parsePipelineFilters, pipelineHref } from "../crm/pipeline-query";
+import { pipelineFiltersSchema, type PipelineFilters } from "../crm/schemas";
 
 import { getGrowthDb } from "../db/client";
 import type { GrowthQueryExecutor } from "../db/types";
@@ -26,6 +29,12 @@ export type PipelineCardRow = {
   offerFocus: string;
   stage: OpenPipelineStage;
   estimatedValuePence: number;
+  oneOffValuePence: number;
+  monthlyValuePence: number;
+  probabilityPercent: number;
+  expectedCloseDate: string | null;
+  sector: string;
+  location: string;
   lastActivityAt: string;
   nextAction: string | null;
   nextActionDueAt: string | null;
@@ -36,6 +45,10 @@ export type PipelineColumn = {
   rows: readonly PipelineCardRow[];
   totalCount: number;
   valueTotalPence: number;
+  oneOffTotalPence: number;
+  monthlyTotalPence: number;
+  weightedOneOffPence: number;
+  weightedMonthlyPence: number;
   nextCursor: string | null;
 };
 
@@ -45,6 +58,7 @@ export type PipelineBoardResult = {
 
 export type PipelineBoardQuery = {
   after: Partial<Record<OpenPipelineStage, string>>;
+  filters?: PipelineFilters;
 };
 
 type RawSearchParams = Record<string, string | readonly string[] | undefined>;
@@ -69,23 +83,26 @@ export function parsePipelineBoardQuery(
     }
   }
 
-  return { after };
+  const filters = parsePipelineFilters(searchParams);
+  const defaults = pipelineFiltersSchema.parse({});
+  return Object.keys(defaults).some(
+    (key) =>
+      filters[key as keyof PipelineFilters] !==
+      defaults[key as keyof PipelineFilters],
+  )
+    ? { after, filters }
+    : { after };
 }
 
 export function buildPipelineBoardHref(
   query: PipelineBoardQuery,
   overrides: Partial<Record<OpenPipelineStage, string>>,
 ): string {
-  const merged = { ...query.after, ...overrides };
-  const params = new URLSearchParams();
-
-  for (const stage of OPEN_PIPELINE_STAGES) {
-    const value = merged[stage];
-    if (value) params.set(`after_${stage}`, value);
-  }
-
-  const queryString = params.toString();
-  return queryString ? `/growth/pipeline?${queryString}` : "/growth/pipeline";
+  return pipelineHref(
+    query.filters ?? pipelineFiltersSchema.parse({}),
+    {},
+    { ...query.after, ...overrides },
+  );
 }
 
 type Cursor = {
@@ -114,15 +131,21 @@ export function decodePipelineCursor(value: string): Cursor | null {
     const decoded: unknown = JSON.parse(
       Buffer.from(value, "base64url").toString("utf8"),
     );
-    if (
-      typeof decoded === "object" &&
-      decoded !== null &&
-      typeof (decoded as Cursor).nextActionSortValue === "string" &&
-      typeof (decoded as Cursor).updatedAt === "string" &&
-      typeof (decoded as Cursor).engagementId === "string"
-    ) {
-      return decoded as Cursor;
-    }
+    const parsed = z
+      .object({
+        nextActionSortValue: z.union([
+          z.literal("infinity"),
+          z.iso.datetime({ offset: true }),
+        ]),
+        updatedAt: z.iso.datetime({ offset: true }),
+        engagementId: z
+          .string()
+          .regex(
+            /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i,
+          ),
+      })
+      .safeParse(decoded);
+    if (parsed.success) return parsed.data;
     return null;
   } catch {
     return null;
@@ -138,14 +161,40 @@ export function decodePipelineCursor(value: string): Cursor | null {
 function sortValueFragment(db: GrowthQueryExecutor, value: string) {
   return value === NEXT_ACTION_SORT_INFINITY
     ? db.unsafe("'infinity'::timestamptz")
-    : db`${value}::timestamptz`;
+    : db`${value}::text::timestamptz`;
+}
+
+function pipelineFilterFragment(
+  db: GrowthQueryExecutor,
+  filters: PipelineFilters,
+) {
+  const search = filters.q
+    ? db`and (b.legal_name ilike ${`%${filters.q}%`} or b.trading_name ilike ${`%${filters.q}%`} or de.name ilike ${`%${filters.q}%`} or c.first_name ilike ${`%${filters.q}%`} or c.last_name ilike ${`%${filters.q}%`})`
+    : db``;
+  const stage =
+    filters.stage === "all" ? db`` : db`and de.stage=${filters.stage}`;
+  const sector = filters.sector ? db`and b.sector=${filters.sector}` : db``;
+  const location = filters.location
+    ? db`and b.locality=${filters.location}`
+    : db``;
+  const nextAction =
+    filters.nextAction === "all"
+      ? db``
+      : filters.nextAction === "missing"
+        ? db`and (p.next_action is null or p.next_action_due_at is null)`
+        : filters.nextAction === "overdue"
+          ? db`and p.next_action_due_at < now()`
+          : db`and p.next_action_due_at >= now()`;
+  return db`${search} ${stage} ${sector} ${location} ${nextAction}`;
 }
 
 async function fetchPipelineColumn(
   db: GrowthQueryExecutor,
   stage: OpenPipelineStage,
   afterCursorValue: string | undefined,
+  filters: PipelineFilters,
 ): Promise<PipelineColumn> {
+  const filterFragment = pipelineFilterFragment(db, filters);
   const cursor = afterCursorValue
     ? decodePipelineCursor(afterCursorValue)
     : null;
@@ -156,11 +205,11 @@ async function fetchPipelineColumn(
           coalesce(p.next_action_due_at, 'infinity') > ${sortValue}
           or (
             coalesce(p.next_action_due_at, 'infinity') = ${sortValue}
-            and de.updated_at < ${cursor.updatedAt}::timestamptz
+            and de.updated_at < ${cursor.updatedAt}::text::timestamptz
           )
           or (
             coalesce(p.next_action_due_at, 'infinity') = ${sortValue}
-            and de.updated_at = ${cursor.updatedAt}::timestamptz
+            and de.updated_at = ${cursor.updatedAt}::text::timestamptz
             and de.id > ${cursor.engagementId}
           )
         )`;
@@ -171,6 +220,8 @@ async function fetchPipelineColumn(
     db<
       (Omit<PipelineCardRow, "lastActivityAt" | "nextActionDueAt"> & {
         lastActivityAt: Date;
+        cursorUpdatedAt: string;
+        cursorNextAction: string | null;
         nextActionDueAt: Date | null;
       })[]
     >`
@@ -182,8 +233,15 @@ async function fetchPipelineColumn(
         c.first_name || ' ' || c.last_name as "primaryContactName",
         de.name as "offerFocus",
         de.stage,
+        coalesce(de.one_off_value_pence,0) as "oneOffValuePence",
+        coalesce(de.monthly_value_pence,0) as "monthlyValuePence",
+        de.probability_percent as "probabilityPercent",
+        de.expected_close_date::text as "expectedCloseDate",
+        b.sector, b.locality as location,
         (coalesce(de.one_off_value_pence, 0) + coalesce(de.monthly_value_pence, 0)) as "estimatedValuePence",
         de.updated_at as "lastActivityAt",
+        to_char(de.updated_at at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') as "cursorUpdatedAt",
+        to_char(p.next_action_due_at at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') as "cursorNextAction",
         p.next_action as "nextAction",
         p.next_action_due_at as "nextActionDueAt"
       from growth.delivery_engagements de
@@ -192,20 +250,38 @@ async function fetchPipelineColumn(
       left join growth.contacts c on c.id = p.primary_contact_id
       where de.stage = ${stage}
         and de.prospect_id is not null
+        ${filterFragment}
         ${cursorFragment}
       order by coalesce(p.next_action_due_at, 'infinity') asc, de.updated_at desc, de.id asc
       limit ${STAGE_PAGE_SIZE + 1}
     `,
-    db<{ totalCount: number; valueTotalPence: number }[]>`
+    db<
+      {
+        totalCount: number;
+        valueTotalPence: number;
+        oneOffTotalPence: number;
+        monthlyTotalPence: number;
+        weightedOneOffPence: number;
+        weightedMonthlyPence: number;
+      }[]
+    >`
       select
         count(*)::int as "totalCount",
         coalesce(
           sum(coalesce(de.one_off_value_pence, 0) + coalesce(de.monthly_value_pence, 0)),
           0
-        )::int as "valueTotalPence"
+        )::float8 as "valueTotalPence",
+        coalesce(sum(de.one_off_value_pence),0)::float8 as "oneOffTotalPence",
+        coalesce(sum(de.monthly_value_pence),0)::float8 as "monthlyTotalPence",
+        coalesce(sum(round(coalesce(de.one_off_value_pence,0)::numeric*de.probability_percent/100)),0)::float8 as "weightedOneOffPence",
+        coalesce(sum(round(coalesce(de.monthly_value_pence,0)::numeric*de.probability_percent/100)),0)::float8 as "weightedMonthlyPence"
       from growth.delivery_engagements de
+      inner join growth.prospects p on p.id=de.prospect_id
+      inner join growth.businesses b on b.id=p.business_id
+      left join growth.contacts c on c.id=p.primary_contact_id
       where de.stage = ${stage}
         and de.prospect_id is not null
+        ${filterFragment}
     `,
   ]);
 
@@ -218,14 +294,25 @@ async function fetchPipelineColumn(
       ? row.nextActionDueAt.toISOString()
       : null,
   }));
-  const last = shapedRows.at(-1);
+  const last = page.at(-1);
 
   return {
     stage,
     rows: shapedRows,
     totalCount: aggregateRows[0]?.totalCount ?? 0,
     valueTotalPence: aggregateRows[0]?.valueTotalPence ?? 0,
-    nextCursor: hasNextPage && last ? encodePipelineCursor(last) : null,
+    oneOffTotalPence: aggregateRows[0]?.oneOffTotalPence ?? 0,
+    monthlyTotalPence: aggregateRows[0]?.monthlyTotalPence ?? 0,
+    weightedOneOffPence: aggregateRows[0]?.weightedOneOffPence ?? 0,
+    weightedMonthlyPence: aggregateRows[0]?.weightedMonthlyPence ?? 0,
+    nextCursor:
+      hasNextPage && last
+        ? encodePipelineCursor({
+            ...shapedRows[shapedRows.length - 1],
+            lastActivityAt: last.cursorUpdatedAt,
+            nextActionDueAt: last.cursorNextAction,
+          })
+        : null,
   };
 }
 
@@ -237,7 +324,12 @@ export async function getPipelineBoardResult(
   try {
     const columns = await Promise.all(
       OPEN_PIPELINE_STAGES.map((stage) =>
-        fetchPipelineColumn(db, stage, query.after[stage]),
+        fetchPipelineColumn(
+          db,
+          stage,
+          query.after[stage],
+          query.filters ?? pipelineFiltersSchema.parse({}),
+        ),
       ),
     );
 

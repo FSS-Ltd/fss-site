@@ -192,3 +192,10 @@ export function formatGrowthEvidenceCount(count: number): string {
 
   return `${count} evidence ${count === 1 ? "item" : "items"}`;
 }
+
+/** Format a PostgreSQL calendar date without treating it as a local instant. */
+export function formatGrowthCalendarDate(value: string): string {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value))
+    throw new RangeError("Growth calendar dates must use YYYY-MM-DD.");
+  return formatGrowthDate(`${value}T12:00:00.000Z`);
+}

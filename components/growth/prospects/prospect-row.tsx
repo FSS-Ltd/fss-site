@@ -5,6 +5,7 @@ import type { CSSProperties } from "react";
 import {
   formatGrowthCurrency,
   formatGrowthStatusLabel,
+  formatGrowthDate,
 } from "@/lib/growth/dashboard/formatters";
 import type { ProspectListRow } from "@/lib/growth/dashboard/prospects";
 
@@ -47,7 +48,16 @@ export function ProspectRow({ row }: { row: ProspectListRow }) {
   return (
     <tr>
       <td>
-        <span className={styles.business}>{row.businessName}</span>
+        <Link className={styles.business} href={detailHref}>
+          {row.businessName}
+        </Link>
+        {row.primaryContactName && (
+          <p className={styles.nextStep}>{row.primaryContactName}</p>
+        )}
+        <p className={styles.nextStep}>
+          {row.nextAction ?? "No next step"}
+          {row.nextActionDueAt && ` · ${formatGrowthDate(row.nextActionDueAt)}`}
+        </p>
         {row.websiteUrl && (
           <a
             className={styles.website}
@@ -109,7 +119,16 @@ export function ProspectMobileCard({ row }: { row: ProspectListRow }) {
     <li className={styles.mobileCard}>
       <ScoreRing score={row.fitScore} />
       <div className={styles.mobileBody}>
-        <p className={styles.business}>{row.businessName}</p>
+        <Link className={styles.business} href={detailHref}>
+          {row.businessName}
+        </Link>
+        {row.primaryContactName && (
+          <p className={styles.nextStep}>{row.primaryContactName}</p>
+        )}
+        <p className={styles.nextStep}>
+          {row.nextAction ?? "No next step"}
+          {row.nextActionDueAt && ` · ${formatGrowthDate(row.nextActionDueAt)}`}
+        </p>
         <p className={styles.sectorLocation}>
           {row.sector}, {row.location}
         </p>

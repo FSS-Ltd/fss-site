@@ -40,6 +40,7 @@ function baseQuery(
 const sampleRow = {
   prospectId: "prospect-1",
   businessName: "Smith & Sons Plumbing Ltd",
+  primaryContactName: "Daniel Smith",
   websiteUrl: "https://smithandsonsplumbing.co.uk",
   sector: "Plumbing",
   location: "Maidstone",
@@ -90,10 +91,7 @@ test("labels every filter control so it can be operated by keyboard and screen r
 
   assert.match(html, /<label[^>]*for="prospect-search"[^>]*>Search<\/label>/);
   assert.match(html, /<label[^>]*for="prospect-sector"[^>]*>Sector<\/label>/);
-  assert.match(
-    html,
-    /<label[^>]*for="prospect-location"[^>]*>Location<\/label>/,
-  );
+  assert.match(html, /<label[^>]*for="prospect-location"[^>]*>City<\/label>/);
   assert.match(
     html,
     /<label[^>]*for="prospect-fit-score"[^>]*>Fit score<\/label>/,

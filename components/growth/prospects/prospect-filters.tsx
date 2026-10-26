@@ -13,23 +13,28 @@ import {
 
 import styles from "./prospects.module.css";
 
-const FIT_SCORE_LABELS: Record<(typeof FIT_SCORE_BAND_VALUES)[number], string> = {
-  all: "All scores",
-  "50": "50+",
-  "70": "70+",
-  "85": "85+",
-};
+const FIT_SCORE_LABELS: Record<(typeof FIT_SCORE_BAND_VALUES)[number], string> =
+  {
+    all: "All scores",
+    "50": "50+",
+    "70": "70+",
+    "85": "85+",
+  };
 
-const OUTREACH_LABELS: Record<(typeof OUTREACH_STATE_VALUES)[number], string> = {
-  all: "All outreach",
-  not_started: "Not started",
-  active: "Active",
-  paused: "Paused",
-  stopped: "Stopped",
-  completed: "Completed",
-};
+const OUTREACH_LABELS: Record<(typeof OUTREACH_STATE_VALUES)[number], string> =
+  {
+    all: "All outreach",
+    not_started: "Not started",
+    active: "Active",
+    paused: "Paused",
+    stopped: "Stopped",
+    completed: "Completed",
+  };
 
-const SUPPRESSED_LABELS: Record<(typeof SUPPRESSION_FILTER_VALUES)[number], string> = {
+const SUPPRESSED_LABELS: Record<
+  (typeof SUPPRESSION_FILTER_VALUES)[number],
+  string
+> = {
   all: "All contacts",
   suppressed: "Suppressed only",
   contactable: "Contactable only",
@@ -75,10 +80,18 @@ function activeFilterChips(
 ): { key: keyof ProspectListQuery; label: string }[] {
   const chips: { key: keyof ProspectListQuery; label: string }[] = [];
 
-  if (query.q) chips.push({ key: "q", label: `${FILTER_LABELS.q}: "${query.q}"` });
-  if (query.sector) chips.push({ key: "sector", label: `${FILTER_LABELS.sector}: ${query.sector}` });
+  if (query.q)
+    chips.push({ key: "q", label: `${FILTER_LABELS.q}: "${query.q}"` });
+  if (query.sector)
+    chips.push({
+      key: "sector",
+      label: `${FILTER_LABELS.sector}: ${query.sector}`,
+    });
   if (query.location)
-    chips.push({ key: "location", label: `${FILTER_LABELS.location}: ${query.location}` });
+    chips.push({
+      key: "location",
+      label: `${FILTER_LABELS.location}: ${query.location}`,
+    });
   if (query.fitScoreMin !== "all")
     chips.push({
       key: "fitScoreMin",
@@ -155,7 +168,7 @@ export function ProspectFilters({
 
           <div className={styles.field}>
             <label className={styles.fieldLabel} htmlFor="prospect-location">
-              Location
+              City
             </label>
             <select
               className={styles.select}
@@ -163,7 +176,7 @@ export function ProspectFilters({
               id="prospect-location"
               name="location"
             >
-              <option value="">All Kent towns</option>
+              <option value="">All cities</option>
               {facets.locations.map((location) => (
                 <option key={location} value={location}>
                   {location}

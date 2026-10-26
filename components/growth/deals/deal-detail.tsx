@@ -1,8 +1,10 @@
 import { ExternalLink, Mail } from "lucide-react";
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 import {
   formatGrowthCurrency,
+  formatGrowthCalendarDate,
   formatGrowthDate,
   formatGrowthDateTime,
   formatGrowthPercentage,
@@ -14,13 +16,21 @@ import { CommercialHistory } from "./commercial-history";
 import { DealActions } from "./deal-actions";
 import styles from "./deals.module.css";
 
-function stageTone(stage: DealDetailData["stage"]): "neutral" | "green" | "red" {
+function stageTone(
+  stage: DealDetailData["stage"],
+): "neutral" | "green" | "red" {
   if (stage === "won") return "green";
   if (stage === "lost") return "red";
   return "neutral";
 }
 
-export function DealDetailView({ deal }: { deal: DealDetailData }) {
+export function DealDetailView({
+  deal,
+  workspace,
+}: {
+  deal: DealDetailData;
+  workspace?: ReactNode;
+}) {
   return (
     <div className={styles.detailPage}>
       <p className={styles.breadcrumb}>
@@ -49,9 +59,10 @@ export function DealDetailView({ deal }: { deal: DealDetailData }) {
               {deal.valueKind === "agreed" ? "Agreed value" : "Estimated value"}
             </p>
             <p className={styles.potentialValue}>
-              {formatGrowthCurrency(
-                (deal.oneOffValuePence ?? 0) + (deal.monthlyValuePence ?? 0),
-              )}
+              {formatGrowthCurrency(deal.oneOffValuePence ?? 0)} one-off
+            </p>
+            <p className={styles.contactField}>
+              {formatGrowthCurrency(deal.monthlyValuePence ?? 0)}/month
             </p>
           </div>
         </div>
@@ -63,6 +74,7 @@ export function DealDetailView({ deal }: { deal: DealDetailData }) {
         </div>
       )}
 
+      {workspace}
       <div className={styles.detailGrid}>
         <div className={styles.detailColumn}>
           <div className={styles.card}>
@@ -76,7 +88,9 @@ export function DealDetailView({ deal }: { deal: DealDetailData }) {
                       <span className={styles.contactName}>
                         {formatGrowthStatusLabel(item.claimType)}
                       </span>
-                      <span className={styles.evidenceClaim}>{item.claimSummary}</span>
+                      <span className={styles.evidenceClaim}>
+                        {item.claimSummary}
+                      </span>
                     </div>
                     <a
                       className={styles.evidenceLink}
@@ -116,7 +130,9 @@ export function DealDetailView({ deal }: { deal: DealDetailData }) {
               )}
               <p className={styles.contactField}>
                 <Mail aria-hidden="true" size={14} />
-                <a href={`mailto:${deal.contact.email}`}>{deal.contact.email}</a>
+                <a href={`mailto:${deal.contact.email}`}>
+                  {deal.contact.email}
+                </a>
               </p>
             </div>
           )}
@@ -125,8 +141,9 @@ export function DealDetailView({ deal }: { deal: DealDetailData }) {
             <div className={styles.card}>
               <h2 className={styles.sectionTitle}>Correspondence</h2>
               <p className={styles.contactField}>
-                {formatGrowthStatusLabel(deal.correspondence.status)} &middot; last
-                activity {formatGrowthDateTime(deal.correspondence.lastActivityAt)}
+                {formatGrowthStatusLabel(deal.correspondence.status)} &middot;
+                last activity{" "}
+                {formatGrowthDateTime(deal.correspondence.lastActivityAt)}
               </p>
               <Link
                 className={styles.evidenceLink}
@@ -144,7 +161,10 @@ export function DealDetailView({ deal }: { deal: DealDetailData }) {
               <p className={styles.contactField}>
                 {deal.nextAction}
                 {deal.nextActionDueAt && (
-                  <span> &middot; Due {formatGrowthDate(deal.nextActionDueAt)}</span>
+                  <span>
+                    {" "}
+                    &middot; Due {formatGrowthDate(deal.nextActionDueAt)}
+                  </span>
                 )}
               </p>
             ) : (
@@ -164,11 +184,13 @@ export function DealDetailView({ deal }: { deal: DealDetailData }) {
           <div className={styles.card}>
             <h2 className={styles.sectionTitle}>Commercial position</h2>
             <p className={styles.contactField}>
-              Probability: {formatGrowthPercentage(deal.probabilityPercent / 100)}
+              Probability:{" "}
+              {formatGrowthPercentage(deal.probabilityPercent / 100)}
             </p>
             {deal.expectedCloseDate && (
               <p className={styles.contactField}>
-                Expected close: {formatGrowthDate(deal.expectedCloseDate)}
+                Expected close:{" "}
+                {formatGrowthCalendarDate(deal.expectedCloseDate)}
               </p>
             )}
             {deal.business.websiteUrl && (

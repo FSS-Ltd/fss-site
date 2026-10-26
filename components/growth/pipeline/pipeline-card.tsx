@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   formatGrowthCurrency,
   formatGrowthRelativeDay,
@@ -16,13 +17,21 @@ export function PipelineCard({
 }) {
   return (
     <article className={styles.card}>
-      <p className={styles.cardBusiness}>{row.businessName}</p>
+      <p className={styles.cardBusiness}>
+        <Link href={`/growth/deals/${row.engagementId}`}>
+          {row.businessName}
+        </Link>
+      </p>
       {row.primaryContactName && (
         <p className={styles.cardContact}>{row.primaryContactName}</p>
       )}
       <p className={styles.cardOffer}>{row.offerFocus}</p>
       <p className={styles.cardValue}>
-        {formatGrowthCurrency(row.estimatedValuePence)}
+        {formatGrowthCurrency(row.oneOffValuePence)} one-off
+        <small className={styles.cardMonthly}>
+          {formatGrowthCurrency(row.monthlyValuePence)}/month ·{" "}
+          {row.probabilityPercent}% probability
+        </small>
       </p>
       {row.nextAction ? (
         <p className={styles.cardNextAction}>

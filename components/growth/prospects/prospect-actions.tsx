@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { publishCrmChange } from "@/lib/growth/crm/change-events";
 import { useState } from "react";
 
 import type { ProspectDetail } from "@/lib/growth/dashboard/prospect-detail";
@@ -47,16 +47,22 @@ export function evaluateApprovalReadiness(
     );
     return { ready: false, reasons };
   }
-  if (prospect.business.corporateStatus === "uncertain") {
-    reasons.push("The company's corporate status is unverified.");
+  if (prospect.business.corporateStatus !== "active") {
+    reasons.push("The company's corporate status is unverified or inactive.");
   }
-  if (!prospect.contact) {
+  if (!prospect.contact || prospect.contact.subscriberType !== "corporate") {
     reasons.push("No verified contact is on file for this prospect.");
   }
 
   const businessAgeMs =
-    new Date(now).getTime() - new Date(prospect.business.verifiedAt).getTime();
-  if (businessAgeMs > STALE_RESEARCH_DAYS * 24 * 60 * 60 * 1000) {
+    new Date(now).getTime() -
+    (prospect.business.verifiedAt
+      ? new Date(prospect.business.verifiedAt).getTime()
+      : 0);
+  if (
+    prospect.business.verifiedAt &&
+    businessAgeMs > STALE_RESEARCH_DAYS * 24 * 60 * 60 * 1000
+  ) {
     reasons.push("Research is more than 30 days old and should be refreshed.");
   }
 
@@ -296,6 +302,5 @@ export function ProspectActions(props: {
   now: string;
   prospect: ProspectDetail;
 }) {
-  const router = useRouter();
-  return <ProspectActionsFrame {...props} onSuccess={() => router.refresh()} />;
+  return <ProspectActionsFrame {...props} onSuccess={publishCrmChange} />;
 }

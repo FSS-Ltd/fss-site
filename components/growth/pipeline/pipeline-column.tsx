@@ -30,13 +30,21 @@ export function PipelineColumn({
   const headingId = `pipeline-column-${column.stage}`;
 
   return (
-    <section aria-labelledby={headingId} className={styles.column}>
+    <section
+      aria-labelledby={headingId}
+      className={styles.column}
+      data-stage={column.stage}
+    >
       <div className={styles.columnHeader}>
         <h2 className={styles.columnTitle} id={headingId}>
           {STAGE_LABELS[column.stage]}
         </h2>
         <p className={styles.columnMeta}>
-          {column.totalCount} · {formatGrowthCurrency(column.valueTotalPence)}
+          {column.totalCount} deals ·{" "}
+          {formatGrowthCurrency(column.oneOffTotalPence)} one-off
+          <small className={styles.cardMonthly}>
+            {formatGrowthCurrency(column.monthlyTotalPence)}/month
+          </small>
         </p>
       </div>
 
@@ -55,7 +63,9 @@ export function PipelineColumn({
       {column.nextCursor && (
         <Link
           className={styles.columnMore}
-          href={buildPipelineBoardHref(query, { [column.stage]: column.nextCursor })}
+          href={buildPipelineBoardHref(query, {
+            [column.stage]: column.nextCursor,
+          })}
         >
           Load more {STAGE_LABELS[column.stage].toLowerCase()}
         </Link>

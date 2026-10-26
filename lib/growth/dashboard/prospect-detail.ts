@@ -23,7 +23,7 @@ export type ProspectDetailBusiness = {
   websiteUrl: string | null;
   googlePlaceId: string | null;
   googleMapsReferenceUrl: string | null;
-  verifiedAt: string;
+  verifiedAt: string | null;
 };
 
 export type ProspectDetailContact = {
@@ -140,7 +140,7 @@ type CoreRow = {
   businessWebsiteUrl: string | null;
   businessGooglePlaceId: string | null;
   businessGoogleMapsReferenceUrl: string | null;
-  businessVerifiedAt: Date;
+  businessVerifiedAt: Date | null;
   contactFirstName: string | null;
   contactLastName: string | null;
   contactRoleTitle: string | null;
@@ -411,7 +411,7 @@ function toProspectDetail(
       websiteUrl: core.businessWebsiteUrl,
       googlePlaceId: core.businessGooglePlaceId,
       googleMapsReferenceUrl: core.businessGoogleMapsReferenceUrl,
-      verifiedAt: core.businessVerifiedAt.toISOString(),
+      verifiedAt: core.businessVerifiedAt?.toISOString() ?? null,
     },
     contact,
     websiteAssessment,

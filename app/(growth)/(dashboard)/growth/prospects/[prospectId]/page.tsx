@@ -1,3 +1,7 @@
+import {
+  RecordWorkspace,
+  parseWorkspaceQuery,
+} from "@/components/growth/crm/record-workspace";
 import { notFound } from "next/navigation";
 
 import { ProspectDetailView } from "@/components/growth/prospects/prospect-detail";
@@ -7,10 +11,12 @@ import { getProspectDetail } from "@/lib/growth/dashboard/prospect-detail";
 
 type ProspectDetailPageProps = {
   params: Promise<{ prospectId: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
 export default async function ProspectDetailPage({
   params,
+  searchParams,
 }: ProspectDetailPageProps) {
   const { prospectId } = await params;
   const now = new Date().toISOString();
@@ -27,7 +33,9 @@ export default async function ProspectDetailPage({
     return (
       <div className={styles.errorState} role="alert">
         <p>{result.message}</p>
-        <p className={styles.errorCorrelation}>Reference: {result.correlationId}</p>
+        <p className={styles.errorCorrelation}>
+          Reference: {result.correlationId}
+        </p>
       </div>
     );
   }
@@ -37,6 +45,13 @@ export default async function ProspectDetailPage({
       integrations={integrations}
       now={now}
       prospect={result.data}
+      workspace={
+        <RecordWorkspace
+          prospectId={result.data.id}
+          basePath={`/growth/prospects/${prospectId}`}
+          query={parseWorkspaceQuery(await searchParams)}
+        />
+      }
     />
   );
 }

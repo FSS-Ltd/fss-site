@@ -39,6 +39,7 @@ const coreRow = {
   businessCorporateStatus: "active",
   businessSector: "Plumbing",
   businessLocality: "Maidstone",
+  businessCountryCode: "GB",
   businessWebsiteUrl: null,
   businessGooglePlaceId: "place-1",
   businessGoogleMapsReferenceUrl: "https://maps.example/place-1",
@@ -261,4 +262,25 @@ test("keeps a sourced public business contact when personal names are unknown", 
   assert.equal(result.data.contact?.firstName, null);
   assert.equal(result.data.business.countryCode, "CA");
   assert.equal(result.data.business.county, "Ontario");
+});
+
+test("manual lead with no corporate verification date remains readable and unverified", async () => {
+  const db = createFakeGrowthDb(
+    routesFor({
+      core: [
+        {
+          ...coreRow,
+          businessCorporateStatus: "uncertain",
+          businessVerifiedAt: null,
+          contactEmail: null,
+        },
+      ],
+    }),
+  );
+  const result = await getProspectDetail(prospectId, db);
+  assert.equal(result.status, "found");
+  if (result.status === "found") {
+    assert.equal(result.data.business.verifiedAt, null);
+    assert.equal(result.data.contact, null);
+  }
 });

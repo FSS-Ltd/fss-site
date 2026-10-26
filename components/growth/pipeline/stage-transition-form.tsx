@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { publishCrmChange } from "@/lib/growth/crm/change-events";
 import { useState } from "react";
 
 import {
@@ -127,9 +127,9 @@ export function StageTransitionFormFrame({
         return;
       }
 
-      const responseBody = (await response.json().catch(() => null)) as
-        | { message?: string }
-        | null;
+      const responseBody = (await response.json().catch(() => null)) as {
+        message?: string;
+      } | null;
       setFeedback({
         tone: "error",
         message: responseBody?.message ?? "The move could not be completed.",
@@ -166,7 +166,11 @@ export function StageTransitionFormFrame({
       role="group"
     >
       {feedback && (
-        <p className={styles.actionFeedback} data-tone={feedback.tone} role="alert">
+        <p
+          className={styles.actionFeedback}
+          data-tone={feedback.tone}
+          role="alert"
+        >
           {feedback.message}
         </p>
       )}
@@ -259,7 +263,9 @@ export function StageTransitionFormFrame({
               disabled={busy || wonBlocked || lostBlocked}
               type="submit"
             >
-              {busy ? "Moving…" : `Confirm move to ${STAGE_LABELS[mode.target]}`}
+              {busy
+                ? "Moving…"
+                : `Confirm move to ${STAGE_LABELS[mode.target]}`}
             </button>
           </div>
         </form>
@@ -273,8 +279,5 @@ export function StageTransitionForm(props: {
   currentStage: CommercialStage;
   version: number;
 }) {
-  const router = useRouter();
-  return (
-    <StageTransitionFormFrame {...props} onSuccess={() => router.refresh()} />
-  );
+  return <StageTransitionFormFrame {...props} onSuccess={publishCrmChange} />;
 }

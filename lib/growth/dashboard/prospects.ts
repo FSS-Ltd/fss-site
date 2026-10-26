@@ -63,6 +63,7 @@ export type ProspectListQuery = {
 export type ProspectListRow = {
   prospectId: string;
   businessName: string;
+  primaryContactName: string | null;
   websiteUrl: string | null;
   sector: string;
   location: string;
@@ -261,6 +262,7 @@ async function fetchProspectRows(
     select
       p.id as "prospectId",
       b.legal_name as "businessName",
+      nullif(concat_ws(' ',c.first_name,c.last_name),'') as "primaryContactName",
       b.website_url as "websiteUrl",
       b.sector,
       b.locality as "location",

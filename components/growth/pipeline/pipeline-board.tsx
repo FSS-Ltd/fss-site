@@ -1,4 +1,10 @@
-import { formatGrowthCurrency } from "@/lib/growth/dashboard/formatters";
+import Link from "next/link";
+import { pipelineFiltersSchema } from "@/lib/growth/crm/schemas";
+import type { SavedCrmView } from "@/lib/growth/crm/workspace-query";
+import { SavedViews } from "../crm/saved-views";
+import { PipelineToolbar } from "./pipeline-toolbar";
+import { PipelineSummary } from "./pipeline-summary";
+import { PipelineTable } from "./pipeline-table";
 import {
   OPEN_PIPELINE_STAGES,
   type PipelineBoardQuery,
@@ -8,21 +14,26 @@ import type { ViewState } from "@/lib/growth/dashboard/view-models";
 
 import { PipelineColumn } from "./pipeline-column";
 import styles from "./pipeline.module.css";
+import workspaceStyles from "./workspace.module.css";
 
 export function PipelineBoard({
   query,
   state,
   now,
+  savedViews = [],
 }: {
   query: PipelineBoardQuery;
   state: ViewState<PipelineBoardResult>;
   now: string;
+  savedViews?: readonly SavedCrmView[];
 }) {
   if (state.status === "error") {
     return (
       <div className={styles.errorState} role="alert">
         <p>{state.message}</p>
-        <p className={styles.errorCorrelation}>Reference: {state.correlationId}</p>
+        <p className={styles.errorCorrelation}>
+          Reference: {state.correlationId}
+        </p>
       </div>
     );
   }
@@ -36,10 +47,7 @@ export function PipelineBoard({
     (sum, stage) => sum + data.columns[stage].totalCount,
     0,
   );
-  const totalOpenValuePence = OPEN_PIPELINE_STAGES.reduce(
-    (sum, stage) => sum + data.columns[stage].valueTotalPence,
-    0,
-  );
+  const filters = query.filters ?? pipelineFiltersSchema.parse({});
 
   return (
     <div className={styles.page}>
@@ -50,18 +58,29 @@ export function PipelineBoard({
             Open commercial engagements from qualification through negotiation.
           </p>
         </div>
-        <div className={styles.summary}>
-          <p className={styles.summaryCount}>{totalOpenCount} open</p>
-          <p className={styles.summaryValue}>
-            {formatGrowthCurrency(totalOpenValuePence)} forecast
-          </p>
+        <div className={workspaceStyles.viewLinks}>
+          <Link href="/growth/deals">All deals</Link>
+          <Link
+            className={workspaceStyles.createButton}
+            href="/growth/prospects/new"
+          >
+            New lead
+          </Link>
         </div>
       </div>
+      <PipelineToolbar filters={filters} />
+      <SavedViews views={savedViews} filters={filters} />
+      <PipelineSummary data={data} />
 
       {totalOpenCount === 0 ? (
         <div className={styles.emptyState}>
-          <p>No open opportunities yet. Prospects enter the pipeline once qualified.</p>
+          <p>
+            No opportunities match this view. Create a deal from a lead record,
+            or clear the filters.
+          </p>
         </div>
+      ) : filters.view === "list" ? (
+        <PipelineTable data={data} query={query} now={now} />
       ) : (
         <div className={styles.board}>
           {OPEN_PIPELINE_STAGES.map((stage) => (
