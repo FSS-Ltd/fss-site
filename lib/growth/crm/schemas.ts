@@ -117,8 +117,8 @@ const updateContact = z.strictObject({
   kind: z.literal("update_contact"),
   prospectId: id,
   expectedVersion: version,
-  firstName: text(100),
-  lastName: text(100),
+  firstName: text(100).nullable(),
+  lastName: text(100).nullable(),
   roleTitle: text(150).nullable(),
 });
 const updateOpportunity = z

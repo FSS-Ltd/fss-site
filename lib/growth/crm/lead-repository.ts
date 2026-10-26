@@ -26,7 +26,12 @@ export async function captureBusiness(
 ): Promise<string> {
   // Serialize captures without locking an existing business before its prospect.
   // Record editors lock prospect first, then business; uniqueness is the final guard.
-  await tx`select pg_advisory_xact_lock(hashtextextended(${input.countryCode + ":" + input.companyNumber}, 0))`;
+  // Share the research intake namespace, including its legacy GB key.
+  const identityKey =
+    input.countryCode === "GB"
+      ? `growth:business:${input.companyNumber}`
+      : `growth:business:${input.countryCode}:${input.companyNumber}`;
+  await tx`select pg_advisory_xact_lock(hashtextextended(${identityKey}, 0))`;
   const [business] = await tx<{ id: string }[]>`select id from growth.businesses
     where country_code=${input.countryCode} and upper(regexp_replace(company_number,'[[:space:]]+','','g'))=${input.companyNumber}`;
   if (business) return business.id;
@@ -44,7 +49,7 @@ export async function captureContact(
   if (!contact) return null;
   if (Date.parse(contact.verifiedAt) > Date.now())
     throw new CrmError("invalid");
-  await tx`select pg_advisory_xact_lock(hashtextextended(${contact.email}, 0))`;
+  await tx`select pg_advisory_xact_lock(hashtextextended(${"growth:contact:" + contact.email}, 0))`;
   const [existing] = await tx<
     { id: string; businessId: string }[]
   >`select id,business_id as "businessId" from growth.contacts where normalised_email=${contact.email} for update`;

@@ -19,7 +19,11 @@ runtimeUrl.searchParams.set("options", "-c role=growth_app");
 const secret =
   process.env.FSS_CRM_TEST_AUTH_SECRET ?? randomBytes(48).toString("base64url");
 process.env.FSS_CRM_TEST_AUTH_SECRET = secret;
-const port = 3229;
+const port = Number(process.env.FSS_CRM_TEST_PORT ?? 3229);
+if (!Number.isInteger(port) || port < 1024 || port > 65535)
+  throw new Error(
+    "FSS_CRM_TEST_PORT must be an integer between 1024 and 65535.",
+  );
 const origin = `http://localhost:${port}`;
 export default defineConfig({
   testDir: "tests/e2e",

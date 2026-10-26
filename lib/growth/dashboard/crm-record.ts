@@ -20,8 +20,8 @@ export type CrmRecord = {
   };
   contact: {
     version: number;
-    firstName: string;
-    lastName: string;
+    firstName: string | null;
+    lastName: string | null;
     roleTitle: string | null;
     email: string;
   } | null;
@@ -100,8 +100,8 @@ export async function getCrmRecord(
       row.email && row.contactVersion
         ? {
             version: row.contactVersion,
-            firstName: row.firstName ?? "",
-            lastName: row.lastName ?? "",
+            firstName: row.firstName,
+            lastName: row.lastName,
             roleTitle: row.roleTitle,
             email: row.email,
           }

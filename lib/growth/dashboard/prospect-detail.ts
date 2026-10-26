@@ -137,6 +137,69 @@ type CoreRow = {
   businessLocality: string;
   businessCountryCode: string;
   businessCounty: string | null;
+  businessWebsiteUrl: string | null;
+  businessGooglePlaceId: string | null;
+  businessGoogleMapsReferenceUrl: string | null;
+  businessVerifiedAt: Date | null;
+  contactFirstName: string | null;
+  contactLastName: string | null;
+  contactRoleTitle: string | null;
+  contactEmail: string | null;
+  contactEmailSourceUrl: string | null;
+  contactEmailVerifiedAt: Date | null;
+  contactSubscriberType: string | null;
+  contactLawfulBasis: string | null;
+  websiteBusinessGoal: string | null;
+  websitePrimaryCta: string | null;
+  websiteStatus: string | null;
+  websiteReviewedAt: Date | null;
+  previewStatus: string | null;
+  previewCompositionDigest: string | null;
+  previewGenerationPrNumber: number | null;
+  previewGenerationStatus: string | null;
+  previewSlug: string | null;
+  previewVersion: number | null;
+  visualBlobUrl: string | null;
+  visualAltText: string | null;
+  visualWidth: number | null;
+  visualHeight: number | null;
+  visualReviewStatus: string | null;
+  visualCreatedAt: Date | null;
+  sequenceId: string | null;
+  sequenceStatus: string | null;
+  sequenceCurrentStep: number | null;
+  sequenceStartedAt: Date | null;
+  sequenceStoppedAt: Date | null;
+  sequenceStopReason: string | null;
+};
+
+async function fetchCoreRow(
+  db: GrowthQueryExecutor,
+  prospectId: string,
+): Promise<CoreRow | null> {
+  const rows = await db<CoreRow[]>`
+    select
+      p.id,
+      p.version,
+      p.status,
+      p.fit_score as "fitScore",
+      p.opportunity_summary as "opportunitySummary",
+      p.recommended_offer as "recommendedOffer",
+      p.estimated_one_off_min_pence as "estimatedOneOffMinPence",
+      p.estimated_one_off_max_pence as "estimatedOneOffMaxPence",
+      p.estimated_monthly_pence as "estimatedMonthlyPence",
+      p.next_action as "nextAction",
+      p.next_action_due_at as "nextActionDueAt",
+      p.created_at as "createdAt",
+      b.legal_name as "businessLegalName",
+      b.trading_name as "businessTradingName",
+      b.company_number as "businessCompanyNumber",
+      b.corporate_type as "businessCorporateType",
+      b.corporate_status as "businessCorporateStatus",
+      b.sector as "businessSector",
+      b.locality as "businessLocality",
+      b.country_code as "businessCountryCode",
+      b.county as "businessCounty",
       b.website_url as "businessWebsiteUrl",
       b.google_place_id as "businessGooglePlaceId",
       b.google_maps_reference_url as "businessGoogleMapsReferenceUrl",
@@ -344,10 +407,7 @@ function toProspectDetail(
       sector: core.businessSector,
       locality: core.businessLocality,
       countryCode: core.businessCountryCode,
-<<<<<<< HEAD
       county: core.businessCounty,
-=======
->>>>>>> 5bdb0873 (feat: support worldwide CRM capture and readable form errors)
       websiteUrl: core.businessWebsiteUrl,
       googlePlaceId: core.businessGooglePlaceId,
       googleMapsReferenceUrl: core.businessGoogleMapsReferenceUrl,

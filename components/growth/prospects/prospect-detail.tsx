@@ -58,7 +58,13 @@ export function ProspectDetailView({
                   size={13}
                   style={{ marginRight: 3, verticalAlign: "-2px" }}
                 />
-                {[prospect.business.locality, prospect.business.county, crmCountryName(prospect.business.countryCode ?? "GB")].filter(Boolean).join(", ")}
+                {[
+                  prospect.business.locality,
+                  prospect.business.county,
+                  crmCountryName(prospect.business.countryCode ?? "GB"),
+                ]
+                  .filter(Boolean)
+                  .join(", ")}
               </span>
               <span>
                 {prospect.business.corporateStatus === "active"
@@ -154,7 +160,11 @@ export function ProspectDetailView({
                     {prospect.contact.email}
                   </a>
                   <span className={styles.pill}>
-                    {researchOnly ? "Source verified" : prospect.contact.subscriberType === "corporate" ? "Verified" : "Needs review"}
+                    {researchOnly
+                      ? "Source verified"
+                      : prospect.contact.subscriberType === "corporate"
+                        ? "Verified"
+                        : "Needs review"}
                   </span>
                 </p>
               </div>

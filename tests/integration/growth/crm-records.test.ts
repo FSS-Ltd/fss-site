@@ -535,3 +535,145 @@ test(
       );
     }),
 );
+
+test(
+  "CRM can edit an imported contact without inventing personal names",
+  { skip: !connection },
+  async () =>
+    withCrmTestDatabase(async (sql, lead) => {
+      const input = {
+        ...lead(),
+        contact: {
+          firstName: "Ada",
+          lastName: "Demo",
+          roleTitle: null,
+          email: randomUUID() + "@example.test",
+          sourceUrl: "https://example.test/contact",
+          verifiedAt: "2026-10-25T12:00:00Z",
+          lawfulBasis: "legitimate_interests" as const,
+        },
+      };
+      const created = await executeCrmCommand(
+        sql,
+        input,
+        founder,
+        randomUUID(),
+      );
+      await sql`update growth.contacts set first_name=null,last_name=null,lawful_basis='research_only' where business_id in (select business_id from growth.prospects where id=${created.prospectId!})`;
+      const { getCrmRecord } =
+        await import("../../../lib/growth/dashboard/crm-record");
+      assert.equal(
+        (await getCrmRecord(sql, created.prospectId!))?.contact?.firstName,
+        null,
+      );
+      await executeCrmCommand(
+        sql,
+        {
+          kind: "update_contact",
+          prospectId: created.prospectId!,
+          expectedVersion: 1,
+          firstName: null,
+          lastName: null,
+          roleTitle: "General enquiries",
+        },
+        founder,
+        randomUUID(),
+      );
+      const [contact] =
+        await sql`select first_name,last_name,role_title,lawful_basis,email_source_url from growth.contacts where business_id in (select business_id from growth.prospects where id=${created.prospectId!})`;
+      assert.equal(contact.first_name, null);
+      assert.equal(contact.last_name, null);
+      assert.equal(contact.role_title, "General enquiries");
+      assert.equal(contact.lawful_basis, "research_only");
+      assert.equal(contact.email_source_url, input.contact.sourceUrl);
+    }),
+);
+
+test(
+  "CRM registration locks serialize with existing global research intake",
+  { skip: !connection },
+  async () =>
+    withCrmTestDatabase(
+      async (sql, lead) => {
+        const { globalCandidateIdentityKeys } =
+          await import("../../../lib/growth/research/global-identity");
+        const { globalResearchRunSchema } =
+          await import("../../../lib/growth/research/global-schema");
+        const { createGlobalResearchFixture } =
+          await import("../../../lib/growth/research/global-test-fixture");
+        for (const countryCode of ["GB", "CA"]) {
+          const input = { ...lead(), countryCode };
+          const candidate = globalResearchRunSchema.parse(
+            createGlobalResearchFixture(),
+          ).prospects[0]!;
+          candidate.business.companyNumber = input.companyNumber;
+          candidate.business.countryCode = countryCode;
+          const key = globalCandidateIdentityKeys(candidate).find((value) =>
+            value.startsWith("growth:business:"),
+          )!;
+          await sql.begin(async (holder) => {
+            await holder`select pg_advisory_xact_lock(hashtextextended(${key},0))`;
+            await assert.rejects(
+              sql.begin(async (attempt) => {
+                await attempt`set local lock_timeout='200ms'`;
+                await captureBusiness(attempt, input);
+              }),
+              (error: unknown) =>
+                typeof error === "object" &&
+                error !== null &&
+                "code" in error &&
+                error.code === "55P03",
+            );
+          });
+        }
+      },
+      connection,
+      3,
+    ),
+);
+
+test(
+  "CRM contact locks serialize with existing research intake",
+  { skip: !connection },
+  async () =>
+    withCrmTestDatabase(
+      async (sql, lead) => {
+        const { captureContact } =
+          await import("../../../lib/growth/crm/lead-repository");
+        const created = await executeCrmCommand(
+          sql,
+          lead(),
+          founder,
+          randomUUID(),
+        );
+        const [prospect] = await sql<
+          { businessId: string }[]
+        >`select business_id as "businessId" from growth.prospects where id=${created.prospectId!}`;
+        const contact = {
+          firstName: "Ada",
+          lastName: "Demo",
+          roleTitle: null,
+          email: randomUUID() + "@example.test",
+          sourceUrl: "https://example.test/team",
+          verifiedAt: "2026-10-25T12:00:00Z",
+          lawfulBasis: "legitimate_interests" as const,
+        };
+        await sql.begin(async (holder) => {
+          await holder`select pg_advisory_xact_lock(hashtextextended(${"growth:contact:" + contact.email},0))`;
+          await assert.rejects(
+            sql.begin(async (attempt) => {
+              await attempt`set local lock_timeout='200ms'`;
+              await captureContact(attempt, contact, prospect.businessId);
+            }),
+            (error: unknown) =>
+              typeof error === "object" &&
+              error !== null &&
+              "code" in error &&
+              error.code === "55P03",
+          );
+        });
+      },
+      connection,
+      3,
+    ),
+);

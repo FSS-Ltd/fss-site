@@ -26,7 +26,7 @@ async function signIn(context: BrowserContext) {
     {
       name: "authjs.session-token",
       value: token,
-      url: "http://localhost:3229",
+      url: test.info().project.use.baseURL ?? "http://localhost:3229",
       httpOnly: true,
       sameSite: "Lax",
     },
@@ -289,7 +289,9 @@ test("enquiry conversion retains provenance and produces one linked lead", async
 test("unauthenticated CRM commands cannot write", async ({ request }) => {
   const id = randomUUID();
   const response = await request.post(`/api/growth/crm/${id}`, {
-    headers: { origin: "http://localhost:3229" },
+    headers: {
+      origin: test.info().project.use.baseURL ?? "http://localhost:3229",
+    },
     data: {
       kind: "save_view",
       requestId: id,
@@ -580,4 +582,49 @@ test("company-number validation is readable and international leads use their se
       await sql`select country_code,county from growth.businesses where company_number=${input.companyNumber}`;
     expect(stored.country_code).toBe("US");
     expect(stored.county).toBeNull();
+  }, databaseUrl));
+
+test("imported business contacts can update a role without invented names", async ({
+  page,
+  context,
+}) =>
+  withCrmTestDatabase(async (sql, newLead) => {
+    await signIn(context);
+    const input = {
+      ...newLead(),
+      contact: {
+        firstName: "Ada",
+        lastName: "Demo",
+        roleTitle: null,
+        email: randomUUID() + "@example.test",
+        sourceUrl: "https://example.test/contact",
+        verifiedAt: "2026-10-25T12:00:00Z",
+        lawfulBasis: "legitimate_interests" as const,
+      },
+    };
+    const created = await executeCrmCommand(sql, input, founder, randomUUID());
+    await sql`update growth.contacts set first_name=null,last_name=null,lawful_basis='research_only' where business_id in (select business_id from growth.prospects where id=${created.prospectId!})`;
+    await page.goto(`/growth/prospects/${created.prospectId}`);
+    await page.getByText("Edit contact details", { exact: true }).click();
+    const form = page.getByRole("form", { name: "Edit contact details" });
+    await expect(form.getByLabel("First name", { exact: true })).toHaveValue(
+      "",
+    );
+    await expect(form.getByLabel("Last name", { exact: true })).toHaveValue("");
+    await form.getByLabel("Role", { exact: true }).fill("General enquiries");
+    const saved = page.waitForResponse(
+      (response) =>
+        response.url().includes("/api/growth/crm/") &&
+        response.request().method() === "POST",
+    );
+    await form
+      .getByRole("button", { name: "Save contact", exact: true })
+      .click();
+    expect((await saved).status()).toBe(200);
+    const [contact] =
+      await sql`select first_name,last_name,role_title,lawful_basis from growth.contacts where business_id in (select business_id from growth.prospects where id=${created.prospectId!})`;
+    expect(contact.first_name).toBeNull();
+    expect(contact.last_name).toBeNull();
+    expect(contact.role_title).toBe("General enquiries");
+    expect(contact.lawful_basis).toBe("research_only");
   }, databaseUrl));

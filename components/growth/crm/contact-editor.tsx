@@ -2,7 +2,7 @@
 import type { CrmRecord } from "@/lib/growth/dashboard/crm-record";
 import { CommandForm } from "./command-form";
 import { FieldGroup, FormField } from "./form-field";
-import { fieldText, nullableText } from "./form-values";
+import { nullableText } from "./form-values";
 import styles from "./crm.module.css";
 export function ContactEditor({
   prospectId,
@@ -19,8 +19,8 @@ export function ContactEditor({
         kind: "update_contact",
         prospectId: prospectId,
         expectedVersion: contact.version,
-        firstName: fieldText(data, "firstName"),
-        lastName: fieldText(data, "lastName"),
+        firstName: nullableText(data, "firstName"),
+        lastName: nullableText(data, "lastName"),
         roleTitle: nullableText(data, "roleTitle"),
       })}
     >
@@ -29,15 +29,13 @@ export function ContactEditor({
         <FormField
           label="First name"
           name="firstName"
-          defaultValue={contact.firstName}
-          required
+          defaultValue={contact.firstName ?? ""}
           maxLength={100}
         />
         <FormField
           label="Last name"
           name="lastName"
-          defaultValue={contact.lastName}
-          required
+          defaultValue={contact.lastName ?? ""}
           maxLength={100}
         />
       </FieldGroup>
