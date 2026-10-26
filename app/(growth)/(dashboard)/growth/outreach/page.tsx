@@ -1,3 +1,4 @@
+import { OutreachWorkspace } from "@/components/growth/outreach/outreach-workspace";
 import { OutreachList } from "@/components/growth/outreach/outreach-list";
 import { OutreachDrafts } from "@/components/growth/outreach/outreach-drafts";
 import { SeoAuditList } from "@/components/growth/outreach/seo-audit-list";
@@ -21,9 +22,11 @@ export default async function OutreachPage() {
           Review email drafts and manage founder-approved Gmail sequences.
         </p>
       </header>
-      <OutreachDrafts result={draftsResult} />
-      <OutreachList result={result} />
-      <SeoAuditList result={seoAuditResult} />
+      <OutreachWorkspace
+        drafts={<OutreachDrafts result={draftsResult} />}
+        sequences={<OutreachList result={result} />}
+        audits={<SeoAuditList result={seoAuditResult} />}
+      />
     </div>
   );
 }

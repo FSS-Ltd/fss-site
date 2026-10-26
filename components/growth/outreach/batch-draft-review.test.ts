@@ -8,15 +8,15 @@ import {
 } from "./batch-draft-review";
 import { draftDeliveryLabel } from "./research-draft-request";
 
+const permission = {
+  basis: "consent",
+  evidence: "Recipient requested this specific email.",
+};
 const id = "11111111-1111-4111-8111-111111111111";
 function entry(): BatchDraftEntry {
   return {
     draftTaskId: id,
     businessName: "Example",
-    permission: {
-      basis: "consent",
-      evidence: "Recipient requested this specific email.",
-    },
     result: null,
     error: null,
     message: {
@@ -92,7 +92,7 @@ test("sends research and legacy approvals through their versioned endpoints", as
     },
   );
   const draft = entry();
-  assert.deepEqual(await sendBatchDraft(draft), {
+  assert.deepEqual(await sendBatchDraft(draft, permission), {
     status: "sent",
     sequenceEnrollmentId: "sequence",
   });
@@ -101,7 +101,7 @@ test("sends research and legacy approvals through their versioned endpoints", as
     researchOnly: false,
     approvalFingerprint: undefined,
   };
-  await sendBatchDraft(draft);
+  await sendBatchDraft(draft, permission);
   assert.deepEqual(sent, [
     {
       path: `/api/growth/messages/${id}/approve-research-send`,
@@ -138,7 +138,7 @@ test("blocked and incomplete reviews never issue send requests", async (t) => {
   ]) {
     const draft = { ...entry(), message };
     assert.equal(canSendBatchDraft(draft), false);
-    await assert.rejects(sendBatchDraft(draft), /not ready/);
+    await assert.rejects(sendBatchDraft(draft, permission), /not ready/);
   }
   assert.equal(requests, 0);
 });
@@ -149,13 +149,13 @@ test("reports delivery outcomes accurately without retrying uncertain sends", as
     requests++;
     return Response.json({ message: "Draft changed" }, { status: 409 });
   });
-  await assert.rejects(sendBatchDraft(entry()), /Draft changed/);
+  await assert.rejects(sendBatchDraft(entry(), permission), /Draft changed/);
   assert.equal(requests, 1);
   fetch.mock.mockImplementation(async () =>
     Response.json({ status: "pending" }),
   );
   assert.equal(
-    draftDeliveryLabel(await sendBatchDraft(entry())),
+    draftDeliveryLabel(await sendBatchDraft(entry(), permission)),
     "Approval saved. Delivery has not yet been confirmed.",
   );
   assert.equal(draftDeliveryLabel({ status: "sent" }), "Email sent.");

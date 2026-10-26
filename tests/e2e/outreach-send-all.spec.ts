@@ -90,13 +90,13 @@ test("send all reviews the displayed drafts, skips blocked recipients, and repor
   await expect(send).toBeDisabled();
   const bases = dialog.getByLabel("Permission to contact this recipient");
   const notes = dialog.getByLabel("Review note or permission evidence");
-  await expect(bases).toHaveCount(2);
-  for (let i = 0; i < 2; i++) {
-    await bases.nth(i).selectOption("consent");
-    await notes
-      .nth(i)
-      .fill(`Recipient ${i + 1} requested this specific email.`);
-  }
+  await expect(bases).toHaveCount(1);
+  await expect(notes).toHaveCount(1);
+  await bases.selectOption("consent");
+  await notes.fill("short");
+  await expect(send).toBeDisabled();
+  await notes.fill("All recipients requested these reviewed emails.");
+  await expect(send).toBeDisabled();
   const acknowledgement = dialog.getByRole("checkbox");
   await acknowledgement.check();
   expect((await acknowledgement.boundingBox())?.width).toBeLessThanOrEqual(24);
@@ -122,7 +122,13 @@ test("send all reviews the displayed drafts, skips blocked recipients, and repor
     fingerprint: "a".repeat(64),
     permission: {
       basis: "consent",
-      evidence: "Recipient 1 requested this specific email.",
+      evidence: "All recipients requested these reviewed emails.",
+    },
+  });
+  expect(requests[1]!.body).toMatchObject({
+    permission: {
+      basis: "consent",
+      evidence: "All recipients requested these reviewed emails.",
     },
   });
   await expect(send).toHaveCount(0);
@@ -218,4 +224,122 @@ test("legacy batch sends once per recipient and blocks dismissal while sending",
     }),
   ).toHaveCount(2);
   await expect(dialog.getByText("Email sent.", { exact: true })).toHaveCount(0);
+});
+
+test("outreach tabs separate the queues and preserve ten-row draft pages", async ({
+  page,
+}, testInfo) => {
+  await page.goto("/visual/fss-studio/growth-outreach-workspace");
+  const drafts = page.getByRole("tab", { name: "Email drafts", exact: true });
+  const sequences = page.getByRole("tab", { name: "Sequences", exact: true });
+  const audits = page.getByRole("tab", {
+    name: "Audit follow-ups",
+    exact: true,
+  });
+  const panel = page.getByRole("tabpanel", {
+    name: "Email drafts",
+    exact: true,
+  });
+  await expect(drafts).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByRole("tabpanel")).toHaveCount(1);
+  await expect(
+    panel.getByRole("link", { name: "Review & publish" }),
+  ).toHaveCount(10);
+  await expect(panel.getByText("Showing 1–10 of 13 drafts")).toBeVisible();
+  await expect(
+    panel.getByRole("button", { name: "Previous", exact: true }),
+  ).toBeDisabled();
+  await page.screenshot({
+    path: `output/review/outreach-tabs-${testInfo.project.name}.png`,
+  });
+  await panel.getByRole("button", { name: "Next", exact: true }).click();
+  await expect(
+    panel.getByRole("link", { name: "Review & publish" }),
+  ).toHaveCount(3);
+  await expect(panel.getByText("Showing 11–13 of 13 drafts")).toBeVisible();
+  await expect(
+    panel.getByRole("button", { name: "Next", exact: true }),
+  ).toBeDisabled();
+  await sequences.click();
+  await expect(page.getByRole("tabpanel")).toHaveCount(1);
+  await expect(
+    page.getByRole("tabpanel", { name: "Sequences", exact: true }),
+  ).toContainText("Active sequence example");
+  await page.screenshot({
+    path: `output/review/outreach-sequences-${testInfo.project.name}.png`,
+  });
+  await sequences.press("ArrowRight");
+  await expect(audits).toBeFocused();
+  await expect(audits).toHaveAttribute("aria-selected", "true");
+  await expect(
+    page.getByRole("tabpanel", { name: "Audit follow-ups", exact: true }),
+  ).toContainText("Audit review example");
+  await audits.press("Home");
+  await expect(drafts).toBeFocused();
+  await drafts.press("End");
+  await expect(audits).toBeFocused();
+  await audits.press("ArrowRight");
+  await expect(drafts).toBeFocused();
+  await drafts.press("ArrowLeft");
+  await expect(audits).toBeFocused();
+  await audits.press("Home");
+  await expect(panel.getByText("Showing 11–13 of 13 drafts")).toBeVisible();
+  await panel.getByRole("button", { name: "Previous", exact: true }).click();
+  await expect(
+    panel.getByRole("link", { name: "Review & publish" }),
+  ).toHaveCount(10);
+});
+
+test("one shared permission sends drafts across every draft page", async ({
+  page,
+}) => {
+  const requests: { id: string; permission: unknown }[] = [];
+  await mockReviews(page);
+  await page.route(
+    "**/api/growth/messages/*/approve-research-send",
+    async (route) => {
+      const id = route.request().url().split("/").at(-2)!;
+      requests.push({
+        id,
+        permission: route.request().postDataJSON().permission,
+      });
+      await route.fulfill({
+        json: { status: "sent", sequenceEnrollmentId: id },
+      });
+    },
+  );
+  await page.goto("/visual/fss-studio/growth-outreach-workspace");
+  await page.getByRole("button", { name: "Next", exact: true }).click();
+  await page.getByRole("button", { name: "Send all", exact: true }).click();
+  const dialog = page.getByRole("dialog", {
+    name: "Review and send all",
+    exact: true,
+  });
+  await expect(dialog).toContainText("12 ready · 1 skipped");
+  const basis = dialog.getByLabel("Permission to contact this recipient");
+  const reason = dialog.getByLabel("Review note or permission evidence");
+  await expect(basis).toHaveCount(1);
+  await expect(reason).toHaveCount(1);
+  await basis.selectOption("corporate_legitimate_interests");
+  await reason.fill(
+    "Verified corporate recipients for this reviewed campaign.",
+  );
+  await dialog.getByRole("checkbox").check();
+  await dialog
+    .getByRole("button", { name: "Confirm & send 12 emails", exact: true })
+    .click();
+  await expect(dialog.getByRole("status")).toContainText(
+    "Batch complete. 12 processed.",
+  );
+  expect(requests).toHaveLength(12);
+  expect(new Set(requests.map((request) => request.id)).size).toBe(12);
+  expect(requests.some((request) => request.id === draftId)).toBe(true);
+  expect(requests.some((request) => request.id.endsWith("000000000010"))).toBe(
+    true,
+  );
+  for (const request of requests)
+    expect(request.permission).toEqual({
+      basis: "corporate_legitimate_interests",
+      evidence: "Verified corporate recipients for this reviewed campaign.",
+    });
 });

@@ -1,13 +1,26 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 
 import { formatGrowthDateTime } from "@/lib/growth/dashboard/formatters";
 import type { OutreachDraftsResult } from "@/lib/growth/dashboard/outreach-drafts";
 
+import { DraftPagination } from "./draft-pagination";
 import { SendAllDrafts } from "./send-all-drafts";
 
 import styles from "./outreach.module.css";
 
-export function OutreachDrafts({ result }: { result: OutreachDraftsResult }) {
+export function OutreachDrafts({
+  result,
+}: {
+  result: OutreachDraftsResult;
+}): React.JSX.Element {
+  const [requestedPage, setPage] = useState(1);
+  const rows = result.status === "ready" ? result.rows : [];
+  const pageCount = Math.max(1, Math.ceil(rows.length / 10));
+  const page = Math.min(requestedPage, pageCount);
+  const visibleRows = rows.slice((page - 1) * 10, page * 10);
   return (
     <section className={styles.card}>
       <div className={styles.header}>
@@ -31,6 +44,9 @@ export function OutreachDrafts({ result }: { result: OutreachDraftsResult }) {
             Review each draft and its evidence, then create a Gmail draft or
             approve and send it.
           </p>
+          <p className={styles.timelineMeta}>
+            Send all covers all {rows.length} drafts across pages.
+          </p>
           <table className={styles.table}>
             <caption className={styles.visuallyHidden}>
               Email drafts awaiting founder review
@@ -44,7 +60,7 @@ export function OutreachDrafts({ result }: { result: OutreachDraftsResult }) {
               </tr>
             </thead>
             <tbody>
-              {result.rows.map((row) => (
+              {visibleRows.map((row) => (
                 <tr key={row.draftTaskId}>
                   <td>{row.businessName}</td>
                   <td>{row.contactName}</td>
@@ -63,7 +79,7 @@ export function OutreachDrafts({ result }: { result: OutreachDraftsResult }) {
             </tbody>
           </table>
           <ul className={styles.mobileList}>
-            {result.rows.map((row) => (
+            {visibleRows.map((row) => (
               <li className={styles.mobileCard} key={row.draftTaskId}>
                 <div>
                   <p className={styles.timelineTitle}>{row.businessName}</p>
@@ -79,6 +95,12 @@ export function OutreachDrafts({ result }: { result: OutreachDraftsResult }) {
               </li>
             ))}
           </ul>
+          <DraftPagination
+            page={page}
+            pageCount={pageCount}
+            total={rows.length}
+            onPageChange={setPage}
+          />
         </>
       )}
     </section>
