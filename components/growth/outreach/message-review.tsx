@@ -6,6 +6,7 @@ import { EmailPreview } from "./email-preview";
 import { MessageActions } from "./message-actions";
 import styles from "./outreach.module.css";
 import { ReviewEvidence } from "./review-evidence";
+import { ResearchMessageActions } from "./research-message-actions";
 
 export function MessageReview({ result }: { result: MessageReviewResult }) {
   if (result.status === "error") {
@@ -44,7 +45,7 @@ export function MessageReview({ result }: { result: MessageReviewResult }) {
           <h1 className={styles.heading}>Review first email</h1>
           <p className={styles.subtitle}>
             {data.researchOnly
-              ? "Review the researched draft and supporting evidence. Outreach has not been approved."
+              ? "Review or edit the researched draft and supporting evidence, then approve this email for sending."
               : "Check the personalised draft and evidence before it enters the Gmail sequence."}
           </p>
         </div>
@@ -54,12 +55,7 @@ export function MessageReview({ result }: { result: MessageReviewResult }) {
         <div className={styles.column}>
           <EmailPreview message={data} />
           {data.researchOnly ? (
-            <div className={styles.card}>
-              <h2 className={styles.sectionTitle}>Research only</h2>
-              {data.eligibility.reasons.map((reason) => (
-                <p key={reason}>{reason}</p>
-              ))}
-            </div>
+            <ResearchMessageActions message={data} />
           ) : (
             <MessageActions message={data} />
           )}

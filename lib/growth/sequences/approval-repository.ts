@@ -24,6 +24,16 @@ function createTransaction(
   transaction: GrowthTransaction,
 ): FirstEmailApprovalTransaction {
   return {
+    async authorizeResearchContact(input) {
+      await transaction`
+        update growth.contacts
+        set lawful_basis = ${input.basis === "consent" ? "consent" : "legitimate_interests"}::growth.lawful_basis,
+            subscriber_type = case when ${input.basis} = 'corporate_legitimate_interests' then 'corporate'::growth.subscriber_type else subscriber_type end,
+            version = version + 1, updated_at = now()
+        where id = ${input.contactId}
+      `;
+      await transaction`update growth.prospects set version = version + 1, updated_at = now() where id = ${input.prospectId}`;
+    },
     async lockDraft(draftTaskId) {
       const rows = await transaction<
         Array<{
@@ -37,6 +47,8 @@ function createTransaction(
           normalisedEmail: string;
           subscriberType: string;
           corporateStatus: string;
+          prospectStatus: string;
+          prospectVersion: number;
         }>
       >`
         select
@@ -49,14 +61,16 @@ function createTransaction(
           c.email as "contactEmail",
           c.normalised_email as "normalisedEmail",
           c.subscriber_type as "subscriberType",
-          b.corporate_status as "corporateStatus"
+          b.corporate_status as "corporateStatus",
+          p.status as "prospectStatus",
+          p.version as "prospectVersion"
         from growth.agent_tasks at
         inner join growth.prospects p on p.id = at.prospect_id
         inner join growth.contacts c on c.id = p.primary_contact_id
         inner join growth.businesses b on b.id = p.business_id
         where at.id = ${draftTaskId}
           and at.task_type = 'first_email_draft'
-        for update of at, p
+        for update of at, p, c
       `;
       const draft = rows[0];
       if (!draft) return null;
@@ -111,11 +125,18 @@ function createTransaction(
     },
 
     async createEnrollmentAndFirstMessage(input) {
+      const templateSnapshot: postgres.JSONValue = input.followUpPolicy
+        ? {
+            followUpPolicy: input.followUpPolicy,
+            approvedRecipient: input.approvedRecipient ?? null,
+          }
+        : {};
       const enrollmentRows = await transaction<Array<{ id: string }>>`
         insert into growth.sequence_enrollments (
-          prospect_id, contact_id, status
+          prospect_id, contact_id, status, template_snapshot
         ) values (
-          ${input.prospectId}, ${input.contactId}, ${input.enrollmentStatus}
+          ${input.prospectId}, ${input.contactId}, ${input.enrollmentStatus},
+          ${transaction.json(templateSnapshot)}
         )
         returning id
       `;
@@ -174,7 +195,10 @@ function createTransaction(
         action: "first_email.approved",
         entityType: "agent_task",
         entityId: input.draftTaskId,
-        metadata: { approved: true },
+        metadata: {
+          approved: true,
+          ...(input.reasonCode ? { reasonCode: input.reasonCode } : {}),
+        },
       });
     },
   };

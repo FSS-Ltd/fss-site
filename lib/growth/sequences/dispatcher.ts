@@ -272,6 +272,7 @@ export function createOutreachDispatcher({
   return async function dispatchDueOutreach(
     db: GrowthDb,
     dispatchAt: Date,
+    messageId?: string,
   ): Promise<DispatchSummary> {
     const summary: DispatchSummary = {
       claimed: 0,
@@ -288,6 +289,7 @@ export function createOutreachDispatcher({
         now: dispatchAt,
         leaseToken: createLeaseToken(),
         leaseExpiresAt,
+        ...(messageId ? { messageId } : {}),
       });
       if (!claimed) break;
       summary.claimed += 1;
@@ -308,6 +310,26 @@ export function createOutreachDispatcher({
         await repository.cancelMessage(db, {
           messageId: claimed.id,
           errorCode: "suppressed_contact",
+        });
+        summary.cancelled += 1;
+        continue;
+      }
+      if (
+        claimed.manualOnly &&
+        (claimed.approvedRecipient !== context.normalisedEmail ||
+          context.corporateStatus !== "active" ||
+          !["ready_for_email_review", "contacted"].includes(
+            context.prospectStatus ?? "",
+          ) ||
+          !(
+            context.lawfulBasis === "consent" ||
+            (context.lawfulBasis === "legitimate_interests" &&
+              context.subscriberType === "corporate")
+          ))
+      ) {
+        await repository.cancelMessage(db, {
+          messageId: claimed.id,
+          errorCode: "research_permission_changed",
         });
         summary.cancelled += 1;
         continue;
@@ -385,7 +407,7 @@ export function createOutreachDispatcher({
           htmlSnapshot: prepared.send.html,
           textSnapshot: prepared.send.text,
           followUps:
-            claimed.stepNumber === 0
+            claimed.stepNumber === 0 && !claimed.manualOnly
               ? scheduledFollowUpsForFirstSend(
                   claimed.sequenceEnrollmentId,
                   now(),
@@ -441,7 +463,7 @@ async function recordReconciledSent(
     htmlSnapshot: claimed.htmlSnapshot ?? "",
     textSnapshot: claimed.textSnapshot ?? "",
     followUps:
-      claimed.stepNumber === 0
+      claimed.stepNumber === 0 && !claimed.manualOnly
         ? scheduledFollowUpsForFirstSend(
             claimed.sequenceEnrollmentId,
             new Date(),

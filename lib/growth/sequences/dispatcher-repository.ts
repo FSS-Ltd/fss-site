@@ -4,6 +4,8 @@ import type { GrowthDb } from "../db/types";
 export type ClaimedMessage = {
   id: string;
   previousStatus: "queued" | "retry" | "sending";
+  manualOnly?: boolean;
+  approvedRecipient?: string | null;
   sequenceEnrollmentId: string;
   prospectId: string;
   contactId: string;
@@ -17,6 +19,10 @@ export type ClaimedMessage = {
 };
 
 export type SendContext = {
+  lawfulBasis?: string;
+  subscriberType?: string;
+  prospectStatus?: string;
+  corporateStatus?: string;
   enrollmentStatus: string;
   gmailThreadId: string | null;
   contactEmail: string;
@@ -73,7 +79,12 @@ export type CancelMessageInput = {
 export interface SequenceDispatchRepository {
   claimDueMessage(
     db: GrowthDb,
-    input: { now: Date; leaseToken: string; leaseExpiresAt: Date },
+    input: {
+      now: Date;
+      leaseToken: string;
+      leaseExpiresAt: Date;
+      messageId?: string;
+    },
   ): Promise<ClaimedMessage | null>;
   getSendContext(
     db: GrowthDb,
@@ -99,17 +110,25 @@ export interface SequenceDispatchRepository {
 
 async function claimDueMessage(
   db: GrowthDb,
-  input: { now: Date; leaseToken: string; leaseExpiresAt: Date },
+  input: {
+    now: Date;
+    leaseToken: string;
+    leaseExpiresAt: Date;
+    messageId?: string;
+  },
 ): Promise<ClaimedMessage | null> {
   const rows = await db<Array<ClaimedMessage>>`
     with target as (
-      select em.id, em.status as "previousStatus"
+      select em.id, em.status as "previousStatus",
+        se.template_snapshot ->> 'followUpPolicy' = 'manual_only' as "manualOnly",
+        se.template_snapshot ->> 'approvedRecipient' as "approvedRecipient"
       from growth.email_messages em
-      where (
+      inner join growth.sequence_enrollments se on se.id = em.sequence_enrollment_id
+      where ((
           em.status in ('queued', 'retry') and em.scheduled_for <= ${input.now}
         ) or (
           em.status = 'sending' and em.lease_expires_at < ${input.now}
-        )
+        )) and (${input.messageId ?? null}::uuid is null or em.id = ${input.messageId ?? null}::uuid)
       order by em.scheduled_for asc nulls last
       for update of em skip locked
       limit 1
@@ -125,6 +144,8 @@ async function claimDueMessage(
     returning
       em.id,
       target."previousStatus",
+      target."manualOnly",
+      target."approvedRecipient",
       em.sequence_enrollment_id as "sequenceEnrollmentId",
       em.prospect_id as "prospectId",
       em.contact_id as "contactId",
@@ -149,6 +170,8 @@ async function getSendContext(
       se.gmail_thread_id as "gmailThreadId",
       c.email as "contactEmail",
       c.normalised_email as "normalisedEmail",
+      c.lawful_basis as "lawfulBasis", c.subscriber_type as "subscriberType",
+      p.status as "prospectStatus", b.corporate_status as "corporateStatus",
       c.first_name as "firstName",
       coalesce(b.trading_name, b.legal_name) as "businessName",
       first_message.subject_snapshot as "firstEmailSubject"
@@ -295,6 +318,7 @@ export async function recordSent(
       update growth.sequence_enrollments
       set gmail_thread_id = coalesce(gmail_thread_id, ${input.providerThreadId}),
           started_at = coalesce(started_at, ${input.sentAt}),
+          status = case when template_snapshot ->> 'followUpPolicy' = 'manual_only' then 'completed' else status end,
           updated_at = now()
       where id = ${input.sequenceEnrollmentId}
     `;

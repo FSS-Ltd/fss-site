@@ -64,6 +64,7 @@ export type MessageReviewData = {
   imageByteSize: number | null;
   visualKind: "stored" | "fallback" | "none";
   researchOnly?: boolean;
+  approvalFingerprint?: string;
   visualReviewStatus: string | null;
   citations: readonly MessageReviewCitation[];
   createdAt: string;
@@ -283,15 +284,17 @@ export async function getMessageReview(
     }
 
     if (isGlobalDraftSnapshot(draft.outputSnapshot)) {
-      const [suppressed, citations] = await Promise.all([
+      const [suppressed, citations, hasEnrollment] = await Promise.all([
         fetchSuppressed(db, draft.normalisedEmail),
         fetchCitations(db, draft.prospectId),
+        fetchHasEnrollment(db, draft.prospectId),
       ]);
       return createGlobalMessageReview(
         draft,
         founderEmail,
         suppressed,
         citations,
+        hasEnrollment,
       );
     }
 

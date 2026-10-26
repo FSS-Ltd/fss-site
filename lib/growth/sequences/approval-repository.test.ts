@@ -85,7 +85,7 @@ test("locks the draft and prospect, creates the enrollment and message, and audi
   assert.equal(result.created.sequenceEnrollmentId, "enrollment-id");
 
   assert.match(queries[0]?.text ?? "", /task_type = 'first_email_draft'/);
-  assert.match(queries[0]?.text ?? "", /for update of at, p$/);
+  assert.match(queries[0]?.text ?? "", /for update of at, p, c$/);
   assert.match(queries[1]?.text ?? "", /select exists/);
   assert.match(queries[2]?.text ?? "", /select exists/);
   assert.deepEqual(queries[2]?.values, ["contact@example.test"]);
@@ -93,7 +93,12 @@ test("locks the draft and prospect, creates the enrollment and message, and audi
     queries[3]?.text ?? "",
     /insert into growth\.sequence_enrollments/,
   );
-  assert.deepEqual(queries[3]?.values, ["prospect-id", "contact-id", "active"]);
+  assert.deepEqual(queries[3]?.values, [
+    "prospect-id",
+    "contact-id",
+    "active",
+    {},
+  ]);
   assert.match(queries[4]?.text ?? "", /insert into growth\.email_messages/);
   assert.match(queries[5]?.text ?? "", /update growth\.sequence_enrollments/);
   assert.match(queries[5]?.text ?? "", /set first_message_id = \?/);

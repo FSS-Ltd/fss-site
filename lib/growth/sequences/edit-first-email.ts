@@ -4,9 +4,13 @@ import {
   isSafeEmailHtml,
 } from "../email/html-policy";
 import type { FirstEmailCandidate } from "../research/types";
+import {
+  findConceptDisclosure,
+  findEmailOptOut,
+  offersEmailOptOut,
+} from "../email/copy-policy";
 
-const MIN_WORD_COUNT = 140;
-const MAX_WORD_COUNT = 220;
+const MAX_WORD_COUNT = 2000;
 const MAX_SUBJECT_LENGTH = 200;
 const MAX_PARAGRAPHS = 20;
 const MAX_PARAGRAPH_LENGTH = 2000;
@@ -57,7 +61,7 @@ function requireRetainedStandards(
     "First-email opt-out sentence",
     MAX_STANDARD_SENTENCE_LENGTH,
   );
-  if (!/opt[ -]?out|no further emails|not hear from me/i.test(optOutSentence)) {
+  if (!offersEmailOptOut(optOutSentence)) {
     throw new InvalidFirstEmailRevisionContentError(
       "First-email opt-out sentence is invalid.",
     );
@@ -79,10 +83,22 @@ export function createFounderFirstEmailRevision(
     MAX_SUBJECT_LENGTH,
   );
   const paragraphs = requireParagraphs(input.paragraphs);
-  const { optOutSentence, conceptDisclaimer } = requireRetainedStandards(
-    input.retained,
-  );
+  requireRetainedStandards(input.retained);
   const text = paragraphs.join("\n\n");
+  const optOutSentence = text.includes(input.retained.optOutSentence)
+    ? input.retained.optOutSentence
+    : findEmailOptOut(text);
+  const conceptDisclaimer = text.includes(input.retained.conceptDisclaimer)
+    ? input.retained.conceptDisclaimer
+    : findConceptDisclosure(text);
+  if (!optOutSentence)
+    throw new InvalidFirstEmailRevisionContentError(
+      "Include a clear email opt-out.",
+    );
+  if (!conceptDisclaimer)
+    throw new InvalidFirstEmailRevisionContentError(
+      "Include a concept disclaimer for the visual.",
+    );
   if (countTextOccurrences(text, optOutSentence) !== 1) {
     throw new InvalidFirstEmailRevisionContentError(
       "First-email opt-out sentence must appear exactly once.",
@@ -95,13 +111,9 @@ export function createFounderFirstEmailRevision(
   }
 
   const wordCount = text.split(/\s+/).length;
-  if (
-    text.length > MAX_TEXT_LENGTH ||
-    wordCount < MIN_WORD_COUNT ||
-    wordCount > MAX_WORD_COUNT
-  ) {
+  if (text.length > MAX_TEXT_LENGTH || wordCount > MAX_WORD_COUNT) {
     throw new InvalidFirstEmailRevisionContentError(
-      "First-email content must contain 140 to 220 words.",
+      "First-email content must contain no more than 2000 words.",
     );
   }
   const html = paragraphs

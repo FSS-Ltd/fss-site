@@ -434,7 +434,7 @@ function researchDraftRow(overrides: Partial<Record<string, unknown>> = {}) {
   });
 }
 
-test("global research drafts retain exact copy and are read-only without visuals or sequences", async () => {
+test("global research drafts retain exact copy and expose versioned edits without visual requirements", async () => {
   const result = await getMessageReview(
     draftTaskId,
     founderEmail,
@@ -449,8 +449,9 @@ test("global research drafts retain exact copy and are read-only without visuals
   assert.equal(result.data.researchOnly, true);
   assert.equal(result.data.contactName, "Business contact");
   assert.equal(result.data.visualKind, "none");
-  assert.equal(result.data.eligibility.ready, false);
-  assert.deepEqual(result.data.editableParagraphs, []);
+  assert.equal(result.data.eligibility.ready, true);
+  assert.match(result.data.approvalFingerprint ?? "", /^[0-9a-f]{64}$/);
+  assert.equal(result.data.editableParagraphs.join("\n\n"), researchEmail.text);
   assert.deepEqual(result.data.followUpCadence, []);
   assert.equal(result.data.citations.length, 1);
 });

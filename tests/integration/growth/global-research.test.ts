@@ -1,3 +1,4 @@
+import { verifyResearchEmailFlow } from "./research-email-flow";
 import { getMessageReview } from "../../../lib/growth/dashboard/message-review";
 import { getProspectDetail } from "../../../lib/growth/dashboard/prospect-detail";
 import { getOverviewViewModel } from "../../../lib/growth/dashboard/overview";
@@ -99,7 +100,8 @@ test(
         first.prospects[0]!.firstEmail.text,
       );
       assert.equal(review.data.researchOnly, true);
-      assert.equal(review.data.eligibility.ready, false);
+      assert.equal(review.data.eligibility.ready, true);
+      assert.match(review.data.approvalFingerprint ?? "", /^[0-9a-f]{64}$/);
       const detail = await getProspectDetail(prospectId, sql);
       assert.equal(detail.status, "found");
       if (detail.status !== "found")
@@ -203,7 +205,11 @@ test(
       const rolledBack =
         await sql`select id from growth.research_runs where external_run_id=${suppressed.externalRunId}`;
       assert.equal(rolledBack.length, 0);
+      await verifyResearchEmailFlow(sql, tasks[0]!.id, prefix);
     } finally {
+      await sql`update growth.sequence_enrollments set first_message_id=null where prospect_id in (select id from growth.prospects where research_run_id in (select id from growth.research_runs where external_run_id like ${`${prefix}%`}))`;
+      await sql`delete from growth.email_messages where prospect_id in (select id from growth.prospects where research_run_id in (select id from growth.research_runs where external_run_id like ${`${prefix}%`}))`;
+      await sql`delete from growth.sequence_enrollments where prospect_id in (select id from growth.prospects where research_run_id in (select id from growth.research_runs where external_run_id like ${`${prefix}%`}))`;
       await sql`delete from growth.agent_tasks where research_run_id in (select id from growth.research_runs where external_run_id like ${`${prefix}%`})`;
       await sql`delete from growth.source_evidence where research_run_id in (select id from growth.research_runs where external_run_id like ${`${prefix}%`})`;
       await sql`delete from growth.audit_log where correlation_id like ${`${prefix}%`}`;

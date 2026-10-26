@@ -10,6 +10,15 @@ import {
   type StoredFirstEmailDraft,
 } from "./first-email-draft-snapshot";
 import { postgresFirstEmailRevisionRepository } from "./first-email-revision-repository";
+import type { z } from "zod";
+import type { globalFirstEmailSchema } from "../research/global-schema";
+import { isResearchEmailSnapshot } from "./research-email-snapshot";
+import { reviseResearchEmailDraft } from "./research-email-revisions";
+import { FirstEmailRevisionError } from "./first-email-revision-errors";
+export {
+  FirstEmailRevisionError,
+  type FirstEmailRevisionErrorCode,
+} from "./first-email-revision-errors";
 
 const FOUNDER_ACTOR_ID_PATTERN = /^[0-9a-f]{64}$/;
 
@@ -52,22 +61,8 @@ export type FounderFirstEmailRevision = {
   draftTaskId: string;
   version: number;
   editedAt: string;
-  email: FirstEmailCandidate;
+  email: FirstEmailCandidate | z.infer<typeof globalFirstEmailSchema>;
 };
-
-export type FirstEmailRevisionErrorCode =
-  | "not_found"
-  | "not_editable"
-  | "version_conflict"
-  | "revision_limit_reached"
-  | "invalid_stored_draft";
-
-export class FirstEmailRevisionError extends Error {
-  constructor(readonly code: FirstEmailRevisionErrorCode) {
-    super("The first-email draft could not be revised.");
-    this.name = "FirstEmailRevisionError";
-  }
-}
 
 function validateRequest(input: ReviseFirstEmailDraftInput): void {
   if (
@@ -101,6 +96,9 @@ export function createFirstEmailDraftReviser({
     return repository.withTransaction(db, async (transaction) => {
       const draft = await transaction.lockDraft(input.draftTaskId);
       if (!draft) throw new FirstEmailRevisionError("not_found");
+      if (isResearchEmailSnapshot(draft.outputSnapshot)) {
+        return reviseResearchEmailDraft(transaction, draft, input, now());
+      }
 
       let stored;
       try {
@@ -145,6 +143,10 @@ export function createFirstEmailDraftReviser({
       const outputSnapshot = {
         ...stored.snapshot,
         email,
+        visual: {
+          ...stored.visual,
+          conceptDisclaimer: email.conceptDisclaimer,
+        },
         reviewState: "draft" as const,
         draftVersion: version,
         emailRevisions: [...stored.revisions, revision],

@@ -1,56 +1,50 @@
-import { z } from "zod";
-
-import { globalFirstEmailSchema } from "../research/global-schema";
+import {
+  isResearchEmailSnapshot,
+  researchEmailFingerprint,
+  researchEmailSnapshotSchema,
+} from "../sequences/research-email-snapshot";
 import type {
   MessageReviewCitation,
   MessageReviewDraftRow,
   MessageReviewResult,
 } from "./message-review";
 
-const globalDraftSnapshotSchema = z
-  .object({
-    schemaVersion: z.literal("2.0"),
-    reviewState: z.literal("research_only"),
-    email: globalFirstEmailSchema,
-  })
-  .strict();
-
-export function isGlobalDraftSnapshot(value: unknown): boolean {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "schemaVersion" in value &&
-    value.schemaVersion === "2.0"
-  );
-}
+export const isGlobalDraftSnapshot = isResearchEmailSnapshot;
 
 export function createGlobalMessageReview(
   draft: MessageReviewDraftRow,
   founderEmail: string,
   suppressed: boolean,
   citations: readonly MessageReviewCitation[],
+  hasEnrollment = false,
 ): MessageReviewResult {
-  const parsed = globalDraftSnapshotSchema.safeParse(draft.outputSnapshot);
+  const parsed = researchEmailSnapshotSchema.safeParse(draft.outputSnapshot);
   if (!parsed.success || draft.status !== "completed" || !draft.completedAt) {
     return {
       status: "unavailable",
       reason: "This research draft is incomplete or failed safety validation.",
     };
   }
+  if (parsed.data.reviewState !== "research_only" || hasEnrollment)
+    return {
+      status: "unavailable",
+      reason:
+        "This email has already been approved. Check its outreach timeline for delivery status.",
+    };
 
   const email = parsed.data.email;
-  const reasons = [
-    "Research only. Outreach has not been approved for this contact.",
-  ];
+  const reasons: string[] = [];
   if (suppressed)
     reasons.push("This contact is suppressed and cannot be emailed.");
+  if (draft.corporateStatus !== "active")
+    reasons.push("The business status must be verified before sending.");
 
   return {
     status: "ready",
     data: {
       draftTaskId: draft.id,
-      version: 1,
-      revisionCount: 0,
+      version: parsed.data.draftVersion,
+      revisionCount: parsed.data.emailRevisions.length,
       prospectId: draft.prospectId,
       prospectVersion: draft.prospectVersion,
       businessName: draft.businessName,
@@ -68,16 +62,21 @@ export function createGlobalMessageReview(
       subject: email.subject,
       previewHtml: email.html,
       previewText: email.text,
-      editableParagraphs: [],
+      editableParagraphs: email.text.split(/\n{2,}/),
       wordCount: email.wordCount,
       imageAltText: "",
       imageByteSize: null,
       visualKind: "none",
       visualReviewStatus: null,
       researchOnly: true,
+      approvalFingerprint: researchEmailFingerprint(
+        parsed.data,
+        draft.contactEmail,
+        draft.prospectVersion,
+      ),
       citations,
       createdAt: draft.completedAt.toISOString(),
-      eligibility: { ready: false, reasons },
+      eligibility: { ready: reasons.length === 0, reasons },
       followUpCadence: [],
     },
   };

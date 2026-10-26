@@ -22,9 +22,13 @@ Use up to ten prospects per batch, distinct stable external run IDs, and ten bat
 
 `lib/growth/research/global-schema.ts` is the contract. Every candidate needs verified business identity, a two-letter country code, contact provenance, source evidence, opportunity and email. Company numbers and personal names may be null. A public business mailbox on Gmail or another provider is supported; publication is not a claim of deliverability or permission to send. The email source URL must appear in first-party evidence. Financial estimates default to zero and display as not estimated, rather than a quote. Keep absent regional names null.
 
-Email requires a subject, safe HTML, matching plain text, actual word count of 20–220 and an opt-out sentence. Evidence supports observations; do not invent a private operational problem or interpret an absent website link as proof that no website exists. Google Maps records only discovery references.
+Email requires a subject, safe HTML, matching plain text, an accurate word count up to 2,000 and a clear opt-out in natural wording. Evidence supports observations; do not invent a private operational problem or interpret an absent website link as proof that no website exists. Google Maps records only discovery references.
 
-All v2 contacts persist with lawful basis `research_only`. Drafts appear in the review queue with citations. Editing, sending, Gmail-draft and sequence actions remain unavailable for these snapshots. An outreach workflow requires a separate explicit review and implementation; changing an input field cannot authorize sending.
+All v2 contacts initially persist with lawful basis `research_only`. Drafts appear in the Outreach queue and their review pages with citations. A founder can edit the subject and copy through **Edit draft**, save a versioned revision, and select **Approve & send**. Approval requires a recipient permission basis and review note, then confirmation of the displayed recipient and subject. Public contact provenance alone does not approve outreach.
+
+Approval freezes the exact reviewed email, records the founder decision, and immediately dispatches only that message through the existing Gmail connection. It starts no automatic follow-ups. Suppression, permission, recipient identity and prospect state are checked again before delivery. A changed draft or contact requires fresh review. Sent, pending, failed and cancelled outcomes are distinct; use the delivery-status link to inspect failures. No Gmail operation occurs merely by viewing, editing, ingesting, or saving a draft.
+
+Text-only research drafts need no concept visual or concept disclaimer. Legacy drafts with a visual retain a concept disclosure, but its wording may be revised. Copy can be concise and the opt-out can use natural language; unsafe HTML, mismatched HTML/plain text, missing opt-out, invalid headers and excessive content remain blocked.
 
 ## Known boundary
 

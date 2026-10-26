@@ -40,6 +40,7 @@ const researchMessage: MessageReviewData = {
   visualKind: "none",
   visualReviewStatus: null,
   researchOnly: true,
+  approvalFingerprint: "a".repeat(64),
   citations: [
     {
       id: "evidence-1",
@@ -51,7 +52,7 @@ const researchMessage: MessageReviewData = {
   ],
   createdAt: "2026-10-26T08:00:00Z",
   eligibility: {
-    ready: false,
+    ready: true,
     reasons: [
       "Research only. Outreach has not been approved for this contact.",
     ],
@@ -59,7 +60,7 @@ const researchMessage: MessageReviewData = {
   followUpCadence: [],
 };
 
-test("research review shows evidence and exact preview without outreach controls or generated visuals", () => {
+test("research review exposes edit and approval controls beside the exact preview", () => {
   const html = renderToStaticMarkup(
     <MessageReview result={{ status: "ready", data: researchMessage }} />,
   );
@@ -69,8 +70,10 @@ test("research review shows evidence and exact preview without outreach controls
   assert.match(html, /Business contact/);
   assert.match(html, /Research only/);
   assert.match(html, /Not estimated/);
+  assert.match(html, />Edit draft<\/button>/);
+  assert.match(html, />Approve &amp; send<\/button>/);
   assert.doesNotMatch(
     html,
-    /Create Gmail draft|Approve &amp; send|Edit draft|Sequence preview|Visual checks|Fallback visual/,
+    /Create Gmail draft|Sequence preview|Visual checks|Fallback visual/,
   );
 });

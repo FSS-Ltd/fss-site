@@ -27,7 +27,7 @@ test("lists the latest unsent first-email drafts with review identities and safe
       );
       assert.match(
         query,
-        /coalesce\(draft.output_snapshot ->> 'reviewState', 'draft'\) = 'draft'/,
+        /coalesce\(draft.output_snapshot ->> 'reviewState', 'draft'\) in \('draft', 'research_only'\)/,
       );
       assert.match(
         query,

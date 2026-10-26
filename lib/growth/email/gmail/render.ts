@@ -1,4 +1,5 @@
 import type { FirstEmailCandidate } from "../../research/types";
+import { offersEmailOptOut } from "../copy-policy";
 import {
   EMAIL_ASSET_FALLBACKS,
   type EmailAssetFallbackKey,
@@ -84,8 +85,8 @@ function requireApprovedSnapshot(snapshot: FirstEmailCandidate): void {
   const actualWordCount = snapshot.text.trim().split(/\s+/).length;
   if (
     !Number.isInteger(snapshot.wordCount) ||
-    snapshot.wordCount < 140 ||
-    snapshot.wordCount > 220 ||
+    snapshot.wordCount < 1 ||
+    snapshot.wordCount > 2000 ||
     snapshot.wordCount !== actualWordCount
   ) {
     throw new TypeError("First-email snapshot word count is invalid.");
@@ -95,9 +96,7 @@ function requireApprovedSnapshot(snapshot: FirstEmailCandidate): void {
   }
   if (
     !snapshot.optOutSentence.trim() ||
-    !/opt[ -]?out|no further emails|not hear from me/i.test(
-      snapshot.optOutSentence,
-    ) ||
+    !offersEmailOptOut(snapshot.optOutSentence) ||
     !hasCanonicalEmailHtmlText(snapshot.html, snapshot.optOutSentence) ||
     countTextOccurrences(
       emailHtmlVisibleText(snapshot.html),
