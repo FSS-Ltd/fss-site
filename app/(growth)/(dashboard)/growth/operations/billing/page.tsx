@@ -18,15 +18,16 @@ export default async function BillingReviewPage({
     redirect(fssStudioUrl("/admin/billing"));
   if (process.env.OPERATIONS_BILLING_ENABLED !== "true") notFound();
   const params = await searchParams;
+  let data: Awaited<ReturnType<typeof listBillingExceptions>>;
   try {
     if (Array.isArray(params.after)) throw new Error("Invalid cursor.");
-    const data = await listBillingExceptions(
+    data = await listBillingExceptions(
       getOperationsDb(),
       founder,
       params.after,
     );
-    return <BillingExceptionList state={{ status: "ready", ...data }} />;
   } catch {
     return <BillingExceptionList state={{ status: "error" }} />;
   }
+  return <BillingExceptionList state={{ status: "ready", ...data }} />;
 }
