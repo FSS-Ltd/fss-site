@@ -18,7 +18,8 @@ Create a single-email enrollment through the existing transactional repository,
 then wake the existing dispatcher for exactly the approved message. Preserve
 suppression checks, stale-version rejection, auditing, idempotent provider
 reconciliation, leases and error feedback. Record a manual-only follow-up policy
-in existing enrollment JSON. No automatic follow-ups are authorized by this
+in existing enrollment JSON. Keep the conversation active after sending so replies
+and Started talks continue through the existing workflow. No automatic follow-ups are authorized by this
 single-email approval. No migration or dependency is required.
 
 Support concise copy and natural opt-out phrasing. Keep safe HTML/plain-text
@@ -35,7 +36,8 @@ Verification on Node 24.21.0 and the frozen dependency lock passed:
   component, editor, confirmation, conflict, pending and permanent failure UI.
 - Database flow verifies saved edits, exact approved HTML/text, one targeted
   provider call, no follow-ups, a second queued email left untouched, and replay
-  rejection. Provider calls are mocked; no real recipient received an email.
+  rejection. A subsequent reply is recorded through the normal Gmail sync flow.
+  Provider calls are mocked; no real recipient received an email.
 - Type checking, production build, formatting and dependency audit pass. Lint has
   no errors and one existing `react-hooks/incompatible-library` warning in
   `components/forms/contact-form.tsx`.

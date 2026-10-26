@@ -207,6 +207,7 @@ test(
       assert.equal(rolledBack.length, 0);
       await verifyResearchEmailFlow(sql, tasks[0]!.id, prefix);
     } finally {
+      await sql`delete from growth.email_events where email_message_id in (select id from growth.email_messages where prospect_id in (select id from growth.prospects where research_run_id in (select id from growth.research_runs where external_run_id like ${`${prefix}%`})))`;
       await sql`update growth.sequence_enrollments set first_message_id=null where prospect_id in (select id from growth.prospects where research_run_id in (select id from growth.research_runs where external_run_id like ${`${prefix}%`}))`;
       await sql`delete from growth.email_messages where prospect_id in (select id from growth.prospects where research_run_id in (select id from growth.research_runs where external_run_id like ${`${prefix}%`}))`;
       await sql`delete from growth.sequence_enrollments where prospect_id in (select id from growth.prospects where research_run_id in (select id from growth.research_runs where external_run_id like ${`${prefix}%`}))`;

@@ -318,7 +318,6 @@ export async function recordSent(
       update growth.sequence_enrollments
       set gmail_thread_id = coalesce(gmail_thread_id, ${input.providerThreadId}),
           started_at = coalesce(started_at, ${input.sentAt}),
-          status = case when template_snapshot ->> 'followUpPolicy' = 'manual_only' then 'completed' else status end,
           updated_at = now()
       where id = ${input.sequenceEnrollmentId}
     `;

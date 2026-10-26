@@ -1,3 +1,5 @@
+import { createGmailReplySync } from "../../../lib/growth/sequences/gmail-sync";
+import { postgresGmailSyncRepository } from "../../../lib/growth/sequences/gmail-sync-repository";
 import assert from "node:assert/strict";
 import type { GrowthDb } from "../../../lib/growth/db/types";
 import { getMessageReview } from "../../../lib/growth/dashboard/message-review";
@@ -128,7 +130,7 @@ export async function verifyResearchEmailFlow(
   assert.equal(stored?.status, "sent");
   assert.equal(stored?.text, review.data.previewText);
   assert.equal(stored?.html, review.data.previewHtml);
-  assert.equal(stored?.enrollmentStatus, "completed");
+  assert.equal(stored?.enrollmentStatus, "active");
   assert.equal(stored?.followUps, 0);
   const [pending] = await sql<
     { status: string }[]
@@ -136,4 +138,52 @@ export async function verifyResearchEmailFlow(
   assert.equal(pending?.status, "queued");
   assert.equal((await dispatch(sql, new Date(), approved.messageId)).sent, 0);
   assert.equal(sentRaw.length, 1);
+  const replyMessageId = `reply-${prefix}`;
+  const threadId = `mock-thread-${prefix}`;
+  const sync = createGmailReplySync({
+    repository: {
+      ...postgresGmailSyncRepository,
+      getCursor: async () => "100",
+      setCursor: async () => {},
+    },
+    founderEmail: founder.email,
+    createCorrelationId: () => `${prefix}-reply`,
+    gmailClient: {
+      getProfile: async () => ({
+        emailAddress: founder.email,
+        historyId: "101",
+      }),
+      listHistory: async () => ({
+        historyId: "101",
+        records: [
+          {
+            historyId: "101",
+            messagesAdded: [
+              { messageId: replyMessageId, gmailThreadId: threadId },
+            ],
+            messagesDeleted: [],
+          },
+        ],
+      }),
+      getMessageMetadata: async () => ({
+        messageId: replyMessageId,
+        gmailThreadId: threadId,
+        historyId: "101",
+        labelIds: ["INBOX"],
+        receivedAt: new Date().toISOString(),
+        from: review.data.contactEmail,
+        subject: "Re: The reviewed subject",
+        rfcMessageId: `<${replyMessageId}@example.test>`,
+        autoSubmitted: null,
+        precedence: null,
+        returnPath: null,
+        autoResponseSuppress: null,
+      }),
+    },
+  });
+  assert.equal((await sync(sql)).replies, 1);
+  const [conversation] = await sql<
+    { status: string }[]
+  >`select status from growth.sequence_enrollments where id=${approved.sequenceEnrollmentId}`;
+  assert.equal(conversation?.status, "stopped_reply");
 }
