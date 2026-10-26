@@ -65,3 +65,20 @@ test("keeps draft empty and failure states visible", () => {
   assert.match(failure, /draft-reference/);
   assert.doesNotMatch(failure, /No email drafts/);
 });
+
+test("shows only ten drafts per page while retaining the full queue for batch review", () => {
+  const rows = Array.from({ length: 13 }, (_, index) => ({
+    draftTaskId: `draft-${index + 1}`,
+    businessName: `Example ${index + 1}`,
+    contactName: "Business contact",
+    completedAt: "2026-10-26T08:00:00Z",
+  }));
+  const html = renderToStaticMarkup(
+    <OutreachDrafts result={{ status: "ready", rows }} />,
+  );
+  assert.match(html, /Showing 1–10 of 13 drafts/);
+  assert.match(html, /Page 1 of 2/);
+  assert.match(html, /draft-10/);
+  assert.doesNotMatch(html, /draft-11/);
+  assert.match(html, /Send all covers all 13 drafts across pages/);
+});

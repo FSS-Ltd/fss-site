@@ -2,21 +2,15 @@
 
 import { canSendBatchDraft, type BatchDraftEntry } from "./batch-draft-review";
 import { draftDeliveryLabel } from "./research-draft-request";
-import {
-  ResearchPermissionFields,
-  type ResearchPermission,
-} from "./research-permission-fields";
 import styles from "./outreach.module.css";
 import dialogStyles from "./outreach-dialog.module.css";
 
 export function BatchDraftCard({
   entry,
   locked,
-  onPermissionChange,
 }: {
   entry: BatchDraftEntry;
   locked: boolean;
-  onPermissionChange: (permission: ResearchPermission) => void;
 }): React.JSX.Element {
   const { message, result, error } = entry;
   const ready = canSendBatchDraft(entry);
@@ -82,14 +76,6 @@ export function BatchDraftCard({
           >
             Open full review (new tab)
           </a>
-          {ready && message?.researchOnly && (
-            <div className={dialogStyles.form}>
-              <ResearchPermissionFields
-                value={entry.permission}
-                onChange={onPermissionChange}
-              />
-            </div>
-          )}
         </>
       )}
     </li>

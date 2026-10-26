@@ -30,7 +30,6 @@ export type BatchDraftEntry = {
   draftTaskId: string;
   businessName: string;
   message: BatchReviewMessage | null;
-  permission: ResearchPermission;
   result: ResearchDraftResponse | null;
   error: string | null;
 };
@@ -67,6 +66,7 @@ export async function loadBatchDraft(
 
 export async function sendBatchDraft(
   entry: BatchDraftEntry,
+  permission: ResearchPermission,
 ): Promise<ResearchDraftResponse> {
   const message = entry.message;
   if (!message || !canSendBatchDraft(entry))
@@ -78,7 +78,7 @@ export async function sendBatchDraft(
           expectedVersion: message.version,
           expectedProspectVersion: message.prospectVersion,
           fingerprint: message.approvalFingerprint,
-          permission: entry.permission,
+          permission,
         }
       : { expectedVersion: message.version },
   );

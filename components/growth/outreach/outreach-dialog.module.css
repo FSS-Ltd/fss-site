@@ -164,3 +164,28 @@
   outline: 3px solid #087f88;
   outline-offset: 3px;
 }
+
+.permission {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  margin: 0;
+  border: 1px solid #cfe3e4;
+  border-radius: 10px;
+  background: #f2fbfb;
+  padding: 16px;
+}
+
+.permission legend {
+  padding: 0 6px;
+  color: #07182e;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.permission p {
+  margin: 0;
+  color: #526078;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}

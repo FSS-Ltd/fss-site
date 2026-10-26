@@ -9,6 +9,10 @@ import {
   sendBatchDraft,
   type BatchDraftEntry,
 } from "./batch-draft-review";
+import {
+  ResearchPermissionFields,
+  type ResearchPermission,
+} from "./research-permission-fields";
 import { OutreachDialog } from "./outreach-dialog";
 import styles from "./outreach.module.css";
 import dialogStyles from "./outreach-dialog.module.css";
@@ -22,6 +26,10 @@ export function SendAllDialog({
 }): React.JSX.Element {
   const [entries, setEntries] = useState<BatchDraftEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [permission, setPermission] = useState<ResearchPermission>({
+    basis: "",
+    evidence: "",
+  });
   const [reviewed, setReviewed] = useState(false);
   const [phase, setPhase] = useState<"review" | "sending" | "complete">(
     "review",
@@ -38,7 +46,6 @@ export function SendAllDialog({
         const entry: BatchDraftEntry = {
           ...row,
           message: null,
-          permission: { basis: "", evidence: "" },
           result: null,
           error: null,
         };
@@ -64,14 +71,11 @@ export function SendAllDialog({
   }, [rows]);
 
   const ready = entries.filter(canSendBatchDraft);
+  const needsPermission = ready.some((entry) => entry.message?.researchOnly);
   const valid =
     ready.length > 0 &&
-    ready.every(
-      (entry) =>
-        !entry.message?.researchOnly ||
-        (entry.permission.basis &&
-          entry.permission.evidence.trim().length >= 10),
-    );
+    (!needsPermission ||
+      (permission.basis && permission.evidence.trim().length >= 10));
   const locked = phase !== "review";
 
   async function send(): Promise<void> {
@@ -83,7 +87,7 @@ export function SendAllDialog({
       try {
         updated = {
           ...entry,
-          result: await sendBatchDraft(entry),
+          result: await sendBatchDraft(entry, permission),
           error: null,
         };
       } catch (failure) {
@@ -108,7 +112,7 @@ export function SendAllDialog({
   return (
     <OutreachDialog
       title="Review and send all"
-      description={`Review the ${rows.length} displayed drafts before confirming. Blocked drafts will be skipped.`}
+      description={`Review all ${rows.length} drafts in this queue before confirming. Blocked drafts will be skipped.`}
       wide
       busy={phase === "sending"}
       onClose={() => onClose(locked)}
@@ -130,24 +134,31 @@ export function SendAllDialog({
                 ? `Sending ${processed} of ${ready.length}. Keep this window open.`
                 : `${ready.length} ready · ${entries.length - ready.length} skipped`}
         </p>
-        <ul className={dialogStyles.list}>
-          {entries.map((entry) => (
-            <BatchDraftCard
-              key={entry.draftTaskId}
-              entry={entry}
-              locked={locked}
-              onPermissionChange={(permission) =>
-                setEntries((current) =>
-                  current.map((row) =>
-                    row.draftTaskId === entry.draftTaskId
-                      ? { ...row, permission }
-                      : row,
-                  ),
-                )
-              }
+        {!locked && !loading && needsPermission && (
+          <fieldset className={dialogStyles.permission}>
+            <legend>Permission for all recipients</legend>
+            <p>
+              The selection and reason below apply to every ready research email
+              in this batch.
+            </p>
+            <ResearchPermissionFields
+              value={permission}
+              onChange={setPermission}
             />
-          ))}
-        </ul>
+          </fieldset>
+        )}
+        <details open={locked}>
+          <summary>Review {entries.length} drafts and delivery results</summary>
+          <ul className={dialogStyles.list}>
+            {entries.map((entry) => (
+              <BatchDraftCard
+                key={entry.draftTaskId}
+                entry={entry}
+                locked={locked}
+              />
+            ))}
+          </ul>
+        </details>
         {!locked && !loading && (
           <label className={dialogStyles.check}>
             <input

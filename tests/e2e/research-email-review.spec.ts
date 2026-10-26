@@ -77,7 +77,11 @@ test("research approval confirms the recipient and sends once with explicit perm
     .getByLabel("Review note or permission evidence")
     .fill("Recipient requested this reviewed email.");
   await send.click();
-  await expect(page.getByRole("status")).toContainText("Email sent.");
+  await expect(
+    page
+      .getByRole("region", { name: "Research email decision" })
+      .getByRole("status"),
+  ).toContainText("Email sent.");
   expect(requests).toHaveLength(1);
   expect(requests[0]).toMatchObject({
     expectedVersion: 1,
@@ -156,9 +160,11 @@ test("unconfirmed delivery is not presented as a successful send", async ({
   await page
     .getByRole("button", { name: "Confirm & send now", exact: true })
     .click();
-  await expect(page.getByRole("status")).toContainText(
-    "Delivery has not yet been confirmed.",
-  );
+  await expect(
+    page
+      .getByRole("region", { name: "Research email decision" })
+      .getByRole("status"),
+  ).toContainText("Delivery has not yet been confirmed.");
   await expect(page.getByText("Email sent.", { exact: true })).toHaveCount(0);
 });
 
@@ -283,8 +289,10 @@ test("single send stays in its modal until delivery resolves and ignores duplica
   expect(requests).toBe(1);
   release();
   await expect(dialog).toHaveCount(0);
-  await expect(page.getByRole("status")).toContainText(
-    "Delivery has not yet been confirmed.",
-  );
+  await expect(
+    page
+      .getByRole("region", { name: "Research email decision" })
+      .getByRole("status"),
+  ).toContainText("Delivery has not yet been confirmed.");
   expect(requests).toBe(1);
 });

@@ -1,0 +1,68 @@
+.workspace {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+
+.tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  border-bottom: 1px solid #dce3e8;
+  padding-bottom: 8px;
+}
+
+.tab {
+  flex: none;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  padding: 11px 16px;
+  color: #526078;
+  font-size: 0.86rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.tab[aria-selected="true"] {
+  border-color: #075f66;
+  background: #e6f3f4;
+  color: #075f66;
+}
+
+.tab:focus-visible,
+.workspace [role="tabpanel"]:focus-visible {
+  outline: 3px solid #087f88;
+  outline-offset: 2px;
+}
+
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid #e3e9ec;
+  margin-top: 18px;
+  padding-top: 16px;
+  color: #526078;
+  font-size: 0.82rem;
+}
+
+.pagination p {
+  margin: 0;
+}
+
+.pageActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+@media (max-width: 480px) {
+  .tab {
+    padding: 10px 12px;
+    font-size: 0.8rem;
+  }
+}
