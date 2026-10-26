@@ -26,8 +26,19 @@
 
 ## Tasks
 
-- [ ] Add focused v2 contract and validation tests, keeping legacy contract unchanged.
-- [ ] Add migration and transactional global persistence with identity deduplication and tests.
-- [ ] Route v2 through intake without previews; preserve exact email snapshots and test replay/suppression.
-- [ ] Add read-only draft review and nullable contact/location display with regressions.
-- [ ] Run focused unit and database tests, typecheck, lint, formatting, build where available; review every changed file and commit.
+- [x] Add focused v2 contract and validation tests, keeping legacy contract unchanged.
+- [x] Add migration and transactional global persistence with identity deduplication and tests.
+- [x] Route v2 through intake without previews; preserve exact email snapshots and test replay/suppression.
+- [x] Add read-only draft review and nullable contact/location display with regressions.
+- [x] Run focused unit and database tests, typecheck, lint, formatting, build where available; review every changed file and commit.
+
+## Execution record
+
+- Versioned intake, canonical public-source URLs, identity locks, transactional persistence and exact internal email snapshots implemented without changing legacy send parsers.
+- Global records are visible in the database-backed review queue, prospect list and detail. Missing names remain null; zero estimates display as not estimated.
+- Full unit suite: 2,323 passed before the final list-label additions; 67 focused tests and typecheck passed after those additions.
+- Full Growth database integration suite: 40 passed. Expanded global integration also passed after independent review fixes, covering persisted review/detail/list/overview queries, Unicode domains and missing website URLs.
+- Production build passed on Next 16.4.1. Full lint passed with one existing React Hook Form compiler warning. Migration policy passed for all 81 migrations.
+- Independent review identified official-source fallback identity, Unicode-host normalization and country-scoped registration lookup; all corrected and covered by regression tests.
+- Ruling: country plus registration is the initial identity scope. The runbook requires omitting registrations whose uniqueness is only subnational; otherwise two local registries could collide.
+- Ruling: rollout is migration-first to avoid querying country_code before it exists. Root owns release, migration, live lead submission and final cleanup.

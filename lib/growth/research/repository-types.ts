@@ -64,7 +64,15 @@ export interface ResearchIngestionTransaction {
   lockCandidateIdentities(
     candidates: readonly ResearchProspectCandidate[],
   ): Promise<void>;
-  insertRun(input: ResearchRunIngestion): Promise<string>;
+  insertRun(
+    input: Pick<
+      ResearchRunIngestion,
+      "externalRunId" | "runDate" | "timezone" | "promptVersion"
+    > & {
+      prospects: readonly unknown[];
+      rejections: readonly unknown[];
+    },
+  ): Promise<string>;
   inspectCandidate(
     candidate: ResearchProspectCandidate,
   ): Promise<CandidateInspection>;

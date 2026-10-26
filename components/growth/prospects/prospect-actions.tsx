@@ -41,6 +41,12 @@ export function evaluateApprovalReadiness(
   if (prospect.status === "suppressed") {
     reasons.push("This prospect is suppressed and cannot be contacted.");
   }
+  if (prospect.contact?.lawfulBasis === "research_only") {
+    reasons.push(
+      "Research only. Outreach has not been approved for this contact.",
+    );
+    return { ready: false, reasons };
+  }
   if (prospect.business.corporateStatus === "uncertain") {
     reasons.push("The company's corporate status is unverified.");
   }
@@ -62,7 +68,9 @@ export function evaluateApprovalReadiness(
     reasons.push("The generated visual has not passed validation.");
   }
 
-  const gmail = integrations.find((integration) => integration.provider === "gmail");
+  const gmail = integrations.find(
+    (integration) => integration.provider === "gmail",
+  );
   if (gmail && gmail.status !== "healthy") {
     reasons.push("Gmail is disconnected. Reconnect it in Settings to send.");
   }
@@ -140,9 +148,9 @@ export function ProspectActionsFrame({
         return;
       }
 
-      const body = (await response.json().catch(() => null)) as
-        | { message?: string }
-        | null;
+      const body = (await response.json().catch(() => null)) as {
+        message?: string;
+      } | null;
       setFeedback({
         tone: "error",
         message: body?.message ?? "The action could not be completed.",
@@ -162,9 +170,17 @@ export function ProspectActionsFrame({
 
   return (
     <div>
-      <div aria-label="Prospect actions" className={styles.actionsBar} role="group">
+      <div
+        aria-label="Prospect actions"
+        className={styles.actionsBar}
+        role="group"
+      >
         {feedback && (
-          <p className={styles.actionFeedback} data-tone={feedback.tone} role="alert">
+          <p
+            className={styles.actionFeedback}
+            data-tone={feedback.tone}
+            role="alert"
+          >
             {feedback.message}
           </p>
         )}
@@ -234,7 +250,10 @@ export function ProspectActionsFrame({
           className={styles.actionButton}
           disabled={!canPause || busy}
           onClick={() =>
-            runAction("pause", `/api/growth/sequences/${prospect.sequence?.id}/pause`)
+            runAction(
+              "pause",
+              `/api/growth/sequences/${prospect.sequence?.id}/pause`,
+            )
           }
           type="button"
         >
@@ -278,7 +297,5 @@ export function ProspectActions(props: {
   prospect: ProspectDetail;
 }) {
   const router = useRouter();
-  return (
-    <ProspectActionsFrame {...props} onSuccess={() => router.refresh()} />
-  );
+  return <ProspectActionsFrame {...props} onSuccess={() => router.refresh()} />;
 }

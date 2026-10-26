@@ -93,7 +93,9 @@ function QueueRow({
       <td>{formatGrowthEvidenceCount(row.evidenceCount)}</td>
       <td>
         <span className={styles.queueValue}>
-          {formatGrowthCurrency(row.potentialValuePence)}
+          {row.researchOnly && row.potentialValuePence === 0
+            ? "Not estimated"
+            : formatGrowthCurrency(row.potentialValuePence)}
         </span>
         <span className={styles.queueValueUnit}>One-off</span>
       </td>
@@ -171,7 +173,9 @@ function QueuePanel({
               <p className={styles.statusMeta}>{row.offerFocus}</p>
             </div>
             <span className={styles.queueValue}>
-              {formatGrowthCurrency(row.potentialValuePence)}
+              {row.researchOnly && row.potentialValuePence === 0
+                ? "Not estimated"
+                : formatGrowthCurrency(row.potentialValuePence)}
             </span>
             <GrowthNavigationLink
               className={styles.rowReviewLink}

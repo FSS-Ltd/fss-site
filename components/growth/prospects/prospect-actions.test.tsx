@@ -21,7 +21,12 @@ const { evaluateApprovalReadiness, ProspectActionsFrame } =
 const NOW = "2026-08-16T08:00:00.000Z";
 
 const healthyIntegrations: readonly IntegrationHealth[] = [
-  { provider: "gmail", status: "healthy", checkedAt: NOW, message: "Gmail connected" },
+  {
+    provider: "gmail",
+    status: "healthy",
+    checkedAt: NOW,
+    message: "Gmail connected",
+  },
 ];
 
 function baseProspect(overrides: Partial<ProspectDetail> = {}): ProspectDetail {
@@ -106,7 +111,9 @@ test("evaluateApprovalReadiness blocks an uncertain corporate status", () => {
     NOW,
   );
   assert.equal(readiness.ready, false);
-  assert.ok(readiness.reasons.some((reason) => /corporate status/.test(reason)));
+  assert.ok(
+    readiness.reasons.some((reason) => /corporate status/.test(reason)),
+  );
 });
 
 test("evaluateApprovalReadiness blocks missing contact evidence", () => {
@@ -116,7 +123,9 @@ test("evaluateApprovalReadiness blocks missing contact evidence", () => {
     NOW,
   );
   assert.equal(readiness.ready, false);
-  assert.ok(readiness.reasons.some((reason) => /verified contact/.test(reason)));
+  assert.ok(
+    readiness.reasons.some((reason) => /verified contact/.test(reason)),
+  );
 });
 
 test("evaluateApprovalReadiness blocks stale research older than 30 days", () => {
@@ -153,9 +162,18 @@ test("evaluateApprovalReadiness blocks a missing or failed visual asset", () => 
 });
 
 test("evaluateApprovalReadiness blocks a disconnected Gmail integration", () => {
-  const readiness = evaluateApprovalReadiness(baseProspect(), [
-    { provider: "gmail", status: "disconnected", checkedAt: NOW, message: "Not connected" },
-  ], NOW);
+  const readiness = evaluateApprovalReadiness(
+    baseProspect(),
+    [
+      {
+        provider: "gmail",
+        status: "disconnected",
+        checkedAt: NOW,
+        message: "Not connected",
+      },
+    ],
+    NOW,
+  );
   assert.equal(readiness.ready, false);
   assert.ok(readiness.reasons.some((reason) => /Gmail/.test(reason)));
 });
@@ -212,10 +230,7 @@ test("enables pause when the sequence is still active", () => {
     }),
   );
 
-  assert.doesNotMatch(
-    html,
-    /<button[^>]*disabled=""[^>]*>\s*Pause<\/button>/,
-  );
+  assert.doesNotMatch(html, /<button[^>]*disabled=""[^>]*>\s*Pause<\/button>/);
 });
 
 test("explains why approval is blocked without relying on colour alone", () => {
@@ -228,4 +243,21 @@ test("explains why approval is blocked without relying on colour alone", () => {
 test("shows a ready message when nothing blocks approval", () => {
   const html = renderActions();
   assert.match(html, /Ready for founder review\./);
+});
+
+test("research-only prospects do not request generated visuals or sending approval", () => {
+  const prospect = baseProspect();
+  if (!prospect.contact) throw new Error("Fixture requires contact");
+  const readiness = evaluateApprovalReadiness(
+    {
+      ...prospect,
+      contact: { ...prospect.contact, lawfulBasis: "research_only" },
+      visualAsset: null,
+    },
+    [],
+    "2026-08-16T10:00:00Z",
+  );
+  assert.equal(readiness.ready, false);
+  assert.equal(readiness.reasons.length, 1);
+  assert.match(readiness.reasons[0] ?? "", /Research only/);
 });

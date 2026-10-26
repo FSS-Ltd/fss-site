@@ -27,6 +27,8 @@ export function ProspectDetailView({
   now: string;
   prospect: ProspectDetailData;
 }) {
+  const researchOnly = prospect.contact?.lawfulBasis === "research_only";
+
   return (
     <div className={styles.detailPage}>
       <p className={styles.breadcrumb}>
@@ -53,11 +55,17 @@ export function ProspectDetailView({
                   size={13}
                   style={{ marginRight: 3, verticalAlign: "-2px" }}
                 />
-                {prospect.business.locality}, Kent
+                {[
+                  prospect.business.locality,
+                  prospect.business.county,
+                  prospect.business.countryCode,
+                ]
+                  .filter(Boolean)
+                  .join(", ")}
               </span>
               <span>
                 {prospect.business.corporateStatus === "active"
-                  ? "Verified company"
+                  ? "Verified business"
                   : formatGrowthStatusLabel(prospect.business.corporateStatus)}
               </span>
               <span className={styles.pill} data-tone="neutral">
@@ -79,9 +87,12 @@ export function ProspectDetailView({
             <h2 className={styles.sectionTitle}>Recommended offer</h2>
             <p className={styles.contactName}>{prospect.recommendedOffer}</p>
             <p className={styles.contactField}>
-              Estimated one-off value:{" "}
-              {formatGrowthCurrency(prospect.estimatedOneOffMinPence)}–
-              {formatGrowthCurrency(prospect.estimatedOneOffMaxPence)}
+              {researchOnly && prospect.estimatedOneOffMaxPence === 0
+                ? "Investment has not been estimated."
+                : `Estimated one-off value: ${formatGrowthCurrency(prospect.estimatedOneOffMinPence)}–${formatGrowthCurrency(prospect.estimatedOneOffMaxPence)}`}
+              {researchOnly &&
+                prospect.estimatedOneOffMaxPence > 0 &&
+                " (research estimate, not a quote)"}
             </p>
             {prospect.estimatedMonthlyPence > 0 && (
               <p className={styles.contactField}>
@@ -102,25 +113,27 @@ export function ProspectDetailView({
             <EvidenceList evidence={prospect.evidence} />
           </div>
 
-          <div className={styles.card}>
-            <h2 className={styles.sectionTitle}>Website assessment</h2>
-            <WebsiteAssessment
-              assessment={prospect.websiteAssessment}
-              prospectId={prospect.id}
-            />
-            <div className="mt-6 border-t border-slate-200 pt-6">
-              <h3 className={styles.sectionTitle}>Private concept preview</h3>
-              <PreviewApproval
-                businessName={
-                  prospect.business.tradingName ?? prospect.business.legalName
-                }
-                preview={prospect.preview}
+          {!researchOnly && (
+            <div className={styles.card}>
+              <h2 className={styles.sectionTitle}>Website assessment</h2>
+              <WebsiteAssessment
+                assessment={prospect.websiteAssessment}
                 prospectId={prospect.id}
-                prospectStatus={prospect.status}
-                prospectVersion={prospect.version}
               />
+              <div className="mt-6 border-t border-slate-200 pt-6">
+                <h3 className={styles.sectionTitle}>Private concept preview</h3>
+                <PreviewApproval
+                  businessName={
+                    prospect.business.tradingName ?? prospect.business.legalName
+                  }
+                  preview={prospect.preview}
+                  prospectId={prospect.id}
+                  prospectStatus={prospect.status}
+                  prospectVersion={prospect.version}
+                />
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         <div className={styles.detailColumn}>
@@ -128,17 +141,21 @@ export function ProspectDetailView({
             <div className={styles.card}>
               <div className={styles.contactCard}>
                 <p className={styles.contactName}>
-                  {prospect.contact.firstName} {prospect.contact.lastName}
+                  {[prospect.contact.firstName, prospect.contact.lastName]
+                    .filter(Boolean)
+                    .join(" ") || "Business contact"}
                 </p>
                 {prospect.contact.roleTitle && (
-                  <p className={styles.contactRole}>{prospect.contact.roleTitle}</p>
+                  <p className={styles.contactRole}>
+                    {prospect.contact.roleTitle}
+                  </p>
                 )}
                 <p className={styles.contactField}>
                   <Mail aria-hidden="true" size={14} />
                   <a href={`mailto:${prospect.contact.email}`}>
                     {prospect.contact.email}
                   </a>
-                  <span className={styles.pill}>Verified</span>
+                  <span className={styles.pill}>Source verified</span>
                 </p>
               </div>
             </div>
@@ -150,7 +167,10 @@ export function ProspectDetailView({
               <p className={styles.contactField}>
                 {prospect.nextAction}
                 {prospect.nextActionDueAt && (
-                  <span> · Due {formatGrowthDate(prospect.nextActionDueAt)}</span>
+                  <span>
+                    {" "}
+                    · Due {formatGrowthDate(prospect.nextActionDueAt)}
+                  </span>
                 )}
               </p>
             )}
@@ -164,15 +184,17 @@ export function ProspectDetailView({
           <div className={styles.card}>
             <p className={styles.resultCount}>Potential value</p>
             <p className={styles.potentialValue}>
-              {formatGrowthCurrency(prospect.estimatedOneOffMaxPence)}
+              {researchOnly && prospect.estimatedOneOffMaxPence === 0
+                ? "Not estimated"
+                : formatGrowthCurrency(prospect.estimatedOneOffMaxPence)}
             </p>
           </div>
 
           <div className={styles.card}>
-            <h2 className={styles.sectionTitle}>Corporate verification</h2>
+            <h2 className={styles.sectionTitle}>Business verification</h2>
             {prospect.business.companyNumber && (
               <p className={styles.contactField}>
-                Company number: {prospect.business.companyNumber}
+                Registration number: {prospect.business.companyNumber}
               </p>
             )}
             <p className={styles.contactField}>

@@ -42,7 +42,11 @@ export const OUTREACH_STATE_VALUES = [
 ] as const;
 export type OutreachStateFilter = (typeof OUTREACH_STATE_VALUES)[number];
 
-export const SUPPRESSION_FILTER_VALUES = ["all", "suppressed", "contactable"] as const;
+export const SUPPRESSION_FILTER_VALUES = [
+  "all",
+  "suppressed",
+  "contactable",
+] as const;
 export type SuppressionFilter = (typeof SUPPRESSION_FILTER_VALUES)[number];
 
 export type ProspectListQuery = {
@@ -68,6 +72,7 @@ export type ProspectListRow = {
   status: ProspectStatus;
   outreachState: Exclude<OutreachStateFilter, "all">;
   potentialValuePence: number;
+  researchOnly?: boolean;
   nextAction: string | null;
   nextActionDueAt: string | null;
 };
@@ -89,15 +94,21 @@ const cursorParamSchema = z.string().trim().max(200);
 
 type RawSearchParams = Record<string, string | readonly string[] | undefined>;
 
-function firstValue(value: string | readonly string[] | undefined): string | undefined {
-  return Array.isArray(value) ? (value[0] as string | undefined) : (value as string | undefined);
+function firstValue(
+  value: string | readonly string[] | undefined,
+): string | undefined {
+  return Array.isArray(value)
+    ? (value[0] as string | undefined)
+    : (value as string | undefined);
 }
 
 function parseEnumParam<const T extends readonly string[]>(
   values: T,
   raw: string | undefined,
 ): T[number] {
-  const parsed = z.enum(values as unknown as [string, ...string[]]).safeParse(raw);
+  const parsed = z
+    .enum(values as unknown as [string, ...string[]])
+    .safeParse(raw);
   return parsed.success ? (parsed.data as T[number]) : (values[0] as T[number]);
 }
 
@@ -105,25 +116,46 @@ export function parseProspectListQuery(
   searchParams: RawSearchParams,
 ): ProspectListQuery {
   const q = textParamSchema.safeParse(firstValue(searchParams.q) ?? "");
-  const sector = textParamSchema.safeParse(firstValue(searchParams.sector) ?? "");
-  const location = textParamSchema.safeParse(firstValue(searchParams.location) ?? "");
-  const after = cursorParamSchema.safeParse(firstValue(searchParams.after) ?? "");
+  const sector = textParamSchema.safeParse(
+    firstValue(searchParams.sector) ?? "",
+  );
+  const location = textParamSchema.safeParse(
+    firstValue(searchParams.location) ?? "",
+  );
+  const after = cursorParamSchema.safeParse(
+    firstValue(searchParams.after) ?? "",
+  );
 
   return {
     q: q.success ? q.data : "",
     sector: sector.success ? sector.data : "",
     location: location.success ? location.data : "",
-    fitScoreMin: parseEnumParam(FIT_SCORE_BAND_VALUES, firstValue(searchParams.fitScoreMin)),
-    status: parseEnumParam(STATUS_FILTER_VALUES, firstValue(searchParams.status)),
-    outreach: parseEnumParam(OUTREACH_STATE_VALUES, firstValue(searchParams.outreach)),
-    suppressed: parseEnumParam(SUPPRESSION_FILTER_VALUES, firstValue(searchParams.suppressed)),
+    fitScoreMin: parseEnumParam(
+      FIT_SCORE_BAND_VALUES,
+      firstValue(searchParams.fitScoreMin),
+    ),
+    status: parseEnumParam(
+      STATUS_FILTER_VALUES,
+      firstValue(searchParams.status),
+    ),
+    outreach: parseEnumParam(
+      OUTREACH_STATE_VALUES,
+      firstValue(searchParams.outreach),
+    ),
+    suppressed: parseEnumParam(
+      SUPPRESSION_FILTER_VALUES,
+      firstValue(searchParams.suppressed),
+    ),
     after: after.success && after.data.length > 0 ? after.data : null,
   };
 }
 
 type Cursor = { fitScore: number; prospectId: string };
 
-export function encodeProspectCursor(fitScore: number, prospectId: string): string {
+export function encodeProspectCursor(
+  fitScore: number,
+  prospectId: string,
+): string {
   return Buffer.from(`${fitScore}:${prospectId}`, "utf8").toString("base64url");
 }
 
@@ -143,7 +175,10 @@ export function decodeProspectCursor(cursor: string): Cursor | null {
   }
 }
 
-function buildFilterFragments(db: GrowthQueryExecutor, query: ProspectListQuery) {
+function buildFilterFragments(
+  db: GrowthQueryExecutor,
+  query: ProspectListQuery,
+) {
   const search = query.q
     ? db`and (
         b.legal_name ilike ${`%${query.q}%`}
@@ -154,12 +189,17 @@ function buildFilterFragments(db: GrowthQueryExecutor, query: ProspectListQuery)
     : db``;
 
   const sector = query.sector ? db`and b.sector = ${query.sector}` : db``;
-  const location = query.location ? db`and b.locality = ${query.location}` : db``;
+  const location = query.location
+    ? db`and b.locality = ${query.location}`
+    : db``;
 
   const fitScoreMin =
-    query.fitScoreMin === "all" ? db`` : db`and p.fit_score >= ${Number(query.fitScoreMin)}`;
+    query.fitScoreMin === "all"
+      ? db``
+      : db`and p.fit_score >= ${Number(query.fitScoreMin)}`;
 
-  const status = query.status === "all" ? db`` : db`and p.status = ${query.status}`;
+  const status =
+    query.status === "all" ? db`` : db`and p.status = ${query.status}`;
 
   const outreach =
     query.outreach === "all"
@@ -179,7 +219,15 @@ function buildFilterFragments(db: GrowthQueryExecutor, query: ProspectListQuery)
             where s.normalised_email = c.normalised_email
           )`;
 
-  return { search, sector, location, fitScoreMin, status, outreach, suppressed };
+  return {
+    search,
+    sector,
+    location,
+    fitScoreMin,
+    status,
+    outreach,
+    suppressed,
+  };
 }
 
 const OUTREACH_STATE_CASE = `
@@ -206,7 +254,9 @@ async function fetchProspectRows(
     : db``;
 
   const rows = await db<
-    (Omit<ProspectListRow, "nextActionDueAt"> & { nextActionDueAt: Date | null })[]
+    (Omit<ProspectListRow, "nextActionDueAt"> & {
+      nextActionDueAt: Date | null;
+    })[]
   >`
     select
       p.id as "prospectId",
@@ -219,6 +269,7 @@ async function fetchProspectRows(
       p.recommended_offer as "recommendedOffer",
       p.status,
       p.estimated_one_off_max_pence as "potentialValuePence",
+      c.lawful_basis = 'research_only' as "researchOnly",
       p.next_action as "nextAction",
       p.next_action_due_at as "nextActionDueAt",
       coalesce(seq.state, 'not_started') as "outreachState"
@@ -252,9 +303,14 @@ async function fetchProspectRows(
   return {
     rows: page.map((row) => ({
       ...row,
-      nextActionDueAt: row.nextActionDueAt ? row.nextActionDueAt.toISOString() : null,
+      nextActionDueAt: row.nextActionDueAt
+        ? row.nextActionDueAt.toISOString()
+        : null,
     })),
-    nextCursor: hasNextPage && last ? encodeProspectCursor(last.fitScore, last.prospectId) : null,
+    nextCursor:
+      hasNextPage && last
+        ? encodeProspectCursor(last.fitScore, last.prospectId)
+        : null,
   };
 }
 
@@ -289,7 +345,9 @@ async function fetchProspectTotalCount(
   return rows[0]?.count ?? 0;
 }
 
-async function fetchFilterFacets(db: GrowthQueryExecutor): Promise<ProspectFilterFacets> {
+async function fetchFilterFacets(
+  db: GrowthQueryExecutor,
+): Promise<ProspectFilterFacets> {
   const [sectorRows, locationRows] = await Promise.all([
     db<{ sector: string }[]>`
       select distinct b.sector

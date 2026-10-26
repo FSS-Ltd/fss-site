@@ -11,6 +11,11 @@ import {
   type StoredFirstEmailVisual,
 } from "../sequences/first-email-draft-snapshot";
 
+import {
+  createGlobalMessageReview,
+  isGlobalDraftSnapshot,
+} from "./global-message-review";
+
 const DRAFT_ID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const MAX_CITATIONS = 20;
@@ -57,12 +62,13 @@ export type MessageReviewData = {
   wordCount: number;
   imageAltText: string;
   imageByteSize: number | null;
-  visualKind: "stored" | "fallback";
+  visualKind: "stored" | "fallback" | "none";
+  researchOnly?: boolean;
   visualReviewStatus: string | null;
   citations: readonly MessageReviewCitation[];
   createdAt: string;
   eligibility: MessageReviewEligibility;
-  followUpCadence: typeof FOLLOW_UP_CADENCE;
+  followUpCadence: ReadonlyArray<{ day: string; label: string }>;
 };
 
 export type MessageReviewResult =
@@ -70,7 +76,7 @@ export type MessageReviewResult =
   | { status: "unavailable"; reason: string }
   | { status: "error"; message: string; correlationId: string };
 
-type DraftRow = {
+export type MessageReviewDraftRow = {
   id: string;
   prospectId: string;
   status: string;
@@ -83,8 +89,8 @@ type DraftRow = {
   recommendedOffer: string;
   estimatedOneOffMinPence: number;
   estimatedOneOffMaxPence: number;
-  contactFirstName: string;
-  contactLastName: string;
+  contactFirstName: string | null;
+  contactLastName: string | null;
   contactEmail: string;
   normalisedEmail: string;
   subscriberType: string;
@@ -94,8 +100,8 @@ type DraftRow = {
 async function fetchDraftRow(
   db: GrowthQueryExecutor,
   draftTaskId: string,
-): Promise<DraftRow | null> {
-  const rows = await db<DraftRow[]>`
+): Promise<MessageReviewDraftRow | null> {
+  const rows = await db<MessageReviewDraftRow[]>`
     select
       at.id,
       at.prospect_id as "prospectId",
@@ -276,6 +282,19 @@ export async function getMessageReview(
       };
     }
 
+    if (isGlobalDraftSnapshot(draft.outputSnapshot)) {
+      const [suppressed, citations] = await Promise.all([
+        fetchSuppressed(db, draft.normalisedEmail),
+        fetchCitations(db, draft.prospectId),
+      ]);
+      return createGlobalMessageReview(
+        draft,
+        founderEmail,
+        suppressed,
+        citations,
+      );
+    }
+
     let stored;
     try {
       stored = parseStoredFirstEmailDraft({
@@ -371,7 +390,10 @@ export async function getMessageReview(
         recommendedOffer: draft.recommendedOffer,
         estimatedOneOffMinPence: draft.estimatedOneOffMinPence,
         estimatedOneOffMaxPence: draft.estimatedOneOffMaxPence,
-        contactName: `${draft.contactFirstName} ${draft.contactLastName}`,
+        contactName:
+          [draft.contactFirstName, draft.contactLastName]
+            .filter(Boolean)
+            .join(" ") || "Business contact",
         contactEmail: draft.contactEmail,
         founderEmail,
         subject: content.subject,

@@ -26,7 +26,8 @@ export function EmailPreview({ message }: { message: MessageReviewData }) {
         <div className={styles.envelopeRow}>
           <span className={styles.envelopeLabel}>From</span>
           <span className={styles.envelopeValue}>
-            Jean-Fidele at Faithful Software Solutions &lt;{message.founderEmail}
+            Jean-Fidele at Faithful Software Solutions &lt;
+            {message.founderEmail}
             &gt;
           </span>
         </div>
@@ -74,7 +75,11 @@ export function EmailPreview({ message }: { message: MessageReviewData }) {
       <p className={styles.previewMeta}>
         <span>{message.wordCount} words</span>
         <span>
-          {message.visualKind === "stored" ? "One approved visual" : "Fallback visual"}
+          {message.visualKind === "none"
+            ? "Text-only draft"
+            : message.visualKind === "stored"
+              ? "One approved visual"
+              : "Fallback visual"}
         </span>
         <span>Plain-text fallback ready</span>
         <span>No tracking pixel</span>

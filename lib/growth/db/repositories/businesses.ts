@@ -5,7 +5,7 @@ export type CorporateStatus = "active" | "inactive" | "uncertain";
 export type BusinessIdentity = {
   id: string;
   legalName: string;
-  companyNumber: string;
+  companyNumber: string | null;
   corporateStatus: CorporateStatus;
   version: number;
 };
@@ -13,6 +13,7 @@ export type BusinessIdentity = {
 export async function findBusinessIdentityByCompanyNumber(
   db: GrowthQueryExecutor,
   companyNumber: string,
+  countryCode = "GB",
 ): Promise<BusinessIdentity | null> {
   const normalisedCompanyNumber = companyNumber
     .replace(/\s+/g, "")
@@ -25,7 +26,8 @@ export async function findBusinessIdentityByCompanyNumber(
       b.corporate_status as "corporateStatus",
       b.version
     from growth.businesses b
-    where upper(regexp_replace(b.company_number, '\s+', '', 'g')) = ${normalisedCompanyNumber}
+    where b.country_code = ${countryCode}
+      and upper(regexp_replace(b.company_number, '\s+', '', 'g')) = ${normalisedCompanyNumber}
     limit 1
   `;
 

@@ -1,3 +1,5 @@
+import type { ResearchIntake } from "../../../../lib/growth/research/intake-schema";
+import { createGlobalResearchFixture } from "../../../../lib/growth/research/global-test-fixture";
 import assert from "node:assert/strict";
 import test from "node:test";
 
@@ -48,12 +50,12 @@ function validPayload(): ResearchRunIngestion {
 
 type HarnessOverrides = {
   signatureResult?: AgentSignatureResult;
-  ingest?: (input: ResearchRunIngestion) => Promise<ResearchRunIngestionResult>;
+  ingest?: (input: ResearchIntake) => Promise<ResearchRunIngestionResult>;
 };
 
 function createHarness(overrides: HarnessOverrides = {}) {
   const verificationInputs: VerifyAgentRequestInput[] = [];
-  const ingestedInputs: ResearchRunIngestion[] = [];
+  const ingestedInputs: ResearchIntake[] = [];
   const reportedErrors: Array<{ correlationId: string; error: unknown }> = [];
 
   const handler = createResearchRunPostHandler({
@@ -347,4 +349,24 @@ test("reports unexpected failures without leaking details", async () => {
     { correlationId: CORRELATION_ID, error: failure },
   ]);
   assert.doesNotMatch(responseText, /database/i);
+});
+
+test("authenticated global research passes validated v2 input to ingestion", async () => {
+  const harness = createHarness();
+  const response = await harness.handler(
+    createRequest(JSON.stringify(createGlobalResearchFixture())),
+  );
+  assert.equal(response.status, 200);
+  assert.equal(harness.ingestedInputs[0]?.schemaVersion, "2.0");
+});
+
+test("malformed global source URLs return validation errors", async () => {
+  const harness = createHarness();
+  const fixture = createGlobalResearchFixture();
+  fixture.prospects[0]!.business.firstPartySourceUrl = "not-a-url";
+  const response = await harness.handler(
+    createRequest(JSON.stringify(fixture)),
+  );
+  assert.equal(response.status, 422);
+  assert.equal(harness.ingestedInputs.length, 0);
 });

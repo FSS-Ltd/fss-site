@@ -11,9 +11,10 @@ const assetId = "33333333-3333-4333-8333-333333333333";
 const siteOrigin = "https://faithfulsoftwaresolutions.co.uk";
 const founderEmail = "j.ntagengwa@faithfulsoftware.dev";
 
-const emailWords = Array.from({ length: 140 }, (_, index) => `word${index + 1}`).join(
-  " ",
-);
+const emailWords = Array.from(
+  { length: 140 },
+  (_, index) => `word${index + 1}`,
+).join(" ");
 const optOutSentence = "Reply opt out and I will send no further emails.";
 const conceptDisclaimer =
   "This visual is a concept for discussion, not an existing system.";
@@ -186,7 +187,12 @@ test("resolves a stored (approved) visual asset from the database", async () => 
     }),
   );
 
-  const result = await getMessageReview(draftTaskId, founderEmail, siteOrigin, db);
+  const result = await getMessageReview(
+    draftTaskId,
+    founderEmail,
+    siteOrigin,
+    db,
+  );
 
   assert.equal(result.status, "ready");
   if (result.status !== "ready") return;
@@ -198,7 +204,12 @@ test("resolves a stored (approved) visual asset from the database", async () => 
 
 test("blocks approval and explains why for a suppressed contact", async () => {
   const db = createFakeGrowthDb(routesFor({ suppressed: true }));
-  const result = await getMessageReview(draftTaskId, founderEmail, siteOrigin, db);
+  const result = await getMessageReview(
+    draftTaskId,
+    founderEmail,
+    siteOrigin,
+    db,
+  );
 
   assert.equal(result.status, "ready");
   if (result.status !== "ready") return;
@@ -210,7 +221,12 @@ test("blocks approval and explains why for a non-corporate or inactive contact",
   const db = createFakeGrowthDb(
     routesFor({ draft: [baseDraftRow({ corporateStatus: "inactive" })] }),
   );
-  const result = await getMessageReview(draftTaskId, founderEmail, siteOrigin, db);
+  const result = await getMessageReview(
+    draftTaskId,
+    founderEmail,
+    siteOrigin,
+    db,
+  );
 
   assert.equal(result.status, "ready");
   if (result.status !== "ready") return;
@@ -246,11 +262,18 @@ test("blocks approval and explains why for an unapproved stored visual", async (
     }),
   );
 
-  const result = await getMessageReview(draftTaskId, founderEmail, siteOrigin, db);
+  const result = await getMessageReview(
+    draftTaskId,
+    founderEmail,
+    siteOrigin,
+    db,
+  );
   assert.equal(result.status, "ready");
   if (result.status !== "ready") return;
   assert.equal(result.data.eligibility.ready, false);
-  assert.ok(result.data.eligibility.reasons.some((r) => /not been approved/.test(r)));
+  assert.ok(
+    result.data.eligibility.reasons.some((r) => /not been approved/.test(r)),
+  );
 });
 
 test("reports unavailable when the referenced visual asset is missing", async () => {
@@ -270,7 +293,12 @@ test("reports unavailable when the referenced visual asset is missing", async ()
     }),
   );
 
-  const result = await getMessageReview(draftTaskId, founderEmail, siteOrigin, db);
+  const result = await getMessageReview(
+    draftTaskId,
+    founderEmail,
+    siteOrigin,
+    db,
+  );
   assert.equal(result.status, "unavailable");
   if (result.status !== "unavailable") return;
   assert.match(result.reason, /missing/);
@@ -292,7 +320,12 @@ test("reports unavailable when the stored draft fails safety validation", async 
     }),
   );
 
-  const result = await getMessageReview(draftTaskId, founderEmail, siteOrigin, db);
+  const result = await getMessageReview(
+    draftTaskId,
+    founderEmail,
+    siteOrigin,
+    db,
+  );
   assert.equal(result.status, "unavailable");
 });
 
@@ -333,7 +366,12 @@ test("reports unavailable once the draft has already been approved or sent", asy
 
 test("rejects a malformed draft ID without querying the database", async () => {
   const db = createFakeGrowthDb([]);
-  const result = await getMessageReview("not-a-uuid", founderEmail, siteOrigin, db);
+  const result = await getMessageReview(
+    "not-a-uuid",
+    founderEmail,
+    siteOrigin,
+    db,
+  );
   assert.deepEqual(result, {
     status: "unavailable",
     reason: "This draft could not be found.",
@@ -342,7 +380,12 @@ test("rejects a malformed draft ID without querying the database", async () => {
 
 test("reports unavailable for a missing draft", async () => {
   const db = createFakeGrowthDb(routesFor({ draft: [] }));
-  const result = await getMessageReview(draftTaskId, founderEmail, siteOrigin, db);
+  const result = await getMessageReview(
+    draftTaskId,
+    founderEmail,
+    siteOrigin,
+    db,
+  );
   assert.deepEqual(result, {
     status: "unavailable",
     reason: "This draft could not be found.",
@@ -366,4 +409,85 @@ test("fails safe with a correlation ID when a query throws", async () => {
   if (result.status !== "error") return;
   assert.equal(result.correlationId, "test-correlation-id");
   assert.doesNotMatch(result.message, /connection refused/);
+});
+
+const researchEmail = {
+  subject: "booking requests",
+  text: "Your team offers appointments by phone. Could an online booking portal reduce the back-and-forth? Reply opt out for no further emails.",
+  html: "<p>Your team offers appointments by phone. Could an online booking portal reduce the back-and-forth? Reply opt out for no further emails.</p>",
+  wordCount: 24,
+  optOutSentence: "Reply opt out for no further emails.",
+};
+researchEmail.wordCount = researchEmail.text.split(/\s+/).length;
+
+function researchDraftRow(overrides: Partial<Record<string, unknown>> = {}) {
+  return baseDraftRow({
+    outputSnapshot: {
+      schemaVersion: "2.0",
+      reviewState: "research_only",
+      email: researchEmail,
+    },
+    contactFirstName: null,
+    contactLastName: null,
+    subscriberType: "individual",
+    ...overrides,
+  });
+}
+
+test("global research drafts retain exact copy and are read-only without visuals or sequences", async () => {
+  const result = await getMessageReview(
+    draftTaskId,
+    founderEmail,
+    siteOrigin,
+    createFakeGrowthDb(routesFor({ draft: [researchDraftRow()] })),
+  );
+  assert.equal(result.status, "ready");
+  if (result.status !== "ready") return;
+  assert.equal(result.data.previewHtml, researchEmail.html);
+  assert.equal(result.data.previewText, researchEmail.text);
+  assert.equal(result.data.subject, researchEmail.subject);
+  assert.equal(result.data.researchOnly, true);
+  assert.equal(result.data.contactName, "Business contact");
+  assert.equal(result.data.visualKind, "none");
+  assert.equal(result.data.eligibility.ready, false);
+  assert.deepEqual(result.data.editableParagraphs, []);
+  assert.deepEqual(result.data.followUpCadence, []);
+  assert.equal(result.data.citations.length, 1);
+});
+
+test("global research drafts still surface suppression", async () => {
+  const result = await getMessageReview(
+    draftTaskId,
+    founderEmail,
+    siteOrigin,
+    createFakeGrowthDb(
+      routesFor({ draft: [researchDraftRow()], suppressed: true }),
+    ),
+  );
+  assert.equal(result.status, "ready");
+  if (result.status !== "ready") return;
+  assert.ok(
+    result.data.eligibility.reasons.some((reason) => /suppressed/.test(reason)),
+  );
+});
+
+test("global research draft review rejects unsafe HTML and altered review state", async () => {
+  for (const outputSnapshot of [
+    {
+      schemaVersion: "2.0",
+      reviewState: "research_only",
+      email: { ...researchEmail, html: "<script>alert(1)</script>" },
+    },
+    { schemaVersion: "2.0", reviewState: "draft", email: researchEmail },
+  ]) {
+    const result = await getMessageReview(
+      draftTaskId,
+      founderEmail,
+      siteOrigin,
+      createFakeGrowthDb(
+        routesFor({ draft: [researchDraftRow({ outputSnapshot })] }),
+      ),
+    );
+    assert.equal(result.status, "unavailable");
+  }
 });

@@ -39,7 +39,8 @@ export function ReviewEvidence({ message }: { message: MessageReviewData }) {
                   size={16}
                 />
                 <span>
-                  {citation.claimSummary} ({publisherFromUrl(citation.sourceUrl)})
+                  {citation.claimSummary} (
+                  {publisherFromUrl(citation.sourceUrl)})
                 </span>
               </li>
             ))}
@@ -54,7 +55,11 @@ export function ReviewEvidence({ message }: { message: MessageReviewData }) {
           </a>
         </p>
         <p className={styles.warningNote}>
-          <TriangleAlert aria-hidden="true" size={14} style={{ flex: "none" }} />
+          <TriangleAlert
+            aria-hidden="true"
+            size={14}
+            style={{ flex: "none" }}
+          />
           Verify every claim before sending.
         </p>
       </div>
@@ -73,66 +78,74 @@ export function ReviewEvidence({ message }: { message: MessageReviewData }) {
           <div>
             <p className={styles.statLabel}>Investment range</p>
             <p className={styles.statValue}>
-              {formatGrowthCurrency(message.estimatedOneOffMinPence)}–
-              {formatGrowthCurrency(message.estimatedOneOffMaxPence)}
+              {message.researchOnly && message.estimatedOneOffMaxPence === 0
+                ? "Not estimated"
+                : `${formatGrowthCurrency(message.estimatedOneOffMinPence)}–${formatGrowthCurrency(message.estimatedOneOffMaxPence)}`}
+              {message.researchOnly &&
+                message.estimatedOneOffMaxPence > 0 &&
+                " (research estimate, not a quote)"}
             </p>
           </div>
         </div>
       </div>
 
-      <div className={styles.card}>
-        <h2 className={styles.sectionTitle}>Sequence preview</h2>
-        <ol className={styles.cadenceList}>
-          {message.followUpCadence.map((step) => (
-            <li className={styles.cadenceItem} key={step.day}>
-              <span className={styles.cadenceDay}>{step.day}</span>
-              <span className={styles.cadenceLabel}>{step.label}</span>
-            </li>
-          ))}
-        </ol>
-        <p className={styles.cadenceNote}>
-          Stops automatically on reply, opt-out, bounce, or manual pause.
-        </p>
-      </div>
+      {!message.researchOnly && (
+        <div className={styles.card}>
+          <h2 className={styles.sectionTitle}>Sequence preview</h2>
+          <ol className={styles.cadenceList}>
+            {message.followUpCadence.map((step) => (
+              <li className={styles.cadenceItem} key={step.day}>
+                <span className={styles.cadenceDay}>{step.day}</span>
+                <span className={styles.cadenceLabel}>{step.label}</span>
+              </li>
+            ))}
+          </ol>
+          <p className={styles.cadenceNote}>
+            Stops automatically on reply, opt-out, bounce, or manual pause.
+          </p>
+        </div>
+      )}
 
-      <div className={styles.card}>
-        <h2 className={styles.sectionTitle}>Visual checks</h2>
-        <ul className={styles.checklist}>
-          <li className={styles.checklistItem}>
-            <CircleCheck
-              aria-hidden="true"
-              className={styles.checklistIcon}
-              size={16}
-            />
-            <span>Alt text: {message.imageAltText}</span>
-          </li>
-          {message.imageByteSize !== null && (
+      {message.visualKind !== "none" && (
+        <div className={styles.card}>
+          <h2 className={styles.sectionTitle}>Visual checks</h2>
+          <ul className={styles.checklist}>
             <li className={styles.checklistItem}>
               <CircleCheck
                 aria-hidden="true"
                 className={styles.checklistIcon}
                 size={16}
               />
-              <span>{Math.round(message.imageByteSize / 1024)} KB</span>
+              <span>Alt text: {message.imageAltText}</span>
             </li>
-          )}
-          <li className={styles.checklistItem}>
-            <span
-              className={styles.pill}
-              data-tone={
-                message.visualReviewStatus === null ||
-                message.visualReviewStatus === "approved"
-                  ? undefined
-                  : "amber"
-              }
-            >
-              {message.visualReviewStatus === null
-                ? "Fallback visual"
-                : formatGrowthStatusLabel(message.visualReviewStatus)}
-            </span>
-          </li>
-        </ul>
-      </div>
+            {message.imageByteSize !== null && (
+              <li className={styles.checklistItem}>
+                <CircleCheck
+                  aria-hidden="true"
+                  className={styles.checklistIcon}
+                  size={16}
+                />
+                <span>{Math.round(message.imageByteSize / 1024)} KB</span>
+              </li>
+            )}
+            <li className={styles.checklistItem}>
+              <span
+                className={styles.pill}
+                data-tone={
+                  message.visualReviewStatus === null ||
+                  message.visualReviewStatus === "approved"
+                    ? undefined
+                    : "amber"
+                }
+              >
+                {message.visualReviewStatus === null
+                  ? "Fallback visual"
+                  : formatGrowthStatusLabel(message.visualReviewStatus)}
+              </span>
+            </li>
+          </ul>
+        </div>
+      )}
 
       <div className={styles.card}>
         <h2 className={styles.sectionTitle}>Draft status</h2>
@@ -143,13 +156,16 @@ export function ReviewEvidence({ message }: { message: MessageReviewData }) {
             size={16}
           />
           <span>
-            {message.revisionCount > 1
-              ? `Revised by founder (v${message.version})`
-              : "Ready for founder review"}
+            {message.researchOnly
+              ? "Research only; no outreach approved"
+              : message.revisionCount > 1
+                ? `Revised by founder (v${message.version})`
+                : "Ready for founder review"}
           </span>
         </p>
         <p className={styles.cadenceNote}>
-          Created by scheduled Codex task, {formatGrowthDateTime(message.createdAt)}
+          Created by scheduled Codex task,{" "}
+          {formatGrowthDateTime(message.createdAt)}
         </p>
       </div>
     </div>

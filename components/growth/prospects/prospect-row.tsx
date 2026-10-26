@@ -56,7 +56,11 @@ export function ProspectRow({ row }: { row: ProspectListRow }) {
             target="_blank"
           >
             {row.websiteUrl.replace(/^https?:\/\//, "")}
-            <ExternalLink aria-hidden="true" size={11} style={{ marginLeft: 3 }} />
+            <ExternalLink
+              aria-hidden="true"
+              size={11}
+              style={{ marginLeft: 3 }}
+            />
           </a>
         )}
       </td>
@@ -83,7 +87,9 @@ export function ProspectRow({ row }: { row: ProspectListRow }) {
       </td>
       <td>
         <span className={styles.value}>
-          {formatGrowthCurrency(row.potentialValuePence)}
+          {row.researchOnly && row.potentialValuePence === 0
+            ? "Not estimated"
+            : formatGrowthCurrency(row.potentialValuePence)}
         </span>
       </td>
       <td>
@@ -109,7 +115,9 @@ export function ProspectMobileCard({ row }: { row: ProspectListRow }) {
         </p>
       </div>
       <span className={styles.value}>
-        {formatGrowthCurrency(row.potentialValuePence)}
+        {row.researchOnly && row.potentialValuePence === 0
+          ? "Not estimated"
+          : formatGrowthCurrency(row.potentialValuePence)}
       </span>
       <Link className={styles.rowLink} href={detailHref}>
         View

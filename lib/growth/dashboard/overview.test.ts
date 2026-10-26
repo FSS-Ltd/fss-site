@@ -53,7 +53,11 @@ test("buildPipelineOverview groups statuses into the four pipeline stages", () =
   ]);
 
   assert.deepEqual(
-    overview.stages.map(({ id, count, valuePence }) => ({ id, count, valuePence })),
+    overview.stages.map(({ id, count, valuePence }) => ({
+      id,
+      count,
+      valuePence,
+    })),
     [
       { id: "new", count: 7, valuePence: 150_000 },
       { id: "qualified", count: 5, valuePence: 200_000 },
@@ -170,7 +174,10 @@ test("nextResearchRunAt rolls forward when the computed run has already passed",
 });
 
 test("nextResearchRunAt is null when no research run has ever completed", () => {
-  assert.equal(nextResearchRunAt(null, new Date("2026-08-16T23:00:00.000Z")), null);
+  assert.equal(
+    nextResearchRunAt(null, new Date("2026-08-16T23:00:00.000Z")),
+    null,
+  );
 });
 
 test("buildSequenceHealth guards against dividing by zero", () => {
@@ -247,35 +254,59 @@ function buildFollowUpRow(overrides: Partial<Record<string, unknown>> = {}) {
   };
 }
 
-function baseRoutes(overrides: Partial<Record<string, readonly object[]>> = {}) {
+function baseRoutes(
+  overrides: Partial<Record<string, readonly object[]>> = {},
+) {
   return [
-    { match: /"emailsWaitingForApproval"/, rows: overrides.summary ?? [
-      { emailsWaitingForApproval: 2, repliesNeedingAttention: 1 },
-    ] },
-    { match: /as count from growth\.email_messages/, rows: overrides.followUpsDueToday ?? [
-      { count: 3 },
-    ] },
-    { match: /"lastRunDate"/, rows: overrides.lastRunDate ?? [{ lastRunDate: "2026-08-16" }] },
+    {
+      match: /"emailsWaitingForApproval"/,
+      rows: overrides.summary ?? [
+        { emailsWaitingForApproval: 2, repliesNeedingAttention: 1 },
+      ],
+    },
+    {
+      match: /as count from growth\.email_messages/,
+      rows: overrides.followUpsDueToday ?? [{ count: 3 }],
+    },
+    {
+      match: /"lastRunDate"/,
+      rows: overrides.lastRunDate ?? [{ lastRunDate: "2026-08-16" }],
+    },
     { match: /"messageId"/, rows: overrides.firstEmails ?? [firstEmailRow] },
     { match: /p\.status = 'replied'/, rows: overrides.replies ?? [replyRow] },
-    { match: /em\.step_number > 0/, rows: overrides.followUps ?? [buildFollowUpRow()] },
-    { match: /group by p\.status/, rows: overrides.pipeline ?? [
-      { status: "new", count: 7, valuePence: 420_000 },
-      { status: "qualified", count: 5, valuePence: 680_000 },
-    ] },
-    { match: /"actionLabel"/, rows: overrides.upcomingActions ?? [
-      {
-        prospectId: "00000000-0000-0000-0000-000000000004",
-        businessName: "BuildRight",
-        actionLabel: "Send case study",
-        status: "started_talks",
-        dueAt: new Date("2026-08-17T09:00:00.000Z"),
-      },
-    ] },
-    { match: /"sentCount"/, rows: overrides.delivery ?? [{ sentCount: 49, failedCount: 1 }] },
-    { match: /"sentEnrollmentCount"/, rows: overrides.enrollments ?? [
-      { sentEnrollmentCount: 50, repliedEnrollmentCount: 8 },
-    ] },
+    {
+      match: /em\.step_number > 0/,
+      rows: overrides.followUps ?? [buildFollowUpRow()],
+    },
+    {
+      match: /group by p\.status/,
+      rows: overrides.pipeline ?? [
+        { status: "new", count: 7, valuePence: 420_000 },
+        { status: "qualified", count: 5, valuePence: 680_000 },
+      ],
+    },
+    {
+      match: /"actionLabel"/,
+      rows: overrides.upcomingActions ?? [
+        {
+          prospectId: "00000000-0000-0000-0000-000000000004",
+          businessName: "BuildRight",
+          actionLabel: "Send case study",
+          status: "started_talks",
+          dueAt: new Date("2026-08-17T09:00:00.000Z"),
+        },
+      ],
+    },
+    {
+      match: /"sentCount"/,
+      rows: overrides.delivery ?? [{ sentCount: 49, failedCount: 1 }],
+    },
+    {
+      match: /"sentEnrollmentCount"/,
+      rows: overrides.enrollments ?? [
+        { sentEnrollmentCount: 50, repliedEnrollmentCount: 8 },
+      ],
+    },
   ];
 }
 
@@ -294,15 +325,25 @@ test("getOverviewViewModel returns a ready state with reconciled counts", async 
   assert.equal(state.data.summary.emailsWaitingForApproval, 2);
   assert.equal(state.data.summary.repliesNeedingAttention, 1);
   assert.equal(state.data.summary.followUpsDueToday, 3);
-  assert.equal(state.data.summary.nextResearchRunAt, "2026-08-17T05:00:00.000Z");
+  assert.equal(
+    state.data.summary.nextResearchRunAt,
+    "2026-08-17T05:00:00.000Z",
+  );
 
-  const firstEmails = state.data.workQueue.find((tab) => tab.kind === "first_emails");
+  const firstEmails = state.data.workQueue.find(
+    (tab) => tab.kind === "first_emails",
+  );
   assert.equal(firstEmails?.totalCount, 2);
   assert.equal(firstEmails?.rows.length, 1);
-  assert.equal(firstEmails?.rows[0]?.reviewHref, "/growth/outreach/messages/00000000-0000-0000-0000-0000000000m1");
+  assert.equal(
+    firstEmails?.rows[0]?.reviewHref,
+    "/growth/outreach/messages/00000000-0000-0000-0000-0000000000m1",
+  );
   assert.equal(firstEmails?.rows[0]?.overdue, false);
 
-  const followUps = state.data.workQueue.find((tab) => tab.kind === "follow_ups");
+  const followUps = state.data.workQueue.find(
+    (tab) => tab.kind === "follow_ups",
+  );
   assert.equal(followUps?.rows[0]?.overdue, true);
   assert.equal(state.data.defaultWorkQueueTab, "follow_ups");
 
@@ -325,7 +366,7 @@ test("getOverviewViewModel returns a ready state with reconciled counts", async 
 
 test("getOverviewViewModel excludes approved first-email tasks from review", async () => {
   const awaitingReview = (query: string) =>
-    query.includes("draft.\"reviewState\" = 'draft'");
+    query.includes("draft.\"reviewState\" in ('draft', 'research_only')");
   const { db } = createFakeGrowthDb([
     {
       match: /"emailsWaitingForApproval"/,
@@ -351,7 +392,9 @@ test("getOverviewViewModel excludes approved first-email tasks from review", asy
   assert.equal(state.status, "ready");
   if (state.status !== "ready") return;
 
-  const firstEmails = state.data.workQueue.find((tab) => tab.kind === "first_emails");
+  const firstEmails = state.data.workQueue.find(
+    (tab) => tab.kind === "first_emails",
+  );
   assert.equal(state.data.summary.emailsWaitingForApproval, 0);
   assert.equal(firstEmails?.totalCount, 0);
   assert.deepEqual(firstEmails?.rows, []);
@@ -409,7 +452,9 @@ test("getOverviewViewModel keeps a bounded totalCount separate from capped rows"
   assert.equal(state.status, "ready");
   if (state.status !== "ready") return;
 
-  const followUps = state.data.workQueue.find((tab) => tab.kind === "follow_ups");
+  const followUps = state.data.workQueue.find(
+    (tab) => tab.kind === "follow_ups",
+  );
   assert.equal(followUps?.rows.length, 6);
   assert.equal(followUps?.totalCount, 9);
 });
@@ -455,7 +500,10 @@ test("getOverviewViewModel reports an empty state with nothing to review", async
     }),
   );
 
-  const state = await getOverviewViewModel(db, () => new Date("2026-08-16T08:00:00.000Z"));
+  const state = await getOverviewViewModel(
+    db,
+    () => new Date("2026-08-16T08:00:00.000Z"),
+  );
 
   assert.equal(state.status, "empty");
 });
@@ -475,4 +523,20 @@ test("getOverviewViewModel fails safe with a correlation ID when a query throws"
   if (state.status !== "error") return;
   assert.equal(state.correlationId, "test-correlation-id");
   assert.doesNotMatch(state.message, /connection refused/);
+});
+
+test("overview includes research-only drafts in its bounded review queue and count", async () => {
+  const { db, queries } = createFakeGrowthDb(baseRoutes());
+  const result = await getOverviewViewModel(
+    db,
+    () => new Date("2026-10-26T08:00:00Z"),
+  );
+  assert.equal(result.status, "ready");
+  const reviewQueries = queries.filter(({ text }) =>
+    /"messageId"|"emailsWaitingForApproval"/.test(text),
+  );
+  assert.equal(reviewQueries.length, 2);
+  for (const { text } of reviewQueries) {
+    assert.match(text, /draft\."reviewState" in \('draft', 'research_only'\)/);
+  }
 });

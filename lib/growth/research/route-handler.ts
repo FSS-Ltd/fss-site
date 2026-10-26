@@ -4,9 +4,9 @@ import type {
 } from "../integrations/agent-signature";
 import { createApiErrorResponse, createJsonResponse } from "../http/api-error";
 import { ResearchIngestionError } from "./ingest";
-import { researchRunIngestionSchema } from "./ingestion-schema";
+import { researchIntakeSchema, type ResearchIntake } from "./intake-schema";
 import { MAX_RESEARCH_BUNDLE_BYTES } from "./limits";
-import type { ResearchRunIngestion, ResearchRunIngestionResult } from "./types";
+import type { ResearchRunIngestionResult } from "./types";
 
 const AGENT_KEY_ID_HEADER = "x-fss-key-id";
 const AGENT_TIMESTAMP_HEADER = "x-fss-timestamp";
@@ -20,7 +20,7 @@ export type ResearchRunRouteDependencies = {
   createCorrelationId: () => string;
   now: () => Date;
   verifyRequest: (input: VerifyAgentRequestInput) => AgentSignatureResult;
-  ingest: (input: ResearchRunIngestion) => Promise<ResearchRunIngestionResult>;
+  ingest: (input: ResearchIntake) => Promise<ResearchRunIngestionResult>;
   reportUnexpectedError: (input: {
     correlationId: string;
     error: unknown;
@@ -121,7 +121,7 @@ export function createResearchRunPostHandler(
       return fail(400, "invalid_json", "Request body must be valid JSON.");
     }
 
-    const parsed = researchRunIngestionSchema.safeParse(untrustedInput);
+    const parsed = researchIntakeSchema.safeParse(untrustedInput);
     if (!parsed.success) {
       return fail(422, "invalid_bundle", "Research bundle validation failed.");
     }

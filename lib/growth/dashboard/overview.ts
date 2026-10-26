@@ -1,7 +1,13 @@
 import { randomUUID } from "node:crypto";
 
 import { TZDate } from "@date-fns/tz";
-import { addDays, setHours, setMilliseconds, setMinutes, setSeconds } from "date-fns";
+import {
+  addDays,
+  setHours,
+  setMilliseconds,
+  setMinutes,
+  setSeconds,
+} from "date-fns";
 
 import { getGrowthDb } from "../db/client";
 import type { GrowthQueryExecutor } from "../db/types";
@@ -31,6 +37,7 @@ export type WorkQueueRow = {
   statusAt: string;
   evidenceCount: number;
   potentialValuePence: number;
+  researchOnly?: boolean;
   reviewHref: string;
   overdue: boolean;
 };
@@ -204,20 +211,36 @@ export function nextResearchRunAt(
   if (!lastRunDate) return null;
 
   const [year, month, day] = lastRunDate.split("-").map(Number);
-  const lastRunLocalMidnight = new TZDate(year ?? 0, (month ?? 1) - 1, day ?? 1, TIMEZONE);
+  const lastRunLocalMidnight = new TZDate(
+    year ?? 0,
+    (month ?? 1) - 1,
+    day ?? 1,
+    TIMEZONE,
+  );
   const candidate = setMilliseconds(
-    setSeconds(setMinutes(setHours(addDays(lastRunLocalMidnight, 1), RESEARCH_RUN_HOUR), 0), 0),
+    setSeconds(
+      setMinutes(
+        setHours(addDays(lastRunLocalMidnight, 1), RESEARCH_RUN_HOUR),
+        0,
+      ),
+      0,
+    ),
     0,
   );
 
   const zonedNow = new TZDate(now, TIMEZONE);
   const result =
-    candidate.getTime() <= zonedNow.getTime() ? addDays(candidate, 1) : candidate;
+    candidate.getTime() <= zonedNow.getTime()
+      ? addDays(candidate, 1)
+      : candidate;
 
   return new Date(result.getTime()).toISOString();
 }
 
-function reviewHrefFor(kind: WorkQueueKind, row: FirstEmailRow | ReplyRow | FollowUpRow): string {
+function reviewHrefFor(
+  kind: WorkQueueKind,
+  row: FirstEmailRow | ReplyRow | FollowUpRow,
+): string {
   if (kind === "first_emails") {
     const first = row as FirstEmailRow;
     return first.messageId
@@ -240,6 +263,7 @@ type BaseRow = {
   status: ProspectStatus;
   evidenceCount: number;
   potentialValuePence: number;
+  researchOnly?: boolean;
   totalCount: number;
 };
 
@@ -276,6 +300,7 @@ function toWorkQueueTab(
       statusAt: row.statusAt.toISOString(),
       evidenceCount: row.evidenceCount,
       potentialValuePence: row.potentialValuePence,
+      ...(row.researchOnly ? { researchOnly: true } : {}),
       reviewHref: reviewHrefFor(kind, row),
       overdue: kind === "follow_ups" && row.statusAt.getTime() < now.getTime(),
     })),
@@ -299,6 +324,7 @@ async function fetchFirstEmailsTab(
       p.estimated_one_off_max_pence as "potentialValuePence",
       coalesce(evidence.count, 0)::int as "evidenceCount",
       draft.id as "messageId",
+      draft."reviewState" = 'research_only' as "researchOnly",
       count(*) over ()::int as "totalCount"
     from growth.prospects p
     inner join growth.businesses b on b.id = p.business_id
@@ -319,7 +345,7 @@ async function fetchFirstEmailsTab(
       limit 1
     ) draft on true
     where p.status = 'ready_for_email_review'
-      and draft."reviewState" = 'draft'
+      and draft."reviewState" in ('draft', 'research_only')
     order by p.fit_score desc, p.updated_at desc
     limit ${WORK_QUEUE_PAGE_SIZE}
     offset ${(page - 1) * WORK_QUEUE_PAGE_SIZE}
@@ -410,7 +436,10 @@ async function fetchFollowUpsTab(
   return toWorkQueueTab("follow_ups", rows, now);
 }
 
-type SummaryCountsRow = { emailsWaitingForApproval: number; repliesNeedingAttention: number };
+type SummaryCountsRow = {
+  emailsWaitingForApproval: number;
+  repliesNeedingAttention: number;
+};
 
 async function fetchSummaryCounts(
   db: GrowthQueryExecutor,
@@ -419,7 +448,7 @@ async function fetchSummaryCounts(
     select
       count(*) filter (
         where p.status = 'ready_for_email_review'
-          and draft."reviewState" = 'draft'
+          and draft."reviewState" in ('draft', 'research_only')
       )::int
         as "emailsWaitingForApproval",
       count(*) filter (where p.status = 'replied')::int
@@ -623,7 +652,8 @@ export async function getOverviewViewModel(
     if (!hasAnyData) {
       return {
         status: "empty",
-        reason: "No prospects yet. Research runs will populate your work queue.",
+        reason:
+          "No prospects yet. Research runs will populate your work queue.",
       };
     }
 
