@@ -44,7 +44,7 @@ test("finds a business identity by normalised company number", async () => {
   const result = await findBusinessIdentityByCompanyNumber(db, " 12 34 56 78 ");
 
   assert.deepEqual(result, expected);
-  assert.deepEqual(queries[0]?.values, ["12345678"]);
+  assert.deepEqual(queries[0]?.values, ["GB", "12345678"]);
   assert.match(queries[0]?.text ?? "", /b\.legal_name as "legalName"/);
   assert.doesNotMatch(queries[0]?.text ?? "", /select\s+\*/i);
 });
@@ -100,4 +100,11 @@ test("returns null when a repository lookup has no match", async () => {
     await findProspectSummaryById(db, "00000000-0000-0000-0000-000000000099"),
     null,
   );
+});
+
+test("company registration lookup is scoped to the requested country", async () => {
+  const { db, queries } = createRecordingQuery([]);
+  await findBusinessIdentityByCompanyNumber(db, " ab 123 ", "CA");
+  assert.deepEqual(queries[0]?.values, ["CA", "AB123"]);
+  assert.match(queries[0]?.text ?? "", /b\.country_code = \?/);
 });

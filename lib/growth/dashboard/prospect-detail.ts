@@ -18,6 +18,8 @@ export type ProspectDetailBusiness = {
   corporateStatus: string;
   sector: string;
   locality: string;
+  countryCode?: string;
+  county?: string | null;
   websiteUrl: string | null;
   googlePlaceId: string | null;
   googleMapsReferenceUrl: string | null;
@@ -25,8 +27,8 @@ export type ProspectDetailBusiness = {
 };
 
 export type ProspectDetailContact = {
-  firstName: string;
-  lastName: string;
+  firstName: string | null;
+  lastName: string | null;
   roleTitle: string | null;
   email: string;
   emailSourceUrl: string;
@@ -133,6 +135,8 @@ type CoreRow = {
   businessCorporateStatus: string;
   businessSector: string;
   businessLocality: string;
+  businessCountryCode: string;
+  businessCounty: string | null;
   businessWebsiteUrl: string | null;
   businessGooglePlaceId: string | null;
   businessGoogleMapsReferenceUrl: string | null;
@@ -194,6 +198,8 @@ async function fetchCoreRow(
       b.corporate_status as "businessCorporateStatus",
       b.sector as "businessSector",
       b.locality as "businessLocality",
+      b.country_code as "businessCountryCode",
+      b.county as "businessCounty",
       b.website_url as "businessWebsiteUrl",
       b.google_place_id as "businessGooglePlaceId",
       b.google_maps_reference_url as "businessGoogleMapsReferenceUrl",
@@ -299,7 +305,10 @@ async function fetchAuditSummary(
     limit ${MAX_AUDIT_ENTRIES}
   `;
 
-  return rows.map((row) => ({ ...row, createdAt: row.createdAt.toISOString() }));
+  return rows.map((row) => ({
+    ...row,
+    createdAt: row.createdAt.toISOString(),
+  }));
 }
 
 function toProspectDetail(
@@ -309,8 +318,6 @@ function toProspectDetail(
 ): ProspectDetail {
   const contact: ProspectDetailContact | null =
     core.contactEmail &&
-    core.contactFirstName &&
-    core.contactLastName &&
     core.contactEmailSourceUrl &&
     core.contactEmailVerifiedAt &&
     core.contactSubscriberType &&
@@ -399,6 +406,8 @@ function toProspectDetail(
       corporateStatus: core.businessCorporateStatus,
       sector: core.businessSector,
       locality: core.businessLocality,
+      countryCode: core.businessCountryCode,
+      county: core.businessCounty,
       websiteUrl: core.businessWebsiteUrl,
       googlePlaceId: core.businessGooglePlaceId,
       googleMapsReferenceUrl: core.businessGoogleMapsReferenceUrl,
@@ -432,7 +441,10 @@ export async function getProspectDetail(
       fetchAuditSummary(db, prospectId),
     ]);
 
-    return { status: "found", data: toProspectDetail(core, evidence, auditSummary) };
+    return {
+      status: "found",
+      data: toProspectDetail(core, evidence, auditSummary),
+    };
   } catch {
     return {
       status: "error",

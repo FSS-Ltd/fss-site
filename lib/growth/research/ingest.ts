@@ -1,3 +1,6 @@
+import { ResearchIngestionError } from "./errors";
+import { ingestGlobalResearchRun } from "./global-ingest";
+import type { ResearchIntake } from "./intake-schema";
 import type { GrowthDb } from "../db/types";
 import { createDraftPreviewSnapshot } from "../prospect-previews/content";
 import {
@@ -15,15 +18,7 @@ import type {
   ResearchRunIngestionResult,
 } from "./types";
 
-export class ResearchIngestionError extends Error {
-  constructor(
-    public readonly code: "invalid_asset_reference" | "suppressed_contact",
-    message: string,
-  ) {
-    super(message);
-    this.name = "ResearchIngestionError";
-  }
-}
+export { ResearchIngestionError } from "./errors";
 
 function isFallbackKey(value: string): value is EmailAssetFallbackKey {
   return Object.hasOwn(EMAIL_ASSET_FALLBACKS, value);
@@ -135,6 +130,15 @@ export function createResearchRunIngester(
   };
 }
 
-export const ingestResearchRun = createResearchRunIngester(
+const ingestLegacyResearchRun = createResearchRunIngester(
   postgresResearchIngestionRepository,
 );
+
+export async function ingestResearchRun(
+  db: GrowthDb,
+  input: ResearchIntake,
+): Promise<ResearchRunIngestionResult> {
+  return input.schemaVersion === "2.0"
+    ? ingestGlobalResearchRun(db, input)
+    : ingestLegacyResearchRun(db, input);
+}

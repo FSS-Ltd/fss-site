@@ -342,3 +342,27 @@ test("stacks summary cards, the work queue, and actions before secondary analyti
     /grid-template-areas:\s*"strip"\s*"queue"\s*"actions"\s*"pipeline"\s*"health";/,
   );
 });
+
+test("research-only queue rows show Not estimated on desktop and mobile", () => {
+  const html = renderOverview({
+    status: "ready",
+    data: {
+      ...readyData,
+      defaultWorkQueueTab: "first_emails",
+      activeWorkQueueTab: "first_emails",
+      workQueue: readyData.workQueue.map((tab) =>
+        tab.kind === "first_emails"
+          ? {
+              ...tab,
+              rows: tab.rows.map((row) => ({
+                ...row,
+                researchOnly: true,
+                potentialValuePence: 0,
+              })),
+            }
+          : tab,
+      ),
+    },
+  });
+  assert.equal(html.match(/Not estimated/g)?.length, 2);
+});

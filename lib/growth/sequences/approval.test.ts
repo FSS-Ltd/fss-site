@@ -3,6 +3,7 @@ import test from "node:test";
 
 import type { FounderSession } from "../auth/require-founder";
 import type { GrowthDb } from "../db/types";
+import { createGlobalResearchFixture } from "../research/global-test-fixture";
 import type { GmailClient } from "../integrations/gmail/types";
 import {
   type ApprovedVisualAsset,
@@ -461,4 +462,37 @@ test("rejects malformed request input", async () => {
     }),
     TypeError,
   );
+});
+
+test("global research-only snapshots cannot create Gmail drafts or queue outreach", async () => {
+  for (const sendMode of ["queue", "gmail_draft"] as const) {
+    const state = createFakeState({
+      draft: lockedDraft({
+        outputSnapshot: {
+          schemaVersion: "2.0",
+          reviewState: "research_only",
+          email: createGlobalResearchFixture().prospects[0]!.firstEmail,
+        },
+      }),
+    });
+    let providerCalls = 0;
+    const approve = createApprover(state, {
+      gmailClient: fakeGmailClient({
+        createDraft: async () => {
+          providerCalls += 1;
+          throw new Error("Research-only drafts must never reach Gmail.");
+        },
+      }),
+    });
+    await assert.rejects(
+      approve(db, { ...baseInput, sendMode }),
+      (error: unknown) =>
+        error instanceof FirstEmailApprovalError &&
+        error.code === "invalid_stored_draft",
+    );
+    assert.equal(providerCalls, 0);
+    assert.equal(state.enrollments.length, 0);
+    assert.equal(state.reviewStateUpdates.length, 0);
+    assert.equal(state.audits.length, 0);
+  }
 });

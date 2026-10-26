@@ -43,8 +43,9 @@ export function MessageReview({ result }: { result: MessageReviewResult }) {
         <div>
           <h1 className={styles.heading}>Review first email</h1>
           <p className={styles.subtitle}>
-            Check the personalised draft and evidence before it enters the Gmail
-            sequence.
+            {data.researchOnly
+              ? "Review the researched draft and supporting evidence. Outreach has not been approved."
+              : "Check the personalised draft and evidence before it enters the Gmail sequence."}
           </p>
         </div>
       </div>
@@ -52,7 +53,16 @@ export function MessageReview({ result }: { result: MessageReviewResult }) {
       <div className={styles.grid}>
         <div className={styles.column}>
           <EmailPreview message={data} />
-          <MessageActions message={data} />
+          {data.researchOnly ? (
+            <div className={styles.card}>
+              <h2 className={styles.sectionTitle}>Research only</h2>
+              {data.eligibility.reasons.map((reason) => (
+                <p key={reason}>{reason}</p>
+              ))}
+            </div>
+          ) : (
+            <MessageActions message={data} />
+          )}
         </div>
         <ReviewEvidence message={data} />
       </div>

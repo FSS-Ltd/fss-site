@@ -43,7 +43,7 @@ export function candidateIdentityLockKeys(
   ].sort();
 }
 
-function createPostgresTransaction(
+export function createPostgresResearchTransaction(
   tx: GrowthTransaction,
 ): ResearchIngestionTransaction {
   return {
@@ -157,7 +157,8 @@ function createPostgresTransaction(
         select exists (
           select 1
           from growth.businesses b
-          where upper(regexp_replace(b.company_number, '\s+', '', 'g')) = ${companyNumber}
+          where b.country_code = 'GB'
+            and upper(regexp_replace(b.company_number, '\s+', '', 'g')) = ${companyNumber}
         ) as exists
       `;
       if (businesses[0]?.exists === true) {
@@ -377,7 +378,7 @@ export const postgresResearchIngestionRepository: ResearchIngestionRepository =
   {
     withTransaction(db, operation) {
       return withGrowthTransaction(db, (tx) =>
-        operation(createPostgresTransaction(tx)),
+        operation(createPostgresResearchTransaction(tx)),
       );
     },
   };

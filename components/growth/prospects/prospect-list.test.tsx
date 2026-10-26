@@ -21,7 +21,9 @@ require.extensions[".css"] = (module) => {
 const { ProspectList } =
   require("./prospect-list") as typeof import("./prospect-list");
 
-function baseQuery(overrides: Partial<ProspectListQuery> = {}): ProspectListQuery {
+function baseQuery(
+  overrides: Partial<ProspectListQuery> = {},
+): ProspectListQuery {
   return {
     q: "",
     sector: "",
@@ -55,7 +57,10 @@ const readyData: ProspectListResult = {
   rows: [sampleRow],
   totalCount: 128,
   nextCursor: "next-cursor-token",
-  facets: { sectors: ["Plumbing", "Garage"], locations: ["Maidstone", "Ashford"] },
+  facets: {
+    sectors: ["Plumbing", "Garage"],
+    locations: ["Maidstone", "Ashford"],
+  },
 };
 
 function renderList(
@@ -85,11 +90,23 @@ test("labels every filter control so it can be operated by keyboard and screen r
 
   assert.match(html, /<label[^>]*for="prospect-search"[^>]*>Search<\/label>/);
   assert.match(html, /<label[^>]*for="prospect-sector"[^>]*>Sector<\/label>/);
-  assert.match(html, /<label[^>]*for="prospect-location"[^>]*>Location<\/label>/);
-  assert.match(html, /<label[^>]*for="prospect-fit-score"[^>]*>Fit score<\/label>/);
+  assert.match(
+    html,
+    /<label[^>]*for="prospect-location"[^>]*>Location<\/label>/,
+  );
+  assert.match(
+    html,
+    /<label[^>]*for="prospect-fit-score"[^>]*>Fit score<\/label>/,
+  );
   assert.match(html, /<label[^>]*for="prospect-status"[^>]*>Status<\/label>/);
-  assert.match(html, /<label[^>]*for="prospect-outreach"[^>]*>Outreach<\/label>/);
-  assert.match(html, /<label[^>]*for="prospect-suppressed"[^>]*>Suppression<\/label>/);
+  assert.match(
+    html,
+    /<label[^>]*for="prospect-outreach"[^>]*>Outreach<\/label>/,
+  );
+  assert.match(
+    html,
+    /<label[^>]*for="prospect-suppressed"[^>]*>Suppression<\/label>/,
+  );
   assert.match(html, /type="submit"[^>]*>Apply filters/);
 });
 
@@ -179,4 +196,16 @@ test("hides the desktop table and shows prospect cards below the tablet breakpoi
     css,
     /@media \(max-width: 767px\)[\s\S]*?\.mobileList[\s\S]*?display: flex/,
   );
+});
+
+test("research-only zero estimates display Not estimated on desktop and mobile", () => {
+  const html = renderList({
+    status: "ready",
+    data: {
+      ...readyData,
+      rows: [{ ...sampleRow, researchOnly: true, potentialValuePence: 0 }],
+    },
+  });
+  assert.equal(html.match(/Not estimated/g)?.length, 2);
+  assert.doesNotMatch(html, /£0/);
 });

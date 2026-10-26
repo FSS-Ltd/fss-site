@@ -82,20 +82,30 @@ function routesFor(overrides: {
 }): FakeRoute[] {
   return [
     { match: /"businessLegalName"/, rows: overrides.core ?? [coreRow] },
-    { match: /"sourceType"/, rows: overrides.evidence ?? [
-      {
-        id: "e1",
-        sourceType: "google_business_profile",
-        sourceUrl: "https://maps.google.com/place-1",
-        claimType: "no_website",
-        claimSummary: "No active website found",
-        observedAt: new Date("2026-08-14T00:00:00.000Z"),
-        verifiedAt: new Date("2026-08-15T00:00:00.000Z"),
-      },
-    ] },
-    { match: /from growth\.audit_log/, rows: overrides.audit ?? [
-      { action: "prospect.status_transitioned.started_talks", actorType: "founder", createdAt: new Date("2026-08-16T09:00:00.000Z") },
-    ] },
+    {
+      match: /"sourceType"/,
+      rows: overrides.evidence ?? [
+        {
+          id: "e1",
+          sourceType: "google_business_profile",
+          sourceUrl: "https://maps.google.com/place-1",
+          claimType: "no_website",
+          claimSummary: "No active website found",
+          observedAt: new Date("2026-08-14T00:00:00.000Z"),
+          verifiedAt: new Date("2026-08-15T00:00:00.000Z"),
+        },
+      ],
+    },
+    {
+      match: /from growth\.audit_log/,
+      rows: overrides.audit ?? [
+        {
+          action: "prospect.status_transitioned.started_talks",
+          actorType: "founder",
+          createdAt: new Date("2026-08-16T09:00:00.000Z"),
+        },
+      ],
+    },
   ];
 }
 
@@ -113,8 +123,14 @@ test("returns full detail for one prospect: business, corporate verification, co
   assert.equal(result.data.contact?.email, "daniel@smithandsonsplumbing.co.uk");
   assert.equal(result.data.contact?.lawfulBasis, "legitimate_interests");
   assert.equal(result.data.fitScore, 91);
-  assert.equal(result.data.opportunitySummary, "No website, slow enquiry handling");
-  assert.equal(result.data.websiteAssessment?.businessGoal, "Capture more enquiries");
+  assert.equal(
+    result.data.opportunitySummary,
+    "No website, slow enquiry handling",
+  );
+  assert.equal(
+    result.data.websiteAssessment?.businessGoal,
+    "Capture more enquiries",
+  );
   assert.deepEqual(result.data.preview, {
     status: "draft",
     version: 1,
@@ -128,7 +144,10 @@ test("returns full detail for one prospect: business, corporate verification, co
   assert.equal(result.data.evidence.length, 1);
   assert.equal(result.data.evidence[0]?.sourceType, "google_business_profile");
   assert.equal(result.data.auditSummary.length, 1);
-  assert.equal(result.data.auditSummary[0]?.action, "prospect.status_transitioned.started_talks");
+  assert.equal(
+    result.data.auditSummary[0]?.action,
+    "prospect.status_transitioned.started_talks",
+  );
   assert.equal(result.data.version, 4);
 });
 
@@ -206,10 +225,40 @@ test("fails safe with a correlation ID when a query throws", async () => {
     throw new Error("connection refused");
   }) as unknown as GrowthQueryExecutor;
 
-  const result = await getProspectDetail(prospectId, db, () => "test-correlation-id");
+  const result = await getProspectDetail(
+    prospectId,
+    db,
+    () => "test-correlation-id",
+  );
 
   assert.equal(result.status, "error");
   if (result.status !== "error") return;
   assert.equal(result.correlationId, "test-correlation-id");
   assert.doesNotMatch(result.message, /connection refused/);
+});
+
+test("keeps a sourced public business contact when personal names are unknown", async () => {
+  const result = await getProspectDetail(
+    prospectId,
+    createFakeGrowthDb(
+      routesFor({
+        core: [
+          {
+            ...coreRow,
+            contactFirstName: null,
+            contactLastName: null,
+            contactLawfulBasis: "research_only",
+            businessCountryCode: "CA",
+            businessCounty: "Ontario",
+          },
+        ],
+      }),
+    ),
+  );
+  assert.equal(result.status, "found");
+  if (result.status !== "found") return;
+  assert.equal(result.data.contact?.email, coreRow.contactEmail);
+  assert.equal(result.data.contact?.firstName, null);
+  assert.equal(result.data.business.countryCode, "CA");
+  assert.equal(result.data.business.county, "Ontario");
 });

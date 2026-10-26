@@ -5,7 +5,8 @@ export type LawfulBasis =
   | "legitimate_interests"
   | "consent"
   | "contract"
-  | "requested_service";
+  | "requested_service"
+  | "research_only";
 
 export type ContactIdentity = {
   id: string;
