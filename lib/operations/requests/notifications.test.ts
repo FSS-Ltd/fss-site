@@ -144,3 +144,12 @@ test("request email templates contain the exact authenticated review and complet
   assert.match(closed.html, /This is not a client acceptance/);
   assert.match(closed.text, /The client cancelled the agreed work/);
 });
+
+test("portal request emails use the current sender domain", () => {
+  const email = buildRequestDeliveryEmail(
+    delivery,
+    "https://portal.example.test",
+  );
+  assert.equal(email.from, "FSS <hello@faithfulsoftware.dev>");
+  assert.equal(email.replyTo, "j.ntagengwa@faithfulsoftware.dev");
+});

@@ -1,4 +1,6 @@
 "use client";
+
+import { OPERATIONS_EMAIL_ADDRESS } from "@/lib/operations/email-identity";
 import { useRef, useState } from "react";
 import { useUnsavedWelcomeChanges } from "./use-unsaved-welcome-changes";
 import type { PortalRole } from "@/lib/operations/auth/types";
@@ -285,7 +287,7 @@ export function useJourneyComposer(props: JourneyComposerProps) {
         senderName: props.settings.displayName,
         organisationName: "Faithful Software Solutions",
         clientOrganisationName: props.organisationName,
-        from: "hello@faithfulsoftwaresolutions.co.uk",
+        from: OPERATIONS_EMAIL_ADDRESS,
         replyTo: props.settings.replyTo,
         welcomePackVersionId: packVersionId,
         emailSubject: packet.emailSubject,
