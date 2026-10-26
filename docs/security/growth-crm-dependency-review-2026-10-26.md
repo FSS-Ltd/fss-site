@@ -16,3 +16,7 @@ Local remediation targets Next.js and its matching lint configuration at 16.4.2,
 Deployment, Production migrations, credential changes and incident response on a live system are outside this local implementation authorization. The required founder decision is whether to release the reviewed, verified branch after the final evidence is available. This note is not evidence of exploitation or proof that a live deployment is affected by every listed code path.
 
 The patched production dependency audit reported zero vulnerabilities. Final resolved versions: Next.js and eslint-config-next 16.4.2, sharp 0.35.5, Zod 4.6.7, source-map-js 1.2.2 and affected undici 6.x at 6.29.1. The transitive Zod 4.1.11 dependency under Vercel Blob is also constrained to the patched major-4 version. Remaining application verification is recorded in the CRM runbook.
+
+## PR integration note
+
+The advisory counts above describe the original inspected checkout. The CRM-only PR is based on main at `245998423`, which already includes the initial dependency remediation. The PR retains targeted patched resolutions and advances Next.js/eslint-config-next from 16.4.1 to 16.4.2 and Zod to 4.6.7. Its production dependency audit reports zero vulnerabilities. This is a lockfile audit, not a claim that every GitHub Dependabot alert on other manifests/default-branch revisions is resolved.
