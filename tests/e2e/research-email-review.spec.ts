@@ -201,3 +201,90 @@ test("permanent delivery failure is visible with a route to its details", async 
     page.getByRole("link", { name: "View delivery status" }),
   ).toBeVisible();
 });
+
+test("approval uses a modal with keyboard dismissal and restored focus", async ({
+  page,
+}, testInfo) => {
+  await page.goto(path);
+  const trigger = page.getByRole("button", {
+    name: "Approve & send",
+    exact: true,
+  });
+  await trigger.click();
+  const dialog = page.getByRole("dialog", {
+    name: "Confirm and send",
+    exact: true,
+  });
+  await expect(dialog).toBeVisible();
+  await page.screenshot({
+    path: `output/review/outreach-confirm-${testInfo.project.name}.png`,
+  });
+  await expect(
+    dialog.getByLabel("Permission to contact this recipient"),
+  ).toBeFocused();
+  await page.keyboard.press("Tab");
+  await page.keyboard.press("Tab");
+  await expect(
+    dialog.getByRole("button", { name: "Cancel", exact: true }),
+  ).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+  await expect(trigger).toBeFocused();
+});
+
+test("single send stays in its modal until delivery resolves and ignores duplicate submissions", async ({
+  page,
+}) => {
+  let release!: () => void;
+  const waiting = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  let requests = 0;
+  await page.route(
+    `**/api/growth/messages/${draftId}/approve-research-send`,
+    async (route) => {
+      requests++;
+      await waiting;
+      await route.fulfill({
+        json: { status: "pending", sequenceEnrollmentId: "pending-sequence" },
+      });
+    },
+  );
+  await page.goto(path);
+  await page
+    .getByRole("button", { name: "Approve & send", exact: true })
+    .click();
+  const dialog = page.getByRole("dialog", {
+    name: "Confirm and send",
+    exact: true,
+  });
+  await dialog
+    .getByLabel("Permission to contact this recipient")
+    .selectOption("consent");
+  await dialog
+    .getByLabel("Review note or permission evidence")
+    .fill("Recipient requested this specific email.");
+  await dialog
+    .getByRole("button", { name: "Confirm & send now", exact: true })
+    .evaluate((button) => {
+      if (!(button instanceof HTMLButtonElement))
+        throw new Error("Expected a send button.");
+      button.click();
+      button.click();
+    });
+  await expect(
+    dialog.getByRole("button", { name: "Sending…", exact: true }),
+  ).toBeDisabled();
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeVisible();
+  await expect(
+    dialog.getByRole("button", { name: "Cancel", exact: true }),
+  ).toBeDisabled();
+  expect(requests).toBe(1);
+  release();
+  await expect(dialog).toHaveCount(0);
+  await expect(page.getByRole("status")).toContainText(
+    "Delivery has not yet been confirmed.",
+  );
+  expect(requests).toBe(1);
+});

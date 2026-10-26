@@ -299,7 +299,7 @@
 
 .actionButton[data-variant="primary"] {
   border: none;
-  background: #0b8f98;
+  background: #087f88;
   color: white;
 }
 
@@ -425,31 +425,6 @@
 }
 
 /* Confirmation dialog */
-
-.dialogBackdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgb(7 24 46 / 55%);
-  padding: 20px;
-}
-
-.dialog {
-  width: min(480px, 100%);
-  border-radius: 14px;
-  background: white;
-  padding: 24px;
-}
-
-.dialogTitle {
-  margin: 0 0 6px;
-  color: #07182e;
-  font-size: 1.1rem;
-  font-weight: 750;
-}
 
 .dialogSummary {
   display: grid;

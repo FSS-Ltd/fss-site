@@ -26,6 +26,7 @@ export default defineConfig({
   testDir: "tests/e2e",
   testMatch: [
     "research-email-review.spec.ts",
+    "outreach-send-all.spec.ts",
     "ai-receptionist-guide.spec.ts",
     "plumber-prompt-kit.spec.ts",
     "agreement-builder.spec.ts",

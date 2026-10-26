@@ -6,6 +6,8 @@ import { useId, useState } from "react";
 import { formatGrowthCurrency } from "@/lib/growth/dashboard/formatters";
 import type { MessageReviewData } from "@/lib/growth/dashboard/message-review";
 
+import { OutreachDialog } from "./outreach-dialog";
+
 import styles from "./outreach.module.css";
 
 type ActionKey =
@@ -170,7 +172,11 @@ export function MessageActionsFrame({
           className={styles.actionButton}
           data-variant="primary"
           disabled={busy || !message.eligibility.ready}
-          onClick={() => setMode("confirm-send")}
+          aria-haspopup="dialog"
+          onClick={() => {
+            setFeedback(null);
+            setMode("confirm-send");
+          }}
           type="button"
         >
           Approve &amp; send
@@ -330,65 +336,68 @@ export function MessageActionsFrame({
       )}
 
       {mode === "confirm-send" && (
-        <div className={styles.dialogBackdrop} role="presentation">
-          <div
-            aria-labelledby={`${formId}-confirm-title`}
-            className={styles.dialog}
-            role="alertdialog"
-          >
-            <h2 className={styles.dialogTitle} id={`${formId}-confirm-title`}>
-              Confirm and send
-            </h2>
-            <p>This starts the Day 1, 5, 11 and 14 sequence for:</p>
-            <dl className={styles.dialogSummary}>
-              <div>
-                <strong>To:</strong> {message.contactName} &lt;
-                {message.contactEmail}
-                &gt;
-              </div>
-              <div>
-                <strong>Subject:</strong> {message.subject}
-              </div>
-              <div>
-                <strong>Visual:</strong>{" "}
-                {message.visualKind === "stored"
-                  ? "Approved image attached"
-                  : "Fallback visual attached"}
-              </div>
-              <div>
-                <strong>Potential value:</strong>{" "}
-                {formatGrowthCurrency(message.estimatedOneOffMinPence)}–
-                {formatGrowthCurrency(message.estimatedOneOffMaxPence)}
-              </div>
-            </dl>
-            <div className={styles.dialogActions}>
-              <button
-                className={styles.actionButton}
-                onClick={() => setMode("idle")}
-                type="button"
-              >
-                Cancel
-              </button>
-              <button
-                className={styles.actionButton}
-                data-variant="primary"
-                disabled={busy}
-                onClick={() =>
-                  run(
-                    "approve-send",
-                    `/api/growth/messages/${message.draftTaskId}/approve-send`,
-                    { expectedVersion: message.version },
-                  )
-                }
-                type="button"
-              >
-                {pendingAction === "approve-send"
-                  ? "Sending…"
-                  : "Approve & send"}
-              </button>
+        <OutreachDialog
+          title="Confirm and send"
+          description="This starts the Day 1, 5, 11 and 14 sequence for the recipient below."
+          busy={busy}
+          onClose={() => setMode("idle")}
+        >
+          {feedback && (
+            <p
+              className={styles.actionFeedback}
+              data-tone={feedback.tone}
+              role="alert"
+            >
+              {feedback.message}
+            </p>
+          )}
+          <dl className={styles.dialogSummary}>
+            <div>
+              <strong>To:</strong> {message.contactName} &lt;
+              {message.contactEmail}
+              &gt;
             </div>
+            <div>
+              <strong>Subject:</strong> {message.subject}
+            </div>
+            <div>
+              <strong>Visual:</strong>{" "}
+              {message.visualKind === "stored"
+                ? "Approved image attached"
+                : "Fallback visual attached"}
+            </div>
+            <div>
+              <strong>Potential value:</strong>{" "}
+              {formatGrowthCurrency(message.estimatedOneOffMinPence)}–
+              {formatGrowthCurrency(message.estimatedOneOffMaxPence)}
+            </div>
+          </dl>
+          <div className={styles.dialogActions}>
+            <button
+              className={styles.actionButton}
+              disabled={busy}
+              onClick={() => setMode("idle")}
+              type="button"
+            >
+              Cancel
+            </button>
+            <button
+              className={styles.actionButton}
+              data-variant="primary"
+              disabled={busy}
+              onClick={() =>
+                run(
+                  "approve-send",
+                  `/api/growth/messages/${message.draftTaskId}/approve-send`,
+                  { expectedVersion: message.version },
+                )
+              }
+              type="button"
+            >
+              {pendingAction === "approve-send" ? "Sending…" : "Approve & send"}
+            </button>
           </div>
-        </div>
+        </OutreachDialog>
       )}
     </div>
   );

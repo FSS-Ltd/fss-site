@@ -3,12 +3,19 @@ import Link from "next/link";
 import { formatGrowthDateTime } from "@/lib/growth/dashboard/formatters";
 import type { OutreachDraftsResult } from "@/lib/growth/dashboard/outreach-drafts";
 
+import { SendAllDrafts } from "./send-all-drafts";
+
 import styles from "./outreach.module.css";
 
 export function OutreachDrafts({ result }: { result: OutreachDraftsResult }) {
   return (
     <section className={styles.card}>
-      <h2 className={styles.sectionTitle}>Email drafts</h2>
+      <div className={styles.header}>
+        <h2 className={styles.sectionTitle}>Email drafts</h2>
+        {result.status === "ready" && result.rows.length > 0 && (
+          <SendAllDrafts rows={result.rows} />
+        )}
+      </div>
       {result.status === "error" ? (
         <div role="alert">
           <p>{result.message}</p>
