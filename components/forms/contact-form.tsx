@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { trackContactSuccess } from "@/lib/analytics/contact-events";
 import {
   contactChallengeLimit,
@@ -34,7 +34,7 @@ export function ContactForm() {
     setError,
     clearErrors,
     setFocus,
-    watch,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<ContactValues>({
     defaultValues: {
@@ -47,8 +47,8 @@ export function ContactForm() {
       newsletterOptIn: false,
     },
   });
-  const service = watch("service");
-  const challenge = watch("challenge") ?? "";
+  const service = useWatch({ control, name: "service" });
+  const challenge = useWatch({ control, name: "challenge" }) ?? "";
   const challengeLimit = contactChallengeLimit(service);
 
   useEffect(() => {
@@ -116,7 +116,9 @@ export function ContactForm() {
       noValidate
       aria-label="Project enquiry"
       aria-busy={isSubmitting}
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={(event) => {
+        void handleSubmit(onSubmit)(event);
+      }}
       onChangeCapture={() => {
         submissionId.current = null;
       }}

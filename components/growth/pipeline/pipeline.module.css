@@ -296,3 +296,37 @@
   background: #fdecec;
   color: #b42318;
 }
+
+.cardMonthly {
+  display: block;
+  margin-top: 5px;
+  color: #526078;
+  font-size: 0.73rem;
+  font-weight: 400;
+}
+.cardBusiness a {
+  text-decoration: none;
+}
+.cardBusiness a:hover {
+  text-decoration: underline;
+}
+.columnHeader {
+  align-items: flex-start;
+  flex-direction: column;
+}
+.column {
+  border-top: 3px solid #99a9b8;
+}
+.column[data-stage="qualified"] {
+  border-top-color: #4193a3;
+}
+.column[data-stage="proposal"] {
+  border-top-color: #707ac0;
+}
+.column[data-stage="negotiation"] {
+  border-top-color: #b98a3b;
+}
+.page :is(a, button, input, select):focus-visible {
+  outline: 3px solid #087780;
+  outline-offset: 3px;
+}

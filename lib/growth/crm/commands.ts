@@ -86,7 +86,11 @@ export async function executeCrmCommand(
       "code" in error &&
       error.code === "23505"
     )
-      throw new CrmError("duplicate");
+      throw new CrmError(
+        command.kind === "save_view" || command.kind === "rename_view"
+          ? "duplicate_view"
+          : "duplicate",
+      );
     throw error;
   }
 }

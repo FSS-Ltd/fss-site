@@ -56,16 +56,28 @@ test("formats evidence counts with explicit empty and plural states", () => {
 test("describes due dates relative to London calendar days", () => {
   const now = "2026-08-16T20:00:00.000Z";
 
-  assert.equal(formatGrowthRelativeDay("2026-08-16T05:00:00.000Z", now), "Today");
-  assert.equal(formatGrowthRelativeDay("2026-08-17T05:00:00.000Z", now), "Tomorrow");
-  assert.equal(formatGrowthRelativeDay("2026-08-15T10:00:00.000Z", now), "Yesterday");
+  assert.equal(
+    formatGrowthRelativeDay("2026-08-16T05:00:00.000Z", now),
+    "Today",
+  );
+  assert.equal(
+    formatGrowthRelativeDay("2026-08-17T05:00:00.000Z", now),
+    "Tomorrow",
+  );
+  assert.equal(
+    formatGrowthRelativeDay("2026-08-15T10:00:00.000Z", now),
+    "Yesterday",
+  );
   assert.equal(
     formatGrowthRelativeDay("2026-08-20T09:00:00.000Z", now),
     "20 Aug 2026",
   );
 
   assert.equal(
-    formatGrowthRelativeDay("2026-08-16T23:30:00.000Z", "2026-08-16T20:00:00.000Z"),
+    formatGrowthRelativeDay(
+      "2026-08-16T23:30:00.000Z",
+      "2026-08-16T20:00:00.000Z",
+    ),
     "Tomorrow",
   );
 });
@@ -78,4 +90,10 @@ test("rejects invalid formatter inputs", () => {
   assert.throws(() => formatGrowthCurrency(1.5), RangeError);
   assert.throws(() => formatGrowthPercentage(Number.NaN), RangeError);
   assert.throws(() => formatGrowthEvidenceCount(-1), RangeError);
+});
+
+test("date-only commercial close dates retain the calendar day", async () => {
+  const { formatGrowthCalendarDate } = await import("./formatters");
+  assert.equal(formatGrowthCalendarDate("2026-11-30"), "30 Nov 2026");
+  assert.throws(() => formatGrowthCalendarDate("2026-02-30"), RangeError);
 });

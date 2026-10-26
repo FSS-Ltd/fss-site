@@ -11,12 +11,21 @@ export const crmTestFounder = {
 export async function withCrmTestDatabase(
   operation: (sql: postgres.Sql, newLead: () => CaptureLead) => Promise<void>,
   connection = process.env.DIRECT_DATABASE_URL,
+  maxConnections = 1,
 ): Promise<void> {
   if (!connection)
     throw new Error(
       "DIRECT_DATABASE_URL is required for CRM integration tests.",
     );
-  const sql = postgres(connection, { max: 1 });
+  const url = new URL(connection);
+  if (
+    !["127.0.0.1", "localhost", "[::1]"].includes(url.hostname) ||
+    !/^\/fss_(?:crm_[a-z0-9_]+|growth_test)$/.test(url.pathname)
+  )
+    throw new Error(
+      "CRM integration tests require a disposable loopback fss_crm_* or fss_growth_test database.",
+    );
+  const sql = postgres(connection, { max: maxConnections });
   const companies: string[] = [];
   const newLead = (): CaptureLead => {
     const companyNumber = randomUUID()

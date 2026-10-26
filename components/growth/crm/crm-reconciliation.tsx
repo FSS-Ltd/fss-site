@@ -1,16 +1,16 @@
 "use client";
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useCrmRefresh } from "./crm-refresh-provider";
 import { subscribeCrmChanges } from "@/lib/growth/crm/change-events";
 export function CrmReconciliation(): null {
-  const router = useRouter();
+  const { refresh } = useCrmRefresh();
   useEffect(
     () =>
       subscribeCrmChanges({
         surface: window,
         visibilitySurface: document,
         visible: () => document.visibilityState === "visible",
-        refresh: () => router.refresh(),
+        refresh,
         openChannel: (receive) => {
           if (typeof BroadcastChannel === "undefined") return null;
           try {
@@ -27,7 +27,7 @@ export function CrmReconciliation(): null {
           }
         },
       }),
-    [router],
+    [refresh],
   );
   return null;
 }

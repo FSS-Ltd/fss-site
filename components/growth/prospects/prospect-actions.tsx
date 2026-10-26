@@ -47,10 +47,10 @@ export function evaluateApprovalReadiness(
     );
     return { ready: false, reasons };
   }
-  if (prospect.business.corporateStatus === "uncertain") {
-    reasons.push("The company's corporate status is unverified.");
+  if (prospect.business.corporateStatus !== "active") {
+    reasons.push("The company's corporate status is unverified or inactive.");
   }
-  if (!prospect.contact) {
+  if (!prospect.contact || prospect.contact.subscriberType !== "corporate") {
     reasons.push("No verified contact is on file for this prospect.");
   }
 
@@ -59,7 +59,10 @@ export function evaluateApprovalReadiness(
     (prospect.business.verifiedAt
       ? new Date(prospect.business.verifiedAt).getTime()
       : 0);
-  if (businessAgeMs > STALE_RESEARCH_DAYS * 24 * 60 * 60 * 1000) {
+  if (
+    prospect.business.verifiedAt &&
+    businessAgeMs > STALE_RESEARCH_DAYS * 24 * 60 * 60 * 1000
+  ) {
     reasons.push("Research is more than 30 days old and should be refreshed.");
   }
 

@@ -1,6 +1,9 @@
 import Link from "next/link";
 
-import type { ProspectListResult, ProspectListQuery } from "@/lib/growth/dashboard/prospects";
+import type {
+  ProspectListResult,
+  ProspectListQuery,
+} from "@/lib/growth/dashboard/prospects";
 import type { ViewState } from "@/lib/growth/dashboard/view-models";
 
 import { buildProspectsHref, ProspectFilters } from "./prospect-filters";
@@ -18,7 +21,9 @@ export function ProspectList({
     return (
       <div className={styles.errorState} role="alert">
         <p>{state.message}</p>
-        <p className={styles.errorCorrelation}>Reference: {state.correlationId}</p>
+        <p className={styles.errorCorrelation}>
+          Reference: {state.correlationId}
+        </p>
       </div>
     );
   }
@@ -39,9 +44,17 @@ export function ProspectList({
             Research, qualify, and move Kent businesses into outreach.
           </p>
         </div>
-        <Link className={styles.rowLink} href="/growth/prospects/previews">
-          Review concept previews
-        </Link>
+        <div className="flex flex-wrap items-center gap-4">
+          <Link className={styles.applyButton} href="/growth/prospects/new">
+            New lead
+          </Link>
+          <Link className={styles.rowLink} href="/growth/prospects/enquiries">
+            Review enquiries
+          </Link>
+          <Link className={styles.rowLink} href="/growth/prospects/previews">
+            Review concept previews
+          </Link>
+        </div>
       </div>
 
       <ProspectFilters facets={data.facets} query={query} />

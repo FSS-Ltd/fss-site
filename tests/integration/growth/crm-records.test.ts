@@ -312,31 +312,35 @@ test(
   "concurrent capture requests cannot create duplicate companies or open leads",
   { skip: !connection },
   async () =>
-    withCrmTestDatabase(async (sql, lead) => {
-      const input = lead();
-      const results = await Promise.allSettled([
-        executeCrmCommand(sql, input, founder, randomUUID()),
-        executeCrmCommand(
-          sql,
-          { ...input, requestId: randomUUID() },
-          founder,
-          randomUUID(),
-        ),
-      ]);
-      assert.equal(
-        results.filter((result) => result.status === "fulfilled").length,
-        1,
-      );
-      const failure = results.find((result) => result.status === "rejected");
-      assert.ok(
-        failure?.status === "rejected" &&
-          failure.reason instanceof CrmError &&
-          failure.reason.code === "duplicate",
-      );
-      const [count] =
-        await sql`select count(*)::int count from growth.businesses where company_number=${input.companyNumber}`;
-      assert.equal(count.count, 1);
-    }),
+    withCrmTestDatabase(
+      async (sql, lead) => {
+        const input = lead();
+        const results = await Promise.allSettled([
+          executeCrmCommand(sql, input, founder, randomUUID()),
+          executeCrmCommand(
+            sql,
+            { ...input, requestId: randomUUID() },
+            founder,
+            randomUUID(),
+          ),
+        ]);
+        assert.equal(
+          results.filter((result) => result.status === "fulfilled").length,
+          1,
+        );
+        const failure = results.find((result) => result.status === "rejected");
+        assert.ok(
+          failure?.status === "rejected" &&
+            failure.reason instanceof CrmError &&
+            failure.reason.code === "duplicate",
+        );
+        const [count] =
+          await sql`select count(*)::int count from growth.businesses where company_number=${input.companyNumber}`;
+        assert.equal(count.count, 1);
+      },
+      connection,
+      3,
+    ),
 );
 
 test(

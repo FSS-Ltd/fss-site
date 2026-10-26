@@ -95,7 +95,9 @@ function createFakeGrowthDb(routes: readonly FakeRoute[]): {
   return { db: tag as unknown as GrowthQueryExecutor, queries };
 }
 
-function baseQuery(overrides: Partial<ProspectListQuery> = {}): ProspectListQuery {
+function baseQuery(
+  overrides: Partial<ProspectListQuery> = {},
+): ProspectListQuery {
   return {
     q: "",
     sector: "",
@@ -112,6 +114,7 @@ function baseQuery(overrides: Partial<ProspectListQuery> = {}): ProspectListQuer
 const sampleRow = {
   prospectId: "00000000-0000-0000-0000-000000000001",
   businessName: "Smith & Sons Plumbing Ltd",
+  primaryContactName: "Daniel Smith",
   websiteUrl: "https://smithandsonsplumbing.co.uk",
   sector: "Plumbing",
   location: "Maidstone",
@@ -132,9 +135,18 @@ function routesFor(overrides: {
   locations?: readonly object[];
 }): FakeRoute[] {
   return [
-    { match: /select distinct b\.sector/, rows: overrides.sectors ?? [{ sector: "Plumbing" }] },
-    { match: /select distinct b\.locality/, rows: overrides.locations ?? [{ locality: "Maidstone" }] },
-    { match: /select count\(\*\)::int as count/, rows: [{ count: overrides.count ?? 1 }] },
+    {
+      match: /select distinct b\.sector/,
+      rows: overrides.sectors ?? [{ sector: "Plumbing" }],
+    },
+    {
+      match: /select distinct b\.locality/,
+      rows: overrides.locations ?? [{ locality: "Maidstone" }],
+    },
+    {
+      match: /select count\(\*\)::int as count/,
+      rows: [{ count: overrides.count ?? 1 }],
+    },
     { match: /"prospectId"/, rows: overrides.rows ?? [sampleRow] },
   ];
 }
@@ -176,7 +188,10 @@ test("parseProspectListQuery drops search text that exceeds the safe length", ()
 
 test("parseProspectListQuery only accepts known enum values", () => {
   for (const value of FIT_SCORE_BAND_VALUES) {
-    assert.equal(parseProspectListQuery({ fitScoreMin: value }).fitScoreMin, value);
+    assert.equal(
+      parseProspectListQuery({ fitScoreMin: value }).fitScoreMin,
+      value,
+    );
   }
   for (const value of STATUS_FILTER_VALUES) {
     assert.equal(parseProspectListQuery({ status: value }).status, value);
@@ -185,19 +200,28 @@ test("parseProspectListQuery only accepts known enum values", () => {
     assert.equal(parseProspectListQuery({ outreach: value }).outreach, value);
   }
   for (const value of SUPPRESSION_FILTER_VALUES) {
-    assert.equal(parseProspectListQuery({ suppressed: value }).suppressed, value);
+    assert.equal(
+      parseProspectListQuery({ suppressed: value }).suppressed,
+      value,
+    );
   }
 });
 
 test("prospect cursors round-trip and reject malformed input", () => {
-  const cursor = encodeProspectCursor(91, "00000000-0000-0000-0000-000000000001");
+  const cursor = encodeProspectCursor(
+    91,
+    "00000000-0000-0000-0000-000000000001",
+  );
   assert.deepEqual(decodeProspectCursor(cursor), {
     fitScore: 91,
     prospectId: "00000000-0000-0000-0000-000000000001",
   });
 
   assert.equal(decodeProspectCursor("not-base64-!!"), null);
-  assert.equal(decodeProspectCursor(Buffer.from("no-separator").toString("base64url")), null);
+  assert.equal(
+    decodeProspectCursor(Buffer.from("no-separator").toString("base64url")),
+    null,
+  );
   assert.equal(
     decodeProspectCursor(Buffer.from("abc:").toString("base64url")),
     null,
@@ -276,8 +300,13 @@ test("getProspectListResult filters by suppression state without leaking emails 
   const { db: contactableDb, queries: contactableQueries } = createFakeGrowthDb(
     routesFor({}),
   );
-  await getProspectListResult(baseQuery({ suppressed: "contactable" }), contactableDb);
-  const contactableQuery = contactableQueries.find((q) => q.text.includes('"prospectId"'));
+  await getProspectListResult(
+    baseQuery({ suppressed: "contactable" }),
+    contactableDb,
+  );
+  const contactableQuery = contactableQueries.find((q) =>
+    q.text.includes('"prospectId"'),
+  );
   assert.ok(contactableQuery);
   assert.match(contactableQuery.text, /not exists \(/);
 });

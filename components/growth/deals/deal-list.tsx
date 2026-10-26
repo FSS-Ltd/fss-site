@@ -17,24 +17,31 @@ import type { ViewState } from "@/lib/growth/dashboard/view-models";
 
 import styles from "./deals.module.css";
 
-const STAGE_LABELS: Record<(typeof DEAL_STAGE_FILTER_VALUES)[number], string> = {
-  all: "All stages",
-  new: "New",
-  qualified: "Qualified",
-  proposal: "Proposal",
-  negotiation: "Negotiation",
-  won: "Won",
-  lost: "Lost",
-};
+const STAGE_LABELS: Record<(typeof DEAL_STAGE_FILTER_VALUES)[number], string> =
+  {
+    all: "All stages",
+    new: "New",
+    qualified: "Qualified",
+    proposal: "Proposal",
+    negotiation: "Negotiation",
+    won: "Won",
+    lost: "Lost",
+  };
 
-const VALUE_BAND_LABELS: Record<(typeof DEAL_VALUE_BAND_VALUES)[number], string> = {
+const VALUE_BAND_LABELS: Record<
+  (typeof DEAL_VALUE_BAND_VALUES)[number],
+  string
+> = {
   all: "Any value",
   "50000": "£500+",
   "200000": "£2,000+",
   "500000": "£5,000+",
 };
 
-const NEXT_ACTION_LABELS: Record<(typeof DEAL_NEXT_ACTION_FILTER_VALUES)[number], string> = {
+const NEXT_ACTION_LABELS: Record<
+  (typeof DEAL_NEXT_ACTION_FILTER_VALUES)[number],
+  string
+> = {
   all: "Any next action",
   overdue: "Overdue",
   upcoming: "Upcoming",
@@ -48,7 +55,8 @@ function buildDealsHref(
   const merged = { ...query, ...overrides };
   const params = new URLSearchParams();
   if (merged.stage !== "all") params.set("stage", merged.stage);
-  if (merged.valueBandMin !== "all") params.set("valueBandMin", merged.valueBandMin);
+  if (merged.valueBandMin !== "all")
+    params.set("valueBandMin", merged.valueBandMin);
   if (merged.owner) params.set("owner", merged.owner);
   if (merged.nextAction !== "all") params.set("nextAction", merged.nextAction);
   if (merged.after) params.set("after", merged.after);
@@ -60,7 +68,10 @@ function buildDealsHref(
 function DealValueCell({ row }: { row: DealListRow }) {
   return (
     <span className={styles.value}>
-      {formatGrowthCurrency(row.valuePence)}
+      {formatGrowthCurrency(row.oneOffValuePence)} one-off
+      <span className={styles.valueKind}>
+        {formatGrowthCurrency(row.monthlyValuePence)}/month
+      </span>
       <span className={styles.valueKind}>
         {row.valueKind === "agreed" ? "Agreed" : "Estimated"}
       </span>
@@ -85,7 +96,9 @@ export function DealList({
     return (
       <div className={styles.errorState} role="alert">
         <p>{state.message}</p>
-        <p className={styles.errorCorrelation}>Reference: {state.correlationId}</p>
+        <p className={styles.errorCorrelation}>
+          Reference: {state.correlationId}
+        </p>
       </div>
     );
   }
@@ -103,12 +116,16 @@ export function DealList({
         <div>
           <h1 className={styles.heading}>Deals</h1>
           <p className={styles.subtitle}>
-            Every commercial opportunity, open or closed, with its current decision record.
+            Every commercial opportunity, open or closed, with its current
+            decision record.
           </p>
         </div>
       </div>
 
-      <form action="/growth/deals" className={`${styles.card} ${styles.filtersForm}`}>
+      <form
+        action="/growth/deals"
+        className={`${styles.card} ${styles.filtersForm}`}
+      >
         <div className={styles.filtersRow}>
           <label className={styles.field}>
             <span className={styles.fieldLabel}>Stage</span>
@@ -126,7 +143,9 @@ export function DealList({
           </label>
 
           <label className={styles.field}>
-            <span className={styles.fieldLabel}>Value</span>
+            <span className={styles.fieldLabel}>
+              One-off + one month minimum
+            </span>
             <select
               className={styles.select}
               defaultValue={query.valueBandMin}
@@ -205,7 +224,7 @@ export function DealList({
                   <th scope="col">Business</th>
                   <th scope="col">Offer focus</th>
                   <th scope="col">Stage</th>
-                  <th scope="col">Value</th>
+                  <th scope="col">One-off and monthly</th>
                   <th scope="col">Next action</th>
                   <th scope="col">Action</th>
                 </tr>
@@ -214,7 +233,9 @@ export function DealList({
                 {data.rows.map((row) => (
                   <tr key={row.engagementId}>
                     <td>
-                      <span className={styles.business}>{row.businessName}</span>
+                      <span className={styles.business}>
+                        {row.businessName}
+                      </span>
                       {row.primaryContactName && (
                         <span className={styles.sectorLocation}>
                           {row.primaryContactName}
@@ -223,7 +244,10 @@ export function DealList({
                     </td>
                     <td className={styles.sectorLocation}>{row.offerFocus}</td>
                     <td>
-                      <span className={styles.pill} data-tone={stageTone(row.stage)}>
+                      <span
+                        className={styles.pill}
+                        data-tone={stageTone(row.stage)}
+                      >
                         {formatGrowthStatusLabel(row.stage)}
                       </span>
                     </td>
@@ -239,7 +263,11 @@ export function DealList({
                         href={`/growth/deals/${row.engagementId}`}
                       >
                         View
-                        <ArrowRight aria-hidden="true" size={14} strokeWidth={2} />
+                        <ArrowRight
+                          aria-hidden="true"
+                          size={14}
+                          strokeWidth={2}
+                        />
                       </Link>
                     </td>
                   </tr>
@@ -276,7 +304,11 @@ export function DealList({
               <Link
                 aria-disabled={!data.nextCursor}
                 className={styles.paginationLink}
-                href={data.nextCursor ? buildDealsHref(query, { after: data.nextCursor }) : "#"}
+                href={
+                  data.nextCursor
+                    ? buildDealsHref(query, { after: data.nextCursor })
+                    : "#"
+                }
               >
                 Next page
               </Link>

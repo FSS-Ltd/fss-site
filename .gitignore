@@ -50,3 +50,7 @@ CLAUDE.md
 
 # local Git worktrees
 .worktrees/
+
+# Growth CRM browser verification artifacts
+/output/playwright-growth-crm/
+/output/growth-crm-*.png

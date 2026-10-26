@@ -261,3 +261,26 @@ test("research-only prospects do not request generated visuals or sending approv
   assert.equal(readiness.reasons.length, 1);
   assert.match(readiness.reasons[0] ?? "", /Research only/);
 });
+
+test("approval readiness holds manually sourced contacts until corporate eligibility is verified", () => {
+  const source = baseProspect();
+  assert.ok(source.contact);
+  const readiness = evaluateApprovalReadiness(
+    { ...source, contact: { ...source.contact, subscriberType: "uncertain" } },
+    healthyIntegrations,
+    NOW,
+  );
+  assert.equal(readiness.ready, false);
+});
+test("approval readiness holds inactive corporate identities", () => {
+  const source = baseProspect();
+  const readiness = evaluateApprovalReadiness(
+    {
+      ...source,
+      business: { ...source.business, corporateStatus: "inactive" },
+    },
+    healthyIntegrations,
+    NOW,
+  );
+  assert.equal(readiness.ready, false);
+});

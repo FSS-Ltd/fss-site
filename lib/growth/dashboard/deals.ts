@@ -2,7 +2,11 @@ import { randomUUID } from "node:crypto";
 
 import { getGrowthDb } from "../db/client";
 import type { GrowthQueryExecutor } from "../db/types";
-import { COMMERCIAL_STAGES, type CommercialStage, type DeliveryStatus } from "../pipeline/stages";
+import {
+  COMMERCIAL_STAGES,
+  type CommercialStage,
+  type DeliveryStatus,
+} from "../pipeline/stages";
 import type { ViewState } from "./view-models";
 
 const PAGE_SIZE = 20;
@@ -26,7 +30,12 @@ export const DEAL_STAGE_FILTER_VALUES = ["all", ...COMMERCIAL_STAGES] as const;
 export type DealStageFilter = (typeof DEAL_STAGE_FILTER_VALUES)[number];
 
 // Minimum-value bands in pence: all, £500+, £2,000+, £5,000+.
-export const DEAL_VALUE_BAND_VALUES = ["all", "50000", "200000", "500000"] as const;
+export const DEAL_VALUE_BAND_VALUES = [
+  "all",
+  "50000",
+  "200000",
+  "500000",
+] as const;
 export type DealValueBand = (typeof DEAL_VALUE_BAND_VALUES)[number];
 
 export const DEAL_NEXT_ACTION_FILTER_VALUES = [
@@ -35,7 +44,8 @@ export const DEAL_NEXT_ACTION_FILTER_VALUES = [
   "upcoming",
   "none",
 ] as const;
-export type DealNextActionFilter = (typeof DEAL_NEXT_ACTION_FILTER_VALUES)[number];
+export type DealNextActionFilter =
+  (typeof DEAL_NEXT_ACTION_FILTER_VALUES)[number];
 
 export type DealListQuery = {
   stage: DealStageFilter;
@@ -53,6 +63,8 @@ export type DealListRow = {
   offerFocus: string;
   stage: CommercialStage;
   valuePence: number;
+  oneOffValuePence: number;
+  monthlyValuePence: number;
   valueKind: DealValueKind;
   nextAction: string | null;
   nextActionDueAt: string | null;
@@ -86,12 +98,17 @@ function parseEnumParam<const T extends readonly string[]>(
 
 const OWNER_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export function parseDealListQuery(searchParams: RawSearchParams): DealListQuery {
+export function parseDealListQuery(
+  searchParams: RawSearchParams,
+): DealListQuery {
   const owner = (firstValue(searchParams.owner) ?? "").trim();
   const after = (firstValue(searchParams.after) ?? "").trim();
 
   return {
-    stage: parseEnumParam(DEAL_STAGE_FILTER_VALUES, firstValue(searchParams.stage)),
+    stage: parseEnumParam(
+      DEAL_STAGE_FILTER_VALUES,
+      firstValue(searchParams.stage),
+    ),
     valueBandMin: parseEnumParam(
       DEAL_VALUE_BAND_VALUES,
       firstValue(searchParams.valueBandMin),
@@ -108,7 +125,10 @@ export function parseDealListQuery(searchParams: RawSearchParams): DealListQuery
 type DealCursor = { updatedAt: string; engagementId: string };
 
 export function encodeDealCursor(row: DealListRow): string {
-  const cursor: DealCursor = { updatedAt: row.updatedAt, engagementId: row.engagementId };
+  const cursor: DealCursor = {
+    updatedAt: row.updatedAt,
+    engagementId: row.engagementId,
+  };
   return Buffer.from(JSON.stringify(cursor), "utf8").toString("base64url");
 }
 
@@ -132,14 +152,17 @@ export function decodeDealCursor(value: string): DealCursor | null {
 }
 
 function buildFilterFragments(db: GrowthQueryExecutor, query: DealListQuery) {
-  const stage = query.stage === "all" ? db`` : db`and de.stage = ${query.stage}`;
+  const stage =
+    query.stage === "all" ? db`` : db`and de.stage = ${query.stage}`;
 
   const valueBandMin =
     query.valueBandMin === "all"
       ? db``
       : db`and (coalesce(de.one_off_value_pence, 0) + coalesce(de.monthly_value_pence, 0)) >= ${Number(query.valueBandMin)}`;
 
-  const owner = query.owner ? db`and p.assigned_owner_email = ${query.owner}` : db``;
+  const owner = query.owner
+    ? db`and p.assigned_owner_email = ${query.owner}`
+    : db``;
 
   const nextAction =
     query.nextAction === "all"
@@ -167,7 +190,10 @@ async function fetchDealRows(
     : db``;
 
   const rows = await db<
-    (Omit<DealListRow, "valueKind" | "updatedAt"> & { updatedAt: Date })[]
+    (Omit<DealListRow, "valueKind" | "updatedAt" | "nextActionDueAt"> & {
+      updatedAt: Date;
+      nextActionDueAt: Date | null;
+    })[]
   >`
     select
       de.id as "engagementId",
@@ -176,6 +202,8 @@ async function fetchDealRows(
       c.first_name || ' ' || c.last_name as "primaryContactName",
       de.name as "offerFocus",
       de.stage,
+      coalesce(de.one_off_value_pence,0) as "oneOffValuePence",
+      coalesce(de.monthly_value_pence,0) as "monthlyValuePence",
       (coalesce(de.one_off_value_pence, 0) + coalesce(de.monthly_value_pence, 0)) as "valuePence",
       p.next_action as "nextAction",
       p.next_action_due_at as "nextActionDueAt",
@@ -200,6 +228,7 @@ async function fetchDealRows(
     ...row,
     valueKind: valueKindForStage(row.stage),
     updatedAt: row.updatedAt.toISOString(),
+    nextActionDueAt: row.nextActionDueAt?.toISOString() ?? null,
   }));
   const last = shaped.at(-1);
 
@@ -441,7 +470,10 @@ async function fetchEvidence(
     limit ${MAX_EVIDENCE_ITEMS}
   `;
 
-  return rows.map((row) => ({ ...row, observedAt: row.observedAt.toISOString() }));
+  return rows.map((row) => ({
+    ...row,
+    observedAt: row.observedAt.toISOString(),
+  }));
 }
 
 async function fetchCommercialHistory(
@@ -459,7 +491,10 @@ async function fetchCommercialHistory(
     limit ${MAX_HISTORY_ENTRIES}
   `;
 
-  return rows.map((row) => ({ ...row, occurredAt: row.occurredAt.toISOString() }));
+  return rows.map((row) => ({
+    ...row,
+    occurredAt: row.occurredAt.toISOString(),
+  }));
 }
 
 function toDealDetail(
@@ -517,7 +552,9 @@ function toDealDetail(
     opportunitySummary: core.opportunitySummary,
     proposedScope: core.proposedScope,
     nextAction: core.nextAction,
-    nextActionDueAt: core.nextActionDueAt ? core.nextActionDueAt.toISOString() : null,
+    nextActionDueAt: core.nextActionDueAt
+      ? core.nextActionDueAt.toISOString()
+      : null,
     correspondence,
     evidence,
     commercialHistory,

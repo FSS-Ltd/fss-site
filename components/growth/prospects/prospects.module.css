@@ -676,3 +676,10 @@
   display: grid;
   gap: 20px;
 }
+
+.nextStep {
+  margin: 6px 0 0;
+  color: #526078;
+  font-size: 0.75rem;
+  line-height: 1.5;
+}

@@ -40,6 +40,7 @@ function baseQuery(
 const sampleRow = {
   prospectId: "prospect-1",
   businessName: "Smith & Sons Plumbing Ltd",
+  primaryContactName: "Daniel Smith",
   websiteUrl: "https://smithandsonsplumbing.co.uk",
   sector: "Plumbing",
   location: "Maidstone",

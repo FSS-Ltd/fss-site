@@ -227,3 +227,57 @@ test(
       );
     }),
 );
+
+test(
+  "duplicate saved-view names return a view-specific conflict",
+  { skip: !connection },
+  async () =>
+    withCrmTestDatabase(async (sql) => {
+      const id = randomUUID();
+      const name = "Duplicate " + id;
+      try {
+        await executeCrmCommand(
+          sql,
+          {
+            kind: "save_view",
+            requestId: id,
+            name,
+            filters: {
+              q: "",
+              stage: "all",
+              sector: "",
+              location: "",
+              nextAction: "all",
+              view: "board",
+            },
+          },
+          founder,
+          randomUUID(),
+        );
+        await assert.rejects(
+          executeCrmCommand(
+            sql,
+            {
+              kind: "save_view",
+              requestId: randomUUID(),
+              name,
+              filters: {
+                q: "",
+                stage: "all",
+                sector: "",
+                location: "",
+                nextAction: "all",
+                view: "list",
+              },
+            },
+            founder,
+            randomUUID(),
+          ),
+          (e: unknown) => e instanceof CrmError && e.code === "duplicate_view",
+        );
+      } finally {
+        await sql`delete from growth.crm_saved_views where id=${id}`;
+        await sql`delete from growth.audit_log where entity_id=${id}`;
+      }
+    }),
+);

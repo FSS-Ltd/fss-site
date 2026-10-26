@@ -1,3 +1,7 @@
+import {
+  RecordWorkspace,
+  parseWorkspaceQuery,
+} from "@/components/growth/crm/record-workspace";
 import { notFound } from "next/navigation";
 
 import { DealDetailView } from "@/components/growth/deals/deal-detail";
@@ -6,9 +10,13 @@ import { getDealDetail } from "@/lib/growth/dashboard/deals";
 
 type DealDetailPageProps = {
   params: Promise<{ engagementId: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-export default async function DealDetailPage({ params }: DealDetailPageProps) {
+export default async function DealDetailPage({
+  params,
+  searchParams,
+}: DealDetailPageProps) {
   const { engagementId } = await params;
   const result = await getDealDetail(engagementId);
 
@@ -20,10 +28,23 @@ export default async function DealDetailPage({ params }: DealDetailPageProps) {
     return (
       <div className={styles.errorState} role="alert">
         <p>{result.message}</p>
-        <p className={styles.errorCorrelation}>Reference: {result.correlationId}</p>
+        <p className={styles.errorCorrelation}>
+          Reference: {result.correlationId}
+        </p>
       </div>
     );
   }
 
-  return <DealDetailView deal={result.data} />;
+  return (
+    <DealDetailView
+      deal={result.data}
+      workspace={
+        <RecordWorkspace
+          prospectId={result.data.prospectId}
+          basePath={`/growth/deals/${engagementId}`}
+          query={parseWorkspaceQuery(await searchParams)}
+        />
+      }
+    />
+  );
 }

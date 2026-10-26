@@ -111,6 +111,8 @@ function sampleListDbRow(overrides: Partial<Record<string, unknown>> = {}) {
     offerFocus: "Website + AI Enquiry Agent",
     stage: "proposal",
     valuePence: 650_000,
+    oneOffValuePence: 600_000,
+    monthlyValuePence: 50_000,
     nextAction: "Send proposal",
     nextActionDueAt: null,
     updatedAt: new Date("2026-08-20T09:00:00.000Z"),
@@ -118,12 +120,17 @@ function sampleListDbRow(overrides: Partial<Record<string, unknown>> = {}) {
   };
 }
 
-function listRoutes(overrides: {
-  rows?: readonly object[];
-  count?: number;
-} = {}): FakeRoute[] {
+function listRoutes(
+  overrides: {
+    rows?: readonly object[];
+    count?: number;
+  } = {},
+): FakeRoute[] {
   return [
-    { match: /select count\(\*\)::int as count/, rows: [{ count: overrides.count ?? 1 }] },
+    {
+      match: /select count\(\*\)::int as count/,
+      rows: [{ count: overrides.count ?? 1 }],
+    },
     { match: /"engagementId"/, rows: overrides.rows ?? [sampleListDbRow()] },
   ];
 }
@@ -146,7 +153,9 @@ test("parseDealListQuery defaults every filter to unset and canonicalises invali
 });
 
 test("parseDealListQuery accepts a valid owner email", () => {
-  const query = parseDealListQuery({ owner: "j.ntagengwa@faithfulsoftware.dev" });
+  const query = parseDealListQuery({
+    owner: "j.ntagengwa@faithfulsoftware.dev",
+  });
   assert.equal(query.owner, "j.ntagengwa@faithfulsoftware.dev");
 });
 
@@ -159,6 +168,8 @@ test("deal cursors round-trip and reject malformed input", () => {
     offerFocus: "Website + AI Enquiry Agent",
     stage: "proposal",
     valuePence: 650_000,
+    oneOffValuePence: 600_000,
+    monthlyValuePence: 50_000,
     valueKind: "estimated",
     nextAction: null,
     nextActionDueAt: null,
@@ -202,7 +213,9 @@ test("getDealListResult filters overdue vs upcoming vs no next action", async ()
 
 test("getDealListResult labels value as agreed once won and estimated otherwise", async () => {
   const { db } = createFakeGrowthDb(
-    listRoutes({ rows: [sampleListDbRow({ stage: "won", engagementId: "won-1" })] }),
+    listRoutes({
+      rows: [sampleListDbRow({ stage: "won", engagementId: "won-1" })],
+    }),
   );
   const state = await getDealListResult(baseQuery(), db);
   assert.equal(state.status, "ready");
@@ -239,7 +252,11 @@ test("getDealListResult fails safe with a correlation ID when a query throws", a
     throw new Error("connection refused");
   }) as unknown as GrowthQueryExecutor;
 
-  const state = await getDealListResult(baseQuery(), db, () => "fixed-correlation-id");
+  const state = await getDealListResult(
+    baseQuery(),
+    db,
+    () => "fixed-correlation-id",
+  );
   assert.deepEqual(state, {
     status: "error",
     message: "The deal list could not load.",
@@ -287,15 +304,20 @@ function sampleCoreRow(overrides: Partial<Record<string, unknown>> = {}) {
   };
 }
 
-function detailRoutes(overrides: {
-  core?: readonly object[];
-  evidence?: readonly object[];
-  history?: readonly object[];
-} = {}): FakeRoute[] {
+function detailRoutes(
+  overrides: {
+    core?: readonly object[];
+    evidence?: readonly object[];
+    history?: readonly object[];
+  } = {},
+): FakeRoute[] {
   return [
     { match: /"engagementId"/, rows: overrides.core ?? [sampleCoreRow()] },
     { match: /from growth\.source_evidence/, rows: overrides.evidence ?? [] },
-    { match: /from growth\.commercial_stage_events/, rows: overrides.history ?? [] },
+    {
+      match: /from growth\.commercial_stage_events/,
+      rows: overrides.history ?? [],
+    },
   ];
 }
 
@@ -326,7 +348,12 @@ test("getDealDetail shows an open deal with an estimated value", async () => {
 test("getDealDetail shows a won deal with an agreed value", async () => {
   const { db } = createFakeGrowthDb(
     detailRoutes({
-      core: [sampleCoreRow({ stage: "won", wonAt: new Date("2026-08-21T09:00:00.000Z") })],
+      core: [
+        sampleCoreRow({
+          stage: "won",
+          wonAt: new Date("2026-08-21T09:00:00.000Z"),
+        }),
+      ],
     }),
   );
   const state = await getDealDetail(ENGAGEMENT_ID, db);
@@ -371,7 +398,9 @@ test("getDealDetail orders commercial history newest first", async () => {
       occurredAt: new Date("2026-08-10T09:00:00.000Z"),
     },
   ];
-  const { db, queries } = createFakeGrowthDb(detailRoutes({ history: historyRows }));
+  const { db, queries } = createFakeGrowthDb(
+    detailRoutes({ history: historyRows }),
+  );
   const state = await getDealDetail(ENGAGEMENT_ID, db);
   assert.equal(state.status, "found");
   if (state.status !== "found") return;
@@ -380,7 +409,9 @@ test("getDealDetail orders commercial history newest first", async () => {
     ["event-2", "event-1"],
   );
 
-  const historyQuery = queries.find((q) => q.text.includes("commercial_stage_events"));
+  const historyQuery = queries.find((q) =>
+    q.text.includes("commercial_stage_events"),
+  );
   assert.ok(historyQuery);
   assert.match(historyQuery.text, /dimension = 'commercial'/);
   assert.match(historyQuery.text, /order by occurred_at desc/);
@@ -422,18 +453,26 @@ test("getDealDetail resolves correspondence to metadata only, with no message bo
 
 test("two engagements for the same business are both visible independently", async () => {
   const rows = [
-    sampleListDbRow({ engagementId: "deal-a", businessName: "Acme Ltd", stage: "lost" }),
-    sampleListDbRow({ engagementId: "deal-b", businessName: "Acme Ltd", stage: "qualified" }),
+    sampleListDbRow({
+      engagementId: "deal-a",
+      businessName: "Acme Ltd",
+      stage: "lost",
+    }),
+    sampleListDbRow({
+      engagementId: "deal-b",
+      businessName: "Acme Ltd",
+      stage: "qualified",
+    }),
   ];
   const { db } = createFakeGrowthDb(listRoutes({ rows, count: 2 }));
   const state = await getDealListResult(baseQuery(), db);
   assert.equal(state.status, "ready");
   if (state.status !== "ready") return;
   assert.equal(state.data.rows.length, 2);
-  assert.deepEqual(
-    state.data.rows.map((row) => row.engagementId).sort(),
-    ["deal-a", "deal-b"],
-  );
+  assert.deepEqual(state.data.rows.map((row) => row.engagementId).sort(), [
+    "deal-a",
+    "deal-b",
+  ]);
 });
 
 test("getDealDetail fails safe with a correlation ID when a query throws", async () => {
@@ -441,10 +480,31 @@ test("getDealDetail fails safe with a correlation ID when a query throws", async
     throw new Error("connection refused");
   }) as unknown as GrowthQueryExecutor;
 
-  const state = await getDealDetail(ENGAGEMENT_ID, db, () => "fixed-correlation-id");
+  const state = await getDealDetail(
+    ENGAGEMENT_ID,
+    db,
+    () => "fixed-correlation-id",
+  );
   assert.deepEqual(state, {
     status: "error",
     message: "The deal record could not load.",
     correlationId: "fixed-correlation-id",
   });
+});
+
+test("deal list serializes dated next steps for the CRM boundary", async () => {
+  const { db } = createFakeGrowthDb(
+    listRoutes({
+      rows: [
+        sampleListDbRow({ nextActionDueAt: new Date("2026-10-28T10:00:00Z") }),
+      ],
+    }),
+  );
+  const state = await getDealListResult(baseQuery(), db);
+  assert.equal(state.status, "ready");
+  if (state.status === "ready")
+    assert.equal(
+      state.data.rows[0]?.nextActionDueAt,
+      "2026-10-28T10:00:00.000Z",
+    );
 });
