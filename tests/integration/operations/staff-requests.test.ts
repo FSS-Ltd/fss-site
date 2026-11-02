@@ -256,7 +256,7 @@ test("staff can read the request email delivery queue but not change it", async 
 
     // Both the grant and the row policy are needed: without the policy the
     // query succeeds but returns nothing.
-    const page = await listStudioNotifications(founder, adminContext, {});
+    const page = await listStudioNotifications(founder, adminContext, { page: 1 });
     const seeded = page.items.find((item) => item.id === delivery.id);
     assert.ok(seeded, "staff see the seeded delivery");
     assert.notEqual(seeded.recipientLabel, "owner@example.test");
