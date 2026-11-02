@@ -22,6 +22,34 @@ test("invitation feedback never reveals an email returned by the provider", () =
   );
 });
 
+test("a replaced, revoked or expired ticket explains which email to use", () => {
+  for (const error of [
+    { errors: [{ code: "ticket_invalid_code", message: "ticket is invalid" }] },
+    Object.assign(new Error("Ticket invalid"), {
+      errors: [{ code: "ticket_invalid", message: "Ticket invalid" }],
+    }),
+    { code: "invitation_revoked", message: "Invitation revoked" },
+  ])
+    assert.match(
+      clerkErrorMessage(error, "Try again."),
+      /replaced or is no longer valid\. Use the most recent email from FSS/,
+    );
+  assert.match(
+    clerkErrorMessage(
+      { errors: [{ code: "ticket_expired_code", message: "expired" }] },
+      "Try again.",
+    ),
+    /expired/,
+  );
+  assert.equal(
+    clerkErrorMessage(
+      { errors: [{ code: "form_password_pwned", message: "Choose another password." }] },
+      "Try again.",
+    ),
+    "Choose another password.",
+  );
+});
+
 test("invitation signup supplies the ticket and password together and routes through the access claim", async () => {
   const calls: unknown[] = [];
   const navigated: string[] = [];

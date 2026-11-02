@@ -12,7 +12,29 @@ type InvitationSignUp = Pick<
   }) => Promise<{ error: unknown }>;
 };
 
+const replacedTicketMessage =
+  "This invitation was replaced or is no longer valid. Use the most recent email from FSS, or ask your FSS contact for a new invitation.";
+const expiredTicketMessage =
+  "This invitation has expired. Ask your FSS contact for a new invitation.";
+
+function clerkErrorCode(error: object): string | undefined {
+  const errors: unknown = "errors" in error ? error.errors : undefined;
+  const first: unknown = Array.isArray(errors) ? errors[0] : error;
+  return first &&
+    typeof first === "object" &&
+    "code" in first &&
+    typeof first.code === "string"
+    ? first.code
+    : undefined;
+}
+
 export function clerkErrorMessage(error: unknown, fallback: string): string {
+  const code =
+    error && typeof error === "object" ? clerkErrorCode(error) : undefined;
+  if (code && /ticket|invitation/.test(code))
+    return code.includes("expired")
+      ? expiredTicketMessage
+      : replacedTicketMessage;
   if (error instanceof Error)
     return error.message.includes("@") ? fallback : error.message;
   if (!error || typeof error !== "object") return fallback;
