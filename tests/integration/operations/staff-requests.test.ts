@@ -17,6 +17,7 @@ import {
   revokeStaffMembership,
 } from "../../../lib/operations/auth/staff-invitations";
 import type { FssAdminContext } from "../../../lib/operations/auth/staff-types";
+import { listStudioNotifications } from "../../../lib/operations/studio/operations-queues";
 
 const url = requireOperationsTestDatabaseUrl(
   process.env.OPERATIONS_TEST_DATABASE_URL,
@@ -208,6 +209,65 @@ test("revoked staff members lose request access on the next command", async () =
         f.correlationId,
       ),
     );
+  } finally {
+    await removeRequestFixture(admin, f);
+    await portalRole.end();
+    await admin.end();
+    await founder.end();
+    await portal.end();
+  }
+});
+
+test("staff can read the request email delivery queue but not change it", async () => {
+  const admin = postgres(url, { max: 1 });
+  const founder = postgres(url, {
+    max: 4,
+    connection: { options: "-c role=operations_founder" },
+  });
+  const portal = postgres(url, {
+    max: 4,
+    connection: { options: "-c role=operations_portal" },
+  });
+  const f = await requestFixture(admin, founder);
+  const portalRole = postgres(url, {
+    max: 1,
+    connection: { options: "-c role=operations_portal" },
+  });
+  const adminContext = await staffAdminFixture(
+    admin,
+    portalRole,
+    `${randomUUID()}@example.test`,
+  );
+  try {
+    const request = await createPortalRequest(
+      portal,
+      f.identity,
+      f.organisationId,
+      newRequest(f.projectId),
+      f.correlationId,
+    );
+    const [outbox] = await admin<{ id: string }[]>`
+      insert into operations.request_notification_outbox(organisation_id, request_id, kind)
+      values (${f.organisationId}, ${request.id}, 'review_requested') returning id`;
+    const [delivery] = await admin<{ id: string }[]>`
+      insert into operations.request_email_deliveries(organisation_id, request_id, outbox_id, kind, recipient)
+      values (${f.organisationId}, ${request.id}, ${outbox.id}, 'review_requested', 'owner@example.test')
+      returning id`;
+
+    // Both the grant and the row policy are needed: without the policy the
+    // query succeeds but returns nothing.
+    const page = await listStudioNotifications(founder, adminContext, { page: 1 });
+    const seeded = page.items.find((item) => item.id === delivery.id);
+    assert.ok(seeded, "staff see the seeded delivery");
+    assert.notEqual(seeded.recipientLabel, "owner@example.test");
+
+    const [privileges] = await admin<
+      { read: boolean; write: boolean; portal: boolean }[]
+    >`select
+        has_table_privilege('operations_founder','operations.request_email_deliveries','select') as read,
+        has_table_privilege('operations_founder','operations.request_email_deliveries','insert,update,delete') as write,
+        has_table_privilege('operations_portal','operations.request_email_deliveries','select') as portal`;
+    assert.deepEqual(privileges, { read: true, write: false, portal: false });
   } finally {
     await removeRequestFixture(admin, f);
     await portalRole.end();
