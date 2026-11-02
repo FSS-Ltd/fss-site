@@ -11,6 +11,7 @@ import { totalLinePence } from "@/lib/operations/agreements/validation";
 import { portalPath } from "@/lib/operations/auth/portal-url";
 import type { SigningApproval } from "@/lib/operations/agreements/signing-types";
 import { AgreementLifecycleActions } from "./agreement-lifecycle-actions";
+import { SigningDeadlineActions } from "./signing-deadline-actions";
 import {
   allRequiredSignaturesRecorded,
   hasCompleteSigningEvidence,
@@ -57,8 +58,12 @@ export function StaffAgreementDetail({
               : "Open for signing"
             : currentSigning.status === "completed"
               ? "Evidence needs review"
-              : "Signing request closed"
+              : currentSigning.status === "expired"
+                ? "Signing deadline expired"
+                : "Signing request closed"
         : null;
+  const signingExpired =
+    record.status === "draft" && currentSigning?.status === "expired";
   const workspaceHref = portalPath(
     `/portal/admin/clients/${encodeURIComponent(organisationId)}/agreements`,
   );
@@ -70,7 +75,15 @@ export function StaffAgreementDetail({
     <article className={styles.detail}>
       <div className={styles.detailStatus}>
         <StatusBadge
-          status={signed ? "success" : currentSigning ? "info" : "warning"}
+          status={
+            signed
+              ? "success"
+              : signingExpired
+                ? "warning"
+                : currentSigning
+                  ? "info"
+                  : "warning"
+          }
         >
           {record.archivedAt
             ? "Archived"
@@ -82,12 +95,14 @@ export function StaffAgreementDetail({
           {record.draft.title} · Revision {record.revision}
         </span>
       </div>
-      <AgreementLifecycleActions
-        record={record}
-        organisationId={organisationId}
-        hasSigningRequest={hasSigningRequest}
-        listHref={workspaceHref}
-      />
+      {signingExpired ? null : (
+        <AgreementLifecycleActions
+          record={record}
+          organisationId={organisationId}
+          hasSigningRequest={hasSigningRequest}
+          listHref={workspaceHref}
+        />
+      )}
       {signed ? (
         <Notice tone="success">
           <strong>
@@ -100,6 +115,12 @@ export function StaffAgreementDetail({
             activation remains a separate operational step.
           </p>
         </Notice>
+      ) : signingExpired && currentSigning ? (
+        <SigningDeadlineActions
+          approval={currentSigning}
+          agreement={{ id: record.id, version: record.version }}
+          organisationId={organisationId}
+        />
       ) : currentSigning ? (
         <PortalCard
           description="This revision already has a signing request. Review its exact document and signer evidence before taking another action."

@@ -37,6 +37,7 @@ function statusLabel(approval: SigningApproval, email: string): string {
   if (progress === "ready") return "Your signature needed";
   if (approval.status === "completed") return "Evidence needs review";
   if (status === "awaiting_signature") return "Waiting for signatures";
+  if (approval.status === "expired") return "Signing window closed";
   if (status === "superseded") return "Superseded";
   if (status === "voided") return "Unavailable for signing";
   return "Preparing agreement";

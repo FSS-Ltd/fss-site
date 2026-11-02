@@ -3,6 +3,10 @@ import { notFound } from "next/navigation";
 import { z } from "zod";
 import { SigningForm } from "@/components/operations/signing/signing-form";
 import { StaffSigningStatus } from "@/components/portal/agreements/staff-signing-status";
+import {
+  SigningDeadlineActions,
+  SigningDeadlineOutcomeNotice,
+} from "@/components/portal/agreements/signing-deadline-actions";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import {
   Notice,
@@ -26,8 +30,10 @@ export const dynamic = "force-dynamic";
 
 export default async function StaffClientSigningPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ organisationId: string }>;
+  searchParams: Promise<{ signing?: string | string[] }>;
 }): Promise<React.JSX.Element> {
   if (!operationsEnabled()) notFound();
   if (!portalAuthConfigured()) return <PortalUnavailable />;
@@ -93,6 +99,7 @@ export default async function StaffClientSigningPage({
         eyebrow="FSS Studio / Agreements"
         title="Signing status"
       />
+      <SigningDeadlineOutcomeNotice outcome={(await searchParams).signing} />
       {approvals.length === 0 ? (
         <PortalCard
           description="Prepare a document from an agreement record before it appears here."
@@ -119,7 +126,16 @@ export default async function StaffClientSigningPage({
                 downloadBase={`${apiRoot}/${approval.id}`}
                 commandEndpoint={apiRoot}
                 controls={
-                  signingOpen ? (
+                  approval.status === "expired" ? (
+                    <SigningDeadlineActions
+                      approval={approval}
+                      agreement={{
+                        id: approval.agreementId,
+                        version: approval.agreementVersion,
+                      }}
+                      organisationId={organisationId.data}
+                    />
+                  ) : signingOpen ? (
                     <PortalCard
                       description="Review the retained document and named signers before approval. Approval opens signing but does not record a signature."
                       title={

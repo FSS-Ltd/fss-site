@@ -105,9 +105,9 @@ function presentationFor(approval: SigningApproval): SigningPresentation {
     case "expired":
       return {
         description:
-          "The signing deadline passed before every required signer completed the request.",
-        label: "Expired",
-        tone: "error",
+          "The signing deadline passed before every required signer completed the request. Reopen signing or withdraw the agreement.",
+        label: "Signing deadline expired",
+        tone: "warning",
       };
   }
 }
@@ -206,6 +206,8 @@ export function StaffSigningStatus({
                       ? "Not yet open"
                       : approval.status === "approved"
                         ? "Signature pending"
+                      : approval.status === "expired"
+                        ? "Not signed before deadline"
                         : "No signature retained"}
                   </StatusBadge>
                 )}

@@ -15,6 +15,7 @@ import {
   approveStaffAgreementSigning,
   cancelStaffAgreementSigning,
   retryStaffAgreementSigning,
+  extendStaffAgreementSigning,
   signPortalAgreement,
   declinePortalAgreement,
 } from "./signing-service";
@@ -38,6 +39,11 @@ const portalCommand = z.discriminatedUnion("action", [
 const staffCommand = z.discriminatedUnion("action", [
   ...founderCommand.options,
   z.strictObject({ action: z.literal("retry"), approvalId: z.uuid() }),
+  z.strictObject({
+    action: z.literal("extend"),
+    approvalId: z.uuid(),
+    days: z.number().int(),
+  }),
   z.strictObject({
     action: z.literal("resend_delivery"),
     approvalId: z.uuid(),
@@ -116,6 +122,14 @@ export async function executeStaffSigningCommand(
       admin,
       organisationId,
       command.approvalId,
+      correlationId,
+    );
+  if (command.action === "extend")
+    return extendStaffAgreementSigning(
+      db,
+      admin,
+      organisationId,
+      { approvalId: command.approvalId, days: command.days },
       correlationId,
     );
   if (command.action === "resend_delivery") {

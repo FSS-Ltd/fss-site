@@ -8,13 +8,17 @@ export type AgreementStage =
   | "pricing_choice_requested"
   | "proposal_submitted"
   | "approved"
+  | "signing_expired"
   | "signatures_collected"
   | "completed"
   | "attention_required"
   | "withdrawn";
 
 export function agreementStage(input: {
-  offer?: Pick<CommercialOffer, "status" | "recordedStatus" | "spec"> | null;
+  offer?: Pick<
+    CommercialOffer,
+    "status" | "recordedStatus" | "spec" | "signingStatus"
+  > | null;
   signing?: Pick<
     SigningApproval,
     "status" | "requiredSigners" | "signatures" | "completionFailureCode"
@@ -35,8 +39,9 @@ export function agreementStage(input: {
     )
       return "signatures_collected";
     if (input.signing.status === "approved") return "approved";
+    if (input.signing.status === "expired") return "signing_expired";
     if (
-      ["cancelled", "declined", "superseded", "expired"].includes(
+      ["cancelled", "declined", "superseded"].includes(
         input.signing.status,
       )
     )
@@ -49,7 +54,16 @@ export function agreementStage(input: {
         input.offer.recordedStatus === "proposed")
     )
       return "proposal_submitted";
-    if (input.offer.status === "selected") return "approved";
+    if (input.offer.status === "selected") {
+      if (input.offer.signingStatus === "expired") return "signing_expired";
+      if (
+        ["cancelled", "declined", "superseded"].includes(
+          input.offer.signingStatus ?? "",
+        )
+      )
+        return "withdrawn";
+      return "approved";
+    }
     if (input.offer.status === "withdrawn" || input.offer.status === "expired")
       return "withdrawn";
     if (
@@ -94,6 +108,12 @@ const labels: Record<
     staff: "Awaiting signatures",
     client: "Review and sign",
     description: "The final agreement is open for its named signers.",
+  },
+  signing_expired: {
+    staff: "Signing expired: extend or withdraw",
+    client: "Signing window closed",
+    description:
+      "The signing deadline passed before every required signature was recorded. Signatures already recorded are kept.",
   },
   signatures_collected: {
     staff: "Preparing signed copy",

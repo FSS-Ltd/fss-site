@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { draftSchema, money, totalLinePence } from "./validation";
 import type { AgreementDraft } from "./types";
+import type { SigningApproval } from "./signing-types";
 
 const terms = {
   revenueSource: z.string().trim().min(1).max(4000),
@@ -146,6 +147,8 @@ export type CommercialOffer = {
   rejectionReason: string | null;
   approvalId: string | null;
   agreementId: string | null;
+  /** Effective status of the linked signing request, with lapsed deadlines read as expired. */
+  signingStatus?: SigningApproval["status"] | null;
 };
 export function recurringTotalMinor(draft: AgreementDraft): string {
   return draft.lines

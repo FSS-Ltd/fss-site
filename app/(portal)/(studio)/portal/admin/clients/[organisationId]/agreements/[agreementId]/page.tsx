@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { StaffAgreementDetail } from "@/components/portal/agreements/staff-agreement-detail";
+import { SigningDeadlineOutcomeNotice } from "@/components/portal/agreements/signing-deadline-actions";
 import { PortalUnavailable } from "@/components/portal/auth/unavailable";
 import { PageHeader } from "@/components/portal/ui";
 import { getPortalIdentity } from "@/lib/operations/auth/server";
@@ -21,8 +22,10 @@ export const dynamic = "force-dynamic";
 
 export default async function StaffAgreementPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ agreementId: string; organisationId: string }>;
+  searchParams: Promise<{ signing?: string | string[] }>;
 }): Promise<React.JSX.Element> {
   if (!operationsEnabled()) notFound();
   if (!portalAuthConfigured()) return <PortalUnavailable />;
@@ -81,6 +84,7 @@ export default async function StaffAgreementPage({
         eyebrow="FSS Studio / Agreements"
         title={record.draft.title}
       />
+      <SigningDeadlineOutcomeNotice outcome={(await searchParams).signing} />
       <StaffAgreementDetail
         organisationId={organisationId.data}
         record={record}

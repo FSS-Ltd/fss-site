@@ -61,3 +61,7 @@ export type SigningArtifact = {
   contentType: "application/pdf" | "application/json";
   filename: string;
 };
+
+/** Reopen windows staff can choose for an expired signing request. */
+export const signingExtensionDays = [7, 14, 30, 60, 90] as const;
+export type SigningExtensionDays = (typeof signingExtensionDays)[number];

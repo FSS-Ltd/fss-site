@@ -56,6 +56,8 @@ import {
   StudioSignatureEvidenceScenario,
   StudioSigningStatusScenario,
   StudioSigningPreparedScenario,
+  StudioSigningExpiredScenario,
+  ClientAgreementExpiredScenario,
 } from "./agreement-visual-fixtures";
 import {
   ClientGettingStartedScenario,
@@ -188,6 +190,8 @@ export type VisualScenarioName =
   | "studio-signature-evidence"
   | "studio-signing-status"
   | "studio-signing-prepared"
+  | "studio-signing-expired"
+  | "client-agreement-expired"
   | "studio-welcome-journeys"
   | "studio-welcome-builder"
   | "studio-welcome-content"
@@ -690,6 +694,14 @@ const scenarios: Record<VisualScenarioName, VisualScenario> = {
   "studio-signing-prepared": {
     name: "studio-signing-prepared",
     content: <StudioSigningPreparedScenario />,
+  },
+  "studio-signing-expired": {
+    name: "studio-signing-expired",
+    content: <StudioSigningExpiredScenario />,
+  },
+  "client-agreement-expired": {
+    name: "client-agreement-expired",
+    content: <ClientAgreementExpiredScenario />,
   },
   "studio-welcome-journeys": {
     name: "studio-welcome-journeys",

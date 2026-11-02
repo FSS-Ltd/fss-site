@@ -173,3 +173,26 @@ test("an approval from an older revision cannot publish the current draft", () =
   assert.match(html, /Prepare signing document/);
   assert.doesNotMatch(html, /Review and publish for signing/);
 });
+
+test("an expired signing request offers reopen and withdraw instead of a generic withdraw", () => {
+  const html = renderDetail(
+    <StaffAgreementDetail
+      organisationId={completedApproval.organisationId}
+      record={{ ...record, status: "draft", version: 2 }}
+      hasSigningRequest
+      signingApproval={{
+        ...completedApproval,
+        status: "expired",
+        signatures: completedApproval.signatures.slice(0, 1),
+      }}
+    />,
+  );
+
+  assert.match(html, /Signing deadline expired/);
+  assert.match(html, /Signing deadline passed/);
+  assert.match(html, /1 of 2 required signatures were recorded/);
+  assert.match(html, /Reopen signing/);
+  assert.match(html, /Withdraw agreement/);
+  assert.equal(html.match(/>Withdraw agreement</g)?.length, 2); // trigger + dialog confirm, no duplicate lifecycle button
+});
+
