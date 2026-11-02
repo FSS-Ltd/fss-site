@@ -18,7 +18,9 @@ import { loadSigningApprovals } from "./signing-repository";
 import {
   approvalBindingSchema,
   signingConsentSchema,
+  signingExtensionDays,
   type SigningApproval,
+  type SigningExtensionDays,
 } from "./signing-types";
 export {
   listFounderSigning,
@@ -228,6 +230,31 @@ export async function retryStaffAgreementSigning(
     withFssAdminTransaction(db, admin, async (tx) => {
       await tx`select operations.retry_agreement_signing(${organisationId},${approvalId},${correlationId})`;
       return (await loadSigningApprovals(tx, organisationId, approvalId))[0];
+    }),
+  );
+}
+export async function extendStaffAgreementSigning(
+  db: OperationsDb,
+  admin: FssAdminContext,
+  organisationId: string,
+  raw: unknown,
+  correlationId: string,
+): Promise<SigningApproval> {
+  z.uuid().parse(organisationId);
+  z.uuid().parse(correlationId);
+  const command = z
+    .strictObject({ approvalId: z.uuid(), days: z.number().int() })
+    .parse(raw);
+  if (!signingExtensionDays.includes(command.days as SigningExtensionDays))
+    throw new AgreementConflict("Choose a future deadline within 90 days.");
+  // The server clock sets the deadline so a skewed browser clock cannot.
+  const expiresAt = new Date(Date.now() + command.days * 24 * 60 * 60 * 1000);
+  return signingOperation(() =>
+    withFssAdminTransaction(db, admin, async (tx) => {
+      await tx`select operations.extend_agreement_signing(${organisationId},${command.approvalId},${expiresAt.toISOString()}::timestamptz,${correlationId})`;
+      return (
+        await loadSigningApprovals(tx, organisationId, command.approvalId)
+      )[0];
     }),
   );
 }

@@ -82,6 +82,15 @@ export async function listStudioClients(
             where r.organisation_id = o.id and r.status = 'ready_for_review'
           ) then 'Review client work'
           when exists (
+            select 1 from operations.signing_approvals p
+            join operations.agreements a on a.id = p.agreement_id
+              and a.current_revision = p.revision and a.status = 'draft'
+            where p.organisation_id = o.id and p.status = 'approved'
+              and p.expires_at <= clock_timestamp()
+              and (select count(*) from operations.signing_signatures s where s.approval_id = p.id)
+                < jsonb_array_length(p.snapshot -> 'signatories')
+          ) then 'Signing expired: extend or withdraw'
+          when exists (
             select 1 from operations.agreements a
             where a.organisation_id = o.id and a.status = 'draft'
           ) then 'Finish agreement'
@@ -101,6 +110,15 @@ export async function listStudioClients(
             select 1 from operations.requests r
             where r.organisation_id = o.id and r.status = 'ready_for_review'
           ) then '/portal/admin/clients/' || o.id::text || '/requests'
+          when exists (
+            select 1 from operations.signing_approvals p
+            join operations.agreements a on a.id = p.agreement_id
+              and a.current_revision = p.revision and a.status = 'draft'
+            where p.organisation_id = o.id and p.status = 'approved'
+              and p.expires_at <= clock_timestamp()
+              and (select count(*) from operations.signing_signatures s where s.approval_id = p.id)
+                < jsonb_array_length(p.snapshot -> 'signatories')
+          ) then '/portal/admin/clients/' || o.id::text || '/signing'
           when exists (
             select 1 from operations.agreements a
             where a.organisation_id = o.id and a.status = 'draft'
@@ -185,6 +203,15 @@ export async function loadStudioClient(
             where r.organisation_id = o.id and r.status = 'ready_for_review'
           ) then 'Review client work'
           when exists (
+            select 1 from operations.signing_approvals p
+            join operations.agreements a on a.id = p.agreement_id
+              and a.current_revision = p.revision and a.status = 'draft'
+            where p.organisation_id = o.id and p.status = 'approved'
+              and p.expires_at <= clock_timestamp()
+              and (select count(*) from operations.signing_signatures s where s.approval_id = p.id)
+                < jsonb_array_length(p.snapshot -> 'signatories')
+          ) then 'Signing expired: extend or withdraw'
+          when exists (
             select 1 from operations.agreements a
             where a.organisation_id = o.id and a.status = 'draft'
           ) then 'Finish agreement'
@@ -204,6 +231,15 @@ export async function loadStudioClient(
             select 1 from operations.requests r
             where r.organisation_id = o.id and r.status = 'ready_for_review'
           ) then '/portal/admin/clients/' || o.id::text || '/requests'
+          when exists (
+            select 1 from operations.signing_approvals p
+            join operations.agreements a on a.id = p.agreement_id
+              and a.current_revision = p.revision and a.status = 'draft'
+            where p.organisation_id = o.id and p.status = 'approved'
+              and p.expires_at <= clock_timestamp()
+              and (select count(*) from operations.signing_signatures s where s.approval_id = p.id)
+                < jsonb_array_length(p.snapshot -> 'signatories')
+          ) then '/portal/admin/clients/' || o.id::text || '/signing'
           when exists (
             select 1 from operations.agreements a
             where a.organisation_id = o.id and a.status = 'draft'

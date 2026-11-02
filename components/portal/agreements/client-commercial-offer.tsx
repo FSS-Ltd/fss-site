@@ -30,7 +30,7 @@ export function ClientCommercialOffer({
   const recurring = offer.draft.lines.find((line) => line.recurrenceMonths > 0);
   return (
     <article className={styles.detail}>
-      <CommercialOfferSummary offer={offer} />
+      <CommercialOfferSummary offer={offer} audience="client" />
       {offer.selection ? (
         <PortalCard title="Your submitted terms">
           <p>
@@ -52,7 +52,20 @@ export function ClientCommercialOffer({
           Awaiting FSS review. Your proposal must be approved before signing.
         </Notice>
       ) : null}
-      {offer.approvalId ? (
+      {offer.approvalId && offer.signingStatus === "expired" ? (
+        <Notice tone="warning">
+          The signing window for this agreement has closed. FSS can reopen it;
+          contact FSS if you still want to proceed.
+        </Notice>
+      ) : offer.approvalId &&
+        ["cancelled", "declined", "superseded"].includes(
+          offer.signingStatus ?? "",
+        ) ? (
+        <Notice tone="info">
+          This signing request is closed. Contact FSS if you need a revised
+          agreement.
+        </Notice>
+      ) : offer.approvalId ? (
         <PortalActionLink
           href={`${portalPath(`/portal/agreements/${offer.approvalId}`)}?organisationId=${offer.organisationId}`}
         >

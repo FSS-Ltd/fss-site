@@ -88,3 +88,36 @@ test("expired submitted commercial proposals remain in the proposal review stage
     "proposal_submitted",
   );
 });
+
+test("an expired signing request is its own stage, not a withdrawal", () => {
+  assert.equal(
+    agreementStage({ signing: { ...signing, status: "expired" } }),
+    "signing_expired",
+  );
+  assert.equal(
+    agreementStage({
+      offer: { ...offer, status: "selected", signingStatus: "expired" },
+    }),
+    "signing_expired",
+  );
+  assert.equal(
+    agreementStage({
+      offer: { ...offer, status: "selected", signingStatus: "cancelled" },
+    }),
+    "withdrawn",
+  );
+  assert.equal(
+    agreementStage({
+      offer: { ...offer, status: "selected", signingStatus: "approved" },
+    }),
+    "approved",
+  );
+  assert.equal(
+    stagePresentation("signing_expired", "staff").label,
+    "Signing expired: extend or withdraw",
+  );
+  assert.equal(
+    stagePresentation("signing_expired", "client").label,
+    "Signing window closed",
+  );
+});

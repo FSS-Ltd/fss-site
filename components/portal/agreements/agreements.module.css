@@ -647,6 +647,47 @@
   color: var(--portal-on-action);
 }
 
+.deadlinePanel {
+  background: var(--portal-surface);
+  border: 1px solid var(--portal-border);
+  border-left: 4px solid var(--portal-warning-ink);
+  border-radius: 12px;
+  padding: 20px 24px;
+}
+
+.deadlinePanel h2 {
+  font-size: 1.0625rem;
+  margin: 0 0 8px;
+}
+
+.deadlinePanel > p {
+  color: var(--portal-muted);
+  margin: 0 0 16px;
+  max-width: 68ch;
+}
+
+.deadlineForm {
+  display: grid;
+  gap: 4px;
+  max-width: 480px;
+}
+
+.deadlineForm .actionRow {
+  margin-top: 8px;
+}
+
+.timelineBlocked .timelineIndex {
+  background: var(--portal-warning-surface);
+  border-color: var(--portal-warning-ink);
+  color: var(--portal-warning-ink);
+}
+
+.timelineNote {
+  color: var(--portal-warning-ink);
+  display: block;
+  font-weight: 600;
+}
+
 @media (max-width: 700px) {
   .agreementTimeline {
     grid-template-columns: 1fr;

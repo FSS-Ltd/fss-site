@@ -136,3 +136,30 @@ test("share fields are opt-in and identify their contractual basis", () => {
   assert.match(enabled, /name="revenueSource"/);
   assert.match(enabled, /name="offerExpiresAt"/);
 });
+
+test("a selected offer follows its signing request instead of linking to a closed one", () => {
+  const selected = {
+    ...offer,
+    status: "selected" as const,
+    recordedStatus: "selected" as const,
+    approvalId: "33333333-3333-4333-8333-333333333333",
+  };
+  const open = render(
+    <ClientCommercialOffer offer={{ ...selected, signingStatus: "approved" }} />,
+  );
+  assert.match(open, /Continue to signing/);
+
+  const expired = render(
+    <ClientCommercialOffer offer={{ ...selected, signingStatus: "expired" }} />,
+  );
+  assert.match(expired, /Signing window closed/);
+  assert.match(expired, /signing window for this agreement has closed/);
+  assert.doesNotMatch(expired, /extend or withdraw/);
+  assert.doesNotMatch(expired, /Continue to signing/);
+
+  const cancelled = render(
+    <ClientCommercialOffer offer={{ ...selected, signingStatus: "cancelled" }} />,
+  );
+  assert.match(cancelled, /This signing request is closed/);
+  assert.doesNotMatch(cancelled, /Continue to signing/);
+});

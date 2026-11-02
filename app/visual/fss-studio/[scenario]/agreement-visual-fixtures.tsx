@@ -7,6 +7,7 @@ import { RoutedStaffAgreementBuilder } from "@/components/portal/agreements/rout
 import type { AgreementEngagementChoice } from "@/components/portal/agreements/staff-agreement-builder";
 import { StaffAgreementOverview } from "@/components/portal/agreements/staff-agreement-overview";
 import { StaffSigningStatus } from "@/components/portal/agreements/staff-signing-status";
+import { SigningDeadlineActions } from "@/components/portal/agreements/signing-deadline-actions";
 import { SigningForm } from "@/components/operations/signing/signing-form";
 import { SignatureEvidenceForm } from "@/components/portal/agreements/signature-evidence-form";
 import { ClientShell } from "@/components/portal/shell/client-shell";
@@ -397,6 +398,47 @@ export function StudioSigningStatusScenario(): React.JSX.Element {
         downloadBase={`/api/portal/admin/clients/${organisationId}/signing/${approvalId}`}
       />
     </StudioShell>
+  );
+}
+
+const expiredApproval = {
+  ...approval,
+  status: "expired" as const,
+  expiresAt: "2026-10-15T10:00:00.000Z",
+};
+
+export function StudioSigningExpiredScenario(): React.JSX.Element {
+  return (
+    <StudioShell>
+      <PageHeader eyebrow="FSS Studio / Agreements" title="Signing status" />
+      <StaffSigningStatus
+        approval={expiredApproval}
+        downloadBase={`/api/portal/admin/clients/${organisationId}/signing/${approvalId}`}
+        controls={
+          <SigningDeadlineActions
+            approval={expiredApproval}
+            agreement={{
+              id: expiredApproval.agreementId,
+              version: expiredApproval.agreementVersion,
+            }}
+            organisationId={organisationId}
+          />
+        }
+      />
+    </StudioShell>
+  );
+}
+
+export function ClientAgreementExpiredScenario(): React.JSX.Element {
+  return (
+    <ClientShell memberships={memberships}>
+      <PageHeader eyebrow="FSS Studio / Agreements" title={draft.title} />
+      <ClientAgreementDetail
+        approval={expiredApproval}
+        email="alex@northstar.example"
+        organisationId={organisationId}
+      />
+    </ClientShell>
   );
 }
 

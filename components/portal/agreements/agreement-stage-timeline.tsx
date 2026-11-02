@@ -24,7 +24,10 @@ export function AgreementStageTimeline({
         ? -1
         : stage === "attention_required"
           ? 3
-          : current;
+          : stage === "signing_expired"
+            ? 2
+            : current;
+  const blocked = stage === "signing_expired";
   return (
     <ol className={styles.agreementTimeline} aria-label="Agreement progress">
       {steps.map((step, index) => (
@@ -34,7 +37,9 @@ export function AgreementStageTimeline({
             index < position
               ? styles.timelineDone
               : index === position
-                ? styles.timelineCurrent
+                ? blocked
+                  ? `${styles.timelineCurrent} ${styles.timelineBlocked}`
+                  : styles.timelineCurrent
                 : undefined
           }
           aria-current={index === position ? "step" : undefined}
@@ -46,6 +51,9 @@ export function AgreementStageTimeline({
               : fixedTerms && index === 1
                 ? "Choice submitted"
                 : step.label}
+            {blocked && index === position ? (
+              <span className={styles.timelineNote}>Deadline passed</span>
+            ) : null}
           </span>
         </li>
       ))}

@@ -15,7 +15,10 @@ export async function loadCommercialOffers(
   >`select id, organisation_id as "organisationId", engagement_id as "engagementId", version,
     case when status in ('published','proposed','rejected') and expires_at<=clock_timestamp() then 'expired' else status end as status,
     status as "recordedStatus",
-    draft, spec, expires_at::text as "expiresAt", selection, rejection_reason as "rejectionReason", approval_id as "approvalId", agreement_id as "agreementId"
+    draft, spec, expires_at::text as "expiresAt", selection, rejection_reason as "rejectionReason", approval_id as "approvalId", agreement_id as "agreementId",
+    (select case when p.status='approved' and p.expires_at<=clock_timestamp() and (select count(*) from operations.signing_signatures s where s.approval_id=p.id)<jsonb_array_length(p.snapshot->'signatories') then 'expired' else p.status end
+      from operations.signing_approvals p where p.agreement_id=commercial_offers.agreement_id
+      order by p.created_at desc, p.id limit 1) as "signingStatus"
     from operations.commercial_offers where organisation_id=${organisationId} and (${offerId}::uuid is null or id=${offerId}::uuid) order by created_at desc,id limit 100`;
 }
 export async function listStaffCommercialOffers(

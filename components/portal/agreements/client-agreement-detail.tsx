@@ -213,6 +213,20 @@ function CompletionNotice({
     );
   }
 
+  if (approval.status === "expired") {
+    return (
+      <Notice tone="warning">
+        <strong>The signing window has closed.</strong>
+        <p>
+          The deadline passed before every required signature was recorded.
+          {ownSignature ? " Your signature is kept." : ""} FSS can reopen
+          signing for this same agreement; contact FSS if you still want to
+          proceed.
+        </p>
+      </Notice>
+    );
+  }
+
   return (
     <Notice tone="info">
       <strong>This signing request is closed.</strong>

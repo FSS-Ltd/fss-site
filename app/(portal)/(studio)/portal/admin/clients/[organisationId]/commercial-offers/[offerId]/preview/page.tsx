@@ -82,7 +82,7 @@ export default async function StaffCommercialOfferPreviewPage({
         <p>Offer version {offer.version}</p>
         <p>Expires {new Date(offer.expiresAt).toLocaleDateString("en-GB")}</p>
       </PortalCard>
-      <CommercialOfferSummary offer={offer} />
+      <CommercialOfferSummary offer={offer} audience="client" />
       {offer.selection ? (
         <PortalCard title="Client selection or proposal">
           <p>
