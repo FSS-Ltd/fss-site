@@ -234,7 +234,8 @@ export async function provisionPortalAccount(
       idempotencyKey: `portal-invitation:${createHash("sha256").update(ticket).digest("hex")}`,
     });
   } catch {
-    // Nobody received this ticket, so a failed revoke leaves nothing usable behind.
+    // Revoke so staff can resend cleanly. A send that timed out may still
+    // arrive; its link then shows the "replaced" screen, which fails closed.
     await revoke(invitation.id).catch(() => undefined);
     throw new PortalProvisioningError(
       ticket ? "RETRYABLE_PROVIDER_ERROR" : "UNKNOWN_PROVIDER_ERROR",
