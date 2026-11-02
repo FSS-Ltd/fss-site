@@ -1,7 +1,7 @@
 # Portal invitation direct link
 
 Owner: Technical Agent
-Status: Proposed; awaiting approval before implementation
+Status: Approved 2026-11-02; implemented on fix/client-invite-link
 Date: 2026-11-02
 
 ## Problem
@@ -23,8 +23,8 @@ Send invitation emails ourselves, with a link that goes straight to our `/activa
 
 1. `provisionPortalAccount` creates the Clerk invitation with `notify: false` and reads the returned `Invitation.url`.
 2. It takes the `ticket` query parameter from that URL and sets it as `__clerk_ticket` on our activation URL (built by `createInvitationActivationUrl`, unchanged).
-3. It sends the invitation email through the existing Operations Resend sender (`createOnboardingResendSender`) from `OPERATIONS_EMAIL_FROM`.
-4. On `/activate`, a failed ticket sign-up caused by an invalid, revoked or expired ticket shows a clear screen: "This invitation was replaced or is no longer valid. Use the most recent email from FSS, or ask your FSS contact for a new one." Expired tickets reuse the existing `InvitationExpired` view, since Clerk's `__clerk_status=expired` redirect no longer applies.
+3. It sends the invitation email through the existing `ResendGateway` (the one founder invitations use) with the Operations key `OPERATIONS_RESEND_API_KEY`, from `OPERATIONS_EMAIL_FROM`, under a new `portal-invitation` category. The journey-bound onboarding sender was not a fit for a one-off email.
+4. On `/activate`, a failed sign-up whose Clerk error code mentions a ticket or invitation shows: "This invitation was replaced or is no longer valid. Use the most recent email from FSS, or ask your FSS contact for a new invitation." Codes containing `expired` show an expiry message instead. The mapping lives in `clerkErrorMessage`, so every ticket error path uses it.
 
 Every caller (first invite, owner invite, staff invite, resend) goes through `provisionPortalAccount`, so the fix sits in that one function and the activation page.
 
@@ -36,7 +36,7 @@ Every caller (first invite, owner invite, staff invite, resend) goes through `pr
 
 ## Data model
 
-No schema change. The idempotency key is derived from the local invitation ID already carried in Clerk metadata (`portal-invitation:<invitationId>`), so a retried send cannot email twice.
+No schema change. The idempotency key is `portal-invitation:<sha256(ticket)>`. Every Clerk invitation has a ticket, legacy metadata included, and the hash keeps the ticket out of provider logs. A retried send of the same ticket cannot email twice.
 
 ## Failure modes
 
@@ -50,14 +50,14 @@ No schema change. The idempotency key is derived from the local invitation ID al
 
 ## Security and privacy
 
-- The ticket is a bearer credential. It already appears in the URL today, after Clerk's redirect. The activation page already strips name, email and decline token from history. Extend that to strip `__clerk_ticket` after it is read.
+- The ticket is a bearer credential. It already appears in the activation URL today, after Clerk's redirect, and stays there so a page refresh keeps working. The activation page still strips name, email and decline token from history.
 - No secrets in code. Resend and Clerk keys stay in the existing environment variables.
 - The email body contains the recipient's name and the link only. No role or organisation details.
 - Redirect URL validation in `provisionPortalAccount` stays in place.
 
 ## Email content
 
-Plain, branded, short. Subject: "Your FSS client portal invitation". Body: who invited them, one button to the activation link, the expiry date, and a line saying older invitation emails no longer work. Follow the brand voice rules. Rendered with the existing `emails/` components.
+Plain and short, in the same inline HTML and text style as the founder invitation email. Subject: "Your FSS portal invitation" (it also covers staff invites). Body: who invited them, one link to the activation page, the 30-day lifetime, and a line saying older invitation emails no longer work. Follows the brand voice rules.
 
 ## Testing
 
@@ -70,7 +70,7 @@ Plain, branded, short. Subject: "Your FSS client portal invitation". Body: who i
 ## Rollout and rollback
 
 - No migration. Ships as a normal PR; merge deploys to production.
-- Requires the Operations Resend key to be set in production. It already is for agreement emails. Confirm before merge.
+- Requires `OPERATIONS_RESEND_API_KEY` in production. Confirmed present on 2026-11-02 (names only were listed).
 - After release, resend the affected client's invitation so they get a working email.
 - Rollback: revert the PR. Clerk resumes sending its own emails. Invitations sent while the fix was live keep working, because their links point at our page with a valid ticket.
 

@@ -74,8 +74,20 @@ test("single-invitation cleanup never revokes a different invitation for the sam
   );
   assert.deepEqual(revoked, ["exact-id"]);
 });
-test("provisioning creates a Clerk invitation with a fixed activation redirect", async () => {
+const clerkInvitation = {
+  id: "inv_fixture",
+  url: "https://clerk.example.test/v1/tickets/accept?ticket=ticket_fixture.value",
+};
+const noDelivery = async (): Promise<void> => {
+  throw new Error("must not deliver");
+};
+const noRevoke = async (): Promise<void> => {
+  throw new Error("must not revoke");
+};
+
+test("provisioning emails a direct activation link carrying the Clerk ticket", async () => {
   const inputs: unknown[] = [];
+  const deliveries: unknown[] = [];
   const metadata = createPortalInvitationMetadata({
     organisationId: "8aa24c0b-3665-4fd4-8694-500675c943c3",
     name: "Client Example",
@@ -86,19 +98,38 @@ test("provisioning creates a Clerk invitation with a fixed activation redirect",
   });
   await provisionPortalAccount(
     "Client@example.test",
-    "https://portal.example.test/portal/activate",
+    "https://portal.example.test/portal/activate?name=Client&email=client%40example.test",
     metadata,
     async (input) => {
       inputs.push(input);
+      return clerkInvitation;
     },
+    async (email) => {
+      deliveries.push(email);
+    },
+    noRevoke,
   );
+  assert.equal(deliveries.length, 1);
+  const delivery = deliveries[0] as {
+    to: string;
+    activationUrl: string;
+    idempotencyKey: string;
+  };
+  assert.equal(delivery.to, "client@example.test");
+  const link = new URL(delivery.activationUrl);
+  assert.equal(link.origin + link.pathname, "https://portal.example.test/portal/activate");
+  assert.equal(link.searchParams.get("__clerk_ticket"), "ticket_fixture.value");
+  assert.equal(link.searchParams.get("name"), "Client");
+  assert.match(delivery.idempotencyKey, /^portal-invitation:[a-f0-9]{64}$/);
+  assert.doesNotMatch(delivery.idempotencyKey, /ticket_fixture/);
   assert.deepEqual(inputs, [
     {
       emailAddress: "client@example.test",
-      notify: true,
+      notify: false,
       ignoreExisting: true,
       expiresInDays: 30,
-      redirectUrl: "https://portal.example.test/portal/activate",
+      redirectUrl:
+        "https://portal.example.test/portal/activate?name=Client&email=client%40example.test",
       publicMetadata: { fssPortalInvitation: metadata },
     },
   ]);
@@ -123,6 +154,58 @@ test("provisioning creates a Clerk invitation with a fixed activation redirect",
       },
     ),
   );
+});
+
+test("provisioning revokes the Clerk invitation when it carries no ticket", async () => {
+  const revoked: string[] = [];
+  await assert.rejects(
+    provisionPortalAccount(
+      "client@example.test",
+      "https://portal.example.test/portal/activate",
+      undefined,
+      async () => ({ id: "inv_no_ticket" }),
+      noDelivery,
+      async (id) => {
+        revoked.push(id);
+      },
+    ),
+    (error: unknown) => {
+      assert.deepEqual(toPortalProvisioningErrorReport(error), {
+        errorName: "PortalProvisioningError",
+        errorCode: "UNKNOWN_PROVIDER_ERROR",
+      });
+      return true;
+    },
+  );
+  assert.deepEqual(revoked, ["inv_no_ticket"]);
+});
+
+test("provisioning revokes the Clerk invitation when the email cannot be sent", async () => {
+  const revoked: string[] = [];
+  await assert.rejects(
+    provisionPortalAccount(
+      "client@example.test",
+      "https://portal.example.test/portal/activate",
+      undefined,
+      async () => clerkInvitation,
+      async () => {
+        throw new Error("Resend unavailable for client@example.test");
+      },
+      async (id) => {
+        revoked.push(id);
+        throw new Error("revoke also failed");
+      },
+    ),
+    (error: unknown) => {
+      assert.deepEqual(toPortalProvisioningErrorReport(error), {
+        errorName: "PortalProvisioningError",
+        errorCode: "RETRYABLE_PROVIDER_ERROR",
+      });
+      assert.doesNotMatch(JSON.stringify(error), /client@example\.test/);
+      return true;
+    },
+  );
+  assert.deepEqual(revoked, ["inv_fixture"]);
 });
 
 test("provisioning classifies an existing Clerk invitation without retaining provider details", async () => {

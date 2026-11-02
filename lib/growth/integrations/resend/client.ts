@@ -10,6 +10,7 @@ const ALLOWED_CATEGORIES: readonly ResendMessage["category"][] = [
   "newsletter-welcome",
   "newsletter",
   "founder-access",
+  "portal-invitation",
 ];
 
 export type ResendMessage = {
@@ -20,7 +21,8 @@ export type ResendMessage = {
     | "client-delivery-thank-you"
     | "newsletter-welcome"
     | "newsletter"
-    | "founder-access";
+    | "founder-access"
+    | "portal-invitation";
   from: string;
   to: string;
   replyTo: string;

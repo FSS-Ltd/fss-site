@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { clerkClient } from "@clerk/nextjs/server";
 import { z } from "zod";
 import { readPortalAuthConfig } from "./configuration";
@@ -7,16 +8,23 @@ import {
   isStaffInvitationForEmail,
   type PortalInvitationMetadata,
 } from "./clerk-invitation";
+import {
+  deliverPortalInvitationEmail,
+  type PortalInvitationEmail,
+} from "./invitation-email";
 
 export type PortalInvitation = {
   emailAddress: string;
-  notify: true;
+  notify: false;
   ignoreExisting: true;
   expiresInDays: 30;
   redirectUrl: string;
   publicMetadata?: { fssPortalInvitation: PortalInvitationMetadata };
 };
-type CreateInvitation = (input: PortalInvitation) => Promise<void>;
+type CreatedInvitation = Readonly<{ id: string; url?: string | undefined }>;
+type CreateInvitation = (input: PortalInvitation) => Promise<CreatedInvitation>;
+type DeliverInvitation = (email: PortalInvitationEmail) => Promise<void>;
+type RevokeInvitation = (invitationId: string) => Promise<unknown>;
 type PendingInvitation = {
   readonly id: string;
   readonly emailAddress: string;
@@ -74,8 +82,27 @@ export function readPortalProvisionConfig(
   return { secretKey: readPortalAuthConfig(env).secretKey };
 }
 
-async function createInvitation(input: PortalInvitation): Promise<void> {
-  await (await clerkClient()).invitations.createInvitation(input);
+async function createInvitation(
+  input: PortalInvitation,
+): Promise<CreatedInvitation> {
+  const invitation = await (
+    await clerkClient()
+  ).invitations.createInvitation(input);
+  return { id: invitation.id, url: invitation.url };
+}
+
+async function revokeInvitation(invitationId: string): Promise<unknown> {
+  return (await clerkClient()).invitations.revokeInvitation(invitationId);
+}
+
+function invitationTicket(url: string | undefined): string | null {
+  if (!url) return null;
+  try {
+    const params = new URL(url).searchParams;
+    return params.get("ticket") ?? params.get("__clerk_ticket");
+  } catch {
+    return null;
+  }
 }
 
 export async function clearPortalInvitationMetadata(
@@ -166,18 +193,26 @@ async function reconcilePendingInvitations(
   for (const id of pendingIds) await client.invitations.revokeInvitation(id);
 }
 
+/**
+ * Clerk creates the invitation but we send the email. The link carries the
+ * ticket straight to our activation page, so a replaced invitation shows a
+ * clear message there instead of Clerk's raw ticket error.
+ */
 export async function provisionPortalAccount(
   email: string,
   redirectUrl: string,
   metadata: PortalInvitationMetadata | undefined,
   create: CreateInvitation = createInvitation,
+  deliver: DeliverInvitation = deliverPortalInvitationEmail,
+  revoke: RevokeInvitation = revokeInvitation,
 ): Promise<void> {
   const normalizedEmail = z.email().max(254).parse(email).toLowerCase();
   const parsedRedirectUrl = z.url().parse(redirectUrl);
+  let invitation: CreatedInvitation;
   try {
-    await create({
+    invitation = await create({
       emailAddress: normalizedEmail,
-      notify: true,
+      notify: false,
       ignoreExisting: true,
       expiresInDays: 30,
       redirectUrl: parsedRedirectUrl,
@@ -187,6 +222,23 @@ export async function provisionPortalAccount(
     });
   } catch (error) {
     throw new PortalProvisioningError(classifyProvisioningError(error));
+  }
+  const ticket = invitationTicket(invitation.url);
+  try {
+    if (!ticket) throw new Error("Clerk returned no invitation ticket.");
+    const activationUrl = new URL(parsedRedirectUrl);
+    activationUrl.searchParams.set("__clerk_ticket", ticket);
+    await deliver({
+      to: normalizedEmail,
+      activationUrl: activationUrl.href,
+      idempotencyKey: `portal-invitation:${createHash("sha256").update(ticket).digest("hex")}`,
+    });
+  } catch {
+    // Nobody received this ticket, so a failed revoke leaves nothing usable behind.
+    await revoke(invitation.id).catch(() => undefined);
+    throw new PortalProvisioningError(
+      ticket ? "RETRYABLE_PROVIDER_ERROR" : "UNKNOWN_PROVIDER_ERROR",
+    );
   }
 }
 
