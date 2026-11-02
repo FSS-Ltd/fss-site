@@ -91,7 +91,9 @@ test("staff reopen an expired signing request without losing recorded signatures
 
     const signed = await fixture.sign(reopened, 1);
     assert.equal(signed.signatures.length, 2);
-    await fixture.admin`update operations.signing_approvals set expires_at=clock_timestamp()-interval '1 minute' where id=${approved.id}`;
+    // Every signature was made in time, then the deadline passed while the
+    // signed copy was still being prepared.
+    await fixture.admin`update operations.signing_approvals set expires_at=(select max(s.signed_at) from operations.signing_signatures s where s.approval_id=${approved.id}) where id=${approved.id}`;
     await assert.rejects(
       extend(approved.id),
       /no longer available/,
