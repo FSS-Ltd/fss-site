@@ -104,7 +104,7 @@ async function saveDraft(
   command: SaveAgreementBuilderDraftCommand,
 ): Promise<AgreementBuilderDraft> {
   let content = command.content;
-  if (command.expectedVersion === 0) {
+  if (command.expectedVersion === 0 && !content.agreement?.currency) {
     const [client] = await tx<
       Array<{ currency: Currency }>
     >`select billing_currency as currency from operations.organisations where id=${organisationId}`;
