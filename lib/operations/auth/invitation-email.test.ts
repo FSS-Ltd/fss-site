@@ -53,3 +53,19 @@ test("the invitation email refuses a missing or malformed Operations Resend key"
     /not configured/,
   );
 });
+
+test("the HTML invitation keeps a copyable URL when links are disabled", async () => {
+  const sent: ResendMessage[] = [];
+  await sendPortalInvitationEmail(email, {
+    send: async (message) => {
+      sent.push(message);
+      return { providerMessageId: "re_fixture" };
+    },
+  });
+
+  const visibleText = sent[0].html
+    .replace(/<[^>]+>/g, "")
+    .replaceAll("&amp;", "&");
+  assert.ok(visibleText.includes(email.activationUrl));
+  assert.match(visibleText, /copy and paste this link into your browser/i);
+});
