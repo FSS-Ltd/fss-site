@@ -14,8 +14,12 @@ export type PortalInvitationEmail = Readonly<{
   idempotencyKey: string;
 }>;
 
-function escapeAttribute(value: string): string {
-  return value.replaceAll("&", "&amp;").replaceAll('"', "&quot;");
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
 }
 
 /** Our own invitation email, so the link opens the portal instead of Clerk's ticket endpoint. */
@@ -23,7 +27,7 @@ export async function sendPortalInvitationEmail(
   email: PortalInvitationEmail,
   gateway: ResendGateway,
 ): Promise<void> {
-  const href = escapeAttribute(email.activationUrl);
+  const href = escapeHtml(email.activationUrl);
   await gateway.send({
     idempotencyKey: email.idempotencyKey,
     category: "portal-invitation",
@@ -31,7 +35,7 @@ export async function sendPortalInvitationEmail(
     to: email.to,
     replyTo: OPERATIONS_EMAIL_ADDRESS,
     subject: "Your FSS portal invitation",
-    html: `<p>Hello,</p><p>Faithful Software Solutions has invited you to the FSS portal.</p><p><a href="${href}">Accept your invitation</a></p><p>This link works for 30 days. If you received older invitation emails from FSS, use this one. Older links no longer work.</p><p>Questions? Reply to this email.</p>`,
+    html: `<p>Hello,</p><p>Faithful Software Solutions has invited you to the FSS portal.</p><p><a href="${href}" style="text-decoration:underline;">Accept your invitation</a></p><p>If the link does not open, copy and paste this link into your browser:</p><p style="overflow-wrap:anywhere;word-break:break-all;">${href}</p><p>This link works for 30 days. If you received older invitation emails from FSS, use this one. Older links no longer work.</p><p>Questions? Reply to this email.</p>`,
     text: `Hello,\n\nFaithful Software Solutions has invited you to the FSS portal.\n\nAccept your invitation: ${email.activationUrl}\n\nThis link works for 30 days. If you received older invitation emails from FSS, use this one. Older links no longer work.\n\nQuestions? Reply to this email.`,
   });
 }
