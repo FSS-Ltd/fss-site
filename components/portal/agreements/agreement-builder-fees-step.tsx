@@ -1,8 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Notice } from "@/components/portal/ui";
-import { decimalToMinor } from "@/lib/operations/money";
+import { Notice, PortalSelect } from "@/components/portal/ui";
+import {
+  currencies,
+  currencySchema,
+  currencySymbol,
+  decimalToMinor,
+  type Currency,
+} from "@/lib/operations/money";
 import type { AgreementBuilderDraftContent } from "@/lib/operations/agreements/builder-draft-schema";
 import {
   CommercialOfferFields,
@@ -50,7 +56,9 @@ export function AgreementBuilderFeesStep({
   onSave,
   pending,
 }: BuilderStepProps): React.JSX.Element {
-  const currency = agreement.currency ?? "GBP";
+  const [currency, setCurrency] = useState<Currency>(
+    agreement.currency ?? "GBP",
+  );
   const initialSpec: CommercialOfferSpec = content.commercialOffer?.spec ?? {
     cash: { mode: "fixed" },
     revenueShare: null,
@@ -328,38 +336,61 @@ export function AgreementBuilderFeesStep({
       title: "Price the services",
       description: `Enter service amounts in ${currency}.`,
       children: (
-        <AgreementBuilderFeeLines
-          currency={currency}
-          onInteraction={() => setFeeLinesVisited(true)}
-          clientProposed={spec.cash?.mode === "client_proposed"}
-          fixed={spec.cash?.mode === "fixed"}
-          includeOneOffFees={includeOneOffFees}
-          lines={lines}
-          services={services}
-          onAddService={() =>
-            setServices((current) => [
-              ...current,
-              { id: crypto.randomUUID(), code: "", name: "", description: "" },
-            ])
-          }
-          onUpdateService={(id, field, value) =>
-            setServices((current) =>
-              current.map((service) =>
-                service.id === id ? { ...service, [field]: value } : service,
-              ),
-            )
-          }
-          onRemoveService={(id) =>
-            setServices((current) =>
-              current.filter((service) => service.id !== id),
-            )
-          }
-          onAdd={addLine}
-          onIncludeOneOffFeesChange={updateIncludeOneOffFees}
-          onRemove={removeLine}
-          totals={totals}
-          updateLine={updateLine}
-        />
+        <>
+          <PortalSelect
+            label="Agreement currency"
+            name="currency"
+            value={currency}
+            onChange={(event) =>
+              setCurrency(currencySchema.parse(event.target.value))
+            }
+            hint="Applies to all fees, deposits and installments. Changing currency keeps entered amounts without converting them."
+            required
+          >
+            {currencies.map((code) => (
+              <option key={code} value={code}>
+                {code} ({currencySymbol(code)})
+              </option>
+            ))}
+          </PortalSelect>
+          <AgreementBuilderFeeLines
+            currency={currency}
+            onInteraction={() => setFeeLinesVisited(true)}
+            clientProposed={spec.cash?.mode === "client_proposed"}
+            fixed={spec.cash?.mode === "fixed"}
+            includeOneOffFees={includeOneOffFees}
+            lines={lines}
+            services={services}
+            onAddService={() =>
+              setServices((current) => [
+                ...current,
+                {
+                  id: crypto.randomUUID(),
+                  code: "",
+                  name: "",
+                  description: "",
+                },
+              ])
+            }
+            onUpdateService={(id, field, value) =>
+              setServices((current) =>
+                current.map((service) =>
+                  service.id === id ? { ...service, [field]: value } : service,
+                ),
+              )
+            }
+            onRemoveService={(id) =>
+              setServices((current) =>
+                current.filter((service) => service.id !== id),
+              )
+            }
+            onAdd={addLine}
+            onIncludeOneOffFeesChange={updateIncludeOneOffFees}
+            onRemove={removeLine}
+            totals={totals}
+            updateLine={updateLine}
+          />
+        </>
       ),
     },
     {

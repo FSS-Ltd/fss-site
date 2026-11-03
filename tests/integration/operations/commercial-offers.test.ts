@@ -19,6 +19,7 @@ import {
 import { getPortalSigning } from "../../../lib/operations/agreements/signing-service";
 import { commercialOfferSpecSchema } from "../../../lib/operations/agreements/commercial-types";
 import {
+  loadStaffAgreementBuilderDraft,
   saveStaffAgreementBuilderDraft,
   AgreementBuilderDraftConflict,
 } from "../../../lib/operations/agreements/builder-draft-service";
@@ -584,7 +585,60 @@ test("direct granted commands reject null versions and retain the actual custom 
   }
 });
 
-test("builder snapshots currency, prevents finalisation bypass and closes published working drafts", async (t) => {
+test("builder currency selection overrides the client default and survives reload", async (t) => {
+  const f = await fixture(t);
+  try {
+    const draftId = randomUUID();
+    let saved = await saveStaffAgreementBuilderDraft(
+      f.founderDb,
+      f.staff,
+      f.organisationId,
+      {
+        action: "save",
+        draftId,
+        expectedVersion: 0,
+        step: "fees",
+        content: {
+          agreement: { title: "Currency selection", currency: "USD" },
+        },
+      },
+      f.correlationId,
+    );
+    assert.equal(saved.content.agreement?.currency, "USD");
+    for (const currency of ["USD", "EUR", "GBP"] as const) {
+      saved = await saveStaffAgreementBuilderDraft(
+        f.founderDb,
+        f.staff,
+        f.organisationId,
+        {
+          action: "save",
+          draftId,
+          expectedVersion: saved.version,
+          step: "fees",
+          content: { agreement: { ...saved.content.agreement, currency } },
+        },
+        f.correlationId,
+      );
+      assert.equal(saved.content.agreement?.currency, currency);
+      const stored = await loadStaffAgreementBuilderDraft(
+        f.founderDb,
+        f.staff,
+        f.organisationId,
+        draftId,
+      );
+      assert.equal(stored?.content.agreement?.currency, currency);
+    }
+    const [client] = await f.admin<{ currency: string }[]>`
+      select billing_currency as currency from operations.organisations where id=${f.organisationId}
+    `;
+    assert.equal(client.currency, "GBP");
+  } finally {
+    await f.admin`delete from operations.agreement_builder_drafts where organisation_id=${f.organisationId}`;
+    await f.cleanup();
+  }
+});
+
+test("builder saves selected currency, prevents finalisation bypass and closes published working drafts", async (t) => {
   const f = await fixture(t);
   try {
     await updateStaffClientCurrency(
@@ -611,7 +665,7 @@ test("builder snapshots currency, prevents finalisation bypass and closes publis
         expectedVersion: 0,
         step: "review",
         content: {
-          agreement,
+          agreement: { ...agreement, currency: "USD" },
           engagementId: f.engagement.engagementId,
           commercialOffer: {
             spec: { cash: { mode: "client_proposed" }, revenueShare: null },
@@ -649,7 +703,15 @@ test("builder snapshots currency, prevents finalisation bypass and closes publis
       },
       f.correlationId,
     );
-    assert.equal(updated.content.agreement?.currency, "USD");
+    assert.equal(updated.content.agreement?.currency, "EUR");
+    assert.deepEqual(
+      updated.content.agreement?.lines,
+      saved.content.agreement?.lines,
+    );
+    assert.deepEqual(
+      updated.content.agreement?.installments,
+      saved.content.agreement?.installments,
+    );
     await assert.rejects(
       saveStaffAgreementBuilderDraft(
         f.founderDb,
@@ -676,12 +738,20 @@ test("builder snapshots currency, prevents finalisation bypass and closes publis
       f.correlationId,
     );
     assert.ok("spec" in offer);
-    assert.equal(offer.draft.currency, "USD");
+    assert.equal(offer.draft.currency, "EUR");
     const [closed] = await f.admin<
       { published_offer_id: string; finalised_at: string }[]
     >`select published_offer_id,finalised_at::text from operations.agreement_builder_drafts where id=${updated.id}`;
     assert.equal(closed.published_offer_id, offer.id);
     assert.ok(closed.finalised_at);
+    await assert.rejects(
+      f.admin`
+        update operations.agreement_builder_drafts
+        set content=jsonb_set(content,'{agreement,currency}','"GBP"'::jsonb)
+        where id=${updated.id}
+      `,
+      /Published draft currency cannot change/,
+    );
     await assert.rejects(
       saveStaffAgreementBuilderDraft(
         f.founderDb,
