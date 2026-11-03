@@ -3,6 +3,7 @@ import {
   PortalCheckbox,
   PortalField,
   PortalSelect,
+  PortalTextarea,
 } from "@/components/portal/ui";
 import { formatGbp } from "./agreement-builder-step-support";
 import { currencySymbol, type Currency } from "@/lib/operations/money";
@@ -96,20 +97,19 @@ export function AgreementBuilderFeeLines({
                     }
                   />
                 </PortalField>
-                <PortalField label="What this service covers" required>
-                  <textarea
-                    required
-                    maxLength={3700}
-                    value={service.description}
-                    onChange={(event) =>
-                      onUpdateService(
-                        service.id,
-                        "description",
-                        event.target.value,
-                      )
-                    }
-                  />
-                </PortalField>
+                <PortalTextarea
+                  label="What this service covers"
+                  required
+                  maxLength={3700}
+                  value={service.description}
+                  onChange={(event) =>
+                    onUpdateService(
+                      service.id,
+                      "description",
+                      event.target.value,
+                    )
+                  }
+                />
               </div>
             </section>
           ))}

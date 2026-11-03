@@ -93,6 +93,28 @@ test("a server-loaded saved draft opens at its persisted builder step", () => {
   assert.doesNotMatch(html, /Link the right work/);
 });
 
+test("fees open for a draft that has not been priced yet", () => {
+  const html = renderBuilder([], {
+    content: { agreement: { currency: "GBP" }, engagementId },
+    createdAt: "2026-11-03T10:00:00.000Z",
+    engagementId,
+    id: "33333333-3333-4333-8333-333333333333",
+    organisationId,
+    step: "fees",
+    updatedAt: "2026-11-03T10:00:00.000Z",
+    version: 2,
+  });
+
+  assert.match(html, /Price the services/);
+  assert.match(html, /Service name/);
+  assert.match(html, /Rate \(£\)/);
+  const descriptionId = html.match(
+    /<label[^>]*for="([^"]+)"[^>]*>What this service covers/,
+  )?.[1];
+  assert.ok(descriptionId);
+  assert.ok(html.includes(`id="${descriptionId}" required=""></textarea>`));
+});
+
 test("a saved draft with empty scope restores reviewed engagement details", () => {
   const html = renderBuilder(
     [
