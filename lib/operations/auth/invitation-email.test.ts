@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { toPlainText } from "@react-email/render";
 import type { ResendMessage } from "@/lib/growth/integrations/resend/client";
 import {
   OPERATIONS_EMAIL_ADDRESS,
@@ -63,9 +64,9 @@ test("the HTML invitation keeps a copyable URL when links are disabled", async (
     },
   });
 
-  const visibleText = sent[0].html
-    .replace(/<[^>]+>/g, "")
-    .replaceAll("&amp;", "&");
+  const visibleText = toPlainText(sent[0].html, {
+    selectors: [{ selector: "a", options: { ignoreHref: true } }],
+  });
   assert.ok(visibleText.includes(email.activationUrl));
   assert.match(visibleText, /copy and paste this link into your browser/i);
 });

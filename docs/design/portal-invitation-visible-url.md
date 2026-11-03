@@ -23,9 +23,14 @@ does not resolve Gmail's spam classification. No dependency or schema changes.
 
 ## Verification and release
 
-The regression test removes HTML tags and verifies that the visible body still
-contains the complete URL. It failed against the previous template and passes
-with the fallback. Existing provisioning and resend tests also pass.
+The regression test converts HTML to visible text with the existing React Email
+parser, ignoring anchor destinations, and verifies that the body still contains
+the complete URL. It failed against the previous template and passes with the
+fallback. Existing provisioning and resend tests also pass.
+
+The first CI run passed application validation but CodeQL flagged the test's
+regex-based tag removal as incomplete sanitization. The parser replaces that
+regex without adding dependencies or suppressing the security check.
 
 Local checks passed: 2,401 unit tests, 20 focused invitation/provisioning/resend
 tests, type checking, full lint, changed-file formatting, and production build.
