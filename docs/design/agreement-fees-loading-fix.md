@@ -24,9 +24,13 @@ input child.` After the repair, it passes.
 
 Verified shared-service creation and retained description edits in the in-app
 browser. All 2,397 unit tests, type checking, repository lint, changed-file
-formatting, production dependency audit and production build passed. Database
-integration and automated Playwright suites were not run: this change affects
-rendering only, and browser verification used the required in-app browser.
+formatting and production build passed. The production dependency audit passed
+the high-severity threshold; one existing low-severity `deepmerge` advisory
+remains. GitHub also reported existing default-branch Dependabot alerts during
+the push, including critical and high alerts. Dependencies are unchanged.
+
+Database integration and automated Playwright suites were not run: this change
+affects rendering only, and browser verification used the required in-app browser.
 
 Production deployment requires founder approval. Rollback is a code revert; no
 data migration is involved.
