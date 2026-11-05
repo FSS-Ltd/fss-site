@@ -18,6 +18,7 @@ export function AgreementBuilderReviewStep({
   content,
   draftExists,
   finalise,
+  onBack,
   onSave,
   pending,
 }: BuilderStepProps &
@@ -111,7 +112,7 @@ export function AgreementBuilderReviewStep({
         engagementLinked={Boolean(content.engagementId)}
         signerCount={agreement.signatories?.length ?? 0}
         pending={pending}
-        onRepair={(step) => onSave(step, content)}
+        onRepair={onBack}
       />
       <Notice tone="warning">
         <strong>
@@ -161,7 +162,7 @@ export function AgreementBuilderReviewStep({
         </PortalButton>
         <PortalButton
           disabled={pending}
-          onClick={() => void onSave("document", content)}
+          onClick={() => onBack("document")}
           type="button"
           variant="secondary"
         >

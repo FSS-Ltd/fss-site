@@ -53,6 +53,7 @@ type FeeLineState = Readonly<{
 export function AgreementBuilderFeesStep({
   agreement,
   content,
+  onBack,
   onSave,
   pending,
 }: BuilderStepProps): React.JSX.Element {
@@ -326,7 +327,7 @@ export function AgreementBuilderFeesStep({
     }
   }
 
-  async function save(step: "fees" | "people" | "scope"): Promise<void> {
+  async function save(step: "fees" | "people"): Promise<void> {
     const nextContent = contentFromForm();
     if (nextContent) await onSave(step, nextContent);
   }
@@ -452,7 +453,7 @@ export function AgreementBuilderFeesStep({
         updateIncludeOneOffFees(includeOneOffFees);
       }}
       backLabel="Back to scope"
-      onBack={() => void save("scope")}
+      onBack={() => onBack("scope")}
       continueLabel="Continue to people"
       onContinue={() => void save("people")}
       onSave={() => void save("fees")}

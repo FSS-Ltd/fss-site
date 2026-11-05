@@ -12,6 +12,7 @@ import styles from "./agreements.module.css";
 export function AgreementBuilderDocumentStep({
   agreement,
   content,
+  onBack,
   onSave,
   pending,
 }: BuilderStepProps): React.JSX.Element {
@@ -40,7 +41,7 @@ export function AgreementBuilderDocumentStep({
       <div className={styles.actionRow}>
         <PortalButton
           disabled={pending}
-          onClick={() => void onSave("people", content)}
+          onClick={() => onBack("people")}
           type="button"
           variant="secondary"
         >

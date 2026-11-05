@@ -14,12 +14,13 @@ import {
 export function AgreementBuilderPeopleStep({
   agreement,
   content,
+  onBack,
   onSave,
   pending,
 }: BuilderStepProps): React.JSX.Element {
   const flow = useAgreementBuilderGroups(1);
 
-  async function save(step: "people" | "fees" | "document"): Promise<void> {
+  async function save(step: "people" | "document"): Promise<void> {
     const data = flow.read();
     if (data)
       await onSave(
@@ -41,7 +42,7 @@ export function AgreementBuilderPeopleStep({
       pending={pending}
       backLabel="Back to fees"
       continueLabel="Continue to document"
-      onBack={() => void save("fees")}
+      onBack={() => onBack("fees")}
       onContinue={() => void save("document")}
       onSave={() => void save("people")}
       groups={[
