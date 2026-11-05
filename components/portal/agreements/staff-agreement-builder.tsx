@@ -63,14 +63,29 @@ export function StaffAgreementBuilder({
     initialDraft?.step ?? "link",
   );
   const [direction, setDirection] = useState<"forward" | "backward">("forward");
+  const [retainedSteps, setRetainedSteps] = useState<AgreementBuilderStep[]>(
+    [],
+  );
   const stageRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (step === "document" || step === "review") {
-      stageRef.current?.querySelector<HTMLElement>("h2")?.focus();
-    }
+    const stage = stageRef.current;
+    const heading =
+      stage?.querySelector<HTMLElement>(
+        "[data-builder-group]:not([hidden]) h2",
+      ) ?? stage?.querySelector<HTMLElement>("h2");
+    heading?.focus();
   }, [step]);
   const agreement = content.agreement ?? {};
   const currentStepIndex = agreementBuilderSteps.indexOf(step) + 1;
+
+  function goBack(nextStep: AgreementBuilderStep): void {
+    // Retain unfinished controls, including text that cannot yet pass draft validation.
+    setRetainedSteps((current) =>
+      current.includes(step) ? current : [...current, step],
+    );
+    setDirection("backward");
+    setStep(nextStep);
+  }
 
   async function persist(
     nextStep: AgreementBuilderStep,
@@ -78,6 +93,8 @@ export function StaffAgreementBuilder({
   ): Promise<void> {
     const saved = await save(nextStep, nextContent);
     if (!saved) return;
+    // Saved stages remount from authoritative content when revisited.
+    setRetainedSteps((current) => current.filter((item) => item !== step));
     setDirection(
       agreementBuilderSteps.indexOf(saved.step) < currentStepIndex - 1
         ? "backward"
@@ -115,6 +132,7 @@ export function StaffAgreementBuilder({
       )
     )
       return false;
+    setRetainedSteps([]);
     setContent(
       content.engagementId
         ? replaceEngagement(content, engagement)
@@ -163,27 +181,33 @@ export function StaffAgreementBuilder({
             ? feedback.message
             : ""}
       </p>
-      <div
-        className={guidedStyles.stage}
-        data-direction={direction}
-        key={step}
-        ref={stageRef}
-      >
-        <AgreementBuilderStepPanel
-          agreement={agreement}
-          content={content}
-          draftExists={Boolean(draft)}
-          engagementHref={engagementHref}
-          engagements={engagements}
-          finalise={finalise}
-          onSave={persist}
-          onBeginEngagement={beginEngagement}
-          onSelectEngagement={selectEngagement}
-          organisationName={organisationName}
-          pending={pending}
-          step={step}
-        />
-      </div>
+      {agreementBuilderSteps
+        .filter((item) => item === step || retainedSteps.includes(item))
+        .map((item) => (
+          <div
+            className={guidedStyles.stage}
+            data-direction={direction}
+            key={item}
+            hidden={item !== step}
+            ref={item === step ? stageRef : undefined}
+          >
+            <AgreementBuilderStepPanel
+              agreement={agreement}
+              content={content}
+              draftExists={Boolean(draft)}
+              engagementHref={engagementHref}
+              engagements={engagements}
+              finalise={finalise}
+              onBack={goBack}
+              onSave={persist}
+              onBeginEngagement={beginEngagement}
+              onSelectEngagement={selectEngagement}
+              organisationName={organisationName}
+              pending={pending}
+              step={item}
+            />
+          </div>
+        ))}
     </section>
   );
 }

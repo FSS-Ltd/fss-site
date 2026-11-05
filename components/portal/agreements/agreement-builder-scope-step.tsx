@@ -14,12 +14,13 @@ import {
 export function AgreementBuilderScopeStep({
   agreement,
   content,
+  onBack,
   onSave,
   pending,
 }: BuilderStepProps): React.JSX.Element {
   const flow = useAgreementBuilderGroups(3);
 
-  async function save(step: "scope" | "link" | "fees"): Promise<void> {
+  async function save(step: "scope" | "fees"): Promise<void> {
     const data = flow.read();
     if (data)
       await onSave(
@@ -41,7 +42,7 @@ export function AgreementBuilderScopeStep({
       pending={pending}
       backLabel="Back to work"
       continueLabel="Continue to fees"
-      onBack={() => void save("link")}
+      onBack={() => onBack("link")}
       onContinue={() => void save("fees")}
       onSave={() => void save("scope")}
       groups={[

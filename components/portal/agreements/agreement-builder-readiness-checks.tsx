@@ -17,7 +17,7 @@ export function AgreementBuilderReadinessChecks({
   engagementLinked: boolean;
   signerCount: number;
   pending: boolean;
-  onRepair: (step: AgreementBuilderStep) => Promise<void>;
+  onRepair: (step: AgreementBuilderStep) => void;
 }>): React.JSX.Element {
   return (
     <PortalCard title="Readiness checks">
@@ -58,7 +58,7 @@ export function AgreementBuilderReadinessChecks({
                 <PortalButton
                   key={step}
                   disabled={pending}
-                  onClick={() => void onRepair(step)}
+                  onClick={() => onRepair(step)}
                   type="button"
                   variant="secondary"
                 >

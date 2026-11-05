@@ -25,6 +25,7 @@ export default defineConfig({
     "{testDir}/{testFilePath}-snapshots/{arg}-{projectName}-{platform}{ext}",
   testDir: "tests/e2e",
   testMatch: [
+    "agreement-builder-navigation.spec.ts",
     "research-email-review.spec.ts",
     "outreach-send-all.spec.ts",
     "ai-receptionist-guide.spec.ts",

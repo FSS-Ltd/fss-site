@@ -14,6 +14,7 @@ export type BuilderAgreement = NonNullable<
 export type BuilderStepProps = Readonly<{
   agreement: BuilderAgreement;
   content: AgreementBuilderDraftContent;
+  onBack: (step: AgreementBuilderStep) => void;
   onSave: (
     step: AgreementBuilderStep,
     content: AgreementBuilderDraftContent,

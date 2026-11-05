@@ -25,6 +25,7 @@ for (const [currency, symbol] of [
       <AgreementBuilderFeesStep
         agreement={agreement}
         content={{ agreement }}
+        onBack={() => undefined}
         onSave={async () => undefined}
         pending={false}
       />,
