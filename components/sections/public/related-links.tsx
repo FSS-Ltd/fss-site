@@ -15,14 +15,12 @@ export function RelatedLinks({ links }: { links: readonly CommercialLink[] }) {
       >
         Related reading and next steps
       </h2>
-      <ul className={styles.list}>
+      <ul className={styles.relatedList}>
         {links.map((link) => (
           <li key={link.href}>
-            <Link
-              href={link.href}
-              className="inline-flex min-h-11 items-center font-medium underline underline-offset-4"
-            >
+            <Link href={link.href} className={styles.relatedLink}>
               {link.label}
+              <span aria-hidden="true">→</span>
             </Link>
           </li>
         ))}

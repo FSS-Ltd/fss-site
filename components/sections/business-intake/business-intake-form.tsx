@@ -188,7 +188,7 @@ export function BusinessIntakeForm() {
             <p className="mt-2 text-sm leading-6 text-text-muted">{step.description}</p>
           ) : null}
         </div>
-        <p className="rounded-full border border-border-soft/80 bg-[#f7f8f9] px-4 py-2 text-sm whitespace-nowrap text-text-muted">
+        <p className="self-start rounded-full border border-border-soft/80 bg-[#f7f8f9] px-4 py-2 text-sm whitespace-nowrap text-text-muted sm:self-auto">
           Step {stepIndex + 1} of {intakeSteps.length}
         </p>
       </div>

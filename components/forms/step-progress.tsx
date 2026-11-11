@@ -4,7 +4,7 @@ type StepProgressProps = {
   label: string;
 };
 
-/** Shared progress bar for multi-step forms. `current` is 1-based. */
+/** Shared segmented progress for multi-step forms. `current` is 1-based. */
 export function StepProgress({ current, total, label }: StepProgressProps) {
   return (
     <div
@@ -14,12 +14,19 @@ export function StepProgress({ current, total, label }: StepProgressProps) {
       aria-valuemax={total}
       aria-valuenow={current}
       aria-valuetext={`Step ${current} of ${total}`}
-      className="h-1.5 w-full overflow-hidden rounded-full bg-[#eef0f2]"
+      className="flex w-full gap-1.5"
     >
-      <div
-        className="h-full rounded-full bg-brand-accent transition-all duration-300 motion-reduce:transition-none"
-        style={{ width: `${Math.round((current / total) * 100)}%` }}
-      />
+      {Array.from({ length: total }, (_, index) => (
+        <span
+          key={index}
+          className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-[rgb(33_27_23/0.1)]"
+        >
+          <span
+            className="absolute inset-0 origin-left rounded-full bg-brand-accent transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
+            style={{ transform: `scaleX(${index < current ? 1 : 0})` }}
+          />
+        </span>
+      ))}
     </div>
   );
 }

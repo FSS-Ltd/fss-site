@@ -7,14 +7,19 @@ export function PageIntro({
   title,
   children,
   image,
+  compact = false,
 }: {
   eyebrow: string;
   title: string;
   children: ReactNode;
   image?: ReactNode;
+  /** A short one-line hero so the content below it leads the page. */
+  compact?: boolean;
 }) {
   return (
-    <header className={styles.hero}>
+    <header
+      className={compact ? `${styles.hero} ${styles.heroCompact}` : styles.hero}
+    >
       <canvas
         data-hero-canvas
         className={styles.particleCanvas}
