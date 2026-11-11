@@ -39,21 +39,19 @@ If the text changes, count it again before pasting. Google truncates anything ov
 
 Enter each as a service in the profile. Names and descriptions follow the site. Descriptions are 300 characters or fewer and contain no prices.
 
-The first five rows are on the site today. The four AI rows come from PR B of the AI-led SEO design (`docs/superpowers/specs/2026-11-11-ai-led-seo-lead-growth-design.md`) and are not live yet. Their names and descriptions are provisional until PR B merges. Re-check all nine rows after PR B, because the reframed pages change their titles and descriptions.
+All nine service pages are live. Each name and description below is taken from the live `label` and `description` in `lib/commercial/services.ts` on `origin/main`.
 
 | # | Service name (as on the site) | Description (300 characters or fewer) | Page URL |
 |---|---|---|---|
-| 1 | AI integration (provisional, TO FILL: exact name after PR B) | Connect AI models to the tools and data your business already uses. We agree the scope, the data involved and where a person approves the output before any build begins. | https://faithfulsoftware.dev/services/ai-integration |
-| 2 | AI agents (provisional, TO FILL: exact name after PR B) | AI agents that carry out defined steps in a business process. We set the limits on what each agent can do, the records it can read and the decisions a person must approve. | https://faithfulsoftware.dev/services/ai-agents |
-| 3 | AI receptionist (provisional, TO FILL: exact name after PR B) | An AI receptionist for small businesses, set up to answer defined enquiries. We agree the questions it handles, when it hands over to staff and what customer data it keeps. | https://faithfulsoftware.dev/services/ai-receptionist |
-| 4 | AI readiness audit (provisional, TO FILL: exact name after PR B) | A structured review of where AI would help your business, which data and systems each option depends on, and which project is worth starting first. | https://faithfulsoftware.dev/services/ai-readiness-audit |
-| 5 | Workflow automation | Connect operational tools and reduce repeated data entry with FSS. Scope workflow automation with human review, exception handling and clear ownership. | https://faithfulsoftware.dev/services/workflow-automation |
-| 6 | Private AI | Assess private, local or self-hosted AI with FSS. Define data boundaries, hardware needs, evaluation and human oversight before committing to deployment. | https://faithfulsoftware.dev/services/private-ai |
-| 7 | Custom software development | Bespoke operational software for businesses when off-the-shelf tools cannot support how the team works. We plan workflows, permissions, integrations and a first release before build begins. | https://faithfulsoftware.dev/services/custom-software-development |
-| 8 | Portal development | Plan and build customer, member and staff portals. We define onboarding, role-based access and the workflows people use once they sign in. | https://faithfulsoftware.dev/services/portal-development |
-| 9 | Software modernisation | Assess and modernise existing business software. We plan data migration, integrations, testing and handover before any replacement is built. | https://faithfulsoftware.dev/services/software-modernisation |
-
-Rows 5 and 6 are live and their descriptions are the current site copy, so they can be pasted now. Rows 7 to 9 are live, but their current descriptions name UK charities and faith organisations, which PR B removes. The descriptions shown for rows 7 to 9 are the replacements PR B will publish. Paste them only after PR B is live, or the profile will describe a different page from the one it links to.
+| 1 | AI integration | FSS adds AI to the systems your business already runs: CRM, email, documents and accounts. Scope the data, approvals and failure handling before any build. | https://faithfulsoftware.dev/services/ai-integration |
+| 2 | AI agents for business | FSS builds AI agents that handle defined back-office tasks, such as email triage or quote follow-up, with approval steps, logs and a route for failures. | https://faithfulsoftware.dev/services/ai-agents |
+| 3 | AI receptionist | FSS sets up an AI receptionist that answers calls and messages, takes details and books appointments, with a clear handover to your staff when it cannot help. | https://faithfulsoftware.dev/services/ai-receptionist |
+| 4 | AI readiness audit | Not sure where AI fits? FSS reviews your processes, data and tools, then advises what to automate first, what to leave alone and what to fix before a build. | https://faithfulsoftware.dev/services/ai-readiness-audit |
+| 5 | Workflow automation | Connect your business tools and cut repeated manual data entry with FSS. Scope process automation with human review, exception handling and AI where useful. | https://faithfulsoftware.dev/services/workflow-automation |
+| 6 | Private AI | Assess private, local or self-hosted AI for your business with FSS. Define data boundaries, hardware needs, evaluation and human oversight before you deploy. | https://faithfulsoftware.dev/services/private-ai |
+| 7 | Custom software development | Bespoke business software built by FSS around your workflows, permissions and integrations, from spreadsheet replacement to systems ready to support AI later. | https://faithfulsoftware.dev/services/custom-software-development |
+| 8 | Portal development | Plan and build client, customer and staff portals with FSS. Define onboarding, role-based access and the workflows people complete inside your portal. | https://faithfulsoftware.dev/services/portal-development |
+| 9 | Software modernisation | Assess and modernise ageing business software with FSS. Plan data migration, integrations, testing and handover so the next system can also support AI work. | https://faithfulsoftware.dev/services/software-modernisation |
 
 ## 5. Consistency checklist
 
@@ -91,5 +89,3 @@ Each item below is listed once. Nothing in this guide invents these values.
 4. **Staffed office or not.** Decided by: founder. Default is a service-area business with the address hidden. A staffed office changes the address setting in section 2.
 5. **Cover image.** Supplied by: founder. Needed in section 6.
 6. **Five photos.** Supplied by: founder. Needed in section 6.
-7. **Exact names and descriptions for the four AI services (rows 1 to 4).** Supplied by: whoever merges PR B, once the page H1 and meta description are final. Needed in section 4.
-8. **Reframed service names and descriptions (rows 5 to 9).** Re-check after PR B. Needed in section 4.
