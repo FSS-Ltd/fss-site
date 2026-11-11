@@ -1,4 +1,6 @@
-.home {
+/* Element-qualified so it outranks .page when route stylesheets are
+   re-inserted in a different order after back navigation. */
+div.home {
   padding: 72px 0 80px;
 }
 
@@ -307,8 +309,14 @@
 }
 
 .serviceHeader a::after {
+  display: inline-block;
   color: #a64224;
   content: "→";
+  transition: transform 0.25s;
+}
+
+.serviceHeader a:hover::after {
+  transform: translateX(4px);
 }
 
 .serviceGrid {

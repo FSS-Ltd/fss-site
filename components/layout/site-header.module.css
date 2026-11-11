@@ -12,6 +12,7 @@
   border-radius: 8px;
   font-size: 0.9rem;
   color: var(--text-muted);
+  transition: background-color 0.2s, color 0.2s;
 }
 .desktop a[aria-current="page"],
 .mobilePanel a[aria-current="page"] {
@@ -28,8 +29,8 @@
 }
 .desktop a:hover,
 .mobilePanel a:hover {
-  text-decoration: underline;
-  text-underline-offset: 4px;
+  color: var(--foreground);
+  background: rgb(255 255 255 / 0.7);
 }
 
 .mobile {

@@ -90,12 +90,13 @@ export function bindMotionReveals(scope: ParentNode) {
               opacity: 0,
               transform:
                 variant === "mask" ? "none" : revealTransforms[variant],
-              clipPath: variant === "mask" ? "inset(0 0 100% 0)" : "inset(0)",
+              clipPath: variant === "mask" ? "inset(0 -48px 100%)" : "inset(0 -48px)",
             },
             {
               opacity: 1,
               transform: variant === "mask" ? "none" : "translate3d(0, 0, 0)",
-              clipPath: "inset(0)",
+              // Negative side insets keep hanging markers (list numbers) visible.
+              clipPath: "inset(0 -48px)",
             },
           ],
           {

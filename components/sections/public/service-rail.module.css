@@ -1,9 +1,6 @@
 .scene {
   margin-top: 64px;
 }
-.viewport {
-  width: 100%;
-}
 .rail {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -29,6 +26,8 @@
   :global(#fssroot[data-motion-enhanced="true"]) .viewport {
     position: sticky;
     top: 96px;
+    /* Full bleed: the track runs to the viewport edges, starting on the gutter. */
+    margin-inline: calc(50% - 50vw);
     overflow: hidden;
     height: calc(100svh - 116px);
     display: grid;
@@ -37,6 +36,7 @@
   :global(#fssroot[data-motion-enhanced="true"]) .rail {
     display: flex;
     width: max-content;
+    padding-inline: max(24px, calc((100vw - 1120px) / 2));
     transform: translate3d(var(--motion-track-x, 0), 0, 0);
   }
   :global(#fssroot[data-motion-enhanced="true"]) .rail article {
