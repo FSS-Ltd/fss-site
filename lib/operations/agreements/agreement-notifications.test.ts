@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { resolvePortalOrigin } from "../auth/configuration";
+import { prefixFreePortalEnabled } from "../auth/release-flags";
 import {
   agreementNotificationEmail,
   type AgreementNotification,
@@ -23,7 +25,7 @@ for (const kind of [
   "offer_request",
   "budget_request",
 ] as const) {
-  test(`${kind} uses the current portal sender domain`, () => {
+  test(`${kind} uses the current sender and links directly to the portal`, () => {
     const email = agreementNotificationEmail({
       ...notification,
       kind,
@@ -32,6 +34,10 @@ for (const kind of [
     assert.equal(email.from, "FSS <hello@faithfulsoftware.dev>");
     assert.equal(email.replyTo, "j.ntagengwa@faithfulsoftware.dev");
     assert.equal(email.to, "signer@example.test");
-    assert.match(email.text, /organisationId=/);
+    const target = kind === "signing_request" ? "" : "offers/";
+    const prefix = prefixFreePortalEnabled() ? "" : "/portal";
+    const url = `${resolvePortalOrigin()}${prefix}/agreements/${target}${notification.approvalId}?organisationId=${notification.organisationId}`;
+    assert.ok(email.text.endsWith(`${url}\n\nFaithful Software Solutions`));
+    assert.ok(email.html.includes(`href="${url}"`));
   });
 }

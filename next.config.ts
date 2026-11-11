@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { resolvePortalOrigin } from "./lib/operations/auth/configuration";
+import { portalUrl } from "./lib/operations/auth/portal-url";
 
 const developmentScriptSources =
   process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : "";
@@ -67,12 +69,21 @@ const nextConfig: NextConfig = {
     "/api/portal/admin/clients/**/journey": emailRuntimeTraceFiles,
     "/api/growth/operations/clients/**/journey": emailRuntimeTraceFiles,
     "/api/cron/operations-dispatch": emailRuntimeTraceFiles,
+    // Bundled so the blog API can check primaryKeyword; harmless if the file is absent.
+    "/api/blog": ["./docs/seo/keyword-bank.md"],
   },
   turbopack: {
     root: projectRoot,
   },
   async redirects() {
+    const legacyAgreementPath = "/portal/agreements/:path*";
     return [
+      {
+        source: legacyAgreementPath,
+        has: [{ type: "host", value: "(?:www\\.)?faithfulsoftware\\.dev" }],
+        destination: portalUrl(legacyAgreementPath, resolvePortalOrigin()).href,
+        permanent: false,
+      },
       {
         source: "/resources/sdk-integration-readiness-kit/:path*",
         has: [{ type: "host", value: "www.faithfulsoftware.dev" }],

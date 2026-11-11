@@ -9,6 +9,9 @@ import { sectorLink, costLink, comparisonLink } from "@/lib/commercial/links";
 
 export const metadata: Metadata = createPageMetadata(publicPages["/blog"]);
 
+// Scheduled (future-dated) posts appear on their date without a write.
+export const revalidate = 3600;
+
 export default async function BlogPage() {
   const posts = await getAllBlogPosts();
 
