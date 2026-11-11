@@ -4,11 +4,19 @@ import styles from "./site-header.module.css";
 
 export function SiteHeader() {
   return (
-    <header className="fixed inset-x-0 top-0 z-90 border-b border-border-soft bg-background">
+    <header
+      className="fixed inset-x-0 top-0 z-90 border-b border-border-soft bg-background"
+      // A named header stays still while page content transitions under it.
+      style={{ viewTransitionName: "site-header" }}
+    >
       <a href="#main-content" className={styles.skip}>
         Skip to content
       </a>
-      <div className="mx-auto flex min-h-[72px] max-w-7xl items-center justify-between gap-2 px-4 py-2.5 sm:gap-5 sm:px-6">
+      {/* Same gutter as public page content and the footer, so all left edges align. */}
+      <div
+        className="flex min-h-[72px] items-center justify-between gap-2 py-2.5 sm:gap-5"
+        style={{ paddingInline: "max(24px, calc((100% - 1120px) / 2))" }}
+      >
         <Link
           href="/"
           prefetch={false}

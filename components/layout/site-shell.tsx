@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteInteractions } from "@/components/layout/site-interactions";
+import { PageTransition } from "@/components/layout/page-transition";
 
 type SiteShellProps = {
   children: ReactNode;
@@ -17,7 +18,7 @@ export function SiteShell({ children }: SiteShellProps) {
       <SiteInteractions />
       <SiteHeader />
       <main id="main-content" tabIndex={-1}>
-        {children}
+        <PageTransition>{children}</PageTransition>
       </main>
       <SiteFooter />
     </div>

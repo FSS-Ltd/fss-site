@@ -5,7 +5,9 @@ import {
   getMagneticOffset,
   getMotionCapabilities,
   getParticleNodeCount,
+  getRevealDelay,
   getScrollProgress,
+  isOnScreen,
 } from "./motion-values";
 
 test("magnetic offsets follow the pointer without leaving the control bounds", () => {
@@ -76,4 +78,20 @@ test("particle density scales at mobile and tablet breakpoints", () => {
   assert.ok(desktop > tablet);
   assert.ok(tablet > mobile);
   assert.ok(mobile >= 10);
+});
+
+test("content already on screen is never treated as an arrival", () => {
+  assert.equal(isOnScreen(120, 480, 800), true);
+  assert.equal(isOnScreen(760, 1100, 800), true);
+  assert.equal(isOnScreen(-300, 20, 800), true);
+  assert.equal(isOnScreen(800, 1200, 800), false);
+  assert.equal(isOnScreen(-400, 0, 800), false);
+});
+
+test("reveal cascades step by 90ms and stop growing after the fourth item", () => {
+  assert.deepEqual(
+    [0, 1, 2, 3, 4, 9].map(getRevealDelay),
+    [0, 90, 180, 270, 270, 270],
+  );
+  assert.equal(getRevealDelay(-1), 0);
 });

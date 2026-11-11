@@ -509,3 +509,33 @@
     clip-path: none;
   }
 }
+
+/* Intro: copy rises in a short cascade; the image only lifts, so the
+   largest paint is never held back by opacity. */
+@media (prefers-reduced-motion: no-preference) {
+  .intro > * {
+    animation: intro 700ms cubic-bezier(0.2, 0.75, 0.2, 1) backwards;
+  }
+  .intro > :nth-child(n + 2) {
+    animation-delay: 70ms;
+  }
+  .intro > :nth-child(n + 3) {
+    animation-delay: 160ms;
+  }
+  .markFrame {
+    animation: lift 900ms cubic-bezier(0.2, 0.75, 0.2, 1) 80ms backwards;
+  }
+}
+
+@keyframes intro {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+@keyframes lift {
+  from {
+    transform: translateY(28px);
+  }
+}

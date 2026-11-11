@@ -1,4 +1,8 @@
-import { getScrollProgress } from "./motion-values";
+import {
+  getRevealDelay,
+  getScrollProgress,
+  isOnScreen,
+} from "./motion-values";
 import { bindStoryScenes } from "./story-scenes";
 import { bindAppJourneys } from "./app-journey-scenes";
 import { storyInterval } from "./story-progress";
@@ -23,6 +27,7 @@ export function bindMotionReveals(scope: ParentNode) {
   );
   if (!elements.length || !("IntersectionObserver" in window)) return () => {};
   const animations = new Map<HTMLElement, Animation>();
+  const unseen = new Set(elements);
   let frame = 0;
   const updateMasks = () => {
     frame = 0;
@@ -54,10 +59,20 @@ export function bindMotionReveals(scope: ParentNode) {
 
   const observer = new IntersectionObserver(
     (entries) => {
+      let arrivals = 0;
       entries.forEach((entry) => {
-        if (!entry.isIntersecting || !(entry.target instanceof HTMLElement))
-          return;
+        if (!(entry.target instanceof HTMLElement)) return;
         const element = entry.target;
+        const firstLook = unseen.delete(element);
+        const { top, bottom } = entry.boundingClientRect;
+        // Content visible when the runtime binds (late load, or a page that
+        // arrived through a view transition) is already readable; hiding it
+        // to replay an entrance would read as a flash.
+        if (firstLook && isOnScreen(top, bottom, window.innerHeight)) {
+          observer.unobserve(element);
+          return;
+        }
+        if (!entry.isIntersecting) return;
         // Canvas fields and forms keep their own stationary coordinate space.
         if (
           element.querySelector("[data-hero-canvas], form") ||
@@ -85,8 +100,11 @@ export function bindMotionReveals(scope: ParentNode) {
           ],
           {
             duration: variant === "mask" ? 1000 : 760,
+            delay: variant === "mask" ? 0 : getRevealDelay(arrivals++),
             easing: "cubic-bezier(.2,.75,.2,1)",
-            fill: "none",
+            // Backwards fill holds the start frame through the cascade delay,
+            // then releases transform and clip ownership once finished.
+            fill: "backwards",
           },
         );
         if (

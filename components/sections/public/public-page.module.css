@@ -193,3 +193,20 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Intro: eyebrow, title and lead rise in a short cascade. */
+@media (prefers-reduced-motion: no-preference) {
+  .hero [data-motion-reveal] > * {
+    animation: intro 700ms cubic-bezier(0.2, 0.75, 0.2, 1) backwards;
+  }
+  .hero [data-motion-reveal] > :nth-child(n + 2) {
+    animation-delay: 90ms;
+  }
+}
+
+@keyframes intro {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
