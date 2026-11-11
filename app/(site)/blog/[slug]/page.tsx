@@ -11,6 +11,9 @@ import {
   getRelatedPosts,
 } from "@/lib/blog";
 
+// Scheduled (future-dated) posts appear on their date without a write.
+export const revalidate = 3600;
+
 type BlogPostRouteProps = {
   params: Promise<{ slug: string }>;
 };

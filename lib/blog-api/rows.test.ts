@@ -1,22 +1,36 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { createTtlMemo, loadRowsSafely, mergeBySlug } from "./rows";
+import {
+  BlogRowsUnavailableError,
+  createTtlMemo,
+  loadRowsSafely,
+  requireRows,
+  rowsNotOwnedBy,
+} from "./rows";
 import { createBlogStore, rowToPost } from "./store";
 import type { BlogPostInput } from "./post-schema";
 import type { GrowthQueryExecutor } from "@/lib/growth/db/types";
 
-test("file posts win a slug collision and rows are appended", () => {
-  const merged = mergeBySlug(
-    [{ slug: "a", from: "file" }, { slug: "b", from: "file" }],
-    [{ slug: "b", from: "row" }, { slug: "c", from: "row" }],
-    (item) => item.slug,
-  );
-  assert.deepEqual(merged, [
-    { slug: "a", from: "file" },
-    { slug: "b", from: "file" },
-    { slug: "c", from: "row" },
-  ]);
+test("a slug owned by a file hides a row with the same slug", () => {
+  const row = (slug: string) => ({ meta: { slug } }) as never;
+  const kept = rowsNotOwnedBy(new Set(["a", "future-file"]), [row("a"), row("future-file"), row("c")]);
+  assert.deepEqual(kept.map((r) => r.meta.slug), ["c"]);
+});
+
+test("a degraded result throws outside a build and passes inside one", () => {
+  const degraded = { posts: [], degraded: true };
+  const phase = process.env.NEXT_PHASE;
+  try {
+    delete process.env.NEXT_PHASE;
+    assert.throws(() => requireRows(degraded), BlogRowsUnavailableError);
+    assert.deepEqual(requireRows({ posts: [], degraded: false }), []);
+    process.env.NEXT_PHASE = "phase-production-build";
+    assert.deepEqual(requireRows(degraded), []);
+  } finally {
+    if (phase === undefined) delete process.env.NEXT_PHASE;
+    else process.env.NEXT_PHASE = phase;
+  }
 });
 
 test("a database failure degrades to no rows and reports once without throwing", async () => {
@@ -28,7 +42,7 @@ test("a database failure degrades to no rows and reports once without throwing",
     1000,
     (name) => reports.push(name),
   );
-  assert.deepEqual(rows, []);
+  assert.deepEqual(rows, { posts: [], degraded: true });
   assert.deepEqual(reports, ["TypeError"]);
 });
 
@@ -41,6 +55,7 @@ function fakeDb(result: unknown[]): { db: GrowthQueryExecutor; calls: Call[] } {
     return result;
   };
   tag.array = (items: unknown[]) => ({ array: items });
+  tag.json = (value: unknown) => ({ json: value });
   // Unit fake implements only the postgres.js surface the store uses.
   return { db: tag as unknown as GrowthQueryExecutor, calls };
 }
@@ -66,15 +81,17 @@ const input: BlogPostInput = {
 };
 
 test("upsert is one parameterised statement and reports created vs updated", async () => {
-  const created = fakeDb([{ created: true }]);
-  assert.equal(await createBlogStore(created.db).upsert(input), "created");
+  const created = fakeDb([{ created: true, status: "draft" }]);
+  assert.deepEqual(await createBlogStore(created.db).upsert(input), { action: "created", status: "draft" });
+  // Evidence goes through db.json (not a pre-stringified string that would double-encode).
+  assert.deepEqual(created.calls[0].values.filter((v) => typeof v === "object" && v !== null && "json" in v), [{ json: { sources: input.sources } }, { json: { sources: input.sources } }]);
   assert.equal(created.calls.length, 1);
   assert.ok(!created.calls[0].sql.includes("drop table"));
   assert.ok(created.calls[0].values.includes(input.bodyMarkdown));
   assert.match(created.calls[0].sql, /on conflict \(slug\) do update/);
 
-  const updated = fakeDb([{ created: false }]);
-  assert.equal(await createBlogStore(updated.db).upsert(input), "updated");
+  const updated = fakeDb([{ created: false, status: "published" }]);
+  assert.deepEqual(await createBlogStore(updated.db).upsert(input), { action: "updated", status: "published" });
 });
 
 test("listing published posts is a single query and maps rows to posts", async () => {
@@ -122,7 +139,7 @@ test("a query slower than the timeout degrades to no rows and reports once", asy
     20,
     (name) => reports.push(name),
   );
-  assert.deepEqual(rows, []);
+  assert.deepEqual(rows, { posts: [], degraded: true });
   assert.deepEqual(reports, ["Error"]);
 });
 

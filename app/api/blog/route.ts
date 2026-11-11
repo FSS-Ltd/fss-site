@@ -23,7 +23,7 @@ const handlers = createBlogHandlers({
   allowWrite: createWriteLimiter(20, 60_000),
   revalidate: (slug) => {
     list.reset();
-    for (const path of ["/blog", `/blog/${slug}`, "/sitemap.xml", "/feed.xml"]) {
+    for (const path of ["/blog", `/blog/${slug}`, "/sitemap.xml", "/feed.xml", "/api/blog"]) {
       revalidatePath(path);
     }
   },

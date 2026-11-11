@@ -6,6 +6,7 @@ import { isSafeLinkDestination } from "./links";
 import { SLUG_PATTERN } from "./slug";
 
 export const MAX_BODY_CHARS = 60_000;
+export const MAX_EVIDENCE_CHARS = 8_000;
 
 const httpUrl = z
   .string()
@@ -22,7 +23,10 @@ export const blogPostInputSchema = blogFrontmatterBaseSchema
       .max(100)
       .regex(SLUG_PATTERN, "Use lowercase letters, digits and hyphens."),
     bodyMarkdown: z.string().min(1).max(MAX_BODY_CHARS),
-    status: z.enum(["draft", "published"]).default("draft"),
+    // Optional with no default: an update that omits them keeps the stored value.
+    status: z.enum(["draft", "published"]).optional(),
+    featured: z.boolean().optional(),
+    indexable: z.boolean().optional(),
     primaryKeyword: z.string().trim().min(1).max(200),
     title: shortText(300),
     excerpt: shortText(500),
@@ -46,7 +50,25 @@ export const blogPostInputSchema = blogFrontmatterBaseSchema
       .max(20)
       .optional(),
   })
-  .strict();
+  .strict()
+  .superRefine((post, ctx) => {
+    // Keep well below the table's pg_column_size(evidence) <= 20000 check.
+    const evidence = JSON.stringify({
+      authorUrl: post.authorUrl,
+      reviewedBy: post.reviewedBy,
+      reviewedDate: post.reviewedDate,
+      audience: post.audience,
+      summary: post.summary,
+      sources: post.sources,
+    });
+    if (evidence.length > MAX_EVIDENCE_CHARS) {
+      ctx.addIssue({ code: "custom", message: "Evidence fields are too large." });
+    }
+    // Postgres text cannot hold NUL, which would otherwise surface as a 500.
+    if (JSON.stringify(post).includes("\\u0000")) {
+      ctx.addIssue({ code: "custom", message: "NUL characters are not allowed." });
+    }
+  });
 
 export type BlogPostInput = z.infer<typeof blogPostInputSchema>;
 

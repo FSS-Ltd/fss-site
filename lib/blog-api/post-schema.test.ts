@@ -22,10 +22,10 @@ const valid = {
   primaryKeyword: "AI automation cost UK",
 };
 
-test("accepts a minimal post and defaults status to draft", () => {
+test("accepts a minimal post and leaves optional fields unset", () => {
   const parsed = blogPostInputSchema.parse(valid);
-  assert.equal(parsed.status, "draft");
-  assert.equal(parsed.featured, false);
+  assert.equal(parsed.status, undefined);
+  assert.equal(parsed.featured, undefined);
 });
 
 test("rejects unknown keys, bad slugs, remote covers and non-http source urls", () => {

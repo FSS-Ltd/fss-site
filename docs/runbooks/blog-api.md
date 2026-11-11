@@ -54,8 +54,20 @@ A write revalidates `/blog`, `/blog/<slug>`, `/sitemap.xml` and `/feed.xml`.
 
 - The write rate limit is 20 per minute per client IP (first `x-forwarded-for` hop, which Vercel sets), held in memory per
   serverless instance, evicting expired then oldest entries at 1000 clients. It slows token guessing; the token's length is the real defence.
-- The row query has a 2.5 s timeout. The database being unreachable or slow never breaks the blog. Pages fall back to MDX
-  posts and log `Blog rows unavailable`. Writes return 503.
+- The row query has a 2.5 s timeout. When it fails or times out, the blog does not cache a files-only result:
+  the index, post page, sitemap and feed throw, so ISR keeps the last good page, and a missing post is an error rather
+  than a 404. (A production build is exempt, so a database outage cannot block a deploy; hourly revalidation repairs
+  it.) Writes return 503. A timed-out query still occupies a pool connection until it completes.
+- Precedence: a slug that exists as an MDX file is owned by that file whatever its date. A scheduled (future-dated)
+  file hides a row with the same slug until the file's date. Rows with a future `publishDate` appear on that date:
+  the index and post page revalidate hourly.
+- Updates by slug keep omitted optional fields (`status`, `featured`, `indexable`, evidence keys), merge evidence keys, and
+  set `modifiedDate` to today unless supplied. Required fields are replaced.
+- Staleness after a write: the writing instance refreshes immediately (`revalidatePath` is global). Other instances
+  keep the `GET /api/blog` list for up to 5 minutes (memo) and the CDN holds it for up to 5 more (plus
+  `stale-while-revalidate` up to 10), so the JSON list can lag a write by roughly 5 to 20 minutes. Pages, sitemap and feed use `revalidatePath` and do not wait.
+- The keyword-bank check is inactive until `docs/seo/keyword-bank.md` is on main (it is not in the repo yet), and it
+  stays inactive whenever the file is absent.
 - No delete endpoint. To retire a row, POST it again with `status: "draft"`.
 
 ## Rollback

@@ -9,7 +9,20 @@ import type { BlogPostInput } from "./post-schema";
 export type BlogStore = {
   /** Every row with status published, newest first. One query. */
   listPublished(): Promise<BlogPost[]>;
-  upsert(input: BlogPostInput): Promise<"created" | "updated">;
+  /**
+   * Insert, or update by slug. An update leaves omitted optional fields as they
+   * are (status, featured, indexable, evidence keys) and stamps modified_date
+   * with today unless one is supplied.
+   */
+  upsert(input: BlogPostInput): Promise<UpsertResult>;
+};
+
+// pg_type oid of text[]; postgres.js needs it to encode arrays without prepared statements.
+const TEXT_ARRAY_OID = 1009;
+
+export type UpsertResult = {
+  action: "created" | "updated";
+  status: "draft" | "published";
 };
 
 type Row = {
@@ -98,20 +111,22 @@ export function createBlogStore(db: GrowthQueryExecutor): BlogStore {
         ...(input.summary ? { summary: input.summary } : {}),
         ...(input.sources ? { sources: input.sources } : {}),
       };
-      const modifiedDate = input.modifiedDate ?? input.publishDate;
-
-      const [row] = await db<{ created: boolean }[]>`
+      const [row] = await db<{ created: boolean; status: "draft" | "published" }[]>`
         insert into growth.blog_posts (
           slug, title, excerpt, body_markdown, category, tags, primary_keyword,
           status, publish_date, modified_date, author, cover_image, seo_title,
           seo_description, featured, indexable, evidence
         ) values (
           ${input.slug}, ${input.title}, ${input.excerpt}, ${input.bodyMarkdown},
-          ${input.category}, ${db.array(input.tags)}::text[], ${input.primaryKeyword},
-          ${input.status}, ${input.publishDate}::date, ${modifiedDate}::date,
+          ${input.category}, ${db.array(input.tags, TEXT_ARRAY_OID)}::text[], ${input.primaryKeyword},
+          coalesce(${input.status ?? null}::text, 'draft'),
+          ${input.publishDate}::date,
+          coalesce(${input.modifiedDate ?? null}::date, ${input.publishDate}::date),
           ${input.author}, ${input.coverImage}, ${input.seoTitle},
-          ${input.seoDescription}, ${input.featured}, ${input.indexable},
-          ${JSON.stringify(evidence)}::jsonb
+          ${input.seoDescription},
+          coalesce(${input.featured ?? null}::boolean, false),
+          coalesce(${input.indexable ?? null}::boolean, true),
+          ${db.json(evidence)}
         )
         on conflict (slug) do update set
           title = excluded.title,
@@ -120,20 +135,23 @@ export function createBlogStore(db: GrowthQueryExecutor): BlogStore {
           category = excluded.category,
           tags = excluded.tags,
           primary_keyword = excluded.primary_keyword,
-          status = excluded.status,
+          status = coalesce(${input.status ?? null}::text, growth.blog_posts.status),
           publish_date = excluded.publish_date,
-          modified_date = excluded.modified_date,
+          modified_date = coalesce(${input.modifiedDate ?? null}::date, current_date),
           author = excluded.author,
           cover_image = excluded.cover_image,
           seo_title = excluded.seo_title,
           seo_description = excluded.seo_description,
-          featured = excluded.featured,
-          indexable = excluded.indexable,
-          evidence = excluded.evidence,
+          featured = coalesce(${input.featured ?? null}::boolean, growth.blog_posts.featured),
+          indexable = coalesce(${input.indexable ?? null}::boolean, growth.blog_posts.indexable),
+          evidence = growth.blog_posts.evidence || ${db.json(evidence)},
           updated_at = now()
-        returning (xmax = 0) as created
+        returning (xmax = 0) as created, status
       `;
-      return row?.created ? "created" : "updated";
+      return {
+        action: row?.created ? "created" : "updated",
+        status: row?.status ?? "draft",
+      };
     },
   };
 }

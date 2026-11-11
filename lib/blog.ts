@@ -11,7 +11,12 @@ import type { BlogFrontmatter, BlogPost, BlogPostMeta } from "@/lib/types/blog";
 
 import { contentEvidenceSchema, isoDateSchema } from "@/lib/seo/content";
 import { SLUG_PATTERN } from "@/lib/blog-api/slug";
-import { loadRowsSafely, mergeBySlug } from "@/lib/blog-api/rows";
+import {
+  type RowsResult,
+  loadRowsSafely,
+  requireRows,
+  rowsNotOwnedBy,
+} from "@/lib/blog-api/rows";
 import { createBlogStore } from "@/lib/blog-api/store";
 import { getGrowthDb } from "@/lib/growth/db/client";
 
@@ -57,19 +62,6 @@ function sortByPublishDateDesc(posts: BlogPostMeta[]): BlogPostMeta[] {
   );
 }
 
-async function getBlogFileNames(): Promise<string[]> {
-  const entries = await fs.readdir(BLOG_CONTENT_DIR, { withFileTypes: true });
-
-  return entries
-    .filter((entry) => entry.isFile() && entry.name.endsWith(".mdx"))
-    .map((entry) => entry.name);
-}
-
-async function readBlogFile(fileName: string): Promise<string> {
-  const fullPath = path.join(BLOG_CONTENT_DIR, fileName);
-  return fs.readFile(fullPath, "utf8");
-}
-
 function fileNameToSlug(fileName: string): string {
   return fileName.replace(/\.mdx$/, "");
 }
@@ -88,26 +80,32 @@ function buildPostMeta(
 
 /**
  * Published API rows, one query per request (React cache). Without DATABASE_URL
- * (previews, CI builds) there is nothing to read and nothing to report.
+ * (previews, CI builds) there is nothing to read, so the result is complete.
+ * A failure or timeout is reported once and flagged as degraded.
  */
-const getPublishedRows = cache(async (): Promise<BlogPost[]> => {
-  if (!process.env.DATABASE_URL) return [];
+const getPublishedRows = cache(async (): Promise<RowsResult> => {
+  if (!process.env.DATABASE_URL) return { posts: [], degraded: false };
   return loadRowsSafely(
     () => createBlogStore(getGrowthDb()).listPublished(),
     ROW_QUERY_TIMEOUT_MS,
     (errorName) =>
-      console.error("Blog rows unavailable; serving MDX posts only.", {
+      console.error("Blog rows unavailable; not caching a files-only result.", {
         errorName,
       }),
   );
 });
 
-export async function getAllBlogPosts(): Promise<BlogPostMeta[]> {
-  const fileNames = await getBlogFileNames();
+export async function getAllBlogPostsWith(
+  getRows: () => Promise<RowsResult>,
+  contentDir: string = BLOG_CONTENT_DIR,
+): Promise<BlogPostMeta[]> {
+  const fileNames = (await fs.readdir(contentDir, { withFileTypes: true }))
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".mdx"))
+    .map((entry) => entry.name);
 
   const posts = await Promise.all(
     fileNames.map(async (fileName) => {
-      const source = await readBlogFile(fileName);
+      const source = await fs.readFile(path.join(contentDir, fileName), "utf8");
       const { data, content } = matter(source);
       const frontmatter = parseFrontmatter(data);
       const slug = fileNameToSlug(fileName);
@@ -116,17 +114,21 @@ export async function getAllBlogPosts(): Promise<BlogPostMeta[]> {
     }),
   );
 
-  const published = posts.filter((post) => isPublished(post.publishDate));
-  const rows = (await getPublishedRows())
+  // One rule everywhere: a file owns its slug whatever its date.
+  const fileSlugs = new Set([
+    ...posts.map((post) => post.slug),
+    churchArticle.meta.slug,
+  ]);
+  const rows = rowsNotOwnedBy(fileSlugs, requireRows(await getRows()))
     .map((post) => post.meta)
     .filter((meta) => isPublished(meta.publishDate));
-  return sortByPublishDateDesc(
-    mergeBySlug(
-      [...published, churchArticle.meta],
-      rows,
-      (post) => post.slug,
-    ),
-  );
+  const published = posts.filter((post) => isPublished(post.publishDate));
+
+  return sortByPublishDateDesc([...published, churchArticle.meta, ...rows]);
+}
+
+export async function getAllBlogPosts(): Promise<BlogPostMeta[]> {
+  return getAllBlogPostsWith(getPublishedRows);
 }
 
 export async function getFeaturedBlogPosts(): Promise<BlogPostMeta[]> {
@@ -136,7 +138,7 @@ export async function getFeaturedBlogPosts(): Promise<BlogPostMeta[]> {
 
 export async function getBlogPostBySlugWith(
   slug: string,
-  getRows: () => Promise<BlogPost[]>,
+  getRows: () => Promise<RowsResult>,
   contentDir: string = BLOG_CONTENT_DIR,
 ): Promise<BlogPost | null> {
   if (slug === churchArticle.meta.slug) return churchArticle;
@@ -150,7 +152,9 @@ export async function getBlogPostBySlugWith(
     // Only a missing file may fall through to a database row; an unreadable
     // file must not be shadowed by one.
     if ((error as NodeJS.ErrnoException).code !== "ENOENT") return null;
-    const row = (await getRows()).find((post) => post.meta.slug === slug);
+    const row = requireRows(await getRows()).find(
+      (post) => post.meta.slug === slug,
+    );
     return row && isPublished(row.meta.publishDate) ? row : null;
   }
 

@@ -34,7 +34,7 @@ function setup(overrides: Partial<BlogApiDeps> = {}) {
     listPublished: async () => [],
     upsert: async (input) => {
       upserts.push(input);
-      return "created";
+      return { action: "created" as const, status: "draft" as const };
     },
   };
   const deps: BlogApiDeps = {
@@ -117,7 +117,7 @@ test("creates a draft by default, logs slug and action only, and revalidates", a
     status: "draft",
     url: `https://example.test/blog/${body.slug}`,
   });
-  assert.equal((upserts[0] as { status: string }).status, "draft");
+  assert.equal((upserts[0] as { status?: string }).status, undefined);
   assert.deepEqual(logs, [{ event: "blog_api_write", slug: body.slug, action: "created" }]);
   assert.ok(!JSON.stringify(logs).includes("Plain markdown"));
   assert.deepEqual(revalidated, [body.slug]);
@@ -129,7 +129,7 @@ test("400 for bad JSON, bad fields and oversize bodies", async () => {
   const invalid = await handlers.POST(post({ ...body, slug: "Bad Slug" }));
   assert.equal(invalid.status, 400);
   assert.equal(await code(invalid), "invalid_body");
-  const big = await handlers.POST(post({ ...body, bodyMarkdown: "x".repeat(250_000) }));
+  const big = await handlers.POST(post({ ...body, bodyMarkdown: "x".repeat(700_000) }));
   assert.equal(big.status, 413);
 });
 

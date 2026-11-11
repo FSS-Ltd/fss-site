@@ -1,27 +1,50 @@
 import type { BlogPost } from "@/lib/types/blog";
 
-/** MDX files win a slug collision, so an API write can never replace repo content. */
-export function mergeBySlug<T>(
-  files: readonly T[],
-  rows: readonly T[],
-  slugOf: (item: T) => string,
-): T[] {
-  const fileSlugs = new Set(files.map(slugOf));
-  return [...files, ...rows.filter((row) => !fileSlugs.has(slugOf(row)))];
+export type RowsResult = { posts: BlogPost[]; degraded: boolean };
+
+export class BlogRowsUnavailableError extends Error {
+  constructor() {
+    super("Blog database rows are unavailable");
+    this.name = "BlogRowsUnavailableError";
+  }
 }
 
 /**
- * Database trouble or slowness must never take the blog down: fall back to files only and
- * report the error name, not the message, which could carry connection details.
+ * A slug that exists as an MDX file (parseable, any date) is owned by the file,
+ * so a row with that slug is never shown, even while the file is scheduled.
+ */
+export function rowsNotOwnedBy(
+  fileSlugs: ReadonlySet<string>,
+  rows: readonly BlogPost[],
+): BlogPost[] {
+  return rows.filter((row) => !fileSlugs.has(row.meta.slug));
+}
+
+/**
+ * Pages built from a degraded (files-only) result must not be cached as if they
+ * were complete: throw so ISR keeps the last good page. A production build is
+ * exempt so an outage cannot block a deploy; revalidation repairs it within the hour.
+ */
+export function requireRows(result: RowsResult): BlogPost[] {
+  if (result.degraded && process.env.NEXT_PHASE !== "phase-production-build") {
+    throw new BlogRowsUnavailableError();
+  }
+  return result.posts;
+}
+
+/**
+ * Database trouble or slowness must never take the blog down silently: report the
+ * error name (not the message, which could carry connection details) and flag the
+ * result as degraded. A timed-out query keeps its pool connection until it finishes.
  */
 export async function loadRowsSafely(
   load: () => Promise<BlogPost[]>,
   timeoutMs: number,
   report: (errorName: string) => void,
-): Promise<BlogPost[]> {
+): Promise<RowsResult> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
-    return await Promise.race([
+    const posts = await Promise.race([
       load(),
       new Promise<never>((_resolve, reject) => {
         timer = setTimeout(
@@ -30,9 +53,10 @@ export async function loadRowsSafely(
         );
       }),
     ]);
+    return { posts, degraded: false };
   } catch (error) {
     report(error instanceof Error ? error.name : "UnknownError");
-    return [];
+    return { posts: [], degraded: true };
   } finally {
     clearTimeout(timer);
   }

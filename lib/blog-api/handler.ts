@@ -4,10 +4,13 @@ import type { BlogPostMeta } from "@/lib/types/blog";
 
 import { type KeywordBankEntry, isKnownKeyword } from "./keyword-bank";
 import { blogPostInputSchema, findMdxConstruct } from "./post-schema";
-import type { BlogStore } from "./store";
+import type { BlogStore, UpsertResult } from "./store";
 
-const MAX_REQUEST_BYTES = 200_000;
-const NO_STORE = { "cache-control": "no-store" } as const;
+// 60k body chars can escape to 6 bytes each in JSON, plus the other fields.
+const MAX_REQUEST_BYTES = 600_000;
+// Postgres 23514 check_violation, 22001 string_data_right_truncation, 22021 bad encoding, 22P05 untranslatable.
+const DATA_ERROR_CODES = new Set(["23514", "22001", "22021", "22P05"]);
+const NO_STORE ={ "cache-control": "no-store" } as const;
 
 export type BlogApiDeps = {
   /** Read per request so an unset variable disables writes immediately. */
@@ -145,10 +148,16 @@ export function createBlogHandlers(deps: BlogApiDeps) {
       return fail(422, "unknown_primary_keyword");
     }
 
-    let action: "created" | "updated";
+    let result: UpsertResult;
     try {
-      action = await deps.store().upsert(post);
+      result = await deps.store().upsert(post);
     } catch (error) {
+      // Check violation, string too long, NUL byte: a bad value, not an outage.
+      const code = (error as { code?: unknown } | null)?.code;
+      if (typeof code === "string" && DATA_ERROR_CODES.has(code)) {
+        deps.log({ event: "blog_api_write_rejected", slug: post.slug, code });
+        return fail(422, "constraint_violation");
+      }
       deps.log({
         event: "blog_api_write_failed",
         slug: post.slug,
@@ -157,6 +166,7 @@ export function createBlogHandlers(deps: BlogApiDeps) {
       return fail(503, "storage_unavailable");
     }
 
+    const { action, status } = result;
     deps.log({ event: "blog_api_write", slug: post.slug, action });
     try {
       deps.revalidate(post.slug);
@@ -170,7 +180,7 @@ export function createBlogHandlers(deps: BlogApiDeps) {
         ok: true,
         action,
         slug: post.slug,
-        status: post.status,
+        status,
         url: deps.postUrl(post.slug),
       },
       { status: action === "created" ? 201 : 200, headers: NO_STORE },

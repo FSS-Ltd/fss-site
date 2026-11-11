@@ -53,6 +53,37 @@ export function parseKeywordBank(markdown: string): KeywordBankEntry[] {
   return entries;
 }
 
+/**
+ * Marks one open phrase used, matching rows by parsed cells (so padded tables
+ * work) and keeping the table's spacing. `matched` is false if no open row fit.
+ */
+export function markKeywordUsed(
+  markdown: string,
+  phrase: string,
+): { text: string; matched: boolean } {
+  const wanted = normalisePhrase(phrase);
+  let inSection = false;
+  let matched = false;
+
+  const lines = markdown.split("\n").map((line) => {
+    if (HEADING.test(line)) {
+      inSection = true;
+      return line;
+    }
+    if (inSection && ANY_HEADING.test(line)) inSection = false;
+    if (matched || !inSection || !line.trim().startsWith("|")) return line;
+
+    const row = cells(line);
+    const status = normalisePhrase(row[row.length - 1] ?? "");
+    if (normalisePhrase(row[0] ?? "") !== wanted || status !== "open") return line;
+
+    matched = true;
+    return line.replace(/(\|\s*)open(\s*\|\s*)$/i, "$1used$2");
+  });
+
+  return { text: lines.join("\n"), matched };
+}
+
 /** Returns null when the bank is not present, so callers can skip the check. */
 export function readKeywordBank(
   filePath: string = KEYWORD_BANK_PATH,
