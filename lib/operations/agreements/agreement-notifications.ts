@@ -1,6 +1,7 @@
 import { OPERATIONS_EMAIL_FROM } from "../email-identity";
 import { createHash } from "node:crypto";
-import { resolveSiteUrl } from "@/lib/config/site-url";
+import { resolvePortalOrigin } from "../auth/configuration";
+import { portalUrl } from "../auth/portal-url";
 import type { OperationsDb } from "../db/client";
 import { createOnboardingResendSender } from "../onboarding/resend-provider";
 import type { EffectResult } from "../onboarding/types";
@@ -42,7 +43,7 @@ export function agreementNotificationEmail(
   const target = offer
     ? `offers/${notification.offerId}`
     : notification.approvalId;
-  const url = new URL(`/portal/agreements/${target}`, resolveSiteUrl());
+  const url = portalUrl(`/portal/agreements/${target}`, resolvePortalOrigin());
   url.searchParams.set("organisationId", notification.organisationId);
   const subject = budget
     ? `Propose a budget: ${notification.title}`

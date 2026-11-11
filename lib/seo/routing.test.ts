@@ -3,6 +3,8 @@ import test from "node:test";
 
 import { unstable_getResponseFromNextConfig } from "next/experimental/testing/server";
 import nextConfig from "../../next.config";
+import { resolvePortalOrigin } from "../operations/auth/configuration";
+import { prefixFreePortalEnabled } from "../operations/auth/release-flags";
 
 test("private trees and thank-you pages receive robots response headers", async () => {
   const headers = await nextConfig.headers?.();
@@ -105,4 +107,41 @@ test("www redirect preserves nested paths and query parameters without redirecti
     nextConfig,
   });
   assert.equal(preview.headers.get("location"), null);
+});
+
+test("already-sent agreement links redirect from public hosts to the portal", async () => {
+  const prefix = prefixFreePortalEnabled() ? "" : "/portal";
+  for (const host of ["faithfulsoftware.dev", "www.faithfulsoftware.dev"]) {
+    for (const path of [
+      "/agreements/offers/offer-id",
+      "/agreements/approval-id/sign",
+    ]) {
+      const search = "?organisationId=organisation-id";
+      const response = await unstable_getResponseFromNextConfig({
+        url: `https://${host}/portal${path}${search}`,
+        nextConfig,
+      });
+      assert.equal(response.status, 307);
+      assert.equal(
+        response.headers.get("location"),
+        `${resolvePortalOrigin()}${prefix}${path}${search}`,
+      );
+    }
+  }
+});
+
+test("legacy agreement link redirect is scoped to public hosts and client pages", async () => {
+  for (const url of [
+    `${resolvePortalOrigin()}/portal/agreements/offers/offer-id`,
+    "https://fss-git-preview.vercel.app/portal/agreements/offers/offer-id",
+    "https://faithfulsoftware.dev/api/portal/organisations/organisation-id/commercial-offers",
+    "https://faithfulsoftware.dev/portal/admin/clients/organisation-id/agreements",
+    "https://faithfulsoftware.dev/portal/login",
+  ]) {
+    const response = await unstable_getResponseFromNextConfig({
+      url,
+      nextConfig,
+    });
+    assert.equal(response.headers.get("location"), null, url);
+  }
 });
