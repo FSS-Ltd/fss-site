@@ -6,6 +6,7 @@ import { RelatedLinks } from "./related-links";
 import { sectorLink, nexstepsLink, costLink } from "@/lib/commercial/links";
 import styles from "./public-page.module.css";
 import contactStyles from "./contact-page.module.css";
+import compactStyles from "./compact-hero.module.css";
 
 const questions = [
   {
@@ -30,13 +31,17 @@ const questions = [
 
 export function ContactPageContent() {
   return (
-    <div className={`${styles.page} ${styles.pageCompact}`}>
+    <div className={`${styles.page} ${compactStyles.pageCompact}`}>
       <PageIntro
-        compact
+        compact={{
+          hero: compactStyles.heroCompact,
+          canvas: compactStyles.canvasCompact,
+          eyebrow: compactStyles.eyebrowCompact,
+        }}
         eyebrow="Five short questions"
         title="Tell us what you want off your plate"
       >
-        <p className={styles.heroLead}>
+        <p className={compactStyles.heroLead}>
           AI, automation and custom software for businesses of any size.
         </p>
       </PageIntro>
