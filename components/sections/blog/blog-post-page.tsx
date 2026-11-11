@@ -16,6 +16,8 @@ export async function BlogPostPage({ post, relatedPosts }: BlogPostPageProps) {
   const { content } = await compileMDX({
     source: post.body,
     components: mdxComponents,
+    // API-published rows are plain Markdown: nothing in them is evaluated.
+    options: post.format === "markdown" ? { mdxOptions: { format: "md" } } : undefined,
   });
 
   return (

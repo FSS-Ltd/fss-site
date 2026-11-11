@@ -21,6 +21,11 @@ import { promisify } from "node:util";
 import matter from "gray-matter";
 import { z } from "zod";
 
+import {
+  KEYWORD_BANK_PATH,
+  normalisePhrase,
+  readKeywordBank,
+} from "../lib/blog-api/keyword-bank";
 import { generateCoverSvg } from "./generate-cover";
 
 const execFileAsync = promisify(execFile);
@@ -521,11 +526,20 @@ async function main(): Promise<void> {
   const generationProvider = resolveGenerationProvider();
   const generationOptions = resolveGenerationOptions();
 
-  const entry = pickNextKeyword(tracker);
-  if (!entry) {
+  const nextEntry = pickNextKeyword(tracker);
+  if (!nextEntry) {
     console.log("All keywords covered - nothing to generate.");
     process.exit(0);
   }
+
+  // When the keyword bank exists, the post must target one of its open phrases.
+  const bank = readKeywordBank();
+  const openPhrase = bank?.find((candidate) => candidate.status === "open");
+  if (bank && !openPhrase) {
+    console.log("Keyword bank has no open phrases - nothing to generate.");
+    process.exit(0);
+  }
+  const entry = openPhrase ? { ...nextEntry, keyword: openPhrase.phrase } : nextEntry;
 
   console.log(`Generation provider: ${generationProvider}`);
   console.log(`CTA href: ${generationOptions.ctaHref}`);
@@ -555,6 +569,13 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
+  if (bank && !normalisePhrase(validatedMdx).includes(normalisePhrase(entry.keyword))) {
+    const debugPath = path.join(DEBUG_DIR, `debug-output-${entry.id}.mdx`);
+    await fs.writeFile(debugPath, rawMdx, "utf8");
+    console.error(`Generated post does not contain the target phrase "${entry.keyword}". Raw output saved to ${debugPath}`);
+    process.exit(1);
+  }
+
   const uniqueSlug = await ensureUniqueSlug(slug);
   const mdxPath = path.join(BLOG_DIR, `${uniqueSlug}.mdx`);
   await fs.writeFile(mdxPath, validatedMdx, "utf8");
@@ -576,6 +597,20 @@ async function main(): Promise<void> {
   tracker.keywords[idx].coveredAt = generationOptions.publishDate;
   await saveTracker(tracker);
   console.log(`Tracker updated: ${entry.id} → ${uniqueSlug}`);
+
+  if (bank) {
+    // Keyword bank rule: mark the phrase used once a piece is assigned to it.
+    const text = await fs.readFile(KEYWORD_BANK_PATH, "utf8");
+    const marked = text
+      .split("\n")
+      .map((line) =>
+        line.startsWith(`| ${entry.keyword} |`) && /\|\s*open\s*\|\s*$/.test(line)
+          ? line.replace(/\|\s*open\s*\|\s*$/, "| used |")
+          : line,
+      )
+      .join("\n");
+    await fs.writeFile(KEYWORD_BANK_PATH, marked, "utf8");
+  }
 }
 
 main();

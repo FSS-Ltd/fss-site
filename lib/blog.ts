@@ -4,32 +4,38 @@ import path from "node:path";
 import matter from "gray-matter";
 import readingTime from "reading-time";
 import { churchArticle } from "@/lib/commercial/church-article";
+import { cache } from "react";
 import { z } from "zod";
 
 import type { BlogFrontmatter, BlogPost, BlogPostMeta } from "@/lib/types/blog";
 
 import { contentEvidenceSchema, isoDateSchema } from "@/lib/seo/content";
+import { loadRowsSafely, mergeBySlug } from "@/lib/blog-api/rows";
+import { createBlogStore } from "@/lib/blog-api/store";
+import { getGrowthDb } from "@/lib/growth/db/client";
 
 const BLOG_CONTENT_DIR = path.join(process.cwd(), "content", "blog");
 
-export const blogFrontmatterSchema = contentEvidenceSchema
-  .extend({
-    title: z.string().min(1),
-    excerpt: z.string().min(1),
-    publishDate: isoDateSchema,
-    modifiedDate: isoDateSchema.optional(),
-    author: z.string().min(1),
-    category: z.string().min(1),
-    tags: z.array(z.string().min(1)).min(1),
-    coverImage: z.string().min(1),
-    seoTitle: z.string().min(1),
-    seoDescription: z.string().min(1),
-    featured: z.boolean().default(false),
-  })
-  .transform((post) => ({
+export const blogFrontmatterBaseSchema = contentEvidenceSchema.extend({
+  title: z.string().min(1),
+  excerpt: z.string().min(1),
+  publishDate: isoDateSchema,
+  modifiedDate: isoDateSchema.optional(),
+  author: z.string().min(1),
+  category: z.string().min(1),
+  tags: z.array(z.string().min(1)).min(1),
+  coverImage: z.string().min(1),
+  seoTitle: z.string().min(1),
+  seoDescription: z.string().min(1),
+  featured: z.boolean().default(false),
+});
+
+export const blogFrontmatterSchema = blogFrontmatterBaseSchema.transform(
+  (post) => ({
     ...post,
     modifiedDate: post.modifiedDate ?? post.publishDate,
-  }));
+  }),
+);
 
 function parseFrontmatter(frontmatter: unknown): BlogFrontmatter {
   return blogFrontmatterSchema.parse(frontmatter);
@@ -76,6 +82,21 @@ function buildPostMeta(
   };
 }
 
+/**
+ * Published API rows, one query per request (React cache). Without DATABASE_URL
+ * (previews, CI builds) there is nothing to read and nothing to report.
+ */
+const getPublishedRows = cache(async (): Promise<BlogPost[]> => {
+  if (!process.env.DATABASE_URL) return [];
+  return loadRowsSafely(
+    () => createBlogStore(getGrowthDb()).listPublished(),
+    (errorName) =>
+      console.error("Blog rows unavailable; serving MDX posts only.", {
+        errorName,
+      }),
+  );
+});
+
 export async function getAllBlogPosts(): Promise<BlogPostMeta[]> {
   const fileNames = await getBlogFileNames();
 
@@ -91,7 +112,16 @@ export async function getAllBlogPosts(): Promise<BlogPostMeta[]> {
   );
 
   const published = posts.filter((post) => isPublished(post.publishDate));
-  return sortByPublishDateDesc([...published, churchArticle.meta]);
+  const rows = (await getPublishedRows())
+    .map((post) => post.meta)
+    .filter((meta) => isPublished(meta.publishDate));
+  return sortByPublishDateDesc(
+    mergeBySlug(
+      [...published, churchArticle.meta],
+      rows,
+      (post) => post.slug,
+    ),
+  );
 }
 
 export async function getFeaturedBlogPosts(): Promise<BlogPostMeta[]> {
@@ -118,7 +148,10 @@ export async function getBlogPostBySlug(
       body: content,
     };
   } catch {
-    return null;
+    const row = (await getPublishedRows()).find(
+      (post) => post.meta.slug === slug,
+    );
+    return row && isPublished(row.meta.publishDate) ? row : null;
   }
 }
 
