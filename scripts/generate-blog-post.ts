@@ -21,6 +21,12 @@ import { promisify } from "node:util";
 import matter from "gray-matter";
 import { z } from "zod";
 
+import {
+  KEYWORD_BANK_PATH,
+  markKeywordUsed,
+  normalisePhrase,
+  readKeywordBank,
+} from "../lib/blog-api/keyword-bank";
 import { generateCoverSvg } from "./generate-cover";
 
 const execFileAsync = promisify(execFile);
@@ -521,11 +527,53 @@ async function main(): Promise<void> {
   const generationProvider = resolveGenerationProvider();
   const generationOptions = resolveGenerationOptions();
 
-  const entry = pickNextKeyword(tracker);
-  if (!entry) {
-    console.log("All keywords covered - nothing to generate.");
+  const nextEntry = pickNextKeyword(tracker);
+  // When the keyword bank exists, the post must target one of its open phrases,
+  // so an exhausted tracker only ends the run if the bank has nothing open either.
+  const bank = readKeywordBank();
+  const openPhrases = bank?.filter((candidate) => candidate.status === "open") ?? [];
+  if (bank ? openPhrases.length === 0 : !nextEntry) {
+    console.log(
+      bank
+        ? "Keyword bank has no open phrases - nothing to generate."
+        : "All keywords covered - nothing to generate.",
+    );
     process.exit(0);
   }
+
+  // Prefer the tracker's own keyword when the bank lists it as open, so the
+  // tracker and the bank stay in step. Otherwise the post is a bank-only piece:
+  // it gets its own id (and cover) and no tracker entry is marked covered.
+  const trackerMatch =
+    nextEntry &&
+    openPhrases.find(
+      (candidate) => normalisePhrase(candidate.phrase) === normalisePhrase(nextEntry.keyword),
+    );
+  const phrase = bank ? (trackerMatch ?? openPhrases[0]).phrase : undefined;
+  const base: KeywordEntry =
+    nextEntry ??
+    {
+      id: "",
+      keyword: "",
+      pageTitle: "",
+      target: "UK small and mid-sized businesses",
+      cta: "Talk to us about your project",
+      pageType: "Blog post",
+      category: "AI and automation",
+      tags: ["ai", "automation"],
+      coveredBySlug: null,
+      coveredAt: null,
+    };
+  const entry: KeywordEntry = phrase
+    ? {
+        ...base,
+        keyword: phrase,
+        ...(trackerMatch
+          ? {}
+          : { id: `bank-${titleToSlug(phrase)}`, pageTitle: phrase }),
+      }
+    : base;
+  const trackerOwnsEntry = Boolean(nextEntry) && (!phrase || Boolean(trackerMatch));
 
   console.log(`Generation provider: ${generationProvider}`);
   console.log(`CTA href: ${generationOptions.ctaHref}`);
@@ -555,6 +603,13 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
+  if (bank && !normalisePhrase(validatedMdx).includes(normalisePhrase(entry.keyword))) {
+    const debugPath = path.join(DEBUG_DIR, `debug-output-${entry.id}.mdx`);
+    await fs.writeFile(debugPath, rawMdx, "utf8");
+    console.error(`Generated post does not contain the target phrase "${entry.keyword}". Raw output saved to ${debugPath}`);
+    process.exit(1);
+  }
+
   const uniqueSlug = await ensureUniqueSlug(slug);
   const mdxPath = path.join(BLOG_DIR, `${uniqueSlug}.mdx`);
   await fs.writeFile(mdxPath, validatedMdx, "utf8");
@@ -571,11 +626,26 @@ async function main(): Promise<void> {
   await fs.writeFile(coverPath, coverSvg, "utf8");
   console.log(`Wrote cover: ${coverPath}`);
 
-  const idx = tracker.keywords.findIndex((k) => k.id === entry.id);
-  tracker.keywords[idx].coveredBySlug = uniqueSlug;
-  tracker.keywords[idx].coveredAt = generationOptions.publishDate;
-  await saveTracker(tracker);
-  console.log(`Tracker updated: ${entry.id} → ${uniqueSlug}`);
+  if (trackerOwnsEntry) {
+    const idx = tracker.keywords.findIndex((k) => k.id === entry.id);
+    tracker.keywords[idx].coveredBySlug = uniqueSlug;
+    tracker.keywords[idx].coveredAt = generationOptions.publishDate;
+    await saveTracker(tracker);
+    console.log(`Tracker updated: ${entry.id} → ${uniqueSlug}`);
+  }
+
+  if (bank) {
+    // Keyword bank rule: mark the phrase used once a piece is assigned to it.
+    const { text, matched } = markKeywordUsed(
+      await fs.readFile(KEYWORD_BANK_PATH, "utf8"),
+      entry.keyword,
+    );
+    if (matched) {
+      await fs.writeFile(KEYWORD_BANK_PATH, text, "utf8");
+    } else {
+      console.warn(`Warning: no open keyword-bank row matched "${entry.keyword}"; the bank was not updated.`);
+    }
+  }
 }
 
 main();

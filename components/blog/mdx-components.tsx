@@ -3,6 +3,7 @@ import type { ComponentPropsWithoutRef } from "react";
 
 import { MdxCallout } from "@/components/blog/mdx-callout";
 import { MdxCtaBlock } from "@/components/blog/mdx-cta-block";
+import { isSafeLinkDestination } from "@/lib/blog-api/links";
 
 function H2(props: ComponentPropsWithoutRef<"h2">) {
   return <h2 className="mt-12 text-3xl font-semibold tracking-tight text-foreground" {...props} />;
@@ -38,6 +39,11 @@ function Blockquote(props: ComponentPropsWithoutRef<"blockquote">) {
 }
 
 function Anchor({ href = "", ...props }: ComponentPropsWithoutRef<"a">) {
+  // API-published rows can carry arbitrary hrefs; never render an unsafe one as a link.
+  if (!isSafeLinkDestination(href, { allowFragment: true })) {
+    return <span {...props} />;
+  }
+
   const isInternal = href.startsWith("/");
 
   if (isInternal) {
