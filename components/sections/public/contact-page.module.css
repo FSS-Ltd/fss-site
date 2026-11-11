@@ -1,0 +1,111 @@
+div.contactGrid {
+  position: relative;
+  z-index: 1;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: clamp(24px, 4vw, 48px);
+  align-items: start;
+}
+.nextSteps {
+  padding-top: 8px;
+}
+.contactGrid .nextSteps h2 {
+  font-size: 1.25rem;
+  letter-spacing: -0.015em;
+  margin-bottom: 18px;
+}
+.timeline {
+  position: relative;
+  display: grid;
+  gap: 18px;
+  margin: 0 0 22px;
+  padding: 0;
+  list-style: none;
+  line-height: 1.5;
+}
+.timeline::before {
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  left: 15px;
+  width: 1px;
+  background: var(--border-strong);
+  content: "";
+}
+.timeline li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  color: var(--foreground);
+  font-weight: 500;
+}
+.timeline span {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgb(15 112 120 / 0.35);
+  border-radius: 50%;
+  background: var(--background, #f2f3f5);
+  color: var(--brand-fss-teal-ink);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.75rem;
+  font-weight: 650;
+}
+.contactGrid .nextSteps p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+.mailLink {
+  display: grid;
+  gap: 2px;
+  min-height: 44px;
+  padding: 12px 16px;
+  border: 1px solid var(--border-soft);
+  border-radius: 14px;
+  background: rgb(255 255 255 / 0.6);
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease;
+}
+.mailLabel {
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+}
+.mailAddress {
+  color: var(--foreground);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: rgb(33 27 23 / 0.3);
+  text-underline-offset: 4px;
+}
+.mailLink:hover {
+  border-color: var(--brand-primary);
+  background: white;
+}
+.mailLink:hover .mailAddress {
+  color: var(--brand-primary);
+  text-decoration-color: currentColor;
+}
+@media (max-width: 900px) {
+  div.contactGrid {
+    grid-template-columns: 1fr;
+  }
+  .nextSteps {
+    padding-top: 16px;
+  }
+}
+.mailArrow {
+  display: inline-block;
+  margin-left: 6px;
+  transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.mailLink:hover .mailArrow {
+  transform: translateX(4px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .mailLink:hover .mailArrow {
+    transform: none;
+  }
+}

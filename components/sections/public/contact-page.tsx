@@ -5,6 +5,7 @@ import { PageIntro } from "./page-intro";
 import { RelatedLinks } from "./related-links";
 import { sectorLink, nexstepsLink, costLink } from "@/lib/commercial/links";
 import styles from "./public-page.module.css";
+import contactStyles from "./contact-page.module.css";
 
 const questions = [
   {
@@ -39,12 +40,12 @@ export function ContactPageContent() {
           AI, automation and custom software for businesses of any size.
         </p>
       </PageIntro>
-      <div className={`${styles.grid} ${styles.contactGrid}`}>
+      <div className={`${styles.grid} ${contactStyles.contactGrid}`}>
         <ContactForm
           aside={
-            <div className={styles.nextSteps}>
+            <div className={contactStyles.nextSteps}>
               <h2 id="contact-next">What happens next</h2>
-              <ol className={styles.timeline}>
+              <ol className={contactStyles.timeline}>
                 <li>
                   <span aria-hidden="true">01</span>
                   We review your project and constraints.
@@ -63,13 +64,13 @@ export function ContactPageContent() {
                 or commit you to a project.
               </p>
               <a
-                className={styles.mailLink}
+                className={contactStyles.mailLink}
                 href={`mailto:${organisation.email}`}
               >
-                <span className={styles.mailLabel}>Prefer email?</span>
-                <span className={styles.mailAddress}>
+                <span className={contactStyles.mailLabel}>Prefer email?</span>
+                <span className={contactStyles.mailAddress}>
                   {organisation.email}
-                  <span aria-hidden="true" className={styles.mailArrow}>
+                  <span aria-hidden="true" className={contactStyles.mailArrow}>
                     →
                   </span>
                 </span>

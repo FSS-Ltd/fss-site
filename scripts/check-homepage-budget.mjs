@@ -13,9 +13,11 @@ const budgets = {
   maxJsRawBytes: 180 * 1024,
   maxJsGzipBytes: 65 * 1024,
   // The public palette adds small, shared colour utilities while the gzip
-  // limit continues to bound the delivered stylesheet size.
-  maxCssRawBytes: 72 * 1024,
-  maxCssGzipBytes: 15 * 1024,
+  // limit continues to bound the delivered stylesheet size. The enquiry page
+  // redesign adds shared hero, FAQ and page styles (72.8KB raw, 15.0KB gzip after moving
+  // the contact-only and related-links rules into their own modules).
+  maxCssRawBytes: 73 * 1024,
+  maxCssGzipBytes: 15.5 * 1024,
 };
 
 function formatBytes(bytes) {
