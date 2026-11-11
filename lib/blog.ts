@@ -18,6 +18,7 @@ import {
   rowsNotOwnedBy,
 } from "@/lib/blog-api/rows";
 import { createBlogStore } from "@/lib/blog-api/store";
+import { readGrowthServerEnv } from "@/lib/growth/config/env";
 import { getGrowthDb } from "@/lib/growth/db/client";
 
 // A slow database must never stall the blog, sitemap or feed.
@@ -79,12 +80,27 @@ function buildPostMeta(
 }
 
 /**
+ * The database counts as configured only when the full Growth runtime config
+ * validates. A bare DATABASE_URL (CI, previews, local scripts) means rows are
+ * simply not in use, which is a complete answer, not a degraded one.
+ */
+function growthDatabaseConfigured(): boolean {
+  if (!process.env.DATABASE_URL) return false;
+  try {
+    readGrowthServerEnv();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Published API rows, one query per request (React cache). Without DATABASE_URL
  * (previews, CI builds) there is nothing to read, so the result is complete.
  * A failure or timeout is reported once and flagged as degraded.
  */
 const getPublishedRows = cache(async (): Promise<RowsResult> => {
-  if (!process.env.DATABASE_URL) return { posts: [], degraded: false };
+  if (!growthDatabaseConfigured()) return { posts: [], degraded: false };
   return loadRowsSafely(
     () => createBlogStore(getGrowthDb()).listPublished(),
     ROW_QUERY_TIMEOUT_MS,
