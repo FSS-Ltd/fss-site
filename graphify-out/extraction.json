@@ -2000,28 +2000,28 @@
       "label": "escapeHtml()",
       "file_type": "code",
       "source_file": "lib/operations/agreements/agreement-notifications.ts",
-      "source_location": "L21"
+      "source_location": "L22"
     },
     {
       "id": "agreement_notifications_agreementnotificationemail",
       "label": "agreementNotificationEmail()",
       "file_type": "code",
       "source_file": "lib/operations/agreements/agreement-notifications.ts",
-      "source_location": "L30"
+      "source_location": "L31"
     },
     {
       "id": "agreement_notifications_agreementnotificationidempotencykey",
       "label": "agreementNotificationIdempotencyKey()",
       "file_type": "code",
       "source_file": "lib/operations/agreements/agreement-notifications.ts",
-      "source_location": "L73"
+      "source_location": "L74"
     },
     {
       "id": "agreement_notifications_dispatchagreementnotifications",
       "label": "dispatchAgreementNotifications()",
       "file_type": "code",
       "source_file": "lib/operations/agreements/agreement-notifications.ts",
-      "source_location": "L85"
+      "source_location": "L86"
     },
     {
       "id": "lib_operations_agreements_signing_service_ts",
@@ -2400,6 +2400,258 @@
       "file_type": "code",
       "source_file": "lib/operations/agreements/commercial-types.test.ts",
       "source_location": "L20"
+    },
+    {
+      "id": "app_portal_client_portal_agreements_offers_offerid_page_tsx",
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "app/(portal)/(client)/portal/agreements/offers/[offerId]/page.tsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "page_clientofferpage",
+      "label": "ClientOfferPage()",
+      "file_type": "code",
+      "source_file": "app/(portal)/(client)/portal/agreements/offers/[offerId]/page.tsx",
+      "source_location": "L16"
+    },
+    {
+      "id": "app_api_cron_operations_dispatch_route_ts",
+      "label": "route.ts",
+      "file_type": "code",
+      "source_file": "app/api/cron/operations-dispatch/route.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "route_get",
+      "label": "GET()",
+      "file_type": "code",
+      "source_file": "app/api/cron/operations-dispatch/route.ts",
+      "source_location": "L14"
+    },
+    {
+      "id": "app_api_portal_admin_clients_organisationid_commercial_offers_route_ts",
+      "label": "route.ts",
+      "file_type": "code",
+      "source_file": "app/api/portal/admin/clients/[organisationId]/commercial-offers/route.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "route_post",
+      "label": "POST()",
+      "file_type": "code",
+      "source_file": "app/api/portal/admin/clients/[organisationId]/commercial-offers/route.ts",
+      "source_location": "L3"
+    },
+    {
+      "id": "app_api_portal_organisations_organisationid_commercial_offers_route_ts",
+      "label": "route.ts",
+      "file_type": "code",
+      "source_file": "app/api/portal/organisations/[organisationId]/commercial-offers/route.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "route_post",
+      "label": "POST()",
+      "file_type": "code",
+      "source_file": "app/api/portal/organisations/[organisationId]/commercial-offers/route.ts",
+      "source_location": "L3"
+    },
+    {
+      "id": "lib_growth_http_founder_request_ts",
+      "label": "founder-request.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/http/founder-request.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "founder_request_payloadtoolargeerror",
+      "label": "PayloadTooLargeError",
+      "file_type": "code",
+      "source_file": "lib/growth/http/founder-request.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "founder_request_requesthasregisteredorigin",
+      "label": "requestHasRegisteredOrigin()",
+      "file_type": "code",
+      "source_file": "lib/growth/http/founder-request.ts",
+      "source_location": "L3"
+    },
+    {
+      "id": "founder_request_readjsonrequestbody",
+      "label": "readJsonRequestBody()",
+      "file_type": "code",
+      "source_file": "lib/growth/http/founder-request.ts",
+      "source_location": "L13"
+    },
+    {
+      "id": "lib_operations_auth_configuration_ts",
+      "label": "configuration.ts",
+      "file_type": "code",
+      "source_file": "lib/operations/auth/configuration.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "configuration_readportalauthconfig",
+      "label": "readPortalAuthConfig()",
+      "file_type": "code",
+      "source_file": "lib/operations/auth/configuration.ts",
+      "source_location": "L6"
+    },
+    {
+      "id": "configuration_portalauthconfigured",
+      "label": "portalAuthConfigured()",
+      "file_type": "code",
+      "source_file": "lib/operations/auth/configuration.ts",
+      "source_location": "L17"
+    },
+    {
+      "id": "configuration_resolveportalorigin",
+      "label": "resolvePortalOrigin()",
+      "file_type": "code",
+      "source_file": "lib/operations/auth/configuration.ts",
+      "source_location": "L26"
+    },
+    {
+      "id": "lib_operations_auth_portal_url_ts",
+      "label": "portal-url.ts",
+      "file_type": "code",
+      "source_file": "lib/operations/auth/portal-url.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "portal_url_portalpath",
+      "label": "portalPath()",
+      "file_type": "code",
+      "source_file": "lib/operations/auth/portal-url.ts",
+      "source_location": "L4"
+    },
+    {
+      "id": "portal_url_portalurl",
+      "label": "portalUrl()",
+      "file_type": "code",
+      "source_file": "lib/operations/auth/portal-url.ts",
+      "source_location": "L21"
+    },
+    {
+      "id": "portal_url_createinvitationactivationurl",
+      "label": "createInvitationActivationUrl()",
+      "file_type": "code",
+      "source_file": "lib/operations/auth/portal-url.ts",
+      "source_location": "L41"
+    },
+    {
+      "id": "lib_operations_auth_release_flags_ts",
+      "label": "release-flags.ts",
+      "file_type": "code",
+      "source_file": "lib/operations/auth/release-flags.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "release_flags_deployedenvironment",
+      "label": "deployedEnvironment()",
+      "file_type": "code",
+      "source_file": "lib/operations/auth/release-flags.ts",
+      "source_location": "L12"
+    },
+    {
+      "id": "release_flags_prefixfreeportalenabled",
+      "label": "prefixFreePortalEnabled()",
+      "file_type": "code",
+      "source_file": "lib/operations/auth/release-flags.ts",
+      "source_location": "L20"
+    },
+    {
+      "id": "release_flags_fssstudioenabled",
+      "label": "fssStudioEnabled()",
+      "file_type": "code",
+      "source_file": "lib/operations/auth/release-flags.ts",
+      "source_location": "L33"
+    },
+    {
+      "id": "release_flags_growthoperationscutoverenabled",
+      "label": "growthOperationsCutoverEnabled()",
+      "file_type": "code",
+      "source_file": "lib/operations/auth/release-flags.ts",
+      "source_location": "L45"
+    },
+    {
+      "id": "lib_operations_http_commercial_offer_route_test_ts",
+      "label": "commercial-offer-route.test.ts",
+      "file_type": "code",
+      "source_file": "lib/operations/http/commercial-offer-route.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "commercial_offer_route_test_request",
+      "label": "request()",
+      "file_type": "code",
+      "source_file": "lib/operations/http/commercial-offer-route.test.ts",
+      "source_location": "L28"
+    },
+    {
+      "id": "commercial_offer_route_test_requestat",
+      "label": "requestAt()",
+      "file_type": "code",
+      "source_file": "lib/operations/http/commercial-offer-route.test.ts",
+      "source_location": "L35"
+    },
+    {
+      "id": "commercial_offer_route_test_handler",
+      "label": "handler()",
+      "file_type": "code",
+      "source_file": "lib/operations/http/commercial-offer-route.test.ts",
+      "source_location": "L47"
+    },
+    {
+      "id": "lib_operations_http_commercial_offer_route_ts",
+      "label": "commercial-offer-route.ts",
+      "file_type": "code",
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "commercial_offer_route_createcommercialofferroutehandler",
+      "label": "createCommercialOfferRouteHandler()",
+      "file_type": "code",
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L46"
+    },
+    {
+      "id": "commercial_offer_route_commercialofferrouteconfiguration",
+      "label": "commercialOfferRouteConfiguration()",
+      "file_type": "code",
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L104"
+    },
+    {
+      "id": "commercial_offer_route_staffcommercialofferroute",
+      "label": "staffCommercialOfferRoute()",
+      "file_type": "code",
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L117"
+    },
+    {
+      "id": "commercial_offer_route_portalcommercialofferroute",
+      "label": "portalCommercialOfferRoute()",
+      "file_type": "code",
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L140"
+    },
+    {
+      "id": "lib_seo_routing_test_ts",
+      "label": "routing.test.ts",
+      "file_type": "code",
+      "source_file": "lib/seo/routing.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "next_config_ts",
+      "label": "next.config.ts",
+      "file_type": "code",
+      "source_file": "next.config.ts",
+      "source_location": "L1"
     }
   ],
   "edges": [
@@ -2477,7 +2729,7 @@
     },
     {
       "source": "components_portal_agreements_staff_commercial_offer_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_use_commercial_offer_command",
+      "target": "components_portal_agreements_use_commercial_offer_command",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/staff-commercial-offer.tsx",
@@ -2486,7 +2738,7 @@
     },
     {
       "source": "components_portal_agreements_staff_commercial_offer_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_commercial_offer_summary",
+      "target": "components_portal_agreements_commercial_offer_summary",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/staff-commercial-offer.tsx",
@@ -2495,7 +2747,7 @@
     },
     {
       "source": "components_portal_agreements_staff_commercial_offer_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_delivery_action",
+      "target": "components_portal_agreements_agreement_delivery_action",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/staff-commercial-offer.tsx",
@@ -2504,7 +2756,7 @@
     },
     {
       "source": "components_portal_agreements_staff_commercial_offer_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreements_module_css",
+      "target": "components_portal_agreements_agreements_module_css",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/staff-commercial-offer.tsx",
@@ -2558,7 +2810,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_fee_inputs_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_step_support",
+      "target": "components_portal_agreements_agreement_builder_step_support",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-fee-inputs.ts",
@@ -2792,7 +3044,7 @@
     },
     {
       "source": "components_portal_agreements_staff_signing_status_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_presentation",
+      "target": "components_portal_agreements_presentation",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/staff-signing-status.tsx",
@@ -2801,7 +3053,7 @@
     },
     {
       "source": "components_portal_agreements_staff_signing_status_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_delivery_action",
+      "target": "components_portal_agreements_agreement_delivery_action",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/staff-signing-status.tsx",
@@ -2819,7 +3071,7 @@
     },
     {
       "source": "components_portal_agreements_staff_signing_status_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_stage_timeline",
+      "target": "components_portal_agreements_agreement_stage_timeline",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/staff-signing-status.tsx",
@@ -2828,7 +3080,7 @@
     },
     {
       "source": "components_portal_agreements_staff_signing_status_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreements_module_css",
+      "target": "components_portal_agreements_agreements_module_css",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/staff-signing-status.tsx",
@@ -2873,7 +3125,7 @@
     },
     {
       "source": "components_portal_agreements_routed_staff_agreement_builder_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_staff_agreement_builder",
+      "target": "components_portal_agreements_staff_agreement_builder",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/routed-staff-agreement-builder.tsx",
@@ -3017,7 +3269,7 @@
     },
     {
       "source": "components_portal_agreements_engagement_prefill_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_step_panel",
+      "target": "components_portal_agreements_agreement_builder_step_panel",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/engagement-prefill.ts",
@@ -3071,7 +3323,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_fee_inputs_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_fee_inputs",
+      "target": "components_portal_agreements_agreement_builder_fee_inputs",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-fee-inputs.test.ts",
@@ -3125,7 +3377,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_fee_lines_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_step_support",
+      "target": "components_portal_agreements_agreement_builder_step_support",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-fee-lines.tsx",
@@ -3143,7 +3395,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_fee_lines_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_fee_inputs",
+      "target": "components_portal_agreements_agreement_builder_fee_inputs",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-fee-lines.tsx",
@@ -3161,7 +3413,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_fee_lines_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreements_module_css",
+      "target": "components_portal_agreements_agreements_module_css",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-fee-lines.tsx",
@@ -3188,7 +3440,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_groups_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_step_support",
+      "target": "components_portal_agreements_agreement_builder_step_support",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-groups.tsx",
@@ -3197,7 +3449,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_groups_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_module_css",
+      "target": "components_portal_agreements_agreement_builder_module_css",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-groups.tsx",
@@ -3278,7 +3530,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_step_support_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreements_module_css",
+      "target": "components_portal_agreements_agreements_module_css",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-step-support.tsx",
@@ -3368,7 +3620,7 @@
     },
     {
       "source": "components_portal_agreements_staff_agreement_overview_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_staff_agreement_overview_module_css",
+      "target": "components_portal_agreements_staff_agreement_overview_module_css",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/staff-agreement-overview.tsx",
@@ -3422,7 +3674,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_summary_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_step_support",
+      "target": "components_portal_agreements_agreement_builder_step_support",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-summary.tsx",
@@ -3431,7 +3683,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_summary_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreements_module_css",
+      "target": "components_portal_agreements_agreements_module_css",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-summary.tsx",
@@ -3476,7 +3728,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_link_step_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_groups",
+      "target": "components_portal_agreements_agreement_builder_groups",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-link-step.tsx",
@@ -3485,7 +3737,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_link_step_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_step_support",
+      "target": "components_portal_agreements_agreement_builder_step_support",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-link-step.tsx",
@@ -3494,7 +3746,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_link_step_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_step_panel",
+      "target": "components_portal_agreements_agreement_builder_step_panel",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-link-step.tsx",
@@ -3503,7 +3755,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_link_step_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_module_css",
+      "target": "components_portal_agreements_agreement_builder_module_css",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-link-step.tsx",
@@ -3692,7 +3944,7 @@
     },
     {
       "source": "components_portal_agreements_signing_deadline_actions_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreements_module_css",
+      "target": "components_portal_agreements_agreements_module_css",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/signing-deadline-actions.tsx",
@@ -3773,7 +4025,7 @@
     },
     {
       "source": "components_portal_agreements_client_agreement_list_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_presentation",
+      "target": "components_portal_agreements_presentation",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/client-agreement-list.tsx",
@@ -3782,7 +4034,7 @@
     },
     {
       "source": "components_portal_agreements_client_agreement_list_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreements_module_css",
+      "target": "components_portal_agreements_agreements_module_css",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/client-agreement-list.tsx",
@@ -3863,7 +4115,7 @@
     },
     {
       "source": "components_portal_agreements_staff_agreement_builder_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_step_panel",
+      "target": "components_portal_agreements_agreement_builder_step_panel",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/staff-agreement-builder.tsx",
@@ -3872,7 +4124,7 @@
     },
     {
       "source": "components_portal_agreements_staff_agreement_builder_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_use_agreement_builder_draft",
+      "target": "components_portal_agreements_use_agreement_builder_draft",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/staff-agreement-builder.tsx",
@@ -3881,7 +4133,7 @@
     },
     {
       "source": "components_portal_agreements_staff_agreement_builder_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_engagement_prefill",
+      "target": "components_portal_agreements_engagement_prefill",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/staff-agreement-builder.tsx",
@@ -3890,7 +4142,7 @@
     },
     {
       "source": "components_portal_agreements_staff_agreement_builder_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreements_module_css",
+      "target": "components_portal_agreements_agreements_module_css",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/staff-agreement-builder.tsx",
@@ -3899,7 +4151,7 @@
     },
     {
       "source": "components_portal_agreements_staff_agreement_builder_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_module_css",
+      "target": "components_portal_agreements_agreement_builder_module_css",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/staff-agreement-builder.tsx",
@@ -3980,7 +4232,7 @@
     },
     {
       "source": "components_portal_agreements_commercial_offer_fields_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreements_module_css",
+      "target": "components_portal_agreements_agreements_module_css",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/commercial-offer-fields.tsx",
@@ -4043,7 +4295,7 @@
     },
     {
       "source": "components_portal_agreements_client_commercial_offer_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_use_commercial_offer_command",
+      "target": "components_portal_agreements_use_commercial_offer_command",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/client-commercial-offer.tsx",
@@ -4052,7 +4304,7 @@
     },
     {
       "source": "components_portal_agreements_client_commercial_offer_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_commercial_offer_summary",
+      "target": "components_portal_agreements_commercial_offer_summary",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/client-commercial-offer.tsx",
@@ -4061,7 +4313,7 @@
     },
     {
       "source": "components_portal_agreements_client_commercial_offer_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreements_module_css",
+      "target": "components_portal_agreements_agreements_module_css",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/client-commercial-offer.tsx",
@@ -4079,7 +4331,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_founder_agreement_fields",
+      "target": "components_portal_agreements_founder_agreement_fields",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder.tsx",
@@ -4088,7 +4340,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreements_module_css",
+      "target": "components_portal_agreements_agreements_module_css",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder.tsx",
@@ -4232,7 +4484,7 @@
     },
     {
       "source": "components_portal_agreements_staff_agreement_detail_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_lifecycle_actions",
+      "target": "components_portal_agreements_agreement_lifecycle_actions",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/staff-agreement-detail.tsx",
@@ -4241,7 +4493,7 @@
     },
     {
       "source": "components_portal_agreements_staff_agreement_detail_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_signing_deadline_actions",
+      "target": "components_portal_agreements_signing_deadline_actions",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/staff-agreement-detail.tsx",
@@ -4250,7 +4502,7 @@
     },
     {
       "source": "components_portal_agreements_staff_agreement_detail_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_presentation",
+      "target": "components_portal_agreements_presentation",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/staff-agreement-detail.tsx",
@@ -4259,7 +4511,7 @@
     },
     {
       "source": "components_portal_agreements_staff_agreement_detail_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreements_module_css",
+      "target": "components_portal_agreements_agreements_module_css",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/staff-agreement-detail.tsx",
@@ -4358,7 +4610,7 @@
     },
     {
       "source": "components_portal_agreements_commercial_offer_summary_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_stage_timeline",
+      "target": "components_portal_agreements_agreement_stage_timeline",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/commercial-offer-summary.tsx",
@@ -4367,7 +4619,7 @@
     },
     {
       "source": "components_portal_agreements_commercial_offer_summary_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreements_module_css",
+      "target": "components_portal_agreements_agreements_module_css",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/commercial-offer-summary.tsx",
@@ -4511,7 +4763,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_review_step_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_step_support",
+      "target": "components_portal_agreements_agreement_builder_step_support",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-review-step.tsx",
@@ -4520,7 +4772,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_review_step_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_readiness_checks",
+      "target": "components_portal_agreements_agreement_builder_readiness_checks",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-review-step.tsx",
@@ -4529,7 +4781,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_review_step_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_summary",
+      "target": "components_portal_agreements_agreement_builder_summary",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-review-step.tsx",
@@ -4538,7 +4790,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_review_step_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreements_module_css",
+      "target": "components_portal_agreements_agreements_module_css",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-review-step.tsx",
@@ -4556,7 +4808,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_step_panel_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_fees_step",
+      "target": "components_portal_agreements_agreement_builder_fees_step",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-step-panel.tsx",
@@ -4565,7 +4817,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_step_panel_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_link_step",
+      "target": "components_portal_agreements_agreement_builder_link_step",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-step-panel.tsx",
@@ -4574,7 +4826,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_step_panel_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_scope_step",
+      "target": "components_portal_agreements_agreement_builder_scope_step",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-step-panel.tsx",
@@ -4583,7 +4835,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_step_panel_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_people_step",
+      "target": "components_portal_agreements_agreement_builder_people_step",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-step-panel.tsx",
@@ -4592,7 +4844,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_step_panel_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_document_step",
+      "target": "components_portal_agreements_agreement_builder_document_step",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-step-panel.tsx",
@@ -4601,7 +4853,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_step_panel_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_review_step",
+      "target": "components_portal_agreements_agreement_builder_review_step",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-step-panel.tsx",
@@ -4619,7 +4871,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_step_panel_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_step_support",
+      "target": "components_portal_agreements_agreement_builder_step_support",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-step-panel.tsx",
@@ -4664,7 +4916,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_payment_fields_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_step_support",
+      "target": "components_portal_agreements_agreement_builder_step_support",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-payment-fields.tsx",
@@ -4673,7 +4925,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_payment_fields_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_fee_inputs",
+      "target": "components_portal_agreements_agreement_builder_fee_inputs",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-payment-fields.tsx",
@@ -4682,7 +4934,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_payment_fields_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreements_module_css",
+      "target": "components_portal_agreements_agreements_module_css",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-payment-fields.tsx",
@@ -4718,7 +4970,7 @@
     },
     {
       "source": "components_portal_agreements_routed_engagement_form_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_engagement_form",
+      "target": "components_portal_agreements_engagement_form",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/routed-engagement-form.tsx",
@@ -4781,7 +5033,7 @@
     },
     {
       "source": "components_portal_agreements_client_signing_review_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_presentation",
+      "target": "components_portal_agreements_presentation",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/client-signing-review.tsx",
@@ -4790,7 +5042,7 @@
     },
     {
       "source": "components_portal_agreements_client_signing_review_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreements_module_css",
+      "target": "components_portal_agreements_agreements_module_css",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/client-signing-review.tsx",
@@ -4871,7 +5123,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_people_step_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_groups",
+      "target": "components_portal_agreements_agreement_builder_groups",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-people-step.tsx",
@@ -4880,7 +5132,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_people_step_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_step_support",
+      "target": "components_portal_agreements_agreement_builder_step_support",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-people-step.tsx",
@@ -4907,7 +5159,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_stage_timeline_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreements_module_css",
+      "target": "components_portal_agreements_agreements_module_css",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-stage-timeline.tsx",
@@ -4961,7 +5213,7 @@
     },
     {
       "source": "components_portal_agreements_signature_evidence_form_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreements_module_css",
+      "target": "components_portal_agreements_agreements_module_css",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/signature-evidence-form.tsx",
@@ -5051,7 +5303,7 @@
     },
     {
       "source": "components_portal_agreements_engagement_form_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreements_module_css",
+      "target": "components_portal_agreements_agreements_module_css",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/engagement-form.tsx",
@@ -5132,7 +5384,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_lifecycle_actions_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreements_module_css",
+      "target": "components_portal_agreements_agreements_module_css",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-lifecycle-actions.tsx",
@@ -5204,7 +5456,7 @@
     },
     {
       "source": "components_portal_agreements_commercial_offer_list_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreements_module_css",
+      "target": "components_portal_agreements_agreements_module_css",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/commercial-offer-list.tsx",
@@ -5231,7 +5483,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_scope_step_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_groups",
+      "target": "components_portal_agreements_agreement_builder_groups",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-scope-step.tsx",
@@ -5240,7 +5492,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_scope_step_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_step_support",
+      "target": "components_portal_agreements_agreement_builder_step_support",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-scope-step.tsx",
@@ -5339,7 +5591,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_readiness_checks_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreements_module_css",
+      "target": "components_portal_agreements_agreements_module_css",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-readiness-checks.tsx",
@@ -5384,7 +5636,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_fees_step_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_commercial_offer_fields",
+      "target": "components_portal_agreements_commercial_offer_fields",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-fees-step.tsx",
@@ -5402,7 +5654,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_fees_step_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_step_support",
+      "target": "components_portal_agreements_agreement_builder_step_support",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-fees-step.tsx",
@@ -5411,7 +5663,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_fees_step_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_groups",
+      "target": "components_portal_agreements_agreement_builder_groups",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-fees-step.tsx",
@@ -5420,7 +5672,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_fees_step_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_fee_lines",
+      "target": "components_portal_agreements_agreement_builder_fee_lines",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-fees-step.tsx",
@@ -5429,7 +5681,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_fees_step_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_payment_fields",
+      "target": "components_portal_agreements_agreement_builder_payment_fields",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-fees-step.tsx",
@@ -5438,7 +5690,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_fees_step_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_fee_inputs",
+      "target": "components_portal_agreements_agreement_builder_fee_inputs",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-fees-step.tsx",
@@ -5627,7 +5879,7 @@
     },
     {
       "source": "components_portal_agreements_saved_agreement_drafts_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreements_module_css",
+      "target": "components_portal_agreements_agreements_module_css",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/saved-agreement-drafts.tsx",
@@ -5735,7 +5987,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_document_step_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_step_support",
+      "target": "components_portal_agreements_agreement_builder_step_support",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-document-step.tsx",
@@ -5744,7 +5996,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_document_step_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_builder_summary",
+      "target": "components_portal_agreements_agreement_builder_summary",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-document-step.tsx",
@@ -5753,7 +6005,7 @@
     },
     {
       "source": "components_portal_agreements_agreement_builder_document_step_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreements_module_css",
+      "target": "components_portal_agreements_agreements_module_css",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/agreement-builder-document-step.tsx",
@@ -5861,7 +6113,7 @@
     },
     {
       "source": "components_portal_agreements_client_agreement_detail_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_presentation",
+      "target": "components_portal_agreements_presentation",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/client-agreement-detail.tsx",
@@ -5879,7 +6131,7 @@
     },
     {
       "source": "components_portal_agreements_client_agreement_detail_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreement_stage_timeline",
+      "target": "components_portal_agreements_agreement_stage_timeline",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/client-agreement-detail.tsx",
@@ -5888,7 +6140,7 @@
     },
     {
       "source": "components_portal_agreements_client_agreement_detail_tsx",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_components_portal_agreements_agreements_module_css",
+      "target": "components_portal_agreements_agreements_module_css",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/portal/agreements/client-agreement-detail.tsx",
@@ -5996,7 +6248,7 @@
     },
     {
       "source": "lib_operations_agreements_engagement_command_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_engagement_command",
+      "target": "lib_operations_agreements_engagement_command",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/engagement-command.test.ts",
@@ -6014,7 +6266,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_types_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_text",
+      "target": "lib_operations_agreements_signing_text",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-types.ts",
@@ -6023,7 +6275,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_types_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_types",
+      "target": "lib_operations_agreements_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-types.ts",
@@ -6086,7 +6338,7 @@
     },
     {
       "source": "lib_operations_agreements_validation_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_types",
+      "target": "lib_operations_agreements_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/validation.ts",
@@ -6095,7 +6347,7 @@
     },
     {
       "source": "lib_operations_agreements_validation_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_money",
+      "target": "lib_operations_money",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/validation.ts",
@@ -6131,7 +6383,7 @@
     },
     {
       "source": "lib_operations_agreements_fixtures_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_types",
+      "target": "lib_operations_agreements_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/fixtures.ts",
@@ -6158,7 +6410,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_validation_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_types",
+      "target": "lib_operations_agreements_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-validation.ts",
@@ -6167,7 +6419,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_validation_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_builder_draft_schema",
+      "target": "lib_operations_agreements_builder_draft_schema",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-validation.ts",
@@ -6176,7 +6428,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_validation_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_commercial_types",
+      "target": "lib_operations_agreements_commercial_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-validation.ts",
@@ -6185,7 +6437,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_validation_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_validation",
+      "target": "lib_operations_agreements_validation",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-validation.ts",
@@ -6194,7 +6446,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_validation_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_builder_draft_validation_messages",
+      "target": "lib_operations_agreements_builder_draft_validation_messages",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-validation.ts",
@@ -6248,7 +6500,7 @@
     },
     {
       "source": "lib_operations_agreements_commercial_presentation_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_fixtures",
+      "target": "lib_operations_agreements_fixtures",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/commercial-presentation.test.ts",
@@ -6257,7 +6509,7 @@
     },
     {
       "source": "lib_operations_agreements_commercial_presentation_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_commercial_presentation",
+      "target": "lib_operations_agreements_commercial_presentation",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/commercial-presentation.test.ts",
@@ -6266,7 +6518,7 @@
     },
     {
       "source": "lib_operations_agreements_commercial_presentation_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_commercial_types",
+      "target": "lib_operations_agreements_commercial_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/commercial-presentation.test.ts",
@@ -6275,7 +6527,7 @@
     },
     {
       "source": "lib_operations_agreements_money_input_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_money",
+      "target": "lib_operations_money",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/money-input.ts",
@@ -6320,7 +6572,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_extension_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_service",
+      "target": "lib_operations_agreements_signing_service",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-extension.test.ts",
@@ -6329,7 +6581,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_extension_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_types",
+      "target": "lib_operations_agreements_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-extension.test.ts",
@@ -6338,7 +6590,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_extension_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_db_client",
+      "target": "lib_operations_db_client",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-extension.test.ts",
@@ -6347,7 +6599,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_extension_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_staff_types",
+      "target": "lib_operations_auth_staff_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-extension.test.ts",
@@ -6356,7 +6608,7 @@
     },
     {
       "source": "lib_operations_agreements_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_money",
+      "target": "lib_operations_money",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/repository.ts",
@@ -6374,7 +6626,7 @@
     },
     {
       "source": "lib_operations_agreements_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_db_client",
+      "target": "lib_operations_db_client",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/repository.ts",
@@ -6383,7 +6635,7 @@
     },
     {
       "source": "lib_operations_agreements_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_organisations_link_engagement",
+      "target": "lib_operations_organisations_link_engagement",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/repository.ts",
@@ -6392,7 +6644,7 @@
     },
     {
       "source": "lib_operations_agreements_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_organisations_types",
+      "target": "lib_operations_organisations_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/repository.ts",
@@ -6401,7 +6653,7 @@
     },
     {
       "source": "lib_operations_agreements_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_staff_transaction",
+      "target": "lib_operations_auth_staff_transaction",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/repository.ts",
@@ -6410,7 +6662,7 @@
     },
     {
       "source": "lib_operations_agreements_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_staff_types",
+      "target": "lib_operations_auth_staff_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/repository.ts",
@@ -6419,7 +6671,7 @@
     },
     {
       "source": "lib_operations_agreements_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_types",
+      "target": "lib_operations_agreements_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/repository.ts",
@@ -6428,7 +6680,7 @@
     },
     {
       "source": "lib_operations_agreements_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_types",
+      "target": "lib_operations_agreements_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/repository.ts",
@@ -6563,7 +6815,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_commands_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_types",
+      "target": "lib_operations_auth_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-commands.ts",
@@ -6572,7 +6824,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_commands_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_db_client",
+      "target": "lib_operations_db_client",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-commands.ts",
@@ -6581,7 +6833,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_commands_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_organisations_types",
+      "target": "lib_operations_organisations_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-commands.ts",
@@ -6590,7 +6842,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_commands_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_staff_types",
+      "target": "lib_operations_auth_staff_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-commands.ts",
@@ -6599,7 +6851,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_commands_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_types",
+      "target": "lib_operations_agreements_signing_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-commands.ts",
@@ -6608,7 +6860,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_commands_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_agreement_notification_service",
+      "target": "lib_operations_agreements_agreement_notification_service",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-commands.ts",
@@ -6617,7 +6869,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_commands_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_repository",
+      "target": "lib_operations_agreements_signing_repository",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-commands.ts",
@@ -6626,7 +6878,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_commands_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_staff_transaction",
+      "target": "lib_operations_auth_staff_transaction",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-commands.ts",
@@ -6635,7 +6887,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_commands_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_service",
+      "target": "lib_operations_agreements_signing_service",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-commands.ts",
@@ -6689,7 +6941,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_route_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_config_site_url",
+      "target": "lib_config_site_url",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-route.ts",
@@ -6698,7 +6950,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_route_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_growth_auth_require_founder",
+      "target": "lib_growth_auth_require_founder",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-route.ts",
@@ -6707,7 +6959,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_route_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_server",
+      "target": "lib_operations_auth_server",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-route.ts",
@@ -6716,7 +6968,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_route_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_configuration",
+      "target": "lib_operations_auth_configuration",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-route.ts",
@@ -6725,7 +6977,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_route_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_require_admin",
+      "target": "lib_operations_auth_require_admin",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-route.ts",
@@ -6734,7 +6986,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_route_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_db_client",
+      "target": "lib_operations_db_client",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-route.ts",
@@ -6743,7 +6995,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_route_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_db_portal_client",
+      "target": "lib_operations_db_portal_client",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-route.ts",
@@ -6752,7 +7004,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_route_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_requests_rate_limit",
+      "target": "lib_operations_requests_rate_limit",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-route.ts",
@@ -6761,7 +7013,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_route_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_http",
+      "target": "lib_operations_agreements_signing_http",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-route.ts",
@@ -6770,7 +7022,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_route_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_commands",
+      "target": "lib_operations_agreements_signing_commands",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-route.ts",
@@ -6779,7 +7031,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_route_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_service",
+      "target": "lib_operations_agreements_signing_service",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-route.ts",
@@ -6788,7 +7040,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_route_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_release_flags",
+      "target": "lib_operations_auth_release_flags",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-route.ts",
@@ -6797,7 +7049,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_route_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_worker",
+      "target": "lib_operations_agreements_signing_worker",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-route.ts",
@@ -6959,7 +7211,7 @@
     },
     {
       "source": "lib_operations_agreements_agreement_notifications_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_agreement_notifications",
+      "target": "lib_operations_auth_configuration",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/agreement-notifications.test.ts",
@@ -6967,8 +7219,26 @@
       "weight": 1.0
     },
     {
+      "source": "lib_operations_agreements_agreement_notifications_test_ts",
+      "target": "lib_operations_auth_release_flags",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/agreement-notifications.test.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_agreement_notifications_test_ts",
+      "target": "lib_operations_agreements_agreement_notifications",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/agreement-notifications.test.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
       "source": "lib_operations_agreements_stage_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_commercial_types",
+      "target": "lib_operations_agreements_commercial_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/stage.ts",
@@ -6977,7 +7247,7 @@
     },
     {
       "source": "lib_operations_agreements_stage_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_state",
+      "target": "lib_operations_agreements_signing_state",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/stage.ts",
@@ -6986,7 +7256,7 @@
     },
     {
       "source": "lib_operations_agreements_stage_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_types",
+      "target": "lib_operations_agreements_signing_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/stage.ts",
@@ -7022,7 +7292,7 @@
     },
     {
       "source": "lib_operations_agreements_route_handler_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_growth_http_founder_request",
+      "target": "lib_growth_http_founder_request",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/route-handler.ts",
@@ -7031,7 +7301,7 @@
     },
     {
       "source": "lib_operations_agreements_route_handler_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_organisations_types",
+      "target": "lib_operations_organisations_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/route-handler.ts",
@@ -7040,7 +7310,7 @@
     },
     {
       "source": "lib_operations_agreements_route_handler_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_types",
+      "target": "lib_operations_agreements_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/route-handler.ts",
@@ -7067,7 +7337,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_staff_types",
+      "target": "lib_operations_auth_staff_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-repository.ts",
@@ -7076,7 +7346,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_staff_transaction",
+      "target": "lib_operations_auth_staff_transaction",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-repository.ts",
@@ -7085,7 +7355,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_db_client",
+      "target": "lib_operations_db_client",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-repository.ts",
@@ -7094,7 +7364,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_workspaces_pagination",
+      "target": "lib_operations_workspaces_pagination",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-repository.ts",
@@ -7103,7 +7373,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_builder_draft_schema",
+      "target": "lib_operations_agreements_builder_draft_schema",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-repository.ts",
@@ -7139,7 +7409,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_service_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_staff_types",
+      "target": "lib_operations_auth_staff_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-service.test.ts",
@@ -7148,7 +7418,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_service_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_db_client",
+      "target": "lib_operations_db_client",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-service.test.ts",
@@ -7157,7 +7427,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_service_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_builder_draft_service",
+      "target": "lib_operations_agreements_builder_draft_service",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-service.test.ts",
@@ -7166,7 +7436,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_service_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_fixtures",
+      "target": "lib_operations_agreements_fixtures",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-service.test.ts",
@@ -7247,7 +7517,7 @@
     },
     {
       "source": "lib_operations_agreements_route_handler_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_route_handler",
+      "target": "lib_operations_agreements_route_handler",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/route-handler.test.ts",
@@ -7256,7 +7526,7 @@
     },
     {
       "source": "lib_operations_agreements_route_handler_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_types",
+      "target": "lib_operations_agreements_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/route-handler.test.ts",
@@ -7265,7 +7535,7 @@
     },
     {
       "source": "lib_operations_agreements_route_handler_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_fixtures",
+      "target": "lib_operations_agreements_fixtures",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/route-handler.test.ts",
@@ -7310,7 +7580,7 @@
     },
     {
       "source": "lib_operations_agreements_service_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_service",
+      "target": "lib_operations_agreements_service",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/service.test.ts",
@@ -7328,7 +7598,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_render",
+      "target": "lib_operations_agreements_signing_render",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-repository.ts",
@@ -7337,7 +7607,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_db_client",
+      "target": "lib_operations_db_client",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-repository.ts",
@@ -7346,7 +7616,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_db_portal_client",
+      "target": "lib_operations_db_portal_client",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-repository.ts",
@@ -7355,7 +7625,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_types",
+      "target": "lib_operations_auth_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-repository.ts",
@@ -7364,7 +7634,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_organisations_types",
+      "target": "lib_operations_organisations_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-repository.ts",
@@ -7373,7 +7643,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_staff_transaction",
+      "target": "lib_operations_auth_staff_transaction",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-repository.ts",
@@ -7382,7 +7652,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_staff_types",
+      "target": "lib_operations_auth_staff_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-repository.ts",
@@ -7391,7 +7661,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_repository",
+      "target": "lib_operations_agreements_repository",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-repository.ts",
@@ -7400,7 +7670,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_types",
+      "target": "lib_operations_agreements_signing_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-repository.ts",
@@ -7562,7 +7832,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_money",
+      "target": "lib_operations_money",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-service.ts",
@@ -7580,7 +7850,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_staff_transaction",
+      "target": "lib_operations_auth_staff_transaction",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-service.ts",
@@ -7589,7 +7859,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_staff_types",
+      "target": "lib_operations_auth_staff_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-service.ts",
@@ -7598,7 +7868,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_db_client",
+      "target": "lib_operations_db_client",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-service.ts",
@@ -7607,7 +7877,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_service",
+      "target": "lib_operations_agreements_service",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-service.ts",
@@ -7616,7 +7886,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_types",
+      "target": "lib_operations_agreements_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-service.ts",
@@ -7625,7 +7895,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_builder_draft_schema",
+      "target": "lib_operations_agreements_builder_draft_schema",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-service.ts",
@@ -7634,7 +7904,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_builder_draft_validation",
+      "target": "lib_operations_agreements_builder_draft_validation",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-service.ts",
@@ -7643,7 +7913,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_commercial_service",
+      "target": "lib_operations_agreements_commercial_service",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-service.ts",
@@ -7652,7 +7922,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_commercial_types",
+      "target": "lib_operations_agreements_commercial_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-service.ts",
@@ -7796,7 +8066,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_render_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_fixtures",
+      "target": "lib_operations_agreements_fixtures",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-render.test.ts",
@@ -7805,7 +8075,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_render_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_render",
+      "target": "lib_operations_agreements_signing_render",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-render.test.ts",
@@ -7814,7 +8084,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_render_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_pdf_content",
+      "target": "lib_operations_agreements_signing_pdf_content",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-render.test.ts",
@@ -7823,7 +8093,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_render_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_text",
+      "target": "lib_operations_agreements_signing_text",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-render.test.ts",
@@ -7832,7 +8102,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_render_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_types",
+      "target": "lib_operations_agreements_signing_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-render.test.ts",
@@ -7841,7 +8111,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_render_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_worker",
+      "target": "lib_operations_agreements_signing_worker",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-render.test.ts",
@@ -7850,7 +8120,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_render_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_service",
+      "target": "lib_operations_agreements_signing_service",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-render.test.ts",
@@ -7868,7 +8138,7 @@
     },
     {
       "source": "lib_operations_agreements_agreement_notification_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_db_client",
+      "target": "lib_operations_db_client",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/agreement-notification-service.ts",
@@ -7877,7 +8147,7 @@
     },
     {
       "source": "lib_operations_agreements_agreement_notification_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_staff_types",
+      "target": "lib_operations_auth_staff_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/agreement-notification-service.ts",
@@ -7886,7 +8156,7 @@
     },
     {
       "source": "lib_operations_agreements_agreement_notification_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_staff_transaction",
+      "target": "lib_operations_auth_staff_transaction",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/agreement-notification-service.ts",
@@ -7895,7 +8165,7 @@
     },
     {
       "source": "lib_operations_agreements_agreement_notification_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_types",
+      "target": "lib_operations_agreements_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/agreement-notification-service.ts",
@@ -8066,7 +8336,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_growth_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_fixtures",
+      "target": "lib_operations_agreements_fixtures",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-growth.test.ts",
@@ -8075,7 +8345,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_growth_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_growth",
+      "target": "lib_operations_agreements_signing_growth",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-growth.test.ts",
@@ -8093,7 +8363,7 @@
     },
     {
       "source": "lib_operations_agreements_staff_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_staff_transaction",
+      "target": "lib_operations_auth_staff_transaction",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/staff-service.ts",
@@ -8102,7 +8372,7 @@
     },
     {
       "source": "lib_operations_agreements_staff_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_staff_types",
+      "target": "lib_operations_auth_staff_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/staff-service.ts",
@@ -8111,7 +8381,7 @@
     },
     {
       "source": "lib_operations_agreements_staff_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_db_client",
+      "target": "lib_operations_db_client",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/staff-service.ts",
@@ -8120,7 +8390,7 @@
     },
     {
       "source": "lib_operations_agreements_staff_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_service",
+      "target": "lib_operations_agreements_service",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/staff-service.ts",
@@ -8129,7 +8399,7 @@
     },
     {
       "source": "lib_operations_agreements_staff_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_types",
+      "target": "lib_operations_agreements_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/staff-service.ts",
@@ -8156,7 +8426,7 @@
     },
     {
       "source": "lib_operations_agreements_lifecycle_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_db_client",
+      "target": "lib_operations_db_client",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/lifecycle-service.ts",
@@ -8165,7 +8435,7 @@
     },
     {
       "source": "lib_operations_agreements_lifecycle_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_staff_types",
+      "target": "lib_operations_auth_staff_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/lifecycle-service.ts",
@@ -8174,7 +8444,7 @@
     },
     {
       "source": "lib_operations_agreements_lifecycle_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_staff_transaction",
+      "target": "lib_operations_auth_staff_transaction",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/lifecycle-service.ts",
@@ -8183,7 +8453,7 @@
     },
     {
       "source": "lib_operations_agreements_lifecycle_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_types",
+      "target": "lib_operations_agreements_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/lifecycle-service.ts",
@@ -8219,7 +8489,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_validation_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_fixtures",
+      "target": "lib_operations_agreements_fixtures",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-validation.test.ts",
@@ -8228,7 +8498,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_validation_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_builder_draft_validation",
+      "target": "lib_operations_agreements_builder_draft_validation",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-validation.test.ts",
@@ -8237,7 +8507,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_validation_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_builder_draft_schema",
+      "target": "lib_operations_agreements_builder_draft_schema",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-validation.test.ts",
@@ -8264,7 +8534,7 @@
     },
     {
       "source": "lib_operations_agreements_commercial_types_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_validation",
+      "target": "lib_operations_agreements_validation",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/commercial-types.ts",
@@ -8273,7 +8543,7 @@
     },
     {
       "source": "lib_operations_agreements_commercial_types_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_types",
+      "target": "lib_operations_agreements_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/commercial-types.ts",
@@ -8282,7 +8552,7 @@
     },
     {
       "source": "lib_operations_agreements_commercial_types_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_types",
+      "target": "lib_operations_agreements_signing_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/commercial-types.ts",
@@ -8309,7 +8579,7 @@
     },
     {
       "source": "lib_operations_agreements_agreement_notification_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_db_client",
+      "target": "lib_operations_db_client",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/agreement-notification-repository.ts",
@@ -8318,7 +8588,7 @@
     },
     {
       "source": "lib_operations_agreements_agreement_notification_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_staff_transaction",
+      "target": "lib_operations_auth_staff_transaction",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/agreement-notification-repository.ts",
@@ -8327,7 +8597,7 @@
     },
     {
       "source": "lib_operations_agreements_agreement_notification_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_staff_types",
+      "target": "lib_operations_auth_staff_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/agreement-notification-repository.ts",
@@ -8354,7 +8624,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_state_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_types",
+      "target": "lib_operations_agreements_signing_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-state.ts",
@@ -8381,7 +8651,7 @@
     },
     {
       "source": "lib_operations_agreements_engagement_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_staff_transaction",
+      "target": "lib_operations_auth_staff_transaction",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/engagement-service.ts",
@@ -8390,7 +8660,7 @@
     },
     {
       "source": "lib_operations_agreements_engagement_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_staff_types",
+      "target": "lib_operations_auth_staff_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/engagement-service.ts",
@@ -8399,7 +8669,7 @@
     },
     {
       "source": "lib_operations_agreements_engagement_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_db_client",
+      "target": "lib_operations_db_client",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/engagement-service.ts",
@@ -8408,7 +8678,7 @@
     },
     {
       "source": "lib_operations_agreements_engagement_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_engagement_command",
+      "target": "lib_operations_agreements_engagement_command",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/engagement-service.ts",
@@ -8453,7 +8723,7 @@
     },
     {
       "source": "lib_operations_agreements_types_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_validation",
+      "target": "lib_operations_agreements_validation",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/types.ts",
@@ -8462,7 +8732,7 @@
     },
     {
       "source": "lib_operations_agreements_types_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_money",
+      "target": "lib_operations_money",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/types.ts",
@@ -8471,7 +8741,7 @@
     },
     {
       "source": "lib_operations_agreements_types_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_services_types",
+      "target": "lib_operations_services_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/types.ts",
@@ -8498,7 +8768,7 @@
     },
     {
       "source": "lib_operations_agreements_commercial_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_db_client",
+      "target": "lib_operations_db_client",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/commercial-repository.ts",
@@ -8507,7 +8777,7 @@
     },
     {
       "source": "lib_operations_agreements_commercial_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_staff_transaction",
+      "target": "lib_operations_auth_staff_transaction",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/commercial-repository.ts",
@@ -8516,7 +8786,7 @@
     },
     {
       "source": "lib_operations_agreements_commercial_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_staff_types",
+      "target": "lib_operations_auth_staff_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/commercial-repository.ts",
@@ -8525,7 +8795,7 @@
     },
     {
       "source": "lib_operations_agreements_commercial_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_db_portal_client",
+      "target": "lib_operations_db_portal_client",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/commercial-repository.ts",
@@ -8534,7 +8804,7 @@
     },
     {
       "source": "lib_operations_agreements_commercial_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_types",
+      "target": "lib_operations_auth_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/commercial-repository.ts",
@@ -8543,7 +8813,7 @@
     },
     {
       "source": "lib_operations_agreements_commercial_repository_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_commercial_types",
+      "target": "lib_operations_agreements_commercial_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/commercial-repository.ts",
@@ -8615,7 +8885,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_render_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_types",
+      "target": "lib_operations_agreements_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-render.ts",
@@ -8624,7 +8894,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_render_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_pdf_content",
+      "target": "lib_operations_agreements_signing_pdf_content",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-render.ts",
@@ -8633,7 +8903,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_render_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_pdf_layout",
+      "target": "lib_operations_agreements_signing_pdf_layout",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-render.ts",
@@ -8642,7 +8912,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_render_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_text",
+      "target": "lib_operations_agreements_signing_text",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-render.ts",
@@ -8651,7 +8921,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_render_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_types",
+      "target": "lib_operations_agreements_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-render.ts",
@@ -8660,7 +8930,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_render_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_types",
+      "target": "lib_operations_agreements_signing_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-render.ts",
@@ -8768,7 +9038,7 @@
     },
     {
       "source": "lib_operations_agreements_commercial_presentation_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_commercial_types",
+      "target": "lib_operations_agreements_commercial_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/commercial-presentation.ts",
@@ -8804,7 +9074,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_worker_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_db_client",
+      "target": "lib_operations_db_client",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-worker.ts",
@@ -8813,7 +9083,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_worker_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_repository",
+      "target": "lib_operations_agreements_signing_repository",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-worker.ts",
@@ -8822,7 +9092,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_worker_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_render",
+      "target": "lib_operations_agreements_signing_render",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-worker.ts",
@@ -8903,7 +9173,7 @@
     },
     {
       "source": "lib_operations_agreements_agreement_notifications_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_email_identity",
+      "target": "lib_operations_email_identity",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/agreement-notifications.ts",
@@ -8921,7 +9191,7 @@
     },
     {
       "source": "lib_operations_agreements_agreement_notifications_ts",
-      "target": "site_url",
+      "target": "lib_operations_auth_configuration",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/agreement-notifications.ts",
@@ -8930,7 +9200,7 @@
     },
     {
       "source": "lib_operations_agreements_agreement_notifications_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_db_client",
+      "target": "lib_operations_auth_portal_url",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/agreement-notifications.ts",
@@ -8939,7 +9209,7 @@
     },
     {
       "source": "lib_operations_agreements_agreement_notifications_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_onboarding_resend_provider",
+      "target": "lib_operations_db_client",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/agreement-notifications.ts",
@@ -8948,7 +9218,7 @@
     },
     {
       "source": "lib_operations_agreements_agreement_notifications_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_onboarding_types",
+      "target": "lib_operations_onboarding_resend_provider",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/agreement-notifications.ts",
@@ -8957,11 +9227,20 @@
     },
     {
       "source": "lib_operations_agreements_agreement_notifications_ts",
+      "target": "lib_operations_onboarding_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/agreement-notifications.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_agreement_notifications_ts",
       "target": "agreement_notifications_escapehtml",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/agreement-notifications.ts",
-      "source_location": "L21",
+      "source_location": "L22",
       "weight": 1.0
     },
     {
@@ -8970,7 +9249,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/agreement-notifications.ts",
-      "source_location": "L30",
+      "source_location": "L31",
       "weight": 1.0
     },
     {
@@ -8979,7 +9258,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/agreement-notifications.ts",
-      "source_location": "L73",
+      "source_location": "L74",
       "weight": 1.0
     },
     {
@@ -8988,7 +9267,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/agreement-notifications.ts",
-      "source_location": "L85",
+      "source_location": "L86",
       "weight": 1.0
     },
     {
@@ -8997,7 +9276,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/agreement-notifications.ts",
-      "source_location": "L69",
+      "source_location": "L70",
       "weight": 1.0
     },
     {
@@ -9006,7 +9285,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/agreement-notifications.ts",
-      "source_location": "L117",
+      "source_location": "L118",
       "weight": 1.0
     },
     {
@@ -9015,7 +9294,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/agreement-notifications.ts",
-      "source_location": "L127",
+      "source_location": "L128",
       "weight": 1.0
     },
     {
@@ -9038,7 +9317,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_db_client",
+      "target": "lib_operations_db_client",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-service.ts",
@@ -9047,7 +9326,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_db_portal_client",
+      "target": "lib_operations_db_portal_client",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-service.ts",
@@ -9056,7 +9335,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_types",
+      "target": "lib_operations_auth_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-service.ts",
@@ -9065,7 +9344,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_staff_transaction",
+      "target": "lib_operations_auth_staff_transaction",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-service.ts",
@@ -9074,7 +9353,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_staff_types",
+      "target": "lib_operations_auth_staff_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-service.ts",
@@ -9083,7 +9362,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_organisations_types",
+      "target": "lib_operations_organisations_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-service.ts",
@@ -9092,7 +9371,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_repository",
+      "target": "lib_operations_agreements_repository",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-service.ts",
@@ -9101,7 +9380,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_service",
+      "target": "lib_operations_agreements_service",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-service.ts",
@@ -9110,7 +9389,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_types",
+      "target": "lib_operations_agreements_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-service.ts",
@@ -9119,7 +9398,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_render",
+      "target": "lib_operations_agreements_signing_render",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-service.ts",
@@ -9128,7 +9407,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_repository",
+      "target": "lib_operations_agreements_signing_repository",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-service.ts",
@@ -9137,7 +9416,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_types",
+      "target": "lib_operations_agreements_signing_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-service.ts",
@@ -9353,7 +9632,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_pdf_content_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_money",
+      "target": "lib_operations_money",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-pdf-content.ts",
@@ -9362,7 +9641,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_pdf_content_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_types",
+      "target": "lib_operations_agreements_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-pdf-content.ts",
@@ -9371,7 +9650,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_pdf_content_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_validation",
+      "target": "lib_operations_agreements_validation",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-pdf-content.ts",
@@ -9380,7 +9659,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_pdf_content_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_types",
+      "target": "lib_operations_agreements_signing_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-pdf-content.ts",
@@ -9389,7 +9668,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_pdf_content_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_pdf_layout",
+      "target": "lib_operations_agreements_signing_pdf_layout",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-pdf-content.ts",
@@ -9488,7 +9767,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_http_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_growth_http_founder_request",
+      "target": "lib_growth_http_founder_request",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-http.ts",
@@ -9497,7 +9776,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_http_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_http",
+      "target": "lib_operations_auth_http",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-http.ts",
@@ -9506,7 +9785,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_http_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_types",
+      "target": "lib_operations_auth_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-http.ts",
@@ -9515,7 +9794,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_http_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_text",
+      "target": "lib_operations_agreements_signing_text",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-http.ts",
@@ -9524,7 +9803,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_http_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_types",
+      "target": "lib_operations_agreements_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-http.ts",
@@ -9533,7 +9812,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_http_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_types",
+      "target": "lib_operations_agreements_signing_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-http.ts",
@@ -9587,7 +9866,7 @@
     },
     {
       "source": "lib_operations_agreements_agreement_delivery_webhook_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_agreement_delivery_webhook",
+      "target": "lib_operations_agreements_agreement_delivery_webhook",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/agreement-delivery-webhook.test.ts",
@@ -9596,7 +9875,7 @@
     },
     {
       "source": "lib_operations_agreements_agreement_delivery_webhook_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_db_client",
+      "target": "lib_operations_db_client",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/agreement-delivery-webhook.test.ts",
@@ -9623,7 +9902,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_growth_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_growth_db_types",
+      "target": "lib_growth_db_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-growth.ts",
@@ -9632,7 +9911,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_growth_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_growth_pipeline_engagement_repository",
+      "target": "lib_growth_pipeline_engagement_repository",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-growth.ts",
@@ -9641,7 +9920,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_growth_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_growth_pipeline_transition_engagement",
+      "target": "lib_growth_pipeline_transition_engagement",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-growth.ts",
@@ -9650,7 +9929,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_growth_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_db_client",
+      "target": "lib_operations_db_client",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-growth.ts",
@@ -9659,7 +9938,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_growth_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_validation",
+      "target": "lib_operations_agreements_validation",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-growth.ts",
@@ -9731,7 +10010,7 @@
     },
     {
       "source": "lib_operations_agreements_money_input_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_money_input",
+      "target": "lib_operations_agreements_money_input",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/money-input.test.ts",
@@ -9767,7 +10046,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_http_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_http",
+      "target": "lib_operations_agreements_signing_http",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-http.test.ts",
@@ -9776,7 +10055,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_http_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_types",
+      "target": "lib_operations_agreements_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-http.test.ts",
@@ -9785,7 +10064,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_http_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_types",
+      "target": "lib_operations_auth_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-http.test.ts",
@@ -9794,7 +10073,7 @@
     },
     {
       "source": "lib_operations_agreements_signing_http_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_types",
+      "target": "lib_operations_agreements_signing_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-http.test.ts",
@@ -9848,7 +10127,7 @@
     },
     {
       "source": "lib_operations_agreements_stage_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_stage",
+      "target": "lib_operations_agreements_stage",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/stage.test.ts",
@@ -9857,7 +10136,7 @@
     },
     {
       "source": "lib_operations_agreements_agreement_delivery_webhook_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_email_identity",
+      "target": "lib_operations_email_identity",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/agreement-delivery-webhook.ts",
@@ -9866,7 +10145,7 @@
     },
     {
       "source": "lib_operations_agreements_agreement_delivery_webhook_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_db_client",
+      "target": "lib_operations_db_client",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/agreement-delivery-webhook.ts",
@@ -9902,7 +10181,7 @@
     },
     {
       "source": "lib_operations_agreements_commercial_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_db_client",
+      "target": "lib_operations_db_client",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/commercial-service.ts",
@@ -9911,7 +10190,7 @@
     },
     {
       "source": "lib_operations_agreements_commercial_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_staff_transaction",
+      "target": "lib_operations_auth_staff_transaction",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/commercial-service.ts",
@@ -9920,7 +10199,7 @@
     },
     {
       "source": "lib_operations_agreements_commercial_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_staff_types",
+      "target": "lib_operations_auth_staff_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/commercial-service.ts",
@@ -9929,7 +10208,7 @@
     },
     {
       "source": "lib_operations_agreements_commercial_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_db_portal_client",
+      "target": "lib_operations_db_portal_client",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/commercial-service.ts",
@@ -9938,7 +10217,7 @@
     },
     {
       "source": "lib_operations_agreements_commercial_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_auth_types",
+      "target": "lib_operations_auth_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/commercial-service.ts",
@@ -9947,7 +10226,7 @@
     },
     {
       "source": "lib_operations_agreements_commercial_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_types",
+      "target": "lib_operations_agreements_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/commercial-service.ts",
@@ -9956,7 +10235,7 @@
     },
     {
       "source": "lib_operations_agreements_commercial_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_render",
+      "target": "lib_operations_agreements_signing_render",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/commercial-service.ts",
@@ -9965,7 +10244,7 @@
     },
     {
       "source": "lib_operations_agreements_commercial_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_signing_service",
+      "target": "lib_operations_agreements_signing_service",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/commercial-service.ts",
@@ -9974,7 +10253,7 @@
     },
     {
       "source": "lib_operations_agreements_commercial_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_commercial_repository",
+      "target": "lib_operations_agreements_commercial_repository",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/commercial-service.ts",
@@ -9983,7 +10262,7 @@
     },
     {
       "source": "lib_operations_agreements_commercial_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_commercial_types",
+      "target": "lib_operations_agreements_commercial_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/commercial-service.ts",
@@ -10046,7 +10325,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_schema_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_validation",
+      "target": "lib_operations_agreements_validation",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-schema.ts",
@@ -10055,7 +10334,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_schema_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_money",
+      "target": "lib_operations_money",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-schema.ts",
@@ -10064,7 +10343,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_schema_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_commercial_types",
+      "target": "lib_operations_agreements_commercial_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-schema.ts",
@@ -10091,7 +10370,7 @@
     },
     {
       "source": "lib_operations_agreements_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_db_client",
+      "target": "lib_operations_db_client",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/service.ts",
@@ -10100,7 +10379,7 @@
     },
     {
       "source": "lib_operations_agreements_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_organisations_types",
+      "target": "lib_operations_organisations_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/service.ts",
@@ -10109,7 +10388,7 @@
     },
     {
       "source": "lib_operations_agreements_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_services_activation",
+      "target": "lib_operations_services_activation",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/service.ts",
@@ -10118,7 +10397,7 @@
     },
     {
       "source": "lib_operations_agreements_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_repository",
+      "target": "lib_operations_agreements_repository",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/service.ts",
@@ -10127,7 +10406,7 @@
     },
     {
       "source": "lib_operations_agreements_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_types",
+      "target": "lib_operations_agreements_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/service.ts",
@@ -10136,7 +10415,7 @@
     },
     {
       "source": "lib_operations_agreements_service_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_validation",
+      "target": "lib_operations_agreements_validation",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/service.ts",
@@ -10208,7 +10487,7 @@
     },
     {
       "source": "lib_operations_agreements_validation_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_validation",
+      "target": "lib_operations_agreements_validation",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/validation.test.ts",
@@ -10217,7 +10496,7 @@
     },
     {
       "source": "lib_operations_agreements_validation_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_fixtures",
+      "target": "lib_operations_agreements_fixtures",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/validation.test.ts",
@@ -10235,7 +10514,7 @@
     },
     {
       "source": "lib_operations_agreements_builder_draft_validation_messages_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_builder_draft_schema",
+      "target": "lib_operations_agreements_builder_draft_schema",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-validation-messages.ts",
@@ -10280,7 +10559,7 @@
     },
     {
       "source": "lib_operations_agreements_commercial_types_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_fixtures",
+      "target": "lib_operations_agreements_fixtures",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/commercial-types.test.ts",
@@ -10289,7 +10568,7 @@
     },
     {
       "source": "lib_operations_agreements_commercial_types_test_ts",
-      "target": "users_jeanfidele_codex_worktrees_agreement_back_navigation_fss_site_lib_operations_agreements_commercial_types",
+      "target": "lib_operations_agreements_commercial_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/commercial-types.test.ts",
@@ -10303,6 +10582,852 @@
       "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/commercial-types.test.ts",
       "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "app_portal_client_portal_agreements_offers_offerid_page_tsx",
+      "target": "node_crypto",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/(portal)/(client)/portal/agreements/offers/[offerId]/page.tsx",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "app_portal_client_portal_agreements_offers_offerid_page_tsx",
+      "target": "navigation",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/(portal)/(client)/portal/agreements/offers/[offerId]/page.tsx",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "app_portal_client_portal_agreements_offers_offerid_page_tsx",
+      "target": "zod",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/(portal)/(client)/portal/agreements/offers/[offerId]/page.tsx",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "app_portal_client_portal_agreements_offers_offerid_page_tsx",
+      "target": "client_commercial_offer",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/(portal)/(client)/portal/agreements/offers/[offerId]/page.tsx",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "app_portal_client_portal_agreements_offers_offerid_page_tsx",
+      "target": "feature_unavailable",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/(portal)/(client)/portal/agreements/offers/[offerId]/page.tsx",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "app_portal_client_portal_agreements_offers_offerid_page_tsx",
+      "target": "unavailable",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/(portal)/(client)/portal/agreements/offers/[offerId]/page.tsx",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "app_portal_client_portal_agreements_offers_offerid_page_tsx",
+      "target": "ui",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/(portal)/(client)/portal/agreements/offers/[offerId]/page.tsx",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "app_portal_client_portal_agreements_offers_offerid_page_tsx",
+      "target": "page_context",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/(portal)/(client)/portal/agreements/offers/[offerId]/page.tsx",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "app_portal_client_portal_agreements_offers_offerid_page_tsx",
+      "target": "types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/(portal)/(client)/portal/agreements/offers/[offerId]/page.tsx",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "app_portal_client_portal_agreements_offers_offerid_page_tsx",
+      "target": "portal_client",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/(portal)/(client)/portal/agreements/offers/[offerId]/page.tsx",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "app_portal_client_portal_agreements_offers_offerid_page_tsx",
+      "target": "commercial_service",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/(portal)/(client)/portal/agreements/offers/[offerId]/page.tsx",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "app_portal_client_portal_agreements_offers_offerid_page_tsx",
+      "target": "signing_worker",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/(portal)/(client)/portal/agreements/offers/[offerId]/page.tsx",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "app_portal_client_portal_agreements_offers_offerid_page_tsx",
+      "target": "portal_url",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/(portal)/(client)/portal/agreements/offers/[offerId]/page.tsx",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "app_portal_client_portal_agreements_offers_offerid_page_tsx",
+      "target": "page_clientofferpage",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/(portal)/(client)/portal/agreements/offers/[offerId]/page.tsx",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "app_api_cron_operations_dispatch_route_ts",
+      "target": "cron_auth",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/cron/operations-dispatch/route.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "app_api_cron_operations_dispatch_route_ts",
+      "target": "worker_db",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/cron/operations-dispatch/route.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "app_api_cron_operations_dispatch_route_ts",
+      "target": "outbox",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/cron/operations-dispatch/route.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "app_api_cron_operations_dispatch_route_ts",
+      "target": "effects",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/cron/operations-dispatch/route.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "app_api_cron_operations_dispatch_route_ts",
+      "target": "worker",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/cron/operations-dispatch/route.ts",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "app_api_cron_operations_dispatch_route_ts",
+      "target": "notifications",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/cron/operations-dispatch/route.ts",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "app_api_cron_operations_dispatch_route_ts",
+      "target": "configuration",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/cron/operations-dispatch/route.ts",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "app_api_cron_operations_dispatch_route_ts",
+      "target": "agreement_notifications",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/cron/operations-dispatch/route.ts",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "app_api_cron_operations_dispatch_route_ts",
+      "target": "route_get",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/cron/operations-dispatch/route.ts",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "app_api_portal_admin_clients_organisationid_commercial_offers_route_ts",
+      "target": "commercial_offer_route",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/portal/admin/clients/[organisationId]/commercial-offers/route.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "app_api_portal_admin_clients_organisationid_commercial_offers_route_ts",
+      "target": "route_post",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/portal/admin/clients/[organisationId]/commercial-offers/route.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "app_api_portal_organisations_organisationid_commercial_offers_route_ts",
+      "target": "commercial_offer_route",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/portal/organisations/[organisationId]/commercial-offers/route.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "app_api_portal_organisations_organisationid_commercial_offers_route_ts",
+      "target": "route_post",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/portal/organisations/[organisationId]/commercial-offers/route.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_http_founder_request_ts",
+      "target": "founder_request_payloadtoolargeerror",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/http/founder-request.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_http_founder_request_ts",
+      "target": "founder_request_requesthasregisteredorigin",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/http/founder-request.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_http_founder_request_ts",
+      "target": "founder_request_readjsonrequestbody",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/http/founder-request.ts",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_auth_configuration_ts",
+      "target": "lib_operations_db_client",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/configuration.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_auth_configuration_ts",
+      "target": "configuration_readportalauthconfig",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/configuration.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_auth_configuration_ts",
+      "target": "configuration_portalauthconfigured",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/configuration.ts",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_auth_configuration_ts",
+      "target": "configuration_resolveportalorigin",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/configuration.ts",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "configuration_portalauthconfigured",
+      "target": "configuration_readportalauthconfig",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/configuration.ts",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_auth_portal_url_ts",
+      "target": "lib_operations_auth_release_flags",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/portal-url.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_auth_portal_url_ts",
+      "target": "portal_url_portalpath",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/portal-url.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_auth_portal_url_ts",
+      "target": "portal_url_portalurl",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/portal-url.ts",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_auth_portal_url_ts",
+      "target": "portal_url_createinvitationactivationurl",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/portal-url.ts",
+      "source_location": "L41",
+      "weight": 1.0
+    },
+    {
+      "source": "portal_url_portalurl",
+      "target": "portal_url_portalpath",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/portal-url.ts",
+      "source_location": "L37",
+      "weight": 1.0
+    },
+    {
+      "source": "portal_url_createinvitationactivationurl",
+      "target": "portal_url_portalurl",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/portal-url.ts",
+      "source_location": "L47",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_auth_release_flags_ts",
+      "target": "release_flags_deployedenvironment",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/release-flags.ts",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_auth_release_flags_ts",
+      "target": "release_flags_prefixfreeportalenabled",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/release-flags.ts",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_auth_release_flags_ts",
+      "target": "release_flags_fssstudioenabled",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/release-flags.ts",
+      "source_location": "L33",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_auth_release_flags_ts",
+      "target": "release_flags_growthoperationscutoverenabled",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/release-flags.ts",
+      "source_location": "L45",
+      "weight": 1.0
+    },
+    {
+      "source": "release_flags_prefixfreeportalenabled",
+      "target": "release_flags_deployedenvironment",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/release-flags.ts",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "release_flags_fssstudioenabled",
+      "target": "release_flags_deployedenvironment",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/release-flags.ts",
+      "source_location": "L37",
+      "weight": 1.0
+    },
+    {
+      "source": "release_flags_growthoperationscutoverenabled",
+      "target": "release_flags_fssstudioenabled",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/release-flags.ts",
+      "source_location": "L49",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_test_ts",
+      "target": "strict",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.test.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_test_ts",
+      "target": "node_test",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.test.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_test_ts",
+      "target": "node_crypto",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_test_ts",
+      "target": "lib_operations_http_commercial_offer_route",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.test.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_test_ts",
+      "target": "lib_operations_agreements_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.test.ts",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_test_ts",
+      "target": "lib_operations_auth_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.test.ts",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_test_ts",
+      "target": "lib_operations_agreements_fixtures",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.test.ts",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_test_ts",
+      "target": "lib_operations_agreements_commercial_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.test.ts",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_test_ts",
+      "target": "commercial_offer_route_test_request",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.test.ts",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_test_ts",
+      "target": "commercial_offer_route_test_requestat",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.test.ts",
+      "source_location": "L35",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_test_ts",
+      "target": "commercial_offer_route_test_handler",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.test.ts",
+      "source_location": "L47",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_ts",
+      "target": "node_crypto",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_ts",
+      "target": "zod",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_ts",
+      "target": "lib_operations_auth_configuration",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_ts",
+      "target": "founder_request",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_ts",
+      "target": "lib_operations_auth_http",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_ts",
+      "target": "lib_operations_auth_release_flags",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_ts",
+      "target": "lib_operations_auth_server",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_ts",
+      "target": "lib_operations_auth_require_admin",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_ts",
+      "target": "lib_operations_auth_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_ts",
+      "target": "lib_operations_db_client",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_ts",
+      "target": "lib_operations_db_portal_client",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_ts",
+      "target": "lib_operations_agreements_signing_worker",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_ts",
+      "target": "lib_operations_agreements_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_ts",
+      "target": "lib_operations_agreements_commercial_service",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_ts",
+      "target": "lib_operations_agreements_commercial_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_ts",
+      "target": "lib_operations_requests_rate_limit",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_ts",
+      "target": "commercial_offer_route_createcommercialofferroutehandler",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L46",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_ts",
+      "target": "commercial_offer_route_commercialofferrouteconfiguration",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L104",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_ts",
+      "target": "commercial_offer_route_staffcommercialofferroute",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L117",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_ts",
+      "target": "commercial_offer_route_portalcommercialofferroute",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L140",
+      "weight": 1.0
+    },
+    {
+      "source": "commercial_offer_route_staffcommercialofferroute",
+      "target": "commercial_offer_route_createcommercialofferroutehandler",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L118",
+      "weight": 1.0
+    },
+    {
+      "source": "commercial_offer_route_staffcommercialofferroute",
+      "target": "commercial_offer_route_commercialofferrouteconfiguration",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L119",
+      "weight": 1.0
+    },
+    {
+      "source": "commercial_offer_route_portalcommercialofferroute",
+      "target": "commercial_offer_route_createcommercialofferroutehandler",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L141",
+      "weight": 1.0
+    },
+    {
+      "source": "commercial_offer_route_portalcommercialofferroute",
+      "target": "commercial_offer_route_commercialofferrouteconfiguration",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L142",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_seo_routing_test_ts",
+      "target": "strict",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/seo/routing.test.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_seo_routing_test_ts",
+      "target": "node_test",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/seo/routing.test.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_seo_routing_test_ts",
+      "target": "server",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/seo/routing.test.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_seo_routing_test_ts",
+      "target": "next_config",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/seo/routing.test.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_seo_routing_test_ts",
+      "target": "lib_operations_auth_configuration",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/seo/routing.test.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_seo_routing_test_ts",
+      "target": "lib_operations_auth_release_flags",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/seo/routing.test.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "next_config_ts",
+      "target": "next",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "next.config.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "next_config_ts",
+      "target": "node_path",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "next.config.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "next_config_ts",
+      "target": "node_url",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "next.config.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "next_config_ts",
+      "target": "lib_operations_auth_configuration",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "next.config.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "next_config_ts",
+      "target": "lib_operations_auth_portal_url",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "next.config.ts",
+      "source_location": "L5",
       "weight": 1.0
     },
     {
@@ -10326,6 +11451,16 @@
       "weight": 1.0
     },
     {
+      "source": "agreement_builder_step_support_textvalue",
+      "target": "route_get",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/agreement-builder-step-support.tsx",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
       "source": "agreement_builder_step_support_formatgbp",
       "target": "commercial_offer_summary_formatmoney",
       "relation": "calls",
@@ -10333,6 +11468,26 @@
       "confidence_score": 0.8,
       "source_file": "components/portal/agreements/agreement-builder-step-support.tsx",
       "source_location": "L50",
+      "weight": 1.0
+    },
+    {
+      "source": "staff_agreement_overview_agreementworkspacehref",
+      "target": "portal_url_portalpath",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/staff-agreement-overview.tsx",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "staff_agreement_overview_signingworkspacehref",
+      "target": "portal_url_portalpath",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/staff-agreement-overview.tsx",
+      "source_location": "L25",
       "weight": 1.0
     },
     {
@@ -10377,12 +11532,22 @@
     },
     {
       "source": "signing_deadline_actions_run",
-      "target": "signing_http_test_request",
+      "target": "commercial_offer_route_test_request",
       "relation": "calls",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "components/portal/agreements/signing-deadline-actions.tsx",
       "source_location": "L92",
+      "weight": 1.0
+    },
+    {
+      "source": "client_agreement_list_agreementhref",
+      "target": "portal_url_portalpath",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/client-agreement-list.tsx",
+      "source_location": "L23",
       "weight": 1.0
     },
     {
@@ -10486,6 +11651,16 @@
       "weight": 1.0
     },
     {
+      "source": "commercial_offer_fields_readcommercialoffer",
+      "target": "route_get",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/commercial-offer-fields.tsx",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
       "source": "presentation_hascompletesigningevidence",
       "target": "signing_state_allrequiredsignaturesrecorded",
       "relation": "calls",
@@ -10493,6 +11668,16 @@
       "confidence_score": 0.8,
       "source_file": "components/portal/agreements/presentation.tsx",
       "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "client_signing_review_agreementpath",
+      "target": "portal_url_portalpath",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/client-signing-review.tsx",
+      "source_location": "L20",
       "weight": 1.0
     },
     {
@@ -10583,6 +11768,16 @@
       "confidence_score": 0.8,
       "source_file": "components/portal/agreements/agreement-builder-fees-step.tsx",
       "source_location": "L298",
+      "weight": 1.0
+    },
+    {
+      "source": "client_agreement_detail_agreementpath",
+      "target": "portal_url_portalpath",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/client-agreement-detail.tsx",
+      "source_location": "L34",
       "weight": 1.0
     },
     {
@@ -10806,6 +12001,16 @@
       "weight": 1.0
     },
     {
+      "source": "signing_route_portalsigningroute",
+      "target": "configuration_resolveportalorigin",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/agreements/signing-route.ts",
+      "source_location": "L67",
+      "weight": 1.0
+    },
+    {
       "source": "signing_route_staffsigningroute",
       "target": "signing_http_createsigningcommandhandler",
       "relation": "calls",
@@ -10817,7 +12022,27 @@
     },
     {
       "source": "signing_route_staffsigningroute",
+      "target": "configuration_resolveportalorigin",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/agreements/signing-route.ts",
+      "source_location": "L145",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_route_staffsigningroute",
       "target": "signing_worker_signingenabled",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/agreements/signing-route.ts",
+      "source_location": "L146",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_route_staffsigningroute",
+      "target": "release_flags_fssstudioenabled",
       "relation": "calls",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
@@ -10846,6 +12071,16 @@
       "weight": 1.0
     },
     {
+      "source": "signing_route_portalsigningdownloadroute",
+      "target": "configuration_resolveportalorigin",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/agreements/signing-route.ts",
+      "source_location": "L215",
+      "weight": 1.0
+    },
+    {
       "source": "signing_route_staffsigningdownloadroute",
       "target": "signing_http_createsigningdownloadhandler",
       "relation": "calls",
@@ -10857,7 +12092,27 @@
     },
     {
       "source": "signing_route_staffsigningdownloadroute",
+      "target": "configuration_resolveportalorigin",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/agreements/signing-route.ts",
+      "source_location": "L230",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_route_staffsigningdownloadroute",
       "target": "signing_worker_signingenabled",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/agreements/signing-route.ts",
+      "source_location": "L231",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_route_staffsigningdownloadroute",
+      "target": "release_flags_fssstudioenabled",
       "relation": "calls",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
@@ -11013,6 +12268,26 @@
       "confidence_score": 0.8,
       "source_file": "lib/operations/agreements/commercial-presentation.ts",
       "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "agreement_notifications_agreementnotificationemail",
+      "target": "portal_url_portalurl",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/agreements/agreement-notifications.ts",
+      "source_location": "L46",
+      "weight": 1.0
+    },
+    {
+      "source": "agreement_notifications_agreementnotificationemail",
+      "target": "configuration_resolveportalorigin",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/agreements/agreement-notifications.ts",
+      "source_location": "L46",
       "weight": 1.0
     },
     {
@@ -11423,6 +12698,116 @@
       "confidence_score": 0.8,
       "source_file": "lib/operations/agreements/commercial-types.test.ts",
       "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "page_clientofferpage",
+      "target": "signing_worker_signingenabled",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "app/(portal)/(client)/portal/agreements/offers/[offerId]/page.tsx",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "page_clientofferpage",
+      "target": "commercial_repository_getportalcommercialoffer",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "app/(portal)/(client)/portal/agreements/offers/[offerId]/page.tsx",
+      "source_location": "L38",
+      "weight": 1.0
+    },
+    {
+      "source": "route_post",
+      "target": "commercial_offer_route_staffcommercialofferroute",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "app/api/portal/admin/clients/[organisationId]/commercial-offers/route.ts",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "route_post",
+      "target": "commercial_offer_route_portalcommercialofferroute",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "app/api/portal/organisations/[organisationId]/commercial-offers/route.ts",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "founder_request_requesthasregisteredorigin",
+      "target": "route_get",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/http/founder-request.ts",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "founder_request_readjsonrequestbody",
+      "target": "route_get",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/http/founder-request.ts",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "commercial_offer_route_test_handler",
+      "target": "commercial_offer_route_createcommercialofferroutehandler",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/http/commercial-offer-route.test.ts",
+      "source_location": "L51",
+      "weight": 1.0
+    },
+    {
+      "source": "commercial_offer_route_commercialofferrouteconfiguration",
+      "target": "signing_worker_signingenabled",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L108",
+      "weight": 1.0
+    },
+    {
+      "source": "commercial_offer_route_commercialofferrouteconfiguration",
+      "target": "configuration_resolveportalorigin",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L109",
+      "weight": 1.0
+    },
+    {
+      "source": "commercial_offer_route_staffcommercialofferroute",
+      "target": "signing_worker_signingenabled",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L120",
+      "weight": 1.0
+    },
+    {
+      "source": "commercial_offer_route_staffcommercialofferroute",
+      "target": "release_flags_fssstudioenabled",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L120",
       "weight": 1.0
     }
   ],
