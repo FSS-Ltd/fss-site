@@ -35,6 +35,15 @@ Updated 2026-11-11 15:50 GMT. Read this first, then the design doc
 
 ## In progress
 
+Order changed on 2026-11-11 (orchestrator's call): PR F goes first. The
+critic's remaining complaints on #330 are site-wide (hard-cut page changes,
+footer em dash, misaligned header/content/footer edges), so #330 and the blog
+layout cannot reach 8/10 until PR F fixes them. To reverse: run items 1 and 2
+before 3. State at the time of writing: #330 CI all green, budget file
+untouched by its diff, branch 2 commits behind main; an Opus agent is building
+PR F in `.claude/worktrees/public-motion-polish` (draft PR to follow); a
+Sonnet code and security review of #330 is running.
+
 1. PR #330 `feat/stepped-enquiry-form` (draft). Worktree
    `.claude/worktrees/agent-a1013263835a4c6a0`, head `1bf5ba6bc`
    ("Keep the homepage CSS within its original budget"), tree clean, CI was
