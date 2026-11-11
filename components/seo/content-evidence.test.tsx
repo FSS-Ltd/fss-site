@@ -21,7 +21,44 @@ test("article evidence is visible and organisational authorship is represented a
   assert.match(html, /Sources and evidence/);
   assert.doesNotMatch(html, /Reviewed by/);
   const schema = renderToStaticMarkup(<ArticleSchema post={post.meta} />);
-  assert.match(schema, /"author":\{"@type":"Organization"/);
+  const org =
+    '{"@type":"Organization","@id":"https://faithfulsoftware.dev/#organization","name":"Faithful Software Solutions","url":"https://faithfulsoftware.dev"';
+  assert.ok(
+    schema.includes(
+      `"publisher":${org},"logo":{"@type":"ImageObject","url":"https://faithfulsoftware.dev/FSS.png"}}`,
+    ),
+  );
+  // A team byline is the organisation; only a named individual is a Person.
+  assert.ok(schema.includes(`"author":${org}}`));
+  const person = renderToStaticMarkup(
+    <ArticleSchema post={{ ...post.meta, author: "Test Person" }} />,
+  );
+  assert.ok(
+    person.includes(
+      `"author":{"@type":"Person","name":"Test Person"${post.meta.authorUrl ? `,"url":"${post.meta.authorUrl}"` : ""}}`,
+    ),
+  );
+  const orgAuthored = renderToStaticMarkup(
+    <ArticleSchema
+      post={{ ...post.meta, author: "Faithful Software Solutions" }}
+    />,
+  );
+  assert.ok(orgAuthored.includes(`"author":${org}}`));
+  const noAuthor = renderToStaticMarkup(
+    <ArticleSchema post={{ ...post.meta, author: "" }} />,
+  );
+  assert.ok(noAuthor.includes(`"author":${org}}`));
+  assert.ok(
+    schema.includes(
+      `"@id":"https://faithfulsoftware.dev/blog/${post.meta.slug}#article"`,
+    ),
+  );
+  assert.ok(
+    schema.includes(
+      '"isPartOf":{"@id":"https://faithfulsoftware.dev/#website"}',
+    ),
+  );
+  assert.ok(schema.includes('"inLanguage":"en-GB"'));
   assert.match(schema, /"dateModified":"2026-09-04"/);
   assert.match(
     renderToStaticMarkup(
