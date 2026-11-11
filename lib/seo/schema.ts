@@ -9,6 +9,18 @@ type SchemaNode = { "@type": string | string[]; "@id": string } & Record<
 export const organisationId = `${organisation.url}/#organization`;
 export const websiteId = `${organisation.url}/#website`;
 
+// A byline that is empty, the company or one of its teams is not a person.
+export function isOrganisationAuthor(author: string): boolean {
+  const name = author.trim().toLowerCase();
+  return (
+    !name ||
+    name === organisation.name.toLowerCase() ||
+    name === organisation.legalName.toLowerCase() ||
+    name.startsWith("fss") ||
+    name.endsWith("team")
+  );
+}
+
 export function buildPageSchema(
   type: "AboutPage" | "ContactPage",
   path: string,

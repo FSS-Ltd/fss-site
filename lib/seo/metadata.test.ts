@@ -9,7 +9,11 @@ import {
 } from "./metadata";
 import { isoDateSchema } from "./content";
 import { organisation as organisationInfo } from "./organisation";
-import { buildPageSchema, buildRootSchema } from "./schema";
+import {
+  buildPageSchema,
+  buildRootSchema,
+  isOrganisationAuthor,
+} from "./schema";
 
 test("canonical URLs discard query fragments and trailing slashes without accepting another origin", () => {
   assert.equal(
@@ -115,6 +119,15 @@ test("root graph connects organisation, website and evidenced founder without a 
   assert.deepEqual(website.publisher, { "@id": organisation["@id"] });
   assert.equal(JSON.stringify(graph).includes("SearchAction"), false);
   assert.equal(JSON.stringify(graph).includes("Jean-Fidele Ntagengwa"), true);
+});
+
+test("team and empty bylines are the organisation; only individuals are people", () => {
+  assert.equal(isOrganisationAuthor("FSS Growth Team"), true);
+  assert.equal(isOrganisationAuthor("Faithful Software Solutions"), true);
+  assert.equal(isOrganisationAuthor("Faithful Software Solutions Ltd"), true);
+  assert.equal(isOrganisationAuthor("Content team"), true);
+  assert.equal(isOrganisationAuthor(""), true);
+  assert.equal(isOrganisationAuthor("Test Person"), false);
 });
 
 test("About and Contact page nodes reference the website and organisation by id", () => {

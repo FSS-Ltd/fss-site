@@ -2,7 +2,11 @@ import type { BlogPostMeta } from "@/lib/types/blog";
 
 import { JsonLd } from "@/components/seo/json-ld";
 import { organisation } from "@/lib/seo/organisation";
-import { organisationId, websiteId } from "@/lib/seo/schema";
+import {
+  isOrganisationAuthor,
+  organisationId,
+  websiteId,
+} from "@/lib/seo/schema";
 
 type ArticleSchemaProps = {
   post: BlogPostMeta;
@@ -32,14 +36,13 @@ export function ArticleSchema({ post }: ArticleSchemaProps) {
       post.modifiedDate > post.publishDate
         ? post.modifiedDate
         : post.publishDate,
-    author:
-      !post.author || post.author === organisation.name
-        ? organisationNode
-        : {
-            "@type": "Person",
-            name: post.author,
-            ...(post.authorUrl ? { url: post.authorUrl } : {}),
-          },
+    author: isOrganisationAuthor(post.author)
+      ? organisationNode
+      : {
+          "@type": "Person",
+          name: post.author,
+          ...(post.authorUrl ? { url: post.authorUrl } : {}),
+        },
     publisher: { ...organisationNode, logo: organisationLogo },
     isPartOf: { "@id": websiteId },
     inLanguage: "en-GB",

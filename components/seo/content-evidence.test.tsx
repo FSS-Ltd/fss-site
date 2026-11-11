@@ -28,10 +28,14 @@ test("article evidence is visible and organisational authorship is represented a
       `"publisher":${org},"logo":{"@type":"ImageObject","url":"https://faithfulsoftware.dev/FSS.png"}}`,
     ),
   );
-  // A named byline stays a Person so the markup matches the visible author.
+  // A team byline is the organisation; only a named individual is a Person.
+  assert.ok(schema.includes(`"author":${org}}`));
+  const person = renderToStaticMarkup(
+    <ArticleSchema post={{ ...post.meta, author: "Test Person" }} />,
+  );
   assert.ok(
-    schema.includes(
-      `"author":{"@type":"Person","name":"${post.meta.author}"${post.meta.authorUrl ? `,"url":"${post.meta.authorUrl}"` : ""}}`,
+    person.includes(
+      `"author":{"@type":"Person","name":"Test Person"${post.meta.authorUrl ? `,"url":"${post.meta.authorUrl}"` : ""}}`,
     ),
   );
   const orgAuthored = renderToStaticMarkup(
