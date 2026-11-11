@@ -31,6 +31,12 @@ Standard prefixes: `feat/` `fix/` `chore/` `refactor/` `perf/` `test/` `docs/`
 - Use `/nexus-memory-capture` to save durable context to the vault after a session.
 - Use `/nexus-handoff` to produce a handoff note before ending a session.
 
+## Project Maps and Content Rules
+
+- Feature inventory: `FEATURE_TREE.md` (public-site features are under "Public site subfeatures"). Graph: `graphify-out/`.
+- Anyone writing a blog post, service page or resource must read `docs/seo/keyword-bank.md` first, pick one open primary phrase from it, and mark it used.
+- Positioning and page set: `docs/superpowers/specs/2026-11-11-ai-led-seo-lead-growth-design.md`.
+
 ## Vault Path
 
 `/Users/JeanFidele/The Nexus Ecosystem/The Nexus/14 AI Collaboration/Context Packs/fss-site/Context Pack.md`
