@@ -119,13 +119,12 @@ export function StaffDeliveryBoard({
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [dragging, setDragging] = useState<string | null>(null);
-  const [movingRequest, setMovingRequest] = useState<StaffDeliveryBoardRequest | null>(
-    () => {
+  const [movingRequest, setMovingRequest] =
+    useState<StaffDeliveryBoardRequest | null>(() => {
       if (!initialMoveRequestId) return null;
       const request = requests.find((item) => item.id === initialMoveRequestId);
       return request && moveTransitions[request.status] ? request : null;
-    },
-  );
+    });
 
   const closeMoveSheet = useCallback(() => {
     setMovingRequest(null);

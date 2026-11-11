@@ -38,7 +38,7 @@ const values = [
   },
   {
     title: "Your team, supported. Your business, moving.",
-    copy: "Practical systems that fit your organisation today and can develop as your needs change.",
+    copy: "Practical systems that fit your business today and can develop as your needs change.",
   },
 ] as const;
 

@@ -58,8 +58,9 @@ test("renders visibly staged roof journeys for both roofing concepts", () => {
     [TunbridgeWellsRoofingPage, 3],
   ] as const) {
     const html = renderToStaticMarkup(<Page />);
-    const routeRevealCount = (html.match(/data-roofing-route-reveal="true"/g) ?? [])
-      .length;
+    const routeRevealCount = (
+      html.match(/data-roofing-route-reveal="true"/g) ?? []
+    ).length;
 
     assert.match(html, /data-roof-build-scroll-progress="true"/);
     assert.match(html, /data-roof-build-scroll-beat="0"/);

@@ -519,8 +519,14 @@ test("request collection provides an actionable empty board and clear board guid
   assert.match(board, /Ready for review/);
   assert.match(emptyBoard, /Nothing in your board yet/);
   assert.match(emptyBoard, /Create first request/);
-  assert.match(emptyBoard, /href="\/portal\/requests\/new\?organisationId=org"/);
-  assert.match(emptyBoard, /href="\/portal\/requests\/new\?organisationId=org&amp;type=bug"/);
+  assert.match(
+    emptyBoard,
+    /href="\/portal\/requests\/new\?organisationId=org"/,
+  );
+  assert.match(
+    emptyBoard,
+    /href="\/portal\/requests\/new\?organisationId=org&amp;type=bug"/,
+  );
   assert.match(loadingBoard, /Loading your requests/);
   assert.match(loadingBoard, /aria-busy="true"/);
   assert.match(loadingBoard, /role="status"/);
@@ -598,9 +604,11 @@ test("staff request creation starts scope assessment without exposing client con
       }) => React.JSX.Element)
     | undefined;
   try {
-    StaffRequestForm = (require("./staff-request-form") as {
-      StaffRequestForm?: typeof StaffRequestForm;
-    }).StaffRequestForm;
+    StaffRequestForm = (
+      require("./staff-request-form") as {
+        StaffRequestForm?: typeof StaffRequestForm;
+      }
+    ).StaffRequestForm;
   } catch {
     StaffRequestForm = undefined;
   }

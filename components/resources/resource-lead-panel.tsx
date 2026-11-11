@@ -27,7 +27,8 @@ export function ResourceLeadPanel({ resource }: ResourceLeadPanelProps) {
         />
       </div>
       <p className="relative mt-4 text-center text-[11px] text-text-subtle">
-        By downloading, you agree to receive strategic updates. Unsubscribe anytime.
+        By downloading, you agree to receive strategic updates. Unsubscribe
+        anytime.
       </p>
     </aside>
   );

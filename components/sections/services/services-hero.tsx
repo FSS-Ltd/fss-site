@@ -15,9 +15,9 @@ export function ServicesHero() {
             <span className="text-brand-primary">Precision.</span>
           </h1>
           <p className="text-lg leading-relaxed text-text-muted">
-            Faithful Software Solutions Ltd provides specialized digital architecture for
-            institutions where reliability is not optional. From global enterprises to local
-            communities.
+            Faithful Software Solutions Ltd provides specialized digital
+            architecture for institutions where reliability is not optional.
+            From global enterprises to local communities.
           </p>
         </div>
         <div className="relative aspect-video overflow-hidden rounded-xl border border-border-soft/40">

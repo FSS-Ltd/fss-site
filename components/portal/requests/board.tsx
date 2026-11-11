@@ -138,7 +138,10 @@ export function RequestBoard({
       </div>
 
       {!hasRequests ? (
-        <section className={styles.emptyBoard} aria-labelledby="empty-board-heading">
+        <section
+          className={styles.emptyBoard}
+          aria-labelledby="empty-board-heading"
+        >
           <p className={styles.eyebrow}>Requests &amp; feedback</p>
           <h2 id="empty-board-heading" className={styles.sectionTitle}>
             Nothing in your board yet.
@@ -174,7 +177,11 @@ export function RequestBoard({
               lane.statuses.includes(request.status),
             );
             return (
-              <section className={styles.lane} key={lane.label} aria-label={lane.label}>
+              <section
+                className={styles.lane}
+                key={lane.label}
+                aria-label={lane.label}
+              >
                 <h2 className={styles.laneTitle}>
                   {lane.label} <span>{cards.length}</span>
                 </h2>
@@ -195,19 +202,25 @@ export function RequestBoard({
                           request.status !== "in_progress" ? (
                             <span>{statusLabels[request.status]}</span>
                           ) : null}
-                          <span>{request.ownerDisplay || "Owner to be confirmed"}</span>
+                          <span>
+                            {request.ownerDisplay || "Owner to be confirmed"}
+                          </span>
                           <span>{requestDate(request.targetDate)}</span>
                         </span>
                         {request.blocked ? (
                           <span className={styles.status}>Blocked</span>
                         ) : null}
                         <span className={styles.cardAction}>
-                          {request.status === "ready_for_review" ? "Review" : "Open"}
+                          {request.status === "ready_for_review"
+                            ? "Review"
+                            : "Open"}
                         </span>
                       </Link>
                     </li>
                   ))}
-                  {!cards.length ? <li className={styles.note}>No requests</li> : null}
+                  {!cards.length ? (
+                    <li className={styles.note}>No requests</li>
+                  ) : null}
                 </ul>
               </section>
             );

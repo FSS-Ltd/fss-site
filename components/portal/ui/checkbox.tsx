@@ -25,13 +25,19 @@ export function PortalCheckbox({
         <input
           {...props}
           aria-describedby={hintId}
-          className={[styles.checkboxInput, className].filter(Boolean).join(" ")}
+          className={[styles.checkboxInput, className]
+            .filter(Boolean)
+            .join(" ")}
           id={checkboxId}
           type="checkbox"
         />
         <span>{label}</span>
       </label>
-      {hint ? <p className={styles.hint} id={hintId}>{hint}</p> : null}
+      {hint ? (
+        <p className={styles.hint} id={hintId}>
+          {hint}
+        </p>
+      ) : null}
     </div>
   );
 }

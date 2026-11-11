@@ -180,7 +180,11 @@
 }
 
 .preferences button:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--portal-action, #0f7078) 88%, var(--portal-ink, #0a1a2e));
+  background: color-mix(
+    in srgb,
+    var(--portal-action, #0f7078) 88%,
+    var(--portal-ink, #0a1a2e)
+  );
 }
 
 .preferences button:disabled {

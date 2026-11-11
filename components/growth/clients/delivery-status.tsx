@@ -108,9 +108,9 @@ export function DeliveryStatusFormFrame({
         return;
       }
 
-      const responseBody = (await response.json().catch(() => null)) as
-        | { message?: string }
-        | null;
+      const responseBody = (await response.json().catch(() => null)) as {
+        message?: string;
+      } | null;
       setFeedback({
         tone: "error",
         message: responseBody?.message ?? "The move could not be completed.",
@@ -142,7 +142,11 @@ export function DeliveryStatusFormFrame({
       role="group"
     >
       {feedback && (
-        <p className={styles.actionFeedback} data-tone={feedback.tone} role="alert">
+        <p
+          className={styles.actionFeedback}
+          data-tone={feedback.tone}
+          role="alert"
+        >
           {feedback.message}
         </p>
       )}
@@ -189,14 +193,16 @@ export function DeliveryStatusFormFrame({
                 onChange={(event) => setIncludeInvite(event.target.checked)}
                 type="checkbox"
               />
-              Invite the client to join FSS Field Notes (only offered if they are
-              not already subscribed)
+              Invite the client to join FSS Field Notes (only offered if they
+              are not already subscribed)
             </label>
           )}
 
           <label className={styles.field}>
             <span className={styles.fieldLabel}>
-              {mode.target === "cancelled" ? "Reason (required)" : "Note (optional)"}
+              {mode.target === "cancelled"
+                ? "Reason (required)"
+                : "Note (optional)"}
             </span>
             <textarea
               className={styles.textArea}
@@ -220,7 +226,9 @@ export function DeliveryStatusFormFrame({
               disabled={busy || cancelBlocked}
               type="submit"
             >
-              {busy ? "Moving…" : `Confirm move to ${STATUS_LABELS[mode.target]}`}
+              {busy
+                ? "Moving…"
+                : `Confirm move to ${STATUS_LABELS[mode.target]}`}
             </button>
           </div>
         </form>

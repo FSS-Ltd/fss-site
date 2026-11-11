@@ -78,10 +78,7 @@ export function PropertyWalkthroughHero({
     if (
       !section ||
       !video ||
-      !shouldEnablePropertyWalkthrough(
-        prefersReducedMotion,
-        window.innerWidth,
-      )
+      !shouldEnablePropertyWalkthrough(prefersReducedMotion, window.innerWidth)
     ) {
       return;
     }

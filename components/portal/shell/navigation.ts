@@ -112,7 +112,9 @@ function isActivePath(pathname: string, href: string): boolean {
   const normalisedPathname = normalisePortalPath(pathname);
   if (href === "/portal" || href === "/portal/admin")
     return normalisedPathname === href;
-  return normalisedPathname === href || normalisedPathname.startsWith(`${href}/`);
+  return (
+    normalisedPathname === href || normalisedPathname.startsWith(`${href}/`)
+  );
 }
 
 export function getClientNavigation(
@@ -138,5 +140,13 @@ export function getStudioNavigation(pathname: string): PortalNavigationItem[] {
   }));
 }
 
-export const clientMobileNavigationIds = ["home", "projects", "requests"] as const;
-export const studioMobileNavigationIds = ["overview", "clients", "delivery"] as const;
+export const clientMobileNavigationIds = [
+  "home",
+  "projects",
+  "requests",
+] as const;
+export const studioMobileNavigationIds = [
+  "overview",
+  "clients",
+  "delivery",
+] as const;

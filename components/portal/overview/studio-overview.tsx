@@ -97,7 +97,10 @@ export function StudioOverview({
         )}
       </section>
 
-      <section className={styles.panel} aria-labelledby="delivery-focus-heading">
+      <section
+        className={styles.panel}
+        aria-labelledby="delivery-focus-heading"
+      >
         <div className={styles.panelHeader}>
           <div>
             <h2 id="delivery-focus-heading">Active delivery</h2>

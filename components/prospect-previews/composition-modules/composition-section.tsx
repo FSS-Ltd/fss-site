@@ -20,7 +20,10 @@ export function CompositionSection({
         </h2>
         <ul className="mt-6 grid list-none gap-3 p-0">
           {section.items.map((item) => (
-            <li className="rounded-2xl border border-black/10 bg-[var(--preview-surface)] px-4 py-3 leading-6 text-[var(--preview-muted)]" key={item}>
+            <li
+              className="rounded-2xl border border-black/10 bg-[var(--preview-surface)] px-4 py-3 leading-6 text-[var(--preview-muted)]"
+              key={item}
+            >
               {item}
             </li>
           ))}

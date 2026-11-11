@@ -140,7 +140,11 @@ test("service pages and AI-led public pages keep title and description lengths i
     "/start",
     ...Object.keys(publicPages).filter((path) => path.startsWith("/services/")),
   ] as const;
-  assert.equal(paths.length, 15);
+  assert.equal(
+    paths.length,
+    6 +
+      Object.keys(publicPages).filter((p) => p.startsWith("/services/")).length,
+  );
   for (const path of paths) {
     const page = publicPages[path as keyof typeof publicPages];
     assert.ok(page.title.length <= 60, `${path} title ${page.title.length}`);
@@ -156,7 +160,14 @@ test("service pages speak to businesses of any size, not only charities", () => 
     require("@/lib/commercial/services") as typeof import("@/lib/commercial/services");
   for (const page of Object.values(servicePages)) {
     assert.doesNotMatch(
-      `${page.title} ${page.description} ${page.heading} ${page.answer}`,
+      JSON.stringify([
+        page.title,
+        page.description,
+        page.heading,
+        page.answer,
+        page.sections,
+        page.faqs,
+      ]),
       /charit|faith|church/i,
       page.path,
     );

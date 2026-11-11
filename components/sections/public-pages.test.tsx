@@ -87,7 +87,7 @@ test("public hero variants render the shared particle canvas", () => {
 test("home keeps its audience, proof and FSS visual language in the rendered document", () => {
   const { default: Page, metadata } = require("../../app/(site)/page");
   assert.deepEqual(metadata.title, {
-    absolute: "AI Integration and Custom Software for Business | FSS",
+    absolute: "AI Automation and Custom Software for UK Business | FSS",
   });
   const html = renderToStaticMarkup(<Page />);
   assert.match(html, /businesses of any size/);

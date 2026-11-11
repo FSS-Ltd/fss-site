@@ -1,8 +1,6 @@
 import Link from "next/link";
 
-import type {
-  FounderDraftProspectPreviewSummary,
-} from "@/lib/growth/prospect-previews/founder-review";
+import type { FounderDraftProspectPreviewSummary } from "@/lib/growth/prospect-previews/founder-review";
 import type { ViewState } from "@/lib/growth/dashboard/view-models";
 
 import { getConceptPreviewHref } from "./concept-preview-href";
@@ -18,17 +16,15 @@ export function FounderPreviewList({
     return (
       <div className={styles.errorState} role="alert">
         <p>{state.message}</p>
-        <p className={styles.errorCorrelation}>Reference: {state.correlationId}</p>
+        <p className={styles.errorCorrelation}>
+          Reference: {state.correlationId}
+        </p>
       </div>
     );
   }
 
   if (state.status === "empty") {
-    return (
-      <div className={styles.emptyState}>
-        {state.reason}
-      </div>
-    );
+    return <div className={styles.emptyState}>{state.reason}</div>;
   }
 
   return (
@@ -38,7 +34,8 @@ export function FounderPreviewList({
           <p className={styles.previewReviewEyebrow}>Founder review</p>
           <h1 className={styles.previewReviewHeading}>Concept previews</h1>
           <p className={styles.previewReviewDescription}>
-            Review each private site concept before it is published for a prospect.
+            Review each private site concept before it is published for a
+            prospect.
           </p>
         </div>
         <Link className={styles.rowLink} href="/growth/prospects">
@@ -47,10 +44,15 @@ export function FounderPreviewList({
       </div>
 
       <p className={styles.previewReviewCount}>
-        {state.data.length} {state.data.length === 1 ? "preview is" : "previews are"} awaiting review.
+        {state.data.length}{" "}
+        {state.data.length === 1 ? "preview is" : "previews are"} awaiting
+        review.
       </p>
 
-      <ul className={styles.previewReviewList} aria-label="Private concept previews">
+      <ul
+        className={styles.previewReviewList}
+        aria-label="Private concept previews"
+      >
         {state.data.map((preview) => {
           const previewHref = getConceptPreviewHref({
             businessName: preview.businessName,
@@ -61,7 +63,9 @@ export function FounderPreviewList({
             <li className={styles.previewReviewCard} key={preview.prospectId}>
               <div className={styles.previewReviewCardHeader}>
                 <div>
-                  <h2 className={styles.previewReviewCardHeading}>{preview.businessName}</h2>
+                  <h2 className={styles.previewReviewCardHeading}>
+                    {preview.businessName}
+                  </h2>
                   <p className={styles.previewReviewCardDescription}>
                     Private concept made for {preview.businessName}, ready for
                     founder review.

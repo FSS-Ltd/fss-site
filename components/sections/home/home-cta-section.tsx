@@ -15,8 +15,8 @@ export function HomeCtaSection() {
             Ready to build your digital foundation?
           </h2>
           <p className="mx-auto max-w-2xl text-lg font-medium text-cta-text/80">
-            Join hundreds of institutions that trust Faithful Software Solutions for their
-            mission-critical technology.
+            Join hundreds of institutions that trust Faithful Software Solutions
+            for their mission-critical technology.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <ButtonLink

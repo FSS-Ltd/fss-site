@@ -39,9 +39,9 @@ const services = [
       "Assess whether self-hosted or on-device AI fits your data, hardware and operational needs. Deployment boundaries, access and oversight are part of the scope.",
   },
   {
-    title: "Custom software, portals and apps",
+    title: "Custom software, portals and modernisation",
     description:
-      "Operational systems, client portals, dashboards, integrations and web or mobile products designed around your workflows, permissions and reporting needs.",
+      "Operational systems, client portals, dashboards and integrations, plus modernisation of ageing systems, designed around your workflows, permissions and reporting needs.",
   },
 ];
 

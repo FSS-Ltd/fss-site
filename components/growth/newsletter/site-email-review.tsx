@@ -52,8 +52,8 @@ export function SiteEmailReview({
             </span>
           </div>
           <p className={styles.subtitle}>
-            Complete copy and imagery for people who have asked FSS to
-            contact them.
+            Complete copy and imagery for people who have asked FSS to contact
+            them.
           </p>
         </div>
       </div>
@@ -141,16 +141,20 @@ export function SiteEmailReview({
               />
             </div>
           ) : (
-            <pre className={styles.previewPlainText}>{selected.renderedText}</pre>
+            <pre className={styles.previewPlainText}>
+              {selected.renderedText}
+            </pre>
           )}
 
           <p className={styles.subtitle}>
-            Rendered with representative fixture data, never a real
-            subscriber or client record:{" "}
+            Rendered with representative fixture data, never a real subscriber
+            or client record:{" "}
             {selected.requiredFields.length === 0
               ? "no personalisation fields."
               : selected.requiredFields
-                  .map((field) => `${field} = "${selected.fixtureFields[field]}"`)
+                  .map(
+                    (field) => `${field} = "${selected.fixtureFields[field]}"`,
+                  )
                   .join(", ")}
           </p>
         </div>
@@ -193,7 +197,9 @@ export function SiteEmailReview({
                 {selected.publishedBy && (
                   <li className={styles.metaItem}>
                     <span className={styles.metaLabel}>Published by</span>
-                    <span className={styles.metaValue}>{selected.publishedBy}</span>
+                    <span className={styles.metaValue}>
+                      {selected.publishedBy}
+                    </span>
                   </li>
                 )}
               </ul>

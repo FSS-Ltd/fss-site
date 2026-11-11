@@ -157,9 +157,9 @@ export function PreviewApprovalFrame({
   } | null>(null);
   const [changeNotes, setChangeNotes] = useState("");
   const [changeRequestPending, setChangeRequestPending] = useState(false);
-  const [changeRequestFeedback, setChangeRequestFeedback] = useState<string | null>(
-    null,
-  );
+  const [changeRequestFeedback, setChangeRequestFeedback] = useState<
+    string | null
+  >(null);
 
   if (!preview) {
     return (
@@ -237,9 +237,9 @@ export function PreviewApprovalFrame({
         return;
       }
 
-      const body = (await response.json().catch(() => null)) as
-        | { message?: string }
-        | null;
+      const body = (await response.json().catch(() => null)) as {
+        message?: string;
+      } | null;
       setFeedback({
         tone: response.status === 409 ? "conflict" : "error",
         message:
@@ -283,9 +283,9 @@ export function PreviewApprovalFrame({
         return;
       }
 
-      const body = (await response.json().catch(() => null)) as
-        | { message?: string }
-        | null;
+      const body = (await response.json().catch(() => null)) as {
+        message?: string;
+      } | null;
       setChangeRequestFeedback(
         body?.message ?? "The change request could not be saved. Try again.",
       );
@@ -305,9 +305,7 @@ export function PreviewApprovalFrame({
         refreshes the stored first-email draft. It does not create a provider
         draft or send email.
       </p>
-      <p style={previewApprovalNoteStyle}>
-        {sourcePackageStatus}
-      </p>
+      <p style={previewApprovalNoteStyle}>{sourcePackageStatus}</p>
       {feedback && (
         <p
           className={

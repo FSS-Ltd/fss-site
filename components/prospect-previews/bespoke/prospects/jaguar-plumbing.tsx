@@ -66,7 +66,10 @@ export function JaguarPlumbingPage() {
       <main>
         <JaguarWaterJourneyHero />
 
-        <RevealOnScroll as="section" className="px-4 py-20 sm:px-7 sm:py-28 lg:px-10">
+        <RevealOnScroll
+          as="section"
+          className="px-4 py-20 sm:px-7 sm:py-28 lg:px-10"
+        >
           <div className="mx-auto max-w-[88rem]">
             <div className="max-w-2xl">
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#d85c07]">
@@ -83,18 +86,27 @@ export function JaguarPlumbingPage() {
             <div className="mt-12 grid gap-px overflow-hidden rounded-[2rem] bg-black/10 md:grid-cols-3">
               {serviceAreas.map(({ Icon, detail, title }) => (
                 <article className="bg-[#f8f8f5] p-7 sm:p-9" key={title}>
-                  <Icon aria-hidden="true" className="size-6 text-[#e56c05]" strokeWidth={1.7} />
+                  <Icon
+                    aria-hidden="true"
+                    className="size-6 text-[#e56c05]"
+                    strokeWidth={1.7}
+                  />
                   <h3 className="mt-16 text-2xl font-semibold tracking-[-0.045em]">
                     {title}
                   </h3>
-                  <p className="mt-3 max-w-xs leading-7 text-[#606668]">{detail}</p>
+                  <p className="mt-3 max-w-xs leading-7 text-[#606668]">
+                    {detail}
+                  </p>
                 </article>
               ))}
             </div>
           </div>
         </RevealOnScroll>
 
-        <section className="bg-[#e7e7e1] px-4 py-20 sm:px-7 sm:py-28 lg:px-10" id="service-brief">
+        <section
+          className="bg-[#e7e7e1] px-4 py-20 sm:px-7 sm:py-28 lg:px-10"
+          id="service-brief"
+        >
           <div className="mx-auto grid max-w-[76rem] gap-12 lg:grid-cols-[minmax(0,.82fr)_minmax(32rem,1.18fr)] lg:gap-20">
             <RevealOnScroll>
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#d85c07]">
@@ -130,7 +142,8 @@ export function JaguarPlumbingPage() {
           <div className="mt-5 grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
             <div>
               <h2 className="max-w-2xl text-3xl font-semibold tracking-[-0.05em] sm:text-4xl">
-                A first enquiry designed around the work, not a generic contact form.
+                A first enquiry designed around the work, not a generic contact
+                form.
               </h2>
               <p className="mt-4 max-w-2xl leading-7 text-white/65">
                 FSS can refine the concept with Jaguar, then connect it to the

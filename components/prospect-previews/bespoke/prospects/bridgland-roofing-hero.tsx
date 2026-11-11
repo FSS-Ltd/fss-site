@@ -197,7 +197,10 @@ export function BridglandRoofingHero() {
         </header>
 
         <div aria-hidden="true" data-bridgland-analysis-layer="true">
-          <div className="bridglandAnalysisHud" data-bridgland-analysis-hud="true">
+          <div
+            className="bridglandAnalysisHud"
+            data-bridgland-analysis-hud="true"
+          >
             <span>Aerial roof scan</span>
             <small>4 inspection targets · scroll synced</small>
           </div>

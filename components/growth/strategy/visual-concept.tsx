@@ -140,7 +140,11 @@ export function VisualConcept({ data }: { data: VisualConceptData }) {
           </ul>
 
           <div className={styles.disclaimer}>
-            <TriangleAlert aria-hidden="true" size={18} style={{ flex: "none" }} />
+            <TriangleAlert
+              aria-hidden="true"
+              size={18}
+              style={{ flex: "none" }}
+            />
             <div>
               <strong>Generated concept, not a built product</strong>
               <p>

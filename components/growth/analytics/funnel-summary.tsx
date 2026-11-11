@@ -16,12 +16,14 @@ export function FunnelSummary({ funnel }: { funnel: AnalyticsFunnel }) {
     <div className={styles.card}>
       <h2 className={styles.sectionTitle}>Funnel</h2>
       <p className={styles.sectionNote}>
-        Each stage counts records that reached it during the selected month, by the
-        London calendar day that event happened on.
+        Each stage counts records that reached it during the selected month, by
+        the London calendar day that event happened on.
       </p>
 
       <table className={styles.table}>
-        <caption className={styles.visuallyHidden}>Monthly funnel counts</caption>
+        <caption className={styles.visuallyHidden}>
+          Monthly funnel counts
+        </caption>
         <thead>
           <tr>
             <th scope="col">Stage</th>

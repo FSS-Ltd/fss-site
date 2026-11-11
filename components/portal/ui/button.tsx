@@ -47,7 +47,9 @@ export function PortalButton({
     props["aria-describedby"],
     isDisabled && disabledReason ? disabledReasonId : undefined,
   ]
-    .filter((value): value is string => typeof value === "string" && value.length > 0)
+    .filter(
+      (value): value is string => typeof value === "string" && value.length > 0,
+    )
     .join(" ");
 
   return (
@@ -62,7 +64,11 @@ export function PortalButton({
         {children}
         {loading ? (
           <>
-            <LoaderCircle aria-hidden="true" className={styles.buttonLoader} size={16} />
+            <LoaderCircle
+              aria-hidden="true"
+              className={styles.buttonLoader}
+              size={16}
+            />
             <span className={styles.visuallyHidden}>Loading</span>
           </>
         ) : null}

@@ -38,7 +38,10 @@ test("keeps Primeline scroll crossfade and reduced-motion fallback in preview CS
   );
 
   assert.match(styles, /\[data-primeline-hero\]\s*\{\s*height: 320svh;/);
-  assert.match(styles, /\[data-primeline-hero-frame\] \{[\s\S]*?position: sticky;/);
+  assert.match(
+    styles,
+    /\[data-primeline-hero-frame\] \{[\s\S]*?position: sticky;/,
+  );
   assert.match(
     styles,
     /\[data-primeline-hero-night\] \{[\s\S]*?opacity: var\(--primeline-night-opacity\);/,

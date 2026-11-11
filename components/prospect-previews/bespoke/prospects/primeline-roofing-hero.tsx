@@ -182,7 +182,11 @@ export function PrimelineRoofingHero() {
         </div>
 
         <header className="primelineHeroChrome" data-primeline-hero-chrome>
-          <a aria-label="Primeline Roofing home" className="primelineLogo" href="#">
+          <a
+            aria-label="Primeline Roofing home"
+            className="primelineLogo"
+            href="#"
+          >
             <Image
               alt="Primeline Roofing & Building Ltd"
               height={450}
@@ -233,7 +237,10 @@ export function PrimelineRoofingHero() {
           </div>
         </div>
 
-        <aside aria-label="Primeline proof points" className="primelineProofDock">
+        <aside
+          aria-label="Primeline proof points"
+          className="primelineProofDock"
+        >
           <div>
             <BadgeCheck aria-hidden="true" className="size-5" />
             <span>TrustATrader 4.97</span>
@@ -248,8 +255,8 @@ export function PrimelineRoofingHero() {
           Primeline Roofing & Building Ltd premium roofing across Kent
         </h1>
         <p className="sr-only">
-          Primeline Roofing provides new roofs, roof repairs, flat roofing,
-          free written quotations, insured work and independent approval signals
+          Primeline Roofing provides new roofs, roof repairs, flat roofing, free
+          written quotations, insured work and independent approval signals
           across Chatham, Medway and Kent.
         </p>
       </div>

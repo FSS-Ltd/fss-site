@@ -35,15 +35,25 @@ export function Default() {
   return (
     <div className="flex min-h-screen w-screen flex-wrap items-center justify-center gap-10 p-10">
       {demoCards.map((card) => (
-        <GlowCard key={card.title} className="overflow-hidden p-0" customSize glowColor={card.glowColor}>
+        <GlowCard
+          key={card.title}
+          className="overflow-hidden p-0"
+          customSize
+          glowColor={card.glowColor}
+        >
           <div
             aria-hidden="true"
             className="h-44 w-full bg-cover bg-center"
             style={{ backgroundImage: `url(${card.image})` }}
           />
           <div className="space-y-3 p-5">
-            <card.icon aria-hidden="true" className="size-5 text-brand-primary" />
-            <p className="text-lg font-semibold text-foreground">{card.title}</p>
+            <card.icon
+              aria-hidden="true"
+              className="size-5 text-brand-primary"
+            />
+            <p className="text-lg font-semibold text-foreground">
+              {card.title}
+            </p>
             <p className="text-sm text-text-muted">{card.description}</p>
           </div>
         </GlowCard>

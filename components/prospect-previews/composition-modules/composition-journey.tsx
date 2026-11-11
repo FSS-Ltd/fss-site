@@ -128,7 +128,10 @@ function EvidenceBackedJourney({
         Step {stepIndex + 1} of {journey.steps.length}
       </p>
       {complete ? (
-        <p aria-live="polite" className="mt-6 max-w-2xl leading-6 text-[color-mix(in_srgb,var(--preview-background)_84%,transparent)]">
+        <p
+          aria-live="polite"
+          className="mt-6 max-w-2xl leading-6 text-[color-mix(in_srgb,var(--preview-background)_84%,transparent)]"
+        >
           {journey.completionMessage}
         </p>
       ) : (
@@ -190,7 +193,8 @@ export function CompositionJourney({
         A tailored journey is awaiting first-party research.
       </h2>
       <p className="mt-5 leading-6 text-[color-mix(in_srgb,var(--preview-background)_76%,transparent)]">
-        Demonstration only. This concept does not collect, send or store information.
+        Demonstration only. This concept does not collect, send or store
+        information.
       </p>
     </section>
   );

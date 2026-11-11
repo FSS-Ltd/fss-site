@@ -19,7 +19,8 @@ const composition: ProspectPreviewComposition = {
   sectionOrder: ["hero", "journey", "proof", "owner-cta"],
   journey: {
     type: "mot-request",
-    completionMessage: "A live version could send this request to the workshop.",
+    completionMessage:
+      "A live version could send this request to the workshop.",
   },
   copy: {
     businessName: "Marden Garage",

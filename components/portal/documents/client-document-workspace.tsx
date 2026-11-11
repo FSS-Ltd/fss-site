@@ -60,8 +60,8 @@ export function ClientDocumentWorkspace({
       </Notice>
       {quarantineNotice ? (
         <Notice tone="warning">
-          Your file is being checked. The file will be available after it
-          passes the security check. You can leave and return later.
+          Your file is being checked. The file will be available after it passes
+          the security check. You can leave and return later.
         </Notice>
       ) : null}
       <section

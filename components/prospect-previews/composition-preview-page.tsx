@@ -9,9 +9,7 @@ export type ProspectCompositionLoader = (
 export type RenderProspectCompositionPageInput = {
   slug: string;
   mode: "public" | "review";
-  getReviewComposition: (
-    slug: string,
-  ) => ProspectPreviewComposition | null;
+  getReviewComposition: (slug: string) => ProspectPreviewComposition | null;
   getPublishedComposition: ProspectCompositionLoader;
 };
 

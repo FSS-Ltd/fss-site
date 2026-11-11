@@ -18,7 +18,9 @@ const { ClientThankYouReviewFrame } =
 const MESSAGE_ID = "11111111-1111-4111-8111-111111111111";
 
 function baseReview(
-  overrides: Partial<Parameters<typeof ClientThankYouReviewFrame>[0]["review"]> = {},
+  overrides: Partial<
+    Parameters<typeof ClientThankYouReviewFrame>[0]["review"]
+  > = {},
 ) {
   return {
     messageId: MESSAGE_ID,
@@ -40,9 +42,14 @@ function baseReview(
   };
 }
 
-function renderReview(overrides: Parameters<typeof baseReview>[0] = {}): string {
+function renderReview(
+  overrides: Parameters<typeof baseReview>[0] = {},
+): string {
   return renderToStaticMarkup(
-    <ClientThankYouReviewFrame onSuccess={() => {}} review={baseReview(overrides)} />,
+    <ClientThankYouReviewFrame
+      onSuccess={() => {}}
+      review={baseReview(overrides)}
+    />,
   );
 }
 

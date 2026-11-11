@@ -45,7 +45,6 @@ export function HomePage() {
               <span>Small businesses</span>
               <span>Growing teams</span>
               <span>Large organisations</span>
-              <span>Charities</span>
             </p>
           </div>
           <div

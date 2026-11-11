@@ -35,7 +35,10 @@ test("keeps workshop transitions within a single extra viewport", () => {
 
   assert.match(styles, /\.kgeTrack \{\s+height: 200svh;/);
   assert.match(styles, /\.kgeViewport \{[\s\S]*?position: sticky;/);
-  assert.match(styles, /\.kgeScene\[data-state="active"\] \{[\s\S]*?opacity: 1;/);
+  assert.match(
+    styles,
+    /\.kgeScene\[data-state="active"\] \{[\s\S]*?opacity: 1;/,
+  );
 });
 
 test("does not clip the sticky workshop hero", () => {

@@ -33,7 +33,9 @@ function formatDeadline(value: string): string {
 /** Confirmation shown by the page after the panel's action succeeds. */
 export function SigningDeadlineOutcomeNotice({
   outcome,
-}: Readonly<{ outcome: string | string[] | undefined }>): React.JSX.Element | null {
+}: Readonly<{
+  outcome: string | string[] | undefined;
+}>): React.JSX.Element | null {
   if (outcome === "reopened")
     return (
       <Notice tone="success">
@@ -103,10 +105,7 @@ export function SigningDeadlineActions({
   }
 
   return (
-    <section
-      className={styles.deadlinePanel}
-      aria-labelledby={`${id}-heading`}
-    >
+    <section className={styles.deadlinePanel} aria-labelledby={`${id}-heading`}>
       <h2 id={`${id}-heading`}>Signing deadline passed</h2>
       <p>
         The deadline was{" "}

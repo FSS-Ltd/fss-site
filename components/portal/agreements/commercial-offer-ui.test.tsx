@@ -145,7 +145,9 @@ test("a selected offer follows its signing request instead of linking to a close
     approvalId: "33333333-3333-4333-8333-333333333333",
   };
   const open = render(
-    <ClientCommercialOffer offer={{ ...selected, signingStatus: "approved" }} />,
+    <ClientCommercialOffer
+      offer={{ ...selected, signingStatus: "approved" }}
+    />,
   );
   assert.match(open, /Continue to signing/);
 
@@ -158,7 +160,9 @@ test("a selected offer follows its signing request instead of linking to a close
   assert.doesNotMatch(expired, /Continue to signing/);
 
   const cancelled = render(
-    <ClientCommercialOffer offer={{ ...selected, signingStatus: "cancelled" }} />,
+    <ClientCommercialOffer
+      offer={{ ...selected, signingStatus: "cancelled" }}
+    />,
   );
   assert.match(cancelled, /This signing request is closed/);
   assert.doesNotMatch(cancelled, /Continue to signing/);

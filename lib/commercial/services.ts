@@ -43,7 +43,7 @@ export const servicePages = {
       {
         id: "notfit",
         title: "Who this is not for.",
-        text: "If a feature inside your current software already does the job, use it. If the process is not yet written down, or nobody owns the data, settle that first. FSS will say so in scoping rather than sell an integration you do not need.",
+        text: "If a feature inside your current software already does the job, use it. If the process is not yet written down, or nobody owns the data, settle that first.",
       },
       {
         id: "outcomes",
@@ -59,7 +59,7 @@ export const servicePages = {
       {
         id: "evidence",
         title: "Operational software in practice.",
-        text: "FSS built NexSteps, a safeguarding, attendance and operations platform, with role-scoped access and connected workflows. It is operational software evidence, not an AI deployment. An AI integration is assessed against your own task and data.",
+        text: "FSS built NexSteps, a safeguarding, attendance and operations platform, with role-scoped access and connected workflows. It is operational software, so it is no proof of AI work. An AI integration is assessed against your own task and data.",
       },
       {
         id: "scope",
@@ -76,7 +76,7 @@ export const servicePages = {
       {
         question: "Can we keep our current tools and add AI to them?",
         answer:
-          "Often, yes. It depends on whether your tools offer supported interfaces and permissions for the data involved. Checking that is the first step of scoping, before any promise of integration.",
+          "It depends on whether your tools offer supported interfaces and permissions for the data involved. Checking that is the first step of scoping, before any promise of integration.",
       },
       {
         question: "Will it integrate with our CRM and booking system?",
@@ -193,7 +193,7 @@ export const servicePages = {
       {
         id: "fit",
         title: "Who this is for.",
-        text: "Owner-led and small businesses that lose enquiries to missed calls, after-hours messages or a busy front desk. Trades, clinics, local services and professional practices often start here, covering after-hours only or the busiest periods.",
+        text: "Owner-led and small businesses that lose enquiries to missed calls, after-hours messages or a busy front desk. Typical fits include trades, clinics, local services and professional practices, covering after-hours only or the busiest periods.",
       },
       {
         id: "notfit",
@@ -214,7 +214,7 @@ export const servicePages = {
       {
         id: "evidence",
         title: "Operational software in practice.",
-        text: "FSS built NexSteps, an operations platform with parent onboarding and role-scoped access. It is operational software evidence, not an AI deployment. An AI receptionist is tested against your own calls and your own diary.",
+        text: "FSS built NexSteps, an operations platform with parent onboarding and role-scoped access. It is operational software rather than an AI deployment, so a receptionist is tested against your own calls and diary.",
       },
       {
         id: "scope",
@@ -246,7 +246,7 @@ export const servicePages = {
       {
         question: "Are AI receptionists GDPR compliant?",
         answer:
-          "Compliance depends on how call data is stored, who processes it and what callers are told. We document the data flow so you can assess it, though this is not legal advice.",
+          "FSS cannot certify compliance. It depends on what is recorded, where it is stored and for how long. The build can include a written data-flow description for your own assessment. This is not legal advice.",
       },
       {
         question: "Will it connect to our CRM and booking system?",
@@ -291,12 +291,12 @@ export const servicePages = {
       {
         id: "evidence",
         title: "Operational software in practice.",
-        text: "FSS built NexSteps, an operations platform, which shaped how we examine workflows, data and access. It is operational software evidence, not an AI deployment. The audit assesses your own processes and data.",
+        text: "FSS built NexSteps, an operations platform, which shaped how we examine workflows, data and access. It is operational software, not an AI project. The audit assesses your own processes and data.",
       },
       {
         id: "scope",
         title: "What affects cost.",
-        text: "Cost follows how many processes and systems are reviewed, how many people we need to speak to and how much data access is needed. Decide the boundary of the review first. The output can feed a later build quote, so the assessment is not wasted if you proceed.",
+        text: "Cost follows how many processes and systems are reviewed, how many people we need to speak to and how much data access is needed. Decide the boundary of the review first. The output is a ranked list of candidate tasks, the data problems blocking each and a recommendation on what to build, fix or leave alone. The assessment can conclude that no build is needed.",
       },
       {
         id: "risk",
@@ -314,22 +314,22 @@ export const servicePages = {
       {
         question: "What should we automate first?",
         answer:
-          "Usually a repeated process with a clear owner, known inputs and checkable results. The audit tests your candidates against those criteria and ranks them.",
+          "A repeated process with a clear owner, known inputs and checkable results. The audit tests your candidates against those criteria and ranks them.",
       },
       {
         question: "Do we need to fix our data before using AI?",
         answer:
-          "Often some of it. Poor or scattered data limits what AI can do. The audit shows which data problems block which tasks, so you fix what matters first.",
+          "Some of it. Poor or scattered data limits what AI can do. The audit shows which data problems block which tasks, so you fix what matters first.",
       },
       {
         question: "Does an assessment come before a fixed quote?",
         answer:
-          "For anything unclear, yes. Pricing a build before the task and data are understood invites surprises. The assessment gives a firmer basis for a quote.",
+          "For anything unclear, yes. Pricing a build before the task and data are understood invites surprises, so the assessment sets out the task, the data and the open questions in writing.",
       },
       {
         question: "Is AI safe for my business?",
         answer:
-          "It depends on the task, the data it touches and the approvals around it. The audit identifies where risk is low enough to proceed and where it is not.",
+          "It depends on the task, the data it touches and the approvals around it. The audit identifies where more controls are needed before anything is built.",
       },
     ],
   },
@@ -362,7 +362,7 @@ export const servicePages = {
       {
         id: "evidence",
         title: "Operational software in practice.",
-        text: "FSS built NexSteps, a safeguarding, attendance and operations platform for schools, churches and community organisations. Its role-scoped access and parent onboarding provide a concrete example of this kind of work. It is not an AI deployment.",
+        text: "FSS built NexSteps, a safeguarding, attendance and operations platform for schools and community organisations. Its role-scoped access and parent onboarding provide a concrete example of this kind of work. It is not evidence of AI work.",
       },
       {
         id: "scope",
@@ -422,7 +422,7 @@ export const servicePages = {
       {
         id: "evidence",
         title: "Portal work in NexSteps.",
-        text: "NexSteps includes role-scoped access, support portals and parent onboarding. FSS built these alongside its safeguarding, attendance and operational workflows. It is operational software, not an AI deployment.",
+        text: "NexSteps includes role-scoped access, support portals and parent onboarding. FSS built these alongside its safeguarding, attendance and operational workflows. These are operational software features, not AI work.",
       },
       {
         id: "scope",

@@ -59,7 +59,11 @@ test("Admin form displays a fixed role without client role or organisation contr
   assert.match(markup, /name="name"/);
   assert.match(markup, /name="email"/);
   const pending = renderToStaticMarkup(
-    <PortalInvitationFields type="existing_client" organisations={[]} pending />,
+    <PortalInvitationFields
+      type="existing_client"
+      organisations={[]}
+      pending
+    />,
   );
   assert.match(pending, /name="role" disabled=""/);
 });

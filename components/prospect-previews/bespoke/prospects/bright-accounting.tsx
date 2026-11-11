@@ -274,9 +274,9 @@ export function BrightAccountingPage() {
                     className="mt-1 size-6 shrink-0 text-[#8ee3d8]"
                   />
                   <p className="leading-7 text-white/78">
-                    A dedicated website team would keep the certificate,
-                    privacy route, enquiry flow and performance looked after
-                    while Bright focuses on serving customers.
+                    A dedicated website team would keep the certificate, privacy
+                    route, enquiry flow and performance looked after while
+                    Bright focuses on serving customers.
                   </p>
                 </div>
               </div>
@@ -294,9 +294,9 @@ export function BrightAccountingPage() {
                 A client chooses the shape of the work before asking for help.
               </h2>
               <p className="mt-6 max-w-xl text-lg leading-8 text-[#58615f]">
-                The experience stays simple, but the intake is structured
-                enough to route a tax return differently from a limited company,
-                VAT or advisory conversation.
+                The experience stays simple, but the intake is structured enough
+                to route a tax return differently from a limited company, VAT or
+                advisory conversation.
               </p>
             </RevealOnScroll>
 
@@ -386,8 +386,8 @@ export function BrightAccountingPage() {
           <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
             <div>
               <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-[#0a7973]">
-                <Sparkles aria-hidden="true" className="size-4" />
-                A private concept for Bright Accounting Ltd
+                <Sparkles aria-hidden="true" className="size-4" />A private
+                concept for Bright Accounting Ltd
               </p>
               <h2 className="mt-4 max-w-3xl text-3xl font-semibold tracking-[-0.045em] sm:text-5xl">
                 A trusted accountancy practice deserves a website that carries

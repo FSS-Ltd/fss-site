@@ -2,7 +2,9 @@ import Link from "next/link";
 import type { ComponentPropsWithoutRef } from "react";
 
 function Heading(props: ComponentPropsWithoutRef<"h2">) {
-  return <h2 className="mt-8 text-2xl font-semibold text-foreground" {...props} />;
+  return (
+    <h2 className="mt-8 text-2xl font-semibold text-foreground" {...props} />
+  );
 }
 
 function Paragraph(props: ComponentPropsWithoutRef<"p">) {
@@ -14,12 +16,20 @@ function UnorderedList(props: ComponentPropsWithoutRef<"ul">) {
 }
 
 function OrderedList(props: ComponentPropsWithoutRef<"ol">) {
-  return <ol className="ml-5 list-decimal space-y-3 text-text-muted" {...props} />;
+  return (
+    <ol className="ml-5 list-decimal space-y-3 text-text-muted" {...props} />
+  );
 }
 
 function Anchor({ href = "", ...props }: ComponentPropsWithoutRef<"a">) {
   if (href.startsWith("/")) {
-    return <Link href={href} className="font-medium text-brand-primary underline-offset-4 hover:underline" {...props} />;
+    return (
+      <Link
+        href={href}
+        className="font-medium text-brand-primary underline-offset-4 hover:underline"
+        {...props}
+      />
+    );
   }
 
   return (

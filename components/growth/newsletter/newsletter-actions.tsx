@@ -25,9 +25,9 @@ async function postAction(
       body: JSON.stringify(body),
     });
     if (response.ok) return { ok: true };
-    const payload = (await response.json().catch(() => null)) as
-      | { message?: string }
-      | null;
+    const payload = (await response.json().catch(() => null)) as {
+      message?: string;
+    } | null;
     return { ok: false, status: response.status, message: payload?.message };
   } catch {
     return { ok: false, status: 0 };
@@ -55,18 +55,23 @@ export function NewsletterActionsFrame({
   const formId = useId();
   const [pendingAction, setPendingAction] = useState<ActionKey | null>(null);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
-  const [mode, setMode] = useState<"idle" | "schedule-form" | "confirm-schedule">(
-    "idle",
-  );
+  const [mode, setMode] = useState<
+    "idle" | "schedule-form" | "confirm-schedule"
+  >("idle");
   const [scheduledForLocal, setScheduledForLocal] = useState("");
 
   const busy = pendingAction !== null;
   const canTest = !NOT_TESTABLE_STATUSES.has(issue.status);
   const canSchedule = SCHEDULABLE_STATUSES.has(issue.status);
   const scheduledDate = scheduledForLocal ? new Date(scheduledForLocal) : null;
-  const excludedCount = issue.audience.suppressedCount + issue.audience.pendingCount;
+  const excludedCount =
+    issue.audience.suppressedCount + issue.audience.pendingCount;
 
-  async function run(action: ActionKey, path: string, body: Record<string, unknown>) {
+  async function run(
+    action: ActionKey,
+    path: string,
+    body: Record<string, unknown>,
+  ) {
     setPendingAction(action);
     setFeedback(null);
     const result = await postAction(path, body);
@@ -75,7 +80,10 @@ export function NewsletterActionsFrame({
     if (result.ok) {
       setMode("idle");
       if (action === "send-test") {
-        setFeedback({ tone: "success", message: "Test email sent to the founder inbox." });
+        setFeedback({
+          tone: "success",
+          message: "Test email sent to the founder inbox.",
+        });
       }
       onSuccess();
       return;
@@ -113,9 +121,17 @@ export function NewsletterActionsFrame({
         )}
       </div>
 
-      <div aria-label="Newsletter decision" className={styles.actionsBar} role="group">
+      <div
+        aria-label="Newsletter decision"
+        className={styles.actionsBar}
+        role="group"
+      >
         {feedback && (
-          <p className={styles.actionFeedback} data-tone={feedback.tone} role="alert">
+          <p
+            className={styles.actionFeedback}
+            data-tone={feedback.tone}
+            role="alert"
+          >
             {feedback.message}
           </p>
         )}
@@ -124,7 +140,11 @@ export function NewsletterActionsFrame({
           className={styles.actionButton}
           disabled={busy || !canTest}
           onClick={() =>
-            run("send-test", `/api/growth/newsletters/${issue.issueId}/send-test`, {})
+            run(
+              "send-test",
+              `/api/growth/newsletters/${issue.issueId}/send-test`,
+              {},
+            )
           }
           type="button"
         >
@@ -151,7 +171,10 @@ export function NewsletterActionsFrame({
           }}
         >
           <div className={styles.field}>
-            <label className={styles.fieldLabel} htmlFor={`${formId}-scheduled-for`}>
+            <label
+              className={styles.fieldLabel}
+              htmlFor={`${formId}-scheduled-for`}
+            >
               Send at (your local time)
             </label>
             <input
@@ -201,7 +224,8 @@ export function NewsletterActionsFrame({
                 <strong>UTC time:</strong> {formatUtc(scheduledDate)}
               </div>
               <div>
-                <strong>Eligible recipients:</strong> {issue.audience.eligibleCount}
+                <strong>Eligible recipients:</strong>{" "}
+                {issue.audience.eligibleCount}
               </div>
               <div>
                 <strong>Excluded:</strong> {excludedCount}

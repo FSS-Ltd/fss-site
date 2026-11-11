@@ -1,5 +1,12 @@
 import Link from "next/link";
-import { ArrowRight, BarChart3, BookOpen, BrainCircuit, Church, Lightbulb } from "lucide-react";
+import {
+  ArrowRight,
+  BarChart3,
+  BookOpen,
+  BrainCircuit,
+  Church,
+  Lightbulb,
+} from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 import { GlowCard } from "@/components/ui/spotlight-card";
@@ -95,11 +102,20 @@ export function FeatureGridSection() {
             className={`${service.span} group p-8`}
           >
             <div className="mb-6 flex items-start justify-between">
-              <service.icon className={`size-8 ${service.iconColor}`} aria-hidden="true" />
-              <span className="font-extrabold text-lg text-border-strong">{service.number}</span>
+              <service.icon
+                className={`size-8 ${service.iconColor}`}
+                aria-hidden="true"
+              />
+              <span className="font-extrabold text-lg text-border-strong">
+                {service.number}
+              </span>
             </div>
-            <h3 className="mb-3 text-xl font-bold text-foreground">{service.title}</h3>
-            <p className="text-sm leading-relaxed text-text-muted">{service.description}</p>
+            <h3 className="mb-3 text-xl font-bold text-foreground">
+              {service.title}
+            </h3>
+            <p className="text-sm leading-relaxed text-text-muted">
+              {service.description}
+            </p>
             {service.href && service.ctaLabel && (
               <Link
                 className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-accent transition hover:text-brand-primary"

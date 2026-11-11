@@ -16,9 +16,7 @@ const { PortalNavigationIcon } =
   require("./navigation-icon") as typeof import("./navigation-icon");
 
 test("renders a decorative Lucide icon for a named Studio destination", () => {
-  const html = renderToStaticMarkup(
-    <PortalNavigationIcon itemId="requests" />,
-  );
+  const html = renderToStaticMarkup(<PortalNavigationIcon itemId="requests" />);
 
   assert.match(html, /aria-hidden="true"/);
   assert.match(html, /<svg/);

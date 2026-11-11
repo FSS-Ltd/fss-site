@@ -194,12 +194,18 @@ export function BillingExceptionList({
                       <span
                         data-tone={item.organisationId ? "positive" : "warning"}
                       >
-                        {item.organisationId ? "Client linked" : "Mapping needed"}
+                        {item.organisationId
+                          ? "Client linked"
+                          : "Mapping needed"}
                       </span>
                       <span
-                        data-tone={item.mode === "live" ? "critical" : "neutral"}
+                        data-tone={
+                          item.mode === "live" ? "critical" : "neutral"
+                        }
                       >
-                        {item.mode === "live" ? "Live provider" : "Test provider"}
+                        {item.mode === "live"
+                          ? "Live provider"
+                          : "Test provider"}
                       </span>
                     </div>
                   </div>

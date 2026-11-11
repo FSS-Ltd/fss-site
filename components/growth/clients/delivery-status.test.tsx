@@ -17,9 +17,13 @@ const { DeliveryStatusFormFrame } =
 
 const ENGAGEMENT_ID = "11111111-1111-4111-8111-111111111111";
 
-function renderForm(overrides: {
-  currentStatus?: Parameters<typeof DeliveryStatusFormFrame>[0]["currentStatus"];
-} = {}): string {
+function renderForm(
+  overrides: {
+    currentStatus?: Parameters<
+      typeof DeliveryStatusFormFrame
+    >[0]["currentStatus"];
+  } = {},
+): string {
   return renderToStaticMarkup(
     <DeliveryStatusFormFrame
       currentStatus={overrides.currentStatus ?? "discovery"}

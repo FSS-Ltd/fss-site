@@ -9,8 +9,8 @@ export function ServicesCta() {
           Ready to stabilize your digital future?
         </h2>
         <p className="mt-4 text-lg text-cta-text/80">
-          Contact Faithful Software Solutions Ltd today for a technical assessment and strategic
-          roadmap.
+          Contact Faithful Software Solutions Ltd today for a technical
+          assessment and strategic roadmap.
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
           <ButtonLink

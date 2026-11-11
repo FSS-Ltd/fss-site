@@ -42,12 +42,15 @@ function EngagementCard({
             >
               {formatGrowthStatusLabel(engagement.deliveryStatus)}
             </span>
-            {engagement.wonAt && <span>Won {formatGrowthDate(engagement.wonAt)}</span>}
+            {engagement.wonAt && (
+              <span>Won {formatGrowthDate(engagement.wonAt)}</span>
+            )}
           </div>
         </div>
         <p className={styles.potentialValue}>
           {formatGrowthCurrency(
-            (engagement.oneOffValuePence ?? 0) + (engagement.monthlyValuePence ?? 0),
+            (engagement.oneOffValuePence ?? 0) +
+              (engagement.monthlyValuePence ?? 0),
           )}
         </p>
       </div>
@@ -82,7 +85,9 @@ function EngagementCard({
 
           <h3 className={styles.sectionTitle}>Delivery history</h3>
           {engagement.deliveryHistory.length === 0 ? (
-            <p className={styles.inlineEmpty}>No delivery moves recorded yet.</p>
+            <p className={styles.inlineEmpty}>
+              No delivery moves recorded yet.
+            </p>
           ) : (
             <ul className={styles.historyList}>
               {engagement.deliveryHistory.map((entry) => (
@@ -126,13 +131,16 @@ export function ClientDetailView({
   return (
     <div className={styles.detailPage}>
       <p className={styles.breadcrumb}>
-        <Link href="/growth/clients">Clients</Link> / {client.business.legalName}
+        <Link href="/growth/clients">Clients</Link> /{" "}
+        {client.business.legalName}
       </p>
 
       <div className={styles.card}>
         <div className={styles.detailHeader}>
           <div>
-            <h1 className={styles.detailHeading}>{client.business.legalName}</h1>
+            <h1 className={styles.detailHeading}>
+              {client.business.legalName}
+            </h1>
             <div className={styles.detailMeta}>
               <span>{client.business.sector}</span>
               <span>{client.business.locality}</span>

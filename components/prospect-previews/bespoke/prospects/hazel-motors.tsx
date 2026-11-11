@@ -2,10 +2,7 @@ import Image from "next/image";
 
 import { ConceptBar, OwnerInvitation } from "../concept-chrome";
 import { DemoEnquiry } from "../demo-enquiry";
-import {
-  InteractiveJourney,
-  type JourneyStep,
-} from "../interactive-journey";
+import { InteractiveJourney, type JourneyStep } from "../interactive-journey";
 
 const fields = [
   {
@@ -42,31 +39,38 @@ const fields = [
 
 const journeySteps: readonly JourneyStep[] = [
   {
-    description: "A registration gives the team a concrete vehicle to discuss from the first response.",
+    description:
+      "A registration gives the team a concrete vehicle to discuss from the first response.",
     icon: "car",
     id: "identify",
-    nextStep: "The workshop can recognise the vehicle before asking what support it needs.",
+    nextStep:
+      "The workshop can recognise the vehicle before asking what support it needs.",
     number: "01",
     title: "Identify the vehicle",
   },
   {
-    description: "MOT, servicing, repair, tyres and diagnostics need different first questions.",
+    description:
+      "MOT, servicing, repair, tyres and diagnostics need different first questions.",
     icon: "wrench",
     id: "route",
-    nextStep: "The request reaches the relevant workshop route rather than a generic inbox.",
+    nextStep:
+      "The request reaches the relevant workshop route rather than a generic inbox.",
     number: "02",
     title: "Route the service",
   },
   {
-    description: "Warning lights, noises and vibration become useful context in the driver’s own words.",
+    description:
+      "Warning lights, noises and vibration become useful context in the driver’s own words.",
     icon: "gauge",
     id: "explain",
-    nextStep: "The first conversation starts with the symptom, not a request to explain it again.",
+    nextStep:
+      "The first conversation starts with the symptom, not a request to explain it again.",
     number: "03",
     title: "Explain the symptom",
   },
   {
-    description: "A timing preference makes space for both urgent work and planned maintenance.",
+    description:
+      "A timing preference makes space for both urgent work and planned maintenance.",
     icon: "calendar-clock",
     id: "schedule",
     nextStep: "The team can respond with an appropriate appointment option.",

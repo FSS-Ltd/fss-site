@@ -25,7 +25,9 @@ export function PortalSelect({
   const hintId = hint ? `${selectId}-hint` : undefined;
   const errorId = error ? `${selectId}-error` : undefined;
   const ariaDescribedBy = [describedBy, hintId, errorId]
-    .filter((value): value is string => typeof value === "string" && value.length > 0)
+    .filter(
+      (value): value is string => typeof value === "string" && value.length > 0,
+    )
     .join(" ");
 
   return (
@@ -44,8 +46,16 @@ export function PortalSelect({
       >
         {children}
       </select>
-      {hint ? <p className={styles.hint} id={hintId}>{hint}</p> : null}
-      {error ? <p className={styles.error} id={errorId}>{error}</p> : null}
+      {hint ? (
+        <p className={styles.hint} id={hintId}>
+          {hint}
+        </p>
+      ) : null}
+      {error ? (
+        <p className={styles.error} id={errorId}>
+          {error}
+        </p>
+      ) : null}
     </div>
   );
 }

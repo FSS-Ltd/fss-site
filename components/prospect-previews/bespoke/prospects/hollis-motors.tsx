@@ -29,9 +29,19 @@ const fields = [
     id: "timing",
     label: "When would you like to begin?",
     type: "select",
-    options: ["As soon as possible", "This week", "Within a month", "Planning ahead"],
+    options: [
+      "As soon as possible",
+      "This week",
+      "Within a month",
+      "Planning ahead",
+    ],
   },
-  { id: "email", label: "Email", type: "email", placeholder: "you@example.co.uk" },
+  {
+    id: "email",
+    label: "Email",
+    type: "email",
+    placeholder: "you@example.co.uk",
+  },
 ] as const;
 
 const customerRoutes = [
@@ -86,7 +96,11 @@ export function HollisMotorsPage() {
           <div className="mt-12 grid overflow-hidden rounded-[2rem] border border-white/10 bg-white/10 md:grid-cols-3">
             {customerRoutes.map(({ Icon, body, title }) => (
               <article className="hollisRouteCard p-7 sm:p-9" key={title}>
-                <Icon aria-hidden="true" className="size-7 text-[#e36b6f]" strokeWidth={1.7} />
+                <Icon
+                  aria-hidden="true"
+                  className="size-7 text-[#e36b6f]"
+                  strokeWidth={1.7}
+                />
                 <h3 className="mt-16 text-2xl font-semibold tracking-[-0.045em]">
                   {title}
                 </h3>

@@ -71,8 +71,7 @@ export function InteractiveJourney({
   steps,
 }: InteractiveJourneyProps) {
   const [activeStepId, setActiveStepId] = useState(steps[0]?.id ?? "");
-  const activeStep =
-    steps.find((step) => step.id === activeStepId) ?? steps[0];
+  const activeStep = steps.find((step) => step.id === activeStepId) ?? steps[0];
 
   if (!activeStep) return null;
 

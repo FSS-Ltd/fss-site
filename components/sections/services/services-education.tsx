@@ -43,8 +43,9 @@ export function ServicesEducation() {
             Education &amp; LMS Infrastructure
           </h2>
           <p className="text-base leading-7 text-text-muted">
-            We build the digital backbone for modern learning environments. Our solutions focus
-            on engagement, accessibility, and administrative efficiency.
+            We build the digital backbone for modern learning environments. Our
+            solutions focus on engagement, accessibility, and administrative
+            efficiency.
           </p>
           <div className="space-y-6">
             {features.map((feature) => (
@@ -54,7 +55,9 @@ export function ServicesEducation() {
                 </div>
                 <div>
                   <h3 className="font-bold text-foreground">{feature.title}</h3>
-                  <p className="mt-1 text-sm leading-6 text-text-muted">{feature.description}</p>
+                  <p className="mt-1 text-sm leading-6 text-text-muted">
+                    {feature.description}
+                  </p>
                 </div>
               </div>
             ))}

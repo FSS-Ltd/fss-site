@@ -8,9 +8,9 @@ export const publicPages = {
   ...commercialPages,
   "/": {
     path: "/",
-    title: "AI Integration and Custom Software for Business | FSS",
+    title: "AI Automation and Custom Software for UK Business | FSS",
     description:
-      "FSS integrates AI, automates workflows and builds custom software for businesses of any size. See how it works in NexSteps and discuss your project with us.",
+      "FSS integrates AI, automates workflows and builds custom software for businesses of any size. See our operational software in NexSteps and discuss a project.",
     modifiedDate: "2026-11-11",
     index: true,
   },

@@ -151,7 +151,10 @@ test("renders an automotive package in its configured section order", () => {
   );
 
   assert.match(markup, /Private website concept/);
-  assert.match(markup, /Start your MOT, service or repair request with your registration/);
+  assert.match(
+    markup,
+    /Start your MOT, service or repair request with your registration/,
+  );
   assert.match(markup, /prospect-reveal/);
 });
 
@@ -165,7 +168,10 @@ test("renders the hospitality journey without automotive content", () => {
     <CompositionPreview composition={composition} mode="public" />,
   );
 
-  assert.match(markup, /Plan a first visit around the table that suits your group/);
+  assert.match(
+    markup,
+    /Plan a first visit around the table that suits your group/,
+  );
   assert.match(markup, /When are you hoping to visit/);
   assert.doesNotMatch(markup, /MOT request/);
   assert.doesNotMatch(markup, /Vehicle care made easier to book/);

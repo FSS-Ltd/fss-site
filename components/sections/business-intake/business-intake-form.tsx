@@ -50,7 +50,9 @@ function IntakeSelectField({
 }) {
   return (
     <fieldset className="space-y-3">
-      <legend className="block text-sm font-semibold text-foreground">{field.label}</legend>
+      <legend className="block text-sm font-semibold text-foreground">
+        {field.label}
+      </legend>
       <div className="grid gap-3">
         {field.options?.map((option) => {
           const selected = value === option.id;
@@ -124,10 +126,14 @@ export function BusinessIntakeForm() {
   const step = intakeSteps[stepIndex];
   const isFirstStep = stepIndex === 0;
   const isLastStep = stepIndex === intakeSteps.length - 1;
-  const progressPercent = Math.round(((stepIndex + 1) / intakeSteps.length) * 100);
+  const progressPercent = Math.round(
+    ((stepIndex + 1) / intakeSteps.length) * 100,
+  );
 
   const goNext = async () => {
-    const fieldIds = step.fields.map((field) => field.id as Path<IntakeSubmissionValues>);
+    const fieldIds = step.fields.map(
+      (field) => field.id as Path<IntakeSubmissionValues>,
+    );
     const isStepValid = await trigger(fieldIds);
 
     if (isStepValid) {
@@ -148,7 +154,9 @@ export function BusinessIntakeForm() {
     });
 
     if (!result.ok) {
-      setSubmitError(result.errorMessage ?? "Something went wrong. Please try again.");
+      setSubmitError(
+        result.errorMessage ?? "Something went wrong. Please try again.",
+      );
       return;
     }
 
@@ -164,10 +172,12 @@ export function BusinessIntakeForm() {
         <span className="mx-auto flex size-11 items-center justify-center rounded-full bg-[rgba(20,152,158,.12)] text-[#0f7a83]">
           <PartyPopper className="size-5" aria-hidden="true" />
         </span>
-        <h3 className="mt-4 text-2xl font-semibold text-foreground">Thanks — we&apos;ve got it.</h3>
+        <h3 className="mt-4 text-2xl font-semibold text-foreground">
+          Thanks — we&apos;ve got it.
+        </h3>
         <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-text-muted">
-          We received your idea and will review it. If it makes sense to talk further,
-          we&apos;ll be in touch at the email you shared.
+          We received your idea and will review it. If it makes sense to talk
+          further, we&apos;ll be in touch at the email you shared.
         </p>
       </div>
     );
@@ -183,9 +193,13 @@ export function BusinessIntakeForm() {
           <p className="font-mono text-xs uppercase tracking-[0.14em] text-brand-primary">
             {step.eyebrow}
           </p>
-          <h2 className="mt-2 text-2xl font-semibold text-foreground sm:text-3xl">{step.title}</h2>
+          <h2 className="mt-2 text-2xl font-semibold text-foreground sm:text-3xl">
+            {step.title}
+          </h2>
           {step.description ? (
-            <p className="mt-2 text-sm leading-6 text-text-muted">{step.description}</p>
+            <p className="mt-2 text-sm leading-6 text-text-muted">
+              {step.description}
+            </p>
           ) : null}
         </div>
         <p className="rounded-full border border-border-soft/80 bg-[#f7f8f9] px-4 py-2 text-sm whitespace-nowrap text-text-muted">
@@ -202,7 +216,11 @@ export function BusinessIntakeForm() {
 
       <form
         className="mt-7 space-y-6"
-        onSubmit={isLastStep ? handleSubmit(onSubmit) : (event) => event.preventDefault()}
+        onSubmit={
+          isLastStep
+            ? handleSubmit(onSubmit)
+            : (event) => event.preventDefault()
+        }
       >
         <input
           type="text"
@@ -285,7 +303,9 @@ export function BusinessIntakeForm() {
           )}
         </div>
 
-        {submitError ? <p className="text-sm text-rose-500">{submitError}</p> : null}
+        {submitError ? (
+          <p className="text-sm text-rose-500">{submitError}</p>
+        ) : null}
       </form>
     </div>
   );

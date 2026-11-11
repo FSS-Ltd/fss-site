@@ -43,7 +43,11 @@ test("a replaced, revoked or expired ticket explains which email to use", () => 
   );
   assert.equal(
     clerkErrorMessage(
-      { errors: [{ code: "form_password_pwned", message: "Choose another password." }] },
+      {
+        errors: [
+          { code: "form_password_pwned", message: "Choose another password." },
+        ],
+      },
       "Try again.",
     ),
     "Choose another password.",

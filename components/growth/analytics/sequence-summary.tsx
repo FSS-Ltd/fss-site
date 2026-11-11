@@ -1,5 +1,8 @@
 import { formatGrowthPercentage } from "@/lib/growth/dashboard/formatters";
-import type { AnalyticsFunnel, AnalyticsRates } from "@/lib/growth/dashboard/analytics";
+import type {
+  AnalyticsFunnel,
+  AnalyticsRates,
+} from "@/lib/growth/dashboard/analytics";
 
 import styles from "./analytics.module.css";
 
@@ -11,7 +14,9 @@ function RateValue({ rate }: { rate: number | null }) {
       </span>
     );
   }
-  return <span className={styles.rateValue}>{formatGrowthPercentage(rate)}</span>;
+  return (
+    <span className={styles.rateValue}>{formatGrowthPercentage(rate)}</span>
+  );
 }
 
 export function SequenceSummary({
@@ -56,13 +61,15 @@ export function SequenceSummary({
     <div className={styles.card}>
       <h2 className={styles.sectionTitle}>Conversion</h2>
       <p className={styles.sectionNote}>
-        Each rate divides one funnel stage by the stage immediately before it, for this
-        month only. A rate reads &quot;Not enough data&quot; rather than 0% when its
-        denominator is zero.
+        Each rate divides one funnel stage by the stage immediately before it,
+        for this month only. A rate reads &quot;Not enough data&quot; rather
+        than 0% when its denominator is zero.
       </p>
 
       <table className={styles.table}>
-        <caption className={styles.visuallyHidden}>Monthly conversion rates</caption>
+        <caption className={styles.visuallyHidden}>
+          Monthly conversion rates
+        </caption>
         <thead>
           <tr>
             <th scope="col">Conversion</th>
