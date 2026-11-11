@@ -5,6 +5,8 @@ import { PageIntro } from "./page-intro";
 import { RelatedLinks } from "./related-links";
 import { sectorLink, nexstepsLink, costLink } from "@/lib/commercial/links";
 import styles from "./public-page.module.css";
+import contactStyles from "./contact-page.module.css";
+import compactStyles from "./compact-hero.module.css";
 
 const questions = [
   {
@@ -29,36 +31,58 @@ const questions = [
 
 export function ContactPageContent() {
   return (
-    <div className={styles.page}>
+    <div className={`${styles.page} ${compactStyles.pageCompact}`}>
       <PageIntro
-        eyebrow="Contact FSS"
-        title="Discuss a custom software project"
+        compact={{
+          hero: compactStyles.heroCompact,
+          canvas: compactStyles.canvasCompact,
+          eyebrow: compactStyles.eyebrowCompact,
+        }}
+        eyebrow="Five short questions"
+        title="Tell us what you want off your plate"
       >
-        <p className="max-w-2xl text-lg sm:text-xl">
-          Tell us about your organisation and the problem you want to solve. We
-          will review your enquiry and reply about how we can help.
+        <p className={compactStyles.heroLead}>
+          AI, automation and custom software for businesses of any size.
         </p>
       </PageIntro>
-      <div className={styles.grid}>
-        <ContactForm />
-        <aside aria-labelledby="contact-next" data-motion-reveal="right">
-          <h2 id="contact-next">What happens next</h2>
-          <ol className={styles.list}>
-            <li>We review your project and constraints.</li>
-            <li>We reply with questions or a suggested next step.</li>
-            <li>If there is a fit, we discuss scope and a proposal.</li>
-          </ol>
-          <p>
-            Submitting this form sends an enquiry. It does not book a call or
-            commit you to a project.
-          </p>
-          <a
-            className="inline-flex min-h-11 items-center font-medium underline underline-offset-4"
-            href={`mailto:${organisation.email}`}
-          >
-            Email {organisation.email}
-          </a>
-        </aside>
+      <div className={`${styles.grid} ${contactStyles.contactGrid}`}>
+        <ContactForm
+          aside={
+            <div className={contactStyles.nextSteps}>
+              <h2 id="contact-next">What happens next</h2>
+              <ol className={contactStyles.timeline}>
+                <li>
+                  <span aria-hidden="true">01</span>
+                  We review your project and constraints.
+                </li>
+                <li>
+                  <span aria-hidden="true">02</span>
+                  We reply with questions or a suggested next step.
+                </li>
+                <li>
+                  <span aria-hidden="true">03</span>
+                  If there is a fit, we discuss scope and a proposal.
+                </li>
+              </ol>
+              <p>
+                Submitting this form sends an enquiry. It does not book a call
+                or commit you to a project.
+              </p>
+              <a
+                className={contactStyles.mailLink}
+                href={`mailto:${organisation.email}`}
+              >
+                <span className={contactStyles.mailLabel}>Prefer email?</span>
+                <span className={contactStyles.mailAddress}>
+                  {organisation.email}
+                  <span aria-hidden="true" className={contactStyles.mailArrow}>
+                    →
+                  </span>
+                </span>
+              </a>
+            </div>
+          }
+        />
       </div>
       <section
         className={styles.section}

@@ -1,0 +1,44 @@
+/* Compact hero: the page content (for example the /contact form) leads.
+   Element selectors lift specificity above the shared public-page rules. */
+div.pageCompact {
+  padding-top: 96px;
+}
+header.heroCompact {
+  margin-bottom: 20px;
+}
+div.eyebrowCompact {
+  margin-bottom: 8px;
+}
+header.heroCompact h1 {
+  font-size: clamp(1.75rem, 3.6vw, 2.6rem);
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+div.pageCompact p.heroLead {
+  max-width: 62ch;
+  margin: 0;
+  font-size: 1.0625rem;
+  line-height: 1.55;
+}
+/* Let the network field run behind the form and fade out, instead of a faint strip. */
+header.heroCompact canvas.canvasCompact {
+  bottom: auto;
+  height: calc(100% + 640px);
+  opacity: 0.95;
+  mask-image: linear-gradient(to bottom, black 55%, transparent);
+}
+@media (max-width: 680px) {
+  div.pageCompact {
+    padding-top: 80px;
+  }
+  header.heroCompact {
+    margin-bottom: 14px;
+  }
+  header.heroCompact h1 {
+    font-size: 1.625rem;
+  }
+  div.pageCompact p.heroLead {
+    font-size: 0.975rem;
+  }
+}

@@ -73,6 +73,11 @@ try {
   const menu = page.getByRole("button", { name: "Menu", exact: true });
   await menu.focus();
   await page.keyboard.press("Enter");
+  const menuHandle = await menu.elementHandle();
+  await page.waitForFunction(
+    (element) => element.getAttribute("aria-expanded") === "true",
+    menuHandle,
+  );
   assert.equal(await menu.getAttribute("aria-expanded"), "true");
   const menuId = await menu.getAttribute("aria-controls");
   assert.ok(menuId);
@@ -81,6 +86,10 @@ try {
     .getByRole("link", { name: "Services", exact: true })
     .focus();
   await page.keyboard.press("Escape");
+  await page.waitForFunction(
+    (element) => element.getAttribute("aria-expanded") === "false",
+    menuHandle,
+  );
   assert.equal(await menu.getAttribute("aria-expanded"), "false");
   assert.equal(
     await menu.evaluate((element) => element === document.activeElement),
@@ -107,6 +116,39 @@ try {
     name: "Send project enquiry",
     exact: true,
   });
+  const progress = page.getByRole("progressbar");
+  const heading = (name) => page.getByRole("heading", { name, exact: true });
+  const isFocused = (locator) =>
+    locator.evaluate((element) => element === document.activeElement);
+  assert.equal(await progress.getAttribute("aria-valuenow"), "1");
+  await page.getByText("Step 1 of 5", { exact: true }).waitFor();
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await page
+    .getByRole("alert")
+    .filter({ hasText: /Choose the option/ })
+    .waitFor();
+  await page
+    .getByLabel("Anything we should know? (optional)", { exact: true })
+    .fill("Attendance reporting");
+  await page.getByRole("button", { name: "Reporting", exact: true }).click();
+  await heading("Which tools do you use today?").waitFor();
+  assert.equal(await progress.getAttribute("aria-valuenow"), "2");
+  assert.equal(await isFocused(heading("Which tools do you use today?")), true);
+  await page.getByRole("button", { name: "Back", exact: true }).click();
+  assert.equal(
+    await page
+      .getByRole("button", { name: "Reporting", exact: true })
+      .getAttribute("aria-pressed"),
+    "true",
+  );
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await page.getByRole("button", { name: "Skip", exact: true }).click();
+  await page.getByRole("button", { name: "2 to 10", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Within 3 months", exact: true })
+    .click();
+  await heading("Where should we send our reply?").waitFor();
+  assert.equal(await progress.getAttribute("aria-valuenow"), "5");
   await submit.click();
   await page
     .getByText("Please enter your first name.", { exact: true })
@@ -124,20 +166,6 @@ try {
   await page
     .getByLabel("Organisation", { exact: true })
     .fill("Example charity");
-  await page
-    .getByRole("radio", { name: "Custom software", exact: true })
-    .focus();
-  await page.keyboard.press("Space");
-  await page.keyboard.press("ArrowRight");
-  assert.equal(
-    await page
-      .getByRole("radio", { name: "App or SaaS", exact: true })
-      .isChecked(),
-    true,
-  );
-  await page
-    .getByLabel("Project challenge (optional)", { exact: true })
-    .fill("Attendance reporting");
 
   await context.setOffline(true);
   await submit.click();
@@ -187,9 +215,12 @@ try {
     })
     .waitFor();
   assert.equal(payloads[0].submissionId, payloads[1].submissionId);
-  assert.equal(payloads[1].sourceContext, "contact-page-v2");
+  assert.equal(payloads[1].sourceContext, "contact-page-v3");
   assert.equal(payloads[1].sourcePath, "/contact");
-  assert.equal(payloads[1].challenge, "App or SaaS: Attendance reporting");
+  assert.equal(
+    payloads[1].challenge,
+    "Need: Reporting; Team: 2 to 10; Timing: Within 3 months; Detail: Attendance reporting",
+  );
   assert.equal(payloads[1].newsletterOptIn, false);
   assert.match(payloads[1].submissionId, /^[0-9a-f-]{36}$/);
   assert.deepEqual(await page.evaluate(() => window.contactAnalytics), []);
@@ -206,6 +237,14 @@ try {
       }),
     );
   });
+  for (const name of ["Not sure yet", "Just me", "Just exploring"]) {
+    if (name === "Just me") {
+      await page.getByRole("button", { name: "Skip", exact: true }).focus();
+      await page.keyboard.press("Enter");
+    }
+    await page.getByRole("button", { name, exact: true }).focus();
+    await page.keyboard.press("Enter");
+  }
   await page.getByLabel("First name", { exact: true }).fill("Ada");
   await page.getByLabel("Last name", { exact: true }).fill("Lovelace");
   await page.getByLabel("Work email", { exact: true }).fill("ada@example.org");
@@ -225,12 +264,16 @@ try {
       exact: true,
     })
     .waitFor();
+  assert.equal(
+    payloads[2].challenge,
+    "Need: Not sure yet; Team: Just me; Timing: Just exploring",
+  );
   assert.equal(payloads[2].newsletterOptIn, true);
   assert.deepEqual(await page.evaluate(() => window.contactAnalytics), [
     [
       "event",
       "generate_lead",
-      { source_context: "contact-page-v2", source_path: "/contact" },
+      { source_context: "contact-page-v3", source_path: "/contact" },
     ],
   ]);
 
@@ -239,7 +282,17 @@ try {
     for (const path of ["/", "/services", "/about", "/contact"]) {
       await page.goto(`${baseURL}${path}`);
       assert.equal(await page.locator("h1").count(), 1);
-      assert.equal(await page.locator("canvas").count(), 0);
+      // Canvases stay in the markup under reduced motion and are drawn static
+      // (components/redesign/fss-interactions.tsx, noMotion). Particle
+      // canvases are aria-hidden; the home app-atoms canvas carries a
+      // data-app-source image fallback.
+      assert.equal(
+        await page
+          .locator("canvas:not([aria-hidden='true']):not([data-app-atoms])")
+          .count(),
+        0,
+        `${path} canvases are decorative`,
+      );
       assert.equal(
         await page.evaluate(
           () => document.documentElement.scrollWidth <= innerWidth,
@@ -300,18 +353,21 @@ try {
   });
   const noScriptPage = await noScriptContext.newPage();
   await noScriptPage.goto(`${baseURL}/contact`);
+  // Without JavaScript the stepped form cannot be used: its fields stay
+  // disabled and the form's noscript note tells the visitor to email instead.
   assert.equal(
     await noScriptPage
-      .getByRole("button", { name: "Send project enquiry", exact: true })
+      .getByRole("button", { name: "Reporting", exact: true })
       .isDisabled(),
     true,
   );
+  await noScriptPage
+    .getByText(/Please enable JavaScript to send this form/)
+    .waitFor();
   assert.equal(
     await noScriptPage
-      .getByRole("link", {
-        name: "Email hello@faithfulsoftware.dev",
-        exact: true,
-      })
+      .locator('a[href="mailto:hello@faithfulsoftware.dev"]')
+      .first()
       .isVisible(),
     true,
   );

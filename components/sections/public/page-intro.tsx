@@ -7,22 +7,37 @@ export function PageIntro({
   title,
   children,
   image,
+  compact,
 }: {
   eyebrow: string;
   title: string;
   children: ReactNode;
   image?: ReactNode;
+  /** Extra class names for a short one-line hero so the content below it leads the page. */
+  compact?: { hero: string; canvas: string; eyebrow: string };
 }) {
   return (
-    <header className={styles.hero}>
+    <header
+      className={compact ? `${styles.hero} ${compact.hero}` : styles.hero}
+    >
       <canvas
         data-hero-canvas
-        className={styles.particleCanvas}
+        className={
+          compact
+            ? `${styles.particleCanvas} ${compact.canvas}`
+            : styles.particleCanvas
+        }
         aria-hidden="true"
       />
       <div className={image ? styles.heroGrid : undefined}>
         <div data-motion-reveal="mask">
-          <div className={styles.eyebrow}>{eyebrow}</div>
+          <div
+            className={
+              compact ? `${styles.eyebrow} ${compact.eyebrow}` : styles.eyebrow
+            }
+          >
+            {eyebrow}
+          </div>
           <h1>{title}</h1>
           {children}
         </div>

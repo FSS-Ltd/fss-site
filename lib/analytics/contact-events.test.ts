@@ -21,7 +21,7 @@ test("consented contact analytics contain only the event and route context", () 
     {
       name: "generate_lead",
       parameters: {
-        source_context: "contact-page-v2",
+        source_context: "contact-page-v3",
         source_path: "/contact",
       },
     },

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { CommercialLink } from "@/lib/commercial/types";
 import styles from "./public-page.module.css";
+import relatedStyles from "./related-links.module.css";
 
 export function RelatedLinks({ links }: { links: readonly CommercialLink[] }) {
   return (
@@ -15,14 +16,12 @@ export function RelatedLinks({ links }: { links: readonly CommercialLink[] }) {
       >
         Related reading and next steps
       </h2>
-      <ul className={styles.list}>
+      <ul className={relatedStyles.relatedList}>
         {links.map((link) => (
           <li key={link.href}>
-            <Link
-              href={link.href}
-              className="inline-flex min-h-11 items-center font-medium underline underline-offset-4"
-            >
+            <Link href={link.href} className={relatedStyles.relatedLink}>
               {link.label}
+              <span aria-hidden="true">→</span>
             </Link>
           </li>
         ))}

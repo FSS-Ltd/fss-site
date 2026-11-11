@@ -10,7 +10,7 @@ export function contactEvent(serializedConsent: string | null) {
     return null;
   return {
     name: "generate_lead",
-    parameters: { source_context: "contact-page-v2", source_path: "/contact" },
+    parameters: { source_context: "contact-page-v3", source_path: "/contact" },
   };
 }
 

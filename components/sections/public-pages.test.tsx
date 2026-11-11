@@ -99,27 +99,19 @@ test("home keeps its audience, proof and FSS visual language in the rendered doc
   assert.doesNotMatch(html, /href="\/start"/);
 });
 
-test("contact renders the API fields with accessible choices and enquiry metadata", () => {
+test("contact opens on the first enquiry question with accessible progress and choices", () => {
   const { default: Page, metadata } = require("../../app/(site)/contact/page");
   assert.match(
     metadata.title.absolute,
     /Talk to FSS About AI or Custom Software/,
   );
   const html = renderToStaticMarkup(<Page />);
-  for (const name of [
-    "firstName",
-    "lastName",
-    "workEmail",
-    "company",
-    "challenge",
-  ]) {
-    assert.match(html, new RegExp(`name="${name}"`));
-  }
-  assert.match(html, /type="radio"/);
-  assert.match(html, /type="checkbox"/);
+  assert.match(html, /What would you like to stop doing by hand/);
+  assert.match(html, /Step 1 of 5/);
+  assert.match(html, /role="progressbar"[^>]*aria-valuenow="1"/);
+  assert.match(html, /aria-pressed="false"[^>]*>Not sure yet/);
   assert.match(html, /<form[^>]*method="post"/);
-  assert.match(html, /<button[^>]*type="submit"[^>]*disabled=""[^>]*>/);
-  assert.match(html, /Send project enquiry/);
+  assert.match(html, /<fieldset[^>]*disabled=""/);
   assert.doesNotMatch(html, /Book a|Opens your email app/);
 });
 
