@@ -78,6 +78,14 @@ Sonnet code and security review of #330 is running.
   growing). My Opus agent stopped without changes to avoid a clash. Do not
   start a second PR F agent. Check `git status` there; if it goes quiet with
   no PR, review its diff and continue it.
+- #330 Sonnet review (code pass, security pass, no blockers, all minor):
+  (1) step 0 chip auto-advances so the optional detail box is only reachable
+  via Back: stop auto-advance or move detail to the last step; (2) hero canvas
+  is `calc(100% + 640px)` tall, cap on narrow widths and confirm resize;
+  (3) put Detail on its own line in `lib/forms/contact-request.ts`;
+  (4) add a component test for focus, Enter, chip guard, reduced motion.
+  Fix 1, 3 and 4 on #330 after PR F merges. Tests 2476 pass, typecheck and
+  lint clean, homepage budget file unchanged. Not browser-verified.
 - Next: fix review findings on #330 after PR F merges (#330 and PR D need
   PR F for the 8/10 critic score), then PR D, then docs PR.
 
