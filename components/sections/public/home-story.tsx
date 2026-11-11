@@ -5,7 +5,7 @@ const chapters = [
   {
     label: "01 / THE FOUNDATION",
     title: "Custom software. Shaped around your people.",
-    copy: "Portals and operational systems built around the way your organisation actually works.",
+    copy: "Portals and operational systems built around the way your business actually works.",
   },
   {
     label: "02 / THE CONNECTION",
@@ -14,15 +14,15 @@ const chapters = [
   },
   {
     label: "03 / THE OUTCOME",
-    title: "Your mission. Supported by better systems.",
-    copy: "From the first workflow to the finished interface. Practical software for the people who care for others.",
+    title: "Your business. Supported by better systems.",
+    copy: "From the first workflow to the finished interface. Practical software and AI for the people who run the work.",
   },
 ] as const;
 
 const values = [
   {
-    title: "Built around your mission.",
-    copy: "Software should support the work you exist to do, not make your people work around it.",
+    title: "Built around your business.",
+    copy: "Software should support the work you do, not make your people work around it.",
   },
   {
     title: "Less admin. More time for people.",
@@ -37,7 +37,7 @@ const values = [
     copy: "Give the right people the context they need, with access and oversight built in.",
   },
   {
-    title: "Your team, supported. Your mission, moving.",
+    title: "Your team, supported. Your business, moving.",
     copy: "Practical systems that fit your organisation today and can develop as your needs change.",
   },
 ] as const;

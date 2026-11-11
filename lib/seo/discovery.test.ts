@@ -29,11 +29,11 @@ test("sitemap includes public pages with source dates and excludes non-indexable
   );
   assert.equal(
     entries.find((entry) => entry.url.endsWith("/blog"))?.lastModified,
-    "2026-09-05",
+    "2026-11-11",
   );
   assert.equal(
     entries.find((entry) => entry.url.endsWith("/resources"))?.lastModified,
-    "2026-09-05",
+    "2026-11-11",
   );
   assert.equal(
     entries.some((entry) =>

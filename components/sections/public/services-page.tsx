@@ -3,20 +3,30 @@ import Image from "next/image";
 import { ContactLink, PageIntro } from "./page-intro";
 import { DeliverySteps } from "./delivery-steps";
 import { RelatedLinks } from "./related-links";
-import { sectorLink, serviceLinks, costLink } from "@/lib/commercial/links";
+import {
+  aiServiceLinks,
+  sectorLink,
+  serviceLinks,
+  costLink,
+} from "@/lib/commercial/links";
 import styles from "./public-page.module.css";
 import railStyles from "./service-rail.module.css";
 
 const services = [
   {
-    title: "Custom software and portals",
+    title: "AI integration",
     description:
-      "Operational systems, member portals, dashboards and integrations designed around your organisation’s workflows, permissions and reporting needs.",
+      "Add AI to your CRM, inbox, documents and accounts. Agree what data it can see, what it may do and who approves it before anything is built.",
   },
   {
-    title: "Apps and SaaS products",
+    title: "AI agents and receptionists",
     description:
-      "Web and mobile products with the foundations for onboarding, subscriptions and ongoing development. Define the first useful release before expanding the scope.",
+      "Agents for defined back-office tasks and a receptionist for calls and messages, each with approval steps, logs and a handover to your team.",
+  },
+  {
+    title: "AI readiness audit",
+    description:
+      "Find where AI fits and where it does not. A written recommendation on what to automate first and what to fix before building.",
   },
   {
     title: "Workflow automation",
@@ -28,6 +38,11 @@ const services = [
     description:
       "Assess whether self-hosted or on-device AI fits your data, hardware and operational needs. Deployment boundaries, access and oversight are part of the scope.",
   },
+  {
+    title: "Custom software, portals and apps",
+    description:
+      "Operational systems, client portals, dashboards, integrations and web or mobile products designed around your workflows, permissions and reporting needs.",
+  },
 ];
 
 export function ServicesPage() {
@@ -35,7 +50,7 @@ export function ServicesPage() {
     <div className={styles.page}>
       <PageIntro
         eyebrow="Services"
-        title="Software built around your organisation."
+        title="AI and software built around your business."
         image={
           <div
             className={styles.editorialFrame}
@@ -55,16 +70,16 @@ export function ServicesPage() {
         }
       >
         <p className="max-w-2xl text-lg sm:text-xl">
-          Custom software, portals and automation for UK charities, faith
-          organisations, schools and businesses. We start with the operational
-          problem and agree the scope with you.
+          AI integration, automation and custom software for businesses of any
+          size, and for charities, faith organisations and schools. We start
+          with the operational problem and agree the scope with you.
         </p>
         <div className="mt-7 flex flex-wrap items-center gap-6">
           <ContactLink />
         </div>
       </PageIntro>
       <section
-        aria-label="Software services"
+        aria-label="AI and software services"
         className={railStyles.scene}
         data-motion-scene
       >
@@ -91,7 +106,8 @@ export function ServicesPage() {
         <h2 id="service-evidence">See these foundations in NexSteps.</h2>
         <p>
           FSS built NexSteps for safeguarding, attendance and community
-          operations, including role-scoped access and parent onboarding.
+          operations, including role-scoped access and parent onboarding. It is
+          operational software, not an AI deployment.
         </p>
         <Link
           href="/work/nexsteps"
@@ -123,7 +139,9 @@ export function ServicesPage() {
           helps frame the first step.
         </p>
       </section>
-      <RelatedLinks links={[...serviceLinks, sectorLink, costLink]} />
+      <RelatedLinks
+        links={[...aiServiceLinks, ...serviceLinks, sectorLink, costLink]}
+      />
     </div>
   );
 }
