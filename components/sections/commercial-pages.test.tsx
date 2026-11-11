@@ -24,7 +24,14 @@ const routes = [
   "/blog/church-management-software-vs-bespoke",
 ];
 
-for (const route of routes) {
+const aiRoutes = [
+  "/services/ai-integration",
+  "/services/ai-agents",
+  "/services/ai-receptionist",
+  "/services/ai-readiness-audit",
+];
+
+for (const route of [...routes, ...aiRoutes]) {
   test(`${route} publishes matching metadata, visible content and schema`, () => {
     const { default: Page, metadata } = require(
       `../../app/(site)${route}/page`,
@@ -93,7 +100,7 @@ for (const route of routes) {
 
 test("all commercial routes are indexable and discoverable exactly once", async () => {
   const entries = await sitemap();
-  for (const route of routes) {
+  for (const route of [...routes, ...aiRoutes]) {
     assert.equal(
       entries.filter(
         (entry) => entry.url === `https://faithfulsoftware.dev${route}`,
@@ -118,6 +125,54 @@ test("commercial titles are unique and authority content avoids unsupported metr
       content,
       /£|\d+%|award-winning|guaranteed|testimonial from/i,
     );
+  }
+});
+
+test("service pages and AI-led public pages keep title and description lengths in range", () => {
+  const { publicPages } =
+    require("@/lib/seo/pages") as typeof import("@/lib/seo/pages");
+  const paths = [
+    "/",
+    "/services",
+    "/blog",
+    "/resources",
+    "/contact",
+    "/start",
+    ...Object.keys(publicPages).filter((path) => path.startsWith("/services/")),
+  ] as const;
+  assert.equal(
+    paths.length,
+    6 +
+      Object.keys(publicPages).filter((p) => p.startsWith("/services/")).length,
+  );
+  for (const path of paths) {
+    const page = publicPages[path as keyof typeof publicPages];
+    assert.ok(page.title.length <= 60, `${path} title ${page.title.length}`);
+    assert.ok(
+      page.description.length >= 150 && page.description.length <= 158,
+      `${path} description ${page.description.length}`,
+    );
+  }
+});
+
+test("service pages speak to businesses of any size, not only charities", () => {
+  const { servicePages } =
+    require("@/lib/commercial/services") as typeof import("@/lib/commercial/services");
+  for (const page of Object.values(servicePages)) {
+    assert.doesNotMatch(
+      JSON.stringify([
+        page.title,
+        page.description,
+        page.heading,
+        page.answer,
+        page.sections,
+        page.faqs,
+      ]),
+      /charit|faith|church/i,
+      page.path,
+    );
+    assert.equal(page.modifiedDate, "2026-11-11");
+    assert.equal(page.faqs.length >= 3, true);
   }
 });
 

@@ -18,6 +18,12 @@ export const resourceLink = {
   href: "/resources",
   label: "Software planning resources",
 };
+export const aiServiceLinks = [
+  { href: "/services/ai-integration", label: "AI integration" },
+  { href: "/services/ai-agents", label: "AI agents for business" },
+  { href: "/services/ai-receptionist", label: "AI receptionist" },
+  { href: "/services/ai-readiness-audit", label: "AI readiness audit" },
+] as const;
 export const serviceLinks = [
   {
     href: "/services/custom-software-development",
