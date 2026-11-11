@@ -246,7 +246,7 @@ export const servicePages = {
       {
         question: "Are AI receptionists GDPR compliant?",
         answer:
-          "FSS cannot certify compliance. It depends on what is recorded, where it is stored and for how long. The build can include a written data-flow description for your own assessment. This is not legal advice.",
+          "FSS cannot certify compliance. It depends on what is recorded, where it is stored and for how long. Every build comes with a written data-flow description for your own assessment. This is not legal advice.",
       },
       {
         question: "Will it connect to our CRM and booking system?",
