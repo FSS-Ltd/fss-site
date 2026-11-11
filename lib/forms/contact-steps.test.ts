@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   contactFlowReducer,
   initialContactFlow,
+  isChipClickGuarded,
   type ContactFlowAction,
 } from "./contact-steps";
 
@@ -79,4 +80,9 @@ test("team size and timing are required to move on", () => {
   );
   assert.equal(atTeam.step, 2);
   assert.ok(atTeam.error);
+});
+
+test("chip clicks are ignored for 300 ms after a step change", () => {
+  assert.equal(isChipClickGuarded(1000, 1100), true);
+  assert.equal(isChipClickGuarded(1000, 1300), false);
 });

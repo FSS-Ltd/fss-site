@@ -9,6 +9,12 @@ import type {
 export const contactStepCount = 5;
 export const contactLastStep = contactStepCount - 1;
 
+const chipGuardMs = 300;
+
+/** True while a pointer click is likely the tail of a double-click on the previous step. */
+export const isChipClickGuarded = (changedAt: number, now: number) =>
+  now - changedAt < chipGuardMs;
+
 export type ContactFlowState = {
   step: number;
   answers: ContactAnswers;
@@ -33,8 +39,7 @@ export const initialContactFlow: ContactFlowState = {
 function missing({ answers, step }: ContactFlowState): string | null {
   if (step === 0 && !answers.need)
     return "Choose the option that fits best to continue.";
-  if (step === 2 && !answers.teamSize)
-    return "Choose a team size to continue.";
+  if (step === 2 && !answers.teamSize) return "Choose a team size to continue.";
   if (step === 3 && !answers.timing) return "Choose a timeframe to continue.";
   return null;
 }

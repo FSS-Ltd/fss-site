@@ -64,11 +64,21 @@ function structuredSegments(answers: ContactAnswers): string[] {
   return segments;
 }
 
-/** Characters left for the free-text detail once the chosen answers are counted. */
-export function contactDetailLimit(answers: ContactAnswers): number {
-  const used = structuredSegments(answers).join("; ").length;
-  const separator = used ? 2 : 0;
-  return Math.max(0, challengeLimit - used - separator - detailPrefix.length);
+/**
+ * Characters the free-text detail may use. Reserves the longest possible
+ * structured answers, so text the user was allowed to type is never cut later.
+ */
+export function contactDetailLimit(): number {
+  const longest = (items: readonly string[]) =>
+    items.reduce((a, b) => (b.length > a.length ? b : a));
+  const worst = structuredSegments({
+    need: longest(contactNeeds) as ContactNeed,
+    tools: [...contactTools],
+    teamSize: longest(contactTeamSizes) as ContactTeamSize,
+    timing: longest(contactTimings) as ContactTiming,
+    detail: "",
+  }).join("; ").length;
+  return challengeLimit - worst - 2 - detailPrefix.length;
 }
 
 export function buildContactChallenge(
@@ -77,7 +87,8 @@ export function buildContactChallenge(
   const segments = structuredSegments(answers);
   const detail = answers.detail
     .trim()
-    .slice(0, contactDetailLimit(answers))
+    .slice(0, contactDetailLimit())
+    .replace(/[\uD800-\uDBFF]$/, "")
     .trim();
   if (detail) segments.push(`${detailPrefix}${detail}`);
   return segments.length ? segments.join("; ") : undefined;

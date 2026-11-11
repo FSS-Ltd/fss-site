@@ -74,8 +74,8 @@ test("contact validation catches blank required fields and invalid email", () =>
 test("long detail is capped so the challenge never exceeds 600 characters", () => {
   const long = { ...valid, detail: "x".repeat(2000) };
   const challenge = buildContactChallenge(long) ?? "";
-  assert.equal(challenge.length, 600);
-  assert.ok(contactDetailLimit(long) < 600);
+  assert.ok(challenge.length <= 600);
+  assert.ok(contactDetailLimit() < 600);
   assert.equal(prepareContactRequest(long, submissionId).success, true);
 });
 
@@ -86,4 +86,34 @@ test("no answers at all keeps the challenge optional", () => {
   );
   assert.equal(result.success, true);
   if (result.success) assert.equal(result.data.challenge, undefined);
+});
+
+test("the detail limit reserves room for the longest later answers", () => {
+  const typed = "x".repeat(contactDetailLimit());
+  const worst: ContactValues = {
+    ...valid,
+    need: "AI on our own data, privately",
+    tools: [
+      "Microsoft 365",
+      "Google Workspace",
+      "Xero",
+      "HubSpot",
+      "Salesforce",
+      "Spreadsheets",
+      "Other",
+    ],
+    teamSize: "51 to 250",
+    timing: "As soon as possible",
+    detail: typed,
+  };
+  const challenge = buildContactChallenge(worst) ?? "";
+  assert.ok(challenge.endsWith(`Detail: ${typed}`));
+  assert.ok(challenge.length <= 600);
+  assert.equal(prepareContactRequest(worst, submissionId).success, true);
+});
+
+test("a cut never leaves half a surrogate pair", () => {
+  const detail = "x".repeat(contactDetailLimit() - 1) + "😀";
+  const challenge = buildContactChallenge({ ...valid, detail }) ?? "";
+  assert.equal(/[\uD800-\uDBFF]$/.test(challenge), false);
 });

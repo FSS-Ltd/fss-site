@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import {
+  type MouseEvent,
   type ReactNode,
   useEffect,
   useReducer,
@@ -23,6 +24,7 @@ import {
 import {
   contactFlowReducer,
   contactLastStep,
+  isChipClickGuarded,
   contactStepCount,
   initialContactFlow,
 } from "@/lib/forms/contact-steps";
@@ -104,7 +106,7 @@ function Chip({
   label: string;
   pressed: boolean;
   multi?: boolean;
-  onClick: () => void;
+  onClick: (event: MouseEvent<HTMLButtonElement>) => void;
 }) {
   return (
     <button
@@ -141,6 +143,7 @@ export function ContactForm({ aside }: { aside?: ReactNode }) {
   const questionHeading = useRef<HTMLHeadingElement>(null);
   const formElement = useRef<HTMLFormElement>(null);
   const previousStep = useRef(flow.step);
+  const stepChangedAt = useRef(0);
   const {
     register,
     handleSubmit,
@@ -162,8 +165,9 @@ export function ContactForm({ aside }: { aside?: ReactNode }) {
   const [shown, setShown] = useState({ step, direction: "forward" });
   if (shown.step !== step) {
     setShown({ step, direction: step > shown.step ? "forward" : "back" });
+    setState("idle");
   }
-  const detailLimit = contactDetailLimit(answers);
+  const detailLimit = contactDetailLimit();
 
   useEffect(() => {
     if (state === "success") successHeading.current?.focus();
@@ -171,6 +175,7 @@ export function ContactForm({ aside }: { aside?: ReactNode }) {
 
   useEffect(() => {
     if (previousStep.current !== step) {
+      stepChangedAt.current = performance.now();
       questionHeading.current?.focus({ preventScroll: true });
       revealCard(formElement.current);
     }
@@ -185,6 +190,18 @@ export function ContactForm({ aside }: { aside?: ReactNode }) {
     submissionId.current = null;
     dispatch(action);
   };
+
+  // Pointer clicks (detail > 0) just after a step change are a double-click tail; keyboard clicks pass.
+  const pick =
+    (action: Parameters<typeof dispatch>[0]) =>
+    (event: MouseEvent<HTMLButtonElement>) => {
+      if (
+        event.detail > 0 &&
+        isChipClickGuarded(stepChangedAt.current, performance.now())
+      )
+        return;
+      choose(action);
+    };
 
   const onSubmit = async (details: ContactDetails) => {
     clearErrors();
@@ -335,7 +352,7 @@ export function ContactForm({ aside }: { aside?: ReactNode }) {
                     key={need}
                     label={need}
                     pressed={answers.need === need}
-                    onClick={() => choose({ type: "choose-need", value: need })}
+                    onClick={pick({ type: "choose-need", value: need })}
                   />
                 ))}
               </div>
@@ -376,7 +393,7 @@ export function ContactForm({ aside }: { aside?: ReactNode }) {
                     label={tool}
                     multi
                     pressed={answers.tools.includes(tool)}
-                    onClick={() => choose({ type: "toggle-tool", value: tool })}
+                    onClick={pick({ type: "toggle-tool", value: tool })}
                   />
                 ))}
               </div>
@@ -394,7 +411,7 @@ export function ContactForm({ aside }: { aside?: ReactNode }) {
                   key={size}
                   label={size}
                   pressed={answers.teamSize === size}
-                  onClick={() => choose({ type: "choose-team", value: size })}
+                  onClick={pick({ type: "choose-team", value: size })}
                 />
               ))}
             </div>
@@ -411,9 +428,7 @@ export function ContactForm({ aside }: { aside?: ReactNode }) {
                   key={timing}
                   label={timing}
                   pressed={answers.timing === timing}
-                  onClick={() =>
-                    choose({ type: "choose-timing", value: timing })
-                  }
+                  onClick={pick({ type: "choose-timing", value: timing })}
                 />
               ))}
             </div>
