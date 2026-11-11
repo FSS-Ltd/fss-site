@@ -1,42 +1,28 @@
 import Link from "next/link";
 import cta from "@/components/ui/cta-motion.module.css";
-import type { ComponentPropsWithoutRef } from "react";
+import { isValidElement, type ComponentPropsWithoutRef, type ReactNode } from "react";
 
 import { MdxCallout } from "@/components/blog/mdx-callout";
 import { MdxCtaBlock } from "@/components/blog/mdx-cta-block";
 import { isSafeLinkDestination } from "@/lib/blog-api/links";
+import { slugifyHeading } from "@/lib/blog-presentation";
 
+/** Plain text of rendered heading children, so ids match extractHeadings. */
+function textOf(node: ReactNode): string {
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(textOf).join("");
+  if (isValidElement<{ children?: ReactNode }>(node)) return textOf(node.props.children);
+  return "";
+}
+
+// Typography lives in blog.module.css (.prose) so MDX and Markdown posts match.
 function H2(props: ComponentPropsWithoutRef<"h2">) {
-  return <h2 className="mt-12 text-3xl font-semibold tracking-tight text-foreground" {...props} />;
+  return <h2 id={slugifyHeading(textOf(props.children))} {...props} />;
 }
 
-function H3(props: ComponentPropsWithoutRef<"h3">) {
-  return <h3 className="mt-10 text-2xl font-semibold tracking-tight text-foreground" {...props} />;
-}
-
-function Paragraph(props: ComponentPropsWithoutRef<"p">) {
-  return <p className="text-base leading-8 text-text-muted" {...props} />;
-}
-
-function UnorderedList(props: ComponentPropsWithoutRef<"ul">) {
-  return <ul className="ml-5 list-disc space-y-3 text-text-muted" {...props} />;
-}
-
-function OrderedList(props: ComponentPropsWithoutRef<"ol">) {
-  return <ol className="ml-5 list-decimal space-y-3 text-text-muted" {...props} />;
-}
-
-function ListItem(props: ComponentPropsWithoutRef<"li">) {
-  return <li className="pl-1" {...props} />;
-}
-
-function Blockquote(props: ComponentPropsWithoutRef<"blockquote">) {
-  return (
-    <blockquote
-      className="rounded-r-xl border-l-4 border-brand-primary/80 bg-surface-1/80 px-5 py-4 text-text-muted"
-      {...props}
-    />
-  );
+function Image({ alt = "", ...props }: ComponentPropsWithoutRef<"img">) {
+  // eslint-disable-next-line @next/next/no-img-element -- Markdown images have no known dimensions for next/image.
+  return <img alt={alt} loading="lazy" decoding="async" {...props} />;
 }
 
 function Anchor({ href = "", ...props }: ComponentPropsWithoutRef<"a">) {
@@ -48,28 +34,17 @@ function Anchor({ href = "", ...props }: ComponentPropsWithoutRef<"a">) {
   const isInternal = href.startsWith("/");
 
   if (isInternal) {
-    return <Link href={href} className={`font-medium text-brand-primary underline-offset-4 ${cta.link}`} {...props} />;
+    return <Link href={href} className={cta.link} {...props} />;
   }
 
   return (
-    <a
-      href={href}
-      className={`font-medium text-brand-primary underline-offset-4 ${cta.link}`}
-      target="_blank"
-      rel="noreferrer"
-      {...props}
-    />
+    <a href={href} className={cta.link} target="_blank" rel="noreferrer" {...props} />
   );
 }
 
 export const mdxComponents = {
   h2: H2,
-  h3: H3,
-  p: Paragraph,
-  ul: UnorderedList,
-  ol: OrderedList,
-  li: ListItem,
-  blockquote: Blockquote,
+  img: Image,
   a: Anchor,
   Callout: MdxCallout,
   CtaBlock: MdxCtaBlock,

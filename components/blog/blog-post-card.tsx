@@ -1,68 +1,92 @@
 import Image from "next/image";
 import Link from "next/link";
-import { format } from "date-fns";
-import { ArrowRight } from "lucide-react";
 
 import type { BlogPostMeta } from "@/lib/types/blog";
 import cta from "@/components/ui/cta-motion.module.css";
 
-type BlogPostCardProps = {
+import { formatEditorialDate } from "@/lib/blog-presentation";
+import styles from "@/components/blog/blog.module.css";
+
+type CoverProps = {
   post: BlogPostMeta;
+  sizes: string;
+  priority?: boolean;
+  /** Link the image to the post; the headline link stays the accessible one. */
+  linked?: boolean;
 };
 
-export function BlogPostCard({ post }: BlogPostCardProps) {
-  return (
-    <article
-      data-lift-light
-      className="group overflow-hidden rounded-[18px] border border-border-soft/70 bg-white transition-[border-color,box-shadow,transform] duration-300"
+/** Cover image at a fixed 5:3 frame, or a typographic panel when a post has none. */
+export function PostCover({ post, sizes, priority = false, linked = true }: CoverProps) {
+  const inner = post.coverImage ? (
+    <Image
+      src={post.coverImage}
+      alt=""
+      fill
+      sizes={sizes}
+      priority={priority}
+    />
+  ) : (
+    <span aria-hidden="true">{post.category}</span>
+  );
+  const className = `${styles.frame} ${post.coverImage ? "" : styles.noCover}`;
+
+  return linked ? (
+    <Link
+      href={`/blog/${post.slug}`}
+      className={className}
+      tabIndex={-1}
+      aria-hidden="true"
     >
-      <Link
-        className="block"
-        href={`/blog/${post.slug}`}
-        aria-label={post.title}
-      >
-        <div className="relative h-52 overflow-hidden bg-[#eef0f2]">
-          <Image
-            src={post.coverImage}
-            alt=""
-            fill
-            sizes="(min-width: 768px) 50vw, 100vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-white/45 to-transparent" />
-        </div>
-      </Link>
-      <div className="p-6 sm:p-7">
-        <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-brand-primary">
-          {format(new Date(post.publishDate), "MMM d, yyyy")} /{" "}
-          {post.readingMinutes} min read
-        </p>
-        <h2 className="mt-4 text-[22px] font-semibold leading-tight text-foreground">
-          <Link
-            className={`transition hover:text-brand-primary ${cta.link}`}
-            href={`/blog/${post.slug}`}
-          >
+      {inner}
+    </Link>
+  ) : (
+    <div className={className}>{inner}</div>
+  );
+}
+
+export function PostMeta({
+  post,
+  withAuthor = false,
+}: {
+  post: BlogPostMeta;
+  withAuthor?: boolean;
+}) {
+  return (
+    <p className={styles.metaLine}>
+      {withAuthor ? <span>By {post.author}</span> : null}
+      <time dateTime={post.publishDate}>
+        {formatEditorialDate(post.publishDate)}
+      </time>
+      <span>{post.readingMinutes} min read</span>
+    </p>
+  );
+}
+
+/** Secondary story: "Also in this edition" and "Read next". */
+export function BlogPostCard({
+  post,
+  showExcerpt = false,
+}: {
+  post: BlogPostMeta;
+  showExcerpt?: boolean;
+}) {
+  return (
+    <article className={styles.story} data-lift-light>
+      <PostCover
+        post={post}
+        sizes="(min-width: 1100px) 380px, (min-width: 640px) 50vw, 100vw"
+      />
+      <div className={styles.storyBody}>
+        <p className={styles.label}>{post.category}</p>
+        <h3 className={styles.storyTitle}>
+          <Link href={`/blog/${post.slug}`} className={cta.link}>
             {post.title}
           </Link>
-        </h2>
-        <p className="mt-3 text-sm leading-6 text-text-muted">{post.excerpt}</p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {post.tags.slice(0, 3).map((tag) => (
-            <span
-              key={tag}
-              className="rounded-md bg-brand-accent/8 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.06em] text-brand-primary"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-        <Link
-          href={`/blog/${post.slug}`}
-          className={`mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-primary transition hover:text-foreground ${cta.link}`}
-          style={{ minHeight: 24 }}
-        >
-          Read article <ArrowRight className="size-4" aria-hidden="true" />
-        </Link>
+        </h3>
+        {showExcerpt ? (
+          <p className={styles.storyExcerpt}>{post.excerpt}</p>
+        ) : null}
+        <PostMeta post={post} />
       </div>
     </article>
   );

@@ -3,9 +3,15 @@ import { ArrowRight } from "lucide-react";
 
 import type { BlogPostMeta } from "@/lib/types/blog";
 
-import { BlogPostCard } from "@/components/blog/blog-post-card";
+import {
+  formatEditorialDate,
+  groupByCategory,
+  latestUpdate,
+  selectLeadStory,
+} from "@/lib/blog-presentation";
+import { BlogPostCard, PostCover, PostMeta } from "@/components/blog/blog-post-card";
+import styles from "@/components/blog/blog.module.css";
 import cta from "@/components/ui/cta-motion.module.css";
-import fill from "@/components/ui/cta-fill.module.css";
 import gutter from "@/components/ui/gutter.module.css";
 import { MeshBand } from "@/components/ui/mesh-band";
 
@@ -13,88 +19,195 @@ type BlogIndexProps = {
   posts: BlogPostMeta[];
 };
 
+const SECONDARY_COUNT = 2;
+
+function plural(count: number, word: string) {
+  return `${count} ${word}${count === 1 ? "" : "s"}`;
+}
+
 export function BlogIndex({ posts }: BlogIndexProps) {
-  const featuredPost = posts[0];
-  const remainingPosts = posts.slice(1);
+  const { lead, rest } = selectLeadStory(posts);
+  const secondary = rest.slice(0, SECONDARY_COUNT);
+  const contents = rest.slice(SECONDARY_COUNT);
+  const sections = groupByCategory(posts);
+  const updated = latestUpdate(posts);
 
   return (
-    <>
-      <section
-        className={`relative overflow-hidden bg-[#f2f3f5] pb-20 pt-[138px] ${gutter.gutter}`}
-      >
+    <div className={styles.page}>
+      <header className={`${styles.masthead} ${gutter.gutter}`}>
         <canvas
           data-hero-canvas
-          className="pointer-events-none absolute inset-0 h-full w-full opacity-70"
+          className={styles.canvas}
+          aria-hidden="true"
         />
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(33,27,23,.026)_1px,transparent_1px),linear-gradient(90deg,rgba(33,27,23,.026)_1px,transparent_1px)] bg-[length:64px_64px] [mask-image:radial-gradient(120%_90%_at_42%_12%,#000,transparent_76%)]" />
-        <div className="relative" data-motion-reveal="mask">
-          <div className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-[rgba(10,26,46,.12)] bg-white/60 py-1.5 pr-3.5 pl-2.5">
-            <span className="h-2 w-2 rounded-full bg-[#14989e] shadow-[0_0_0_4px_rgba(20,152,158,.18)]" />
-            <span className="font-mono text-[11px] font-medium tracking-[0.12em] text-[#41506a]">
-              FIELD NOTES
-            </span>
-          </div>
-          <h1 className="max-w-[850px] text-[clamp(40px,6vw,78px)] leading-[.99] font-bold text-[#0a1a2e]">
-            Software thinking for teams building through complexity.
-          </h1>
-          <p className="mt-7 max-w-[560px] text-[clamp(16px,1.6vw,20px)] leading-[1.6] text-[#46566c]">
-            Practical writing on custom software, operational systems, AI
-            workflows, and the engineering choices behind dependable digital
-            foundations.
+        <div data-motion-reveal="mask">
+          <p className={styles.mastTop}>
+            <span>Faithful Software Solutions</span>
+            <span>AI, automation and custom software</span>
           </p>
-          <div className="mt-9 flex flex-wrap gap-3">
+          <h1 className={styles.nameplate}>
+            <span className={styles.nameplateWord}>
+              Field <em>Notes</em>
+            </span>
+            <span className={styles.nameplateSub}>
+              AI and software insights for UK businesses
+            </span>
+          </h1>
+          <div className={styles.mastFoot}>
+            <p className={styles.standfirst}>
+              Practical writing on AI integration, workflow automation and
+              custom software for businesses of any size. What to check
+              first, what to build, and what to leave alone.
+            </p>
+          </div>
+          <div className={styles.dateline}>
+            {updated ? (
+              <span>
+                Updated&nbsp;
+                <time dateTime={updated}>{formatEditorialDate(updated)}</time>
+              </span>
+            ) : null}
+            <span>{plural(posts.length, "article")}</span>
+            <span>{plural(sections.length, "section")}</span>
             <Link
               href="/resources"
               data-magnetic
-              className={`inline-flex items-center gap-2 rounded-full bg-[#0a1a2e] px-6 py-3.5 text-sm font-semibold text-[#fff] transition ${cta.sweep} ${fill.rust}`}
+              className={`${styles.datelineLink} ${cta.link}`}
             >
               <span data-mag-label className="inline-flex items-center gap-2">
-                Browse resources{" "}
-                <ArrowRight className="size-4" aria-hidden="true" />
+                Resource library <ArrowRight className="size-4" aria-hidden="true" />
               </span>
             </Link>
-            <Link
-              href="/contact"
-              className={`inline-flex items-center gap-2 rounded-full border border-[rgba(10,26,46,.14)] bg-white/70 px-6 py-3.5 text-sm font-semibold text-[#0a1a2e] ${cta.sweep} ${fill.navy}`}
-            >
-              Talk to FSS
-            </Link>
           </div>
         </div>
-        <div className="relative">
-          <MeshBand section="blog" />
-        </div>
-      </section>
+        {sections.length > 1 ? (
+          <nav aria-label="Sections" className={styles.rail}>
+            <ul className={styles.railList}>
+              {sections.map((section) => (
+                <li key={section.id}>
+                  <a href={`#${section.id}`}>
+                    {section.category}
+                    <sup aria-label={plural(section.posts.length, "article")}>
+                      {section.posts.length}
+                    </sup>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ) : null}
+        <MeshBand section="blog" />
+      </header>
 
-      <section
-        className={`bg-[#f2f3f5] py-[clamp(80px,10vw,130px)] ${gutter.gutter}`}
-        data-motion-reveal="up"
-      >
-        <div>
-          {featuredPost ? (
-            <div
-              data-reveal
-              className="mb-14 grid gap-8 lg:grid-cols-[.85fr_1.15fr] lg:items-end"
+      <div className={gutter.gutter}>
+        {!lead ? (
+          <p className={styles.empty}>
+            No articles are published yet. The{" "}
+            <Link href="/resources" className="underline">
+              resource library
+            </Link>{" "}
+            has practical guides in the meantime.
+          </p>
+        ) : (
+          <>
+            <article
+              className={styles.lead}
+              aria-labelledby="lead-story"
+              data-motion-reveal="up"
             >
-              <div>
-                <p className="font-mono text-xs tracking-[0.14em] text-[#0f7078]">
-                  LATEST ARTICLE
-                </p>
-                <h2 className="mt-4 max-w-[560px] text-[clamp(28px,4vw,46px)] leading-[1.05] font-semibold text-[#0a1a2e]">
-                  Read the latest field note from FSS.
+              <PostCover post={lead} priority sizes="(min-width: 960px) 680px, 100vw" />
+              <div className={styles.leadText}>
+                <p className={styles.label}>Lead story / {lead.category}</p>
+                <h2 id="lead-story" className={styles.leadTitle}>
+                  <Link href={`/blog/${lead.slug}`} className={cta.link}>
+                    {lead.title}
+                  </Link>
+                </h2>
+                <p className={styles.leadStandfirst}>{lead.excerpt}</p>
+                <PostMeta post={lead} withAuthor />
+              </div>
+            </article>
+
+            {secondary.length ? (
+              <section
+                className={styles.edition}
+                aria-labelledby="edition-title"
+                data-motion-reveal="up"
+              >
+                <div className={styles.sectionHead}>
+                  <h2 id="edition-title" className={styles.sectionTitle}>
+                    Also in this edition
+                  </h2>
+                </div>
+                <div
+                  className={styles.editionGrid}
+                  data-with-contents={contents.length ? "" : undefined}
+                >
+                  {secondary.map((post) => (
+                    <BlogPostCard key={post.slug} post={post} showExcerpt />
+                  ))}
+                  {contents.length ? (
+                    <div>
+                      <h3 className={styles.contentsHead}>
+                        Also published
+                      </h3>
+                      <ol className={styles.contents}>
+                        {contents.map((post) => (
+                          <li key={post.slug}>
+                            <Link
+                              href={`/blog/${post.slug}`}
+                              className={`${cta.link} ${styles.contentsTitle}`}
+                            >
+                              {post.title}
+                            </Link>
+                            <PostMeta post={post} />
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  ) : null}
+                </div>
+              </section>
+            ) : null}
+
+            <section
+              className={styles.archive}
+              aria-labelledby="archive-title"
+              data-motion-reveal="up"
+            >
+              <div className={styles.sectionHead}>
+                <h2 id="archive-title" className={styles.archiveTitle}>
+                  Every article, by section
                 </h2>
               </div>
-              <BlogPostCard post={featuredPost} />
-            </div>
-          ) : null}
-
-          <div className="grid gap-6 md:grid-cols-2">
-            {remainingPosts.map((post) => (
-              <BlogPostCard key={post.slug} post={post} />
-            ))}
-          </div>
-        </div>
-      </section>
-    </>
+              {sections.map((section) => (
+                <div key={section.id} id={section.id} className={styles.archiveRow}>
+                  <div>
+                    <h3 className={styles.archiveSection}>{section.category}</h3>
+                    <p className={styles.metaLine}>
+                      <span>{plural(section.posts.length, "article")}</span>
+                    </p>
+                  </div>
+                  <ul className={styles.archiveList}>
+                    {section.posts.map((post) => (
+                      <li key={post.slug} className={styles.archiveItem}>
+                        <Link
+                          href={`/blog/${post.slug}`}
+                          className={`${cta.link} ${styles.archiveItemTitle}`}
+                        >
+                          {post.title}
+                        </Link>
+                        <p>{post.excerpt}</p>
+                        <PostMeta post={post} />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </section>
+          </>
+        )}
+      </div>
+    </div>
   );
 }
