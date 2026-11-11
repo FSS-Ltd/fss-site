@@ -66,6 +66,15 @@ Updated 2026-11-11 15:50 GMT. Read this first, then the design doc
 - Optional, biggest remaining lead lever: real price ranges and measured
   case-study results to publish.
 
+## Blog API access
+
+- Production accepts the token: an authenticated empty POST returned 400
+  `invalid_body` (not 401) on 2026-11-11. No post was written.
+- The founder said to use the token in the main checkout's `.env`
+  (`/Users/JeanFidele/The Nexus Ecosystem/Projects/fss-site/.env`, key
+  `BLOG_API_TOKEN`). Read it into a shell variable; never print or commit it.
+- No post has been published through the API yet. Posts default to draft.
+
 ## Known gaps
 
 - Blog API behaviour under a database outage and scheduled posts are covered
