@@ -73,6 +73,11 @@ try {
   const menu = page.getByRole("button", { name: "Menu", exact: true });
   await menu.focus();
   await page.keyboard.press("Enter");
+  const menuHandle = await menu.elementHandle();
+  await page.waitForFunction(
+    (element) => element.getAttribute("aria-expanded") === "true",
+    menuHandle,
+  );
   assert.equal(await menu.getAttribute("aria-expanded"), "true");
   const menuId = await menu.getAttribute("aria-controls");
   assert.ok(menuId);
@@ -81,6 +86,10 @@ try {
     .getByRole("link", { name: "Services", exact: true })
     .focus();
   await page.keyboard.press("Escape");
+  await page.waitForFunction(
+    (element) => element.getAttribute("aria-expanded") === "false",
+    menuHandle,
+  );
   assert.equal(await menu.getAttribute("aria-expanded"), "false");
   assert.equal(
     await menu.evaluate((element) => element === document.activeElement),
@@ -273,7 +282,17 @@ try {
     for (const path of ["/", "/services", "/about", "/contact"]) {
       await page.goto(`${baseURL}${path}`);
       assert.equal(await page.locator("h1").count(), 1);
-      assert.equal(await page.locator("canvas").count(), 0);
+      // Canvases stay in the markup under reduced motion and are drawn static
+      // (components/redesign/fss-interactions.tsx, noMotion). Particle
+      // canvases are aria-hidden; the home app-atoms canvas carries a
+      // data-app-source image fallback.
+      assert.equal(
+        await page
+          .locator("canvas:not([aria-hidden='true']):not([data-app-atoms])")
+          .count(),
+        0,
+        `${path} canvases are decorative`,
+      );
       assert.equal(
         await page.evaluate(
           () => document.documentElement.scrollWidth <= innerWidth,
@@ -334,18 +353,21 @@ try {
   });
   const noScriptPage = await noScriptContext.newPage();
   await noScriptPage.goto(`${baseURL}/contact`);
+  // Without JavaScript the stepped form cannot be used: its fields stay
+  // disabled and the form's noscript note tells the visitor to email instead.
   assert.equal(
     await noScriptPage
-      .getByRole("button", { name: "Send project enquiry", exact: true })
+      .getByRole("button", { name: "Reporting", exact: true })
       .isDisabled(),
     true,
   );
+  await noScriptPage
+    .getByText(/Please enable JavaScript to send this form/)
+    .waitFor();
   assert.equal(
     await noScriptPage
-      .getByRole("link", {
-        name: "Email hello@faithfulsoftware.dev",
-        exact: true,
-      })
+      .locator('a[href="mailto:hello@faithfulsoftware.dev"]')
+      .first()
       .isVisible(),
     true,
   );
