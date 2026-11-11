@@ -10,10 +10,10 @@ Updated 2026-11-11 15:50 GMT. Read this first, then the design doc
 - One pull request per change. Sonnet code review and Sonnet security review,
   findings fixed, before a PR is marked ready. Merge one at a time on green
   checks. A merge is a production deploy.
-- UI work uses `/design-craft` and must reach 8/10 from the `jury` skill
-  before it ships. Open question: the form's critic score is 7.05 and the
-  skill's jury estimate is about 8.2. The founder has not said which number
-  the gate means. Proceeding on the jury estimate until told otherwise.
+- UI work uses `/design-craft` and must reach 8/10 on the jury skill's
+  critic score (the critic's own number, not the calibrated jury estimate).
+  Founder confirmed this on 2026-11-11. PR #330 scored 7.05, so it is below
+  the gate and must be improved before it ships.
 - Never remove particle or motion effects. No AI attribution in commits or
   PRs. Never commit to main. Never raise the homepage CSS budget.
 - Positioning: all businesses, small to large, led by AI integration and
@@ -39,7 +39,9 @@ Updated 2026-11-11 15:50 GMT. Read this first, then the design doc
    `.claude/worktrees/agent-a1013263835a4c6a0`, head `1bf5ba6bc`
    ("Keep the homepage CSS within its original budget"), tree clean, CI was
    pending. Next: confirm CI green and the budget file is unchanged from
-   main; run Sonnet code review and security review; fix findings; mark
+   main; an Opus agent raises the design to 8/10 on the critic score (remaining
+   criticisms are in the PR body); then run Sonnet code review and security
+   review; fix findings; mark
    ready; merge on green; verify `/contact` live (five steps, progress bar,
    submit path with a fake value intercepted, never a real production submit).
 2. PR D `feat/editorial-blog-layout`. Worktree
@@ -57,9 +59,8 @@ Updated 2026-11-11 15:50 GMT. Read this first, then the design doc
 
 ## Founder actions outstanding
 
-- Set `BLOG_API_TOKEN` in Vercel (API refuses writes until then; contract in
-  `docs/runbooks/blog-api.md`).
-- Set the `www` domain to a permanent redirect in Vercel (currently 307).
+- Done by the founder on 2026-11-11: `BLOG_API_TOKEN` set in Vercel; `www`
+  redirect set to permanent.
 - Google Business Profile: phone, hours, opening date, photos
   (`docs/seo/google-business-profile.md`).
 - Optional, biggest remaining lead lever: real price ranges and measured
