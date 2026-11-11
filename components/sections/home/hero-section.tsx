@@ -8,11 +8,7 @@ type CategoryCard = {
 };
 
 const categoryCards: CategoryCard[] = [
-  {
-    label: "Enterprise",
-    sub: "Robust ERP & CRM",
-    iconColor: "bg-brand-primary",
-  },
+  { label: "Enterprise", sub: "Robust ERP & CRM", iconColor: "bg-brand-primary" },
   { label: "Education", sub: "LMS & Admin", iconColor: "bg-brand-accent" },
   { label: "Religious", sub: "Member Management", iconColor: "bg-[#b5c7e8]" },
   { label: "Non-Profit", sub: "Custom Dashboards", iconColor: "bg-[#b7c6f2]" },
@@ -25,8 +21,10 @@ export function HeroSection() {
         <div className="space-y-6">
           <h1 className="max-w-xl font-[ui-sans-serif] text-3xl font-extrabold tracking-tight text-foreground sm:text-5xl lg:text-[3.5rem] lg:leading-[1.08]">
             Custom Software for{" "}
-            <span className="text-brand-primary">Business</span>, Schools, and
-            Churches
+            <span className="text-brand-primary">
+              Business
+            </span>
+            , Schools, and Churches
           </h1>
 
           <p className="text-xs font-bold uppercase tracking-widest text-brand-primary">
@@ -34,8 +32,8 @@ export function HeroSection() {
           </p>
 
           <p className="max-w-md font-[ui-sans-serif] text-sm leading-6 text-text-muted sm:max-w-lg sm:text-lg sm:leading-8">
-            We build unshakeable digital foundations with reliable technology
-            solutions tailored to your unique mission and operational needs.
+            We build unshakeable digital foundations with reliable technology solutions tailored
+            to your unique mission and operational needs.
           </p>
 
           <div className="flex flex-wrap items-center gap-4">

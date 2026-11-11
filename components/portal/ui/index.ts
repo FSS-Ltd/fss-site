@@ -4,7 +4,10 @@ export {
   type PortalButtonProps,
   type PortalButtonVariant,
 } from "./button";
-export { PortalActionLink, type PortalActionLinkProps } from "./action-link";
+export {
+  PortalActionLink,
+  type PortalActionLinkProps,
+} from "./action-link";
 export { PortalCard, type PortalCardProps } from "./card";
 export { PortalCheckbox, type PortalCheckboxProps } from "./checkbox";
 export { PortalField, type PortalFieldProps } from "./field";

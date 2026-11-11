@@ -72,10 +72,7 @@ export function StrategyReview({ data }: { data: WebsiteStrategyData }) {
             </p>
           )}
         </div>
-        <Link
-          className={styles.evidenceLink}
-          href={`/growth/prospects/${data.prospectId}/visual`}
-        >
+        <Link className={styles.evidenceLink} href={`/growth/prospects/${data.prospectId}/visual`}>
           View 3D hero concept
         </Link>
       </div>
@@ -116,9 +113,7 @@ export function StrategyReview({ data }: { data: WebsiteStrategyData }) {
 
       <div className={styles.sectionsGrid}>
         <div className={styles.sectionCard}>
-          <h3 className={styles.sectionTitle}>
-            Business goal &amp; primary CTA
-          </h3>
+          <h3 className={styles.sectionTitle}>Business goal &amp; primary CTA</h3>
           <p className={styles.sectionField}>{data.businessGoal}</p>
           <p className={styles.sectionField}>
             <strong>Primary call to action:</strong> {data.primaryCta}
@@ -139,10 +134,7 @@ export function StrategyReview({ data }: { data: WebsiteStrategyData }) {
         </div>
 
         <SectionCard section={data.sitemap} title="Sitemap" />
-        <SectionCard
-          section={data.homepageSections}
-          title="Homepage sections"
-        />
+        <SectionCard section={data.homepageSections} title="Homepage sections" />
         <SectionCard section={data.trustSignals} title="Trust signals" />
         <SectionCard section={data.localSeoPlan} title="Local SEO plan" />
         <SectionCard section={data.technologyPlan} title="Technology plan" />
@@ -166,19 +158,14 @@ export function StrategyReview({ data }: { data: WebsiteStrategyData }) {
                   size={16}
                 />
                 <span>
-                  {item.claimSummary} —{" "}
-                  {formatGrowthStatusLabel(item.sourceType)}
+                  {item.claimSummary} — {formatGrowthStatusLabel(item.sourceType)}
                 </span>
               </li>
             ))}
           </ul>
         )}
         <p className={styles.warningNote}>
-          <TriangleAlert
-            aria-hidden="true"
-            size={14}
-            style={{ flex: "none" }}
-          />
+          <TriangleAlert aria-hidden="true" size={14} style={{ flex: "none" }} />
           Every observation above is drawn from the sources listed here. Verify
           before sharing with the business.
         </p>

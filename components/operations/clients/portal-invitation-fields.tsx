@@ -43,12 +43,7 @@ export function PortalInvitationFields({
         <>
           <label>
             Client organisation
-            <select
-              defaultValue=""
-              name="organisationId"
-              required
-              disabled={pending}
-            >
+            <select defaultValue="" name="organisationId" required disabled={pending}>
               <option disabled value="">
                 Select a client
               </option>

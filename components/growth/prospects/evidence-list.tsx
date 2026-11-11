@@ -22,9 +22,7 @@ export function EvidenceList({
   evidence: readonly ProspectEvidenceItem[];
 }) {
   if (evidence.length === 0) {
-    return (
-      <p className={styles.inlineEmpty}>No research evidence recorded yet.</p>
-    );
+    return <p className={styles.inlineEmpty}>No research evidence recorded yet.</p>;
   }
 
   return (

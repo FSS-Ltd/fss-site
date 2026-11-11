@@ -86,9 +86,9 @@ export function PrimelineRoofingPage() {
                 Premium service, made easier to choose.
               </h2>
               <p className="max-w-2xl text-lg leading-8 text-slate-600">
-                The demo turns Primeline proof into a clearer first action: pick
-                the roofing need, share the property context and give the team
-                enough detail to prepare a focused visit.
+                The demo turns Primeline proof into a clearer first action:
+                pick the roofing need, share the property context and give the
+                team enough detail to prepare a focused visit.
               </p>
             </div>
             <div className="mt-14 grid gap-px overflow-hidden rounded-lg border border-slate-200 bg-slate-200 md:grid-cols-3">

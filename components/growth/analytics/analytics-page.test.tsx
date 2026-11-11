@@ -70,12 +70,10 @@ test("renders month navigation links pointing at the adjacent months", () => {
   assert.match(html, /href="\/growth\/analytics\?month=2026-09"/);
 });
 
-test('renders "Not enough data" instead of 0% for a null rate', () => {
+test("renders \"Not enough data\" instead of 0% for a null rate", () => {
   const state = readyState();
   state.data.rates.winRate = null;
-  const html = renderToStaticMarkup(
-    <AnalyticsPage month="2026-08" state={state} />,
-  );
+  const html = renderToStaticMarkup(<AnalyticsPage month="2026-08" state={state} />);
   assert.match(html, /Not enough data/);
 });
 

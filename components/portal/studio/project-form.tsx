@@ -106,9 +106,7 @@ export function StudioProjectForm({
       }
       const result = body as ProjectUpdateResponse;
       if (typeof result.version !== "number") {
-        setMessage(
-          "The saved project response was incomplete. Refresh and try again.",
-        );
+        setMessage("The saved project response was incomplete. Refresh and try again.");
         return;
       }
       window.location.reload();

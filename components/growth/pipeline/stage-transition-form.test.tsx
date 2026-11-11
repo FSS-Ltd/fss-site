@@ -18,13 +18,7 @@ const { StageTransitionFormFrame } =
 const ENGAGEMENT_ID = "11111111-1111-4111-8111-111111111111";
 
 function renderForm(
-  currentStage:
-    | "new"
-    | "qualified"
-    | "proposal"
-    | "negotiation"
-    | "won"
-    | "lost",
+  currentStage: "new" | "qualified" | "proposal" | "negotiation" | "won" | "lost",
 ): string {
   return renderToStaticMarkup(
     <StageTransitionFormFrame

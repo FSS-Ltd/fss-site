@@ -146,21 +146,9 @@ export function BridglandRoofingPage() {
             <RevealOnScroll delay={100}>
               <ol className="grid gap-3">
                 {[
-                  [
-                    "01",
-                    "Share the property context",
-                    "Property type, roof concern and postcode create a useful start.",
-                  ],
-                  [
-                    "02",
-                    "Inspect the details that matter",
-                    "Slate, leadwork, ridges and weathering points are considered in context.",
-                  ],
-                  [
-                    "03",
-                    "Plan the right next step",
-                    "The outcome is a clearer repair, installation or conservation conversation.",
-                  ],
+                  ["01", "Share the property context", "Property type, roof concern and postcode create a useful start."],
+                  ["02", "Inspect the details that matter", "Slate, leadwork, ridges and weathering points are considered in context."],
+                  ["03", "Plan the right next step", "The outcome is a clearer repair, installation or conservation conversation."],
                 ].map(([number, title, detail]) => (
                   <li
                     className="grid gap-4 rounded-[1.35rem] border border-white/12 bg-white/[.06] p-5 sm:grid-cols-[3.5rem_1fr] sm:p-6"

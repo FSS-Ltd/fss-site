@@ -3,7 +3,10 @@ import { ArrowDown } from "lucide-react";
 
 import { ConceptBar, OwnerInvitation } from "../concept-chrome";
 import { DemoEnquiry } from "../demo-enquiry";
-import { InteractiveJourney, type JourneyStep } from "../interactive-journey";
+import {
+  InteractiveJourney,
+  type JourneyStep,
+} from "../interactive-journey";
 
 const fields = [
   {
@@ -45,42 +48,34 @@ const fields = [
 
 const journeySteps: readonly JourneyStep[] = [
   {
-    description:
-      "Bring the site stage, constraints and professional team into view at the start.",
+    description: "Bring the site stage, constraints and professional team into view at the start.",
     icon: "compass",
     id: "planning",
-    nextStep:
-      "The first discussion can begin with the planning and design context already understood.",
+    nextStep: "The first discussion can begin with the planning and design context already understood.",
     number: "01",
     title: "Planning and design",
   },
   {
-    description:
-      "Frame site selection, proposals and mitigation before the BNG conversation begins.",
+    description: "Frame site selection, proposals and mitigation before the BNG conversation begins.",
     icon: "sprout",
     id: "bng",
-    nextStep:
-      "The practice can identify the relevant ecological and delivery questions sooner.",
+    nextStep: "The practice can identify the relevant ecological and delivery questions sooner.",
     number: "02",
     title: "Biodiversity Net Gain",
   },
   {
-    description:
-      "A visit has a different purpose from a development or planning conversation.",
+    description: "A visit has a different purpose from a development or planning conversation.",
     icon: "flower",
     id: "garden",
-    nextStep:
-      "The request arrives with enough context to arrange the right kind of visit.",
+    nextStep: "The request arrives with enough context to arrange the right kind of visit.",
     number: "03",
     title: "Show garden",
   },
   {
-    description:
-      "Retain the landscape intent as a project moves from a drawn proposal toward a built place.",
+    description: "Retain the landscape intent as a project moves from a drawn proposal toward a built place.",
     icon: "leaf",
     id: "delivery",
-    nextStep:
-      "The team can begin with the project phase and the discipline required.",
+    nextStep: "The team can begin with the project phase and the discipline required.",
     number: "04",
     title: "Delivery",
   },

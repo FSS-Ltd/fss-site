@@ -10,12 +10,7 @@ type SectionProps = {
   containerClassName?: string;
 };
 
-export function Section({
-  id,
-  children,
-  className,
-  containerClassName,
-}: SectionProps) {
+export function Section({ id, children, className, containerClassName }: SectionProps) {
   return (
     <section id={id} className={cn("py-16 sm:py-20 lg:py-28", className)}>
       <Container className={containerClassName}>{children}</Container>

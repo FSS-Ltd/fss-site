@@ -21,9 +21,7 @@ export function IssueList({ result }: { result: NewsletterIssueListResult }) {
     return (
       <div className={styles.errorState} role="alert">
         <p>{result.message}</p>
-        <p className={styles.errorCorrelation}>
-          Reference: {result.correlationId}
-        </p>
+        <p className={styles.errorCorrelation}>Reference: {result.correlationId}</p>
       </div>
     );
   }
@@ -37,10 +35,7 @@ export function IssueList({ result }: { result: NewsletterIssueListResult }) {
             FSS Field Notes issues, drafted and sent through Resend.
           </p>
         </div>
-        <Link
-          className={styles.evidenceLink}
-          href="/growth/settings/email-templates"
-        >
+        <Link className={styles.evidenceLink} href="/growth/settings/email-templates">
           Email templates
         </Link>
       </div>
@@ -51,9 +46,7 @@ export function IssueList({ result }: { result: NewsletterIssueListResult }) {
         ) : (
           <>
             <table className={styles.table}>
-              <caption className={styles.visuallyHidden}>
-                Newsletter issues
-              </caption>
+              <caption className={styles.visuallyHidden}>Newsletter issues</caption>
               <thead>
                 <tr>
                   <th scope="col">Subject</th>

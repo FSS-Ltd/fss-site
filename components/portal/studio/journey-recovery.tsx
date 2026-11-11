@@ -16,9 +16,7 @@ function actionLabel(id: string): string {
   return "Open welcome journeys";
 }
 
-function tone(
-  status: StaffJourneyRecovery["checks"][number]["status"],
-): "success" | "warning" | "error" {
+function tone(status: StaffJourneyRecovery["checks"][number]["status"]): "success" | "warning" | "error" {
   if (status === "passed") return "success";
   return status === "failed" ? "error" : "warning";
 }
@@ -46,8 +44,7 @@ export function JourneyRecovery({
         title="Two things need your attention"
       />
       <Notice tone="warning">
-        Activation remains unavailable until the existing journey command runs a
-        new server preflight. A browser result cannot start this journey.
+        Activation remains unavailable until the existing journey command runs a new server preflight. A browser result cannot start this journey.
       </Notice>
       <PortalCard title="Readiness checks">
         <ul className={styles.list}>
@@ -58,14 +55,8 @@ export function JourneyRecovery({
                   <h2>{check.id.replaceAll("_", " ")}</h2>
                   <p>{check.reason}</p>
                 </div>
-                <StatusBadge status={tone(check.status)}>
-                  {check.status === "passed" ? "Confirmed" : "Needs attention"}
-                </StatusBadge>
-                {check.href ? (
-                  <PortalActionLink href={check.href} variant="secondary">
-                    {actionLabel(check.id)}
-                  </PortalActionLink>
-                ) : null}
+                <StatusBadge status={tone(check.status)}>{check.status === "passed" ? "Confirmed" : "Needs attention"}</StatusBadge>
+                {check.href ? <PortalActionLink href={check.href} variant="secondary">{actionLabel(check.id)}</PortalActionLink> : null}
               </div>
             </li>
           ))}
@@ -77,11 +68,7 @@ export function JourneyRecovery({
             ? "The displayed checks are current, but starting still requires a new server preview."
             : `${failed.length} retained ${failed.length === 1 ? "check needs" : "checks need"} repair before a new preview can be prepared.`}
         </p>
-        <PortalButton
-          disabled
-          disabledReason="Prepare a new server preview after resolving every retained check."
-          type="button"
-        >
+        <PortalButton disabled disabledReason="Prepare a new server preview after resolving every retained check." type="button">
           Start welcome journey
         </PortalButton>
       </PortalCard>

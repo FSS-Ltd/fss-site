@@ -17,10 +17,7 @@ type PreviewTheme = CSSProperties & {
   "--preview-accent-contrast": string;
 };
 
-const themes: Record<
-  ProspectPreviewComposition["visualDirection"],
-  PreviewTheme
-> = {
+const themes: Record<ProspectPreviewComposition["visualDirection"], PreviewTheme> = {
   "precision-dark": {
     "--preview-background": "#121719",
     "--preview-surface": "#1d2526",
@@ -86,35 +83,15 @@ export function CompositionPreview({
   composition,
   mode,
 }: CompositionPreviewProps) {
-  const sections: Record<
-    ProspectPreviewComposition["sectionOrder"][number],
-    ReactNode
-  > = {
+  const sections: Record<ProspectPreviewComposition["sectionOrder"][number], ReactNode> = {
     hero: <CompositionHero composition={composition} />,
-    proof: (
-      <CompositionSection
-        eyebrow="Trust"
-        section={composition.content.trustSignals}
-      />
-    ),
-    services: (
-      <CompositionSection
-        eyebrow="A clearer route"
-        section={composition.content.homepageSections}
-      />
-    ),
-    "case-for-change": (
-      <CompositionSection
-        eyebrow="The next step"
-        section={composition.content.conversionPlan}
-      />
-    ),
+    proof: <CompositionSection eyebrow="Trust" section={composition.content.trustSignals} />,
+    services: <CompositionSection eyebrow="A clearer route" section={composition.content.homepageSections} />,
+    "case-for-change": <CompositionSection eyebrow="The next step" section={composition.content.conversionPlan} />,
     journey: <CompositionJourney composition={composition} />,
     locality: (
       <section className="grid gap-5 border-t border-black/10 py-8 sm:py-14 lg:grid-cols-[minmax(12rem,.42fr)_minmax(0,1fr)]">
-        <p className="m-0 text-xs font-extrabold uppercase tracking-[0.16em] text-[var(--preview-accent)]">
-          Local focus
-        </p>
+        <p className="m-0 text-xs font-extrabold uppercase tracking-[0.16em] text-[var(--preview-accent)]">Local focus</p>
         <div>
           <h2 className="m-0 text-[clamp(1.7rem,4vw,3rem)] font-semibold tracking-[-0.045em] leading-[1.05]">
             Designed around a clearer first step in {composition.copy.locality}.

@@ -3,7 +3,10 @@ import { ArrowRight } from "lucide-react";
 
 import { ConceptBar, OwnerInvitation } from "../concept-chrome";
 import { DemoEnquiry } from "../demo-enquiry";
-import { InteractiveJourney, type JourneyStep } from "../interactive-journey";
+import {
+  InteractiveJourney,
+  type JourneyStep,
+} from "../interactive-journey";
 
 const fields = [
   {
@@ -35,42 +38,34 @@ const fields = [
 
 const journeySteps: readonly JourneyStep[] = [
   {
-    description:
-      "Start with the person, business, trust or estate that needs support.",
+    description: "Start with the person, business, trust or estate that needs support.",
     icon: "user",
     id: "client",
-    nextStep:
-      "The practice can frame the first response around the right client context.",
+    nextStep: "The practice can frame the first response around the right client context.",
     number: "01",
     title: "Person or business",
   },
   {
-    description:
-      "Accounts, taxation and wider support each need a different opening conversation.",
+    description: "Accounts, taxation and wider support each need a different opening conversation.",
     icon: "briefcase",
     id: "service",
-    nextStep:
-      "The enquiry can reach the relevant service route before a meeting is proposed.",
+    nextStep: "The enquiry can reach the relevant service route before a meeting is proposed.",
     number: "02",
     title: "Service context",
   },
   {
-    description:
-      "A filing date or decision date gives the team a useful sense of timing.",
+    description: "A filing date or decision date gives the team a useful sense of timing.",
     icon: "calendar",
     id: "deadline",
-    nextStep:
-      "The response can account for the date that matters rather than discover it later.",
+    nextStep: "The response can account for the date that matters rather than discover it later.",
     number: "03",
     title: "Next deadline",
   },
   {
-    description:
-      "Documents should follow a relevant first response, not replace one.",
+    description: "Documents should follow a relevant first response, not replace one.",
     icon: "lock",
     id: "follow-up",
-    nextStep:
-      "A secure follow-up can request only the records needed for the next step.",
+    nextStep: "A secure follow-up can request only the records needed for the next step.",
     number: "04",
     title: "Secure follow-up",
   },

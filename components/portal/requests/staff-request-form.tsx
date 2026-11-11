@@ -149,9 +149,7 @@ export function StaffRequestForm({
             required
             value={clientId}
           >
-            {clients.length ? null : (
-              <option value="">No active clients</option>
-            )}
+            {clients.length ? null : <option value="">No active clients</option>}
             {clients.map((client) => (
               <option key={client.id} value={client.id}>
                 {client.displayName}
@@ -165,9 +163,7 @@ export function StaffRequestForm({
             required
             value={projectId}
           >
-            {projects.length ? null : (
-              <option value="">No client-visible projects</option>
-            )}
+            {projects.length ? null : <option value="">No client-visible projects</option>}
             {projects.map((project) => (
               <option key={project.id} value={project.id}>
                 {project.title}
@@ -232,37 +228,20 @@ export function StaffRequestForm({
           )}
         </PortalCard>
         <PortalCard title="Delivery assessment">
-          <PortalSelect
-            disabled
-            label="Scope decision"
-            value="assessment_pending"
-          >
+          <PortalSelect disabled label="Scope decision" value="assessment_pending">
             <option value="assessment_pending">Assessment pending</option>
           </PortalSelect>
-          <PortalSelect
-            defaultValue="normal"
-            label="Operational priority"
-            name="priority"
-            required
-          >
+          <PortalSelect defaultValue="normal" label="Operational priority" name="priority" required>
             {requestPriorities.map((priority) => (
               <option key={priority} value={priority}>
                 {priority.charAt(0).toUpperCase() + priority.slice(1)}
               </option>
             ))}
           </PortalSelect>
-          <PortalField
-            label="Desired date"
-            hint="Optional. This is not an agreed delivery date."
-          >
+          <PortalField label="Desired date" hint="Optional. This is not an agreed delivery date.">
             <input name="desiredDate" type="date" />
           </PortalField>
-          <PortalTextarea
-            label="Impact"
-            maxLength={4000}
-            name="impact"
-            rows={3}
-          />
+          <PortalTextarea label="Impact" maxLength={4000} name="impact" rows={3} />
           <Notice tone="info">
             Public request details are shared with the client. Internal priority
             remains in FSS Studio. An owner and scope decision are recorded when

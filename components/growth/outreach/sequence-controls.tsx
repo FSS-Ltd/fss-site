@@ -16,12 +16,7 @@ const TERMINAL_STATUSES = new Set([
   "completed",
 ]);
 
-type ActionKey =
-  | "pause"
-  | "resume"
-  | "started-talks"
-  | "reject"
-  | "do-not-contact";
+type ActionKey = "pause" | "resume" | "started-talks" | "reject" | "do-not-contact";
 
 type Feedback = { tone: "conflict" | "error"; message: string };
 
@@ -35,9 +30,9 @@ async function postAction(
       body: "{}",
     });
     if (response.ok) return { ok: true };
-    const payload = (await response.json().catch(() => null)) as {
-      message?: string;
-    } | null;
+    const payload = (await response.json().catch(() => null)) as
+      | { message?: string }
+      | null;
     return { ok: false, status: response.status, message: payload?.message };
   } catch {
     return { ok: false, status: 0 };
@@ -95,11 +90,7 @@ export function SequenceControlsFrame({
         role="group"
       >
         {feedback && (
-          <p
-            className={styles.actionFeedback}
-            data-tone={feedback.tone}
-            role="alert"
-          >
+          <p className={styles.actionFeedback} data-tone={feedback.tone} role="alert">
             {feedback.message}
           </p>
         )}
@@ -167,20 +158,14 @@ export function SequenceControlsFrame({
           }
           type="button"
         >
-          {pendingAction === "do-not-contact"
-            ? "Suppressing…"
-            : "Do not contact"}
+          {pendingAction === "do-not-contact" ? "Suppressing…" : "Do not contact"}
         </button>
       </div>
     </div>
   );
 }
 
-export function SequenceControls({
-  detail,
-}: {
-  detail: OutreachSequenceDetail;
-}) {
+export function SequenceControls({ detail }: { detail: OutreachSequenceDetail }) {
   const router = useRouter();
   return (
     <SequenceControlsFrame detail={detail} onSuccess={() => router.refresh()} />

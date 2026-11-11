@@ -178,7 +178,9 @@ export function PortalLoginForm({
             disabled={!loaded || status.kind === "pending"}
           >
             <span>
-              {status.kind === "pending" ? "Sending code…" : "Continue"}
+              {status.kind === "pending"
+                ? "Sending code…"
+                : "Continue"}
             </span>
             <ArrowRight size={18} aria-hidden="true" />
           </button>

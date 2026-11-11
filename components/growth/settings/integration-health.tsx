@@ -19,8 +19,7 @@ export function IntegrationHealth({ data }: { data: SettingsData }) {
   return (
     <>
       <p className={styles.subtitle}>
-        Redacted integration health, checked{" "}
-        {formatGrowthDateTime(data.checkedAt)}.
+        Redacted integration health, checked {formatGrowthDateTime(data.checkedAt)}.
       </p>
 
       <div className={styles.grid}>
@@ -42,10 +41,7 @@ export function IntegrationHealth({ data }: { data: SettingsData }) {
         <div className={styles.card}>
           <div className={styles.cardHeader}>
             <h2 className={styles.sectionTitle}>Gmail</h2>
-            <span
-              className={styles.pill}
-              data-tone={gmailTone(data.gmail.status)}
-            >
+            <span className={styles.pill} data-tone={gmailTone(data.gmail.status)}>
               {formatGrowthStatusLabel(data.gmail.status)}
             </span>
           </div>
@@ -97,19 +93,12 @@ export function IntegrationHealth({ data }: { data: SettingsData }) {
             <div className={styles.actionsBar}>
               {data.gmail.accountIdentity ? (
                 <form action="/api/integrations/gmail/disconnect" method="post">
-                  <button
-                    className={styles.actionButton}
-                    data-variant="danger"
-                    type="submit"
-                  >
+                  <button className={styles.actionButton} data-variant="danger" type="submit">
                     Disconnect Gmail
                   </button>
                 </form>
               ) : (
-                <a
-                  className={styles.actionButton}
-                  href="/api/integrations/gmail/connect"
-                >
+                <a className={styles.actionButton} href="/api/integrations/gmail/connect">
                   Connect Gmail
                 </a>
               )}
@@ -131,15 +120,11 @@ export function IntegrationHealth({ data }: { data: SettingsData }) {
             <ul className={styles.metaList}>
               <li className={styles.metaItem}>
                 <span className={styles.metaLabel}>From</span>
-                <span className={styles.metaValue}>
-                  {data.resend.fromEmail}
-                </span>
+                <span className={styles.metaValue}>{data.resend.fromEmail}</span>
               </li>
               <li className={styles.metaItem}>
                 <span className={styles.metaLabel}>Reply to</span>
-                <span className={styles.metaValue}>
-                  {data.resend.replyToEmail}
-                </span>
+                <span className={styles.metaValue}>{data.resend.replyToEmail}</span>
               </li>
             </ul>
           ) : (
@@ -150,8 +135,8 @@ export function IntegrationHealth({ data }: { data: SettingsData }) {
             </p>
           )}
           <p className={styles.guidance}>
-            Resend is configured externally — this dashboard cannot change these
-            values.
+            Resend is configured externally — this dashboard cannot change
+            these values.
           </p>
         </div>
 
@@ -193,9 +178,7 @@ export function IntegrationHealth({ data }: { data: SettingsData }) {
             <h2 className={styles.sectionTitle}>Scheduled automation</h2>
             <span
               className={styles.pill}
-              data-tone={
-                data.automation.automationsEnabled ? undefined : "neutral"
-              }
+              data-tone={data.automation.automationsEnabled ? undefined : "neutral"}
             >
               {data.automation.automationsEnabled ? "Enabled" : "Disabled"}
             </span>
@@ -213,8 +196,8 @@ export function IntegrationHealth({ data }: { data: SettingsData }) {
             ))}
           </ul>
           <p className={styles.guidance}>
-            Controlled by the GROWTH_OS_AUTOMATIONS_ENABLED Vercel environment
-            variable — this dashboard cannot change it.
+            Controlled by the GROWTH_OS_AUTOMATIONS_ENABLED Vercel
+            environment variable — this dashboard cannot change it.
           </p>
         </div>
       </div>

@@ -16,24 +16,9 @@ function HeroArtwork({
       <svg aria-hidden="true" viewBox="0 0 600 440">
         <rect fill="currentColor" height="440" opacity="0.94" width="600" />
         <circle cx="455" cy="130" fill="var(--preview-accent)" r="110" />
-        <path
-          d="M60 344 244 146l136 198H60Z"
-          fill="var(--preview-surface)"
-          opacity="0.94"
-        />
-        <path
-          d="M214 386 390 204l150 182H214Z"
-          fill="var(--preview-background)"
-          opacity="0.3"
-        />
-        <rect
-          fill="var(--preview-accent)"
-          height="8"
-          rx="4"
-          width="160"
-          x="70"
-          y="83"
-        />
+        <path d="M60 344 244 146l136 198H60Z" fill="var(--preview-surface)" opacity="0.94" />
+        <path d="M214 386 390 204l150 182H214Z" fill="var(--preview-background)" opacity="0.3" />
+        <rect fill="var(--preview-accent)" height="8" rx="4" width="160" x="70" y="83" />
       </svg>
     );
   }
@@ -42,19 +27,8 @@ function HeroArtwork({
     return (
       <svg aria-hidden="true" viewBox="0 0 600 440">
         <rect fill="var(--preview-surface)" height="440" width="600" />
-        <path
-          d="M-10 335C115 227 202 409 325 264S486 123 620 179"
-          fill="none"
-          stroke="var(--preview-accent)"
-          strokeWidth="26"
-        />
-        <path
-          d="M-10 98C128 203 179 24 325 120S485 341 620 294"
-          fill="none"
-          opacity="0.3"
-          stroke="currentColor"
-          strokeWidth="19"
-        />
+        <path d="M-10 335C115 227 202 409 325 264S486 123 620 179" fill="none" stroke="var(--preview-accent)" strokeWidth="26" />
+        <path d="M-10 98C128 203 179 24 325 120S485 341 620 294" fill="none" opacity="0.3" stroke="currentColor" strokeWidth="19" />
         <circle cx="310" cy="256" fill="var(--preview-accent)" r="33" />
         <circle cx="310" cy="256" fill="var(--preview-surface)" r="13" />
       </svg>
@@ -67,18 +41,8 @@ function HeroArtwork({
         <rect fill="var(--preview-surface)" height="440" width="600" />
         <circle cx="300" cy="220" fill="var(--preview-accent)" r="132" />
         <circle cx="300" cy="220" fill="var(--preview-background)" r="84" />
-        <path
-          d="M90 84h420v272H90z"
-          fill="none"
-          opacity="0.25"
-          stroke="currentColor"
-          strokeWidth="8"
-        />
-        <path
-          d="m161 307 77-115 67 94 84-139 69 160H161Z"
-          fill="var(--preview-ink)"
-          opacity="0.18"
-        />
+        <path d="M90 84h420v272H90z" fill="none" opacity="0.25" stroke="currentColor" strokeWidth="8" />
+        <path d="m161 307 77-115 67 94 84-139 69 160H161Z" fill="var(--preview-ink)" opacity="0.18" />
       </svg>
     );
   }
@@ -87,27 +51,9 @@ function HeroArtwork({
     return (
       <svg aria-hidden="true" viewBox="0 0 600 440">
         <rect fill="var(--preview-surface)" height="440" width="600" />
-        <rect
-          fill="var(--preview-accent)"
-          height="305"
-          rx="18"
-          width="336"
-          x="132"
-          y="68"
-        />
-        <rect
-          fill="var(--preview-background)"
-          height="220"
-          rx="8"
-          width="247"
-          x="176"
-          y="112"
-        />
-        <path
-          d="m190 286 83-97 65 61 54-71 18 107H190Z"
-          fill="currentColor"
-          opacity="0.22"
-        />
+        <rect fill="var(--preview-accent)" height="305" rx="18" width="336" x="132" y="68" />
+        <rect fill="var(--preview-background)" height="220" rx="8" width="247" x="176" y="112" />
+        <path d="m190 286 83-97 65 61 54-71 18 107H190Z" fill="currentColor" opacity="0.22" />
       </svg>
     );
   }

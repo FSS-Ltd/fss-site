@@ -39,10 +39,7 @@ test("keeps the drone journey contained and supplies a reduced-motion fallback",
     "utf8",
   );
 
-  assert.match(
-    styles,
-    /\[data-bridgland-drone-journey\]\s*\{\s*height:\s*400svh;/,
-  );
+  assert.match(styles, /\[data-bridgland-drone-journey\]\s*\{\s*height:\s*400svh;/);
   assert.match(
     styles,
     /\[data-bridgland-drone-frame\] \{[\s\S]*?position:\s*sticky;/,

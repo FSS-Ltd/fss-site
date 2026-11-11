@@ -13,9 +13,7 @@ export function SummaryStrip({ summary }: { summary: OverviewSummary }) {
           <Mail size={20} strokeWidth={1.8} />
         </span>
         <div>
-          <p className={styles.statNumber}>
-            {summary.emailsWaitingForApproval}
-          </p>
+          <p className={styles.statNumber}>{summary.emailsWaitingForApproval}</p>
           <p className={styles.statLabel}>Emails waiting for approval</p>
         </div>
       </div>

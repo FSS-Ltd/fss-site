@@ -1,4 +1,6 @@
-import { formatGrowthPercentage } from "@/lib/growth/dashboard/formatters";
+import {
+  formatGrowthPercentage,
+} from "@/lib/growth/dashboard/formatters";
 import type { SequenceHealth as SequenceHealthData } from "@/lib/growth/dashboard/overview";
 
 import styles from "./overview.module.css";
@@ -11,9 +13,7 @@ export function SequenceHealth({ health }: { health: SequenceHealthData }) {
           <h2 className={styles.cardTitle} id="sequence-health-heading">
             Sequence health
           </h2>
-          <p className={styles.cardDescription}>
-            How your outreach is performing
-          </p>
+          <p className={styles.cardDescription}>How your outreach is performing</p>
         </div>
       </div>
 
@@ -28,8 +28,7 @@ export function SequenceHealth({ health }: { health: SequenceHealthData }) {
                 {formatGrowthPercentage(health.deliveryRate)}
               </span>
               <span className={styles.healthNote}>
-                {health.sentCount} of {health.sentCount + health.failedCount}{" "}
-                sent
+                {health.sentCount} of {health.sentCount + health.failedCount} sent
               </span>
             </>
           )}
@@ -45,8 +44,7 @@ export function SequenceHealth({ health }: { health: SequenceHealthData }) {
                 {formatGrowthPercentage(health.replyRate)}
               </span>
               <span className={styles.healthNote}>
-                {health.repliedEnrollmentCount} of {health.sentEnrollmentCount}{" "}
-                replied
+                {health.repliedEnrollmentCount} of {health.sentEnrollmentCount} replied
               </span>
             </>
           )}

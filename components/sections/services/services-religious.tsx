@@ -43,9 +43,7 @@ export function ServicesReligious() {
             </div>
             <div>
               <h3 className="font-bold text-foreground">{card.title}</h3>
-              <p className="mt-2 text-sm leading-6 text-text-muted">
-                {card.description}
-              </p>
+              <p className="mt-2 text-sm leading-6 text-text-muted">{card.description}</p>
               <Link
                 href="/contact"
                 className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-primary hover:underline"

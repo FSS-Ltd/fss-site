@@ -5,21 +5,11 @@ import { MdxCallout } from "@/components/blog/mdx-callout";
 import { MdxCtaBlock } from "@/components/blog/mdx-cta-block";
 
 function H2(props: ComponentPropsWithoutRef<"h2">) {
-  return (
-    <h2
-      className="mt-12 text-3xl font-semibold tracking-tight text-foreground"
-      {...props}
-    />
-  );
+  return <h2 className="mt-12 text-3xl font-semibold tracking-tight text-foreground" {...props} />;
 }
 
 function H3(props: ComponentPropsWithoutRef<"h3">) {
-  return (
-    <h3
-      className="mt-10 text-2xl font-semibold tracking-tight text-foreground"
-      {...props}
-    />
-  );
+  return <h3 className="mt-10 text-2xl font-semibold tracking-tight text-foreground" {...props} />;
 }
 
 function Paragraph(props: ComponentPropsWithoutRef<"p">) {
@@ -31,9 +21,7 @@ function UnorderedList(props: ComponentPropsWithoutRef<"ul">) {
 }
 
 function OrderedList(props: ComponentPropsWithoutRef<"ol">) {
-  return (
-    <ol className="ml-5 list-decimal space-y-3 text-text-muted" {...props} />
-  );
+  return <ol className="ml-5 list-decimal space-y-3 text-text-muted" {...props} />;
 }
 
 function ListItem(props: ComponentPropsWithoutRef<"li">) {
@@ -53,13 +41,7 @@ function Anchor({ href = "", ...props }: ComponentPropsWithoutRef<"a">) {
   const isInternal = href.startsWith("/");
 
   if (isInternal) {
-    return (
-      <Link
-        href={href}
-        className="font-medium text-brand-primary underline-offset-4 hover:underline"
-        {...props}
-      />
-    );
+    return <Link href={href} className="font-medium text-brand-primary underline-offset-4 hover:underline" {...props} />;
   }
 
   return (

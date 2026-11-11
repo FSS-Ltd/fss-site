@@ -15,18 +15,13 @@ import type { ViewState } from "@/lib/growth/dashboard/view-models";
 
 import styles from "./clients.module.css";
 
-const STATUS_LABELS: Record<
-  (typeof CLIENT_STATUS_FILTER_VALUES)[number],
-  string
-> = {
+const STATUS_LABELS: Record<(typeof CLIENT_STATUS_FILTER_VALUES)[number], string> = {
   all: "All clients",
   active: "Active delivery",
   completed: "Completed",
 };
 
-function deliveryTone(
-  status: ClientListRow["latestDeliveryStatus"],
-): "neutral" | "green" | "red" {
+function deliveryTone(status: ClientListRow["latestDeliveryStatus"]): "neutral" | "green" | "red" {
   if (status === "complete" || status === "support") return "green";
   if (status === "cancelled") return "red";
   return "neutral";
@@ -56,9 +51,7 @@ export function ClientList({
     return (
       <div className={styles.errorState} role="alert">
         <p>{state.message}</p>
-        <p className={styles.errorCorrelation}>
-          Reference: {state.correlationId}
-        </p>
+        <p className={styles.errorCorrelation}>Reference: {state.correlationId}</p>
       </div>
     );
   }
@@ -76,24 +69,17 @@ export function ClientList({
         <div>
           <h1 className={styles.heading}>Clients</h1>
           <p className={styles.subtitle}>
-            Every business with a won engagement, one row per business, however
-            many opportunities it has closed.
+            Every business with a won engagement, one row per business, however many
+            opportunities it has closed.
           </p>
         </div>
       </div>
 
-      <form
-        action="/growth/clients"
-        className={`${styles.card} ${styles.filtersForm}`}
-      >
+      <form action="/growth/clients" className={`${styles.card} ${styles.filtersForm}`}>
         <div className={styles.filtersRow}>
           <label className={styles.field}>
             <span className={styles.fieldLabel}>Status</span>
-            <select
-              className={styles.select}
-              defaultValue={query.status}
-              name="status"
-            >
+            <select className={styles.select} defaultValue={query.status} name="status">
               {CLIENT_STATUS_FILTER_VALUES.map((value) => (
                 <option key={value} value={value}>
                   {STATUS_LABELS[value]}
@@ -160,18 +146,14 @@ export function ClientList({
                 {data.rows.map((row) => (
                   <tr key={row.businessId}>
                     <td>
-                      <span className={styles.business}>
-                        {row.businessName}
-                      </span>
+                      <span className={styles.business}>{row.businessName}</span>
                       {row.primaryContactName && (
                         <span className={styles.sectorLocation}>
                           {row.primaryContactName}
                         </span>
                       )}
                     </td>
-                    <td className={styles.sectorLocation}>
-                      {row.engagementCount}
-                    </td>
+                    <td className={styles.sectorLocation}>{row.engagementCount}</td>
                     <td>
                       <span
                         className={styles.pill}
@@ -194,11 +176,7 @@ export function ClientList({
                         href={`/growth/clients/${row.businessId}`}
                       >
                         View
-                        <ArrowRight
-                          aria-hidden="true"
-                          size={14}
-                          strokeWidth={2}
-                        />
+                        <ArrowRight aria-hidden="true" size={14} strokeWidth={2} />
                       </Link>
                     </td>
                   </tr>
@@ -239,11 +217,7 @@ export function ClientList({
               <Link
                 aria-disabled={!data.nextCursor}
                 className={styles.paginationLink}
-                href={
-                  data.nextCursor
-                    ? buildClientsHref(query, { after: data.nextCursor })
-                    : "#"
-                }
+                href={data.nextCursor ? buildClientsHref(query, { after: data.nextCursor }) : "#"}
               >
                 Next page
               </Link>

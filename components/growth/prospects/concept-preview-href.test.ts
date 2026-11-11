@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { getConceptPreviewHref } from "./concept-preview-href";
+import {
+  getConceptPreviewHref,
+} from "./concept-preview-href";
 
 test("opens concept previews by slug", () => {
   assert.equal(

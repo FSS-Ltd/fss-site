@@ -206,9 +206,9 @@ export function StaffSigningStatus({
                       ? "Not yet open"
                       : approval.status === "approved"
                         ? "Signature pending"
-                        : approval.status === "expired"
-                          ? "Not signed before deadline"
-                          : "No signature retained"}
+                      : approval.status === "expired"
+                        ? "Not signed before deadline"
+                        : "No signature retained"}
                   </StatusBadge>
                 )}
               </li>

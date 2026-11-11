@@ -20,7 +20,11 @@ export function RequestList({
   organisationId,
 }: RequestCollectionProps): React.JSX.Element {
   if (!requests.length)
-    return <p className={styles.empty}>Nothing in your board yet.</p>;
+    return (
+      <p className={styles.empty}>
+        Nothing in your board yet.
+      </p>
+    );
   return (
     <ul className={styles.list}>
       {requests.map((request) => (
@@ -36,9 +40,7 @@ export function RequestList({
               >
                 {statusLabels[request.status]}
               </span>
-              <span className={styles.note}>
-                {requestTypeLabels[request.type]}
-              </span>
+              <span className={styles.note}>{requestTypeLabels[request.type]}</span>
               {request.blocked && <span className={styles.note}>Blocked</span>}
               <ArrowUpRight
                 className={styles.arrow}

@@ -18,13 +18,11 @@ const { DealActionsFrame } =
 const ENGAGEMENT_ID = "11111111-1111-4111-8111-111111111111";
 const PROSPECT_ID = "22222222-2222-4222-8222-222222222222";
 
-function renderActions(
-  overrides: {
-    stage?: "new" | "qualified" | "proposal" | "negotiation" | "won" | "lost";
-    currentNextAction?: string | null;
-    currentNextActionDueAt?: string | null;
-  } = {},
-): string {
+function renderActions(overrides: {
+  stage?: "new" | "qualified" | "proposal" | "negotiation" | "won" | "lost";
+  currentNextAction?: string | null;
+  currentNextActionDueAt?: string | null;
+} = {}): string {
   return renderToStaticMarkup(
     <DealActionsFrame
       currentNextAction={overrides.currentNextAction ?? null}
@@ -60,14 +58,8 @@ test("pre-fills the next-step field with the current next action", () => {
 });
 
 test("the save button is disabled until both fields are filled", () => {
-  const html = renderActions({
-    currentNextAction: null,
-    currentNextActionDueAt: null,
-  });
-  assert.match(
-    html,
-    /<button[^>]*disabled=""[^>]*>\s*Save next step<\/button>/,
-  );
+  const html = renderActions({ currentNextAction: null, currentNextActionDueAt: null });
+  assert.match(html, /<button[^>]*disabled=""[^>]*>\s*Save next step<\/button>/);
 });
 
 test("the save button is enabled once a next step and due date are pre-filled", () => {

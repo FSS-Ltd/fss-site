@@ -26,8 +26,7 @@ const scenarios = [
     id: "growing",
     label: "Growing",
     focus: "Give a growing business a finance team that keeps pace.",
-    nextMove:
-      "Map the capacity question and the reporting needed to answer it.",
+    nextMove: "Map the capacity question and the reporting needed to answer it.",
     signal: "Capacity in view",
     status: "Planning call",
     tasks: ["Team capacity", "Cash planning", "Growth decisions"],
@@ -41,8 +40,7 @@ export function MdFinanceWorkspace() {
     scenarios[0].id,
   );
   const activeScenario =
-    scenarios.find((scenario) => scenario.id === activeScenarioId) ??
-    scenarios[0];
+    scenarios.find((scenario) => scenario.id === activeScenarioId) ?? scenarios[0];
 
   return (
     <section
@@ -172,10 +170,7 @@ export function MdFinanceWorkspace() {
               </div>
               <ul className="mt-6 space-y-4">
                 {activeScenario.tasks.map((task) => (
-                  <li
-                    className="flex items-center gap-3 text-sm font-semibold"
-                    key={task}
-                  >
+                  <li className="flex items-center gap-3 text-sm font-semibold" key={task}>
                     <Check className="size-4 shrink-0 text-[#d91f2a]" />
                     {task}
                   </li>

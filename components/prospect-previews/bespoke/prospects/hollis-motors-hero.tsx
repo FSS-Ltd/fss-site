@@ -13,34 +13,26 @@ const galleryFrames = [
   "dealership-gallery-04.webp",
 ] as const;
 
-const sellingPoints = [
-  "Used cars",
-  "Part exchange",
-  "Finance",
-  "Onsite workshop",
-] as const;
+const sellingPoints = ["Used cars", "Part exchange", "Finance", "Onsite workshop"] as const;
 
 const copyBeats = [
   {
     eyebrow: "Used cars in Dover",
     isTagline: false,
     message: "Find the right car.",
-    summary:
-      "A considered used-car route from the same team that can look after what comes next.",
+    summary: "A considered used-car route from the same team that can look after what comes next.",
   },
   {
     eyebrow: "Part exchange and finance",
     isTagline: false,
     message: "Move on with a plan.",
-    summary:
-      "Bring your current car, your next car and your finance questions into one clear conversation.",
+    summary: "Bring your current car, your next car and your finance questions into one clear conversation.",
   },
   {
     eyebrow: "Onsite workshop",
     isTagline: false,
     message: "Keep your car in shape.",
-    summary:
-      "MOT, servicing and repairs stay close to the people who helped you choose your car.",
+    summary: "MOT, servicing and repairs stay close to the people who helped you choose your car.",
   },
   {
     eyebrow: "Hollis Motors · Dover",
@@ -95,9 +87,7 @@ export function HollisMotorsHero() {
       return;
     }
 
-    const reducedMotionQuery = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    );
+    const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     let animationFrame: number | undefined;
 
     const syncOpacity = (
@@ -185,22 +175,10 @@ export function HollisMotorsHero() {
         <div aria-hidden="true" data-hollis-gallery-shade="true" />
 
         <header className="hollisHeroChrome">
-          <a
-            aria-label="Hollis Motors concept home"
-            className="hollisBrand"
-            href="#top"
-          >
-            <Image
-              alt="Hollis Motors, established 1965"
-              height={95}
-              src={`${assetBase}/logo.png`}
-              width={120}
-            />
+          <a aria-label="Hollis Motors concept home" className="hollisBrand" href="#top">
+            <Image alt="Hollis Motors, established 1965" height={95} src={`${assetBase}/logo.png`} width={120} />
           </a>
-          <nav
-            aria-label="Hollis Motors concept navigation"
-            className="hollisHeroNavigation"
-          >
+          <nav aria-label="Hollis Motors concept navigation" className="hollisHeroNavigation">
             <a href="#collection">Why Hollis</a>
             <a className="hollisHeaderCta" href="#vehicle">
               Start with your vehicle
@@ -248,10 +226,7 @@ export function HollisMotorsHero() {
           Motors. There’s nowhere better.
         </p>
 
-        <aside
-          aria-label="Hollis Motors selling points"
-          className="hollisProofDock"
-        >
+        <aside aria-label="Hollis Motors selling points" className="hollisProofDock">
           {sellingPoints.map((point, index) => (
             <div key={point}>
               <span>0{index + 1}</span>

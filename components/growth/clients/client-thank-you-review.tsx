@@ -36,9 +36,7 @@ export function ClientThankYouReviewFrame({
   postAction?: (path: string, body: object) => Promise<Response>;
 }) {
   const [mode, setMode] = useState<PreviewMode>("html");
-  const [includeInvite, setIncludeInvite] = useState(
-    review.includedNewsletterInvite,
-  );
+  const [includeInvite, setIncludeInvite] = useState(review.includedNewsletterInvite);
   const [busy, setBusy] = useState<"test" | "send" | null>(null);
   const [feedback, setFeedback] = useState<{
     tone: "success" | "conflict" | "error";
@@ -63,9 +61,9 @@ export function ClientThankYouReviewFrame({
         onSuccess();
         return;
       }
-      const body = (await response.json().catch(() => null)) as {
-        message?: string;
-      } | null;
+      const body = (await response.json().catch(() => null)) as
+        | { message?: string }
+        | null;
       setFeedback({
         tone: "error",
         message: body?.message ?? "The test could not be sent.",
@@ -73,8 +71,7 @@ export function ClientThankYouReviewFrame({
     } catch {
       setFeedback({
         tone: "error",
-        message:
-          "The test could not be sent. Check your connection and try again.",
+        message: "The test could not be sent. Check your connection and try again.",
       });
     } finally {
       setBusy(null);
@@ -106,9 +103,9 @@ export function ClientThankYouReviewFrame({
         });
         return;
       }
-      const responseBody = (await response.json().catch(() => null)) as {
-        message?: string;
-      } | null;
+      const responseBody = (await response.json().catch(() => null)) as
+        | { message?: string }
+        | null;
       setFeedback({
         tone: "error",
         message: responseBody?.message ?? "The message could not be sent.",
@@ -183,9 +180,7 @@ export function ClientThankYouReviewFrame({
       )}
 
       {alreadySent ? (
-        <p className={styles.inlineEmpty}>
-          This message has already been sent.
-        </p>
+        <p className={styles.inlineEmpty}>This message has already been sent.</p>
       ) : (
         <>
           {review.includedNewsletterInvite ? (
@@ -199,17 +194,13 @@ export function ClientThankYouReviewFrame({
             </label>
           ) : (
             <p className={`${styles.inlineEmpty} ${styles.inviteToggle}`}>
-              This client is already subscribed, so the newsletter invitation
-              was not offered.
+              This client is already subscribed, so the newsletter invitation was
+              not offered.
             </p>
           )}
 
           {feedback && (
-            <p
-              className={styles.actionFeedback}
-              data-tone={feedback.tone}
-              role="alert"
-            >
+            <p className={styles.actionFeedback} data-tone={feedback.tone} role="alert">
               {feedback.message}
             </p>
           )}
@@ -221,9 +212,7 @@ export function ClientThankYouReviewFrame({
               onClick={sendTest}
               type="button"
             >
-              {busy === "test"
-                ? "Sending…"
-                : `Send test to ${review.founderEmail}`}
+              {busy === "test" ? "Sending…" : `Send test to ${review.founderEmail}`}
             </button>
             <button
               className={styles.actionButton}
@@ -248,9 +237,6 @@ export function ClientThankYouReview({
 }) {
   const router = useRouter();
   return (
-    <ClientThankYouReviewFrame
-      onSuccess={() => router.refresh()}
-      review={review}
-    />
+    <ClientThankYouReviewFrame onSuccess={() => router.refresh()} review={review} />
   );
 }

@@ -1,7 +1,4 @@
-import {
-  formatGrowthDateTime,
-  formatGrowthStatusLabel,
-} from "@/lib/growth/dashboard/formatters";
+import { formatGrowthDateTime, formatGrowthStatusLabel } from "@/lib/growth/dashboard/formatters";
 import type { CommercialHistoryEntry } from "@/lib/growth/dashboard/deals";
 
 import styles from "./deals.module.css";
@@ -12,11 +9,7 @@ export function CommercialHistory({
   history: readonly CommercialHistoryEntry[];
 }) {
   if (history.length === 0) {
-    return (
-      <p className={styles.inlineEmpty}>
-        No commercial decisions recorded yet.
-      </p>
-    );
+    return <p className={styles.inlineEmpty}>No commercial decisions recorded yet.</p>;
   }
 
   return (
@@ -27,9 +20,7 @@ export function CommercialHistory({
             {formatGrowthStatusLabel(entry.fromState)} &rarr;{" "}
             {formatGrowthStatusLabel(entry.toState)}
           </p>
-          <p className={styles.historyMeta}>
-            {formatGrowthDateTime(entry.occurredAt)}
-          </p>
+          <p className={styles.historyMeta}>{formatGrowthDateTime(entry.occurredAt)}</p>
           {entry.reasonCode && (
             <p className={styles.historyReason}>{entry.reasonCode}</p>
           )}

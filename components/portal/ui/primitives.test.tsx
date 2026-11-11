@@ -78,9 +78,7 @@ test("renders named notice actions and a navigable page header", () => {
 
 test("keeps route actions as links while applying the shared button treatment", () => {
   const html = renderToStaticMarkup(
-    <PortalActionLink href="/portal/agreements">
-      Open agreement
-    </PortalActionLink>,
+    <PortalActionLink href="/portal/agreements">Open agreement</PortalActionLink>,
   );
 
   assert.match(html, /<a[^>]*href="\/portal\/agreements"/);

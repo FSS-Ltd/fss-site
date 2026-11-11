@@ -195,3 +195,4 @@ test("an expired signing request offers reopen and withdraw instead of a generic
   assert.match(html, /Withdraw agreement/);
   assert.equal(html.match(/>Withdraw agreement</g)?.length, 2); // trigger + dialog confirm, no duplicate lifecycle button
 });
+

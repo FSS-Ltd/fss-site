@@ -36,20 +36,17 @@ const fields = [
 
 const workflow = [
   {
-    detail:
-      "See the business stage, the immediate decision and the date that matters.",
+    detail: "See the business stage, the immediate decision and the date that matters.",
     number: "01",
     title: "Start with position",
   },
   {
-    detail:
-      "Turn that context into a focused call, not a request for every document.",
+    detail: "Turn that context into a focused call, not a request for every document.",
     number: "02",
     title: "Shape the question",
   },
   {
-    detail:
-      "Request the right records only after the team has agreed the next useful step.",
+    detail: "Request the right records only after the team has agreed the next useful step.",
     number: "03",
     title: "Move with clarity",
   },
@@ -88,8 +85,7 @@ export function MdAccountancyPage() {
                 Marden · Business finance
               </p>
               <h1 className="mt-6 max-w-xl text-5xl font-semibold leading-[.9] tracking-[-.065em] sm:text-7xl">
-                Accountancy should begin with your question, not a list of
-                documents.
+                Accountancy should begin with your question, not a list of documents.
               </h1>
               <p className="mt-7 max-w-lg text-lg leading-8 text-black/62">
                 Bring the decision in front of you. The first conversation can
@@ -100,12 +96,11 @@ export function MdAccountancyPage() {
                 className="mt-10 inline-flex items-center gap-2 rounded-full bg-[#171717] px-5 py-3 text-sm font-black text-white transition-transform hover:-translate-y-0.5 hover:bg-[#d91f2a] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#d91f2a]"
                 href="#finance-route"
               >
-                Prepare a first conversation{" "}
-                <ArrowDownRight className="size-4" />
+                Prepare a first conversation <ArrowDownRight className="size-4" />
               </a>
               <p className="mt-8 max-w-md border-l-2 border-[#d91f2a] pl-4 text-sm font-semibold leading-6 text-black/58">
-                A more useful first meeting starts with what matters to the
-                person running the business.
+                A more useful first meeting starts with what matters to the person
+                running the business.
               </p>
             </div>
           </div>

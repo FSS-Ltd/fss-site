@@ -123,9 +123,7 @@ export function JaguarWaterJourneyHero() {
       }
 
       const velocityRate =
-        scrollDelta > 0
-          ? Math.min(Math.max((scrollDelta / elapsed) * 0.15, 0.25), 1.5)
-          : 0;
+        scrollDelta > 0 ? Math.min(Math.max((scrollDelta / elapsed) * 0.15, 0.25), 1.5) : 0;
       const catchUpRate = Math.min(Math.max(timeDelta * 2.5, 0.25), 1.5);
 
       video.playbackRate = Math.max(velocityRate, catchUpRate);

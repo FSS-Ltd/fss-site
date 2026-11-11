@@ -44,17 +44,11 @@ export function TestimonialStrip() {
             key={principle.title}
             className={`group rounded-xl border border-border-soft/40 bg-surface-2 p-8 transition-all ${principle.borderHover}`}
           >
-            <p
-              className={`text-[10px] font-bold uppercase tracking-[0.2em] ${principle.eyebrowColor}`}
-            >
+            <p className={`text-[10px] font-bold uppercase tracking-[0.2em] ${principle.eyebrowColor}`}>
               {principle.eyebrow}
             </p>
-            <h3 className="mt-3 text-xl font-bold text-foreground">
-              {principle.title}
-            </h3>
-            <p className="mt-3 text-sm leading-relaxed text-text-muted">
-              {principle.description}
-            </p>
+            <h3 className="mt-3 text-xl font-bold text-foreground">{principle.title}</h3>
+            <p className="mt-3 text-sm leading-relaxed text-text-muted">{principle.description}</p>
           </article>
         ))}
       </div>

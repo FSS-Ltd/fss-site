@@ -47,7 +47,10 @@ test("opens a draft concept preview by slug", () => {
     />,
   );
 
-  assert.match(html, /href="\/preview\/example-heating"/);
+  assert.match(
+    html,
+    /href="\/preview\/example-heating"/,
+  );
   assert.match(html, />View concept preview</);
 });
 
@@ -116,9 +119,7 @@ test("treats a registered bespoke concept as ready for founder approval", () => 
       prospectStatus="ready_for_email_review"
     />,
   );
-  const approveButton = html.match(
-    /<button[^>]*>Approve preview<\/button>/,
-  )?.[0];
+  const approveButton = html.match(/<button[^>]*>Approve preview<\/button>/)?.[0];
 
   assert.ok(approveButton);
   assert.doesNotMatch(approveButton, /disabled=/);
@@ -197,9 +198,7 @@ test("keeps bespoke approval unavailable when the stored slug conflicts", () => 
       prospectStatus="ready_for_email_review"
     />,
   );
-  const approveButton = html.match(
-    /<button[^>]*>Approve preview<\/button>/,
-  )?.[0];
+  const approveButton = html.match(/<button[^>]*>Approve preview<\/button>/)?.[0];
 
   assert.ok(approveButton);
   assert.match(approveButton, /disabled=/);
@@ -225,10 +224,7 @@ test("does not expose generated database-only preview links", () => {
     />,
   );
 
-  assert.doesNotMatch(
-    html,
-    /\/growth\/prospects\/11111111-1111-4111-8111-111111111111\/preview/,
-  );
+  assert.doesNotMatch(html, /\/growth\/prospects\/11111111-1111-4111-8111-111111111111\/preview/);
   assert.doesNotMatch(html, />View concept preview</);
 });
 

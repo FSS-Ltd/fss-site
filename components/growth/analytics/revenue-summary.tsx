@@ -8,8 +8,8 @@ export function RevenueSummary({ values }: { values: AnalyticsValues }) {
     <div className={styles.card}>
       <h2 className={styles.sectionTitle}>Pipeline and delivery value</h2>
       <p className={styles.sectionNote}>
-        Figures are the agreed commercial value the founder closed on, not
-        recognised accounting revenue.
+        Figures are the agreed commercial value the founder closed on, not recognised
+        accounting revenue.
       </p>
 
       <div className={styles.statRow}>
@@ -18,9 +18,7 @@ export function RevenueSummary({ values }: { values: AnalyticsValues }) {
           <p className={styles.statValue}>
             {formatGrowthCurrency(values.openPipelineValuePence)}
           </p>
-          <p className={styles.statMeta}>
-            Forecast as of today, not this month
-          </p>
+          <p className={styles.statMeta}>Forecast as of today, not this month</p>
         </div>
         <div className={styles.statCard}>
           <p className={styles.statLabel}>Agreed won value</p>

@@ -12,24 +12,18 @@ type Feedback = { tone: "error" | "success"; message: string };
 
 async function postAction(
   path: string,
-): Promise<
-  { ok: true; pausedSequenceCount: number } | { ok: false; message?: string }
-> {
+): Promise<{ ok: true; pausedSequenceCount: number } | { ok: false; message?: string }> {
   try {
     const response = await fetch(path, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: "{}",
     });
-    const payload = (await response.json().catch(() => null)) as {
-      message?: string;
-      pausedSequenceCount?: number;
-    } | null;
+    const payload = (await response.json().catch(() => null)) as
+      | { message?: string; pausedSequenceCount?: number }
+      | null;
     if (response.ok) {
-      return {
-        ok: true,
-        pausedSequenceCount: payload?.pausedSequenceCount ?? 0,
-      };
+      return { ok: true, pausedSequenceCount: payload?.pausedSequenceCount ?? 0 };
     }
     return { ok: false, message: payload?.message };
   } catch {
@@ -76,23 +70,13 @@ export function AutomationControlsFrame({
       <ul className={styles.metaList}>
         <li className={styles.metaItem}>
           <span className={styles.metaLabel}>Active sequences</span>
-          <span className={styles.metaValue}>
-            {automation.activeSequenceCount}
-          </span>
+          <span className={styles.metaValue}>{automation.activeSequenceCount}</span>
         </li>
       </ul>
 
-      <div
-        aria-label="Automation controls"
-        className={styles.actionsBar}
-        role="group"
-      >
+      <div aria-label="Automation controls" className={styles.actionsBar} role="group">
         {feedback && (
-          <p
-            className={styles.actionFeedback}
-            data-tone={feedback.tone}
-            role="alert"
-          >
+          <p className={styles.actionFeedback} data-tone={feedback.tone} role="alert">
             {feedback.message}
           </p>
         )}
@@ -112,12 +96,13 @@ export function AutomationControlsFrame({
         <div>
           <strong>What this does and does not do</strong>
           <p>
-            This pauses every currently active outreach sequence in the database
-            — the same effect as pausing one from Outreach, applied to all of
-            them at once. It does not disable the scheduled cron jobs below;
-            those are controlled by the GROWTH_OS_AUTOMATIONS_ENABLED Vercel
-            environment variable. To fully stop new automated work, an operator
-            must also disable that flag in the Vercel project settings.
+            This pauses every currently active outreach sequence in the
+            database — the same effect as pausing one from Outreach, applied
+            to all of them at once. It does not disable the scheduled cron
+            jobs below; those are controlled by the
+            GROWTH_OS_AUTOMATIONS_ENABLED Vercel environment variable. To
+            fully stop new automated work, an operator must also disable
+            that flag in the Vercel project settings.
           </p>
         </div>
       </div>
@@ -125,11 +110,7 @@ export function AutomationControlsFrame({
   );
 }
 
-export function AutomationControls({
-  automation,
-}: {
-  automation: AutomationSummary;
-}) {
+export function AutomationControls({ automation }: { automation: AutomationSummary }) {
   const router = useRouter();
   return (
     <AutomationControlsFrame
