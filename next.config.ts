@@ -67,6 +67,8 @@ const nextConfig: NextConfig = {
     "/api/portal/admin/clients/**/journey": emailRuntimeTraceFiles,
     "/api/growth/operations/clients/**/journey": emailRuntimeTraceFiles,
     "/api/cron/operations-dispatch": emailRuntimeTraceFiles,
+    // Bundled so the blog API can check primaryKeyword; harmless if the file is absent.
+    "/api/blog": ["./docs/seo/keyword-bank.md"],
   },
   turbopack: {
     root: projectRoot,

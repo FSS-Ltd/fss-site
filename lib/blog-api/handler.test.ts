@@ -198,3 +198,16 @@ test("GET lists the public fields with a shared cache header", async () => {
     ],
   });
 });
+
+test("at capacity the limiter evicts expired then oldest entries, not everyone", () => {
+  let now = 0;
+  const allow = createWriteLimiter(1, 1000, () => now, 2);
+  assert.equal(allow("a"), true);
+  now = 10;
+  assert.equal(allow("b"), true);
+  assert.equal(allow("b"), false); // b is at its limit
+  now = 20;
+  assert.equal(allow("c"), true); // evicts oldest (a); b must keep its count
+  assert.equal(allow("b"), false);
+  assert.equal(allow("a"), true); // a was evicted, so it starts fresh
+});

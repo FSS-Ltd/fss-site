@@ -17,7 +17,7 @@ by `lib/blog.ts`. If a file and a row share a slug, the file wins.
 
 `GET /api/blog` is public and returns published posts (files and database rows):
 `{ ok, posts: [{ slug, title, excerpt, category, tags, publishDate, url }] }`.
-Cached at the CDN for 5 minutes.
+Memoised in the server for 5 minutes and cached at the CDN for 5 minutes; query strings do not bypass the memo, so they cause no extra database work. A write resets the memo.
 
 `POST /api/blog` creates or updates a post by `slug`. Header
 `Authorization: Bearer <BLOG_API_TOKEN>`, JSON body:
@@ -30,7 +30,7 @@ Cached at the CDN for 5 minutes.
 | `tags` | at least one |
 | `coverImage` | a path under `/public`, e.g. `/images/covers/x.svg` |
 | `bodyMarkdown` | plain Markdown, max 60,000 characters |
-| `primaryKeyword` | required; must be in the keyword bank when `docs/seo/keyword-bank.md` is present |
+| `primaryKeyword` | required; must be in the keyword bank when `docs/seo/keyword-bank.md` is present (the file is bundled with the route through `outputFileTracingIncludes`; if it is absent the check fails open and only a non-empty keyword is required) |
 | `status` | `draft` (default) or `published`; drafts are never public |
 | optional | `modifiedDate`, `featured`, `indexable`, `authorUrl`, `reviewedBy`, `reviewedDate`, `audience`, `summary`, `sources` (http/https URLs only) |
 
@@ -39,9 +39,7 @@ Responses: `201` created, `200` updated, `400 invalid_json|invalid_body`,
 `429 rate_limited`, `503 api_disabled|storage_unavailable`. Errors are
 `{ ok: false, code, ... }`; no stack traces.
 
-Bodies containing `import`/`export` lines, raw HTML or JSX tags, `<script`, or
-`{expression}` blocks are refused with 422 (code fences and inline code are
-exempt). Rows are also rendered as plain Markdown, so nothing in them is evaluated.
+Bodies containing `import`/`export` lines, any raw HTML or JSX tag, `<script`, `{expression}` blocks, or link/image destinations other than http, https, mailto or a single-slash path are refused with 422 (line-start code fences and inline code are exempt; an unclosed fence hides nothing). Rows are also rendered as plain Markdown, so nothing in them is evaluated.
 
 ```sh
 curl -X POST https://www.faithfulsoftware.dev/api/blog \
@@ -54,9 +52,9 @@ A write revalidates `/blog`, `/blog/<slug>`, `/sitemap.xml` and `/feed.xml`.
 
 ## Limits
 
-- The write rate limit is 20 per minute per client IP, held in memory per
-  serverless instance. It slows token guessing; the token's length is the real defence.
-- The database being unreachable never breaks the blog. Pages fall back to MDX
+- The write rate limit is 20 per minute per client IP (first `x-forwarded-for` hop, which Vercel sets), held in memory per
+  serverless instance, evicting expired then oldest entries at 1000 clients. It slows token guessing; the token's length is the real defence.
+- The row query has a 2.5 s timeout. The database being unreachable or slow never breaks the blog. Pages fall back to MDX
   posts and log `Blog rows unavailable`. Writes return 503.
 - No delete endpoint. To retire a row, POST it again with `status: "draft"`.
 

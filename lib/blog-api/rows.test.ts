@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { loadRowsSafely, mergeBySlug } from "./rows";
+import { createTtlMemo, loadRowsSafely, mergeBySlug } from "./rows";
 import { createBlogStore, rowToPost } from "./store";
 import type { BlogPostInput } from "./post-schema";
 import type { GrowthQueryExecutor } from "@/lib/growth/db/types";
@@ -25,6 +25,7 @@ test("a database failure degrades to no rows and reports once without throwing",
     async () => {
       throw new TypeError("connect ECONNREFUSED postgres://user:secret@host");
     },
+    1000,
     (name) => reports.push(name),
   );
   assert.deepEqual(rows, []);
@@ -112,4 +113,35 @@ test("a corrupt evidence column is ignored rather than breaking the post", () =>
     featured: false, indexable: true, evidence: { authorUrl: 42 },
   });
   assert.equal(post.meta.authorUrl, undefined);
+});
+
+test("a query slower than the timeout degrades to no rows and reports once", async () => {
+  const reports: string[] = [];
+  const rows = await loadRowsSafely(
+    () => new Promise(() => {}),
+    20,
+    (name) => reports.push(name),
+  );
+  assert.deepEqual(rows, []);
+  assert.deepEqual(reports, ["Error"]);
+});
+
+test("the TTL memo loads once per window, reloads after expiry or reset, and drops failures", async () => {
+  let now = 0;
+  let loads = 0;
+  const memo = createTtlMemo(async () => ++loads, 300, () => now);
+  assert.deepEqual([await memo.get(), await memo.get()], [1, 1]);
+  now = 300;
+  assert.equal(await memo.get(), 2);
+  memo.reset();
+  assert.equal(await memo.get(), 3);
+
+  let fail = true;
+  const flaky = createTtlMemo(async () => {
+    if (fail) throw new Error("x");
+    return "ok";
+  }, 300, () => now);
+  await assert.rejects(flaky.get());
+  fail = false;
+  assert.equal(await flaky.get(), "ok");
 });

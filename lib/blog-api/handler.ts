@@ -49,13 +49,23 @@ export function createWriteLimiter(
   limit: number,
   windowMs: number,
   now: () => number = Date.now,
+  maxKeys = 1000,
 ): (key: string) => boolean {
   const windows = new Map<string, { start: number; count: number }>();
   return (key) => {
     const at = now();
     const current = windows.get(key);
     if (!current || at - current.start >= windowMs) {
-      if (windows.size > 1000) windows.clear();
+      windows.delete(key);
+      if (windows.size >= maxKeys) {
+        // Drop expired windows first, then the oldest; never reset everyone.
+        for (const [other, w] of windows) {
+          if (at - w.start >= windowMs) windows.delete(other);
+        }
+        while (windows.size >= maxKeys) {
+          windows.delete(windows.keys().next().value as string);
+        }
+      }
       windows.set(key, { start: at, count: 1 });
       return true;
     }

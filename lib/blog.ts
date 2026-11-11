@@ -10,9 +10,13 @@ import { z } from "zod";
 import type { BlogFrontmatter, BlogPost, BlogPostMeta } from "@/lib/types/blog";
 
 import { contentEvidenceSchema, isoDateSchema } from "@/lib/seo/content";
+import { SLUG_PATTERN } from "@/lib/blog-api/slug";
 import { loadRowsSafely, mergeBySlug } from "@/lib/blog-api/rows";
 import { createBlogStore } from "@/lib/blog-api/store";
 import { getGrowthDb } from "@/lib/growth/db/client";
+
+// A slow database must never stall the blog, sitemap or feed.
+const ROW_QUERY_TIMEOUT_MS = 2500;
 
 const BLOG_CONTENT_DIR = path.join(process.cwd(), "content", "blog");
 
@@ -90,6 +94,7 @@ const getPublishedRows = cache(async (): Promise<BlogPost[]> => {
   if (!process.env.DATABASE_URL) return [];
   return loadRowsSafely(
     () => createBlogStore(getGrowthDb()).listPublished(),
+    ROW_QUERY_TIMEOUT_MS,
     (errorName) =>
       console.error("Blog rows unavailable; serving MDX posts only.", {
         errorName,
@@ -129,14 +134,27 @@ export async function getFeaturedBlogPosts(): Promise<BlogPostMeta[]> {
   return posts.filter((post) => post.featured);
 }
 
-export async function getBlogPostBySlug(
+export async function getBlogPostBySlugWith(
   slug: string,
+  getRows: () => Promise<BlogPost[]>,
+  contentDir: string = BLOG_CONTENT_DIR,
 ): Promise<BlogPost | null> {
   if (slug === churchArticle.meta.slug) return churchArticle;
-  const sourcePath = path.join(BLOG_CONTENT_DIR, `${slug}.mdx`);
+  // Nothing outside the strict slug shape may reach path.join.
+  if (!SLUG_PATTERN.test(slug) || slug.length > 100) return null;
+
+  let source: string;
+  try {
+    source = await fs.readFile(path.join(contentDir, `${slug}.mdx`), "utf8");
+  } catch (error) {
+    // Only a missing file may fall through to a database row; an unreadable
+    // file must not be shadowed by one.
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") return null;
+    const row = (await getRows()).find((post) => post.meta.slug === slug);
+    return row && isPublished(row.meta.publishDate) ? row : null;
+  }
 
   try {
-    const source = await fs.readFile(sourcePath, "utf8");
     const { data, content } = matter(source);
     const frontmatter = parseFrontmatter(data);
     if (!isPublished(frontmatter.publishDate)) {
@@ -148,11 +166,14 @@ export async function getBlogPostBySlug(
       body: content,
     };
   } catch {
-    const row = (await getPublishedRows()).find(
-      (post) => post.meta.slug === slug,
-    );
-    return row && isPublished(row.meta.publishDate) ? row : null;
+    return null;
   }
+}
+
+export async function getBlogPostBySlug(
+  slug: string,
+): Promise<BlogPost | null> {
+  return getBlogPostBySlugWith(slug, getPublishedRows);
 }
 
 export async function getRelatedPosts(
