@@ -8,10 +8,31 @@ import { buildRobots } from "./robots";
 import { buildRssFeed } from "./rss";
 
 test("public crawlers can read pages and noindex directives; preview deployments remain blocked", () => {
-  assert.deepEqual(buildRobots(true), {
-    rules: { userAgent: "*", allow: "/", disallow: "/api/" },
-    sitemap: "https://faithfulsoftware.dev/sitemap.xml",
+  const production = buildRobots(true);
+  assert.equal(production.sitemap, "https://faithfulsoftware.dev/sitemap.xml");
+  assert.ok(Array.isArray(production.rules));
+  const [wildcard, ...aiGroups] = production.rules;
+  assert.deepEqual(wildcard, {
+    userAgent: "*",
+    allow: "/",
+    disallow: "/api/",
   });
+  assert.deepEqual(
+    aiGroups.map((rule) => rule.userAgent),
+    [
+      "GPTBot",
+      "OAI-SearchBot",
+      "ChatGPT-User",
+      "ClaudeBot",
+      "Claude-SearchBot",
+      "PerplexityBot",
+      "Google-Extended",
+    ],
+  );
+  for (const rule of aiGroups) {
+    assert.equal(rule.allow, wildcard.allow);
+    assert.equal(rule.disallow, wildcard.disallow);
+  }
   assert.deepEqual(buildRobots(false), {
     rules: { userAgent: "*", disallow: "/" },
   });
@@ -29,11 +50,11 @@ test("sitemap includes public pages with source dates and excludes non-indexable
   );
   assert.equal(
     entries.find((entry) => entry.url.endsWith("/blog"))?.lastModified,
-    "2026-09-05",
+    "2026-11-11",
   );
   assert.equal(
     entries.find((entry) => entry.url.endsWith("/resources"))?.lastModified,
-    "2026-09-05",
+    "2026-11-11",
   );
   assert.equal(
     entries.some((entry) =>

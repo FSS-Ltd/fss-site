@@ -21,4 +21,6 @@ export type BlogPostMeta = BlogFrontmatter & {
 export type BlogPost = {
   meta: BlogPostMeta;
   body: string;
+  /** "markdown" bodies (API-published rows) are rendered without MDX/JSX. */
+  format?: "markdown";
 };

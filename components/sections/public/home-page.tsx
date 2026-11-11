@@ -26,12 +26,13 @@ export function HomePage() {
               Faithful Software Solutions · UK studio
             </p>
             <h1 id="home-title" className={homeStyles.title}>
-              Custom software for the work your <em>mission</em> depends on.
+              AI and custom software for the work your <em>business</em> depends
+              on.
             </h1>
             <p className={homeStyles.description}>
-              We build custom software for UK charities and faith organisations:
-              portals, operational systems and workflow automation shaped around
-              your people.
+              We add AI to the systems you already use, automate repeated work
+              and build custom software for businesses of any size, from
+              owner-led firms to large teams.
             </p>
             <div className={homeStyles.actions}>
               <ContactLink />
@@ -41,9 +42,9 @@ export function HomePage() {
             </div>
             <p className={homeStyles.audience}>
               <span>BUILT FOR</span>
-              <span>Charities</span>
-              <span>Faith organisations</span>
-              <span>Schools</span>
+              <span>Small businesses</span>
+              <span>Growing teams</span>
+              <span>Large organisations</span>
             </p>
           </div>
           <div
@@ -68,7 +69,7 @@ export function HomePage() {
                   width={709}
                   height={316}
                 />
-                <span>For Your Mission</span>
+                <span>For Your Business</span>
               </div>
             </div>
           </div>
@@ -91,12 +92,14 @@ export function HomePage() {
               data-motion-reveal="left"
             >
               <div className={homeStyles.serviceNumber}>01</div>
-              <h3>Custom platforms and portals</h3>
+              <h3>AI integration and agents</h3>
               <p>
-                Connect teams, members and services with operational software,
-                dashboards and access shaped around each person’s role.
+                Add AI to the tools your team already uses, with approval steps,
+                logs and a clear route for anything it cannot handle.
               </p>
-              <Link href="/services/portal-development">Explore portals</Link>
+              <Link href="/services/ai-integration">
+                Explore AI integration
+              </Link>
             </article>
             <article
               className={homeStyles.serviceCard}
@@ -105,9 +108,8 @@ export function HomePage() {
               <div className={homeStyles.serviceNumber}>02</div>
               <h3>Workflows and integrations</h3>
               <p>
-                Reduce repeated data entry and connect the tools your
-                organisation already relies on, with clear review and exception
-                handling.
+                Reduce repeated data entry and connect the tools your business
+                already relies on, with clear review and exception handling.
               </p>
               <Link href="/services/workflow-automation">
                 Explore automation
@@ -141,10 +143,10 @@ export function HomePage() {
         data-motion-wipe
       >
         <p>LET’S BUILD</p>
-        <h2 id="home-closing">Start with the operational problem.</h2>
+        <h2 id="home-closing">Start with the problem.</h2>
         <p>
-          Tell us what is getting in the way. We will help you decide whether a
-          custom system is the right next step.
+          Tell us what is getting in the way. We will help you decide whether
+          AI, automation or a custom system is the right next step.
         </p>
         <ButtonLink
           href="/contact"

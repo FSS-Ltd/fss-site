@@ -87,21 +87,24 @@ test("public hero variants render the shared particle canvas", () => {
 test("home keeps its audience, proof and FSS visual language in the rendered document", () => {
   const { default: Page, metadata } = require("../../app/(site)/page");
   assert.deepEqual(metadata.title, {
-    absolute: "Custom Software for UK Charities & Faith Organisations | FSS",
+    absolute: "AI Automation and Custom Software for UK Business | FSS",
   });
   const html = renderToStaticMarkup(<Page />);
-  assert.match(html, /UK charities/);
-  assert.match(html, /faith organisations/);
+  assert.match(html, /businesses of any size/);
+  assert.match(html, /Large organisations/);
   assert.match(html, /NexSteps/);
   assert.match(html, /FSS \/ SYSTEMS/);
-  assert.match(html, /Custom platforms and portals/);
+  assert.match(html, /AI integration and agents/);
   assert.ok((html.match(/href="\/contact"/g) ?? []).length >= 1);
   assert.doesNotMatch(html, /href="\/start"/);
 });
 
 test("contact opens on the first enquiry question with accessible progress and choices", () => {
   const { default: Page, metadata } = require("../../app/(site)/contact/page");
-  assert.match(metadata.title.absolute, /Discuss a custom software project/);
+  assert.match(
+    metadata.title.absolute,
+    /Talk to FSS About AI or Custom Software/,
+  );
   const html = renderToStaticMarkup(<Page />);
   assert.match(html, /What would you like to stop doing by hand/);
   assert.match(html, /Step 1 of 5/);
@@ -116,7 +119,7 @@ test("the opening mission scene contains five outcome-led phrases, not a title-o
   const { HomeValueStory } = require("./public/home-story");
   const html = renderToStaticMarkup(<HomeValueStory />);
   assert.equal((html.match(/data-story-chapter=/g) ?? []).length, 5);
-  assert.match(html, /Built around your mission/);
+  assert.match(html, /Built around your business/);
   assert.match(html, /Less admin. More time for people/);
   assert.match(html, /More confident decisions/);
   assert.match(html, /data-value-particles/);
@@ -141,7 +144,7 @@ test("home carries the hero mission branding and a dedicated delivery scene", ()
   const { HomePage } = require("./public/home-page");
   const html = renderToStaticMarkup(<HomePage />);
   assert.match(html, /fss-monogram-white/);
-  assert.match(html, /For Your Mission/);
+  assert.match(html, /For Your Business/);
   assert.match(html, /data-motion-delivery="cinematic"/);
   assert.equal((html.match(/data-delivery-step=/g) ?? []).length, 3);
 });

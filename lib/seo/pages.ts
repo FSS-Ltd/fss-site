@@ -8,10 +8,10 @@ export const publicPages = {
   ...commercialPages,
   "/": {
     path: "/",
-    title: "Custom Software for UK Charities & Faith Organisations | FSS",
+    title: "AI Automation and Custom Software for UK Business | FSS",
     description:
-      "Custom software, portals and workflow automation for UK charities and faith organisations. Explore FSS-built NexSteps and discuss your operational software project.",
-    modifiedDate: "2026-09-04",
+      "FSS integrates AI, automates workflows and builds custom software for businesses of any size. See our operational software in NexSteps and discuss a project.",
+    modifiedDate: "2026-11-11",
     index: true,
   },
   "/about": {
@@ -32,19 +32,18 @@ export const publicPages = {
   },
   "/blog": {
     path: "/blog",
-    title:
-      "Software Development Insights for UK Businesses, Charities and Schools",
+    title: "AI and Software Insights for UK Businesses | FSS",
     description:
-      "Practical articles on bespoke software strategy, portal development, workflow automation and digital modernisation for UK charities, schools and SMEs.",
-    modifiedDate: "2026-09-05",
+      "Practical articles on AI integration, workflow automation, private AI and custom software for UK businesses of any size, from owner-led firms to large teams.",
+    modifiedDate: "2026-11-11",
     index: true,
   },
   "/contact": {
     path: "/contact",
-    title: "Discuss a custom software project | FSS",
+    title: "Talk to FSS About AI or Custom Software",
     description:
-      "Discuss a custom software project with Faithful Software Solutions. Share your organisation’s needs and we will reply about scope and next steps.",
-    modifiedDate: "2026-09-04",
+      "Tell FSS what your team repeats by hand or what you want AI to do. Share your project and we will reply about scope, approvals, data handling and next steps.",
+    modifiedDate: "2026-11-11",
     index: true,
   },
   "/privacy": {
@@ -56,29 +55,26 @@ export const publicPages = {
   },
   "/resources": {
     path: "/resources",
-    title:
-      "Free Software Strategy Guides for UK Charities, Schools and Businesses",
+    title: "Free AI and Software Planning Guides | FSS",
     description:
-      "Download free practical guides on custom software planning, portal development and digital modernisation. Built for UK charity leaders, school administrators and business owners.",
-    modifiedDate: "2026-09-05",
+      "Download free guides on AI readiness, workflow automation, AI receptionists and custom software planning. Written for business owners and operations leads.",
+    modifiedDate: "2026-11-11",
     index: true,
   },
   "/services": {
     path: "/services",
-    title:
-      "Bespoke Software Development UK | Portals, Dashboards & Workflow Automation",
+    title: "AI, Automation and Custom Software Services | FSS",
     description:
-      "Custom software development services for UK businesses, charities and schools. We build bespoke ERP systems, client portals, operational dashboards, workflow automation and legacy system migrations.",
-    modifiedDate: "2026-09-04",
+      "AI integration, AI agents, AI receptionists, readiness audits, workflow automation, private AI and custom software for UK businesses of any size, from FSS.",
+    modifiedDate: "2026-11-11",
     index: true,
   },
   "/start": {
     path: "/start",
-    title:
-      "Business Idea Review | Should You Build an App, a Website, or an Audience First?",
+    title: "Business Idea Review: App, Website or Audience? | FSS",
     description:
-      "Describe your business idea and goals. We'll review your answers and tell you whether the right first move is a website, an app, or building an audience before you build anything.",
-    modifiedDate: "2026-08-17",
+      "Describe your business idea and goals. FSS reviews your answers and tells you whether the right first move is a website, an app, AI or building an audience.",
+    modifiedDate: "2026-11-11",
     index: true,
   },
 } satisfies Record<string, PublicPage>;
