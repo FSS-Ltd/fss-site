@@ -73,6 +73,11 @@ Sonnet code and security review of #330 is running.
   existed). `editorial-blog-layout` still one unpushed commit.
 - Started: Opus agent building PR F in `public-motion-polish`; Sonnet code
   and security review of #330 (read-only). Results not yet recorded here.
+- Correction 20:30 GMT: another agent from an earlier dispatch is already
+  editing `public-motion-polish` (about 10 files, uncommitted, still
+  growing). My Opus agent stopped without changes to avoid a clash. Do not
+  start a second PR F agent. Check `git status` there; if it goes quiet with
+  no PR, review its diff and continue it.
 - Next: fix review findings on #330 after PR F merges (#330 and PR D need
   PR F for the 8/10 critic score), then PR D, then docs PR.
 
