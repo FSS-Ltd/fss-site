@@ -8,6 +8,17 @@ type ArticleSchemaProps = {
   post: BlogPostMeta;
 };
 
+const organisationNode = {
+  "@type": "Organization",
+  "@id": organisationId,
+  name: organisation.name,
+  url: organisation.url,
+};
+const organisationLogo = {
+  "@type": "ImageObject",
+  url: `${organisation.url}/FSS.png`,
+};
+
 export function ArticleSchema({ post }: ArticleSchemaProps) {
   const articleUrl = `${organisation.url}/blog/${post.slug}`;
   const articleSchema = {
@@ -21,8 +32,15 @@ export function ArticleSchema({ post }: ArticleSchemaProps) {
       post.modifiedDate > post.publishDate
         ? post.modifiedDate
         : post.publishDate,
-    author: { "@id": organisationId },
-    publisher: { "@id": organisationId },
+    author:
+      !post.author || post.author === organisation.name
+        ? organisationNode
+        : {
+            "@type": "Person",
+            name: post.author,
+            ...(post.authorUrl ? { url: post.authorUrl } : {}),
+          },
+    publisher: { ...organisationNode, logo: organisationLogo },
     isPartOf: { "@id": websiteId },
     inLanguage: "en-GB",
     mainEntityOfPage: {

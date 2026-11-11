@@ -21,9 +21,29 @@ test("article evidence is visible and organisational authorship is represented a
   assert.match(html, /Sources and evidence/);
   assert.doesNotMatch(html, /Reviewed by/);
   const schema = renderToStaticMarkup(<ArticleSchema post={post.meta} />);
-  const org = '{"@id":"https://faithfulsoftware.dev/#organization"}';
-  assert.ok(schema.includes(`"author":${org}`));
-  assert.ok(schema.includes(`"publisher":${org}`));
+  const org =
+    '{"@type":"Organization","@id":"https://faithfulsoftware.dev/#organization","name":"Faithful Software Solutions","url":"https://faithfulsoftware.dev"';
+  assert.ok(
+    schema.includes(
+      `"publisher":${org},"logo":{"@type":"ImageObject","url":"https://faithfulsoftware.dev/FSS.png"}}`,
+    ),
+  );
+  // A named byline stays a Person so the markup matches the visible author.
+  assert.ok(
+    schema.includes(
+      `"author":{"@type":"Person","name":"${post.meta.author}"${post.meta.authorUrl ? `,"url":"${post.meta.authorUrl}"` : ""}}`,
+    ),
+  );
+  const orgAuthored = renderToStaticMarkup(
+    <ArticleSchema
+      post={{ ...post.meta, author: "Faithful Software Solutions" }}
+    />,
+  );
+  assert.ok(orgAuthored.includes(`"author":${org}}`));
+  const noAuthor = renderToStaticMarkup(
+    <ArticleSchema post={{ ...post.meta, author: "" }} />,
+  );
+  assert.ok(noAuthor.includes(`"author":${org}}`));
   assert.ok(
     schema.includes(
       `"@id":"https://faithfulsoftware.dev/blog/${post.meta.slug}#article"`,

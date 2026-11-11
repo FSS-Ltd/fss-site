@@ -9,12 +9,9 @@ export const organisation = {
   founder: { name: "Jean-Fidele Ntagengwa" },
   companiesHouse:
     "https://find-and-update.company-information.service.gov.uk/company/16682725",
-  // Registered office as published in /privacy.
-  address: {
-    streetAddress: "51 Hurst Road, Kennington",
-    addressLocality: "Ashford",
-    postalCode: "TN24 9RS",
-    addressCountry: "GB",
-  },
+  summary:
+    "UK studio building AI integration, automation and custom software for businesses of any size.",
+  // Town and country only; the street address stays out of structured data.
+  address: { addressLocality: "Ashford", addressCountry: "GB" },
   areaServed: "United Kingdom",
 } as const;

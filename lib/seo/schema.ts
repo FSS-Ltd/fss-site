@@ -14,7 +14,7 @@ export function buildPageSchema(
   path: string,
   name: string,
   description: string,
-) {
+): SchemaNode {
   return {
     "@context": "https://schema.org",
     "@type": type,
@@ -41,8 +41,7 @@ export function buildRootSchema(): {
         "@id": organisationId,
         name: organisation.name,
         legalName: organisation.legalName,
-        description:
-          "UK studio building AI integration, automation and custom software for businesses of any size.",
+        description: organisation.summary,
         identifier: organisation.companyNumber,
         url: organisation.url,
         email: organisation.email,

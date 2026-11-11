@@ -8,6 +8,7 @@ import {
   socialImage,
 } from "./metadata";
 import { isoDateSchema } from "./content";
+import { organisation as organisationInfo } from "./organisation";
 import { buildPageSchema, buildRootSchema } from "./schema";
 
 test("canonical URLs discard query fragments and trailing slashes without accepting another origin", () => {
@@ -103,11 +104,10 @@ test("root graph connects organisation, website and evidenced founder without a 
   });
   assert.deepEqual(organisation.address, {
     "@type": "PostalAddress",
-    streetAddress: "51 Hurst Road, Kennington",
     addressLocality: "Ashford",
-    postalCode: "TN24 9RS",
     addressCountry: "GB",
   });
+  assert.equal(organisation.description, organisationInfo.summary);
   assert.deepEqual(organisation.sameAs, [
     "https://www.linkedin.com/company/faithful-software-solutions-ltd",
     "https://find-and-update.company-information.service.gov.uk/company/16682725",

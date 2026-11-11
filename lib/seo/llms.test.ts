@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { buildLlmsTxt } from "./llms";
+import { buildLlmsTxt, llmsTxtResponse } from "./llms";
 import type { BlogPostMeta } from "@/lib/types/blog";
 import type { ResourceMeta } from "@/lib/types/resource";
 
@@ -66,7 +66,7 @@ test("llms.txt lists indexable pages, posts and resources under sections with ab
     "Guides and case studies",
     "Articles",
     "Resources",
-    "Company",
+    "Pages",
   ]);
   assert.ok(
     text.includes(
@@ -91,6 +91,45 @@ test("llms.txt lists indexable pages, posts and resources under sections with ab
   assert.ok(
     text.includes("- [Home](https://faithfulsoftware.dev): Home page."),
   );
+});
+
+test("llms.txt collapses whitespace and omits empty sections", () => {
+  const text = buildLlmsTxt(
+    {
+      "/": {
+        path: "/",
+        title: "Home\n  page",
+        description: "Line one.\n\nLine   two.",
+        index: true,
+      },
+    },
+    [],
+    [],
+  );
+  assert.ok(
+    text.includes(
+      "- [Home page](https://faithfulsoftware.dev): Line one. Line two.",
+    ),
+  );
+  assert.deepEqual(
+    [...text.matchAll(/^## (.+)$/gm)].map((m) => m[1]),
+    ["Pages"],
+  );
+});
+
+test("llms.txt response is 404 on preview deployments and nosniff plain text in production", async () => {
+  let built = false;
+  const preview = llmsTxtResponse(false, () => {
+    built = true;
+    return "x";
+  });
+  assert.equal(preview.status, 404);
+  assert.equal(built, false);
+  const live = llmsTxtResponse(true, () => "# Body\n");
+  assert.equal(live.status, 200);
+  assert.equal(live.headers.get("Content-Type"), "text/plain; charset=utf-8");
+  assert.equal(live.headers.get("X-Content-Type-Options"), "nosniff");
+  assert.equal(await live.text(), "# Body\n");
 });
 
 test("llms.txt omits non-indexable entries and duplicates", () => {
