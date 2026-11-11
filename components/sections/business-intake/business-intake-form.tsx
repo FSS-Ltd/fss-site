@@ -8,6 +8,7 @@ import type { Path } from "react-hook-form";
 import { useForm, useWatch } from "react-hook-form";
 
 import { FormField } from "@/components/forms/form-field";
+import { StepProgress } from "@/components/forms/step-progress";
 import { TextareaField } from "@/components/forms/textarea-field";
 import { Button } from "@/components/ui/button";
 import {
@@ -124,7 +125,6 @@ export function BusinessIntakeForm() {
   const step = intakeSteps[stepIndex];
   const isFirstStep = stepIndex === 0;
   const isLastStep = stepIndex === intakeSteps.length - 1;
-  const progressPercent = Math.round(((stepIndex + 1) / intakeSteps.length) * 100);
 
   const goNext = async () => {
     const fieldIds = step.fields.map((field) => field.id as Path<IntakeSubmissionValues>);
@@ -193,10 +193,11 @@ export function BusinessIntakeForm() {
         </p>
       </div>
 
-      <div className="mt-5 h-1.5 w-full overflow-hidden rounded-full bg-[#eef0f2]">
-        <div
-          className="h-full rounded-full bg-brand-accent transition-all duration-300"
-          style={{ width: `${progressPercent}%` }}
+      <div className="mt-5">
+        <StepProgress
+          current={stepIndex + 1}
+          total={intakeSteps.length}
+          label="Business idea intake progress"
         />
       </div>
 

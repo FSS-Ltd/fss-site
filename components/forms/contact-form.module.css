@@ -19,8 +19,7 @@
   display: grid;
   gap: 8px;
 }
-.field label,
-.choices legend {
+.field label {
   font-weight: 600;
 }
 .input {
@@ -36,35 +35,6 @@
 .input[aria-invalid="true"] {
   border-color: #9b2020;
 }
-.choices {
-  border: 0;
-  padding: 0;
-  min-width: 0;
-}
-.choices legend {
-  margin-bottom: 10px;
-}
-.choiceList {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-.choice {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 48px;
-  padding: 10px 14px;
-  background: white;
-  border: 1px solid var(--border-strong);
-  border-radius: 10px;
-  cursor: pointer;
-}
-.choice:has(input:checked) {
-  border-color: var(--foreground);
-  background: #f6e9e4;
-}
-.choice input,
 .consent input {
   width: 18px;
   height: 18px;
@@ -84,6 +54,7 @@
   margin: 0 !important;
 }
 .hint {
+  color: color-mix(in srgb, var(--foreground) 82%, white);
   font-size: 0.9rem;
   margin: 0 !important;
 }
@@ -98,6 +69,108 @@
   border: 1px solid #0f7078;
   border-radius: 18px;
   background: #e5f1f2;
+}
+.progress {
+  display: grid;
+  gap: 10px;
+}
+.stepLabel {
+  margin: 0 !important;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--foreground);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.stepBody {
+  display: grid;
+  gap: 22px;
+  animation: stepIn 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.question {
+  margin: 0;
+  font-size: clamp(1.4rem, 4.6vw, 1.9rem);
+  line-height: 1.2;
+  outline: none;
+}
+.chips {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.chip {
+  min-height: 48px;
+  padding: 10px 18px;
+  background: white;
+  color: var(--foreground);
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition:
+    border-color 160ms,
+    background-color 160ms;
+}
+.chip:hover {
+  border-color: var(--foreground);
+}
+.chip[aria-pressed="true"] {
+  border-color: var(--foreground);
+  background: var(--foreground);
+  color: white;
+  font-weight: 600;
+}
+.chip[aria-pressed="true"]::before {
+  content: "\2713";
+  margin-right: 8px;
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .chip {
+    transition:
+      border-color 160ms,
+      background-color 160ms,
+      transform 160ms;
+  }
+  .chip:hover {
+    transform: translateY(-2px);
+  }
+}
+.chip:focus-visible,
+.back:focus-visible {
+  outline: 2px solid var(--foreground);
+  outline-offset: 2px;
+}
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.back {
+  min-height: 48px;
+  padding: 0 4px;
+  background: none;
+  border: 0;
+  color: var(--foreground);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+@keyframes stepIn {
+  from {
+    opacity: 0;
+    transform: translateX(14px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stepBody {
+    animation: none;
+  }
+  .chip {
+    transition: none;
+  }
 }
 @media (max-width: 540px) {
   .row {
