@@ -8,7 +8,7 @@ import {
   socialImage,
 } from "./metadata";
 import { isoDateSchema } from "./content";
-import { buildRootSchema } from "./schema";
+import { buildPageSchema, buildRootSchema } from "./schema";
 
 test("canonical URLs discard query fragments and trailing slashes without accepting another origin", () => {
   assert.equal(
@@ -80,7 +80,9 @@ test("ISO content dates reject invalid calendar dates and ambiguous formats", ()
 
 test("root graph connects organisation, website and evidenced founder without a search action", () => {
   const graph = buildRootSchema()["@graph"];
-  const organisation = graph.find((node) => node["@type"] === "Organization");
+  const organisation = graph.find(
+    (node) => node["@id"] === "https://faithfulsoftware.dev/#organization",
+  );
   const website = graph.find((node) => node["@type"] === "WebSite");
   assert.ok(organisation && website);
   assert.equal(
@@ -89,10 +91,48 @@ test("root graph connects organisation, website and evidenced founder without a 
   );
   assert.equal(organisation.legalName, "Faithful Software Solutions Ltd");
   assert.equal(organisation.identifier, "16682725");
+  assert.deepEqual(organisation["@type"], [
+    "Organization",
+    "ProfessionalService",
+  ]);
+  assert.equal(typeof organisation.description, "string");
+  assert.ok((organisation.knowsAbout as string[]).includes("private AI"));
+  assert.deepEqual(organisation.logo, {
+    "@type": "ImageObject",
+    url: "https://faithfulsoftware.dev/FSS.png",
+  });
+  assert.deepEqual(organisation.address, {
+    "@type": "PostalAddress",
+    streetAddress: "51 Hurst Road, Kennington",
+    addressLocality: "Ashford",
+    postalCode: "TN24 9RS",
+    addressCountry: "GB",
+  });
   assert.deepEqual(organisation.sameAs, [
     "https://www.linkedin.com/company/faithful-software-solutions-ltd",
+    "https://find-and-update.company-information.service.gov.uk/company/16682725",
   ]);
   assert.deepEqual(website.publisher, { "@id": organisation["@id"] });
   assert.equal(JSON.stringify(graph).includes("SearchAction"), false);
   assert.equal(JSON.stringify(graph).includes("Jean-Fidele Ntagengwa"), true);
+});
+
+test("About and Contact page nodes reference the website and organisation by id", () => {
+  const about = buildPageSchema("AboutPage", "/about", "About", "About us.");
+  assert.equal(about["@type"], "AboutPage");
+  assert.equal(about["@id"], "https://faithfulsoftware.dev/about#webpage");
+  assert.equal(about.url, "https://faithfulsoftware.dev/about");
+  assert.deepEqual(about.isPartOf, {
+    "@id": "https://faithfulsoftware.dev/#website",
+  });
+  assert.deepEqual(about.about, {
+    "@id": "https://faithfulsoftware.dev/#organization",
+  });
+  assert.equal(about.inLanguage, "en-GB");
+  assert.equal(
+    buildPageSchema("ContactPage", "/contact", "Contact", "Get in touch.")[
+      "@type"
+    ],
+    "ContactPage",
+  );
 });

@@ -7,5 +7,14 @@ export const organisation = {
   email: "hello@faithfulsoftware.dev",
   linkedin: "https://www.linkedin.com/company/faithful-software-solutions-ltd",
   founder: { name: "Jean-Fidele Ntagengwa" },
+  companiesHouse:
+    "https://find-and-update.company-information.service.gov.uk/company/16682725",
+  // Registered office as published in /privacy.
+  address: {
+    streetAddress: "51 Hurst Road, Kennington",
+    addressLocality: "Ashford",
+    postalCode: "TN24 9RS",
+    addressCountry: "GB",
+  },
   areaServed: "United Kingdom",
 } as const;

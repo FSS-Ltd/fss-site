@@ -21,7 +21,20 @@ test("article evidence is visible and organisational authorship is represented a
   assert.match(html, /Sources and evidence/);
   assert.doesNotMatch(html, /Reviewed by/);
   const schema = renderToStaticMarkup(<ArticleSchema post={post.meta} />);
-  assert.match(schema, /"author":\{"@type":"Organization"/);
+  const org = '{"@id":"https://faithfulsoftware.dev/#organization"}';
+  assert.ok(schema.includes(`"author":${org}`));
+  assert.ok(schema.includes(`"publisher":${org}`));
+  assert.ok(
+    schema.includes(
+      `"@id":"https://faithfulsoftware.dev/blog/${post.meta.slug}#article"`,
+    ),
+  );
+  assert.ok(
+    schema.includes(
+      '"isPartOf":{"@id":"https://faithfulsoftware.dev/#website"}',
+    ),
+  );
+  assert.ok(schema.includes('"inLanguage":"en-GB"'));
   assert.match(schema, /"dateModified":"2026-09-04"/);
   assert.match(
     renderToStaticMarkup(

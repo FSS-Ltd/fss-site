@@ -1,16 +1,19 @@
 import type { BlogPostMeta } from "@/lib/types/blog";
 
 import { JsonLd } from "@/components/seo/json-ld";
-import { siteConfig } from "@/lib/site-config";
+import { organisation } from "@/lib/seo/organisation";
+import { organisationId, websiteId } from "@/lib/seo/schema";
 
 type ArticleSchemaProps = {
   post: BlogPostMeta;
 };
 
 export function ArticleSchema({ post }: ArticleSchemaProps) {
+  const articleUrl = `${organisation.url}/blog/${post.slug}`;
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "Article",
+    "@id": `${articleUrl}#article`,
     headline: post.seoTitle,
     description: post.seoDescription,
     datePublished: post.publishDate,
@@ -18,24 +21,15 @@ export function ArticleSchema({ post }: ArticleSchemaProps) {
       post.modifiedDate > post.publishDate
         ? post.modifiedDate
         : post.publishDate,
-    author: {
-      "@type": "Organization",
-      name: post.author,
-      ...(post.authorUrl ? { url: post.authorUrl } : {}),
-    },
-    publisher: {
-      "@type": "Organization",
-      name: siteConfig.name,
-      logo: {
-        "@type": "ImageObject",
-        url: siteConfig.url + "/FSS.png",
-      },
-    },
+    author: { "@id": organisationId },
+    publisher: { "@id": organisationId },
+    isPartOf: { "@id": websiteId },
+    inLanguage: "en-GB",
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": siteConfig.url + "/blog/" + post.slug,
+      "@id": articleUrl,
     },
-    image: [siteConfig.url + post.coverImage],
+    image: [organisation.url + post.coverImage],
   };
 
   return <JsonLd data={articleSchema} />;
