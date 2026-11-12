@@ -40,7 +40,7 @@ function post(overrides: Partial<BlogPostMeta>): BlogPostMeta {
 
 const h1Count = (html: string) => (html.match(/<h1[\s>]/g) ?? []).length;
 
-test("blog index leads with the featured story and groups only sections with two articles", () => {
+test("blog index is one route map: a named link per post, lead largest, no counter", () => {
   const posts = [
     post({ slug: "newest", title: "Newest", category: "Growth", publishDate: "2026-05-01" }),
     post({ slug: "pick", title: "Editor pick", featured: true }),
@@ -56,44 +56,29 @@ test("blog index leads with the featured story and groups only sections with two
   assert.match(html, /data-hero-canvas/);
   assert.match(html, /data-motion-reveal/);
   assert.match(html, /data-magnetic/);
-  assert.match(html, /<h2 id="lead-story"[^>]*><a[^>]*href="\/blog\/pick"/);
+  assert.match(html, /data-lift-light/);
   assert.match(html, /7 articles/);
-  assert.doesNotMatch(html, /sections?</);
-  // One section has three articles: it is a group; the one-article section is not.
-  assert.match(html, /id="section-automation"/);
-  assert.doesNotMatch(html, /id="section-software"/);
-  assert.doesNotMatch(html, /aria-label="Sections"/);
-  // Each card has one link, and every post is reachable exactly once from the
-  // page body; the edition network adds one named node link per post.
-  for (const p of posts) {
-    const all = html.match(new RegExp(`href="/blog/${p.slug}"`, "g")) ?? [];
-    const nodes =
-      html.match(new RegExp(`class="netHit" aria-label="${p.title}" href="/blog/${p.slug}"`, "g")) ?? [];
-    assert.equal(nodes.length, 1, `${p.slug} node`);
-    assert.equal(all.length - nodes.length, 1, p.slug);
-  }
+  assert.match(html, /Index updated/);
   assert.match(html, /Field Notes, 7 articles/);
+  assert.doesNotMatch(html, /\d\d \/ \d\d/);
+  assert.doesNotMatch(html, /<img|Also in this edition|More articles/);
+  // Exactly one link per post, named by its title; the lead is marked.
+  for (const p of posts) {
+    const links = html.match(new RegExp(`aria-label="${p.title}"[^>]*href="/blog/${p.slug}"|href="/blog/${p.slug}"[^>]*aria-label="${p.title}"`, "g")) ?? [];
+    assert.equal(links.length, 1, p.slug);
+    assert.equal((html.match(new RegExp(`href="/blog/${p.slug}"`, "g")) ?? []).length, 1, p.slug);
+  }
+  assert.match(html, /Lead story \/ Custom Software/);
+  assert.equal((html.match(/class="mapNode mapLead"/g) ?? []).length, 1);
+  // Routes: one svg per layout, both aria-hidden.
+  assert.equal((html.match(/<div class="mapRoutes map(Wide|Mid)" aria-hidden="true"><svg/g) ?? []).length, 2);
   assert.doesNotMatch(html, /—|–|!/);
-});
-
-test("blog index shows the section rail only with two or more groups", () => {
-  const sections = ["A", "B"].flatMap((category) =>
-    ["1", "2"].map((n) => post({ slug: `${category}${n}`, title: `${category}${n}`, category })),
-  );
-  const html = renderToStaticMarkup(
-    <BlogIndex posts={[post({ slug: "lead", featured: true, category: "L" }), post({ slug: "s1", category: "S" }), post({ slug: "s2", category: "T" }), ...sections]} />,
-  );
-  assert.match(html, /aria-label="Sections"/);
-  assert.match(html, /href="#section-a"/);
-  assert.match(html, /href="#section-b"/);
 });
 
 test("blog index handles a single post and no posts", () => {
   const one = renderToStaticMarkup(<BlogIndex posts={[post({})]} />);
   assert.equal(h1Count(one), 1);
-  assert.match(one, /id="lead-story"/);
-  assert.doesNotMatch(one, /aria-label="Sections"/);
-  assert.doesNotMatch(one, /Also in this edition/);
+  assert.match(one, /Lead story/);
 
   const none = renderToStaticMarkup(<BlogIndex posts={[]} />);
   assert.equal(h1Count(none), 1);
@@ -107,7 +92,7 @@ test("article shows a contents list whose links match the rendered h2 ids", () =
     mdxComponents.h2({ children: h.text }),
   );
   const html = renderToStaticMarkup(
-    <BlogPostLayout post={post({ modifiedDate: "2026-09-04" })} headings={headings} relatedPosts={[post({ slug: "next" })]}>
+    <BlogPostLayout post={post({ modifiedDate: "2026-09-04" })} headings={headings} allPosts={[post({ slug: "next", title: "Next one" })]}>
       {prose}
     </BlogPostLayout>,
   );
@@ -123,19 +108,23 @@ test("article shows a contents list whose links match the rendered h2 ids", () =
   assert.match(html, /Read next/);
   assert.match(html, /href="\/blog"/);
   assert.match(html, /<ol><li><a href="#first-step"><span>First step<\/span>/);
-  // The edition network lights the current article and links the others.
-  assert.match(html, /aria-current="page"/);
-  assert.match(html, /A post \(this article\)/);
+  // Hero art: one labelled node per heading, on a route.
+  assert.match(html, /<svg[^>]*class="artSvg artWide"[^>]*aria-hidden="true"/);
+  assert.match(html, />First step</);
+  assert.match(html, />Third step</);
+  assert.doesNotMatch(html, /<img/);
+  assert.match(html, /class="cta-link|link"[^>]*>\s*Home/);
 });
 
 test("article without a cover or enough sections stays clean", () => {
   const html = renderToStaticMarkup(
-    <BlogPostLayout post={post({ coverImage: "" })} headings={extractHeadings("## Only one")} relatedPosts={[]}>
+    <BlogPostLayout post={post({ coverImage: "" })} headings={extractHeadings("## Only one")}>
       <p>Body</p>
     </BlogPostLayout>,
   );
   assert.doesNotMatch(html, /In this article/);
-  assert.doesNotMatch(html, /<figure/);
+  // Fewer than three headings: the art shows the post's own node instead.
+  assert.match(html, /THIS ARTICLE/);
   assert.doesNotMatch(html, /Read next/);
   assert.doesNotMatch(html, /Updated/);
 });

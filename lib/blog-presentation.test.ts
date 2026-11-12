@@ -3,14 +3,18 @@ import test from "node:test";
 
 import type { BlogPostMeta } from "@/lib/types/blog";
 import {
-  buildEditionNetwork,
+  buildEditionMap,
+  buildRouteArt,
+  routeAnchors,
+  pickRelatedPosts,
+  wrapLabel,
+  type MapCell,
+  type MapLayout,
   editionLabel,
   extractHeadings,
   formatEditorialDate,
-  groupByCategory,
   latestUpdate,
   selectLeadStory,
-  splitArchive,
   shouldShowContents,
   slugifyHeading,
 } from "@/lib/blog-presentation";
@@ -83,22 +87,6 @@ test("selectLeadStory prefers the newest featured post, else the newest", () => 
   assert.equal(selectLeadStory([]).lead, undefined);
 });
 
-test("groupByCategory keeps newest-first order for sections and posts", () => {
-  const groups = groupByCategory([
-    post({ slug: "1", category: "Automation" }),
-    post({ slug: "2", category: "Custom Software" }),
-    post({ slug: "3", category: "Automation" }),
-  ]);
-  assert.deepEqual(
-    groups.map((g) => [g.category, g.id, g.posts.map((p) => p.slug)]),
-    [
-      ["Automation", "section-automation", ["1", "3"]],
-      ["Custom Software", "section-custom-software", ["2"]],
-    ],
-  );
-  assert.deepEqual(groupByCategory([]), []);
-});
-
 test("dates render in British form regardless of time zone", () => {
   assert.equal(formatEditorialDate("2026-04-02"), "2 April 2026");
   assert.equal(
@@ -111,59 +99,118 @@ test("dates render in British form regardless of time zone", () => {
   assert.equal(latestUpdate([]), undefined);
 });
 
-test("splitArchive groups only sections with two or more articles", () => {
-  const posts = [
-    post({ slug: "a", category: "Automation" }),
-    post({ slug: "b", category: "Growth" }),
-    post({ slug: "c", category: "Automation" }),
-    post({ slug: "d", category: "Software" }),
-  ];
-  const { groups, ungrouped } = splitArchive(posts);
-  assert.deepEqual(groups.map((g) => [g.category, g.posts.map((p) => p.slug)]), [
-    ["Automation", ["a", "c"]],
-  ]);
-  assert.deepEqual(ungrouped.map((p) => p.slug), ["b", "d"]);
-});
+const mk = (slug: string, publishDate: string, category: string, tags: string[] = [], featured = false) =>
+  ({ slug, title: slug, publishDate, category, tags, featured }) as BlogPostMeta;
 
-test("splitArchive yields no groups when every section has one article", () => {
-  const { groups, ungrouped } = splitArchive([
-    post({ slug: "a", category: "A" }),
-    post({ slug: "b", category: "B" }),
-  ]);
-  assert.equal(groups.length, 0);
-  assert.equal(ungrouped.length, 2);
-});
+const SEVEN = [
+  mk("church", "2026-09-04", "Software decisions", ["Charities", "Church software", "Custom Software"], true),
+  mk("dash", "2026-04-13", "Dashboard", ["Custom Software", "UK", "Charities"]),
+  mk("portal", "2026-04-11", "Portal", ["Custom Software", "UK", "Charities"]),
+  mk("custom", "2026-04-04", "Custom Software", ["Custom Software", "UK", "Charities"]),
+  mk("bespoke", "2026-04-02", "Bespoke", ["Custom Software", "UK", "Charities"]),
+  mk("sdk", "2026-03-20", "Implementation", ["SDK"]),
+  mk("pipe", "2026-03-11", "Growth", ["Pipeline"]),
+];
 
-test("edition network is deterministic, ordered by date and routes neighbours", () => {
-  const mk = (slug: string, publishDate: string, category: string) =>
-    ({ slug, title: slug, publishDate, category }) as BlogPostMeta;
-  const posts = [
-    mk("c", "2026-03-03", "Growth"),
-    mk("a", "2026-01-01", "Growth"),
-    mk("b", "2026-02-02", "Software"),
-    mk("d", "2026-03-03", "Software"),
-  ];
-  const net = buildEditionNetwork(posts);
-  assert.deepEqual(net.nodes.map((n) => n.slug), ["a", "b", "c", "d"]);
-  assert.deepEqual(net, buildEditionNetwork([...posts].reverse()));
-  assert.ok(net.nodes.every((n) => n.x > 0 && n.x < 1 && n.y > 0 && n.y < 1));
-  assert.ok(net.nodes[0].x < net.nodes[3].x);
-  assert.notEqual(net.nodes[0].y, net.nodes[1].y);
-  assert.equal(net.routes.filter((r) => r.kind === "chain").length, 3);
-  // a-c share Growth, b-d share Software; neither pair is adjacent.
-  assert.deepEqual(
-    net.routes.filter((r) => r.kind === "related").map((r) => `${r.from}-${r.to}`),
-    ["a-c", "b-d"],
+function overlaps(a: MapCell, b: MapCell) {
+  return (
+    a.col < b.col + b.colSpan &&
+    b.col < a.col + a.colSpan &&
+    a.row < b.row + b.rowSpan &&
+    b.row < a.row + a.rowSpan
   );
+}
+
+test("edition map is deterministic whatever order the posts arrive in", () => {
+  const map = buildEditionMap(SEVEN);
+  assert.deepEqual(map, buildEditionMap([...SEVEN].reverse()));
+  assert.equal(map?.lead, "church");
+  assert.deepEqual(map?.order, ["church", "dash", "portal", "custom", "bespoke", "sdk", "pipe"]);
 });
 
-test("edition network handles one and zero posts; label counts from data", () => {
-  assert.deepEqual(buildEditionNetwork([]), { nodes: [], routes: [] });
-  const one = buildEditionNetwork([
-    { slug: "x", title: "x", publishDate: "2026-01-01", category: "A" } as BlogPostMeta,
-  ]);
-  assert.equal(one.nodes[0].x, 0.5);
-  assert.equal(one.nodes[0].y, 0.5);
+test("edition map cells never overlap and stay inside the grid, wide and mid", () => {
+  for (const count of [1, 2, 3, 4, 5, 6, 7, 9]) {
+    const posts = SEVEN.slice(0, 1).concat(
+      Array.from({ length: count - 1 }, (_, i) => mk(`p${i}`, `2026-01-${String(i + 1).padStart(2, "0")}`, "X")),
+    );
+    const map = buildEditionMap(posts);
+    assert.ok(map);
+    for (const name of ["wide", "mid"] as const) {
+      const layout: MapLayout = map.layouts[name];
+      const { cols, rows, cells } = layout;
+      assert.equal(cells.length, count);
+      cells.forEach((cell, i) => {
+        assert.ok(cell.col >= 0 && cell.col + cell.colSpan <= cols, `${name} ${count} cols`);
+        assert.ok(cell.row >= 0 && cell.row + cell.rowSpan <= rows, `${name} ${count} rows`);
+        assert.ok(cell.x > 0 && cell.x < 1 && cell.y > 0 && cell.y < 1);
+        cells.slice(i + 1).forEach((other) => assert.ok(!overlaps(cell, other), `${name} ${count} overlap`));
+      });
+      const lead = cells[0];
+      for (const other of cells.slice(1)) {
+        assert.ok(lead.colSpan * lead.rowSpan > other.colSpan * other.rowSpan, `${name} lead is largest`);
+      }
+    }
+  }
+});
+
+test("edition map edges come only from shared section or tags; the route runs lead then newest", () => {
+  const map = buildEditionMap(SEVEN)!;
+  const bySlug = new Map(SEVEN.map((p) => [p.slug, p]));
+  for (const edge of map.related) {
+    const a = bySlug.get(edge.from)!;
+    const b = bySlug.get(edge.to)!;
+    assert.ok(a.category === b.category || a.tags.some((t) => b.tags.includes(t)), `${edge.from}-${edge.to}`);
+    assert.ok(a.publishDate <= b.publishDate);
+  }
+  assert.deepEqual(
+    map.related.map((e) => `${e.from}-${e.to}`),
+    ["bespoke-custom", "custom-portal", "portal-dash", "dash-church"],
+  );
+  assert.deepEqual(map.route, ["church", "dash", "portal", "custom"]);
+});
+
+test("edition map handles no posts and one post; label counts from data", () => {
+  assert.equal(buildEditionMap([]), undefined);
+  const one = buildEditionMap([mk("x", "2026-01-01", "A")])!;
+  assert.deepEqual(one.route, ["x"]);
+  assert.equal(one.layouts.wide.cells[0].colSpan, 13);
   assert.equal(editionLabel(7), "Field Notes, 7 articles");
   assert.equal(editionLabel(1), "Field Notes, 1 article");
+});
+
+test("related posts vary per post: shared topics, then nearest date, never itself", () => {
+  const pairs = SEVEN.map((p) => pickRelatedPosts(p, SEVEN).map((r) => r.slug).join(","));
+  assert.ok(pairs.every((pair, i) => !pair.split(",").includes(SEVEN[i].slug)));
+  assert.equal(new Set(pairs).size, SEVEN.length);
+  assert.equal(pickRelatedPosts(SEVEN[3], SEVEN).map((r) => r.slug).join(), "bespoke,portal");
+});
+
+test("route art labels every heading, wraps long labels and scales per mode", () => {
+  assert.deepEqual(wrapLabel("What should you define before commissioning a dashboard?", 26, 3), [
+    "What should you define",
+    "before commissioning a",
+    "dashboard",
+  ]);
+  assert.ok(wrapLabel("a ".repeat(80), 10, 2).at(-1)?.endsWith("..."));
+  const wide = buildRouteArt(["One", "Two", "Three", "Four", "Five"], "wide");
+  assert.equal(wide.nodes.length, 5);
+  assert.ok(wide.nodes.every((n) => n.x > 0 && n.x < wide.width && n.y > 0 && n.y < wide.height));
+  assert.equal(wide.nodes[4].x, wide.nodes[3].x);
+  const tall = buildRouteArt(["One", "Two", "Three"], "tall");
+  assert.equal(tall.height, 228);
+  assert.equal(buildRouteArt(Array(20).fill("x"), "wide").nodes.length, 8);
+});
+
+test("route anchors meet the facing edges of the two blocks", () => {
+  const map = buildEditionMap(SEVEN)!;
+  const wide = map.layouts.wide;
+  const cell = (slug: string) => wide.cells.find((c) => c.slug === slug)!;
+  const lead = cell("church");
+  const first = cell("dash");
+  const a = routeAnchors(lead, first, wide);
+  assert.equal(a.x1, (lead.col + lead.colSpan) / wide.cols);
+  assert.equal(a.x2, first.col / wide.cols);
+  const mid = map.layouts.mid;
+  const m = routeAnchors(mid.cells[0], mid.cells.find((c) => c.slug === "dash")!, mid);
+  assert.equal(m.y1, (mid.cells[0].row + mid.cells[0].rowSpan) / mid.rows);
 });

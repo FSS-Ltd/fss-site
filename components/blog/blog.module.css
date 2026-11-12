@@ -160,196 +160,17 @@
   color: var(--foreground);
 }
 
+/* Phones: the two masthead kickers become one line. */
+@media (max-width: 639px) {
+  .mastTop > span + span {
+    display: none;
+  }
+}
+
 @media (min-width: 900px) {
   .mastFoot {
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: end;
-  }
-}
-
-/* ---------- Section rail ---------- */
-
-.rail {
-  padding: 14px 0 0;
-}
-
-.railList {
-  display: flex;
-  gap: 8px;
-  margin: 0;
-  padding: 0 0 6px;
-  overflow-x: auto;
-  list-style: none;
-  scroll-snap-type: x proximity;
-  scrollbar-width: thin;
-  /* Edge fade: the row continues beyond the right edge. */
-  mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent);
-}
-
-.railList a {
-  font-family: var(--mono);
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 0 16px;
-  border: 1px solid var(--border-soft);
-  border-radius: 999px;
-  background: rgb(255 255 255 / 0.5);
-  color: var(--foreground);
-  letter-spacing: 0.06em;
-  white-space: nowrap;
-  scroll-snap-align: start;
-  transition:
-    border-color 180ms ease,
-    background-color 180ms ease;
-}
-
-.railList a {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-}
-
-.railList a::before {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: #fff;
-  border-radius: inherit;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 300ms cubic-bezier(0.2, 0.75, 0.2, 1);
-  content: "";
-}
-
-.railList a:is(:hover, :focus-visible) {
-  border-color: var(--brand-primary);
-}
-
-.railList a:is(:hover, :focus-visible)::before {
-  transform: scaleX(1);
-}
-
-.railList sup {
-  color: var(--brand-primary);
-  font-size: 0.65rem;
-}
-
-/* ---------- Lead story ---------- */
-
-.lead {
-  position: relative;
-  display: grid;
-  gap: clamp(24px, 4vw, 56px);
-  margin-top: clamp(36px, 5vw, 64px);
-  padding-top: 18px;
-  border-top: 3px solid var(--rule);
-}
-
-.frame {
-  position: relative;
-  display: block;
-  overflow: hidden;
-  aspect-ratio: 5 / 3;
-  border: 1px solid var(--border-soft);
-  border-radius: clamp(14px, 2vw, 22px);
-  background: var(--surface-3);
-}
-
-.frame img {
-  object-fit: cover;
-  transition: transform 700ms cubic-bezier(0.2, 0.75, 0.2, 1);
-}
-
-.lead:hover .frame img {
-  transform: scale(1.03);
-}
-
-/* A product screenshot is cropped to its card grid so it reads at card size. */
-.screenshot img {
-  transform: scale(1.85);
-  transform-origin: 60% 12%;
-}
-
-.lead:hover .screenshot img {
-  transform: scale(1.9);
-}
-
-.noCover {
-  display: grid;
-  place-items: end start;
-  padding: clamp(18px, 3vw, 32px);
-  background:
-    radial-gradient(circle at 85% 15%, rgb(181 89 55 / 0.16), transparent 45%),
-    var(--surface-1);
-  color: var(--foreground);
-  font-size: clamp(1.5rem, 3vw, 2.5rem);
-  font-weight: 700;
-  letter-spacing: -0.04em;
-  line-height: 1;
-}
-
-.leadText {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  align-self: center;
-}
-
-.leadTitle {
-  margin: 0;
-  color: var(--foreground);
-  font-size: clamp(2rem, 4.2vw, 3.6rem);
-  font-weight: 680;
-  letter-spacing: -0.045em;
-  line-height: 1.02;
-  text-wrap: balance;
-}
-
-.leadStandfirst {
-  margin: 0;
-  color: var(--text-muted);
-  font-size: clamp(1.0625rem, 1.4vw, 1.2rem);
-  line-height: 1.6;
-}
-
-@media (min-width: 960px) {
-  .lead {
-    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
-  }
-
-  /* The image column takes the height of the text block: the frame fills it
-     and the cover crops (object-fit) instead of leaving a hole below. */
-  .lead > :first-child,
-  .lead > :first-child > .frame {
-    height: 100%;
-  }
-
-  .lead .frame {
-    min-height: 360px;
-    aspect-ratio: auto;
-  }
-
-  .leadText {
-    align-self: start;
-  }
-
-  /* The taller frame crops the screenshot's sides, so anchor on its top-left
-     (the card grid) and zoom less. */
-  .lead .screenshot img {
-    object-position: 0 0;
-    transform: scale(1.3);
-    transform-origin: 0 0;
-  }
-
-  .lead:hover .screenshot img {
-    transform: scale(1.35);
   }
 }
 
@@ -364,16 +185,12 @@
 }
 
 .stretch:is(:hover, :focus-visible) .grow,
-.lead:hover .grow,
+.mapLink:is(:hover, :focus-visible) .grow,
 .story:hover .grow {
   background-size: 100% 2px;
 }
 
-/* ---------- Also in this edition ---------- */
-
-.edition {
-  margin-top: clamp(48px, 6vw, 88px);
-}
+/* ---------- Section heads and read-next stories ---------- */
 
 .sectionHead {
   display: flex;
@@ -393,11 +210,6 @@
   font-size: 0.8125rem;
 }
 
-.editionGrid {
-  display: grid;
-  gap: 28px;
-}
-
 .story {
   position: relative;
   display: flex;
@@ -411,43 +223,6 @@
     transform 300ms ease,
     border-color 300ms ease,
     box-shadow 300ms ease;
-}
-
-.storyTop {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.storyTop .label {
-  margin: 0;
-}
-
-.glyph {
-  flex: none;
-  width: 72px;
-  height: 29px;
-  overflow: visible;
-}
-
-.glyphRoute,
-.glyphRouteLit {
-  stroke: var(--border-strong);
-  stroke-width: 0.9;
-}
-
-.glyphRouteLit {
-  stroke: var(--brand-primary);
-  stroke-width: 1.4;
-}
-
-.glyphNode {
-  fill: var(--text-muted);
-}
-
-.glyphLit {
-  fill: var(--brand-primary);
 }
 
 /* The rust rule: short at rest, runs the width of the card on hover. */
@@ -479,99 +254,6 @@
   margin: 0 0 8px;
   color: var(--text-muted);
   font-size: 0.975rem;
-  line-height: 1.6;
-}
-
-@media (min-width: 760px) {
-  .editionGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-/* ---------- Index by section ---------- */
-
-.archive {
-  margin-top: clamp(56px, 7vw, 104px);
-  padding-bottom: clamp(48px, 6vw, 80px);
-}
-
-.archiveTitle {
-  margin: 0;
-  color: var(--foreground);
-  font-size: clamp(1.75rem, 3vw, 2.5rem);
-  font-weight: 650;
-  letter-spacing: -0.035em;
-  line-height: 1.1;
-}
-
-.archiveRow {
-  display: grid;
-  gap: 12px 48px;
-  padding: 22px 0 26px;
-  border-top: 1px solid var(--border-strong);
-  scroll-margin-top: 96px;
-}
-
-.archiveFlat .archiveList {
-  max-width: 760px;
-}
-
-.archiveRow:target {
-  border-top-color: var(--brand-primary);
-  box-shadow: inset 0 2px var(--brand-primary);
-}
-
-.archiveSection {
-  margin: 0;
-  color: var(--foreground);
-  font-size: 1.125rem;
-  font-weight: 650;
-  letter-spacing: -0.02em;
-}
-
-.archiveList {
-  display: grid;
-  gap: 20px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.archiveItem {
-  display: grid;
-  gap: 6px;
-}
-
-.archiveItemTitle {
-  display: inline-block;
-  justify-self: start;
-  padding: 4px 0;
-  color: var(--foreground);
-  font-size: 1.125rem;
-  font-weight: 620;
-  letter-spacing: -0.015em;
-  line-height: 1.3;
-}
-
-.archiveItem p {
-  margin: 0;
-  max-width: 68ch;
-  color: var(--text-muted);
-  font-size: 0.975rem;
-  line-height: 1.6;
-}
-
-@media (min-width: 860px) {
-  .archiveRow:not(.archiveFlat) {
-    grid-template-columns: 260px minmax(0, 1fr);
-  }
-}
-
-.empty {
-  max-width: 58ch;
-  margin: 48px 0 80px;
-  color: var(--text-muted);
-  font-size: 1.125rem;
   line-height: 1.6;
 }
 
@@ -617,7 +299,6 @@
 
 .kicker {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: 0 14px;
   padding-bottom: 10px;
@@ -630,7 +311,15 @@
   min-height: 44px;
 }
 
+.kicker a {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .kicker span {
+  flex: none;
   font-family: var(--mono);
   font-size: 0.75rem;
   font-weight: 500;
@@ -671,13 +360,6 @@
   border-bottom: 1px solid var(--border-strong);
 }
 
-.cover {
-  margin: clamp(28px, 4vw, 48px) 0 0;
-}
-
-.cover .frame {
-  border-radius: clamp(16px, 2.4vw, 26px);
-}
 
 .columns {
   display: grid;
@@ -1275,8 +957,6 @@
   display: inline-flex;
   align-items: center;
   min-block-size: 44px;
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
 }
 
 .crumbLeaf {
@@ -1292,242 +972,414 @@
   white-space: nowrap;
 }
 
-.srOnly {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  border: 0;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
-/* ---------- Edition network ---------- */
-
-.net {
-  --map-h: 96px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  margin-top: 36px;
+.empty {
+  max-width: 58ch;
+  margin: 48px 0 80px;
   color: var(--text-muted);
+  font-size: 1.125rem;
+  line-height: 1.6;
 }
 
-.netCompact {
-  --map-h: 80px;
-  margin-top: 12px;
+/* ---------- Edition map ---------- */
+
+.map {
+  --row-h: 100px;
+  margin-top: clamp(28px, 4vw, 48px);
+  padding-bottom: clamp(32px, 4vw, 56px);
 }
 
-.netLabel {
-  display: flex;
-  flex: none;
-  flex-direction: column;
-  gap: 4px;
+.mapKey {
+  max-width: 62ch;
   margin: 0;
-  font-family: var(--mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
 }
 
-.netMap {
+.mapKey span {
+  font-weight: 600;
+}
+
+.mapKeyRoute {
+  color: var(--brand-primary);
+}
+
+.mapBody {
   position: relative;
-  flex: 1;
-  height: var(--map-h);
-  min-width: 0;
 }
 
-.netRoutes {
+.mapRoutes {
   position: absolute;
   inset: 0;
+  display: none;
+}
+
+.mapRoutes svg {
+  display: block;
   width: 100%;
   height: 100%;
   overflow: visible;
-  transform-origin: left;
 }
 
-.netRoute {
-  stroke: var(--border-strong);
-  stroke-width: 1;
+.mapEdge {
+  stroke: var(--text-muted);
+  stroke-opacity: 0.55;
+  stroke-width: 1.5;
 }
 
-.netRouteRelated {
-  stroke-dasharray: 3 4;
-}
-
-.netRouteLit {
+.mapRoute {
   stroke: var(--brand-primary);
-  stroke-width: 2;
+  stroke-width: 3;
+  stroke-linecap: round;
 }
 
-.netNodes {
-  position: absolute;
-  inset: 0;
+.mapNodes {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
   margin: 0;
-  padding: 0;
+  padding: 0 0 0 32px;
   list-style: none;
 }
 
-.netNode {
+.mapNode {
+  position: relative;
+}
+
+/* Phone rail: a dot per node, and a line to the next one that turns rust
+   along the route, the same device as the article contents. */
+.mapNode::before {
   position: absolute;
-  width: 28px;
-  height: 28px;
-  margin: -14px 0 0 -14px;
+  top: 28px;
+  bottom: -14px;
+  left: -21px;
+  width: 2px;
+  background: var(--border-strong);
+  content: "";
 }
 
-.netHit {
-  display: grid;
-  width: 28px;
-  height: 28px;
-  place-items: center;
-  border-radius: 50%;
+.mapNode:last-child::before {
+  display: none;
 }
 
-.netDot {
-  width: 10px;
-  height: 10px;
-  border: 2px solid var(--text-muted);
-  border-radius: 50%;
-  background: var(--background, #fff);
-  transition:
-    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
-    background-color 160ms ease,
-    border-color 160ms ease;
-}
-
-.netNode:is(:hover, :focus-within) .netDot {
-  border-color: var(--brand-primary);
+.mapNode[data-route-next]::before {
   background: var(--brand-primary);
-  transform: scale(1.5);
 }
 
-.netNode[data-current] .netDot {
+.mapLink {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  padding: 18px 20px 18px;
+  overflow: hidden;
+  border: 1px solid rgb(33 27 23 / 0.14);
+  border-radius: 16px;
+  background: var(--surface-1, #fff);
+  color: var(--foreground);
+  transition:
+    transform 300ms ease,
+    border-color 300ms ease,
+    box-shadow 300ms ease;
+}
+
+.mapLink:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 3px;
+}
+
+.mapDot {
+  position: absolute;
+  top: 21px;
+  left: -27px;
   width: 14px;
   height: 14px;
+  box-sizing: border-box;
+  border: 2px solid var(--text-muted);
+  border-radius: 50%;
+  background: var(--surface-1, #fff);
+}
+
+.mapNode[data-route] .mapDot {
   border-color: var(--brand-primary);
   background: var(--brand-primary);
-  box-shadow: 0 0 0 5px rgb(166 66 36 / 0.18);
 }
 
-.netHit:focus-visible {
-  outline: 2px solid var(--brand-primary);
-  outline-offset: 2px;
+.mapKicker {
+  composes: mono;
+  color: var(--brand-primary);
 }
 
-.netTip {
-  position: absolute;
-  top: calc(100% + 2px);
-  left: 50%;
-  z-index: 3;
-  width: max-content;
-  max-width: min(220px, 52vw);
-  padding: 6px 10px;
-  border: 1px solid var(--border-strong);
-  border-radius: 8px;
-  background: #fff;
+.mapTitle {
   color: var(--foreground);
-  font-family: var(--mono);
+  font-size: 1.1875rem;
+  font-weight: 640;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.mapStandfirst {
+  color: var(--text-muted);
+  font-size: 1.125rem;
+  line-height: 1.55;
+}
+
+.mapLink .metaLine {
+  margin-top: auto;
+}
+
+.mapNode:not(.mapLead) .mapKicker {
+  overflow: hidden;
   font-size: 0.6875rem;
   letter-spacing: 0.04em;
-  line-height: 1.35;
-  opacity: 0;
-  pointer-events: none;
-  transform: translate(-50%, 4px);
-  transition:
-    opacity 160ms ease,
-    transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.netNode[data-up] .netTip {
-  top: auto;
-  bottom: calc(100% + 2px);
+.mapNode:not(.mapLead) .metaLine {
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  gap: 2px 10px;
 }
 
-.netNode[data-side="start"] .netTip {
-  left: 0;
-  transform: translate(-8px, 4px);
+.mapNode:not(.mapLead) .metaLine > * + *::before {
+  margin-right: 10px;
 }
 
-.netNode[data-side="end"] .netTip {
-  right: 0;
-  left: auto;
-  transform: translate(8px, 4px);
+/* The lead: the largest node, set as type on the dark ground. */
+.mapLead .mapLink {
+  gap: 14px;
+  padding: 26px 26px 24px;
+  border-color: var(--foreground);
+  background: var(--foreground);
+  color: #fff;
 }
 
-.netNode:is(:hover, :focus-within) .netTip {
-  opacity: 1;
-  transform: translate(-50%, 0);
+.mapLead .mapKicker {
+  color: #e6a07f;
 }
 
-.netNode[data-side="start"]:is(:hover, :focus-within) .netTip {
-  transform: translate(-8px, 0);
+.mapLead .mapTitle {
+  color: #fff;
+  font-size: clamp(1.875rem, 7.5vw, 2.5rem);
+  font-weight: 680;
+  letter-spacing: -0.04em;
+  line-height: 1.04;
 }
 
-.netNode[data-side="end"]:is(:hover, :focus-within) .netTip {
-  transform: translate(8px, 0);
+.mapLead .mapStandfirst {
+  color: rgb(255 255 255 / 0.82);
 }
 
-/* The entrance: routes draw in from the left, nodes step in after them. The
-   wrapper itself rides the shared [data-mesh-band] cascade in globals.css. */
-@media (prefers-reduced-motion: no-preference) {
-  .netRoutes {
-    animation: netDraw 700ms cubic-bezier(0.2, 0.75, 0.2, 1) 0.3s backwards;
+.mapLead .metaLine {
+  color: rgb(255 255 255 / 0.78);
+}
+
+.mapLead .grow {
+  background-image: linear-gradient(#e6a07f 0 0);
+}
+
+.mapLead .mapDot {
+  border-color: #e6a07f;
+  background: #e6a07f;
+}
+
+/* Tablet: the lead across the top, the nodes in two staggered columns. */
+@media (min-width: 640px) {
+  .mapMid {
+    display: block;
   }
 
-  .netNode {
-    animation: netPop 360ms cubic-bezier(0.22, 1, 0.36, 1)
-      calc(0.4s + var(--i) * 70ms) backwards;
+  .mapNodes {
+    display: grid;
+    grid-template-columns: repeat(var(--m-cols), minmax(0, 1fr));
+    grid-template-rows: repeat(var(--m-rows), var(--row-h));
+    gap: 0;
+    padding: 0;
   }
 
-  .netNode[data-current] .netDot {
-    animation: netPulse 2.4s ease-out 1.2s infinite;
-  }
-}
-
-@keyframes netDraw {
-  from {
-    transform: scaleX(0);
-  }
-}
-
-@keyframes netPop {
-  from {
-    opacity: 0;
-    transform: scale(0.4);
-  }
-}
-
-@keyframes netPulse {
-  50% {
-    transform: scale(1.18);
-  }
-}
-
-/* Phones: label above, a taller map, and only the chain of routes. */
-@media (max-width: 639px) {
-  .net {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 6px;
-    --map-h: 128px;
+  .mapNode {
+    grid-column: var(--m-col) / span var(--m-span);
+    grid-row: var(--m-row) / span var(--m-rspan);
+    padding: 6px;
   }
 
-  .netCompact {
-    --map-h: 112px;
-  }
-
-  .netMap {
-    flex: none;
-  }
-
-  .netLabel {
-    flex-direction: row;
-    gap: 14px;
-  }
-
-  .netRouteRelated {
+  .mapNode::before {
     display: none;
   }
+
+  .mapDot {
+    top: 16px;
+    right: 16px;
+    left: auto;
+  }
+
+  .mapLink {
+    padding: 16px 40px 14px 18px;
+  }
+
+  .mapLead .mapLink {
+    padding: 22px 40px 20px 24px;
+  }
+
+  .mapLead .mapTitle {
+    max-width: 24ch;
+    font-size: clamp(1.75rem, 4vw, 2.4rem);
+  }
+
+  .mapLead .mapStandfirst {
+    display: -webkit-box;
+    max-width: 62ch;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .mapNode:not(.mapLead) .mapTitle {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+  }
+}
+
+/* Desktop: the lead beside two staggered node columns with a gutter for routes. */
+@media (min-width: 1100px) {
+  .mapMid {
+    display: none;
+  }
+
+  .mapWide {
+    display: block;
+  }
+
+  .mapNodes {
+    grid-template-columns: repeat(var(--w-cols), minmax(0, 1fr));
+    grid-template-rows: repeat(var(--w-rows), var(--row-h));
+  }
+
+  .mapNode {
+    grid-column: var(--w-col) / span var(--w-span);
+    grid-row: var(--w-row) / span var(--w-rspan);
+  }
+
+  .mapLead .mapTitle {
+    max-width: none;
+    font-size: clamp(2rem, 4.1vw, 3.3rem);
+  }
+
+  .mapLead .mapStandfirst {
+    display: block;
+    overflow: visible;
+  }
+
+  .mapLead .mapLink {
+    padding: 30px 30px 28px;
+  }
+}
+
+/* Entrance: routes draw in from the left, nodes rise in turn. Static when the
+   visitor prefers reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .mapNode {
+    animation: mapRise 520ms cubic-bezier(0.22, 1, 0.36, 1)
+      calc(0.12s + var(--i) * 80ms) backwards;
+  }
+}
+
+@keyframes mapRise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+/* ---------- Article hero art ---------- */
+
+.art {
+  margin: clamp(28px, 4vw, 48px) 0 0;
+  padding: clamp(16px, 2.4vw, 28px);
+  border: 1px solid var(--border-soft);
+  border-radius: clamp(16px, 2.4vw, 26px);
+  background: rgb(255 255 255 / 0.6);
+}
+
+.artSvg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.artTall {
+  max-width: 420px;
+}
+
+.artWide {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .artWide {
+    display: block;
+  }
+
+  .artTall {
+    display: none;
+  }
+}
+
+.artRoute {
+  stroke: var(--brand-primary);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.artDot {
+  fill: var(--surface-1, #fff);
+  stroke: var(--brand-primary);
+  stroke-width: 3;
+}
+
+.artNode[data-primary] .artDot {
+  fill: var(--brand-primary);
+}
+
+.artKicker {
+  fill: var(--brand-primary);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+}
+
+.artLabel {
+  fill: var(--foreground);
+  font-size: 16px;
+  font-weight: 620;
+  letter-spacing: -0.01em;
+}
+
+/* Draw-in: armed by DrawIn after hydration, so content is visible without it. */
+.draw {
+  transition: clip-path 1200ms cubic-bezier(0.2, 0.75, 0.2, 1) 0.25s;
+}
+
+.draw[data-armed]:not([data-in]) {
+  clip-path: inset(-10px 100% -10px -10px);
+}
+
+.draw[data-in] {
+  clip-path: inset(-10px);
+}
+
+.mapLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }

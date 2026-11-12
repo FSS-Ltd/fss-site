@@ -8,22 +8,21 @@ import type { BlogPostMeta } from "@/lib/types/blog";
 
 import {
   type ArticleHeading,
-  buildEditionNetwork,
   formatEditorialDate,
+  pickRelatedPosts,
   shouldShowContents,
 } from "@/lib/blog-presentation";
 import { ArticleRoute } from "@/components/blog/article-route";
 import { ArticleEvidence } from "@/components/blog/article-evidence";
 import { BlogBreadcrumbs } from "@/components/blog/blog-breadcrumbs";
-import { EditionNetwork } from "@/components/blog/edition-network";
-import { BlogPostCard, PostCover } from "@/components/blog/blog-post-card";
+import { ArticleArt } from "@/components/blog/article-art";
+import { BlogPostCard } from "@/components/blog/blog-post-card";
 import styles from "@/components/blog/blog.module.css";
 
 type BlogPostLayoutProps = {
   post: BlogPostMeta;
   headings: ArticleHeading[];
-  relatedPosts: BlogPostMeta[];
-  /** Every published article, for the edition network. */
+  /** Every published article; the related ones are picked from these. */
   allPosts?: BlogPostMeta[];
   children: ReactNode;
 };
@@ -31,15 +30,10 @@ type BlogPostLayoutProps = {
 export function BlogPostLayout({
   post,
   headings,
-  relatedPosts,
   allPosts = [],
   children,
 }: BlogPostLayoutProps) {
-  const network = buildEditionNetwork(
-    allPosts.some((candidate) => candidate.slug === post.slug)
-      ? allPosts
-      : [...allPosts, post],
-  );
+  const relatedPosts = pickRelatedPosts(post, allPosts, 2);
   const updated =
     post.modifiedDate && post.modifiedDate !== post.publishDate
       ? post.modifiedDate
@@ -85,18 +79,9 @@ export function BlogPostLayout({
             ) : null}
             <span>{post.readingMinutes} min read</span>
           </p>
-          <EditionNetwork network={network} currentSlug={post.slug} compact />
         </header>
 
-        {post.coverImage ? (
-          <figure className={styles.cover} data-motion-reveal="up">
-            <PostCover
-              post={post}
-              priority
-              sizes="(min-width: 1260px) 1180px, 100vw"
-            />
-          </figure>
-        ) : null}
+        <ArticleArt post={post} headings={headings} related={relatedPosts} />
 
         <div className={styles.columns}>
           {shouldShowContents(headings) ? (
@@ -161,7 +146,7 @@ export function BlogPostLayout({
             </h2>
             <div className={styles.nextList}>
               {relatedPosts.map((related) => (
-                <BlogPostCard key={related.slug} post={related} network={network} />
+                <BlogPostCard key={related.slug} post={related} />
               ))}
             </div>
           </section>

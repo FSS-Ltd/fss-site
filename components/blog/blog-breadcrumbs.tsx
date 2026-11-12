@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import cta from "@/components/ui/cta-motion.module.css";
 import styles from "@/components/blog/blog.module.css";
 
 /** Home / Blog / article title. The leaf is cut with an ellipsis by CSS, so a
@@ -9,10 +10,14 @@ export function BlogBreadcrumbs({ title }: { title: string }) {
     <nav aria-label="Breadcrumb" className={styles.crumbs}>
       <ol>
         <li>
-          <Link href="/">Home</Link>
+          <Link href="/" className={cta.link}>
+            Home
+          </Link>
         </li>
         <li>
-          <Link href="/blog">Blog</Link>
+          <Link href="/blog" className={cta.link}>
+            Blog
+          </Link>
         </li>
         <li className={styles.crumbLeaf}>
           <span aria-current="page" title={title}>
