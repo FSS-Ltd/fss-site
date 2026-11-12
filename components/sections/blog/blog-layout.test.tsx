@@ -62,9 +62,11 @@ test("blog index is one route map: a named link per post, lead largest, no count
   assert.match(html, /Field Notes, 7 articles/);
   assert.doesNotMatch(html, /\d\d \/ \d\d/);
   assert.doesNotMatch(html, /<img|Also in this edition|More articles/);
-  // Exactly one link per post, named by its title; the lead is marked.
+  // Exactly one link per post, named by its visible content (no aria-label,
+  // which would not contain the kicker and date); the lead is marked.
+  assert.doesNotMatch(html, /aria-label="(Newest|Editor pick|Second)"/);
   for (const p of posts) {
-    const links = html.match(new RegExp(`aria-label="${p.title}"[^>]*href="/blog/${p.slug}"|href="/blog/${p.slug}"[^>]*aria-label="${p.title}"`, "g")) ?? [];
+    const links = html.match(new RegExp(`href="/blog/${p.slug}"[^>]*>(?:(?!</a>).)*<span class="grow">${p.title}</span>`, "g")) ?? [];
     assert.equal(links.length, 1, p.slug);
     assert.equal((html.match(new RegExp(`href="/blog/${p.slug}"`, "g")) ?? []).length, 1, p.slug);
   }

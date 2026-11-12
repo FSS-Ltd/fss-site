@@ -4,6 +4,7 @@ import test from "node:test";
 import type { BlogPostMeta } from "@/lib/types/blog";
 import {
   buildEditionMap,
+  ART_NODE_RADIUS,
   buildRouteArt,
   routeAnchors,
   pickRelatedPosts,
@@ -213,4 +214,63 @@ test("route anchors meet the facing edges of the two blocks", () => {
   const mid = map.layouts.mid;
   const m = routeAnchors(mid.cells[0], mid.cells.find((c) => c.slug === "dash")!, mid);
   assert.equal(m.y1, (mid.cells[0].row + mid.cells[0].rowSpan) / mid.rows);
+});
+
+type Seg = { x1: number; y1: number; x2: number; y2: number };
+
+/** Does an axis-aligned segment pass within `pad` of the rect? */
+function crosses(seg: Seg, r: { x: number; y: number; w: number; h: number }, pad = 4) {
+  const [x0, x1] = [Math.min(seg.x1, seg.x2), Math.max(seg.x1, seg.x2)];
+  const [y0, y1] = [Math.min(seg.y1, seg.y2), Math.max(seg.y1, seg.y2)];
+  return x1 > r.x - pad && x0 < r.x + r.w + pad && y1 > r.y - pad && y0 < r.y + r.h + pad;
+}
+
+test("hero routes start and end on node edges and never cross a label box, 3 to 6 headings", () => {
+  const long = (i: number) =>
+    `What should a charity ask about question number ${i} before it signs anything at all`;
+  for (const mode of ["wide", "tall"] as const) {
+    for (let n = 3; n <= 6; n++) {
+      const art = buildRouteArt(Array.from({ length: n }, (_, i) => long(i)), mode);
+      assert.equal(art.legs.length, n - 1, `${mode} ${n} legs`);
+      art.legs.forEach((leg, i) => {
+        const a = art.nodes[i];
+        const b = art.nodes[i + 1];
+        const gap = (p: { x: number; y: number }, node: { x: number; y: number }) =>
+          Math.hypot(p.x - node.x, p.y - node.y);
+        assert.equal(gap(leg[0], a), ART_NODE_RADIUS, `${mode} ${n} leg ${i} start`);
+        assert.equal(gap(leg[leg.length - 1], b), ART_NODE_RADIUS, `${mode} ${n} leg ${i} end`);
+        for (let s = 1; s < leg.length; s++) {
+          const seg = { x1: leg[s - 1].x, y1: leg[s - 1].y, x2: leg[s].x, y2: leg[s].y };
+          art.nodes.forEach((node, k) =>
+            assert.ok(!crosses(seg, node.box), `${mode} ${n}: leg ${i} crosses label ${k}`),
+          );
+        }
+      });
+    }
+  }
+});
+
+test("edition map edges carry the shared section, else the first shared topic", () => {
+  const map = buildEditionMap(SEVEN)!;
+  const label = (from: string, to: string) =>
+    map.related.find((e) => e.from === from && e.to === to)?.label;
+  assert.equal(label("dash", "church"), "Custom Software");
+  assert.ok(map.related.every((e) => e.label.length > 0));
+  const same = buildEditionMap([mk("a", "2026-01-01", "Growth"), mk("b", "2026-01-02", "Growth", ["z"])])!;
+  assert.equal(same.related[0].label, "Growth");
+});
+
+test("each node column ends flush with the grid, so no column leaves a gap at its foot", () => {
+  for (const count of [3, 4, 5, 6, 7, 8]) {
+    const posts = [mk("lead", "2026-09-01", "X", [], true)].concat(
+      Array.from({ length: count - 1 }, (_, i) => mk(`p${i}`, `2026-01-${String(i + 1).padStart(2, "0")}`, "X")),
+    );
+    const map = buildEditionMap(posts)!;
+    for (const name of ["wide", "mid"] as const) {
+      const { rows, cells } = map.layouts[name];
+      const cols = new Map<number, number>();
+      cells.slice(1).forEach((c) => cols.set(c.col, Math.max(cols.get(c.col) ?? 0, c.row + c.rowSpan)));
+      for (const [col, end] of cols) assert.equal(end, rows, `${name} ${count} col ${col}`);
+    }
+  }
 });

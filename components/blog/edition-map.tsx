@@ -15,45 +15,114 @@ import styles from "@/components/blog/blog.module.css";
 const LAYOUTS: MapLayoutName[] = ["wide", "mid"];
 const pct = (value: number) => (value * 100).toFixed(2);
 
-/** Routes for one layout, drawn under the nodes between cell centres. Grey
- *  lines are real relations (shared section or tags); the rust route runs
- *  from the lead through the newest articles and is drawn over them. */
-function Routes({ map, layout }: { map: EditionMapData; layout: MapLayoutName }) {
+type MapLine = { a: string; b: string; kind: "route" | "edge"; label?: string };
+
+/** Every drawn line: the rust route, then the grey relations that are not on
+ *  it. A route hop that is also a relation carries that relation's label. */
+function mapLines(map: EditionMapData): MapLine[] {
+  const key = (a: string, b: string) => [a, b].sort().join(">");
+  const labels = new Map(map.related.map((edge) => [key(edge.from, edge.to), edge.label]));
+  const hops = map.route.slice(1).map((slug, i) => [map.route[i], slug]);
+  const onRoute = new Set(hops.map(([a, b]) => key(a, b)));
+  return [
+    ...map.related
+      .filter((edge) => !onRoute.has(key(edge.from, edge.to)))
+      .map((edge): MapLine => ({ a: edge.from, b: edge.to, kind: "edge", label: edge.label })),
+    ...hops.map(([a, b]): MapLine => ({ a, b, kind: "route", label: labels.get(key(a, b)) })),
+  ];
+}
+
+/** Routes for one layout, drawn under the nodes between cell edges. Grey
+ *  lines are real relations (shared section or tags) and carry a label naming
+ *  what the two articles share; the rust route runs from the lead through the
+ *  newest articles and is drawn over them. Each line and label lists the nodes
+ *  it touches in data-e, which the hover rules below read. */
+function Routes({
+  map,
+  lines,
+  layout,
+}: {
+  map: EditionMapData;
+  lines: MapLine[];
+  layout: MapLayoutName;
+}) {
   const cells = new Map(
     map.layouts[layout].cells.map((cell) => [cell.slug, cell]),
   );
-  const segments = map.route.slice(1).map((slug, i) => [map.route[i], slug]);
-  const onRoute = new Set(segments.map(([a, b]) => `${a}>${b}`));
-  const line = (a: string, b: string, className: string) => {
-    const from = cells.get(a);
-    const to = cells.get(b);
-    if (!from || !to) return null;
-    const at = routeAnchors(from, to, map.layouts[layout]);
-    return (
-      <line
-        key={`${a}>${b}`}
-        x1={pct(at.x1)}
-        y1={pct(at.y1)}
-        x2={pct(at.x2)}
-        y2={pct(at.y2)}
-        vectorEffect="non-scaling-stroke"
-        className={className}
-      />
-    );
-  };
+  const ends = (line: MapLine) => `${map.order.indexOf(line.a)} ${map.order.indexOf(line.b)}`;
+  const placed = lines.flatMap((line) => {
+    const from = cells.get(line.a);
+    const to = cells.get(line.b);
+    if (!from || !to) return [];
+    return [{ line, from, to, at: routeAnchors(from, to, map.layouts[layout]) }];
+  });
   return (
     <div
       className={`${styles.mapRoutes} ${layout === "wide" ? styles.mapWide : styles.mapMid}`}
       aria-hidden="true"
     >
-    <svg viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false">
-      {map.related
-        .filter((edge) => !onRoute.has(`${edge.from}>${edge.to}`) && !onRoute.has(`${edge.to}>${edge.from}`))
-        .map((edge) => line(edge.from, edge.to, styles.mapEdge))}
-      {segments.map(([a, b]) => line(a, b, styles.mapRoute))}
-    </svg>
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false">
+        {placed.map(({ line, at }) => (
+          <line
+            key={`${line.a}>${line.b}`}
+            x1={pct(at.x1)}
+            y1={pct(at.y1)}
+            x2={pct(at.x2)}
+            y2={pct(at.y2)}
+            vectorEffect="non-scaling-stroke"
+            className={line.kind === "route" ? styles.mapRoute : styles.mapEdge}
+            data-e={ends(line)}
+          />
+        ))}
+      </svg>
+      {placed.map(({ line, from, to, at }) => {
+        // Only lines that cross a gutter have room for a label; a stacked pair
+        // would put it under the cards.
+        const sideBySide =
+          to.col >= from.col + from.colSpan || from.col >= to.col + to.colSpan;
+        if (!line.label || !sideBySide) return null;
+        return (
+          <span
+            key={`${line.a}>${line.b}`}
+            className={styles.mapEdgeLabel}
+            style={{
+              left: `${pct((at.x1 + at.x2) / 2)}%`,
+              top: `${pct((at.y1 + at.y2) / 2)}%`,
+            }}
+            data-e={ends(line)}
+          >
+            {line.label}
+          </span>
+        );
+      })}
     </div>
   );
+}
+
+/** Hover or keyboard focus on a node: the nodes, lines and labels joined to it
+ *  stay at full strength (lines and labels turn rust) and the rest drop to 40%.
+ *  CSS only. The rules are generated from the map so they follow the data;
+ *  indices and class names are the only interpolated values. */
+function emphasisCss(map: EditionMapData, lines: MapLine[]): string {
+  const { mapBody, mapNode, mapLink, mapEdge, mapRoute, mapEdgeLabel } = styles;
+  return map.order
+    .map((slug, k) => {
+      const joined = new Set(
+        lines.flatMap((l) => (l.a === slug ? [l.b] : l.b === slug ? [l.a] : [])),
+      );
+      const withK = [...joined].map((s) => map.order.indexOf(s));
+      const hot = `.${mapBody}:has(.${mapNode}[data-n="${k}"] .${mapLink}:is(:hover,:focus-visible))`;
+      const joinedNodes = withK.map((n) => `[data-n="${n}"]`).join(",");
+      const keep = `[data-n="${k}"]${joinedNodes ? `,${joinedNodes}` : ""}`;
+      return [
+        `${hot} .${mapNode}:not(${keep}){opacity:.4}`,
+        `${hot} :is(.${mapEdge},.${mapRoute},.${mapEdgeLabel}):not([data-e~="${k}"]){opacity:.4}`,
+        `${hot} .${mapEdge}[data-e~="${k}"]{stroke:var(--brand-primary);stroke-opacity:1;stroke-width:2.5}`,
+        `${hot} .${mapRoute}[data-e~="${k}"]{stroke-width:4}`,
+        `${hot} .${mapEdgeLabel}[data-e~="${k}"]{color:var(--brand-primary)}`,
+      ].join("\n");
+    })
+    .join("\n");
 }
 
 /** The blog index as one labelled route map. Every article is a node block
@@ -74,6 +143,7 @@ export function EditionMap({
   const wide = cellsOf("wide");
   const mid = cellsOf("mid");
   const routeLast = map.route[map.route.length - 1];
+  const lines = mapLines(map);
 
   const gridVars: Record<string, number> = {
     "--w-cols": map.layouts.wide.cols,
@@ -95,13 +165,14 @@ export function EditionMap({
         <p className={styles.mapKey}>
           <span className={styles.mapKeyRoute}>Rust route</span> runs from the
           lead through the newest. <span>Grey lines</span> join articles that
-          share a section or topic.
+          share a section or topic, and each label names it.
         </p>
       </div>
       <div className={styles.mapBody} style={gridVars as React.CSSProperties}>
+        <style dangerouslySetInnerHTML={{ __html: emphasisCss(map, lines) }} />
         <DrawIn className={styles.mapLayer}>
           {LAYOUTS.map((layout) => (
-            <Routes key={layout} map={map} layout={layout} />
+            <Routes key={layout} map={map} lines={lines} layout={layout} />
           ))}
         </DrawIn>
         <ol className={styles.mapNodes}>
@@ -129,13 +200,15 @@ export function EditionMap({
                 className={`${styles.mapNode} ${lead ? styles.mapLead : ""}`}
                 data-route={onRoute ? "" : undefined}
                 data-route-next={onRoute && slug !== routeLast ? "" : undefined}
+                data-n={index}
+                data-tall-w={w.rowSpan > 2 ? "" : undefined}
+                data-tall-m={m.rowSpan > 2 ? "" : undefined}
                 style={vars as React.CSSProperties}
               >
                 <CoverTransition slug={slug}>
                   <Link
                     href={`/blog/${slug}`}
                     className={styles.mapLink}
-                    aria-label={post.title}
                     data-lift-light
                   >
                     <span className={styles.mapDot} aria-hidden="true" />
@@ -147,7 +220,11 @@ export function EditionMap({
                     </span>
                     {lead ? (
                       <span className={styles.mapStandfirst}>{post.excerpt}</span>
-                    ) : null}
+                    ) : (
+                      /* Shown only when the grid stretches this node taller than
+                         the usual two rows, so the extra height carries text. */
+                      <span className={styles.mapExcerpt}>{post.excerpt}</span>
+                    )}
                     <PostMeta post={post} withAuthor={lead} />
                   </Link>
                 </CoverTransition>

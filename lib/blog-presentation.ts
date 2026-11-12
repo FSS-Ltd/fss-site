@@ -93,7 +93,8 @@ export type MapCell = {
 
 export type MapLayout = { cols: number; rows: number; cells: MapCell[] };
 export type MapLayoutName = "wide" | "mid";
-export type MapEdge = { from: string; to: string };
+/** `label` is the shared section, or else the first shared topic. */
+export type MapEdge = { from: string; to: string; label: string };
 
 export type EditionMap = {
   lead: string;
@@ -128,6 +129,11 @@ function relationScore(a: BlogPostMeta, b: BlogPostMeta): number {
   return shared + (a.category === b.category ? 2 : 0);
 }
 
+function relationLabel(a: BlogPostMeta, b: BlogPostMeta): string {
+  if (a.category === b.category) return a.category;
+  return (a.tags ?? []).find((tag) => b.tags?.includes(tag)) ?? "";
+}
+
 function byDateAsc(a: BlogPostMeta, b: BlogPostMeta): number {
   return a.publishDate.localeCompare(b.publishDate) || a.slug.localeCompare(b.slug);
 }
@@ -158,7 +164,7 @@ export function buildEditionMap(posts: BlogPostMeta[]): EditionMap | undefined {
         bestScore = score;
       }
     }
-    if (best) related.push({ from: best.slug, to: post.slug });
+    if (best) related.push({ from: best.slug, to: post.slug, label: relationLabel(best, post) });
   });
 
   const layouts = {} as Record<MapLayoutName, MapLayout>;
@@ -177,6 +183,14 @@ export function buildEditionMap(posts: BlogPostMeta[]): EditionMap | undefined {
     });
     const used = cells.reduce((max, cell) => Math.max(max, cell.row + cell.rowSpan), top);
     const rows = shape.leadRows ? used : Math.max(used, LEAD_MIN_ROWS);
+    // Each column's last node stretches to the foot of the grid, so no column
+    // ends in empty space under its last card.
+    for (const col of shape.starts) {
+      const last = cells
+        .filter((cell) => cell.col === col)
+        .reduce<MapCell | undefined>((a, c) => (!a || c.row > a.row ? c : a), undefined);
+      if (last) last.rowSpan = rows - last.row;
+    }
     cells.unshift({
       slug: lead.slug,
       col: 0,
@@ -258,21 +272,35 @@ export function pickRelatedPosts(
     .map((entry) => entry.candidate);
 }
 
+export type Rect = { x: number; y: number; w: number; h: number };
+export type Point = { x: number; y: number };
+
 export type RouteArtNode = {
   label: string[];
   x: number;
   y: number;
   /** The node the route starts from (the post itself, in the fallback). */
   primary: boolean;
+  /** Baseline origins of the number/kicker line and the first label line. */
+  kicker: Point;
+  text: Point;
+  /** Where the kicker (up to "THIS ARTICLE") and label sit, so routes keep clear. */
+  box: Rect;
 };
 
 export type RouteArt = {
   width: number;
   height: number;
   nodes: RouteArtNode[];
+  /** One polyline per hop, from the edge of one node to the edge of the next. */
+  legs: Point[][];
 };
 
 export const ART_MAX_NODES = 8;
+export const ART_NODE_RADIUS = 9;
+const ART_LINE = 19;
+const ART_CHAR_W = 9;
+const ART_GUTTER = 16;
 
 /** A label cut to at most `lines` lines of about `max` characters each. */
 export function wrapLabel(text: string, max = 26, lines = 3): string[] {
@@ -299,6 +327,65 @@ export function wrapLabel(text: string, max = 26, lines = 3): string[] {
   return out.slice(0, lines);
 }
 
+function artNode(
+  label: string[],
+  x: number,
+  y: number,
+  primary: boolean,
+  below: boolean,
+): RouteArtNode {
+  const top = below ? y + 40 : y - ((label.length - 1) * ART_LINE) / 2;
+  const lx = below ? x - 9 : x + 24;
+  const kicker = { x: lx, y: top - 18 };
+  const text = { x: lx, y: top + 5 };
+  const w = Math.max(...label.map((line) => line.length), 12) * ART_CHAR_W;
+  const bottom = text.y + (label.length - 1) * ART_LINE + 5;
+  return {
+    label,
+    x,
+    y,
+    primary,
+    kicker,
+    text,
+    box: { x: lx, y: kicker.y - 10, w, h: bottom - kicker.y + 10 },
+  };
+}
+
+/**
+ * Routes between the nodes. Each leg starts and ends on a node's edge. Along a
+ * row or down the tall rail it is a straight line; where the wide snake turns
+ * to the next row, the line leaves the node sideways and drops in a channel
+ * outside every label, so it never crosses a label box.
+ */
+function artLegs(nodes: RouteArtNode[], cols: number | null): Point[][] {
+  const r = ART_NODE_RADIUS;
+  const legs: Point[][] = [];
+  nodes.slice(1).forEach((b, i) => {
+    const a = nodes[i];
+    if (a.y === b.y) {
+      const dir = Math.sign(b.x - a.x);
+      legs.push([{ x: a.x + dir * r, y: a.y }, { x: b.x - dir * r, y: b.y }]);
+    } else if (cols === null) {
+      const dir = Math.sign(b.y - a.y);
+      legs.push([{ x: a.x, y: a.y + dir * r }, { x: b.x, y: b.y - dir * r }]);
+    } else {
+      const side = Math.floor(i / cols) % 2 === 0 ? 1 : -1;
+      const rows = nodes.filter((n) => n.y >= a.y && n.y <= b.y);
+      const channel =
+        side === 1
+          ? Math.max(...rows.map((n) => n.box.x + n.box.w)) + ART_GUTTER
+          : Math.min(...rows.map((n) => n.box.x)) - ART_GUTTER;
+      legs.push([
+        { x: a.x + side * r, y: a.y },
+        { x: channel, y: a.y },
+        { x: channel, y: b.y },
+        { x: b.x + side * r, y: b.y },
+      ]);
+    }
+  });
+  return legs;
+}
+
 /**
  * Hero art for a post: one labelled node per label on a single route. "wide"
  * snakes across up to four columns; "tall" is one column, the phone rail.
@@ -311,15 +398,14 @@ export function buildRouteArt(
   const shown = labels.slice(0, ART_MAX_NODES);
   if (mode === "tall") {
     const step = 76;
+    const nodes = shown.map((label, index) =>
+      artNode(wrapLabel(label, 24, 2), 18, step / 2 + index * step, index === 0, false),
+    );
     return {
       width: 340,
       height: Math.max(shown.length, 1) * step,
-      nodes: shown.map((label, index) => ({
-        label: wrapLabel(label, 24, 2),
-        x: 18,
-        y: step / 2 + index * step,
-        primary: index === 0,
-      })),
+      nodes,
+      legs: artLegs(nodes, null),
     };
   }
   const cols = Math.min(Math.max(shown.length, 1), 4);
@@ -327,22 +413,14 @@ export function buildRouteArt(
   const width = 1120;
   const cell = width / cols;
   const rowStep = 150;
-  return {
-    width,
-    height: rows * rowStep,
-    nodes: shown.map((label, index) => {
-      const row = Math.floor(index / cols);
-      const inRow = index % cols;
-      // Boustrophedon: odd rows run right to left, so the route never jumps back.
-      const col = row % 2 ? cols - 1 - inRow : inRow;
-      return {
-        label: wrapLabel(label, 28, 3),
-        x: col * cell + 12,
-        y: row * rowStep + 44,
-        primary: index === 0,
-      };
-    }),
-  };
+  const nodes = shown.map((label, index) => {
+    const row = Math.floor(index / cols);
+    const inRow = index % cols;
+    // Boustrophedon: odd rows run right to left, so the route never jumps back.
+    const col = row % 2 ? cols - 1 - inRow : inRow;
+    return artNode(wrapLabel(label, 28, 3), col * cell + 12, row * rowStep + 44, index === 0, true);
+  });
+  return { width, height: rows * rowStep, nodes, legs: artLegs(nodes, cols) };
 }
 
 /** "Field Notes, 7 articles": the count comes from the posts, never typed. */

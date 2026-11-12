@@ -3,8 +3,8 @@ import Link from "next/link";
 import cta from "@/components/ui/cta-motion.module.css";
 import styles from "@/components/blog/blog.module.css";
 
-/** Home / Blog / article title. The leaf is cut with an ellipsis by CSS, so a
- *  long headline never wraps the trail; the full title stays in the markup. */
+/** Home / Blog / this article. The leaf names the page without repeating the
+ *  headline, which sits directly below; the title stays in its tooltip. */
 export function BlogBreadcrumbs({ title }: { title: string }) {
   return (
     <nav aria-label="Breadcrumb" className={styles.crumbs}>
@@ -21,7 +21,7 @@ export function BlogBreadcrumbs({ title }: { title: string }) {
         </li>
         <li className={styles.crumbLeaf}>
           <span aria-current="page" title={title}>
-            {title}
+            This article
           </span>
         </li>
       </ol>

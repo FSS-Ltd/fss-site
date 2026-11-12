@@ -240,6 +240,22 @@
   transform: scaleX(1);
 }
 
+/* The index lead card's hover, for every card on an article page: rust border
+   and soft shadow always, the lift when motion is welcome. The shared
+   data-lift-light script sets the same values inline. */
+.story:is(:hover, :focus-within),
+.cta:is(:hover, :focus-within) {
+  border-color: rgb(181 89 55 / 0.4);
+  box-shadow: 0 26px 50px -30px rgb(33 27 23 / 0.35);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .story:is(:hover, :focus-within),
+  .cta:is(:hover, :focus-within) {
+    transform: translateY(-5px);
+  }
+}
+
 .storyTitle {
   margin: 0;
   color: var(--foreground);
@@ -728,6 +744,10 @@
 }
 
 .cta {
+  transition:
+    transform 300ms ease,
+    border-color 300ms ease,
+    box-shadow 300ms ease;
   margin: 2.4em 0;
   padding: clamp(22px, 3vw, 30px);
   border: 1px solid var(--border-soft);
@@ -1128,8 +1148,35 @@
   line-height: 1.55;
 }
 
+/* Date and read time never break inside an item. When the pair does not fit
+   one line it stacks, and the separator that would start the second line sits
+   in a strip the line clips away, so no "/" is ever left orphaned. */
+.mapExcerpt {
+  display: none;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+}
+
 .mapLink .metaLine {
-  margin-top: auto;
+  margin: auto 0 0 -26px;
+  column-gap: 0;
+  clip-path: inset(0 0 0 26px);
+}
+
+.mapLink .metaLine > * {
+  position: relative;
+  padding-left: 26px;
+  white-space: nowrap;
+}
+
+.mapLink .metaLine > * + *::before {
+  position: absolute;
+  left: 10px;
+  margin: 0;
 }
 
 .mapNode:not(.mapLead) .mapKicker {
@@ -1143,11 +1190,7 @@
 .mapNode:not(.mapLead) .metaLine {
   font-size: 0.6875rem;
   letter-spacing: 0.06em;
-  gap: 2px 10px;
-}
-
-.mapNode:not(.mapLead) .metaLine > * + *::before {
-  margin-right: 10px;
+  row-gap: 2px;
 }
 
 /* The lead: the largest node, set as type on the dark ground. */
@@ -1179,6 +1222,17 @@
   color: rgb(255 255 255 / 0.78);
 }
 
+/* The byline closes the lead: a rule above it anchors it to the foot of the
+   card, so the space under the standfirst reads as deliberate. */
+.mapLead .mapLink .metaLine {
+  padding-top: 16px;
+  background: linear-gradient(rgb(255 255 255 / 0.22) 0 0) 0 0 / 100% 1px no-repeat;
+}
+
+.mapLead .metaLine > * + *::before {
+  color: #e6a07f;
+}
+
 .mapLead .grow {
   background-image: linear-gradient(#e6a07f 0 0);
 }
@@ -1186,6 +1240,33 @@
 .mapLead .mapDot {
   border-color: #e6a07f;
   background: #e6a07f;
+}
+
+.mapEdgeLabel {
+  position: absolute;
+  max-width: 84px;
+  padding: 2px 4px;
+  background: var(--background, #f2f3f5);
+  color: var(--text-muted);
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+  line-height: 1.25;
+  text-align: center;
+  text-wrap: balance;
+  transform: translate(-50%, -50%);
+}
+
+/* Phones: the meta items stack, so the separators and the clip strip go. */
+@media (max-width: 479px) {
+  .mapLink .metaLine {
+    margin-left: 0;
+    clip-path: none;
+  }
+
+  .mapLink .metaLine > * {
+    padding-left: 0;
+  }
 }
 
 /* Tablet: the lead across the top, the nodes in two staggered columns. */
@@ -1222,6 +1303,11 @@
     padding: 16px 40px 14px 18px;
   }
 
+  /* The dot only crowds the top right; the meta line may use that padding. */
+  .mapNode:not(.mapLead) .metaLine {
+    margin-right: -22px;
+  }
+
   .mapLead .mapLink {
     padding: 22px 40px 20px 24px;
   }
@@ -1244,6 +1330,12 @@
     overflow: hidden;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 4;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1099px) {
+  .mapNode[data-tall-m] .mapExcerpt {
+    display: -webkit-box;
   }
 }
 
@@ -1280,6 +1372,10 @@
   .mapLead .mapLink {
     padding: 30px 30px 28px;
   }
+
+  .mapNode[data-tall-w] .mapExcerpt {
+    display: -webkit-box;
+  }
 }
 
 /* Entrance: routes draw in from the left, nodes rise in turn. Static when the
@@ -1289,6 +1385,26 @@
     animation: mapRise 520ms cubic-bezier(0.22, 1, 0.36, 1)
       calc(0.12s + var(--i) * 80ms) backwards;
   }
+}
+
+/* Hover or focus emphasis (rules generated in edition-map.tsx): the colour and
+   dimming switch at once; they ease only when motion is welcome. */
+@media (prefers-reduced-motion: no-preference) {
+  .mapNode,
+  .mapEdge,
+  .mapRoute,
+  .mapEdgeLabel {
+    transition:
+      opacity 250ms ease,
+      stroke 250ms ease,
+      stroke-width 250ms ease,
+      color 250ms ease;
+  }
+}
+
+.mapLink:is(:hover, :focus-visible) {
+  border-color: rgb(181 89 55 / 0.4);
+  box-shadow: 0 26px 50px -30px rgb(33 27 23 / 0.35);
 }
 
 @keyframes mapRise {

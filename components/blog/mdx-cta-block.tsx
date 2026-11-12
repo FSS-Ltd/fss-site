@@ -18,7 +18,7 @@ export function MdxCtaBlock({
   ctaLabel = "Book a strategy call",
 }: MdxCtaBlockProps) {
   return (
-    <div className={styles.cta}>
+    <div className={styles.cta} data-lift-light>
       <p className={styles.ctaTitle}>{title}</p>
       <p className={styles.ctaBody}>{body}</p>
       <Link href={href} className={`${styles.ctaLink} ${cta.sweep} ${fill.rust}`}>

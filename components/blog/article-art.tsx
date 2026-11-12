@@ -1,5 +1,6 @@
 import type { BlogPostMeta } from "@/lib/types/blog";
 import {
+  ART_NODE_RADIUS,
   type ArticleHeading,
   type RouteArt,
   buildRouteArt,
@@ -13,15 +14,11 @@ function Art({
   art,
   kickers,
   className,
-  below = false,
 }: {
   art: RouteArt;
   kickers: string[];
   className: string;
-  /** Labels under the route (wide) or beside it (tall). */
-  below?: boolean;
 }) {
-  const points = art.nodes.map((node) => `${node.x},${node.y}`).join(" ");
   return (
     <svg
       className={`${styles.artSvg} ${className}`}
@@ -29,36 +26,38 @@ function Art({
       aria-hidden="true"
       focusable="false"
     >
-      {art.nodes.length > 1 ? (
+      {art.legs.map((leg, index) => (
         <polyline
+          key={index}
           className={styles.artRoute}
-          points={points}
+          points={leg.map((point) => `${point.x},${point.y}`).join(" ")}
           fill="none"
         />
-      ) : null}
-      {art.nodes.map((node, index) => {
-        const top = below ? node.y + 40 : node.y - ((node.label.length - 1) * 19) / 2;
-        const lx = below ? node.x - 9 : node.x + 24;
-        return (
-          <g
-            key={index}
-            className={styles.artNode}
-            data-primary={node.primary ? "" : undefined}
-          >
-            <circle className={styles.artDot} cx={node.x} cy={node.y} r={9} />
-            <text className={styles.artKicker} x={lx} y={top - 18}>
-              {kickers[index]}
-            </text>
-            <text className={styles.artLabel} x={lx} y={top + 5}>
-              {node.label.map((line, i) => (
-                <tspan key={i} x={lx} dy={i === 0 ? 0 : 19}>
-                  {line}
-                </tspan>
-              ))}
-            </text>
-          </g>
-        );
-      })}
+      ))}
+      {art.nodes.map((node, index) => (
+        <g
+          key={index}
+          className={styles.artNode}
+          data-primary={node.primary ? "" : undefined}
+        >
+          <circle
+            className={styles.artDot}
+            cx={node.x}
+            cy={node.y}
+            r={ART_NODE_RADIUS}
+          />
+          <text className={styles.artKicker} x={node.kicker.x} y={node.kicker.y}>
+            {kickers[index]}
+          </text>
+          <text className={styles.artLabel} x={node.text.x} y={node.text.y}>
+            {node.label.map((line, i) => (
+              <tspan key={i} x={node.text.x} dy={i === 0 ? 0 : 19}>
+                {line}
+              </tspan>
+            ))}
+          </text>
+        </g>
+      ))}
     </svg>
   );
 }
@@ -88,7 +87,7 @@ export function ArticleArt({
     <figure className={styles.art} data-motion-reveal="up">
       <CoverTransition slug={post.slug}>
         <DrawIn>
-          <Art art={buildRouteArt(labels, "wide")} kickers={kickers} className={styles.artWide} below />
+          <Art art={buildRouteArt(labels, "wide")} kickers={kickers} className={styles.artWide} />
           <Art art={buildRouteArt(labels, "tall")} kickers={kickers} className={styles.artTall} />
         </DrawIn>
       </CoverTransition>
