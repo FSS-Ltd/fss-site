@@ -11,6 +11,7 @@ function setup() {
     {
       get: (_t, key) => {
         if (key === "clearRect") return () => void draws++;
+        if (key === "measureText") return () => ({ width: 40 });
         return () => {};
       },
       set: () => true,

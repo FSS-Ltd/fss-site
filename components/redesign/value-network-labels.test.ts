@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   businessParts,
+  estimateLabelWidth,
+  fitLabelX,
   heroLabels,
   labelPosition,
   labelPull,
@@ -67,4 +69,19 @@ test("pointer pull is bounded, toward the pointer and zero out of range", () => 
     glow: 0,
   });
   assert.deepEqual(labelPull(anchor, anchor), { x: 0, y: 0, glow: 0 });
+});
+
+test("labels slide inward so the whole box stays inside the stage", () => {
+  const width = estimateLabelWidth("Invoices", 12);
+  const inside = (x: number, stage: number) =>
+    x - width / 2 >= 0 && x + width / 2 <= stage;
+  // Wide stage: a label already inside is left alone.
+  assert.equal(fitLabelX(300, width, 835), 300);
+  // Mid stage: a node near the right edge pulls its label back in.
+  const mid = fitLabelX(590, width, 594);
+  assert.ok(mid < 590 && inside(mid, 594));
+  // Left edge is guarded too.
+  assert.ok(inside(fitLabelX(2, width, 594), 594));
+  // Narrow stage: too small for the label, so it is centred.
+  assert.equal(fitLabelX(90, width, 60), 30);
 });

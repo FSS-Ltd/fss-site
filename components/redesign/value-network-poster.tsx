@@ -1,5 +1,10 @@
 import { buildValueNetwork } from "./value-network";
-import { heroLabels, hubName } from "./value-network-labels";
+import {
+  estimateLabelWidth,
+  fitLabelX,
+  heroLabels,
+  hubName,
+} from "./value-network-labels";
 
 /** The hero's static frame: the same lattice the canvas draws, as inline SVG so
  *  it paints with the HTML (no-JS, reduced motion, first paint) and is not an
@@ -100,7 +105,11 @@ export function ValueNetworkPoster({ className }: { className?: string }) {
                 strokeWidth="2"
               />
               <text
-                x={part.x}
+                x={fitLabelX(
+                  part.x,
+                  estimateLabelWidth(part.name, 12.5) + 4,
+                  networkView.width,
+                )}
                 y={part.y - 17}
                 fill="#2b2420"
                 stroke="rgba(245,246,247,.92)"
