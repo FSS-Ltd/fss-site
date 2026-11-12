@@ -1,6 +1,6 @@
 # AI-led SEO and lead growth: handoff
 
-Updated 2026-11-12. Read this first, then the design doc
+Updated 2026-11-12 (late). Read this first, then the design doc
 `docs/superpowers/specs/2026-11-11-ai-led-seo-lead-growth-design.md`.
 
 ## Standing rules from the founder
@@ -108,16 +108,30 @@ Sonnet code and security review of #330 is running.
   newline-to-br, with an injection test. jsdom added as a dev dependency.
   Pre-existing minor: email subject uses raw names (Resend JSON, so no
   header injection).
-- Next: PR D blog layout
-  (rebase on main first; it predates #333), then the docs PR.
+- PR D MERGED 2026-11-12 as #336 (`1573c09e8`, squash, clean message, no
+  trailers) after green CI. Verified live: /blog route map and a post's
+  heading-route hero render, no console errors. Shipped at critic 7.6
+  (rounds 6.8, 7.0, 6.8, 6.9, 7.35, 7.6), below the 8 gate, with the
+  founder's approval. Fable: 8 needs fuller posts (1 to 2 min reads now).
+  Scorecards in `.claude/worktrees/editorial-blog-layout/.jury/127.0.0.1-4401/`.
+  Founder named himself author: every post now credits Jean-Fidele
+  Ntagengwa (Person JSON-LD). Critic's remaining fixes: drop the map
+  legend and de-clutter connectors, a continuous blog-to-post transition,
+  richer inline link hovers, itemise OG tags, fuller SDK post.
+- Flaky CI: `tests/integration/operations/onboarding-uncertainty.test.ts:43`
+  ("lost response remains unresolved...") failed twice on #336 then passed
+  on the next push. Unrelated to the blog; needs its own fix.
+- FEATURE_TREE.md and Graphify not yet updated for PR D's components
+  (edition-map, article-art, article-route, draw-in, cover-transition,
+  lib/blog-presentation).
+- Next: Dependabot PR (founder asked: 96 alerts on main, 6 critical, 49
+  high), then the docs PR.
 - Open on #333: the old hero card hover lift (on main) went with the card;
   give the new hero a pointer response. Homepage CSS has 4 B gzip headroom.
   The app screenshot shows the founder's first name; founder to confirm.
 - Commit trailers: early commits on #333 and this branch carry a
   Co-Authored-By line against the founder's rule. Squash-merge with a clean
   message to drop them. Never add them again.
-- PR D `feat/editorial-blog-layout`: one local commit `1ef83e280`, unpushed.
-  Waits for PR F (shared site chrome).
 
 ## Run log 2026-11-11 (scheduled continuation)
 
