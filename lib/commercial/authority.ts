@@ -84,37 +84,32 @@ export const authorityPages = {
     index: true,
     modifiedDate: "2026-09-04",
     label: "NexSteps",
-    title: "NexSteps: Safeguarding & Community Operations Software | FSS",
+    title: "NexSteps: School Management Software Built by FSS | FSS",
     description:
-      "Explore NexSteps, the FSS-built safeguarding, attendance and operations platform for schools, churches and community organisations, with a first-party interface example.",
-    heading: "NexSteps: software for the people who care for others.",
+      "How FSS built NexSteps, complete school management software that understands the ACE system, and turned hours of admin into more time with children and families.",
+    heading: "NexSteps: hours of admin turned into time with families.",
     answer:
-      "NexSteps is an FSS-built safeguarding, attendance and operations platform for schools, churches and community organisations. It brings role-scoped access, support portals, attendance and safeguarding handover logs, parent onboarding and billing workflows into one operational product.",
+      "A learning centre needed complete school management software that understood the ACE system. FSS built NexSteps for that. The real benefit is hours of admin turned into more time with the children and families.",
     sections: [
       {
-        id: "fit",
-        title: "Designed around community operations.",
-        text: "The product addresses work involving attendance, safeguarding handovers and parent participation. Those tasks involve different people and responsibilities, which need to be reflected in the software.",
+        id: "problem",
+        title: "The problem.",
+        text: "A learning centre needed complete school management software that understood the ACE system.",
+      },
+      {
+        id: "idea",
+        title: "The idea.",
+        text: "FSS built NexSteps for that: school management software shaped around how the centre already works.",
       },
       {
         id: "outcomes",
-        title: "What FSS built.",
-        text: "The supported product capabilities provide the evidence for this case study.",
-        points: [
-          "Role-scoped access and support portals",
-          "Attendance and safeguarding handover logs",
-          "Parent onboarding and billing workflows",
-        ],
+        title: "The outcome.",
+        text: "Hours of admin turned into more time with the children and families.",
       },
       {
-        id: "scope",
-        title: "An example to inform a new scope.",
-        text: "NexSteps can help frame a conversation about operational software for your organisation. It does not establish the price, delivery time or exact scope of a separate project. Those depend on your workflows, records and users.",
-      },
-      {
-        id: "risk",
-        title: "Software supports accountable people.",
-        text: "Safeguarding responsibilities remain with the organisation and its people. Product capabilities alone are not a guarantee of security, compliance or safeguarding outcomes. A new project needs its own access, data and operating requirements.",
+        id: "direction",
+        title: "Where it goes next.",
+        text: "NexSteps now aims to be a platform that adapts to the systems a real school uses, rather than forcing them into an old way of doing things.",
       },
     ],
     faqs: [
@@ -123,14 +118,14 @@ export const authorityPages = {
         answer: "Faithful Software Solutions built NexSteps.",
       },
       {
-        question: "Which settings is NexSteps for?",
+        question: "What is NexSteps for?",
         answer:
-          "NexSteps is a safeguarding, attendance and operations platform for schools, churches and community organisations.",
+          "NexSteps is school management software, built for a learning centre that needed a system that understood the ACE system.",
       },
       {
         question: "Are measured results available on this page?",
         answer:
-          "This page documents product capabilities and a first-party interface example. It does not claim numerical improvements or present customer testimonials.",
+          "No. This page describes the problem, the idea, the outcome and the direction in plain words. It does not claim numerical improvements or present customer testimonials.",
       },
     ],
     related: [
