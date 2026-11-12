@@ -43,6 +43,17 @@ test("404 gives visitors a branded heading and routes back to home or contact", 
   assert.match(html, /href="\/contact"/);
 });
 
+test("404 opens with the skip link and sits in the light site shell", () => {
+  const { default: NotFound } =
+    require("./not-found") as typeof import("./not-found");
+  const html = renderToStaticMarkup(<NotFound />);
+  assert.equal(html.match(/<a[\s>][^>]*href="([^"]*)"/)?.[1], "#main-content");
+  assert.match(html, /id="fssroot"/);
+  assert.match(html, /<main id="main-content"/);
+  assert.equal((html.match(/<main[\s>]/g) ?? []).length, 1);
+  assert.doesNotMatch(html, /#07182e/);
+});
+
 test("article and resource metadata publish full social image descriptors and canonical titles", async () => {
   const { createArticleMetadata, createResourceMetadata } =
     await import("@/lib/seo/content-metadata");

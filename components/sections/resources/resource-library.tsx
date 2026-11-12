@@ -4,6 +4,8 @@ import { ArrowRight, Download, FileText, FolderOpen } from "lucide-react";
 import type { ResourceMeta } from "@/lib/types/resource";
 
 import { ResourceCard } from "@/components/resources/resource-card";
+import cta from "@/components/ui/cta-motion.module.css";
+import gutter from "@/components/ui/gutter.module.css";
 
 type ResourceLibraryProps = {
   resources: ResourceMeta[];
@@ -31,7 +33,7 @@ export function ResourceLibrary({ resources }: ResourceLibraryProps) {
   return (
     <>
       <section
-        className="relative overflow-hidden px-7 pb-16 pt-[138px]"
+        className={`relative overflow-hidden pb-16 pt-[138px] ${gutter.gutter}`}
         style={{
           background:
             "radial-gradient(110% 70% at 82% -10%, rgba(230,160,127,.10), transparent 52%), #f2f3f5",
@@ -43,7 +45,7 @@ export function ResourceLibrary({ resources }: ResourceLibraryProps) {
         />
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(33,27,23,.026)_1px,transparent_1px),linear-gradient(90deg,rgba(33,27,23,.026)_1px,transparent_1px)] bg-[length:64px_64px] [mask-image:radial-gradient(120%_90%_at_42%_12%,#000,transparent_76%)]" />
         <div
-          className="relative mx-auto grid max-w-[1180px] gap-12 lg:grid-cols-2 lg:items-end"
+          className="relative grid gap-12 lg:grid-cols-2 lg:items-end"
           data-motion-reveal="mask"
         >
           <div>
@@ -72,7 +74,7 @@ export function ResourceLibrary({ resources }: ResourceLibraryProps) {
               <Link
                 data-magnetic
                 href={primaryCtaHref}
-                className="inline-flex items-center gap-2 rounded-full bg-[var(--button-primary)] px-6 py-3.5 text-sm font-semibold text-cta-text transition hover:bg-[var(--button-primary-hover)]"
+                className={`inline-flex items-center gap-2 rounded-full bg-[var(--button-primary)] px-6 py-3.5 text-sm font-semibold text-cta-text transition ${cta.sweep} ${cta.rust}`}
               >
                 <span data-mag-label className="inline-flex items-center gap-2">
                   {primaryCtaLabel}
@@ -83,7 +85,7 @@ export function ResourceLibrary({ resources }: ResourceLibraryProps) {
               </Link>
               <Link
                 href="#library"
-                className="inline-flex items-center gap-2 rounded-full border border-border-soft bg-white/70 px-6 py-3.5 text-sm font-semibold text-foreground transition hover:border-border-strong hover:bg-white"
+                className={`inline-flex items-center gap-2 rounded-full border border-border-soft bg-white/70 px-6 py-3.5 text-sm font-semibold text-foreground ${cta.sweep}`}
               >
                 Browse all resources
               </Link>
@@ -160,10 +162,10 @@ export function ResourceLibrary({ resources }: ResourceLibraryProps) {
 
       <section
         id="library"
-        className="bg-[#f2f3f5] px-7 py-[clamp(80px,10vw,130px)]"
+        className={`bg-[#f2f3f5] py-[clamp(80px,10vw,130px)] ${gutter.gutter}`}
         data-motion-reveal="up"
       >
-        <div className="mx-auto max-w-[1180px]">
+        <div>
           <div
             data-reveal
             className="mb-12 grid gap-6 lg:grid-cols-2 lg:items-end"
@@ -218,7 +220,7 @@ export function ResourceLibrary({ resources }: ResourceLibraryProps) {
                 <Link
                   href="/blog"
                   data-magnetic
-                  className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-foreground transition hover:bg-[#eef0f2]"
+                  className={`inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-foreground ${cta.sweep} ${cta.clay}`}
                 >
                   <span
                     data-mag-label
@@ -229,7 +231,7 @@ export function ResourceLibrary({ resources }: ResourceLibraryProps) {
                 </Link>
                 <Link
                   href="/contact"
-                  className="inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,.2)] bg-[rgba(255,255,255,.08)] px-6 py-3.5 text-sm font-semibold text-[#fff] transition hover:bg-[rgba(255,255,255,.14)]"
+                  className={`inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,.2)] bg-[rgba(255,255,255,.08)] px-6 py-3.5 text-sm font-semibold text-[#fff] ${cta.sweep} ${cta.white}`}
                 >
                   Talk to FSS{" "}
                   <ArrowRight className="size-4" aria-hidden="true" />

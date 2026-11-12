@@ -1,0 +1,5 @@
+/* The public page gutter: 24px minimum, then the 1120px content column
+   centred, so every section's left edge lines up with the header and footer. */
+.gutter {
+  padding-inline: max(24px, calc((100% - 1120px) / 2));
+}

@@ -18,5 +18,8 @@ test("footer copy avoids em dashes and shares the public page gutter", () => {
 
   assert.doesNotMatch(html, /—/);
   assert.match(html, /private AI\. Built faithfully, in the UK\./);
-  assert.match(html, /max\(24px, calc\(\(100% - 1120px\) \/ 2\)\)/);
+  assert.match(
+    html,
+    /max\(clamp\(16px, 7\.5vw - 8px, 24px\), calc\(\(100% - 1120px\) \/ 2\)\)/,
+  );
 });

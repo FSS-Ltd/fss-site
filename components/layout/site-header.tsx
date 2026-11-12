@@ -12,10 +12,15 @@ export function SiteHeader() {
       <a href="#main-content" className={styles.skip}>
         Skip to content
       </a>
-      {/* Same gutter as public page content and the footer, so all left edges align. */}
+      {/* Same gutter as public page content and the footer, so all left edges
+          align; it eases down to 16px on the narrowest phones so the logo,
+          call to action and menu do not crowd. */}
       <div
         className="flex min-h-[72px] items-center justify-between gap-2 py-2.5 sm:gap-5"
-        style={{ paddingInline: "max(24px, calc((100% - 1120px) / 2))" }}
+        style={{
+          paddingInline:
+            "max(clamp(16px, 7.5vw - 8px, 24px), calc((100% - 1120px) / 2))",
+        }}
       >
         <Link
           href="/"

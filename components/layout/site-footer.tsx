@@ -24,7 +24,7 @@ export function SiteFooter() {
         color: "#d8cdc4",
         // Shares the public page gutter so footer, header and content align.
         padding:
-          "clamp(56px,7vw,84px) max(24px, calc((100% - 1120px) / 2)) 36px",
+          "clamp(56px,7vw,84px) max(clamp(16px, 7.5vw - 8px, 24px), calc((100% - 1120px) / 2)) 36px",
         borderTop: "1px solid rgba(255,255,255,.07)",
       }}
     >

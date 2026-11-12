@@ -85,6 +85,7 @@ export function SiteHeaderNavigation() {
       <ButtonLink
         size="lg"
         className="px-3 text-sm sm:px-5"
+        style={{ whiteSpace: "nowrap" }}
         href="/contact"
         prefetch={false}
         magnetic
