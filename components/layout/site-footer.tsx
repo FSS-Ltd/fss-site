@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { CookieSettingsButton } from "@/components/layout/cookie-settings-button";
 import { organisation } from "@/lib/seo/organisation";
+import cta from "@/components/ui/cta-motion.module.css";
 
 const sitemapLinks = [
   { label: "Services", href: "/services" },
@@ -62,6 +63,7 @@ export function SiteFooter() {
             <Link
               href="/contact"
               prefetch={false}
+              className={cta.link}
               style={{
                 display: "inline-flex",
                 alignItems: "center",

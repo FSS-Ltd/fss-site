@@ -46,7 +46,8 @@ export function ResourceCard({ resource }: ResourceCardProps) {
         <h2 className="mt-4 text-[22px] leading-tight font-semibold text-foreground">
           <Link
             href={resourceHref}
-            className={`transition hover:text-brand-primary ${cta.link}`}
+            className={`inline-block transition hover:text-brand-primary ${cta.link}`}
+            style={{ padding: "4px 0", margin: "-4px 0" }}
           >
             {resource.title}
           </Link>
@@ -56,7 +57,8 @@ export function ResourceCard({ resource }: ResourceCardProps) {
         </p>
         <Link
           href={resourceHref}
-          className={`mt-6 inline-flex items-center gap-2 text-sm font-semibold text-brand-primary transition hover:text-foreground sm:mt-auto sm:pt-6 ${cta.link}`}
+          className={`mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-primary transition hover:text-foreground sm:mt-auto sm:pt-6 ${cta.link}`}
+          style={{ minHeight: 24 }}
         >
           {resource.ctaLabel}{" "}
           <ArrowRight className="size-4" aria-hidden="true" />

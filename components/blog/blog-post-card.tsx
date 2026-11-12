@@ -58,7 +58,8 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
         </div>
         <Link
           href={`/blog/${post.slug}`}
-          className={`mt-6 inline-flex items-center gap-2 text-sm font-semibold text-brand-primary transition hover:text-foreground ${cta.link}`}
+          className={`mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-primary transition hover:text-foreground ${cta.link}`}
+          style={{ minHeight: 24 }}
         >
           Read article <ArrowRight className="size-4" aria-hidden="true" />
         </Link>

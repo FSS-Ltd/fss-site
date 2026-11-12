@@ -1,9 +1,18 @@
 import assert from "node:assert/strict";
+import { createRequire } from "node:module";
 import test from "node:test";
 
 import { renderToStaticMarkup } from "react-dom/server";
 
-import { SiteFooter } from "./site-footer";
+// The footer pulls in CSS modules, which plain node cannot load.
+const require = createRequire(import.meta.url);
+require.extensions[".css"] = (module) => {
+  module.exports = {
+    __esModule: true,
+    default: new Proxy({}, { get: (_target, key) => String(key) }),
+  };
+};
+const { SiteFooter } = require("./site-footer");
 
 test("offers the privacy notice and a persistent cookie settings control", () => {
   const html = renderToStaticMarkup(<SiteFooter />);

@@ -5,7 +5,9 @@ import type { ResourceMeta } from "@/lib/types/resource";
 
 import { ResourceCard } from "@/components/resources/resource-card";
 import cta from "@/components/ui/cta-motion.module.css";
+import fill from "@/components/ui/cta-fill.module.css";
 import gutter from "@/components/ui/gutter.module.css";
+import { MeshBand } from "@/components/ui/mesh-band";
 
 type ResourceLibraryProps = {
   resources: ResourceMeta[];
@@ -74,7 +76,7 @@ export function ResourceLibrary({ resources }: ResourceLibraryProps) {
               <Link
                 data-magnetic
                 href={primaryCtaHref}
-                className={`inline-flex items-center gap-2 rounded-full bg-[var(--button-primary)] px-6 py-3.5 text-sm font-semibold text-cta-text transition ${cta.sweep} ${cta.rust}`}
+                className={`inline-flex items-center gap-2 rounded-full bg-[var(--button-primary)] px-6 py-3.5 text-sm font-semibold text-cta-text transition ${cta.sweep} ${fill.rust}`}
               >
                 <span data-mag-label className="inline-flex items-center gap-2">
                   {primaryCtaLabel}
@@ -158,6 +160,9 @@ export function ResourceLibrary({ resources }: ResourceLibraryProps) {
             </div>
           </aside>
         </div>
+        <div className="relative">
+          <MeshBand section="resources" />
+        </div>
       </section>
 
       <section
@@ -220,7 +225,7 @@ export function ResourceLibrary({ resources }: ResourceLibraryProps) {
                 <Link
                   href="/blog"
                   data-magnetic
-                  className={`inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-foreground ${cta.sweep} ${cta.clay}`}
+                  className={`inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-foreground ${cta.sweep} ${fill.clay}`}
                 >
                   <span
                     data-mag-label
@@ -231,7 +236,7 @@ export function ResourceLibrary({ resources }: ResourceLibraryProps) {
                 </Link>
                 <Link
                   href="/contact"
-                  className={`inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,.2)] bg-[rgba(255,255,255,.08)] px-6 py-3.5 text-sm font-semibold text-[#fff] ${cta.sweep} ${cta.white}`}
+                  className={`inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,.2)] bg-[rgba(255,255,255,.08)] px-6 py-3.5 text-sm font-semibold text-[#fff] ${cta.sweep} ${fill.white}`}
                 >
                   Talk to FSS{" "}
                   <ArrowRight className="size-4" aria-hidden="true" />

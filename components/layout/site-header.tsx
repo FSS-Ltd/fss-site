@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SiteHeaderNavigation } from "./site-header-controls";
 import styles from "./site-header.module.css";
+import cta from "@/components/ui/cta-motion.module.css";
 
 export function SiteHeader() {
   return (
@@ -26,7 +27,7 @@ export function SiteHeader() {
           href="/"
           prefetch={false}
           aria-label="Faithful Software Solutions home"
-          className="inline-flex min-h-11 shrink-0 items-center gap-4"
+          className={`inline-flex min-h-11 shrink-0 items-center gap-4 ${cta.link}`}
         >
           {/* Small, pre-sized local brand asset avoids image runtime overhead. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}

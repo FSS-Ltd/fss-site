@@ -5,7 +5,9 @@ import type { BlogPostMeta } from "@/lib/types/blog";
 
 import { BlogPostCard } from "@/components/blog/blog-post-card";
 import cta from "@/components/ui/cta-motion.module.css";
+import fill from "@/components/ui/cta-fill.module.css";
 import gutter from "@/components/ui/gutter.module.css";
+import { MeshBand } from "@/components/ui/mesh-band";
 
 type BlogIndexProps = {
   posts: BlogPostMeta[];
@@ -44,7 +46,7 @@ export function BlogIndex({ posts }: BlogIndexProps) {
             <Link
               href="/resources"
               data-magnetic
-              className={`inline-flex items-center gap-2 rounded-full bg-[#0a1a2e] px-6 py-3.5 text-sm font-semibold text-[#fff] transition ${cta.sweep} ${cta.rust}`}
+              className={`inline-flex items-center gap-2 rounded-full bg-[#0a1a2e] px-6 py-3.5 text-sm font-semibold text-[#fff] transition ${cta.sweep} ${fill.rust}`}
             >
               <span data-mag-label className="inline-flex items-center gap-2">
                 Browse resources{" "}
@@ -53,11 +55,14 @@ export function BlogIndex({ posts }: BlogIndexProps) {
             </Link>
             <Link
               href="/contact"
-              className={`inline-flex items-center gap-2 rounded-full border border-[rgba(10,26,46,.14)] bg-white/70 px-6 py-3.5 text-sm font-semibold text-[#0a1a2e] ${cta.sweep} ${cta.navy}`}
+              className={`inline-flex items-center gap-2 rounded-full border border-[rgba(10,26,46,.14)] bg-white/70 px-6 py-3.5 text-sm font-semibold text-[#0a1a2e] ${cta.sweep} ${fill.navy}`}
             >
               Talk to FSS
             </Link>
           </div>
+        </div>
+        <div className="relative">
+          <MeshBand section="blog" />
         </div>
       </section>
 
@@ -72,7 +77,7 @@ export function BlogIndex({ posts }: BlogIndexProps) {
               className="mb-14 grid gap-8 lg:grid-cols-[.85fr_1.15fr] lg:items-end"
             >
               <div>
-                <p className="font-mono text-xs tracking-[0.14em] text-[#0f7a83]">
+                <p className="font-mono text-xs tracking-[0.14em] text-[#0f7078]">
                   LATEST ARTICLE
                 </p>
                 <h2 className="mt-4 max-w-[560px] text-[clamp(28px,4vw,46px)] leading-[1.05] font-semibold text-[#0a1a2e]">
