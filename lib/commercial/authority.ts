@@ -99,7 +99,7 @@ export const authorityPages = {
       {
         id: "idea",
         title: "The idea.",
-        text: "FSS built NexSteps for that: school management software shaped around how the centre already works.",
+        text: "FSS built NexSteps for that.",
       },
       {
         id: "outcomes",

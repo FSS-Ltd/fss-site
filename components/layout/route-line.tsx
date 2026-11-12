@@ -19,6 +19,7 @@ function internalTarget(event: MouseEvent) {
     return false;
   }
   const url = new URL(anchor.href, location.href);
+  if (url.pathname === "/api" || url.pathname.startsWith("/api/")) return false;
   return url.origin === location.origin && url.pathname !== location.pathname;
 }
 
@@ -76,13 +77,14 @@ export function RouteLine() {
     };
     document.addEventListener("click", onClick, true);
     return () => document.removeEventListener("click", onClick, true);
-  });
+    // start only reads refs, so the listener binds once.
+  }, []);
 
   useEffect(() => {
     if (previous.current === pathname) return;
     previous.current = pathname;
     start();
-  });
+  }, [pathname]);
 
   return (
     <span
