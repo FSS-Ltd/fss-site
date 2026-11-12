@@ -42,7 +42,8 @@
     overflow: hidden;
     height: calc(100svh - 116px);
     display: grid;
-    align-content: center;
+    /* Cards start right under the section counter, not centred in the pin. */
+    align-content: start;
   }
   :global(#fssroot[data-motion-enhanced="true"]) .rail {
     display: flex;
@@ -52,7 +53,7 @@
   }
   :global(#fssroot[data-motion-enhanced="true"]) .rail article {
     width: min(38vw, 460px);
-    min-height: 330px;
+    min-height: min(50svh, 440px);
   }
 }
 .hint {
@@ -60,13 +61,11 @@
 }
 @media (min-width: 901px) and (prefers-reduced-motion: no-preference) {
   :global(#fssroot[data-motion-enhanced="true"]) .hint {
-    position: absolute;
-    bottom: 12px;
-    left: max(24px, calc((100cqw - 1120px) / 2));
     display: flex;
     align-items: center;
     gap: 10px;
-    margin: 0;
+    margin: 20px 0 0;
+    padding-inline: max(24px, calc((100cqw - 1120px) / 2));
     color: #665b54;
     font-size: 0.8125rem;
     font-weight: 540;
