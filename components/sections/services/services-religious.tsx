@@ -1,6 +1,7 @@
 import { ArrowRight, Church, Heart } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
+import cta from "@/components/ui/cta-motion.module.css";
 
 import { GlowCard } from "@/components/ui/spotlight-card";
 import { Section } from "@/components/ui/section";
@@ -46,7 +47,7 @@ export function ServicesReligious() {
               <p className="mt-2 text-sm leading-6 text-text-muted">{card.description}</p>
               <Link
                 href="/contact"
-                className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-primary hover:underline"
+                className={`mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-primary ${cta.link}`}
               >
                 Learn More <ArrowRight className="size-4" />
               </Link>

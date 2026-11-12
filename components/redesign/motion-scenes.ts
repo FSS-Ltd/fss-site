@@ -1,4 +1,4 @@
-import { getScrollProgress } from "./motion-values";
+import { getRevealDelay, getScrollProgress, isOnScreen } from "./motion-values";
 import { bindStoryScenes } from "./story-scenes";
 import { bindAppJourneys } from "./app-journey-scenes";
 import { storyInterval } from "./story-progress";
@@ -23,6 +23,7 @@ export function bindMotionReveals(scope: ParentNode) {
   );
   if (!elements.length || !("IntersectionObserver" in window)) return () => {};
   const animations = new Map<HTMLElement, Animation>();
+  const unseen = new Set(elements);
   let frame = 0;
   const updateMasks = () => {
     frame = 0;
@@ -54,10 +55,24 @@ export function bindMotionReveals(scope: ParentNode) {
 
   const observer = new IntersectionObserver(
     (entries) => {
+      let arrivals = 0;
       entries.forEach((entry) => {
-        if (!entry.isIntersecting || !(entry.target instanceof HTMLElement))
-          return;
+        if (!(entry.target instanceof HTMLElement)) return;
         const element = entry.target;
+        const firstLook = unseen.delete(element);
+        const { top, bottom } = entry.boundingClientRect;
+        // The page intro (data-intro) has its own CSS entrance; replaying a
+        // second one from here would stack the two. Everything else keeps its
+        // scroll reveal.
+        if (
+          firstLook &&
+          element.closest("[data-intro]") &&
+          isOnScreen(top, bottom, window.innerHeight)
+        ) {
+          observer.unobserve(element);
+          return;
+        }
+        if (!entry.isIntersecting) return;
         // Canvas fields and forms keep their own stationary coordinate space.
         if (
           element.querySelector("[data-hero-canvas], form") ||
@@ -75,18 +90,23 @@ export function bindMotionReveals(scope: ParentNode) {
               opacity: 0,
               transform:
                 variant === "mask" ? "none" : revealTransforms[variant],
-              clipPath: variant === "mask" ? "inset(0 0 100% 0)" : "inset(0)",
+              clipPath:
+                variant === "mask" ? "inset(0 -48px 100%)" : "inset(0 -48px)",
             },
             {
               opacity: 1,
               transform: variant === "mask" ? "none" : "translate3d(0, 0, 0)",
-              clipPath: "inset(0)",
+              // Negative side insets keep hanging markers (list numbers) visible.
+              clipPath: "inset(0 -48px)",
             },
           ],
           {
             duration: variant === "mask" ? 1000 : 760,
+            delay: variant === "mask" ? 0 : getRevealDelay(arrivals++),
             easing: "cubic-bezier(.2,.75,.2,1)",
-            fill: "none",
+            // Backwards fill holds the start frame through the cascade delay,
+            // then releases transform and clip ownership once finished.
+            fill: "backwards",
           },
         );
         if (
@@ -233,6 +253,10 @@ export function bindScrollScenes(scope: ParentNode) {
           0,
           element.scrollWidth - (element.parentElement?.clientWidth ?? 0),
         );
+        // The scene host also carries the progress so siblings of the track
+        // (edge fade, scroll hint) can follow it.
+        if (host !== element)
+          host.style.setProperty("--motion-progress", progress.toFixed(4));
         element.style.setProperty(
           "--motion-track-x",
           `${(-progress * travel).toFixed(2)}px`,

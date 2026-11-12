@@ -1,4 +1,5 @@
 import Link from "next/link";
+import cta from "@/components/ui/cta-motion.module.css";
 import type { ComponentPropsWithoutRef } from "react";
 
 import { MdxCallout } from "@/components/blog/mdx-callout";
@@ -47,13 +48,13 @@ function Anchor({ href = "", ...props }: ComponentPropsWithoutRef<"a">) {
   const isInternal = href.startsWith("/");
 
   if (isInternal) {
-    return <Link href={href} className="font-medium text-brand-primary underline-offset-4 hover:underline" {...props} />;
+    return <Link href={href} className={`font-medium text-brand-primary underline-offset-4 ${cta.link}`} {...props} />;
   }
 
   return (
     <a
       href={href}
-      className="font-medium text-brand-primary underline-offset-4 hover:underline"
+      className={`font-medium text-brand-primary underline-offset-4 ${cta.link}`}
       target="_blank"
       rel="noreferrer"
       {...props}

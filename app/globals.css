@@ -25,13 +25,13 @@
   --button-primary-hover: #102642;
   --button-secondary-border: rgba(10, 26, 46, 0.14);
   --button-secondary-hover-border: rgba(10, 26, 46, 0.28);
-  --button-ghost-text: #0f7a83;
+  --button-ghost-text: #0f7078;
 }
 
 #fssroot {
   --foreground: #211b17;
   --brand-primary: #a64224;
-  --brand-accent: #b55937;
+  --brand-accent: #a84b2b;
   --brand-secondary: #211b17;
   --brand-fss-navy: #07182e;
   --brand-fss-teal: #14989e;
@@ -40,7 +40,7 @@
   --border-soft: rgba(33, 27, 23, 0.12);
   --border-strong: rgba(33, 27, 23, 0.22);
   --text-muted: #554b45;
-  --text-subtle: #877d76;
+  --text-subtle: #6f645d;
   --button-shadow: rgba(33, 27, 23, 0.65);
   --button-primary: #211b17;
   --button-primary-hover: #302722;
@@ -89,7 +89,6 @@ body {
 
 @layer base {
   a {
-    color: inherit;
     text-decoration: none;
   }
 }
@@ -107,16 +106,6 @@ textarea::placeholder {
 
 html {
   -webkit-text-size-adjust: 100%;
-  scroll-behavior: auto;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  * {
-    transition: none !important;
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    scroll-behavior: auto !important;
-  }
 }
 
 #fssroot :focus-visible {
@@ -171,6 +160,15 @@ html {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+
   [data-magnetic],
   [data-mag-label],
   [data-motion-parallax],
@@ -182,5 +180,56 @@ html {
 
   [data-motion-wipe] {
     clip-path: none !important;
+  }
+}
+
+/* Page transitions: React route changes animate the keyed page boundary
+   (components/layout/page-transition.tsx); full document loads opt in below.
+   Unsupported browsers swap pages instantly. Opacity and transform only.
+   Everything sits under no-preference, so reduced motion gets none of it.
+   The site header carries its own view-transition-name, so it stays still.
+   The route line (components/layout/route-line.tsx) draws the workflow motif
+   across the header from JS, so it needs no keyframes here; its view-transition
+   group only sits above the page layers.
+   After a client navigation the boundary only fades (0.18 s); the page then
+   settles in two beats: the intro headline (data-intro), then the mesh band
+   under it (data-mesh-band), done inside 0.6 s. A first load plays the same
+   two beats, so the entrance settles quickly. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+  ::view-transition-old(.fss-page-out) {
+    animation: fss-fade 0.12s ease-in reverse both;
+  }
+  ::view-transition-new(.fss-page-in) {
+    animation: fss-fade 0.12s ease-out 0.06s both;
+  }
+  ::view-transition-group(fss-line) {
+    z-index: 2;
+  }
+  ::view-transition-old(fss-line) {
+    display: none;
+  }
+  ::view-transition-new(fss-line) {
+    animation: none;
+  }
+  [data-intro] > *,
+  [data-mesh-band] {
+    animation: fss-in 0.3s cubic-bezier(0.2, 0.75, 0.2, 1) var(--d, 0.06s)
+      backwards;
+  }
+}
+
+@keyframes fss-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes fss-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
   }
 }

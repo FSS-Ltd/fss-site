@@ -21,21 +21,23 @@ export function NexStepsProof({
       <div>
         <div className={styles.eyebrow}>Our work · NexSteps</div>
         <h2 id="nexsteps-title">
-          Software for the people who care for others.
+          Hours of admin, turned into time with families.
         </h2>
-        <p>
-          NexSteps is an FSS-built safeguarding, attendance and operations
-          platform for schools, churches and community organisations.
-        </p>
         <ul className={styles.list}>
-          <li>Role-scoped access and support portals</li>
-          <li>Attendance and safeguarding handover logs</li>
-          <li>Parent onboarding and billing workflows</li>
+          <li>
+            Problem: a learning centre needed complete school management
+            software that understood the ACE system.
+          </li>
+          <li>Idea: FSS built NexSteps for that.</li>
+          <li>
+            Outcome: hours of admin became more time with the children and
+            families.
+          </li>
+          <li>
+            Direction: a platform that adapts to the systems a real school uses,
+            rather than forcing them into an old way of doing things.
+          </li>
         </ul>
-        <p>
-          It brings the practical needs of faith and community settings into the
-          software design.
-        </p>
       </div>
       <figure>
         <Image

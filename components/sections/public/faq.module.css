@@ -1,6 +1,9 @@
 .item {
   border-bottom: 1px solid var(--border-soft);
 }
+.item:last-child {
+  border-bottom: 0;
+}
 .item h3 {
   margin: 0;
 }
@@ -37,7 +40,11 @@
   transition:
     background-color 160ms ease,
     border-color 160ms ease,
-    color 160ms ease;
+    color 160ms ease,
+    transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.question:hover span {
+  transform: scale(1.14);
 }
 .question:hover {
   text-decoration: underline;
@@ -49,4 +56,9 @@
   border-color: var(--foreground);
   background: var(--foreground);
   color: white;
+}
+@media (prefers-reduced-motion: reduce) {
+  .question:hover span {
+    transform: none;
+  }
 }

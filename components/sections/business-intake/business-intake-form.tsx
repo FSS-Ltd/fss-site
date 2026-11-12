@@ -161,10 +161,10 @@ export function BusinessIntakeForm() {
         data-lift-light
         className="rounded-[22px] border border-border-soft/70 bg-white p-7 text-center shadow-[0_40px_90px_-55px_rgba(33,27,23,.45)] sm:p-10"
       >
-        <span className="mx-auto flex size-11 items-center justify-center rounded-full bg-[rgba(20,152,158,.12)] text-[#0f7a83]">
+        <span className="mx-auto flex size-11 items-center justify-center rounded-full bg-[rgba(20,152,158,.12)] text-[#0f7078]">
           <PartyPopper className="size-5" aria-hidden="true" />
         </span>
-        <h3 className="mt-4 text-2xl font-semibold text-foreground">Thanks — we&apos;ve got it.</h3>
+        <h3 className="mt-4 text-2xl font-semibold text-foreground">Thanks, we&apos;ve got it.</h3>
         <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-text-muted">
           We received your idea and will review it. If it makes sense to talk further,
           we&apos;ll be in touch at the email you shared.

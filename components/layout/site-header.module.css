@@ -12,11 +12,12 @@
   border-radius: 8px;
   font-size: 0.9rem;
   color: var(--text-muted);
+  transition: 0.2s;
 }
 .desktop a[aria-current="page"],
 .mobilePanel a[aria-current="page"] {
   color: var(--foreground);
-  background: white;
+  background-color: #fff;
   font-weight: 650;
 }
 .desktop a[aria-current="page"] {
@@ -28,8 +29,8 @@
 }
 .desktop a:hover,
 .mobilePanel a:hover {
-  text-decoration: underline;
-  text-underline-offset: 4px;
+  color: var(--foreground);
+  background-color: #ffffffb3;
 }
 
 .mobile {
@@ -52,7 +53,7 @@
   top: 12px;
   left: 24px;
   padding: 12px;
-  background: white;
+  background: #fff;
   transform: translateY(-200%);
 }
 .skip:focus {

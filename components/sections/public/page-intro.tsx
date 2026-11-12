@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { ButtonLink } from "@/components/ui/button";
+import { MeshBand, type MeshSection } from "@/components/ui/mesh-band";
 import styles from "./public-page.module.css";
 
 export function PageIntro({
@@ -8,7 +9,10 @@ export function PageIntro({
   children,
   image,
   compact,
+  section,
 }: {
+  /** Which part of the site this header opens; drives the "0N / 0M" counter. */
+  section: MeshSection;
   eyebrow: string;
   title: string;
   children: ReactNode;
@@ -30,7 +34,7 @@ export function PageIntro({
         aria-hidden="true"
       />
       <div className={image ? styles.heroGrid : undefined}>
-        <div data-motion-reveal="mask">
+        <div data-motion-reveal="mask" data-intro>
           <div
             className={
               compact ? `${styles.eyebrow} ${compact.eyebrow}` : styles.eyebrow
@@ -43,6 +47,7 @@ export function PageIntro({
         </div>
         {image}
       </div>
+      <MeshBand section={section} compact={Boolean(compact)} />
     </header>
   );
 }

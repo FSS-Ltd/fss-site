@@ -1,13 +1,23 @@
 import assert from "node:assert/strict";
+import { createRequire } from "node:module";
 import test from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { getBlogPostBySlug } from "@/lib/blog";
 import { getResourceBySlug } from "@/lib/resources";
 import { ArticleSchema } from "./article-schema";
 import { ContentEvidence } from "./content-evidence";
-import { ContentBreadcrumbs } from "./content-breadcrumbs";
 import { ResourceSchema } from "./resource-schema";
 import { ResourceDelivery } from "@/emails/resource-delivery";
+
+// The breadcrumbs pull in a CSS module, which plain node cannot load.
+const require = createRequire(import.meta.url);
+require.extensions[".css"] = (module) => {
+  module.exports = {
+    __esModule: true,
+    default: new Proxy({}, { get: (_target, key) => String(key) }),
+  };
+};
+const { ContentBreadcrumbs } = require("./content-breadcrumbs");
 
 test("article evidence is visible and organisational authorship is represented accurately", async () => {
   const post = await getBlogPostBySlug(

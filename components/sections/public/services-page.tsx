@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { ContactLink, PageIntro } from "./page-intro";
 import { DeliverySteps } from "./delivery-steps";
 import { RelatedLinks } from "./related-links";
@@ -11,6 +10,7 @@ import {
 } from "@/lib/commercial/links";
 import styles from "./public-page.module.css";
 import railStyles from "./service-rail.module.css";
+import cta from "@/components/ui/cta-motion.module.css";
 
 const services = [
   {
@@ -49,6 +49,7 @@ export function ServicesPage() {
   return (
     <div className={styles.page}>
       <PageIntro
+        section="services"
         eyebrow="Services"
         title="AI and software built around your business."
         image={
@@ -57,14 +58,14 @@ export function ServicesPage() {
             data-motion-parallax="0.07"
             aria-hidden="true"
           >
-            <Image
-              src="/images/editorial/services-workflow-v1.webp"
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/redesign/services-network.svg"
               alt=""
-              width={2048}
-              height={1280}
-              sizes="(max-width: 900px) 92vw, 43vw"
+              width={1200}
+              height={750}
+              fetchPriority="high"
               className={styles.editorialImage}
-              priority
             />
           </div>
         }
@@ -96,6 +97,9 @@ export function ServicesPage() {
               </article>
             ))}
           </div>
+          <p className={railStyles.hint} aria-hidden="true">
+            Keep scrolling to see all six services <span>→</span>
+          </p>
         </div>
       </section>
       <section
@@ -105,13 +109,13 @@ export function ServicesPage() {
       >
         <h2 id="service-evidence">See these foundations in NexSteps.</h2>
         <p>
-          FSS built NexSteps for safeguarding, attendance and community
-          operations, including role-scoped access and parent onboarding. It is
-          operational software, not an AI deployment.
+          FSS built NexSteps, complete school management software that
+          understands the ACE system, for a learning centre. It is operational
+          software, not an AI deployment.
         </p>
         <Link
           href="/work/nexsteps"
-          className="inline-flex min-h-11 items-center font-medium underline underline-offset-4"
+          className={`inline-block py-3 font-medium underline underline-offset-4 ${cta.link}`}
         >
           Read the NexSteps case study
         </Link>
@@ -132,7 +136,7 @@ export function ServicesPage() {
           For founders exploring a new business idea, the{" "}
           <Link
             href="/start"
-            className="inline-flex min-h-11 items-center font-medium underline underline-offset-4"
+            className={`inline-flex min-h-11 items-center font-medium underline underline-offset-4 ${cta.link}`}
           >
             business idea review
           </Link>{" "}

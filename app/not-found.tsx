@@ -1,34 +1,50 @@
-import Link from "next/link";
+import type { Metadata } from "next";
 
+import { SiteShell } from "@/components/layout/site-shell";
+import { ButtonLink } from "@/components/ui/button";
+import { MeshBand } from "@/components/ui/mesh-band";
+
+export const metadata: Metadata = {
+  title: "Page not found | Faithful Software Solutions",
+};
+
+// Rendered inside the site shell so the skip link, header, footer and light
+// theme match every other page. Styled with utilities only: the root
+// not-found boundary ships to every route, so a CSS module here would count
+// against the homepage stylesheet budget.
 export default function NotFound() {
   return (
-    <main className="grid min-h-screen place-items-center bg-[#07182e] px-6 py-20 text-white">
-      <div className="max-w-xl">
-        <p className="mb-12 text-sm font-semibold tracking-wider text-[#46c7d8]">
-          Faithful Software Solutions
+    <SiteShell>
+      <section
+        style={{
+          padding: "176px max(24px, calc((100% - 1120px) / 2)) 96px",
+        }}
+      >
+        <p className="mb-4 text-sm font-semibold tracking-wider text-brand-primary">
+          404
         </p>
-        <p className="mb-4 text-sm text-[#b7c4d3]">404</p>
-        <h1 className="mb-6 text-4xl font-semibold tracking-tight sm:text-5xl">
+        <h1 className="mb-6 max-w-xl text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
           We couldn’t find that page.
         </h1>
-        <p className="mb-8 text-lg text-[#b7c4d3]">
+        <p className="mb-8 max-w-xl text-lg text-text-muted">
           The link may have changed. Visit our homepage or contact us for help.
         </p>
         <div className="flex flex-wrap gap-4">
-          <Link
-            className="rounded-full bg-[#46c7d8] px-6 py-3 font-semibold text-[#07182e] focus-visible:outline-2 focus-visible:outline-offset-4"
-            href="/"
-          >
-            Go to homepage
-          </Link>
-          <Link
-            className="rounded-full border border-white/40 px-6 py-3 focus-visible:outline-2 focus-visible:outline-offset-4"
+          <ButtonLink href="/" size="lg" magnetic>
+            Go to homepage <span aria-hidden="true">&nbsp;→</span>
+          </ButtonLink>
+          <ButtonLink
             href="/contact"
+            variant="secondary"
+            size="lg"
+            magnetic
+            className="hover:bg-foreground hover:text-white"
           >
             Contact FSS
-          </Link>
+          </ButtonLink>
         </div>
-      </div>
-    </main>
+        <MeshBand section="notFound" />
+      </section>
+    </SiteShell>
   );
 }

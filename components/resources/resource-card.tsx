@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import type { ResourceMeta } from "@/lib/types/resource";
+import cta from "@/components/ui/cta-motion.module.css";
 
 type ResourceCardProps = {
   resource: ResourceMeta;
@@ -17,7 +18,8 @@ export function ResourceCard({ resource }: ResourceCardProps) {
       className="group flex h-full flex-col overflow-hidden rounded-[18px] border border-border-soft/70 bg-white transition-[border-color,box-shadow,transform] duration-300"
     >
       <Link
-        aria-label={`View ${resource.title}`}
+        // The accessible name carries the visible FEATURED badge text.
+        aria-label={`${resource.featured ? "Featured: " : ""}View ${resource.title}`}
         className="block"
         href={resourceHref}
       >
@@ -44,7 +46,8 @@ export function ResourceCard({ resource }: ResourceCardProps) {
         <h2 className="mt-4 text-[22px] leading-tight font-semibold text-foreground">
           <Link
             href={resourceHref}
-            className="transition hover:text-brand-primary"
+            className={`inline-block transition hover:text-brand-primary ${cta.link}`}
+            style={{ padding: "4px 0", margin: "-4px 0" }}
           >
             {resource.title}
           </Link>
@@ -54,7 +57,8 @@ export function ResourceCard({ resource }: ResourceCardProps) {
         </p>
         <Link
           href={resourceHref}
-          className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-brand-primary transition hover:text-foreground sm:mt-auto sm:pt-6"
+          className={`mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-primary transition hover:text-foreground sm:mt-auto sm:pt-6 ${cta.link}`}
+          style={{ minHeight: 24 }}
         >
           {resource.ctaLabel}{" "}
           <ArrowRight className="size-4" aria-hidden="true" />

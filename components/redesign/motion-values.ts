@@ -80,3 +80,15 @@ export function getParticleNodeCount({
     Math.round(baseCount * sizeMultiplier * pointerMultiplier * areaMultiplier),
   );
 }
+
+// A reveal must never hide content the visitor can already see: anything on
+// screen when the observer binds stays put and only later arrivals animate.
+export function isOnScreen(top: number, bottom: number, viewportHeight: number) {
+  return bottom > 0 && top < viewportHeight;
+}
+
+// Siblings that enter together cascade instead of landing at once; the cap
+// keeps long lists from making the last item wait.
+export function getRevealDelay(index: number) {
+  return Math.min(Math.max(index, 0), 3) * 90;
+}

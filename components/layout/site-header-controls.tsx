@@ -6,6 +6,7 @@ import { useRef, useState } from "react";
 import { navItems } from "./site-header-nav-items";
 import styles from "./site-header.module.css";
 import { ButtonLink } from "@/components/ui/button";
+import cta from "@/components/ui/cta-motion.module.css";
 import {
   AI_RECEPTIONIST_GUIDE_PATH,
   isAiReceptionistGuidePath,
@@ -18,6 +19,7 @@ function HeaderLinks({ onNavigate }: { onNavigate?: () => void }) {
       key={item.href}
       href={item.href}
       prefetch={false}
+      className={cta.link}
       aria-current={pathname === item.activePath ? "page" : undefined}
       onClick={onNavigate}
     >
@@ -85,6 +87,7 @@ export function SiteHeaderNavigation() {
       <ButtonLink
         size="lg"
         className="px-3 text-sm sm:px-5"
+        style={{ whiteSpace: "nowrap" }}
         href="/contact"
         prefetch={false}
         magnetic

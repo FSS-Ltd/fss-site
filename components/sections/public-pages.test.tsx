@@ -20,7 +20,7 @@ test("personal brand colours stay scoped to the public site shell", () => {
 
   assert.match(css, /:root\s*\{[^}]*--brand-primary:\s*#14989e/);
   assert.match(css, /#fssroot\s*\{[^}]*--brand-primary:\s*#a64224/);
-  assert.match(css, /#fssroot\s*\{[^}]*--brand-accent:\s*#b55937/);
+  assert.match(css, /#fssroot\s*\{[^}]*--brand-accent:\s*#a84b2b/);
   assert.match(css, /#fssroot\s*\{[^}]*--brand-fss-teal:\s*#14989e/);
   assert.match(css, /#fssroot\s*\{[^}]*--brand-fss-cyan:\s*#46c7d8/);
   assert.match(css, /#fssroot\s*\{[^}]*--brand-fss-navy:\s*#07182e/);
@@ -137,14 +137,22 @@ test("the mobile concept keeps a static image fallback and an isolated atom canv
   assert.equal((html.match(/data-app-atoms=/g) ?? []).length, 1);
   assert.doesNotMatch(html, /data-app-tile=/);
   assert.match(html, /data-app-image/);
-  assert.match(html, /Illustrative app concept/);
+  assert.match(html, /NexSteps app, Today screen/);
 });
 
-test("home carries the hero mission branding and a dedicated delivery scene", () => {
+test("home draws its own value network in the hero, with a static poster beneath it, and keeps a dedicated delivery scene", () => {
   const { HomePage } = require("./public/home-page");
   const html = renderToStaticMarkup(<HomePage />);
-  assert.match(html, /fss-monogram-white/);
-  assert.match(html, /For Your Business/);
+  assert.doesNotMatch(
+    html,
+    /home-mission-systems|fss-monogram-white|For Your Business/,
+  );
+  assert.match(
+    html,
+    /<canvas[^>]*data-value-particles[^>]*data-network-nodes="150"[^>]*data-network-view="840x780"/,
+  );
+  assert.match(html, /<canvas[^>]*><\/canvas><svg[^>]*viewBox="0 0 840 780"/);
+  assert.match(html, /data-motion-delivery="cinematic"/);
   assert.match(html, /data-motion-delivery="cinematic"/);
   assert.equal((html.match(/data-delivery-step=/g) ?? []).length, 3);
 });

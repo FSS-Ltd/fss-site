@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type {
   CommercialPageContent,
   CommercialSection,
@@ -10,10 +11,12 @@ import {
 import { JsonLd } from "@/components/seo/json-ld";
 import { organisation } from "@/lib/seo/organisation";
 import { ContactLink, PageIntro } from "./page-intro";
+import type { MeshSection } from "@/components/ui/mesh-band";
 import { DeliverySteps } from "./delivery-steps";
-import { NexStepsProof } from "./nexsteps-proof";
 import { RelatedLinks } from "./related-links";
+import { SectionSpine } from "./section-spine";
 import styles from "./public-page.module.css";
+import cta from "@/components/ui/cta-motion.module.css";
 import { ContentEvidence } from "@/components/seo/content-evidence";
 import { churchArticle } from "@/lib/commercial/church-article";
 
@@ -28,7 +31,10 @@ function ContentSection({ section }: { section: CommercialSection }) {
       <p className="max-w-3xl">{section.text}</p>
       {section.links?.map((link) => (
         <p key={link.href}>
-          <Link href={link.href} className="underline underline-offset-4">
+          <Link
+            href={link.href}
+            className={`underline underline-offset-4 ${cta.link}`}
+          >
             {link.label}
           </Link>
         </p>
@@ -43,6 +49,14 @@ function ContentSection({ section }: { section: CommercialSection }) {
     </section>
   );
 }
+
+const headerSection: Record<CommercialPageContent["kind"], MeshSection> = {
+  service: "services",
+  sector: "services",
+  "case-study": "work",
+  guide: "resources",
+  article: "blog",
+};
 
 export function CommercialPage({ page }: { page: CommercialPageContent }) {
   return (
@@ -59,7 +73,7 @@ export function CommercialPage({ page }: { page: CommercialPageContent }) {
                 ) : (
                   <Link
                     href={item.href}
-                    className="inline-flex min-h-11 items-center underline underline-offset-4"
+                    className={`inline-block py-3 underline underline-offset-4 ${cta.link}`}
                   >
                     {item.label}
                   </Link>
@@ -68,7 +82,38 @@ export function CommercialPage({ page }: { page: CommercialPageContent }) {
             ))}
           </ol>
         </nav>
-        <PageIntro eyebrow={page.label} title={page.heading}>
+        <PageIntro
+          section={headerSection[page.kind]}
+          eyebrow={page.label}
+          title={page.heading}
+          image={
+            page.kind === "case-study" ? (
+              <div
+                className={styles.editorialFrame}
+                data-motion-parallax="0.06"
+                style={{ aspectRatio: "5 / 2" }}
+              >
+                {/* One real card from the dashboard, cropped by position, not edited. */}
+                <Image
+                  src="/redesign/products/admin-dashboard.png"
+                  alt="NexSteps Today's Sessions card, from the operations dashboard built by FSS"
+                  width={4112}
+                  height={2406}
+                  sizes="(max-width: 900px) 350vw, 165vw"
+                  style={{
+                    position: "absolute",
+                    maxWidth: "none",
+                    width: "384.6%",
+                    height: "auto",
+                    left: "-117.3%",
+                    top: "-66.4%",
+                  }}
+                  priority
+                />
+              </div>
+            ) : undefined
+          }
+        >
           <p className="max-w-2xl text-lg sm:text-xl">{page.answer}</p>
           <p className="text-sm">
             By {organisation.name} · Updated{" "}
@@ -81,10 +126,13 @@ export function CommercialPage({ page }: { page: CommercialPageContent }) {
         {page.path === "/blog/church-management-software-vs-bespoke" && (
           <ContentEvidence content={churchArticle.meta} />
         )}
-        {page.kind === "case-study" && <NexStepsProof />}
-        {page.sections.map((section) => (
-          <ContentSection key={section.id} section={section} />
-        ))}
+        {page.kind === "case-study" || page.kind === "service" ? (
+          <SectionSpine sections={page.sections} />
+        ) : (
+          page.sections.map((section) => (
+            <ContentSection key={section.id} section={section} />
+          ))
+        )}
         {page.kind !== "article" && <DeliverySteps />}
         <section
           className={styles.section}

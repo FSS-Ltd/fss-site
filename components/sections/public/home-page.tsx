@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { ButtonLink } from "@/components/ui/button";
 import { ContactLink } from "./page-intro";
 import { NexStepsProof } from "./nexsteps-proof";
@@ -10,6 +9,11 @@ import { AppJourney } from "./app-journey";
 import { sectorLink, costLink } from "@/lib/commercial/links";
 import styles from "./public-page.module.css";
 import homeStyles from "./home-page.module.css";
+import {
+  ValueNetworkPoster,
+  networkView,
+} from "@/components/redesign/value-network-poster";
+import cta from "@/components/ui/cta-motion.module.css";
 
 export function HomePage() {
   return (
@@ -21,7 +25,7 @@ export function HomePage() {
           aria-hidden="true"
         />
         <div className={homeStyles.heroGrid}>
-          <div className={homeStyles.intro}>
+          <div className={homeStyles.intro} data-intro>
             <p className={homeStyles.eyebrow}>
               Faithful Software Solutions · UK studio
             </p>
@@ -29,6 +33,36 @@ export function HomePage() {
               AI and custom software for the work your <em>business</em> depends
               on.
             </h1>
+            <p
+              style={{
+                maxWidth: 540,
+                margin: "22px 0 0",
+                paddingLeft: 14,
+                borderLeft: "3px solid #a64224",
+                color: "#211b17",
+                fontSize: "1.0625rem",
+                fontWeight: 560,
+                lineHeight: 1.5,
+              }}
+            >
+              For a learning centre,{" "}
+              <Link
+                href="/work/nexsteps"
+                className={cta.link}
+                // Vertical padding with a matching negative margin gives the
+                // inline link a 44px target without moving the line.
+                style={{
+                  display: "inline-block",
+                  padding: "11px 0",
+                  margin: "-11px 0",
+                  color: "#a64224",
+                }}
+              >
+                NexSteps
+              </Link>{" "}
+              turned hours of admin into more time with the children and
+              families.
+            </p>
             <p className={homeStyles.description}>
               We add AI to the systems you already use, automate repeated work
               and build custom software for businesses of any size, from
@@ -36,7 +70,10 @@ export function HomePage() {
             </p>
             <div className={homeStyles.actions}>
               <ContactLink />
-              <Link href="/work/nexsteps" className={homeStyles.caseStudyLink}>
+              <Link
+                href="/work/nexsteps"
+                className={`${homeStyles.caseStudyLink} ${cta.sweep}`}
+              >
                 Read the NexSteps case study
               </Link>
             </div>
@@ -47,32 +84,23 @@ export function HomePage() {
               <span>Large organisations</span>
             </p>
           </div>
-          <div
-            className={homeStyles.markStage}
-            aria-hidden="true"
-            data-motion-parallax="0.08"
-          >
-            <div className={homeStyles.markFrame}>
-              <Image
-                src="/images/editorial/home-mission-systems-v1.webp"
-                alt=""
-                width={2048}
-                height={1280}
-                priority
-                sizes="(max-width: 760px) 92vw, 44vw"
-                className={homeStyles.editorialImage}
-              />
-              <div className={homeStyles.imageBrand}>
-                <Image
-                  src="/redesign/brand/fss-monogram-white.png"
-                  alt=""
-                  width={709}
-                  height={316}
-                />
-                <span>For Your Business</span>
-              </div>
-            </div>
-          </div>
+        </div>
+        {/* The site's own value network, bled across the hero. The poster is the
+            static frame for first paint, no-JS and reduced motion, until the
+            canvas takes over. */}
+        <div
+          className={homeStyles.markStage}
+          aria-hidden="true"
+          data-motion-parallax="0.08"
+        >
+          <canvas
+            data-hero-canvas
+            data-value-particles
+            data-network-nodes={networkView.nodes}
+            data-network-view={`${networkView.width}x${networkView.height}`}
+            className={homeStyles.networkCanvas}
+          />
+          <ValueNetworkPoster className={homeStyles.poster} />
         </div>
       </section>
       <HomeValueStory />
@@ -84,7 +112,12 @@ export function HomePage() {
               <p>WHAT WE BUILD</p>
               <h2>Systems that fit the way you work.</h2>
             </div>
-            <Link href="/services">All services</Link>
+            <Link
+              href="/services"
+              className={`${homeStyles.caseStudyLink} ${cta.sweep}`}
+            >
+              All services
+            </Link>
           </div>
           <div className={homeStyles.serviceGrid}>
             <article
@@ -97,7 +130,7 @@ export function HomePage() {
                 Add AI to the tools your team already uses, with approval steps,
                 logs and a clear route for anything it cannot handle.
               </p>
-              <Link href="/services/ai-integration">
+              <Link href="/services/ai-integration" className={cta.link}>
                 Explore AI integration
               </Link>
             </article>
@@ -111,7 +144,7 @@ export function HomePage() {
                 Reduce repeated data entry and connect the tools your business
                 already relies on, with clear review and exception handling.
               </p>
-              <Link href="/services/workflow-automation">
+              <Link href="/services/workflow-automation" className={cta.link}>
                 Explore automation
               </Link>
             </article>
@@ -125,7 +158,7 @@ export function HomePage() {
                 Assess sensitive workflows before data reaches the wrong tools,
                 with deployment boundaries and oversight built into the work.
               </p>
-              <Link href="/services/private-ai">Explore private AI</Link>
+              <Link href="/services/private-ai" className={cta.link}>Explore private AI</Link>
             </article>
           </div>
         </div>

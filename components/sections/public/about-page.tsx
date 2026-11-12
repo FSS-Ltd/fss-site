@@ -5,11 +5,13 @@ import { ContactLink, PageIntro } from "./page-intro";
 import { RelatedLinks } from "./related-links";
 import { sectorLink } from "@/lib/commercial/links";
 import styles from "./public-page.module.css";
+import cta from "@/components/ui/cta-motion.module.css";
 
 export function AboutPage() {
   return (
     <div className={styles.page}>
       <PageIntro
+        section="about"
         eyebrow="About FSS"
         title="Faithful by name. Dependable by design."
         image={
@@ -68,13 +70,13 @@ export function AboutPage() {
       >
         <h2 id="about-work">Built by FSS: NexSteps.</h2>
         <p>
-          NexSteps brings safeguarding, attendance and operations into a
-          platform for schools, churches and community organisations. It
-          reflects the operational settings our work serves.
+          A learning centre needed complete school management software that
+          understood the ACE system, so FSS built NexSteps. Hours of admin
+          became more time with the children and families.
         </p>
         <Link
           href="/work/nexsteps"
-          className="inline-flex min-h-11 items-center font-medium underline underline-offset-4"
+          className={`inline-block py-3 font-medium underline underline-offset-4 ${cta.link}`}
         >
           Read the NexSteps case study
         </Link>
@@ -93,7 +95,7 @@ export function AboutPage() {
         </p>
         <Link
           href="/services"
-          className="inline-flex min-h-11 items-center font-medium underline underline-offset-4"
+          className={`inline-block py-3 font-medium underline underline-offset-4 ${cta.link}`}
         >
           See how we can help
         </Link>

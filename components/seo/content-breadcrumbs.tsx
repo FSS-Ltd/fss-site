@@ -1,17 +1,18 @@
 import Link from "next/link";
+import cta from "@/components/ui/cta-motion.module.css";
 
 export function ContentBreadcrumbs({
   parent,
-  title,
 }: {
   parent: "Blog" | "Resources";
-  title: string;
+  /** The page title; shown by the heading, not the trail. */
+  title?: string;
 }) {
   return (
     <nav aria-label="Breadcrumb" className="mb-8 text-sm">
       <ol className="flex flex-wrap items-center gap-3">
         <li>
-          <Link href="/" className="underline">
+          <Link href="/" className={`inline-block py-3 underline ${cta.link}`}>
             Home
           </Link>
         </li>
@@ -19,14 +20,17 @@ export function ContentBreadcrumbs({
         <li>
           <Link
             href={parent === "Blog" ? "/blog" : "/resources"}
-            className="underline"
+            className={`inline-block py-3 underline ${cta.link}`}
           >
             {parent}
           </Link>
         </li>
         <li aria-hidden="true">/</li>
         <li>
-          <span aria-current="page">{title}</span>
+          {/* The title is the page heading right below; repeating it adds nothing. */}
+          <span aria-current="page">
+            {parent === "Blog" ? "Article" : "Resource"}
+          </span>
         </li>
       </ol>
     </nav>

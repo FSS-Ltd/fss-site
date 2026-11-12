@@ -1,0 +1,14 @@
+/* Fill colours for .sweep (cta-motion.module.css); the default is the site's dark brown. */
+.rust {
+  --sweep-fill: #a64224;
+}
+.clay {
+  --sweep-fill: #b55937;
+}
+.navy {
+  --sweep-fill: #0a1a2e;
+}
+.white {
+  --sweep-fill: #fff;
+  --sweep-ink: #211b17;
+}

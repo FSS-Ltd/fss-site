@@ -33,6 +33,7 @@ export function ContactPageContent() {
   return (
     <div className={`${styles.page} ${compactStyles.pageCompact}`}>
       <PageIntro
+        section="contact"
         compact={{
           hero: compactStyles.heroCompact,
           canvas: compactStyles.canvasCompact,

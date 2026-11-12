@@ -1,6 +1,7 @@
 import { Check } from "lucide-react";
 import { compileMDX } from "next-mdx-remote/rsc";
 import Link from "next/link";
+import cta from "@/components/ui/cta-motion.module.css";
 
 import type { ResourceItem, ResourceMeta } from "@/lib/types/resource";
 
@@ -85,9 +86,9 @@ export async function ResourceDetailPage({
           <div className="relative">
             <div className="pointer-events-none absolute -inset-4 rounded-full bg-brand-primary/8 blur-3xl" />
             <GlowCard customSize className="relative p-8 shadow-2xl">
-              <h3 className="text-xl font-bold text-foreground">
+              <h2 className="text-xl font-bold text-foreground">
                 Download for Free
-              </h3>
+              </h2>
               <p className="mt-1 text-sm text-text-muted">{deliveryPromise}</p>
               <div className="mt-5">
                 <LeadMagnetCaptureForm
@@ -133,9 +134,9 @@ export async function ResourceDetailPage({
         </section>
 
         <section className="mt-20 py-16 text-center" data-motion-reveal="up">
-          <h3 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
+          <h2 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
             Prepare the next software decision.
-          </h3>
+          </h2>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-text-muted">
             Complete the resource with the people who own the process and agree
             which open question to resolve next.
@@ -180,13 +181,13 @@ export async function ResourceDetailPage({
             </div>
             <p className="mt-6 text-sm text-text-subtle">
               Want to learn more?{" "}
-              <Link href="/blog" className="text-brand-primary hover:underline">
+              <Link href="/blog" className={`text-brand-primary ${cta.link}`}>
                 Read our blog
               </Link>{" "}
               or{" "}
               <Link
                 href="/contact"
-                className="text-brand-primary hover:underline"
+                className={`text-brand-primary ${cta.link}`}
               >
                 talk to FSS directly
               </Link>

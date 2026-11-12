@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import { ArrowRight } from "lucide-react";
 
 import type { BlogPostMeta } from "@/lib/types/blog";
+import cta from "@/components/ui/cta-motion.module.css";
 
 type BlogPostCardProps = {
   post: BlogPostMeta;
@@ -15,7 +16,11 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
       data-lift-light
       className="group overflow-hidden rounded-[18px] border border-border-soft/70 bg-white transition-[border-color,box-shadow,transform] duration-300"
     >
-      <Link className="block" href={`/blog/${post.slug}`}>
+      <Link
+        className="block"
+        href={`/blog/${post.slug}`}
+        aria-label={post.title}
+      >
         <div className="relative h-52 overflow-hidden bg-[#eef0f2]">
           <Image
             src={post.coverImage}
@@ -34,7 +39,7 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
         </p>
         <h2 className="mt-4 text-[22px] font-semibold leading-tight text-foreground">
           <Link
-            className="transition hover:text-brand-primary"
+            className={`transition hover:text-brand-primary ${cta.link}`}
             href={`/blog/${post.slug}`}
           >
             {post.title}
@@ -53,7 +58,8 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
         </div>
         <Link
           href={`/blog/${post.slug}`}
-          className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-brand-primary transition hover:text-foreground"
+          className={`mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-primary transition hover:text-foreground ${cta.link}`}
+          style={{ minHeight: 24 }}
         >
           Read article <ArrowRight className="size-4" aria-hidden="true" />
         </Link>

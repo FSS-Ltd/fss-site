@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { CookieSettingsButton } from "@/components/layout/cookie-settings-button";
 import { organisation } from "@/lib/seo/organisation";
+import cta from "@/components/ui/cta-motion.module.css";
 
 const sitemapLinks = [
   { label: "Services", href: "/services" },
@@ -22,11 +23,13 @@ export function SiteFooter() {
       style={{
         background: "#211b17",
         color: "#d8cdc4",
-        padding: "clamp(56px,7vw,84px) 28px 36px",
+        // Shares the public page gutter so footer, header and content align.
+        padding:
+          "clamp(56px,7vw,84px) max(clamp(16px, 7.5vw - 8px, 24px), calc((100% - 1120px) / 2)) 36px",
         borderTop: "1px solid rgba(255,255,255,.07)",
       }}
     >
-      <div style={{ maxWidth: "1180px", margin: "0 auto" }}>
+      <div>
         <div
           data-foot-grid
           style={{
@@ -55,11 +58,12 @@ export function SiteFooter() {
             />
             <p style={{ margin: 0, fontSize: "14.5px", lineHeight: 1.6 }}>
               Engineering clarity out of complexity. Bespoke software, apps and
-              private AI — built faithfully, in the UK.
+              private AI. Built faithfully, in the UK.
             </p>
             <Link
               href="/contact"
               prefetch={false}
+              className={cta.link}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
