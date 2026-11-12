@@ -21,7 +21,7 @@ export function HomePage() {
           aria-hidden="true"
         />
         <div className={homeStyles.heroGrid}>
-          <div className={homeStyles.intro}>
+          <div className={homeStyles.intro} data-intro>
             <p className={homeStyles.eyebrow}>
               Faithful Software Solutions · UK studio
             </p>

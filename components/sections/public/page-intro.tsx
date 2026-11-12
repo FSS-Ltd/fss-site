@@ -30,7 +30,7 @@ export function PageIntro({
         aria-hidden="true"
       />
       <div className={image ? styles.heroGrid : undefined}>
-        <div data-motion-reveal="mask">
+        <div data-motion-reveal="mask" data-intro>
           <div
             className={
               compact ? `${styles.eyebrow} ${compact.eyebrow}` : styles.eyebrow

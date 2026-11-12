@@ -187,48 +187,37 @@ html {
 
 /* Page transitions: React route changes animate the keyed page boundary
    (components/layout/page-transition.tsx); full document loads opt in below.
-   Unsupported browsers swap pages instantly. Opacity and transform only. */
+   Unsupported browsers swap pages instantly. Opacity and transform only.
+   Everything sits under no-preference, so reduced motion gets none of it.
+   [data-intro] is the shared hero cascade for the homepage and page intros. */
 @media (prefers-reduced-motion: no-preference) {
   @view-transition {
     navigation: auto;
   }
+  ::view-transition-old(.fss-page-out) {
+    animation: fss-out 0.16s ease-in both;
+  }
+  ::view-transition-new(.fss-page-in) {
+    animation: fss-in 0.42s cubic-bezier(0.2, 0.75, 0.2, 1) 0.09s both;
+  }
+  [data-intro] > * {
+    animation: fss-in 0.7s cubic-bezier(0.2, 0.75, 0.2, 1) backwards;
+  }
+  [data-intro] > :nth-child(n + 2) {
+    animation-delay: 0.08s;
+  }
 }
 
-::view-transition {
-  pointer-events: none;
-}
-
-/* The header keeps its place and paints above the moving page. */
-::view-transition-group(site-header) {
-  z-index: 100;
-}
-
-::view-transition-old(.fss-page-out) {
-  animation: fss-page-out 160ms cubic-bezier(0.4, 0, 1, 1) both;
-}
-
-::view-transition-new(.fss-page-in) {
-  animation: fss-page-in 420ms cubic-bezier(0.2, 0.75, 0.2, 1) 90ms both;
-}
-
-@keyframes fss-page-out {
+@keyframes fss-out {
   to {
     opacity: 0;
     transform: translateY(-8px);
   }
 }
 
-@keyframes fss-page-in {
+@keyframes fss-in {
   from {
     opacity: 0;
     transform: translateY(16px);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-group(*),
-  ::view-transition-old(*),
-  ::view-transition-new(*) {
-    animation: none !important;
   }
 }

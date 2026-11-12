@@ -1,6 +1,9 @@
 .item {
   border-bottom: 1px solid var(--border-soft);
 }
+.item:last-child {
+  border-bottom: 0;
+}
 .item h3 {
   margin: 0;
 }
