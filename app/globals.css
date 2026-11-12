@@ -189,7 +189,10 @@ html {
    (components/layout/page-transition.tsx); full document loads opt in below.
    Unsupported browsers swap pages instantly. Opacity and transform only.
    Everything sits under no-preference, so reduced motion gets none of it.
-   [data-intro] is the shared hero cascade for the homepage and page intros. */
+   [data-intro] is the shared hero cascade for the homepage and page intros.
+   It plays on a first load only: after a client navigation the page transition
+   already fades the page in, and a second entrance would stack on top of it
+   (page-transition.tsx sets data-navigated). */
 @media (prefers-reduced-motion: no-preference) {
   @view-transition {
     navigation: auto;
@@ -200,11 +203,11 @@ html {
   ::view-transition-new(.fss-page-in) {
     animation: fss-in 0.42s cubic-bezier(0.2, 0.75, 0.2, 1) 0.09s both;
   }
-  [data-intro] > * {
-    animation: fss-in 0.7s cubic-bezier(0.2, 0.75, 0.2, 1) backwards;
+  html:not([data-navigated]) [data-intro] > * {
+    animation: fss-in 0.5s cubic-bezier(0.2, 0.75, 0.2, 1) backwards;
   }
-  [data-intro] > :nth-child(n + 2) {
-    animation-delay: 0.08s;
+  html:not([data-navigated]) [data-intro] > :nth-child(n + 2) {
+    animation-delay: 0.05s;
   }
 }
 

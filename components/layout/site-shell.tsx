@@ -17,7 +17,7 @@ export function SiteShell({ children }: SiteShellProps) {
     >
       <SiteInteractions />
       <SiteHeader />
-      <main id="main-content" tabIndex={-1}>
+      <main id="main-content" tabIndex={-1} style={{ outline: "none" }}>
         <PageTransition>{children}</PageTransition>
       </main>
       <SiteFooter />

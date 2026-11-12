@@ -1,8 +1,4 @@
-import {
-  getRevealDelay,
-  getScrollProgress,
-  isOnScreen,
-} from "./motion-values";
+import { getRevealDelay, getScrollProgress, isOnScreen } from "./motion-values";
 import { bindStoryScenes } from "./story-scenes";
 import { bindAppJourneys } from "./app-journey-scenes";
 import { storyInterval } from "./story-progress";
@@ -65,10 +61,14 @@ export function bindMotionReveals(scope: ParentNode) {
         const element = entry.target;
         const firstLook = unseen.delete(element);
         const { top, bottom } = entry.boundingClientRect;
-        // Content visible when the runtime binds (late load, or a page that
-        // arrived through a view transition) is already readable; hiding it
-        // to replay an entrance would read as a flash.
-        if (firstLook && isOnScreen(top, bottom, window.innerHeight)) {
+        // The page intro (data-intro) has its own CSS entrance; replaying a
+        // second one from here would stack the two. Everything else keeps its
+        // scroll reveal.
+        if (
+          firstLook &&
+          element.closest("[data-intro]") &&
+          isOnScreen(top, bottom, window.innerHeight)
+        ) {
           observer.unobserve(element);
           return;
         }
@@ -90,7 +90,8 @@ export function bindMotionReveals(scope: ParentNode) {
               opacity: 0,
               transform:
                 variant === "mask" ? "none" : revealTransforms[variant],
-              clipPath: variant === "mask" ? "inset(0 -48px 100%)" : "inset(0 -48px)",
+              clipPath:
+                variant === "mask" ? "inset(0 -48px 100%)" : "inset(0 -48px)",
             },
             {
               opacity: 1,
@@ -252,6 +253,10 @@ export function bindScrollScenes(scope: ParentNode) {
           0,
           element.scrollWidth - (element.parentElement?.clientWidth ?? 0),
         );
+        // The scene host also carries the progress so siblings of the track
+        // (edge fade, scroll hint) can follow it.
+        if (host !== element)
+          host.style.setProperty("--motion-progress", progress.toFixed(4));
         element.style.setProperty(
           "--motion-track-x",
           `${(-progress * travel).toFixed(2)}px`,
