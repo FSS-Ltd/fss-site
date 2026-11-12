@@ -46,7 +46,11 @@ export function MeshBand({
       <span>{sectionCounter(section)}</span>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/redesign/mesh-band.svg"
+        src={
+          section === "notFound"
+            ? "/redesign/mesh-band-lost.svg"
+            : "/redesign/mesh-band.svg"
+        }
         alt=""
         width={1120}
         height={120}
