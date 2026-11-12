@@ -106,7 +106,6 @@ textarea::placeholder {
 }
 
 html {
-  -webkit-text-size-adjust: 100%;
   scroll-behavior: auto;
 }
 
@@ -115,7 +114,6 @@ html {
     transition: none !important;
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
-    scroll-behavior: auto !important;
   }
 }
 
@@ -204,15 +202,29 @@ html {
   ::view-transition-new(.fss-page-in) {
     animation: fss-fade 0.12s ease-out 0.06s both;
   }
+  ::view-transition-group(fss-line) {
+    background: var(--brand-primary);
+    transform-origin: left;
+    animation: fss-line 0.5s ease-out both;
+  }
   [data-intro] > *,
   [data-mesh-band] {
-    animation: fss-in 0.3s cubic-bezier(0.2, 0.75, 0.2, 1) var(--d, 0.12s)
+    animation: fss-in 0.3s cubic-bezier(0.2, 0.75, 0.2, 1) var(--d, 0.06s)
       backwards;
   }
 }
 
 @keyframes fss-fade {
   from {
+    opacity: 0;
+  }
+}
+
+@keyframes fss-line {
+  from {
+    scale: 0 1;
+  }
+  to {
     opacity: 0;
   }
 }

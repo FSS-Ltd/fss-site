@@ -10,6 +10,18 @@ export function SiteHeader() {
       // A named header stays still while page content transitions under it.
       style={{ viewTransitionName: "site-header" }}
     >
+      {/* The motif line a page change draws under the header (see globals.css). */}
+      <span
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          insetInline: 0,
+          bottom: -1,
+          height: 2,
+          pointerEvents: "none",
+          viewTransitionName: "fss-line",
+        }}
+      />
       <a href="#main-content" className={styles.skip}>
         Skip to content
       </a>

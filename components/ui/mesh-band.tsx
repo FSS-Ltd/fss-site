@@ -36,7 +36,7 @@ export function MeshBand({
         gap: 16,
         marginTop: compact ? 12 : 44,
         // Starts after the headline (globals.css reads --d for its delay).
-        ["--d" as string]: "0.22s",
+        ["--d" as string]: "0.16s",
         color: "#665b54",
         fontFamily: "var(--font-geist-mono), monospace",
         fontSize: 11,
