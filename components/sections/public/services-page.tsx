@@ -137,7 +137,7 @@ export function ServicesPage() {
           For founders exploring a new business idea, the{" "}
           <Link
             href="/start"
-            className="inline-flex min-h-11 items-center font-medium underline underline-offset-4"
+            className={`inline-flex min-h-11 items-center font-medium underline underline-offset-4 ${cta.link}`}
           >
             business idea review
           </Link>{" "}

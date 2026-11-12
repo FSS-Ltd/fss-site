@@ -16,7 +16,6 @@ export function CookieSettingsButton() {
       }
       style={{
         border: 0,
-        background: "transparent",
         padding: "4px 0",
         color: "#8aa0b8",
         fontSize: "13px",
