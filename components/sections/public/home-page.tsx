@@ -53,24 +53,23 @@ export function HomePage() {
             data-motion-parallax="0.08"
           >
             <div className={homeStyles.markFrame}>
-              <Image
-                src="/images/editorial/home-mission-systems-v1.webp"
-                alt=""
-                width={2048}
-                height={1280}
-                priority
-                sizes="(max-width: 760px) 92vw, 44vw"
-                className={homeStyles.editorialImage}
+              {/* The site's own value network. The poster is the static frame
+                  for first paint, no-JS and until the canvas takes over. */}
+              <canvas
+                data-hero-canvas
+                data-value-particles
+                data-network-nodes="54"
+                className={homeStyles.networkCanvas}
               />
-              <div className={homeStyles.imageBrand}>
-                <Image
-                  src="/redesign/brand/fss-monogram-white.png"
-                  alt=""
-                  width={709}
-                  height={316}
-                />
-                <span>For Your Business</span>
-              </div>
+              <Image
+                src="/redesign/value-network-poster.svg"
+                alt=""
+                width={500}
+                height={312}
+                unoptimized
+                priority
+                className={homeStyles.poster}
+              />
             </div>
           </div>
         </div>

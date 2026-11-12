@@ -140,11 +140,22 @@ test("the mobile concept keeps a static image fallback and an isolated atom canv
   assert.match(html, /Illustrative app concept/);
 });
 
-test("home carries the hero mission branding and a dedicated delivery scene", () => {
+test("home draws its own value network in the hero, with a static poster beneath it, and keeps a dedicated delivery scene", () => {
   const { HomePage } = require("./public/home-page");
   const html = renderToStaticMarkup(<HomePage />);
-  assert.match(html, /fss-monogram-white/);
-  assert.match(html, /For Your Business/);
+  assert.doesNotMatch(
+    html,
+    /home-mission-systems|fss-monogram-white|For Your Business/,
+  );
+  assert.match(
+    html,
+    /<canvas[^>]*data-value-particles[^>]*data-network-nodes="54"/,
+  );
+  assert.match(
+    html,
+    /<canvas[^>]*><\/canvas><img[^>]*value-network-poster\.svg/,
+  );
+  assert.match(html, /data-motion-delivery="cinematic"/);
   assert.match(html, /data-motion-delivery="cinematic"/);
   assert.equal((html.match(/data-delivery-step=/g) ?? []).length, 3);
 });

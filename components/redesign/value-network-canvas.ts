@@ -5,7 +5,9 @@ import {
   networkPointerOffset,
 } from "./value-network";
 
-/** Event-driven assembly: no elapsed-time movement and no perpetual frame loop. */
+/** Event-driven assembly: no elapsed-time movement and no perpetual frame loop.
+ *  A canvas outside a scroll story (the homepage hero) is drawn fully formed and
+ *  only answers the pointer; its markup carries a matching static poster. */
 export function bindValueNetwork(
   canvas: HTMLCanvasElement,
   baseCount: number,
@@ -14,7 +16,9 @@ export function bindValueNetwork(
 ): () => void {
   const context = canvas.getContext("2d");
   const host = canvas.closest<HTMLElement>("[data-motion-story]");
-  if (!context || !host) return () => {};
+  if (!context) return () => {};
+  // A fixed node count keeps a small canvas from thinning out on phones.
+  const fixedCount = Number(canvas.dataset.networkNodes) || 0;
   let width = 0;
   let height = 0;
   let frame = 0;
@@ -36,15 +40,17 @@ export function bindValueNetwork(
       network = buildValueNetwork(
         width,
         height,
-        getParticleNodeCount({ baseCount, width, height, finePointer }),
+        fixedCount ||
+          getParticleNodeCount({ baseCount, width, height, finePointer }),
       );
     }
-    const progress = reducedMotion
-      ? 1
-      : getScrollProgress(
-          host.getBoundingClientRect().top,
-          host.offsetHeight - window.innerHeight,
-        );
+    const progress =
+      reducedMotion || !host
+        ? 1
+        : getScrollProgress(
+            host.getBoundingClientRect().top,
+            host.offsetHeight - window.innerHeight,
+          );
     const localPointer =
       pointer && !reducedMotion
         ? { x: pointer.x - rect.left, y: pointer.y - rect.top }
@@ -91,6 +97,8 @@ export function bindValueNetwork(
       context.arc(point.x, point.y, 1.8 * point.opacity, 0, Math.PI * 2);
       context.fill();
     });
+    // Tells the poster beside the canvas that it can step aside.
+    canvas.setAttribute("data-ready", "");
   };
   const schedule = () => {
     if (!frame && !document.hidden) frame = window.requestAnimationFrame(draw);

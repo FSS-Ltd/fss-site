@@ -112,10 +112,13 @@ div.home {
 }
 
 .caseStudyLink {
+  position: relative;
   display: inline-flex;
   min-height: 48px;
   align-items: center;
   gap: 10px;
+  isolation: isolate;
+  overflow: hidden;
   padding: 0 21px;
   border: 1px solid rgb(33 27 23 / 0.15);
   border-radius: 999px;
@@ -125,20 +128,50 @@ div.home {
   font-weight: 600;
   transition:
     transform 180ms ease,
-    border-color 180ms ease,
-    background 180ms ease;
+    color 200ms ease,
+    border-color 180ms ease;
 }
 
-.caseStudyLink::after {
+/* Fill sweep and arrow travel, as on the other calls to action. */
+.caseStudyLink::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: #211b17;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 340ms cubic-bezier(0.2, 0.75, 0.2, 1);
+  content: "";
+}
+
+.caseStudyLink::after,
+.serviceHeader a::after {
   color: #a64224;
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
   content: "→";
 }
 
 .caseStudyLink:hover,
 .caseStudyLink:focus-visible {
-  border-color: rgb(166 66 36 / 0.45);
-  background: #fff;
+  border-color: transparent;
+  color: #fff;
   transform: translateY(-2px);
+}
+
+.caseStudyLink:hover::before,
+.caseStudyLink:focus-visible::before {
+  transform: scaleX(1);
+}
+
+.caseStudyLink:hover::after,
+.caseStudyLink:focus-visible::after {
+  color: #e6a07f;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :is(.caseStudyLink, .serviceHeader a):is(:hover, :focus-visible)::after {
+    transform: translateX(4px);
+  }
 }
 
 .home .audience {
@@ -168,8 +201,8 @@ div.home {
 .markFrame {
   position: relative;
   width: min(100%, 510px);
+  aspect-ratio: 8 / 5;
   overflow: hidden;
-  padding: 10px;
   border: 1px solid rgb(33 27 23 / 0.12);
   border-radius: 20px;
   background: linear-gradient(
@@ -181,33 +214,16 @@ div.home {
   transition: transform 300ms cubic-bezier(0.2, 0.75, 0.2, 1);
 }
 
-.editorialImage {
-  display: block;
-  width: 100%;
-  aspect-ratio: 8 / 5;
-  border-radius: 14px;
-  object-fit: cover;
-}
-.imageBrand {
+.networkCanvas,
+.poster {
   position: absolute;
-  inset: 10px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 24px;
-  border-radius: 14px;
-  background: linear-gradient(transparent 35%, rgb(33 27 23 / 0.85));
-  color: #fff;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
-.imageBrand img {
-  width: 42%;
-  height: auto;
-}
-.imageBrand span {
-  font-size: 0.875rem;
-  letter-spacing: 0.06em;
+
+.networkCanvas[data-ready] + .poster {
+  visibility: hidden;
 }
 
 .markStage:hover .markFrame {
@@ -302,17 +318,20 @@ div.home {
 
 .serviceHeader a {
   display: inline-flex;
-  min-height: 44px;
+  padding-block: 12px;
   align-items: center;
   gap: 9px;
+  background: linear-gradient(#a64224, #a64224) 0 100% / 0 2px no-repeat
+    content-box;
   color: #211b17;
   font-size: 0.875rem;
   font-weight: 600;
+  transition: background-size 300ms cubic-bezier(0.2, 0.75, 0.2, 1);
 }
 
-.serviceHeader a::after {
-  color: #a64224;
-  content: "→";
+.serviceHeader a:hover,
+.serviceHeader a:focus-visible {
+  background-size: 100% 2px;
 }
 
 .serviceGrid {
