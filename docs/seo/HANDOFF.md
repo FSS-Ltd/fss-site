@@ -102,7 +102,13 @@ Sonnet code and security review of #330 is running.
   - FEATURE_TREE.md and Graphify not yet updated for #333's new components
     (route-line, header-scroll-state, mesh-band, section-spine,
     value-network-labels, value-network-poster).
-- Next: #330 review findings 1, 3, 4 (stepped form), then PR D blog layout
+- #330 review findings 1, 3, 4 fixed in #335 (`6c20cd9b5`, merged after
+  green CI, clean message). Optional detail now on step 5 beside contact
+  fields (verified live, no submit). Email template sanitises before
+  newline-to-br, with an injection test. jsdom added as a dev dependency.
+  Pre-existing minor: email subject uses raw names (Resend JSON, so no
+  header injection).
+- Next: PR D blog layout
   (rebase on main first; it predates #333), then the docs PR.
 - Open on #333: the old hero card hover lift (on main) went with the card;
   give the new hero a pointer response. Homepage CSS has 4 B gzip headroom.
