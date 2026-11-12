@@ -89,7 +89,7 @@ export const authorityPages = {
       "How FSS built NexSteps, complete school management software that understands the ACE system, and turned hours of admin into more time with children and families.",
     heading: "NexSteps: hours of admin turned into time with families.",
     answer:
-      "A learning centre needed complete school management software that understood the ACE system. FSS built NexSteps for that. The real benefit is hours of admin turned into more time with the children and families.",
+      "FSS built NexSteps, complete school management software that understands the ACE system, for a learning centre. The real benefit is hours of admin turned into more time with the children and families.",
     sections: [
       {
         id: "problem",
