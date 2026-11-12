@@ -20,7 +20,7 @@ test("personal brand colours stay scoped to the public site shell", () => {
 
   assert.match(css, /:root\s*\{[^}]*--brand-primary:\s*#14989e/);
   assert.match(css, /#fssroot\s*\{[^}]*--brand-primary:\s*#a64224/);
-  assert.match(css, /#fssroot\s*\{[^}]*--brand-accent:\s*#b55937/);
+  assert.match(css, /#fssroot\s*\{[^}]*--brand-accent:\s*#a84b2b/);
   assert.match(css, /#fssroot\s*\{[^}]*--brand-fss-teal:\s*#14989e/);
   assert.match(css, /#fssroot\s*\{[^}]*--brand-fss-cyan:\s*#46c7d8/);
   assert.match(css, /#fssroot\s*\{[^}]*--brand-fss-navy:\s*#07182e/);
