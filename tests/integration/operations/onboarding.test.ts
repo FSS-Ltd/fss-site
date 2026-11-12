@@ -205,7 +205,7 @@ test("late verified signing schedules calendar morning once and email failure ne
     (await runOnboardingWorker(f.store, effects, { now: future })).retried,
     1,
   );
-  await f.admin`update operations.onboarding_jobs set next_attempt_at=now() where journey_id=${f.journeyId} and step='thank_you'`;
+  await f.admin`update operations.onboarding_jobs set next_attempt_at=now()-interval '1 minute' where journey_id=${f.journeyId} and step='thank_you'`;
   assert.equal(
     (await runOnboardingWorker(f.store, effects, { now: future })).succeeded,
     1,

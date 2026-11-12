@@ -151,7 +151,7 @@ test("separate signer, billing recipient and owner receive exactly their approve
     ).length,
     1,
   );
-  await f.admin`update operations.onboarding_jobs set next_attempt_at=now() where journey_id=${f.journeyId} and step='activation'`;
+  await f.admin`update operations.onboarding_jobs set next_attempt_at=now()-interval '1 minute' where journey_id=${f.journeyId} and step='activation'`;
   await runOnboardingWorker(f.store, effects, {
     now: () => new Date(Date.now() + 2 * 86400000),
   });

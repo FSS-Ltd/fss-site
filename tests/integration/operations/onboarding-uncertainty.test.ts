@@ -39,10 +39,10 @@ test("lost response remains unresolved after a rejected replay and a pause past 
     ensureInvitation: send,
   };
   assert.equal((await runOnboardingWorker(f.store, effects)).retried, 1);
-  await f.admin`update operations.onboarding_jobs set next_attempt_at=now() where journey_id=${f.journeyId}`;
+  await f.admin`update operations.onboarding_jobs set next_attempt_at=now()-interval '1 minute' where journey_id=${f.journeyId}`;
   assert.equal((await runOnboardingWorker(f.store, effects)).retried, 1);
   await controlJourney(f.founderDb, f.founder, f.journeyId, "pause");
-  await f.admin`update operations.onboarding_jobs set first_attempt_at=now()-interval '25 hours',next_attempt_at=now() where journey_id=${f.journeyId}`;
+  await f.admin`update operations.onboarding_jobs set first_attempt_at=now()-interval '25 hours',next_attempt_at=now()-interval '1 minute' where journey_id=${f.journeyId}`;
   await f.admin`update operations.onboarding_effects set first_attempt_at=now()-interval '25 hours' where organisation_id=${f.organisationId}`;
   await controlJourney(f.founderDb, f.founder, f.journeyId, "resume");
   const report = await runOnboardingWorker(f.store, effects);
@@ -80,7 +80,7 @@ test("a definite rejection without an earlier unresolved attempt remains retryab
   };
   await runOnboardingWorker(f.store, effects);
   await controlJourney(f.founderDb, f.founder, f.journeyId, "pause");
-  await f.admin`update operations.onboarding_jobs set first_attempt_at=now()-interval '25 hours',next_attempt_at=now() where journey_id=${f.journeyId}`;
+  await f.admin`update operations.onboarding_jobs set first_attempt_at=now()-interval '25 hours',next_attempt_at=now()-interval '1 minute' where journey_id=${f.journeyId}`;
   await f.admin`update operations.onboarding_effects set first_attempt_at=now()-interval '25 hours' where organisation_id=${f.organisationId}`;
   await controlJourney(f.founderDb, f.founder, f.journeyId, "resume");
   assert.equal((await runOnboardingWorker(f.store, effects)).succeeded, 1);
