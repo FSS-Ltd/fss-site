@@ -3,6 +3,11 @@ import { storyInterval } from "./story-progress";
 
 type Atom = { x: number; y: number; color: string; dx: number; dy: number };
 
+/** Site tokens: light screen pixels become teal atoms, darker ones rust, so the
+ *  phone assembles in the same two colours as the value network. */
+const atomTeal = "rgb(20 152 158)";
+const atomRust = "rgb(166 66 36)";
+
 /** A separate, scroll-only particle field. The hero particle engine is untouched. */
 export function createAppAtoms(
   canvas: HTMLCanvasElement,
@@ -31,7 +36,10 @@ export function createAppAtoms(
         atoms.push({
           x,
           y,
-          color: `rgb(${pixels[offset]} ${pixels[offset + 1]} ${pixels[offset + 2]})`,
+          color:
+            pixels[offset] + pixels[offset + 1] + pixels[offset + 2] > 600
+              ? atomTeal
+              : atomRust,
           dx: Math.sin(index * 2.399) * 140,
           dy: Math.cos(index * 1.713) * 120,
         });
@@ -65,7 +73,7 @@ export function createAppAtoms(
         context.arc(
           atom.x + 60 + atom.dx * (1 - formed),
           atom.y + 60 + atom.dy * (1 - formed),
-          0.6 + formed * 3.1,
+          0.5 + formed * 2.5,
           0,
           Math.PI * 2,
         );
