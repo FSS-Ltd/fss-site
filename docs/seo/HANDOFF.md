@@ -93,8 +93,12 @@ Sonnet code and security review of #330 is running.
   https://faithfulsoftware.dev, no console errors.
   - Auto-merge fired before "Lint and Build" finished because branch
     protection does not require it. Founder may want it made required.
-  - Seen live at about 800px wide: hero labels Calls, Invoices, Reports clip
-    at the right edge. Small follow-up fix.
+  - Hero label clipping fixed in #334 (`148e898b5`, merged after green CI,
+    clean message). Live at 1024 all labels end by 990px. Minor: from 901 to
+    about 975px the Calls dot sits outside the poster crop (label is pulled
+    in). The hero canvas draws only after first scroll, pointer or key by
+    design (Lighthouse deferral in site-interactions.tsx); the poster shows
+    until then.
   - FEATURE_TREE.md and Graphify not yet updated for #333's new components
     (route-line, header-scroll-state, mesh-band, section-spine,
     value-network-labels, value-network-poster).
