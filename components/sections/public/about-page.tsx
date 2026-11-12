@@ -11,6 +11,7 @@ export function AboutPage() {
   return (
     <div className={styles.page}>
       <PageIntro
+        section="about"
         eyebrow="About FSS"
         title="Faithful by name. Dependable by design."
         image={

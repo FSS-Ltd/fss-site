@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { SiteShell } from "@/components/layout/site-shell";
 import { ButtonLink } from "@/components/ui/button";
+import { MeshBand } from "@/components/ui/mesh-band";
 
 export const metadata: Metadata = {
   title: "Page not found | Faithful Software Solutions",
@@ -42,6 +43,7 @@ export default function NotFound() {
             Contact FSS
           </ButtonLink>
         </div>
+        <MeshBand section="notFound" />
       </section>
     </SiteShell>
   );

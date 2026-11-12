@@ -6,12 +6,15 @@ type NexStepsProofProps = {
   motionTrack?: boolean;
   /** Pages that already open with this summary leave it out of the panel. */
   showSummary?: boolean;
+  /** Pages that show the screenshot beside their headline leave it out here. */
+  showFigure?: boolean;
 };
 
 export function NexStepsProof({
   className,
   motionTrack = false,
   showSummary = true,
+  showFigure = true,
 }: NexStepsProofProps) {
   return (
     <section
@@ -20,6 +23,7 @@ export function NexStepsProof({
       className={`${styles.proof} ${styles.grid} ${className ?? ""}`}
       data-motion-track={motionTrack || undefined}
       data-motion-reveal="mask"
+      style={showFigure ? undefined : { gridTemplateColumns: "minmax(0, 1fr)" }}
     >
       <div>
         <div className={styles.eyebrow}>Our work · NexSteps</div>
@@ -42,19 +46,21 @@ export function NexStepsProof({
           software design.
         </p>
       </div>
-      <figure>
-        <Image
-          src="/redesign/products/admin-dashboard.png"
-          alt="NexSteps operations dashboard"
-          width={4112}
-          height={2406}
-          sizes="(max-width: 680px) 90vw, 45vw"
-          className="h-auto w-full rounded-xl border border-border-soft"
-        />
-        <figcaption className="mt-3 text-sm text-text-muted">
-          NexSteps admin interface, built by FSS.
-        </figcaption>
-      </figure>
+      {showFigure && (
+        <figure>
+          <Image
+            src="/redesign/products/admin-dashboard.png"
+            alt="NexSteps operations dashboard"
+            width={4112}
+            height={2406}
+            sizes="(max-width: 680px) 90vw, 45vw"
+            className="h-auto w-full rounded-xl border border-border-soft"
+          />
+          <figcaption className="mt-3 text-sm text-text-muted">
+            NexSteps admin interface, built by FSS.
+          </figcaption>
+        </figure>
+      )}
     </section>
   );
 }

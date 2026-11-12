@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { MeshBand } from "@/components/ui/mesh-band";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -34,6 +35,7 @@ export function BlogPostLayout({ post, children }: BlogPostLayoutProps) {
             {format(new Date(post.publishDate), "MMMM d, yyyy")} •{" "}
             {post.readingMinutes} min read • {post.author}
           </p>
+          <MeshBand section="blog" compact />
         </header>
         {post.summary && (
           <div className="mt-6">

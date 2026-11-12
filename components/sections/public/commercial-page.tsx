@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type {
   CommercialPageContent,
   CommercialSection,
@@ -10,6 +11,7 @@ import {
 import { JsonLd } from "@/components/seo/json-ld";
 import { organisation } from "@/lib/seo/organisation";
 import { ContactLink, PageIntro } from "./page-intro";
+import type { MeshSection } from "@/components/ui/mesh-band";
 import { DeliverySteps } from "./delivery-steps";
 import { NexStepsProof } from "./nexsteps-proof";
 import { RelatedLinks } from "./related-links";
@@ -44,6 +46,14 @@ function ContentSection({ section }: { section: CommercialSection }) {
   );
 }
 
+const headerSection: Record<CommercialPageContent["kind"], MeshSection> = {
+  service: "services",
+  sector: "services",
+  "case-study": "work",
+  guide: "resources",
+  article: "blog",
+};
+
 export function CommercialPage({ page }: { page: CommercialPageContent }) {
   return (
     <>
@@ -68,7 +78,30 @@ export function CommercialPage({ page }: { page: CommercialPageContent }) {
             ))}
           </ol>
         </nav>
-        <PageIntro eyebrow={page.label} title={page.heading}>
+        <PageIntro
+          section={headerSection[page.kind]}
+          eyebrow={page.label}
+          title={page.heading}
+          image={
+            page.kind === "case-study" ? (
+              <div
+                className={styles.editorialFrame}
+                data-motion-parallax="0.06"
+              >
+                <Image
+                  src="/redesign/products/admin-dashboard.png"
+                  alt="NexSteps operations dashboard, built by FSS"
+                  width={4112}
+                  height={2406}
+                  sizes="(max-width: 900px) 92vw, 43vw"
+                  className={styles.editorialImage}
+                  style={{ objectPosition: "left top" }}
+                  priority
+                />
+              </div>
+            ) : undefined
+          }
+        >
           <p className="max-w-2xl text-lg sm:text-xl">{page.answer}</p>
           <p className="text-sm">
             By {organisation.name} · Updated{" "}
@@ -81,7 +114,9 @@ export function CommercialPage({ page }: { page: CommercialPageContent }) {
         {page.path === "/blog/church-management-software-vs-bespoke" && (
           <ContentEvidence content={churchArticle.meta} />
         )}
-        {page.kind === "case-study" && <NexStepsProof showSummary={false} />}
+        {page.kind === "case-study" && (
+          <NexStepsProof showSummary={false} showFigure={false} />
+        )}
         {page.sections.map((section) => (
           <ContentSection key={section.id} section={section} />
         ))}

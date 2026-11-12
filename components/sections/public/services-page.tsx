@@ -50,6 +50,7 @@ export function ServicesPage() {
   return (
     <div className={styles.page}>
       <PageIntro
+        section="services"
         eyebrow="Services"
         title="AI and software built around your business."
         image={
