@@ -21,12 +21,9 @@ export function PageTransition({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const previousPathname = React.useRef(pathname);
 
-  // Runs before paint so the first-load-only intro cascade (globals.css) is
-  // switched off before the new page's intro can start.
   React.useLayoutEffect(() => {
     if (previousPathname.current === pathname) return;
     previousPathname.current = pathname;
-    document.documentElement.dataset.navigated = "true";
     focusMainContent(document);
   }, [pathname]);
 
