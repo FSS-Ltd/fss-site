@@ -40,12 +40,15 @@ function post(overrides: Partial<BlogPostMeta>): BlogPostMeta {
 
 const h1Count = (html: string) => (html.match(/<h1[\s>]/g) ?? []).length;
 
-test("blog index leads with the featured story and indexes every section", () => {
+test("blog index leads with the featured story and groups only sections with two articles", () => {
   const posts = [
-    post({ slug: "newest", title: "Newest", category: "Automation", publishDate: "2026-05-01" }),
+    post({ slug: "newest", title: "Newest", category: "Growth", publishDate: "2026-05-01" }),
     post({ slug: "pick", title: "Editor pick", featured: true }),
-    post({ slug: "third", title: "Third", category: "Automation" }),
-    post({ slug: "fourth", title: "Fourth", coverImage: "" }),
+    post({ slug: "second", title: "Second", category: "Growth" }),
+    post({ slug: "a1", title: "Auto one", category: "Automation" }),
+    post({ slug: "a2", title: "Auto two", category: "Automation" }),
+    post({ slug: "a3", title: "Auto three", category: "Automation" }),
+    post({ slug: "solo", title: "Solo", category: "Software", coverImage: "" }),
   ];
   const html = renderToStaticMarkup(<BlogIndex posts={posts} />);
 
@@ -54,13 +57,30 @@ test("blog index leads with the featured story and indexes every section", () =>
   assert.match(html, /data-motion-reveal/);
   assert.match(html, /data-magnetic/);
   assert.match(html, /<h2 id="lead-story"[^>]*><a[^>]*href="\/blog\/pick"/);
-  assert.match(html, /href="#section-automation"/);
+  assert.match(html, /7 articles/);
+  assert.doesNotMatch(html, /sections?</);
+  // One section has three articles: it is a group; the one-article section is not.
   assert.match(html, /id="section-automation"/);
-  assert.match(html, /4 articles/);
-  assert.match(html, /2 sections/);
-  // Every post is reachable from the section index.
-  for (const p of posts) assert.match(html, new RegExp(`href="/blog/${p.slug}"`));
+  assert.doesNotMatch(html, /id="section-software"/);
+  assert.doesNotMatch(html, /aria-label="Sections"/);
+  // Each card has one link, and every post is reachable exactly once.
+  for (const p of posts) {
+    const links = html.match(new RegExp(`href="/blog/${p.slug}"`, "g")) ?? [];
+    assert.equal(links.length, 1, p.slug);
+  }
   assert.doesNotMatch(html, /—|–|!/);
+});
+
+test("blog index shows the section rail only with two or more groups", () => {
+  const sections = ["A", "B"].flatMap((category) =>
+    ["1", "2"].map((n) => post({ slug: `${category}${n}`, title: `${category}${n}`, category })),
+  );
+  const html = renderToStaticMarkup(
+    <BlogIndex posts={[post({ slug: "lead", featured: true, category: "L" }), post({ slug: "s1", category: "S" }), post({ slug: "s2", category: "T" }), ...sections]} />,
+  );
+  assert.match(html, /aria-label="Sections"/);
+  assert.match(html, /href="#section-a"/);
+  assert.match(html, /href="#section-b"/);
 });
 
 test("blog index handles a single post and no posts", () => {
@@ -96,7 +116,8 @@ test("article shows a contents list whose links match the rendered h2 ids", () =
   assert.match(html, /Updated <time dateTime="2026-09-04">4 September 2026<\/time>/);
   assert.match(html, /href="\/contact"/);
   assert.match(html, /Read next/);
-  assert.match(html, /href="\/blog#section-custom-software"/);
+  assert.match(html, /href="\/blog"/);
+  assert.match(html, /<ol><li><a href="#first-step"><span>First step<\/span>/);
 });
 
 test("article without a cover or enough sections stays clean", () => {

@@ -71,7 +71,7 @@
     x="58"
     y="172"
     font-family="Arial, sans-serif"
-    font-size="44"
+    font-size="36"
     font-weight="800"
     fill="#0a1a2e"
   >
@@ -79,9 +79,9 @@
   </text>
   <text
     x="58"
-    y="226"
+    y="218"
     font-family="Arial, sans-serif"
-    font-size="44"
+    font-size="36"
     font-weight="800"
     fill="#0a1a2e"
   >

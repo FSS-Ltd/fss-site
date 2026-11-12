@@ -5,9 +5,9 @@ import type { BlogPostMeta } from "@/lib/types/blog";
 
 import {
   formatEditorialDate,
-  groupByCategory,
   latestUpdate,
   selectLeadStory,
+  splitArchive,
 } from "@/lib/blog-presentation";
 import { BlogPostCard, PostCover, PostMeta } from "@/components/blog/blog-post-card";
 import styles from "@/components/blog/blog.module.css";
@@ -25,11 +25,38 @@ function plural(count: number, word: string) {
   return `${count} ${word}${count === 1 ? "" : "s"}`;
 }
 
+function ArchiveList({
+  posts,
+  showCategory = false,
+}: {
+  posts: BlogPostMeta[];
+  showCategory?: boolean;
+}) {
+  return (
+    <ul className={styles.archiveList}>
+      {posts.map((post) => (
+        <li key={post.slug} className={styles.archiveItem}>
+          {showCategory ? <p className={styles.label}>{post.category}</p> : null}
+          <Link
+            href={`/blog/${post.slug}`}
+            className={`${cta.link} ${styles.archiveItemTitle}`}
+          >
+            {post.title}
+          </Link>
+          <p>{post.excerpt}</p>
+          <PostMeta post={post} />
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function BlogIndex({ posts }: BlogIndexProps) {
   const { lead, rest } = selectLeadStory(posts);
   const secondary = rest.slice(0, SECONDARY_COUNT);
-  const contents = rest.slice(SECONDARY_COUNT);
-  const sections = groupByCategory(posts);
+  // Everything not already featured above, so no headline appears twice.
+  const { groups: sections, ungrouped } = splitArchive(rest.slice(SECONDARY_COUNT));
+  const hasArchive = sections.length > 0 || ungrouped.length > 0;
   const updated = latestUpdate(posts);
 
   return (
@@ -49,15 +76,13 @@ export function BlogIndex({ posts }: BlogIndexProps) {
             <span className={styles.nameplateWord}>
               Field <em>Notes</em>
             </span>
-            <span className={styles.nameplateSub}>
-              AI and software insights for UK businesses
-            </span>
           </h1>
           <div className={styles.mastFoot}>
             <p className={styles.standfirst}>
-              Practical writing on AI integration, workflow automation and
-              custom software for businesses of any size. What to check
-              first, what to build, and what to leave alone.
+              AI and software insights for UK businesses. Practical writing
+              on AI integration, workflow automation and custom software for
+              businesses of any size: what to check first, what to build, and
+              what to leave alone.
             </p>
           </div>
           <div className={styles.dateline}>
@@ -68,7 +93,6 @@ export function BlogIndex({ posts }: BlogIndexProps) {
               </span>
             ) : null}
             <span>{plural(posts.length, "article")}</span>
-            <span>{plural(sections.length, "section")}</span>
             <Link
               href="/resources"
               data-magnetic
@@ -82,7 +106,7 @@ export function BlogIndex({ posts }: BlogIndexProps) {
         </div>
         {sections.length > 1 ? (
           <nav aria-label="Sections" className={styles.rail}>
-            <ul className={styles.railList}>
+            <ul className={styles.railList} data-scroll-cue>
               {sections.map((section) => (
                 <li key={section.id}>
                   <a href={`#${section.id}`}>
@@ -119,7 +143,7 @@ export function BlogIndex({ posts }: BlogIndexProps) {
               <div className={styles.leadText}>
                 <p className={styles.label}>Lead story / {lead.category}</p>
                 <h2 id="lead-story" className={styles.leadTitle}>
-                  <Link href={`/blog/${lead.slug}`} className={cta.link}>
+                  <Link href={`/blog/${lead.slug}`} className={`${cta.link} ${styles.stretch}`}>
                     {lead.title}
                   </Link>
                 </h2>
@@ -139,72 +163,43 @@ export function BlogIndex({ posts }: BlogIndexProps) {
                     Also in this edition
                   </h2>
                 </div>
-                <div
-                  className={styles.editionGrid}
-                  data-with-contents={contents.length ? "" : undefined}
-                >
+                <div className={styles.editionGrid}>
                   {secondary.map((post) => (
                     <BlogPostCard key={post.slug} post={post} showExcerpt />
                   ))}
-                  {contents.length ? (
-                    <div>
-                      <h3 className={styles.contentsHead}>
-                        Also published
-                      </h3>
-                      <ol className={styles.contents}>
-                        {contents.map((post) => (
-                          <li key={post.slug}>
-                            <Link
-                              href={`/blog/${post.slug}`}
-                              className={`${cta.link} ${styles.contentsTitle}`}
-                            >
-                              {post.title}
-                            </Link>
-                            <PostMeta post={post} />
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
-                  ) : null}
                 </div>
               </section>
             ) : null}
 
-            <section
-              className={styles.archive}
-              aria-labelledby="archive-title"
-              data-motion-reveal="up"
-            >
-              <div className={styles.sectionHead}>
-                <h2 id="archive-title" className={styles.archiveTitle}>
-                  Every article, by section
-                </h2>
-              </div>
-              {sections.map((section) => (
-                <div key={section.id} id={section.id} className={styles.archiveRow}>
-                  <div>
-                    <h3 className={styles.archiveSection}>{section.category}</h3>
-                    <p className={styles.metaLine}>
-                      <span>{plural(section.posts.length, "article")}</span>
-                    </p>
-                  </div>
-                  <ul className={styles.archiveList}>
-                    {section.posts.map((post) => (
-                      <li key={post.slug} className={styles.archiveItem}>
-                        <Link
-                          href={`/blog/${post.slug}`}
-                          className={`${cta.link} ${styles.archiveItemTitle}`}
-                        >
-                          {post.title}
-                        </Link>
-                        <p>{post.excerpt}</p>
-                        <PostMeta post={post} />
-                      </li>
-                    ))}
-                  </ul>
+            {hasArchive ? (
+              <section
+                className={styles.archive}
+                aria-labelledby="archive-title"
+                data-motion-reveal="up"
+              >
+                <div className={styles.sectionHead}>
+                  <h2 id="archive-title" className={styles.archiveTitle}>
+                    More articles
+                  </h2>
                 </div>
-              ))}
-            </section>
+                {sections.map((section) => (
+                  <div key={section.id} id={section.id} className={styles.archiveRow}>
+                    <div>
+                      <h3 className={styles.archiveSection}>{section.category}</h3>
+                      <p className={styles.metaLine}>
+                        <span>{plural(section.posts.length, "article")}</span>
+                      </p>
+                    </div>
+                    <ArchiveList posts={section.posts} />
+                  </div>
+                ))}
+                {ungrouped.length ? (
+                  <div className={`${styles.archiveRow} ${styles.archiveFlat}`}>
+                    <ArchiveList posts={ungrouped} showCategory />
+                  </div>
+                ) : null}
+              </section>
+            ) : null}
           </>
         )}
       </div>

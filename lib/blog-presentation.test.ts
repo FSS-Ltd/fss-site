@@ -8,6 +8,7 @@ import {
   groupByCategory,
   latestUpdate,
   selectLeadStory,
+  splitArchive,
   shouldShowContents,
   slugifyHeading,
 } from "@/lib/blog-presentation";
@@ -106,4 +107,27 @@ test("dates render in British form regardless of time zone", () => {
     "2026-09-04",
   );
   assert.equal(latestUpdate([]), undefined);
+});
+
+test("splitArchive groups only sections with two or more articles", () => {
+  const posts = [
+    post({ slug: "a", category: "Automation" }),
+    post({ slug: "b", category: "Growth" }),
+    post({ slug: "c", category: "Automation" }),
+    post({ slug: "d", category: "Software" }),
+  ];
+  const { groups, ungrouped } = splitArchive(posts);
+  assert.deepEqual(groups.map((g) => [g.category, g.posts.map((p) => p.slug)]), [
+    ["Automation", ["a", "c"]],
+  ]);
+  assert.deepEqual(ungrouped.map((p) => p.slug), ["b", "d"]);
+});
+
+test("splitArchive yields no groups when every section has one article", () => {
+  const { groups, ungrouped } = splitArchive([
+    post({ slug: "a", category: "A" }),
+    post({ slug: "b", category: "B" }),
+  ]);
+  assert.equal(groups.length, 0);
+  assert.equal(ungrouped.length, 2);
 });

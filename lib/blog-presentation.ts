@@ -81,6 +81,19 @@ export function groupByCategory(posts: BlogPostMeta[]): CategoryGroup[] {
   return [...groups.values()];
 }
 
+/**
+ * Archive layout: a section earns its own group from two articles up; every
+ * other article goes into one chronological list (incoming order, newest first).
+ */
+export function splitArchive(posts: BlogPostMeta[]): {
+  groups: CategoryGroup[];
+  ungrouped: BlogPostMeta[];
+} {
+  const groups = groupByCategory(posts).filter((group) => group.posts.length >= 2);
+  const grouped = new Set(groups.flatMap((group) => group.posts));
+  return { groups, ungrouped: posts.filter((post) => !grouped.has(post)) };
+}
+
 const dateFormatter = new Intl.DateTimeFormat("en-GB", {
   day: "numeric",
   month: "long",

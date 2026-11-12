@@ -34,6 +34,36 @@
   content: "/";
 }
 
+@media (max-width: 479px) {
+  .metaLine {
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .metaLine > * + *::before {
+    display: none;
+  }
+}
+
+/* A card's single link: the headline link stretches over the whole card. */
+.stretch::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 20px;
+  content: "";
+  transform: none !important;
+}
+
+.stretch:focus-visible {
+  outline: none;
+}
+
+.stretch:focus-visible::after {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 3px;
+}
+
 /* ---------- Masthead ---------- */
 
 .masthead {
@@ -70,7 +100,7 @@
 
 .nameplateWord {
   display: block;
-  font-size: clamp(4rem, 16.4vw, 14.5rem);
+  font-size: clamp(4rem, 16.4vw, 13.5rem);
   font-weight: 700;
   letter-spacing: -0.065em;
   line-height: 0.84;
@@ -83,16 +113,6 @@
   font-weight: 580;
 }
 
-.nameplateSub {
-  display: block;
-  max-width: 24ch;
-  margin-top: clamp(18px, 2.4vw, 28px);
-  font-size: clamp(1.25rem, 2.3vw, 1.75rem);
-  font-weight: 620;
-  letter-spacing: -0.025em;
-  line-height: 1.2;
-}
-
 .mastFoot {
   display: grid;
   gap: 20px 48px;
@@ -101,11 +121,11 @@
 }
 
 .standfirst {
-  max-width: 58ch;
+  max-width: 52ch;
   margin: 0;
   color: var(--text-muted);
-  font-size: clamp(1.0625rem, 1.5vw, 1.25rem);
-  line-height: 1.6;
+  font-size: clamp(1.125rem, 1.7vw, 1.4rem);
+  line-height: 1.55;
 }
 
 .dateline {
@@ -162,6 +182,8 @@
   list-style: none;
   scroll-snap-type: x proximity;
   scrollbar-width: thin;
+  /* Edge fade: the row continues beyond the right edge. */
+  mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent);
 }
 
 .railList a {
@@ -188,9 +210,30 @@
     background-color 180ms ease;
 }
 
-.railList a:hover {
-  border-color: var(--brand-accent);
+.railList a {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.railList a::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
   background: #fff;
+  border-radius: inherit;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 300ms cubic-bezier(0.2, 0.75, 0.2, 1);
+  content: "";
+}
+
+.railList a:is(:hover, :focus-visible) {
+  border-color: var(--brand-primary);
+}
+
+.railList a:is(:hover, :focus-visible)::before {
+  transform: scaleX(1);
 }
 
 .railList sup {
@@ -201,6 +244,7 @@
 /* ---------- Lead story ---------- */
 
 .lead {
+  position: relative;
   display: grid;
   gap: clamp(24px, 4vw, 56px);
   margin-top: clamp(36px, 5vw, 64px);
@@ -223,8 +267,20 @@
   transition: transform 700ms cubic-bezier(0.2, 0.75, 0.2, 1);
 }
 
-a.frame:hover img {
+.story:hover .frame img,
+.lead:hover .frame img {
   transform: scale(1.03);
+}
+
+/* A product screenshot is cropped to its card grid so it reads at card size. */
+.screenshot img {
+  transform: scale(1.85);
+  transform-origin: 60% 12%;
+}
+
+.story:hover .screenshot img,
+.lead:hover .screenshot img {
+  transform: scale(1.9);
 }
 
 .noCover {
@@ -301,6 +357,7 @@ a.frame:hover img {
 }
 
 .story {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -312,6 +369,11 @@ a.frame:hover img {
     transform 300ms ease,
     border-color 300ms ease,
     box-shadow 300ms ease;
+}
+
+.story:hover .storyTitle a,
+.lead:hover .leadTitle a {
+  background-size: 100% 2px;
 }
 
 .story .frame {
@@ -342,57 +404,9 @@ a.frame:hover img {
   line-height: 1.6;
 }
 
-.contentsHead {
-  composes: label;
-  margin: 0 0 16px;
-}
-
-.contents {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  counter-reset: item;
-}
-
-.contents li {
-  display: grid;
-  grid-template-columns: 2.4rem minmax(0, 1fr);
-  gap: 4px 0;
-  padding: 16px 0;
-  border-bottom: 1px solid var(--border-soft);
-  counter-increment: item;
-}
-
-.contents li:first-child {
-  padding-top: 0;
-}
-
-.contents li::before {
-  grid-row: span 2;
-  color: var(--brand-primary);
-  font-family: var(--mono);
-  font-size: 0.8125rem;
-  line-height: 1.6;
-  content: counter(item, decimal-leading-zero);
-}
-
-.contentsTitle {
-  color: var(--foreground);
-  font-size: 1.0625rem;
-  font-weight: 620;
-  letter-spacing: -0.015em;
-  line-height: 1.3;
-}
-
 @media (min-width: 760px) {
   .editionGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (min-width: 1100px) {
-  .editionGrid[data-with-contents] {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) minmax(0, 0.85fr);
   }
 }
 
@@ -418,6 +432,10 @@ a.frame:hover img {
   padding: 22px 0 26px;
   border-top: 1px solid var(--border-strong);
   scroll-margin-top: 96px;
+}
+
+.archiveFlat .archiveList {
+  max-width: 760px;
 }
 
 .archiveRow:target {
@@ -447,6 +465,9 @@ a.frame:hover img {
 }
 
 .archiveItemTitle {
+  display: inline-block;
+  justify-self: start;
+  padding: 4px 0;
   color: var(--foreground);
   font-size: 1.125rem;
   font-weight: 620;
@@ -463,7 +484,7 @@ a.frame:hover img {
 }
 
 @media (min-width: 860px) {
-  .archiveRow {
+  .archiveRow:not(.archiveFlat) {
     grid-template-columns: 260px minmax(0, 1fr);
   }
 }
@@ -598,20 +619,85 @@ a.frame:hover img {
   }
 }
 
+/* Contents as a route: h2s are nodes on a vertical line. The line fills (one
+   transform) as the reader scrolls and the current node lights. Without JS or
+   under reduced motion it is a static, fully readable numbered list. */
 .toc {
-  padding: 0 0 0 16px;
-  border-left: 2px solid var(--rule);
+  --node: 12px;
+  --track: 2px;
+  --line-x: 6px;
 }
 
 .toc ol {
+  position: relative;
   margin: 12px 0 0;
-  padding: 0;
+  padding: 0 0 0 28px;
   list-style: none;
   counter-reset: toc;
 }
 
+.toc ol::before,
+.toc ol::after {
+  position: absolute;
+  top: 22px;
+  bottom: 22px;
+  left: calc(var(--line-x) - var(--track) / 2);
+  width: var(--track);
+  border-radius: 1px;
+  content: "";
+}
+
+.toc ol::before {
+  background: var(--border-strong);
+}
+
+.toc ol::after {
+  background: var(--brand-primary);
+  transform: scaleY(var(--fill, 0));
+  transform-origin: top;
+  transition: transform 160ms linear;
+}
+
 .toc li {
+  position: relative;
   counter-increment: toc;
+}
+
+/* The node: a ring, with a solid dot that scales in once it is reached. */
+.toc li::before,
+.toc li::after {
+  position: absolute;
+  top: calc(50% - var(--node) / 2);
+  left: calc(var(--line-x) - 28px - var(--node) / 2);
+  width: var(--node);
+  height: var(--node);
+  border-radius: 50%;
+  content: "";
+}
+
+.toc li::before {
+  border: 2px solid var(--border-strong);
+  background: var(--background, #fff);
+}
+
+.toc li::after {
+  background: var(--brand-primary);
+  opacity: 0;
+  transform: scale(0.3);
+  transition:
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 160ms ease;
+}
+
+.toc li[data-state="passed"]::after,
+.toc li[data-state="current"]::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.toc li[data-state="current"]::after {
+  transform: scale(1.35);
+  box-shadow: 0 0 0 4px rgb(166 66 36 / 0.18);
 }
 
 .toc a {
@@ -626,6 +712,11 @@ a.frame:hover img {
   transition: color 160ms ease;
 }
 
+.toc li[data-state="current"] a {
+  color: var(--foreground);
+  font-weight: 620;
+}
+
 .toc a::before {
   align-self: start;
   padding-top: 0.15em;
@@ -635,8 +726,34 @@ a.frame:hover img {
   content: counter(toc, decimal-leading-zero);
 }
 
-.toc a:hover {
+/* Hover: the title underlines itself, left to right. */
+.toc a span {
+  justify-self: start;
+  background: linear-gradient(var(--brand-primary) 0 0) 0 100% / 0 2px no-repeat;
+  transition: background-size 300ms cubic-bezier(0.2, 0.75, 0.2, 1);
+}
+
+.toc a:is(:hover, :focus-visible) {
   color: var(--foreground);
+}
+
+.toc a:is(:hover, :focus-visible) span {
+  background-size: 100% 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toc ol::after {
+    display: none;
+  }
+
+  .toc li::after,
+  .toc a span {
+    transition: none;
+  }
+
+  .toc li[data-state="current"]::after {
+    transform: scale(1);
+  }
 }
 
 /* Prose: one readable column, around 66 characters. */
@@ -710,7 +827,7 @@ a.frame:hover img {
   font-weight: 650;
 }
 
-.prose a {
+.prose a:not(.ctaLink) {
   color: var(--brand-primary);
   font-weight: 560;
   text-decoration: underline;
@@ -866,6 +983,25 @@ a.frame:hover img {
   line-height: 1.6;
 }
 
+/* Pill: cream on dark, rust fill sweeping in on hover (cta-motion .sweep). */
+.ctaLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 999px;
+  background: #211b17;
+  color: #fff;
+  font-size: 0.9375rem;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.ctaLink:is(:hover, :focus-visible) {
+  color: #fff;
+}
+
 /* ---------- End of article ---------- */
 
 .endnotes {
@@ -922,6 +1058,24 @@ a.frame:hover img {
 
 .about p {
   margin: 0;
+}
+
+.about a {
+  display: inline-block;
+  padding: 3px 0;
+  background:
+    linear-gradient(var(--brand-primary) 0 0) 0 100% / 0 2px no-repeat,
+    linear-gradient(var(--border-strong) 0 0) 0 100% / 100% 1px no-repeat;
+  color: var(--foreground);
+  text-decoration: none;
+  transition:
+    background-size 300ms cubic-bezier(0.2, 0.75, 0.2, 1),
+    color 160ms ease;
+}
+
+.about a:is(:hover, :focus-visible) {
+  background-size: 100% 2px, 100% 1px;
+  color: var(--brand-primary);
 }
 
 .tags {

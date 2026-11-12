@@ -11,8 +11,8 @@ import {
   type ArticleHeading,
   formatEditorialDate,
   shouldShowContents,
-  slugifyHeading,
 } from "@/lib/blog-presentation";
+import { ArticleRoute } from "@/components/blog/article-route";
 import { BlogPostCard, PostCover } from "@/components/blog/blog-post-card";
 import styles from "@/components/blog/blog.module.css";
 import { ContentBreadcrumbs } from "@/components/seo/content-breadcrumbs";
@@ -44,7 +44,7 @@ export function BlogPostLayout({
           <ContentBreadcrumbs parent="Blog" title={post.title} />
           <div className={styles.kicker}>
             <Link
-              href={`/blog#section-${slugifyHeading(post.category)}`}
+              href="/blog"
               className={`${styles.label} ${cta.link}`}
             >
               {post.category}
@@ -56,7 +56,12 @@ export function BlogPostLayout({
             {post.summary ?? post.excerpt}
           </p>
           <p className={`${styles.metaLine} ${styles.byline}`}>
-            <span>By {post.author}</span>
+            <span>
+              By{" "}
+              <Link href="/about" className={cta.link}>
+                {post.author}
+              </Link>
+            </span>
             <span>
               Published{" "}
               <time dateTime={post.publishDate}>
@@ -78,7 +83,6 @@ export function BlogPostLayout({
           <figure className={styles.cover} data-motion-reveal="up">
             <PostCover
               post={post}
-              linked={false}
               priority
               sizes="(min-width: 1260px) 1180px, 100vw"
             />
@@ -87,18 +91,7 @@ export function BlogPostLayout({
 
         <div className={styles.columns}>
           {shouldShowContents(headings) ? (
-            <nav className={styles.toc} aria-labelledby="article-contents">
-              <p id="article-contents" className={styles.label}>
-                In this article
-              </p>
-              <ol>
-                {headings.map((heading) => (
-                  <li key={heading.id}>
-                    <a href={`#${heading.id}`}>{heading.text}</a>
-                  </li>
-                ))}
-              </ol>
-            </nav>
+            <ArticleRoute headings={headings} />
           ) : null}
           <div className={styles.prose}>{children}</div>
         </div>

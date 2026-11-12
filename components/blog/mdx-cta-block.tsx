@@ -1,5 +1,7 @@
-import { ButtonLink } from "@/components/ui/button";
+import Link from "next/link";
 
+import cta from "@/components/ui/cta-motion.module.css";
+import fill from "@/components/ui/cta-fill.module.css";
 import styles from "@/components/blog/blog.module.css";
 
 type MdxCtaBlockProps = {
@@ -19,9 +21,9 @@ export function MdxCtaBlock({
     <div className={styles.cta}>
       <p className={styles.ctaTitle}>{title}</p>
       <p className={styles.ctaBody}>{body}</p>
-      <ButtonLink href={href} variant="primary">
-        {ctaLabel}
-      </ButtonLink>
+      <Link href={href} className={`${styles.ctaLink} ${cta.sweep} ${fill.rust}`}>
+        {ctaLabel} <span aria-hidden="true">→</span>
+      </Link>
     </div>
   );
 }
