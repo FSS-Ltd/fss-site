@@ -73,9 +73,22 @@ Sonnet code and security review of #330 is running.
 - #330 was merged to main at 21:34 GMT on 2026-11-11 at critic score 7.05,
   below the 8/10 gate. Its review findings 1, 3 and 4 are still open. They
   go in a follow-up PR after PR F, which also re-scores `/contact`.
-- PR F `feat/public-motion-polish`: two local commits existed, never pushed.
-  A Sonnet agent is rebasing it on main, verifying, opening a draft PR and
-  gathering jury evidence. A fresh Sonnet critic then scores it. Gate: 8/10.
+- PR F is draft PR #333, head `e158e4a2f`. Three Sonnet fix rounds; critic
+  scores 6.6, 7.05, 6.8. Creativity stuck at 6. Cards in the worktree's
+  `.jury/127.0.0.1-4400/` (scorecard-1.md, scorecard-2.md, scorecard.md).
+  Fable advised: label the hero network with business nouns (Inbox, Calls,
+  CRM, Invoices, Rota, Reports) and a rust path to an FSS node; make the
+  scroll sequence change the network's state; crop the NexSteps screenshot
+  legibly; services hero as labelled network; broken-link 404. Fable's
+  estimate: about 7.5 to 7.7, and 8 needs founder decisions (commit to "your
+  business as a connected system" as the concept; supply real NexSteps
+  problem, idea and outcome material). Waiting on the founder.
+- Open on #333: the old hero card hover lift (on main) went with the card;
+  give the new hero a pointer response. Homepage CSS has 4 B gzip headroom.
+  The app screenshot shows the founder's first name; founder to confirm.
+- Commit trailers: early commits on #333 and this branch carry a
+  Co-Authored-By line against the founder's rule. Squash-merge with a clean
+  message to drop them. Never add them again.
 - PR D `feat/editorial-blog-layout`: one local commit `1ef83e280`, unpushed.
   Waits for PR F (shared site chrome).
 
