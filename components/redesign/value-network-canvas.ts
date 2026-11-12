@@ -5,6 +5,7 @@ import {
   networkPointerOffset,
 } from "./value-network";
 import {
+  fitLabelX,
   heroLabels,
   hubName,
   labelPosition,
@@ -230,9 +231,16 @@ export function bindValueNetwork(
         // A pale halo keeps the label legible where mesh lines cross it.
         context.lineWidth = 4 * scale;
         context.strokeStyle = "rgba(245,246,247,.92)";
-        context.strokeText(item.name, item.x, item.y - radius - size * 0.8);
+        // Keep the whole label inside the stage, which can be narrower than the
+        // view box scaled to cover it.
+        const textX = fitLabelX(
+          item.x,
+          context.measureText(item.name).width + context.lineWidth,
+          width,
+        );
+        context.strokeText(item.name, textX, item.y - radius - size * 0.8);
         context.fillStyle = "#2b2420";
-        context.fillText(item.name, item.x, item.y - radius - size * 0.8);
+        context.fillText(item.name, textX, item.y - radius - size * 0.8);
       });
     }
     // Tells the poster beside the canvas that it can step aside.

@@ -1,5 +1,10 @@
 import { buildValueNetwork } from "./value-network";
-import { heroLabels, hubName } from "./value-network-labels";
+import {
+  estimateLabelWidth,
+  fitLabelX,
+  heroLabels,
+  hubName,
+} from "./value-network-labels";
 
 /** The hero's static frame: the same lattice the canvas draws, as inline SVG so
  *  it paints with the HTML (no-JS, reduced motion, first paint) and is not an
@@ -25,6 +30,45 @@ const labelAt = (item: (typeof heroLabels)[number]) => ({
 const parts = heroLabels.map(labelAt);
 const route = parts.map((part) => `${part.x} ${part.y}`).join("L");
 
+/** The stage is 58% of the viewport and about 960px tall, and the SVG scales
+ *  its view box to cover it, so narrower viewports crop the sides. Returns how
+ *  far each label must slide, in view units, to sit inside the visible slice. */
+export function posterLabelShifts(viewportWidth: number, stageHeight = 960) {
+  const stageWidth = viewportWidth * 0.58;
+  const fit = Math.max(
+    stageWidth / networkView.width,
+    stageHeight / networkView.height,
+  );
+  const visible = stageWidth / fit;
+  const left = (networkView.width - visible) / 2;
+  return parts.map((part) =>
+    part.name === hubName
+      ? 0
+      : Math.round(
+          left +
+            fitLabelX(
+              part.x - left,
+              estimateLabelWidth(part.name, 12.5) + 4,
+              visible,
+            ) -
+            part.x,
+        ),
+  );
+}
+
+// Wide stages show the whole view box, so the bands stop at 1300px. Each band
+// uses its narrowest viewport, which crops the most.
+const clipCss = [901, 951, 1001, 1051, 1101, 1151, 1201, 1251]
+  .map((from) => {
+    const rules = posterLabelShifts(from)
+      .map((dx, index) =>
+        dx ? `.n${index}{transform:translateX(${dx}px)}` : "",
+      )
+      .join("");
+    return rules && `@media(min-width:${from}px){${rules}}`;
+  })
+  .join("");
+
 export function ValueNetworkPoster({ className }: { className?: string }) {
   return (
     <svg
@@ -49,7 +93,7 @@ export function ValueNetworkPoster({ className }: { className?: string }) {
       />
       {/* Same labelled parts and rust path as the canvas. Hidden on phones, where
           the headline sits over the mesh (the canvas skips them there too). */}
-      <style>{"@media(max-width:900px){.nl{display:none}}"}</style>
+      <style>{`@media(max-width:900px){.nl{display:none}}${clipCss}`}</style>
       <g className="nl" fontFamily="inherit" fontWeight="600" fontSize="12.5">
         <path
           d={`M${route}`}
@@ -59,7 +103,7 @@ export function ValueNetworkPoster({ className }: { className?: string }) {
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        {parts.map((part) =>
+        {parts.map((part, index) =>
           part.name === hubName ? (
             <g key={part.name}>
               <circle
@@ -100,6 +144,7 @@ export function ValueNetworkPoster({ className }: { className?: string }) {
                 strokeWidth="2"
               />
               <text
+                className={`n${index}`}
                 x={part.x}
                 y={part.y - 17}
                 fill="#2b2420"

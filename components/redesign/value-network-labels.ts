@@ -96,6 +96,24 @@ export function labelPosition(item: NetworkLabel, settle: number): Position {
   };
 }
 
+/** Rough text width for places that cannot measure (the SVG poster). */
+export function estimateLabelWidth(name: string, size: number) {
+  return name.length * size * 0.62;
+}
+
+/** Slides a centred label sideways so its whole box stays inside the stage.
+ *  A stage narrower than the label centres it. */
+export function fitLabelX(
+  centre: number,
+  textWidth: number,
+  stageWidth: number,
+  pad = 8,
+) {
+  const half = textWidth / 2 + pad;
+  if (stageWidth <= half * 2) return stageWidth / 2;
+  return Math.min(Math.max(centre, half), stageWidth - half);
+}
+
 /** Nodes near the pointer lean towards it and light up; nothing accumulates. */
 export function labelPull(
   anchor: Position,
