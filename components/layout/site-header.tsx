@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { HeaderScrollState } from "./header-scroll-state";
+import { RouteLine } from "./route-line";
 import { SiteHeaderNavigation } from "./site-header-controls";
 import styles from "./site-header.module.css";
 import cta from "@/components/ui/cta-motion.module.css";
@@ -10,18 +12,8 @@ export function SiteHeader() {
       // A named header stays still while page content transitions under it.
       style={{ viewTransitionName: "site-header" }}
     >
-      {/* The motif line a page change draws under the header (see globals.css). */}
-      <span
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          insetInline: 0,
-          bottom: -1,
-          height: 2,
-          pointerEvents: "none",
-          viewTransitionName: "fss-line",
-        }}
-      />
+      <RouteLine />
+      <HeaderScrollState />
       <a href="#main-content" className={styles.skip}>
         Skip to content
       </a>

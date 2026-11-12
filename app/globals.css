@@ -188,6 +188,9 @@ html {
    Unsupported browsers swap pages instantly. Opacity and transform only.
    Everything sits under no-preference, so reduced motion gets none of it.
    The site header carries its own view-transition-name, so it stays still.
+   The route line (components/layout/route-line.tsx) draws the workflow motif
+   across the header from JS, so it needs no keyframes here; its view-transition
+   group only sits above the page layers.
    After a client navigation the boundary only fades (0.18 s); the page then
    settles in two beats: the intro headline (data-intro), then the mesh band
    under it (data-mesh-band), done inside 0.6 s. A first load plays the same
@@ -203,9 +206,13 @@ html {
     animation: fss-fade 0.12s ease-out 0.06s both;
   }
   ::view-transition-group(fss-line) {
-    background: var(--brand-primary);
-    transform-origin: left;
-    animation: fss-line 0.5s ease-out both;
+    z-index: 2;
+  }
+  ::view-transition-old(fss-line) {
+    display: none;
+  }
+  ::view-transition-new(fss-line) {
+    animation: none;
   }
   [data-intro] > *,
   [data-mesh-band] {
@@ -216,15 +223,6 @@ html {
 
 @keyframes fss-fade {
   from {
-    opacity: 0;
-  }
-}
-
-@keyframes fss-line {
-  from {
-    scale: 0 1;
-  }
-  to {
     opacity: 0;
   }
 }
