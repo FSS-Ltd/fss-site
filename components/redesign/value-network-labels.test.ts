@@ -27,7 +27,10 @@ test("six business parts plus the FSS hub, in both layouts", () => {
 });
 
 test("hero labels stay on the right, clear of the headline column", () => {
-  heroLabels.forEach((item) => assert.ok(item.x >= 0.55 && item.x <= 0.9));
+  heroLabels.forEach((item) => {
+    assert.ok(item.x >= 0.55 && item.x <= 0.8);
+    assert.ok(item.y >= 0.1 && item.y <= 0.8);
+  });
 });
 
 test("story state: scattered, then joined, then one path, never backwards", () => {

@@ -32,13 +32,13 @@ const label = (name: string, at: Position, from: Position): NetworkLabel => ({
 
 /** Hero: one path zigzags down the right of the 840x780 view, clear of the headline. */
 const heroPath: Position[] = [
-  { x: 0.6, y: 0.15 },
-  { x: 0.86, y: 0.26 },
-  { x: 0.64, y: 0.38 },
-  { x: 0.88, y: 0.5 },
-  { x: 0.62, y: 0.62 },
-  { x: 0.86, y: 0.74 },
-  { x: 0.7, y: 0.88 },
+  { x: 0.58, y: 0.14 },
+  { x: 0.78, y: 0.24 },
+  { x: 0.6, y: 0.35 },
+  { x: 0.77, y: 0.46 },
+  { x: 0.6, y: 0.57 },
+  { x: 0.77, y: 0.67 },
+  { x: 0.64, y: 0.77 },
 ];
 export const heroLabels: NetworkLabel[] = [...businessParts, hubName].map(
   (name, index) => label(name, heroPath[index], heroPath[index]),
