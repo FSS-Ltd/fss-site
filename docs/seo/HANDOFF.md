@@ -86,8 +86,20 @@ Sonnet code and security review of #330 is running.
   gave NexSteps facts on 2026-11-12 (see memory and the case study copy).
 - Rounds 4 to 6 (Sonnet): 7.0, 7.4, 7.3. Head `70199980e`. Plateau near
   7.3 to 7.4. Latest card: `.jury/127.0.0.1-4400/scorecard.md` in the
-  worktree. Not yet code or security reviewed since round 1. Waiting on the
-  founder: accept about 7.4 and ship, or fund another round.
+  worktree. Founder accepted about 7.4 and said ship.
+- #333 MERGED 2026-11-12 as `77984e134` (squash, clean message, no
+  trailers) after a final Sonnet code and security review; all six findings
+  fixed (halo timer leak was the blocker). Main CI green; live on
+  https://faithfulsoftware.dev, no console errors.
+  - Auto-merge fired before "Lint and Build" finished because branch
+    protection does not require it. Founder may want it made required.
+  - Seen live at about 800px wide: hero labels Calls, Invoices, Reports clip
+    at the right edge. Small follow-up fix.
+  - FEATURE_TREE.md and Graphify not yet updated for #333's new components
+    (route-line, header-scroll-state, mesh-band, section-spine,
+    value-network-labels, value-network-poster).
+- Next: #330 review findings 1, 3, 4 (stepped form), then PR D blog layout
+  (rebase on main first; it predates #333), then the docs PR.
 - Open on #333: the old hero card hover lift (on main) went with the card;
   give the new hero a pointer response. Homepage CSS has 4 B gzip headroom.
   The app screenshot shows the founder's first name; founder to confirm.
