@@ -279,6 +279,9 @@ export function routeAnchors(
   return { x1: from.x, y1: top(from), x2: to.x, y2: bottom(to) };
 }
 
+/** Older articles kept online for their links but never promoted as related reading. */
+const NOT_PROMOTED = ["sdk-integration-playbook", "technical-content-lead-pipeline"];
+
 /**
  * Other articles for the end of a post: most in common first (section counts
  * double, each shared tag once), then the closest publishing date, then the
@@ -290,7 +293,10 @@ export function pickRelatedPosts(
   limit = 2,
 ): BlogPostMeta[] {
   return all
-    .filter((candidate) => candidate.slug !== post.slug)
+    .filter(
+      (candidate) =>
+        candidate.slug !== post.slug && !NOT_PROMOTED.includes(candidate.slug),
+    )
     .map((candidate) => ({
       candidate,
       score: relationScore(post, candidate),
