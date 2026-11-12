@@ -81,7 +81,8 @@ export function ArticleRoute({ headings }: { headings: ArticleHeading[] }) {
         {headings.map((heading) => (
           <li key={heading.id}>
             <a href={`#${heading.id}`}>
-              <span>{heading.text}</span>
+              {/* No closing "?": the heading below carries the full question. */}
+              <span>{heading.text.replace(/[?.:;]+$/, "")}</span>
             </a>
           </li>
         ))}

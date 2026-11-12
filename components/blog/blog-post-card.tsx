@@ -2,10 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 
 import type { BlogPostMeta } from "@/lib/types/blog";
-import cta from "@/components/ui/cta-motion.module.css";
-
+import { NetworkGlyph } from "@/components/blog/edition-network";
 import { CoverTransition } from "@/components/blog/cover-transition";
-import { formatEditorialDate } from "@/lib/blog-presentation";
+import { type EditionNetwork, formatEditorialDate } from "@/lib/blog-presentation";
 import styles from "@/components/blog/blog.module.css";
 
 type CoverProps = {
@@ -57,32 +56,29 @@ export function PostMeta({
   );
 }
 
-/** Secondary story: "Also in this edition" and "Read next". */
+/** Secondary story, set as type: kicker, headline, dek, date and read time,
+ *  a rust rule and a glyph of the article's node in the edition network. */
 export function BlogPostCard({
   post,
-  showExcerpt = false,
+  network,
 }: {
   post: BlogPostMeta;
-  showExcerpt?: boolean;
+  network: EditionNetwork;
 }) {
   return (
     <article className={styles.story} data-lift-light>
-      <PostCover
-        post={post}
-        sizes="(min-width: 1100px) 380px, (min-width: 640px) 50vw, 100vw"
-      />
-      <div className={styles.storyBody}>
+      <div className={styles.storyTop}>
         <p className={styles.label}>{post.category}</p>
-        <h3 className={styles.storyTitle}>
-          <Link href={`/blog/${post.slug}`} className={`${cta.link} ${styles.stretch}`}>
-            {post.title}
-          </Link>
-        </h3>
-        {showExcerpt ? (
-          <p className={styles.storyExcerpt}>{post.excerpt}</p>
-        ) : null}
-        <PostMeta post={post} />
+        <NetworkGlyph network={network} slug={post.slug} />
       </div>
+      <h3 className={styles.storyTitle}>
+        <Link href={`/blog/${post.slug}`} className={styles.stretch}>
+          <span className={styles.grow}>{post.title}</span>
+        </Link>
+      </h3>
+      <p className={styles.storyExcerpt}>{post.excerpt}</p>
+      <span className={styles.storyRule} aria-hidden="true" />
+      <PostMeta post={post} />
     </article>
   );
 }

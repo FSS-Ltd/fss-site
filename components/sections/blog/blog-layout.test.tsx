@@ -63,11 +63,16 @@ test("blog index leads with the featured story and groups only sections with two
   assert.match(html, /id="section-automation"/);
   assert.doesNotMatch(html, /id="section-software"/);
   assert.doesNotMatch(html, /aria-label="Sections"/);
-  // Each card has one link, and every post is reachable exactly once.
+  // Each card has one link, and every post is reachable exactly once from the
+  // page body; the edition network adds one named node link per post.
   for (const p of posts) {
-    const links = html.match(new RegExp(`href="/blog/${p.slug}"`, "g")) ?? [];
-    assert.equal(links.length, 1, p.slug);
+    const all = html.match(new RegExp(`href="/blog/${p.slug}"`, "g")) ?? [];
+    const nodes =
+      html.match(new RegExp(`class="netHit" aria-label="${p.title}" href="/blog/${p.slug}"`, "g")) ?? [];
+    assert.equal(nodes.length, 1, `${p.slug} node`);
+    assert.equal(all.length - nodes.length, 1, p.slug);
   }
+  assert.match(html, /Field Notes, 7 articles/);
   assert.doesNotMatch(html, /—|–|!/);
 });
 
@@ -118,6 +123,9 @@ test("article shows a contents list whose links match the rendered h2 ids", () =
   assert.match(html, /Read next/);
   assert.match(html, /href="\/blog"/);
   assert.match(html, /<ol><li><a href="#first-step"><span>First step<\/span>/);
+  // The edition network lights the current article and links the others.
+  assert.match(html, /aria-current="page"/);
+  assert.match(html, /A post \(this article\)/);
 });
 
 test("article without a cover or enough sections stays clean", () => {

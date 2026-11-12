@@ -3,6 +3,8 @@ import test from "node:test";
 
 import type { BlogPostMeta } from "@/lib/types/blog";
 import {
+  buildEditionNetwork,
+  editionLabel,
   extractHeadings,
   formatEditorialDate,
   groupByCategory,
@@ -130,4 +132,38 @@ test("splitArchive yields no groups when every section has one article", () => {
   ]);
   assert.equal(groups.length, 0);
   assert.equal(ungrouped.length, 2);
+});
+
+test("edition network is deterministic, ordered by date and routes neighbours", () => {
+  const mk = (slug: string, publishDate: string, category: string) =>
+    ({ slug, title: slug, publishDate, category }) as BlogPostMeta;
+  const posts = [
+    mk("c", "2026-03-03", "Growth"),
+    mk("a", "2026-01-01", "Growth"),
+    mk("b", "2026-02-02", "Software"),
+    mk("d", "2026-03-03", "Software"),
+  ];
+  const net = buildEditionNetwork(posts);
+  assert.deepEqual(net.nodes.map((n) => n.slug), ["a", "b", "c", "d"]);
+  assert.deepEqual(net, buildEditionNetwork([...posts].reverse()));
+  assert.ok(net.nodes.every((n) => n.x > 0 && n.x < 1 && n.y > 0 && n.y < 1));
+  assert.ok(net.nodes[0].x < net.nodes[3].x);
+  assert.notEqual(net.nodes[0].y, net.nodes[1].y);
+  assert.equal(net.routes.filter((r) => r.kind === "chain").length, 3);
+  // a-c share Growth, b-d share Software; neither pair is adjacent.
+  assert.deepEqual(
+    net.routes.filter((r) => r.kind === "related").map((r) => `${r.from}-${r.to}`),
+    ["a-c", "b-d"],
+  );
+});
+
+test("edition network handles one and zero posts; label counts from data", () => {
+  assert.deepEqual(buildEditionNetwork([]), { nodes: [], routes: [] });
+  const one = buildEditionNetwork([
+    { slug: "x", title: "x", publishDate: "2026-01-01", category: "A" } as BlogPostMeta,
+  ]);
+  assert.equal(one.nodes[0].x, 0.5);
+  assert.equal(one.nodes[0].y, 0.5);
+  assert.equal(editionLabel(7), "Field Notes, 7 articles");
+  assert.equal(editionLabel(1), "Field Notes, 1 article");
 });

@@ -267,7 +267,6 @@
   transition: transform 700ms cubic-bezier(0.2, 0.75, 0.2, 1);
 }
 
-.story:hover .frame img,
 .lead:hover .frame img {
   transform: scale(1.03);
 }
@@ -278,7 +277,6 @@
   transform-origin: 60% 12%;
 }
 
-.story:hover .screenshot img,
 .lead:hover .screenshot img {
   transform: scale(1.9);
 }
@@ -325,6 +323,50 @@
   .lead {
     grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
   }
+
+  /* The image column takes the height of the text block: the frame fills it
+     and the cover crops (object-fit) instead of leaving a hole below. */
+  .lead > :first-child,
+  .lead > :first-child > .frame {
+    height: 100%;
+  }
+
+  .lead .frame {
+    min-height: 360px;
+    aspect-ratio: auto;
+  }
+
+  .leadText {
+    align-self: start;
+  }
+
+  /* The taller frame crops the screenshot's sides, so anchor on its top-left
+     (the card grid) and zoom less. */
+  .lead .screenshot img {
+    object-position: 0 0;
+    transform: scale(1.3);
+    transform-origin: 0 0;
+  }
+
+  .lead:hover .screenshot img {
+    transform: scale(1.35);
+  }
+}
+
+/* Headline underline: clean at rest, grows on hover or keyboard focus. One
+   span, so it reads as one line of rust under wrapped text. */
+.grow {
+  padding-bottom: 3px;
+  background: linear-gradient(var(--brand-primary) 0 0) 0 100% / 0 2px no-repeat;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  transition: background-size 300ms cubic-bezier(0.2, 0.75, 0.2, 1);
+}
+
+.stretch:is(:hover, :focus-visible) .grow,
+.lead:hover .grow,
+.story:hover .grow {
+  background-size: 100% 2px;
 }
 
 /* ---------- Also in this edition ---------- */
@@ -361,7 +403,7 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 12px 12px 22px;
+  padding: 22px 24px 24px;
   border: 1px solid rgb(33 27 23 / 0.08);
   border-radius: 20px;
   background: rgb(255 255 255 / 0.55);
@@ -371,26 +413,62 @@
     box-shadow 300ms ease;
 }
 
-.story:hover .storyTitle a,
-.lead:hover .leadTitle a {
-  background-size: 100% 2px;
-}
-
-.story .frame {
-  border-radius: 12px;
-}
-
-.storyBody {
+.storyTop {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 4px 8px 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.storyTop .label {
+  margin: 0;
+}
+
+.glyph {
+  flex: none;
+  width: 72px;
+  height: 29px;
+  overflow: visible;
+}
+
+.glyphRoute,
+.glyphRouteLit {
+  stroke: var(--border-strong);
+  stroke-width: 0.9;
+}
+
+.glyphRouteLit {
+  stroke: var(--brand-primary);
+  stroke-width: 1.4;
+}
+
+.glyphNode {
+  fill: var(--text-muted);
+}
+
+.glyphLit {
+  fill: var(--brand-primary);
+}
+
+/* The rust rule: short at rest, runs the width of the card on hover. */
+.storyRule {
+  display: block;
+  height: 2px;
+  margin-top: auto;
+  background: var(--brand-primary);
+  transform: scaleX(0.14);
+  transform-origin: left;
+  transition: transform 500ms cubic-bezier(0.2, 0.75, 0.2, 1);
+}
+
+.story:is(:hover, :focus-within) .storyRule {
+  transform: scaleX(1);
 }
 
 .storyTitle {
   margin: 0;
   color: var(--foreground);
-  font-size: clamp(1.3rem, 1.9vw, 1.6rem);
+  font-size: clamp(1.4rem, 2vw, 1.75rem);
   font-weight: 650;
   letter-spacing: -0.03em;
   line-height: 1.15;
@@ -398,7 +476,7 @@
 }
 
 .storyExcerpt {
-  margin: 0;
+  margin: 0 0 8px;
   color: var(--text-muted);
   font-size: 0.975rem;
   line-height: 1.6;
@@ -578,6 +656,12 @@
   color: var(--text-muted);
   font-size: clamp(1.125rem, 1.8vw, 1.375rem);
   line-height: 1.55;
+}
+
+.byline a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 24px;
 }
 
 .byline {
@@ -828,6 +912,10 @@
 }
 
 .prose a:not(.ctaLink) {
+  /* inline-block: a 24px+ hit height, and a wrapped link stays one block. */
+  display: inline-block;
+  max-width: 100%;
+  padding-block: 2px;
   color: var(--brand-primary);
   font-weight: 560;
   text-decoration: underline;
@@ -1060,8 +1148,10 @@
   margin: 0;
 }
 
-.about a {
+.about a,
+.about summary {
   display: inline-block;
+  min-block-size: 24px;
   padding: 3px 0;
   background:
     linear-gradient(var(--brand-primary) 0 0) 0 100% / 0 2px no-repeat,
@@ -1071,6 +1161,10 @@
   transition:
     background-size 300ms cubic-bezier(0.2, 0.75, 0.2, 1),
     color 160ms ease;
+}
+
+.about summary {
+  cursor: pointer;
 }
 
 .about a:is(:hover, :focus-visible) {
@@ -1146,5 +1240,294 @@
 @media (min-width: 640px) {
   .nextList {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Breadcrumb ---------- */
+
+.crumbs {
+  margin: 0 0 8px;
+  font-size: 0.875rem;
+}
+
+.crumbs ol {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.crumbs li {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.crumbs li + li::before {
+  margin: 0 10px;
+  color: var(--text-muted);
+  content: "/";
+}
+
+.crumbs a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 44px;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.crumbLeaf {
+  flex: 1;
+}
+
+.crumbLeaf span {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- Edition network ---------- */
+
+.net {
+  --map-h: 96px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: 36px;
+  color: var(--text-muted);
+}
+
+.netCompact {
+  --map-h: 80px;
+  margin-top: 12px;
+}
+
+.netLabel {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.netMap {
+  position: relative;
+  flex: 1;
+  height: var(--map-h);
+  min-width: 0;
+}
+
+.netRoutes {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform-origin: left;
+}
+
+.netRoute {
+  stroke: var(--border-strong);
+  stroke-width: 1;
+}
+
+.netRouteRelated {
+  stroke-dasharray: 3 4;
+}
+
+.netRouteLit {
+  stroke: var(--brand-primary);
+  stroke-width: 2;
+}
+
+.netNodes {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.netNode {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+}
+
+.netHit {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.netDot {
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--text-muted);
+  border-radius: 50%;
+  background: var(--background, #fff);
+  transition:
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 160ms ease,
+    border-color 160ms ease;
+}
+
+.netNode:is(:hover, :focus-within) .netDot {
+  border-color: var(--brand-primary);
+  background: var(--brand-primary);
+  transform: scale(1.5);
+}
+
+.netNode[data-current] .netDot {
+  width: 14px;
+  height: 14px;
+  border-color: var(--brand-primary);
+  background: var(--brand-primary);
+  box-shadow: 0 0 0 5px rgb(166 66 36 / 0.18);
+}
+
+.netHit:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+.netTip {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 50%;
+  z-index: 3;
+  width: max-content;
+  max-width: min(220px, 52vw);
+  padding: 6px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--foreground);
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  line-height: 1.35;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 4px);
+  transition:
+    opacity 160ms ease,
+    transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.netNode[data-up] .netTip {
+  top: auto;
+  bottom: calc(100% + 2px);
+}
+
+.netNode[data-side="start"] .netTip {
+  left: 0;
+  transform: translate(-8px, 4px);
+}
+
+.netNode[data-side="end"] .netTip {
+  right: 0;
+  left: auto;
+  transform: translate(8px, 4px);
+}
+
+.netNode:is(:hover, :focus-within) .netTip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.netNode[data-side="start"]:is(:hover, :focus-within) .netTip {
+  transform: translate(-8px, 0);
+}
+
+.netNode[data-side="end"]:is(:hover, :focus-within) .netTip {
+  transform: translate(8px, 0);
+}
+
+/* The entrance: routes draw in from the left, nodes step in after them. The
+   wrapper itself rides the shared [data-mesh-band] cascade in globals.css. */
+@media (prefers-reduced-motion: no-preference) {
+  .netRoutes {
+    animation: netDraw 700ms cubic-bezier(0.2, 0.75, 0.2, 1) 0.3s backwards;
+  }
+
+  .netNode {
+    animation: netPop 360ms cubic-bezier(0.22, 1, 0.36, 1)
+      calc(0.4s + var(--i) * 70ms) backwards;
+  }
+
+  .netNode[data-current] .netDot {
+    animation: netPulse 2.4s ease-out 1.2s infinite;
+  }
+}
+
+@keyframes netDraw {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes netPop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+@keyframes netPulse {
+  50% {
+    transform: scale(1.18);
+  }
+}
+
+/* Phones: label above, a taller map, and only the chain of routes. */
+@media (max-width: 639px) {
+  .net {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    --map-h: 128px;
+  }
+
+  .netCompact {
+    --map-h: 112px;
+  }
+
+  .netMap {
+    flex: none;
+  }
+
+  .netLabel {
+    flex-direction: row;
+    gap: 14px;
+  }
+
+  .netRouteRelated {
+    display: none;
   }
 }

@@ -4,16 +4,17 @@ import { ArrowRight } from "lucide-react";
 import type { BlogPostMeta } from "@/lib/types/blog";
 
 import {
+  buildEditionNetwork,
   formatEditorialDate,
   latestUpdate,
   selectLeadStory,
   splitArchive,
 } from "@/lib/blog-presentation";
+import { EditionNetwork } from "@/components/blog/edition-network";
 import { BlogPostCard, PostCover, PostMeta } from "@/components/blog/blog-post-card";
 import styles from "@/components/blog/blog.module.css";
 import cta from "@/components/ui/cta-motion.module.css";
 import gutter from "@/components/ui/gutter.module.css";
-import { MeshBand } from "@/components/ui/mesh-band";
 
 type BlogIndexProps = {
   posts: BlogPostMeta[];
@@ -58,6 +59,7 @@ export function BlogIndex({ posts }: BlogIndexProps) {
   const { groups: sections, ungrouped } = splitArchive(rest.slice(SECONDARY_COUNT));
   const hasArchive = sections.length > 0 || ungrouped.length > 0;
   const updated = latestUpdate(posts);
+  const network = buildEditionNetwork(posts);
 
   return (
     <div className={styles.page}>
@@ -120,7 +122,7 @@ export function BlogIndex({ posts }: BlogIndexProps) {
             </ul>
           </nav>
         ) : null}
-        <MeshBand section="blog" />
+        <EditionNetwork network={network} />
       </header>
 
       <div className={gutter.gutter}>
@@ -143,8 +145,8 @@ export function BlogIndex({ posts }: BlogIndexProps) {
               <div className={styles.leadText}>
                 <p className={styles.label}>Lead story / {lead.category}</p>
                 <h2 id="lead-story" className={styles.leadTitle}>
-                  <Link href={`/blog/${lead.slug}`} className={`${cta.link} ${styles.stretch}`}>
-                    {lead.title}
+                  <Link href={`/blog/${lead.slug}`} className={styles.stretch}>
+                    <span className={styles.grow}>{lead.title}</span>
                   </Link>
                 </h2>
                 <p className={styles.leadStandfirst}>{lead.excerpt}</p>
@@ -165,7 +167,7 @@ export function BlogIndex({ posts }: BlogIndexProps) {
                 </div>
                 <div className={styles.editionGrid}>
                   {secondary.map((post) => (
-                    <BlogPostCard key={post.slug} post={post} showExcerpt />
+                    <BlogPostCard key={post.slug} post={post} network={network} />
                   ))}
                 </div>
               </section>

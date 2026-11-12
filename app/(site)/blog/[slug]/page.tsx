@@ -51,7 +51,10 @@ export default async function BlogPostRoute({ params }: BlogPostRouteProps) {
     notFound();
   }
 
-  const relatedPosts = await getRelatedPosts(post.meta, 2);
+  const [relatedPosts, allPosts] = await Promise.all([
+    getRelatedPosts(post.meta, 2),
+    getAllBlogPosts(),
+  ]);
 
   return (
     <>
@@ -63,7 +66,9 @@ export default async function BlogPostRoute({ params }: BlogPostRouteProps) {
           { name: post.meta.title, path: `/blog/${post.meta.slug}` },
         ]}
       />
-      <BlogPostPage post={post} relatedPosts={relatedPosts} />
+      <BlogPostPage post={post} relatedPosts={relatedPosts}
+        allPosts={allPosts}
+      />
     </>
   );
 }

@@ -10,9 +10,10 @@ import { mdxComponents } from "@/components/blog/mdx-components";
 type BlogPostPageProps = {
   post: BlogPost;
   relatedPosts: BlogPost["meta"][];
+  allPosts: BlogPost["meta"][];
 };
 
-export async function BlogPostPage({ post, relatedPosts }: BlogPostPageProps) {
+export async function BlogPostPage({ post, relatedPosts, allPosts }: BlogPostPageProps) {
   const { content } = await compileMDX({
     source: post.body,
     components: mdxComponents,
@@ -25,6 +26,7 @@ export async function BlogPostPage({ post, relatedPosts }: BlogPostPageProps) {
       post={post.meta}
       headings={extractHeadings(post.body)}
       relatedPosts={relatedPosts}
+      allPosts={allPosts}
     >
       {content}
     </BlogPostLayout>

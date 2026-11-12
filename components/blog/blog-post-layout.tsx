@@ -1,4 +1,3 @@
-import { MeshBand } from "@/components/ui/mesh-band";
 import Link from "next/link";
 import cta from "@/components/ui/cta-motion.module.css";
 import fill from "@/components/ui/cta-fill.module.css";
@@ -9,19 +8,23 @@ import type { BlogPostMeta } from "@/lib/types/blog";
 
 import {
   type ArticleHeading,
+  buildEditionNetwork,
   formatEditorialDate,
   shouldShowContents,
 } from "@/lib/blog-presentation";
 import { ArticleRoute } from "@/components/blog/article-route";
+import { ArticleEvidence } from "@/components/blog/article-evidence";
+import { BlogBreadcrumbs } from "@/components/blog/blog-breadcrumbs";
+import { EditionNetwork } from "@/components/blog/edition-network";
 import { BlogPostCard, PostCover } from "@/components/blog/blog-post-card";
 import styles from "@/components/blog/blog.module.css";
-import { ContentBreadcrumbs } from "@/components/seo/content-breadcrumbs";
-import { ContentEvidence } from "@/components/seo/content-evidence";
 
 type BlogPostLayoutProps = {
   post: BlogPostMeta;
   headings: ArticleHeading[];
   relatedPosts: BlogPostMeta[];
+  /** Every published article, for the edition network. */
+  allPosts?: BlogPostMeta[];
   children: ReactNode;
 };
 
@@ -29,8 +32,14 @@ export function BlogPostLayout({
   post,
   headings,
   relatedPosts,
+  allPosts = [],
   children,
 }: BlogPostLayoutProps) {
+  const network = buildEditionNetwork(
+    allPosts.some((candidate) => candidate.slug === post.slug)
+      ? allPosts
+      : [...allPosts, post],
+  );
   const updated =
     post.modifiedDate && post.modifiedDate !== post.publishDate
       ? post.modifiedDate
@@ -41,7 +50,7 @@ export function BlogPostLayout({
       <div className={styles.progress} aria-hidden="true" />
       <article className={styles.article}>
         <header className={styles.articleHead} data-motion-reveal="mask">
-          <ContentBreadcrumbs parent="Blog" title={post.title} />
+          <BlogBreadcrumbs title={post.title} />
           <div className={styles.kicker}>
             <Link
               href="/blog"
@@ -76,7 +85,7 @@ export function BlogPostLayout({
             ) : null}
             <span>{post.readingMinutes} min read</span>
           </p>
-          <MeshBand section="blog" compact />
+          <EditionNetwork network={network} currentSlug={post.slug} compact />
         </header>
 
         {post.coverImage ? (
@@ -106,7 +115,7 @@ export function BlogPostLayout({
           </h2>
           <div className={styles.about}>
             {post.summary ? (
-              <ContentEvidence content={post} />
+              <ArticleEvidence post={post} />
             ) : (
               <p>
                 Written by {post.author} for Faithful Software Solutions.
@@ -152,7 +161,7 @@ export function BlogPostLayout({
             </h2>
             <div className={styles.nextList}>
               {relatedPosts.map((related) => (
-                <BlogPostCard key={related.slug} post={related} />
+                <BlogPostCard key={related.slug} post={related} network={network} />
               ))}
             </div>
           </section>
