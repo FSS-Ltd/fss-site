@@ -17,7 +17,7 @@
 .desktop a[aria-current="page"],
 .mobilePanel a[aria-current="page"] {
   color: var(--foreground);
-  background: white;
+  background-color: #fff;
   font-weight: 650;
 }
 .desktop a[aria-current="page"] {
@@ -30,7 +30,7 @@
 .desktop a:hover,
 .mobilePanel a:hover {
   color: var(--foreground);
-  background: rgb(255 255 255 / 0.7);
+  background-color: #ffffffb3;
 }
 
 .mobile {
@@ -53,7 +53,7 @@
   top: 12px;
   left: 24px;
   padding: 12px;
-  background: white;
+  background: #fff;
   transform: translateY(-200%);
 }
 .skip:focus {

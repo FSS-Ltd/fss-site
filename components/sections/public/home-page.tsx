@@ -100,7 +100,7 @@ export function HomePage() {
                 Add AI to the tools your team already uses, with approval steps,
                 logs and a clear route for anything it cannot handle.
               </p>
-              <Link href="/services/ai-integration">
+              <Link href="/services/ai-integration" className={cta.link}>
                 Explore AI integration
               </Link>
             </article>
@@ -114,7 +114,7 @@ export function HomePage() {
                 Reduce repeated data entry and connect the tools your business
                 already relies on, with clear review and exception handling.
               </p>
-              <Link href="/services/workflow-automation">
+              <Link href="/services/workflow-automation" className={cta.link}>
                 Explore automation
               </Link>
             </article>
@@ -128,7 +128,7 @@ export function HomePage() {
                 Assess sensitive workflows before data reaches the wrong tools,
                 with deployment boundaries and oversight built into the work.
               </p>
-              <Link href="/services/private-ai">Explore private AI</Link>
+              <Link href="/services/private-ai" className={cta.link}>Explore private AI</Link>
             </article>
           </div>
         </div>

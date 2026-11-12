@@ -15,6 +15,7 @@ import type { MeshSection } from "@/components/ui/mesh-band";
 import { DeliverySteps } from "./delivery-steps";
 import { RelatedLinks } from "./related-links";
 import styles from "./public-page.module.css";
+import cta from "@/components/ui/cta-motion.module.css";
 import { ContentEvidence } from "@/components/seo/content-evidence";
 import { churchArticle } from "@/lib/commercial/church-article";
 
@@ -29,7 +30,10 @@ function ContentSection({ section }: { section: CommercialSection }) {
       <p className="max-w-3xl">{section.text}</p>
       {section.links?.map((link) => (
         <p key={link.href}>
-          <Link href={link.href} className="underline underline-offset-4">
+          <Link
+            href={link.href}
+            className={`underline underline-offset-4 ${cta.link}`}
+          >
             {link.label}
           </Link>
         </p>
@@ -68,7 +72,7 @@ export function CommercialPage({ page }: { page: CommercialPageContent }) {
                 ) : (
                   <Link
                     href={item.href}
-                    className="inline-flex min-h-11 items-center underline underline-offset-4"
+                    className={`inline-block py-3 underline underline-offset-4 ${cta.link}`}
                   >
                     {item.label}
                   </Link>

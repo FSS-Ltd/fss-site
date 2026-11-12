@@ -1,4 +1,5 @@
 import Link from "next/link";
+import cta from "@/components/ui/cta-motion.module.css";
 
 import type { ResourceMeta } from "@/lib/types/resource";
 
@@ -42,12 +43,12 @@ export function ResourceThankYouPage({ resource }: ResourceThankYouPageProps) {
             Want to review this page again?{" "}
             <Link
               href={resourcePath}
-              className="text-brand-primary hover:underline"
+              className={`text-brand-primary ${cta.link}`}
             >
               Go back to resource
             </Link>
             . You can also browse our{" "}
-            <Link href="/blog" className="text-brand-primary hover:underline">
+            <Link href="/blog" className={`text-brand-primary ${cta.link}`}>
               latest blog articles
             </Link>
             .

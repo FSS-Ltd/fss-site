@@ -1,6 +1,7 @@
 import { Check } from "lucide-react";
 import { compileMDX } from "next-mdx-remote/rsc";
 import Link from "next/link";
+import cta from "@/components/ui/cta-motion.module.css";
 
 import type { ResourceItem, ResourceMeta } from "@/lib/types/resource";
 
@@ -180,13 +181,13 @@ export async function ResourceDetailPage({
             </div>
             <p className="mt-6 text-sm text-text-subtle">
               Want to learn more?{" "}
-              <Link href="/blog" className="text-brand-primary hover:underline">
+              <Link href="/blog" className={`text-brand-primary ${cta.link}`}>
                 Read our blog
               </Link>{" "}
               or{" "}
               <Link
                 href="/contact"
-                className="text-brand-primary hover:underline"
+                className={`text-brand-primary ${cta.link}`}
               >
                 talk to FSS directly
               </Link>

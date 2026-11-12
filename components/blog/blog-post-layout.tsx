@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { MeshBand } from "@/components/ui/mesh-band";
 import Link from "next/link";
+import cta from "@/components/ui/cta-motion.module.css";
 import type { ReactNode } from "react";
 
 import { format } from "date-fns";
@@ -70,14 +71,14 @@ export function BlogPostLayout({ post, children }: BlogPostLayoutProps) {
             Explore implementation resources in{" "}
             <Link
               href="/resources"
-              className="text-brand-primary hover:underline"
+              className={`text-brand-primary ${cta.link}`}
             >
               the resource library
             </Link>
             , or{" "}
             <Link
               href="/contact"
-              className="text-brand-primary hover:underline"
+              className={`text-brand-primary ${cta.link}`}
             >
               talk to FSS
             </Link>

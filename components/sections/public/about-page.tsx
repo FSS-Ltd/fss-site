@@ -95,7 +95,7 @@ export function AboutPage() {
         </p>
         <Link
           href="/services"
-          className="inline-flex min-h-11 items-center font-medium underline underline-offset-4"
+          className={`inline-block py-3 font-medium underline underline-offset-4 ${cta.link}`}
         >
           See how we can help
         </Link>
