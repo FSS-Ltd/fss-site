@@ -195,37 +195,3 @@ export async function getBlogPostBySlug(
 ): Promise<BlogPost | null> {
   return getBlogPostBySlugWith(slug, getPublishedRows);
 }
-
-export async function getRelatedPosts(
-  post: BlogPostMeta,
-  limit = 2,
-): Promise<BlogPostMeta[]> {
-  const allPosts = (await getAllBlogPosts()).filter(
-    (candidate) =>
-      !["sdk-integration-playbook", "technical-content-lead-pipeline"].includes(
-        candidate.slug,
-      ),
-  );
-
-  const related = allPosts
-    .filter((candidate) => candidate.slug !== post.slug)
-    .filter(
-      (candidate) =>
-        candidate.category === post.category ||
-        candidate.tags.some((tag) => post.tags.includes(tag)),
-    )
-    .slice(0, limit);
-
-  if (related.length >= limit) {
-    return related;
-  }
-
-  const fallback = allPosts
-    .filter((candidate) => candidate.slug !== post.slug)
-    .filter(
-      (candidate) => !related.some((item) => item.slug === candidate.slug),
-    )
-    .slice(0, limit - related.length);
-
-  return [...related, ...fallback];
-}

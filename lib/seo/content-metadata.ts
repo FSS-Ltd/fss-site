@@ -3,10 +3,14 @@ import type { BlogPostMeta } from "@/lib/types/blog";
 import type { ResourceMeta } from "@/lib/types/resource";
 import { createPageMetadata } from "./metadata";
 
+const SITE_SUFFIX = " | FSS";
+
 export function createArticleMetadata(post: BlogPostMeta): Metadata {
   const metadata = createPageMetadata({
     path: `/blog/${post.slug}`,
-    title: post.seoTitle,
+    title: post.seoTitle.endsWith(SITE_SUFFIX)
+      ? post.seoTitle
+      : `${post.seoTitle}${SITE_SUFFIX}`,
     description: post.seoDescription,
     index: post.indexable,
   });

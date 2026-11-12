@@ -25,7 +25,7 @@ test("article evidence is visible and organisational authorship is represented a
   );
   assert.ok(post);
   const html = renderToStaticMarkup(<ContentEvidence content={post.meta} />);
-  assert.match(html, /FSS Growth Team/);
+  assert.match(html, /Jean-Fidele Ntagengwa/);
   assert.match(html, /2026-09-04/);
   assert.match(html, /Charity leaders/);
   assert.match(html, /Sources and evidence/);
@@ -38,8 +38,16 @@ test("article evidence is visible and organisational authorship is represented a
       `"publisher":${org},"logo":{"@type":"ImageObject","url":"https://faithfulsoftware.dev/FSS.png"}}`,
     ),
   );
-  // A team byline is the organisation; only a named individual is a Person.
-  assert.ok(schema.includes(`"author":${org}}`));
+  // A named individual is a Person; a team byline is the organisation.
+  assert.ok(
+    schema.includes(
+      `"author":{"@type":"Person","name":"Jean-Fidele Ntagengwa","url":"https://faithfulsoftware.dev/about"}`,
+    ),
+  );
+  const team = renderToStaticMarkup(
+    <ArticleSchema post={{ ...post.meta, author: "FSS Growth Team" }} />,
+  );
+  assert.ok(team.includes(`"author":${org}}`));
   const person = renderToStaticMarkup(
     <ArticleSchema post={{ ...post.meta, author: "Test Person" }} />,
   );

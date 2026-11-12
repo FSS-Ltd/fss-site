@@ -12,7 +12,7 @@ export const churchArticle: BlogPost = {
     excerpt: page.description,
     publishDate: "2026-09-04",
     modifiedDate: page.modifiedDate,
-    author: "Faithful Software Solutions Ltd",
+    author: "Jean-Fidele Ntagengwa",
     authorUrl: "https://faithfulsoftware.dev/about",
     audience: ["Church administrators", "Ministry leads", "Trustees"],
     summary: page.answer,

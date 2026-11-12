@@ -1,4 +1,8 @@
-import { ButtonLink } from "@/components/ui/button";
+import Link from "next/link";
+
+import cta from "@/components/ui/cta-motion.module.css";
+import fill from "@/components/ui/cta-fill.module.css";
+import styles from "@/components/blog/blog.module.css";
 
 type MdxCtaBlockProps = {
   title: string;
@@ -14,12 +18,12 @@ export function MdxCtaBlock({
   ctaLabel = "Book a strategy call",
 }: MdxCtaBlockProps) {
   return (
-    <div className="rounded-2xl border border-border-soft/50 bg-gradient-to-r from-brand-secondary/42 via-surface-1/88 to-surface-2/88 p-6">
-      <p className="text-xl font-semibold text-foreground">{title}</p>
-      <p className="mt-2 text-sm text-text-muted">{body}</p>
-      <ButtonLink href={href} variant="primary" className="mt-5">
-        {ctaLabel}
-      </ButtonLink>
+    <div className={styles.cta} data-lift-light>
+      <p className={styles.ctaTitle}>{title}</p>
+      <p className={styles.ctaBody}>{body}</p>
+      <Link href={href} className={`${styles.ctaLink} ${cta.sweep} ${fill.rust}`}>
+        {ctaLabel} <span aria-hidden="true">→</span>
+      </Link>
     </div>
   );
 }

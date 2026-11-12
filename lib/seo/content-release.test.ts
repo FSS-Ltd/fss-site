@@ -2,11 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { access } from "node:fs/promises";
 import path from "node:path";
-import {
-  getAllBlogPosts,
-  getBlogPostBySlug,
-  getRelatedPosts,
-} from "@/lib/blog";
+import { getAllBlogPosts, getBlogPostBySlug } from "@/lib/blog";
+import { pickRelatedPosts } from "@/lib/blog-presentation";
 import { getAllResources, getResourceBySlug } from "@/lib/resources";
 import nextConfig from "@/next.config";
 
@@ -43,9 +40,10 @@ test("substantive articles and resources expose evidence and contextual next ste
 test("legacy articles stay served without receiving new related-post promotion", async () => {
   for (const slug of legacy) assert.ok(await getBlogPostBySlug(slug));
   const posts = await getAllBlogPosts();
-  for (const post of posts.filter((item) => !legacy.includes(item.slug))) {
+  const promoted = posts.filter((item) => !legacy.includes(item.slug));
+  for (const post of promoted) {
     assert.ok(
-      (await getRelatedPosts(post)).every(
+      pickRelatedPosts(post, posts).every(
         (related) => !legacy.includes(related.slug),
       ),
     );

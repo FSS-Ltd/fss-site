@@ -1,0 +1,1559 @@
+/* Field Notes: editorial styles for /blog and its articles. Blog-scoped so the
+   homepage CSS budget is untouched. Colours and type come from #fssroot. */
+
+.page {
+  --rule: var(--foreground);
+  --mono: var(--font-geist-mono), "Geist Mono", ui-monospace, monospace;
+}
+
+.mono {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.label {
+  composes: mono;
+  color: var(--brand-primary);
+}
+
+.metaLine {
+  composes: mono;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+}
+
+.metaLine > * + *::before {
+  margin-right: 14px;
+  color: var(--brand-accent);
+  content: "/";
+}
+
+@media (max-width: 479px) {
+  .metaLine {
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .metaLine > * + *::before {
+    display: none;
+  }
+}
+
+/* A card's single link: the headline link stretches over the whole card. */
+.stretch::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 20px;
+  content: "";
+  transform: none !important;
+}
+
+.stretch:focus-visible {
+  outline: none;
+}
+
+.stretch:focus-visible::after {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 3px;
+}
+
+/* ---------- Masthead ---------- */
+
+.masthead {
+  position: relative;
+  isolation: isolate;
+  padding: 112px 0 0;
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.45;
+}
+
+.mastTop {
+  composes: mono;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 24px;
+  padding: 14px 0 12px;
+  border-bottom: 2px solid var(--rule);
+  color: var(--foreground);
+}
+
+.nameplate {
+  margin: clamp(20px, 3vw, 36px) 0 0;
+  color: var(--foreground);
+}
+
+.nameplateWord {
+  display: block;
+  font-size: clamp(4rem, 16.4vw, 13.5rem);
+  font-weight: 700;
+  letter-spacing: -0.065em;
+  line-height: 0.84;
+  margin-left: -0.04em;
+}
+
+.nameplateWord em {
+  color: var(--brand-primary);
+  font-style: italic;
+  font-weight: 580;
+}
+
+.mastFoot {
+  display: grid;
+  gap: 20px 48px;
+  margin-top: clamp(20px, 3vw, 32px);
+  padding-bottom: clamp(24px, 3vw, 36px);
+}
+
+.standfirst {
+  max-width: 52ch;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: clamp(1.125rem, 1.7vw, 1.4rem);
+  line-height: 1.55;
+}
+
+.dateline {
+  composes: mono;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 20px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border-strong);
+  border-bottom: 1px solid var(--border-strong);
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+}
+
+.dateline > span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+}
+
+.datelineLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  margin-left: auto;
+  padding: 0 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.66);
+  color: var(--foreground);
+}
+
+/* Phones: the two masthead kickers become one line. */
+@media (max-width: 639px) {
+  .mastTop > span + span {
+    display: none;
+  }
+}
+
+@media (min-width: 900px) {
+  .mastFoot {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+  }
+}
+
+/* Headline underline: clean at rest, grows on hover or keyboard focus. One
+   span, so it reads as one line of rust under wrapped text. */
+.grow {
+  padding-bottom: 3px;
+  background: linear-gradient(var(--brand-primary) 0 0) 0 100% / 0 2px no-repeat;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  transition: background-size 300ms cubic-bezier(0.2, 0.75, 0.2, 1);
+}
+
+.stretch:is(:hover, :focus-visible) .grow,
+.mapLink:is(:hover, :focus-visible) .grow,
+.story:hover .grow {
+  background-size: 100% 2px;
+}
+
+/* ---------- Section heads and read-next stories ---------- */
+
+.sectionHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 24px;
+  margin: 0 0 24px;
+  padding-top: 12px;
+  border-top: 2px solid var(--rule);
+}
+
+.sectionTitle {
+  composes: mono;
+  margin: 0;
+  color: var(--foreground);
+  font-size: 0.8125rem;
+}
+
+.story {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px 24px 24px;
+  border: 1px solid rgb(33 27 23 / 0.08);
+  border-radius: 20px;
+  background: rgb(255 255 255 / 0.55);
+  transition:
+    transform 300ms ease,
+    border-color 300ms ease,
+    box-shadow 300ms ease;
+}
+
+/* The rust rule: short at rest, runs the width of the card on hover. */
+.storyRule {
+  display: block;
+  height: 2px;
+  margin-top: auto;
+  background: var(--brand-primary);
+  transform: scaleX(0.14);
+  transform-origin: left;
+  transition: transform 500ms cubic-bezier(0.2, 0.75, 0.2, 1);
+}
+
+.story:is(:hover, :focus-within) .storyRule {
+  transform: scaleX(1);
+}
+
+/* The index lead card's hover, for every card on an article page: rust border
+   and soft shadow always, the lift when motion is welcome. The shared
+   data-lift-light script sets the same values inline. */
+.story:is(:hover, :focus-within),
+.cta:is(:hover, :focus-within) {
+  border-color: rgb(181 89 55 / 0.4);
+  box-shadow: 0 26px 50px -30px rgb(33 27 23 / 0.35);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .story:is(:hover, :focus-within),
+  .cta:is(:hover, :focus-within) {
+    transform: translateY(-5px);
+  }
+}
+
+.storyTitle {
+  margin: 0;
+  color: var(--foreground);
+  font-size: clamp(1.4rem, 2vw, 1.75rem);
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.storyExcerpt {
+  margin: 0 0 8px;
+  color: var(--text-muted);
+  font-size: 0.975rem;
+  line-height: 1.6;
+}
+
+/* ---------- Article ---------- */
+
+.progress {
+  display: none;
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .progress {
+      position: fixed;
+      top: 72px;
+      left: 0;
+      z-index: 91;
+      display: block;
+      width: 100%;
+      height: 3px;
+      background: var(--brand-primary);
+      transform: scaleX(0);
+      transform-origin: 0 50%;
+      animation: readingProgress linear both;
+      animation-timeline: scroll(root block);
+      pointer-events: none;
+    }
+  }
+}
+
+@keyframes readingProgress {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.article {
+  padding-top: 104px;
+}
+
+.articleHead {
+  margin: 0;
+}
+
+.kicker {
+  display: flex;
+  align-items: center;
+  gap: 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--rule);
+}
+
+.kicker a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.kicker a {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kicker span {
+  flex: none;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.title {
+  max-width: 22ch;
+  margin: clamp(22px, 3vw, 36px) 0 0;
+  color: var(--foreground);
+  font-size: clamp(2.25rem, 5.6vw, 4.6rem);
+  font-weight: 680;
+  letter-spacing: -0.05em;
+  line-height: 1.01;
+  text-wrap: balance;
+}
+
+.articleStandfirst {
+  max-width: 60ch;
+  margin: clamp(18px, 2.4vw, 28px) 0 0;
+  color: var(--text-muted);
+  font-size: clamp(1.125rem, 1.8vw, 1.375rem);
+  line-height: 1.55;
+}
+
+.byline a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 24px;
+}
+
+.byline {
+  margin-top: clamp(24px, 3vw, 36px);
+  padding: 12px 0;
+  border-top: 1px solid var(--border-strong);
+  border-bottom: 1px solid var(--border-strong);
+}
+
+
+.columns {
+  display: grid;
+  gap: 32px;
+  margin: clamp(32px, 5vw, 64px) 0 0;
+}
+
+@media (min-width: 1100px) {
+  .columns {
+    grid-template-columns: 220px minmax(0, 68ch);
+    justify-content: space-between;
+    gap: 64px;
+  }
+
+  .columns > :only-child {
+    grid-column: 2;
+  }
+
+  .toc {
+    position: sticky;
+    top: 104px;
+    align-self: start;
+  }
+}
+
+/* Contents as a route: h2s are nodes on a vertical line. The line fills (one
+   transform) as the reader scrolls and the current node lights. Without JS or
+   under reduced motion it is a static, fully readable numbered list. */
+.toc {
+  --node: 12px;
+  --track: 2px;
+  --line-x: 6px;
+}
+
+.toc ol {
+  position: relative;
+  margin: 12px 0 0;
+  padding: 0 0 0 28px;
+  list-style: none;
+  counter-reset: toc;
+}
+
+.toc ol::before,
+.toc ol::after {
+  position: absolute;
+  top: 22px;
+  bottom: 22px;
+  left: calc(var(--line-x) - var(--track) / 2);
+  width: var(--track);
+  border-radius: 1px;
+  content: "";
+}
+
+.toc ol::before {
+  background: var(--border-strong);
+}
+
+.toc ol::after {
+  background: var(--brand-primary);
+  transform: scaleY(var(--fill, 0));
+  transform-origin: top;
+  transition: transform 160ms linear;
+}
+
+.toc li {
+  position: relative;
+  counter-increment: toc;
+}
+
+/* The node: a ring, with a solid dot that scales in once it is reached. */
+.toc li::before,
+.toc li::after {
+  position: absolute;
+  top: calc(50% - var(--node) / 2);
+  left: calc(var(--line-x) - 28px - var(--node) / 2);
+  width: var(--node);
+  height: var(--node);
+  border-radius: 50%;
+  content: "";
+}
+
+.toc li::before {
+  border: 2px solid var(--border-strong);
+  background: var(--background, #fff);
+}
+
+.toc li::after {
+  background: var(--brand-primary);
+  opacity: 0;
+  transform: scale(0.3);
+  transition:
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 160ms ease;
+}
+
+.toc li[data-state="passed"]::after,
+.toc li[data-state="current"]::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.toc li[data-state="current"]::after {
+  transform: scale(1.35);
+  box-shadow: 0 0 0 4px rgb(166 66 36 / 0.18);
+}
+
+.toc a {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  min-height: 44px;
+  align-items: center;
+  padding: 6px 0;
+  color: var(--text-muted);
+  font-size: 0.9375rem;
+  line-height: 1.35;
+  transition: color 160ms ease;
+}
+
+.toc li[data-state="current"] a {
+  color: var(--foreground);
+  font-weight: 620;
+}
+
+.toc a::before {
+  align-self: start;
+  padding-top: 0.15em;
+  color: var(--brand-primary);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  content: counter(toc, decimal-leading-zero);
+}
+
+/* Hover: the title underlines itself, left to right. */
+.toc a span {
+  justify-self: start;
+  background: linear-gradient(var(--brand-primary) 0 0) 0 100% / 0 2px no-repeat;
+  transition: background-size 300ms cubic-bezier(0.2, 0.75, 0.2, 1);
+}
+
+.toc a:is(:hover, :focus-visible) {
+  color: var(--foreground);
+}
+
+.toc a:is(:hover, :focus-visible) span {
+  background-size: 100% 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toc ol::after {
+    display: none;
+  }
+
+  .toc li::after,
+  .toc a span {
+    transition: none;
+  }
+
+  .toc li[data-state="current"]::after {
+    transform: scale(1);
+  }
+}
+
+/* Prose: one readable column, around 66 characters. */
+.prose {
+  min-width: 0;
+  max-width: 68ch;
+  color: var(--text-muted);
+  font-size: clamp(1.0625rem, 1.2vw, 1.15rem);
+  line-height: 1.75;
+  counter-reset: section;
+}
+
+.prose > * {
+  margin: 0 0 1.25em;
+}
+
+.prose > p:first-child,
+.prose > h2:first-child + p {
+  color: var(--foreground);
+  font-size: 1.2em;
+  line-height: 1.6;
+}
+
+.prose > p:first-child::first-letter {
+  float: left;
+  margin: 0.08em 0.12em 0 -0.02em;
+  color: var(--brand-primary);
+  font-size: 3.6em;
+  font-weight: 700;
+  line-height: 0.82;
+}
+
+.prose h2 {
+  margin: 2.6em 0 0.7em;
+  color: var(--foreground);
+  font-size: clamp(1.6rem, 2.6vw, 2.05rem);
+  font-weight: 650;
+  letter-spacing: -0.035em;
+  line-height: 1.14;
+  text-wrap: balance;
+  scroll-margin-top: 104px;
+  counter-increment: section;
+}
+
+.prose h2::before {
+  display: block;
+  margin-bottom: 0.7rem;
+  color: var(--brand-primary);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  content: counter(section, decimal-leading-zero);
+}
+
+.prose > h2:first-child {
+  margin-top: 0;
+}
+
+.prose h3 {
+  margin: 2em 0 0.6em;
+  color: var(--foreground);
+  font-size: 1.3rem;
+  font-weight: 640;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.prose strong {
+  color: var(--foreground);
+  font-weight: 650;
+}
+
+.prose a:not(.ctaLink) {
+  /* inline-block: a 24px+ hit height, and a wrapped link stays one block. */
+  display: inline-block;
+  max-width: 100%;
+  padding-block: 2px;
+  color: var(--brand-primary);
+  font-weight: 560;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.3em;
+  list-style: disc;
+}
+
+.prose ol {
+  list-style: decimal;
+}
+
+.prose li + li {
+  margin-top: 0.45em;
+}
+
+.prose li::marker {
+  color: var(--brand-primary);
+}
+
+.prose code {
+  padding: 0.1em 0.35em;
+  border-radius: 6px;
+  background: var(--surface-3);
+  color: var(--foreground);
+  font-family: var(--mono);
+  font-size: 0.85em;
+}
+
+.prose pre {
+  overflow-x: auto;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: var(--foreground);
+  color: #f2f3f5;
+  font-size: 0.875rem;
+}
+
+.prose pre code {
+  padding: 0;
+  background: none;
+  color: inherit;
+}
+
+/* Pull quote */
+.prose blockquote {
+  margin: 2.2em 0;
+  padding: 0.2em 0 0.2em 1.2em;
+  border-left: 3px solid var(--brand-primary);
+  color: var(--foreground);
+  font-size: clamp(1.3rem, 2.2vw, 1.6rem);
+  font-style: italic;
+  font-weight: 560;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+}
+
+.prose blockquote p {
+  margin: 0;
+}
+
+.prose img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 14px;
+}
+
+.prose figure {
+  margin: 2.2em 0;
+}
+
+.prose figcaption {
+  margin-top: 10px;
+  color: var(--text-muted);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+}
+
+.prose hr {
+  height: 0;
+  margin: 2.6em 0;
+  border: 0;
+  border-top: 1px solid var(--border-strong);
+}
+
+.prose table {
+  display: block;
+  overflow-x: auto;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+
+.prose th,
+.prose td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-soft);
+  text-align: left;
+}
+
+.callout {
+  margin: 2em 0;
+  padding: 18px 22px 20px;
+  border-top: 2px solid var(--rule);
+  background: rgb(255 255 255 / 0.7);
+  border-radius: 0 0 16px 16px;
+}
+
+.callout > p:first-child {
+  margin: 0 0 6px;
+}
+
+.callout div {
+  color: var(--text-muted);
+  font-size: 0.975rem;
+  line-height: 1.65;
+}
+
+.callout div > * {
+  margin: 0;
+}
+
+.cta {
+  transition:
+    transform 300ms ease,
+    border-color 300ms ease,
+    box-shadow 300ms ease;
+  margin: 2.4em 0;
+  padding: clamp(22px, 3vw, 30px);
+  border: 1px solid var(--border-soft);
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 92% 8%, rgb(181 89 55 / 0.12), transparent 40%),
+    var(--surface-1);
+}
+
+.ctaTitle {
+  margin: 0;
+  color: var(--foreground);
+  font-size: 1.3rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.ctaBody {
+  margin: 8px 0 18px;
+  color: var(--text-muted);
+  font-size: 0.975rem;
+  line-height: 1.6;
+}
+
+/* Pill: cream on dark, rust fill sweeping in on hover (cta-motion .sweep). */
+.ctaLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 999px;
+  background: #211b17;
+  color: #fff;
+  font-size: 0.9375rem;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.ctaLink:is(:hover, :focus-visible) {
+  color: #fff;
+}
+
+/* ---------- End of article ---------- */
+
+.endnotes {
+  display: grid;
+  gap: 40px;
+  margin: clamp(48px, 6vw, 80px) 0 0;
+  padding-bottom: clamp(56px, 7vw, 96px);
+}
+
+/* The article grid ends with the body, so the end sections span the full
+   content width instead of leaving the rail's column empty. Running text
+   keeps its measure. */
+@media (min-width: 1100px) {
+  .endnotes .about > p {
+    max-width: 68ch;
+  }
+}
+
+.endMark {
+  composes: mono;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-muted);
+}
+
+.endMark::before {
+  width: 10px;
+  height: 10px;
+  background: var(--brand-primary);
+  content: "";
+}
+
+.endMark::after {
+  flex: 1;
+  height: 1px;
+  background: var(--border-strong);
+  content: "";
+}
+
+.endHeading {
+  margin: 0 0 14px;
+  color: var(--foreground);
+  font-size: 1.375rem;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+}
+
+.about {
+  display: grid;
+  gap: 16px;
+  color: var(--text-muted);
+  font-size: 0.975rem;
+  line-height: 1.65;
+}
+
+.about p {
+  margin: 0;
+}
+
+.about a,
+.about summary {
+  display: inline-block;
+  min-block-size: 24px;
+  padding: 3px 0;
+  background:
+    linear-gradient(var(--brand-primary) 0 0) 0 100% / 0 2px no-repeat,
+    linear-gradient(var(--border-strong) 0 0) 0 100% / 100% 1px no-repeat;
+  color: var(--foreground);
+  text-decoration: none;
+  transition:
+    background-size 300ms cubic-bezier(0.2, 0.75, 0.2, 1),
+    color 160ms ease;
+}
+
+.about summary {
+  cursor: pointer;
+}
+
+.about a:is(:hover, :focus-visible) {
+  background-size: 100% 2px, 100% 1px;
+  color: var(--brand-primary);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tags li {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 6px 10px;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+}
+
+.contact {
+  padding: clamp(24px, 4vw, 40px);
+  border-radius: 24px;
+  background: var(--foreground);
+  color: #f2f3f5;
+}
+
+.contact .endHeading {
+  color: #fff;
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+.contact p {
+  margin: 0 0 22px;
+  max-width: 52ch;
+  color: #d8cdc4;
+  line-height: 1.6;
+}
+
+.contactLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 999px;
+  background: #f2f3f5;
+  color: var(--foreground);
+  font-weight: 650;
+}
+
+:global(#fssroot) .contact :focus-visible {
+  outline-color: #e6a07f;
+}
+
+.nextList {
+  display: grid;
+  gap: 20px;
+}
+
+@media (min-width: 640px) {
+  .nextList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Breadcrumb ---------- */
+
+.crumbs {
+  margin: 0 0 8px;
+  font-size: 0.875rem;
+}
+
+.crumbs ol {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.crumbs li {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.crumbs li + li::before {
+  margin: 0 10px;
+  color: var(--text-muted);
+  content: "/";
+}
+
+.crumbs a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 44px;
+}
+
+.crumbLeaf {
+  flex: 1;
+}
+
+.crumbLeaf span {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty {
+  max-width: 58ch;
+  margin: 48px 0 80px;
+  color: var(--text-muted);
+  font-size: 1.125rem;
+  line-height: 1.6;
+}
+
+/* ---------- Edition map ---------- */
+
+.map {
+  --row-h: 100px;
+  margin-top: clamp(28px, 4vw, 48px);
+  padding-bottom: clamp(32px, 4vw, 56px);
+}
+
+.mapKey {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.mapKey span {
+  font-weight: 600;
+}
+
+.mapKeyRoute {
+  color: var(--brand-primary);
+}
+
+.mapBody {
+  position: relative;
+}
+
+.mapRoutes {
+  position: absolute;
+  inset: 0;
+  display: none;
+}
+
+.mapRoutes svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.mapEdge {
+  stroke: var(--text-muted);
+  stroke-opacity: 0.55;
+  stroke-width: 1.5;
+}
+
+.mapRoute {
+  stroke: var(--brand-primary);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.mapNodes {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 0 0 0 32px;
+  list-style: none;
+}
+
+.mapNode {
+  position: relative;
+}
+
+/* Phone rail: a dot per node, and a line to the next one that turns rust
+   along the route, the same device as the article contents. */
+.mapNode::before {
+  position: absolute;
+  top: 28px;
+  bottom: -14px;
+  left: -21px;
+  width: 2px;
+  background: var(--border-strong);
+  content: "";
+}
+
+.mapNode:last-child::before {
+  display: none;
+}
+
+.mapNode[data-route-next]::before {
+  background: var(--brand-primary);
+}
+
+.mapLink {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  padding: 18px 20px 18px;
+  overflow: hidden;
+  border: 1px solid rgb(33 27 23 / 0.14);
+  border-radius: 16px;
+  background: var(--surface-1, #fff);
+  color: var(--foreground);
+  transition:
+    transform 300ms ease,
+    border-color 300ms ease,
+    box-shadow 300ms ease;
+}
+
+.mapLink:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 3px;
+}
+
+.mapDot {
+  position: absolute;
+  top: 21px;
+  left: -27px;
+  width: 14px;
+  height: 14px;
+  box-sizing: border-box;
+  border: 2px solid var(--text-muted);
+  border-radius: 50%;
+  background: var(--surface-1, #fff);
+}
+
+.mapNode[data-route] .mapDot {
+  border-color: var(--brand-primary);
+  background: var(--brand-primary);
+}
+
+.mapKicker {
+  composes: mono;
+  color: var(--brand-primary);
+}
+
+.mapTitle {
+  color: var(--foreground);
+  font-size: 1.1875rem;
+  font-weight: 640;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.mapStandfirst {
+  color: var(--text-muted);
+  font-size: 1.125rem;
+  line-height: 1.55;
+}
+
+/* Date and read time never break inside an item. When the pair does not fit
+   one line it stacks, and the separator that would start the second line sits
+   in a strip the line clips away, so no "/" is ever left orphaned. */
+.mapExcerpt {
+  display: none;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+}
+
+.mapLink .metaLine {
+  margin: auto 0 0 -26px;
+  column-gap: 0;
+  clip-path: inset(0 0 0 26px);
+}
+
+.mapLink .metaLine > * {
+  position: relative;
+  padding-left: 26px;
+  white-space: nowrap;
+}
+
+.mapLink .metaLine > * + *::before {
+  position: absolute;
+  left: 10px;
+  margin: 0;
+}
+
+.mapNode:not(.mapLead) .mapKicker {
+  overflow: hidden;
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mapNode:not(.mapLead) .metaLine {
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  row-gap: 2px;
+}
+
+/* The lead: the largest node, set as type on the dark ground. */
+.mapLead .mapLink {
+  gap: 14px;
+  padding: 26px 26px 24px;
+  border-color: var(--foreground);
+  background: var(--foreground);
+  color: #fff;
+}
+
+.mapLead .mapKicker {
+  color: #e6a07f;
+}
+
+.mapLead .mapTitle {
+  color: #fff;
+  font-size: clamp(1.875rem, 7.5vw, 2.5rem);
+  font-weight: 680;
+  letter-spacing: -0.04em;
+  line-height: 1.04;
+}
+
+.mapLead .mapStandfirst {
+  color: rgb(255 255 255 / 0.82);
+}
+
+.mapLead .metaLine {
+  color: rgb(255 255 255 / 0.78);
+}
+
+/* The byline closes the lead: a rule above it anchors it to the foot of the
+   card, so the space under the standfirst reads as deliberate. */
+.mapLead .mapLink .metaLine {
+  padding-top: 16px;
+  background: linear-gradient(rgb(255 255 255 / 0.22) 0 0) 0 0 / 100% 1px no-repeat;
+}
+
+/* The lead's own section route sits between standfirst and byline, so the
+   height the neighbouring column gives the card carries content. Wide only. */
+.mapLeadRoute {
+  display: none;
+}
+
+.mapLead .metaLine > * + *::before {
+  color: #e6a07f;
+}
+
+.mapLead .grow {
+  background-image: linear-gradient(#e6a07f 0 0);
+}
+
+.mapLead .mapDot {
+  border-color: #e6a07f;
+  background: #e6a07f;
+}
+
+.mapEdgeLabel {
+  position: absolute;
+  max-width: 96px;
+  padding: 2px 6px;
+  background: var(--background, #f2f3f5);
+  color: var(--text-muted);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  line-height: 1.25;
+  text-align: center;
+  text-wrap: balance;
+  transform: translate(-50%, -50%);
+}
+
+/* Phones: the meta items stack, so the separators and the clip strip go. */
+@media (max-width: 479px) {
+  .mapLink .metaLine {
+    margin-left: 0;
+    clip-path: none;
+  }
+
+  .mapLink .metaLine > * {
+    padding-left: 0;
+  }
+}
+
+/* Tablet: the lead across the top, the nodes in two staggered columns. */
+@media (min-width: 640px) {
+  .mapMid {
+    display: block;
+  }
+
+  .mapNodes {
+    display: grid;
+    grid-template-columns: repeat(var(--m-cols), minmax(0, 1fr));
+    grid-template-rows: repeat(var(--m-rows), var(--row-h));
+    gap: 0;
+    padding: 0;
+  }
+
+  .mapNode {
+    grid-column: var(--m-col) / span var(--m-span);
+    grid-row: var(--m-row) / span var(--m-rspan);
+    padding: 6px;
+  }
+
+  .mapNode::before {
+    display: none;
+  }
+
+  .mapDot {
+    top: 16px;
+    right: 16px;
+    left: auto;
+  }
+
+  .mapLink {
+    padding: 16px 40px 14px 18px;
+  }
+
+  /* The dot only crowds the top right; the meta line may use that padding. */
+  .mapNode:not(.mapLead) .metaLine {
+    margin-right: -22px;
+  }
+
+  .mapLead .mapLink {
+    padding: 22px 40px 20px 24px;
+  }
+
+  .mapLead .mapTitle {
+    max-width: 24ch;
+    font-size: clamp(1.75rem, 4vw, 2.4rem);
+  }
+
+  .mapLead .mapStandfirst {
+    display: -webkit-box;
+    max-width: 62ch;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .mapNode:not(.mapLead) .mapTitle {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1099px) {
+  .mapNode[data-tall-m] .mapExcerpt {
+    display: -webkit-box;
+  }
+}
+
+/* Desktop: the lead beside two staggered node columns with a gutter for routes. */
+@media (min-width: 1100px) {
+  .mapMid {
+    display: none;
+  }
+
+  .mapWide {
+    display: block;
+  }
+
+  .mapNodes {
+    grid-template-columns: repeat(var(--w-cols), minmax(0, 1fr));
+    grid-template-rows: repeat(var(--w-rows), var(--row-h));
+  }
+
+  .mapNode {
+    grid-column: var(--w-col) / span var(--w-span);
+    grid-row: var(--w-row) / span var(--w-rspan);
+  }
+
+  .mapLead .mapTitle {
+    max-width: none;
+    font-size: clamp(2rem, 4.1vw, 3.3rem);
+  }
+
+  .mapLead .mapStandfirst {
+    display: block;
+    overflow: visible;
+  }
+
+  .mapLead .mapLink {
+    padding: 30px 30px 28px;
+  }
+
+  .mapLeadRoute {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: auto;
+    color: rgb(255 255 255 / 0.86);
+    font-size: 0.875rem;
+    line-height: 1.35;
+  }
+
+  .mapLeadRoute > span {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  .mapLeadRoute > span > span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mapLeadRoute b {
+    flex: none;
+    position: relative;
+    padding-left: 18px;
+    color: #e6a07f;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+  }
+
+  .mapLeadRoute b::before {
+    position: absolute;
+    top: 0.32em;
+    left: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--brand-primary);
+    content: "";
+  }
+
+  .mapLead .mapLeadRoute + .metaLine {
+    margin-top: 14px;
+  }
+
+  .mapNode[data-tall-w] .mapExcerpt {
+    display: -webkit-box;
+  }
+}
+
+/* Entrance: routes draw in from the left, nodes rise in turn. Static when the
+   visitor prefers reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .mapNode {
+    animation: mapRise 520ms cubic-bezier(0.22, 1, 0.36, 1)
+      calc(0.12s + var(--i) * 80ms) backwards;
+  }
+}
+
+/* Hover or focus emphasis (rules generated in edition-map.tsx): the rust colour
+   switches at once; dimming and easing exist only when motion is welcome. */
+@media (prefers-reduced-motion: no-preference) {
+  .mapNode,
+  .mapLead .mapLink > *,
+  .mapEdge,
+  .mapRoute,
+  .mapEdgeLabel {
+    transition:
+      opacity 250ms ease,
+      stroke 250ms ease,
+      stroke-width 250ms ease,
+      color 250ms ease;
+  }
+}
+
+.mapLink:is(:hover, :focus-visible) {
+  border-color: rgb(181 89 55 / 0.4);
+  box-shadow: 0 26px 50px -30px rgb(33 27 23 / 0.35);
+}
+
+@keyframes mapRise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+/* ---------- Article hero art ---------- */
+
+.art {
+  margin: clamp(28px, 4vw, 48px) 0 0;
+  padding: clamp(16px, 2.4vw, 28px);
+  border: 1px solid var(--border-soft);
+  border-radius: clamp(16px, 2.4vw, 26px);
+  background: rgb(255 255 255 / 0.6);
+}
+
+.artSvg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.artTall {
+  max-width: 420px;
+}
+
+.artWide {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .artWide {
+    display: block;
+  }
+
+  .artTall {
+    display: none;
+  }
+}
+
+.artRoute {
+  stroke: var(--brand-primary);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.artDot {
+  fill: var(--surface-1, #fff);
+  stroke: var(--brand-primary);
+  stroke-width: 3;
+}
+
+.artNode[data-primary] .artDot {
+  fill: var(--brand-primary);
+}
+
+.artKicker {
+  fill: var(--brand-primary);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+}
+
+.artLabel {
+  fill: var(--foreground);
+  font-size: 16px;
+  font-weight: 620;
+  letter-spacing: -0.01em;
+}
+
+/* Draw-in: armed by DrawIn after hydration, so content is visible without it. */
+.draw {
+  transition: clip-path 1200ms cubic-bezier(0.2, 0.75, 0.2, 1) 0.25s;
+}
+
+.draw[data-armed]:not([data-in]) {
+  clip-path: inset(-10px 100% -10px -10px);
+}
+
+.draw[data-in] {
+  clip-path: inset(-10px);
+}
+
+.mapLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}

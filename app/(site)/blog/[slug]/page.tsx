@@ -8,7 +8,6 @@ import { BlogPostPage } from "@/components/sections/blog/blog-post-page";
 import {
   getAllBlogPosts,
   getBlogPostBySlug,
-  getRelatedPosts,
 } from "@/lib/blog";
 
 // Scheduled (future-dated) posts appear on their date without a write.
@@ -51,7 +50,7 @@ export default async function BlogPostRoute({ params }: BlogPostRouteProps) {
     notFound();
   }
 
-  const relatedPosts = await getRelatedPosts(post.meta, 2);
+  const allPosts = await getAllBlogPosts();
 
   return (
     <>
@@ -63,7 +62,7 @@ export default async function BlogPostRoute({ params }: BlogPostRouteProps) {
           { name: post.meta.title, path: `/blog/${post.meta.slug}` },
         ]}
       />
-      <BlogPostPage post={post} relatedPosts={relatedPosts} />
+      <BlogPostPage post={post} allPosts={allPosts} />
     </>
   );
 }
