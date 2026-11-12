@@ -11,6 +11,7 @@ import {
 } from "@/lib/commercial/links";
 import styles from "./public-page.module.css";
 import railStyles from "./service-rail.module.css";
+import cta from "@/components/ui/cta-motion.module.css";
 
 const services = [
   {
@@ -96,6 +97,9 @@ export function ServicesPage() {
               </article>
             ))}
           </div>
+          <p className={railStyles.hint} aria-hidden="true">
+            Keep scrolling to see all six services <span>→</span>
+          </p>
         </div>
       </section>
       <section
@@ -111,7 +115,7 @@ export function ServicesPage() {
         </p>
         <Link
           href="/work/nexsteps"
-          className="inline-flex min-h-11 items-center font-medium underline underline-offset-4"
+          className={`inline-block py-3 font-medium underline underline-offset-4 ${cta.link}`}
         >
           Read the NexSteps case study
         </Link>

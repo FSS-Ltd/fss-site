@@ -5,6 +5,7 @@ import { ContactLink, PageIntro } from "./page-intro";
 import { RelatedLinks } from "./related-links";
 import { sectorLink } from "@/lib/commercial/links";
 import styles from "./public-page.module.css";
+import cta from "@/components/ui/cta-motion.module.css";
 
 export function AboutPage() {
   return (
@@ -74,7 +75,7 @@ export function AboutPage() {
         </p>
         <Link
           href="/work/nexsteps"
-          className="inline-flex min-h-11 items-center font-medium underline underline-offset-4"
+          className={`inline-block py-3 font-medium underline underline-offset-4 ${cta.link}`}
         >
           Read the NexSteps case study
         </Link>
