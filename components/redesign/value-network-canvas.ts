@@ -39,12 +39,14 @@ export function bindValueNetwork(
   let height = 0;
   let frame = 0;
   let pulseTimer = 0;
+  let disposed = false;
+  let fontFamily = "";
   let pointer: { x: number; y: number } | null = null;
   let network = buildValueNetwork(1, 1, 10);
 
   const draw = () => {
     frame = 0;
-    if (document.hidden) return;
+    if (disposed || document.hidden) return;
     const rect = canvas.getBoundingClientRect();
     if (rect.bottom < 0 || rect.top > window.innerHeight) return;
     if (width !== rect.width || height !== rect.height) {
@@ -54,6 +56,7 @@ export function bindValueNetwork(
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
+      fontFamily = getComputedStyle(canvas).fontFamily;
       fit = viewWidth ? Math.max(width / viewWidth, height / viewHeight) : 0;
       network = buildValueNetwork(
         viewWidth || width,
@@ -177,7 +180,7 @@ export function bindValueNetwork(
         });
       }
       const size = Math.max(12, 12 * scale);
-      context.font = `600 ${size}px ${getComputedStyle(canvas).fontFamily}`;
+      context.font = `600 ${size}px ${fontFamily}`;
       context.textAlign = "center";
       context.textBaseline = "middle";
       // FSS is where every path ends: a soft halo marks it as live and central.
@@ -237,11 +240,13 @@ export function bindValueNetwork(
     // The hero's halo breathes, so it redraws about 25 times a second while the
     // canvas is on screen; offscreen or hidden, draw() returns before this line.
     if (!host && !reducedMotion && showLabels) {
+      window.clearTimeout(pulseTimer);
       pulseTimer = window.setTimeout(schedule, 40);
     }
   };
   const schedule = () => {
-    if (!frame && !document.hidden) frame = window.requestAnimationFrame(draw);
+    if (!disposed && !frame && !document.hidden)
+      frame = window.requestAnimationFrame(draw);
   };
   const move = (event: PointerEvent) => {
     if (!finePointer || reducedMotion || event.pointerType === "touch") return;
@@ -262,7 +267,9 @@ export function bindValueNetwork(
   document.addEventListener("visibilitychange", schedule);
   schedule();
   return () => {
+    disposed = true;
     window.cancelAnimationFrame(frame);
+    frame = 0;
     window.clearTimeout(pulseTimer);
     resizeObserver.disconnect();
     window.removeEventListener("scroll", schedule);
