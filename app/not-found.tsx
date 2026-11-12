@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
+
 import { SiteShell } from "@/components/layout/site-shell";
 import { ButtonLink } from "@/components/ui/button";
+
+export const metadata: Metadata = {
+  title: "Page not found | Faithful Software Solutions",
+};
 
 // Rendered inside the site shell so the skip link, header, footer and light
 // theme match every other page. Styled with utilities only: the root

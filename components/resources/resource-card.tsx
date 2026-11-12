@@ -18,7 +18,8 @@ export function ResourceCard({ resource }: ResourceCardProps) {
       className="group flex h-full flex-col overflow-hidden rounded-[18px] border border-border-soft/70 bg-white transition-[border-color,box-shadow,transform] duration-300"
     >
       <Link
-        aria-label={`View ${resource.title}`}
+        // The accessible name carries the visible FEATURED badge text.
+        aria-label={`${resource.featured ? "Featured: " : ""}View ${resource.title}`}
         className="block"
         href={resourceHref}
       >

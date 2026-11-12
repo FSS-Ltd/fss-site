@@ -54,6 +54,11 @@ test("404 opens with the skip link and sits in the light site shell", () => {
   assert.doesNotMatch(html, /#07182e/);
 });
 
+test("404 has a document title", () => {
+  const { metadata } = require("./not-found") as typeof import("./not-found");
+  assert.match(String(metadata.title), /Page not found/);
+});
+
 test("article and resource metadata publish full social image descriptors and canonical titles", async () => {
   const { createArticleMetadata, createResourceMetadata } =
     await import("@/lib/seo/content-metadata");
