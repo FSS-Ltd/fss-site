@@ -1,12 +1,14 @@
 # AI-led SEO and lead growth: handoff
 
-Updated 2026-11-11 15:50 GMT. Read this first, then the design doc
+Updated 2026-11-12. Read this first, then the design doc
 `docs/superpowers/specs/2026-11-11-ai-led-seo-lead-growth-design.md`.
 
 ## Standing rules from the founder
 
-- Lead model orchestrates; Haiku, Sonnet and Opus subagents do the work
-  (skill `orchestrating-model-tiers`). Keep the lead's own context small.
+- Opus plans, Sonnet executes (builds, reviews, jury), Haiku does mechanical
+  sweeps. Fable is an advisor only, called when a piece fails two Sonnet
+  rounds or the jury score stalls (skill `orchestrating-model-tiers`, changed
+  by the founder on 2026-11-12). Keep the lead's own context small.
 - One pull request per change. Sonnet code review and Sonnet security review,
   findings fixed, before a PR is marked ready. Merge one at a time on green
   checks. A merge is a production deploy.
@@ -65,6 +67,17 @@ Sonnet code and security review of #330 is running.
    the Context Pack at
    `/Users/JeanFidele/The Nexus Ecosystem/The Nexus/14 AI Collaboration/Context Packs/fss-site/Context Pack.md`
    and remove this handoff's "In progress" items as they land.
+
+## State 2026-11-12
+
+- #330 was merged to main at 21:34 GMT on 2026-11-11 at critic score 7.05,
+  below the 8/10 gate. Its review findings 1, 3 and 4 are still open. They
+  go in a follow-up PR after PR F, which also re-scores `/contact`.
+- PR F `feat/public-motion-polish`: two local commits existed, never pushed.
+  A Sonnet agent is rebasing it on main, verifying, opening a draft PR and
+  gathering jury evidence. A fresh Sonnet critic then scores it. Gate: 8/10.
+- PR D `feat/editorial-blog-layout`: one local commit `1ef83e280`, unpushed.
+  Waits for PR F (shared site chrome).
 
 ## Run log 2026-11-11 (scheduled continuation)
 
