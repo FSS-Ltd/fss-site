@@ -330,7 +330,7 @@ FRONTMATTER SCHEMA - all fields required, exact types:
 title: <string>
 excerpt: <1–2 sentence summary, plain text, no interior quotes>
 publishDate: <YYYY-MM-DD>
-author: "FSS Growth Team"
+author: "Jean-Fidele Ntagengwa"
 category: <string>
 tags:
   - <string>
