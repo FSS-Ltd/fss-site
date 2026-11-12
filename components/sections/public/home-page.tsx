@@ -49,7 +49,14 @@ export function HomePage() {
               <Link
                 href="/work/nexsteps"
                 className={cta.link}
-                style={{ color: "#a64224" }}
+                // Vertical padding with a matching negative margin gives the
+                // inline link a 44px target without moving the line.
+                style={{
+                  display: "inline-block",
+                  padding: "11px 0",
+                  margin: "-11px 0",
+                  color: "#a64224",
+                }}
               >
                 NexSteps
               </Link>{" "}
