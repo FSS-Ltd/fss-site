@@ -13,7 +13,6 @@ import { organisation } from "@/lib/seo/organisation";
 import { ContactLink, PageIntro } from "./page-intro";
 import type { MeshSection } from "@/components/ui/mesh-band";
 import { DeliverySteps } from "./delivery-steps";
-import { NexStepsProof } from "./nexsteps-proof";
 import { RelatedLinks } from "./related-links";
 import styles from "./public-page.module.css";
 import { ContentEvidence } from "@/components/seo/content-evidence";
@@ -87,15 +86,23 @@ export function CommercialPage({ page }: { page: CommercialPageContent }) {
               <div
                 className={styles.editorialFrame}
                 data-motion-parallax="0.06"
+                style={{ aspectRatio: "5 / 2" }}
               >
+                {/* One real card from the dashboard, cropped by position, not edited. */}
                 <Image
                   src="/redesign/products/admin-dashboard.png"
-                  alt="NexSteps operations dashboard, built by FSS"
+                  alt="NexSteps Today's Sessions card, from the operations dashboard built by FSS"
                   width={4112}
                   height={2406}
-                  sizes="(max-width: 900px) 92vw, 43vw"
-                  className={styles.editorialImage}
-                  style={{ objectPosition: "left top" }}
+                  sizes="(max-width: 900px) 350vw, 165vw"
+                  style={{
+                    position: "absolute",
+                    maxWidth: "none",
+                    width: "384.6%",
+                    height: "auto",
+                    left: "-117.3%",
+                    top: "-66.4%",
+                  }}
                   priority
                 />
               </div>
@@ -113,9 +120,6 @@ export function CommercialPage({ page }: { page: CommercialPageContent }) {
         </PageIntro>
         {page.path === "/blog/church-management-software-vs-bespoke" && (
           <ContentEvidence content={churchArticle.meta} />
-        )}
-        {page.kind === "case-study" && (
-          <NexStepsProof showSummary={false} showFigure={false} />
         )}
         {page.sections.map((section) => (
           <ContentSection key={section.id} section={section} />
