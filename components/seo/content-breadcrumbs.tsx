@@ -2,10 +2,10 @@ import Link from "next/link";
 
 export function ContentBreadcrumbs({
   parent,
-  title,
 }: {
   parent: "Blog" | "Resources";
-  title: string;
+  /** The page title; shown by the heading, not the trail. */
+  title?: string;
 }) {
   return (
     <nav aria-label="Breadcrumb" className="mb-8 text-sm">
@@ -26,7 +26,10 @@ export function ContentBreadcrumbs({
         </li>
         <li aria-hidden="true">/</li>
         <li>
-          <span aria-current="page">{title}</span>
+          {/* The title is the page heading right below; repeating it adds nothing. */}
+          <span aria-current="page">
+            {parent === "Blog" ? "Article" : "Resource"}
+          </span>
         </li>
       </ol>
     </nav>

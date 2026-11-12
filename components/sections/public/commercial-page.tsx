@@ -81,7 +81,7 @@ export function CommercialPage({ page }: { page: CommercialPageContent }) {
         {page.path === "/blog/church-management-software-vs-bespoke" && (
           <ContentEvidence content={churchArticle.meta} />
         )}
-        {page.kind === "case-study" && <NexStepsProof />}
+        {page.kind === "case-study" && <NexStepsProof showSummary={false} />}
         {page.sections.map((section) => (
           <ContentSection key={section.id} section={section} />
         ))}

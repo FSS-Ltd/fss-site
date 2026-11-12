@@ -27,7 +27,7 @@ export const businessIntakeFaqs: Faq[] = [
   {
     question: "How long does it take?",
     answer:
-      "Around 5–10 minutes. The more detail you share about the problem and your goals, the more useful the review.",
+      "Around 5 to 10 minutes. The more detail you share about the problem and your goals, the more useful the review.",
   },
 ];
 

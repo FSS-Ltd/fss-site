@@ -4,11 +4,14 @@ import styles from "./public-page.module.css";
 type NexStepsProofProps = {
   className?: string;
   motionTrack?: boolean;
+  /** Pages that already open with this summary leave it out of the panel. */
+  showSummary?: boolean;
 };
 
 export function NexStepsProof({
   className,
   motionTrack = false,
+  showSummary = true,
 }: NexStepsProofProps) {
   return (
     <section
@@ -23,10 +26,12 @@ export function NexStepsProof({
         <h2 id="nexsteps-title">
           Software for the people who care for others.
         </h2>
-        <p>
-          NexSteps is an FSS-built safeguarding, attendance and operations
-          platform for schools, churches and community organisations.
-        </p>
+        {showSummary && (
+          <p>
+            NexSteps is an FSS-built safeguarding, attendance and operations
+            platform for schools, churches and community organisations.
+          </p>
+        )}
         <ul className={styles.list}>
           <li>Role-scoped access and support portals</li>
           <li>Attendance and safeguarding handover logs</li>

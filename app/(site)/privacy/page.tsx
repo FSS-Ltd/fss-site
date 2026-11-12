@@ -184,7 +184,7 @@ export default function PrivacyPage() {
             at{" "}
             <a
               href="https://ico.org.uk/make-a-complaint/"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               target="_blank"
             >
               ico.org.uk

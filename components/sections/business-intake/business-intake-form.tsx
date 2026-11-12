@@ -164,7 +164,7 @@ export function BusinessIntakeForm() {
         <span className="mx-auto flex size-11 items-center justify-center rounded-full bg-[rgba(20,152,158,.12)] text-[#0f7a83]">
           <PartyPopper className="size-5" aria-hidden="true" />
         </span>
-        <h3 className="mt-4 text-2xl font-semibold text-foreground">Thanks — we&apos;ve got it.</h3>
+        <h3 className="mt-4 text-2xl font-semibold text-foreground">Thanks, we&apos;ve got it.</h3>
         <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-text-muted">
           We received your idea and will review it. If it makes sense to talk further,
           we&apos;ll be in touch at the email you shared.
