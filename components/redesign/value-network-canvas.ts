@@ -38,6 +38,7 @@ export function bindValueNetwork(
   let width = 0;
   let height = 0;
   let frame = 0;
+  let pulseTimer = 0;
   let pointer: { x: number; y: number } | null = null;
   let network = buildValueNetwork(1, 1, 10);
 
@@ -179,8 +180,34 @@ export function bindValueNetwork(
       context.font = `600 ${size}px ${getComputedStyle(canvas).fontFamily}`;
       context.textAlign = "center";
       context.textBaseline = "middle";
+      // FSS is where every path ends: a soft halo marks it as live and central.
+      // A static ring always; the pulse ring only where motion is welcome.
+      const pulse = (performance.now() % 2800) / 2800;
       items.forEach((item) => {
         const radius = (item.hub ? 17 : 5.5 + 2.5 * item.glow) * scale;
+        if (item.hub) {
+          context.lineWidth = 2 * scale;
+          context.strokeStyle = "rgba(166,66,36,.3)";
+          context.beginPath();
+          context.arc(item.x, item.y, 23 * scale, 0, Math.PI * 2);
+          context.stroke();
+          context.strokeStyle = "rgba(166,66,36,.14)";
+          context.beginPath();
+          context.arc(item.x, item.y, 30 * scale, 0, Math.PI * 2);
+          context.stroke();
+          if (!reducedMotion && !host) {
+            context.strokeStyle = `rgba(166,66,36,${0.4 * (1 - pulse)})`;
+            context.beginPath();
+            context.arc(
+              item.x,
+              item.y,
+              (21 + 22 * pulse) * scale,
+              0,
+              Math.PI * 2,
+            );
+            context.stroke();
+          }
+        }
         context.beginPath();
         context.arc(item.x, item.y, radius, 0, Math.PI * 2);
         context.fillStyle = item.hub
@@ -207,6 +234,11 @@ export function bindValueNetwork(
     }
     // Tells the poster beside the canvas that it can step aside.
     canvas.setAttribute("data-ready", "");
+    // The hero's halo breathes, so it redraws about 25 times a second while the
+    // canvas is on screen; offscreen or hidden, draw() returns before this line.
+    if (!host && !reducedMotion && showLabels) {
+      pulseTimer = window.setTimeout(schedule, 40);
+    }
   };
   const schedule = () => {
     if (!frame && !document.hidden) frame = window.requestAnimationFrame(draw);
@@ -231,6 +263,7 @@ export function bindValueNetwork(
   schedule();
   return () => {
     window.cancelAnimationFrame(frame);
+    window.clearTimeout(pulseTimer);
     resizeObserver.disconnect();
     window.removeEventListener("scroll", schedule);
     window.removeEventListener("resize", schedule);

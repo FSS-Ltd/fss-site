@@ -62,6 +62,22 @@ export function ValueNetworkPoster({ className }: { className?: string }) {
         {parts.map((part) =>
           part.name === hubName ? (
             <g key={part.name}>
+              <circle
+                cx={part.x}
+                cy={part.y}
+                r="23"
+                fill="none"
+                stroke="rgba(166,66,36,.3)"
+                strokeWidth="2"
+              />
+              <circle
+                cx={part.x}
+                cy={part.y}
+                r="30"
+                fill="none"
+                stroke="rgba(166,66,36,.14)"
+                strokeWidth="2"
+              />
               <circle cx={part.x} cy={part.y} r="17" fill="#a64224" />
               <text
                 x={part.x}

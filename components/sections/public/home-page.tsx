@@ -33,6 +33,29 @@ export function HomePage() {
               AI and custom software for the work your <em>business</em> depends
               on.
             </h1>
+            <p
+              style={{
+                maxWidth: 540,
+                margin: "22px 0 0",
+                paddingLeft: 14,
+                borderLeft: "3px solid #a64224",
+                color: "#211b17",
+                fontSize: "1.0625rem",
+                fontWeight: 560,
+                lineHeight: 1.5,
+              }}
+            >
+              For a learning centre,{" "}
+              <Link
+                href="/work/nexsteps"
+                className={cta.link}
+                style={{ color: "#a64224" }}
+              >
+                NexSteps
+              </Link>{" "}
+              turned hours of admin into more time with the children and
+              families.
+            </p>
             <p className={homeStyles.description}>
               We add AI to the systems you already use, automate repeated work
               and build custom software for businesses of any size, from

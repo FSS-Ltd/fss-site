@@ -81,7 +81,6 @@ div.home {
 
 .title em {
   color: #a64224;
-  font-style: italic;
   font-weight: 580;
 }
 
@@ -421,6 +420,11 @@ div.home {
     width: auto;
     opacity: 0.45;
     mask-image: none;
+  }
+
+  .home .audience {
+    display: grid;
+    gap: 6px;
   }
 
   .serviceHeader {
