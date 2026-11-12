@@ -149,12 +149,9 @@ test("home draws its own value network in the hero, with a static poster beneath
   );
   assert.match(
     html,
-    /<canvas[^>]*data-value-particles[^>]*data-network-nodes="54"/,
+    /<canvas[^>]*data-value-particles[^>]*data-network-nodes="150"[^>]*data-network-view="840x780"/,
   );
-  assert.match(
-    html,
-    /<canvas[^>]*><\/canvas><img[^>]*value-network-poster\.svg/,
-  );
+  assert.match(html, /<canvas[^>]*><\/canvas><svg[^>]*viewBox="0 0 840 780"/);
   assert.match(html, /data-motion-delivery="cinematic"/);
   assert.match(html, /data-motion-delivery="cinematic"/);
   assert.equal((html.match(/data-delivery-step=/g) ?? []).length, 3);

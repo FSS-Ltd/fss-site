@@ -19,6 +19,12 @@ export function bindValueNetwork(
   if (!context) return () => {};
   // A fixed node count keeps a small canvas from thinning out on phones.
   const fixedCount = Number(canvas.dataset.networkNodes) || 0;
+  // A fixed view box ("840x780") is scaled to cover the canvas, exactly as the
+  // matching inline poster is, so the hand-over from poster to canvas is unseen.
+  const [viewWidth = 0, viewHeight = 0] = (canvas.dataset.networkView ?? "")
+    .split("x")
+    .map(Number);
+  let fit = 0;
   let width = 0;
   let height = 0;
   let frame = 0;
@@ -37,9 +43,10 @@ export function bindValueNetwork(
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
+      fit = viewWidth ? Math.max(width / viewWidth, height / viewHeight) : 0;
       network = buildValueNetwork(
-        width,
-        height,
+        viewWidth || width,
+        viewHeight || height,
         fixedCount ||
           getParticleNodeCount({ baseCount, width, height, finePointer }),
       );
@@ -56,7 +63,12 @@ export function bindValueNetwork(
         ? { x: pointer.x - rect.left, y: pointer.y - rect.top }
         : null;
     const points = network.nodes.map((node) => {
-      const anchor = { x: node.x * width, y: node.y * height };
+      const anchor = fit
+        ? {
+            x: (width - viewWidth * fit) / 2 + node.x * viewWidth * fit,
+            y: (height - viewHeight * fit) / 2 + node.y * viewHeight * fit,
+          }
+        : { x: node.x * width, y: node.y * height };
       const offset = networkPointerOffset(anchor, localPointer);
       return {
         x: anchor.x + offset.x,
@@ -65,7 +77,7 @@ export function bindValueNetwork(
       };
     });
     context.clearRect(0, 0, width, height);
-    context.lineWidth = 0.85;
+    context.lineWidth = 0.85 * (fit || 1);
     network.edges.forEach(([a, b]) => {
       const firstNode = network.nodes[a];
       const secondNode = network.nodes[b];
@@ -94,7 +106,13 @@ export function bindValueNetwork(
       if (!point.opacity) return;
       context.fillStyle = `rgba(166,66,36,${0.6 * point.opacity})`;
       context.beginPath();
-      context.arc(point.x, point.y, 1.8 * point.opacity, 0, Math.PI * 2);
+      context.arc(
+        point.x,
+        point.y,
+        1.8 * (fit || 1) * point.opacity,
+        0,
+        Math.PI * 2,
+      );
       context.fill();
     });
     // Tells the poster beside the canvas that it can step aside.

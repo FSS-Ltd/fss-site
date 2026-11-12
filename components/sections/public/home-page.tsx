@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { ButtonLink } from "@/components/ui/button";
 import { ContactLink } from "./page-intro";
 import { NexStepsProof } from "./nexsteps-proof";
@@ -10,6 +9,11 @@ import { AppJourney } from "./app-journey";
 import { sectorLink, costLink } from "@/lib/commercial/links";
 import styles from "./public-page.module.css";
 import homeStyles from "./home-page.module.css";
+import {
+  ValueNetworkPoster,
+  networkView,
+} from "@/components/redesign/value-network-poster";
+import cta from "@/components/ui/cta-motion.module.css";
 
 export function HomePage() {
   return (
@@ -36,7 +40,10 @@ export function HomePage() {
             </p>
             <div className={homeStyles.actions}>
               <ContactLink />
-              <Link href="/work/nexsteps" className={homeStyles.caseStudyLink}>
+              <Link
+                href="/work/nexsteps"
+                className={`${homeStyles.caseStudyLink} ${cta.sweep}`}
+              >
                 Read the NexSteps case study
               </Link>
             </div>
@@ -47,31 +54,23 @@ export function HomePage() {
               <span>Large organisations</span>
             </p>
           </div>
-          <div
-            className={homeStyles.markStage}
-            aria-hidden="true"
-            data-motion-parallax="0.08"
-          >
-            <div className={homeStyles.markFrame}>
-              {/* The site's own value network. The poster is the static frame
-                  for first paint, no-JS and until the canvas takes over. */}
-              <canvas
-                data-hero-canvas
-                data-value-particles
-                data-network-nodes="54"
-                className={homeStyles.networkCanvas}
-              />
-              <Image
-                src="/redesign/value-network-poster.svg"
-                alt=""
-                width={500}
-                height={312}
-                unoptimized
-                priority
-                className={homeStyles.poster}
-              />
-            </div>
-          </div>
+        </div>
+        {/* The site's own value network, bled across the hero. The poster is the
+            static frame for first paint, no-JS and reduced motion, until the
+            canvas takes over. */}
+        <div
+          className={homeStyles.markStage}
+          aria-hidden="true"
+          data-motion-parallax="0.08"
+        >
+          <canvas
+            data-hero-canvas
+            data-value-particles
+            data-network-nodes={networkView.nodes}
+            data-network-view={`${networkView.width}x${networkView.height}`}
+            className={homeStyles.networkCanvas}
+          />
+          <ValueNetworkPoster className={homeStyles.poster} />
         </div>
       </section>
       <HomeValueStory />
@@ -83,7 +82,12 @@ export function HomePage() {
               <p>WHAT WE BUILD</p>
               <h2>Systems that fit the way you work.</h2>
             </div>
-            <Link href="/services">All services</Link>
+            <Link
+              href="/services"
+              className={`${homeStyles.caseStudyLink} ${cta.sweep}`}
+            >
+              All services
+            </Link>
           </div>
           <div className={homeStyles.serviceGrid}>
             <article
