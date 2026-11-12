@@ -32,7 +32,7 @@ test("every answer lands in the existing lead API contract", () => {
     workEmail: "ada@example.org",
     company: "A charity",
     challenge:
-      "Need: Reporting; Tools: Xero, Spreadsheets; Team: 2 to 10; Timing: Within 3 months; Detail: Attendance reporting",
+      "Need: Reporting; Tools: Xero, Spreadsheets; Team: 2 to 10; Timing: Within 3 months\nDetail: Attendance reporting",
     newsletterOptIn: false,
     sourceContext: "contact-page-v3",
     sourcePath: "/contact",
@@ -107,7 +107,7 @@ test("the detail limit reserves room for the longest later answers", () => {
     detail: typed,
   };
   const challenge = buildContactChallenge(worst) ?? "";
-  assert.ok(challenge.endsWith(`Detail: ${typed}`));
+  assert.ok(challenge.endsWith(`\nDetail: ${typed}`));
   assert.ok(challenge.length <= 600);
   assert.equal(prepareContactRequest(worst, submissionId).success, true);
 });
@@ -116,4 +116,21 @@ test("a cut never leaves half a surrogate pair", () => {
   const detail = "x".repeat(contactDetailLimit() - 1) + "😀";
   const challenge = buildContactChallenge({ ...valid, detail }) ?? "";
   assert.equal(/[\uD800-\uDBFF]$/.test(challenge), false);
+});
+
+test("detail goes on its own line after the structured answers", () => {
+  const lines = (buildContactChallenge(valid) ?? "").split("\n");
+  assert.equal(lines.length, 2);
+  assert.match(lines[0], /^Need: .*Timing: Within 3 months$/);
+  assert.equal(lines[1], "Detail: Attendance reporting");
+  assert.equal(
+    buildContactChallenge({
+      ...valid,
+      need: "",
+      tools: [],
+      teamSize: "",
+      timing: "",
+    }),
+    "Detail: Attendance reporting",
+  );
 });
