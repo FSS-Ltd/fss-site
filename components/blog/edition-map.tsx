@@ -2,16 +2,20 @@ import Link from "next/link";
 
 import type { BlogPostMeta } from "@/lib/types/blog";
 import {
+  type ArticleHeading,
   type EditionMap as EditionMapData,
   type MapLayoutName,
   editionLabel,
   routeAnchors,
+  shouldShowContents,
+  visibleEdgeLabels,
 } from "@/lib/blog-presentation";
 import { DrawIn } from "@/components/blog/draw-in";
 import { CoverTransition } from "@/components/blog/cover-transition";
 import { PostMeta } from "@/components/blog/blog-post-card";
 import styles from "@/components/blog/blog.module.css";
 
+const LEAD_ROUTE_MAX = 4;
 const LAYOUTS: MapLayoutName[] = ["wide", "mid"];
 const pct = (value: number) => (value * 100).toFixed(2);
 
@@ -56,6 +60,19 @@ function Routes({
     if (!from || !to) return [];
     return [{ line, from, to, at: routeAnchors(from, to, map.layouts[layout]) }];
   });
+  // Only lines that cross a gutter have room for a label; a stacked pair
+  // would put it under the cards. Same label in one gutter shows once.
+  const crossing = placed.filter(
+    ({ from, to }) => to.col >= from.col + from.colSpan || from.col >= to.col + to.colSpan,
+  );
+  const shown = visibleEdgeLabels(
+    crossing.map(({ line, at }) => ({
+      id: `${line.a}>${line.b}`,
+      label: line.label ?? "",
+      gutter: `${Math.min(at.x1, at.x2).toFixed(3)}-${Math.max(at.x1, at.x2).toFixed(3)}`,
+      y: (at.y1 + at.y2) / 2,
+    })),
+  );
   return (
     <div
       className={`${styles.mapRoutes} ${layout === "wide" ? styles.mapWide : styles.mapMid}`}
@@ -75,12 +92,8 @@ function Routes({
           />
         ))}
       </svg>
-      {placed.map(({ line, from, to, at }) => {
-        // Only lines that cross a gutter have room for a label; a stacked pair
-        // would put it under the cards.
-        const sideBySide =
-          to.col >= from.col + from.colSpan || from.col >= to.col + to.colSpan;
-        if (!line.label || !sideBySide) return null;
+      {crossing.map(({ line, at }) => {
+        if (!line.label || !shown.has(`${line.a}>${line.b}`)) return null;
         return (
           <span
             key={`${line.a}>${line.b}`}
@@ -121,7 +134,9 @@ function emphasisCss(map: EditionMapData, lines: MapLine[]): string {
         // The dark lead keeps its fill: only its text and border dim.
         `${hot} .${mapLead}:not(${keep}) .${mapLink}{border-color:rgb(33 27 23/.55)}`,
         `${hot} .${mapLead}:not(${keep}) .${mapLink}>*{opacity:.55;transition-delay:150ms}`,
-        `${hot} :is(.${mapEdge},.${mapRoute},.${mapEdgeLabel}):not([data-e~="${k}"]){opacity:.55;transition-delay:150ms}`,
+        `${hot} :is(.${mapEdge},.${mapRoute}):not([data-e~="${k}"]){opacity:.55;transition-delay:150ms}`,
+        // Labels keep their solid pill (the line must stay hidden behind it), so they dim by colour.
+        `${hot} .${mapEdgeLabel}:not([data-e~="${k}"]){color:color-mix(in srgb,var(--text-muted) 55%,var(--background,#f2f3f5));transition-delay:150ms}`,
       ].join("\n");
       return [
         `@media (prefers-reduced-motion:no-preference){\n${dim}\n}`,
@@ -141,9 +156,12 @@ function emphasisCss(map: EditionMapData, lines: MapLine[]): string {
 export function EditionMap({
   posts,
   map,
+  leadHeadings = [],
 }: {
   posts: BlogPostMeta[];
   map: EditionMapData;
+  /** The lead article's h2s: its section route, shown inside the lead card. */
+  leadHeadings?: ArticleHeading[];
 }) {
   const bySlug = new Map(posts.map((post) => [post.slug, post]));
   const cellsOf = (name: MapLayoutName) =>
@@ -234,6 +252,17 @@ export function EditionMap({
                          the usual two rows, so the extra height carries text. */
                       <span className={styles.mapExcerpt}>{post.excerpt}</span>
                     )}
+                    {lead && shouldShowContents(leadHeadings) ? (
+                      /* Decorative: the same headings are the article's contents. */
+                      <span className={styles.mapLeadRoute} aria-hidden="true">
+                        {leadHeadings.slice(0, LEAD_ROUTE_MAX).map((heading, i) => (
+                          <span key={heading.id}>
+                            <b>{String(i + 1).padStart(2, "0")}</b>
+                            <span>{heading.text.replace(/[?.:;]+$/, "")}</span>
+                          </span>
+                        ))}
+                      </span>
+                    ) : null}
                     <PostMeta post={post} withAuthor={lead} />
                   </Link>
                 </CoverTransition>

@@ -255,6 +255,35 @@ export function buildEditionMap(posts: BlogPostMeta[]): EditionMap | undefined {
   };
 }
 
+export type EdgeLabelCandidate = {
+  id: string;
+  label: string;
+  /** The gutter the line crosses, e.g. its two x anchors; same gutter, same value. */
+  gutter: string;
+  /** Vertical midpoint of the line, to find the middle one. */
+  y: number;
+};
+
+/**
+ * Which lines keep their label. Several lines in one gutter that name the same
+ * thing would repeat it, so the label is shown once, on the middle line (by
+ * height; the upper one when the count is even). Returns the ids that keep it.
+ */
+export function visibleEdgeLabels(candidates: EdgeLabelCandidate[]): Set<string> {
+  const groups = new Map<string, EdgeLabelCandidate[]>();
+  for (const c of candidates) {
+    if (!c.label) continue;
+    const key = `${c.gutter}|${c.label}`;
+    groups.set(key, [...(groups.get(key) ?? []), c]);
+  }
+  return new Set(
+    [...groups.values()].map((g) => {
+      const sorted = [...g].sort((a, b) => a.y - b.y || a.id.localeCompare(b.id));
+      return sorted[Math.floor((sorted.length - 1) / 2)].id;
+    }),
+  );
+}
+
 /**
  * Where a route leaves one cell and enters the other, as shares of the map:
  * the facing edge midpoints, so lines meet the blocks where they touch the
@@ -332,6 +361,10 @@ export type RouteArtNode = {
 };
 
 export type RouteArt = {
+  /** The viewBox: the drawn content's bounds plus a small pad, so the card
+   *  never has an empty side. Origin is the top-left of that box. */
+  x: number;
+  y: number;
   width: number;
   height: number;
   nodes: RouteArtNode[];
@@ -429,6 +462,29 @@ function artLegs(nodes: RouteArtNode[], cols: number | null): Point[][] {
   return legs;
 }
 
+const ART_PAD = 8;
+
+/** Bounds of everything drawn (dots, label boxes, route legs) plus a pad. */
+function artBounds(nodes: RouteArtNode[], legs: Point[][]) {
+  const r = ART_NODE_RADIUS;
+  const xs = [
+    ...nodes.flatMap((n) => [n.x - r, n.x + r, n.box.x, n.box.x + n.box.w]),
+    ...legs.flat().map((p) => p.x),
+  ];
+  const ys = [
+    ...nodes.flatMap((n) => [n.y - r, n.y + r, n.box.y, n.box.y + n.box.h]),
+    ...legs.flat().map((p) => p.y),
+  ];
+  const x = Math.min(...xs) - ART_PAD;
+  const y = Math.min(...ys) - ART_PAD;
+  return {
+    x,
+    y,
+    width: Math.max(...xs) + ART_PAD - x,
+    height: Math.max(...ys) + ART_PAD - y,
+  };
+}
+
 /**
  * Hero art for a post: one labelled node per label on a single route. "wide"
  * snakes across up to four columns; "tall" is one column, the phone rail.
@@ -444,26 +500,25 @@ export function buildRouteArt(
     const nodes = shown.map((label, index) =>
       artNode(wrapLabel(label, 24, 2), 18, step / 2 + index * step, index === 0, false),
     );
-    return {
-      width: 340,
-      height: Math.max(shown.length, 1) * step,
-      nodes,
-      legs: artLegs(nodes, null),
-    };
+    const legs = artLegs(nodes, null);
+    return { ...artBounds(nodes, legs), nodes, legs };
   }
   const cols = Math.min(Math.max(shown.length, 1), 4);
-  const rows = Math.ceil(Math.max(shown.length, 1) / cols);
   const width = 1120;
-  const cell = width / cols;
   const rowStep = 150;
-  const nodes = shown.map((label, index) => {
+  const wrapped = shown.map((label) => wrapLabel(label, 28, 3));
+  // Columns are spread so the last label ends at the right edge, not before it.
+  const widest = Math.max(...wrapped.flatMap((lines) => lines.map((line) => line.length)), 12) * ART_CHAR_W;
+  const cell = cols > 1 ? (width - 12 - widest) / (cols - 1) : 0;
+  const nodes = wrapped.map((label, index) => {
     const row = Math.floor(index / cols);
     const inRow = index % cols;
     // Boustrophedon: odd rows run right to left, so the route never jumps back.
     const col = row % 2 ? cols - 1 - inRow : inRow;
-    return artNode(wrapLabel(label, 28, 3), col * cell + 12, row * rowStep + 44, index === 0, true);
+    return artNode(label, col * cell + 12, row * rowStep + 44, index === 0, true);
   });
-  return { width, height: rows * rowStep, nodes, legs: artLegs(nodes, cols) };
+  const legs = artLegs(nodes, cols);
+  return { ...artBounds(nodes, legs), nodes, legs };
 }
 
 /** "Field Notes, 7 articles": the count comes from the posts, never typed. */

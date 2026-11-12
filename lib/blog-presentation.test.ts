@@ -6,6 +6,7 @@ import {
   buildEditionMap,
   ART_NODE_RADIUS,
   buildRouteArt,
+  visibleEdgeLabels,
   routeAnchors,
   pickRelatedPosts,
   wrapLabel,
@@ -205,11 +206,42 @@ test("route art labels every heading, wraps long labels and scales per mode", ()
   assert.ok(wrapLabel("a ".repeat(80), 10, 2).at(-1)?.endsWith("..."));
   const wide = buildRouteArt(["One", "Two", "Three", "Four", "Five"], "wide");
   assert.equal(wide.nodes.length, 5);
-  assert.ok(wide.nodes.every((n) => n.x > 0 && n.x < wide.width && n.y > 0 && n.y < wide.height));
+  assert.ok(
+    wide.nodes.every(
+      (n) =>
+        n.x > wide.x && n.x < wide.x + wide.width && n.y > wide.y && n.y < wide.y + wide.height,
+    ),
+  );
   assert.equal(wide.nodes[4].x, wide.nodes[3].x);
   const tall = buildRouteArt(["One", "Two", "Three"], "tall");
-  assert.equal(tall.height, 228);
+  assert.ok(tall.nodes.every((n) => n.box.y >= tall.y && n.box.y + n.box.h <= tall.y + tall.height));
   assert.equal(buildRouteArt(Array(20).fill("x"), "wide").nodes.length, 8);
+});
+
+test("hero art viewBox fits the drawn content with no empty side, 3 to 8 headings", () => {
+  for (const mode of ["wide", "tall"] as const) {
+    for (let n = 3; n <= 8; n++) {
+      const art = buildRouteArt(Array.from({ length: n }, (_, i) => `Heading number ${i}`), mode);
+      const right = Math.max(...art.nodes.map((node) => node.box.x + node.box.w));
+      const left = Math.min(...art.nodes.map((node) => node.x - ART_NODE_RADIUS));
+      assert.ok(art.x + art.width - right <= 32, `${mode} ${n} right gap`);
+      assert.ok(left - art.x <= 16, `${mode} ${n} left gap`);
+    }
+  }
+});
+
+test("a label repeated in one gutter shows once, on the middle line", () => {
+  const c = (id: string, label: string, gutter: string, y: number) => ({ id, label, gutter, y });
+  const shown = visibleEdgeLabels([
+    c("a", "Custom Software", "g2", 0.5),
+    c("b", "Custom Software", "g2", 0.3),
+    c("c", "Custom Software", "g2", 0.7),
+    c("d", "Custom Software", "g1", 0.4),
+    c("e", "Portal", "g2", 0.6),
+    c("f", "", "g2", 0.2),
+  ]);
+  assert.deepEqual([...shown].sort(), ["a", "d", "e"]);
+  assert.deepEqual([...visibleEdgeLabels([c("x", "T", "g", 0.2), c("y", "T", "g", 0.8)])], ["x"]);
 });
 
 test("route anchors meet the facing edges of the two blocks", () => {

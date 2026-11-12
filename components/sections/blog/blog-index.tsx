@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import type { BlogPostMeta } from "@/lib/types/blog";
 
 import {
+  type ArticleHeading,
   buildEditionMap,
   formatEditorialDate,
   latestUpdate,
@@ -15,13 +16,15 @@ import gutter from "@/components/ui/gutter.module.css";
 
 type BlogIndexProps = {
   posts: BlogPostMeta[];
+  /** The lead article's h2s, for the route shown in the lead card. */
+  leadHeadings?: ArticleHeading[];
 };
 
 function plural(count: number, word: string) {
   return `${count} ${word}${count === 1 ? "" : "s"}`;
 }
 
-export function BlogIndex({ posts }: BlogIndexProps) {
+export function BlogIndex({ posts, leadHeadings }: BlogIndexProps) {
   const updated = latestUpdate(posts);
   const map = buildEditionMap(posts);
 
@@ -82,7 +85,7 @@ export function BlogIndex({ posts }: BlogIndexProps) {
             has practical guides in the meantime.
           </p>
         ) : (
-          <EditionMap posts={posts} map={map} />
+          <EditionMap posts={posts} map={map} leadHeadings={leadHeadings} />
         )}
       </div>
     </div>

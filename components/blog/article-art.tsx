@@ -22,7 +22,7 @@ function Art({
   return (
     <svg
       className={`${styles.artSvg} ${className}`}
-      viewBox={`0 0 ${art.width} ${art.height}`}
+      viewBox={`${art.x} ${art.y} ${art.width} ${art.height}`}
       aria-hidden="true"
       focusable="false"
     >
