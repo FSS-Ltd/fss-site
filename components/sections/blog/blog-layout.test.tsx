@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import test from "node:test";
+import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import type { BlogPostMeta } from "@/lib/types/blog";
@@ -15,7 +16,7 @@ require.extensions[".css"] = (module) => {
 
 const { BlogIndex } = require("./blog-index");
 const { BlogPostLayout } = require("../../blog/blog-post-layout");
-const { mdxComponents } = require("../../blog/mdx-components");
+const { createMdxComponents } = require("../../blog/mdx-components");
 const { extractHeadings } = require("../../../lib/blog-presentation");
 
 function post(overrides: Partial<BlogPostMeta>): BlogPostMeta {
@@ -90,9 +91,8 @@ test("blog index handles a single post and no posts", () => {
 test("article shows a contents list whose links match the rendered h2 ids", () => {
   const body = "## First step\n\ntext\n\n## Second **step**\n\n## Third [step](/x)";
   const headings = extractHeadings(body);
-  const prose = headings.map((h: { text: string }) =>
-    mdxComponents.h2({ children: h.text }),
-  );
+  const { h2 } = createMdxComponents();
+  const prose = headings.map((h: { text: string }) => h2({ children: h.text }));
   const html = renderToStaticMarkup(
     <BlogPostLayout post={post({ modifiedDate: "2026-09-04" })} headings={headings} allPosts={[post({ slug: "next", title: "Next one" })]}>
       {prose}
@@ -101,7 +101,7 @@ test("article shows a contents list whose links match the rendered h2 ids", () =
 
   assert.equal(h1Count(html), 1);
   assert.match(html, /In this article/);
-  for (const id of ["first-step", "second-step", "third-step"]) {
+  for (const id of ["s-first-step", "s-second-step", "s-third-step"]) {
     assert.match(html, new RegExp(`href="#${id}"`));
     assert.match(html, new RegExp(`<h2 id="${id}"`));
   }
@@ -109,13 +109,28 @@ test("article shows a contents list whose links match the rendered h2 ids", () =
   assert.match(html, /href="\/contact"/);
   assert.match(html, /Read next/);
   assert.match(html, /href="\/blog"/);
-  assert.match(html, /<ol><li><a href="#first-step"><span>First step<\/span>/);
+  assert.match(html, /<ol><li><a href="#s-first-step"><span>First step<\/span>/);
   // Hero art: one labelled node per heading, on a route.
   assert.match(html, /<svg[^>]*class="artSvg artWide"[^>]*aria-hidden="true"/);
   assert.match(html, />First step</);
   assert.match(html, />Third step</);
   assert.doesNotMatch(html, /<img/);
   assert.match(html, /class="cta-link|link"[^>]*>\s*Home/);
+});
+
+test("rendered h2 ids equal extractHeadings ids, including repeats, code, emphasis and entities", () => {
+  const body = ["## Tom &amp; `Jerry` **now**", "## Setup", "## Setup", "## Read next"].join("\n");
+  const headings = extractHeadings(body);
+  const { h2 } = createMdxComponents();
+  // What MDX hands the h2 component: text with the entity decoded, code and emphasis as elements.
+  const rendered = [
+    h2({ children: ["Tom & ", React.createElement("code", null, "Jerry"), " ", React.createElement("strong", null, "now")] }),
+    h2({ children: "Setup" }),
+    h2({ children: "Setup" }),
+    h2({ children: "Read next" }),
+  ].map((el) => el.props.id);
+  assert.deepEqual(rendered, headings.map((h: { id: string }) => h.id));
+  assert.equal(rendered[0], "s-tom-jerry-now");
 });
 
 test("article without a cover or enough sections stays clean", () => {

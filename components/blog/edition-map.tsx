@@ -100,11 +100,11 @@ function Routes({
 }
 
 /** Hover or keyboard focus on a node: the nodes, lines and labels joined to it
- *  stay at full strength (lines and labels turn rust) and the rest drop to 40%.
+ *  stay at full strength (lines and labels turn rust) and the rest drop to 55%.
  *  CSS only. The rules are generated from the map so they follow the data;
  *  indices and class names are the only interpolated values. */
 function emphasisCss(map: EditionMapData, lines: MapLine[]): string {
-  const { mapBody, mapNode, mapLink, mapEdge, mapRoute, mapEdgeLabel } = styles;
+  const { mapBody, mapNode, mapLead, mapLink, mapEdge, mapRoute, mapEdgeLabel } = styles;
   return map.order
     .map((slug, k) => {
       const joined = new Set(
@@ -114,9 +114,17 @@ function emphasisCss(map: EditionMapData, lines: MapLine[]): string {
       const hot = `.${mapBody}:has(.${mapNode}[data-n="${k}"] .${mapLink}:is(:hover,:focus-visible))`;
       const joinedNodes = withK.map((n) => `[data-n="${n}"]`).join(",");
       const keep = `[data-n="${k}"]${joinedNodes ? `,${joinedNodes}` : ""}`;
+      // Dimming needs motion: reduced-motion visitors get the rust colour only.
+      // It waits 150ms (hover intent) on the way in and has no delay on return.
+      const dim = [
+        `${hot} .${mapNode}:not(.${mapLead}):not(${keep}){opacity:.55;transition-delay:150ms}`,
+        // The dark lead keeps its fill: only its text and border dim.
+        `${hot} .${mapLead}:not(${keep}) .${mapLink}{border-color:rgb(33 27 23/.55)}`,
+        `${hot} .${mapLead}:not(${keep}) .${mapLink}>*{opacity:.55;transition-delay:150ms}`,
+        `${hot} :is(.${mapEdge},.${mapRoute},.${mapEdgeLabel}):not([data-e~="${k}"]){opacity:.55;transition-delay:150ms}`,
+      ].join("\n");
       return [
-        `${hot} .${mapNode}:not(${keep}){opacity:.4}`,
-        `${hot} :is(.${mapEdge},.${mapRoute},.${mapEdgeLabel}):not([data-e~="${k}"]){opacity:.4}`,
+        `@media (prefers-reduced-motion:no-preference){\n${dim}\n}`,
         `${hot} .${mapEdge}[data-e~="${k}"]{stroke:var(--brand-primary);stroke-opacity:1;stroke-width:2.5}`,
         `${hot} .${mapRoute}[data-e~="${k}"]{stroke-width:4}`,
         `${hot} .${mapEdgeLabel}[data-e~="${k}"]{color:var(--brand-primary)}`,
@@ -169,6 +177,7 @@ export function EditionMap({
         </p>
       </div>
       <div className={styles.mapBody} style={gridVars as React.CSSProperties}>
+        {/* Built only from class names and integers: never interpolate post fields here. */}
         <style dangerouslySetInnerHTML={{ __html: emphasisCss(map, lines) }} />
         <DrawIn className={styles.mapLayer}>
           {LAYOUTS.map((layout) => (

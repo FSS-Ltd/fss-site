@@ -61,11 +61,21 @@ test("extractHeadings reads h2s only, strips inline Markdown and skips code fenc
   ].join("\n");
 
   assert.deepEqual(extractHeadings(body), [
-    { id: "start-with-one-journey", text: "Start with one journey" },
-    { id: "use-code-and-bold", text: "Use code and bold" },
-    { id: "closing", text: "Closing" },
+    { id: "s-start-with-one-journey", text: "Start with one journey" },
+    { id: "s-use-code-and-bold", text: "Use code and bold" },
+    { id: "s-closing", text: "Closing" },
   ]);
   assert.deepEqual(extractHeadings("No headings at all."), []);
+});
+
+test("heading ids: repeats get -2, -3 and never collide with the layout's fixed ids", () => {
+  const ids = extractHeadings("## Setup\n## Setup\n## Setup\n## Setup 2\n## Read next\n## Edition map").map(
+    (h) => h.id,
+  );
+  assert.deepEqual(ids, ["s-setup", "s-setup-2", "s-setup-3", "s-setup-2-2", "s-read-next", "s-edition-map"]);
+  assert.equal(new Set(ids).size, ids.length);
+  const fixed = ["read-next", "about-article", "article-contact", "edition-map", "article-contents"];
+  for (const id of ids) assert.ok(!fixed.includes(id));
 });
 
 test("contents appear only for three or more sections", () => {
@@ -273,4 +283,27 @@ test("each node column ends flush with the grid, so no column leaves a gap at it
       for (const [col, end] of cols) assert.equal(end, rows, `${name} ${count} col ${col}`);
     }
   }
+});
+
+test("missing or invalid dates never throw or yield NaN", () => {
+  assert.equal(formatEditorialDate(undefined), "");
+  assert.equal(formatEditorialDate("not-a-date"), "");
+  assert.equal(formatEditorialDate("2026-04-02"), "2 April 2026");
+
+  const broken = post({ slug: "b", publishDate: undefined as unknown as string, modifiedDate: undefined });
+  assert.equal(latestUpdate([broken]), undefined);
+  assert.equal(latestUpdate([broken, post({ slug: "c", modifiedDate: "2026-03-01" })]), "2026-03-01");
+  assert.equal(latestUpdate([post({ slug: "d", modifiedDate: "garbage", publishDate: "also bad" })]), undefined);
+
+  const base = post({ slug: "base", publishDate: "2026-03-01" });
+  const near = post({ slug: "near", publishDate: "2026-03-02" });
+  const far = post({ slug: "far", publishDate: "2025-01-01" });
+  const invalid = post({ slug: "invalid", publishDate: "nope" });
+  const missing = post({ slug: "missing", publishDate: undefined as unknown as string });
+  assert.deepEqual(
+    pickRelatedPosts(base, [invalid, missing, far, near], 4).map((p) => p.slug),
+    ["near", "far", "invalid", "missing"],
+  );
+  assert.doesNotThrow(() => pickRelatedPosts(invalid, [base, near, missing]));
+  assert.doesNotThrow(() => buildEditionMap([base, invalid, missing]));
 });

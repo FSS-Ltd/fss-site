@@ -5,7 +5,7 @@ import type { BlogPost } from "@/lib/types/blog";
 import { BlogPostLayout } from "@/components/blog/blog-post-layout";
 import { extractHeadings } from "@/lib/blog-presentation";
 import { markdownMdxOptions } from "@/lib/blog-api/render";
-import { mdxComponents } from "@/components/blog/mdx-components";
+import { createMdxComponents } from "@/components/blog/mdx-components";
 
 type BlogPostPageProps = {
   post: BlogPost;
@@ -15,7 +15,7 @@ type BlogPostPageProps = {
 export async function BlogPostPage({ post, allPosts }: BlogPostPageProps) {
   const { content } = await compileMDX({
     source: post.body,
-    components: mdxComponents,
+    components: createMdxComponents(),
     // API-published rows are plain Markdown: nothing in them is evaluated.
     options: post.format === "markdown" ? { mdxOptions: markdownMdxOptions } : undefined,
   });

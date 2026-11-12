@@ -13,9 +13,37 @@ export function slugifyHeading(text: string): string {
     .replace(/[\s-]+/g, "-");
 }
 
+const ENTITIES: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " " };
+
+/** Decodes the entities MDX renders as characters, so ids match the rendered text. */
+function decodeEntities(text: string): string {
+  return text.replace(/&(?:#(\d+)|#x([\da-f]+)|(\w+));/gi, (whole, dec, hex, name) => {
+    if (name) return ENTITIES[name.toLowerCase()] ?? whole;
+    const code = dec ? Number(dec) : parseInt(hex, 16);
+    return code > 0 && code <= 0x10ffff ? String.fromCodePoint(code) : whole;
+  });
+}
+
+/**
+ * Hands out heading ids for one document: `s-` keeps them clear of the layout's
+ * fixed ids (read-next, article-contents ...), and repeats get -2, -3 by
+ * occurrence. extractHeadings and the rendered h2 each use a fresh allocator,
+ * so both walk the same headings in the same order and agree.
+ */
+export function createHeadingIds(): (text: string) => string {
+  const used = new Set<string>();
+  return (text) => {
+    const base = `s-${slugifyHeading(text)}`;
+    let id = base;
+    for (let n = 2; used.has(id); n++) id = `${base}-${n}`;
+    used.add(id);
+    return id;
+  };
+}
+
 /** Plain text of a Markdown heading: links keep their label, emphasis and code marks go. */
 function stripInlineMarkdown(text: string): string {
-  return text
+  return decodeEntities(text)
     .replace(/!?\[([^\]]*)\]\([^)]*\)/g, "$1")
     .replace(/[*_`~]/g, "")
     .replace(/\s+#+\s*$/, "")
@@ -25,6 +53,7 @@ function stripInlineMarkdown(text: string): string {
 /** The article's h2s, in order, ignoring anything inside fenced code. */
 export function extractHeadings(body: string): ArticleHeading[] {
   const headings: ArticleHeading[] = [];
+  const nextId = createHeadingIds();
   let inFence = false;
 
   for (const line of body.split("\n")) {
@@ -35,8 +64,7 @@ export function extractHeadings(body: string): ArticleHeading[] {
     const match = inFence ? null : /^## (.+)$/.exec(line.trim());
     if (!match) continue;
     const text = stripInlineMarkdown(match[1]);
-    const id = slugifyHeading(text);
-    if (text && id) headings.push({ id, text });
+    if (text && slugifyHeading(text)) headings.push({ id: nextId(text), text });
   }
 
   return headings;
@@ -66,15 +94,22 @@ const dateFormatter = new Intl.DateTimeFormat("en-GB", {
   timeZone: "UTC",
 });
 
-/** "2026-04-02" as "2 April 2026", independent of the server's time zone. */
-export function formatEditorialDate(isoDate: string): string {
-  return dateFormatter.format(new Date(`${isoDate.slice(0, 10)}T00:00:00Z`));
+/** Midnight UTC of an ISO date's day, or NaN when missing or invalid. */
+function dayMs(isoDate: string | undefined): number {
+  return Date.parse(`${(isoDate ?? "").slice(0, 10)}T00:00:00Z`);
+}
+
+/** "2026-04-02" as "2 April 2026", independent of the server's time zone. "" when the date is missing or invalid. */
+export function formatEditorialDate(isoDate: string | undefined): string {
+  const ms = dayMs(isoDate);
+  return Number.isNaN(ms) ? "" : dateFormatter.format(ms);
 }
 
 /** Newest modified or published date across the posts, for the masthead dateline. */
 export function latestUpdate(posts: BlogPostMeta[]): string | undefined {
   return posts
     .map((post) => post.modifiedDate ?? post.publishDate)
+    .filter((date) => !Number.isNaN(dayMs(date)))
     .sort()
     .at(-1);
 }
@@ -135,7 +170,7 @@ function relationLabel(a: BlogPostMeta, b: BlogPostMeta): string {
 }
 
 function byDateAsc(a: BlogPostMeta, b: BlogPostMeta): number {
-  return a.publishDate.localeCompare(b.publishDate) || a.slug.localeCompare(b.slug);
+  return (a.publishDate ?? "").localeCompare(b.publishDate ?? "") || a.slug.localeCompare(b.slug);
 }
 
 /**
@@ -254,17 +289,19 @@ export function pickRelatedPosts(
   all: BlogPostMeta[],
   limit = 2,
 ): BlogPostMeta[] {
-  const day = (iso: string) => Date.parse(`${iso.slice(0, 10)}T00:00:00Z`);
   return all
     .filter((candidate) => candidate.slug !== post.slug)
     .map((candidate) => ({
       candidate,
       score: relationScore(post, candidate),
-      gap: Math.abs(day(candidate.publishDate) - day(post.publishDate)),
+      // An invalid date has no gap to speak of: it sorts after every dated candidate.
+      gap: Math.abs(dayMs(candidate.publishDate) - dayMs(post.publishDate)) || 0,
+      dated: !Number.isNaN(dayMs(candidate.publishDate) - dayMs(post.publishDate)),
     }))
     .sort(
       (a, b) =>
         b.score - a.score ||
+        Number(b.dated) - Number(a.dated) ||
         a.gap - b.gap ||
         byDateAsc(b.candidate, a.candidate),
     )

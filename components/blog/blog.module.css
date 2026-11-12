@@ -1387,10 +1387,11 @@
   }
 }
 
-/* Hover or focus emphasis (rules generated in edition-map.tsx): the colour and
-   dimming switch at once; they ease only when motion is welcome. */
+/* Hover or focus emphasis (rules generated in edition-map.tsx): the rust colour
+   switches at once; dimming and easing exist only when motion is welcome. */
 @media (prefers-reduced-motion: no-preference) {
   .mapNode,
+  .mapLead .mapLink > *,
   .mapEdge,
   .mapRoute,
   .mapEdgeLabel {

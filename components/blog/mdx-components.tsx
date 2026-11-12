@@ -5,7 +5,7 @@ import { isValidElement, type ComponentPropsWithoutRef, type ReactNode } from "r
 import { MdxCallout } from "@/components/blog/mdx-callout";
 import { MdxCtaBlock } from "@/components/blog/mdx-cta-block";
 import { isSafeLinkDestination } from "@/lib/blog-api/links";
-import { slugifyHeading } from "@/lib/blog-presentation";
+import { createHeadingIds, slugifyHeading } from "@/lib/blog-presentation";
 
 /** Plain text of rendered heading children, so ids match extractHeadings. */
 function textOf(node: ReactNode): string {
@@ -16,8 +16,13 @@ function textOf(node: ReactNode): string {
 }
 
 // Typography lives in blog.module.css (.prose) so MDX and Markdown posts match.
-function H2(props: ComponentPropsWithoutRef<"h2">) {
-  return <h2 id={slugifyHeading(textOf(props.children))} {...props} />;
+/** Heading ids are allocated per document, so build the components once per compile. */
+function createH2() {
+  const nextId = createHeadingIds();
+  return function H2(props: ComponentPropsWithoutRef<"h2">) {
+    const text = textOf(props.children);
+    return <h2 id={slugifyHeading(text) ? nextId(text) : undefined} {...props} />;
+  };
 }
 
 function Image({ alt = "", ...props }: ComponentPropsWithoutRef<"img">) {
@@ -42,10 +47,10 @@ function Anchor({ href = "", ...props }: ComponentPropsWithoutRef<"a">) {
   );
 }
 
-export const mdxComponents = {
-  h2: H2,
+export const createMdxComponents = () => ({
+  h2: createH2(),
   img: Image,
   a: Anchor,
   Callout: MdxCallout,
   CtaBlock: MdxCtaBlock,
-};
+});
