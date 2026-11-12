@@ -82,7 +82,12 @@ Sonnet code and security review of #330 is running.
   legibly; services hero as labelled network; broken-link 404. Fable's
   estimate: about 7.5 to 7.7, and 8 needs founder decisions (commit to "your
   business as a connected system" as the concept; supply real NexSteps
-  problem, idea and outcome material). Waiting on the founder.
+  problem, idea and outcome material). Founder committed to the concept and
+  gave NexSteps facts on 2026-11-12 (see memory and the case study copy).
+- Rounds 4 to 6 (Sonnet): 7.0, 7.4, 7.3. Head `70199980e`. Plateau near
+  7.3 to 7.4. Latest card: `.jury/127.0.0.1-4400/scorecard.md` in the
+  worktree. Not yet code or security reviewed since round 1. Waiting on the
+  founder: accept about 7.4 and ship, or fund another round.
 - Open on #333: the old hero card hover lift (on main) went with the card;
   give the new hero a pointer response. Homepage CSS has 4 B gzip headroom.
   The app screenshot shows the founder's first name; founder to confirm.
