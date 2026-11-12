@@ -1,0 +1,86 @@
+.spine {
+  margin: 64px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.node {
+  position: relative;
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  column-gap: clamp(16px, 3vw, 32px);
+  padding-bottom: 48px;
+}
+/* The line runs from each node to the next. */
+.node::before {
+  position: absolute;
+  top: 56px;
+  bottom: 0;
+  left: 27px;
+  width: 2px;
+  background: linear-gradient(var(--brand-fss-teal), rgb(20 152 158 / 0.2));
+  content: "";
+}
+.node[data-last]::before {
+  display: none;
+}
+.number {
+  z-index: 1;
+  display: grid;
+  width: 56px;
+  height: 56px;
+  place-items: center;
+  border: 2px solid var(--brand-fss-teal);
+  border-radius: 50%;
+  background: var(--background);
+  color: var(--brand-fss-teal-ink);
+  font-family: var(--mono, ui-monospace, monospace);
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+.node[data-last] .number {
+  border-color: var(--brand-primary);
+  background: var(--brand-primary);
+  color: #fff;
+}
+.body {
+  max-width: 44rem;
+  padding-top: 10px;
+}
+/* Varied rhythm: even sections step in and carry a pull line. */
+.node:nth-child(even) .body {
+  max-width: 38rem;
+  margin-left: clamp(0px, 5vw, 64px);
+  padding-left: 20px;
+  border-left: 2px solid rgb(166 66 36 / 0.35);
+}
+.node:nth-child(even) h2 {
+  font-size: clamp(1.4rem, 2.4vw, 2rem);
+}
+.body h2 {
+  margin-bottom: 12px;
+}
+.points {
+  padding-left: 22px;
+  margin: 12px 0 0;
+  color: var(--text-muted);
+  line-height: 1.8;
+}
+@media (max-width: 680px) {
+  .node {
+    grid-template-columns: 40px minmax(0, 1fr);
+    column-gap: 14px;
+    padding-bottom: 36px;
+  }
+  .node::before {
+    top: 40px;
+    left: 19px;
+  }
+  .number {
+    width: 40px;
+    height: 40px;
+    font-size: 0.7rem;
+  }
+  .node:nth-child(even) .body {
+    margin-left: 0;
+  }
+}

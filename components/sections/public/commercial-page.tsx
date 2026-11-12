@@ -14,6 +14,7 @@ import { ContactLink, PageIntro } from "./page-intro";
 import type { MeshSection } from "@/components/ui/mesh-band";
 import { DeliverySteps } from "./delivery-steps";
 import { RelatedLinks } from "./related-links";
+import { SectionSpine } from "./section-spine";
 import styles from "./public-page.module.css";
 import cta from "@/components/ui/cta-motion.module.css";
 import { ContentEvidence } from "@/components/seo/content-evidence";
@@ -125,9 +126,13 @@ export function CommercialPage({ page }: { page: CommercialPageContent }) {
         {page.path === "/blog/church-management-software-vs-bespoke" && (
           <ContentEvidence content={churchArticle.meta} />
         )}
-        {page.sections.map((section) => (
-          <ContentSection key={section.id} section={section} />
-        ))}
+        {page.kind === "case-study" || page.kind === "service" ? (
+          <SectionSpine sections={page.sections} />
+        ) : (
+          page.sections.map((section) => (
+            <ContentSection key={section.id} section={section} />
+          ))
+        )}
         {page.kind !== "article" && <DeliverySteps />}
         <section
           className={styles.section}
