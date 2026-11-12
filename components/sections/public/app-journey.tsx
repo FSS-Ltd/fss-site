@@ -2,14 +2,14 @@ import type { ReactNode } from "react";
 import Image from "next/image";
 import styles from "./app-journey.module.css";
 
-const appImage = "/images/editorial/community-app-concept-v1.webp";
+const appImage = "/redesign/products/app-today.png";
 
 export function AppJourney({ children }: { children: ReactNode }) {
   return (
     <section
       className={styles.journey}
       data-motion-app
-      aria-label="From services to a mobile app concept"
+      aria-label="From services to a mobile app"
     >
       <div data-app-viewport>
         <div data-app-track>
@@ -27,7 +27,7 @@ export function AppJourney({ children }: { children: ReactNode }) {
                 around the work your team needs to do.
               </p>
               <p className={styles.caption}>
-                Illustrative app concept · AI-generated design
+                NexSteps app, Today screen · FSS-built product
               </p>
             </div>
             <div className={styles.phone} data-app-phone aria-hidden="true">
@@ -59,8 +59,8 @@ export function AppJourney({ children }: { children: ReactNode }) {
               <Image
                 src={appImage}
                 alt=""
-                width={720}
-                height={1260}
+                width={780}
+                height={1548}
                 className={styles.image}
                 data-app-image
                 sizes="(max-width: 900px) 80vw, 340px"

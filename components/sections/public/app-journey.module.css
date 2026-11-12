@@ -24,7 +24,7 @@
 .phone {
   position: relative;
   width: min(100%, 330px);
-  aspect-ratio: 4 / 7;
+  aspect-ratio: 330 / 643;
   margin: auto;
   border-radius: 28px;
   border: 6px solid #211b17;

@@ -137,7 +137,7 @@ test("the mobile concept keeps a static image fallback and an isolated atom canv
   assert.equal((html.match(/data-app-atoms=/g) ?? []).length, 1);
   assert.doesNotMatch(html, /data-app-tile=/);
   assert.match(html, /data-app-image/);
-  assert.match(html, /Illustrative app concept/);
+  assert.match(html, /NexSteps app, Today screen/);
 });
 
 test("home draws its own value network in the hero, with a static poster beneath it, and keeps a dedicated delivery scene", () => {
