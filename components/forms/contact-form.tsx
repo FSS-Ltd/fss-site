@@ -341,42 +341,20 @@ export function ContactForm({ aside }: { aside?: ReactNode }) {
           </h2>
 
           {step === 0 && (
-            <>
-              <div
-                className={styles.chips}
-                role="group"
-                aria-label="What you would like help with"
-              >
-                {contactNeeds.map((need) => (
-                  <Chip
-                    key={need}
-                    label={need}
-                    pressed={answers.need === need}
-                    onClick={pick({ type: "choose-need", value: need })}
-                  />
-                ))}
-              </div>
-              <div className={styles.field}>
-                <label htmlFor="contact-detail">
-                  Anything we should know? (optional)
-                </label>
-                <input
-                  id="contact-detail"
-                  type="text"
-                  className={styles.input}
-                  value={answers.detail}
-                  maxLength={detailLimit}
-                  onChange={(event) =>
-                    choose({ type: "set-detail", value: event.target.value })
-                  }
-                  aria-describedby="contact-detail-hint"
+            <div
+              className={styles.chips}
+              role="group"
+              aria-label="What you would like help with"
+            >
+              {contactNeeds.map((need) => (
+                <Chip
+                  key={need}
+                  label={need}
+                  pressed={answers.need === need}
+                  onClick={pick({ type: "choose-need", value: need })}
                 />
-                <p className={styles.hint} id="contact-detail-hint">
-                  A line is plenty. Please leave out confidential or sensitive
-                  personal information.
-                </p>
-              </div>
-            </>
+              ))}
+            </div>
           )}
 
           {step === 1 && (
@@ -464,6 +442,26 @@ export function ContactForm({ aside }: { aside?: ReactNode }) {
                   registration={register("company")}
                   error={errors.company?.message}
                 />
+              </div>
+              <div className={styles.field}>
+                <label htmlFor="contact-detail">
+                  Anything we should know? (optional)
+                </label>
+                <input
+                  id="contact-detail"
+                  type="text"
+                  className={styles.input}
+                  value={answers.detail}
+                  maxLength={detailLimit}
+                  onChange={(event) =>
+                    choose({ type: "set-detail", value: event.target.value })
+                  }
+                  aria-describedby="contact-detail-hint"
+                />
+                <p className={styles.hint} id="contact-detail-hint">
+                  A line is plenty. Please leave out confidential or sensitive
+                  personal information.
+                </p>
               </div>
               <label htmlFor="contact-newsletter" className={styles.consent}>
                 <input

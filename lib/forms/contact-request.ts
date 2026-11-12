@@ -84,14 +84,17 @@ export function contactDetailLimit(): number {
 export function buildContactChallenge(
   answers: ContactAnswers,
 ): string | undefined {
-  const segments = structuredSegments(answers);
+  const structured = structuredSegments(answers).join("; ");
   const detail = answers.detail
     .trim()
     .slice(0, contactDetailLimit())
     .replace(/[\uD800-\uDBFF]$/, "")
     .trim();
-  if (detail) segments.push(`${detailPrefix}${detail}`);
-  return segments.length ? segments.join("; ") : undefined;
+  // Detail sits on its own line so it is not read as one more structured answer.
+  const lines = [structured, detail && `${detailPrefix}${detail}`].filter(
+    Boolean,
+  );
+  return lines.length ? lines.join("\n") : undefined;
 }
 
 export function prepareContactRequest(

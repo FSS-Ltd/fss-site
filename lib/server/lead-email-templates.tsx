@@ -36,7 +36,7 @@ export function buildInternalLeadNotificationEmail(
       <p><strong>Name:</strong> ${sanitize(payload.firstName)} ${sanitize(payload.lastName)}</p>
       <p><strong>Email:</strong> ${sanitize(payload.workEmail)}</p>
       <p><strong>Company:</strong> ${sanitize(payload.company)}</p>
-      <p><strong>Challenge:</strong> ${sanitize(payload.challenge) || "N/A"}</p>
+      <p><strong>Challenge:</strong> ${sanitize(payload.challenge).replace(/\n/g, "<br>") || "N/A"}</p>
       <p><strong>Source Context:</strong> ${sanitize(payload.sourceContext)}</p>
       <p><strong>Source Path:</strong> ${sanitize(payload.sourcePath)}</p>
       <p><strong>Resource Slug:</strong> ${sanitize(payload.resourceSlug) || "N/A"}</p>
