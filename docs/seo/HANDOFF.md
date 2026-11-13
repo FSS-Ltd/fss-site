@@ -118,14 +118,20 @@ Sonnet code and security review of #330 is running.
   Ntagengwa (Person JSON-LD). Critic's remaining fixes: drop the map
   legend and de-clutter connectors, a continuous blog-to-post transition,
   richer inline link hovers, itemise OG tags, fuller SDK post.
-- Flaky CI: `tests/integration/operations/onboarding-uncertainty.test.ts:43`
-  ("lost response remains unresolved...") failed twice on #336 then passed
-  on the next push. Unrelated to the blog; needs its own fix.
+- Flaky CI fixed in #337: onboarding integration tests set due times with
+  the DB clock while the worker claims with the runner clock; due times
+  are now backdated one minute.
 - FEATURE_TREE.md and Graphify not yet updated for PR D's components
   (edition-map, article-art, article-route, draw-in, cover-transition,
   lib/blog-presentation).
-- Next: Dependabot PR (founder asked: 96 alerts on main, 6 critical, 49
-  high), then the docs PR.
+- #337 MERGED 2026-11-13 (`98a9a2925`, squash, clean message) on green
+  CI: stale package-lock.json removed, transitive packages refreshed,
+  ws pinned to 8.22.2 / 7.5.13 via pnpm.overrides (8.23.0 and 7.5.14 were
+  hours old; lift the pin once they have aged). Live pages 200, no console
+  errors. Dependabot open alerts now 8 (3 high, 3 medium, 2 low), from
+  96; the rest are dev-only under @lhci/cli and eslint-config-next, or
+  unpatched (extract-zip, deepmerge). Upgrading @lhci/cli clears most.
+- Next: the docs PR.
 - Open on #333: the old hero card hover lift (on main) went with the card;
   give the new hero a pointer response. Homepage CSS has 4 B gzip headroom.
   The app screenshot shows the founder's first name; founder to confirm.
