@@ -106,6 +106,7 @@ test("root graph connects organisation, website and evidenced founder without a 
     "@type": "ImageObject",
     url: "https://faithfulsoftware.dev/FSS.png",
   });
+  assert.equal(organisation.image, "https://faithfulsoftware.dev/FSS.png");
   assert.deepEqual(organisation.address, {
     "@type": "PostalAddress",
     addressLocality: "Ashford",

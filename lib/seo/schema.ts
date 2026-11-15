@@ -61,6 +61,7 @@ export function buildRootSchema(): {
           "@type": "ImageObject",
           url: `${organisation.url}/FSS.png`,
         },
+        image: `${organisation.url}/FSS.png`,
         address: { "@type": "PostalAddress", ...organisation.address },
         areaServed: { "@type": "Country", name: organisation.areaServed },
         knowsAbout: [
