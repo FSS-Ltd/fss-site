@@ -8,6 +8,7 @@ At the start of every session, load in this order:
 2. `AGENTS.md` in this repo (FSS Agent Operating System v2 + Nexus context)
 3. `.claude/rules/nexus-shared-context.md` (vault context summary)
 4. `.claude/rules/project-rules.md` (project-specific rules and branch)
+5. `.claude/skills/fable-playbook/SKILL.md` (working method: plan, steps, verification, mistakes to avoid — applies to every task)
 
 Or use the `/nexus-session-start` skill to automate this.
 
