@@ -25275,6 +25275,4506 @@
       "source_file": "lib/growth/dashboard/message-review.ts",
       "source_location": "L303",
       "weight": 1.0
+    },
+    {
+      "source": "components_portal_agreements_staff_commercial_offer_tsx",
+      "target": "lib_operations_agreements_validation_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-commercial-offer.tsx",
+      "source_location": "L17",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_commercial_offer_tsx",
+      "target": "lib_operations_agreements_commercial_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-commercial-offer.tsx",
+      "source_location": "L18",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_commercial_offer_tsx",
+      "target": "lib_operations_agreements_commercial_presentation_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-commercial-offer.tsx",
+      "source_location": "L19",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_commercial_offer_tsx",
+      "target": "lib_operations_agreements_agreement_notification_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-commercial-offer.tsx",
+      "source_location": "L20",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_commercial_offer_tsx",
+      "target": "lib_operations_auth_portal_url_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-commercial-offer.tsx",
+      "source_location": "L21",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_commercial_offer_tsx",
+      "target": "components_portal_agreements_use_commercial_offer_command_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-commercial-offer.tsx",
+      "source_location": "L22",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_commercial_offer_tsx",
+      "target": "components_portal_agreements_commercial_offer_summary_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-commercial-offer.tsx",
+      "source_location": "L23",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_commercial_offer_tsx",
+      "target": "components_portal_agreements_agreement_delivery_action_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-commercial-offer.tsx",
+      "source_location": "L24",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_fee_inputs_ts",
+      "target": "lib_operations_agreements_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-fee-inputs.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_fee_inputs_ts",
+      "target": "lib_operations_agreements_validation_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-fee-inputs.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_fee_inputs_ts",
+      "target": "components_portal_agreements_agreement_builder_step_support_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-fee-inputs.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_fee_inputs_ts",
+      "target": "lib_operations_agreements_builder_draft_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-fee-inputs.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_signing_status_tsx",
+      "target": "lib_operations_agreements_signing_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-signing-status.tsx",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_signing_status_tsx",
+      "target": "lib_operations_agreements_agreement_notification_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-signing-status.tsx",
+      "source_location": "L9",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_signing_status_tsx",
+      "target": "components_portal_agreements_presentation_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-signing-status.tsx",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_signing_status_tsx",
+      "target": "components_portal_agreements_agreement_delivery_action_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-signing-status.tsx",
+      "source_location": "L14",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_signing_status_tsx",
+      "target": "lib_operations_agreements_stage_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-signing-status.tsx",
+      "source_location": "L15",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_signing_status_tsx",
+      "target": "components_portal_agreements_agreement_stage_timeline_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-signing-status.tsx",
+      "source_location": "L16",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_routed_staff_agreement_builder_tsx",
+      "target": "components_portal_agreements_staff_agreement_builder_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/routed-staff-agreement-builder.tsx",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_routed_staff_agreement_builder_tsx",
+      "target": "lib_operations_agreements_builder_draft_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/routed-staff-agreement-builder.tsx",
+      "source_location": "L9",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_delivery_action_tsx",
+      "target": "lib_operations_agreements_agreement_notification_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-delivery-action.tsx",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_client_signing_review_test_tsx",
+      "target": "lib_operations_agreements_signing_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/client-signing-review.test.tsx",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_engagement_prefill_ts",
+      "target": "lib_operations_agreements_builder_draft_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/engagement-prefill.ts",
+      "source_location": "L1",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_engagement_prefill_ts",
+      "target": "components_portal_agreements_agreement_builder_step_panel_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/engagement-prefill.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_fee_inputs_test_ts",
+      "target": "components_portal_agreements_agreement_builder_fee_inputs_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-fee-inputs.test.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_fee_lines_tsx",
+      "target": "components_portal_agreements_agreement_builder_step_support_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-fee-lines.tsx",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_fee_lines_tsx",
+      "target": "components_portal_agreements_agreement_builder_fee_inputs_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-fee-lines.tsx",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_fee_lines_tsx",
+      "target": "lib_operations_agreements_builder_draft_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-fee-lines.tsx",
+      "source_location": "L11",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_groups_tsx",
+      "target": "components_portal_agreements_agreement_builder_step_support_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-groups.tsx",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_step_support_tsx",
+      "target": "lib_operations_agreements_builder_draft_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-step-support.tsx",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_agreement_overview_tsx",
+      "target": "lib_operations_agreements_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-agreement-overview.tsx",
+      "source_location": "L1",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_agreement_overview_tsx",
+      "target": "lib_operations_agreements_signing_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-agreement-overview.tsx",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_agreement_overview_tsx",
+      "target": "lib_operations_auth_portal_url_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-agreement-overview.tsx",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_summary_tsx",
+      "target": "lib_operations_agreements_builder_draft_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-summary.tsx",
+      "source_location": "L1",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_summary_tsx",
+      "target": "lib_operations_agreements_validation_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-summary.tsx",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_summary_tsx",
+      "target": "components_portal_agreements_agreement_builder_step_support_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-summary.tsx",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_link_step_tsx",
+      "target": "components_portal_agreements_agreement_builder_groups_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-link-step.tsx",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_link_step_tsx",
+      "target": "components_portal_agreements_agreement_builder_step_support_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-link-step.tsx",
+      "source_location": "L14",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_link_step_tsx",
+      "target": "components_portal_agreements_agreement_builder_step_panel_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-link-step.tsx",
+      "source_location": "L19",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_use_commercial_offer_command_ts",
+      "target": "lib_operations_auth_portal_url_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/use-commercial-offer-command.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_use_commercial_offer_command_ts",
+      "target": "lib_operations_agreements_commercial_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/use-commercial-offer-command.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_agreement_detail_test_tsx",
+      "target": "lib_operations_agreements_fixtures_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-agreement-detail.test.tsx",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_agreement_detail_test_tsx",
+      "target": "lib_operations_agreements_signing_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-agreement-detail.test.tsx",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_agreement_detail_test_tsx",
+      "target": "lib_operations_agreements_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-agreement-detail.test.tsx",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_signing_deadline_actions_tsx",
+      "target": "lib_operations_agreements_signing_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/signing-deadline-actions.tsx",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_client_agreement_list_tsx",
+      "target": "lib_operations_auth_portal_url_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/client-agreement-list.tsx",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_client_agreement_list_tsx",
+      "target": "lib_operations_agreements_signing_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/client-agreement-list.tsx",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_client_agreement_list_tsx",
+      "target": "components_portal_agreements_presentation_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/client-agreement-list.tsx",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_agreement_builder_tsx",
+      "target": "lib_operations_agreements_builder_draft_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-agreement-builder.tsx",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_agreement_builder_tsx",
+      "target": "lib_operations_agreements_builder_draft_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-agreement-builder.tsx",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_agreement_builder_tsx",
+      "target": "components_portal_agreements_agreement_builder_step_panel_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-agreement-builder.tsx",
+      "source_location": "L11",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_agreement_builder_tsx",
+      "target": "components_portal_agreements_use_agreement_builder_draft_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-agreement-builder.tsx",
+      "source_location": "L17",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_agreement_builder_tsx",
+      "target": "components_portal_agreements_engagement_prefill_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-agreement-builder.tsx",
+      "source_location": "L18",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_commercial_offer_fields_tsx",
+      "target": "lib_operations_agreements_commercial_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/commercial-offer-fields.tsx",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_commercial_offer_fields_tsx",
+      "target": "lib_operations_agreements_builder_draft_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/commercial-offer-fields.tsx",
+      "source_location": "L14",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_client_commercial_offer_tsx",
+      "target": "lib_operations_agreements_commercial_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/client-commercial-offer.tsx",
+      "source_location": "L12",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_client_commercial_offer_tsx",
+      "target": "lib_operations_auth_portal_url_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/client-commercial-offer.tsx",
+      "source_location": "L13",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_client_commercial_offer_tsx",
+      "target": "components_portal_agreements_use_commercial_offer_command_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/client-commercial-offer.tsx",
+      "source_location": "L14",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_client_commercial_offer_tsx",
+      "target": "components_portal_agreements_commercial_offer_summary_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/client-commercial-offer.tsx",
+      "source_location": "L15",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_tsx",
+      "target": "components_portal_agreements_founder_agreement_fields_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder.tsx",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_presentation_tsx",
+      "target": "lib_operations_agreements_signing_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/presentation.tsx",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_presentation_tsx",
+      "target": "lib_operations_agreements_signing_state_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/presentation.tsx",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_agreement_detail_tsx",
+      "target": "lib_operations_agreements_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-agreement-detail.tsx",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_agreement_detail_tsx",
+      "target": "lib_operations_agreements_validation_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-agreement-detail.tsx",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_agreement_detail_tsx",
+      "target": "lib_operations_auth_portal_url_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-agreement-detail.tsx",
+      "source_location": "L11",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_agreement_detail_tsx",
+      "target": "lib_operations_agreements_signing_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-agreement-detail.tsx",
+      "source_location": "L12",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_agreement_detail_tsx",
+      "target": "components_portal_agreements_agreement_lifecycle_actions_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-agreement-detail.tsx",
+      "source_location": "L13",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_agreement_detail_tsx",
+      "target": "components_portal_agreements_signing_deadline_actions_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-agreement-detail.tsx",
+      "source_location": "L14",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_agreement_detail_tsx",
+      "target": "components_portal_agreements_presentation_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-agreement-detail.tsx",
+      "source_location": "L15",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_currency_test_tsx",
+      "target": "lib_operations_agreements_fixtures_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-currency.test.tsx",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_commercial_offer_summary_tsx",
+      "target": "lib_operations_agreements_validation_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/commercial-offer-summary.tsx",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_commercial_offer_summary_tsx",
+      "target": "lib_operations_agreements_commercial_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/commercial-offer-summary.tsx",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_commercial_offer_summary_tsx",
+      "target": "lib_operations_agreements_stage_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/commercial-offer-summary.tsx",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_commercial_offer_summary_tsx",
+      "target": "components_portal_agreements_agreement_stage_timeline_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/commercial-offer-summary.tsx",
+      "source_location": "L9",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_review_step_tsx",
+      "target": "lib_operations_agreements_builder_draft_validation_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-review-step.tsx",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_review_step_tsx",
+      "target": "lib_operations_agreements_validation_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-review-step.tsx",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_review_step_tsx",
+      "target": "components_portal_agreements_agreement_builder_step_support_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-review-step.tsx",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_review_step_tsx",
+      "target": "components_portal_agreements_agreement_builder_readiness_checks_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-review-step.tsx",
+      "source_location": "L13",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_review_step_tsx",
+      "target": "components_portal_agreements_agreement_builder_summary_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-review-step.tsx",
+      "source_location": "L14",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_step_panel_tsx",
+      "target": "components_portal_agreements_agreement_builder_fees_step_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-step-panel.tsx",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_step_panel_tsx",
+      "target": "components_portal_agreements_agreement_builder_link_step_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-step-panel.tsx",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_step_panel_tsx",
+      "target": "components_portal_agreements_agreement_builder_scope_step_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-step-panel.tsx",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_step_panel_tsx",
+      "target": "components_portal_agreements_agreement_builder_people_step_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-step-panel.tsx",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_step_panel_tsx",
+      "target": "components_portal_agreements_agreement_builder_document_step_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-step-panel.tsx",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_step_panel_tsx",
+      "target": "components_portal_agreements_agreement_builder_review_step_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-step-panel.tsx",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_step_panel_tsx",
+      "target": "lib_operations_agreements_builder_draft_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-step-panel.tsx",
+      "source_location": "L9",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_step_panel_tsx",
+      "target": "components_portal_agreements_agreement_builder_step_support_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-step-panel.tsx",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_payment_fields_tsx",
+      "target": "components_portal_agreements_agreement_builder_step_support_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-payment-fields.tsx",
+      "source_location": "L11",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_payment_fields_tsx",
+      "target": "components_portal_agreements_agreement_builder_fee_inputs_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-payment-fields.tsx",
+      "source_location": "L12",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_routed_engagement_form_tsx",
+      "target": "components_portal_agreements_engagement_form_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/routed-engagement-form.tsx",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_client_signing_review_tsx",
+      "target": "lib_operations_auth_portal_url_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/client-signing-review.tsx",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_client_signing_review_tsx",
+      "target": "lib_operations_agreements_signing_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/client-signing-review.tsx",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_client_signing_review_tsx",
+      "target": "components_portal_agreements_presentation_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/client-signing-review.tsx",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_people_step_tsx",
+      "target": "components_portal_agreements_agreement_builder_groups_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-people-step.tsx",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_people_step_tsx",
+      "target": "components_portal_agreements_agreement_builder_step_support_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-people-step.tsx",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_stage_timeline_tsx",
+      "target": "lib_operations_agreements_stage_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-stage-timeline.tsx",
+      "source_location": "L1",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_signature_evidence_form_tsx",
+      "target": "lib_operations_agreements_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/signature-evidence-form.tsx",
+      "source_location": "L13",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_agreement_builder_test_tsx",
+      "target": "lib_operations_agreements_fixtures_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-agreement-builder.test.tsx",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_engagement_form_tsx",
+      "target": "lib_operations_agreements_engagement_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/engagement-form.tsx",
+      "source_location": "L13",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_lifecycle_actions_tsx",
+      "target": "lib_operations_agreements_lifecycle_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-lifecycle-actions.tsx",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_lifecycle_actions_tsx",
+      "target": "lib_operations_agreements_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-lifecycle-actions.tsx",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_commercial_offer_list_tsx",
+      "target": "lib_operations_auth_portal_url_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/commercial-offer-list.tsx",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_commercial_offer_list_tsx",
+      "target": "lib_operations_agreements_commercial_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/commercial-offer-list.tsx",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_commercial_offer_list_tsx",
+      "target": "lib_operations_agreements_commercial_presentation_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/commercial-offer-list.tsx",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_commercial_offer_list_tsx",
+      "target": "lib_operations_agreements_stage_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/commercial-offer-list.tsx",
+      "source_location": "L9",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_scope_step_tsx",
+      "target": "components_portal_agreements_agreement_builder_groups_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-scope-step.tsx",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_scope_step_tsx",
+      "target": "components_portal_agreements_agreement_builder_step_support_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-scope-step.tsx",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_staff_signing_status_test_tsx",
+      "target": "lib_operations_agreements_signing_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/staff-signing-status.test.tsx",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_readiness_checks_tsx",
+      "target": "lib_operations_agreements_builder_draft_validation_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-readiness-checks.tsx",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_readiness_checks_tsx",
+      "target": "lib_operations_agreements_builder_draft_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-readiness-checks.tsx",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_fees_step_tsx",
+      "target": "lib_operations_agreements_builder_draft_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-fees-step.tsx",
+      "source_location": "L12",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_fees_step_tsx",
+      "target": "components_portal_agreements_commercial_offer_fields_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-fees-step.tsx",
+      "source_location": "L13",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_fees_step_tsx",
+      "target": "lib_operations_agreements_commercial_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-fees-step.tsx",
+      "source_location": "L17",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_fees_step_tsx",
+      "target": "components_portal_agreements_agreement_builder_step_support_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-fees-step.tsx",
+      "source_location": "L18",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_fees_step_tsx",
+      "target": "components_portal_agreements_agreement_builder_groups_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-fees-step.tsx",
+      "source_location": "L24",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_fees_step_tsx",
+      "target": "components_portal_agreements_agreement_builder_fee_lines_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-fees-step.tsx",
+      "source_location": "L28",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_fees_step_tsx",
+      "target": "components_portal_agreements_agreement_builder_payment_fields_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-fees-step.tsx",
+      "source_location": "L29",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_fees_step_tsx",
+      "target": "components_portal_agreements_agreement_builder_fee_inputs_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-fees-step.tsx",
+      "source_location": "L33",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_use_agreement_builder_draft_ts",
+      "target": "lib_operations_agreements_builder_draft_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/use-agreement-builder-draft.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_use_agreement_builder_draft_ts",
+      "target": "lib_operations_agreements_builder_draft_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/use-agreement-builder-draft.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_saved_agreement_drafts_tsx",
+      "target": "lib_operations_agreements_builder_draft_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/saved-agreement-drafts.tsx",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_commercial_offer_ui_test_tsx",
+      "target": "lib_operations_agreements_fixtures_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/commercial-offer-ui.test.tsx",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_commercial_offer_ui_test_tsx",
+      "target": "lib_operations_agreements_commercial_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/commercial-offer-ui.test.tsx",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_document_step_tsx",
+      "target": "components_portal_agreements_agreement_builder_step_support_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-document-step.tsx",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_agreement_builder_document_step_tsx",
+      "target": "components_portal_agreements_agreement_builder_summary_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/agreement-builder-document-step.tsx",
+      "source_location": "L9",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_client_agreement_detail_test_tsx",
+      "target": "lib_operations_agreements_signing_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/client-agreement-detail.test.tsx",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_client_agreement_detail_tsx",
+      "target": "lib_operations_auth_portal_url_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/client-agreement-detail.tsx",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_client_agreement_detail_tsx",
+      "target": "lib_operations_agreements_validation_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/client-agreement-detail.tsx",
+      "source_location": "L9",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_client_agreement_detail_tsx",
+      "target": "lib_operations_agreements_signing_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/client-agreement-detail.tsx",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_client_agreement_detail_tsx",
+      "target": "components_portal_agreements_presentation_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/client-agreement-detail.tsx",
+      "source_location": "L11",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_client_agreement_detail_tsx",
+      "target": "lib_operations_agreements_stage_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/client-agreement-detail.tsx",
+      "source_location": "L15",
+      "weight": 1
+    },
+    {
+      "source": "components_portal_agreements_client_agreement_detail_tsx",
+      "target": "components_portal_agreements_agreement_stage_timeline_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/portal/agreements/client-agreement-detail.tsx",
+      "source_location": "L19",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_engagement_command_test_ts",
+      "target": "lib_operations_agreements_engagement_command_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/engagement-command.test.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_types_ts",
+      "target": "lib_operations_agreements_signing_text_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-types.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_types_ts",
+      "target": "lib_operations_agreements_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-types.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_validation_ts",
+      "target": "lib_operations_agreements_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/validation.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_fixtures_ts",
+      "target": "lib_operations_agreements_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/fixtures.ts",
+      "source_location": "L1",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_builder_draft_validation_ts",
+      "target": "lib_operations_agreements_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/builder-draft-validation.ts",
+      "source_location": "L1",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_builder_draft_validation_ts",
+      "target": "lib_operations_agreements_builder_draft_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/builder-draft-validation.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_builder_draft_validation_ts",
+      "target": "lib_operations_agreements_commercial_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/builder-draft-validation.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_builder_draft_validation_ts",
+      "target": "lib_operations_agreements_validation_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/builder-draft-validation.ts",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_builder_draft_validation_ts",
+      "target": "lib_operations_agreements_builder_draft_validation_messages_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/builder-draft-validation.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_commercial_presentation_test_ts",
+      "target": "lib_operations_agreements_fixtures_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/commercial-presentation.test.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_commercial_presentation_test_ts",
+      "target": "lib_operations_agreements_commercial_presentation_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/commercial-presentation.test.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_commercial_presentation_test_ts",
+      "target": "lib_operations_agreements_commercial_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/commercial-presentation.test.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_extension_test_ts",
+      "target": "lib_operations_agreements_signing_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-extension.test.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_extension_test_ts",
+      "target": "lib_operations_agreements_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-extension.test.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_repository_ts",
+      "target": "lib_operations_agreements_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/repository.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_repository_ts",
+      "target": "lib_operations_agreements_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/repository.ts",
+      "source_location": "L13",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_commands_ts",
+      "target": "lib_operations_agreements_signing_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-commands.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_commands_ts",
+      "target": "lib_operations_agreements_agreement_notification_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-commands.ts",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_commands_ts",
+      "target": "lib_operations_agreements_signing_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-commands.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_commands_ts",
+      "target": "lib_operations_agreements_signing_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-commands.ts",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_route_ts",
+      "target": "lib_operations_auth_configuration_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-route.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_route_ts",
+      "target": "lib_operations_agreements_signing_http_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-route.ts",
+      "source_location": "L11",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_route_ts",
+      "target": "lib_operations_agreements_signing_commands_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-route.ts",
+      "source_location": "L15",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_route_ts",
+      "target": "lib_operations_agreements_signing_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-route.ts",
+      "source_location": "L21",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_route_ts",
+      "target": "lib_operations_auth_release_flags_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-route.ts",
+      "source_location": "L26",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_route_ts",
+      "target": "lib_operations_agreements_signing_worker_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-route.ts",
+      "source_location": "L27",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_agreement_notifications_test_ts",
+      "target": "lib_operations_auth_configuration_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/agreement-notifications.test.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_agreement_notifications_test_ts",
+      "target": "lib_operations_auth_release_flags_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/agreement-notifications.test.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_agreement_notifications_test_ts",
+      "target": "lib_operations_agreements_agreement_notifications_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/agreement-notifications.test.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_stage_ts",
+      "target": "lib_operations_agreements_commercial_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/stage.ts",
+      "source_location": "L1",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_stage_ts",
+      "target": "lib_operations_agreements_signing_state_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/stage.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_stage_ts",
+      "target": "lib_operations_agreements_signing_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/stage.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_route_handler_ts",
+      "target": "lib_growth_http_founder_request_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/route-handler.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_route_handler_ts",
+      "target": "lib_operations_agreements_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/route-handler.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_builder_draft_repository_ts",
+      "target": "lib_operations_agreements_builder_draft_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/builder-draft-repository.ts",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_builder_draft_service_test_ts",
+      "target": "lib_operations_agreements_builder_draft_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/builder-draft-service.test.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_builder_draft_service_test_ts",
+      "target": "lib_operations_agreements_fixtures_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/builder-draft-service.test.ts",
+      "source_location": "L11",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_route_handler_test_ts",
+      "target": "lib_operations_agreements_route_handler_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/route-handler.test.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_route_handler_test_ts",
+      "target": "lib_operations_agreements_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/route-handler.test.ts",
+      "source_location": "L9",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_route_handler_test_ts",
+      "target": "lib_operations_agreements_fixtures_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/route-handler.test.ts",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_service_test_ts",
+      "target": "lib_operations_agreements_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/service.test.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_repository_ts",
+      "target": "lib_operations_agreements_signing_render_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-repository.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_repository_ts",
+      "target": "lib_operations_agreements_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-repository.ts",
+      "source_location": "L9",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_repository_ts",
+      "target": "lib_operations_agreements_signing_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-repository.ts",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_builder_draft_service_ts",
+      "target": "lib_operations_agreements_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/builder-draft-service.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_builder_draft_service_ts",
+      "target": "lib_operations_agreements_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/builder-draft-service.ts",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_builder_draft_service_ts",
+      "target": "lib_operations_agreements_builder_draft_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/builder-draft-service.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_builder_draft_service_ts",
+      "target": "lib_operations_agreements_builder_draft_validation_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/builder-draft-service.ts",
+      "source_location": "L17",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_builder_draft_service_ts",
+      "target": "lib_operations_agreements_commercial_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/builder-draft-service.ts",
+      "source_location": "L21",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_builder_draft_service_ts",
+      "target": "lib_operations_agreements_commercial_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/builder-draft-service.ts",
+      "source_location": "L22",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_render_test_ts",
+      "target": "lib_operations_agreements_fixtures_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-render.test.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_render_test_ts",
+      "target": "lib_operations_agreements_signing_render_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-render.test.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_render_test_ts",
+      "target": "lib_operations_agreements_signing_pdf_content_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-render.test.ts",
+      "source_location": "L11",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_render_test_ts",
+      "target": "lib_operations_agreements_signing_text_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-render.test.ts",
+      "source_location": "L12",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_render_test_ts",
+      "target": "lib_operations_agreements_signing_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-render.test.ts",
+      "source_location": "L13",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_render_test_ts",
+      "target": "lib_operations_agreements_signing_worker_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-render.test.ts",
+      "source_location": "L14",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_render_test_ts",
+      "target": "lib_operations_agreements_signing_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-render.test.ts",
+      "source_location": "L15",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_agreement_notification_service_ts",
+      "target": "lib_operations_agreements_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/agreement-notification-service.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_growth_test_ts",
+      "target": "lib_operations_agreements_fixtures_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-growth.test.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_growth_test_ts",
+      "target": "lib_operations_agreements_signing_growth_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-growth.test.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_staff_service_ts",
+      "target": "lib_operations_agreements_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/staff-service.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_staff_service_ts",
+      "target": "lib_operations_agreements_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/staff-service.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_lifecycle_service_ts",
+      "target": "lib_operations_agreements_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/lifecycle-service.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_builder_draft_validation_test_ts",
+      "target": "lib_operations_agreements_fixtures_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/builder-draft-validation.test.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_builder_draft_validation_test_ts",
+      "target": "lib_operations_agreements_builder_draft_validation_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/builder-draft-validation.test.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_builder_draft_validation_test_ts",
+      "target": "lib_operations_agreements_builder_draft_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/builder-draft-validation.test.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_commercial_types_ts",
+      "target": "lib_operations_agreements_validation_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/commercial-types.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_commercial_types_ts",
+      "target": "lib_operations_agreements_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/commercial-types.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_commercial_types_ts",
+      "target": "lib_operations_agreements_signing_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/commercial-types.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_state_ts",
+      "target": "lib_operations_agreements_signing_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-state.ts",
+      "source_location": "L1",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_engagement_service_ts",
+      "target": "lib_operations_agreements_engagement_command_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/engagement-service.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_types_ts",
+      "target": "lib_operations_agreements_validation_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/types.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_commercial_repository_ts",
+      "target": "lib_operations_agreements_commercial_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/commercial-repository.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_render_ts",
+      "target": "lib_operations_agreements_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-render.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_render_ts",
+      "target": "lib_operations_agreements_signing_pdf_content_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-render.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_render_ts",
+      "target": "lib_operations_agreements_signing_pdf_layout_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-render.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_render_ts",
+      "target": "lib_operations_agreements_signing_text_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-render.ts",
+      "source_location": "L9",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_render_ts",
+      "target": "lib_operations_agreements_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-render.ts",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_render_ts",
+      "target": "lib_operations_agreements_signing_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-render.ts",
+      "source_location": "L11",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_commercial_presentation_ts",
+      "target": "lib_operations_agreements_commercial_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/commercial-presentation.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_worker_ts",
+      "target": "lib_operations_agreements_signing_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-worker.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_worker_ts",
+      "target": "lib_operations_agreements_signing_render_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-worker.ts",
+      "source_location": "L9",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_agreement_notifications_ts",
+      "target": "lib_operations_auth_configuration_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/agreement-notifications.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_agreement_notifications_ts",
+      "target": "lib_operations_auth_portal_url_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/agreement-notifications.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "lib_operations_agreements_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L9",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "lib_operations_agreements_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L14",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "lib_operations_agreements_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L15",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "lib_operations_agreements_signing_render_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L16",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "lib_operations_agreements_signing_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L17",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "lib_operations_agreements_signing_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L18",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_pdf_content_ts",
+      "target": "lib_operations_agreements_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-pdf-content.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_pdf_content_ts",
+      "target": "lib_operations_agreements_validation_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-pdf-content.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_pdf_content_ts",
+      "target": "lib_operations_agreements_signing_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-pdf-content.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_pdf_content_ts",
+      "target": "lib_operations_agreements_signing_pdf_layout_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-pdf-content.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_http_ts",
+      "target": "lib_growth_http_founder_request_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-http.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_http_ts",
+      "target": "lib_operations_agreements_signing_text_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-http.ts",
+      "source_location": "L9",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_http_ts",
+      "target": "lib_operations_agreements_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-http.ts",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_http_ts",
+      "target": "lib_operations_agreements_signing_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-http.ts",
+      "source_location": "L11",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_agreement_delivery_webhook_test_ts",
+      "target": "lib_operations_agreements_agreement_delivery_webhook_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/agreement-delivery-webhook.test.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_growth_ts",
+      "target": "lib_operations_agreements_validation_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-growth.ts",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_money_input_test_ts",
+      "target": "lib_operations_agreements_money_input_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/money-input.test.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_http_test_ts",
+      "target": "lib_operations_agreements_signing_http_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-http.test.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_http_test_ts",
+      "target": "lib_operations_agreements_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-http.test.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_signing_http_test_ts",
+      "target": "lib_operations_agreements_signing_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/signing-http.test.ts",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_stage_test_ts",
+      "target": "lib_operations_agreements_stage_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/stage.test.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_commercial_service_ts",
+      "target": "lib_operations_agreements_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/commercial-service.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_commercial_service_ts",
+      "target": "lib_operations_agreements_signing_render_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/commercial-service.ts",
+      "source_location": "L9",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_commercial_service_ts",
+      "target": "lib_operations_agreements_signing_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/commercial-service.ts",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_commercial_service_ts",
+      "target": "lib_operations_agreements_commercial_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/commercial-service.ts",
+      "source_location": "L11",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_commercial_service_ts",
+      "target": "lib_operations_agreements_commercial_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/commercial-service.ts",
+      "source_location": "L12",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_builder_draft_schema_ts",
+      "target": "lib_operations_agreements_validation_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/builder-draft-schema.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_builder_draft_schema_ts",
+      "target": "lib_operations_agreements_commercial_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/builder-draft-schema.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_service_ts",
+      "target": "lib_operations_agreements_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/service.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_service_ts",
+      "target": "lib_operations_agreements_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/service.ts",
+      "source_location": "L11",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_service_ts",
+      "target": "lib_operations_agreements_validation_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/service.ts",
+      "source_location": "L12",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_validation_test_ts",
+      "target": "lib_operations_agreements_validation_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/validation.test.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_validation_test_ts",
+      "target": "lib_operations_agreements_fixtures_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/validation.test.ts",
+      "source_location": "L9",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_builder_draft_validation_messages_ts",
+      "target": "lib_operations_agreements_builder_draft_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/builder-draft-validation-messages.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_commercial_types_test_ts",
+      "target": "lib_operations_agreements_fixtures_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/commercial-types.test.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_agreements_commercial_types_test_ts",
+      "target": "lib_operations_agreements_commercial_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/agreements/commercial-types.test.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "app_portal_client_portal_agreements_offers_offerid_page_tsx",
+      "target": "components_portal_agreements_client_commercial_offer_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "app/(portal)/(client)/portal/agreements/offers/[offerId]/page.tsx",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "app_portal_client_portal_agreements_offers_offerid_page_tsx",
+      "target": "lib_operations_agreements_commercial_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "app/(portal)/(client)/portal/agreements/offers/[offerId]/page.tsx",
+      "source_location": "L11",
+      "weight": 1
+    },
+    {
+      "source": "app_portal_client_portal_agreements_offers_offerid_page_tsx",
+      "target": "lib_operations_agreements_signing_worker_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "app/(portal)/(client)/portal/agreements/offers/[offerId]/page.tsx",
+      "source_location": "L12",
+      "weight": 1
+    },
+    {
+      "source": "app_portal_client_portal_agreements_offers_offerid_page_tsx",
+      "target": "lib_operations_auth_portal_url_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "app/(portal)/(client)/portal/agreements/offers/[offerId]/page.tsx",
+      "source_location": "L13",
+      "weight": 1
+    },
+    {
+      "source": "app_api_cron_operations_dispatch_route_ts",
+      "target": "lib_operations_agreements_agreement_notifications_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "app/api/cron/operations-dispatch/route.ts",
+      "source_location": "L11",
+      "weight": 1
+    },
+    {
+      "source": "app_api_portal_admin_clients_organisationid_commercial_offers_route_ts",
+      "target": "lib_operations_http_commercial_offer_route_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "app/api/portal/admin/clients/[organisationId]/commercial-offers/route.ts",
+      "source_location": "L1",
+      "weight": 1
+    },
+    {
+      "source": "app_api_portal_organisations_organisationid_commercial_offers_route_ts",
+      "target": "lib_operations_http_commercial_offer_route_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "app/api/portal/organisations/[organisationId]/commercial-offers/route.ts",
+      "source_location": "L1",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_auth_portal_url_ts",
+      "target": "lib_operations_auth_release_flags_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/auth/portal-url.ts",
+      "source_location": "L1",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_test_ts",
+      "target": "lib_operations_http_commercial_offer_route_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/http/commercial-offer-route.test.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_test_ts",
+      "target": "lib_operations_agreements_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/http/commercial-offer-route.test.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_test_ts",
+      "target": "lib_operations_agreements_fixtures_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/http/commercial-offer-route.test.ts",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_test_ts",
+      "target": "lib_operations_agreements_commercial_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/http/commercial-offer-route.test.ts",
+      "source_location": "L11",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_ts",
+      "target": "lib_operations_auth_configuration_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_ts",
+      "target": "lib_growth_http_founder_request_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_ts",
+      "target": "lib_operations_auth_release_flags_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_ts",
+      "target": "lib_operations_agreements_signing_worker_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L16",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_ts",
+      "target": "lib_operations_agreements_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L17",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_ts",
+      "target": "lib_operations_agreements_commercial_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L18",
+      "weight": 1
+    },
+    {
+      "source": "lib_operations_http_commercial_offer_route_ts",
+      "target": "lib_operations_agreements_commercial_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L22",
+      "weight": 1
+    },
+    {
+      "source": "lib_seo_routing_test_ts",
+      "target": "next_config_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/seo/routing.test.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_seo_routing_test_ts",
+      "target": "lib_operations_auth_configuration_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/seo/routing.test.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "lib_seo_routing_test_ts",
+      "target": "lib_operations_auth_release_flags_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/seo/routing.test.ts",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "next_config_ts",
+      "target": "lib_operations_auth_configuration_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "next.config.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "next_config_ts",
+      "target": "lib_operations_auth_portal_url_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "next.config.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_activity_service_ts",
+      "target": "lib_growth_crm_errors_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/activity-service.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_activity_service_ts",
+      "target": "lib_growth_crm_schemas_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/activity-service.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_commands_ts",
+      "target": "lib_growth_crm_errors_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/commands.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_commands_ts",
+      "target": "lib_growth_crm_activity_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/commands.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_commands_ts",
+      "target": "lib_growth_crm_task_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/commands.ts",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_commands_ts",
+      "target": "lib_growth_crm_view_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/commands.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_commands_ts",
+      "target": "lib_growth_crm_opportunity_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/commands.ts",
+      "source_location": "L9",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_commands_ts",
+      "target": "lib_growth_crm_lead_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/commands.ts",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_commands_ts",
+      "target": "lib_growth_campaigns_source_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/commands.ts",
+      "source_location": "L11",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_commands_ts",
+      "target": "lib_growth_crm_record_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/commands.ts",
+      "source_location": "L12",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_commands_ts",
+      "target": "lib_growth_crm_schemas_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/commands.ts",
+      "source_location": "L13",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_lead_repository_ts",
+      "target": "lib_growth_crm_errors_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/lead-repository.ts",
+      "source_location": "L1",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_lead_repository_ts",
+      "target": "lib_growth_crm_schemas_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/lead-repository.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_lead_service_ts",
+      "target": "lib_growth_crm_errors_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/lead-service.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_lead_service_ts",
+      "target": "lib_growth_crm_lead_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/lead-service.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_lead_service_ts",
+      "target": "lib_growth_crm_schemas_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/lead-service.ts",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_opportunity_service_ts",
+      "target": "lib_growth_crm_activity_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/opportunity-service.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_opportunity_service_ts",
+      "target": "lib_growth_crm_lead_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/opportunity-service.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_opportunity_service_ts",
+      "target": "lib_growth_crm_errors_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/opportunity-service.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_opportunity_service_ts",
+      "target": "lib_growth_crm_schemas_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/opportunity-service.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_pipeline_query_ts",
+      "target": "lib_growth_crm_schemas_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/pipeline-query.ts",
+      "source_location": "L1",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_record_service_ts",
+      "target": "lib_growth_crm_errors_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/record-service.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_record_service_ts",
+      "target": "lib_growth_crm_schemas_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/record-service.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_route_handler_ts",
+      "target": "lib_growth_sequences_message_action_route_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/route-handler.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_route_handler_ts",
+      "target": "lib_growth_crm_commands_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/route-handler.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_route_handler_ts",
+      "target": "lib_growth_crm_errors_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/route-handler.ts",
+      "source_location": "L9",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_route_handler_ts",
+      "target": "lib_growth_crm_schemas_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/route-handler.ts",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_schemas_ts",
+      "target": "lib_growth_crm_countries_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/schemas.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_schemas_ts",
+      "target": "lib_growth_campaigns_schemas_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/schemas.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_task_service_ts",
+      "target": "lib_growth_crm_activity_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/task-service.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_task_service_ts",
+      "target": "lib_growth_crm_errors_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/task-service.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_task_service_ts",
+      "target": "lib_growth_crm_schemas_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/task-service.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_view_service_ts",
+      "target": "lib_growth_crm_errors_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/view-service.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_view_service_ts",
+      "target": "lib_growth_crm_schemas_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/view-service.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_crm_workspace_query_ts",
+      "target": "lib_growth_crm_schemas_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/crm/workspace-query.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_candidate_details_ts",
+      "target": "lib_growth_research_repository_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/candidate-details.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_global_identity_ts",
+      "target": "lib_growth_research_global_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/global-identity.ts",
+      "source_location": "L1",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_global_ingest_ts",
+      "target": "lib_growth_research_errors_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/global-ingest.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_global_ingest_ts",
+      "target": "lib_growth_research_global_identity_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/global-ingest.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_global_ingest_ts",
+      "target": "lib_growth_research_global_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/global-ingest.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_global_ingest_ts",
+      "target": "lib_growth_research_global_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/global-ingest.ts",
+      "source_location": "L9",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_global_ingest_ts",
+      "target": "lib_growth_research_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/global-ingest.ts",
+      "source_location": "L14",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_global_ingest_ts",
+      "target": "lib_growth_research_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/global-ingest.ts",
+      "source_location": "L15",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_global_repository_ts",
+      "target": "lib_growth_research_repository_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/global-repository.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_global_repository_ts",
+      "target": "lib_growth_research_global_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/global-repository.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_global_repository_ts",
+      "target": "lib_growth_research_global_identity_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/global-repository.ts",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_global_schema_ts",
+      "target": "lib_growth_research_limits_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/global-schema.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_ingest_ts",
+      "target": "lib_growth_research_errors_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/ingest.ts",
+      "source_location": "L1",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_ingest_ts",
+      "target": "lib_growth_research_global_ingest_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/ingest.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_ingest_ts",
+      "target": "lib_growth_research_intake_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/ingest.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_ingest_ts",
+      "target": "lib_growth_research_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/ingest.ts",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_ingest_ts",
+      "target": "lib_growth_research_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/ingest.ts",
+      "source_location": "L15",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_ingestion_schema_ts",
+      "target": "lib_growth_research_limits_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/ingestion-schema.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_ingestion_schema_ts",
+      "target": "lib_growth_research_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/ingestion-schema.ts",
+      "source_location": "L9",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_intake_schema_ts",
+      "target": "lib_growth_research_global_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/intake-schema.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_intake_schema_ts",
+      "target": "lib_growth_research_ingestion_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/intake-schema.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_repository_types_ts",
+      "target": "lib_growth_research_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/repository-types.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_repository_ts",
+      "target": "lib_growth_research_candidate_details_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/repository.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_repository_ts",
+      "target": "lib_growth_research_repository_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/repository.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_route_handler_ts",
+      "target": "lib_growth_research_ingest_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/route-handler.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_route_handler_ts",
+      "target": "lib_growth_research_intake_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/route-handler.ts",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_route_handler_ts",
+      "target": "lib_growth_research_limits_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/route-handler.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_route_handler_ts",
+      "target": "lib_growth_research_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/route-handler.ts",
+      "source_location": "L9",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_scheduled_agent_runner_ts",
+      "target": "lib_growth_research_redacted_run_report_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_scheduled_workflow_ts",
+      "target": "lib_growth_research_redacted_run_report_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/scheduled-workflow.ts",
+      "source_location": "L1",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_submission_client_ts",
+      "target": "lib_growth_research_global_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/submission-client.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_submission_client_ts",
+      "target": "lib_growth_research_limits_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/submission-client.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_approval_repository_ts",
+      "target": "lib_growth_sequences_approval_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/approval-repository.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_approval_ts",
+      "target": "lib_growth_integrations_gmail_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/approval.ts",
+      "source_location": "L14",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_approval_ts",
+      "target": "lib_growth_sequences_first_email_draft_snapshot_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/approval.ts",
+      "source_location": "L15",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_approve_send_route_handler_ts",
+      "target": "lib_growth_sequences_approval_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/approve-send-route-handler.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_approve_send_route_handler_ts",
+      "target": "lib_growth_sequences_approval_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/approve-send-route-handler.ts",
+      "source_location": "L12",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_approve_send_route_handler_ts",
+      "target": "lib_growth_sequences_message_action_route_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/approve-send-route-handler.ts",
+      "source_location": "L13",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_create_gmail_draft_route_handler_ts",
+      "target": "lib_growth_integrations_gmail_live_client_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/create-gmail-draft-route-handler.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_create_gmail_draft_route_handler_ts",
+      "target": "lib_growth_sequences_approval_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/create-gmail-draft-route-handler.ts",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_create_gmail_draft_route_handler_ts",
+      "target": "lib_growth_sequences_approval_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/create-gmail-draft-route-handler.ts",
+      "source_location": "L17",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_create_gmail_draft_route_handler_ts",
+      "target": "lib_growth_sequences_message_action_route_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/create-gmail-draft-route-handler.ts",
+      "source_location": "L18",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_dispatcher_ts",
+      "target": "lib_growth_integrations_gmail_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/dispatcher.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_dispatcher_ts",
+      "target": "lib_growth_integrations_gmail_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/dispatcher.ts",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_dispatcher_ts",
+      "target": "lib_growth_sequences_dispatcher_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/dispatcher.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_dispatcher_ts",
+      "target": "lib_growth_sequences_schedule_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/dispatcher.ts",
+      "source_location": "L13",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_edit_draft_route_handler_ts",
+      "target": "lib_growth_sequences_first_email_revisions_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/edit-draft-route-handler.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_edit_draft_route_handler_ts",
+      "target": "lib_growth_sequences_edit_first_email_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/edit-draft-route-handler.ts",
+      "source_location": "L12",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_edit_draft_route_handler_ts",
+      "target": "lib_growth_sequences_message_action_route_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/edit-draft-route-handler.ts",
+      "source_location": "L13",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_edit_first_email_ts",
+      "target": "lib_growth_research_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/edit-first-email.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_first_email_draft_snapshot_ts",
+      "target": "lib_growth_research_ingestion_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/first-email-draft-snapshot.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_first_email_draft_snapshot_ts",
+      "target": "lib_growth_research_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/first-email-draft-snapshot.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_first_email_revision_repository_ts",
+      "target": "lib_growth_sequences_first_email_revisions_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/first-email-revision-repository.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_first_email_revisions_ts",
+      "target": "lib_growth_research_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/first-email-revisions.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_first_email_revisions_ts",
+      "target": "lib_growth_sequences_edit_first_email_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/first-email-revisions.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_first_email_revisions_ts",
+      "target": "lib_growth_sequences_first_email_draft_snapshot_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/first-email-revisions.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_first_email_revisions_ts",
+      "target": "lib_growth_sequences_first_email_revision_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/first-email-revisions.ts",
+      "source_location": "L12",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_first_email_revisions_ts",
+      "target": "lib_growth_research_global_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/first-email-revisions.ts",
+      "source_location": "L14",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_first_email_revisions_ts",
+      "target": "lib_growth_sequences_research_email_snapshot_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/first-email-revisions.ts",
+      "source_location": "L15",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_first_email_revisions_ts",
+      "target": "lib_growth_sequences_research_email_revisions_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/first-email-revisions.ts",
+      "source_location": "L16",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_first_email_revisions_ts",
+      "target": "lib_growth_sequences_first_email_revision_errors_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/first-email-revisions.ts",
+      "source_location": "L17",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_first_email_template_refresh_ts",
+      "target": "lib_growth_research_ingestion_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/first-email-template-refresh.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_first_email_template_refresh_ts",
+      "target": "lib_growth_sequences_first_email_draft_snapshot_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/first-email-template-refresh.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_gmail_sync_ts",
+      "target": "lib_growth_integrations_gmail_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/gmail-sync.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_gmail_sync_ts",
+      "target": "lib_growth_sequences_dispatcher_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/gmail-sync.ts",
+      "source_location": "L9",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_gmail_sync_ts",
+      "target": "lib_growth_sequences_dispatcher_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/gmail-sync.ts",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_gmail_sync_ts",
+      "target": "lib_growth_sequences_gmail_sync_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/gmail-sync.ts",
+      "source_location": "L11",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_gmail_sync_ts",
+      "target": "lib_growth_sequences_stop_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/gmail-sync.ts",
+      "source_location": "L12",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_gmail_sync_ts",
+      "target": "lib_growth_sequences_stop_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/gmail-sync.ts",
+      "source_location": "L13",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_message_action_route_ts",
+      "target": "lib_growth_http_founder_request_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/message-action-route.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_needs_redraft_route_handler_ts",
+      "target": "lib_growth_sequences_message_action_route_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/needs-redraft-route-handler.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_needs_redraft_route_handler_ts",
+      "target": "lib_growth_sequences_redraft_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/needs-redraft-route-handler.ts",
+      "source_location": "L11",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_redraft_repository_ts",
+      "target": "lib_growth_sequences_redraft_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/redraft-repository.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_redraft_ts",
+      "target": "lib_growth_sequences_first_email_draft_snapshot_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/redraft.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_redraft_ts",
+      "target": "lib_growth_sequences_redraft_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/redraft.ts",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_research_email_approval_ts",
+      "target": "lib_growth_sequences_approval_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/research-email-approval.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_research_email_approval_ts",
+      "target": "lib_growth_sequences_research_email_snapshot_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/research-email-approval.ts",
+      "source_location": "L11",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_research_email_revisions_ts",
+      "target": "lib_growth_research_global_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/research-email-revisions.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_research_email_revisions_ts",
+      "target": "lib_growth_sequences_edit_first_email_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/research-email-revisions.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_research_email_revisions_ts",
+      "target": "lib_growth_sequences_research_email_snapshot_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/research-email-revisions.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_research_email_revisions_ts",
+      "target": "lib_growth_sequences_first_email_draft_snapshot_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/research-email-revisions.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_research_email_revisions_ts",
+      "target": "lib_growth_sequences_first_email_revisions_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/research-email-revisions.ts",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_research_email_revisions_ts",
+      "target": "lib_growth_sequences_first_email_revision_errors_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/research-email-revisions.ts",
+      "source_location": "L12",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_research_email_send_route_ts",
+      "target": "lib_growth_integrations_gmail_live_client_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/research-email-send-route.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_research_email_send_route_ts",
+      "target": "lib_growth_sequences_approval_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/research-email-send-route.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_research_email_send_route_ts",
+      "target": "lib_growth_sequences_approval_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/research-email-send-route.ts",
+      "source_location": "L9",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_research_email_send_route_ts",
+      "target": "lib_growth_sequences_dispatcher_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/research-email-send-route.ts",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_research_email_send_route_ts",
+      "target": "lib_growth_sequences_dispatcher_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/research-email-send-route.ts",
+      "source_location": "L11",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_research_email_send_route_ts",
+      "target": "lib_growth_sequences_message_action_route_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/research-email-send-route.ts",
+      "source_location": "L12",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_research_email_send_route_ts",
+      "target": "lib_growth_sequences_research_email_approval_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/research-email-send-route.ts",
+      "source_location": "L17",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_research_email_snapshot_ts",
+      "target": "lib_growth_research_global_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/research-email-snapshot.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_resume_repository_ts",
+      "target": "lib_growth_sequences_resume_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/resume-repository.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_resume_route_handler_ts",
+      "target": "lib_growth_sequences_message_action_route_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/resume-route-handler.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_resume_route_handler_ts",
+      "target": "lib_growth_sequences_resume_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/resume-route-handler.ts",
+      "source_location": "L11",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_resume_ts",
+      "target": "lib_growth_sequences_resume_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/resume.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_stop_repository_ts",
+      "target": "lib_growth_sequences_stop_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/stop-repository.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_stop_route_handler_ts",
+      "target": "lib_growth_sequences_message_action_route_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/stop-route-handler.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_stop_route_handler_ts",
+      "target": "lib_growth_sequences_stop_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/stop-route-handler.ts",
+      "source_location": "L11",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_stop_ts",
+      "target": "lib_growth_sequences_stop_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/stop.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_integrations_gmail_client_ts",
+      "target": "lib_growth_integrations_gmail_reconciliation_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/integrations/gmail/client.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_integrations_gmail_client_ts",
+      "target": "lib_growth_integrations_gmail_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/integrations/gmail/client.ts",
+      "source_location": "L9",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_integrations_gmail_live_client_ts",
+      "target": "lib_growth_integrations_gmail_client_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/integrations/gmail/live-client.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_integrations_gmail_live_client_ts",
+      "target": "lib_growth_integrations_gmail_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/integrations/gmail/live-client.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_integrations_gmail_reconciliation_ts",
+      "target": "lib_growth_integrations_gmail_types_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/integrations/gmail/reconciliation.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_integrations_resend_webhook_repository_ts",
+      "target": "lib_growth_integrations_resend_webhook_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/integrations/resend/webhook-repository.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_integrations_resend_webhook_ts",
+      "target": "lib_growth_sequences_stop_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/integrations/resend/webhook.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_integrations_resend_webhook_ts",
+      "target": "lib_growth_sequences_stop_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/integrations/resend/webhook.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_integrations_resend_webhook_ts",
+      "target": "lib_growth_email_suppression_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/integrations/resend/webhook.ts",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_integrations_resend_webhook_ts",
+      "target": "lib_growth_email_suppression_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/integrations/resend/webhook.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_schemas_ts",
+      "target": "lib_growth_research_global_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/schemas.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_policy_ts",
+      "target": "lib_growth_campaigns_schemas_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/policy.ts",
+      "source_location": "L1",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_report_ts",
+      "target": "lib_growth_campaigns_schemas_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/report.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_report_ts",
+      "target": "lib_growth_campaigns_time_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/report.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_domain_test_ts",
+      "target": "lib_growth_campaigns_policy_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/domain.test.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_domain_test_ts",
+      "target": "lib_growth_campaigns_variants_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/domain.test.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_domain_test_ts",
+      "target": "lib_growth_campaigns_copy_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/domain.test.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_domain_test_ts",
+      "target": "lib_growth_campaigns_time_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/domain.test.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_domain_test_ts",
+      "target": "lib_growth_campaigns_report_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/domain.test.ts",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_domain_test_ts",
+      "target": "lib_growth_campaigns_schemas_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/domain.test.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_source_service_ts",
+      "target": "lib_growth_crm_errors_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/source-service.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_source_service_ts",
+      "target": "lib_growth_crm_schemas_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/source-service.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_source_service_ts",
+      "target": "lib_growth_research_global_identity_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/source-service.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_source_service_ts",
+      "target": "lib_growth_campaigns_schemas_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/source-service.ts",
+      "source_location": "L12",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_dashboard_prospects_test_ts",
+      "target": "lib_growth_dashboard_prospects_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/dashboard/prospects.test.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_dashboard_prospects_ts",
+      "target": "lib_growth_db_repositories_prospects_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/dashboard/prospects.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_source_capture_test_ts",
+      "target": "lib_growth_crm_commands_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/source-capture.test.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_source_capture_test_ts",
+      "target": "lib_growth_dashboard_prospects_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/source-capture.test.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_founder_verification_reader_ts",
+      "target": "lib_growth_crm_errors_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_founder_verification_ts",
+      "target": "lib_growth_crm_errors_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/founder-verification.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_founder_verification_ts",
+      "target": "lib_growth_campaigns_schemas_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/founder-verification.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_dashboard_message_review_ts",
+      "target": "lib_growth_sequences_first_email_draft_snapshot_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/dashboard/message-review.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_dashboard_overview_ts",
+      "target": "lib_growth_db_repositories_prospects_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/dashboard/overview.ts",
+      "source_location": "L14",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_dashboard_prospect_detail_ts",
+      "target": "lib_growth_db_repositories_prospects_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/dashboard/prospect-detail.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "scripts_refresh_pending_first_email_drafts_ts",
+      "target": "lib_growth_sequences_first_email_template_refresh_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "scripts/refresh-pending-first-email-drafts.ts",
+      "source_location": "L11",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_founder_evidence_test_ts",
+      "target": "lib_growth_dashboard_prospect_detail_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/founder-evidence.test.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_founder_evidence_test_ts",
+      "target": "lib_growth_crm_commands_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/founder-evidence.test.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_founder_evidence_test_ts",
+      "target": "lib_growth_campaigns_founder_verification_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/founder-evidence.test.ts",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_founder_evidence_test_ts",
+      "target": "lib_growth_campaigns_founder_verification_reader_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/founder-evidence.test.ts",
+      "source_location": "L8",
+      "weight": 1
     }
   ],
   "input_tokens": 0,
