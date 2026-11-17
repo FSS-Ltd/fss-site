@@ -93,7 +93,7 @@ export async function captureSourceLead(
     select p.id, b.id as "businessId", b.legal_name as name, b.country_code as country, p.source_url as "sourceUrl"
     from growth.prospects p join growth.businesses b on b.id=p.business_id
     where p.source_url=${sourceUrl} or (${input.sourceType.startsWith("facebook_")} and p.source_type in ('facebook_page','facebook_group')
-      and regexp_replace(split_part(regexp_replace(p.source_url, '^https?://(www[.]|m[.])?facebook[.]com', '', 'i'), '?', 1), '/+$', '')=${sourcePath})`;
+      and regexp_replace(split_part(split_part(regexp_replace(p.source_url, '^https?://([a-z0-9-]+[.])*facebook[.]com(:[0-9]+)?', '', 'i'), '#', 1), '?', 1), '/+$', '')=${sourcePath})`;
   const sourceMatches = sourceCandidates.filter(
     (row) =>
       normalizeSourceUrl(row.sourceUrl) === sourceUrl &&
@@ -117,10 +117,33 @@ export async function captureSourceLead(
     )
       throw new CrmError("duplicate");
     const prospects = await tx<
-      { id: string }[]
-    >`select id from growth.prospects where business_id=${businessId} order by created_at desc limit 2`;
+      {
+        id: string;
+        registration: string | null;
+        companyNumber: string | null;
+      }[]
+    >`select p.id, p.source_details->>'registrationNumber' as registration, b.company_number as "companyNumber" from growth.prospects p join growth.businesses b on b.id=p.business_id where p.business_id=${businessId} order by p.created_at desc limit 2 for update of p`;
     if (prospects.length > 1) throw new CrmError("duplicate");
     if (prospects[0]) {
+      const current = normalizeRegistration(prospects[0].registration);
+      const company = normalizeRegistration(prospects[0].companyNumber);
+      if (
+        registration &&
+        ((current && current !== registration) ||
+          (company && company !== registration))
+      )
+        throw new CrmError("duplicate", prospects[0].id);
+      if (registration && !current) {
+        await tx`update growth.prospects set source_details=jsonb_set(source_details,'{registrationNumber}',to_jsonb(${registration}::text)), version=version+1, updated_at=now() where id=${prospects[0].id}`;
+        await appendAuditEvent(tx, {
+          correlationId,
+          actorType: "founder",
+          actorId: founder.actorId,
+          action: "crm.record_source_registration",
+          entityType: "prospect",
+          entityId: prospects[0].id,
+        });
+      }
       await tx`insert into growth.crm_capture_requests (id,prospect_id,actor_id) values (${input.requestId},${prospects[0].id},${founder.actorId})`;
       return { prospectId: prospects[0].id, alreadyExisted: true };
     }

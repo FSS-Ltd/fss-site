@@ -489,3 +489,123 @@ test(
     }
   },
 );
+
+test(
+  "new registration on an existing source is retained and old Facebook URL forms resolve",
+  { skip: !connection },
+  async () => {
+    if (!connection) return;
+    const db = postgres(connection, { max: 4 });
+    const token = randomUUID().replaceAll("-", "");
+    const registration = token.slice(0, 8).toUpperCase();
+    const founder = {
+      email: "j.ntagengwa@faithfulsoftware.dev",
+      actorId: createHash("sha256")
+        .update("j.ntagengwa@faithfulsoftware.dev")
+        .digest("hex"),
+    };
+    const input = {
+      kind: "capture_source" as const,
+      requestId: randomUUID(),
+      sourceType: "facebook_page" as const,
+      sourceUrl: `https://facebook.com/${token}`,
+      businessName: `claim-${token}`,
+      countryCode: "GB",
+      corporateType: null,
+      registrationNumber: null,
+      firstName: null,
+      lastName: null,
+      email: null,
+      opportunity: "Review",
+      offer: "Website",
+      observedAt: new Date(),
+    };
+    try {
+      const first = await executeCrmCommand(db, input, founder, randomUUID());
+      assert.ok(first.prospectId);
+      await db`update growth.prospects set source_url=${`https://mbasic.facebook.com/${token}#about`} where id=${first.prospectId}`;
+      const claimed = await executeCrmCommand(
+        db,
+        { ...input, requestId: randomUUID(), registrationNumber: registration },
+        founder,
+        randomUUID(),
+      );
+      assert.equal(claimed.prospectId, first.prospectId);
+      const [proof] =
+        await db`select source_details->>'registrationNumber' as registration, version from growth.prospects where id=${first.prospectId}`;
+      assert.equal(proof?.registration, registration);
+      assert.equal(proof?.version, 2);
+      const again = await executeCrmCommand(
+        db,
+        {
+          ...input,
+          requestId: randomUUID(),
+          registrationNumber: registration,
+          sourceUrl: `https://facebook.com/different-${token}`,
+        },
+        founder,
+        randomUUID(),
+      );
+      assert.equal(again.prospectId, first.prospectId);
+      const [audit] =
+        await db`select count(*)::int as count from growth.audit_log where entity_id=${first.prospectId} and action='crm.record_source_registration'`;
+      assert.equal(audit?.count, 1);
+      await assert.rejects(
+        executeCrmCommand(
+          db,
+          { ...input, requestId: randomUUID(), registrationNumber: "ABC12345" },
+          founder,
+          randomUUID(),
+        ),
+      );
+      const legacy = {
+        kind: "capture" as const,
+        requestId: randomUUID(),
+        businessName: input.businessName,
+        companyNumber: registration,
+        countryCode: "GB",
+        corporateType: "limited_company" as const,
+        sector: "Services",
+        locality: "London",
+        sourceUrl: "https://example.com/contact",
+        websiteUrl: null,
+        opportunitySummary: "Review",
+        recommendedOffer: "Website",
+        oneOffMinPence: 0,
+        oneOffMaxPence: 0,
+        monthlyPence: 0,
+      };
+      await assert.rejects(
+        executeCrmCommand(db, legacy, founder, randomUUID()),
+      );
+      const { createGlobalResearchFixture } =
+        await import("../../../lib/growth/research/global-test-fixture");
+      const { globalResearchRunSchema } =
+        await import("../../../lib/growth/research/global-schema");
+      const { ingestResearchRun } =
+        await import("../../../lib/growth/research/ingest");
+      const run = globalResearchRunSchema.parse(createGlobalResearchFixture());
+      run.externalRunId = `claim-${token}`;
+      const candidate = run.prospects[0]!;
+      candidate.business.companyNumber = registration;
+      candidate.business.countryCode = "GB";
+      candidate.business.legalName = input.businessName;
+      candidate.business.websiteUrl = `https://${token}.example.com`;
+      candidate.business.firstPartySourceUrl = `${candidate.business.websiteUrl}/contact`;
+      candidate.contact.email = `${token}@gmail.com`;
+      candidate.contact.emailSourceUrl = candidate.business.firstPartySourceUrl;
+      candidate.evidence[0]!.sourceUrl = candidate.business.firstPartySourceUrl;
+      assert.equal((await ingestResearchRun(db, run)).duplicates, 1);
+      await db`update growth.prospects set source_url=${`https://www.facebook.com/${token}#about`} where id=${first.prospectId}`;
+      const fragmentReplay = await executeCrmCommand(
+        db,
+        { ...input, requestId: randomUUID(), registrationNumber: null },
+        founder,
+        randomUUID(),
+      );
+      assert.equal(fragmentReplay.prospectId, first.prospectId);
+    } finally {
+      await db.end();
+    }
+  },
+);
