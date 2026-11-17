@@ -504,3 +504,17 @@ test("campaign policy retains an explicit Gmail account binding", async () => {
   });
   assert.equal(Reflect.get(result, "accountConnectionId"), accountConnectionId);
 });
+
+test("campaign commands reject the retired campaign-scoped ramp operation", async () => {
+  const { campaignCommandSchema } = await import("./schemas");
+  assert.equal(
+    campaignCommandSchema.safeParse({
+      type: "raise_limit",
+      requestId: "00000000-0000-4000-8000-000000000001",
+      campaignId: "00000000-0000-4000-8000-000000000002",
+      policyVersion: 1,
+      limit: 50,
+    }).success,
+    false,
+  );
+});

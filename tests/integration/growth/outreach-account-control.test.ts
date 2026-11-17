@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { createHash, randomUUID } from "node:crypto";
 import test from "node:test";
 import postgres from "postgres";
+import { exerciseCampaignReservation } from "./reservation-campaign-assertions";
+import { exerciseLegacyReservation } from "./reservation-assertions";
 import { loadConfiguredAccountReadiness } from "../../../lib/growth/campaigns/account-repository";
 import { withGrowthTransaction } from "../../../lib/growth/db/client";
 import { executeAccountControlCommand } from "../../../lib/growth/campaigns/account-control";
@@ -310,6 +312,8 @@ test(
         randomUUID(),
       );
       assert.equal((await readiness("active")).status, "ready");
+      await exerciseCampaignReservation(admin, db, { id, email, now, founder });
+      await exerciseLegacyReservation(admin, db, { id, email });
       await assert.rejects(
         admin`insert into growth.outreach_provider_usage(account_id,complete,health,connection_id) values (${randomUUID()},false,'unknown',${id})`,
       );

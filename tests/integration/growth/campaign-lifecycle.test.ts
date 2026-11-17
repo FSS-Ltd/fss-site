@@ -395,21 +395,6 @@ test(
       assert.notEqual(renewed.id, saved.id);
       await assert.rejects(db`insert into growth.outreach_permissions(id,membership_id,basis,provider,jurisdiction,expires_at,actor_id,evidence,contact_version,prospect_version,contact_id,proof_request_id)
         select ${randomUUID()},membership_id,basis,provider,jurisdiction,expires_at,actor_id,evidence,contact_version,prospect_version,contact_id,null from growth.outreach_permissions where id=${saved.id}`);
-      await assert.rejects(
-        executeCampaignCommand(
-          db,
-          {
-            type: "raise_limit",
-            requestId: randomUUID(),
-            campaignId: winningCampaignId,
-            policyVersion: 1,
-            limit: 50,
-          },
-          founder,
-          randomUUID(),
-        ),
-        /not_available/,
-      );
       const [count] =
         await db`select count(*)::int as count from growth.outreach_permissions where membership_id=${member.value.id}`;
       assert.equal(count?.count, 2);
@@ -441,6 +426,8 @@ test(
         await db`select count(*)::int as count from growth.outreach_events where id=${eventId}`;
       assert.equal(afterRollback?.count, 0);
       await db`insert into growth.outreach_jobs(campaign_id,policy_version,membership_id,job_type,due_at,idempotency_key,status,lease_owner,lease_until) values (${winningCampaignId},1,${member.value.id},'follow_up',now(),${randomUUID()},'leased','worker',now()+interval '1 minute')`;
+      const reportJobId = randomUUID();
+      await db`insert into growth.outreach_jobs(id,campaign_id,policy_version,membership_id,job_type,due_at,idempotency_key,status) values (${reportJobId},${winningCampaignId},1,${member.value.id},'monthly_report',now(),${randomUUID()},'pending')`;
       await executeCampaignCommand(
         db,
         {
@@ -452,9 +439,17 @@ test(
         founder,
         randomUUID(),
       );
-      const [job] =
-        await db`select status from growth.outreach_jobs where membership_id=${member.value.id}`;
-      assert.equal(job?.status, "cancelled");
+      const jobs = await db<
+        { jobType: string; status: string }[]
+      >`select job_type as "jobType",status from growth.outreach_jobs where membership_id=${member.value.id} order by job_type`;
+      assert.deepEqual(
+        [...jobs],
+        [
+          { jobType: "follow_up", status: "cancelled" },
+          { jobType: "monthly_report", status: "pending" },
+        ],
+      );
+      await db`update growth.outreach_jobs set status='completed' where id=${reportJobId}`;
       const revision = await executeCampaignCommand(
         db,
         {

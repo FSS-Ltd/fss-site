@@ -1,7 +1,11 @@
 import { createHash } from "node:crypto";
+import { z } from "zod";
+import { loadConfiguredAccountReadiness } from "./account-repository";
+import { validateCampaignDefinition } from "./lifecycle";
+import { campaignPolicyDefinitionSchema } from "./schemas";
 import type { FounderSession } from "../auth/require-founder";
 import { CrmError } from "../crm/errors";
-import type { GrowthQueryExecutor } from "../db/types";
+import type { GrowthQueryExecutor, GrowthTransaction } from "../db/types";
 
 export type FounderVerificationSnapshot = {
   status: "current" | "stale";
@@ -33,6 +37,14 @@ export async function loadFounderVerification(
     founder.actorId !== createHash("sha256").update(founder.email).digest("hex")
   )
     throw new CrmError("invalid");
+  return readFounderVerification(db, prospectId, now);
+}
+
+async function readFounderVerification(
+  db: GrowthQueryExecutor,
+  prospectId: string,
+  now: Date,
+): Promise<FounderVerificationSnapshot | null> {
   const rows = await db<
     {
       contactId: string;
@@ -106,5 +118,111 @@ export async function loadFounderVerification(
     contactSourceUrl: contact.sourceUrl,
     contactObservedAt: contact.observedAt,
     verifiedAt: contact.verifiedAt,
+  };
+}
+
+// Caller holds the canonical membership, sequence and message locks.
+export async function loadPolicyAuthorizedSourceProof(
+  db: GrowthTransaction,
+  input: {
+    membershipId: string;
+    messageId: string;
+    connectionId: string;
+  },
+): Promise<Pick<
+  FounderVerificationSnapshot,
+  | "contactId"
+  | "requestId"
+  | "contactProofId"
+  | "observationProofId"
+  | "proofContactVersion"
+  | "proofProspectVersion"
+  | "freshUntil"
+> | null> {
+  const [clock] = await db<{ now: Date }[]>`select clock_timestamp() as now`;
+  if (
+    !clock ||
+    (await loadConfiguredAccountReadiness(db, input.connectionId, "active"))
+      .status !== "ready"
+  )
+    return null;
+  const now = clock.now;
+  const [authority] = await db<
+    {
+      prospectId: string;
+      contactId: string;
+      proofRequestId: string;
+      prospectVersion: number;
+      contactVersion: number;
+      policy: unknown;
+      policyVersion: number;
+      basis: string;
+      jurisdiction: string;
+      evidence: unknown;
+      country: string;
+    }[]
+  >`
+    select c.policy,c.version as "policyVersion",p.basis,p.jurisdiction,p.evidence,b.country_code as country, m.prospect_id as "prospectId", p.contact_id as "contactId",
+      p.proof_request_id as "proofRequestId", p.prospect_version as "prospectVersion",
+      p.contact_version as "contactVersion"
+    from growth.campaign_memberships m
+    join growth.campaigns c on c.id=m.campaign_id and c.version=m.policy_version
+    join growth.outreach_permissions p on p.id=m.current_permission_id and p.membership_id=m.id
+    join growth.sequence_enrollments se on se.id=m.sequence_id and se.prospect_id=m.prospect_id
+    join growth.prospects prospect on prospect.id=m.prospect_id
+    join growth.businesses b on b.id=prospect.business_id
+    join growth.email_messages em on em.sequence_enrollment_id=se.id and em.id=${input.messageId} and em.contact_id=se.contact_id
+    where m.id=${input.membershipId} and m.status='active' and se.status='active'
+      and c.status='approved' and c.approved_by is not null and c.approved_at is not null and c.approved_at <= ${now}
+      and c.account_connection_id=${input.connectionId} and p.provider='gmail' and p.contact_id=se.contact_id
+      and p.expires_at > ${now} and p.proof_request_id is not null
+      and c.version=(select max(version) from growth.campaigns where id=c.id)
+  `;
+  if (!authority) return null;
+  const policy = campaignPolicyDefinitionSchema.safeParse(authority.policy);
+  const evidence = z
+    .object({
+      observedAt: z.iso.datetime(),
+      explicitOptIn: z.boolean(),
+      summary: z.string().trim().min(1),
+      reference: z.object({
+        kind: z.enum(["private", "public"]),
+        value: z.string().trim().min(1),
+      }),
+    })
+    .safeParse(authority.evidence);
+  if (
+    !policy.success ||
+    !evidence.success ||
+    authority.basis !== policy.data.permissionRequirement ||
+    authority.jurisdiction !== policy.data.jurisdiction ||
+    authority.jurisdiction !== authority.country ||
+    (authority.basis === "consent" && !evidence.data.explicitOptIn) ||
+    new Date(evidence.data.observedAt) > now
+  )
+    return null;
+  try {
+    validateCampaignDefinition(policy.data, authority.policyVersion, now, true);
+  } catch {
+    return null;
+  }
+  const proof = await readFounderVerification(db, authority.prospectId, now);
+  if (
+    !proof ||
+    proof.status !== "current" ||
+    proof.contactId !== authority.contactId ||
+    proof.requestId !== authority.proofRequestId ||
+    proof.proofContactVersion !== authority.contactVersion ||
+    proof.proofProspectVersion !== authority.prospectVersion
+  )
+    return null;
+  return {
+    contactId: proof.contactId,
+    requestId: proof.requestId,
+    contactProofId: proof.contactProofId,
+    observationProofId: proof.observationProofId,
+    proofContactVersion: proof.proofContactVersion,
+    proofProspectVersion: proof.proofProspectVersion,
+    freshUntil: proof.freshUntil,
   };
 }

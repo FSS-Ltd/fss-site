@@ -3,6 +3,7 @@ import type { FounderSession } from "../auth/require-founder";
 import { withGrowthTransaction } from "../db/client";
 import type { GrowthDb, GrowthTransaction } from "../db/types";
 import { requireCampaignFounder } from "./authorization";
+import { loadConfiguredAccountReadiness } from "./account-repository";
 import { appendCampaignEventAndOutbox, type CampaignMutation } from "./events";
 import {
   cancelCampaignJobs,
@@ -45,11 +46,7 @@ async function mutate(
   founder: FounderSession,
   correlationId: string,
 ): Promise<CampaignMutation> {
-  if (
-    command.type === "record_reply" ||
-    command.type === "record_outcome" ||
-    command.type === "raise_limit"
-  )
+  if (command.type === "record_reply" || command.type === "record_outcome")
     throw new Error("not_available");
   if (command.type === "create") {
     validateCampaignDefinition(command.policy, 1, new Date(), false);
@@ -121,7 +118,15 @@ async function mutate(
     if (!policy.approvedAt || !policy.approvedBy)
       throw new Error("policy_not_approved");
     validateCampaignDefinition(policy.definition, policy.version, now, true);
-    throw new Error("provider_health_unknown");
+    if (!policy.definition.accountConnectionId)
+      throw new Error("provider_health_unknown");
+    const readiness = await loadConfiguredAccountReadiness(
+      tx,
+      policy.definition.accountConnectionId,
+      "active",
+    );
+    if (readiness.status === "held") throw new Error(readiness.reason);
+    await tx`update growth.campaigns set status='approved' where id=${campaignId} and version=${policy.version}`;
   } else if (command.type === "enrol") {
     const member = await persistCampaignMembership(tx, {
       campaignId,

@@ -235,16 +235,6 @@ export const campaignCommandSchema = z.discriminatedUnion("type", [
   z.strictObject({ type: z.literal("pause"), ...versionedCampaign }),
   z.strictObject({ type: z.literal("approve"), ...versionedCampaign }),
   z.strictObject({ type: z.literal("resume"), ...versionedCampaign }),
-  z.strictObject({
-    type: z.literal("raise_limit"),
-    ...versionedCampaign,
-    limit: z.union([
-      z.literal(25),
-      z.literal(50),
-      z.literal(100),
-      z.literal(150),
-    ]),
-  }),
   z.strictObject({ type: z.literal("stop"), ...mutation, membershipId: uuid }),
   z.strictObject({
     type: z.literal("record_permission"),
