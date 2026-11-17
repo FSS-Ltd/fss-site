@@ -69,6 +69,13 @@ Graphify: [graph](graphify-out/graph.json), [audit report](graphify-out/GRAPH_RE
 - Status: implemented. Entry: `app/api/growth/prospects/[id]/request-research/route.ts`, `lib/growth/research/scheduled-workflow.ts#runScheduledResearchWorkflow`. Canonical global ingestion: `lib/growth/research/global-ingest.ts#ingestGlobalResearchRun`, `lib/growth/research/global-repository.ts#inspectGlobalCandidate`.
 - depends_on GROWTH-CRM, INFRA, evidence validation and suppression checks; used_by GROWTH-OUTREACH. Graph node: `lib_growth_research_global_ingest_ts`. Tests: `tests/integration/growth/global-research.test.ts`, `lib/growth/research/global-identity.test.ts`.
 
+### GROWTH-VERIFICATION: founder source and contact proof
+
+- Status: partial. Backend entry `lib/growth/campaigns/founder-verification.ts#verifyFounderEvidence` verifies actual contact/observation facts with nullable person names and current versions. Private reader `founder-verification-reader.ts#loadFounderVerification` checks founder identity and returns complete proof pairs ordered by serialized prospect version; observation age bounds freshness. No UI route yet, no sending permission granted.
+- Canonical store: `growth.source_evidence` extended by `supabase/migrations/20261117110000_growth_founder_evidence.sql` for append-only founder proofs, preserving research run/uniqueness semantics. `contacts.email_source_visibility` masks founder-only URL/time from generic detail; existing research provenance stays intact. Legacy evidence readers explicitly select research origin.
+- depends_on GROWTH-CRM, AUTH and INFRA; feeds GROWTH-POLICY and manual GROWTH-FB-SOURCE verification (consumers pending). Reuses canonical contacts/prospects/evidence; avoids a parallel verification store. Graph nodes `lib_growth_campaigns_founder_verification_ts`, `lib_growth_campaigns_founder_verification_reader_ts`.
+- Tests: `tests/integration/growth/founder-evidence.test.ts`; 19 targeted PostgreSQL regressions and two founder tests passed, including privacy, renewal, authorization and current/stale evidence. Independent SPEC/QUALITY PASS at `b84bafcca`; all 89 final migrations fresh-applied to isolated PostgreSQL17. Production migration rehearsal remains pending.
+
 ### GROWTH-OUTREACH: approved email sequences
 
 - Status: implemented. Entry: `app/api/growth/messages/[id]/approve-research-send/route.ts`. Canonical approval and dispatcher: `lib/growth/sequences/research-email-approval.ts#createResearchEmailApprover`, `lib/growth/sequences/approval.ts#createFirstEmailApprover`, `lib/growth/sequences/dispatcher.ts#createOutreachDispatcher`.

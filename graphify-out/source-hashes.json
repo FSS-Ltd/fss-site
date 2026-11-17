@@ -207,5 +207,16 @@
   "lib/growth/campaigns/source-service.ts": "12402157edaf750d7cb18e3fd7abd8511a02d431e7563e65bac98588d03c8916",
   "lib/growth/dashboard/prospects.test.ts": "0c2143f8797f46cee768b56948528e9787b2e892a274c4a52ad3b4827104d4c0",
   "lib/growth/dashboard/prospects.ts": "7e81c0e846933dd0d50be650f08b2d20fc80136e546d41c6febf736a1366cb22",
-  "tests/integration/growth/source-capture.test.ts": "8536d128ef0ed6930720188e863790ed5b136ae05ffed4a0c8e442ad7137197b"
+  "tests/integration/growth/source-capture.test.ts": "8536d128ef0ed6930720188e863790ed5b136ae05ffed4a0c8e442ad7137197b",
+  "lib/growth/campaigns/founder-verification-reader.ts": "2822b3473da2ae7e68822be0410b89919f767f1583baea3f27bee9844f7e256c",
+  "lib/growth/campaigns/founder-verification.ts": "9ecf59dbaa0cb97874d88ae62d44ccd75946d2a3f0e83c83a33ccf7d3129a461",
+  "lib/growth/dashboard/deals.ts": "107a02d98f49461d255318be94691572c75d328c2ba62448cc10c7232237e4ac",
+  "lib/growth/dashboard/message-review.ts": "aa1648bd3844992cfe75d4c5e3c4d5844c259085b1be29752600a5826ee341d9",
+  "lib/growth/dashboard/overview.ts": "b8d3bc398529dcf0958fe51f9fb8c1959b6430876b385d0b3072a47c50408570",
+  "lib/growth/dashboard/prospect-detail.ts": "9e055f874b3561de41e27a26c9cdab9258a542f0ef50cdcc4c35f1b043ff942d",
+  "lib/growth/dashboard/website-strategy.ts": "42dec7ed35bf4496e8e0a5be912e8d7758ce72b2dc98061f8e36e3c6b8737405",
+  "lib/growth/prospect-previews/approval-repository.ts": "a3c19283e96b168d33f1671bf2238250cbad59b1c9d621f032f2de35ec8dd7c8",
+  "lib/growth/prospect-previews/backfill.ts": "15f4da74243ec79e3a1b390a862f94859ac0ee393fddf887cb9d3297f78ea96b",
+  "scripts/refresh-pending-first-email-drafts.ts": "42e493827529adb79092d19ace75e692c23cecb84e7d00f35d7231971c81a9fb",
+  "tests/integration/growth/founder-evidence.test.ts": "dfe06e969ce00bf034d13edf40c96a0f26a1380cd7c0ceabaf84c9e6c6cc32f6"
 }
