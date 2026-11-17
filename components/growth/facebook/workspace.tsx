@@ -36,10 +36,33 @@ export function FacebookWorkspace() {
             readWorkspace(`?selectedId=${encodeURIComponent(id)}`, signal),
           ),
         ]);
+        const checked = new Set(ids);
+        const found = [
+          ...selections.flatMap((selection) => selection.destinations),
+          ...page.destinations,
+        ];
+        // A form can become active while the snapshot is in flight. Fetch any
+        // newly retained off-page rows before applying the snapshot.
+        while (true) {
+          if (signal.aborted || current !== generation.current) return "error";
+          const missing = retainedRef.current
+            .map((item) => item.id)
+            .filter(
+              (id) => !checked.has(id) && !found.some((item) => item.id === id),
+            );
+          if (missing.length === 0) break;
+          missing.forEach((id) => checked.add(id));
+          const additional = await Promise.all(
+            missing.map((id) =>
+              readWorkspace(`?selectedId=${encodeURIComponent(id)}`, signal),
+            ),
+          );
+          found.push(
+            ...additional.flatMap((selection) => selection.destinations),
+          );
+        }
         if (signal.aborted || current !== generation.current) return "error";
-        if (!page) throw new Error("read");
         setWorkspace(page);
-        const found = selections.flatMap((selection) => selection.destinations);
         setSelected(found.find((item) => item.id === selectedId) ?? null);
         const updated = retainedRef.current.map(
           (item) => found.find((latest) => latest.id === item.id) ?? item,

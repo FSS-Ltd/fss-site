@@ -35,11 +35,13 @@ export function DestinationRow({
   const [rulesOpen, setRulesOpen] = useState(false);
   const last = item.activities[0];
   const dirtyForms = useRef(new Set<string>());
+  const openPilots = useRef(new Set<string>());
   const detailsRef = useRef<HTMLDetailsElement>(null);
   const activityRef = useRef<HTMLDetailsElement>(null);
   const completed = (label: string) => {
     dirtyForms.current.delete(label);
-    if (dirtyForms.current.size === 0) release(item.id);
+    if (dirtyForms.current.size === 0 && openPilots.current.size === 0)
+      release(item.id);
     saved(item.id);
   };
   const openNext = () => {
@@ -232,12 +234,26 @@ export function DestinationRow({
           {item.prospects.map((p) => (
             <li key={p.prospectId}>
               <a href={`/growth/prospects/${p.prospectId}`}>{p.name}</a>{" "}
-              {pilots.remaining > 0 &&
-                !pilots.allocations.some(
-                  (a) => a.prospectId === p.prospectId,
-                ) && (
-                  <PilotAllocation prospect={p} saved={() => saved(item.id)} />
-                )}
+              <PilotAllocation
+                prospect={p}
+                available={
+                  pilots.remaining > 0 &&
+                  !pilots.allocations.some((a) => a.prospectId === p.prospectId)
+                }
+                opened={() => {
+                  openPilots.current.add(p.prospectId);
+                  retain(item);
+                }}
+                closed={() => {
+                  openPilots.current.delete(p.prospectId);
+                  if (
+                    openPilots.current.size === 0 &&
+                    dirtyForms.current.size === 0
+                  )
+                    release(item.id);
+                }}
+                saved={() => saved(item.id)}
+              />
             </li>
           ))}
         </ul>
@@ -270,15 +286,29 @@ export function DestinationRow({
 function PilotAllocation({
   prospect,
   saved,
+  available,
+  opened,
+  closed,
 }: {
   prospect: Destination["prospects"][number];
   saved: () => void;
+  available: boolean;
+  opened: () => void;
+  closed: () => void;
 }) {
   const [version, setVersion] = useState<number | null>(null);
   return version === null ? (
-    <button type="button" onClick={() => setVersion(prospect.version)}>
-      Allocate private pilot
-    </button>
+    available && (
+      <button
+        type="button"
+        onClick={() => {
+          setVersion(prospect.version);
+          opened();
+        }}
+      >
+        Allocate private pilot
+      </button>
+    )
   ) : (
     <div>
       <p>
@@ -288,14 +318,24 @@ function PilotAllocation({
       </p>
       <CommandForm
         label="Confirm allocation"
-        onSuccess={saved}
+        onSuccess={() => {
+          setVersion(null);
+          closed();
+          saved();
+        }}
         build={() => ({
           type: "allocate_pilot",
           prospectId: prospect.prospectId,
           expectedVersion: version,
         })}
       />
-      <button type="button" onClick={() => setVersion(null)}>
+      <button
+        type="button"
+        onClick={() => {
+          setVersion(null);
+          closed();
+        }}
+      >
         Close allocation
       </button>
     </div>

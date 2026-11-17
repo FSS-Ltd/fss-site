@@ -4,6 +4,7 @@ import test from "node:test";
 import { JSDOM } from "jsdom";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
+import type { Destination } from "./types";
 
 const require = createRequire(import.meta.url);
 require.extensions[".css"] = (module) => {
@@ -34,7 +35,7 @@ class Events extends EventTarget {
   }
 }
 Object.assign(globalThis, { EventSource: Events });
-const item = (id: string, version = 1) => ({
+const item = (id: string, version = 1): Destination => ({
   id,
   name: id,
   url: "https://facebook.com/page",
@@ -158,6 +159,14 @@ test("retains multiple edited rows through paging and committed refresh; rebases
     assert.ok(row);
     const form = row.querySelector("form");
     assert.ok(form);
+    const linkInput = row.querySelector<HTMLInputElement>(
+      'form[data-command="Link prospect"] input[name="prospect"]',
+    );
+    assert.ok(linkInput);
+    await act(async () => {
+      linkInput.value = "second draft";
+      linkInput.dispatchEvent(new dom.window.Event("input", { bubbles: true }));
+    });
     for (const [name, value] of [
       ["source", "https://facebook.com/rules"],
       ["observed", "2026-11-17T10:00"],
@@ -195,11 +204,189 @@ test("retains multiple edited rows through paging and committed refresh; rebases
     });
     assert.equal(commands[1].expectedVersion, 2);
     assert.notEqual(commands[0].requestId, commands[1].requestId);
+    assert.equal(linkInput.value, "second draft");
+    assert.ok(button(row, "Discard unsaved entries"));
     assert.equal(
       container.querySelector<HTMLInputElement>('#D input[name="summary"]')
         ?.value,
       "draft D",
     );
+  } finally {
+    await act(async () => root.unmount());
+    container.remove();
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("keeps an off-page pilot review pinned through refresh and other form completion", async () => {
+  const originalFetch = globalThis.fetch;
+  let version = 1;
+  const commands: Array<{ type: string; expectedVersion?: number }> = [];
+  const prospect = {
+    destinationId: "C",
+    prospectId: "prospect",
+    name: "Prospect",
+    version: 1,
+  };
+  const row = () => ({
+    ...item("C", version),
+    prospects: [{ ...prospect, version }],
+  });
+  globalThis.fetch = async (input, init) => {
+    if (init?.method === "POST") {
+      commands.push(JSON.parse(String(init.body)));
+      return Response.json({ id: "ok" });
+    }
+    const url = new URL(String(input), "http://localhost");
+    if (url.searchParams.has("selectedId")) return Response.json(page([row()]));
+    return Response.json(
+      url.searchParams.has("cursor")
+        ? page([row()])
+        : page([item("A", version)], "cursor"),
+    );
+  };
+  const container = document.createElement("div");
+  document.body.append(container);
+  const root = createRoot(container);
+  try {
+    await act(async () => {
+      root.render(createElement(FacebookWorkspace));
+    });
+    await act(async () => {
+      Events.instance.emit("ready");
+      await tick();
+    });
+    await act(async () => {
+      button(container, "Next directory page").click();
+      await tick();
+    });
+    const c = container.querySelector("#C");
+    assert.ok(c);
+    await act(async () => {
+      button(c, "Allocate private pilot").click();
+    });
+    version = 2;
+    await act(async () => {
+      Events.instance.emit("change");
+      await tick();
+    });
+    assert.match(c.textContent ?? "", /Prospect version 1/);
+    await act(async () => {
+      button(c, "Review rules").click();
+    });
+    const rules = c.querySelector<HTMLFormElement>(
+      'form[data-command="Save rules review"]',
+    );
+    assert.ok(rules);
+    for (const [name, value] of [
+      ["source", "https://facebook.com/rules"],
+      ["summary", "draft"],
+      ["observed", "2026-11-17T10:00"],
+      ["expires", "2026-11-18T10:00"],
+    ]) {
+      const input = rules.querySelector<HTMLInputElement>(`[name="${name}"]`);
+      assert.ok(input);
+      input.value = value;
+      input.dispatchEvent(new dom.window.Event("input", { bubbles: true }));
+    }
+    await act(async () => {
+      rules.dispatchEvent(
+        new dom.window.Event("submit", { bubbles: true, cancelable: true }),
+      );
+      await tick();
+    });
+    assert.ok(container.querySelector("#C"));
+    assert.match(c.textContent ?? "", /Prospect version 1/);
+    const pilot = c.querySelector<HTMLFormElement>(
+      'form[data-command="Confirm allocation"]',
+    );
+    assert.ok(pilot);
+    await act(async () => {
+      pilot.dispatchEvent(
+        new dom.window.Event("submit", { bubbles: true, cancelable: true }),
+      );
+      await tick();
+    });
+    assert.equal(
+      commands.find((command) => command.type === "allocate_pilot")
+        ?.expectedVersion,
+      1,
+    );
+  } finally {
+    await act(async () => root.unmount());
+    container.remove();
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("reconciles drafts started during a pending snapshot against page and off-page reads", async () => {
+  const originalFetch = globalThis.fetch;
+  let resolvePage: ((response: Response) => void) | undefined;
+  let pending = false;
+  const lookups: string[] = [];
+  globalThis.fetch = async (input) => {
+    const url = new URL(String(input), "http://localhost");
+    const id = url.searchParams.get("selectedId");
+    if (id) {
+      lookups.push(id);
+      return Response.json(
+        page([{ ...item(id, 2), postReadiness: "prohibited" }]),
+      );
+    }
+    if (pending)
+      return new Promise<Response>((resolve) => {
+        resolvePage = resolve;
+      });
+    return Response.json(page([item("A"), item("C")]));
+  };
+  const container = document.createElement("div");
+  document.body.append(container);
+  const root = createRoot(container);
+  try {
+    await act(async () => {
+      root.render(createElement(FacebookWorkspace));
+    });
+    await act(async () => {
+      Events.instance.emit("ready");
+      await tick();
+    });
+    pending = true;
+    await act(async () => {
+      Events.instance.emit("change");
+      await tick();
+    });
+    for (const id of ["A", "C"]) {
+      const row = container.querySelector(`#${id}`);
+      assert.ok(row);
+      await act(async () => {
+        button(row, "Review rules").click();
+      });
+      const input = row.querySelector<HTMLInputElement>(
+        'input[name="summary"]',
+      );
+      assert.ok(input);
+      await act(async () => {
+        input.value = `draft ${id}`;
+        input.dispatchEvent(new dom.window.Event("input", { bubbles: true }));
+      });
+    }
+    await act(async () => {
+      resolvePage?.(
+        Response.json(page([{ ...item("A", 2), postReadiness: "prohibited" }])),
+      );
+      await tick();
+    });
+    assert.deepEqual(lookups, ["C"]);
+    for (const id of ["A", "C"]) {
+      const row = container.querySelector(`#${id}`);
+      assert.ok(row);
+      assert.match(row.textContent ?? "", /prohibited/);
+      assert.match(row.textContent ?? "", /Reviewing version 1/);
+      assert.equal(
+        row.querySelector<HTMLInputElement>('input[name="summary"]')?.value,
+        `draft ${id}`,
+      );
+    }
   } finally {
     await act(async () => root.unmount());
     container.remove();
