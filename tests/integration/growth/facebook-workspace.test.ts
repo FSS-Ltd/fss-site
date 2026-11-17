@@ -187,6 +187,8 @@ test(
         founder,
         new Date(),
         randomUUID(),
+        null,
+        created.id,
       );
       assert.equal(workspace.status, "ready");
       if (workspace.status !== "ready") return;
@@ -229,6 +231,8 @@ test(
         founder,
         new Date(),
         randomUUID(),
+        null,
+        created.id,
       );
       assert.equal(updated.status, "ready");
       if (updated.status === "ready")
@@ -629,6 +633,141 @@ test(
     } finally {
       await admin`alter role growth_app nologin nocreaterole`;
       await admin.end();
+    }
+  },
+);
+
+test(
+  "selected destination outside the first 50 retains the canonical bounded projection",
+  { skip: !url },
+  async () => {
+    if (!url) return;
+    const db = postgres(url, { max: 3 });
+    const now = new Date();
+    const { getFacebookWorkspace } =
+      await import("../../../lib/growth/facebook/workspace");
+    try {
+      const created: { id: string; url: string }[] = [];
+      for (let i = 0; i < 51; i++) {
+        const destinationUrl = `https://facebook.com/groups/${randomUUID()}`;
+        const destination = await executeFacebookCommand(
+          db,
+          {
+            type: "capture_destination",
+            requestId: randomUUID(),
+            destination: {
+              url: destinationUrl,
+              name: `Off-page ${i}`,
+              kind: "group",
+              locality: null,
+              websiteUrl: null,
+              observation: {
+                sourceUrl: destinationUrl,
+                summary: "Public",
+                observedAt: now,
+              },
+            },
+          },
+          founder,
+          randomUUID(),
+        );
+        created.push({ id: destination.id, url: destinationUrl });
+      }
+      created.sort((a, b) => a.id.localeCompare(b.id));
+      const target = created[50];
+      for (let i = 0; i < 20; i++) {
+        await db`insert into growth.facebook_destination_observations (destination_id, source_url, summary, observed_at, provenance, actor_id) values (${target.id}::uuid, ${target.url}, ${`Evidence ${i}`}, ${now}, 'founder', ${founder.actorId})`;
+      }
+      const sourceRequest = randomUUID();
+      const prospect = await executeFacebookCommand(
+        db,
+        {
+          type: "capture_source",
+          requestId: sourceRequest,
+          destinationId: target.id,
+          source: {
+            requestId: sourceRequest,
+            sourceType: "facebook_group",
+            sourceUrl: target.url,
+            businessName: `Off-page prospect ${randomUUID()}`,
+            countryCode: "GB",
+            corporateType: null,
+            registrationNumber: null,
+            firstName: null,
+            lastName: null,
+            email: null,
+            opportunity: "Review",
+            offer: "Preview",
+            observedAt: now,
+          },
+        },
+        founder,
+        randomUUID(),
+      );
+      const [version] = await db<
+        { version: number }[]
+      >`select version from growth.prospects where id=${prospect.id}::uuid`;
+      await executeFacebookCommand(
+        db,
+        {
+          type: "review_rules",
+          requestId: randomUUID(),
+          destinationId: target.id,
+          expectedVersion: 1,
+          sourceUrl: target.url,
+          summary: "Rules reviewed",
+          observedAt: now,
+          expiresAt: new Date(now.getTime() + 86400000),
+          decision: "allowed",
+        },
+        founder,
+        randomUUID(),
+      );
+      const first = await getFacebookWorkspace(db, founder, now, randomUUID());
+      const selected = await getFacebookWorkspace(
+        db,
+        founder,
+        now,
+        randomUUID(),
+        null,
+        target.id,
+      );
+      const later = await getFacebookWorkspace(
+        db,
+        founder,
+        now,
+        randomUUID(),
+        created[49].id,
+      );
+      assert.equal(first.status, "ready");
+      assert.equal(selected.status, "ready");
+      assert.equal(later.status, "ready");
+      if (
+        first.status !== "ready" ||
+        selected.status !== "ready" ||
+        later.status !== "ready"
+      )
+        return;
+      assert.equal(first.destinations.length, 50);
+      assert.ok(!first.destinations.some((item) => item.id === target.id));
+      assert.equal(selected.destinations.length, 1);
+      const item = selected.destinations[0];
+      assert.deepEqual(
+        item,
+        later.destinations.find((destination) => destination.id === target.id),
+      );
+      assert.deepEqual(selected.pilots, first.pilots);
+      assert.equal(item.postReadiness, "allowed");
+      assert.equal(item.observations.length, 20);
+      assert.equal(item.observationsHaveMore, true);
+      assert.equal(item.activitiesHaveMore, false);
+      assert.equal(item.prospectsHaveMore, false);
+      assert.equal(
+        item.prospects.find((link) => link.prospectId === prospect.id)?.version,
+        version.version,
+      );
+    } finally {
+      await db.end();
     }
   },
 );
