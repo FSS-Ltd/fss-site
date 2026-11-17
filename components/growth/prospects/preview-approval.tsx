@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useState, type CSSProperties } from "react";
+import { useRef, useState, type CSSProperties } from "react";
 
 import { resolveKnownBespokePreviewSlug } from "@/lib/growth/prospect-previews/preview-slugs";
 
@@ -156,10 +156,11 @@ export function PreviewApprovalFrame({
     message: string;
   } | null>(null);
   const [changeNotes, setChangeNotes] = useState("");
+  const changeRequest = useRef<{ payload: string; id: string } | null>(null);
   const [changeRequestPending, setChangeRequestPending] = useState(false);
-  const [changeRequestFeedback, setChangeRequestFeedback] = useState<string | null>(
-    null,
-  );
+  const [changeRequestFeedback, setChangeRequestFeedback] = useState<
+    string | null
+  >(null);
 
   if (!preview) {
     return (
@@ -237,9 +238,9 @@ export function PreviewApprovalFrame({
         return;
       }
 
-      const body = (await response.json().catch(() => null)) as
-        | { message?: string }
-        | null;
+      const body = (await response.json().catch(() => null)) as {
+        message?: string;
+      } | null;
       setFeedback({
         tone: response.status === 409 ? "conflict" : "error",
         message:
@@ -260,6 +261,13 @@ export function PreviewApprovalFrame({
   async function requestChanges(): Promise<void> {
     if (!draftPreview.compositionDigest || !changeNotes.trim()) return;
 
+    const payload = JSON.stringify([
+      draftPreview.compositionDigest,
+      changeNotes.trim(),
+    ]);
+    if (changeRequest.current?.payload !== payload) {
+      changeRequest.current = { payload, id: crypto.randomUUID() };
+    }
     setChangeRequestPending(true);
     setChangeRequestFeedback(null);
     try {
@@ -271,10 +279,12 @@ export function PreviewApprovalFrame({
           body: JSON.stringify({
             compositionDigest: draftPreview.compositionDigest,
             notes: changeNotes.trim(),
+            requestId: changeRequest.current.id,
           }),
         },
       );
       if (response.ok) {
+        changeRequest.current = null;
         setChangeNotes("");
         setChangeRequestFeedback(
           "Change request saved against this source package.",
@@ -283,9 +293,9 @@ export function PreviewApprovalFrame({
         return;
       }
 
-      const body = (await response.json().catch(() => null)) as
-        | { message?: string }
-        | null;
+      const body = (await response.json().catch(() => null)) as {
+        message?: string;
+      } | null;
       setChangeRequestFeedback(
         body?.message ?? "The change request could not be saved. Try again.",
       );
@@ -305,9 +315,7 @@ export function PreviewApprovalFrame({
         refreshes the stored first-email draft. It does not create a provider
         draft or send email.
       </p>
-      <p style={previewApprovalNoteStyle}>
-        {sourcePackageStatus}
-      </p>
+      <p style={previewApprovalNoteStyle}>{sourcePackageStatus}</p>
       {feedback && (
         <p
           className={

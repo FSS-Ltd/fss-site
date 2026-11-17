@@ -207,3 +207,26 @@ test("research-only zero estimates display Not estimated on desktop and mobile",
   assert.equal(html.match(/Not estimated/g)?.length, 2);
   assert.doesNotMatch(html, /£0/);
 });
+
+test("source filter survives pagination and can be removed", async () => {
+  const { buildProspectsHref } = await import("./prospect-filters");
+  const query = {
+    q: "",
+    sector: "",
+    location: "",
+    fitScoreMin: "all",
+    status: "all",
+    outreach: "all",
+    suppressed: "all",
+    source: "facebook_page",
+    after: null,
+  } as const;
+  assert.equal(
+    buildProspectsHref(query, { after: "cursor" }),
+    "/growth/prospects?source=facebook_page&after=cursor",
+  );
+  assert.equal(
+    buildProspectsHref(query, { source: null }),
+    "/growth/prospects",
+  );
+});
