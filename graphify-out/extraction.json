@@ -1107,6 +1107,111 @@
       "source_location": "L277"
     },
     {
+      "id": "lib_growth_campaigns_account_contracts_ts",
+      "label": "account-contracts.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/campaigns/account-contracts.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "lib_growth_campaigns_account_control_ts",
+      "label": "account-control.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/campaigns/account-control.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "account_control_executeaccountcontrolcommand",
+      "label": "executeAccountControlCommand()",
+      "file_type": "code",
+      "source_file": "lib/growth/campaigns/account-control.ts",
+      "source_location": "L36"
+    },
+    {
+      "id": "lib_growth_campaigns_account_readiness_test_ts",
+      "label": "account-readiness.test.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/campaigns/account-readiness.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "lib_growth_campaigns_account_readiness_ts",
+      "label": "account-readiness.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/campaigns/account-readiness.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "account_readiness_validtime",
+      "label": "validTime()",
+      "file_type": "code",
+      "source_file": "lib/growth/campaigns/account-readiness.ts",
+      "source_location": "L51"
+    },
+    {
+      "id": "account_readiness_count",
+      "label": "count()",
+      "file_type": "code",
+      "source_file": "lib/growth/campaigns/account-readiness.ts",
+      "source_location": "L52"
+    },
+    {
+      "id": "account_readiness_assessaccountreadiness",
+      "label": "assessAccountReadiness()",
+      "file_type": "code",
+      "source_file": "lib/growth/campaigns/account-readiness.ts",
+      "source_location": "L54"
+    },
+    {
+      "id": "lib_growth_campaigns_account_repository_ts",
+      "label": "account-repository.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/campaigns/account-repository.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "account_repository_normalizescope",
+      "label": "normalizeScope()",
+      "file_type": "code",
+      "source_file": "lib/growth/campaigns/account-repository.ts",
+      "source_location": "L9"
+    },
+    {
+      "id": "account_repository_sameaccountscopes",
+      "label": "sameAccountScopes()",
+      "file_type": "code",
+      "source_file": "lib/growth/campaigns/account-repository.ts",
+      "source_location": "L11"
+    },
+    {
+      "id": "account_repository_loadconfiguredaccountreadiness",
+      "label": "loadConfiguredAccountReadiness()",
+      "file_type": "code",
+      "source_file": "lib/growth/campaigns/account-repository.ts",
+      "source_location": "L20"
+    },
+    {
+      "id": "lib_growth_campaigns_account_usage_test_ts",
+      "label": "account-usage.test.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/campaigns/account-usage.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "lib_growth_campaigns_account_usage_ts",
+      "label": "account-usage.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/campaigns/account-usage.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "account_usage_validusageprovenance",
+      "label": "validUsageProvenance()",
+      "file_type": "code",
+      "source_file": "lib/growth/campaigns/account-usage.ts",
+      "source_location": "L10"
+    },
+    {
       "id": "lib_growth_campaigns_authorization_ts",
       "label": "authorization.ts",
       "file_type": "code",
@@ -1118,7 +1223,7 @@
       "label": "requireCampaignFounder()",
       "file_type": "code",
       "source_file": "lib/growth/campaigns/authorization.ts",
-      "source_location": "L4"
+      "source_location": "L6"
     },
     {
       "id": "lib_growth_campaigns_commands_ts",
@@ -2850,74 +2955,81 @@
       "source_location": "L1"
     },
     {
+      "id": "google_oauth_hasrequiredgmailscopes",
+      "label": "hasRequiredGmailScopes()",
+      "file_type": "code",
+      "source_file": "lib/growth/integrations/google-oauth.ts",
+      "source_location": "L25"
+    },
+    {
       "id": "google_oauth_googleoautherror",
       "label": "GoogleOAuthError",
       "file_type": "code",
       "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L69"
+      "source_location": "L76"
     },
     {
       "id": "google_oauth_googleoautherror_constructor",
       "label": ".constructor()",
       "file_type": "code",
       "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L70"
+      "source_location": "L77"
     },
     {
       "id": "google_oauth_requirenonblank",
       "label": "requireNonBlank()",
       "file_type": "code",
       "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L84"
+      "source_location": "L91"
     },
     {
       "id": "google_oauth_validateconfig",
       "label": "validateConfig()",
       "file_type": "code",
       "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L92"
+      "source_location": "L99"
     },
     {
       "id": "google_oauth_readjson",
       "label": "readJson()",
       "file_type": "code",
       "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L99"
+      "source_location": "L106"
     },
     {
       "id": "google_oauth_generategoogleoauthstate",
       "label": "generateGoogleOAuthState()",
       "file_type": "code",
       "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L107"
+      "source_location": "L114"
     },
     {
       "id": "google_oauth_buildgoogleauthorizationurl",
       "label": "buildGoogleAuthorizationUrl()",
       "file_type": "code",
       "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L111"
+      "source_location": "L118"
     },
     {
       "id": "google_oauth_exchangegoogleauthorizationcode",
       "label": "exchangeGoogleAuthorizationCode()",
       "file_type": "code",
       "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L133"
+      "source_location": "L140"
     },
     {
       "id": "google_oauth_fetchgoogleidentity",
       "label": "fetchGoogleIdentity()",
       "file_type": "code",
       "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L200"
+      "source_location": "L203"
     },
     {
       "id": "google_oauth_revokegoogleoauthtoken",
       "label": "revokeGoogleOAuthToken()",
       "file_type": "code",
       "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L247"
+      "source_location": "L250"
     },
     {
       "id": "lib_growth_integrations_resend_client_ts",
@@ -6229,6 +6341,20 @@
       "file_type": "code",
       "source_file": "tests/integration/growth/gmail-disconnect.test.ts",
       "source_location": "L1"
+    },
+    {
+      "id": "tests_integration_growth_outreach_account_control_test_ts",
+      "label": "outreach-account-control.test.ts",
+      "file_type": "code",
+      "source_file": "tests/integration/growth/outreach-account-control.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "outreach_account_control_test_readiness",
+      "label": "readiness()",
+      "file_type": "code",
+      "source_file": "tests/integration/growth/outreach-account-control.test.ts",
+      "source_location": "L33"
     },
     {
       "id": "tests_integration_growth_source_capture_test_ts",
@@ -10146,6 +10272,321 @@
       "weight": 1.0
     },
     {
+      "source": "lib_growth_campaigns_account_contracts_ts",
+      "target": "zod",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-contracts.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_control_ts",
+      "target": "node_crypto",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-control.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_control_ts",
+      "target": "lib_growth_audit_service",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-control.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_control_ts",
+      "target": "lib_growth_auth_require_founder",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-control.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_control_ts",
+      "target": "lib_growth_db_client",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-control.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_control_ts",
+      "target": "lib_growth_db_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-control.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_control_ts",
+      "target": "lib_growth_integrations_google_oauth",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-control.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_control_ts",
+      "target": "lib_growth_campaigns_authorization",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-control.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_control_ts",
+      "target": "lib_growth_campaigns_account_contracts",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-control.ts",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_control_ts",
+      "target": "lib_growth_campaigns_account_repository",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-control.ts",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_control_ts",
+      "target": "account_control_executeaccountcontrolcommand",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-control.ts",
+      "source_location": "L36",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_readiness_test_ts",
+      "target": "strict",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-readiness.test.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_readiness_test_ts",
+      "target": "node_test",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-readiness.test.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_readiness_test_ts",
+      "target": "lib_growth_campaigns_account_readiness",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-readiness.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_readiness_ts",
+      "target": "account_readiness_validtime",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-readiness.ts",
+      "source_location": "L51",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_readiness_ts",
+      "target": "account_readiness_count",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-readiness.ts",
+      "source_location": "L52",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_readiness_ts",
+      "target": "account_readiness_assessaccountreadiness",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-readiness.ts",
+      "source_location": "L54",
+      "weight": 1.0
+    },
+    {
+      "source": "account_readiness_assessaccountreadiness",
+      "target": "account_readiness_validtime",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-readiness.ts",
+      "source_location": "L59",
+      "weight": 1.0
+    },
+    {
+      "source": "account_readiness_assessaccountreadiness",
+      "target": "account_readiness_count",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-readiness.ts",
+      "source_location": "L83",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_repository_ts",
+      "target": "zod",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-repository.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_repository_ts",
+      "target": "lib_growth_db_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-repository.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_repository_ts",
+      "target": "lib_growth_integrations_google_oauth",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-repository.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_repository_ts",
+      "target": "lib_growth_campaigns_authorization",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-repository.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_repository_ts",
+      "target": "lib_growth_campaigns_account_contracts",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-repository.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_repository_ts",
+      "target": "lib_growth_campaigns_account_readiness",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-repository.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_repository_ts",
+      "target": "lib_growth_campaigns_account_usage",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-repository.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_repository_ts",
+      "target": "account_repository_normalizescope",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-repository.ts",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_repository_ts",
+      "target": "account_repository_sameaccountscopes",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-repository.ts",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_repository_ts",
+      "target": "account_repository_loadconfiguredaccountreadiness",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-repository.ts",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "account_repository_loadconfiguredaccountreadiness",
+      "target": "account_repository_sameaccountscopes",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-repository.ts",
+      "source_location": "L56",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_usage_test_ts",
+      "target": "strict",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-usage.test.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_usage_test_ts",
+      "target": "node_test",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-usage.test.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_usage_test_ts",
+      "target": "lib_growth_campaigns_account_usage",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-usage.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_usage_ts",
+      "target": "zod",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-usage.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_account_usage_ts",
+      "target": "account_usage_validusageprovenance",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/account-usage.ts",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
       "source": "lib_growth_campaigns_authorization_ts",
       "target": "node_crypto",
       "relation": "imports_from",
@@ -10169,7 +10610,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/authorization.ts",
-      "source_location": "L4",
+      "source_location": "L6",
       "weight": 1.0
     },
     {
@@ -14782,11 +15223,20 @@
     },
     {
       "source": "lib_growth_integrations_google_oauth_ts",
+      "target": "google_oauth_hasrequiredgmailscopes",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/integrations/google-oauth.ts",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_integrations_google_oauth_ts",
       "target": "google_oauth_googleoautherror",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L69",
+      "source_location": "L76",
       "weight": 1.0
     },
     {
@@ -14795,7 +15245,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L70",
+      "source_location": "L77",
       "weight": 1.0
     },
     {
@@ -14804,21 +15254,12 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L84",
+      "source_location": "L91",
       "weight": 1.0
     },
     {
       "source": "lib_growth_integrations_google_oauth_ts",
       "target": "google_oauth_validateconfig",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L92",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_integrations_google_oauth_ts",
-      "target": "google_oauth_readjson",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/integrations/google-oauth.ts",
@@ -14827,11 +15268,20 @@
     },
     {
       "source": "lib_growth_integrations_google_oauth_ts",
+      "target": "google_oauth_readjson",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/integrations/google-oauth.ts",
+      "source_location": "L106",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_integrations_google_oauth_ts",
       "target": "google_oauth_generategoogleoauthstate",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L107",
+      "source_location": "L114",
       "weight": 1.0
     },
     {
@@ -14840,7 +15290,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L111",
+      "source_location": "L118",
       "weight": 1.0
     },
     {
@@ -14849,7 +15299,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L133",
+      "source_location": "L140",
       "weight": 1.0
     },
     {
@@ -14858,7 +15308,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L200",
+      "source_location": "L203",
       "weight": 1.0
     },
     {
@@ -14867,7 +15317,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L247",
+      "source_location": "L250",
       "weight": 1.0
     },
     {
@@ -14876,7 +15326,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L93",
+      "source_location": "L100",
       "weight": 1.0
     },
     {
@@ -14885,7 +15335,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L115",
+      "source_location": "L122",
       "weight": 1.0
     },
     {
@@ -14894,7 +15344,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L116",
+      "source_location": "L123",
       "weight": 1.0
     },
     {
@@ -14903,7 +15353,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L138",
+      "source_location": "L145",
       "weight": 1.0
     },
     {
@@ -14912,7 +15362,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L139",
+      "source_location": "L146",
       "weight": 1.0
     },
     {
@@ -14921,7 +15371,16 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L169",
+      "source_location": "L176",
+      "weight": 1.0
+    },
+    {
+      "source": "google_oauth_exchangegoogleauthorizationcode",
+      "target": "google_oauth_hasrequiredgmailscopes",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/integrations/google-oauth.ts",
+      "source_location": "L185",
       "weight": 1.0
     },
     {
@@ -14930,7 +15389,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L204",
+      "source_location": "L207",
       "weight": 1.0
     },
     {
@@ -14939,7 +15398,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L231",
+      "source_location": "L234",
       "weight": 1.0
     },
     {
@@ -14948,7 +15407,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L251",
+      "source_location": "L254",
       "weight": 1.0
     },
     {
@@ -18408,6 +18867,1256 @@
       "weight": 1.0
     },
     {
+      "source": "agreement_builder_fees_step_contentfromform",
+      "target": "commercial_offer_fields_readcommercialoffer",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/agreement-builder-fees-step.tsx",
+      "source_location": "L257",
+      "weight": 1.0
+    },
+    {
+      "source": "agreement_builder_fees_step_contentfromform",
+      "target": "agreement_builder_fee_inputs_linesforagreementdraft",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/agreement-builder-fees-step.tsx",
+      "source_location": "L264",
+      "weight": 1.0
+    },
+    {
+      "source": "agreement_builder_fees_step_contentfromform",
+      "target": "agreement_builder_fee_inputs_parseinstallments",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/agreement-builder-fees-step.tsx",
+      "source_location": "L286",
+      "weight": 1.0
+    },
+    {
+      "source": "agreement_builder_fees_step_contentfromform",
+      "target": "agreement_builder_step_support_mergecontent",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/agreement-builder-fees-step.tsx",
+      "source_location": "L289",
+      "weight": 1.0
+    },
+    {
+      "source": "agreement_builder_fees_step_contentfromform",
+      "target": "agreement_builder_step_support_numbervalue",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/agreement-builder-fees-step.tsx",
+      "source_location": "L295",
+      "weight": 1.0
+    },
+    {
+      "source": "agreement_builder_fees_step_contentfromform",
+      "target": "agreement_builder_step_support_textvalue",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/agreement-builder-fees-step.tsx",
+      "source_location": "L298",
+      "weight": 1.0
+    },
+    {
+      "source": "agreement_builder_link_step_save",
+      "target": "agreement_builder_step_support_mergecontent",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/agreement-builder-link-step.tsx",
+      "source_location": "L53",
+      "weight": 1.0
+    },
+    {
+      "source": "agreement_builder_link_step_save",
+      "target": "agreement_builder_step_support_textvalue",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/agreement-builder-link-step.tsx",
+      "source_location": "L57",
+      "weight": 1.0
+    },
+    {
+      "source": "agreement_builder_link_step_beginengagement",
+      "target": "agreement_builder_step_support_textvalue",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/agreement-builder-link-step.tsx",
+      "source_location": "L66",
+      "weight": 1.0
+    },
+    {
+      "source": "agreement_builder_link_step_beginengagement",
+      "target": "agreement_builder_step_support_mergecontent",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/agreement-builder-link-step.tsx",
+      "source_location": "L68",
+      "weight": 1.0
+    },
+    {
+      "source": "agreement_builder_people_step_agreementbuilderpeoplestep",
+      "target": "agreement_builder_groups_useagreementbuildergroups",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/agreement-builder-people-step.tsx",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "agreement_builder_scope_step_save",
+      "target": "agreement_builder_step_support_mergecontent",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/agreement-builder-scope-step.tsx",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "agreement_builder_scope_step_save",
+      "target": "agreement_builder_step_support_textvalue",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/agreement-builder-scope-step.tsx",
+      "source_location": "L30",
+      "weight": 1.0
+    },
+    {
+      "source": "agreement_builder_step_support_textvalue",
+      "target": "route_get",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/agreement-builder-step-support.tsx",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "agreement_builder_step_support_formatgbp",
+      "target": "commercial_offer_summary_formatmoney",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/agreement-builder-step-support.tsx",
+      "source_location": "L50",
+      "weight": 1.0
+    },
+    {
+      "source": "client_agreement_detail_signingrecord",
+      "target": "presentation_hascompletesigningevidence",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/client-agreement-detail.tsx",
+      "source_location": "L77",
+      "weight": 1.0
+    },
+    {
+      "source": "client_agreement_detail_completionnotice",
+      "target": "presentation_hascompletesigningevidence",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/client-agreement-detail.tsx",
+      "source_location": "L120",
+      "weight": 1.0
+    },
+    {
+      "source": "client_agreement_detail_completionnotice",
+      "target": "presentation_clientsigningprogress",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/client-agreement-detail.tsx",
+      "source_location": "L142",
+      "weight": 1.0
+    },
+    {
+      "source": "client_agreement_detail_clientagreementdetail",
+      "target": "presentation_hascompletesigningevidence",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/client-agreement-detail.tsx",
+      "source_location": "L244",
+      "weight": 1.0
+    },
+    {
+      "source": "client_agreement_detail_clientagreementdetail",
+      "target": "agreement_builder_summary_formatgbp",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/client-agreement-detail.tsx",
+      "source_location": "L305",
+      "weight": 1.0
+    },
+    {
+      "source": "client_agreement_list_statuslabel",
+      "target": "presentation_clientsigningprogress",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/client-agreement-list.tsx",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "client_agreement_list_statuslabel",
+      "target": "presentation_hascompletesigningevidence",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/client-agreement-list.tsx",
+      "source_location": "L30",
+      "weight": 1.0
+    },
+    {
+      "source": "client_agreement_list_statuslabel",
+      "target": "presentation_toportalagreementstatus",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/client-agreement-list.tsx",
+      "source_location": "L31",
+      "weight": 1.0
+    },
+    {
+      "source": "client_agreement_list_agreementrow",
+      "target": "presentation_hascompletesigningevidence",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/client-agreement-list.tsx",
+      "source_location": "L55",
+      "weight": 1.0
+    },
+    {
+      "source": "client_agreement_list_agreementrow",
+      "target": "presentation_toportalagreementstatus",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/client-agreement-list.tsx",
+      "source_location": "L56",
+      "weight": 1.0
+    },
+    {
+      "source": "client_agreement_list_agreementrow",
+      "target": "presentation_clientsigningprogress",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/client-agreement-list.tsx",
+      "source_location": "L60",
+      "weight": 1.0
+    },
+    {
+      "source": "commercial_offer_fields_readcommercialoffer",
+      "target": "route_get",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/commercial-offer-fields.tsx",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_deadline_actions_run",
+      "target": "client_googlegmailclient_request",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/signing-deadline-actions.tsx",
+      "source_location": "L92",
+      "weight": 1.0
+    },
+    {
+      "source": "staff_agreement_builder_persist",
+      "target": "agreement_builder_scope_step_save",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/staff-agreement-builder.tsx",
+      "source_location": "L94",
+      "weight": 1.0
+    },
+    {
+      "source": "staff_agreement_builder_beginengagement",
+      "target": "agreement_builder_scope_step_save",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/staff-agreement-builder.tsx",
+      "source_location": "L110",
+      "weight": 1.0
+    },
+    {
+      "source": "staff_agreement_builder_selectengagement",
+      "target": "engagement_prefill_replaceengagement",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/staff-agreement-builder.tsx",
+      "source_location": "L138",
+      "weight": 1.0
+    },
+    {
+      "source": "staff_agreement_builder_selectengagement",
+      "target": "engagement_prefill_prefillfromengagement",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/staff-agreement-builder.tsx",
+      "source_location": "L139",
+      "weight": 1.0
+    },
+    {
+      "source": "staff_signing_status_presentationfor",
+      "target": "presentation_hascompletesigningevidence",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/staff-signing-status.tsx",
+      "source_location": "L34",
+      "weight": 1.0
+    },
+    {
+      "source": "account_control_executeaccountcontrolcommand",
+      "target": "authorization_requirecampaignfounder",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/campaigns/account-control.ts",
+      "source_location": "L49",
+      "weight": 1.0
+    },
+    {
+      "source": "account_repository_loadconfiguredaccountreadiness",
+      "target": "google_oauth_hasrequiredgmailscopes",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/campaigns/account-repository.ts",
+      "source_location": "L55",
+      "weight": 1.0
+    },
+    {
+      "source": "account_repository_loadconfiguredaccountreadiness",
+      "target": "account_readiness_assessaccountreadiness",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/campaigns/account-repository.ts",
+      "source_location": "L99",
+      "weight": 1.0
+    },
+    {
+      "source": "account_repository_loadconfiguredaccountreadiness",
+      "target": "account_usage_validusageprovenance",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/campaigns/account-repository.ts",
+      "source_location": "L122",
+      "weight": 1.0
+    },
+    {
+      "source": "commands_mutate",
+      "target": "lifecycle_validatecampaigndefinition",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/campaigns/commands.ts",
+      "source_location": "L55",
+      "weight": 1.0
+    },
+    {
+      "source": "commands_mutate",
+      "target": "lifecycle_serializecampaigndefinition",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/campaigns/commands.ts",
+      "source_location": "L58",
+      "weight": 1.0
+    },
+    {
+      "source": "commands_mutate",
+      "target": "permissions_recordcampaignpermission",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/campaigns/commands.ts",
+      "source_location": "L76",
+      "weight": 1.0
+    },
+    {
+      "source": "commands_mutate",
+      "target": "lifecycle_cancelcampaignjobs",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/campaigns/commands.ts",
+      "source_location": "L86",
+      "weight": 1.0
+    },
+    {
+      "source": "commands_mutate",
+      "target": "repository_loadlatestcampaignpolicy",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/campaigns/commands.ts",
+      "source_location": "L95",
+      "weight": 1.0
+    },
+    {
+      "source": "commands_mutate",
+      "target": "repository_persistcampaignmembership",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/campaigns/commands.ts",
+      "source_location": "L126",
+      "weight": 1.0
+    },
+    {
+      "source": "commands_executecampaigncommand",
+      "target": "authorization_requirecampaignfounder",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/campaigns/commands.ts",
+      "source_location": "L156",
+      "weight": 1.0
+    },
+    {
+      "source": "events_appendcampaigneventandoutbox",
+      "target": "authorization_requirecampaignfounder",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/campaigns/events.ts",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "permissions_recordcampaignpermission",
+      "target": "authorization_requirecampaignfounder",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/campaigns/permissions.ts",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "permissions_recordcampaignpermission",
+      "target": "repository_loadlatestcampaignpolicy",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/campaigns/permissions.ts",
+      "source_location": "L77",
+      "weight": 1.0
+    },
+    {
+      "source": "permissions_recordcampaignpermission",
+      "target": "founder_verification_reader_loadfounderverification",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/campaigns/permissions.ts",
+      "source_location": "L99",
+      "weight": 1.0
+    },
+    {
+      "source": "permissions_recordcampaignpermission",
+      "target": "events_appendcampaigneventandoutbox",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/campaigns/permissions.ts",
+      "source_location": "L134",
+      "weight": 1.0
+    },
+    {
+      "source": "report_buildcampaignreport",
+      "target": "time_londondaykey",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/campaigns/report.ts",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "report_buildcampaignreport",
+      "target": "route_get",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/campaigns/report.ts",
+      "source_location": "L41",
+      "weight": 1.0
+    },
+    {
+      "source": "repository_loadlatestcampaignpolicy",
+      "target": "authorization_requirecampaignfounder",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/campaigns/repository.ts",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "repository_loadcampaignpolicyversion",
+      "target": "authorization_requirecampaignfounder",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/campaigns/repository.ts",
+      "source_location": "L58",
+      "weight": 1.0
+    },
+    {
+      "source": "repository_persistcampaignmembership",
+      "target": "authorization_requirecampaignfounder",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/campaigns/repository.ts",
+      "source_location": "L108",
+      "weight": 1.0
+    },
+    {
+      "source": "repository_persistcampaignmembership",
+      "target": "events_appendcampaigneventandoutbox",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/campaigns/repository.ts",
+      "source_location": "L185",
+      "weight": 1.0
+    },
+    {
+      "source": "source_service_capturesourcelead",
+      "target": "global_identity_normalizeregistration",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/campaigns/source-service.ts",
+      "source_location": "L63",
+      "weight": 1.0
+    },
+    {
+      "source": "source_service_capturesourcelead",
+      "target": "global_identity_businesswebsitehost",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/campaigns/source-service.ts",
+      "source_location": "L67",
+      "weight": 1.0
+    },
+    {
+      "source": "source_service_capturesourcelead",
+      "target": "route_get",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/campaigns/source-service.ts",
+      "source_location": "L115",
+      "weight": 1.0
+    },
+    {
+      "source": "lead_service_capturelead",
+      "target": "lead_repository_findcapture",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/crm/lead-service.ts",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "lead_service_capturelead",
+      "target": "lead_repository_capturebusiness",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/crm/lead-service.ts",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "lead_service_capturelead",
+      "target": "lead_repository_capturecontact",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/crm/lead-service.ts",
+      "source_location": "L41",
+      "weight": 1.0
+    },
+    {
+      "source": "opportunity_service_attachcrmcontact",
+      "target": "activity_service_requirecrmprospect",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/crm/opportunity-service.ts",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "opportunity_service_attachcrmcontact",
+      "target": "lead_repository_capturecontact",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/crm/opportunity-service.ts",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "opportunity_service_createcrmopportunity",
+      "target": "activity_service_requirecrmprospect",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/crm/opportunity-service.ts",
+      "source_location": "L30",
+      "weight": 1.0
+    },
+    {
+      "source": "task_service_executetaskcommand",
+      "target": "activity_service_requirecrmprospect",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/crm/task-service.ts",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "task_service_executetaskcommand",
+      "target": "activity_service_appendcrmactivity",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/crm/task-service.ts",
+      "source_location": "L29",
+      "weight": 1.0
+    },
+    {
+      "source": "message_review_getmessagereview",
+      "target": "first_email_draft_snapshot_parsestoredfirstemaildraft",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/dashboard/message-review.ts",
+      "source_location": "L303",
+      "weight": 1.0
+    },
+    {
+      "source": "overview_selectdefaultworkqueuetab",
+      "target": "route_get",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/dashboard/overview.ts",
+      "source_location": "L184",
+      "weight": 1.0
+    },
+    {
+      "source": "founder_request_requesthasregisteredorigin",
+      "target": "route_get",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/http/founder-request.ts",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "founder_request_readjsonrequestbody",
+      "target": "route_get",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/http/founder-request.ts",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "founder_request_readjsonrequestbody",
+      "target": "global_schema_text",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/http/founder-request.ts",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "client_readjson",
+      "target": "route_get",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/integrations/gmail/client.ts",
+      "source_location": "L123",
+      "weight": 1.0
+    },
+    {
+      "source": "client_googlegmailclient_fetchprovider",
+      "target": "google_oauth_test_fetchimpl",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/integrations/gmail/client.ts",
+      "source_location": "L230",
+      "weight": 1.0
+    },
+    {
+      "source": "client_googlegmailclient_getfreshaccesstoken",
+      "target": "prospects_test_fakefragment_then",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/integrations/gmail/client.ts",
+      "source_location": "L297",
+      "weight": 1.0
+    },
+    {
+      "source": "client_googlegmailclient_listhistory",
+      "target": "reconciliation_readgmailhistorypage",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/integrations/gmail/client.ts",
+      "source_location": "L431",
+      "weight": 1.0
+    },
+    {
+      "source": "client_googlegmailclient_getmessagemetadata",
+      "target": "reconciliation_readgmailmessagemetadata",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/integrations/gmail/client.ts",
+      "source_location": "L444",
+      "weight": 1.0
+    },
+    {
+      "source": "client_googlegmailclient_findbyrfcmessageid",
+      "target": "reconciliation_findgmailmessagebyrfcid",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/integrations/gmail/client.ts",
+      "source_location": "L450",
+      "weight": 1.0
+    },
+    {
+      "source": "live_client_createlivegmailclient",
+      "target": "integration_connections_getconnectedgmailcredential",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/integrations/gmail/live-client.ts",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "live_client_createlivegmailclient",
+      "target": "client_creategmailclient",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/integrations/gmail/live-client.ts",
+      "source_location": "L37",
+      "weight": 1.0
+    },
+    {
+      "source": "reconciliation_readgmailhistorypage",
+      "target": "google_oauth_readjson",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/integrations/gmail/reconciliation.ts",
+      "source_location": "L154",
+      "weight": 1.0
+    },
+    {
+      "source": "reconciliation_readgmailmessagemetadata",
+      "target": "google_oauth_readjson",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/integrations/gmail/reconciliation.ts",
+      "source_location": "L187",
+      "weight": 1.0
+    },
+    {
+      "source": "reconciliation_findgmailmessagebyrfcid",
+      "target": "google_oauth_readjson",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/integrations/gmail/reconciliation.ts",
+      "source_location": "L223",
+      "weight": 1.0
+    },
+    {
+      "source": "google_oauth_exchangegoogleauthorizationcode",
+      "target": "google_oauth_test_fetchimpl",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/integrations/google-oauth.ts",
+      "source_location": "L150",
+      "weight": 1.0
+    },
+    {
+      "source": "google_oauth_fetchgoogleidentity",
+      "target": "google_oauth_test_fetchimpl",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/integrations/google-oauth.ts",
+      "source_location": "L211",
+      "weight": 1.0
+    },
+    {
+      "source": "google_oauth_revokegoogleoauthtoken",
+      "target": "google_oauth_test_fetchimpl",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/integrations/google-oauth.ts",
+      "source_location": "L257",
+      "weight": 1.0
+    },
+    {
+      "source": "webhook_applysuppression",
+      "target": "suppression_recordhardbounce",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/integrations/resend/webhook.ts",
+      "source_location": "L175",
+      "weight": 1.0
+    },
+    {
+      "source": "webhook_applysuppression",
+      "target": "suppression_recordcomplaint",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/integrations/resend/webhook.ts",
+      "source_location": "L177",
+      "weight": 1.0
+    },
+    {
+      "source": "webhook_applysuppression",
+      "target": "webhook_repository_insertglobalsuppression",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/integrations/resend/webhook.ts",
+      "source_location": "L185",
+      "weight": 1.0
+    },
+    {
+      "source": "webhook_applysuppression",
+      "target": "webhook_repository_findsequenceenrollmentidsbyemail",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/integrations/resend/webhook.ts",
+      "source_location": "L192",
+      "weight": 1.0
+    },
+    {
+      "source": "webhook_applyresendwebhookevent",
+      "target": "webhook_repository_hasdeliveryevent",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/integrations/resend/webhook.ts",
+      "source_location": "L230",
+      "weight": 1.0
+    },
+    {
+      "source": "webhook_applyresendwebhookevent",
+      "target": "webhook_repository_recorddeliveryevent",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/integrations/resend/webhook.ts",
+      "source_location": "L238",
+      "weight": 1.0
+    },
+    {
+      "source": "global_repository_inspectglobalcandidate",
+      "target": "global_identity_normalizeregistration",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/research/global-repository.ts",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "global_repository_inspectglobalcandidate",
+      "target": "global_identity_businesswebsitehost",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/research/global-repository.ts",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "global_repository_insertglobalcandidate",
+      "target": "global_identity_normalizeregistration",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/research/global-repository.ts",
+      "source_location": "L61",
+      "weight": 1.0
+    },
+    {
+      "source": "ingest_ingestresearchrun",
+      "target": "global_ingest_ingestglobalresearchrun",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/research/ingest.ts",
+      "source_location": "L142",
+      "weight": 1.0
+    },
+    {
+      "source": "preview_pr_trigger_triggerpreviewpullrequest",
+      "target": "client_googlegmailclient_request",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/research/preview-pr-trigger.ts",
+      "source_location": "L147",
+      "weight": 1.0
+    },
+    {
+      "source": "preview_pr_trigger_triggercurrenttendraftpreviewbackfill",
+      "target": "client_googlegmailclient_request",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/research/preview-pr-trigger.ts",
+      "source_location": "L212",
+      "weight": 1.0
+    },
+    {
+      "source": "route_handler_readrawbody",
+      "target": "route_get",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/research/route-handler.ts",
+      "source_location": "L31",
+      "weight": 1.0
+    },
+    {
+      "source": "submission_client_submitglobalresearch",
+      "target": "client_googlegmailclient_request",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/research/submission-client.ts",
+      "source_location": "L92",
+      "weight": 1.0
+    },
+    {
+      "source": "approval_createfirstemailapprover",
+      "target": "client_googlegmailclient_createdraft",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/approval.ts",
+      "source_location": "L334",
+      "weight": 1.0
+    },
+    {
+      "source": "approve_send_route_handler_createapprovesendhandler",
+      "target": "approval_createfirstemailapprover",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/approve-send-route-handler.ts",
+      "source_location": "L98",
+      "weight": 1.0
+    },
+    {
+      "source": "approve_send_route_handler_createapprovesendhandler",
+      "target": "message_action_route_createmessageactionhandler",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/approve-send-route-handler.ts",
+      "source_location": "L105",
+      "weight": 1.0
+    },
+    {
+      "source": "create_gmail_draft_route_handler_createcreategmaildrafthandler",
+      "target": "message_action_route_createmessageactionhandler",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/create-gmail-draft-route-handler.ts",
+      "source_location": "L115",
+      "weight": 1.0
+    },
+    {
+      "source": "dispatcher_preparefollowupsend",
+      "target": "dispatcher_repository_getthreadreferences",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/dispatcher.ts",
+      "source_location": "L143",
+      "weight": 1.0
+    },
+    {
+      "source": "dispatcher_preparefollowupsend",
+      "target": "dispatcher_repository_getfollowuptemplate",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/dispatcher.ts",
+      "source_location": "L207",
+      "weight": 1.0
+    },
+    {
+      "source": "dispatcher_createoutreachdispatcher",
+      "target": "dispatcher_repository_claimduemessage",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/dispatcher.ts",
+      "source_location": "L288",
+      "weight": 1.0
+    },
+    {
+      "source": "dispatcher_createoutreachdispatcher",
+      "target": "dispatcher_repository_getsendcontext",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/dispatcher.ts",
+      "source_location": "L297",
+      "weight": 1.0
+    },
+    {
+      "source": "dispatcher_createoutreachdispatcher",
+      "target": "dispatcher_repository_cancelmessage",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/dispatcher.ts",
+      "source_location": "L302",
+      "weight": 1.0
+    },
+    {
+      "source": "dispatcher_createoutreachdispatcher",
+      "target": "dispatcher_repository_issuppressed",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/dispatcher.ts",
+      "source_location": "L309",
+      "weight": 1.0
+    },
+    {
+      "source": "dispatcher_createoutreachdispatcher",
+      "target": "dispatcher_repository_hasnewerinboundmessage",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/dispatcher.ts",
+      "source_location": "L338",
+      "weight": 1.0
+    },
+    {
+      "source": "dispatcher_createoutreachdispatcher",
+      "target": "client_googlegmailclient_findbyrfcmessageid",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/dispatcher.ts",
+      "source_location": "L352",
+      "weight": 1.0
+    },
+    {
+      "source": "dispatcher_createoutreachdispatcher",
+      "target": "dispatcher_repository_failmessage",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/dispatcher.ts",
+      "source_location": "L382",
+      "weight": 1.0
+    },
+    {
+      "source": "dispatcher_createoutreachdispatcher",
+      "target": "client_googlegmailclient_sendmessage",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/dispatcher.ts",
+      "source_location": "L393",
+      "weight": 1.0
+    },
+    {
+      "source": "dispatcher_createoutreachdispatcher",
+      "target": "dispatcher_repository_recordsent",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/dispatcher.ts",
+      "source_location": "L397",
+      "weight": 1.0
+    },
+    {
+      "source": "dispatcher_recordreconciledsent",
+      "target": "dispatcher_repository_recordsent",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/dispatcher.ts",
+      "source_location": "L453",
+      "weight": 1.0
+    },
+    {
+      "source": "edit_draft_route_handler_createeditdrafthandler",
+      "target": "message_action_route_createmessageactionhandler",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/edit-draft-route-handler.ts",
+      "source_location": "L77",
+      "weight": 1.0
+    },
+    {
+      "source": "first_email_draft_snapshot_parsestoredfirstemaildraft",
+      "target": "ingestion_schema_parsefirstemailcandidate",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/first-email-draft-snapshot.ts",
+      "source_location": "L136",
+      "weight": 1.0
+    },
+    {
+      "source": "first_email_template_refresh_refreshfirstemailtemplate",
+      "target": "first_email_draft_snapshot_parsestoredfirstemaildraft",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/first-email-template-refresh.ts",
+      "source_location": "L58",
+      "weight": 1.0
+    },
+    {
+      "source": "first_email_template_refresh_refreshfirstemailtemplate",
+      "target": "ingestion_schema_parsewebsiteemailnarrative",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/first-email-template-refresh.ts",
+      "source_location": "L93",
+      "weight": 1.0
+    },
+    {
+      "source": "first_email_template_refresh_refreshfirstemailtemplate",
+      "target": "first_email_draft_snapshot_samefirstemailcandidate",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/first-email-template-refresh.ts",
+      "source_location": "L124",
+      "weight": 1.0
+    },
+    {
+      "source": "gmail_sync_creategmailreplysync",
+      "target": "gmail_sync_repository_getcursor",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/gmail-sync.ts",
+      "source_location": "L94",
+      "weight": 1.0
+    },
+    {
+      "source": "gmail_sync_creategmailreplysync",
+      "target": "client_googlegmailclient_getprofile",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/gmail-sync.ts",
+      "source_location": "L96",
+      "weight": 1.0
+    },
+    {
+      "source": "gmail_sync_creategmailreplysync",
+      "target": "gmail_sync_repository_setcursor",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/gmail-sync.ts",
+      "source_location": "L97",
+      "weight": 1.0
+    },
+    {
+      "source": "gmail_sync_creategmailreplysync",
+      "target": "client_googlegmailclient_listhistory",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/gmail-sync.ts",
+      "source_location": "L199",
+      "weight": 1.0
+    },
+    {
+      "source": "needs_redraft_route_handler_createneedsredrafthandler",
+      "target": "message_action_route_createmessageactionhandler",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/needs-redraft-route-handler.ts",
+      "source_location": "L71",
+      "weight": 1.0
+    },
+    {
       "source": "lib_growth_sequences_redraft_repository_ts",
       "target": "lib_growth_audit_service",
       "relation": "imports_from",
@@ -18891,1226 +20600,6 @@
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/resume-repository.ts",
       "source_location": "L9",
-      "weight": 1.0
-    },
-    {
-      "source": "agreement_builder_fees_step_contentfromform",
-      "target": "commercial_offer_fields_readcommercialoffer",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/agreement-builder-fees-step.tsx",
-      "source_location": "L257",
-      "weight": 1.0
-    },
-    {
-      "source": "agreement_builder_fees_step_contentfromform",
-      "target": "agreement_builder_fee_inputs_linesforagreementdraft",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/agreement-builder-fees-step.tsx",
-      "source_location": "L264",
-      "weight": 1.0
-    },
-    {
-      "source": "agreement_builder_fees_step_contentfromform",
-      "target": "agreement_builder_fee_inputs_parseinstallments",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/agreement-builder-fees-step.tsx",
-      "source_location": "L286",
-      "weight": 1.0
-    },
-    {
-      "source": "agreement_builder_fees_step_contentfromform",
-      "target": "agreement_builder_step_support_mergecontent",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/agreement-builder-fees-step.tsx",
-      "source_location": "L289",
-      "weight": 1.0
-    },
-    {
-      "source": "agreement_builder_fees_step_contentfromform",
-      "target": "agreement_builder_step_support_numbervalue",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/agreement-builder-fees-step.tsx",
-      "source_location": "L295",
-      "weight": 1.0
-    },
-    {
-      "source": "agreement_builder_fees_step_contentfromform",
-      "target": "agreement_builder_step_support_textvalue",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/agreement-builder-fees-step.tsx",
-      "source_location": "L298",
-      "weight": 1.0
-    },
-    {
-      "source": "agreement_builder_link_step_save",
-      "target": "agreement_builder_step_support_mergecontent",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/agreement-builder-link-step.tsx",
-      "source_location": "L53",
-      "weight": 1.0
-    },
-    {
-      "source": "agreement_builder_link_step_save",
-      "target": "agreement_builder_step_support_textvalue",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/agreement-builder-link-step.tsx",
-      "source_location": "L57",
-      "weight": 1.0
-    },
-    {
-      "source": "agreement_builder_link_step_beginengagement",
-      "target": "agreement_builder_step_support_textvalue",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/agreement-builder-link-step.tsx",
-      "source_location": "L66",
-      "weight": 1.0
-    },
-    {
-      "source": "agreement_builder_link_step_beginengagement",
-      "target": "agreement_builder_step_support_mergecontent",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/agreement-builder-link-step.tsx",
-      "source_location": "L68",
-      "weight": 1.0
-    },
-    {
-      "source": "agreement_builder_people_step_agreementbuilderpeoplestep",
-      "target": "agreement_builder_groups_useagreementbuildergroups",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/agreement-builder-people-step.tsx",
-      "source_location": "L21",
-      "weight": 1.0
-    },
-    {
-      "source": "agreement_builder_scope_step_save",
-      "target": "agreement_builder_step_support_mergecontent",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/agreement-builder-scope-step.tsx",
-      "source_location": "L28",
-      "weight": 1.0
-    },
-    {
-      "source": "agreement_builder_scope_step_save",
-      "target": "agreement_builder_step_support_textvalue",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/agreement-builder-scope-step.tsx",
-      "source_location": "L30",
-      "weight": 1.0
-    },
-    {
-      "source": "agreement_builder_step_support_textvalue",
-      "target": "route_get",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/agreement-builder-step-support.tsx",
-      "source_location": "L27",
-      "weight": 1.0
-    },
-    {
-      "source": "agreement_builder_step_support_formatgbp",
-      "target": "commercial_offer_summary_formatmoney",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/agreement-builder-step-support.tsx",
-      "source_location": "L50",
-      "weight": 1.0
-    },
-    {
-      "source": "client_agreement_detail_signingrecord",
-      "target": "presentation_hascompletesigningevidence",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/client-agreement-detail.tsx",
-      "source_location": "L77",
-      "weight": 1.0
-    },
-    {
-      "source": "client_agreement_detail_completionnotice",
-      "target": "presentation_hascompletesigningevidence",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/client-agreement-detail.tsx",
-      "source_location": "L120",
-      "weight": 1.0
-    },
-    {
-      "source": "client_agreement_detail_completionnotice",
-      "target": "presentation_clientsigningprogress",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/client-agreement-detail.tsx",
-      "source_location": "L142",
-      "weight": 1.0
-    },
-    {
-      "source": "client_agreement_detail_clientagreementdetail",
-      "target": "presentation_hascompletesigningevidence",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/client-agreement-detail.tsx",
-      "source_location": "L244",
-      "weight": 1.0
-    },
-    {
-      "source": "client_agreement_detail_clientagreementdetail",
-      "target": "agreement_builder_summary_formatgbp",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/client-agreement-detail.tsx",
-      "source_location": "L305",
-      "weight": 1.0
-    },
-    {
-      "source": "client_agreement_list_statuslabel",
-      "target": "presentation_clientsigningprogress",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/client-agreement-list.tsx",
-      "source_location": "L27",
-      "weight": 1.0
-    },
-    {
-      "source": "client_agreement_list_statuslabel",
-      "target": "presentation_hascompletesigningevidence",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/client-agreement-list.tsx",
-      "source_location": "L30",
-      "weight": 1.0
-    },
-    {
-      "source": "client_agreement_list_statuslabel",
-      "target": "presentation_toportalagreementstatus",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/client-agreement-list.tsx",
-      "source_location": "L31",
-      "weight": 1.0
-    },
-    {
-      "source": "client_agreement_list_agreementrow",
-      "target": "presentation_hascompletesigningevidence",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/client-agreement-list.tsx",
-      "source_location": "L55",
-      "weight": 1.0
-    },
-    {
-      "source": "client_agreement_list_agreementrow",
-      "target": "presentation_toportalagreementstatus",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/client-agreement-list.tsx",
-      "source_location": "L56",
-      "weight": 1.0
-    },
-    {
-      "source": "client_agreement_list_agreementrow",
-      "target": "presentation_clientsigningprogress",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/client-agreement-list.tsx",
-      "source_location": "L60",
-      "weight": 1.0
-    },
-    {
-      "source": "commercial_offer_fields_readcommercialoffer",
-      "target": "route_get",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/commercial-offer-fields.tsx",
-      "source_location": "L20",
-      "weight": 1.0
-    },
-    {
-      "source": "signing_deadline_actions_run",
-      "target": "client_googlegmailclient_request",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/signing-deadline-actions.tsx",
-      "source_location": "L92",
-      "weight": 1.0
-    },
-    {
-      "source": "staff_agreement_builder_persist",
-      "target": "agreement_builder_scope_step_save",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/staff-agreement-builder.tsx",
-      "source_location": "L94",
-      "weight": 1.0
-    },
-    {
-      "source": "staff_agreement_builder_beginengagement",
-      "target": "agreement_builder_scope_step_save",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/staff-agreement-builder.tsx",
-      "source_location": "L110",
-      "weight": 1.0
-    },
-    {
-      "source": "staff_agreement_builder_selectengagement",
-      "target": "engagement_prefill_replaceengagement",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/staff-agreement-builder.tsx",
-      "source_location": "L138",
-      "weight": 1.0
-    },
-    {
-      "source": "staff_agreement_builder_selectengagement",
-      "target": "engagement_prefill_prefillfromengagement",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/staff-agreement-builder.tsx",
-      "source_location": "L139",
-      "weight": 1.0
-    },
-    {
-      "source": "staff_signing_status_presentationfor",
-      "target": "presentation_hascompletesigningevidence",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "components/portal/agreements/staff-signing-status.tsx",
-      "source_location": "L34",
-      "weight": 1.0
-    },
-    {
-      "source": "commands_mutate",
-      "target": "lifecycle_validatecampaigndefinition",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/campaigns/commands.ts",
-      "source_location": "L55",
-      "weight": 1.0
-    },
-    {
-      "source": "commands_mutate",
-      "target": "lifecycle_serializecampaigndefinition",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/campaigns/commands.ts",
-      "source_location": "L58",
-      "weight": 1.0
-    },
-    {
-      "source": "commands_mutate",
-      "target": "permissions_recordcampaignpermission",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/campaigns/commands.ts",
-      "source_location": "L76",
-      "weight": 1.0
-    },
-    {
-      "source": "commands_mutate",
-      "target": "lifecycle_cancelcampaignjobs",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/campaigns/commands.ts",
-      "source_location": "L86",
-      "weight": 1.0
-    },
-    {
-      "source": "commands_mutate",
-      "target": "repository_loadlatestcampaignpolicy",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/campaigns/commands.ts",
-      "source_location": "L95",
-      "weight": 1.0
-    },
-    {
-      "source": "commands_mutate",
-      "target": "repository_persistcampaignmembership",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/campaigns/commands.ts",
-      "source_location": "L126",
-      "weight": 1.0
-    },
-    {
-      "source": "commands_executecampaigncommand",
-      "target": "authorization_requirecampaignfounder",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/campaigns/commands.ts",
-      "source_location": "L156",
-      "weight": 1.0
-    },
-    {
-      "source": "events_appendcampaigneventandoutbox",
-      "target": "authorization_requirecampaignfounder",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/campaigns/events.ts",
-      "source_location": "L24",
-      "weight": 1.0
-    },
-    {
-      "source": "permissions_recordcampaignpermission",
-      "target": "authorization_requirecampaignfounder",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/campaigns/permissions.ts",
-      "source_location": "L25",
-      "weight": 1.0
-    },
-    {
-      "source": "permissions_recordcampaignpermission",
-      "target": "repository_loadlatestcampaignpolicy",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/campaigns/permissions.ts",
-      "source_location": "L77",
-      "weight": 1.0
-    },
-    {
-      "source": "permissions_recordcampaignpermission",
-      "target": "founder_verification_reader_loadfounderverification",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/campaigns/permissions.ts",
-      "source_location": "L99",
-      "weight": 1.0
-    },
-    {
-      "source": "permissions_recordcampaignpermission",
-      "target": "events_appendcampaigneventandoutbox",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/campaigns/permissions.ts",
-      "source_location": "L134",
-      "weight": 1.0
-    },
-    {
-      "source": "report_buildcampaignreport",
-      "target": "time_londondaykey",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/campaigns/report.ts",
-      "source_location": "L26",
-      "weight": 1.0
-    },
-    {
-      "source": "report_buildcampaignreport",
-      "target": "route_get",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/campaigns/report.ts",
-      "source_location": "L41",
-      "weight": 1.0
-    },
-    {
-      "source": "repository_loadlatestcampaignpolicy",
-      "target": "authorization_requirecampaignfounder",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/campaigns/repository.ts",
-      "source_location": "L28",
-      "weight": 1.0
-    },
-    {
-      "source": "repository_loadcampaignpolicyversion",
-      "target": "authorization_requirecampaignfounder",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/campaigns/repository.ts",
-      "source_location": "L58",
-      "weight": 1.0
-    },
-    {
-      "source": "repository_persistcampaignmembership",
-      "target": "authorization_requirecampaignfounder",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/campaigns/repository.ts",
-      "source_location": "L108",
-      "weight": 1.0
-    },
-    {
-      "source": "repository_persistcampaignmembership",
-      "target": "events_appendcampaigneventandoutbox",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/campaigns/repository.ts",
-      "source_location": "L185",
-      "weight": 1.0
-    },
-    {
-      "source": "source_service_capturesourcelead",
-      "target": "global_identity_normalizeregistration",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/campaigns/source-service.ts",
-      "source_location": "L63",
-      "weight": 1.0
-    },
-    {
-      "source": "source_service_capturesourcelead",
-      "target": "global_identity_businesswebsitehost",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/campaigns/source-service.ts",
-      "source_location": "L67",
-      "weight": 1.0
-    },
-    {
-      "source": "source_service_capturesourcelead",
-      "target": "route_get",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/campaigns/source-service.ts",
-      "source_location": "L115",
-      "weight": 1.0
-    },
-    {
-      "source": "lead_service_capturelead",
-      "target": "lead_repository_findcapture",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/crm/lead-service.ts",
-      "source_location": "L18",
-      "weight": 1.0
-    },
-    {
-      "source": "lead_service_capturelead",
-      "target": "lead_repository_capturebusiness",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/crm/lead-service.ts",
-      "source_location": "L20",
-      "weight": 1.0
-    },
-    {
-      "source": "lead_service_capturelead",
-      "target": "lead_repository_capturecontact",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/crm/lead-service.ts",
-      "source_location": "L41",
-      "weight": 1.0
-    },
-    {
-      "source": "opportunity_service_attachcrmcontact",
-      "target": "activity_service_requirecrmprospect",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/crm/opportunity-service.ts",
-      "source_location": "L11",
-      "weight": 1.0
-    },
-    {
-      "source": "opportunity_service_attachcrmcontact",
-      "target": "lead_repository_capturecontact",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/crm/opportunity-service.ts",
-      "source_location": "L18",
-      "weight": 1.0
-    },
-    {
-      "source": "opportunity_service_createcrmopportunity",
-      "target": "activity_service_requirecrmprospect",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/crm/opportunity-service.ts",
-      "source_location": "L30",
-      "weight": 1.0
-    },
-    {
-      "source": "task_service_executetaskcommand",
-      "target": "activity_service_requirecrmprospect",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/crm/task-service.ts",
-      "source_location": "L15",
-      "weight": 1.0
-    },
-    {
-      "source": "task_service_executetaskcommand",
-      "target": "activity_service_appendcrmactivity",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/crm/task-service.ts",
-      "source_location": "L29",
-      "weight": 1.0
-    },
-    {
-      "source": "message_review_getmessagereview",
-      "target": "first_email_draft_snapshot_parsestoredfirstemaildraft",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/dashboard/message-review.ts",
-      "source_location": "L303",
-      "weight": 1.0
-    },
-    {
-      "source": "overview_selectdefaultworkqueuetab",
-      "target": "route_get",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/dashboard/overview.ts",
-      "source_location": "L184",
-      "weight": 1.0
-    },
-    {
-      "source": "founder_request_requesthasregisteredorigin",
-      "target": "route_get",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/http/founder-request.ts",
-      "source_location": "L9",
-      "weight": 1.0
-    },
-    {
-      "source": "founder_request_readjsonrequestbody",
-      "target": "route_get",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/http/founder-request.ts",
-      "source_location": "L17",
-      "weight": 1.0
-    },
-    {
-      "source": "founder_request_readjsonrequestbody",
-      "target": "global_schema_text",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/http/founder-request.ts",
-      "source_location": "L26",
-      "weight": 1.0
-    },
-    {
-      "source": "client_readjson",
-      "target": "route_get",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/integrations/gmail/client.ts",
-      "source_location": "L123",
-      "weight": 1.0
-    },
-    {
-      "source": "client_googlegmailclient_fetchprovider",
-      "target": "google_oauth_test_fetchimpl",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/integrations/gmail/client.ts",
-      "source_location": "L230",
-      "weight": 1.0
-    },
-    {
-      "source": "client_googlegmailclient_getfreshaccesstoken",
-      "target": "prospects_test_fakefragment_then",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/integrations/gmail/client.ts",
-      "source_location": "L297",
-      "weight": 1.0
-    },
-    {
-      "source": "client_googlegmailclient_listhistory",
-      "target": "reconciliation_readgmailhistorypage",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/integrations/gmail/client.ts",
-      "source_location": "L431",
-      "weight": 1.0
-    },
-    {
-      "source": "client_googlegmailclient_getmessagemetadata",
-      "target": "reconciliation_readgmailmessagemetadata",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/integrations/gmail/client.ts",
-      "source_location": "L444",
-      "weight": 1.0
-    },
-    {
-      "source": "client_googlegmailclient_findbyrfcmessageid",
-      "target": "reconciliation_findgmailmessagebyrfcid",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/integrations/gmail/client.ts",
-      "source_location": "L450",
-      "weight": 1.0
-    },
-    {
-      "source": "live_client_createlivegmailclient",
-      "target": "integration_connections_getconnectedgmailcredential",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/integrations/gmail/live-client.ts",
-      "source_location": "L26",
-      "weight": 1.0
-    },
-    {
-      "source": "live_client_createlivegmailclient",
-      "target": "client_creategmailclient",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/integrations/gmail/live-client.ts",
-      "source_location": "L37",
-      "weight": 1.0
-    },
-    {
-      "source": "reconciliation_readgmailhistorypage",
-      "target": "google_oauth_readjson",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/integrations/gmail/reconciliation.ts",
-      "source_location": "L154",
-      "weight": 1.0
-    },
-    {
-      "source": "reconciliation_readgmailmessagemetadata",
-      "target": "google_oauth_readjson",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/integrations/gmail/reconciliation.ts",
-      "source_location": "L187",
-      "weight": 1.0
-    },
-    {
-      "source": "reconciliation_findgmailmessagebyrfcid",
-      "target": "google_oauth_readjson",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/integrations/gmail/reconciliation.ts",
-      "source_location": "L223",
-      "weight": 1.0
-    },
-    {
-      "source": "google_oauth_exchangegoogleauthorizationcode",
-      "target": "google_oauth_test_fetchimpl",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L143",
-      "weight": 1.0
-    },
-    {
-      "source": "google_oauth_fetchgoogleidentity",
-      "target": "google_oauth_test_fetchimpl",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L208",
-      "weight": 1.0
-    },
-    {
-      "source": "google_oauth_revokegoogleoauthtoken",
-      "target": "google_oauth_test_fetchimpl",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/integrations/google-oauth.ts",
-      "source_location": "L254",
-      "weight": 1.0
-    },
-    {
-      "source": "webhook_applysuppression",
-      "target": "suppression_recordhardbounce",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/integrations/resend/webhook.ts",
-      "source_location": "L175",
-      "weight": 1.0
-    },
-    {
-      "source": "webhook_applysuppression",
-      "target": "suppression_recordcomplaint",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/integrations/resend/webhook.ts",
-      "source_location": "L177",
-      "weight": 1.0
-    },
-    {
-      "source": "webhook_applysuppression",
-      "target": "webhook_repository_insertglobalsuppression",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/integrations/resend/webhook.ts",
-      "source_location": "L185",
-      "weight": 1.0
-    },
-    {
-      "source": "webhook_applysuppression",
-      "target": "webhook_repository_findsequenceenrollmentidsbyemail",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/integrations/resend/webhook.ts",
-      "source_location": "L192",
-      "weight": 1.0
-    },
-    {
-      "source": "webhook_applyresendwebhookevent",
-      "target": "webhook_repository_hasdeliveryevent",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/integrations/resend/webhook.ts",
-      "source_location": "L230",
-      "weight": 1.0
-    },
-    {
-      "source": "webhook_applyresendwebhookevent",
-      "target": "webhook_repository_recorddeliveryevent",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/integrations/resend/webhook.ts",
-      "source_location": "L238",
-      "weight": 1.0
-    },
-    {
-      "source": "global_repository_inspectglobalcandidate",
-      "target": "global_identity_normalizeregistration",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/research/global-repository.ts",
-      "source_location": "L17",
-      "weight": 1.0
-    },
-    {
-      "source": "global_repository_inspectglobalcandidate",
-      "target": "global_identity_businesswebsitehost",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/research/global-repository.ts",
-      "source_location": "L18",
-      "weight": 1.0
-    },
-    {
-      "source": "global_repository_insertglobalcandidate",
-      "target": "global_identity_normalizeregistration",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/research/global-repository.ts",
-      "source_location": "L61",
-      "weight": 1.0
-    },
-    {
-      "source": "ingest_ingestresearchrun",
-      "target": "global_ingest_ingestglobalresearchrun",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/research/ingest.ts",
-      "source_location": "L142",
-      "weight": 1.0
-    },
-    {
-      "source": "preview_pr_trigger_triggerpreviewpullrequest",
-      "target": "client_googlegmailclient_request",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/research/preview-pr-trigger.ts",
-      "source_location": "L147",
-      "weight": 1.0
-    },
-    {
-      "source": "preview_pr_trigger_triggercurrenttendraftpreviewbackfill",
-      "target": "client_googlegmailclient_request",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/research/preview-pr-trigger.ts",
-      "source_location": "L212",
-      "weight": 1.0
-    },
-    {
-      "source": "route_handler_readrawbody",
-      "target": "route_get",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/research/route-handler.ts",
-      "source_location": "L31",
-      "weight": 1.0
-    },
-    {
-      "source": "submission_client_submitglobalresearch",
-      "target": "client_googlegmailclient_request",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/research/submission-client.ts",
-      "source_location": "L92",
-      "weight": 1.0
-    },
-    {
-      "source": "approval_createfirstemailapprover",
-      "target": "client_googlegmailclient_createdraft",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/sequences/approval.ts",
-      "source_location": "L334",
-      "weight": 1.0
-    },
-    {
-      "source": "approve_send_route_handler_createapprovesendhandler",
-      "target": "approval_createfirstemailapprover",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/sequences/approve-send-route-handler.ts",
-      "source_location": "L98",
-      "weight": 1.0
-    },
-    {
-      "source": "approve_send_route_handler_createapprovesendhandler",
-      "target": "message_action_route_createmessageactionhandler",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/sequences/approve-send-route-handler.ts",
-      "source_location": "L105",
-      "weight": 1.0
-    },
-    {
-      "source": "create_gmail_draft_route_handler_createcreategmaildrafthandler",
-      "target": "message_action_route_createmessageactionhandler",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/sequences/create-gmail-draft-route-handler.ts",
-      "source_location": "L115",
-      "weight": 1.0
-    },
-    {
-      "source": "dispatcher_preparefollowupsend",
-      "target": "dispatcher_repository_getthreadreferences",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/sequences/dispatcher.ts",
-      "source_location": "L143",
-      "weight": 1.0
-    },
-    {
-      "source": "dispatcher_preparefollowupsend",
-      "target": "dispatcher_repository_getfollowuptemplate",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/sequences/dispatcher.ts",
-      "source_location": "L207",
-      "weight": 1.0
-    },
-    {
-      "source": "dispatcher_createoutreachdispatcher",
-      "target": "dispatcher_repository_claimduemessage",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/sequences/dispatcher.ts",
-      "source_location": "L288",
-      "weight": 1.0
-    },
-    {
-      "source": "dispatcher_createoutreachdispatcher",
-      "target": "dispatcher_repository_getsendcontext",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/sequences/dispatcher.ts",
-      "source_location": "L297",
-      "weight": 1.0
-    },
-    {
-      "source": "dispatcher_createoutreachdispatcher",
-      "target": "dispatcher_repository_cancelmessage",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/sequences/dispatcher.ts",
-      "source_location": "L302",
-      "weight": 1.0
-    },
-    {
-      "source": "dispatcher_createoutreachdispatcher",
-      "target": "dispatcher_repository_issuppressed",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/sequences/dispatcher.ts",
-      "source_location": "L309",
-      "weight": 1.0
-    },
-    {
-      "source": "dispatcher_createoutreachdispatcher",
-      "target": "dispatcher_repository_hasnewerinboundmessage",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/sequences/dispatcher.ts",
-      "source_location": "L338",
-      "weight": 1.0
-    },
-    {
-      "source": "dispatcher_createoutreachdispatcher",
-      "target": "client_googlegmailclient_findbyrfcmessageid",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/sequences/dispatcher.ts",
-      "source_location": "L352",
-      "weight": 1.0
-    },
-    {
-      "source": "dispatcher_createoutreachdispatcher",
-      "target": "dispatcher_repository_failmessage",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/sequences/dispatcher.ts",
-      "source_location": "L382",
-      "weight": 1.0
-    },
-    {
-      "source": "dispatcher_createoutreachdispatcher",
-      "target": "client_googlegmailclient_sendmessage",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/sequences/dispatcher.ts",
-      "source_location": "L393",
-      "weight": 1.0
-    },
-    {
-      "source": "dispatcher_createoutreachdispatcher",
-      "target": "dispatcher_repository_recordsent",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/sequences/dispatcher.ts",
-      "source_location": "L397",
-      "weight": 1.0
-    },
-    {
-      "source": "dispatcher_recordreconciledsent",
-      "target": "dispatcher_repository_recordsent",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/sequences/dispatcher.ts",
-      "source_location": "L453",
-      "weight": 1.0
-    },
-    {
-      "source": "edit_draft_route_handler_createeditdrafthandler",
-      "target": "message_action_route_createmessageactionhandler",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/sequences/edit-draft-route-handler.ts",
-      "source_location": "L77",
-      "weight": 1.0
-    },
-    {
-      "source": "first_email_draft_snapshot_parsestoredfirstemaildraft",
-      "target": "ingestion_schema_parsefirstemailcandidate",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/sequences/first-email-draft-snapshot.ts",
-      "source_location": "L136",
-      "weight": 1.0
-    },
-    {
-      "source": "first_email_template_refresh_refreshfirstemailtemplate",
-      "target": "first_email_draft_snapshot_parsestoredfirstemaildraft",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/sequences/first-email-template-refresh.ts",
-      "source_location": "L58",
-      "weight": 1.0
-    },
-    {
-      "source": "first_email_template_refresh_refreshfirstemailtemplate",
-      "target": "ingestion_schema_parsewebsiteemailnarrative",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/sequences/first-email-template-refresh.ts",
-      "source_location": "L93",
-      "weight": 1.0
-    },
-    {
-      "source": "first_email_template_refresh_refreshfirstemailtemplate",
-      "target": "first_email_draft_snapshot_samefirstemailcandidate",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/sequences/first-email-template-refresh.ts",
-      "source_location": "L124",
-      "weight": 1.0
-    },
-    {
-      "source": "gmail_sync_creategmailreplysync",
-      "target": "gmail_sync_repository_getcursor",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/sequences/gmail-sync.ts",
-      "source_location": "L94",
-      "weight": 1.0
-    },
-    {
-      "source": "gmail_sync_creategmailreplysync",
-      "target": "client_googlegmailclient_getprofile",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/sequences/gmail-sync.ts",
-      "source_location": "L96",
-      "weight": 1.0
-    },
-    {
-      "source": "gmail_sync_creategmailreplysync",
-      "target": "gmail_sync_repository_setcursor",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/sequences/gmail-sync.ts",
-      "source_location": "L97",
-      "weight": 1.0
-    },
-    {
-      "source": "gmail_sync_creategmailreplysync",
-      "target": "client_googlegmailclient_listhistory",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/sequences/gmail-sync.ts",
-      "source_location": "L199",
-      "weight": 1.0
-    },
-    {
-      "source": "needs_redraft_route_handler_createneedsredrafthandler",
-      "target": "message_action_route_createmessageactionhandler",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/sequences/needs-redraft-route-handler.ts",
-      "source_location": "L71",
-      "weight": 1.0
-    },
-    {
-      "source": "research_email_send_route_createresearchemailsendhandler",
-      "target": "message_action_route_createmessageactionhandler",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/sequences/research-email-send-route.ts",
-      "source_location": "L84",
       "weight": 1.0
     },
     {
@@ -26036,6 +26525,87 @@
       "weight": 1.0
     },
     {
+      "source": "tests_integration_growth_outreach_account_control_test_ts",
+      "target": "strict",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/outreach-account-control.test.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_outreach_account_control_test_ts",
+      "target": "node_crypto",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/outreach-account-control.test.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_outreach_account_control_test_ts",
+      "target": "node_test",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/outreach-account-control.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_outreach_account_control_test_ts",
+      "target": "postgres",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/outreach-account-control.test.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_outreach_account_control_test_ts",
+      "target": "lib_growth_campaigns_account_repository",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/outreach-account-control.test.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_outreach_account_control_test_ts",
+      "target": "lib_growth_db_client",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/outreach-account-control.test.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_outreach_account_control_test_ts",
+      "target": "lib_growth_campaigns_account_control",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/outreach-account-control.test.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_outreach_account_control_test_ts",
+      "target": "lib_growth_campaigns_account_contracts",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/outreach-account-control.test.ts",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_outreach_account_control_test_ts",
+      "target": "outreach_account_control_test_readiness",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/outreach-account-control.test.ts",
+      "source_location": "L33",
+      "weight": 1.0
+    },
+    {
       "source": "tests_integration_growth_source_capture_test_ts",
       "target": "strict",
       "relation": "imports_from",
@@ -28337,6 +28907,116 @@
       "confidence_score": 1,
       "source_file": "components/portal/agreements/use-commercial-offer-command.ts",
       "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_account_control_ts",
+      "target": "lib_growth_integrations_google_oauth_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/account-control.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_account_control_ts",
+      "target": "lib_growth_campaigns_authorization_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/account-control.ts",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_account_control_ts",
+      "target": "lib_growth_campaigns_account_contracts_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/account-control.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_account_control_ts",
+      "target": "lib_growth_campaigns_account_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/account-control.ts",
+      "source_location": "L12",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_account_readiness_test_ts",
+      "target": "lib_growth_campaigns_account_readiness_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/account-readiness.test.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_account_repository_ts",
+      "target": "lib_growth_integrations_google_oauth_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/account-repository.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_account_repository_ts",
+      "target": "lib_growth_campaigns_authorization_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/account-repository.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_account_repository_ts",
+      "target": "lib_growth_campaigns_account_contracts_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/account-repository.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_account_repository_ts",
+      "target": "lib_growth_campaigns_account_readiness_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/account-repository.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_account_repository_ts",
+      "target": "lib_growth_campaigns_account_usage_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/account-repository.ts",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_account_usage_test_ts",
+      "target": "lib_growth_campaigns_account_usage_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/account-usage.test.ts",
+      "source_location": "L3",
       "weight": 1
     },
     {
@@ -31777,6 +32457,36 @@
       "confidence_score": 1,
       "source_file": "tests/integration/growth/gmail-disconnect.test.ts",
       "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_outreach_account_control_test_ts",
+      "target": "lib_growth_campaigns_account_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/outreach-account-control.test.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_outreach_account_control_test_ts",
+      "target": "lib_growth_campaigns_account_control_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/outreach-account-control.test.ts",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_outreach_account_control_test_ts",
+      "target": "lib_growth_campaigns_account_contracts_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/outreach-account-control.test.ts",
+      "source_location": "L8",
       "weight": 1
     },
     {
