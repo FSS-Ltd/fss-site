@@ -8,11 +8,13 @@ export function CommandForm({
   label,
   build,
   onSuccess,
+  onConflict,
   children,
 }: {
   label: string;
   build: (data: FormData) => Payload;
   onSuccess: (id: string) => void;
+  onConflict?: () => void;
   children?: ReactNode;
 }) {
   const retry = useRef<{ payload: string; id: string } | null>(null);
@@ -22,6 +24,7 @@ export function CommandForm({
   return (
     <form
       className={styles.form}
+      data-command={label}
       onSubmit={async (event) => {
         event.preventDefault();
         const form = event.currentTarget;
@@ -52,6 +55,7 @@ export function CommandForm({
             body: JSON.stringify({ ...payload, requestId }),
           });
           if (!response.ok) {
+            if (response.status === 409) onConflict?.();
             const location = response.headers.get("location");
             if (location?.startsWith("/growth/prospects/"))
               setDuplicate(location);

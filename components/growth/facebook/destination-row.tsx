@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { CommandForm } from "./command-form";
 import {
   ActivityForm,
@@ -16,18 +16,53 @@ export function DestinationRow({
   item,
   saved,
   pilots,
-  select,
+  retain,
+  discard,
+  release,
+  retained,
+  refresh,
 }: {
   item: Destination;
   saved: (id: string) => void;
   pilots: ReadyWorkspace["pilots"];
-  select: (id: string) => void;
+  retain: (item: Destination) => void;
+  discard: (id: string) => void;
+  release: (id: string) => void;
+  retained: boolean;
+  refresh: () => void;
 }) {
   const [rulesVersion, setRulesVersion] = useState<number | null>(null);
   const [rulesOpen, setRulesOpen] = useState(false);
   const last = item.activities[0];
+  const dirtyForms = useRef(new Set<string>());
+  const detailsRef = useRef<HTMLDetailsElement>(null);
+  const activityRef = useRef<HTMLDetailsElement>(null);
+  const completed = (label: string) => {
+    dirtyForms.current.delete(label);
+    if (dirtyForms.current.size === 0) release(item.id);
+    saved(item.id);
+  };
+  const openNext = () => {
+    if (detailsRef.current) detailsRef.current.open = true;
+    if (item.nextManualAction === "review_rules") {
+      if (rulesVersion === null) setRulesVersion(item.version);
+      setRulesOpen(true);
+    } else if (activityRef.current) activityRef.current.open = true;
+  };
   return (
-    <article className={styles.row} id={item.id}>
+    <article
+      className={styles.row}
+      id={item.id}
+      onInputCapture={(event) => {
+        if (event.target instanceof Element) {
+          const label = event.target.closest("form")?.dataset.command;
+          if (label) {
+            dirtyForms.current.add(label);
+            retain(item);
+          }
+        }
+      }}
+    >
       <h2>{item.name}</h2>
       <a href={item.url} target="_blank" rel="noopener noreferrer">
         {item.url}
@@ -70,15 +105,24 @@ export function DestinationRow({
                 : item.nextManualAction === "follow"
                   ? "Follow, then record"
                   : "Join, then record"}
+            <br />
+            <button
+              type="button"
+              className={styles.secondary}
+              onClick={openNext}
+            >
+              {item.nextManualAction === "review_rules"
+                ? "Review rules"
+                : item.nextManualAction === "follow"
+                  ? "Record completed follow"
+                  : item.nextManualAction === "join"
+                    ? "Record completed join"
+                    : "Record completed activity"}
+            </button>
           </dd>
         </div>
       </dl>
-      <details
-        className={styles.details}
-        onToggle={(event) => {
-          if (event.currentTarget.open) select(item.id);
-        }}
-      >
+      <details className={styles.details} ref={detailsRef}>
         <summary>Evidence, history and actions</summary>
         <h3>Rules evidence</h3>
         {item.review ? (
@@ -115,12 +159,26 @@ export function DestinationRow({
           <div hidden={!rulesOpen}>
             <RulesForm
               destination={{ ...item, version: rulesVersion }}
+              onConflict={refresh}
               saved={() => {
                 setRulesVersion(null);
                 setRulesOpen(false);
-                saved(item.id);
+                completed("Save rules review");
               }}
             />
+            {item.version !== rulesVersion && (
+              <p>
+                Current version {item.version} is shown above. Review the
+                evidence, then{" "}
+                <button
+                  type="button"
+                  onClick={() => setRulesVersion(item.version)}
+                >
+                  Use current version
+                </button>{" "}
+                to keep these entries and submit a new review.
+              </p>
+            )}
             <button type="button" onClick={() => setRulesOpen(false)}>
               Close rules review
             </button>
@@ -162,9 +220,12 @@ export function DestinationRow({
           ))}
         </ul>
         {item.activitiesHaveMore && <p>Showing the latest 20 activities.</p>}
-        <details>
+        <details ref={activityRef}>
           <summary>Record completed activity</summary>
-          <ActivityForm destination={item} saved={() => saved(item.id)} />
+          <ActivityForm
+            destination={item}
+            saved={() => completed("Record completed activity")}
+          />
         </details>
         <h3>Linked prospects</h3>
         <ul>
@@ -185,13 +246,24 @@ export function DestinationRow({
         )}
         <details>
           <summary>Link existing prospect</summary>
-          <LinkForm destination={item} saved={() => saved(item.id)} />
+          <LinkForm
+            destination={item}
+            saved={() => completed("Link prospect")}
+          />
         </details>
         <details>
           <summary>Add prospect</summary>
-          <SourceForm destination={item} saved={() => saved(item.id)} />
+          <SourceForm
+            destination={item}
+            saved={() => completed("Save prospect")}
+          />
         </details>
       </details>
+      {retained && (
+        <button type="button" onClick={() => discard(item.id)}>
+          Discard unsaved entries
+        </button>
+      )}
     </article>
   );
 }

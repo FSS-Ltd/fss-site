@@ -45,12 +45,17 @@ export function DestinationCapture({ saved }: { saved: (id: string) => void }) {
     </CommandForm>
   );
 }
-export function RulesForm({ destination, saved }: Props) {
+export function RulesForm({
+  destination,
+  saved,
+  onConflict,
+}: Props & { onConflict: () => void }) {
   const version = destination.version;
   return (
     <CommandForm
       label="Save rules review"
       onSuccess={saved}
+      onConflict={onConflict}
       build={(d) => ({
         type: "review_rules",
         destinationId: destination.id,

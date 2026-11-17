@@ -108,3 +108,41 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+.primary {
+  display: inline-flex;
+  align-items: center;
+  background: #087f88;
+  color: white;
+  border-radius: 4px;
+  padding: 0.65rem 1rem;
+  font-weight: 700;
+  list-style: none;
+}
+.primary::-webkit-details-marker {
+  display: none;
+}
+.page button.secondary {
+  background: transparent;
+  color: #00656c;
+  border: 1px solid #87a9ad;
+}
+.details h3 {
+  margin: 1.4rem 0 0.5rem;
+}
+.details ul {
+  margin: 0.5rem 0 1rem;
+  padding-left: 1.3rem;
+}
+.details li {
+  margin: 0.35rem 0;
+}
+.pilot h2,
+.pilot p {
+  display: inline;
+  margin-right: 0.5rem;
+  font-size: 1rem;
+}
+.pilot summary {
+  min-height: 0;
+  padding: 0.5rem 0;
+}
