@@ -22,6 +22,13 @@ const REQUIRED_GMAIL_SCOPE_OPTIONS = [
   ["https://www.googleapis.com/auth/gmail.modify"],
 ] as const;
 
+export function hasRequiredGmailScopes(scopes: readonly string[]): boolean {
+  const granted = new Set(scopes);
+  return REQUIRED_GMAIL_SCOPE_OPTIONS.every((options) =>
+    options.some((scope) => granted.has(scope)),
+  );
+}
+
 const googleTokenResponseSchema = z.object({
   access_token: z.string().min(1),
   expires_in: z.number().int().positive(),
@@ -175,11 +182,7 @@ export async function exchangeGoogleAuthorizationCode(
   }
 
   const grantedScopes = parsed.data.scope.split(/\s+/).filter(Boolean);
-  const grantedScopeSet = new Set(grantedScopes);
-  const hasRequiredScopes = REQUIRED_GMAIL_SCOPE_OPTIONS.every((options) =>
-    options.some((scope) => grantedScopeSet.has(scope)),
-  );
-  if (!hasRequiredScopes) {
+  if (!hasRequiredGmailScopes(grantedScopes)) {
     throw new GoogleOAuthError(
       "INVALID_TOKEN_RESPONSE",
       "Google returned an invalid token response.",
