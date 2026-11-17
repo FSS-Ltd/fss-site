@@ -2,7 +2,7 @@
 
 **Status:** Design approved by the user on 17 November 2026; implementation is in progress. Production deployment and campaign activation remain subject to the documented review and approval gates.
 **Date:** 17 November 2026
-**Baseline:** `origin/main` `618e7d730`; verify against the implementation checkout before planning. The refreshed structural map covers 198 selected files; it is not an exhaustive repository graph.
+**Baseline:** `origin/main` `618e7d730`; verify against the implementation checkout before planning. The initial structural map covered 198 selected files; consult FEATURE_TREE.md and graphify-out/source-hashes.json for the current scoped inventory, which is not exhaustive.
 **Source research:** [Video outreach brief](../../growth-os/research/2026-11-17-video-outreach-brief.md).
 
 ## Intent and success
@@ -72,7 +72,7 @@ Trace: **found → deduplicated → qualified or rejected with reason → permis
 
 ## Offers, copy and cadence
 
-The founder has not yet confirmed the offer or pricing question. Propose keeping existing FSS offers and pricing unless the founder separately approves changes. Never change prices based solely on an LLM recommendation. The videos' $297 review and website examples and $297/$397/$497 Facebook examples are reference material, not adopted pricing. Free-build, review management, AI booking, and texting cannot be offered as operational capabilities without proof of delivery and a separate scope decision where needed.
+On 17 November 2026 the founder confirmed that the free website plus monthly services model is a separate offer from all bespoke FSS services, and approved this design. Preserve existing bespoke services and pricing. Give the separate offer its own identity, approved terms and reporting cohort. Its monthly amount/currency, included services, free-site scope, minimum term and cancellation terms are awaiting clarification; keep it an unpriced draft until configured and approved. Never adopt the videos' $297/$397/$497 examples as FSS prices. Free-build, review management, AI booking and texting claims still require actual approved delivery capability. No existing client plan, public service catalogue, billing subscription or domain is changed by this clarification.
 
 Original message concepts for founder review, with names and facts filled only from verified evidence:
 
@@ -88,7 +88,7 @@ For the Facebook sequence, propose follow-ups at two days and two days later, th
 
 Add `/growth/facebook` as a separate workspace using existing Growth white, navy and teal tokens and accessible CRM primitives. Thin routes call the canonical Growth services. List public pages to follow and groups to join; pages are followed, groups are joined. Record destination URL, locality, public activity evidence, posting rules, evidence timestamp, and manual join/follow/post status. Unknown or stale rules mean unqualified for posting. Discovery uses public information only, with no login bypass, scraping of private groups, automatic joining or posting.
 
-The proposed initial Facebook pilot has two free-build slots total. Each is a private, one-page review preview using the canonical preview technology and includes at most one revision. This is an FSS design proposal, not a claim about the video. A free published website is not adopted until the founder resolves the pricing and offer question. Do not promise SMS, booking, review management or a monthly bundle as live without approved capability evidence. The private free preview requires no payment; payment is required only for an approved paid setup, activation or domain connection. The client retains the domain and no automatic hosting migration occurs.
+The proposed initial Facebook pilot has two free-build slots total. Each is a private, one-page review preview using the canonical preview technology and includes at most one revision. This is an FSS design proposal, not a claim about the video. The founder has confirmed the separate free-website/monthly-service offer direction; its published-site and recurring-service terms remain pending. These private preview allocations describe the validation pilot and do not silently define the separate commercial terms. Do not promise SMS, booking, review management or a monthly bundle as live without approved capability evidence. The private free preview requires no payment; payment is required only for an approved paid setup, activation or domain connection. The client retains the domain and no automatic hosting migration occurs.
 
 A founder may create a prospect from a Facebook page with the source URL and evidence. Registration number and person name may be unknown in the source-aware research-only path. Missing information cannot turn into send permission. Reuse CRM deduplication, suppression, contact verification, research and campaign history; existing legacy capture contract stays intact.
 
