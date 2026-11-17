@@ -196,5 +196,12 @@
   "lib/growth/db/repositories/prospects.ts": "89d0a8e482dce1cdf80919c7d81c693592e66bd42f285efc3b2e04e01adfcdd6",
   "lib/growth/db/repositories/contacts.ts": "5a163dcee2b9f0ced4e667bf5a0ac0c1e019c9ce46db8e038241ef07f839f52d",
   "lib/growth/email/suppression.ts": "7afd1b29dcb7223d16b4b2aa21a3e00cf2b831a970511b78f4a9a6a86cc4a353",
-  "lib/operations/studio/clients.ts": "8182f702843c121420b0e8a60d8b9e5890f3377db2d415a66d48ac30853469b6"
+  "lib/operations/studio/clients.ts": "8182f702843c121420b0e8a60d8b9e5890f3377db2d415a66d48ac30853469b6",
+  "lib/growth/campaigns/schemas.ts": "ec9abb9658b481ba544e8c8ebeef47190c9366eada1d4e04bc97ae3f77b202fd",
+  "lib/growth/campaigns/policy.ts": "baa49aabf959ee802c9b7eb100836d9f14863a56bcda6a64f0d9dab86c45f2b1",
+  "lib/growth/campaigns/variants.ts": "2bd4c5e587eec2e3d4e3881a3d597e126793b6b4b5f84fee59833643eda85295",
+  "lib/growth/campaigns/copy.ts": "b244193b7a028b95b2c2b7ed952b9cc27a3496719f945e566c13008ec701c630",
+  "lib/growth/campaigns/time.ts": "2acd24683f8cc89ceecd0a46862024a4bb3fbce28f639ff54b8d5c1da2088d84",
+  "lib/growth/campaigns/report.ts": "7fea5fee6848bf160fd6927274db9d6c78471566714e41c321f79d110b4a3f90",
+  "lib/growth/campaigns/domain.test.ts": "a1fbc26b6d6ae594120283b98912ba5f28b925039c42f77f134dc0450ca37e0c"
 }
