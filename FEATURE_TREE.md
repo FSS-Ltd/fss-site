@@ -61,6 +61,7 @@ Graphify: [graph](graphify-out/graph.json), [audit report](graphify-out/GRAPH_RE
 ### GROWTH-CRM: CRM workspace and lead capture
 
 - Status: implemented. Entry: `app/api/growth/crm/[id]/route.ts`. Canonical readers and capture: `lib/growth/crm/workspace-query.ts#getCrmWorkspace`, `lib/growth/crm/lead-service.ts#captureLead`, `lib/growth/crm/lead-repository.ts#captureBusiness`.
+- Source-aware capture: `lib/growth/campaigns/source-service.ts#captureSourceLead` via `executeCrmCommand` kind `capture_source`; requires founder hash/email, stores unknown facts privately, no fabricated verified contact/run/evidence. Prospects source predicates in `lib/growth/dashboard/prospects.ts#SOURCE_FILTER_VALUES`. UI is pending. Canonical identity readers in `lead-repository.ts` and `global-repository.ts` recognize private registration claims for review without promotion.
 - depends_on INFRA and Growth auth; used_by GROWTH-RESEARCH and GROWTH-OUTREACH. Tests: `tests/integration/growth/crm-workspace.test.ts`, `tests/integration/growth/crm-records.test.ts`. Graph node: `lib_growth_crm_lead_service_ts`.
 
 ### GROWTH-RESEARCH: research ingestion
@@ -85,8 +86,8 @@ Graphify: [graph](graphify-out/graph.json), [audit report](graphify-out/GRAPH_RE
 
 ### GROWTH-FB-SOURCE: Facebook source identity handling
 
-- Status: partial. `lib/growth/research/global-identity.ts` treats Facebook hosts as social sources; `lib/growth/crm/schemas.ts#sourceUrlSchema` validates public source URLs. This does not establish a Facebook workspace or automated collection.
-- depends_on GROWTH-RESEARCH and GROWTH-CRM; used_by candidate identity and manual source entry. Graph node: `lib_growth_research_global_identity_ts`. Tests: `lib/growth/research/global-identity.test.ts`.
+- Status: partial. `lib/growth/research/global-identity.ts` treats Facebook hosts as social sources; `lib/growth/campaigns/source-service.ts#captureSourceLead` normalizes equivalent public Facebook URLs, keeps shared-group businesses distinct, reuses orphan businesses, and retains new registration claims privately with audited version updates. Entry: founder `executeCrmCommand` kind `capture_source`; input `sourceLeadInputSchema` in campaign schemas. No Facebook workspace or automated collection yet.
+- depends_on GROWTH-RESEARCH and GROWTH-CRM; used_by candidate identity and manual source entry. Graph nodes: `lib_growth_research_global_identity_ts`, `lib_growth_campaigns_source_service_ts`. Tests: `lib/growth/research/global-identity.test.ts`, `tests/integration/growth/source-capture.test.ts`; 24 targeted source/global/CRM PostgreSQL tests passed, source review PASS at `31fdc346a`. Operations/suppression before/after hash invariants verified.
 
 ### OPS-CLIENT: Studio client ownership boundary
 
