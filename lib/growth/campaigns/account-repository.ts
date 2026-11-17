@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { AuthorityBounds } from "./authority-bounds";
 import type { GrowthTransaction } from "../db/types";
 import { hasRequiredGmailScopes } from "../integrations/google-oauth";
 import { CAMPAIGN_FOUNDER_EMAIL } from "./authorization";
@@ -17,6 +18,7 @@ export function sameAccountScopes(a: string[], b: string[]): boolean {
 type Decision = { status: "ready" } | { status: "held"; reason: string };
 
 type ReservationAccount = {
+  bounds: AuthorityBounds;
   grantEpoch: number;
   ramp: number;
   limits: Pick<
@@ -44,6 +46,7 @@ async function loadConfiguredAccount(
   connectionId: string,
   mode: "prerequisites" | "active",
   healthAfter?: Date,
+  locks: "acquire" | "held" = "acquire",
 ): Promise<ReservationDecision> {
   const held = (reason: string): ReservationDecision => ({
     status: "held",
@@ -58,7 +61,7 @@ async function loadConfiguredAccount(
     }[]
   >`
     select status,google_subject as subject,version,granted_scopes as scopes
-    from growth.integration_connections where id=${connectionId} and provider='gmail' and subject_email=${CAMPAIGN_FOUNDER_EMAIL} for share`;
+    from growth.integration_connections where id=${connectionId} and provider='gmail' and subject_email=${CAMPAIGN_FOUNDER_EMAIL} ${locks === "acquire" ? tx`for share` : tx``}`;
   if (!connection) return held("identity_or_grant_unknown");
   const [control] = await tx<
     {
@@ -71,7 +74,7 @@ async function loadConfiguredAccount(
       healthId: string | null;
     }[]
   >`
-    select state,ramp,verified_subject as subject,verified_grant_epoch as grant,verified_scopes as scopes,limits_review_id as "limitsId",health_review_id as "healthId" from growth.outreach_account_controls where connection_id=${connectionId} for share`;
+    select state,ramp,verified_subject as subject,verified_grant_epoch as grant,verified_scopes as scopes,limits_review_id as "limitsId",health_review_id as "healthId" from growth.outreach_account_controls where connection_id=${connectionId} ${locks === "acquire" ? tx`for share` : tx``}`;
   if (
     !control ||
     connection.status !== "connected" ||
@@ -121,7 +124,7 @@ async function loadConfiguredAccount(
       ids: unknown;
     }[]
   >`
-    select account_id as "accountId",captured_at as "capturedAt",fresh_until as "expiresAt",complete,grant_epoch as grant,rolling_messages as messages,rolling_recipients as recipients,window_start as "windowStart",history_start as "historyStart",history_end as "historyEnd",evidence_version as "evidenceVersion",provider_message_ids as ids from growth.outreach_provider_usage where connection_id=${connectionId} for share`;
+    select account_id as "accountId",captured_at as "capturedAt",fresh_until as "expiresAt",complete,grant_epoch as grant,rolling_messages as messages,rolling_recipients as recipients,window_start as "windowStart",history_start as "historyStart",history_end as "historyEnd",evidence_version as "evidenceVersion",provider_message_ids as ids from growth.outreach_provider_usage where connection_id=${connectionId} ${locks === "acquire" ? tx`for share` : tx``}`;
   const usage = rows.length === 1 ? rows[0] : undefined;
   const [clock] = await tx<{ now: Date }[]>`select clock_timestamp() as now`;
   if (!clock) return held("invalid_time");
@@ -166,7 +169,9 @@ async function loadConfiguredAccount(
   const ids = z.array(z.object({ id: z.string() })).safeParse(usage?.ids);
   if (
     !limits.success ||
-    !usage ||
+    !health.success ||
+    !usage?.capturedAt ||
+    !usage.expiresAt ||
     usage.messages === null ||
     usage.recipients === null ||
     !ids.success
@@ -175,6 +180,17 @@ async function loadConfiguredAccount(
   return {
     status: "ready",
     account: {
+      bounds: {
+        validatedAt: clock.now,
+        expiresAt: new Date(
+          Math.min(
+            limits.data.expiresAt.getTime(),
+            health.data.expiresAt.getTime(),
+            usage.expiresAt.getTime(),
+          ),
+        ),
+        validThrough: new Date(usage.capturedAt.getTime() + 300000),
+      },
       grantEpoch: connection.version,
       ramp: control.ramp,
       limits: {
@@ -198,8 +214,9 @@ async function loadConfiguredAccount(
 export async function loadReservationAccount(
   tx: GrowthTransaction,
   connectionId: string,
+  locks: "acquire" | "held" = "acquire",
 ): Promise<ReservationDecision> {
-  return loadConfiguredAccount(tx, connectionId, "active");
+  return loadConfiguredAccount(tx, connectionId, "active", undefined, locks);
 }
 
 export async function loadConfiguredAccountReadiness(

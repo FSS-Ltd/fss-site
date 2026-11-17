@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
+import { withTransitionClock } from "./reservation-clock";
 import type { FounderSession } from "../../../lib/growth/auth/require-founder";
 import type { GrowthDb } from "../../../lib/growth/db/types";
 import { executeCampaignCommand } from "../../../lib/growth/campaigns/commands";
@@ -220,6 +221,116 @@ export async function exerciseCampaignReservation(
         await admin`delete from growth.prospects where id=${manualProspect}`;
         await admin`delete from growth.contacts where id=${manualContact}`;
         await admin`delete from growth.businesses where id=${manualBusiness}`;
+      }
+      const [sample] = await admin<
+        { now: Date }[]
+      >`select clock_timestamp() as now`;
+      assert.ok(sample);
+      const t0 = sample.now;
+      const t1 = new Date(t0.getTime() + 1000);
+      for (const bound of [
+        "policy",
+        "capability",
+        "provider",
+        "permission",
+      ] as const) {
+        try {
+          if (bound === "permission") {
+            await admin`update growth.outreach_permissions set expires_at=${t1} where id=${permission}`;
+          } else {
+            const changed = structuredClone(campaignPolicy);
+            changed.version = 2;
+            if (bound === "policy") changed.expiresAt = t1;
+            if (bound === "capability")
+              changed.capabilityAttestation.expiresAt = t1;
+            if (bound === "provider")
+              changed.providerAttestation.expiresAt = t1;
+            await admin.begin(async (tx) => {
+              await tx`alter table growth.campaigns disable trigger campaign_policy_immutable`;
+              await tx`update growth.campaigns set policy=${tx.json(JSON.parse(JSON.stringify(changed)))} where id=${campaign.id} and version=2`;
+              await tx`alter table growth.campaigns enable trigger campaign_policy_immutable`;
+            });
+          }
+          assert.deepEqual(
+            await reserveOutreachAttempt(withTransitionClock(db, t0, t1), {
+              messageId: message,
+              leaseToken: lease,
+              attemptKey: randomUUID(),
+            }),
+            { status: "held", reason: "authority_expired" },
+            bound,
+          );
+          const [writes] = await admin<
+            { count: number; rfc: string | null }[]
+          >`select (select count(*)::int from growth.outreach_reservations where email_message_id=${message}) as count,rfc_message_id as rfc from growth.email_messages where id=${message}`;
+          assert.equal(writes?.count, 0, bound);
+          assert.equal(writes?.rfc, null, bound);
+        } finally {
+          await admin`update growth.outreach_permissions set expires_at=${new Date(now + 3600000)} where id=${permission}`;
+          await admin.begin(async (tx) => {
+            await tx`alter table growth.campaigns disable trigger campaign_policy_immutable`;
+            await tx`update growth.campaigns set policy=${tx.json(JSON.parse(JSON.stringify({ ...campaignPolicy, version: 2 })))} where id=${campaign.id} and version=2`;
+            await tx`alter table growth.campaigns enable trigger campaign_policy_immutable`;
+          });
+        }
+      }
+      for (const [claim, field] of [
+        ["contact_email", "observed"],
+        ["contact_email", "verified"],
+        ["business_observation", "observed"],
+        ["business_observation", "verified"],
+      ] as const) {
+        const oldest = new Date(t1.getTime() - 30 * 86400000);
+        try {
+          await admin.begin(async (tx) => {
+            await tx`alter table growth.source_evidence disable trigger protect_founder_source_evidence`;
+            if (field === "observed")
+              await tx`update growth.source_evidence set observed_at=${oldest} where request_id=${proofRequest} and claim_type=${claim}`;
+            else
+              await tx`update growth.source_evidence set verified_at=${oldest} where request_id=${proofRequest} and claim_type=${claim}`;
+            await tx`alter table growth.source_evidence enable trigger protect_founder_source_evidence`;
+          });
+          assert.deepEqual(
+            await reserveOutreachAttempt(
+              withTransitionClock(db, t0, new Date(t1.getTime() + 1)),
+              {
+                messageId: message,
+                leaseToken: lease,
+                attemptKey: randomUUID(),
+              },
+            ),
+            { status: "held", reason: "authority_expired" },
+            `${claim} ${field}`,
+          );
+          const reserve = await reserveOutreachAttempt(
+            withTransitionClock(db, t0, t1),
+            { messageId: message, leaseToken: lease, attemptKey: randomUUID() },
+          );
+          assert.ok(reserve.status === "ready", `${claim} ${field}`);
+          const begin = await beginOutreachSubmission(
+            withTransitionClock(db, t0, t1),
+            {
+              reservationId: reserve.value.reservationId,
+              leaseToken: lease,
+              fence: reserve.value.fence,
+              fingerprint: reserve.value.preparation.fingerprint,
+            },
+          );
+          assert.ok(begin.status === "ready", `${claim} ${field}`);
+          assert.equal(
+            begin.value.preparation.fingerprint,
+            reserve.value.preparation.fingerprint,
+          );
+          await admin`delete from growth.audit_log where entity_type='outreach_reservation' and entity_id=${reserve.value.reservationId}`;
+          await admin`delete from growth.outreach_reservations where id=${reserve.value.reservationId}`;
+          await admin`update growth.email_messages set rfc_message_id=null where id=${message}`;
+        } finally {
+          await admin.begin(async (tx) => {
+            await tx`alter table growth.source_evidence disable trigger protect_founder_source_evidence`;
+            await tx`update growth.source_evidence set observed_at=${new Date(now - 60000)},verified_at=${new Date(now - 60000)} where request_id=${proofRequest}`;
+            await tx`alter table growth.source_evidence enable trigger protect_founder_source_evidence`;
+          });
+        }
       }
       const attempt = await reserveOutreachAttempt(db, {
         messageId: message,

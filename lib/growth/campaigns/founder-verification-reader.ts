@@ -1,6 +1,10 @@
 import { createHash } from "node:crypto";
 import { z } from "zod";
-import { loadConfiguredAccountReadiness } from "./account-repository";
+import { loadReservationAccount } from "./account-repository";
+import {
+  intersectAuthorityBounds,
+  type AuthorityBounds,
+} from "./authority-bounds";
 import { validateCampaignDefinition } from "./lifecycle";
 import { campaignPolicyDefinitionSchema } from "./schemas";
 import type { FounderSession } from "../auth/require-founder";
@@ -37,14 +41,17 @@ export async function loadFounderVerification(
     founder.actorId !== createHash("sha256").update(founder.email).digest("hex")
   )
     throw new CrmError("invalid");
-  return readFounderVerification(db, prospectId, now);
+  return (await readFounderVerification(db, prospectId, now))?.snapshot ?? null;
 }
 
 async function readFounderVerification(
   db: GrowthQueryExecutor,
   prospectId: string,
   now: Date,
-): Promise<FounderVerificationSnapshot | null> {
+): Promise<{
+  snapshot: FounderVerificationSnapshot;
+  validThrough: Date;
+} | null> {
   const rows = await db<
     {
       contactId: string;
@@ -102,26 +109,37 @@ async function readFounderVerification(
     ),
   );
   return {
-    effectiveEvidenceAt,
-    freshUntil: new Date(effectiveEvidenceAt.getTime() + 30 * 86400000),
-    status: current ? "current" : "stale",
-    requestId: contact.requestId,
-    contactProofId: contact.proofId,
-    observationProofId: observation.proofId,
-    proofContactVersion: contact.proofContactVersion,
-    proofProspectVersion: contact.proofProspectVersion,
-    contactId: contact.contactId,
-    email: contact.email,
-    observation: observation.summary,
-    observationSourceUrl: observation.sourceUrl,
-    observedAt: observation.observedAt,
-    contactSourceUrl: contact.sourceUrl,
-    contactObservedAt: contact.observedAt,
-    verifiedAt: contact.verifiedAt,
+    validThrough: new Date(
+      Math.min(
+        ...rows.flatMap((row) => [
+          row.observedAt.getTime(),
+          row.verifiedAt.getTime(),
+        ]),
+      ) +
+        30 * 86400000,
+    ),
+    snapshot: {
+      effectiveEvidenceAt,
+      freshUntil: new Date(effectiveEvidenceAt.getTime() + 30 * 86400000),
+      status: current ? "current" : "stale",
+      requestId: contact.requestId,
+      contactProofId: contact.proofId,
+      observationProofId: observation.proofId,
+      proofContactVersion: contact.proofContactVersion,
+      proofProspectVersion: contact.proofProspectVersion,
+      contactId: contact.contactId,
+      email: contact.email,
+      observation: observation.summary,
+      observationSourceUrl: observation.sourceUrl,
+      observedAt: observation.observedAt,
+      contactSourceUrl: contact.sourceUrl,
+      contactObservedAt: contact.observedAt,
+      verifiedAt: contact.verifiedAt,
+    },
   };
 }
 
-// Caller holds the canonical membership, sequence and message locks.
+// Caller holds connection, control, usage, membership, sequence and message locks.
 export async function loadPolicyAuthorizedSourceProof(
   db: GrowthTransaction,
   input: {
@@ -129,23 +147,22 @@ export async function loadPolicyAuthorizedSourceProof(
     messageId: string;
     connectionId: string;
   },
-): Promise<Pick<
-  FounderVerificationSnapshot,
-  | "contactId"
-  | "requestId"
-  | "contactProofId"
-  | "observationProofId"
-  | "proofContactVersion"
-  | "proofProspectVersion"
-  | "freshUntil"
-> | null> {
+): Promise<{
+  proof: Pick<
+    FounderVerificationSnapshot,
+    | "contactId"
+    | "requestId"
+    | "contactProofId"
+    | "observationProofId"
+    | "proofContactVersion"
+    | "proofProspectVersion"
+    | "freshUntil"
+  >;
+  bounds: AuthorityBounds;
+} | null> {
   const [clock] = await db<{ now: Date }[]>`select clock_timestamp() as now`;
-  if (
-    !clock ||
-    (await loadConfiguredAccountReadiness(db, input.connectionId, "active"))
-      .status !== "ready"
-  )
-    return null;
+  const account = await loadReservationAccount(db, input.connectionId, "held");
+  if (!clock || account.status !== "ready") return null;
   const now = clock.now;
   const [authority] = await db<
     {
@@ -206,8 +223,10 @@ export async function loadPolicyAuthorizedSourceProof(
   } catch {
     return null;
   }
-  const proof = await readFounderVerification(db, authority.prospectId, now);
+  const result = await readFounderVerification(db, authority.prospectId, now);
+  const proof = result?.snapshot;
   if (
+    !result ||
     !proof ||
     proof.status !== "current" ||
     proof.contactId !== authority.contactId ||
@@ -217,12 +236,19 @@ export async function loadPolicyAuthorizedSourceProof(
   )
     return null;
   return {
-    contactId: proof.contactId,
-    requestId: proof.requestId,
-    contactProofId: proof.contactProofId,
-    observationProofId: proof.observationProofId,
-    proofContactVersion: proof.proofContactVersion,
-    proofProspectVersion: proof.proofProspectVersion,
-    freshUntil: proof.freshUntil,
+    bounds: intersectAuthorityBounds(account.account.bounds, {
+      validatedAt: now,
+      expiresAt: account.account.bounds.expiresAt,
+      validThrough: result.validThrough,
+    }),
+    proof: {
+      contactId: proof.contactId,
+      requestId: proof.requestId,
+      contactProofId: proof.contactProofId,
+      observationProofId: proof.observationProofId,
+      proofContactVersion: proof.proofContactVersion,
+      proofProspectVersion: proof.proofProspectVersion,
+      freshUntil: proof.freshUntil,
+    },
   };
 }

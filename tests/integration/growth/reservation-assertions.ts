@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import type postgres from "postgres";
+import { withTransitionClock } from "./reservation-clock";
 import type { GrowthDb } from "../../../lib/growth/db/types";
 import {
   reserveOutreachAttempt,
@@ -72,9 +73,260 @@ export async function exerciseLegacyReservation(
     );
     await admin`update growth.email_messages set outreach_claim_previous_status='queued' where id=${messageId}`;
 
+    // Move only synthetic fixture times to the next London midnight, after all checks.
+    const [clockFixture] = await admin<
+      {
+        captured: Date;
+        expires: Date;
+        windowStart: Date;
+        lease: Date;
+        midnight: Date;
+      }[]
+    >`
+      select u.captured_at as captured,u.fresh_until as expires,u.window_start as "windowStart",m.lease_expires_at as lease,
+        (((clock_timestamp() at time zone 'Europe/London')::date + 1)::timestamp at time zone 'Europe/London') as midnight
+      from growth.outreach_provider_usage u cross join growth.email_messages m where u.connection_id=${id} and m.id=${messageId}`;
+    assert.ok(clockFixture);
+    const [healthFixture] = await admin<
+      { id: string; evidence: postgres.JSONValue }[]
+    >`select r.id,r.evidence from growth.outreach_account_reviews r join growth.outreach_account_controls c on c.health_review_id=r.id where c.connection_id=${id}`;
+    assert.ok(healthFixture);
+    const beforeMidnight = new Date(clockFixture.midnight.getTime() - 100);
+    await admin`update growth.outreach_account_reviews set evidence=jsonb_set(jsonb_set(jsonb_set(evidence,'{evidence,observedFrom}',to_jsonb(${new Date(beforeMidnight.getTime() - 3600000).toISOString()}::text)),'{evidence,observedUntil}',to_jsonb(${new Date(beforeMidnight.getTime() - 1000).toISOString()}::text)),'{evidence,expiresAt}',to_jsonb(${new Date(clockFixture.midnight.getTime() + 3600000).toISOString()}::text)) where id=${healthFixture.id}`;
+    await admin`update growth.outreach_provider_usage set captured_at=${beforeMidnight},fresh_until=${new Date(clockFixture.midnight.getTime() + 60000)},window_start=${new Date(beforeMidnight.getTime() - 86400000)} where connection_id=${id}`;
+    await admin`update growth.email_messages set lease_expires_at=${new Date(clockFixture.midnight.getTime() + 60000)} where id=${messageId}`;
+    try {
+      const crossing = await reserveOutreachAttempt(
+        withTransitionClock(db, beforeMidnight, clockFixture.midnight),
+        { messageId, leaseToken, attemptKey: randomUUID() },
+      );
+      assert.deepEqual(crossing, { status: "held", reason: "day_changed" });
+      const [unchanged] = await admin<
+        { count: number; rfc: string | null }[]
+      >`select (select count(*)::int from growth.outreach_reservations where email_message_id=${messageId}) as count,rfc_message_id as rfc from growth.email_messages where id=${messageId}`;
+      assert.equal(unchanged?.count, 0);
+      assert.equal(unchanged?.rfc, null);
+      const nextDay = await reserveOutreachAttempt(
+        withTransitionClock(db, clockFixture.midnight, clockFixture.midnight),
+        { messageId, leaseToken, attemptKey: randomUUID() },
+      );
+      assert.ok(nextDay.status === "ready");
+      const [nextState] = await admin<
+        { day: string; reserved: Date }[]
+      >`select london_day::text as day,reserved_at as reserved from growth.outreach_reservations where id=${nextDay.value.reservationId}`;
+      assert.equal(
+        nextState?.reserved.getTime(),
+        clockFixture.midnight.getTime(),
+      );
+      assert.notEqual(
+        nextState?.day,
+        (
+          await admin<
+            { day: string }[]
+          >`select (${beforeMidnight}::timestamptz at time zone 'Europe/London')::date::text as day`
+        )[0]?.day,
+      );
+      await admin`delete from growth.audit_log where entity_type='outreach_reservation' and entity_id=${nextDay.value.reservationId}`;
+      await admin`delete from growth.outreach_reservations where id=${nextDay.value.reservationId}`;
+      await admin`update growth.email_messages set rfc_message_id=null where id=${messageId}`;
+      const attemptKey = randomUUID();
+      const reserved = await reserveOutreachAttempt(
+        withTransitionClock(db, beforeMidnight, beforeMidnight),
+        { messageId, leaseToken, attemptKey },
+      );
+      assert.equal(reserved.status, "ready");
+      assert.ok(reserved.status === "ready");
+      const replay = await reserveOutreachAttempt(
+        withTransitionClock(db, beforeMidnight, beforeMidnight, false),
+        { messageId, leaseToken, attemptKey },
+      );
+      assert.deepEqual(replay, reserved);
+      const expiredReplay = await reserveOutreachAttempt(
+        withTransitionClock(db, beforeMidnight, clockFixture.midnight, false),
+        { messageId, leaseToken, attemptKey },
+      );
+      assert.deepEqual(expiredReplay, {
+        status: "held",
+        reason: "day_changed",
+      });
+      const begin = {
+        reservationId: reserved.value.reservationId,
+        leaseToken,
+        fence: reserved.value.fence,
+        fingerprint: reserved.value.preparation.fingerprint,
+      };
+      assert.deepEqual(
+        await beginOutreachSubmission(
+          withTransitionClock(db, beforeMidnight, clockFixture.midnight),
+          begin,
+        ),
+        { status: "held", reason: "day_changed" },
+      );
+      const [state] = await admin<
+        {
+          status: string;
+          submitted: Date | null;
+          reserved: Date;
+          audits: number;
+        }[]
+      >`select status,submitted_at as submitted,reserved_at as reserved,(select count(*)::int from growth.audit_log where entity_id=${begin.reservationId}) as audits from growth.outreach_reservations where id=${begin.reservationId}`;
+      assert.equal(state?.status, "reserved");
+      assert.equal(state?.submitted, null);
+      assert.equal(state?.reserved.getTime(), beforeMidnight.getTime());
+      assert.equal(state?.audits, 1);
+      assert.equal(
+        (
+          await cancelOutreachReservation(db, {
+            reservationId: begin.reservationId,
+            leaseToken,
+            fence: begin.fence,
+          })
+        ).status,
+        "ready",
+      );
+      await admin`delete from growth.audit_log where entity_type='outreach_reservation' and entity_id=${begin.reservationId}`;
+      await admin`delete from growth.outreach_reservations where id=${begin.reservationId}`;
+      await admin`update growth.email_messages set rfc_message_id=null where id=${messageId}`;
+    } finally {
+      await admin`update growth.outreach_account_reviews set evidence=${admin.json(healthFixture.evidence)} where id=${healthFixture.id}`;
+      await admin`update growth.outreach_provider_usage set captured_at=${clockFixture.captured},fresh_until=${clockFixture.expires},window_start=${clockFixture.windowStart} where connection_id=${id}`;
+      await admin`update growth.email_messages set lease_expires_at=${clockFixture.lease} where id=${messageId}`;
+    }
+
+    const [boundaryClock] = await admin<
+      { now: Date }[]
+    >`select clock_timestamp() as now`;
+    assert.ok(boundaryClock);
+    const t0 = boundaryClock.now;
+    const t1 = new Date(t0.getTime() + 1000);
+    const [limitsFixture] = await admin<
+      { id: string; evidence: postgres.JSONValue }[]
+    >`select r.id,r.evidence from growth.outreach_account_reviews r join growth.outreach_account_controls c on c.limits_review_id=r.id where c.connection_id=${id}`;
+    assert.ok(limitsFixture);
+    for (const bound of ["message", "limits", "health", "usage"] as const) {
+      try {
+        if (bound === "message")
+          await admin`update growth.email_messages set lease_expires_at=${t1} where id=${messageId}`;
+        if (bound === "usage")
+          await admin`update growth.outreach_provider_usage set fresh_until=${t1} where connection_id=${id}`;
+        if (bound === "limits")
+          await admin`update growth.outreach_account_reviews set evidence=jsonb_set(evidence,'{evidence,expiresAt}',to_jsonb(${t1.toISOString()}::text)) where id=${limitsFixture.id}`;
+        if (bound === "health")
+          await admin`update growth.outreach_account_reviews set evidence=jsonb_set(evidence,'{evidence,expiresAt}',to_jsonb(${t1.toISOString()}::text)) where id=${healthFixture.id}`;
+        assert.deepEqual(
+          await reserveOutreachAttempt(withTransitionClock(db, t0, t1), {
+            messageId,
+            leaseToken,
+            attemptKey: randomUUID(),
+          }),
+          { status: "held", reason: "authority_expired" },
+          bound,
+        );
+        const [writes] = await admin<
+          { count: number; rfc: string | null }[]
+        >`select (select count(*)::int from growth.outreach_reservations where email_message_id=${messageId}) as count,rfc_message_id as rfc from growth.email_messages where id=${messageId}`;
+        assert.equal(writes?.count, 0, bound);
+        assert.equal(writes?.rfc, null, bound);
+      } finally {
+        await admin`update growth.email_messages set lease_expires_at=${clockFixture.lease} where id=${messageId}`;
+        await admin`update growth.outreach_provider_usage set fresh_until=${clockFixture.expires} where connection_id=${id}`;
+        await admin`update growth.outreach_account_reviews set evidence=${admin.json(limitsFixture.evidence)} where id=${limitsFixture.id}`;
+        await admin`update growth.outreach_account_reviews set evidence=${admin.json(healthFixture.evidence)} where id=${healthFixture.id}`;
+      }
+    }
+
+    const [usageFixture] = await admin<
+      { ids: postgres.JSONValue }[]
+    >`select provider_message_ids as ids from growth.outreach_provider_usage where connection_id=${id}`;
+    assert.ok(usageFixture);
+    const capture = new Date(t1.getTime() - 300000);
+    await admin`update growth.outreach_provider_usage set captured_at=${capture},window_start=${new Date(capture.getTime() - 86400000)},provider_message_ids=(select jsonb_agg(jsonb_set(value,'{sentAt}',to_jsonb(${new Date(capture.getTime() - 1000).toISOString()}::text))) from jsonb_array_elements(provider_message_ids)) where connection_id=${id}`;
+    try {
+      const expired = await reserveOutreachAttempt(
+        withTransitionClock(db, t0, new Date(t1.getTime() + 1)),
+        { messageId, leaseToken, attemptKey: randomUUID() },
+      );
+      assert.deepEqual(expired, {
+        status: "held",
+        reason: "authority_expired",
+      });
+      const valid = await reserveOutreachAttempt(
+        withTransitionClock(db, t0, t1),
+        { messageId, leaseToken, attemptKey: randomUUID() },
+      );
+      assert.ok(valid.status === "ready");
+      await admin`delete from growth.audit_log where entity_type='outreach_reservation' and entity_id=${valid.value.reservationId}`;
+      await admin`delete from growth.outreach_reservations where id=${valid.value.reservationId}`;
+      await admin`update growth.email_messages set rfc_message_id=null where id=${messageId}`;
+    } finally {
+      await admin`update growth.outreach_provider_usage set captured_at=${clockFixture.captured},fresh_until=${clockFixture.expires},window_start=${clockFixture.windowStart},provider_message_ids=${admin.json(usageFixture.ids)} where connection_id=${id}`;
+    }
+
+    assert.deepEqual(
+      await reserveOutreachAttempt(
+        withTransitionClock(db, t0, new Date(t0.getTime() - 1)),
+        { messageId, leaseToken, attemptKey: randomUUID() },
+      ),
+      { status: "held", reason: "authority_expired" },
+    );
+
+    const fiveMinutes = new Date(t0.getTime() + 300000);
+    await admin`update growth.outreach_provider_usage set captured_at=${t0},fresh_until=${new Date(t0.getTime() + 600000)},window_start=${new Date(t0.getTime() - 86400000)} where connection_id=${id}`;
+    await admin`update growth.email_messages set lease_expires_at=${new Date(t0.getTime() + 600000)} where id=${messageId}`;
+    try {
+      const key = randomUUID();
+      const reserve = await reserveOutreachAttempt(
+        withTransitionClock(db, t0, t0),
+        { messageId, leaseToken, attemptKey: key },
+      );
+      assert.ok(reserve.status === "ready");
+      const expected = { status: "held", reason: "authority_expired" };
+      assert.deepEqual(
+        await reserveOutreachAttempt(
+          withTransitionClock(db, t0, fiveMinutes, false),
+          { messageId, leaseToken, attemptKey: key },
+        ),
+        expected,
+      );
+      assert.deepEqual(
+        await beginOutreachSubmission(
+          withTransitionClock(db, t0, fiveMinutes),
+          {
+            reservationId: reserve.value.reservationId,
+            leaseToken,
+            fence: reserve.value.fence,
+            fingerprint: reserve.value.preparation.fingerprint,
+          },
+        ),
+        expected,
+      );
+      const [state] = await admin<
+        { status: string; submitted: Date | null; audits: number }[]
+      >`select status,submitted_at as submitted,(select count(*)::int from growth.audit_log where entity_id=${reserve.value.reservationId}) as audits from growth.outreach_reservations where id=${reserve.value.reservationId}`;
+      assert.equal(state?.status, "reserved");
+      assert.equal(state?.submitted, null);
+      assert.equal(state?.audits, 1);
+      await admin`delete from growth.audit_log where entity_type='outreach_reservation' and entity_id=${reserve.value.reservationId}`;
+      await admin`delete from growth.outreach_reservations where id=${reserve.value.reservationId}`;
+      await admin`update growth.email_messages set rfc_message_id=null where id=${messageId}`;
+    } finally {
+      await admin`update growth.outreach_provider_usage set captured_at=${clockFixture.captured},fresh_until=${clockFixture.expires},window_start=${clockFixture.windowStart} where connection_id=${id}`;
+      await admin`update growth.email_messages set lease_expires_at=${clockFixture.lease} where id=${messageId}`;
+    }
+
     await admin`create function growth.test_reject_reservation_audit() returns trigger language plpgsql as $$ begin if new.action = 'outreach_reservation.reserved' then raise exception 'reservation audit failure'; end if; return new; end $$`;
     await admin`create trigger test_reject_reservation_audit before insert on growth.audit_log for each row execute function growth.test_reject_reservation_audit()`;
     try {
+      await admin`update growth.email_messages set lease_expires_at=${t1} where id=${messageId}`;
+      assert.deepEqual(
+        await reserveOutreachAttempt(withTransitionClock(db, t0, t1), {
+          messageId,
+          leaseToken,
+          attemptKey: randomUUID(),
+        }),
+        { status: "held", reason: "authority_expired" },
+      );
+      await admin`update growth.email_messages set lease_expires_at=${clockFixture.lease} where id=${messageId}`;
       await assert.rejects(
         reserveOutreachAttempt(db, {
           messageId,
@@ -115,6 +367,16 @@ export async function exerciseLegacyReservation(
     });
     assert.ok(replay.status === "ready");
     assert.equal(replay.value.reservationId, ready.value.reservationId);
+    await admin`update growth.email_messages set rfc_message_id='<changed@example.test>' where id=${messageId}`;
+    assert.deepEqual(
+      await reserveOutreachAttempt(db, {
+        messageId,
+        leaseToken,
+        attemptKey: winningKey,
+      }),
+      { status: "held", reason: "rfc_message_id_changed" },
+    );
+    await admin`update growth.email_messages set rfc_message_id=${ready.value.rfcMessageId} where id=${messageId}`;
     await assert.rejects(
       db`update growth.outreach_reservations set authority_fingerprint=${"b".repeat(64)} where id=${ready.value.reservationId}`,
       /reservation authority is immutable/,
@@ -216,8 +478,31 @@ export async function exerciseLegacyReservation(
       fence: next.value.fence,
       fingerprint: next.value.preparation.fingerprint,
     };
-    assert.equal((await beginOutreachSubmission(db, second)).status, "ready");
-    assert.equal((await beginOutreachSubmission(db, second)).status, "held");
+    await admin`create function growth.test_reject_submitting_audit() returns trigger language plpgsql as $$ begin if new.action = 'outreach_reservation.submitting' then raise exception 'submitting audit failure'; end if; return new; end $$`;
+    await admin`create trigger test_reject_submitting_audit before insert on growth.audit_log for each row execute function growth.test_reject_submitting_audit()`;
+    try {
+      await assert.rejects(
+        beginOutreachSubmission(db, second),
+        /submitting audit failure/,
+      );
+      const [rolledBack] = await admin<
+        { status: string; submitted: Date | null }[]
+      >`select status,submitted_at as submitted from growth.outreach_reservations where id=${second.reservationId}`;
+      assert.equal(rolledBack?.status, "reserved");
+      assert.equal(rolledBack?.submitted, null);
+    } finally {
+      await admin`drop trigger test_reject_submitting_audit on growth.audit_log`;
+      await admin`drop function growth.test_reject_submitting_audit()`;
+    }
+    const begins = await Promise.all([
+      beginOutreachSubmission(db, second),
+      beginOutreachSubmission(db, second),
+    ]);
+    assert.equal(begins.filter((entry) => entry.status === "ready").length, 1);
+    const [auditCount] = await admin<
+      { count: number }[]
+    >`select count(*)::int as count from growth.audit_log where entity_id=${second.reservationId} and action='outreach_reservation.submitting'`;
+    assert.equal(auditCount?.count, 1);
     assert.equal(
       (
         await settleOutreachAttempt(db, {

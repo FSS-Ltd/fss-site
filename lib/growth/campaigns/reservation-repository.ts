@@ -1,5 +1,4 @@
 import {
-  auditReservation,
   held,
   reservationLeaseSchema,
   type ReservationOutcome as Outcome,
@@ -14,7 +13,13 @@ import { loadReservationAccount } from "./account-repository";
 import {
   loadCanonicalOutreachPreparation,
   type CanonicalOutreachPreparation,
+  type SendWindow,
 } from "./dispatch-authority";
+import {
+  intersectAuthorityBounds,
+  type AuthorityBounds,
+} from "./authority-bounds";
+import { authorityGate, gateFailure, type GateResult } from "./authority-gate";
 import { assessReservationBudget } from "./reservation-budget";
 import { campaignPolicyDefinitionSchema } from "./schemas";
 import { londonDayKey } from "./time";
@@ -73,6 +78,8 @@ async function lockedPreparation(
       { status: "ready" }
     >["account"];
     now: Date;
+    bounds: AuthorityBounds;
+    window: SendWindow | null;
   }>
 > {
   await lockKey(tx, `growth:outreach-day:${day}`);
@@ -104,13 +111,11 @@ async function lockedPreparation(
   const current = await preliminary(tx, identity.messageId);
   if (!current || JSON.stringify(current) !== JSON.stringify(identity))
     return held("identity_changed");
-  const freshAccount = await loadReservationAccount(tx, identity.connectionId);
-  if (freshAccount.status === "held") return freshAccount;
   const preparation = await loadCanonicalOutreachPreparation(tx, {
     messageId: identity.messageId,
     leaseToken,
     connectionId: identity.connectionId,
-    grantEpoch: freshAccount.account.grantEpoch,
+    grantEpoch: account.account.grantEpoch,
     now: clock.now,
   });
   if (preparation.status === "held") return preparation;
@@ -118,7 +123,12 @@ async function lockedPreparation(
     status: "ready",
     value: {
       preparation: preparation.preparation,
-      account: freshAccount.account,
+      account: account.account,
+      bounds: intersectAuthorityBounds(
+        account.account.bounds,
+        preparation.bounds,
+      ),
+      window: preparation.window,
       now: clock.now,
     },
   };
@@ -202,7 +212,7 @@ export async function reserveOutreachAttempt(
     const day = londonDayKey(clock.now);
     const locked = await lockedPreparation(tx, identity, input.leaseToken, day);
     if (locked.status === "held") return locked;
-    const { preparation, account, now } = locked.value;
+    const { preparation, account, now, bounds, window } = locked.value;
     const [existing] = await tx<
       {
         id: string;
@@ -214,8 +224,9 @@ export async function reserveOutreachAttempt(
         leaseToken: string | null;
         connectionId: string | null;
         grantEpoch: number | null;
+        day: string;
       }[]
-    >`select id,authority_fingerprint as fingerprint,status,fence,rfc_message_id as rfc,lease_until as "leaseUntil",lease_token as "leaseToken",connection_id as "connectionId",grant_epoch as "grantEpoch" from growth.outreach_reservations where idempotency_key=${input.attemptKey}`;
+    >`select london_day::text as day,id,authority_fingerprint as fingerprint,status,fence,rfc_message_id as rfc,lease_until as "leaseUntil",lease_token as "leaseToken",connection_id as "connectionId",grant_epoch as "grantEpoch" from growth.outreach_reservations where idempotency_key=${input.attemptKey} for update`;
     if (existing) {
       if (
         existing.status !== "reserved" ||
@@ -228,6 +239,23 @@ export async function reserveOutreachAttempt(
         !existing.rfc
       )
         return held("attempt_conflict");
+      if (existing.day !== day) return held("day_changed");
+      const [message] = await tx<
+        { rfc: string | null }[]
+      >`select rfc_message_id as rfc from growth.email_messages where id=${identity.messageId}`;
+      if (!message || message.rfc !== existing.rfc)
+        return held("rfc_message_id_changed");
+      const replayBounds = intersectAuthorityBounds(bounds, {
+        validatedAt: now,
+        expiresAt: existing.leaseUntil,
+        validThrough: null,
+      });
+      const [gate] = await tx<
+        GateResult[]
+      >`with ${authorityGate(tx, day, replayBounds, window)}
+        select day_ok as "dayOk", interval_ok as "intervalOk", window_ok as "windowOk", 0::int as writes from authority_gate`;
+      const failure = gateFailure(gate);
+      if (failure) return held(failure);
       return {
         status: "ready",
         value: {
@@ -258,11 +286,6 @@ export async function reserveOutreachAttempt(
     if (unresolved?.found) return held("attempt_unresolved");
     const budget = await checkBudget(tx, identity, day, account, now, null);
     if (budget !== "ready") return held(budget);
-    const finalAccount = await loadReservationAccount(
-      tx,
-      identity.connectionId,
-    );
-    if (finalAccount.status === "held") return finalAccount;
     const parentMessageId = preparation.references.at(-1);
     const rendered = renderGmailMime({
       id: preparation.messageId,
@@ -294,10 +317,26 @@ export async function reserveOutreachAttempt(
       { value: number }[]
     >`select coalesce(max(fence),0)::int+1 as value from growth.outreach_reservations where email_message_id=${identity.messageId}`;
     if (!fence) return held("fence_unavailable");
-    await tx`update growth.email_messages set rfc_message_id=coalesce(rfc_message_id,${rendered.rfcMessageId}) where id=${identity.messageId}`;
     const reservationId = randomUUID();
-    await tx`insert into growth.outreach_reservations(id,idempotency_key,campaign_id,policy_version,membership_id,email_message_id,sequence_id,account_id,london_day,connection_id,grant_epoch,rfc_message_id,recipient_count,authority_fingerprint,lease_token,lease_until,fence) values (${reservationId},${input.attemptKey},${identity.campaignId},${identity.policyVersion},${identity.membershipId},${identity.messageId},${identity.sequenceId},${account.usage.accountId},${day},${identity.connectionId},${account.grantEpoch},${rendered.rfcMessageId},1,${preparation.fingerprint},${input.leaseToken},${new Date(now.getTime() + 300000)},${fence.value})`;
-    await auditReservation(tx, reservationId, "reserved");
+    const [gate] = await tx<
+      GateResult[]
+    >`with ${authorityGate(tx, day, bounds, window)},
+      inserted as (
+        insert into growth.outreach_reservations(id,idempotency_key,campaign_id,policy_version,membership_id,email_message_id,sequence_id,account_id,london_day,connection_id,grant_epoch,rfc_message_id,recipient_count,authority_fingerprint,lease_token,lease_until,fence,reserved_at)
+        select ${reservationId},${input.attemptKey},${identity.campaignId},${identity.policyVersion},${identity.membershipId},${identity.messageId},${identity.sequenceId},${account.usage.accountId},${day}::date,${identity.connectionId},${account.grantEpoch},${rendered.rfcMessageId},1,${preparation.fingerprint},${input.leaseToken},at + interval '5 minutes',${fence.value},at
+        from authority_gate where day_ok and interval_ok and window_ok returning id
+      ), message_write as (
+        update growth.email_messages set rfc_message_id=coalesce(rfc_message_id,${rendered.rfcMessageId})
+        where id=${identity.messageId} and (rfc_message_id is null or rfc_message_id=${rendered.rfcMessageId}) and exists(select 1 from inserted) returning id
+      ), audit_write as (
+        insert into growth.audit_log(correlation_id,actor_type,actor_id,action,entity_type,entity_id,metadata)
+        select ${reservationId},'system','outreach-dispatch','outreach_reservation.reserved','outreach_reservation',${reservationId},'{}'::jsonb
+        from inserted where exists(select 1 from message_write) returning id
+      )
+      select day_ok as "dayOk",interval_ok as "intervalOk",window_ok as "windowOk", (select count(*)::int from audit_write) as writes from authority_gate`;
+    const failure = gateFailure(gate);
+    if (failure) return held(failure);
+    if (gate?.writes !== 1) throw new Error("reservation_write_failed");
     return {
       status: "ready",
       value: {
@@ -340,7 +379,7 @@ export async function beginOutreachSubmission(
       initial.day,
     );
     if (locked.status === "held") return locked;
-    const { preparation, account, now } = locked.value;
+    const { preparation, account, now, bounds, window } = locked.value;
     const [reservation] = await tx<
       {
         status: string;
@@ -384,13 +423,31 @@ export async function beginOutreachSubmission(
       input.reservationId,
     );
     if (budget !== "ready") return held(budget);
-    const finalAccount = await loadReservationAccount(
-      tx,
-      identity.connectionId,
-    );
-    if (finalAccount.status === "held") return finalAccount;
-    await tx`update growth.outreach_reservations set status='submitting',submitted_at=${now} where id=${input.reservationId}`;
-    await auditReservation(tx, input.reservationId, "submitting");
+    const submissionBounds = intersectAuthorityBounds(bounds, {
+      validatedAt: now,
+      expiresAt: reservation.leaseUntil,
+      validThrough: null,
+    });
+    const [gate] = await tx<
+      GateResult[]
+    >`with ${authorityGate(tx, initial.day, submissionBounds, window)},
+      updated as (
+        update growth.outreach_reservations r set status='submitting',submitted_at=g.at
+        from authority_gate g where g.day_ok and g.interval_ok and g.window_ok
+          and r.id=${input.reservationId} and r.status='reserved' and r.fence=${input.fence}
+          and r.lease_token=${input.leaseToken} and r.connection_id=${identity.connectionId}
+          and r.grant_epoch=${account.grantEpoch} and r.authority_fingerprint=${input.fingerprint}
+          and r.rfc_message_id=${reservation.rfc} and r.london_day=${initial.day}::date
+        returning r.id
+      ), audit_write as (
+        insert into growth.audit_log(correlation_id,actor_type,actor_id,action,entity_type,entity_id,metadata)
+        select ${input.reservationId},'system','outreach-dispatch','outreach_reservation.submitting','outreach_reservation',${input.reservationId},'{}'::jsonb
+        from updated returning id
+      )
+      select day_ok as "dayOk",interval_ok as "intervalOk",window_ok as "windowOk",(select count(*)::int from audit_write) as writes from authority_gate`;
+    const failure = gateFailure(gate);
+    if (failure) return held(failure);
+    if (gate?.writes !== 1) throw new Error("submission_write_failed");
     return {
       status: "ready",
       value: {

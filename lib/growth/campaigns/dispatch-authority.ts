@@ -1,4 +1,8 @@
 import { createHash } from "node:crypto";
+import {
+  intersectAuthorityBounds,
+  type AuthorityBounds,
+} from "./authority-bounds";
 import { z } from "zod";
 import type { GrowthTransaction } from "../db/types";
 import { loadPolicyAuthorizedSourceProof } from "./founder-verification-reader";
@@ -17,8 +21,20 @@ export type CanonicalOutreachPreparation = {
   fingerprint: string;
 };
 export type PreparationDecision =
-  | { status: "ready"; preparation: CanonicalOutreachPreparation }
+  | {
+      status: "ready";
+      preparation: CanonicalOutreachPreparation;
+      bounds: AuthorityBounds;
+      window: SendWindow | null;
+    }
   | { status: "held"; reason: string };
+
+export type SendWindow = {
+  timezone: string;
+  weekdays: number[];
+  start: string;
+  end: string;
+};
 
 type LockedMessage = {
   messageId: string;
@@ -139,12 +155,19 @@ export async function loadCanonicalOutreachPreparation(
   if (memberships.length === 0 && row.approvedRecipient !== row.normalizedEmail)
     return held("legacy_approval_unbound");
   let campaignAuthority: unknown = null;
+  let bounds: AuthorityBounds = {
+    validatedAt: input.now,
+    expiresAt: row.leaseUntil,
+    validThrough: null,
+  };
+  let window: SendWindow | null = null;
   if (memberships.length === 1) {
     const member = memberships[0];
     if (!member) return held("membership_ambiguous");
     const parsed = campaignPolicyDefinitionSchema.safeParse(member.policy);
     if (
       !parsed.success ||
+      !parsed.data.expiresAt ||
       member.status !== "approved" ||
       !member.approvedAt ||
       member.approvedAt > input.now ||
@@ -208,7 +231,25 @@ export async function loadCanonicalOutreachPreparation(
       connectionId: input.connectionId,
     });
     if (!proof) return held("verification_required");
-    campaignAuthority = { member, proof };
+    campaignAuthority = { member, proof: proof.proof };
+    bounds = intersectAuthorityBounds(bounds, proof.bounds, {
+      validatedAt: input.now,
+      expiresAt: new Date(
+        Math.min(
+          member.expiresAt.getTime(),
+          parsed.data.expiresAt.getTime(),
+          parsed.data.capabilityAttestation.expiresAt.getTime(),
+          parsed.data.providerAttestation.expiresAt.getTime(),
+        ),
+      ),
+      validThrough: null,
+    });
+    window = {
+      timezone: parsed.data.recipientTimezone,
+      weekdays: parsed.data.sendWeekdays,
+      start: parsed.data.windowStart,
+      end: parsed.data.windowEnd,
+    };
   }
   const references =
     row.stepNumber === 0
@@ -247,6 +288,8 @@ export async function loadCanonicalOutreachPreparation(
   };
   return {
     status: "ready",
+    bounds,
+    window,
     preparation: {
       messageId: row.messageId,
       sequenceId: row.sequenceId,
