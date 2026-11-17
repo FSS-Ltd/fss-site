@@ -25,14 +25,14 @@
       "id": "route_get",
       "label": "GET()",
       "file_type": "code",
-      "source_file": "app/api/cron/operations-dispatch/route.ts",
-      "source_location": "L14"
+      "source_file": "app/api/growth/facebook/route.ts",
+      "source_location": "L28"
     },
     {
-      "id": "app_api_portal_admin_clients_organisationid_commercial_offers_route_ts",
+      "id": "app_api_growth_facebook_route_ts",
       "label": "route.ts",
       "file_type": "code",
-      "source_file": "app/api/portal/admin/clients/[organisationId]/commercial-offers/route.ts",
+      "source_file": "app/api/growth/facebook/route.ts",
       "source_location": "L1"
     },
     {
@@ -43,11 +43,81 @@
       "source_location": "L3"
     },
     {
+      "id": "app_api_portal_admin_clients_organisationid_commercial_offers_route_ts",
+      "label": "route.ts",
+      "file_type": "code",
+      "source_file": "app/api/portal/admin/clients/[organisationId]/commercial-offers/route.ts",
+      "source_location": "L1"
+    },
+    {
       "id": "app_api_portal_organisations_organisationid_commercial_offers_route_ts",
       "label": "route.ts",
       "file_type": "code",
       "source_file": "app/api/portal/organisations/[organisationId]/commercial-offers/route.ts",
       "source_location": "L1"
+    },
+    {
+      "id": "components_growth_prospects_preview_approval_tsx",
+      "label": "preview-approval.tsx",
+      "file_type": "code",
+      "source_file": "components/growth/prospects/preview-approval.tsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "preview_approval_hasreadypreviewsource",
+      "label": "hasReadyPreviewSource()",
+      "file_type": "code",
+      "source_file": "components/growth/prospects/preview-approval.tsx",
+      "source_location": "L91"
+    },
+    {
+      "id": "preview_approval_resolvereadybespokepreviewslug",
+      "label": "resolveReadyBespokePreviewSlug()",
+      "file_type": "code",
+      "source_file": "components/growth/prospects/preview-approval.tsx",
+      "source_location": "L105"
+    },
+    {
+      "id": "preview_approval_describesourcepackagestatus",
+      "label": "describeSourcePackageStatus()",
+      "file_type": "code",
+      "source_file": "components/growth/prospects/preview-approval.tsx",
+      "source_location": "L121"
+    },
+    {
+      "id": "components_growth_prospects_prospect_filters_tsx",
+      "label": "prospect-filters.tsx",
+      "file_type": "code",
+      "source_file": "components/growth/prospects/prospect-filters.tsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "prospect_filters_buildprospectshref",
+      "label": "buildProspectsHref()",
+      "file_type": "code",
+      "source_file": "components/growth/prospects/prospect-filters.tsx",
+      "source_location": "L55"
+    },
+    {
+      "id": "prospect_filters_activefilterchips",
+      "label": "activeFilterChips()",
+      "file_type": "code",
+      "source_file": "components/growth/prospects/prospect-filters.tsx",
+      "source_location": "L81"
+    },
+    {
+      "id": "components_growth_prospects_prospect_list_test_tsx",
+      "label": "prospect-list.test.tsx",
+      "file_type": "code",
+      "source_file": "components/growth/prospects/prospect-list.test.tsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "prospect_list_test_basequery",
+      "label": "baseQuery()",
+      "file_type": "code",
+      "source_file": "components/growth/prospects/prospect-list.test.tsx",
+      "source_location": "L24"
     },
     {
       "id": "components_portal_agreements_agreement_builder_currency_test_tsx",
@@ -2822,6 +2892,55 @@
       "source_location": "L93"
     },
     {
+      "id": "lib_growth_facebook_read_route_handler_test_ts",
+      "label": "read-route-handler.test.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/facebook/read-route-handler.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "read_route_handler_test_handler",
+      "label": "handler()",
+      "file_type": "code",
+      "source_file": "lib/growth/facebook/read-route-handler.test.ts",
+      "source_location": "L16"
+    },
+    {
+      "id": "lib_growth_facebook_read_route_handler_ts",
+      "label": "read-route-handler.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/facebook/read-route-handler.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "read_route_handler_createfacebookreadhandler",
+      "label": "createFacebookReadHandler()",
+      "file_type": "code",
+      "source_file": "lib/growth/facebook/read-route-handler.ts",
+      "source_location": "L21"
+    },
+    {
+      "id": "lib_growth_facebook_route_handler_test_ts",
+      "label": "route-handler.test.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/facebook/route-handler.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "lib_growth_facebook_route_handler_ts",
+      "label": "route-handler.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/facebook/route-handler.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "route_handler_createfacebookcommandhandler",
+      "label": "createFacebookCommandHandler()",
+      "file_type": "code",
+      "source_file": "lib/growth/facebook/route-handler.ts",
+      "source_location": "L23"
+    },
+    {
       "id": "lib_growth_facebook_service_ts",
       "label": "service.ts",
       "file_type": "code",
@@ -2925,6 +3044,13 @@
       "file_type": "code",
       "source_file": "lib/growth/http/founder-request.ts",
       "source_location": "L13"
+    },
+    {
+      "id": "founder_request_readrequesthasregisteredorigin",
+      "label": "readRequestHasRegisteredOrigin()",
+      "file_type": "code",
+      "source_file": "lib/growth/http/founder-request.ts",
+      "source_location": "L34"
     },
     {
       "id": "lib_growth_integrations_gmail_connection_test_ts",
@@ -3660,6 +3786,55 @@
       "file_type": "code",
       "source_file": "lib/growth/prospect-previews/backfill.ts",
       "source_location": "L172"
+    },
+    {
+      "id": "lib_growth_prospect_previews_change_request_route_handler_test_ts",
+      "label": "change-request-route-handler.test.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/prospect-previews/change-request-route-handler.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "change_request_route_handler_test_request",
+      "label": "request()",
+      "file_type": "code",
+      "source_file": "lib/growth/prospect-previews/change-request-route-handler.test.ts",
+      "source_location": "L11"
+    },
+    {
+      "id": "change_request_route_handler_test_context",
+      "label": "context()",
+      "file_type": "code",
+      "source_file": "lib/growth/prospect-previews/change-request-route-handler.test.ts",
+      "source_location": "L25"
+    },
+    {
+      "id": "lib_growth_prospect_previews_change_request_route_handler_ts",
+      "label": "change-request-route-handler.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/prospect-previews/change-request-route-handler.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "change_request_route_handler_previewchangerequesterror",
+      "label": "PreviewChangeRequestError",
+      "file_type": "code",
+      "source_file": "lib/growth/prospect-previews/change-request-route-handler.ts",
+      "source_location": "L25"
+    },
+    {
+      "id": "change_request_route_handler_previewchangerequesterror_constructor",
+      "label": ".constructor()",
+      "file_type": "code",
+      "source_file": "lib/growth/prospect-previews/change-request-route-handler.ts",
+      "source_location": "L26"
+    },
+    {
+      "id": "change_request_route_handler_createpreviewchangerequestroutehandler",
+      "label": "createPreviewChangeRequestRouteHandler()",
+      "file_type": "code",
+      "source_file": "lib/growth/prospect-previews/change-request-route-handler.ts",
+      "source_location": "L47"
     },
     {
       "id": "lib_growth_prospect_previews_change_requests_test_ts",
@@ -7035,6 +7210,78 @@
       "weight": 1.0
     },
     {
+      "source": "app_api_growth_facebook_route_ts",
+      "target": "node_crypto",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/growth/facebook/route.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "app_api_growth_facebook_route_ts",
+      "target": "require_founder",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/growth/facebook/route.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "app_api_growth_facebook_route_ts",
+      "target": "client",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/growth/facebook/route.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "app_api_growth_facebook_route_ts",
+      "target": "route_handler",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/growth/facebook/route.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "app_api_growth_facebook_route_ts",
+      "target": "read_route_handler",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/growth/facebook/route.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "app_api_growth_facebook_route_ts",
+      "target": "app_api_growth_runtime",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/growth/facebook/route.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "app_api_growth_facebook_route_ts",
+      "target": "route_post",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/growth/facebook/route.ts",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "app_api_growth_facebook_route_ts",
+      "target": "route_get",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/growth/facebook/route.ts",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
       "source": "app_api_portal_admin_clients_organisationid_commercial_offers_route_ts",
       "target": "commercial_offer_route",
       "relation": "imports_from",
@@ -7068,6 +7315,222 @@
       "confidence": "EXTRACTED",
       "source_file": "app/api/portal/organisations/[organisationId]/commercial-offers/route.ts",
       "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_prospects_preview_approval_tsx",
+      "target": "navigation",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/prospects/preview-approval.tsx",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_prospects_preview_approval_tsx",
+      "target": "link",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/prospects/preview-approval.tsx",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_prospects_preview_approval_tsx",
+      "target": "react",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/prospects/preview-approval.tsx",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_prospects_preview_approval_tsx",
+      "target": "preview_slugs",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/prospects/preview-approval.tsx",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_prospects_preview_approval_tsx",
+      "target": "components_growth_prospects_concept_preview_href",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/prospects/preview-approval.tsx",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_prospects_preview_approval_tsx",
+      "target": "preview_approval_hasreadypreviewsource",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/prospects/preview-approval.tsx",
+      "source_location": "L91",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_prospects_preview_approval_tsx",
+      "target": "preview_approval_resolvereadybespokepreviewslug",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/prospects/preview-approval.tsx",
+      "source_location": "L105",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_prospects_preview_approval_tsx",
+      "target": "preview_approval_describesourcepackagestatus",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/prospects/preview-approval.tsx",
+      "source_location": "L121",
+      "weight": 1.0
+    },
+    {
+      "source": "preview_approval_hasreadypreviewsource",
+      "target": "preview_approval_resolvereadybespokepreviewslug",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/prospects/preview-approval.tsx",
+      "source_location": "L102",
+      "weight": 1.0
+    },
+    {
+      "source": "preview_approval_describesourcepackagestatus",
+      "target": "preview_approval_resolvereadybespokepreviewslug",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/prospects/preview-approval.tsx",
+      "source_location": "L125",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_prospects_prospect_filters_tsx",
+      "target": "lucide_react",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/prospects/prospect-filters.tsx",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_prospects_prospect_filters_tsx",
+      "target": "link",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/prospects/prospect-filters.tsx",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_prospects_prospect_filters_tsx",
+      "target": "formatters",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/prospects/prospect-filters.tsx",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_prospects_prospect_filters_tsx",
+      "target": "prospects",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/prospects/prospect-filters.tsx",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_prospects_prospect_filters_tsx",
+      "target": "components_growth_prospects_prospects_module_css",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/prospects/prospect-filters.tsx",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_prospects_prospect_filters_tsx",
+      "target": "prospect_filters_buildprospectshref",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/prospects/prospect-filters.tsx",
+      "source_location": "L55",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_prospects_prospect_filters_tsx",
+      "target": "prospect_filters_activefilterchips",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/prospects/prospect-filters.tsx",
+      "source_location": "L81",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_prospects_prospect_list_test_tsx",
+      "target": "strict",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/prospects/prospect-list.test.tsx",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_prospects_prospect_list_test_tsx",
+      "target": "node_module",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/prospects/prospect-list.test.tsx",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_prospects_prospect_list_test_tsx",
+      "target": "node_test",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/prospects/prospect-list.test.tsx",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_prospects_prospect_list_test_tsx",
+      "target": "server",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/prospects/prospect-list.test.tsx",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_prospects_prospect_list_test_tsx",
+      "target": "prospects",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/prospects/prospect-list.test.tsx",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_prospects_prospect_list_test_tsx",
+      "target": "view_models",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/prospects/prospect-list.test.tsx",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_prospects_prospect_list_test_tsx",
+      "target": "prospect_list_test_basequery",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/prospects/prospect-list.test.tsx",
+      "source_location": "L24",
       "weight": 1.0
     },
     {
@@ -12526,7 +12989,7 @@
     },
     {
       "source": "lib_growth_campaigns_schemas_ts",
-      "target": "node_net",
+      "target": "lib_growth_research_global_schema",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/schemas.ts",
@@ -12535,20 +12998,11 @@
     },
     {
       "source": "lib_growth_campaigns_schemas_ts",
-      "target": "lib_growth_research_global_schema",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/campaigns/schemas.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_campaigns_schemas_ts",
       "target": "lib_growth_crm_countries",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/schemas.ts",
-      "source_location": "L4",
+      "source_location": "L3",
       "weight": 1.0
     },
     {
@@ -15486,6 +15940,231 @@
       "weight": 1.0
     },
     {
+      "source": "lib_growth_facebook_read_route_handler_test_ts",
+      "target": "strict",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/read-route-handler.test.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_read_route_handler_test_ts",
+      "target": "node_test",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/read-route-handler.test.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_read_route_handler_test_ts",
+      "target": "lib_growth_auth_require_founder",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/read-route-handler.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_read_route_handler_test_ts",
+      "target": "lib_growth_db_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/read-route-handler.test.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_read_route_handler_test_ts",
+      "target": "lib_growth_facebook_read_route_handler",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/read-route-handler.test.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_read_route_handler_test_ts",
+      "target": "lib_growth_facebook_workspace",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/read-route-handler.test.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_read_route_handler_test_ts",
+      "target": "read_route_handler_test_handler",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/read-route-handler.test.ts",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_read_route_handler_ts",
+      "target": "lib_growth_auth_require_founder",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/read-route-handler.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_read_route_handler_ts",
+      "target": "lib_growth_db_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/read-route-handler.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_read_route_handler_ts",
+      "target": "lib_growth_http_api_error",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/read-route-handler.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_read_route_handler_ts",
+      "target": "lib_growth_http_founder_request",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/read-route-handler.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_read_route_handler_ts",
+      "target": "lib_growth_facebook_workspace",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/read-route-handler.ts",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_read_route_handler_ts",
+      "target": "read_route_handler_createfacebookreadhandler",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/read-route-handler.ts",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_route_handler_test_ts",
+      "target": "strict",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/route-handler.test.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_route_handler_test_ts",
+      "target": "node_test",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/route-handler.test.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_route_handler_test_ts",
+      "target": "lib_growth_auth_require_founder",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/route-handler.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_route_handler_test_ts",
+      "target": "lib_growth_db_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/route-handler.test.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_route_handler_test_ts",
+      "target": "lib_growth_facebook_route_handler",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/route-handler.test.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_route_handler_ts",
+      "target": "lib_growth_auth_require_founder",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/route-handler.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_route_handler_ts",
+      "target": "lib_growth_crm_errors",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/route-handler.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_route_handler_ts",
+      "target": "lib_growth_db_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/route-handler.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_route_handler_ts",
+      "target": "lib_growth_sequences_message_action_route",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/route-handler.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_route_handler_ts",
+      "target": "lib_growth_facebook_contracts",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/route-handler.ts",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_route_handler_ts",
+      "target": "lib_growth_facebook_service",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/route-handler.ts",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_route_handler_ts",
+      "target": "route_handler_createfacebookcommandhandler",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/route-handler.ts",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
       "source": "lib_growth_facebook_service_ts",
       "target": "node_crypto",
       "relation": "imports_from",
@@ -15735,6 +16414,15 @@
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/http/founder-request.ts",
       "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_http_founder_request_ts",
+      "target": "founder_request_readrequesthasregisteredorigin",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/http/founder-request.ts",
+      "source_location": "L34",
       "weight": 1.0
     },
     {
@@ -17529,6 +18217,141 @@
       "weight": 1.0
     },
     {
+      "source": "lib_growth_prospect_previews_change_request_route_handler_test_ts",
+      "target": "strict",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/prospect-previews/change-request-route-handler.test.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_prospect_previews_change_request_route_handler_test_ts",
+      "target": "node_test",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/prospect-previews/change-request-route-handler.test.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_prospect_previews_change_request_route_handler_test_ts",
+      "target": "lib_growth_auth_require_founder",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/prospect-previews/change-request-route-handler.test.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_prospect_previews_change_request_route_handler_test_ts",
+      "target": "lib_growth_db_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/prospect-previews/change-request-route-handler.test.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_prospect_previews_change_request_route_handler_test_ts",
+      "target": "lib_growth_prospect_previews_change_request_route_handler",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/prospect-previews/change-request-route-handler.test.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_prospect_previews_change_request_route_handler_test_ts",
+      "target": "change_request_route_handler_test_request",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/prospect-previews/change-request-route-handler.test.ts",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_prospect_previews_change_request_route_handler_test_ts",
+      "target": "change_request_route_handler_test_context",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/prospect-previews/change-request-route-handler.test.ts",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_prospect_previews_change_request_route_handler_ts",
+      "target": "zod",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/prospect-previews/change-request-route-handler.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_prospect_previews_change_request_route_handler_ts",
+      "target": "lib_growth_auth_require_founder",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/prospect-previews/change-request-route-handler.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_prospect_previews_change_request_route_handler_ts",
+      "target": "lib_growth_db_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/prospect-previews/change-request-route-handler.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_prospect_previews_change_request_route_handler_ts",
+      "target": "lib_growth_sequences_message_action_route",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/prospect-previews/change-request-route-handler.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_prospect_previews_change_request_route_handler_ts",
+      "target": "lib_growth_prospect_previews_change_requests",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/prospect-previews/change-request-route-handler.ts",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_prospect_previews_change_request_route_handler_ts",
+      "target": "change_request_route_handler_previewchangerequesterror",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/prospect-previews/change-request-route-handler.ts",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "change_request_route_handler_previewchangerequesterror",
+      "target": "change_request_route_handler_previewchangerequesterror_constructor",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/prospect-previews/change-request-route-handler.ts",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_prospect_previews_change_request_route_handler_ts",
+      "target": "change_request_route_handler_createpreviewchangerequestroutehandler",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/prospect-previews/change-request-route-handler.ts",
+      "source_location": "L47",
+      "weight": 1.0
+    },
+    {
       "source": "lib_growth_prospect_previews_change_requests_test_ts",
       "target": "strict",
       "relation": "imports_from",
@@ -18294,723 +19117,23 @@
       "weight": 1.0
     },
     {
-      "source": "lib_growth_research_preview_pr_trigger_ts",
-      "target": "node_crypto",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/preview-pr-trigger.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_preview_pr_trigger_ts",
-      "target": "zod",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/preview-pr-trigger.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_preview_pr_trigger_ts",
-      "target": "lib_growth_prospect_previews_generation_current_ten_backfill",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/preview-pr-trigger.ts",
-      "source_location": "L5",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_preview_pr_trigger_ts",
-      "target": "lib_growth_prospect_previews_generation_current_thirteen_evidence_refresh",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/preview-pr-trigger.ts",
-      "source_location": "L6",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_preview_pr_trigger_ts",
-      "target": "preview_pr_trigger_validateinput",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/preview-pr-trigger.ts",
-      "source_location": "L69",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_preview_pr_trigger_ts",
-      "target": "preview_pr_trigger_validatesecret",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/preview-pr-trigger.ts",
-      "source_location": "L82",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_preview_pr_trigger_ts",
-      "target": "preview_pr_trigger_createsignature",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/preview-pr-trigger.ts",
-      "source_location": "L88",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_preview_pr_trigger_ts",
-      "target": "preview_pr_trigger_isvalidresponse",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/preview-pr-trigger.ts",
-      "source_location": "L100",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_preview_pr_trigger_ts",
-      "target": "preview_pr_trigger_isvaliddraftbackfillresponse",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/preview-pr-trigger.ts",
-      "source_location": "L113",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_preview_pr_trigger_ts",
-      "target": "preview_pr_trigger_triggerpreviewpullrequest",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/preview-pr-trigger.ts",
-      "source_location": "L123",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_preview_pr_trigger_ts",
-      "target": "preview_pr_trigger_triggerscheduledpreviewpullrequest",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/preview-pr-trigger.ts",
-      "source_location": "L160",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_preview_pr_trigger_ts",
-      "target": "preview_pr_trigger_triggercurrenttenpreviewpullrequest",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/preview-pr-trigger.ts",
-      "source_location": "L170",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_preview_pr_trigger_ts",
-      "target": "preview_pr_trigger_triggercurrentthirteenevidencerefresh",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/preview-pr-trigger.ts",
-      "source_location": "L180",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_preview_pr_trigger_ts",
-      "target": "preview_pr_trigger_triggercurrenttendraftpreviewbackfill",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/preview-pr-trigger.ts",
-      "source_location": "L191",
-      "weight": 1.0
-    },
-    {
-      "source": "preview_pr_trigger_validateinput",
-      "target": "preview_pr_trigger_validatesecret",
+      "source": "route_post",
+      "target": "route_handler_createfacebookcommandhandler",
       "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/preview-pr-trigger.ts",
-      "source_location": "L79",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "app/api/growth/facebook/route.ts",
+      "source_location": "L14",
       "weight": 1.0
     },
     {
-      "source": "preview_pr_trigger_triggerpreviewpullrequest",
-      "target": "preview_pr_trigger_validateinput",
+      "source": "route_get",
+      "target": "read_route_handler_createfacebookreadhandler",
       "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/preview-pr-trigger.ts",
-      "source_location": "L127",
-      "weight": 1.0
-    },
-    {
-      "source": "preview_pr_trigger_triggerpreviewpullrequest",
-      "target": "preview_pr_trigger_createsignature",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/preview-pr-trigger.ts",
-      "source_location": "L138",
-      "weight": 1.0
-    },
-    {
-      "source": "preview_pr_trigger_triggerpreviewpullrequest",
-      "target": "preview_pr_trigger_isvalidresponse",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/preview-pr-trigger.ts",
-      "source_location": "L152",
-      "weight": 1.0
-    },
-    {
-      "source": "preview_pr_trigger_triggerscheduledpreviewpullrequest",
-      "target": "preview_pr_trigger_triggerpreviewpullrequest",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/preview-pr-trigger.ts",
-      "source_location": "L163",
-      "weight": 1.0
-    },
-    {
-      "source": "preview_pr_trigger_triggercurrenttenpreviewpullrequest",
-      "target": "preview_pr_trigger_triggerpreviewpullrequest",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/preview-pr-trigger.ts",
-      "source_location": "L173",
-      "weight": 1.0
-    },
-    {
-      "source": "preview_pr_trigger_triggercurrentthirteenevidencerefresh",
-      "target": "preview_pr_trigger_triggerpreviewpullrequest",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/preview-pr-trigger.ts",
-      "source_location": "L183",
-      "weight": 1.0
-    },
-    {
-      "source": "preview_pr_trigger_triggercurrenttendraftpreviewbackfill",
-      "target": "preview_pr_trigger_validatesecret",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/preview-pr-trigger.ts",
-      "source_location": "L194",
-      "weight": 1.0
-    },
-    {
-      "source": "preview_pr_trigger_triggercurrenttendraftpreviewbackfill",
-      "target": "preview_pr_trigger_createsignature",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/preview-pr-trigger.ts",
-      "source_location": "L204",
-      "weight": 1.0
-    },
-    {
-      "source": "preview_pr_trigger_triggercurrenttendraftpreviewbackfill",
-      "target": "preview_pr_trigger_isvaliddraftbackfillresponse",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/preview-pr-trigger.ts",
-      "source_location": "L216",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_redacted_run_report_ts",
-      "target": "node_fs",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/redacted-run-report.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_redacted_run_report_ts",
-      "target": "node_child_process",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/redacted-run-report.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_redacted_run_report_ts",
-      "target": "zod",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/redacted-run-report.ts",
-      "source_location": "L4",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_redacted_run_report_ts",
-      "target": "redacted_run_report_researchagentoutputerror",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/redacted-run-report.ts",
-      "source_location": "L82",
-      "weight": 1.0
-    },
-    {
-      "source": "redacted_run_report_researchagentoutputerror",
-      "target": "redacted_run_report_researchagentoutputerror_constructor",
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/redacted-run-report.ts",
-      "source_location": "L83",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_redacted_run_report_ts",
-      "target": "redacted_run_report_parseredactedresearchreport",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/redacted-run-report.ts",
-      "source_location": "L89",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_redacted_run_report_ts",
-      "target": "redacted_run_report_runredactedchildprocess",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/redacted-run-report.ts",
-      "source_location": "L107",
-      "weight": 1.0
-    },
-    {
-      "source": "redacted_run_report_runredactedchildprocess",
-      "target": "redacted_run_report_parseredactedresearchreport",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/redacted-run-report.ts",
-      "source_location": "L125",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_repository_types_ts",
-      "target": "lib_growth_db_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/repository-types.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_repository_types_ts",
-      "target": "lib_growth_prospect_previews_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/repository-types.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_repository_types_ts",
-      "target": "lib_growth_research_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/repository-types.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_repository_ts",
-      "target": "lib_growth_audit_service",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/repository.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_repository_ts",
-      "target": "lib_growth_db_client",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/repository.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_repository_ts",
-      "target": "lib_growth_db_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/repository.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_repository_ts",
-      "target": "lib_growth_prospect_previews_ingestion_repository",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/repository.ts",
-      "source_location": "L4",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_repository_ts",
-      "target": "lib_growth_research_candidate_details",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/repository.ts",
-      "source_location": "L5",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_repository_ts",
-      "target": "lib_growth_research_repository_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/repository.ts",
-      "source_location": "L6",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_repository_ts",
-      "target": "repository_normalisecompanynumber",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/repository.ts",
-      "source_location": "L20",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_repository_ts",
-      "target": "repository_normaliseemail",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/repository.ts",
-      "source_location": "L24",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_repository_ts",
-      "target": "repository_candidateidentitylockkeys",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/repository.ts",
-      "source_location": "L28",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_repository_ts",
-      "target": "repository_createpostgresresearchtransaction",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/repository.ts",
-      "source_location": "L46",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_route_handler_ts",
-      "target": "lib_growth_integrations_agent_signature",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/route-handler.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_route_handler_ts",
-      "target": "lib_growth_http_api_error",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/route-handler.ts",
-      "source_location": "L5",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_route_handler_ts",
-      "target": "lib_growth_research_ingest",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/route-handler.ts",
-      "source_location": "L6",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_route_handler_ts",
-      "target": "lib_growth_research_intake_schema",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/route-handler.ts",
-      "source_location": "L7",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_route_handler_ts",
-      "target": "lib_growth_research_limits",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/route-handler.ts",
-      "source_location": "L8",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_route_handler_ts",
-      "target": "lib_growth_research_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/route-handler.ts",
-      "source_location": "L9",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_route_handler_ts",
-      "target": "route_handler_payloadtoolargeerror",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/route-handler.ts",
-      "source_location": "L15",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_route_handler_ts",
-      "target": "route_handler_readrawbody",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/route-handler.ts",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "app/api/growth/facebook/route.ts",
       "source_location": "L30",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_route_handler_ts",
-      "target": "route_handler_parsejson",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/route-handler.ts",
-      "source_location": "L80",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_route_handler_ts",
-      "target": "route_handler_createresearchrunposthandler",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/route-handler.ts",
-      "source_location": "L85",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_scheduled_agent_runner_ts",
-      "target": "node_fs",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_scheduled_agent_runner_ts",
-      "target": "node_os",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_scheduled_agent_runner_ts",
-      "target": "node_path",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_scheduled_agent_runner_ts",
-      "target": "zod",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
-      "source_location": "L5",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_scheduled_agent_runner_ts",
-      "target": "lib_sector_examples_research_instructions",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
-      "source_location": "L6",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_scheduled_agent_runner_ts",
-      "target": "lib_growth_research_redacted_run_report",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
-      "source_location": "L8",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_scheduled_agent_runner_ts",
-      "target": "scheduled_agent_runner_londondate",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
-      "source_location": "L42",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_scheduled_agent_runner_ts",
-      "target": "scheduled_agent_runner_buildweekdayexternalrunid",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
-      "source_location": "L54",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_scheduled_agent_runner_ts",
-      "target": "scheduled_agent_runner_buildagentprompt",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
-      "source_location": "L58",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_scheduled_agent_runner_ts",
-      "target": "scheduled_agent_runner_buildfailurereport",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
-      "source_location": "L97",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_scheduled_agent_runner_ts",
-      "target": "scheduled_agent_runner_executescheduledresearchagent",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
-      "source_location": "L133",
-      "weight": 1.0
-    },
-    {
-      "source": "scheduled_agent_runner_buildweekdayexternalrunid",
-      "target": "scheduled_agent_runner_londondate",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
-      "source_location": "L55",
-      "weight": 1.0
-    },
-    {
-      "source": "scheduled_agent_runner_buildfailurereport",
-      "target": "scheduled_agent_runner_londondate",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
-      "source_location": "L99",
-      "weight": 1.0
-    },
-    {
-      "source": "scheduled_agent_runner_buildfailurereport",
-      "target": "scheduled_agent_runner_buildweekdayexternalrunid",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
-      "source_location": "L101",
-      "weight": 1.0
-    },
-    {
-      "source": "scheduled_agent_runner_executescheduledresearchagent",
-      "target": "scheduled_agent_runner_buildweekdayexternalrunid",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
-      "source_location": "L152",
-      "weight": 1.0
-    },
-    {
-      "source": "scheduled_agent_runner_executescheduledresearchagent",
-      "target": "scheduled_agent_runner_buildagentprompt",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
-      "source_location": "L175",
-      "weight": 1.0
-    },
-    {
-      "source": "scheduled_agent_runner_executescheduledresearchagent",
-      "target": "scheduled_agent_runner_buildfailurereport",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
-      "source_location": "L189",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_scheduled_workflow_ts",
-      "target": "lib_growth_research_redacted_run_report",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/scheduled-workflow.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_scheduled_workflow_ts",
-      "target": "scheduled_workflow_runscheduledresearchworkflow",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/scheduled-workflow.ts",
-      "source_location": "L12",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_submission_client_ts",
-      "target": "node_crypto",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/submission-client.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_submission_client_ts",
-      "target": "promises",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/submission-client.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_submission_client_ts",
-      "target": "zod",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/submission-client.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_submission_client_ts",
-      "target": "lib_growth_research_global_schema",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/submission-client.ts",
-      "source_location": "L5",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_submission_client_ts",
-      "target": "lib_growth_research_limits",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/submission-client.ts",
-      "source_location": "L6",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_submission_client_ts",
-      "target": "submission_client_submitglobalresearch",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/submission-client.ts",
-      "source_location": "L42",
       "weight": 1.0
     },
     {
@@ -19285,7 +19408,7 @@
     },
     {
       "source": "signing_deadline_actions_run",
-      "target": "client_googlegmailclient_request",
+      "target": "change_request_route_handler_test_request",
       "relation": "calls",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
@@ -20114,6 +20237,16 @@
       "weight": 1.0
     },
     {
+      "source": "read_route_handler_test_handler",
+      "target": "read_route_handler_createfacebookreadhandler",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/facebook/read-route-handler.test.ts",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
       "source": "service_insertobservation",
       "target": "source_service_normalizesourceurl",
       "relation": "calls",
@@ -20181,6 +20314,16 @@
       "confidence_score": 0.8,
       "source_file": "lib/growth/http/founder-request.ts",
       "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "founder_request_readrequesthasregisteredorigin",
+      "target": "route_get",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/http/founder-request.ts",
+      "source_location": "L38",
       "weight": 1.0
     },
     {
@@ -20444,43 +20587,723 @@
       "weight": 1.0
     },
     {
-      "source": "preview_pr_trigger_triggerpreviewpullrequest",
-      "target": "client_googlegmailclient_request",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
+      "source": "lib_growth_research_preview_pr_trigger_ts",
+      "target": "node_crypto",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/preview-pr-trigger.ts",
-      "source_location": "L147",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_preview_pr_trigger_ts",
+      "target": "zod",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/preview-pr-trigger.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_preview_pr_trigger_ts",
+      "target": "lib_growth_prospect_previews_generation_current_ten_backfill",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/preview-pr-trigger.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_preview_pr_trigger_ts",
+      "target": "lib_growth_prospect_previews_generation_current_thirteen_evidence_refresh",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/preview-pr-trigger.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_preview_pr_trigger_ts",
+      "target": "preview_pr_trigger_validateinput",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/preview-pr-trigger.ts",
+      "source_location": "L69",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_preview_pr_trigger_ts",
+      "target": "preview_pr_trigger_validatesecret",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/preview-pr-trigger.ts",
+      "source_location": "L82",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_preview_pr_trigger_ts",
+      "target": "preview_pr_trigger_createsignature",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/preview-pr-trigger.ts",
+      "source_location": "L88",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_preview_pr_trigger_ts",
+      "target": "preview_pr_trigger_isvalidresponse",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/preview-pr-trigger.ts",
+      "source_location": "L100",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_preview_pr_trigger_ts",
+      "target": "preview_pr_trigger_isvaliddraftbackfillresponse",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/preview-pr-trigger.ts",
+      "source_location": "L113",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_preview_pr_trigger_ts",
+      "target": "preview_pr_trigger_triggerpreviewpullrequest",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/preview-pr-trigger.ts",
+      "source_location": "L123",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_preview_pr_trigger_ts",
+      "target": "preview_pr_trigger_triggerscheduledpreviewpullrequest",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/preview-pr-trigger.ts",
+      "source_location": "L160",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_preview_pr_trigger_ts",
+      "target": "preview_pr_trigger_triggercurrenttenpreviewpullrequest",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/preview-pr-trigger.ts",
+      "source_location": "L170",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_preview_pr_trigger_ts",
+      "target": "preview_pr_trigger_triggercurrentthirteenevidencerefresh",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/preview-pr-trigger.ts",
+      "source_location": "L180",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_preview_pr_trigger_ts",
+      "target": "preview_pr_trigger_triggercurrenttendraftpreviewbackfill",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/preview-pr-trigger.ts",
+      "source_location": "L191",
+      "weight": 1.0
+    },
+    {
+      "source": "preview_pr_trigger_validateinput",
+      "target": "preview_pr_trigger_validatesecret",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/preview-pr-trigger.ts",
+      "source_location": "L79",
+      "weight": 1.0
+    },
+    {
+      "source": "preview_pr_trigger_triggerpreviewpullrequest",
+      "target": "preview_pr_trigger_validateinput",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/preview-pr-trigger.ts",
+      "source_location": "L127",
+      "weight": 1.0
+    },
+    {
+      "source": "preview_pr_trigger_triggerpreviewpullrequest",
+      "target": "preview_pr_trigger_createsignature",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/preview-pr-trigger.ts",
+      "source_location": "L138",
+      "weight": 1.0
+    },
+    {
+      "source": "preview_pr_trigger_triggerpreviewpullrequest",
+      "target": "preview_pr_trigger_isvalidresponse",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/preview-pr-trigger.ts",
+      "source_location": "L152",
+      "weight": 1.0
+    },
+    {
+      "source": "preview_pr_trigger_triggerscheduledpreviewpullrequest",
+      "target": "preview_pr_trigger_triggerpreviewpullrequest",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/preview-pr-trigger.ts",
+      "source_location": "L163",
+      "weight": 1.0
+    },
+    {
+      "source": "preview_pr_trigger_triggercurrenttenpreviewpullrequest",
+      "target": "preview_pr_trigger_triggerpreviewpullrequest",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/preview-pr-trigger.ts",
+      "source_location": "L173",
+      "weight": 1.0
+    },
+    {
+      "source": "preview_pr_trigger_triggercurrentthirteenevidencerefresh",
+      "target": "preview_pr_trigger_triggerpreviewpullrequest",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/preview-pr-trigger.ts",
+      "source_location": "L183",
       "weight": 1.0
     },
     {
       "source": "preview_pr_trigger_triggercurrenttendraftpreviewbackfill",
-      "target": "client_googlegmailclient_request",
+      "target": "preview_pr_trigger_validatesecret",
       "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
+      "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/preview-pr-trigger.ts",
-      "source_location": "L212",
+      "source_location": "L194",
       "weight": 1.0
     },
     {
-      "source": "route_handler_readrawbody",
-      "target": "route_get",
+      "source": "preview_pr_trigger_triggercurrenttendraftpreviewbackfill",
+      "target": "preview_pr_trigger_createsignature",
       "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/preview-pr-trigger.ts",
+      "source_location": "L204",
+      "weight": 1.0
+    },
+    {
+      "source": "preview_pr_trigger_triggercurrenttendraftpreviewbackfill",
+      "target": "preview_pr_trigger_isvaliddraftbackfillresponse",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/preview-pr-trigger.ts",
+      "source_location": "L216",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_redacted_run_report_ts",
+      "target": "node_fs",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/redacted-run-report.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_redacted_run_report_ts",
+      "target": "node_child_process",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/redacted-run-report.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_redacted_run_report_ts",
+      "target": "zod",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/redacted-run-report.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_redacted_run_report_ts",
+      "target": "redacted_run_report_researchagentoutputerror",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/redacted-run-report.ts",
+      "source_location": "L82",
+      "weight": 1.0
+    },
+    {
+      "source": "redacted_run_report_researchagentoutputerror",
+      "target": "redacted_run_report_researchagentoutputerror_constructor",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/redacted-run-report.ts",
+      "source_location": "L83",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_redacted_run_report_ts",
+      "target": "redacted_run_report_parseredactedresearchreport",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/redacted-run-report.ts",
+      "source_location": "L89",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_redacted_run_report_ts",
+      "target": "redacted_run_report_runredactedchildprocess",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/redacted-run-report.ts",
+      "source_location": "L107",
+      "weight": 1.0
+    },
+    {
+      "source": "redacted_run_report_runredactedchildprocess",
+      "target": "redacted_run_report_parseredactedresearchreport",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/redacted-run-report.ts",
+      "source_location": "L125",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_repository_types_ts",
+      "target": "lib_growth_db_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/repository-types.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_repository_types_ts",
+      "target": "lib_growth_prospect_previews_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/repository-types.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_repository_types_ts",
+      "target": "lib_growth_research_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/repository-types.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_repository_ts",
+      "target": "lib_growth_audit_service",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/repository.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_repository_ts",
+      "target": "lib_growth_db_client",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/repository.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_repository_ts",
+      "target": "lib_growth_db_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/repository.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_repository_ts",
+      "target": "lib_growth_prospect_previews_ingestion_repository",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/repository.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_repository_ts",
+      "target": "lib_growth_research_candidate_details",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/repository.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_repository_ts",
+      "target": "lib_growth_research_repository_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/repository.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_repository_ts",
+      "target": "repository_normalisecompanynumber",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/repository.ts",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_repository_ts",
+      "target": "repository_normaliseemail",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/repository.ts",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_repository_ts",
+      "target": "repository_candidateidentitylockkeys",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/repository.ts",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_repository_ts",
+      "target": "repository_createpostgresresearchtransaction",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/repository.ts",
+      "source_location": "L46",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_route_handler_ts",
+      "target": "lib_growth_integrations_agent_signature",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/route-handler.ts",
-      "source_location": "L31",
+      "source_location": "L1",
       "weight": 1.0
     },
     {
-      "source": "submission_client_submitglobalresearch",
-      "target": "client_googlegmailclient_request",
+      "source": "lib_growth_research_route_handler_ts",
+      "target": "lib_growth_http_api_error",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/route-handler.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_route_handler_ts",
+      "target": "lib_growth_research_ingest",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/route-handler.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_route_handler_ts",
+      "target": "lib_growth_research_intake_schema",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/route-handler.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_route_handler_ts",
+      "target": "lib_growth_research_limits",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/route-handler.ts",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_route_handler_ts",
+      "target": "lib_growth_research_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/route-handler.ts",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_route_handler_ts",
+      "target": "route_handler_payloadtoolargeerror",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/route-handler.ts",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_route_handler_ts",
+      "target": "route_handler_readrawbody",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/route-handler.ts",
+      "source_location": "L30",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_route_handler_ts",
+      "target": "route_handler_parsejson",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/route-handler.ts",
+      "source_location": "L80",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_route_handler_ts",
+      "target": "route_handler_createresearchrunposthandler",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/route-handler.ts",
+      "source_location": "L85",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_scheduled_agent_runner_ts",
+      "target": "node_fs",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_scheduled_agent_runner_ts",
+      "target": "node_os",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_scheduled_agent_runner_ts",
+      "target": "node_path",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_scheduled_agent_runner_ts",
+      "target": "zod",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_scheduled_agent_runner_ts",
+      "target": "lib_sector_examples_research_instructions",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_scheduled_agent_runner_ts",
+      "target": "lib_growth_research_redacted_run_report",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_scheduled_agent_runner_ts",
+      "target": "scheduled_agent_runner_londondate",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
+      "source_location": "L42",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_scheduled_agent_runner_ts",
+      "target": "scheduled_agent_runner_buildweekdayexternalrunid",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
+      "source_location": "L54",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_scheduled_agent_runner_ts",
+      "target": "scheduled_agent_runner_buildagentprompt",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
+      "source_location": "L58",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_scheduled_agent_runner_ts",
+      "target": "scheduled_agent_runner_buildfailurereport",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
+      "source_location": "L97",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_scheduled_agent_runner_ts",
+      "target": "scheduled_agent_runner_executescheduledresearchagent",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
+      "source_location": "L133",
+      "weight": 1.0
+    },
+    {
+      "source": "scheduled_agent_runner_buildweekdayexternalrunid",
+      "target": "scheduled_agent_runner_londondate",
       "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
+      "source_location": "L55",
+      "weight": 1.0
+    },
+    {
+      "source": "scheduled_agent_runner_buildfailurereport",
+      "target": "scheduled_agent_runner_londondate",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
+      "source_location": "L99",
+      "weight": 1.0
+    },
+    {
+      "source": "scheduled_agent_runner_buildfailurereport",
+      "target": "scheduled_agent_runner_buildweekdayexternalrunid",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
+      "source_location": "L101",
+      "weight": 1.0
+    },
+    {
+      "source": "scheduled_agent_runner_executescheduledresearchagent",
+      "target": "scheduled_agent_runner_buildweekdayexternalrunid",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
+      "source_location": "L152",
+      "weight": 1.0
+    },
+    {
+      "source": "scheduled_agent_runner_executescheduledresearchagent",
+      "target": "scheduled_agent_runner_buildagentprompt",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
+      "source_location": "L175",
+      "weight": 1.0
+    },
+    {
+      "source": "scheduled_agent_runner_executescheduledresearchagent",
+      "target": "scheduled_agent_runner_buildfailurereport",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/scheduled-agent-runner.ts",
+      "source_location": "L189",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_scheduled_workflow_ts",
+      "target": "lib_growth_research_redacted_run_report",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/scheduled-workflow.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_scheduled_workflow_ts",
+      "target": "scheduled_workflow_runscheduledresearchworkflow",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/scheduled-workflow.ts",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_submission_client_ts",
+      "target": "node_crypto",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/submission-client.ts",
-      "source_location": "L92",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_submission_client_ts",
+      "target": "promises",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/submission-client.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_submission_client_ts",
+      "target": "zod",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/submission-client.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_submission_client_ts",
+      "target": "lib_growth_research_global_schema",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/submission-client.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_submission_client_ts",
+      "target": "lib_growth_research_limits",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/submission-client.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_submission_client_ts",
+      "target": "submission_client_submitglobalresearch",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/submission-client.ts",
+      "source_location": "L42",
       "weight": 1.0
     },
     {
@@ -28818,6 +29641,36 @@
       "weight": 1.0
     },
     {
+      "source": "preview_pr_trigger_triggerpreviewpullrequest",
+      "target": "commercial_offer_route_test_request",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/research/preview-pr-trigger.ts",
+      "source_location": "L147",
+      "weight": 1.0
+    },
+    {
+      "source": "preview_pr_trigger_triggercurrenttendraftpreviewbackfill",
+      "target": "commercial_offer_route_test_request",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/research/preview-pr-trigger.ts",
+      "source_location": "L212",
+      "weight": 1.0
+    },
+    {
+      "source": "submission_client_submitglobalresearch",
+      "target": "commercial_offer_route_test_request",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/research/submission-client.ts",
+      "source_location": "L92",
+      "weight": 1.0
+    },
+    {
       "source": "approve_send_route_handler_createapprovesendhandler",
       "target": "approval_createfirstemailapprover",
       "relation": "calls",
@@ -29978,6 +30831,26 @@
       "weight": 1
     },
     {
+      "source": "app_api_growth_facebook_route_ts",
+      "target": "lib_growth_facebook_route_handler_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "app/api/growth/facebook/route.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "app_api_growth_facebook_route_ts",
+      "target": "lib_growth_facebook_read_route_handler_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "app/api/growth/facebook/route.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
       "source": "app_api_portal_admin_clients_organisationid_commercial_offers_route_ts",
       "target": "lib_operations_http_commercial_offer_route_ts",
       "relation": "imports",
@@ -29995,6 +30868,26 @@
       "confidence_score": 1,
       "source_file": "app/api/portal/organisations/[organisationId]/commercial-offers/route.ts",
       "source_location": "L1",
+      "weight": 1
+    },
+    {
+      "source": "components_growth_prospects_prospect_filters_tsx",
+      "target": "lib_growth_dashboard_prospects_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/growth/prospects/prospect-filters.tsx",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "components_growth_prospects_prospect_list_test_tsx",
+      "target": "lib_growth_dashboard_prospects_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/growth/prospects/prospect-list.test.tsx",
+      "source_location": "L7",
       "weight": 1
     },
     {
@@ -31994,7 +32887,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/campaigns/schemas.ts",
-      "source_location": "L3",
+      "source_location": "L2",
       "weight": 1
     },
     {
@@ -32004,7 +32897,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/campaigns/schemas.ts",
-      "source_location": "L4",
+      "source_location": "L3",
       "weight": 1
     },
     {
@@ -32488,6 +33381,96 @@
       "weight": 1
     },
     {
+      "source": "lib_growth_facebook_read_route_handler_test_ts",
+      "target": "lib_growth_facebook_read_route_handler_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/facebook/read-route-handler.test.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_facebook_read_route_handler_test_ts",
+      "target": "lib_growth_facebook_workspace_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/facebook/read-route-handler.test.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_facebook_read_route_handler_ts",
+      "target": "lib_growth_http_founder_request_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/facebook/read-route-handler.ts",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_facebook_read_route_handler_ts",
+      "target": "lib_growth_facebook_workspace_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/facebook/read-route-handler.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_facebook_route_handler_test_ts",
+      "target": "lib_growth_facebook_route_handler_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/facebook/route-handler.test.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_facebook_route_handler_ts",
+      "target": "lib_growth_crm_errors_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/facebook/route-handler.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_facebook_route_handler_ts",
+      "target": "lib_growth_sequences_message_action_route_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/facebook/route-handler.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_facebook_route_handler_ts",
+      "target": "lib_growth_facebook_contracts_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/facebook/route-handler.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_facebook_route_handler_ts",
+      "target": "lib_growth_facebook_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/facebook/route-handler.ts",
+      "source_location": "L9",
+      "weight": 1
+    },
+    {
       "source": "lib_growth_facebook_service_ts",
       "target": "lib_growth_campaigns_authorization_ts",
       "relation": "imports",
@@ -32695,6 +33678,36 @@
       "confidence_score": 1,
       "source_file": "lib/growth/integrations/resend/webhook.ts",
       "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_prospect_previews_change_request_route_handler_test_ts",
+      "target": "lib_growth_prospect_previews_change_request_route_handler_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/prospect-previews/change-request-route-handler.test.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_prospect_previews_change_request_route_handler_ts",
+      "target": "lib_growth_sequences_message_action_route_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/prospect-previews/change-request-route-handler.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_prospect_previews_change_request_route_handler_ts",
+      "target": "lib_growth_prospect_previews_change_requests_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/prospect-previews/change-request-route-handler.ts",
+      "source_location": "L10",
       "weight": 1
     },
     {
