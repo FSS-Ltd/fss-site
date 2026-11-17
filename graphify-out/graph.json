@@ -9,7 +9,7 @@
       "source_file": "app/(portal)/(client)/portal/agreements/offers/[offerId]/page.tsx",
       "source_location": "L1",
       "id": "app_portal_client_portal_agreements_offers_offerid_page_tsx",
-      "community": 6,
+      "community": 3,
       "norm_label": "page.tsx"
     },
     {
@@ -18,7 +18,7 @@
       "source_file": "app/(portal)/(client)/portal/agreements/offers/[offerId]/page.tsx",
       "source_location": "L16",
       "id": "page_clientofferpage",
-      "community": 6,
+      "community": 3,
       "norm_label": "clientofferpage()"
     },
     {
@@ -45,7 +45,7 @@
       "source_file": "app/api/portal/admin/clients/[organisationId]/commercial-offers/route.ts",
       "source_location": "L1",
       "id": "app_api_portal_admin_clients_organisationid_commercial_offers_route_ts",
-      "community": 6,
+      "community": 3,
       "norm_label": "route.ts"
     },
     {
@@ -54,7 +54,7 @@
       "source_file": "app/api/portal/organisations/[organisationId]/commercial-offers/route.ts",
       "source_location": "L3",
       "id": "route_post",
-      "community": 6,
+      "community": 3,
       "norm_label": "post()"
     },
     {
@@ -63,7 +63,7 @@
       "source_file": "app/api/portal/organisations/[organisationId]/commercial-offers/route.ts",
       "source_location": "L1",
       "id": "app_api_portal_organisations_organisationid_commercial_offers_route_ts",
-      "community": 6,
+      "community": 3,
       "norm_label": "route.ts"
     },
     {
@@ -72,7 +72,7 @@
       "source_file": "components/portal/agreements/agreement-builder-currency.test.tsx",
       "source_location": "L1",
       "id": "components_portal_agreements_agreement_builder_currency_test_tsx",
-      "community": 7,
+      "community": 4,
       "norm_label": "agreement-builder-currency.test.tsx"
     },
     {
@@ -558,7 +558,7 @@
       "source_file": "components/portal/agreements/agreement-builder.test.tsx",
       "source_location": "L1",
       "id": "components_portal_agreements_agreement_builder_test_tsx",
-      "community": 31,
+      "community": 32,
       "norm_label": "agreement-builder.test.tsx"
     },
     {
@@ -567,7 +567,7 @@
       "source_file": "components/portal/agreements/agreement-builder.tsx",
       "source_location": "L1",
       "id": "components_portal_agreements_agreement_builder_tsx",
-      "community": 25,
+      "community": 26,
       "norm_label": "agreement-builder.tsx"
     },
     {
@@ -594,7 +594,7 @@
       "source_file": "components/portal/agreements/agreement-lifecycle-actions.tsx",
       "source_location": "L1",
       "id": "components_portal_agreements_agreement_lifecycle_actions_tsx",
-      "community": 7,
+      "community": 4,
       "norm_label": "agreement-lifecycle-actions.tsx"
     },
     {
@@ -603,7 +603,7 @@
       "source_file": "components/portal/agreements/agreement-lifecycle-actions.tsx",
       "source_location": "L12",
       "id": "agreement_lifecycle_actions_actionfor",
-      "community": 7,
+      "community": 4,
       "norm_label": "actionfor()"
     },
     {
@@ -612,7 +612,7 @@
       "source_file": "components/portal/agreements/agreement-lifecycle-actions.tsx",
       "source_location": "L60",
       "id": "agreement_lifecycle_actions_submit",
-      "community": 7,
+      "community": 4,
       "norm_label": "submit()"
     },
     {
@@ -864,7 +864,7 @@
       "source_file": "components/portal/agreements/commercial-offer-ui.test.tsx",
       "source_location": "L1",
       "id": "components_portal_agreements_commercial_offer_ui_test_tsx",
-      "community": 7,
+      "community": 4,
       "norm_label": "commercial-offer-ui.test.tsx"
     },
     {
@@ -873,7 +873,7 @@
       "source_file": "components/portal/agreements/commercial-offer-ui.test.tsx",
       "source_location": "L49",
       "id": "commercial_offer_ui_test_render",
-      "community": 7,
+      "community": 4,
       "norm_label": "render()"
     },
     {
@@ -882,7 +882,7 @@
       "source_file": "components/portal/agreements/engagement-form.test.tsx",
       "source_location": "L1",
       "id": "components_portal_agreements_engagement_form_test_tsx",
-      "community": 32,
+      "community": 33,
       "norm_label": "engagement-form.test.tsx"
     },
     {
@@ -891,7 +891,7 @@
       "source_file": "components/portal/agreements/engagement-form.tsx",
       "source_location": "L1",
       "id": "components_portal_agreements_engagement_form_tsx",
-      "community": 19,
+      "community": 20,
       "norm_label": "engagement-form.tsx"
     },
     {
@@ -900,7 +900,7 @@
       "source_file": "components/portal/agreements/engagement-form.tsx",
       "source_location": "L27",
       "id": "engagement_form_resultfrom",
-      "community": 19,
+      "community": 20,
       "norm_label": "resultfrom()"
     },
     {
@@ -909,7 +909,7 @@
       "source_file": "components/portal/agreements/engagement-form.tsx",
       "source_location": "L52",
       "id": "engagement_form_submit",
-      "community": 19,
+      "community": 20,
       "norm_label": "submit()"
     },
     {
@@ -945,7 +945,7 @@
       "source_file": "components/portal/agreements/founder-agreement-fields.tsx",
       "source_location": "L1",
       "id": "components_portal_agreements_founder_agreement_fields_tsx",
-      "community": 25,
+      "community": 26,
       "norm_label": "founder-agreement-fields.tsx"
     },
     {
@@ -954,7 +954,7 @@
       "source_file": "components/portal/agreements/founder-agreement-fields.tsx",
       "source_location": "L50",
       "id": "founder_agreement_fields_founderagreementfields",
-      "community": 25,
+      "community": 26,
       "norm_label": "founderagreementfields()"
     },
     {
@@ -963,7 +963,7 @@
       "source_file": "components/portal/agreements/presentation.test.tsx",
       "source_location": "L1",
       "id": "components_portal_agreements_presentation_test_tsx",
-      "community": 33,
+      "community": 34,
       "norm_label": "presentation.test.tsx"
     },
     {
@@ -1017,7 +1017,7 @@
       "source_file": "components/portal/agreements/routed-engagement-form.tsx",
       "source_location": "L1",
       "id": "components_portal_agreements_routed_engagement_form_tsx",
-      "community": 19,
+      "community": 20,
       "norm_label": "routed-engagement-form.tsx"
     },
     {
@@ -1026,7 +1026,7 @@
       "source_file": "components/portal/agreements/routed-engagement-form.tsx",
       "source_location": "L11",
       "id": "routed_engagement_form_routedengagementform",
-      "community": 19,
+      "community": 20,
       "norm_label": "routedengagementform()"
     },
     {
@@ -1071,7 +1071,7 @@
       "source_file": "components/portal/agreements/signature-evidence-form.tsx",
       "source_location": "L1",
       "id": "components_portal_agreements_signature_evidence_form_tsx",
-      "community": 7,
+      "community": 4,
       "norm_label": "signature-evidence-form.tsx"
     },
     {
@@ -1080,7 +1080,7 @@
       "source_file": "components/portal/agreements/signature-evidence-form.tsx",
       "source_location": "L23",
       "id": "signature_evidence_form_signatureevidenceform",
-      "community": 7,
+      "community": 4,
       "norm_label": "signatureevidenceform()"
     },
     {
@@ -1089,7 +1089,7 @@
       "source_file": "components/portal/agreements/signing-deadline-actions.test.tsx",
       "source_location": "L1",
       "id": "components_portal_agreements_signing_deadline_actions_test_tsx",
-      "community": 34,
+      "community": 35,
       "norm_label": "signing-deadline-actions.test.tsx"
     },
     {
@@ -1098,7 +1098,7 @@
       "source_file": "components/portal/agreements/signing-deadline-actions.tsx",
       "source_location": "L1",
       "id": "components_portal_agreements_signing_deadline_actions_tsx",
-      "community": 7,
+      "community": 4,
       "norm_label": "signing-deadline-actions.tsx"
     },
     {
@@ -1107,7 +1107,7 @@
       "source_file": "components/portal/agreements/signing-deadline-actions.tsx",
       "source_location": "L15",
       "id": "signing_deadline_actions_errormessage",
-      "community": 7,
+      "community": 4,
       "norm_label": "errormessage()"
     },
     {
@@ -1116,7 +1116,7 @@
       "source_file": "components/portal/agreements/signing-deadline-actions.tsx",
       "source_location": "L25",
       "id": "signing_deadline_actions_formatdeadline",
-      "community": 7,
+      "community": 4,
       "norm_label": "formatdeadline()"
     },
     {
@@ -1125,7 +1125,7 @@
       "source_file": "components/portal/agreements/signing-deadline-actions.tsx",
       "source_location": "L34",
       "id": "signing_deadline_actions_signingdeadlineoutcomenotice",
-      "community": 7,
+      "community": 4,
       "norm_label": "signingdeadlineoutcomenotice()"
     },
     {
@@ -1134,7 +1134,7 @@
       "source_file": "components/portal/agreements/signing-deadline-actions.tsx",
       "source_location": "L82",
       "id": "signing_deadline_actions_run",
-      "community": 7,
+      "community": 4,
       "norm_label": "run()"
     },
     {
@@ -1143,7 +1143,7 @@
       "source_file": "components/portal/agreements/staff-agreement-builder.test.tsx",
       "source_location": "L1",
       "id": "components_portal_agreements_staff_agreement_builder_test_tsx",
-      "community": 7,
+      "community": 4,
       "norm_label": "staff-agreement-builder.test.tsx"
     },
     {
@@ -1197,7 +1197,7 @@
       "source_file": "components/portal/agreements/staff-agreement-detail.test.tsx",
       "source_location": "L1",
       "id": "components_portal_agreements_staff_agreement_detail_test_tsx",
-      "community": 7,
+      "community": 4,
       "norm_label": "staff-agreement-detail.test.tsx"
     },
     {
@@ -1206,7 +1206,7 @@
       "source_file": "components/portal/agreements/staff-agreement-detail.test.tsx",
       "source_location": "L33",
       "id": "staff_agreement_detail_test_renderdetail",
-      "community": 7,
+      "community": 4,
       "norm_label": "renderdetail()"
     },
     {
@@ -1215,7 +1215,7 @@
       "source_file": "components/portal/agreements/staff-agreement-detail.tsx",
       "source_location": "L1",
       "id": "components_portal_agreements_staff_agreement_detail_tsx",
-      "community": 7,
+      "community": 4,
       "norm_label": "staff-agreement-detail.tsx"
     },
     {
@@ -1224,7 +1224,7 @@
       "source_file": "components/portal/agreements/staff-agreement-overview.test.tsx",
       "source_location": "L1",
       "id": "components_portal_agreements_staff_agreement_overview_test_tsx",
-      "community": 35,
+      "community": 36,
       "norm_label": "staff-agreement-overview.test.tsx"
     },
     {
@@ -1233,7 +1233,7 @@
       "source_file": "components/portal/agreements/staff-agreement-overview.tsx",
       "source_location": "L1",
       "id": "components_portal_agreements_staff_agreement_overview_tsx",
-      "community": 4,
+      "community": 2,
       "norm_label": "staff-agreement-overview.tsx"
     },
     {
@@ -1242,7 +1242,7 @@
       "source_file": "components/portal/agreements/staff-agreement-overview.tsx",
       "source_location": "L18",
       "id": "staff_agreement_overview_agreementworkspacehref",
-      "community": 4,
+      "community": 2,
       "norm_label": "agreementworkspacehref()"
     },
     {
@@ -1251,7 +1251,7 @@
       "source_file": "components/portal/agreements/staff-agreement-overview.tsx",
       "source_location": "L24",
       "id": "staff_agreement_overview_signingworkspacehref",
-      "community": 4,
+      "community": 2,
       "norm_label": "signingworkspacehref()"
     },
     {
@@ -1368,7 +1368,7 @@
       "source_file": "lib/growth/analytics/definitions.ts",
       "source_location": "L1",
       "id": "lib_growth_analytics_definitions_ts",
-      "community": 21,
+      "community": 22,
       "norm_label": "definitions.ts"
     },
     {
@@ -1377,7 +1377,7 @@
       "source_file": "lib/growth/analytics/definitions.ts",
       "source_location": "L27",
       "id": "definitions_parsecalendardate",
-      "community": 21,
+      "community": 22,
       "norm_label": "parsecalendardate()"
     },
     {
@@ -1386,7 +1386,7 @@
       "source_file": "lib/growth/analytics/definitions.ts",
       "source_location": "L39",
       "id": "definitions_resolveutcwindow",
-      "community": 21,
+      "community": 22,
       "norm_label": "resolveutcwindow()"
     },
     {
@@ -1395,7 +1395,7 @@
       "source_file": "lib/growth/analytics/definitions.ts",
       "source_location": "L60",
       "id": "definitions_daysinmonth",
-      "community": 21,
+      "community": 22,
       "norm_label": "daysinmonth()"
     },
     {
@@ -1404,7 +1404,7 @@
       "source_file": "lib/growth/analytics/definitions.ts",
       "source_location": "L66",
       "id": "definitions_resolvelondonmonthrange",
-      "community": 21,
+      "community": 22,
       "norm_label": "resolvelondonmonthrange()"
     },
     {
@@ -1413,7 +1413,7 @@
       "source_file": "lib/growth/analytics/definitions.ts",
       "source_location": "L86",
       "id": "definitions_currentlondonmonthkey",
-      "community": 21,
+      "community": 22,
       "norm_label": "currentlondonmonthkey()"
     },
     {
@@ -1422,7 +1422,7 @@
       "source_file": "lib/growth/analytics/definitions.ts",
       "source_location": "L277",
       "id": "definitions_computerate",
-      "community": 21,
+      "community": 22,
       "norm_label": "computerate()"
     },
     {
@@ -1431,7 +1431,7 @@
       "source_file": "lib/growth/campaigns/authorization.ts",
       "source_location": "L1",
       "id": "lib_growth_campaigns_authorization_ts",
-      "community": 3,
+      "community": 6,
       "norm_label": "authorization.ts"
     },
     {
@@ -1440,7 +1440,7 @@
       "source_file": "lib/growth/campaigns/authorization.ts",
       "source_location": "L4",
       "id": "authorization_requirecampaignfounder",
-      "community": 3,
+      "community": 6,
       "norm_label": "requirecampaignfounder()"
     },
     {
@@ -1449,25 +1449,34 @@
       "source_file": "lib/growth/campaigns/commands.ts",
       "source_location": "L1",
       "id": "lib_growth_campaigns_commands_ts",
-      "community": 3,
+      "community": 6,
       "norm_label": "commands.ts"
+    },
+    {
+      "label": "validateAccountBinding()",
+      "file_type": "code",
+      "source_file": "lib/growth/campaigns/commands.ts",
+      "source_location": "L24",
+      "id": "commands_validateaccountbinding",
+      "community": 6,
+      "norm_label": "validateaccountbinding()"
     },
     {
       "label": "mutate()",
       "file_type": "code",
       "source_file": "lib/growth/campaigns/commands.ts",
-      "source_location": "L23",
+      "source_location": "L42",
       "id": "commands_mutate",
-      "community": 3,
+      "community": 6,
       "norm_label": "mutate()"
     },
     {
       "label": "executeCampaignCommand()",
       "file_type": "code",
       "source_file": "lib/growth/campaigns/commands.ts",
-      "source_location": "L128",
+      "source_location": "L149",
       "id": "commands_executecampaigncommand",
-      "community": 3,
+      "community": 6,
       "norm_label": "executecampaigncommand()"
     },
     {
@@ -1476,7 +1485,7 @@
       "source_file": "lib/growth/campaigns/copy.ts",
       "source_location": "L1",
       "id": "lib_growth_campaigns_copy_ts",
-      "community": 15,
+      "community": 6,
       "norm_label": "copy.ts"
     },
     {
@@ -1485,7 +1494,7 @@
       "source_file": "lib/growth/campaigns/copy.ts",
       "source_location": "L4",
       "id": "copy_safe",
-      "community": 15,
+      "community": 6,
       "norm_label": "safe()"
     },
     {
@@ -1494,7 +1503,7 @@
       "source_file": "lib/growth/campaigns/copy.ts",
       "source_location": "L14",
       "id": "copy_buildcampaignsubject",
-      "community": 15,
+      "community": 6,
       "norm_label": "buildcampaignsubject()"
     },
     {
@@ -1503,7 +1512,7 @@
       "source_file": "lib/growth/campaigns/copy.ts",
       "source_location": "L24",
       "id": "copy_buildcampaigncopy",
-      "community": 15,
+      "community": 6,
       "norm_label": "buildcampaigncopy()"
     },
     {
@@ -1512,7 +1521,7 @@
       "source_file": "lib/growth/campaigns/copy.ts",
       "source_location": "L67",
       "id": "copy_buildfacebookpost",
-      "community": 15,
+      "community": 6,
       "norm_label": "buildfacebookpost()"
     },
     {
@@ -1521,7 +1530,7 @@
       "source_file": "lib/growth/campaigns/domain.test.ts",
       "source_location": "L1",
       "id": "lib_growth_campaigns_domain_test_ts",
-      "community": 15,
+      "community": 6,
       "norm_label": "domain.test.ts"
     },
     {
@@ -1530,7 +1539,7 @@
       "source_file": "lib/growth/campaigns/events.ts",
       "source_location": "L1",
       "id": "lib_growth_campaigns_events_ts",
-      "community": 3,
+      "community": 6,
       "norm_label": "events.ts"
     },
     {
@@ -1539,7 +1548,7 @@
       "source_file": "lib/growth/campaigns/events.ts",
       "source_location": "L14",
       "id": "events_appendcampaigneventandoutbox",
-      "community": 3,
+      "community": 6,
       "norm_label": "appendcampaigneventandoutbox()"
     },
     {
@@ -1548,7 +1557,7 @@
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
       "source_location": "L1",
       "id": "lib_growth_campaigns_founder_verification_reader_ts",
-      "community": 3,
+      "community": 6,
       "norm_label": "founder-verification-reader.ts"
     },
     {
@@ -1557,7 +1566,7 @@
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
       "source_location": "L25",
       "id": "founder_verification_reader_loadfounderverification",
-      "community": 3,
+      "community": 6,
       "norm_label": "loadfounderverification()"
     },
     {
@@ -1566,7 +1575,7 @@
       "source_file": "lib/growth/campaigns/founder-verification.ts",
       "source_location": "L1",
       "id": "lib_growth_campaigns_founder_verification_ts",
-      "community": 3,
+      "community": 6,
       "norm_label": "founder-verification.ts"
     },
     {
@@ -1575,7 +1584,7 @@
       "source_file": "lib/growth/campaigns/founder-verification.ts",
       "source_location": "L45",
       "id": "founder_verification_verifyfounderevidence",
-      "community": 3,
+      "community": 6,
       "norm_label": "verifyfounderevidence()"
     },
     {
@@ -1584,7 +1593,7 @@
       "source_file": "lib/growth/campaigns/lifecycle.ts",
       "source_location": "L1",
       "id": "lib_growth_campaigns_lifecycle_ts",
-      "community": 3,
+      "community": 6,
       "norm_label": "lifecycle.ts"
     },
     {
@@ -1593,7 +1602,7 @@
       "source_file": "lib/growth/campaigns/lifecycle.ts",
       "source_location": "L4",
       "id": "lifecycle_validatecampaigndefinition",
-      "community": 3,
+      "community": 6,
       "norm_label": "validatecampaigndefinition()"
     },
     {
@@ -1602,7 +1611,7 @@
       "source_file": "lib/growth/campaigns/lifecycle.ts",
       "source_location": "L51",
       "id": "lifecycle_cancelcampaignjobs",
-      "community": 3,
+      "community": 6,
       "norm_label": "cancelcampaignjobs()"
     },
     {
@@ -1611,7 +1620,7 @@
       "source_file": "lib/growth/campaigns/lifecycle.ts",
       "source_location": "L59",
       "id": "lifecycle_serializecampaigndefinition",
-      "community": 3,
+      "community": 6,
       "norm_label": "serializecampaigndefinition()"
     },
     {
@@ -1620,7 +1629,7 @@
       "source_file": "lib/growth/campaigns/permissions.ts",
       "source_location": "L1",
       "id": "lib_growth_campaigns_permissions_ts",
-      "community": 3,
+      "community": 6,
       "norm_label": "permissions.ts"
     },
     {
@@ -1629,7 +1638,7 @@
       "source_file": "lib/growth/campaigns/permissions.ts",
       "source_location": "L14",
       "id": "permissions_recordcampaignpermission",
-      "community": 3,
+      "community": 6,
       "norm_label": "recordcampaignpermission()"
     },
     {
@@ -1638,7 +1647,7 @@
       "source_file": "lib/growth/campaigns/policy.ts",
       "source_location": "L1",
       "id": "lib_growth_campaigns_policy_ts",
-      "community": 15,
+      "community": 6,
       "norm_label": "policy.ts"
     },
     {
@@ -1647,7 +1656,7 @@
       "source_file": "lib/growth/campaigns/policy.ts",
       "source_location": "L7",
       "id": "policy_evaluatecampaigneligibility",
-      "community": 15,
+      "community": 6,
       "norm_label": "evaluatecampaigneligibility()"
     },
     {
@@ -1656,7 +1665,7 @@
       "source_file": "lib/growth/campaigns/report.ts",
       "source_location": "L1",
       "id": "lib_growth_campaigns_report_ts",
-      "community": 15,
+      "community": 6,
       "norm_label": "report.ts"
     },
     {
@@ -1665,7 +1674,7 @@
       "source_file": "lib/growth/campaigns/report.ts",
       "source_location": "L5",
       "id": "report_addlondondays",
-      "community": 15,
+      "community": 6,
       "norm_label": "addlondondays()"
     },
     {
@@ -1674,7 +1683,7 @@
       "source_file": "lib/growth/campaigns/report.ts",
       "source_location": "L10",
       "id": "report_interval",
-      "community": 15,
+      "community": 6,
       "norm_label": "interval()"
     },
     {
@@ -1683,7 +1692,7 @@
       "source_file": "lib/growth/campaigns/report.ts",
       "source_location": "L19",
       "id": "report_buildcampaignreport",
-      "community": 15,
+      "community": 6,
       "norm_label": "buildcampaignreport()"
     },
     {
@@ -1692,7 +1701,7 @@
       "source_file": "lib/growth/campaigns/repository.ts",
       "source_location": "L1",
       "id": "lib_growth_campaigns_repository_ts",
-      "community": 3,
+      "community": 6,
       "norm_label": "repository.ts"
     },
     {
@@ -1701,7 +1710,7 @@
       "source_file": "lib/growth/campaigns/repository.ts",
       "source_location": "L23",
       "id": "repository_loadlatestcampaignpolicy",
-      "community": 3,
+      "community": 6,
       "norm_label": "loadlatestcampaignpolicy()"
     },
     {
@@ -1710,7 +1719,7 @@
       "source_file": "lib/growth/campaigns/repository.ts",
       "source_location": "L52",
       "id": "repository_loadcampaignpolicyversion",
-      "community": 3,
+      "community": 6,
       "norm_label": "loadcampaignpolicyversion()"
     },
     {
@@ -1719,7 +1728,7 @@
       "source_file": "lib/growth/campaigns/repository.ts",
       "source_location": "L82",
       "id": "repository_projectcampaignpolicy",
-      "community": 3,
+      "community": 6,
       "norm_label": "projectcampaignpolicy()"
     },
     {
@@ -1728,7 +1737,7 @@
       "source_file": "lib/growth/campaigns/repository.ts",
       "source_location": "L104",
       "id": "repository_persistcampaignmembership",
-      "community": 3,
+      "community": 6,
       "norm_label": "persistcampaignmembership()"
     },
     {
@@ -1737,7 +1746,7 @@
       "source_file": "lib/growth/campaigns/schemas.ts",
       "source_location": "L1",
       "id": "lib_growth_campaigns_schemas_ts",
-      "community": 3,
+      "community": 6,
       "norm_label": "schemas.ts"
     },
     {
@@ -1746,7 +1755,7 @@
       "source_file": "lib/growth/campaigns/source-service.ts",
       "source_location": "L1",
       "id": "lib_growth_campaigns_source_service_ts",
-      "community": 3,
+      "community": 11,
       "norm_label": "source-service.ts"
     },
     {
@@ -1773,7 +1782,7 @@
       "source_file": "lib/growth/campaigns/time.ts",
       "source_location": "L1",
       "id": "lib_growth_campaigns_time_ts",
-      "community": 15,
+      "community": 6,
       "norm_label": "time.ts"
     },
     {
@@ -1782,7 +1791,7 @@
       "source_file": "lib/growth/campaigns/time.ts",
       "source_location": "L3",
       "id": "time_londondaykey",
-      "community": 15,
+      "community": 6,
       "norm_label": "londondaykey()"
     },
     {
@@ -1791,7 +1800,7 @@
       "source_file": "lib/growth/campaigns/time.ts",
       "source_location": "L7",
       "id": "time_campaignmonthanniversary",
-      "community": 15,
+      "community": 6,
       "norm_label": "campaignmonthanniversary()"
     },
     {
@@ -1800,7 +1809,7 @@
       "source_file": "lib/growth/campaigns/time.ts",
       "source_location": "L19",
       "id": "time_campaigncadencedays",
-      "community": 15,
+      "community": 6,
       "norm_label": "campaigncadencedays()"
     },
     {
@@ -1809,7 +1818,7 @@
       "source_file": "lib/growth/campaigns/variants.ts",
       "source_location": "L1",
       "id": "lib_growth_campaigns_variants_ts",
-      "community": 15,
+      "community": 6,
       "norm_label": "variants.ts"
     },
     {
@@ -1818,7 +1827,7 @@
       "source_file": "lib/growth/campaigns/variants.ts",
       "source_location": "L2",
       "id": "variants_assigncampaignvariant",
-      "community": 15,
+      "community": 6,
       "norm_label": "assigncampaignvariant()"
     },
     {
@@ -1827,7 +1836,7 @@
       "source_file": "lib/growth/crm/activity-service.ts",
       "source_location": "L1",
       "id": "lib_growth_crm_activity_service_ts",
-      "community": 3,
+      "community": 11,
       "norm_label": "activity-service.ts"
     },
     {
@@ -1836,7 +1845,7 @@
       "source_file": "lib/growth/crm/activity-service.ts",
       "source_location": "L6",
       "id": "activity_service_appendcrmactivity",
-      "community": 3,
+      "community": 11,
       "norm_label": "appendcrmactivity()"
     },
     {
@@ -1845,7 +1854,7 @@
       "source_file": "lib/growth/crm/activity-service.ts",
       "source_location": "L32",
       "id": "activity_service_requirecrmprospect",
-      "community": 3,
+      "community": 11,
       "norm_label": "requirecrmprospect()"
     },
     {
@@ -1854,7 +1863,7 @@
       "source_file": "lib/growth/crm/change-events.ts",
       "source_location": "L1",
       "id": "lib_growth_crm_change_events_ts",
-      "community": 26,
+      "community": 27,
       "norm_label": "change-events.ts"
     },
     {
@@ -1863,7 +1872,7 @@
       "source_file": "lib/growth/crm/change-events.ts",
       "source_location": "L10",
       "id": "change_events_subscribecrmchanges",
-      "community": 26,
+      "community": 27,
       "norm_label": "subscribecrmchanges()"
     },
     {
@@ -1872,7 +1881,7 @@
       "source_file": "lib/growth/crm/change-events.ts",
       "source_location": "L73",
       "id": "change_events_publishcrmchange",
-      "community": 26,
+      "community": 27,
       "norm_label": "publishcrmchange()"
     },
     {
@@ -1881,7 +1890,7 @@
       "source_file": "lib/growth/crm/commands.ts",
       "source_location": "L1",
       "id": "lib_growth_crm_commands_ts",
-      "community": 3,
+      "community": 11,
       "norm_label": "commands.ts"
     },
     {
@@ -1890,7 +1899,7 @@
       "source_file": "lib/growth/crm/commands.ts",
       "source_location": "L19",
       "id": "commands_executecrmcommand",
-      "community": 3,
+      "community": 11,
       "norm_label": "executecrmcommand()"
     },
     {
@@ -1899,7 +1908,7 @@
       "source_file": "lib/growth/crm/commands.ts",
       "source_location": "L102",
       "id": "commands_commandresultid",
-      "community": 3,
+      "community": 11,
       "norm_label": "commandresultid()"
     },
     {
@@ -1908,7 +1917,7 @@
       "source_file": "lib/growth/crm/countries.ts",
       "source_location": "L1",
       "id": "lib_growth_crm_countries_ts",
-      "community": 3,
+      "community": 6,
       "norm_label": "countries.ts"
     },
     {
@@ -1917,7 +1926,7 @@
       "source_file": "lib/growth/crm/countries.ts",
       "source_location": "L6",
       "id": "countries_iscrmcountrycode",
-      "community": 3,
+      "community": 6,
       "norm_label": "iscrmcountrycode()"
     },
     {
@@ -1926,7 +1935,7 @@
       "source_file": "lib/growth/crm/countries.ts",
       "source_location": "L10",
       "id": "countries_crmcountryname",
-      "community": 3,
+      "community": 6,
       "norm_label": "crmcountryname()"
     },
     {
@@ -1935,7 +1944,7 @@
       "source_file": "lib/growth/crm/errors.ts",
       "source_location": "L1",
       "id": "lib_growth_crm_errors_ts",
-      "community": 3,
+      "community": 11,
       "norm_label": "errors.ts"
     },
     {
@@ -1944,7 +1953,7 @@
       "source_file": "lib/growth/crm/errors.ts",
       "source_location": "L22",
       "id": "errors_crmerror",
-      "community": 3,
+      "community": 11,
       "norm_label": "crmerror"
     },
     {
@@ -1953,7 +1962,7 @@
       "source_file": "lib/growth/crm/errors.ts",
       "source_location": "L23",
       "id": "errors_crmerror_constructor",
-      "community": 3,
+      "community": 11,
       "norm_label": ".constructor()"
     },
     {
@@ -1962,7 +1971,7 @@
       "source_file": "lib/growth/crm/lead-repository.ts",
       "source_location": "L1",
       "id": "lib_growth_crm_lead_repository_ts",
-      "community": 3,
+      "community": 11,
       "norm_label": "lead-repository.ts"
     },
     {
@@ -1971,7 +1980,7 @@
       "source_file": "lib/growth/crm/lead-repository.ts",
       "source_location": "L5",
       "id": "lead_repository_findcapture",
-      "community": 3,
+      "community": 11,
       "norm_label": "findcapture()"
     },
     {
@@ -1980,7 +1989,7 @@
       "source_file": "lib/growth/crm/lead-repository.ts",
       "source_location": "L23",
       "id": "lead_repository_capturebusiness",
-      "community": 3,
+      "community": 11,
       "norm_label": "capturebusiness()"
     },
     {
@@ -1989,7 +1998,7 @@
       "source_file": "lib/growth/crm/lead-repository.ts",
       "source_location": "L49",
       "id": "lead_repository_capturecontact",
-      "community": 3,
+      "community": 11,
       "norm_label": "capturecontact()"
     },
     {
@@ -1998,7 +2007,7 @@
       "source_file": "lib/growth/crm/lead-service.ts",
       "source_location": "L1",
       "id": "lib_growth_crm_lead_service_ts",
-      "community": 3,
+      "community": 11,
       "norm_label": "lead-service.ts"
     },
     {
@@ -2007,7 +2016,7 @@
       "source_file": "lib/growth/crm/lead-service.ts",
       "source_location": "L12",
       "id": "lead_service_capturelead",
-      "community": 3,
+      "community": 11,
       "norm_label": "capturelead()"
     },
     {
@@ -2016,7 +2025,7 @@
       "source_file": "lib/growth/crm/opportunity-service.ts",
       "source_location": "L1",
       "id": "lib_growth_crm_opportunity_service_ts",
-      "community": 3,
+      "community": 11,
       "norm_label": "opportunity-service.ts"
     },
     {
@@ -2025,7 +2034,7 @@
       "source_file": "lib/growth/crm/opportunity-service.ts",
       "source_location": "L7",
       "id": "opportunity_service_attachcrmcontact",
-      "community": 3,
+      "community": 11,
       "norm_label": "attachcrmcontact()"
     },
     {
@@ -2034,7 +2043,7 @@
       "source_file": "lib/growth/crm/opportunity-service.ts",
       "source_location": "L26",
       "id": "opportunity_service_createcrmopportunity",
-      "community": 3,
+      "community": 11,
       "norm_label": "createcrmopportunity()"
     },
     {
@@ -2043,7 +2052,7 @@
       "source_file": "lib/growth/crm/pipeline-query.ts",
       "source_location": "L1",
       "id": "lib_growth_crm_pipeline_query_ts",
-      "community": 3,
+      "community": 11,
       "norm_label": "pipeline-query.ts"
     },
     {
@@ -2052,7 +2061,7 @@
       "source_file": "lib/growth/crm/pipeline-query.ts",
       "source_location": "L4",
       "id": "pipeline_query_parsepipelinefilters",
-      "community": 3,
+      "community": 11,
       "norm_label": "parsepipelinefilters()"
     },
     {
@@ -2061,7 +2070,7 @@
       "source_file": "lib/growth/crm/pipeline-query.ts",
       "source_location": "L32",
       "id": "pipeline_query_pipelinehref",
-      "community": 3,
+      "community": 11,
       "norm_label": "pipelinehref()"
     },
     {
@@ -2070,7 +2079,7 @@
       "source_file": "lib/growth/crm/record-service.ts",
       "source_location": "L1",
       "id": "lib_growth_crm_record_service_ts",
-      "community": 3,
+      "community": 11,
       "norm_label": "record-service.ts"
     },
     {
@@ -2079,7 +2088,7 @@
       "source_file": "lib/growth/crm/record-service.ts",
       "source_location": "L15",
       "id": "record_service_updatecrmrecord",
-      "community": 3,
+      "community": 11,
       "norm_label": "updatecrmrecord()"
     },
     {
@@ -2088,7 +2097,7 @@
       "source_file": "lib/growth/crm/route-handler.ts",
       "source_location": "L1",
       "id": "lib_growth_crm_route_handler_ts",
-      "community": 3,
+      "community": 11,
       "norm_label": "route-handler.ts"
     },
     {
@@ -2097,7 +2106,7 @@
       "source_file": "lib/growth/crm/route-handler.ts",
       "source_location": "L27",
       "id": "route_handler_targetid",
-      "community": 3,
+      "community": 11,
       "norm_label": "targetid()"
     },
     {
@@ -2106,7 +2115,7 @@
       "source_file": "lib/growth/crm/route-handler.ts",
       "source_location": "L32",
       "id": "route_handler_createcrmcommandhandler",
-      "community": 3,
+      "community": 11,
       "norm_label": "createcrmcommandhandler()"
     },
     {
@@ -2115,7 +2124,7 @@
       "source_file": "lib/growth/crm/schemas.ts",
       "source_location": "L1",
       "id": "lib_growth_crm_schemas_ts",
-      "community": 3,
+      "community": 11,
       "norm_label": "schemas.ts"
     },
     {
@@ -2124,7 +2133,7 @@
       "source_file": "lib/growth/crm/schemas.ts",
       "source_location": "L7",
       "id": "schemas_text",
-      "community": 3,
+      "community": 11,
       "norm_label": "text()"
     },
     {
@@ -2133,7 +2142,7 @@
       "source_file": "lib/growth/crm/task-service.ts",
       "source_location": "L1",
       "id": "lib_growth_crm_task_service_ts",
-      "community": 3,
+      "community": 11,
       "norm_label": "task-service.ts"
     },
     {
@@ -2142,7 +2151,7 @@
       "source_file": "lib/growth/crm/task-service.ts",
       "source_location": "L10",
       "id": "task_service_executetaskcommand",
-      "community": 3,
+      "community": 11,
       "norm_label": "executetaskcommand()"
     },
     {
@@ -2151,7 +2160,7 @@
       "source_file": "lib/growth/crm/validation-feedback.ts",
       "source_location": "L1",
       "id": "lib_growth_crm_validation_feedback_ts",
-      "community": 27,
+      "community": 28,
       "norm_label": "validation-feedback.ts"
     },
     {
@@ -2160,7 +2169,7 @@
       "source_file": "lib/growth/crm/validation-feedback.ts",
       "source_location": "L46",
       "id": "validation_feedback_fielderror",
-      "community": 27,
+      "community": 28,
       "norm_label": "fielderror()"
     },
     {
@@ -2169,7 +2178,7 @@
       "source_file": "lib/growth/crm/validation-feedback.ts",
       "source_location": "L72",
       "id": "validation_feedback_crmvalidationfeedback",
-      "community": 27,
+      "community": 28,
       "norm_label": "crmvalidationfeedback()"
     },
     {
@@ -2178,7 +2187,7 @@
       "source_file": "lib/growth/crm/view-service.ts",
       "source_location": "L1",
       "id": "lib_growth_crm_view_service_ts",
-      "community": 3,
+      "community": 11,
       "norm_label": "view-service.ts"
     },
     {
@@ -2187,7 +2196,7 @@
       "source_file": "lib/growth/crm/view-service.ts",
       "source_location": "L9",
       "id": "view_service_executeviewcommand",
-      "community": 3,
+      "community": 11,
       "norm_label": "executeviewcommand()"
     },
     {
@@ -2196,7 +2205,7 @@
       "source_file": "lib/growth/crm/workspace-query.ts",
       "source_location": "L1",
       "id": "lib_growth_crm_workspace_query_ts",
-      "community": 3,
+      "community": 11,
       "norm_label": "workspace-query.ts"
     },
     {
@@ -2205,7 +2214,7 @@
       "source_file": "lib/growth/crm/workspace-query.ts",
       "source_location": "L39",
       "id": "workspace_query_cursor",
-      "community": 3,
+      "community": 11,
       "norm_label": "cursor()"
     },
     {
@@ -2214,7 +2223,7 @@
       "source_file": "lib/growth/crm/workspace-query.ts",
       "source_location": "L52",
       "id": "workspace_query_encode",
-      "community": 3,
+      "community": 11,
       "norm_label": "encode()"
     },
     {
@@ -2223,7 +2232,7 @@
       "source_file": "lib/growth/crm/workspace-query.ts",
       "source_location": "L55",
       "id": "workspace_query_getcrmworkspace",
-      "community": 3,
+      "community": 11,
       "norm_label": "getcrmworkspace()"
     },
     {
@@ -2232,7 +2241,7 @@
       "source_file": "lib/growth/crm/workspace-query.ts",
       "source_location": "L119",
       "id": "workspace_query_getsavedcrmviews",
-      "community": 3,
+      "community": 11,
       "norm_label": "getsavedcrmviews()"
     },
     {
@@ -2241,7 +2250,7 @@
       "source_file": "lib/growth/dashboard/deals.ts",
       "source_location": "L1",
       "id": "lib_growth_dashboard_deals_ts",
-      "community": 16,
+      "community": 17,
       "norm_label": "deals.ts"
     },
     {
@@ -2250,7 +2259,7 @@
       "source_file": "lib/growth/dashboard/deals.ts",
       "source_location": "L25",
       "id": "deals_valuekindforstage",
-      "community": 16,
+      "community": 17,
       "norm_label": "valuekindforstage()"
     },
     {
@@ -2259,7 +2268,7 @@
       "source_file": "lib/growth/dashboard/deals.ts",
       "source_location": "L82",
       "id": "deals_firstvalue",
-      "community": 16,
+      "community": 17,
       "norm_label": "firstvalue()"
     },
     {
@@ -2268,7 +2277,7 @@
       "source_file": "lib/growth/dashboard/deals.ts",
       "source_location": "L90",
       "id": "deals_parseenumparam",
-      "community": 16,
+      "community": 17,
       "norm_label": "parseenumparam()"
     },
     {
@@ -2277,7 +2286,7 @@
       "source_file": "lib/growth/dashboard/deals.ts",
       "source_location": "L101",
       "id": "deals_parsedeallistquery",
-      "community": 16,
+      "community": 17,
       "norm_label": "parsedeallistquery()"
     },
     {
@@ -2286,7 +2295,7 @@
       "source_file": "lib/growth/dashboard/deals.ts",
       "source_location": "L127",
       "id": "deals_encodedealcursor",
-      "community": 16,
+      "community": 17,
       "norm_label": "encodedealcursor()"
     },
     {
@@ -2295,7 +2304,7 @@
       "source_file": "lib/growth/dashboard/deals.ts",
       "source_location": "L135",
       "id": "deals_decodedealcursor",
-      "community": 16,
+      "community": 17,
       "norm_label": "decodedealcursor()"
     },
     {
@@ -2304,7 +2313,7 @@
       "source_file": "lib/growth/dashboard/deals.ts",
       "source_location": "L154",
       "id": "deals_buildfilterfragments",
-      "community": 16,
+      "community": 17,
       "norm_label": "buildfilterfragments()"
     },
     {
@@ -2313,7 +2322,7 @@
       "source_file": "lib/growth/dashboard/deals.ts",
       "source_location": "L179",
       "id": "deals_fetchdealrows",
-      "community": 16,
+      "community": 17,
       "norm_label": "fetchdealrows()"
     },
     {
@@ -2322,7 +2331,7 @@
       "source_file": "lib/growth/dashboard/deals.ts",
       "source_location": "L241",
       "id": "deals_fetchdealtotalcount",
-      "community": 16,
+      "community": 17,
       "norm_label": "fetchdealtotalcount()"
     },
     {
@@ -2331,7 +2340,7 @@
       "source_file": "lib/growth/dashboard/deals.ts",
       "source_location": "L263",
       "id": "deals_getdeallistresult",
-      "community": 16,
+      "community": 17,
       "norm_label": "getdeallistresult()"
     },
     {
@@ -2340,7 +2349,7 @@
       "source_file": "lib/growth/dashboard/deals.ts",
       "source_location": "L391",
       "id": "deals_fetchcorerow",
-      "community": 16,
+      "community": 17,
       "norm_label": "fetchcorerow()"
     },
     {
@@ -2349,7 +2358,7 @@
       "source_file": "lib/growth/dashboard/deals.ts",
       "source_location": "L453",
       "id": "deals_fetchevidence",
-      "community": 16,
+      "community": 17,
       "norm_label": "fetchevidence()"
     },
     {
@@ -2358,7 +2367,7 @@
       "source_file": "lib/growth/dashboard/deals.ts",
       "source_location": "L479",
       "id": "deals_fetchcommercialhistory",
-      "community": 16,
+      "community": 17,
       "norm_label": "fetchcommercialhistory()"
     },
     {
@@ -2367,7 +2376,7 @@
       "source_file": "lib/growth/dashboard/deals.ts",
       "source_location": "L500",
       "id": "deals_todealdetail",
-      "community": 16,
+      "community": 17,
       "norm_label": "todealdetail()"
     },
     {
@@ -2376,7 +2385,7 @@
       "source_file": "lib/growth/dashboard/deals.ts",
       "source_location": "L564",
       "id": "deals_getdealdetail",
-      "community": 16,
+      "community": 17,
       "norm_label": "getdealdetail()"
     },
     {
@@ -2385,7 +2394,7 @@
       "source_file": "lib/growth/dashboard/message-review.ts",
       "source_location": "L1",
       "id": "lib_growth_dashboard_message_review_ts",
-      "community": 8,
+      "community": 7,
       "norm_label": "message-review.ts"
     },
     {
@@ -2394,7 +2403,7 @@
       "source_file": "lib/growth/dashboard/message-review.ts",
       "source_location": "L101",
       "id": "message_review_fetchdraftrow",
-      "community": 8,
+      "community": 7,
       "norm_label": "fetchdraftrow()"
     },
     {
@@ -2403,7 +2412,7 @@
       "source_file": "lib/growth/dashboard/message-review.ts",
       "source_location": "L137",
       "id": "message_review_fetchhasenrollment",
-      "community": 8,
+      "community": 7,
       "norm_label": "fetchhasenrollment()"
     },
     {
@@ -2412,7 +2421,7 @@
       "source_file": "lib/growth/dashboard/message-review.ts",
       "source_location": "L149",
       "id": "message_review_fetchsuppressed",
-      "community": 8,
+      "community": 7,
       "norm_label": "fetchsuppressed()"
     },
     {
@@ -2421,7 +2430,7 @@
       "source_file": "lib/growth/dashboard/message-review.ts",
       "source_location": "L161",
       "id": "message_review_fetchemailasset",
-      "community": 8,
+      "community": 7,
       "norm_label": "fetchemailasset()"
     },
     {
@@ -2430,7 +2439,7 @@
       "source_file": "lib/growth/dashboard/message-review.ts",
       "source_location": "L196",
       "id": "message_review_fetchcitations",
-      "community": 8,
+      "community": 7,
       "norm_label": "fetchcitations()"
     },
     {
@@ -2439,7 +2448,7 @@
       "source_file": "lib/growth/dashboard/message-review.ts",
       "source_location": "L214",
       "id": "message_review_isfallbackkey",
-      "community": 8,
+      "community": 7,
       "norm_label": "isfallbackkey()"
     },
     {
@@ -2448,7 +2457,7 @@
       "source_file": "lib/growth/dashboard/message-review.ts",
       "source_location": "L225",
       "id": "message_review_resolvevisualforpreview",
-      "community": 8,
+      "community": 7,
       "norm_label": "resolvevisualforpreview()"
     },
     {
@@ -2457,7 +2466,7 @@
       "source_file": "lib/growth/dashboard/message-review.ts",
       "source_location": "L266",
       "id": "message_review_getmessagereview",
-      "community": 8,
+      "community": 7,
       "norm_label": "getmessagereview()"
     },
     {
@@ -2466,7 +2475,7 @@
       "source_file": "lib/growth/dashboard/overview.ts",
       "source_location": "L1",
       "id": "lib_growth_dashboard_overview_ts",
-      "community": 14,
+      "community": 16,
       "norm_label": "overview.ts"
     },
     {
@@ -2475,7 +2484,7 @@
       "source_file": "lib/growth/dashboard/overview.ts",
       "source_location": "L102",
       "id": "overview_firstqueryvalue",
-      "community": 14,
+      "community": 16,
       "norm_label": "firstqueryvalue()"
     },
     {
@@ -2484,7 +2493,7 @@
       "source_file": "lib/growth/dashboard/overview.ts",
       "source_location": "L108",
       "id": "overview_isworkqueuekind",
-      "community": 14,
+      "community": 16,
       "norm_label": "isworkqueuekind()"
     },
     {
@@ -2493,7 +2502,7 @@
       "source_file": "lib/growth/dashboard/overview.ts",
       "source_location": "L114",
       "id": "overview_parseworkqueuequery",
-      "community": 14,
+      "community": 16,
       "norm_label": "parseworkqueuequery()"
     },
     {
@@ -2502,7 +2511,7 @@
       "source_file": "lib/growth/dashboard/overview.ts",
       "source_location": "L158",
       "id": "overview_buildpipelineoverview",
-      "community": 14,
+      "community": 16,
       "norm_label": "buildpipelineoverview()"
     },
     {
@@ -2511,7 +2520,7 @@
       "source_file": "lib/growth/dashboard/overview.ts",
       "source_location": "L180",
       "id": "overview_selectdefaultworkqueuetab",
-      "community": 14,
+      "community": 16,
       "norm_label": "selectdefaultworkqueuetab()"
     },
     {
@@ -2520,7 +2529,7 @@
       "source_file": "lib/growth/dashboard/overview.ts",
       "source_location": "L207",
       "id": "overview_nextresearchrunat",
-      "community": 14,
+      "community": 16,
       "norm_label": "nextresearchrunat()"
     },
     {
@@ -2529,7 +2538,7 @@
       "source_file": "lib/growth/dashboard/overview.ts",
       "source_location": "L240",
       "id": "overview_reviewhreffor",
-      "community": 14,
+      "community": 16,
       "norm_label": "reviewhreffor()"
     },
     {
@@ -2538,7 +2547,7 @@
       "source_file": "lib/growth/dashboard/overview.ts",
       "source_location": "L285",
       "id": "overview_toworkqueuetab",
-      "community": 14,
+      "community": 16,
       "norm_label": "toworkqueuetab()"
     },
     {
@@ -2547,7 +2556,7 @@
       "source_file": "lib/growth/dashboard/overview.ts",
       "source_location": "L310",
       "id": "overview_fetchfirstemailstab",
-      "community": 14,
+      "community": 16,
       "norm_label": "fetchfirstemailstab()"
     },
     {
@@ -2556,7 +2565,7 @@
       "source_file": "lib/growth/dashboard/overview.ts",
       "source_location": "L357",
       "id": "overview_fetchrepliestab",
-      "community": 14,
+      "community": 16,
       "norm_label": "fetchrepliestab()"
     },
     {
@@ -2565,7 +2574,7 @@
       "source_file": "lib/growth/dashboard/overview.ts",
       "source_location": "L399",
       "id": "overview_fetchfollowupstab",
-      "community": 14,
+      "community": 16,
       "norm_label": "fetchfollowupstab()"
     },
     {
@@ -2574,7 +2583,7 @@
       "source_file": "lib/growth/dashboard/overview.ts",
       "source_location": "L444",
       "id": "overview_fetchsummarycounts",
-      "community": 14,
+      "community": 16,
       "norm_label": "fetchsummarycounts()"
     },
     {
@@ -2583,7 +2592,7 @@
       "source_file": "lib/growth/dashboard/overview.ts",
       "source_location": "L471",
       "id": "overview_fetchfollowupsduetoday",
-      "community": 14,
+      "community": 16,
       "norm_label": "fetchfollowupsduetoday()"
     },
     {
@@ -2592,7 +2601,7 @@
       "source_file": "lib/growth/dashboard/overview.ts",
       "source_location": "L489",
       "id": "overview_fetchlastresearchrundate",
-      "community": 14,
+      "community": 16,
       "norm_label": "fetchlastresearchrundate()"
     },
     {
@@ -2601,7 +2610,7 @@
       "source_file": "lib/growth/dashboard/overview.ts",
       "source_location": "L500",
       "id": "overview_fetchpipelinestatuscounts",
-      "community": 14,
+      "community": 16,
       "norm_label": "fetchpipelinestatuscounts()"
     },
     {
@@ -2610,7 +2619,7 @@
       "source_file": "lib/growth/dashboard/overview.ts",
       "source_location": "L514",
       "id": "overview_fetchupcomingactions",
-      "community": 14,
+      "community": 16,
       "norm_label": "fetchupcomingactions()"
     },
     {
@@ -2619,7 +2628,7 @@
       "source_file": "lib/growth/dashboard/overview.ts",
       "source_location": "L550",
       "id": "overview_buildsequencehealth",
-      "community": 14,
+      "community": 16,
       "norm_label": "buildsequencehealth()"
     },
     {
@@ -2628,7 +2637,7 @@
       "source_file": "lib/growth/dashboard/overview.ts",
       "source_location": "L574",
       "id": "overview_fetchsequencehealth",
-      "community": 14,
+      "community": 16,
       "norm_label": "fetchsequencehealth()"
     },
     {
@@ -2637,7 +2646,7 @@
       "source_file": "lib/growth/dashboard/overview.ts",
       "source_location": "L605",
       "id": "overview_getoverviewviewmodel",
-      "community": 14,
+      "community": 16,
       "norm_label": "getoverviewviewmodel()"
     },
     {
@@ -2646,7 +2655,7 @@
       "source_file": "lib/growth/dashboard/prospect-detail.ts",
       "source_location": "L1",
       "id": "lib_growth_dashboard_prospect_detail_ts",
-      "community": 11,
+      "community": 15,
       "norm_label": "prospect-detail.ts"
     },
     {
@@ -2655,7 +2664,7 @@
       "source_file": "lib/growth/dashboard/prospect-detail.ts",
       "source_location": "L176",
       "id": "prospect_detail_fetchcorerow",
-      "community": 11,
+      "community": 15,
       "norm_label": "fetchcorerow()"
     },
     {
@@ -2664,7 +2673,7 @@
       "source_file": "lib/growth/dashboard/prospect-detail.ts",
       "source_location": "L263",
       "id": "prospect_detail_fetchevidence",
-      "community": 11,
+      "community": 15,
       "norm_label": "fetchevidence()"
     },
     {
@@ -2673,7 +2682,7 @@
       "source_file": "lib/growth/dashboard/prospect-detail.ts",
       "source_location": "L294",
       "id": "prospect_detail_fetchauditsummary",
-      "community": 11,
+      "community": 15,
       "norm_label": "fetchauditsummary()"
     },
     {
@@ -2682,7 +2691,7 @@
       "source_file": "lib/growth/dashboard/prospect-detail.ts",
       "source_location": "L314",
       "id": "prospect_detail_toprospectdetail",
-      "community": 11,
+      "community": 15,
       "norm_label": "toprospectdetail()"
     },
     {
@@ -2691,7 +2700,7 @@
       "source_file": "lib/growth/dashboard/prospect-detail.ts",
       "source_location": "L422",
       "id": "prospect_detail_getprospectdetail",
-      "community": 11,
+      "community": 15,
       "norm_label": "getprospectdetail()"
     },
     {
@@ -2700,7 +2709,7 @@
       "source_file": "lib/growth/dashboard/prospects.test.ts",
       "source_location": "L1",
       "id": "lib_growth_dashboard_prospects_test_ts",
-      "community": 11,
+      "community": 10,
       "norm_label": "prospects.test.ts"
     },
     {
@@ -2709,7 +2718,7 @@
       "source_file": "lib/growth/dashboard/prospects.test.ts",
       "source_location": "L28",
       "id": "prospects_test_fakerawfragment",
-      "community": 11,
+      "community": 10,
       "norm_label": "fakerawfragment"
     },
     {
@@ -2718,7 +2727,7 @@
       "source_file": "lib/growth/dashboard/prospects.test.ts",
       "source_location": "L29",
       "id": "prospects_test_fakerawfragment_constructor",
-      "community": 11,
+      "community": 10,
       "norm_label": ".constructor()"
     },
     {
@@ -2727,7 +2736,7 @@
       "source_file": "lib/growth/dashboard/prospects.test.ts",
       "source_location": "L32",
       "id": "prospects_test_fakefragment",
-      "community": 11,
+      "community": 10,
       "norm_label": "fakefragment"
     },
     {
@@ -2736,7 +2745,7 @@
       "source_file": "lib/growth/dashboard/prospects.test.ts",
       "source_location": "L33",
       "id": "prospects_test_fakefragment_constructor",
-      "community": 11,
+      "community": 10,
       "norm_label": ".constructor()"
     },
     {
@@ -2745,7 +2754,7 @@
       "source_file": "lib/growth/dashboard/prospects.test.ts",
       "source_location": "L39",
       "id": "prospects_test_fakefragment_then",
-      "community": 11,
+      "community": 10,
       "norm_label": ".then()"
     },
     {
@@ -2754,7 +2763,7 @@
       "source_file": "lib/growth/dashboard/prospects.test.ts",
       "source_location": "L57",
       "id": "prospects_test_flatten",
-      "community": 11,
+      "community": 10,
       "norm_label": "flatten()"
     },
     {
@@ -2763,7 +2772,7 @@
       "source_file": "lib/growth/dashboard/prospects.test.ts",
       "source_location": "L82",
       "id": "prospects_test_createfakegrowthdb",
-      "community": 11,
+      "community": 10,
       "norm_label": "createfakegrowthdb()"
     },
     {
@@ -2772,7 +2781,7 @@
       "source_file": "lib/growth/dashboard/prospects.test.ts",
       "source_location": "L98",
       "id": "prospects_test_basequery",
-      "community": 11,
+      "community": 10,
       "norm_label": "basequery()"
     },
     {
@@ -2781,7 +2790,7 @@
       "source_file": "lib/growth/dashboard/prospects.test.ts",
       "source_location": "L131",
       "id": "prospects_test_routesfor",
-      "community": 11,
+      "community": 10,
       "norm_label": "routesfor()"
     },
     {
@@ -2790,7 +2799,7 @@
       "source_file": "lib/growth/dashboard/prospects.ts",
       "source_location": "L1",
       "id": "lib_growth_dashboard_prospects_ts",
-      "community": 11,
+      "community": 15,
       "norm_label": "prospects.ts"
     },
     {
@@ -2799,7 +2808,7 @@
       "source_file": "lib/growth/dashboard/prospects.ts",
       "source_location": "L112",
       "id": "prospects_firstvalue",
-      "community": 11,
+      "community": 15,
       "norm_label": "firstvalue()"
     },
     {
@@ -2808,7 +2817,7 @@
       "source_file": "lib/growth/dashboard/prospects.ts",
       "source_location": "L120",
       "id": "prospects_parseenumparam",
-      "community": 11,
+      "community": 15,
       "norm_label": "parseenumparam()"
     },
     {
@@ -2817,7 +2826,7 @@
       "source_file": "lib/growth/dashboard/prospects.ts",
       "source_location": "L130",
       "id": "prospects_parseprospectlistquery",
-      "community": 11,
+      "community": 15,
       "norm_label": "parseprospectlistquery()"
     },
     {
@@ -2826,7 +2835,7 @@
       "source_file": "lib/growth/dashboard/prospects.ts",
       "source_location": "L174",
       "id": "prospects_encodeprospectcursor",
-      "community": 11,
+      "community": 15,
       "norm_label": "encodeprospectcursor()"
     },
     {
@@ -2835,7 +2844,7 @@
       "source_file": "lib/growth/dashboard/prospects.ts",
       "source_location": "L181",
       "id": "prospects_decodeprospectcursor",
-      "community": 11,
+      "community": 15,
       "norm_label": "decodeprospectcursor()"
     },
     {
@@ -2844,7 +2853,7 @@
       "source_file": "lib/growth/dashboard/prospects.ts",
       "source_location": "L197",
       "id": "prospects_buildfilterfragments",
-      "community": 11,
+      "community": 15,
       "norm_label": "buildfilterfragments()"
     },
     {
@@ -2853,7 +2862,7 @@
       "source_file": "lib/growth/dashboard/prospects.ts",
       "source_location": "L268",
       "id": "prospects_fetchprospectrows",
-      "community": 11,
+      "community": 15,
       "norm_label": "fetchprospectrows()"
     },
     {
@@ -2862,7 +2871,7 @@
       "source_file": "lib/growth/dashboard/prospects.ts",
       "source_location": "L344",
       "id": "prospects_fetchprospecttotalcount",
-      "community": 11,
+      "community": 15,
       "norm_label": "fetchprospecttotalcount()"
     },
     {
@@ -2871,7 +2880,7 @@
       "source_file": "lib/growth/dashboard/prospects.ts",
       "source_location": "L376",
       "id": "prospects_fetchfilterfacets",
-      "community": 11,
+      "community": 15,
       "norm_label": "fetchfilterfacets()"
     },
     {
@@ -2880,7 +2889,7 @@
       "source_file": "lib/growth/dashboard/prospects.ts",
       "source_location": "L402",
       "id": "prospects_getprospectlistresult",
-      "community": 11,
+      "community": 15,
       "norm_label": "getprospectlistresult()"
     },
     {
@@ -2889,7 +2898,7 @@
       "source_file": "lib/growth/dashboard/website-strategy.ts",
       "source_location": "L1",
       "id": "lib_growth_dashboard_website_strategy_ts",
-      "community": 20,
+      "community": 21,
       "norm_label": "website-strategy.ts"
     },
     {
@@ -2898,7 +2907,7 @@
       "source_file": "lib/growth/dashboard/website-strategy.ts",
       "source_location": "L114",
       "id": "website_strategy_fetchassessmentrow",
-      "community": 20,
+      "community": 21,
       "norm_label": "fetchassessmentrow()"
     },
     {
@@ -2907,7 +2916,7 @@
       "source_file": "lib/growth/dashboard/website-strategy.ts",
       "source_location": "L150",
       "id": "website_strategy_fetchevidence",
-      "community": 20,
+      "community": 21,
       "norm_label": "fetchevidence()"
     },
     {
@@ -2916,7 +2925,7 @@
       "source_file": "lib/growth/dashboard/website-strategy.ts",
       "source_location": "L183",
       "id": "website_strategy_fetchvisualasset",
-      "community": 20,
+      "community": 21,
       "norm_label": "fetchvisualasset()"
     },
     {
@@ -2925,7 +2934,7 @@
       "source_file": "lib/growth/dashboard/website-strategy.ts",
       "source_location": "L208",
       "id": "website_strategy_parsesection",
-      "community": 20,
+      "community": 21,
       "norm_label": "parsesection()"
     },
     {
@@ -2934,7 +2943,7 @@
       "source_file": "lib/growth/dashboard/website-strategy.ts",
       "source_location": "L213",
       "id": "website_strategy_prospectsummaryfrom",
-      "community": 20,
+      "community": 21,
       "norm_label": "prospectsummaryfrom()"
     },
     {
@@ -2943,7 +2952,7 @@
       "source_file": "lib/growth/dashboard/website-strategy.ts",
       "source_location": "L226",
       "id": "website_strategy_getwebsitestrategy",
-      "community": 20,
+      "community": 21,
       "norm_label": "getwebsitestrategy()"
     },
     {
@@ -2952,7 +2961,7 @@
       "source_file": "lib/growth/dashboard/website-strategy.ts",
       "source_location": "L268",
       "id": "website_strategy_getvisualconcept",
-      "community": 20,
+      "community": 21,
       "norm_label": "getvisualconcept()"
     },
     {
@@ -2961,7 +2970,7 @@
       "source_file": "lib/growth/db/repositories/contacts.ts",
       "source_location": "L1",
       "id": "lib_growth_db_repositories_contacts_ts",
-      "community": 30,
+      "community": 31,
       "norm_label": "contacts.ts"
     },
     {
@@ -2970,7 +2979,7 @@
       "source_file": "lib/growth/db/repositories/contacts.ts",
       "source_location": "L20",
       "id": "contacts_findcontactidentitybyemail",
-      "community": 30,
+      "community": 31,
       "norm_label": "findcontactidentitybyemail()"
     },
     {
@@ -2979,7 +2988,7 @@
       "source_file": "lib/growth/db/repositories/integration-connections.test.ts",
       "source_location": "L1",
       "id": "lib_growth_db_repositories_integration_connections_test_ts",
-      "community": 2,
+      "community": 5,
       "norm_label": "integration-connections.test.ts"
     },
     {
@@ -2988,7 +2997,7 @@
       "source_file": "lib/growth/db/repositories/integration-connections.ts",
       "source_location": "L1",
       "id": "lib_growth_db_repositories_integration_connections_ts",
-      "community": 2,
+      "community": 5,
       "norm_label": "integration-connections.ts"
     },
     {
@@ -2997,7 +3006,7 @@
       "source_file": "lib/growth/db/repositories/integration-connections.ts",
       "source_location": "L33",
       "id": "integration_connections_integrationconnectionpersistenceerror",
-      "community": 2,
+      "community": 5,
       "norm_label": "integrationconnectionpersistenceerror"
     },
     {
@@ -3006,7 +3015,7 @@
       "source_file": "lib/growth/db/repositories/integration-connections.ts",
       "source_location": "L34",
       "id": "integration_connections_integrationconnectionpersistenceerror_constructor",
-      "community": 2,
+      "community": 5,
       "norm_label": ".constructor()"
     },
     {
@@ -3015,7 +3024,7 @@
       "source_file": "lib/growth/db/repositories/integration-connections.ts",
       "source_location": "L62",
       "id": "integration_connections_getconnectedgmailcredential",
-      "community": 2,
+      "community": 5,
       "norm_label": "getconnectedgmailcredential()"
     },
     {
@@ -3024,7 +3033,7 @@
       "source_file": "lib/growth/db/repositories/integration-connections.ts",
       "source_location": "L97",
       "id": "integration_connections_listintegrationconnectionhealth",
-      "community": 2,
+      "community": 5,
       "norm_label": "listintegrationconnectionhealth()"
     },
     {
@@ -3033,7 +3042,7 @@
       "source_file": "lib/growth/db/repositories/integration-connections.ts",
       "source_location": "L130",
       "id": "integration_connections_storeconnectedgmailconnection",
-      "community": 2,
+      "community": 5,
       "norm_label": "storeconnectedgmailconnection()"
     },
     {
@@ -3042,7 +3051,7 @@
       "source_file": "lib/growth/db/repositories/integration-connections.ts",
       "source_location": "L195",
       "id": "integration_connections_disconnectstoredgmailconnection",
-      "community": 2,
+      "community": 5,
       "norm_label": "disconnectstoredgmailconnection()"
     },
     {
@@ -3051,7 +3060,7 @@
       "source_file": "lib/growth/db/repositories/prospects.ts",
       "source_location": "L1",
       "id": "lib_growth_db_repositories_prospects_ts",
-      "community": 11,
+      "community": 15,
       "norm_label": "prospects.ts"
     },
     {
@@ -3060,7 +3069,7 @@
       "source_file": "lib/growth/db/repositories/prospects.ts",
       "source_location": "L29",
       "id": "prospects_findprospectsummarybyid",
-      "community": 11,
+      "community": 15,
       "norm_label": "findprospectsummarybyid()"
     },
     {
@@ -3069,7 +3078,7 @@
       "source_file": "lib/growth/email/suppression.ts",
       "source_location": "L1",
       "id": "lib_growth_email_suppression_ts",
-      "community": 10,
+      "community": 12,
       "norm_label": "suppression.ts"
     },
     {
@@ -3078,7 +3087,7 @@
       "source_file": "lib/growth/email/suppression.ts",
       "source_location": "L20",
       "id": "suppression_normaliseemail",
-      "community": 10,
+      "community": 12,
       "norm_label": "normaliseemail()"
     },
     {
@@ -3087,7 +3096,7 @@
       "source_file": "lib/growth/email/suppression.ts",
       "source_location": "L28",
       "id": "suppression_issuppressed",
-      "community": 10,
+      "community": 12,
       "norm_label": "issuppressed()"
     },
     {
@@ -3096,7 +3105,7 @@
       "source_file": "lib/growth/email/suppression.ts",
       "source_location": "L36",
       "id": "suppression_recordhardbounce",
-      "community": 10,
+      "community": 12,
       "norm_label": "recordhardbounce()"
     },
     {
@@ -3105,7 +3114,7 @@
       "source_file": "lib/growth/email/suppression.ts",
       "source_location": "L44",
       "id": "suppression_recordcomplaint",
-      "community": 10,
+      "community": 12,
       "norm_label": "recordcomplaint()"
     },
     {
@@ -3114,7 +3123,7 @@
       "source_file": "lib/growth/email/suppression.ts",
       "source_location": "L58",
       "id": "suppression_encodepayload",
-      "community": 10,
+      "community": 12,
       "norm_label": "encodepayload()"
     },
     {
@@ -3123,7 +3132,7 @@
       "source_file": "lib/growth/email/suppression.ts",
       "source_location": "L62",
       "id": "suppression_sign",
-      "community": 10,
+      "community": 12,
       "norm_label": "sign()"
     },
     {
@@ -3132,7 +3141,7 @@
       "source_file": "lib/growth/email/suppression.ts",
       "source_location": "L66",
       "id": "suppression_signunsubscribetoken",
-      "community": 10,
+      "community": 12,
       "norm_label": "signunsubscribetoken()"
     },
     {
@@ -3141,7 +3150,7 @@
       "source_file": "lib/growth/email/suppression.ts",
       "source_location": "L83",
       "id": "suppression_verifyunsubscribetoken",
-      "community": 10,
+      "community": 12,
       "norm_label": "verifyunsubscribetoken()"
     },
     {
@@ -3186,7 +3195,7 @@
       "source_file": "lib/growth/integrations/gmail-connection.test.ts",
       "source_location": "L1",
       "id": "lib_growth_integrations_gmail_connection_test_ts",
-      "community": 12,
+      "community": 13,
       "norm_label": "gmail-connection.test.ts"
     },
     {
@@ -3195,7 +3204,7 @@
       "source_file": "lib/growth/integrations/gmail-connection.test.ts",
       "source_location": "L40",
       "id": "gmail_connection_test_createdependencies",
-      "community": 12,
+      "community": 13,
       "norm_label": "createdependencies()"
     },
     {
@@ -3204,7 +3213,7 @@
       "source_file": "lib/growth/integrations/gmail-connection.ts",
       "source_location": "L1",
       "id": "lib_growth_integrations_gmail_connection_ts",
-      "community": 12,
+      "community": 13,
       "norm_label": "gmail-connection.ts"
     },
     {
@@ -3213,7 +3222,7 @@
       "source_file": "lib/growth/integrations/gmail-connection.ts",
       "source_location": "L21",
       "id": "gmail_connection_gmailconnectionerror",
-      "community": 12,
+      "community": 13,
       "norm_label": "gmailconnectionerror"
     },
     {
@@ -3222,7 +3231,7 @@
       "source_file": "lib/growth/integrations/gmail-connection.ts",
       "source_location": "L22",
       "id": "gmail_connection_gmailconnectionerror_constructor",
-      "community": 12,
+      "community": 13,
       "norm_label": ".constructor()"
     },
     {
@@ -3231,7 +3240,7 @@
       "source_file": "lib/growth/integrations/gmail-connection.ts",
       "source_location": "L67",
       "id": "gmail_connection_requirenonblank",
-      "community": 12,
+      "community": 13,
       "norm_label": "requirenonblank()"
     },
     {
@@ -3240,7 +3249,7 @@
       "source_file": "lib/growth/integrations/gmail-connection.ts",
       "source_location": "L76",
       "id": "gmail_connection_calculateaccesstokenexpiry",
-      "community": 12,
+      "community": 13,
       "norm_label": "calculateaccesstokenexpiry()"
     },
     {
@@ -3249,7 +3258,7 @@
       "source_file": "lib/growth/integrations/gmail-connection.ts",
       "source_location": "L85",
       "id": "gmail_connection_connectgmail",
-      "community": 12,
+      "community": 13,
       "norm_label": "connectgmail()"
     },
     {
@@ -3258,7 +3267,7 @@
       "source_file": "lib/growth/integrations/gmail/client.ts",
       "source_location": "L1",
       "id": "lib_growth_integrations_gmail_client_ts",
-      "community": 2,
+      "community": 10,
       "norm_label": "client.ts"
     },
     {
@@ -3267,7 +3276,7 @@
       "source_file": "lib/growth/integrations/gmail/client.ts",
       "source_location": "L53",
       "id": "client_iscanonicalrawmessage",
-      "community": 2,
+      "community": 10,
       "norm_label": "iscanonicalrawmessage()"
     },
     {
@@ -3276,7 +3285,7 @@
       "source_file": "lib/growth/integrations/gmail/client.ts",
       "source_location": "L115",
       "id": "client_requirecredential",
-      "community": 2,
+      "community": 10,
       "norm_label": "requirecredential()"
     },
     {
@@ -3285,7 +3294,7 @@
       "source_file": "lib/growth/integrations/gmail/client.ts",
       "source_location": "L122",
       "id": "client_readjson",
-      "community": 2,
+      "community": 10,
       "norm_label": "readjson()"
     },
     {
@@ -3294,7 +3303,7 @@
       "source_file": "lib/growth/integrations/gmail/client.ts",
       "source_location": "L170",
       "id": "client_discardbody",
-      "community": 2,
+      "community": 10,
       "norm_label": "discardbody()"
     },
     {
@@ -3303,7 +3312,7 @@
       "source_file": "lib/growth/integrations/gmail/client.ts",
       "source_location": "L178",
       "id": "client_providererror",
-      "community": 2,
+      "community": 10,
       "norm_label": "providererror()"
     },
     {
@@ -3312,7 +3321,7 @@
       "source_file": "lib/growth/integrations/gmail/client.ts",
       "source_location": "L211",
       "id": "client_googlegmailclient",
-      "community": 2,
+      "community": 10,
       "norm_label": "googlegmailclient"
     },
     {
@@ -3321,7 +3330,7 @@
       "source_file": "lib/growth/integrations/gmail/client.ts",
       "source_location": "L217",
       "id": "client_googlegmailclient_constructor",
-      "community": 2,
+      "community": 10,
       "norm_label": ".constructor()"
     },
     {
@@ -3330,7 +3339,7 @@
       "source_file": "lib/growth/integrations/gmail/client.ts",
       "source_location": "L225",
       "id": "client_googlegmailclient_fetchprovider",
-      "community": 2,
+      "community": 10,
       "norm_label": ".fetchprovider()"
     },
     {
@@ -3339,7 +3348,7 @@
       "source_file": "lib/growth/integrations/gmail/client.ts",
       "source_location": "L240",
       "id": "client_googlegmailclient_refreshaccesstoken",
-      "community": 2,
+      "community": 10,
       "norm_label": ".refreshaccesstoken()"
     },
     {
@@ -3348,7 +3357,7 @@
       "source_file": "lib/growth/integrations/gmail/client.ts",
       "source_location": "L288",
       "id": "client_googlegmailclient_getfreshaccesstoken",
-      "community": 2,
+      "community": 10,
       "norm_label": ".getfreshaccesstoken()"
     },
     {
@@ -3357,7 +3366,7 @@
       "source_file": "lib/growth/integrations/gmail/client.ts",
       "source_location": "L308",
       "id": "client_googlegmailclient_request",
-      "community": 2,
+      "community": 10,
       "norm_label": ".request()"
     },
     {
@@ -3366,7 +3375,7 @@
       "source_file": "lib/growth/integrations/gmail/client.ts",
       "source_location": "L349",
       "id": "client_googlegmailclient_postjson",
-      "community": 2,
+      "community": 10,
       "norm_label": ".postjson()"
     },
     {
@@ -3375,7 +3384,7 @@
       "source_file": "lib/growth/integrations/gmail/client.ts",
       "source_location": "L358",
       "id": "client_googlegmailclient_getjson",
-      "community": 2,
+      "community": 10,
       "norm_label": ".getjson()"
     },
     {
@@ -3384,7 +3393,7 @@
       "source_file": "lib/growth/integrations/gmail/client.ts",
       "source_location": "L365",
       "id": "client_googlegmailclient_createdraft",
-      "community": 2,
+      "community": 10,
       "norm_label": ".createdraft()"
     },
     {
@@ -3393,7 +3402,7 @@
       "source_file": "lib/growth/integrations/gmail/client.ts",
       "source_location": "L389",
       "id": "client_googlegmailclient_senddraft",
-      "community": 2,
+      "community": 10,
       "norm_label": ".senddraft()"
     },
     {
@@ -3402,7 +3411,7 @@
       "source_file": "lib/growth/integrations/gmail/client.ts",
       "source_location": "L406",
       "id": "client_googlegmailclient_sendmessage",
-      "community": 2,
+      "community": 10,
       "norm_label": ".sendmessage()"
     },
     {
@@ -3411,7 +3420,7 @@
       "source_file": "lib/growth/integrations/gmail/client.ts",
       "source_location": "L429",
       "id": "client_googlegmailclient_listhistory",
-      "community": 2,
+      "community": 8,
       "norm_label": ".listhistory()"
     },
     {
@@ -3420,7 +3429,7 @@
       "source_file": "lib/growth/integrations/gmail/client.ts",
       "source_location": "L443",
       "id": "client_googlegmailclient_getmessagemetadata",
-      "community": 2,
+      "community": 10,
       "norm_label": ".getmessagemetadata()"
     },
     {
@@ -3429,7 +3438,7 @@
       "source_file": "lib/growth/integrations/gmail/client.ts",
       "source_location": "L447",
       "id": "client_googlegmailclient_findbyrfcmessageid",
-      "community": 2,
+      "community": 10,
       "norm_label": ".findbyrfcmessageid()"
     },
     {
@@ -3438,7 +3447,7 @@
       "source_file": "lib/growth/integrations/gmail/client.ts",
       "source_location": "L453",
       "id": "client_googlegmailclient_getprofile",
-      "community": 2,
+      "community": 10,
       "norm_label": ".getprofile()"
     },
     {
@@ -3447,7 +3456,7 @@
       "source_file": "lib/growth/integrations/gmail/client.ts",
       "source_location": "L463",
       "id": "client_creategmailclient",
-      "community": 2,
+      "community": 5,
       "norm_label": "creategmailclient()"
     },
     {
@@ -3456,7 +3465,7 @@
       "source_file": "lib/growth/integrations/gmail/live-client.ts",
       "source_location": "L1",
       "id": "lib_growth_integrations_gmail_live_client_ts",
-      "community": 2,
+      "community": 5,
       "norm_label": "live-client.ts"
     },
     {
@@ -3465,7 +3474,7 @@
       "source_file": "lib/growth/integrations/gmail/live-client.ts",
       "source_location": "L8",
       "id": "live_client_gmailnotconnectederror",
-      "community": 2,
+      "community": 5,
       "norm_label": "gmailnotconnectederror"
     },
     {
@@ -3474,7 +3483,7 @@
       "source_file": "lib/growth/integrations/gmail/live-client.ts",
       "source_location": "L9",
       "id": "live_client_gmailnotconnectederror_constructor",
-      "community": 2,
+      "community": 5,
       "norm_label": ".constructor()"
     },
     {
@@ -3483,7 +3492,7 @@
       "source_file": "lib/growth/integrations/gmail/live-client.ts",
       "source_location": "L22",
       "id": "live_client_createlivegmailclient",
-      "community": 2,
+      "community": 5,
       "norm_label": "createlivegmailclient()"
     },
     {
@@ -3492,7 +3501,7 @@
       "source_file": "lib/growth/integrations/gmail/reconciliation.ts",
       "source_location": "L1",
       "id": "lib_growth_integrations_gmail_reconciliation_ts",
-      "community": 12,
+      "community": 13,
       "norm_label": "reconciliation.ts"
     },
     {
@@ -3501,7 +3510,7 @@
       "source_file": "lib/growth/integrations/gmail/reconciliation.ts",
       "source_location": "L94",
       "id": "reconciliation_requirevalid",
-      "community": 12,
+      "community": 13,
       "norm_label": "requirevalid()"
     },
     {
@@ -3510,7 +3519,7 @@
       "source_file": "lib/growth/integrations/gmail/reconciliation.ts",
       "source_location": "L104",
       "id": "reconciliation_invalidproviderresponse",
-      "community": 12,
+      "community": 13,
       "norm_label": "invalidproviderresponse()"
     },
     {
@@ -3519,7 +3528,7 @@
       "source_file": "lib/growth/integrations/gmail/reconciliation.ts",
       "source_location": "L108",
       "id": "reconciliation_selectedheader",
-      "community": 12,
+      "community": 13,
       "norm_label": "selectedheader()"
     },
     {
@@ -3528,7 +3537,7 @@
       "source_file": "lib/growth/integrations/gmail/reconciliation.ts",
       "source_location": "L119",
       "id": "reconciliation_receivedat",
-      "community": 12,
+      "community": 13,
       "norm_label": "receivedat()"
     },
     {
@@ -3537,7 +3546,7 @@
       "source_file": "lib/growth/integrations/gmail/reconciliation.ts",
       "source_location": "L128",
       "id": "reconciliation_metadatapath",
-      "community": 12,
+      "community": 13,
       "norm_label": "metadatapath()"
     },
     {
@@ -3546,7 +3555,7 @@
       "source_file": "lib/growth/integrations/gmail/reconciliation.ts",
       "source_location": "L136",
       "id": "reconciliation_readgmailhistorypage",
-      "community": 12,
+      "community": 13,
       "norm_label": "readgmailhistorypage()"
     },
     {
@@ -3555,7 +3564,7 @@
       "source_file": "lib/growth/integrations/gmail/reconciliation.ts",
       "source_location": "L177",
       "id": "reconciliation_readgmailmessagemetadata",
-      "community": 12,
+      "community": 13,
       "norm_label": "readgmailmessagemetadata()"
     },
     {
@@ -3564,7 +3573,7 @@
       "source_file": "lib/growth/integrations/gmail/reconciliation.ts",
       "source_location": "L210",
       "id": "reconciliation_findgmailmessagebyrfcid",
-      "community": 12,
+      "community": 13,
       "norm_label": "findgmailmessagebyrfcid()"
     },
     {
@@ -3573,7 +3582,7 @@
       "source_file": "lib/growth/integrations/gmail/types.ts",
       "source_location": "L1",
       "id": "lib_growth_integrations_gmail_types_ts",
-      "community": 2,
+      "community": 8,
       "norm_label": "types.ts"
     },
     {
@@ -3582,7 +3591,7 @@
       "source_file": "lib/growth/integrations/gmail/types.ts",
       "source_location": "L83",
       "id": "types_gmailclienterror",
-      "community": 2,
+      "community": 8,
       "norm_label": "gmailclienterror"
     },
     {
@@ -3591,7 +3600,7 @@
       "source_file": "lib/growth/integrations/gmail/types.ts",
       "source_location": "L86",
       "id": "types_gmailclienterror_constructor",
-      "community": 2,
+      "community": 8,
       "norm_label": ".constructor()"
     },
     {
@@ -3600,7 +3609,7 @@
       "source_file": "lib/growth/integrations/gmail/types.ts",
       "source_location": "L93",
       "id": "types_gmailtokenresponseerror",
-      "community": 2,
+      "community": 8,
       "norm_label": "gmailtokenresponseerror"
     },
     {
@@ -3609,7 +3618,7 @@
       "source_file": "lib/growth/integrations/gmail/types.ts",
       "source_location": "L94",
       "id": "types_gmailtokenresponseerror_constructor",
-      "community": 2,
+      "community": 8,
       "norm_label": ".constructor()"
     },
     {
@@ -3618,7 +3627,7 @@
       "source_file": "lib/growth/integrations/gmail/types.ts",
       "source_location": "L100",
       "id": "types_gmailhistoryresponseerror",
-      "community": 2,
+      "community": 8,
       "norm_label": "gmailhistoryresponseerror"
     },
     {
@@ -3627,7 +3636,7 @@
       "source_file": "lib/growth/integrations/gmail/types.ts",
       "source_location": "L101",
       "id": "types_gmailhistoryresponseerror_constructor",
-      "community": 2,
+      "community": 8,
       "norm_label": ".constructor()"
     },
     {
@@ -3636,7 +3645,7 @@
       "source_file": "lib/growth/integrations/google-oauth.test.ts",
       "source_location": "L1",
       "id": "lib_growth_integrations_google_oauth_test_ts",
-      "community": 12,
+      "community": 13,
       "norm_label": "google-oauth.test.ts"
     },
     {
@@ -3645,7 +3654,7 @@
       "source_file": "lib/growth/integrations/google-oauth.test.ts",
       "source_location": "L61",
       "id": "google_oauth_test_fetchimpl",
-      "community": 12,
+      "community": 13,
       "norm_label": "fetchimpl()"
     },
     {
@@ -3654,7 +3663,7 @@
       "source_file": "lib/growth/integrations/google-oauth.ts",
       "source_location": "L1",
       "id": "lib_growth_integrations_google_oauth_ts",
-      "community": 12,
+      "community": 13,
       "norm_label": "google-oauth.ts"
     },
     {
@@ -3663,7 +3672,7 @@
       "source_file": "lib/growth/integrations/google-oauth.ts",
       "source_location": "L69",
       "id": "google_oauth_googleoautherror",
-      "community": 12,
+      "community": 13,
       "norm_label": "googleoautherror"
     },
     {
@@ -3672,7 +3681,7 @@
       "source_file": "lib/growth/integrations/google-oauth.ts",
       "source_location": "L70",
       "id": "google_oauth_googleoautherror_constructor",
-      "community": 12,
+      "community": 13,
       "norm_label": ".constructor()"
     },
     {
@@ -3681,7 +3690,7 @@
       "source_file": "lib/growth/integrations/google-oauth.ts",
       "source_location": "L84",
       "id": "google_oauth_requirenonblank",
-      "community": 12,
+      "community": 13,
       "norm_label": "requirenonblank()"
     },
     {
@@ -3690,7 +3699,7 @@
       "source_file": "lib/growth/integrations/google-oauth.ts",
       "source_location": "L92",
       "id": "google_oauth_validateconfig",
-      "community": 12,
+      "community": 13,
       "norm_label": "validateconfig()"
     },
     {
@@ -3699,7 +3708,7 @@
       "source_file": "lib/growth/integrations/google-oauth.ts",
       "source_location": "L99",
       "id": "google_oauth_readjson",
-      "community": 12,
+      "community": 13,
       "norm_label": "readjson()"
     },
     {
@@ -3708,7 +3717,7 @@
       "source_file": "lib/growth/integrations/google-oauth.ts",
       "source_location": "L107",
       "id": "google_oauth_generategoogleoauthstate",
-      "community": 12,
+      "community": 13,
       "norm_label": "generategoogleoauthstate()"
     },
     {
@@ -3717,7 +3726,7 @@
       "source_file": "lib/growth/integrations/google-oauth.ts",
       "source_location": "L111",
       "id": "google_oauth_buildgoogleauthorizationurl",
-      "community": 12,
+      "community": 13,
       "norm_label": "buildgoogleauthorizationurl()"
     },
     {
@@ -3726,7 +3735,7 @@
       "source_file": "lib/growth/integrations/google-oauth.ts",
       "source_location": "L133",
       "id": "google_oauth_exchangegoogleauthorizationcode",
-      "community": 12,
+      "community": 13,
       "norm_label": "exchangegoogleauthorizationcode()"
     },
     {
@@ -3735,7 +3744,7 @@
       "source_file": "lib/growth/integrations/google-oauth.ts",
       "source_location": "L200",
       "id": "google_oauth_fetchgoogleidentity",
-      "community": 12,
+      "community": 13,
       "norm_label": "fetchgoogleidentity()"
     },
     {
@@ -3744,7 +3753,7 @@
       "source_file": "lib/growth/integrations/google-oauth.ts",
       "source_location": "L247",
       "id": "google_oauth_revokegoogleoauthtoken",
-      "community": 12,
+      "community": 13,
       "norm_label": "revokegoogleoauthtoken()"
     },
     {
@@ -3753,7 +3762,7 @@
       "source_file": "lib/growth/integrations/resend/client.ts",
       "source_location": "L1",
       "id": "lib_growth_integrations_resend_client_ts",
-      "community": 17,
+      "community": 18,
       "norm_label": "client.ts"
     },
     {
@@ -3762,7 +3771,7 @@
       "source_file": "lib/growth/integrations/resend/client.ts",
       "source_location": "L45",
       "id": "client_resendclienterror",
-      "community": 17,
+      "community": 18,
       "norm_label": "resendclienterror"
     },
     {
@@ -3771,7 +3780,7 @@
       "source_file": "lib/growth/integrations/resend/client.ts",
       "source_location": "L48",
       "id": "client_resendclienterror_constructor",
-      "community": 17,
+      "community": 18,
       "norm_label": ".constructor()"
     },
     {
@@ -3780,7 +3789,7 @@
       "source_file": "lib/growth/integrations/resend/client.ts",
       "source_location": "L72",
       "id": "client_requirenonempty",
-      "community": 17,
+      "community": 18,
       "norm_label": "requirenonempty()"
     },
     {
@@ -3789,7 +3798,7 @@
       "source_file": "lib/growth/integrations/resend/client.ts",
       "source_location": "L79",
       "id": "client_defaultretrydelayms",
-      "community": 17,
+      "community": 18,
       "norm_label": "defaultretrydelayms()"
     },
     {
@@ -3798,7 +3807,7 @@
       "source_file": "lib/growth/integrations/resend/client.ts",
       "source_location": "L83",
       "id": "client_defaultsleep",
-      "community": 17,
+      "community": 18,
       "norm_label": "defaultsleep()"
     },
     {
@@ -3807,7 +3816,7 @@
       "source_file": "lib/growth/integrations/resend/client.ts",
       "source_location": "L87",
       "id": "client_defaultonprovidererror",
-      "community": 17,
+      "community": 18,
       "norm_label": "defaultonprovidererror()"
     },
     {
@@ -3816,7 +3825,7 @@
       "source_file": "lib/growth/integrations/resend/client.ts",
       "source_location": "L91",
       "id": "client_withtimeout",
-      "community": 17,
+      "community": 18,
       "norm_label": "withtimeout()"
     },
     {
@@ -3825,7 +3834,7 @@
       "source_file": "lib/growth/integrations/resend/client.ts",
       "source_location": "L109",
       "id": "client_classifyprovidererror",
-      "community": 17,
+      "community": 18,
       "norm_label": "classifyprovidererror()"
     },
     {
@@ -3834,7 +3843,7 @@
       "source_file": "lib/growth/integrations/resend/client.ts",
       "source_location": "L116",
       "id": "client_resendsdkgateway",
-      "community": 17,
+      "community": 18,
       "norm_label": "resendsdkgateway"
     },
     {
@@ -3843,7 +3852,7 @@
       "source_file": "lib/growth/integrations/resend/client.ts",
       "source_location": "L124",
       "id": "client_resendsdkgateway_constructor",
-      "community": 17,
+      "community": 18,
       "norm_label": ".constructor()"
     },
     {
@@ -3852,7 +3861,7 @@
       "source_file": "lib/growth/integrations/resend/client.ts",
       "source_location": "L133",
       "id": "client_resendsdkgateway_send",
-      "community": 17,
+      "community": 18,
       "norm_label": ".send()"
     },
     {
@@ -3861,7 +3870,7 @@
       "source_file": "lib/growth/integrations/resend/client.ts",
       "source_location": "L174",
       "id": "client_resendsdkgateway_attemptsend",
-      "community": 17,
+      "community": 18,
       "norm_label": ".attemptsend()"
     },
     {
@@ -3870,7 +3879,7 @@
       "source_file": "lib/growth/integrations/resend/client.ts",
       "source_location": "L201",
       "id": "client_createresendclient",
-      "community": 17,
+      "community": 18,
       "norm_label": "createresendclient()"
     },
     {
@@ -3879,7 +3888,7 @@
       "source_file": "lib/growth/integrations/resend/webhook-repository.ts",
       "source_location": "L1",
       "id": "lib_growth_integrations_resend_webhook_repository_ts",
-      "community": 10,
+      "community": 12,
       "norm_label": "webhook-repository.ts"
     },
     {
@@ -3888,7 +3897,7 @@
       "source_file": "lib/growth/integrations/resend/webhook-repository.ts",
       "source_location": "L16",
       "id": "webhook_repository_hasdeliveryevent",
-      "community": 10,
+      "community": 12,
       "norm_label": "hasdeliveryevent()"
     },
     {
@@ -3897,7 +3906,7 @@
       "source_file": "lib/growth/integrations/resend/webhook-repository.ts",
       "source_location": "L25",
       "id": "webhook_repository_recorddeliveryevent",
-      "community": 10,
+      "community": 12,
       "norm_label": "recorddeliveryevent()"
     },
     {
@@ -3906,7 +3915,7 @@
       "source_file": "lib/growth/integrations/resend/webhook-repository.ts",
       "source_location": "L57",
       "id": "webhook_repository_findsequenceenrollmentidsbyemail",
-      "community": 10,
+      "community": 12,
       "norm_label": "findsequenceenrollmentidsbyemail()"
     },
     {
@@ -3915,7 +3924,7 @@
       "source_file": "lib/growth/integrations/resend/webhook-repository.ts",
       "source_location": "L72",
       "id": "webhook_repository_insertglobalsuppression",
-      "community": 10,
+      "community": 12,
       "norm_label": "insertglobalsuppression()"
     },
     {
@@ -3924,7 +3933,7 @@
       "source_file": "lib/growth/integrations/resend/webhook-repository.ts",
       "source_location": "L83",
       "id": "webhook_repository_createpostgresresendwebhookrepository",
-      "community": 10,
+      "community": 12,
       "norm_label": "createpostgresresendwebhookrepository()"
     },
     {
@@ -3933,7 +3942,7 @@
       "source_file": "lib/growth/integrations/resend/webhook.ts",
       "source_location": "L1",
       "id": "lib_growth_integrations_resend_webhook_ts",
-      "community": 10,
+      "community": 12,
       "norm_label": "webhook.ts"
     },
     {
@@ -3942,7 +3951,7 @@
       "source_file": "lib/growth/integrations/resend/webhook.ts",
       "source_location": "L49",
       "id": "webhook_verifyresendwebhooksignature",
-      "community": 10,
+      "community": 12,
       "norm_label": "verifyresendwebhooksignature()"
     },
     {
@@ -3951,7 +3960,7 @@
       "source_file": "lib/growth/integrations/resend/webhook.ts",
       "source_location": "L85",
       "id": "webhook_firstrecipient",
-      "community": 10,
+      "community": 12,
       "norm_label": "firstrecipient()"
     },
     {
@@ -3960,7 +3969,7 @@
       "source_file": "lib/growth/integrations/resend/webhook.ts",
       "source_location": "L90",
       "id": "webhook_parseresendwebhookpayload",
-      "community": 10,
+      "community": 12,
       "norm_label": "parseresendwebhookpayload()"
     },
     {
@@ -3969,7 +3978,7 @@
       "source_file": "lib/growth/integrations/resend/webhook.ts",
       "source_location": "L152",
       "id": "webhook_suppressionreasonforeventtype",
-      "community": 10,
+      "community": 12,
       "norm_label": "suppressionreasonforeventtype()"
     },
     {
@@ -3978,7 +3987,7 @@
       "source_file": "lib/growth/integrations/resend/webhook.ts",
       "source_location": "L159",
       "id": "webhook_issuppressingevent",
-      "community": 10,
+      "community": 12,
       "norm_label": "issuppressingevent()"
     },
     {
@@ -3987,7 +3996,7 @@
       "source_file": "lib/growth/integrations/resend/webhook.ts",
       "source_location": "L165",
       "id": "webhook_applysuppression",
-      "community": 10,
+      "community": 12,
       "norm_label": "applysuppression()"
     },
     {
@@ -3996,7 +4005,7 @@
       "source_file": "lib/growth/integrations/resend/webhook.ts",
       "source_location": "L225",
       "id": "webhook_applyresendwebhookevent",
-      "community": 10,
+      "community": 12,
       "norm_label": "applyresendwebhookevent()"
     },
     {
@@ -4005,7 +4014,7 @@
       "source_file": "lib/growth/integrations/resend/webhook.ts",
       "source_location": "L260",
       "id": "webhook_handleresendwebhook",
-      "community": 10,
+      "community": 12,
       "norm_label": "handleresendwebhook()"
     },
     {
@@ -4059,7 +4068,7 @@
       "source_file": "lib/growth/prospect-previews/backfill.ts",
       "source_location": "L1",
       "id": "lib_growth_prospect_previews_backfill_ts",
-      "community": 22,
+      "community": 23,
       "norm_label": "backfill.ts"
     },
     {
@@ -4068,7 +4077,7 @@
       "source_file": "lib/growth/prospect-previews/backfill.ts",
       "source_location": "L66",
       "id": "backfill_createpublicid",
-      "community": 22,
+      "community": 23,
       "norm_label": "createpublicid()"
     },
     {
@@ -4077,7 +4086,7 @@
       "source_file": "lib/growth/prospect-previews/backfill.ts",
       "source_location": "L70",
       "id": "backfill_ispubliciduniquekeycollision",
-      "community": 22,
+      "community": 23,
       "norm_label": "ispubliciduniquekeycollision()"
     },
     {
@@ -4086,7 +4095,7 @@
       "source_file": "lib/growth/prospect-previews/backfill.ts",
       "source_location": "L80",
       "id": "backfill_buildstoredsnapshot",
-      "community": 22,
+      "community": 23,
       "norm_label": "buildstoredsnapshot()"
     },
     {
@@ -4095,7 +4104,7 @@
       "source_file": "lib/growth/prospect-previews/backfill.ts",
       "source_location": "L100",
       "id": "backfill_hashistoricalnarrativeinputs",
-      "community": 22,
+      "community": 23,
       "norm_label": "hashistoricalnarrativeinputs()"
     },
     {
@@ -4104,7 +4113,7 @@
       "source_file": "lib/growth/prospect-previews/backfill.ts",
       "source_location": "L126",
       "id": "backfill_backfillprospectpreviews",
-      "community": 22,
+      "community": 23,
       "norm_label": "backfillprospectpreviews()"
     },
     {
@@ -4113,7 +4122,7 @@
       "source_file": "lib/growth/prospect-previews/backfill.ts",
       "source_location": "L172",
       "id": "backfill_createpostgrestransaction",
-      "community": 22,
+      "community": 23,
       "norm_label": "createpostgrestransaction()"
     },
     {
@@ -4338,7 +4347,7 @@
       "source_file": "lib/growth/research/ingestion-schema.ts",
       "source_location": "L1",
       "id": "lib_growth_research_ingestion_schema_ts",
-      "community": 8,
+      "community": 7,
       "norm_label": "ingestion-schema.ts"
     },
     {
@@ -4347,7 +4356,7 @@
       "source_file": "lib/growth/research/ingestion-schema.ts",
       "source_location": "L44",
       "id": "ingestion_schema_parseurl",
-      "community": 8,
+      "community": 7,
       "norm_label": "parseurl()"
     },
     {
@@ -4356,7 +4365,7 @@
       "source_file": "lib/growth/research/ingestion-schema.ts",
       "source_location": "L52",
       "id": "ingestion_schema_geturlhostname",
-      "community": 8,
+      "community": 7,
       "norm_label": "geturlhostname()"
     },
     {
@@ -4365,7 +4374,7 @@
       "source_file": "lib/growth/research/ingestion-schema.ts",
       "source_location": "L56",
       "id": "ingestion_schema_ishttpurl",
-      "community": 8,
+      "community": 7,
       "norm_label": "ishttpurl()"
     },
     {
@@ -4374,7 +4383,7 @@
       "source_file": "lib/growth/research/ingestion-schema.ts",
       "source_location": "L61",
       "id": "ingestion_schema_hostsarerelated",
-      "community": 8,
+      "community": 7,
       "norm_label": "hostsarerelated()"
     },
     {
@@ -4383,7 +4392,7 @@
       "source_file": "lib/growth/research/ingestion-schema.ts",
       "source_location": "L67",
       "id": "ingestion_schema_isgooglemapsreferenceurl",
-      "community": 8,
+      "community": 7,
       "norm_label": "isgooglemapsreferenceurl()"
     },
     {
@@ -4392,7 +4401,7 @@
       "source_file": "lib/growth/research/ingestion-schema.ts",
       "source_location": "L80",
       "id": "ingestion_schema_requiredtext",
-      "community": 8,
+      "community": 7,
       "norm_label": "requiredtext()"
     },
     {
@@ -4401,7 +4410,7 @@
       "source_file": "lib/growth/research/ingestion-schema.ts",
       "source_location": "L349",
       "id": "ingestion_schema_parsewebsiteemailnarrative",
-      "community": 8,
+      "community": 7,
       "norm_label": "parsewebsiteemailnarrative()"
     },
     {
@@ -4410,7 +4419,7 @@
       "source_file": "lib/growth/research/ingestion-schema.ts",
       "source_location": "L355",
       "id": "ingestion_schema_parsefirstemailcandidate",
-      "community": 8,
+      "community": 7,
       "norm_label": "parsefirstemailcandidate()"
     },
     {
@@ -4419,7 +4428,7 @@
       "source_file": "lib/growth/research/ingestion-schema.ts",
       "source_location": "L729",
       "id": "ingestion_schema_parseresearchruningestion",
-      "community": 8,
+      "community": 7,
       "norm_label": "parseresearchruningestion()"
     },
     {
@@ -4446,7 +4455,7 @@
       "source_file": "lib/growth/research/preview-pr-trigger.ts",
       "source_location": "L1",
       "id": "lib_growth_research_preview_pr_trigger_ts",
-      "community": 2,
+      "community": 10,
       "norm_label": "preview-pr-trigger.ts"
     },
     {
@@ -4455,7 +4464,7 @@
       "source_file": "lib/growth/research/preview-pr-trigger.ts",
       "source_location": "L69",
       "id": "preview_pr_trigger_validateinput",
-      "community": 2,
+      "community": 10,
       "norm_label": "validateinput()"
     },
     {
@@ -4464,7 +4473,7 @@
       "source_file": "lib/growth/research/preview-pr-trigger.ts",
       "source_location": "L82",
       "id": "preview_pr_trigger_validatesecret",
-      "community": 2,
+      "community": 10,
       "norm_label": "validatesecret()"
     },
     {
@@ -4473,7 +4482,7 @@
       "source_file": "lib/growth/research/preview-pr-trigger.ts",
       "source_location": "L88",
       "id": "preview_pr_trigger_createsignature",
-      "community": 2,
+      "community": 10,
       "norm_label": "createsignature()"
     },
     {
@@ -4482,7 +4491,7 @@
       "source_file": "lib/growth/research/preview-pr-trigger.ts",
       "source_location": "L100",
       "id": "preview_pr_trigger_isvalidresponse",
-      "community": 2,
+      "community": 10,
       "norm_label": "isvalidresponse()"
     },
     {
@@ -4491,7 +4500,7 @@
       "source_file": "lib/growth/research/preview-pr-trigger.ts",
       "source_location": "L113",
       "id": "preview_pr_trigger_isvaliddraftbackfillresponse",
-      "community": 2,
+      "community": 10,
       "norm_label": "isvaliddraftbackfillresponse()"
     },
     {
@@ -4500,7 +4509,7 @@
       "source_file": "lib/growth/research/preview-pr-trigger.ts",
       "source_location": "L123",
       "id": "preview_pr_trigger_triggerpreviewpullrequest",
-      "community": 2,
+      "community": 10,
       "norm_label": "triggerpreviewpullrequest()"
     },
     {
@@ -4509,7 +4518,7 @@
       "source_file": "lib/growth/research/preview-pr-trigger.ts",
       "source_location": "L160",
       "id": "preview_pr_trigger_triggerscheduledpreviewpullrequest",
-      "community": 2,
+      "community": 10,
       "norm_label": "triggerscheduledpreviewpullrequest()"
     },
     {
@@ -4518,7 +4527,7 @@
       "source_file": "lib/growth/research/preview-pr-trigger.ts",
       "source_location": "L170",
       "id": "preview_pr_trigger_triggercurrenttenpreviewpullrequest",
-      "community": 2,
+      "community": 10,
       "norm_label": "triggercurrenttenpreviewpullrequest()"
     },
     {
@@ -4527,7 +4536,7 @@
       "source_file": "lib/growth/research/preview-pr-trigger.ts",
       "source_location": "L180",
       "id": "preview_pr_trigger_triggercurrentthirteenevidencerefresh",
-      "community": 2,
+      "community": 10,
       "norm_label": "triggercurrentthirteenevidencerefresh()"
     },
     {
@@ -4536,7 +4545,7 @@
       "source_file": "lib/growth/research/preview-pr-trigger.ts",
       "source_location": "L191",
       "id": "preview_pr_trigger_triggercurrenttendraftpreviewbackfill",
-      "community": 2,
+      "community": 10,
       "norm_label": "triggercurrenttendraftpreviewbackfill()"
     },
     {
@@ -4545,7 +4554,7 @@
       "source_file": "lib/growth/research/redacted-run-report.ts",
       "source_location": "L1",
       "id": "lib_growth_research_redacted_run_report_ts",
-      "community": 18,
+      "community": 19,
       "norm_label": "redacted-run-report.ts"
     },
     {
@@ -4554,7 +4563,7 @@
       "source_file": "lib/growth/research/redacted-run-report.ts",
       "source_location": "L82",
       "id": "redacted_run_report_researchagentoutputerror",
-      "community": 18,
+      "community": 19,
       "norm_label": "researchagentoutputerror"
     },
     {
@@ -4563,7 +4572,7 @@
       "source_file": "lib/growth/research/redacted-run-report.ts",
       "source_location": "L83",
       "id": "redacted_run_report_researchagentoutputerror_constructor",
-      "community": 18,
+      "community": 19,
       "norm_label": ".constructor()"
     },
     {
@@ -4572,7 +4581,7 @@
       "source_file": "lib/growth/research/redacted-run-report.ts",
       "source_location": "L89",
       "id": "redacted_run_report_parseredactedresearchreport",
-      "community": 18,
+      "community": 19,
       "norm_label": "parseredactedresearchreport()"
     },
     {
@@ -4581,7 +4590,7 @@
       "source_file": "lib/growth/research/redacted-run-report.ts",
       "source_location": "L107",
       "id": "redacted_run_report_runredactedchildprocess",
-      "community": 18,
+      "community": 19,
       "norm_label": "runredactedchildprocess()"
     },
     {
@@ -4689,7 +4698,7 @@
       "source_file": "lib/growth/research/scheduled-agent-runner.ts",
       "source_location": "L1",
       "id": "lib_growth_research_scheduled_agent_runner_ts",
-      "community": 18,
+      "community": 19,
       "norm_label": "scheduled-agent-runner.ts"
     },
     {
@@ -4698,7 +4707,7 @@
       "source_file": "lib/growth/research/scheduled-agent-runner.ts",
       "source_location": "L42",
       "id": "scheduled_agent_runner_londondate",
-      "community": 18,
+      "community": 19,
       "norm_label": "londondate()"
     },
     {
@@ -4707,7 +4716,7 @@
       "source_file": "lib/growth/research/scheduled-agent-runner.ts",
       "source_location": "L54",
       "id": "scheduled_agent_runner_buildweekdayexternalrunid",
-      "community": 18,
+      "community": 19,
       "norm_label": "buildweekdayexternalrunid()"
     },
     {
@@ -4716,7 +4725,7 @@
       "source_file": "lib/growth/research/scheduled-agent-runner.ts",
       "source_location": "L58",
       "id": "scheduled_agent_runner_buildagentprompt",
-      "community": 18,
+      "community": 19,
       "norm_label": "buildagentprompt()"
     },
     {
@@ -4725,7 +4734,7 @@
       "source_file": "lib/growth/research/scheduled-agent-runner.ts",
       "source_location": "L97",
       "id": "scheduled_agent_runner_buildfailurereport",
-      "community": 18,
+      "community": 19,
       "norm_label": "buildfailurereport()"
     },
     {
@@ -4734,7 +4743,7 @@
       "source_file": "lib/growth/research/scheduled-agent-runner.ts",
       "source_location": "L133",
       "id": "scheduled_agent_runner_executescheduledresearchagent",
-      "community": 18,
+      "community": 19,
       "norm_label": "executescheduledresearchagent()"
     },
     {
@@ -4743,7 +4752,7 @@
       "source_file": "lib/growth/research/scheduled-workflow.ts",
       "source_location": "L1",
       "id": "lib_growth_research_scheduled_workflow_ts",
-      "community": 18,
+      "community": 19,
       "norm_label": "scheduled-workflow.ts"
     },
     {
@@ -4752,7 +4761,7 @@
       "source_file": "lib/growth/research/scheduled-workflow.ts",
       "source_location": "L12",
       "id": "scheduled_workflow_runscheduledresearchworkflow",
-      "community": 18,
+      "community": 19,
       "norm_label": "runscheduledresearchworkflow()"
     },
     {
@@ -4914,7 +4923,7 @@
       "source_file": "lib/growth/sequences/dispatcher-repository.ts",
       "source_location": "L1",
       "id": "lib_growth_sequences_dispatcher_repository_ts",
-      "community": 5,
+      "community": 8,
       "norm_label": "dispatcher-repository.ts"
     },
     {
@@ -4923,7 +4932,7 @@
       "source_file": "lib/growth/sequences/dispatcher-repository.ts",
       "source_location": "L111",
       "id": "dispatcher_repository_claimduemessage",
-      "community": 5,
+      "community": 8,
       "norm_label": "claimduemessage()"
     },
     {
@@ -4932,7 +4941,7 @@
       "source_file": "lib/growth/sequences/dispatcher-repository.ts",
       "source_location": "L163",
       "id": "dispatcher_repository_getsendcontext",
-      "community": 5,
+      "community": 8,
       "norm_label": "getsendcontext()"
     },
     {
@@ -4941,7 +4950,7 @@
       "source_file": "lib/growth/sequences/dispatcher-repository.ts",
       "source_location": "L190",
       "id": "dispatcher_repository_issuppressed",
-      "community": 5,
+      "community": 8,
       "norm_label": "issuppressed()"
     },
     {
@@ -4950,7 +4959,7 @@
       "source_file": "lib/growth/sequences/dispatcher-repository.ts",
       "source_location": "L202",
       "id": "dispatcher_repository_hasnewerinboundmessage",
-      "community": 5,
+      "community": 8,
       "norm_label": "hasnewerinboundmessage()"
     },
     {
@@ -4959,7 +4968,7 @@
       "source_file": "lib/growth/sequences/dispatcher-repository.ts",
       "source_location": "L227",
       "id": "dispatcher_repository_getfollowuptemplate",
-      "community": 5,
+      "community": 8,
       "norm_label": "getfollowuptemplate()"
     },
     {
@@ -4968,7 +4977,7 @@
       "source_file": "lib/growth/sequences/dispatcher-repository.ts",
       "source_location": "L246",
       "id": "dispatcher_repository_getthreadreferences",
-      "community": 5,
+      "community": 8,
       "norm_label": "getthreadreferences()"
     },
     {
@@ -4977,7 +4986,7 @@
       "source_file": "lib/growth/sequences/dispatcher-repository.ts",
       "source_location": "L265",
       "id": "dispatcher_repository_cancelmessage",
-      "community": 5,
+      "community": 8,
       "norm_label": "cancelmessage()"
     },
     {
@@ -4986,7 +4995,7 @@
       "source_file": "lib/growth/sequences/dispatcher-repository.ts",
       "source_location": "L280",
       "id": "dispatcher_repository_failmessage",
-      "community": 5,
+      "community": 8,
       "norm_label": "failmessage()"
     },
     {
@@ -4995,7 +5004,7 @@
       "source_file": "lib/growth/sequences/dispatcher-repository.ts",
       "source_location": "L296",
       "id": "dispatcher_repository_recordsent",
-      "community": 5,
+      "community": 8,
       "norm_label": "recordsent()"
     },
     {
@@ -5004,7 +5013,7 @@
       "source_file": "lib/growth/sequences/dispatcher.ts",
       "source_location": "L1",
       "id": "lib_growth_sequences_dispatcher_ts",
-      "community": 5,
+      "community": 8,
       "norm_label": "dispatcher.ts"
     },
     {
@@ -5013,7 +5022,7 @@
       "source_file": "lib/growth/sequences/dispatcher.ts",
       "source_location": "L42",
       "id": "dispatcher_followupidempotencykey",
-      "community": 5,
+      "community": 8,
       "norm_label": "followupidempotencykey()"
     },
     {
@@ -5022,7 +5031,7 @@
       "source_file": "lib/growth/sequences/dispatcher.ts",
       "source_location": "L49",
       "id": "dispatcher_scheduledfollowupsforfirstsend",
-      "community": 5,
+      "community": 8,
       "norm_label": "scheduledfollowupsforfirstsend()"
     },
     {
@@ -5031,7 +5040,7 @@
       "source_file": "lib/growth/sequences/dispatcher.ts",
       "source_location": "L78",
       "id": "dispatcher_preparefirstemailsend",
-      "community": 5,
+      "community": 8,
       "norm_label": "preparefirstemailsend()"
     },
     {
@@ -5040,7 +5049,7 @@
       "source_file": "lib/growth/sequences/dispatcher.ts",
       "source_location": "L118",
       "id": "dispatcher_preparefollowupsend",
-      "community": 5,
+      "community": 8,
       "norm_label": "preparefollowupsend()"
     },
     {
@@ -5049,7 +5058,7 @@
       "source_file": "lib/growth/sequences/dispatcher.ts",
       "source_location": "L264",
       "id": "dispatcher_createoutreachdispatcher",
-      "community": 5,
+      "community": 8,
       "norm_label": "createoutreachdispatcher()"
     },
     {
@@ -5058,7 +5067,7 @@
       "source_file": "lib/growth/sequences/dispatcher.ts",
       "source_location": "L447",
       "id": "dispatcher_recordreconciledsent",
-      "community": 5,
+      "community": 8,
       "norm_label": "recordreconciledsent()"
     },
     {
@@ -5067,7 +5076,7 @@
       "source_file": "lib/growth/sequences/edit-draft-route-handler.ts",
       "source_location": "L1",
       "id": "lib_growth_sequences_edit_draft_route_handler_ts",
-      "community": 5,
+      "community": 1,
       "norm_label": "edit-draft-route-handler.ts"
     },
     {
@@ -5076,7 +5085,7 @@
       "source_file": "lib/growth/sequences/edit-draft-route-handler.ts",
       "source_location": "L72",
       "id": "edit_draft_route_handler_createeditdrafthandler",
-      "community": 5,
+      "community": 1,
       "norm_label": "createeditdrafthandler()"
     },
     {
@@ -5139,7 +5148,7 @@
       "source_file": "lib/growth/sequences/first-email-draft-snapshot.ts",
       "source_location": "L1",
       "id": "lib_growth_sequences_first_email_draft_snapshot_ts",
-      "community": 8,
+      "community": 7,
       "norm_label": "first-email-draft-snapshot.ts"
     },
     {
@@ -5148,7 +5157,7 @@
       "source_file": "lib/growth/sequences/first-email-draft-snapshot.ts",
       "source_location": "L9",
       "id": "first_email_draft_snapshot_exacttext",
-      "community": 8,
+      "community": 7,
       "norm_label": "exacttext()"
     },
     {
@@ -5157,7 +5166,7 @@
       "source_file": "lib/growth/sequences/first-email-draft-snapshot.ts",
       "source_location": "L110",
       "id": "first_email_draft_snapshot_invalidstoredfirstemaildrafterror",
-      "community": 8,
+      "community": 7,
       "norm_label": "invalidstoredfirstemaildrafterror"
     },
     {
@@ -5166,7 +5175,7 @@
       "source_file": "lib/growth/sequences/first-email-draft-snapshot.ts",
       "source_location": "L111",
       "id": "first_email_draft_snapshot_invalidstoredfirstemaildrafterror_constructor",
-      "community": 8,
+      "community": 7,
       "norm_label": ".constructor()"
     },
     {
@@ -5175,7 +5184,7 @@
       "source_file": "lib/growth/sequences/first-email-draft-snapshot.ts",
       "source_location": "L117",
       "id": "first_email_draft_snapshot_samefirstemailcandidate",
-      "community": 8,
+      "community": 7,
       "norm_label": "samefirstemailcandidate()"
     },
     {
@@ -5184,7 +5193,7 @@
       "source_file": "lib/growth/sequences/first-email-draft-snapshot.ts",
       "source_location": "L131",
       "id": "first_email_draft_snapshot_parsestoredfirstemaildraft",
-      "community": 8,
+      "community": 7,
       "norm_label": "parsestoredfirstemaildraft()"
     },
     {
@@ -5292,7 +5301,7 @@
       "source_file": "lib/growth/sequences/first-email-template-refresh.ts",
       "source_location": "L1",
       "id": "lib_growth_sequences_first_email_template_refresh_ts",
-      "community": 8,
+      "community": 7,
       "norm_label": "first-email-template-refresh.ts"
     },
     {
@@ -5301,7 +5310,7 @@
       "source_file": "lib/growth/sequences/first-email-template-refresh.ts",
       "source_location": "L24",
       "id": "first_email_template_refresh_firstemailtemplaterefresherror",
-      "community": 8,
+      "community": 7,
       "norm_label": "firstemailtemplaterefresherror"
     },
     {
@@ -5310,7 +5319,7 @@
       "source_file": "lib/growth/sequences/first-email-template-refresh.ts",
       "source_location": "L25",
       "id": "first_email_template_refresh_firstemailtemplaterefresherror_constructor",
-      "community": 8,
+      "community": 7,
       "norm_label": ".constructor()"
     },
     {
@@ -5319,7 +5328,7 @@
       "source_file": "lib/growth/sequences/first-email-template-refresh.ts",
       "source_location": "L53",
       "id": "first_email_template_refresh_refreshfirstemailtemplate",
-      "community": 8,
+      "community": 7,
       "norm_label": "refreshfirstemailtemplate()"
     },
     {
@@ -5328,7 +5337,7 @@
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
       "source_location": "L1",
       "id": "lib_growth_sequences_gmail_sync_repository_ts",
-      "community": 2,
+      "community": 8,
       "norm_label": "gmail-sync-repository.ts"
     },
     {
@@ -5337,7 +5346,7 @@
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
       "source_location": "L59",
       "id": "gmail_sync_repository_getcursor",
-      "community": 2,
+      "community": 8,
       "norm_label": "getcursor()"
     },
     {
@@ -5346,7 +5355,7 @@
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
       "source_location": "L71",
       "id": "gmail_sync_repository_setcursor",
-      "community": 2,
+      "community": 8,
       "norm_label": "setcursor()"
     },
     {
@@ -5355,7 +5364,7 @@
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
       "source_location": "L83",
       "id": "gmail_sync_repository_findpendingdraftbyrfcmessageid",
-      "community": 2,
+      "community": 8,
       "norm_label": "findpendingdraftbyrfcmessageid()"
     },
     {
@@ -5364,7 +5373,7 @@
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
       "source_location": "L105",
       "id": "gmail_sync_repository_findenrollmentbythread",
-      "community": 2,
+      "community": 8,
       "norm_label": "findenrollmentbythread()"
     },
     {
@@ -5373,7 +5382,7 @@
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
       "source_location": "L117",
       "id": "gmail_sync_repository_recordinboundevent",
-      "community": 2,
+      "community": 8,
       "norm_label": "recordinboundevent()"
     },
     {
@@ -5382,7 +5391,7 @@
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
       "source_location": "L156",
       "id": "gmail_sync_repository_activatependingapproval",
-      "community": 2,
+      "community": 8,
       "norm_label": "activatependingapproval()"
     },
     {
@@ -5391,7 +5400,7 @@
       "source_file": "lib/growth/sequences/gmail-sync.ts",
       "source_location": "L1",
       "id": "lib_growth_sequences_gmail_sync_ts",
-      "community": 2,
+      "community": 8,
       "norm_label": "gmail-sync.ts"
     },
     {
@@ -5400,7 +5409,7 @@
       "source_file": "lib/growth/sequences/gmail-sync.ts",
       "source_location": "L28",
       "id": "gmail_sync_extractemailaddress",
-      "community": 2,
+      "community": 8,
       "norm_label": "extractemailaddress()"
     },
     {
@@ -5409,7 +5418,7 @@
       "source_file": "lib/growth/sequences/gmail-sync.ts",
       "source_location": "L35",
       "id": "gmail_sync_isbouncesender",
-      "community": 2,
+      "community": 8,
       "norm_label": "isbouncesender()"
     },
     {
@@ -5418,7 +5427,7 @@
       "source_file": "lib/growth/sequences/gmail-sync.ts",
       "source_location": "L39",
       "id": "gmail_sync_isautomatedresponse",
-      "community": 2,
+      "community": 8,
       "norm_label": "isautomatedresponse()"
     },
     {
@@ -5427,7 +5436,7 @@
       "source_file": "lib/growth/sequences/gmail-sync.ts",
       "source_location": "L55",
       "id": "gmail_sync_emptysummary",
-      "community": 2,
+      "community": 8,
       "norm_label": "emptysummary()"
     },
     {
@@ -5436,7 +5445,7 @@
       "source_file": "lib/growth/sequences/gmail-sync.ts",
       "source_location": "L79",
       "id": "gmail_sync_creategmailreplysync",
-      "community": 2,
+      "community": 8,
       "norm_label": "creategmailreplysync()"
     },
     {
@@ -5481,7 +5490,7 @@
       "source_file": "lib/growth/sequences/redraft-repository.ts",
       "source_location": "L1",
       "id": "lib_growth_sequences_redraft_repository_ts",
-      "community": 8,
+      "community": 7,
       "norm_label": "redraft-repository.ts"
     },
     {
@@ -5490,7 +5499,7 @@
       "source_file": "lib/growth/sequences/redraft-repository.ts",
       "source_location": "L9",
       "id": "redraft_repository_firstemailredraftpersistenceerror",
-      "community": 8,
+      "community": 7,
       "norm_label": "firstemailredraftpersistenceerror"
     },
     {
@@ -5499,7 +5508,7 @@
       "source_file": "lib/growth/sequences/redraft-repository.ts",
       "source_location": "L10",
       "id": "redraft_repository_firstemailredraftpersistenceerror_constructor",
-      "community": 8,
+      "community": 7,
       "norm_label": ".constructor()"
     },
     {
@@ -5508,7 +5517,7 @@
       "source_file": "lib/growth/sequences/redraft-repository.ts",
       "source_location": "L16",
       "id": "redraft_repository_createtransaction",
-      "community": 8,
+      "community": 7,
       "norm_label": "createtransaction()"
     },
     {
@@ -5517,7 +5526,7 @@
       "source_file": "lib/growth/sequences/redraft.ts",
       "source_location": "L1",
       "id": "lib_growth_sequences_redraft_ts",
-      "community": 8,
+      "community": 7,
       "norm_label": "redraft.ts"
     },
     {
@@ -5526,7 +5535,7 @@
       "source_file": "lib/growth/sequences/redraft.ts",
       "source_location": "L72",
       "id": "redraft_firstemailredrafterror",
-      "community": 8,
+      "community": 7,
       "norm_label": "firstemailredrafterror"
     },
     {
@@ -5535,7 +5544,7 @@
       "source_file": "lib/growth/sequences/redraft.ts",
       "source_location": "L73",
       "id": "redraft_firstemailredrafterror_constructor",
-      "community": 8,
+      "community": 7,
       "norm_label": ".constructor()"
     },
     {
@@ -5544,7 +5553,7 @@
       "source_file": "lib/growth/sequences/redraft.ts",
       "source_location": "L79",
       "id": "redraft_validaterequest",
-      "community": 8,
+      "community": 7,
       "norm_label": "validaterequest()"
     },
     {
@@ -5553,7 +5562,7 @@
       "source_file": "lib/growth/sequences/redraft.ts",
       "source_location": "L99",
       "id": "redraft_createfirstemailredrafter",
-      "community": 8,
+      "community": 7,
       "norm_label": "createfirstemailredrafter()"
     },
     {
@@ -5724,7 +5733,7 @@
       "source_file": "lib/growth/sequences/schedule.ts",
       "source_location": "L1",
       "id": "lib_growth_sequences_schedule_ts",
-      "community": 5,
+      "community": 8,
       "norm_label": "schedule.ts"
     },
     {
@@ -5733,7 +5742,7 @@
       "source_file": "lib/growth/sequences/schedule.ts",
       "source_location": "L27",
       "id": "schedule_atlocalsendtime",
-      "community": 5,
+      "community": 8,
       "norm_label": "atlocalsendtime()"
     },
     {
@@ -5742,7 +5751,7 @@
       "source_file": "lib/growth/sequences/schedule.ts",
       "source_location": "L34",
       "id": "schedule_moveweekendtomonday",
-      "community": 5,
+      "community": 8,
       "norm_label": "moveweekendtomonday()"
     },
     {
@@ -5751,7 +5760,7 @@
       "source_file": "lib/growth/sequences/schedule.ts",
       "source_location": "L41",
       "id": "schedule_schedulefollowup",
-      "community": 5,
+      "community": 8,
       "norm_label": "schedulefollowup()"
     },
     {
@@ -5760,7 +5769,7 @@
       "source_file": "lib/growth/sequences/schedule.ts",
       "source_location": "L53",
       "id": "schedule_schedulefollowups",
-      "community": 5,
+      "community": 8,
       "norm_label": "schedulefollowups()"
     },
     {
@@ -5769,7 +5778,7 @@
       "source_file": "lib/growth/sequences/stop-repository.ts",
       "source_location": "L1",
       "id": "lib_growth_sequences_stop_repository_ts",
-      "community": 10,
+      "community": 12,
       "norm_label": "stop-repository.ts"
     },
     {
@@ -5778,7 +5787,7 @@
       "source_file": "lib/growth/sequences/stop-repository.ts",
       "source_location": "L6",
       "id": "stop_repository_createtransaction",
-      "community": 10,
+      "community": 12,
       "norm_label": "createtransaction()"
     },
     {
@@ -5787,7 +5796,7 @@
       "source_file": "lib/growth/sequences/stop-route-handler.ts",
       "source_location": "L1",
       "id": "lib_growth_sequences_stop_route_handler_ts",
-      "community": 10,
+      "community": 12,
       "norm_label": "stop-route-handler.ts"
     },
     {
@@ -5796,7 +5805,7 @@
       "source_file": "lib/growth/sequences/stop-route-handler.ts",
       "source_location": "L51",
       "id": "stop_route_handler_createstoproutehandler",
-      "community": 10,
+      "community": 12,
       "norm_label": "createstoproutehandler()"
     },
     {
@@ -5805,7 +5814,7 @@
       "source_file": "lib/growth/sequences/stop.ts",
       "source_location": "L1",
       "id": "lib_growth_sequences_stop_ts",
-      "community": 10,
+      "community": 12,
       "norm_label": "stop.ts"
     },
     {
@@ -5814,7 +5823,7 @@
       "source_file": "lib/growth/sequences/stop.ts",
       "source_location": "L108",
       "id": "stop_sequencestoperror",
-      "community": 10,
+      "community": 12,
       "norm_label": "sequencestoperror"
     },
     {
@@ -5823,7 +5832,7 @@
       "source_file": "lib/growth/sequences/stop.ts",
       "source_location": "L109",
       "id": "stop_sequencestoperror_constructor",
-      "community": 10,
+      "community": 12,
       "norm_label": ".constructor()"
     },
     {
@@ -5832,7 +5841,7 @@
       "source_file": "lib/growth/sequences/stop.ts",
       "source_location": "L115",
       "id": "stop_resolveactor",
-      "community": 10,
+      "community": 12,
       "norm_label": "resolveactor()"
     },
     {
@@ -5841,7 +5850,7 @@
       "source_file": "lib/growth/sequences/stop.ts",
       "source_location": "L128",
       "id": "stop_validaterequest",
-      "community": 10,
+      "community": 12,
       "norm_label": "validaterequest()"
     },
     {
@@ -5850,7 +5859,7 @@
       "source_file": "lib/growth/sequences/stop.ts",
       "source_location": "L147",
       "id": "stop_createsequencestopper",
-      "community": 10,
+      "community": 12,
       "norm_label": "createsequencestopper()"
     },
     {
@@ -5859,7 +5868,7 @@
       "source_file": "lib/operations/agreements/agreement-delivery-webhook.test.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_agreement_delivery_webhook_test_ts",
-      "community": 28,
+      "community": 29,
       "norm_label": "agreement-delivery-webhook.test.ts"
     },
     {
@@ -5868,7 +5877,7 @@
       "source_file": "lib/operations/agreements/agreement-delivery-webhook.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_agreement_delivery_webhook_ts",
-      "community": 28,
+      "community": 29,
       "norm_label": "agreement-delivery-webhook.ts"
     },
     {
@@ -5877,7 +5886,7 @@
       "source_file": "lib/operations/agreements/agreement-delivery-webhook.ts",
       "source_location": "L4",
       "id": "agreement_delivery_webhook_applyagreementdeliveryevent",
-      "community": 28,
+      "community": 29,
       "norm_label": "applyagreementdeliveryevent()"
     },
     {
@@ -5913,7 +5922,7 @@
       "source_file": "lib/operations/agreements/agreement-notification-service.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_agreement_notification_service_ts",
-      "community": 4,
+      "community": 2,
       "norm_label": "agreement-notification-service.ts"
     },
     {
@@ -5922,7 +5931,7 @@
       "source_file": "lib/operations/agreements/agreement-notification-service.ts",
       "source_location": "L7",
       "id": "agreement_notification_service_resendstaffagreementnotification",
-      "community": 4,
+      "community": 2,
       "norm_label": "resendstaffagreementnotification()"
     },
     {
@@ -5931,7 +5940,7 @@
       "source_file": "lib/operations/agreements/agreement-notifications.test.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_agreement_notifications_test_ts",
-      "community": 6,
+      "community": 3,
       "norm_label": "agreement-notifications.test.ts"
     },
     {
@@ -5940,7 +5949,7 @@
       "source_file": "lib/operations/agreements/agreement-notifications.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_agreement_notifications_ts",
-      "community": 6,
+      "community": 3,
       "norm_label": "agreement-notifications.ts"
     },
     {
@@ -5949,7 +5958,7 @@
       "source_file": "lib/operations/agreements/agreement-notifications.ts",
       "source_location": "L22",
       "id": "agreement_notifications_escapehtml",
-      "community": 6,
+      "community": 3,
       "norm_label": "escapehtml()"
     },
     {
@@ -5958,7 +5967,7 @@
       "source_file": "lib/operations/agreements/agreement-notifications.ts",
       "source_location": "L31",
       "id": "agreement_notifications_agreementnotificationemail",
-      "community": 6,
+      "community": 3,
       "norm_label": "agreementnotificationemail()"
     },
     {
@@ -5967,7 +5976,7 @@
       "source_file": "lib/operations/agreements/agreement-notifications.ts",
       "source_location": "L74",
       "id": "agreement_notifications_agreementnotificationidempotencykey",
-      "community": 6,
+      "community": 3,
       "norm_label": "agreementnotificationidempotencykey()"
     },
     {
@@ -5976,7 +5985,7 @@
       "source_file": "lib/operations/agreements/agreement-notifications.ts",
       "source_location": "L86",
       "id": "agreement_notifications_dispatchagreementnotifications",
-      "community": 6,
+      "community": 3,
       "norm_label": "dispatchagreementnotifications()"
     },
     {
@@ -6021,7 +6030,7 @@
       "source_file": "lib/operations/agreements/builder-draft-service.test.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_builder_draft_service_test_ts",
-      "community": 7,
+      "community": 4,
       "norm_label": "builder-draft-service.test.ts"
     },
     {
@@ -6030,7 +6039,7 @@
       "source_file": "lib/operations/agreements/builder-draft-service.test.ts",
       "source_location": "L27",
       "id": "builder_draft_service_test_saveddraft",
-      "community": 7,
+      "community": 4,
       "norm_label": "saveddraft()"
     },
     {
@@ -6039,7 +6048,7 @@
       "source_file": "lib/operations/agreements/builder-draft-service.test.ts",
       "source_location": "L43",
       "id": "builder_draft_service_test_completedraft",
-      "community": 7,
+      "community": 4,
       "norm_label": "completedraft()"
     },
     {
@@ -6048,7 +6057,7 @@
       "source_file": "lib/operations/agreements/builder-draft-service.test.ts",
       "source_location": "L57",
       "id": "builder_draft_service_test_recordingdb",
-      "community": 7,
+      "community": 4,
       "norm_label": "recordingdb()"
     },
     {
@@ -6165,7 +6174,7 @@
       "source_file": "lib/operations/agreements/builder-draft-validation.test.ts",
       "source_location": "L7",
       "id": "builder_draft_validation_test_content",
-      "community": 7,
+      "community": 4,
       "norm_label": "content()"
     },
     {
@@ -6237,7 +6246,7 @@
       "source_file": "lib/operations/agreements/commercial-repository.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_commercial_repository_ts",
-      "community": 4,
+      "community": 2,
       "norm_label": "commercial-repository.ts"
     },
     {
@@ -6246,7 +6255,7 @@
       "source_file": "lib/operations/agreements/commercial-repository.ts",
       "source_location": "L8",
       "id": "commercial_repository_loadcommercialoffers",
-      "community": 4,
+      "community": 2,
       "norm_label": "loadcommercialoffers()"
     },
     {
@@ -6255,7 +6264,7 @@
       "source_file": "lib/operations/agreements/commercial-repository.ts",
       "source_location": "L24",
       "id": "commercial_repository_liststaffcommercialoffers",
-      "community": 4,
+      "community": 2,
       "norm_label": "liststaffcommercialoffers()"
     },
     {
@@ -6264,7 +6273,7 @@
       "source_file": "lib/operations/agreements/commercial-repository.ts",
       "source_location": "L33",
       "id": "commercial_repository_listportalcommercialoffers",
-      "community": 4,
+      "community": 2,
       "norm_label": "listportalcommercialoffers()"
     },
     {
@@ -6273,7 +6282,7 @@
       "source_file": "lib/operations/agreements/commercial-repository.ts",
       "source_location": "L48",
       "id": "commercial_repository_getstaffcommercialoffer",
-      "community": 4,
+      "community": 2,
       "norm_label": "getstaffcommercialoffer()"
     },
     {
@@ -6282,7 +6291,7 @@
       "source_file": "lib/operations/agreements/commercial-repository.ts",
       "source_location": "L61",
       "id": "commercial_repository_getportalcommercialoffer",
-      "community": 4,
+      "community": 2,
       "norm_label": "getportalcommercialoffer()"
     },
     {
@@ -6291,7 +6300,7 @@
       "source_file": "lib/operations/agreements/commercial-service.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_commercial_service_ts",
-      "community": 4,
+      "community": 2,
       "norm_label": "commercial-service.ts"
     },
     {
@@ -6300,7 +6309,7 @@
       "source_file": "lib/operations/agreements/commercial-service.ts",
       "source_location": "L27",
       "id": "commercial_service_retainbranch",
-      "community": 13,
+      "community": 14,
       "norm_label": "retainbranch()"
     },
     {
@@ -6309,7 +6318,7 @@
       "source_file": "lib/operations/agreements/commercial-service.ts",
       "source_location": "L46",
       "id": "commercial_service_publishstaffcommercialoffer",
-      "community": 4,
+      "community": 2,
       "norm_label": "publishstaffcommercialoffer()"
     },
     {
@@ -6318,7 +6327,7 @@
       "source_file": "lib/operations/agreements/commercial-service.ts",
       "source_location": "L95",
       "id": "commercial_service_executestaffcommercialoffercommand",
-      "community": 4,
+      "community": 2,
       "norm_label": "executestaffcommercialoffercommand()"
     },
     {
@@ -6327,7 +6336,7 @@
       "source_file": "lib/operations/agreements/commercial-service.ts",
       "source_location": "L176",
       "id": "commercial_service_executeportalcommercialoffercommand",
-      "community": 4,
+      "community": 2,
       "norm_label": "executeportalcommercialoffercommand()"
     },
     {
@@ -6336,7 +6345,7 @@
       "source_file": "lib/operations/agreements/commercial-types.test.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_commercial_types_test_ts",
-      "community": 7,
+      "community": 4,
       "norm_label": "commercial-types.test.ts"
     },
     {
@@ -6345,7 +6354,7 @@
       "source_file": "lib/operations/agreements/commercial-types.test.ts",
       "source_location": "L20",
       "id": "commercial_types_test_recurringdraft",
-      "community": 7,
+      "community": 4,
       "norm_label": "recurringdraft()"
     },
     {
@@ -6381,7 +6390,7 @@
       "source_file": "lib/operations/agreements/engagement-command.test.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_engagement_command_test_ts",
-      "community": 19,
+      "community": 20,
       "norm_label": "engagement-command.test.ts"
     },
     {
@@ -6390,7 +6399,7 @@
       "source_file": "lib/operations/agreements/engagement-command.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_engagement_command_ts",
-      "community": 19,
+      "community": 20,
       "norm_label": "engagement-command.ts"
     },
     {
@@ -6399,7 +6408,7 @@
       "source_file": "lib/operations/agreements/engagement-service.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_engagement_service_ts",
-      "community": 19,
+      "community": 20,
       "norm_label": "engagement-service.ts"
     },
     {
@@ -6408,7 +6417,7 @@
       "source_file": "lib/operations/agreements/engagement-service.ts",
       "source_location": "L13",
       "id": "engagement_service_engagementcommandconflict",
-      "community": 19,
+      "community": 20,
       "norm_label": "engagementcommandconflict"
     },
     {
@@ -6417,7 +6426,7 @@
       "source_file": "lib/operations/agreements/engagement-service.ts",
       "source_location": "L14",
       "id": "engagement_service_engagementcommandconflict_constructor",
-      "community": 19,
+      "community": 20,
       "norm_label": ".constructor()"
     },
     {
@@ -6426,7 +6435,7 @@
       "source_file": "lib/operations/agreements/engagement-service.ts",
       "source_location": "L22",
       "id": "engagement_service_completestaffengagementcommand",
-      "community": 19,
+      "community": 20,
       "norm_label": "completestaffengagementcommand()"
     },
     {
@@ -6435,7 +6444,7 @@
       "source_file": "lib/operations/agreements/fixtures.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_fixtures_ts",
-      "community": 7,
+      "community": 4,
       "norm_label": "fixtures.ts"
     },
     {
@@ -6444,7 +6453,7 @@
       "source_file": "lib/operations/agreements/fixtures.ts",
       "source_location": "L2",
       "id": "fixtures_agreementdraft",
-      "community": 7,
+      "community": 4,
       "norm_label": "agreementdraft()"
     },
     {
@@ -6453,7 +6462,7 @@
       "source_file": "lib/operations/agreements/fixtures.ts",
       "source_location": "L39",
       "id": "fixtures_signatureevidence",
-      "community": 7,
+      "community": 4,
       "norm_label": "signatureevidence()"
     },
     {
@@ -6462,7 +6471,7 @@
       "source_file": "lib/operations/agreements/lifecycle-service.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_lifecycle_service_ts",
-      "community": 7,
+      "community": 4,
       "norm_label": "lifecycle-service.ts"
     },
     {
@@ -6471,7 +6480,7 @@
       "source_file": "lib/operations/agreements/lifecycle-service.ts",
       "source_location": "L15",
       "id": "lifecycle_service_changestaffagreementlifecycle",
-      "community": 7,
+      "community": 4,
       "norm_label": "changestaffagreementlifecycle()"
     },
     {
@@ -6480,7 +6489,7 @@
       "source_file": "lib/operations/agreements/money-input.test.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_money_input_test_ts",
-      "community": 23,
+      "community": 24,
       "norm_label": "money-input.test.ts"
     },
     {
@@ -6489,7 +6498,7 @@
       "source_file": "lib/operations/agreements/money-input.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_money_input_ts",
-      "community": 23,
+      "community": 24,
       "norm_label": "money-input.ts"
     },
     {
@@ -6498,7 +6507,7 @@
       "source_file": "lib/operations/agreements/money-input.ts",
       "source_location": "L4",
       "id": "money_input_gbptopence",
-      "community": 23,
+      "community": 24,
       "norm_label": "gbptopence()"
     },
     {
@@ -6507,7 +6516,7 @@
       "source_file": "lib/operations/agreements/money-input.ts",
       "source_location": "L15",
       "id": "money_input_pencetogbp",
-      "community": 23,
+      "community": 24,
       "norm_label": "pencetogbp()"
     },
     {
@@ -6516,7 +6525,7 @@
       "source_file": "lib/operations/agreements/repository.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_repository_ts",
-      "community": 4,
+      "community": 2,
       "norm_label": "repository.ts"
     },
     {
@@ -6525,7 +6534,7 @@
       "source_file": "lib/operations/agreements/repository.ts",
       "source_location": "L15",
       "id": "repository_assertnopendingexecution",
-      "community": 4,
+      "community": 2,
       "norm_label": "assertnopendingexecution()"
     },
     {
@@ -6534,7 +6543,7 @@
       "source_file": "lib/operations/agreements/repository.ts",
       "source_location": "L29",
       "id": "repository_withagreementtransaction",
-      "community": 4,
+      "community": 2,
       "norm_label": "withagreementtransaction()"
     },
     {
@@ -6543,7 +6552,7 @@
       "source_file": "lib/operations/agreements/repository.ts",
       "source_location": "L41",
       "id": "repository_insertrevision",
-      "community": 4,
+      "community": 2,
       "norm_label": "insertrevision()"
     },
     {
@@ -6552,7 +6561,7 @@
       "source_file": "lib/operations/agreements/repository.ts",
       "source_location": "L56",
       "id": "repository_loadagreements",
-      "community": 4,
+      "community": 2,
       "norm_label": "loadagreements()"
     },
     {
@@ -6561,7 +6570,7 @@
       "source_file": "lib/operations/agreements/repository.ts",
       "source_location": "L76",
       "id": "repository_loadagreement",
-      "community": 4,
+      "community": 2,
       "norm_label": "loadagreement()"
     },
     {
@@ -6570,7 +6579,7 @@
       "source_file": "lib/operations/agreements/repository.ts",
       "source_location": "L85",
       "id": "repository_listagreementregister",
-      "community": 4,
+      "community": 2,
       "norm_label": "listagreementregister()"
     },
     {
@@ -6579,7 +6588,7 @@
       "source_file": "lib/operations/agreements/repository.ts",
       "source_location": "L98",
       "id": "repository_readagreementregister",
-      "community": 4,
+      "community": 2,
       "norm_label": "readagreementregister()"
     },
     {
@@ -6588,7 +6597,7 @@
       "source_file": "lib/operations/agreements/repository.ts",
       "source_location": "L133",
       "id": "repository_liststaffagreementregister",
-      "community": 4,
+      "community": 2,
       "norm_label": "liststaffagreementregister()"
     },
     {
@@ -6597,7 +6606,7 @@
       "source_file": "lib/operations/agreements/repository.ts",
       "source_location": "L165",
       "id": "repository_getstaffagreement",
-      "community": 4,
+      "community": 2,
       "norm_label": "getstaffagreement()"
     },
     {
@@ -6606,7 +6615,7 @@
       "source_file": "lib/operations/agreements/repository.ts",
       "source_location": "L178",
       "id": "repository_liststaffagreementoverview",
-      "community": 4,
+      "community": 2,
       "norm_label": "liststaffagreementoverview()"
     },
     {
@@ -6615,7 +6624,7 @@
       "source_file": "lib/operations/agreements/route-handler.test.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_route_handler_test_ts",
-      "community": 7,
+      "community": 4,
       "norm_label": "route-handler.test.ts"
     },
     {
@@ -6624,7 +6633,7 @@
       "source_file": "lib/operations/agreements/route-handler.test.ts",
       "source_location": "L26",
       "id": "route_handler_test_setup",
-      "community": 7,
+      "community": 4,
       "norm_label": "setup()"
     },
     {
@@ -6633,7 +6642,7 @@
       "source_file": "lib/operations/agreements/route-handler.test.ts",
       "source_location": "L47",
       "id": "route_handler_test_request",
-      "community": 7,
+      "community": 4,
       "norm_label": "request()"
     },
     {
@@ -6642,7 +6651,7 @@
       "source_file": "lib/operations/agreements/route-handler.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_route_handler_ts",
-      "community": 7,
+      "community": 4,
       "norm_label": "route-handler.ts"
     },
     {
@@ -6651,7 +6660,7 @@
       "source_file": "lib/operations/agreements/route-handler.ts",
       "source_location": "L26",
       "id": "route_handler_createagreementroutehandler",
-      "community": 7,
+      "community": 4,
       "norm_label": "createagreementroutehandler()"
     },
     {
@@ -6660,7 +6669,7 @@
       "source_file": "lib/operations/agreements/service.test.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_service_test_ts",
-      "community": 4,
+      "community": 2,
       "norm_label": "service.test.ts"
     },
     {
@@ -6669,7 +6678,7 @@
       "source_file": "lib/operations/agreements/service.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_service_ts",
-      "community": 4,
+      "community": 2,
       "norm_label": "service.ts"
     },
     {
@@ -6678,7 +6687,7 @@
       "source_file": "lib/operations/agreements/service.ts",
       "source_location": "L42",
       "id": "service_asserteditable",
-      "community": 4,
+      "community": 2,
       "norm_label": "asserteditable()"
     },
     {
@@ -6687,7 +6696,7 @@
       "source_file": "lib/operations/agreements/service.ts",
       "source_location": "L52",
       "id": "service_runagreementcommand",
-      "community": 4,
+      "community": 2,
       "norm_label": "runagreementcommand()"
     },
     {
@@ -6696,7 +6705,7 @@
       "source_file": "lib/operations/agreements/service.ts",
       "source_location": "L153",
       "id": "service_executeagreementcommand",
-      "community": 4,
+      "community": 2,
       "norm_label": "executeagreementcommand()"
     },
     {
@@ -6705,7 +6714,7 @@
       "source_file": "lib/operations/agreements/signing-commands.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_signing_commands_ts",
-      "community": 4,
+      "community": 2,
       "norm_label": "signing-commands.ts"
     },
     {
@@ -6714,7 +6723,7 @@
       "source_file": "lib/operations/agreements/signing-commands.ts",
       "source_location": "L56",
       "id": "signing_commands_executefoundersigningcommand",
-      "community": 4,
+      "community": 2,
       "norm_label": "executefoundersigningcommand()"
     },
     {
@@ -6723,7 +6732,7 @@
       "source_file": "lib/operations/agreements/signing-commands.ts",
       "source_location": "L88",
       "id": "signing_commands_executestaffsigningcommand",
-      "community": 4,
+      "community": 2,
       "norm_label": "executestaffsigningcommand()"
     },
     {
@@ -6732,7 +6741,7 @@
       "source_file": "lib/operations/agreements/signing-commands.ts",
       "source_location": "L159",
       "id": "signing_commands_executeportalsigningcommand",
-      "community": 4,
+      "community": 2,
       "norm_label": "executeportalsigningcommand()"
     },
     {
@@ -6741,7 +6750,7 @@
       "source_file": "lib/operations/agreements/signing-extension.test.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_signing_extension_test_ts",
-      "community": 7,
+      "community": 4,
       "norm_label": "signing-extension.test.ts"
     },
     {
@@ -6750,7 +6759,7 @@
       "source_file": "lib/operations/agreements/signing-growth.test.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_signing_growth_test_ts",
-      "community": 7,
+      "community": 4,
       "norm_label": "signing-growth.test.ts"
     },
     {
@@ -6759,7 +6768,7 @@
       "source_file": "lib/operations/agreements/signing-growth.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_signing_growth_ts",
-      "community": 7,
+      "community": 4,
       "norm_label": "signing-growth.ts"
     },
     {
@@ -6768,7 +6777,7 @@
       "source_file": "lib/operations/agreements/signing-growth.ts",
       "source_location": "L21",
       "id": "signing_growth_signinggrowthvalues",
-      "community": 7,
+      "community": 4,
       "norm_label": "signinggrowthvalues()"
     },
     {
@@ -6777,7 +6786,7 @@
       "source_file": "lib/operations/agreements/signing-growth.ts",
       "source_location": "L50",
       "id": "signing_growth_projectcompletion",
-      "community": 7,
+      "community": 4,
       "norm_label": "projectcompletion()"
     },
     {
@@ -6786,7 +6795,7 @@
       "source_file": "lib/operations/agreements/signing-growth.ts",
       "source_location": "L81",
       "id": "signing_growth_runsigninggrowthworker",
-      "community": 7,
+      "community": 4,
       "norm_label": "runsigninggrowthworker()"
     },
     {
@@ -6795,7 +6804,7 @@
       "source_file": "lib/operations/agreements/signing-http.test.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_signing_http_test_ts",
-      "community": 7,
+      "community": 4,
       "norm_label": "signing-http.test.ts"
     },
     {
@@ -6804,7 +6813,7 @@
       "source_file": "lib/operations/agreements/signing-http.test.ts",
       "source_location": "L19",
       "id": "signing_http_test_request",
-      "community": 7,
+      "community": 4,
       "norm_label": "request()"
     },
     {
@@ -6813,7 +6822,7 @@
       "source_file": "lib/operations/agreements/signing-http.test.ts",
       "source_location": "L30",
       "id": "signing_http_test_unused",
-      "community": 7,
+      "community": 4,
       "norm_label": "unused()"
     },
     {
@@ -6822,7 +6831,7 @@
       "source_file": "lib/operations/agreements/signing-http.test.ts",
       "source_location": "L116",
       "id": "signing_http_test_download",
-      "community": 7,
+      "community": 4,
       "norm_label": "download()"
     },
     {
@@ -6831,7 +6840,7 @@
       "source_file": "lib/operations/agreements/signing-http.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_signing_http_ts",
-      "community": 6,
+      "community": 3,
       "norm_label": "signing-http.ts"
     },
     {
@@ -6840,7 +6849,7 @@
       "source_file": "lib/operations/agreements/signing-http.ts",
       "source_location": "L37",
       "id": "signing_http_createsigningcommandhandler",
-      "community": 6,
+      "community": 3,
       "norm_label": "createsigningcommandhandler()"
     },
     {
@@ -6849,7 +6858,7 @@
       "source_file": "lib/operations/agreements/signing-http.ts",
       "source_location": "L100",
       "id": "signing_http_createsigningdownloadhandler",
-      "community": 6,
+      "community": 3,
       "norm_label": "createsigningdownloadhandler()"
     },
     {
@@ -6858,7 +6867,7 @@
       "source_file": "lib/operations/agreements/signing-pdf-content.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_signing_pdf_content_ts",
-      "community": 13,
+      "community": 14,
       "norm_label": "signing-pdf-content.ts"
     },
     {
@@ -6867,7 +6876,7 @@
       "source_file": "lib/operations/agreements/signing-pdf-content.ts",
       "source_location": "L15",
       "id": "signing_pdf_content_signingpounds",
-      "community": 13,
+      "community": 14,
       "norm_label": "signingpounds()"
     },
     {
@@ -6876,7 +6885,7 @@
       "source_file": "lib/operations/agreements/signing-pdf-content.ts",
       "source_location": "L22",
       "id": "signing_pdf_content_writeservicelines",
-      "community": 13,
+      "community": 14,
       "norm_label": "writeservicelines()"
     },
     {
@@ -6885,7 +6894,7 @@
       "source_file": "lib/operations/agreements/signing-pdf-content.ts",
       "source_location": "L74",
       "id": "signing_pdf_content_writerevenueshare",
-      "community": 13,
+      "community": 14,
       "norm_label": "writerevenueshare()"
     },
     {
@@ -6894,7 +6903,7 @@
       "source_file": "lib/operations/agreements/signing-pdf-content.ts",
       "source_location": "L102",
       "id": "signing_pdf_content_writeagreementcontent",
-      "community": 13,
+      "community": 14,
       "norm_label": "writeagreementcontent()"
     },
     {
@@ -6903,7 +6912,7 @@
       "source_file": "lib/operations/agreements/signing-pdf-content.ts",
       "source_location": "L170",
       "id": "signing_pdf_content_writeexecutionrecord",
-      "community": 13,
+      "community": 14,
       "norm_label": "writeexecutionrecord()"
     },
     {
@@ -6912,7 +6921,7 @@
       "source_file": "lib/operations/agreements/signing-pdf-layout.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_signing_pdf_layout_ts",
-      "community": 13,
+      "community": 14,
       "norm_label": "signing-pdf-layout.ts"
     },
     {
@@ -6921,7 +6930,7 @@
       "source_file": "lib/operations/agreements/signing-pdf-layout.ts",
       "source_location": "L13",
       "id": "signing_pdf_layout_masthead",
-      "community": 13,
+      "community": 14,
       "norm_label": "masthead()"
     },
     {
@@ -6930,7 +6939,7 @@
       "source_file": "lib/operations/agreements/signing-pdf-layout.ts",
       "source_location": "L46",
       "id": "signing_pdf_layout_startsigningpdf",
-      "community": 13,
+      "community": 14,
       "norm_label": "startsigningpdf()"
     },
     {
@@ -6939,7 +6948,7 @@
       "source_file": "lib/operations/agreements/signing-pdf-layout.ts",
       "source_location": "L51",
       "id": "signing_pdf_layout_finishsigningpdf",
-      "community": 13,
+      "community": 14,
       "norm_label": "finishsigningpdf()"
     },
     {
@@ -6948,7 +6957,7 @@
       "source_file": "lib/operations/agreements/signing-pdf-layout.ts",
       "source_location": "L77",
       "id": "signing_pdf_layout_ensuresigningspace",
-      "community": 13,
+      "community": 14,
       "norm_label": "ensuresigningspace()"
     },
     {
@@ -6957,7 +6966,7 @@
       "source_file": "lib/operations/agreements/signing-pdf-layout.ts",
       "source_location": "L84",
       "id": "signing_pdf_layout_signingtitle",
-      "community": 13,
+      "community": 14,
       "norm_label": "signingtitle()"
     },
     {
@@ -6966,7 +6975,7 @@
       "source_file": "lib/operations/agreements/signing-pdf-layout.ts",
       "source_location": "L103",
       "id": "signing_pdf_layout_signingsection",
-      "community": 13,
+      "community": 14,
       "norm_label": "signingsection()"
     },
     {
@@ -6975,7 +6984,7 @@
       "source_file": "lib/operations/agreements/signing-pdf-layout.ts",
       "source_location": "L131",
       "id": "signing_pdf_layout_signingparagraph",
-      "community": 13,
+      "community": 14,
       "norm_label": "signingparagraph()"
     },
     {
@@ -6984,7 +6993,7 @@
       "source_file": "lib/operations/agreements/signing-pdf-layout.ts",
       "source_location": "L143",
       "id": "signing_pdf_layout_signingfieldrow",
-      "community": 13,
+      "community": 14,
       "norm_label": "signingfieldrow()"
     },
     {
@@ -6993,7 +7002,7 @@
       "source_file": "lib/operations/agreements/signing-pdf-layout.ts",
       "source_location": "L184",
       "id": "signing_pdf_layout_signingdetail",
-      "community": 13,
+      "community": 14,
       "norm_label": "signingdetail()"
     },
     {
@@ -7002,7 +7011,7 @@
       "source_file": "lib/operations/agreements/signing-render.test.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_signing_render_test_ts",
-      "community": 13,
+      "community": 14,
       "norm_label": "signing-render.test.ts"
     },
     {
@@ -7011,7 +7020,7 @@
       "source_file": "lib/operations/agreements/signing-render.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_signing_render_ts",
-      "community": 13,
+      "community": 14,
       "norm_label": "signing-render.ts"
     },
     {
@@ -7020,7 +7029,7 @@
       "source_file": "lib/operations/agreements/signing-render.ts",
       "source_location": "L17",
       "id": "signing_render_signinghash",
-      "community": 13,
+      "community": 14,
       "norm_label": "signinghash()"
     },
     {
@@ -7029,7 +7038,7 @@
       "source_file": "lib/operations/agreements/signing-render.ts",
       "source_location": "L23",
       "id": "signing_render_agreementcontent",
-      "community": 13,
+      "community": 14,
       "norm_label": "agreementcontent()"
     },
     {
@@ -7038,7 +7047,7 @@
       "source_file": "lib/operations/agreements/signing-render.ts",
       "source_location": "L36",
       "id": "signing_render_pdf",
-      "community": 13,
+      "community": 14,
       "norm_label": "pdf()"
     },
     {
@@ -7047,7 +7056,7 @@
       "source_file": "lib/operations/agreements/signing-render.ts",
       "source_location": "L66",
       "id": "signing_render_renderagreementsource",
-      "community": 13,
+      "community": 14,
       "norm_label": "renderagreementsource()"
     },
     {
@@ -7056,7 +7065,7 @@
       "source_file": "lib/operations/agreements/signing-render.ts",
       "source_location": "L79",
       "id": "signing_render_signingaudit",
-      "community": 13,
+      "community": 14,
       "norm_label": "signingaudit()"
     },
     {
@@ -7065,7 +7074,7 @@
       "source_file": "lib/operations/agreements/signing-render.ts",
       "source_location": "L102",
       "id": "signing_render_rendersignedagreement",
-      "community": 13,
+      "community": 14,
       "norm_label": "rendersignedagreement()"
     },
     {
@@ -7074,7 +7083,7 @@
       "source_file": "lib/operations/agreements/signing-repository.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_signing_repository_ts",
-      "community": 4,
+      "community": 2,
       "norm_label": "signing-repository.ts"
     },
     {
@@ -7083,7 +7092,7 @@
       "source_file": "lib/operations/agreements/signing-repository.ts",
       "source_location": "L16",
       "id": "signing_repository_loadsigningapprovals",
-      "community": 4,
+      "community": 2,
       "norm_label": "loadsigningapprovals()"
     },
     {
@@ -7092,7 +7101,7 @@
       "source_file": "lib/operations/agreements/signing-repository.ts",
       "source_location": "L34",
       "id": "signing_repository_validatelookup",
-      "community": 4,
+      "community": 2,
       "norm_label": "validatelookup()"
     },
     {
@@ -7101,7 +7110,7 @@
       "source_file": "lib/operations/agreements/signing-repository.ts",
       "source_location": "L38",
       "id": "signing_repository_listfoundersigning",
-      "community": 4,
+      "community": 2,
       "norm_label": "listfoundersigning()"
     },
     {
@@ -7110,7 +7119,7 @@
       "source_file": "lib/operations/agreements/signing-repository.ts",
       "source_location": "L50",
       "id": "signing_repository_liststaffsigning",
-      "community": 4,
+      "community": 2,
       "norm_label": "liststaffsigning()"
     },
     {
@@ -7119,7 +7128,7 @@
       "source_file": "lib/operations/agreements/signing-repository.ts",
       "source_location": "L76",
       "id": "signing_repository_liststaffsigningreadiness",
-      "community": 4,
+      "community": 2,
       "norm_label": "liststaffsigningreadiness()"
     },
     {
@@ -7128,7 +7137,7 @@
       "source_file": "lib/operations/agreements/signing-repository.ts",
       "source_location": "L109",
       "id": "signing_repository_getfoundersigning",
-      "community": 4,
+      "community": 2,
       "norm_label": "getfoundersigning()"
     },
     {
@@ -7137,7 +7146,7 @@
       "source_file": "lib/operations/agreements/signing-repository.ts",
       "source_location": "L125",
       "id": "signing_repository_listportalsigning",
-      "community": 4,
+      "community": 2,
       "norm_label": "listportalsigning()"
     },
     {
@@ -7146,7 +7155,7 @@
       "source_file": "lib/operations/agreements/signing-repository.ts",
       "source_location": "L139",
       "id": "signing_repository_getportalsigning",
-      "community": 4,
+      "community": 2,
       "norm_label": "getportalsigning()"
     },
     {
@@ -7155,7 +7164,7 @@
       "source_file": "lib/operations/agreements/signing-repository.ts",
       "source_location": "L156",
       "id": "signing_repository_artifact",
-      "community": 13,
+      "community": 14,
       "norm_label": "artifact()"
     },
     {
@@ -7164,7 +7173,7 @@
       "source_file": "lib/operations/agreements/signing-repository.ts",
       "source_location": "L185",
       "id": "signing_repository_downloadfoundersigningartifact",
-      "community": 4,
+      "community": 2,
       "norm_label": "downloadfoundersigningartifact()"
     },
     {
@@ -7173,7 +7182,7 @@
       "source_file": "lib/operations/agreements/signing-repository.ts",
       "source_location": "L199",
       "id": "signing_repository_downloadstaffsigningartifact",
-      "community": 4,
+      "community": 2,
       "norm_label": "downloadstaffsigningartifact()"
     },
     {
@@ -7182,7 +7191,7 @@
       "source_file": "lib/operations/agreements/signing-repository.ts",
       "source_location": "L213",
       "id": "signing_repository_downloadportalsigningartifact",
-      "community": 4,
+      "community": 2,
       "norm_label": "downloadportalsigningartifact()"
     },
     {
@@ -7191,7 +7200,7 @@
       "source_file": "lib/operations/agreements/signing-route.test.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_signing_route_test_ts",
-      "community": 29,
+      "community": 30,
       "norm_label": "signing-route.test.ts"
     },
     {
@@ -7200,7 +7209,7 @@
       "source_file": "lib/operations/agreements/signing-route.test.ts",
       "source_location": "L7",
       "id": "signing_route_test_stub",
-      "community": 29,
+      "community": 30,
       "norm_label": "stub()"
     },
     {
@@ -7209,7 +7218,7 @@
       "source_file": "lib/operations/agreements/signing-route.test.ts",
       "source_location": "L51",
       "id": "signing_route_test_request",
-      "community": 29,
+      "community": 30,
       "norm_label": "request()"
     },
     {
@@ -7218,7 +7227,7 @@
       "source_file": "lib/operations/agreements/signing-route.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_signing_route_ts",
-      "community": 6,
+      "community": 3,
       "norm_label": "signing-route.ts"
     },
     {
@@ -7227,7 +7236,7 @@
       "source_file": "lib/operations/agreements/signing-route.ts",
       "source_location": "L33",
       "id": "signing_route_configuration",
-      "community": 6,
+      "community": 3,
       "norm_label": "configuration()"
     },
     {
@@ -7236,7 +7245,7 @@
       "source_file": "lib/operations/agreements/signing-route.ts",
       "source_location": "L44",
       "id": "signing_route_authorizefounder",
-      "community": 6,
+      "community": 3,
       "norm_label": "authorizefounder()"
     },
     {
@@ -7245,7 +7254,7 @@
       "source_file": "lib/operations/agreements/signing-route.ts",
       "source_location": "L51",
       "id": "signing_route_foundersigningroute",
-      "community": 6,
+      "community": 3,
       "norm_label": "foundersigningroute()"
     },
     {
@@ -7254,7 +7263,7 @@
       "source_file": "lib/operations/agreements/signing-route.ts",
       "source_location": "L65",
       "id": "signing_route_portalsigningroute",
-      "community": 6,
+      "community": 3,
       "norm_label": "portalsigningroute()"
     },
     {
@@ -7263,7 +7272,7 @@
       "source_file": "lib/operations/agreements/signing-route.ts",
       "source_location": "L134",
       "id": "signing_route_authorizestaff",
-      "community": 6,
+      "community": 3,
       "norm_label": "authorizestaff()"
     },
     {
@@ -7272,7 +7281,7 @@
       "source_file": "lib/operations/agreements/signing-route.ts",
       "source_location": "L143",
       "id": "signing_route_staffsigningroute",
-      "community": 6,
+      "community": 3,
       "norm_label": "staffsigningroute()"
     },
     {
@@ -7281,7 +7290,7 @@
       "source_file": "lib/operations/agreements/signing-route.ts",
       "source_location": "L198",
       "id": "signing_route_foundersigningdownloadroute",
-      "community": 6,
+      "community": 3,
       "norm_label": "foundersigningdownloadroute()"
     },
     {
@@ -7290,7 +7299,7 @@
       "source_file": "lib/operations/agreements/signing-route.ts",
       "source_location": "L213",
       "id": "signing_route_portalsigningdownloadroute",
-      "community": 6,
+      "community": 3,
       "norm_label": "portalsigningdownloadroute()"
     },
     {
@@ -7299,7 +7308,7 @@
       "source_file": "lib/operations/agreements/signing-route.ts",
       "source_location": "L228",
       "id": "signing_route_staffsigningdownloadroute",
-      "community": 6,
+      "community": 3,
       "norm_label": "staffsigningdownloadroute()"
     },
     {
@@ -7308,7 +7317,7 @@
       "source_file": "lib/operations/agreements/signing-service.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_signing_service_ts",
-      "community": 4,
+      "community": 2,
       "norm_label": "signing-service.ts"
     },
     {
@@ -7317,7 +7326,7 @@
       "source_file": "lib/operations/agreements/signing-service.ts",
       "source_location": "L37",
       "id": "signing_service_signingoperation",
-      "community": 4,
+      "community": 2,
       "norm_label": "signingoperation()"
     },
     {
@@ -7326,7 +7335,7 @@
       "source_file": "lib/operations/agreements/signing-service.ts",
       "source_location": "L58",
       "id": "signing_service_preparesigningintransaction",
-      "community": 4,
+      "community": 2,
       "norm_label": "preparesigningintransaction()"
     },
     {
@@ -7335,7 +7344,7 @@
       "source_file": "lib/operations/agreements/signing-service.ts",
       "source_location": "L96",
       "id": "signing_service_prepareagreementsigning",
-      "community": 4,
+      "community": 2,
       "norm_label": "prepareagreementsigning()"
     },
     {
@@ -7344,7 +7353,7 @@
       "source_file": "lib/operations/agreements/signing-service.ts",
       "source_location": "L119",
       "id": "signing_service_preparestaffagreementsigning",
-      "community": 4,
+      "community": 2,
       "norm_label": "preparestaffagreementsigning()"
     },
     {
@@ -7353,7 +7362,7 @@
       "source_file": "lib/operations/agreements/signing-service.ts",
       "source_location": "L141",
       "id": "signing_service_approveagreementsigning",
-      "community": 4,
+      "community": 2,
       "norm_label": "approveagreementsigning()"
     },
     {
@@ -7362,7 +7371,7 @@
       "source_file": "lib/operations/agreements/signing-service.ts",
       "source_location": "L161",
       "id": "signing_service_approvestaffagreementsigning",
-      "community": 4,
+      "community": 2,
       "norm_label": "approvestaffagreementsigning()"
     },
     {
@@ -7371,7 +7380,7 @@
       "source_file": "lib/operations/agreements/signing-service.ts",
       "source_location": "L182",
       "id": "signing_service_cancelagreementsigning",
-      "community": 4,
+      "community": 2,
       "norm_label": "cancelagreementsigning()"
     },
     {
@@ -7380,7 +7389,7 @@
       "source_file": "lib/operations/agreements/signing-service.ts",
       "source_location": "L200",
       "id": "signing_service_cancelstaffagreementsigning",
-      "community": 4,
+      "community": 2,
       "norm_label": "cancelstaffagreementsigning()"
     },
     {
@@ -7389,7 +7398,7 @@
       "source_file": "lib/operations/agreements/signing-service.ts",
       "source_location": "L219",
       "id": "signing_service_retrystaffagreementsigning",
-      "community": 4,
+      "community": 2,
       "norm_label": "retrystaffagreementsigning()"
     },
     {
@@ -7398,7 +7407,7 @@
       "source_file": "lib/operations/agreements/signing-service.ts",
       "source_location": "L236",
       "id": "signing_service_extendstaffagreementsigning",
-      "community": 4,
+      "community": 2,
       "norm_label": "extendstaffagreementsigning()"
     },
     {
@@ -7407,7 +7416,7 @@
       "source_file": "lib/operations/agreements/signing-service.ts",
       "source_location": "L261",
       "id": "signing_service_signportalagreement",
-      "community": 4,
+      "community": 2,
       "norm_label": "signportalagreement()"
     },
     {
@@ -7416,7 +7425,7 @@
       "source_file": "lib/operations/agreements/signing-service.ts",
       "source_location": "L286",
       "id": "signing_service_declineportalagreement",
-      "community": 4,
+      "community": 2,
       "norm_label": "declineportalagreement()"
     },
     {
@@ -7443,7 +7452,7 @@
       "source_file": "lib/operations/agreements/signing-text.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_signing_text_ts",
-      "community": 13,
+      "community": 14,
       "norm_label": "signing-text.ts"
     },
     {
@@ -7452,7 +7461,7 @@
       "source_file": "lib/operations/agreements/signing-text.ts",
       "source_location": "L7",
       "id": "signing_text_supportssigningtext",
-      "community": 13,
+      "community": 14,
       "norm_label": "supportssigningtext()"
     },
     {
@@ -7470,7 +7479,7 @@
       "source_file": "lib/operations/agreements/signing-worker.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_signing_worker_ts",
-      "community": 6,
+      "community": 3,
       "norm_label": "signing-worker.ts"
     },
     {
@@ -7479,7 +7488,7 @@
       "source_file": "lib/operations/agreements/signing-worker.ts",
       "source_location": "L12",
       "id": "signing_worker_signingenabled",
-      "community": 6,
+      "community": 3,
       "norm_label": "signingenabled()"
     },
     {
@@ -7488,7 +7497,7 @@
       "source_file": "lib/operations/agreements/signing-worker.ts",
       "source_location": "L17",
       "id": "signing_worker_getsigningworkerdb",
-      "community": 6,
+      "community": 3,
       "norm_label": "getsigningworkerdb()"
     },
     {
@@ -7497,7 +7506,7 @@
       "source_file": "lib/operations/agreements/signing-worker.ts",
       "source_location": "L24",
       "id": "signing_worker_completeagreementsigning",
-      "community": 6,
+      "community": 3,
       "norm_label": "completeagreementsigning()"
     },
     {
@@ -7506,7 +7515,7 @@
       "source_file": "lib/operations/agreements/signing-worker.ts",
       "source_location": "L55",
       "id": "signing_worker_recordsigningcompletionfailure",
-      "community": 6,
+      "community": 3,
       "norm_label": "recordsigningcompletionfailure()"
     },
     {
@@ -7515,7 +7524,7 @@
       "source_file": "lib/operations/agreements/signing-worker.ts",
       "source_location": "L68",
       "id": "signing_worker_runsigningcompletionworker",
-      "community": 6,
+      "community": 3,
       "norm_label": "runsigningcompletionworker()"
     },
     {
@@ -7578,7 +7587,7 @@
       "source_file": "lib/operations/agreements/types.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_types_ts",
-      "community": 7,
+      "community": 4,
       "norm_label": "types.ts"
     },
     {
@@ -7587,7 +7596,7 @@
       "source_file": "lib/operations/agreements/types.ts",
       "source_location": "L38",
       "id": "types_agreementconflict",
-      "community": 7,
+      "community": 4,
       "norm_label": "agreementconflict"
     },
     {
@@ -7596,7 +7605,7 @@
       "source_file": "lib/operations/agreements/types.ts",
       "source_location": "L39",
       "id": "types_agreementconflict_constructor",
-      "community": 7,
+      "community": 4,
       "norm_label": ".constructor()"
     },
     {
@@ -7605,7 +7614,7 @@
       "source_file": "lib/operations/agreements/validation.test.ts",
       "source_location": "L1",
       "id": "lib_operations_agreements_validation_test_ts",
-      "community": 7,
+      "community": 4,
       "norm_label": "validation.test.ts"
     },
     {
@@ -7623,7 +7632,7 @@
       "source_file": "lib/operations/agreements/validation.ts",
       "source_location": "L171",
       "id": "validation_totallinepence",
-      "community": 13,
+      "community": 14,
       "norm_label": "totallinepence()"
     },
     {
@@ -7650,7 +7659,7 @@
       "source_file": "lib/operations/auth/configuration.ts",
       "source_location": "L1",
       "id": "lib_operations_auth_configuration_ts",
-      "community": 6,
+      "community": 3,
       "norm_label": "configuration.ts"
     },
     {
@@ -7659,7 +7668,7 @@
       "source_file": "lib/operations/auth/configuration.ts",
       "source_location": "L6",
       "id": "configuration_readportalauthconfig",
-      "community": 6,
+      "community": 3,
       "norm_label": "readportalauthconfig()"
     },
     {
@@ -7668,7 +7677,7 @@
       "source_file": "lib/operations/auth/configuration.ts",
       "source_location": "L17",
       "id": "configuration_portalauthconfigured",
-      "community": 6,
+      "community": 3,
       "norm_label": "portalauthconfigured()"
     },
     {
@@ -7677,7 +7686,7 @@
       "source_file": "lib/operations/auth/configuration.ts",
       "source_location": "L26",
       "id": "configuration_resolveportalorigin",
-      "community": 6,
+      "community": 3,
       "norm_label": "resolveportalorigin()"
     },
     {
@@ -7686,7 +7695,7 @@
       "source_file": "lib/operations/auth/portal-url.ts",
       "source_location": "L1",
       "id": "lib_operations_auth_portal_url_ts",
-      "community": 6,
+      "community": 3,
       "norm_label": "portal-url.ts"
     },
     {
@@ -7695,7 +7704,7 @@
       "source_file": "lib/operations/auth/portal-url.ts",
       "source_location": "L4",
       "id": "portal_url_portalpath",
-      "community": 6,
+      "community": 3,
       "norm_label": "portalpath()"
     },
     {
@@ -7704,7 +7713,7 @@
       "source_file": "lib/operations/auth/portal-url.ts",
       "source_location": "L21",
       "id": "portal_url_portalurl",
-      "community": 6,
+      "community": 3,
       "norm_label": "portalurl()"
     },
     {
@@ -7713,7 +7722,7 @@
       "source_file": "lib/operations/auth/portal-url.ts",
       "source_location": "L41",
       "id": "portal_url_createinvitationactivationurl",
-      "community": 6,
+      "community": 3,
       "norm_label": "createinvitationactivationurl()"
     },
     {
@@ -7722,7 +7731,7 @@
       "source_file": "lib/operations/auth/release-flags.ts",
       "source_location": "L1",
       "id": "lib_operations_auth_release_flags_ts",
-      "community": 6,
+      "community": 3,
       "norm_label": "release-flags.ts"
     },
     {
@@ -7731,7 +7740,7 @@
       "source_file": "lib/operations/auth/release-flags.ts",
       "source_location": "L12",
       "id": "release_flags_deployedenvironment",
-      "community": 6,
+      "community": 3,
       "norm_label": "deployedenvironment()"
     },
     {
@@ -7740,7 +7749,7 @@
       "source_file": "lib/operations/auth/release-flags.ts",
       "source_location": "L20",
       "id": "release_flags_prefixfreeportalenabled",
-      "community": 6,
+      "community": 3,
       "norm_label": "prefixfreeportalenabled()"
     },
     {
@@ -7749,7 +7758,7 @@
       "source_file": "lib/operations/auth/release-flags.ts",
       "source_location": "L33",
       "id": "release_flags_fssstudioenabled",
-      "community": 6,
+      "community": 3,
       "norm_label": "fssstudioenabled()"
     },
     {
@@ -7758,7 +7767,7 @@
       "source_file": "lib/operations/auth/release-flags.ts",
       "source_location": "L45",
       "id": "release_flags_growthoperationscutoverenabled",
-      "community": 6,
+      "community": 3,
       "norm_label": "growthoperationscutoverenabled()"
     },
     {
@@ -7767,7 +7776,7 @@
       "source_file": "lib/operations/http/commercial-offer-route.test.ts",
       "source_location": "L1",
       "id": "lib_operations_http_commercial_offer_route_test_ts",
-      "community": 6,
+      "community": 3,
       "norm_label": "commercial-offer-route.test.ts"
     },
     {
@@ -7776,7 +7785,7 @@
       "source_file": "lib/operations/http/commercial-offer-route.test.ts",
       "source_location": "L28",
       "id": "commercial_offer_route_test_request",
-      "community": 6,
+      "community": 3,
       "norm_label": "request()"
     },
     {
@@ -7785,7 +7794,7 @@
       "source_file": "lib/operations/http/commercial-offer-route.test.ts",
       "source_location": "L35",
       "id": "commercial_offer_route_test_requestat",
-      "community": 6,
+      "community": 3,
       "norm_label": "requestat()"
     },
     {
@@ -7794,7 +7803,7 @@
       "source_file": "lib/operations/http/commercial-offer-route.test.ts",
       "source_location": "L47",
       "id": "commercial_offer_route_test_handler",
-      "community": 6,
+      "community": 3,
       "norm_label": "handler()"
     },
     {
@@ -7803,7 +7812,7 @@
       "source_file": "lib/operations/http/commercial-offer-route.ts",
       "source_location": "L1",
       "id": "lib_operations_http_commercial_offer_route_ts",
-      "community": 6,
+      "community": 3,
       "norm_label": "commercial-offer-route.ts"
     },
     {
@@ -7812,7 +7821,7 @@
       "source_file": "lib/operations/http/commercial-offer-route.ts",
       "source_location": "L46",
       "id": "commercial_offer_route_createcommercialofferroutehandler",
-      "community": 6,
+      "community": 3,
       "norm_label": "createcommercialofferroutehandler()"
     },
     {
@@ -7821,7 +7830,7 @@
       "source_file": "lib/operations/http/commercial-offer-route.ts",
       "source_location": "L104",
       "id": "commercial_offer_route_commercialofferrouteconfiguration",
-      "community": 6,
+      "community": 3,
       "norm_label": "commercialofferrouteconfiguration()"
     },
     {
@@ -7830,7 +7839,7 @@
       "source_file": "lib/operations/http/commercial-offer-route.ts",
       "source_location": "L117",
       "id": "commercial_offer_route_staffcommercialofferroute",
-      "community": 6,
+      "community": 3,
       "norm_label": "staffcommercialofferroute()"
     },
     {
@@ -7839,7 +7848,7 @@
       "source_file": "lib/operations/http/commercial-offer-route.ts",
       "source_location": "L140",
       "id": "commercial_offer_route_portalcommercialofferroute",
-      "community": 6,
+      "community": 3,
       "norm_label": "portalcommercialofferroute()"
     },
     {
@@ -7848,7 +7857,7 @@
       "source_file": "lib/operations/studio/clients.ts",
       "source_location": "L1",
       "id": "lib_operations_studio_clients_ts",
-      "community": 24,
+      "community": 25,
       "norm_label": "clients.ts"
     },
     {
@@ -7857,7 +7866,7 @@
       "source_file": "lib/operations/studio/clients.ts",
       "source_location": "L45",
       "id": "clients_parsesearch",
-      "community": 24,
+      "community": 25,
       "norm_label": "parsesearch()"
     },
     {
@@ -7866,7 +7875,7 @@
       "source_file": "lib/operations/studio/clients.ts",
       "source_location": "L51",
       "id": "clients_liststudioclients",
-      "community": 24,
+      "community": 25,
       "norm_label": "liststudioclients()"
     },
     {
@@ -7875,7 +7884,7 @@
       "source_file": "lib/operations/studio/clients.ts",
       "source_location": "L168",
       "id": "clients_loadstudioclient",
-      "community": 24,
+      "community": 25,
       "norm_label": "loadstudioclient()"
     },
     {
@@ -7884,7 +7893,7 @@
       "source_file": "lib/seo/routing.test.ts",
       "source_location": "L1",
       "id": "lib_seo_routing_test_ts",
-      "community": 6,
+      "community": 3,
       "norm_label": "routing.test.ts"
     },
     {
@@ -7893,7 +7902,7 @@
       "source_file": "next.config.ts",
       "source_location": "L1",
       "id": "next_config_ts",
-      "community": 6,
+      "community": 3,
       "norm_label": "next.config.ts"
     },
     {
@@ -7902,7 +7911,7 @@
       "source_file": "scripts/refresh-pending-first-email-drafts.ts",
       "source_location": "L1",
       "id": "scripts_refresh_pending_first_email_drafts_ts",
-      "community": 8,
+      "community": 7,
       "norm_label": "refresh-pending-first-email-drafts.ts"
     },
     {
@@ -7911,7 +7920,7 @@
       "source_file": "scripts/refresh-pending-first-email-drafts.ts",
       "source_location": "L41",
       "id": "refresh_pending_first_email_drafts_tojsonvalue",
-      "community": 8,
+      "community": 7,
       "norm_label": "tojsonvalue()"
     },
     {
@@ -7920,7 +7929,7 @@
       "source_file": "scripts/refresh-pending-first-email-drafts.ts",
       "source_location": "L45",
       "id": "refresh_pending_first_email_drafts_readdatabaseurl",
-      "community": 8,
+      "community": 7,
       "norm_label": "readdatabaseurl()"
     },
     {
@@ -7929,7 +7938,7 @@
       "source_file": "scripts/refresh-pending-first-email-drafts.ts",
       "source_location": "L61",
       "id": "refresh_pending_first_email_drafts_findeligibledraftids",
-      "community": 8,
+      "community": 7,
       "norm_label": "findeligibledraftids()"
     },
     {
@@ -7938,7 +7947,7 @@
       "source_file": "scripts/refresh-pending-first-email-drafts.ts",
       "source_location": "L79",
       "id": "refresh_pending_first_email_drafts_lockdraft",
-      "community": 8,
+      "community": 7,
       "norm_label": "lockdraft()"
     },
     {
@@ -7947,7 +7956,7 @@
       "source_file": "scripts/refresh-pending-first-email-drafts.ts",
       "source_location": "L126",
       "id": "refresh_pending_first_email_drafts_refreshdraft",
-      "community": 8,
+      "community": 7,
       "norm_label": "refreshdraft()"
     },
     {
@@ -7956,8 +7965,17 @@
       "source_file": "scripts/refresh-pending-first-email-drafts.ts",
       "source_location": "L183",
       "id": "refresh_pending_first_email_drafts_main",
-      "community": 8,
+      "community": 7,
       "norm_label": "main()"
+    },
+    {
+      "label": "campaign-account-binding.test.ts",
+      "file_type": "code",
+      "source_file": "tests/integration/growth/campaign-account-binding.test.ts",
+      "source_location": "L1",
+      "id": "tests_integration_growth_campaign_account_binding_test_ts",
+      "community": 6,
+      "norm_label": "campaign-account-binding.test.ts"
     },
     {
       "label": "campaign-lifecycle.test.ts",
@@ -7965,7 +7983,7 @@
       "source_file": "tests/integration/growth/campaign-lifecycle.test.ts",
       "source_location": "L1",
       "id": "tests_integration_growth_campaign_lifecycle_test_ts",
-      "community": 3,
+      "community": 6,
       "norm_label": "campaign-lifecycle.test.ts"
     },
     {
@@ -7974,7 +7992,7 @@
       "source_file": "tests/integration/growth/founder-evidence.test.ts",
       "source_location": "L1",
       "id": "tests_integration_growth_founder_evidence_test_ts",
-      "community": 3,
+      "community": 6,
       "norm_label": "founder-evidence.test.ts"
     },
     {
@@ -7983,7 +8001,7 @@
       "source_file": "tests/integration/growth/gmail-connection-persistence.test.ts",
       "source_location": "L1",
       "id": "tests_integration_growth_gmail_connection_persistence_test_ts",
-      "community": 2,
+      "community": 8,
       "norm_label": "gmail-connection-persistence.test.ts"
     },
     {
@@ -7992,7 +8010,7 @@
       "source_file": "tests/integration/growth/gmail-disconnect.test.ts",
       "source_location": "L1",
       "id": "tests_integration_growth_gmail_disconnect_test_ts",
-      "community": 2,
+      "community": 5,
       "norm_label": "gmail-disconnect.test.ts"
     },
     {
@@ -8001,7 +8019,7 @@
       "source_file": "tests/integration/growth/source-capture.test.ts",
       "source_location": "L1",
       "id": "tests_integration_growth_source_capture_test_ts",
-      "community": 11,
+      "community": 15,
       "norm_label": "source-capture.test.ts"
     }
   ],
@@ -11575,7 +11593,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/commands.ts",
-      "source_location": "L135",
+      "source_location": "L156",
       "weight": 1.0,
       "_src": "commands_executecampaigncommand",
       "_tgt": "authorization_requirecampaignfounder",
@@ -11646,7 +11664,19 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/commands.ts",
-      "source_location": "L23",
+      "source_location": "L24",
+      "weight": 1.0,
+      "_src": "lib_growth_campaigns_commands_ts",
+      "_tgt": "commands_validateaccountbinding",
+      "source": "lib_growth_campaigns_commands_ts",
+      "target": "commands_validateaccountbinding",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/commands.ts",
+      "source_location": "L42",
       "weight": 1.0,
       "_src": "lib_growth_campaigns_commands_ts",
       "_tgt": "commands_mutate",
@@ -11658,7 +11688,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/commands.ts",
-      "source_location": "L128",
+      "source_location": "L149",
       "weight": 1.0,
       "_src": "lib_growth_campaigns_commands_ts",
       "_tgt": "commands_executecampaigncommand",
@@ -11730,6 +11760,18 @@
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1,
+      "source_file": "tests/integration/growth/campaign-account-binding.test.ts",
+      "source_location": "L6",
+      "weight": 1,
+      "_src": "tests_integration_growth_campaign_account_binding_test_ts",
+      "_tgt": "lib_growth_campaigns_commands_ts",
+      "source": "lib_growth_campaigns_commands_ts",
+      "target": "tests_integration_growth_campaign_account_binding_test_ts"
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
       "source_file": "tests/integration/growth/campaign-lifecycle.test.ts",
       "source_location": "L13",
       "weight": 1,
@@ -11740,10 +11782,22 @@
     },
     {
       "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/commands.ts",
+      "source_location": "L56",
+      "weight": 1.0,
+      "_src": "commands_mutate",
+      "_tgt": "commands_validateaccountbinding",
+      "source": "commands_validateaccountbinding",
+      "target": "commands_mutate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/commands.ts",
-      "source_location": "L36",
+      "source_location": "L55",
       "weight": 1.0,
       "_src": "commands_mutate",
       "_tgt": "lifecycle_validatecampaigndefinition",
@@ -11755,7 +11809,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/commands.ts",
-      "source_location": "L38",
+      "source_location": "L58",
       "weight": 1.0,
       "_src": "commands_mutate",
       "_tgt": "lifecycle_serializecampaigndefinition",
@@ -11767,7 +11821,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/commands.ts",
-      "source_location": "L56",
+      "source_location": "L76",
       "weight": 1.0,
       "_src": "commands_mutate",
       "_tgt": "permissions_recordcampaignpermission",
@@ -11779,7 +11833,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/commands.ts",
-      "source_location": "L66",
+      "source_location": "L86",
       "weight": 1.0,
       "_src": "commands_mutate",
       "_tgt": "lifecycle_cancelcampaignjobs",
@@ -11791,7 +11845,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/commands.ts",
-      "source_location": "L75",
+      "source_location": "L95",
       "weight": 1.0,
       "_src": "commands_mutate",
       "_tgt": "repository_loadlatestcampaignpolicy",
@@ -11803,7 +11857,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/commands.ts",
-      "source_location": "L105",
+      "source_location": "L126",
       "weight": 1.0,
       "_src": "commands_mutate",
       "_tgt": "repository_persistcampaignmembership",
@@ -12505,6 +12559,18 @@
       "_tgt": "lib_growth_campaigns_schemas_ts",
       "source": "lib_growth_campaigns_schemas_ts",
       "target": "lib_growth_crm_schemas_ts"
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/campaign-account-binding.test.ts",
+      "source_location": "L5",
+      "weight": 1,
+      "_src": "tests_integration_growth_campaign_account_binding_test_ts",
+      "_tgt": "lib_growth_campaigns_schemas_ts",
+      "source": "lib_growth_campaigns_schemas_ts",
+      "target": "tests_integration_growth_campaign_account_binding_test_ts"
     },
     {
       "relation": "contains",
