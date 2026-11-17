@@ -30,3 +30,15 @@ export async function readJsonRequestBody(
 
   return JSON.parse(text) as unknown;
 }
+
+export function readRequestHasRegisteredOrigin(
+  request: Request,
+  origin: string,
+): boolean {
+  const header = request.headers.get("origin");
+  return (
+    new URL(request.url).origin === origin &&
+    (header === null || header === origin) &&
+    request.headers.get("sec-fetch-site") !== "cross-site"
+  );
+}

@@ -555,3 +555,21 @@ test("public source URLs reject normalized IP hosts", async () => {
   }
   assert.equal(schema.safeParse("https://example.org/path").success, true);
 });
+
+test("public source URL validation retains DNS and URL boundary behavior", async () => {
+  const { sourceLeadInputSchema } = await import("./schemas");
+  const schema = sourceLeadInputSchema.shape.sourceUrl;
+  const cases: [string, boolean][] = [
+    ["https://example.org/path", true],
+    ["http://sub.example.org", true],
+    ["https://user:pass@example.org", false],
+    ["ftp://example.org", false],
+    ["https://localhost", false],
+    ["https://example.localhost", false],
+    ["https://example.local", false],
+    ["https://example.localhost.org", true],
+    ["https://example.internal", true],
+  ];
+  for (const [url, expected] of cases)
+    assert.equal(schema.safeParse(url).success, expected, url);
+});
