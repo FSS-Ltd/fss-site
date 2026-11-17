@@ -4,6 +4,7 @@ import test from "node:test";
 
 import postgres from "postgres";
 
+import { postgresGmailSyncRepository } from "../../../lib/growth/sequences/gmail-sync-repository";
 import { storeConnectedGmailConnection } from "../../../lib/growth/db/repositories/integration-connections";
 import { encryptRefreshToken } from "../../../lib/growth/integrations/token-crypto";
 
@@ -33,6 +34,7 @@ test(
     try {
       const firstConnectionId = await storeConnectedGmailConnection(sql, {
         subjectEmail,
+        googleSubject: "test-google-subject",
         encryptedRefreshToken: firstEncryptedToken,
         grantedScopes: ["openid", "email", "gmail.modify"],
         accessTokenExpiresAt: new Date("2026-08-17T13:00:00.000Z"),
@@ -41,6 +43,7 @@ test(
       });
       const secondConnectionId = await storeConnectedGmailConnection(sql, {
         subjectEmail,
+        googleSubject: "test-google-subject",
         encryptedRefreshToken: secondEncryptedToken,
         grantedScopes: ["openid", "email", "gmail.modify"],
         accessTokenExpiresAt: new Date("2026-08-17T14:00:00.000Z"),
@@ -49,6 +52,17 @@ test(
       });
 
       assert.equal(secondConnectionId, firstConnectionId);
+      await assert.rejects(
+        storeConnectedGmailConnection(sql, {
+          subjectEmail,
+          googleSubject: "different-google-subject",
+          encryptedRefreshToken: secondEncryptedToken,
+          grantedScopes: ["openid", "email", "gmail.modify"],
+          accessTokenExpiresAt: new Date("2026-08-17T14:00:00.000Z"),
+          correlationId: randomUUID(),
+          actorId: "integration-test-founder",
+        }),
+      );
 
       const [connection] = await sql<
         Array<{
@@ -86,6 +100,11 @@ test(
         lastErrorCode: null,
         version: 2,
       });
+      await postgresGmailSyncRepository.setCursor(sql, subjectEmail, "12345");
+      const [afterSync] = await sql<Array<{ version: number }>>`
+        select version from growth.integration_connections where id = ${firstConnectionId}
+      `;
+      assert.equal(afterSync?.version, 2);
       assert.deepEqual(
         auditEvents.map((event) => event.correlationId),
         [firstCorrelationId, secondCorrelationId].sort(),

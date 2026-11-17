@@ -122,6 +122,7 @@ export async function connectGmail(
   });
   const connectionId = await dependencies.storeConnection(db, {
     subjectEmail,
+    googleSubject: identity.subject,
     encryptedRefreshToken: encryptedToken,
     grantedScopes: tokens.grantedScopes,
     accessTokenExpiresAt: calculateAccessTokenExpiry(

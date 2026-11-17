@@ -42,6 +42,7 @@ test(
     try {
       await storeConnectedGmailConnection(sql, {
         subjectEmail,
+        googleSubject: "test-google-subject",
         encryptedRefreshToken: encryptedToken,
         grantedScopes: ["openid", "email", "gmail.modify"],
         accessTokenExpiresAt: new Date("2026-08-17T13:00:00.000Z"),

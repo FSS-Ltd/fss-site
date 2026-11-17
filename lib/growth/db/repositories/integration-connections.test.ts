@@ -101,6 +101,7 @@ test("upserts a connected Gmail row and audit event in one transaction", async (
 
   const id = await storeConnectedGmailConnection(db, {
     subjectEmail: "founder@example.test",
+    googleSubject: "google-subject",
     encryptedRefreshToken: storedToken,
     grantedScopes: ["openid", "email", "gmail.modify"],
     accessTokenExpiresAt: new Date("2026-08-17T13:00:00.000Z"),
@@ -117,6 +118,7 @@ test("upserts a connected Gmail row and audit event in one transaction", async (
   assert.match(queries[0]?.text ?? "", /version = ic\.version \+ 1/);
   assert.deepEqual(queries[0]?.values, [
     "founder@example.test",
+    "google-subject",
     JSON.stringify(storedToken),
     "v1",
     ["openid", "email", "gmail.modify"],
@@ -148,6 +150,7 @@ test("fails closed when the Gmail upsert returns no connection", async () => {
   await assert.rejects(
     storeConnectedGmailConnection(db, {
       subjectEmail: "founder@example.test",
+      googleSubject: "google-subject",
       encryptedRefreshToken: {
         version: "v1",
         iv: "iv",
