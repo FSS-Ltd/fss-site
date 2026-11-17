@@ -21,6 +21,7 @@ test(
     const subjectEmail = `gmail-persistence-${testId}@example.test`;
     const firstCorrelationId = `gmail-connect-${testId}`;
     const secondCorrelationId = `gmail-reconnect-${testId}`;
+    const thirdCorrelationId = `gmail-same-subject-${testId}`;
     const rejectedCorrelationId = `gmail-rejected-${testId}`;
     const encryptionKey = Buffer.alloc(32, 7);
     const firstEncryptedToken = encryptRefreshToken("first-refresh-token", {
@@ -28,6 +29,11 @@ test(
       key: encryptionKey,
     });
     const secondEncryptedToken = encryptRefreshToken("second-refresh-token", {
+      version: "v1",
+      key: encryptionKey,
+    });
+
+    const thirdEncryptedToken = encryptRefreshToken("third-refresh-token", {
       version: "v1",
       key: encryptionKey,
     });
@@ -67,6 +73,25 @@ test(
       });
 
       assert.equal(secondConnectionId, firstConnectionId);
+      const [afterLegacy] = await sql<
+        Array<{ googleSubject: string | null; version: number }>
+      >`
+        select google_subject as "googleSubject", version from growth.integration_connections where id = ${firstConnectionId}
+      `;
+      assert.deepEqual(afterLegacy, {
+        googleSubject: "test-google-subject",
+        version: 2,
+      });
+      const thirdConnectionId = await storeConnectedGmailConnection(sql, {
+        subjectEmail,
+        googleSubject: "test-google-subject",
+        encryptedRefreshToken: thirdEncryptedToken,
+        grantedScopes: ["openid", "email", "gmail.modify"],
+        accessTokenExpiresAt: new Date("2026-08-17T15:00:00.000Z"),
+        correlationId: thirdCorrelationId,
+        actorId: "integration-test-founder",
+      });
+      assert.equal(thirdConnectionId, firstConnectionId);
       await assert.rejects(
         storeConnectedGmailConnection(sql, {
           subjectEmail,
@@ -105,32 +130,32 @@ test(
       const auditEvents = await sql<Array<{ correlationId: string }>>`
         select correlation_id as "correlationId"
         from growth.audit_log
-        where correlation_id in (${firstCorrelationId}, ${secondCorrelationId}, ${rejectedCorrelationId})
+        where correlation_id in (${firstCorrelationId}, ${secondCorrelationId}, ${thirdCorrelationId}, ${rejectedCorrelationId})
         order by correlation_id
       `;
 
       assert.deepEqual(connection, {
         id: firstConnectionId,
         googleSubject: "test-google-subject",
-        encryptedRefreshToken: JSON.stringify(secondEncryptedToken),
+        encryptedRefreshToken: JSON.stringify(thirdEncryptedToken),
         status: "connected",
         providerCursor: null,
         lastErrorCode: null,
-        version: 2,
+        version: 3,
       });
       await postgresGmailSyncRepository.setCursor(sql, subjectEmail, "12345");
       const [afterSync] = await sql<Array<{ version: number }>>`
         select version from growth.integration_connections where id = ${firstConnectionId}
       `;
-      assert.equal(afterSync?.version, 2);
+      assert.equal(afterSync?.version, 3);
       assert.deepEqual(
         auditEvents.map((event) => event.correlationId),
-        [firstCorrelationId, secondCorrelationId].sort(),
+        [firstCorrelationId, secondCorrelationId, thirdCorrelationId].sort(),
       );
     } finally {
       await sql`
         delete from growth.audit_log
-        where correlation_id in (${firstCorrelationId}, ${secondCorrelationId}, ${rejectedCorrelationId})
+        where correlation_id in (${firstCorrelationId}, ${secondCorrelationId}, ${thirdCorrelationId}, ${rejectedCorrelationId})
       `;
       await sql`
         delete from growth.integration_connections
