@@ -1,11 +1,7 @@
 import { createHash } from "node:crypto";
 import type { FounderSession } from "../auth/require-founder";
 import { CrmError } from "../crm/errors";
-import type {
-  GrowthDb,
-  GrowthQueryExecutor,
-  GrowthTransaction,
-} from "../db/types";
+import type { GrowthDb } from "../db/types";
 
 export type FounderVerificationSnapshot = {
   status: "current" | "stale";
@@ -37,22 +33,6 @@ export async function loadFounderVerification(
     founder.actorId !== createHash("sha256").update(founder.email).digest("hex")
   )
     throw new CrmError("invalid");
-  return readFounderVerification(db, prospectId, now);
-}
-
-export async function loadFounderVerificationInTransaction(
-  tx: GrowthTransaction,
-  prospectId: string,
-  now: Date,
-): Promise<FounderVerificationSnapshot | null> {
-  return readFounderVerification(tx, prospectId, now);
-}
-
-async function readFounderVerification(
-  db: GrowthQueryExecutor,
-  prospectId: string,
-  now: Date,
-): Promise<FounderVerificationSnapshot | null> {
   const rows = await db<
     {
       contactId: string;
