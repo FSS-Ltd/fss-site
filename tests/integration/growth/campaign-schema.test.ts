@@ -5,7 +5,7 @@ import postgres from "postgres";
 const url = process.env.DIRECT_DATABASE_URL;
 if (
   !url ||
-  !/^postgres(?:ql)?:\/\/[^@]+@(?:127\.0\.0\.1|localhost):55487\/fss_growth_test$/.test(
+  !/^postgres(?:ql)?:\/\/[^@]+@(?:127\.0\.0\.1|localhost):5548[78]\/fss_growth_test$/.test(
     url,
   )
 )
@@ -244,6 +244,170 @@ test("rolled-back campaign writes stay invisible", async () => {
     const rows =
       await sql`select id from growth.campaigns where request_id=${requestId}`;
     assert.equal(rows.length, 0);
+  } finally {
+    await sql.end();
+  }
+});
+
+test("campaign references cannot cross membership or sequence boundaries", async () => {
+  const sql = postgres(url, { max: 1 });
+  try {
+    await sql
+      .begin(async (tx) => {
+        const businesses = await tx<
+          { id: string }[]
+        >`insert into growth.businesses (legal_name,corporate_type,corporate_status,sector,locality,first_party_source_url,country_code) values ('Cross A','unknown','uncertain','Unclassified','Not provided','https://example.test','GB'),('Cross B','unknown','uncertain','Unclassified','Not provided','https://example.test','GB') returning id`;
+        const [contact1] = await tx<
+          { id: string }[]
+        >`insert into growth.contacts (business_id,email,email_source_url,email_verified_at,subscriber_type,lawful_basis) values (${businesses[0].id},${`${crypto.randomUUID()}@example.test`},'https://example.test',now(),'uncertain','consent') returning id`;
+        const [contact] = await tx<
+          { id: string }[]
+        >`insert into growth.contacts (business_id,email,email_source_url,email_verified_at,subscriber_type,lawful_basis) values (${businesses[1].id},${`${crypto.randomUUID()}@example.test`},'https://example.test',now(),'uncertain','consent') returning id`;
+        const prospects = await tx<
+          { id: string }[]
+        >`insert into growth.prospects (business_id,primary_contact_id,status,fit_score,opportunity_summary,recommended_offer,estimated_one_off_min_pence,estimated_one_off_max_pence,assigned_owner_email) values (${businesses[0].id},${contact1.id},'needs_review',0,'test','test',0,0,'j.ntagengwa@faithfulsoftware.dev'),(${businesses[1].id},${contact.id},'needs_review',0,'test','test',0,0,'j.ntagengwa@faithfulsoftware.dev') returning id`;
+        const [sequence] = await tx<
+          { id: string }[]
+        >`insert into growth.sequence_enrollments (prospect_id,contact_id,status) values (${prospects[1].id},${contact.id},'paused') returning id`;
+        const [sequence1] = await tx<
+          { id: string }[]
+        >`insert into growth.sequence_enrollments (prospect_id,contact_id,status) values (${prospects[0].id},${contact1.id},'paused') returning id`;
+        const [message] = await tx<
+          { id: string }[]
+        >`insert into growth.email_messages (sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key) values (${sequence1.id},${prospects[0].id},${contact1.id},'gmail','outbound',0,'draft',gen_random_uuid()::text) returning id`;
+        const campaigns = await tx<
+          { id: string }[]
+        >`insert into growth.campaigns (version,request_id,name,policy) values (1,gen_random_uuid(),'cross A','{}'),(1,gen_random_uuid(),'cross B','{}') returning id`;
+        const [member] = await tx<
+          { id: string }[]
+        >`insert into growth.campaign_memberships (campaign_id,policy_version,business_id,prospect_id,request_id) values (${campaigns[0].id},1,${businesses[0].id},${prospects[0].id},gen_random_uuid()) returning id`;
+        await assert.rejects(
+          tx.savepoint(async (sp) => {
+            await sp`update growth.campaign_memberships set sequence_id=${sequence.id} where id=${member.id}`;
+          }),
+          /foreign key/,
+        );
+        await tx`update growth.campaign_memberships set sequence_id=${sequence1.id} where id=${member.id}`;
+        await assert.rejects(
+          tx.savepoint(async (sp) => {
+            await sp`insert into growth.outreach_events (id,campaign_id,policy_version,membership_id,event_type) values (gen_random_uuid(),${campaigns[1].id},1,${member.id},'test')`;
+          }),
+          /foreign key/,
+        );
+        await assert.rejects(
+          tx.savepoint(async (sp) => {
+            await sp`insert into growth.outreach_jobs (campaign_id,policy_version,membership_id,job_type,due_at,idempotency_key) values (${campaigns[1].id},1,${member.id},'test',now(),gen_random_uuid()::text)`;
+          }),
+          /foreign key/,
+        );
+        await assert.rejects(
+          tx.savepoint(async (sp) => {
+            await sp`insert into growth.outreach_jobs (membership_id,job_type,due_at,idempotency_key) values (${member.id},'test',now(),gen_random_uuid()::text)`;
+          }),
+          /check/,
+        );
+        await tx`insert into growth.outreach_jobs (job_type,due_at,idempotency_key) values ('test',now(),gen_random_uuid()::text)`;
+        await tx`insert into growth.outreach_provider_usage (account_id,observed_at,rolling_messages,rolling_recipients,message_limit,recipient_limit,complete,health) values ('test-cross',now(),0,0,100,100,true,'healthy')`;
+        await assert.rejects(
+          tx.savepoint(async (sp) => {
+            await sp`insert into growth.outreach_reservations (idempotency_key,campaign_id,policy_version,membership_id,account_id,london_day,email_message_id,sequence_id) values (gen_random_uuid()::text,${campaigns[1].id},1,${member.id},'test-cross',current_date,${message.id},${sequence1.id})`;
+          }),
+          /foreign key/,
+        );
+        await tx`insert into growth.outreach_reservations (idempotency_key,campaign_id,policy_version,membership_id,account_id,london_day,email_message_id,sequence_id) values (gen_random_uuid()::text,${campaigns[0].id},1,${member.id},'test-cross',current_date,${message.id},${sequence1.id})`;
+        await assert.rejects(
+          tx.savepoint(async (sp) => {
+            await sp`insert into growth.outreach_reservations (idempotency_key,campaign_id,account_id,london_day,email_message_id,sequence_id) values (gen_random_uuid()::text,${campaigns[0].id},'test-cross',current_date,${message.id},${sequence1.id})`;
+          }),
+          /check/,
+        );
+        await tx`insert into growth.outreach_reservations (idempotency_key,account_id,london_day,email_message_id,sequence_id) values (gen_random_uuid()::text,'test-cross',current_date,${message.id},${sequence1.id})`;
+        await assert.rejects(
+          tx.savepoint(async (sp) => {
+            await sp`insert into growth.outreach_reservations (idempotency_key,account_id,london_day,email_message_id,sequence_id) values (gen_random_uuid()::text,'test-cross',current_date,${message.id},${sequence.id})`;
+          }),
+          /foreign key/,
+        );
+        throw new Error("rollback fixture");
+      })
+      .catch((error: Error) => {
+        if (error.message !== "rollback fixture") throw error;
+      });
+  } finally {
+    await sql.end();
+  }
+});
+
+test("approval attribution cannot change after approval", async () => {
+  const sql = postgres(url, { max: 1 });
+  try {
+    await sql
+      .begin(async (tx) => {
+        const [campaign] = await tx<
+          { id: string }[]
+        >`insert into growth.campaigns (version,request_id,name,policy,status,approved_by,approved_at) values (1,gen_random_uuid(),'approval','{}','approved',${"a".repeat(64)},now()) returning id`;
+        await assert.rejects(
+          tx.savepoint(async (sp) => {
+            await sp`update growth.campaigns set approved_by=${"b".repeat(64)} where id=${campaign.id}`;
+          }),
+          /immutable/,
+        );
+        await assert.rejects(
+          tx.savepoint(async (sp) => {
+            await sp`update growth.campaigns set approved_at=now()+interval '1 day' where id=${campaign.id}`;
+          }),
+          /immutable/,
+        );
+        await tx`update growth.campaigns set status='revoked' where id=${campaign.id}`;
+        await assert.rejects(
+          tx.savepoint(async (sp) => {
+            await sp`update growth.campaigns set approved_by=null, approved_at=null where id=${campaign.id}`;
+          }),
+          /immutable/,
+        );
+        throw new Error("rollback fixture");
+      })
+      .catch((error: Error) => {
+        if (error.message !== "rollback fixture") throw error;
+      });
+  } finally {
+    await sql.end();
+  }
+});
+
+test("client matching rejects malformed domains and normalizes website ports", async () => {
+  const sql = postgres(url, { max: 1 });
+  try {
+    await sql
+      .begin(async (tx) => {
+        const [business] = await tx<
+          { id: string }[]
+        >`insert into growth.businesses (legal_name,corporate_type,corporate_status,sector,locality,first_party_source_url,country_code) values ('Unrelated matching test','unknown','uncertain','Unclassified','Not provided','https://example.test','GB') returning id`;
+        const [prospect] = await tx<
+          { id: string }[]
+        >`insert into growth.prospects (business_id,status,fit_score,opportunity_summary,recommended_offer,estimated_one_off_min_pence,estimated_one_off_max_pence,assigned_owner_email,source_details) values (${business.id},'needs_review',0,'test','test',0,0,'j.ntagengwa@faithfulsoftware.dev',${tx.json({ email: "invalid" })}) returning id`;
+        const [org] = await tx<
+          { id: string }[]
+        >`insert into operations.organisations (id,legal_name,display_name,trading_status,timezone,created_by,review_reference) values (gen_random_uuid(),'Different matching client','Different matching client','active','Europe/London',${"a".repeat(64)},'test') returning id`;
+        await tx`insert into operations.contacts (organisation_id,name,email,created_by,review_reference) values (${org.id},'test','abc',${"a".repeat(64)},'test')`;
+        await tx`set local role growth_app`;
+        const [negative] = await tx<
+          { matched: boolean }[]
+        >`select growth.is_outreach_client(${prospect.id}) as matched`;
+        assert.equal(negative.matched, false);
+        await tx`reset role`;
+        await tx`insert into operations.contacts (organisation_id,name,email,created_by,review_reference) values (${org.id},'test','person@match.example',${"a".repeat(64)},'test')`;
+        await tx`update growth.businesses set website_url='https://www.match.example:443?ref=1' where id=${business.id}`;
+        await tx`set local role growth_app`;
+        const [positive] = await tx<
+          { matched: boolean }[]
+        >`select growth.is_outreach_client(${prospect.id}) as matched`;
+        assert.equal(positive.matched, true);
+        throw new Error("rollback fixture");
+      })
+      .catch((error: Error) => {
+        if (error.message !== "rollback fixture") throw error;
+      });
   } finally {
     await sql.end();
   }

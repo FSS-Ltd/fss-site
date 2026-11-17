@@ -33,9 +33,14 @@ begin
   if new.policy is distinct from old.policy or new.id is distinct from old.id or new.version is distinct from old.version then
     raise exception 'campaign policy revisions are immutable';
   end if;
+  if old.approved_by is not null and (new.approved_by is distinct from old.approved_by or new.approved_at is distinct from old.approved_at) then
+    raise exception 'campaign approval attribution is immutable';
+  end if;
   return new;
 end $$;
 create trigger campaign_policy_immutable before update on growth.campaigns for each row execute function growth.prevent_campaign_policy_update();
+
+alter table growth.sequence_enrollments add constraint sequence_id_prospect_unique unique (id,prospect_id);
 
 create table growth.campaign_memberships (
   id uuid primary key default gen_random_uuid(),
@@ -47,7 +52,10 @@ create table growth.campaign_memberships (
   variant_id text, first_sent_at timestamptz,
   sequence_id uuid references growth.sequence_enrollments(id) on delete restrict,
   created_at timestamptz not null default now(), updated_at timestamptz not null default now(),
-  foreign key (campaign_id, policy_version) references growth.campaigns(id,version) on delete restrict
+  foreign key (campaign_id, policy_version) references growth.campaigns(id,version) on delete restrict,
+  foreign key (sequence_id,prospect_id) references growth.sequence_enrollments(id,prospect_id) on delete restrict,
+  unique (id,campaign_id,policy_version),
+  unique (id,campaign_id,policy_version,sequence_id)
 );
 create unique index outreach_one_active_business on growth.campaign_memberships (business_id) where status in ('review','active','paused');
 create index campaign_memberships_campaign_idx on growth.campaign_memberships(campaign_id,policy_version);
@@ -77,7 +85,8 @@ create table growth.outreach_events (
  id uuid primary key, campaign_id uuid not null, policy_version integer not null,
  membership_id uuid references growth.campaign_memberships(id) on delete restrict,
  event_type text not null, occurred_at timestamptz not null default now(),
- foreign key (campaign_id,policy_version) references growth.campaigns(id,version) on delete restrict
+ foreign key (campaign_id,policy_version) references growth.campaigns(id,version) on delete restrict,
+ foreign key (membership_id,campaign_id,policy_version) references growth.campaign_memberships(id,campaign_id,policy_version) on delete restrict
 );
 create index outreach_events_campaign_idx on growth.outreach_events(campaign_id,policy_version,occurred_at);
 create index outreach_events_membership_idx on growth.outreach_events(membership_id);
@@ -93,7 +102,9 @@ create table growth.outreach_jobs (
  status text not null default 'pending' check (status in ('pending','leased','completed','cancelled')),
  lease_owner text, lease_until timestamptz, created_at timestamptz not null default now(),
  foreign key (campaign_id,policy_version) references growth.campaigns(id,version) on delete restrict,
+ foreign key (membership_id,campaign_id,policy_version) references growth.campaign_memberships(id,campaign_id,policy_version) on delete restrict,
  check ((campaign_id is null) = (policy_version is null)),
+ check (membership_id is null or campaign_id is not null),
  check (status <> 'leased' or (lease_owner is not null and lease_until is not null))
 );
 create index outreach_jobs_due_idx on growth.outreach_jobs(due_at,id) where status in ('pending','leased');
@@ -107,14 +118,19 @@ create table growth.outreach_provider_usage (
 );
 create table growth.outreach_reservations (
  id uuid primary key default gen_random_uuid(), idempotency_key text not null unique,
- campaign_id uuid not null, policy_version integer not null,
- membership_id uuid not null references growth.campaign_memberships(id) on delete restrict,
+ campaign_id uuid, policy_version integer,
+ membership_id uuid references growth.campaign_memberships(id) on delete restrict,
+ email_message_id uuid not null, sequence_id uuid not null,
  account_id text not null references growth.outreach_provider_usage(account_id) on delete restrict,
  london_day date not null, reserved_at timestamptz not null default now(),
  status text not null default 'reserved' check (status in ('reserved','sent','uncertain','cancelled')),
  completed_at timestamptz,
- foreign key (campaign_id,policy_version) references growth.campaigns(id,version) on delete restrict
+ foreign key (campaign_id,policy_version) references growth.campaigns(id,version) on delete restrict,
+ foreign key (email_message_id,sequence_id) references growth.email_messages(id,sequence_enrollment_id) on delete restrict,
+ foreign key (membership_id,campaign_id,policy_version,sequence_id) references growth.campaign_memberships(id,campaign_id,policy_version,sequence_id) on delete restrict,
+ check ((campaign_id is null and policy_version is null and membership_id is null) or (campaign_id is not null and policy_version is not null and membership_id is not null))
 );
+create index outreach_reservations_message_idx on growth.outreach_reservations(email_message_id,sequence_id);
 create index outreach_reservations_day_idx on growth.outreach_reservations(london_day) where status <> 'cancelled';
 create index outreach_reservations_account_idx on growth.outreach_reservations(account_id,reserved_at) where status <> 'cancelled';
 create index outreach_reservations_campaign_idx on growth.outreach_reservations(campaign_id,policy_version,london_day);
@@ -149,6 +165,17 @@ begin
 end $$;
 grant update on growth.campaigns, growth.campaign_memberships, growth.outreach_reservations, growth.outreach_outbox, growth.outreach_jobs, growth.facebook_destinations, growth.outreach_provider_usage to growth_app;
 
+create function growth.outreach_email_domain(value text) returns text
+language sql immutable strict set search_path = '' as $$
+  select case when lower(trim(value)) ~ '^[^@[:space:]]+@[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$'
+    then split_part(lower(trim(value)), '@', 2) end;
+$$;
+create function growth.outreach_website_domain(value text) returns text
+language sql immutable strict set search_path = '' as $$
+  select case when host ~ '^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$' then host end
+  from (select regexp_replace(substring(lower(trim(value)) from '^https?://([^/?#:@]+)(:[0-9]+)?([/?#]|$)'), '^www\.', '') as host) parsed;
+$$;
+revoke all on function growth.outreach_email_domain(text), growth.outreach_website_domain(text) from public, anon, authenticated, service_role;
 create function growth.is_outreach_client(target_prospect uuid) returns boolean
 language sql stable security definer set search_path = '' as $$
  select exists (
@@ -156,16 +183,11 @@ language sql stable security definer set search_path = '' as $$
    where p.id = target_prospect and (
      exists (select 1 from growth.delivery_engagements de join operations.engagement_links el on el.engagement_id = de.id where de.prospect_id = p.id)
      or exists (select 1 from operations.organisations o where lower(trim(o.legal_name)) = lower(trim(b.legal_name)) or lower(trim(o.display_name)) = lower(trim(b.legal_name)))
-     or exists (select 1 from operations.contacts oc where lower(trim(oc.email)) = lower(trim(p.source_details->>'email')))
-     or exists (select 1 from operations.contacts oc where
-       split_part(lower(trim(oc.email)), '@', 2) not in ('gmail.com','yahoo.com','hotmail.com','outlook.com','icloud.com','aol.com','live.com','googlemail.com')
-       and split_part(lower(trim(oc.email)), '@', 2) = split_part(lower(trim(p.source_details->>'email')), '@', 2))
-     or exists (select 1 from operations.contacts oc where
-       split_part(lower(trim(oc.email)), '@', 2) not in ('gmail.com','yahoo.com','hotmail.com','outlook.com','icloud.com','aol.com','live.com','googlemail.com')
-       and split_part(lower(trim(oc.email)), '@', 2) = lower(regexp_replace(split_part(split_part(coalesce(b.website_url,''), '://', 2), '/', 1), '^www\.', '')))
-     or exists (select 1 from growth.contacts gc join operations.contacts oc on lower(trim(oc.email)) = gc.normalised_email where gc.business_id = b.id)
-     or exists (select 1 from growth.contacts gc join operations.contacts oc on split_part(lower(trim(oc.email)), '@', 2) = split_part(gc.normalised_email, '@', 2)
-       where gc.business_id = b.id and split_part(gc.normalised_email, '@', 2) not in ('gmail.com','yahoo.com','hotmail.com','outlook.com','icloud.com','aol.com','live.com','googlemail.com'))
+     or exists (select 1 from operations.contacts oc where growth.outreach_email_domain(oc.email) is not null and growth.outreach_email_domain(p.source_details->>'email') is not null and lower(trim(oc.email)) = lower(trim(p.source_details->>'email')))
+     or exists (select 1 from operations.contacts oc where growth.outreach_email_domain(oc.email) not in ('gmail.com','yahoo.com','hotmail.com','outlook.com','icloud.com','aol.com','live.com','googlemail.com') and growth.outreach_email_domain(oc.email) = growth.outreach_email_domain(p.source_details->>'email'))
+     or exists (select 1 from operations.contacts oc where growth.outreach_email_domain(oc.email) not in ('gmail.com','yahoo.com','hotmail.com','outlook.com','icloud.com','aol.com','live.com','googlemail.com') and growth.outreach_email_domain(oc.email) = growth.outreach_website_domain(b.website_url))
+     or exists (select 1 from growth.contacts gc join operations.contacts oc on growth.outreach_email_domain(gc.email) is not null and growth.outreach_email_domain(oc.email) is not null and lower(trim(oc.email)) = gc.normalised_email where gc.business_id = b.id)
+     or exists (select 1 from growth.contacts gc join operations.contacts oc on growth.outreach_email_domain(oc.email) = growth.outreach_email_domain(gc.email) where gc.business_id = b.id and growth.outreach_email_domain(gc.email) not in ('gmail.com','yahoo.com','hotmail.com','outlook.com','icloud.com','aol.com','live.com','googlemail.com'))
    )
  );
 $$;
