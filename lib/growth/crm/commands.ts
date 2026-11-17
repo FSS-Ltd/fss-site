@@ -8,6 +8,7 @@ import { executeTaskCommand } from "./task-service";
 import { executeViewCommand } from "./view-service";
 import { attachCrmContact, createCrmOpportunity } from "./opportunity-service";
 import { captureLead } from "./lead-service";
+import { captureSourceLead } from "../campaigns/source-service";
 import { updateCrmRecord } from "./record-service";
 import {
   crmCommandSchema,
@@ -31,6 +32,9 @@ export async function executeCrmCommand(
     return await withGrowthTransaction(db, async (tx) => {
       let result: CrmCommandResult;
       switch (command.kind) {
+        case "capture_source":
+          result = await captureSourceLead(tx, command, founder, correlationId);
+          break;
         case "capture":
           result = await captureLead(tx, command, founder, correlationId);
           break;
@@ -68,7 +72,7 @@ export async function executeCrmCommand(
           result = await executeViewCommand(tx, command, founder.actorId);
           break;
       }
-      if (!result.alreadyExisted)
+      if (!result.alreadyExisted && command.kind !== "capture_source")
         await appendAuditEvent(tx, {
           correlationId,
           actorType: "founder",

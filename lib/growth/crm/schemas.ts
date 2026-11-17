@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { isCrmCountryCode } from "./countries";
+import { sourceLeadInputSchema } from "../campaigns/schemas";
 
 const id = z.uuid();
 const version = z.number().int().positive();
@@ -144,6 +145,7 @@ const taskFields = {
 };
 export const crmCommandSchema = z.discriminatedUnion("kind", [
   captureLeadSchema,
+  sourceLeadInputSchema.safeExtend({ kind: z.literal("capture_source") }),
   z.strictObject({
     kind: z.literal("attach_contact"),
     prospectId: id,
