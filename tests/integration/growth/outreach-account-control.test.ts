@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { createHash, randomUUID } from "node:crypto";
 import test from "node:test";
 import postgres from "postgres";
+import { loadConfiguredAccountReadiness } from "../../../lib/growth/campaigns/account-repository";
+import { withGrowthTransaction } from "../../../lib/growth/db/client";
 import { executeAccountControlCommand } from "../../../lib/growth/campaigns/account-control";
 import type { AccountControlCommand } from "../../../lib/growth/campaigns/account-contracts";
 
@@ -23,6 +25,15 @@ test(
     };
     const id = randomUUID();
     const now = Date.now();
+    const snapshotMessages = Array.from({ length: 10 }, (_, index) => ({
+      id: String(index),
+      sentAt: new Date(now - 1000).toISOString(),
+      recipientCount: 1,
+    }));
+    const readiness = (mode: "prerequisites" | "active") =>
+      withGrowthTransaction(db, (tx) =>
+        loadConfiguredAccountReadiness(tx, id, mode),
+      );
     try {
       await admin`insert into growth.integration_connections(id,provider,subject_email,status,google_subject,granted_scopes) values (${id},'gmail',${email},'connected','test-subject',${["openid", "email", "https://www.googleapis.com/auth/gmail.modify"]})`;
       await admin`update growth.integration_connections set google_subject=null where id=${id}`;
@@ -102,6 +113,14 @@ test(
         await admin`insert into growth.outreach_account_controls(connection_id,verified_subject,verified_grant_epoch,verified_scopes) values (${other},'other-subject',1,'{}')`;
         await assert.rejects(
           db`update growth.outreach_account_controls set limits_review_id=${first.reviewId} where connection_id=${other}`,
+        );
+        assert.equal(
+          (
+            await withGrowthTransaction(db, (tx) =>
+              loadConfiguredAccountReadiness(tx, other, "prerequisites"),
+            )
+          ).status,
+          "held",
         );
         await assert.rejects(
           db`insert into growth.outreach_account_controls(connection_id,provider,verified_subject,verified_grant_epoch,verified_scopes) values (${randomUUID()},'resend','bad',1,'{}')`,
@@ -211,7 +230,9 @@ test(
         /usage_unknown/,
       );
       await admin`delete from growth.outreach_provider_usage where account_id=${id}`;
-      await admin`insert into growth.outreach_provider_usage(account_id,observed_at,rolling_messages,rolling_recipients,complete,health,connection_id,grant_epoch,captured_at,window_start,history_start,history_end,fresh_until,evidence_version,provider_message_ids) values (${id},now(),10,10,true,'healthy',${id},1,now(),now() - interval '24 hours','start','end',now() + interval '4 minutes',1,'["1","2","3","4","5","6","7","8","9","10"]'::jsonb)`;
+      await admin`insert into growth.outreach_provider_usage(account_id,observed_at,rolling_messages,rolling_recipients,complete,health,connection_id,grant_epoch,captured_at,window_start,history_start,history_end,fresh_until,evidence_version,provider_message_ids) values (${id},now(),10,10,true,'healthy',${id},1,now(),now() - interval '24 hours','start','end',now() + interval '4 minutes',1,${admin.json(snapshotMessages)})`;
+      assert.equal((await readiness("prerequisites")).status, "ready");
+      assert.equal((await readiness("active")).status, "held");
       await executeAccountControlCommand(
         db,
         { type: "activate", requestId: randomUUID(), expectedVersion: 3 },
@@ -282,22 +303,46 @@ test(
         await admin`drop trigger test_reject_account_audit on growth.audit_log`;
         await admin`drop function growth.test_reject_account_audit()`;
       }
+      await executeAccountControlCommand(
+        db,
+        { type: "activate", requestId: randomUUID(), expectedVersion: 6 },
+        founder,
+        randomUUID(),
+      );
+      assert.equal((await readiness("active")).status, "ready");
+      await assert.rejects(
+        admin`insert into growth.outreach_provider_usage(account_id,complete,health,connection_id) values (${randomUUID()},false,'unknown',${id})`,
+      );
+      const duplicateMessages = [...snapshotMessages];
+      duplicateMessages[1] = duplicateMessages[0]!;
+      await admin`update growth.outreach_provider_usage set provider_message_ids=${admin.json(duplicateMessages)} where account_id=${id}`;
+      assert.equal((await readiness("active")).status, "held");
+      await admin`update growth.outreach_provider_usage set provider_message_ids=${admin.json(snapshotMessages)} where account_id=${id}`;
+      await admin`update growth.outreach_provider_usage set rolling_recipients=0 where account_id=${id}`;
+      assert.equal((await readiness("active")).status, "held");
+      await admin`update growth.outreach_provider_usage set rolling_recipients=10 where account_id=${id}`;
       await admin`update growth.integration_connections set version=version+1,granted_scopes=array_replace(granted_scopes,'email','https://www.googleapis.com/auth/userinfo.email') where id=${id}`;
       await assert.rejects(
         executeAccountControlCommand(
           db,
-          { type: "activate", requestId: randomUUID(), expectedVersion: 6 },
+          { type: "activate", requestId: randomUUID(), expectedVersion: 7 },
           founder,
           randomUUID(),
         ),
         /usage_unknown/,
       );
-      await admin`update growth.integration_connections set granted_scopes=array_append(granted_scopes,'new-scope') where id=${id}`;
+      assert.equal((await readiness("active")).status, "held");
+      await admin`update growth.outreach_provider_usage set grant_epoch=2 where account_id=${id}`;
+      assert.equal((await readiness("active")).status, "ready");
+      const [stillActive] =
+        await admin`select state from growth.outreach_account_controls where connection_id=${id}`;
+      assert.equal(stillActive?.state, "active");
+      await admin`update growth.integration_connections set version=version+1,granted_scopes=array_append(granted_scopes,'new-scope') where id=${id}`;
       const revalidate = {
         type: "revalidate_grant" as const,
         requestId: randomUUID(),
-        expectedVersion: 6,
-        expectedGrantVersion: 2,
+        expectedVersion: 7,
+        expectedGrantVersion: 3,
       };
       await assert.rejects(
         executeAccountControlCommand(
@@ -314,21 +359,27 @@ test(
         /account_authority_changed/,
       );
       await admin`update growth.integration_connections set google_subject='test-subject' where id=${id}`;
+      assert.equal((await readiness("active")).status, "held");
       const revalidated = await executeAccountControlCommand(
         db,
         revalidate,
         founder,
         randomUUID(),
       );
-      assert.equal(revalidated.version, 7);
+      assert.equal(revalidated.version, 8);
       const [after] =
         await admin`select state,ramp from growth.outreach_account_controls where connection_id=${id}`;
+      const [invalidated] =
+        await admin`select complete,incomplete_reason from growth.outreach_provider_usage where account_id=${id}`;
+      assert.equal(invalidated?.complete, false);
+      assert.equal(invalidated?.incomplete_reason, "grant_revalidated");
       assert.equal(after?.state, "paused");
+      assert.equal((await readiness("active")).status, "held");
       assert.equal(after?.ramp, 50);
       await assert.rejects(
         executeAccountControlCommand(
           db,
-          { type: "activate", requestId: randomUUID(), expectedVersion: 7 },
+          { type: "activate", requestId: randomUUID(), expectedVersion: 8 },
           founder,
           randomUUID(),
         ),
@@ -340,7 +391,7 @@ test(
         {
           type: "halt",
           requestId: randomUUID(),
-          expectedVersion: 7,
+          expectedVersion: 8,
           reason: "grant revoked",
         },
         founder,
@@ -348,7 +399,7 @@ test(
       );
       const [count] =
         await admin`select count(*)::int as value from growth.outreach_account_reviews where connection_id=${id}`;
-      assert.equal(count?.value, 7);
+      assert.equal(count?.value, 8);
     } finally {
       await admin`delete from growth.outreach_provider_usage where account_id=${id}`;
       await admin`update growth.outreach_account_controls set limits_review_id=null,health_review_id=null where connection_id=${id}`;

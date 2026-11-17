@@ -1,4 +1,3 @@
-import { z } from "zod";
 import { createHash, randomUUID } from "node:crypto";
 import { appendAuditEvent } from "../audit/service";
 import type { FounderSession } from "../auth/require-founder";
@@ -8,11 +7,12 @@ import { hasRequiredGmailScopes } from "../integrations/google-oauth";
 import { requireCampaignFounder } from "./authorization";
 import {
   accountControlCommandSchema,
-  healthReviewSchema,
-  limitsReviewSchema,
   type AccountControlCommand,
 } from "./account-contracts";
-import { assessAccountReadiness } from "./account-readiness";
+import {
+  loadConfiguredAccountReadiness,
+  sameAccountScopes,
+} from "./account-repository";
 
 type Connection = {
   id: string;
@@ -33,11 +33,6 @@ type Control = {
   lastRampAt: Date | null;
 };
 const day = 24 * 60 * 60 * 1000;
-const normalizeScope = (scope: string) =>
-  scope === "https://www.googleapis.com/auth/userinfo.email" ? "email" : scope;
-const sameScopes = (a: string[], b: string[]) =>
-  [...new Set(a.map(normalizeScope))].sort().join("\n") ===
-  [...new Set(b.map(normalizeScope))].sort().join("\n");
 export async function executeAccountControlCommand(
   db: GrowthDb,
   raw: AccountControlCommand,
@@ -102,7 +97,7 @@ export async function executeAccountControlCommand(
     if (
       !protective &&
       command.type !== "revalidate_grant" &&
-      !sameScopes(control.scopes, connection.scopes)
+      !sameAccountScopes(control.scopes, connection.scopes)
     )
       throw new Error("account_authority_changed");
     if (
@@ -142,80 +137,6 @@ export async function executeAccountControlCommand(
     if (command.type === "reduce_ramp" && command.ramp >= control.ramp)
       throw new Error("invalid_ramp_reduction");
     if (command.type === "activate" || command.type === "approve_ramp") {
-      const reviews = await tx<
-        { id: string; evidence: unknown }[]
-      >`select id,evidence from growth.outreach_account_reviews where connection_id=${connection.id} and id in (${control.limitsId},${control.healthId})`;
-      const envelope = z.object({ evidence: z.unknown() });
-      const limitsEnvelope = envelope.safeParse(
-        reviews.find((r) => r.id === control.limitsId)?.evidence,
-      );
-      const healthEnvelope = envelope.safeParse(
-        reviews.find((r) => r.id === control.healthId)?.evidence,
-      );
-      const limits = limitsReviewSchema.safeParse(
-        limitsEnvelope.success ? limitsEnvelope.data.evidence : null,
-      );
-      const health = healthReviewSchema.safeParse(
-        healthEnvelope.success ? healthEnvelope.data.evidence : null,
-      );
-      const usageRows = await tx<
-        {
-          capturedAt: Date | null;
-          expiresAt: Date | null;
-          complete: boolean;
-          grant: number | null;
-          messages: number | null;
-          recipients: number | null;
-          windowStart: Date | null;
-          historyStart: string | null;
-          historyEnd: string | null;
-          evidenceVersion: number | null;
-          ids: unknown;
-        }[]
-      >`select captured_at as "capturedAt",fresh_until as "expiresAt",complete,grant_epoch as grant,rolling_messages as messages,rolling_recipients as recipients,window_start as "windowStart",history_start as "historyStart",history_end as "historyEnd",evidence_version as "evidenceVersion",provider_message_ids as ids from growth.outreach_provider_usage where connection_id=${connection.id} for share`;
-      const usage = usageRows.length === 1 ? usageRows[0] : undefined;
-      const validIds =
-        Array.isArray(usage?.ids) &&
-        usage.ids.length <= 1000 &&
-        usage.ids.length === usage.messages &&
-        usage.ids.every(
-          (id: unknown) =>
-            typeof id === "string" && id.length > 0 && id.length <= 255,
-        ) &&
-        new Set(usage.ids).size === usage.ids.length;
-      const decision = assessAccountReadiness(
-        {
-          identity: {
-            connected: true,
-            subjectMatches: true,
-            grantMatches: true,
-            scopesValid: true,
-          },
-          limits: limits.success ? limits.data : null,
-          health: health.success ? health.data : null,
-          usage:
-            usage?.capturedAt && usage.expiresAt
-              ? {
-                  capturedAt: usage.capturedAt,
-                  expiresAt: usage.expiresAt,
-                  complete:
-                    usage.complete &&
-                    !!usage.windowStart &&
-                    usage.windowStart.getTime() <=
-                      usage.capturedAt.getTime() - day &&
-                    !!usage.historyStart &&
-                    !!usage.historyEnd &&
-                    !!usage.evidenceVersion &&
-                    validIds,
-                  grantMatches: usage.grant === connection.version,
-                  messages: usage.messages,
-                  recipients: usage.recipients,
-                }
-              : null,
-        },
-        now,
-      );
-      if (decision.status === "held") throw new Error(decision.reason);
       if (command.type === "approve_ramp") {
         if (control.state === "halted" || !control.lastRampAt)
           throw new Error("account_not_activated");
@@ -225,12 +146,19 @@ export async function executeAccountControlCommand(
           [100, 150],
         ]).get(control.ramp);
         if (command.ramp !== next) throw new Error("invalid_ramp_step");
-        if (
-          !health.success ||
-          (control.lastRampAt && health.data.observedFrom <= control.lastRampAt)
-        )
-          throw new Error("health_review_reused");
       }
+      const decision = await loadConfiguredAccountReadiness(
+        tx,
+        connection.id,
+        "prerequisites",
+        command.type === "approve_ramp"
+          ? (control.lastRampAt ?? undefined)
+          : undefined,
+      );
+      if (decision.status === "held") throw new Error(decision.reason);
+    }
+    if (command.type === "revalidate_grant") {
+      await tx`update growth.outreach_provider_usage set complete=false,incomplete_reason='grant_revalidated' where connection_id=${connection.id}`;
     }
     const reviewId = randomUUID();
     const version = control.version + 1;
@@ -250,8 +178,7 @@ export async function executeAccountControlCommand(
           ? "active"
           : command.type === "revalidate_grant"
             ? "paused"
-            : control.grant !== connection.version ||
-                command.type === "record_health"
+            : command.type === "record_health"
               ? "paused"
               : control.state;
     const ramp =

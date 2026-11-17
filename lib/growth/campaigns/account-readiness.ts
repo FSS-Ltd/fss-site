@@ -19,6 +19,7 @@ export type AccountReadinessSnapshot = {
     recipientReserve: number;
   } | null;
   health: {
+    source: string;
     observedFrom: Date;
     observedUntil: Date;
     expiresAt: Date;
@@ -84,6 +85,8 @@ export function assessAccountReadiness(
     return held("limits_unknown");
   if (
     !health ||
+    typeof health.source !== "string" ||
+    !health.source.trim() ||
     !validTime(health.observedFrom) ||
     !validTime(health.observedUntil) ||
     !validTime(health.expiresAt) ||
@@ -108,7 +111,11 @@ export function assessAccountReadiness(
       health.authentication.dkim,
       health.authentication.dmarc,
     ].some(
-      (check) => !check || check.status !== "pass" || !check.source.trim(),
+      (check) =>
+        !check ||
+        check.status !== "pass" ||
+        typeof check.source !== "string" ||
+        !check.source.trim(),
     ) ||
     health.hardBounces +
       health.complaints +

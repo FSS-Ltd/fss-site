@@ -23,6 +23,7 @@ const snapshot: AccountReadinessSnapshot = {
     recipientReserve: 10,
   },
   health: {
+    source: "measured health log",
     observedFrom: new Date("2026-11-17T09:00:00Z"),
     observedUntil: new Date("2026-11-17T10:00:00Z"),
     expiresAt: new Date("2026-11-18T10:00:00Z"),
@@ -201,6 +202,22 @@ test("each recipient constraint and explicit freshness boundary is enforced", ()
       },
       now,
     ).status,
+    "held",
+  );
+});
+
+test("missing health measurement source is held", () => {
+  assert.equal(
+    assessAccountReadiness(
+      { ...snapshot, health: { ...snapshot.health!, source: "  " } },
+      now,
+    ).status,
+    "held",
+  );
+  const health = { ...snapshot.health! };
+  Reflect.deleteProperty(health, "source");
+  assert.equal(
+    assessAccountReadiness({ ...snapshot, health }, now).status,
     "held",
   );
 });
