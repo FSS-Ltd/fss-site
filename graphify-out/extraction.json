@@ -29,6 +29,13 @@
       "source_location": "L28"
     },
     {
+      "id": "app_api_growth_events_route_ts",
+      "label": "route.ts",
+      "file_type": "code",
+      "source_file": "app/api/growth/events/route.ts",
+      "source_location": "L1"
+    },
+    {
       "id": "app_api_growth_facebook_route_ts",
       "label": "route.ts",
       "file_type": "code",
@@ -1807,6 +1814,69 @@
       "source_location": "L2"
     },
     {
+      "id": "lib_growth_client_use_growth_events_test_tsx",
+      "label": "use-growth-events.test.tsx",
+      "file_type": "code",
+      "source_file": "lib/growth/client/use-growth-events.test.tsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "use_growth_events_test_fakeeventsource",
+      "label": "FakeEventSource",
+      "file_type": "code",
+      "source_file": "lib/growth/client/use-growth-events.test.tsx",
+      "source_location": "L16"
+    },
+    {
+      "id": "use_growth_events_test_fakeeventsource_constructor",
+      "label": ".constructor()",
+      "file_type": "code",
+      "source_file": "lib/growth/client/use-growth-events.test.tsx",
+      "source_location": "L20"
+    },
+    {
+      "id": "use_growth_events_test_fakeeventsource_close",
+      "label": ".close()",
+      "file_type": "code",
+      "source_file": "lib/growth/client/use-growth-events.test.tsx",
+      "source_location": "L24"
+    },
+    {
+      "id": "use_growth_events_test_fakeeventsource_emit",
+      "label": ".emit()",
+      "file_type": "code",
+      "source_file": "lib/growth/client/use-growth-events.test.tsx",
+      "source_location": "L27"
+    },
+    {
+      "id": "use_growth_events_test_refresh",
+      "label": "refresh()",
+      "file_type": "code",
+      "source_file": "lib/growth/client/use-growth-events.test.tsx",
+      "source_location": "L39"
+    },
+    {
+      "id": "use_growth_events_test_component",
+      "label": "Component()",
+      "file_type": "code",
+      "source_file": "lib/growth/client/use-growth-events.test.tsx",
+      "source_location": "L48"
+    },
+    {
+      "id": "lib_growth_client_use_growth_events_ts",
+      "label": "use-growth-events.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/client/use-growth-events.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "use_growth_events_usegrowthevents",
+      "label": "useGrowthEvents()",
+      "file_type": "code",
+      "source_file": "lib/growth/client/use-growth-events.ts",
+      "source_location": "L16"
+    },
+    {
       "id": "lib_growth_crm_activity_service_ts",
       "label": "activity-service.ts",
       "file_type": "code",
@@ -2857,6 +2927,34 @@
       "source_location": "L117"
     },
     {
+      "id": "lib_growth_facebook_event_route_handler_test_ts",
+      "label": "event-route-handler.test.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/facebook/event-route-handler.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "event_route_handler_test_request",
+      "label": "request()",
+      "file_type": "code",
+      "source_file": "lib/growth/facebook/event-route-handler.test.ts",
+      "source_location": "L7"
+    },
+    {
+      "id": "lib_growth_facebook_event_route_handler_ts",
+      "label": "event-route-handler.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/facebook/event-route-handler.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "event_route_handler_creategrowtheventhandler",
+      "label": "createGrowthEventHandler()",
+      "file_type": "code",
+      "source_file": "lib/growth/facebook/event-route-handler.ts",
+      "source_location": "L17"
+    },
+    {
       "id": "lib_growth_facebook_events_test_ts",
       "label": "events.test.ts",
       "file_type": "code",
@@ -2904,6 +3002,13 @@
       "file_type": "code",
       "source_file": "lib/growth/facebook/read-route-handler.test.ts",
       "source_location": "L16"
+    },
+    {
+      "id": "read_route_handler_test_read",
+      "label": "read()",
+      "file_type": "code",
+      "source_file": "lib/growth/facebook/read-route-handler.test.ts",
+      "source_location": "L91"
     },
     {
       "id": "lib_growth_facebook_read_route_handler_ts",
@@ -3004,6 +3109,34 @@
       "source_location": "L219"
     },
     {
+      "id": "lib_growth_facebook_session_deadline_test_ts",
+      "label": "session-deadline.test.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/facebook/session-deadline.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "session_deadline_test_request",
+      "label": "request()",
+      "file_type": "code",
+      "source_file": "lib/growth/facebook/session-deadline.test.ts",
+      "source_location": "L7"
+    },
+    {
+      "id": "lib_growth_facebook_session_deadline_ts",
+      "label": "session-deadline.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/facebook/session-deadline.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "session_deadline_growthstreamdeadline",
+      "label": "growthStreamDeadline()",
+      "file_type": "code",
+      "source_file": "lib/growth/facebook/session-deadline.ts",
+      "source_location": "L5"
+    },
+    {
       "id": "lib_growth_facebook_workspace_ts",
       "label": "workspace.ts",
       "file_type": "code",
@@ -3015,7 +3148,7 @@
       "label": "getFacebookWorkspace()",
       "file_type": "code",
       "source_file": "lib/growth/facebook/workspace.ts",
-      "source_location": "L77"
+      "source_location": "L91"
     },
     {
       "id": "lib_growth_http_founder_request_ts",
@@ -6914,7 +7047,7 @@
       "label": "source()",
       "file_type": "code",
       "source_file": "tests/integration/growth/facebook-workspace.test.ts",
-      "source_location": "L483"
+      "source_location": "L522"
     },
     {
       "id": "tests_integration_growth_founder_evidence_test_ts",
@@ -7207,6 +7340,69 @@
       "confidence": "EXTRACTED",
       "source_file": "app/api/cron/operations-dispatch/route.ts",
       "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "app_api_growth_events_route_ts",
+      "target": "require_founder",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/growth/events/route.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "app_api_growth_events_route_ts",
+      "target": "env",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/growth/events/route.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "app_api_growth_events_route_ts",
+      "target": "event_route_handler",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/growth/events/route.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "app_api_growth_events_route_ts",
+      "target": "events",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/growth/events/route.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "app_api_growth_events_route_ts",
+      "target": "session_deadline",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/growth/events/route.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "app_api_growth_events_route_ts",
+      "target": "app_api_growth_runtime",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/growth/events/route.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "app_api_growth_events_route_ts",
+      "target": "route_get",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/api/growth/events/route.ts",
+      "source_location": "L9",
       "weight": 1.0
     },
     {
@@ -13159,6 +13355,132 @@
       "weight": 1.0
     },
     {
+      "source": "lib_growth_client_use_growth_events_test_tsx",
+      "target": "strict",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/client/use-growth-events.test.tsx",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_client_use_growth_events_test_tsx",
+      "target": "node_test",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/client/use-growth-events.test.tsx",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_client_use_growth_events_test_tsx",
+      "target": "jsdom",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/client/use-growth-events.test.tsx",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_client_use_growth_events_test_tsx",
+      "target": "react",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/client/use-growth-events.test.tsx",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_client_use_growth_events_test_tsx",
+      "target": "client",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/client/use-growth-events.test.tsx",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_client_use_growth_events_test_tsx",
+      "target": "lib_growth_client_use_growth_events",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/client/use-growth-events.test.tsx",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_client_use_growth_events_test_tsx",
+      "target": "use_growth_events_test_fakeeventsource",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/client/use-growth-events.test.tsx",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "use_growth_events_test_fakeeventsource",
+      "target": "use_growth_events_test_fakeeventsource_constructor",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/client/use-growth-events.test.tsx",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "use_growth_events_test_fakeeventsource",
+      "target": "use_growth_events_test_fakeeventsource_close",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/client/use-growth-events.test.tsx",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "use_growth_events_test_fakeeventsource",
+      "target": "use_growth_events_test_fakeeventsource_emit",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/client/use-growth-events.test.tsx",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_client_use_growth_events_test_tsx",
+      "target": "use_growth_events_test_refresh",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/client/use-growth-events.test.tsx",
+      "source_location": "L39",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_client_use_growth_events_test_tsx",
+      "target": "use_growth_events_test_component",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/client/use-growth-events.test.tsx",
+      "source_location": "L48",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_client_use_growth_events_ts",
+      "target": "react",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/client/use-growth-events.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_client_use_growth_events_ts",
+      "target": "use_growth_events_usegrowthevents",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/client/use-growth-events.ts",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
       "source": "lib_growth_crm_activity_service_ts",
       "target": "node_crypto",
       "relation": "imports_from",
@@ -15859,6 +16181,87 @@
       "weight": 1.0
     },
     {
+      "source": "lib_growth_facebook_event_route_handler_test_ts",
+      "target": "strict",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/event-route-handler.test.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_event_route_handler_test_ts",
+      "target": "node_test",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/event-route-handler.test.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_event_route_handler_test_ts",
+      "target": "lib_growth_auth_require_founder",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/event-route-handler.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_event_route_handler_test_ts",
+      "target": "lib_growth_facebook_event_route_handler",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/event-route-handler.test.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_event_route_handler_test_ts",
+      "target": "event_route_handler_test_request",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/event-route-handler.test.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_event_route_handler_ts",
+      "target": "lib_growth_auth_require_founder",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/event-route-handler.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_event_route_handler_ts",
+      "target": "lib_growth_http_founder_request",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/event-route-handler.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_event_route_handler_ts",
+      "target": "lib_growth_facebook_events",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/event-route-handler.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_event_route_handler_ts",
+      "target": "event_route_handler_creategrowtheventhandler",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/event-route-handler.ts",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
       "source": "lib_growth_facebook_events_test_ts",
       "target": "strict",
       "relation": "imports_from",
@@ -16000,6 +16403,15 @@
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/facebook/read-route-handler.test.ts",
       "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_read_route_handler_test_ts",
+      "target": "read_route_handler_test_read",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/read-route-handler.test.ts",
+      "source_location": "L91",
       "weight": 1.0
     },
     {
@@ -16336,6 +16748,69 @@
       "weight": 1.0
     },
     {
+      "source": "lib_growth_facebook_session_deadline_test_ts",
+      "target": "strict",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/session-deadline.test.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_session_deadline_test_ts",
+      "target": "node_test",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/session-deadline.test.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_session_deadline_test_ts",
+      "target": "jwt",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/session-deadline.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_session_deadline_test_ts",
+      "target": "lib_growth_facebook_session_deadline",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/session-deadline.test.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_session_deadline_test_ts",
+      "target": "session_deadline_test_request",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/session-deadline.test.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_session_deadline_ts",
+      "target": "jwt",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/session-deadline.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_session_deadline_ts",
+      "target": "session_deadline_growthstreamdeadline",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/session-deadline.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
       "source": "lib_growth_facebook_workspace_ts",
       "target": "lib_growth_campaigns_authorization",
       "relation": "imports_from",
@@ -16386,7 +16861,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/facebook/workspace.ts",
-      "source_location": "L77",
+      "source_location": "L91",
       "weight": 1.0
     },
     {
@@ -18550,570 +19025,13 @@
       "weight": 1.0
     },
     {
-      "source": "lib_growth_research_global_identity_ts",
-      "target": "lib_growth_research_global_schema",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/global-identity.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_global_identity_ts",
-      "target": "global_identity_normalizeregistration",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/global-identity.ts",
-      "source_location": "L21",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_global_identity_ts",
-      "target": "global_identity_businesswebsitehost",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/global-identity.ts",
-      "source_location": "L25",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_global_identity_ts",
-      "target": "global_identity_globalcandidateidentitykeys",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/global-identity.ts",
-      "source_location": "L39",
-      "weight": 1.0
-    },
-    {
-      "source": "global_identity_globalcandidateidentitykeys",
-      "target": "global_identity_normalizeregistration",
+      "source": "route_get",
+      "target": "event_route_handler_creategrowtheventhandler",
       "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/global-identity.ts",
-      "source_location": "L43",
-      "weight": 1.0
-    },
-    {
-      "source": "global_identity_globalcandidateidentitykeys",
-      "target": "global_identity_businesswebsitehost",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/global-identity.ts",
-      "source_location": "L44",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_global_ingest_ts",
-      "target": "lib_growth_db_client",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/global-ingest.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_global_ingest_ts",
-      "target": "lib_growth_db_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/global-ingest.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_global_ingest_ts",
-      "target": "lib_growth_research_errors",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/global-ingest.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_global_ingest_ts",
-      "target": "lib_growth_research_global_identity",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/global-ingest.ts",
-      "source_location": "L4",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_global_ingest_ts",
-      "target": "lib_growth_research_global_schema",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/global-ingest.ts",
-      "source_location": "L5",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_global_ingest_ts",
-      "target": "lib_growth_research_global_repository",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/global-ingest.ts",
-      "source_location": "L9",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_global_ingest_ts",
-      "target": "lib_growth_research_repository",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/global-ingest.ts",
-      "source_location": "L14",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_global_ingest_ts",
-      "target": "lib_growth_research_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/global-ingest.ts",
-      "source_location": "L15",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_global_ingest_ts",
-      "target": "global_ingest_ingestglobalresearchrun",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/global-ingest.ts",
-      "source_location": "L17",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_global_repository_ts",
-      "target": "lib_growth_db_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/global-repository.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_global_repository_ts",
-      "target": "lib_growth_research_repository_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/global-repository.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_global_repository_ts",
-      "target": "lib_growth_research_global_schema",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/global-repository.ts",
-      "source_location": "L6",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_global_repository_ts",
-      "target": "lib_growth_research_global_identity",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/global-repository.ts",
-      "source_location": "L10",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_global_repository_ts",
-      "target": "global_repository_inspectglobalcandidate",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/global-repository.ts",
-      "source_location": "L12",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_global_repository_ts",
-      "target": "global_repository_insertglobalcandidate",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/global-repository.ts",
-      "source_location": "L48",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_global_repository_ts",
-      "target": "global_repository_insertglobalcandidatedetails",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/global-repository.ts",
-      "source_location": "L91",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_global_schema_ts",
-      "target": "zod",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/global-schema.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_global_schema_ts",
-      "target": "lib_growth_email_html_policy",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/global-schema.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_global_schema_ts",
-      "target": "lib_growth_email_copy_policy",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/global-schema.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_global_schema_ts",
-      "target": "lib_growth_research_limits",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/global-schema.ts",
-      "source_location": "L4",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_global_schema_ts",
-      "target": "global_schema_text",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/global-schema.ts",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "app/api/growth/events/route.ts",
       "source_location": "L11",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_global_schema_ts",
-      "target": "global_schema_parseurl",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/global-schema.ts",
-      "source_location": "L12",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_global_schema_ts",
-      "target": "global_schema_normalizetext",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/global-schema.ts",
-      "source_location": "L29",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_ingest_ts",
-      "target": "lib_growth_research_errors",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingest.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_ingest_ts",
-      "target": "lib_growth_research_global_ingest",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingest.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_ingest_ts",
-      "target": "lib_growth_research_intake_schema",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingest.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_ingest_ts",
-      "target": "lib_growth_db_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingest.ts",
-      "source_location": "L4",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_ingest_ts",
-      "target": "lib_growth_prospect_previews_content",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingest.ts",
-      "source_location": "L5",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_ingest_ts",
-      "target": "lib_growth_email_assets_fallbacks",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingest.ts",
-      "source_location": "L6",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_ingest_ts",
-      "target": "lib_growth_research_repository",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingest.ts",
-      "source_location": "L10",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_ingest_ts",
-      "target": "lib_growth_research_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingest.ts",
-      "source_location": "L15",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_ingest_ts",
-      "target": "ingest_isfallbackkey",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingest.ts",
-      "source_location": "L23",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_ingest_ts",
-      "target": "ingest_selectvisual",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingest.ts",
-      "source_location": "L27",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_ingest_ts",
-      "target": "ingest_createresearchruningester",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingest.ts",
-      "source_location": "L56",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_ingest_ts",
-      "target": "ingest_ingestresearchrun",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingest.ts",
-      "source_location": "L137",
-      "weight": 1.0
-    },
-    {
-      "source": "ingest_selectvisual",
-      "target": "ingest_isfallbackkey",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingest.ts",
-      "source_location": "L38",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_ingestion_schema_ts",
-      "target": "zod",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_ingestion_schema_ts",
-      "target": "lib_growth_email_copy_policy",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_ingestion_schema_ts",
-      "target": "lib_growth_email_html_policy",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L4",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_ingestion_schema_ts",
-      "target": "lib_growth_research_limits",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L8",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_ingestion_schema_ts",
-      "target": "lib_growth_research_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L9",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_ingestion_schema_ts",
-      "target": "lib_growth_prospect_previews_experience_brief",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L25",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_ingestion_schema_ts",
-      "target": "ingestion_schema_parseurl",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L44",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_ingestion_schema_ts",
-      "target": "ingestion_schema_geturlhostname",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L52",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_ingestion_schema_ts",
-      "target": "ingestion_schema_ishttpurl",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L56",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_ingestion_schema_ts",
-      "target": "ingestion_schema_hostsarerelated",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L61",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_ingestion_schema_ts",
-      "target": "ingestion_schema_isgooglemapsreferenceurl",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L67",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_ingestion_schema_ts",
-      "target": "ingestion_schema_requiredtext",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L80",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_ingestion_schema_ts",
-      "target": "ingestion_schema_parsewebsiteemailnarrative",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L349",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_ingestion_schema_ts",
-      "target": "ingestion_schema_parsefirstemailcandidate",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L355",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_ingestion_schema_ts",
-      "target": "ingestion_schema_parseresearchruningestion",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L729",
-      "weight": 1.0
-    },
-    {
-      "source": "ingestion_schema_geturlhostname",
-      "target": "ingestion_schema_parseurl",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L53",
-      "weight": 1.0
-    },
-    {
-      "source": "ingestion_schema_ishttpurl",
-      "target": "ingestion_schema_parseurl",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L57",
-      "weight": 1.0
-    },
-    {
-      "source": "ingestion_schema_isgooglemapsreferenceurl",
-      "target": "ingestion_schema_parseurl",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L68",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_intake_schema_ts",
-      "target": "zod",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/intake-schema.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_intake_schema_ts",
-      "target": "lib_growth_research_global_schema",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/intake-schema.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_research_intake_schema_ts",
-      "target": "lib_growth_research_ingestion_schema",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/research/intake-schema.ts",
-      "source_location": "L3",
       "weight": 1.0
     },
     {
@@ -19134,6 +19052,16 @@
       "confidence_score": 0.8,
       "source_file": "app/api/growth/facebook/route.ts",
       "source_location": "L30",
+      "weight": 1.0
+    },
+    {
+      "source": "agreement_builder_fees_step_contentfromform",
+      "target": "read_route_handler_test_read",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/agreement-builder-fees-step.tsx",
+      "source_location": "L245",
       "weight": 1.0
     },
     {
@@ -19198,6 +19126,16 @@
     },
     {
       "source": "agreement_builder_link_step_save",
+      "target": "read_route_handler_test_read",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/agreement-builder-link-step.tsx",
+      "source_location": "L49",
+      "weight": 1.0
+    },
+    {
+      "source": "agreement_builder_link_step_save",
       "target": "agreement_builder_step_support_mergecontent",
       "relation": "calls",
       "confidence": "INFERRED",
@@ -19248,6 +19186,16 @@
     },
     {
       "source": "agreement_builder_scope_step_save",
+      "target": "read_route_handler_test_read",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/agreement-builder-scope-step.tsx",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "agreement_builder_scope_step_save",
       "target": "agreement_builder_step_support_mergecontent",
       "relation": "calls",
       "confidence": "INFERRED",
@@ -19284,6 +19232,26 @@
       "confidence_score": 0.8,
       "source_file": "components/portal/agreements/agreement-builder-step-support.tsx",
       "source_location": "L50",
+      "weight": 1.0
+    },
+    {
+      "source": "agreement_lifecycle_actions_submit",
+      "target": "use_growth_events_test_fakeeventsource_close",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/agreement-lifecycle-actions.tsx",
+      "source_location": "L87",
+      "weight": 1.0
+    },
+    {
+      "source": "agreement_lifecycle_actions_submit",
+      "target": "use_growth_events_test_refresh",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/agreement-lifecycle-actions.tsx",
+      "source_location": "L89",
       "weight": 1.0
     },
     {
@@ -19414,6 +19382,16 @@
       "confidence_score": 0.8,
       "source_file": "components/portal/agreements/signing-deadline-actions.tsx",
       "source_location": "L92",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_deadline_actions_run",
+      "target": "use_growth_events_test_fakeeventsource_close",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/portal/agreements/signing-deadline-actions.tsx",
+      "source_location": "L94",
       "weight": 1.0
     },
     {
@@ -20008,26 +19986,6 @@
     },
     {
       "source": "source_service_capturesourcelead",
-      "target": "global_identity_normalizeregistration",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/campaigns/source-service.ts",
-      "source_location": "L63",
-      "weight": 1.0
-    },
-    {
-      "source": "source_service_capturesourcelead",
-      "target": "global_identity_businesswebsitehost",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/campaigns/source-service.ts",
-      "source_location": "L67",
-      "weight": 1.0
-    },
-    {
-      "source": "source_service_capturesourcelead",
       "target": "change_requests_test_tx",
       "relation": "calls",
       "confidence": "INFERRED",
@@ -20047,6 +20005,16 @@
       "weight": 1.0
     },
     {
+      "source": "use_growth_events_test_component",
+      "target": "use_growth_events_usegrowthevents",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/client/use-growth-events.test.tsx",
+      "source_location": "L49",
+      "weight": 1.0
+    },
+    {
       "source": "activity_service_appendcrmactivity",
       "target": "change_requests_test_tx",
       "relation": "calls",
@@ -20054,6 +20022,16 @@
       "confidence_score": 0.8,
       "source_file": "lib/growth/crm/activity-service.ts",
       "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "change_events_publishcrmchange",
+      "target": "use_growth_events_test_fakeeventsource_close",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/crm/change-events.ts",
+      "source_location": "L82",
       "weight": 1.0
     },
     {
@@ -20277,13 +20255,23 @@
       "weight": 1.0
     },
     {
+      "source": "session_deadline_test_request",
+      "target": "workspace_query_encode",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/facebook/session-deadline.test.ts",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
       "source": "workspace_getfacebookworkspace",
       "target": "authorization_requirecampaignfounder",
       "relation": "calls",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/facebook/workspace.ts",
-      "source_location": "L84",
+      "source_location": "L99",
       "weight": 1.0
     },
     {
@@ -20308,7 +20296,7 @@
     },
     {
       "source": "founder_request_readjsonrequestbody",
-      "target": "global_schema_text",
+      "target": "schemas_text",
       "relation": "calls",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
@@ -20334,6 +20322,16 @@
       "confidence_score": 0.8,
       "source_file": "lib/growth/integrations/gmail/client.ts",
       "source_location": "L123",
+      "weight": 1.0
+    },
+    {
+      "source": "client_readjson",
+      "target": "read_route_handler_test_read",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/integrations/gmail/client.ts",
+      "source_location": "L142",
       "weight": 1.0
     },
     {
@@ -20537,53 +20535,570 @@
       "weight": 1.0
     },
     {
-      "source": "global_repository_inspectglobalcandidate",
+      "source": "lib_growth_research_global_identity_ts",
+      "target": "lib_growth_research_global_schema",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-identity.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_global_identity_ts",
+      "target": "global_identity_normalizeregistration",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-identity.ts",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_global_identity_ts",
+      "target": "global_identity_businesswebsitehost",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-identity.ts",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_global_identity_ts",
+      "target": "global_identity_globalcandidateidentitykeys",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-identity.ts",
+      "source_location": "L39",
+      "weight": 1.0
+    },
+    {
+      "source": "global_identity_globalcandidateidentitykeys",
       "target": "global_identity_normalizeregistration",
       "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/research/global-repository.ts",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-identity.ts",
+      "source_location": "L43",
+      "weight": 1.0
+    },
+    {
+      "source": "global_identity_globalcandidateidentitykeys",
+      "target": "global_identity_businesswebsitehost",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-identity.ts",
+      "source_location": "L44",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_global_ingest_ts",
+      "target": "lib_growth_db_client",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-ingest.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_global_ingest_ts",
+      "target": "lib_growth_db_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-ingest.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_global_ingest_ts",
+      "target": "lib_growth_research_errors",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-ingest.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_global_ingest_ts",
+      "target": "lib_growth_research_global_identity",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-ingest.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_global_ingest_ts",
+      "target": "lib_growth_research_global_schema",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-ingest.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_global_ingest_ts",
+      "target": "lib_growth_research_global_repository",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-ingest.ts",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_global_ingest_ts",
+      "target": "lib_growth_research_repository",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-ingest.ts",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_global_ingest_ts",
+      "target": "lib_growth_research_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-ingest.ts",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_global_ingest_ts",
+      "target": "global_ingest_ingestglobalresearchrun",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-ingest.ts",
       "source_location": "L17",
       "weight": 1.0
     },
     {
-      "source": "global_repository_inspectglobalcandidate",
-      "target": "global_identity_businesswebsitehost",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
+      "source": "lib_growth_research_global_repository_ts",
+      "target": "lib_growth_db_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/global-repository.ts",
-      "source_location": "L18",
+      "source_location": "L1",
       "weight": 1.0
     },
     {
-      "source": "global_repository_insertglobalcandidate",
-      "target": "global_identity_normalizeregistration",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
+      "source": "lib_growth_research_global_repository_ts",
+      "target": "lib_growth_research_repository_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/global-repository.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_global_repository_ts",
+      "target": "lib_growth_research_global_schema",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-repository.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_global_repository_ts",
+      "target": "lib_growth_research_global_identity",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-repository.ts",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_global_repository_ts",
+      "target": "global_repository_inspectglobalcandidate",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-repository.ts",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_global_repository_ts",
+      "target": "global_repository_insertglobalcandidate",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-repository.ts",
+      "source_location": "L48",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_global_repository_ts",
+      "target": "global_repository_insertglobalcandidatedetails",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-repository.ts",
+      "source_location": "L91",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_global_schema_ts",
+      "target": "zod",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-schema.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_global_schema_ts",
+      "target": "lib_growth_email_html_policy",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-schema.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_global_schema_ts",
+      "target": "lib_growth_email_copy_policy",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-schema.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_global_schema_ts",
+      "target": "lib_growth_research_limits",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-schema.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_global_schema_ts",
+      "target": "global_schema_text",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-schema.ts",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_global_schema_ts",
+      "target": "global_schema_parseurl",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-schema.ts",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_global_schema_ts",
+      "target": "global_schema_normalizetext",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-schema.ts",
+      "source_location": "L29",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_ingest_ts",
+      "target": "lib_growth_research_errors",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingest.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_ingest_ts",
+      "target": "lib_growth_research_global_ingest",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingest.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_ingest_ts",
+      "target": "lib_growth_research_intake_schema",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingest.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_ingest_ts",
+      "target": "lib_growth_db_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingest.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_ingest_ts",
+      "target": "lib_growth_prospect_previews_content",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingest.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_ingest_ts",
+      "target": "lib_growth_email_assets_fallbacks",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingest.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_ingest_ts",
+      "target": "lib_growth_research_repository",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingest.ts",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_ingest_ts",
+      "target": "lib_growth_research_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingest.ts",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_ingest_ts",
+      "target": "ingest_isfallbackkey",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingest.ts",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_ingest_ts",
+      "target": "ingest_selectvisual",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingest.ts",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_ingest_ts",
+      "target": "ingest_createresearchruningester",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingest.ts",
+      "source_location": "L56",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_ingest_ts",
+      "target": "ingest_ingestresearchrun",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingest.ts",
+      "source_location": "L137",
+      "weight": 1.0
+    },
+    {
+      "source": "ingest_selectvisual",
+      "target": "ingest_isfallbackkey",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingest.ts",
+      "source_location": "L38",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_ingestion_schema_ts",
+      "target": "zod",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingestion-schema.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_ingestion_schema_ts",
+      "target": "lib_growth_email_copy_policy",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingestion-schema.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_ingestion_schema_ts",
+      "target": "lib_growth_email_html_policy",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingestion-schema.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_ingestion_schema_ts",
+      "target": "lib_growth_research_limits",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingestion-schema.ts",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_ingestion_schema_ts",
+      "target": "lib_growth_research_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingestion-schema.ts",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_ingestion_schema_ts",
+      "target": "lib_growth_prospect_previews_experience_brief",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingestion-schema.ts",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_ingestion_schema_ts",
+      "target": "ingestion_schema_parseurl",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingestion-schema.ts",
+      "source_location": "L44",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_ingestion_schema_ts",
+      "target": "ingestion_schema_geturlhostname",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingestion-schema.ts",
+      "source_location": "L52",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_ingestion_schema_ts",
+      "target": "ingestion_schema_ishttpurl",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingestion-schema.ts",
+      "source_location": "L56",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_ingestion_schema_ts",
+      "target": "ingestion_schema_hostsarerelated",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingestion-schema.ts",
       "source_location": "L61",
       "weight": 1.0
     },
     {
-      "source": "global_repository_insertglobalcandidatedetails",
-      "target": "change_requests_test_tx",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/research/global-repository.ts",
-      "source_location": "L103",
+      "source": "lib_growth_research_ingestion_schema_ts",
+      "target": "ingestion_schema_isgooglemapsreferenceurl",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingestion-schema.ts",
+      "source_location": "L67",
       "weight": 1.0
     },
     {
-      "source": "ingest_ingestresearchrun",
-      "target": "global_ingest_ingestglobalresearchrun",
+      "source": "lib_growth_research_ingestion_schema_ts",
+      "target": "ingestion_schema_requiredtext",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingestion-schema.ts",
+      "source_location": "L80",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_ingestion_schema_ts",
+      "target": "ingestion_schema_parsewebsiteemailnarrative",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingestion-schema.ts",
+      "source_location": "L349",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_ingestion_schema_ts",
+      "target": "ingestion_schema_parsefirstemailcandidate",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingestion-schema.ts",
+      "source_location": "L355",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_ingestion_schema_ts",
+      "target": "ingestion_schema_parseresearchruningestion",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingestion-schema.ts",
+      "source_location": "L729",
+      "weight": 1.0
+    },
+    {
+      "source": "ingestion_schema_geturlhostname",
+      "target": "ingestion_schema_parseurl",
       "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/research/ingest.ts",
-      "source_location": "L142",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingestion-schema.ts",
+      "source_location": "L53",
+      "weight": 1.0
+    },
+    {
+      "source": "ingestion_schema_ishttpurl",
+      "target": "ingestion_schema_parseurl",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingestion-schema.ts",
+      "source_location": "L57",
+      "weight": 1.0
+    },
+    {
+      "source": "ingestion_schema_isgooglemapsreferenceurl",
+      "target": "ingestion_schema_parseurl",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingestion-schema.ts",
+      "source_location": "L68",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_intake_schema_ts",
+      "target": "zod",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/intake-schema.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_intake_schema_ts",
+      "target": "lib_growth_research_global_schema",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/intake-schema.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_intake_schema_ts",
+      "target": "lib_growth_research_ingestion_schema",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/intake-schema.ts",
+      "source_location": "L3",
       "weight": 1.0
     },
     {
@@ -29106,7 +29621,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/facebook-workspace.test.ts",
-      "source_location": "L483",
+      "source_location": "L522",
       "weight": 1.0
     },
     {
@@ -29641,6 +30156,46 @@
       "weight": 1.0
     },
     {
+      "source": "global_repository_inspectglobalcandidate",
+      "target": "global_identity_normalizeregistration",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/research/global-repository.ts",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "global_repository_inspectglobalcandidate",
+      "target": "global_identity_businesswebsitehost",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/research/global-repository.ts",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "global_repository_insertglobalcandidate",
+      "target": "global_identity_normalizeregistration",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/research/global-repository.ts",
+      "source_location": "L61",
+      "weight": 1.0
+    },
+    {
+      "source": "ingest_ingestresearchrun",
+      "target": "global_ingest_ingestglobalresearchrun",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/research/ingest.ts",
+      "source_location": "L142",
+      "weight": 1.0
+    },
+    {
       "source": "preview_pr_trigger_triggerpreviewpullrequest",
       "target": "commercial_offer_route_test_request",
       "relation": "calls",
@@ -29821,6 +30376,16 @@
       "weight": 1.0
     },
     {
+      "source": "first_email_draft_snapshot_parsestoredfirstemaildraft",
+      "target": "ingestion_schema_parsefirstemailcandidate",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/first-email-draft-snapshot.ts",
+      "source_location": "L136",
+      "weight": 1.0
+    },
+    {
       "source": "first_email_template_refresh_refreshfirstemailtemplate",
       "target": "first_email_draft_snapshot_parsestoredfirstemaildraft",
       "relation": "calls",
@@ -29828,6 +30393,16 @@
       "confidence_score": 0.8,
       "source_file": "lib/growth/sequences/first-email-template-refresh.ts",
       "source_location": "L58",
+      "weight": 1.0
+    },
+    {
+      "source": "first_email_template_refresh_refreshfirstemailtemplate",
+      "target": "ingestion_schema_parsewebsiteemailnarrative",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/first-email-template-refresh.ts",
+      "source_location": "L93",
       "weight": 1.0
     },
     {
@@ -30222,6 +30797,16 @@
     },
     {
       "source": "signing_pdf_content_writeservicelines",
+      "target": "global_schema_text",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/agreements/signing-pdf-content.ts",
+      "source_location": "L36",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_pdf_content_writeservicelines",
       "target": "signing_pdf_layout_signingdetail",
       "relation": "calls",
       "confidence": "INFERRED",
@@ -30428,6 +31013,76 @@
       "confidence_score": 0.8,
       "source_file": "lib/operations/agreements/signing-pdf-content.ts",
       "source_location": "L191",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_pdf_layout_masthead",
+      "target": "global_schema_text",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/agreements/signing-pdf-layout.ts",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_pdf_layout_finishsigningpdf",
+      "target": "global_schema_text",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/agreements/signing-pdf-layout.ts",
+      "source_location": "L63",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_pdf_layout_signingtitle",
+      "target": "global_schema_text",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/agreements/signing-pdf-layout.ts",
+      "source_location": "L89",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_pdf_layout_signingsection",
+      "target": "global_schema_text",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/agreements/signing-pdf-layout.ts",
+      "source_location": "L111",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_pdf_layout_signingparagraph",
+      "target": "global_schema_text",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/agreements/signing-pdf-layout.ts",
+      "source_location": "L135",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_pdf_layout_signingfieldrow",
+      "target": "global_schema_text",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/agreements/signing-pdf-layout.ts",
+      "source_location": "L164",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_pdf_layout_signingdetail",
+      "target": "global_schema_text",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/agreements/signing-pdf-layout.ts",
+      "source_location": "L190",
       "weight": 1.0
     },
     {
@@ -30761,6 +31416,16 @@
       "weight": 1.0
     },
     {
+      "source": "refresh_pending_first_email_drafts_main",
+      "target": "global_schema_text",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "scripts/refresh-pending-first-email-drafts.ts",
+      "source_location": "L202",
+      "weight": 1.0
+    },
+    {
       "source": "reservation_assertions_exerciselegacyreservation",
       "target": "reservation_clock_withtransitionclock",
       "relation": "calls",
@@ -30828,6 +31493,36 @@
       "confidence_score": 1,
       "source_file": "app/api/cron/operations-dispatch/route.ts",
       "source_location": "L11",
+      "weight": 1
+    },
+    {
+      "source": "app_api_growth_events_route_ts",
+      "target": "lib_growth_facebook_event_route_handler_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "app/api/growth/events/route.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "app_api_growth_events_route_ts",
+      "target": "lib_growth_facebook_events_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "app/api/growth/events/route.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "app_api_growth_events_route_ts",
+      "target": "lib_growth_facebook_session_deadline_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "app/api/growth/events/route.ts",
+      "source_location": "L5",
       "weight": 1
     },
     {
@@ -32941,6 +33636,16 @@
       "weight": 1
     },
     {
+      "source": "lib_growth_client_use_growth_events_test_tsx",
+      "target": "lib_growth_client_use_growth_events_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/client/use-growth-events.test.tsx",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
       "source": "lib_growth_crm_activity_service_ts",
       "target": "lib_growth_crm_errors_ts",
       "relation": "imports",
@@ -33371,6 +34076,36 @@
       "weight": 1
     },
     {
+      "source": "lib_growth_facebook_event_route_handler_test_ts",
+      "target": "lib_growth_facebook_event_route_handler_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/facebook/event-route-handler.test.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_facebook_event_route_handler_ts",
+      "target": "lib_growth_http_founder_request_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/facebook/event-route-handler.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_facebook_event_route_handler_ts",
+      "target": "lib_growth_facebook_events_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/facebook/event-route-handler.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
       "source": "lib_growth_facebook_events_test_ts",
       "target": "lib_growth_facebook_events_ts",
       "relation": "imports",
@@ -33498,6 +34233,16 @@
       "confidence_score": 1,
       "source_file": "lib/growth/facebook/service.ts",
       "source_location": "L11",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_facebook_session_deadline_test_ts",
+      "target": "lib_growth_facebook_session_deadline_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/facebook/session-deadline.test.ts",
+      "source_location": "L4",
       "weight": 1
     },
     {
