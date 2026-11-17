@@ -147,6 +147,41 @@ test(
         decision: "allowed" as const,
       };
       await executeFacebookCommand(db, review, founder, randomUUID());
+      const selected = await getFacebookWorkspace(
+        db,
+        founder,
+        new Date(),
+        randomUUID(),
+        null,
+        created.id,
+      );
+      assert.equal(selected.status, "ready");
+      if (selected.status === "ready") {
+        assert.equal(selected.destinations.length, 1);
+        assert.equal(selected.destinations[0].id, created.id);
+        assert.equal(selected.destinations[0].postReadiness, "allowed");
+      }
+      const missing = await getFacebookWorkspace(
+        db,
+        founder,
+        new Date(),
+        randomUUID(),
+        null,
+        randomUUID(),
+      );
+      assert.equal(missing.status, "ready");
+      if (missing.status === "ready")
+        assert.equal(missing.destinations.length, 0);
+      await assert.rejects(
+        getFacebookWorkspace(
+          db,
+          { ...founder, actorId: "invalid" },
+          new Date(),
+          randomUUID(),
+          null,
+          created.id,
+        ),
+      );
       const workspace = await getFacebookWorkspace(
         db,
         founder,
@@ -512,6 +547,27 @@ test(
         await executeFacebookCommand(db, command, founder, randomUUID()),
         { id: first.id, alreadyExisted: true },
       );
+      const { getFacebookWorkspace } =
+        await import("../../../lib/growth/facebook/workspace");
+      const selected = await getFacebookWorkspace(
+        db,
+        founder,
+        now,
+        randomUUID(),
+        null,
+        dest.id,
+      );
+      const [prospect] = await db<
+        { version: number }[]
+      >`select version from growth.prospects where id=${first.id}::uuid`;
+      assert.equal(selected.status, "ready");
+      if (selected.status === "ready")
+        assert.equal(
+          selected.destinations[0].prospects.find(
+            (item) => item.prospectId === first.id,
+          )?.version,
+          prospect.version,
+        );
       const secondId = randomUUID();
       const second = await executeFacebookCommand(
         db,

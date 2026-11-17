@@ -39,7 +39,12 @@ type Activity = {
   evidenceUrl: string | null;
   prospectId: string | null;
 };
-type Link = { destinationId: string; prospectId: string; name: string };
+type Link = {
+  destinationId: string;
+  prospectId: string;
+  name: string;
+  version: number;
+};
 type Pilot = {
   slot: number;
   prospectId: string;
@@ -74,21 +79,34 @@ export type FacebookWorkspaceResult =
       };
     }
   | { status: "error"; message: string; correlationId: string };
+type JsonValue<T> = T extends Date
+  ? string
+  : T extends Array<infer Item>
+    ? JsonValue<Item>[]
+    : T extends object
+      ? { [Key in keyof T]: JsonValue<T[Key]> }
+      : T;
+/** The HTTP representation serializes database dates as ISO strings. */
+export type FacebookWorkspaceDto = JsonValue<FacebookWorkspaceResult>;
 export async function getFacebookWorkspace(
   db: GrowthDb,
   founder: FounderSession,
   now: Date,
   correlationId: string,
   cursor: string | null = null,
+  selectedId: string | null = null,
 ): Promise<FacebookWorkspaceResult> {
   requireCampaignFounder(founder);
   if (
     !correlationId.trim() ||
     Number.isNaN(now.getTime()) ||
-    (cursor !== null &&
-      !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
-        cursor,
-      ))
+    [cursor, selectedId].some(
+      (id) =>
+        id !== null &&
+        !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+          id,
+        ),
+    )
   )
     throw new Error("invalid_workspace_request");
   try {
@@ -97,7 +115,7 @@ export async function getFacebookWorkspace(
       const [page, allocations] = await Promise.all([
         tx<
           Destination[]
-        >`select id,url,name,kind,locality,website_url as "websiteUrl",version from growth.facebook_destinations where (${cursor}::uuid is null or id>${cursor}::uuid) order by id limit 51`,
+        >`select id,url,name,kind,locality,website_url as "websiteUrl",version from growth.facebook_destinations where (${selectedId}::uuid is null and (${cursor}::uuid is null or id>${cursor}::uuid) or id=${selectedId}::uuid) order by id limit 51`,
         tx<
           Pilot[]
         >`select a.slot,a.prospect_id as "prospectId",a.business_id as "businessId",b.legal_name as name,pp.status as "previewStatus" from growth.facebook_pilot_allocations a join growth.businesses b on b.id=a.business_id left join growth.prospect_previews pp on pp.prospect_id=a.prospect_id order by a.slot`,
@@ -117,7 +135,7 @@ export async function getFacebookWorkspace(
           >`select a.id,a.destination_id as "destinationId",a.activity,a.occurred_at as "occurredAt",a.evidence_url as "evidenceUrl",a.prospect_id as "prospectId" from unnest(${ids}::uuid[]) d(id) cross join lateral (select * from growth.facebook_activities where destination_id=d.id order by occurred_at desc,id desc limit 21) a order by a.occurred_at desc,a.id desc`,
           tx<
             Link[]
-          >`select l.destination_id as "destinationId",p.id as "prospectId",b.legal_name as name from unnest(${ids}::uuid[]) d(id) cross join lateral (select * from growth.facebook_destination_prospects where destination_id=d.id order by prospect_id limit 21) l join growth.prospects p on p.id=l.prospect_id join growth.businesses b on b.id=p.business_id order by l.destination_id,p.id`,
+          >`select l.destination_id as "destinationId",p.id as "prospectId",b.legal_name as name,p.version from unnest(${ids}::uuid[]) d(id) cross join lateral (select * from growth.facebook_destination_prospects where destination_id=d.id order by prospect_id limit 21) l join growth.prospects p on p.id=l.prospect_id join growth.businesses b on b.id=p.business_id order by l.destination_id,p.id`,
           tx<
             { destinationId: string; activity: "followed" | "joined" }[]
           >`select d.id as "destinationId", m.activity from unnest(${ids}::uuid[]) d(id) cross join lateral (select distinct activity from growth.facebook_activities a where a.destination_id=d.id and a.activity in ('followed','joined')) m`,

@@ -33,11 +33,16 @@ export function createFacebookReadHandler(
     try {
       const founder = await dependencies.authorizeFounder();
       const cursor = new URL(request.url).searchParams.get("cursor");
+      const selectedId = new URL(request.url).searchParams.get("selectedId");
       if (
-        cursor !== null &&
-        !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
-          cursor,
-        )
+        [cursor, selectedId].some(
+          (id) =>
+            id !== null &&
+            !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+              id,
+            ),
+        ) ||
+        (cursor !== null && selectedId !== null)
       )
         return createApiErrorResponse(
           422,
@@ -51,6 +56,7 @@ export function createFacebookReadHandler(
         new Date(),
         correlationId,
         cursor,
+        selectedId,
       );
       return createJsonResponse(result, result.status === "ready" ? 200 : 503);
     } catch (error) {

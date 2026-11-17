@@ -85,3 +85,45 @@ test("rejects unauthorized and invalid cursors, and returns reader errors", asyn
     503,
   );
 });
+test("validates selected ID and passes it to the canonical reader", async () => {
+  const id = "123e4567-e89b-42d3-a456-426614174000";
+  let selected: string | null | undefined;
+  const read: typeof import("./workspace").getFacebookWorkspace = async (
+    _db,
+    _founder,
+    _now,
+    _correlation,
+    _cursor,
+    selectedId,
+  ) => {
+    selected = selectedId;
+    return ready;
+  };
+  assert.equal(
+    (
+      await handler({ read })(
+        new Request(`${origin}/api/growth/facebook?selectedId=${id}`),
+      )
+    ).status,
+    200,
+  );
+  assert.equal(selected, id);
+  assert.equal(
+    (
+      await handler()(
+        new Request(`${origin}/api/growth/facebook?selectedId=bad`),
+      )
+    ).status,
+    422,
+  );
+  assert.equal(
+    (
+      await handler()(
+        new Request(
+          `${origin}/api/growth/facebook?selectedId=${id}&cursor=${id}`,
+        ),
+      )
+    ).status,
+    422,
+  );
+});
