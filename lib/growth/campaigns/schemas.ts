@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { isIP } from "node:net";
 import { globalCandidateSchema } from "../research/global-schema";
+import { isCrmCountryCode } from "../crm/countries";
 
 const id = z.string().min(1);
 const date = z.coerce.date();
@@ -56,6 +57,12 @@ export const campaignPolicySchema = z
         }
       })
       .default("Europe/London"),
+    sendWeekdays: z
+      .array(z.number().int().min(1).max(7))
+      .min(1)
+      .max(7)
+      .refine((days) => new Set(days).size === days.length)
+      .default([1, 2, 3, 4, 5]),
     windowStart: z
       .string()
       .regex(/^([01]\d|2[0-3]):[0-5]\d$/)
@@ -164,34 +171,72 @@ export const campaignOutcomeInputSchema = z.object({
   netClearedPence: z.number().int().nonnegative().nullable(),
 });
 export type CampaignOutcomeInput = z.infer<typeof campaignOutcomeInputSchema>;
+const evidenceReferenceSchema = z.discriminatedUnion("kind", [
+  z.strictObject({
+    kind: z.literal("public"),
+    value: publicUrl.refine(
+      (value) =>
+        ![".internal", ".localhost", ".local", ".test"].some((suffix) =>
+          new URL(value).hostname.toLowerCase().endsWith(suffix),
+        ),
+    ),
+  }),
+  z.strictObject({
+    kind: z.literal("private"),
+    value: z.string().trim().min(1).max(500),
+  }),
+]);
+const attestationSchema = z.strictObject({
+  summary: z.string().trim().min(1).max(2000),
+  reference: evidenceReferenceSchema,
+  observedAt: date,
+  expiresAt: date,
+});
+export const campaignPolicyDefinitionSchema = campaignPolicySchema.safeExtend({
+  capabilityAttestation: attestationSchema,
+  providerAttestation: attestationSchema.safeExtend({
+    provider: z.enum(["gmail", "resend"]),
+    jurisdiction: z
+      .string()
+      .trim()
+      .length(2)
+      .toUpperCase()
+      .refine(isCrmCountryCode),
+    confirmed: z.literal(true),
+  }),
+});
+export type CampaignPolicyDefinition = z.infer<
+  typeof campaignPolicyDefinitionSchema
+>;
+const mutation = { requestId: uuid };
+const versionedCampaign = {
+  ...mutation,
+  campaignId: uuid,
+  policyVersion: z.number().int().positive(),
+};
 export const campaignCommandSchema = z.discriminatedUnion("type", [
-  z.object({
+  z.strictObject({
     type: z.literal("create"),
-    requestId: uuid,
-    name: id.max(200),
-    policy: campaignPolicySchema,
+    ...mutation,
+    name: z.string().trim().min(1).max(200),
+    policy: campaignPolicyDefinitionSchema,
   }),
-  z.object({
+  z.strictObject({
     type: z.literal("revise"),
-    campaignId: uuid,
-    policy: campaignPolicySchema,
+    ...versionedCampaign,
+    policy: campaignPolicyDefinitionSchema,
   }),
-  z.object({
+  z.strictObject({
     type: z.literal("enrol"),
-    campaignId: uuid,
+    ...versionedCampaign,
     prospectId: uuid,
-    requestId: uuid,
   }),
-  z.object({ type: z.literal("pause"), campaignId: uuid }),
-  z.object({
-    type: z.literal("approve"),
-    campaignId: uuid,
-    policyVersion: z.number().int().positive(),
-  }),
-  z.object({ type: z.literal("resume"), campaignId: uuid }),
-  z.object({
+  z.strictObject({ type: z.literal("pause"), ...versionedCampaign }),
+  z.strictObject({ type: z.literal("approve"), ...versionedCampaign }),
+  z.strictObject({ type: z.literal("resume"), ...versionedCampaign }),
+  z.strictObject({
     type: z.literal("raise_limit"),
-    campaignId: uuid,
+    ...versionedCampaign,
     limit: z.union([
       z.literal(25),
       z.literal(50),
@@ -199,18 +244,32 @@ export const campaignCommandSchema = z.discriminatedUnion("type", [
       z.literal(150),
     ]),
   }),
-  z.object({ type: z.literal("stop"), membershipId: uuid }),
-  z.object({
+  z.strictObject({ type: z.literal("stop"), ...mutation, membershipId: uuid }),
+  z.strictObject({
     type: z.literal("record_permission"),
+    ...mutation,
     membershipId: uuid,
     evidenceId: uuid,
     basis: z.enum(["consent", "requested_service"]),
     provider: z.enum(["gmail", "resend"]),
-    jurisdiction: id,
+    jurisdiction: z
+      .string()
+      .trim()
+      .length(2)
+      .toUpperCase()
+      .refine(isCrmCountryCode),
     expiresAt: date,
+    observedAt: date,
+    explicitOptIn: z.boolean(),
+    summary: z.string().trim().min(1).max(2000),
+    reference: evidenceReferenceSchema,
+    expectedProspectVersion: z.number().int().positive(),
+    expectedContactVersion: z.number().int().positive(),
+    proofRequestId: uuid,
   }),
-  z.object({
+  z.strictObject({
     type: z.literal("record_reply"),
+    ...mutation,
     membershipId: uuid,
     providerReplyId: id,
     kind: z.enum([
@@ -223,14 +282,20 @@ export const campaignCommandSchema = z.discriminatedUnion("type", [
     ]),
     occurredAt: date,
   }),
-  z.object({
+  z.strictObject({
     type: z.literal("record_outcome"),
+    ...mutation,
     outcome: campaignOutcomeInputSchema,
   }),
 ]);
 export type CampaignCommand = z.infer<typeof campaignCommandSchema>;
 export const campaignCommandResultSchema = z.discriminatedUnion("status", [
-  z.object({ status: z.literal("ok"), id }),
+  z.object({
+    status: z.literal("ok"),
+    id: uuid,
+    version: z.number().int().positive(),
+    alreadyExisted: z.boolean(),
+  }),
   z.object({ status: z.literal("error"), code: id, message: id }),
 ]);
 export type CampaignCommandResult = z.infer<typeof campaignCommandResultSchema>;

@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import type { FounderSession } from "../auth/require-founder";
 import { CrmError } from "../crm/errors";
-import type { GrowthDb } from "../db/types";
+import type { GrowthQueryExecutor } from "../db/types";
 
 export type FounderVerificationSnapshot = {
   status: "current" | "stale";
@@ -23,7 +23,7 @@ export type FounderVerificationSnapshot = {
 };
 
 export async function loadFounderVerification(
-  db: GrowthDb,
+  db: GrowthQueryExecutor,
   prospectId: string,
   now: Date,
   founder: FounderSession,

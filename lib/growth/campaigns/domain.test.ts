@@ -468,3 +468,29 @@ test("outcome observation distinguishes missing and censored from confirmed abse
   assert.equal(group.meetingMature, 0);
   assert.equal(group.paymentMature, 0);
 });
+
+test("campaign weekdays default to business days and reject duplicates", async () => {
+  const { campaignPolicySchema } = await import("./schemas");
+  assert.deepEqual(
+    campaignPolicySchema.parse({ version: 1 }).sendWeekdays,
+    [1, 2, 3, 4, 5],
+  );
+  assert.deepEqual(
+    campaignPolicySchema.parse({ version: 1, sendWeekdays: [6, 7] })
+      .sendWeekdays,
+    [6, 7],
+  );
+  assert.equal(
+    campaignPolicySchema.safeParse({ version: 1, sendWeekdays: [1, 1] })
+      .success,
+    false,
+  );
+  assert.equal(
+    campaignPolicySchema.safeParse({ version: 1, sendWeekdays: [] }).success,
+    false,
+  );
+  assert.equal(
+    campaignPolicySchema.safeParse({ version: 1, sendWeekdays: [8] }).success,
+    false,
+  );
+});
