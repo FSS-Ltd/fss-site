@@ -32,7 +32,7 @@ export async function inspectGlobalCandidate(
           where c.normalised_email = ${email} and p.status = 'suppressed')) as suppressed,
       exists (select 1 from growth.businesses b where
         (${registration}::text is not null and b.country_code = ${candidate.business.countryCode}
-          and upper(regexp_replace(b.company_number, '[[:space:]]+', '', 'g')) = ${registration})
+          and (upper(regexp_replace(b.company_number, '[[:space:]]+', '', 'g')) = ${registration} or exists (select 1 from growth.prospects source where source.business_id = b.id and upper(regexp_replace(source.source_details->>'registrationNumber', '[[:space:]]+', '', 'g')) = ${registration})))
         or (${candidate.business.googlePlaceId}::text is not null and b.google_place_id = ${candidate.business.googlePlaceId})
         or (${host}::text is not null and substring(lower(coalesce(b.website_url, b.first_party_source_url)) from '^https?://(?:www[.])?([^/:?#]+)') = ${host})
       ) as "businessExists",

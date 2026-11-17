@@ -32,6 +32,11 @@ export async function captureBusiness(
       ? `growth:business:${input.companyNumber}`
       : `growth:business:${input.countryCode}:${input.companyNumber}`;
   await tx`select pg_advisory_xact_lock(hashtextextended(${identityKey}, 0))`;
+  const [unverified] = await tx<
+    { id: string }[]
+  >`select p.id from growth.prospects p join growth.businesses b on b.id=p.business_id
+    where b.country_code=${input.countryCode} and upper(regexp_replace(p.source_details->>'registrationNumber','[[:space:]]+','','g'))=${input.companyNumber} limit 1`;
+  if (unverified) throw new CrmError("duplicate", unverified.id);
   const [business] = await tx<{ id: string }[]>`select id from growth.businesses
     where country_code=${input.countryCode} and upper(regexp_replace(company_number,'[[:space:]]+','','g'))=${input.companyNumber}`;
   if (business) return business.id;
