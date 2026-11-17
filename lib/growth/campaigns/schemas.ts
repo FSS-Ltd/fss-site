@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { isIP } from "node:net";
 import { globalCandidateSchema } from "../research/global-schema";
 import { isCrmCountryCode } from "../crm/countries";
 
@@ -19,7 +18,8 @@ const publicUrl = z.url().refine((value) => {
     url.hostname.includes(".") &&
     !url.hostname.endsWith(".localhost") &&
     !url.hostname.endsWith(".local") &&
-    !isIP(url.hostname.replace(/^\[|\]$/g, ""))
+    !url.hostname.includes(":") &&
+    !/^\d+\.\d+\.\d+\.\d+$/.test(url.hostname)
   );
 }, "A public HTTP URL without credentials is required.");
 export const campaignVariantSchema = z.object({

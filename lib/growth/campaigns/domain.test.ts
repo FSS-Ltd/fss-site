@@ -537,3 +537,21 @@ test("campaign commands reject the retired campaign-scoped ramp operation", asyn
     false,
   );
 });
+
+test("public source URLs reject normalized IP hosts", async () => {
+  const { sourceLeadInputSchema } = await import("./schemas");
+  const schema = sourceLeadInputSchema.shape.sourceUrl;
+  for (const value of [
+    "http://127.0.0.1",
+    "http://2130706433",
+    "http://0x7f000001",
+    "http://0177.0.0.1",
+    "http://[::1]",
+    "http://[::ffff:127.0.0.1]",
+    "http://example.localhost",
+    "http://example.local",
+  ]) {
+    assert.equal(schema.safeParse(value).success, false, value);
+  }
+  assert.equal(schema.safeParse("https://example.org/path").success, true);
+});
