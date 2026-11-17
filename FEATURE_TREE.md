@@ -101,6 +101,13 @@ Graphify: [graph](graphify-out/graph.json), [audit report](graphify-out/GRAPH_RE
 - Status: implemented. Entry and canonical readers: `lib/operations/studio/clients.ts#listStudioClients`, `lib/operations/studio/clients.ts#loadStudioClient`. `supabase/migrations/20261001120000_operations_studio_engagement_creation.sql` constrains delivery engagements to Growth prospect or Studio organisation ownership.
 - depends_on AUTH and INFRA; used_by OPS and AGREEMENT. The schema alone does not prove any production records are unrelated. Graph node: `lib_operations_studio_clients_ts`. Tests: `lib/operations/studio/clients.test.ts`.
 
+### GROWTH-GMAIL-IDENTITY: verified sender account identity
+
+- Status: implemented. Entry `app/api/integrations/gmail/callback/route.ts`; canonical `lib/growth/integrations/gmail-connection.ts#connectGmail` obtains verified Google userinfo subject from `google-oauth.ts`, then `lib/growth/db/repositories/integration-connections.ts#storeConnectedGmailConnection` stores it transactionally.
+- `supabase/migrations/20261117130000_growth_gmail_subject.sql` adds private `integration_connections.google_subject`. Known-subject replacement is rejected atomically, legacy NULL requires a verified reconnect, and the existing connection UUID/history remain. Connection version is the grant epoch; cursor sync and in-memory access-token refresh do not increment it. No subject appears in audit metadata or public projections.
+- depends_on AUTH and INFRA; used_by GROWTH-OUTREACH Gmail connection and pending GROWTH-BUDGETS account authority. This identity foundation does not activate sending or establish quota/health. Reuse the existing connect flow; no extra OAuth scope or provider added.
+- Tests: `lib/growth/integrations/google-oauth.test.ts`, `gmail-connection.test.ts`, `lib/growth/db/repositories/integration-connections.test.ts`, `tests/integration/growth/gmail-connection-persistence.test.ts`, `gmail-disconnect.test.ts`. Independent SPEC/QUALITY PASS at `709f16bfa`; 23 focused unit tests and two DB tests passed. All 91 migrations fresh-applied, then two connection tests passed again on the fresh isolated cluster. Graph nodes `lib_growth_integrations_gmail_connection_ts`, `lib_growth_db_repositories_integration_connections_ts`.
+
 ### Campaign outreach work in progress
 
 These stable IDs follow the [approved design](docs/superpowers/specs/2026-11-17-outreach-revamp-design.md). Pure rules and schema are present; adapters, UI and activation remain in progress. Status reflects source and tests, not the design alone.
