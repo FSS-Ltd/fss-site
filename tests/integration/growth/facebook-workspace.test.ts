@@ -48,6 +48,22 @@ test(
         (await executeFacebookCommand(db, command, founder, randomUUID())).id,
         first.id,
       );
+      const { facebookCommandSchema } =
+        await import("../../../lib/growth/facebook/contracts");
+      const isoReplay = facebookCommandSchema.parse({
+        ...command,
+        destination: {
+          ...command.destination,
+          observation: {
+            ...command.destination.observation,
+            observedAt: now.toISOString(),
+          },
+        },
+      });
+      assert.deepEqual(
+        await executeFacebookCommand(db, isoReplay, founder, randomUUID()),
+        { id: first.id, alreadyExisted: true },
+      );
       await assert.rejects(
         executeFacebookCommand(
           db,
@@ -530,6 +546,33 @@ test(
       assert.equal(rows.length, 0);
     } finally {
       await db.end();
+    }
+  },
+);
+
+test(
+  "event listener rejects a Growth role with elevated privileges",
+  { skip: !url },
+  async () => {
+    if (!url) return;
+    const { subscribeFacebookChanges } =
+      await import("../../../lib/growth/facebook/events");
+    const admin = postgres(url, { max: 1 });
+    const eventUrl = new URL(url);
+    eventUrl.username = "growth_app";
+    eventUrl.password = "";
+    await admin`alter role growth_app login createrole`;
+    try {
+      await assert.rejects(
+        subscribeFacebookChanges(eventUrl.toString(), {
+          ready: () => {},
+          change: () => {},
+        }),
+        /invalid_growth_event_role/,
+      );
+    } finally {
+      await admin`alter role growth_app nologin nocreaterole`;
+      await admin.end();
     }
   },
 );

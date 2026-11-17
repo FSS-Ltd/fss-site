@@ -4,7 +4,11 @@ import { globalCandidateSchema } from "../research/global-schema";
 import { isCrmCountryCode } from "../crm/countries";
 
 const id = z.string().min(1);
-const date = z.coerce.date();
+export const campaignTimestampSchema = z.union([
+  z.date(),
+  z.iso.datetime({ offset: true }).transform((value) => new Date(value)),
+]);
+const date = campaignTimestampSchema;
 const uuid = z.uuid();
 const publicUrl = z.url().refine((value) => {
   const url = new URL(value);

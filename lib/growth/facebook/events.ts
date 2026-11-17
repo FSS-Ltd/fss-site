@@ -3,12 +3,23 @@ const UUID =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 export function validateFacebookEventUrl(value: string): void {
   const url = new URL(value);
+  const username = decodeURIComponent(url.username);
+  const isSupabasePooler =
+    /^aws-[0-9]+-[a-z0-9-]+\.pooler\.supabase\.com$/.test(url.hostname);
+  const sessionUser = /^growth_app\.[a-z0-9]{20}$/.test(username);
+  const validUser = isSupabasePooler ? sessionUser : username === "growth_app";
+  const poolingOptions = [...url.searchParams].some(
+    ([key, value]) =>
+      /^(pgbouncer|pool_mode)$/i.test(key) ||
+      (key.toLowerCase() === "options" && /pgbouncer|pool_mode/i.test(value)),
+  );
   if (
     !["postgres:", "postgresql:"].includes(url.protocol) ||
-    decodeURIComponent(url.username) !== "growth_app" ||
+    !validUser ||
     url.port === "6543" ||
-    url.searchParams.has("pgbouncer") ||
-    url.hostname.includes("pooler")
+    poolingOptions ||
+    (url.hostname.includes("pooler") && !isSupabasePooler) ||
+    (isSupabasePooler && url.port !== "" && url.port !== "5432")
   )
     throw new Error("invalid_growth_event_url");
 }

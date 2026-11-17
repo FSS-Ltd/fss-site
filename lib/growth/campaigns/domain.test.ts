@@ -269,6 +269,25 @@ test("source leads reject private addresses, invalid countries and mismatched Fa
     observedAt: "2026-01-01T00:00:00Z",
   };
   assert.equal(sourceLeadInputSchema.safeParse(lead).success, true);
+  for (const observedAt of [
+    null,
+    false,
+    0,
+    "2026-01-01",
+    "2026-02-30T00:00:00Z",
+  ]) {
+    assert.equal(
+      sourceLeadInputSchema.safeParse({ ...lead, observedAt }).success,
+      false,
+    );
+  }
+  assert.deepEqual(
+    sourceLeadInputSchema.parse(lead),
+    sourceLeadInputSchema.parse({
+      ...lead,
+      observedAt: new Date(lead.observedAt),
+    }),
+  );
   assert.equal(
     sourceLeadInputSchema.safeParse({ ...lead, countryCode: "ZZ" }).success,
     false,

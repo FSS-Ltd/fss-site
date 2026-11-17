@@ -1,9 +1,12 @@
 import { isIP } from "node:net";
 import { z } from "zod";
-import { sourceLeadInputSchema } from "../campaigns/schemas";
+import {
+  campaignTimestampSchema,
+  sourceLeadInputSchema,
+} from "../campaigns/schemas";
 
 const uuid = z.uuid();
-const date = z.coerce.date();
+const date = campaignTimestampSchema;
 const text = z.string().trim().min(1).max(2000);
 const publicUrl = z.url().refine((value) => {
   const url = new URL(value);
@@ -73,7 +76,7 @@ export const facebookCommandSchema = z.discriminatedUnion("type", [
       type: z.literal("capture_source"),
       requestId: uuid,
       destinationId: uuid,
-      source: z.strictObject(sourceLeadInputSchema.shape),
+      source: sourceLeadInputSchema.strict(),
     })
     .strict(),
   z
