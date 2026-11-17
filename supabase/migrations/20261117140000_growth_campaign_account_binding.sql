@@ -9,6 +9,9 @@ alter table growth.campaigns
     references growth.integration_connections(id, provider) on delete restrict,
   add constraint campaign_account_policy_match check (
     account_connection_id::text is not distinct from policy ->> 'accountConnectionId'
+  ),
+  add constraint campaign_bound_provider_gmail check (
+    account_connection_id is null or (policy ->> 'provider' = 'gmail') is true
   );
 
 create index campaigns_account_connection_idx on growth.campaigns(account_connection_id);

@@ -23,6 +23,9 @@ test(
     };
     const accountId = randomUUID();
     const otherId = randomUUID();
+    const resendId = randomUUID();
+    const directCampaignId = randomUUID();
+    const unboundCampaignId = randomUUID();
     const now = Date.now();
     const evidence = {
       summary: "Reviewed",
@@ -50,6 +53,23 @@ test(
     let campaignId: string | undefined;
     try {
       await admin`insert into growth.integration_connections(id,provider,subject_email,google_subject,status,granted_scopes) values (${accountId},'gmail',${email},'verified-subject','connected',array['https://www.googleapis.com/auth/gmail.modify']), (${otherId},'gmail',${`other-${randomUUID()}@example.test`},'other-subject','connected',array['https://www.googleapis.com/auth/gmail.modify'])`;
+      await admin`insert into growth.integration_connections(id,provider,subject_email,status) values (${resendId},'resend',${`resend-${randomUUID()}@example.test`},'connected')`;
+      for (const provider of ["resend", null, undefined] as const) {
+        const directPolicy =
+          provider === undefined
+            ? { accountConnectionId: accountId }
+            : { accountConnectionId: accountId, provider };
+        await assert.rejects(
+          db`insert into growth.campaigns(id,version,request_id,name,policy,account_connection_id) values (${randomUUID()},1,${randomUUID()},'invalid',${db.json(directPolicy)},${accountId})`,
+          /campaign_bound_provider_gmail/,
+        );
+      }
+      await assert.rejects(
+        db`insert into growth.campaigns(id,version,request_id,name,policy,account_connection_id) values (${randomUUID()},1,${randomUUID()},'wrong-provider',${db.json({ accountConnectionId: resendId, provider: "gmail" })},${resendId})`,
+        /campaign_gmail_account_fk/,
+      );
+      await db`insert into growth.campaigns(id,version,request_id,name,policy) values (${unboundCampaignId},1,${randomUUID()},'unbound',${db.json({})})`;
+      await db`insert into growth.campaigns(id,version,request_id,name,policy,account_connection_id) values (${directCampaignId},1,${randomUUID()},'valid',${db.json({ accountConnectionId: accountId, provider: "gmail" })},${accountId})`;
       await assert.rejects(
         executeCampaignCommand(
           db,
@@ -157,7 +177,8 @@ test(
         await admin`delete from growth.audit_log where entity_type='campaign' and entity_id=${campaignId}`;
         await admin`delete from growth.campaigns where id=${campaignId}`;
       }
-      await admin`delete from growth.integration_connections where id in (${accountId},${otherId})`;
+      await admin`delete from growth.campaigns where id in (${directCampaignId},${unboundCampaignId}) or (account_connection_id=${accountId} and name='invalid')`;
+      await admin`delete from growth.integration_connections where id in (${accountId},${otherId},${resendId})`;
       await db.end();
       await admin.end();
     }
