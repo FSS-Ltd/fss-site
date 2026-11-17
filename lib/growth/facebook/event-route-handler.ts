@@ -36,12 +36,16 @@ export function createGrowthEventHandler(
       const encoder = new TextEncoder();
       const subscriptionState: { close?: () => Promise<void> } = {};
       let closed = false;
-      let timer: ReturnType<typeof setTimeout> | undefined;
       let heartbeat: ReturnType<typeof setInterval> | undefined;
       let controller: ReadableStreamDefaultController<Uint8Array>;
+      let resolveClosed: () => void = () => undefined;
+      const closedPromise = new Promise<"closed">((resolve) => {
+        resolveClosed = () => resolve("closed");
+      });
       const close = () => {
         if (closed) return;
         closed = true;
+        resolveClosed();
         if (timer) clearTimeout(timer);
         if (heartbeat) clearInterval(heartbeat);
         request.signal.removeEventListener("abort", close);
@@ -65,6 +69,10 @@ export function createGrowthEventHandler(
       );
       const send = (event: string, data: string) => {
         if (closed) return;
+        if (Date.now() >= deadline) {
+          close();
+          return;
+        }
         if ((controller.desiredSize ?? 0) <= 0) {
           close();
           return;
@@ -74,36 +82,45 @@ export function createGrowthEventHandler(
         );
       };
       request.signal.addEventListener("abort", close, { once: true });
-      if (request.signal.aborted) close();
-      let subscription: Awaited<ReturnType<Subscription>>;
-      try {
-        subscription = await (deps.subscribe ?? subscribeFacebookChanges)(url, {
-          ready: () => send("ready", "{}"),
-          change: (id) => {
-            if (
-              /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
-                id,
+      const timer = setTimeout(close, Math.max(0, deadline - Date.now()));
+      if (request.signal.aborted || Date.now() >= deadline) close();
+      if (!closed) {
+        let subscription: Awaited<ReturnType<Subscription>> | "closed";
+        try {
+          const pending = (deps.subscribe ?? subscribeFacebookChanges)(url, {
+            ready: () => send("ready", "{}"),
+            change: (id) => {
+              if (
+                /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+                  id,
+                )
               )
-            )
-              send("change", id);
-          },
-        });
-      } catch (error) {
-        close();
-        throw error;
-      }
-      if (subscription.status === "unconfigured") {
-        close();
-        return new Response(null, {
-          status: 503,
-          headers: { "X-Growth-Events": "unconfigured" },
-        });
-      }
-      subscriptionState.close = subscription.close;
-      if (closed) void subscriptionState.close().catch(() => undefined);
-      else {
-        timer = setTimeout(close, Math.max(0, deadline - Date.now()));
-        heartbeat = setInterval(() => send("heartbeat", "{}"), 25_000);
+                send("change", id);
+            },
+          }).then((subscription) => {
+            if (subscription.status === "listening") {
+              if (closed) void subscription.close().catch(() => undefined);
+              else subscriptionState.close = subscription.close;
+            }
+            return subscription;
+          });
+          subscription = await Promise.race([pending, closedPromise]);
+        } catch (error) {
+          close();
+          throw error;
+        }
+        if (
+          subscription !== "closed" &&
+          subscription.status === "unconfigured"
+        ) {
+          close();
+          return new Response(null, {
+            status: 503,
+            headers: { "X-Growth-Events": "unconfigured" },
+          });
+        }
+        if (!closed)
+          heartbeat = setInterval(() => send("heartbeat", "{}"), 25_000);
       }
       return new Response(stream, {
         headers: {

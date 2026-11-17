@@ -107,3 +107,148 @@ test("closes expired streams and handles listener failure", async () => {
   });
   assert.equal((await failed(request())).status, 503);
 });
+
+test("deadline bounds pending setup and disposes a late subscription", async (t) => {
+  t.mock.timers.enable({ apis: ["Date", "setTimeout"], now: 1000 });
+  let callbacks:
+    | { ready: () => void; change: (id: string) => void }
+    | undefined;
+  let finish:
+    | ((value: { status: "listening"; close: () => Promise<void> }) => void)
+    | undefined;
+  let closes = 0;
+  const handler = createGrowthEventHandler({
+    origin,
+    authorizeFounder: async () => founder,
+    deadline: async () => 1100,
+    eventUrl: () => "postgres://x",
+    subscribe: async (_url, handlers) => {
+      callbacks = handlers;
+      return new Promise((resolve) => {
+        finish = resolve;
+      });
+    },
+  });
+  const responsePromise = handler(request());
+  await Promise.resolve();
+  await Promise.resolve();
+  await Promise.resolve();
+  assert.ok(callbacks);
+  t.mock.timers.tick(100);
+  callbacks.ready();
+  callbacks.change("123e4567-e89b-42d3-a456-426614174000");
+  const response = await responsePromise;
+  assert.equal(await response.text(), "");
+  assert.ok(finish);
+  finish({
+    status: "listening",
+    close: async () => {
+      closes++;
+    },
+  });
+  await Promise.resolve();
+  await Promise.resolve();
+  assert.equal(closes, 1);
+});
+
+test("abort bounds pending setup and handles late success or failure", async () => {
+  for (const rejectLate of [false, true]) {
+    const abort = new AbortController();
+    let finish:
+      | ((value: { status: "listening"; close: () => Promise<void> }) => void)
+      | undefined;
+    let fail: ((error: Error) => void) | undefined;
+    let closes = 0;
+    const handler = createGrowthEventHandler({
+      origin,
+      authorizeFounder: async () => founder,
+      deadline: async () => Date.now() + 10000,
+      eventUrl: () => "postgres://x",
+      subscribe: async () =>
+        new Promise((resolve, reject) => {
+          finish = resolve;
+          fail = reject;
+        }),
+    });
+    const responsePromise = handler(request(abort.signal));
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    assert.ok(finish);
+    assert.ok(fail);
+    abort.abort();
+    assert.equal(await (await responsePromise).text(), "");
+    if (rejectLate) fail(new Error("late failure"));
+    else
+      finish({
+        status: "listening",
+        close: async () => {
+          closes++;
+        },
+      });
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    assert.equal(closes, rejectLate ? 0 : 1);
+  }
+});
+
+test("an already aborted request does not start a listener", async () => {
+  const abort = new AbortController();
+  abort.abort();
+  let subscribed = false;
+  const handler = createGrowthEventHandler({
+    origin,
+    authorizeFounder: async () => founder,
+    deadline: async () => Date.now() + 10000,
+    eventUrl: () => "postgres://x",
+    subscribe: async () => {
+      subscribed = true;
+      return { status: "unconfigured" };
+    },
+  });
+  assert.equal(await (await handler(request(abort.signal))).text(), "");
+  assert.equal(subscribed, false);
+});
+
+test("callbacks at the deadline close setup before the timer runs", async (t) => {
+  t.mock.timers.enable({ apis: ["Date"], now: 1000 });
+  let callbacks:
+    | { ready: () => void; change: (id: string) => void }
+    | undefined;
+  let finish:
+    | ((value: { status: "listening"; close: () => Promise<void> }) => void)
+    | undefined;
+  let closes = 0;
+  const handler = createGrowthEventHandler({
+    origin,
+    authorizeFounder: async () => founder,
+    deadline: async () => 1100,
+    eventUrl: () => "postgres://x",
+    subscribe: async (_url, handlers) => {
+      callbacks = handlers;
+      return new Promise((resolve) => {
+        finish = resolve;
+      });
+    },
+  });
+  const responsePromise = handler(request());
+  await Promise.resolve();
+  await Promise.resolve();
+  await Promise.resolve();
+  assert.ok(callbacks);
+  assert.ok(finish);
+  t.mock.timers.setTime(1100);
+  callbacks.ready();
+  callbacks.change("123e4567-e89b-42d3-a456-426614174000");
+  assert.equal(await (await responsePromise).text(), "");
+  finish({
+    status: "listening",
+    close: async () => {
+      closes++;
+    },
+  });
+  await Promise.resolve();
+  await Promise.resolve();
+  assert.equal(closes, 1);
+});
