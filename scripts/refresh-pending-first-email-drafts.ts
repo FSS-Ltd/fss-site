@@ -93,7 +93,7 @@ async function lockDraft(
       wa.trust_signals as "trustSignals",
       wa.conversion_plan as "conversionPlan",
       (select se.source_url from growth.source_evidence se
-       where se.prospect_id = at.prospect_id and se.source_type = 'first_party'
+       where se.prospect_id = at.prospect_id and se.origin = 'research' and se.source_type = 'first_party'
        order by se.verified_at desc, se.created_at desc limit 1) as "firstPartyEvidenceUrl",
       exists (
         select 1

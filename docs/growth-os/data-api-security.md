@@ -195,7 +195,9 @@ Rules:
 - No copied Google Maps reviews, photos, rating values, or listing descriptions
 - Companies House evidence stores the company number, profile URL, corporate type, and active status
 - First-party evidence stores a short factual summary and link, not a full page copy
-- Unique `(prospect_id, source_url, claim_type)`
+- Research-origin claims remain unique by `(prospect_id, source_url, claim_type)`.
+- Founder verification stores append-only, request-idempotent contact and business observations bound to prospect, contact, business, and record versions. It uses no fabricated research run and does not establish outreach permission.
+- Founder proofs are private to authorized founder workflows; legacy research evidence readers exclude them. Freshness is bounded by both observation and verification times.
 
 ### `website_assessments`
 

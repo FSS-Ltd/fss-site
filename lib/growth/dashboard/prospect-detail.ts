@@ -279,7 +279,7 @@ async function fetchEvidence(
       observed_at as "observedAt",
       verified_at as "verifiedAt"
     from growth.source_evidence
-    where prospect_id = ${prospectId}
+    where origin = 'research' and prospect_id = ${prospectId}
     order by verified_at desc
     limit ${MAX_EVIDENCE_ITEMS}
   `;
