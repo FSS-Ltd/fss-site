@@ -31,7 +31,11 @@ const googleTokenResponseSchema = z.object({
 });
 
 const googleIdentityResponseSchema = z.object({
-  sub: z.string().min(1).max(255),
+  sub: z
+    .string()
+    .min(1)
+    .max(255)
+    .refine((value) => value.trim().length > 0),
   email: z.string().email(),
   email_verified: z.boolean(),
 });

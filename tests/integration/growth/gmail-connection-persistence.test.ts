@@ -21,6 +21,7 @@ test(
     const subjectEmail = `gmail-persistence-${testId}@example.test`;
     const firstCorrelationId = `gmail-connect-${testId}`;
     const secondCorrelationId = `gmail-reconnect-${testId}`;
+    const rejectedCorrelationId = `gmail-rejected-${testId}`;
     const encryptionKey = Buffer.alloc(32, 7);
     const firstEncryptedToken = encryptRefreshToken("first-refresh-token", {
       version: "v1",
@@ -30,6 +31,14 @@ test(
       version: "v1",
       key: encryptionKey,
     });
+
+    const rejectedEncryptedToken = encryptRefreshToken(
+      "rejected-refresh-token",
+      {
+        version: "v1",
+        key: encryptionKey,
+      },
+    );
 
     try {
       const firstConnectionId = await storeConnectedGmailConnection(sql, {
@@ -41,6 +50,12 @@ test(
         correlationId: firstCorrelationId,
         actorId: "integration-test-founder",
       });
+      const [initial] = await sql<Array<{ googleSubject: string | null }>>`
+        select google_subject as "googleSubject" from growth.integration_connections where id = ${firstConnectionId}
+      `;
+      assert.equal(initial?.googleSubject, "test-google-subject");
+      // Simulate a connection created before subject persistence existed.
+      await sql`update growth.integration_connections set google_subject = null where id = ${firstConnectionId}`;
       const secondConnectionId = await storeConnectedGmailConnection(sql, {
         subjectEmail,
         googleSubject: "test-google-subject",
@@ -56,10 +71,10 @@ test(
         storeConnectedGmailConnection(sql, {
           subjectEmail,
           googleSubject: "different-google-subject",
-          encryptedRefreshToken: secondEncryptedToken,
+          encryptedRefreshToken: rejectedEncryptedToken,
           grantedScopes: ["openid", "email", "gmail.modify"],
           accessTokenExpiresAt: new Date("2026-08-17T14:00:00.000Z"),
-          correlationId: randomUUID(),
+          correlationId: rejectedCorrelationId,
           actorId: "integration-test-founder",
         }),
       );
@@ -67,6 +82,7 @@ test(
       const [connection] = await sql<
         Array<{
           id: string;
+          googleSubject: string | null;
           encryptedRefreshToken: string;
           status: string;
           providerCursor: string | null;
@@ -76,6 +92,7 @@ test(
       >`
         select
           id,
+          google_subject as "googleSubject",
           encrypted_refresh_token as "encryptedRefreshToken",
           status,
           provider_cursor as "providerCursor",
@@ -88,12 +105,13 @@ test(
       const auditEvents = await sql<Array<{ correlationId: string }>>`
         select correlation_id as "correlationId"
         from growth.audit_log
-        where correlation_id in (${firstCorrelationId}, ${secondCorrelationId})
+        where correlation_id in (${firstCorrelationId}, ${secondCorrelationId}, ${rejectedCorrelationId})
         order by correlation_id
       `;
 
       assert.deepEqual(connection, {
         id: firstConnectionId,
+        googleSubject: "test-google-subject",
         encryptedRefreshToken: JSON.stringify(secondEncryptedToken),
         status: "connected",
         providerCursor: null,
@@ -112,7 +130,7 @@ test(
     } finally {
       await sql`
         delete from growth.audit_log
-        where correlation_id in (${firstCorrelationId}, ${secondCorrelationId})
+        where correlation_id in (${firstCorrelationId}, ${secondCorrelationId}, ${rejectedCorrelationId})
       `;
       await sql`
         delete from growth.integration_connections
