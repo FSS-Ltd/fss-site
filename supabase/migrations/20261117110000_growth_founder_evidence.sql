@@ -1,5 +1,7 @@
 set lock_timeout = '5s';
 
+alter table growth.contacts add column email_source_visibility text not null default 'standard' check (email_source_visibility in ('standard', 'private_founder'));
+
 alter table growth.source_evidence alter column research_run_id drop not null;
 alter table growth.source_evidence
   add column origin text not null default 'research' check (origin in ('research', 'founder')),

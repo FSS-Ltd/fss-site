@@ -1,11 +1,20 @@
 import { createHash } from "node:crypto";
 import type { FounderSession } from "../auth/require-founder";
 import { CrmError } from "../crm/errors";
-import type { GrowthDb } from "../db/types";
+import type {
+  GrowthDb,
+  GrowthQueryExecutor,
+  GrowthTransaction,
+} from "../db/types";
 
 export type FounderVerificationSnapshot = {
   status: "current" | "stale";
   contactId: string;
+  requestId: string;
+  contactProofId: string;
+  observationProofId: string;
+  proofContactVersion: number;
+  proofProspectVersion: number;
   email: string;
   observation: string;
   observationSourceUrl: string;
@@ -28,9 +37,26 @@ export async function loadFounderVerification(
     founder.actorId !== createHash("sha256").update(founder.email).digest("hex")
   )
     throw new CrmError("invalid");
+  return readFounderVerification(db, prospectId, now);
+}
+
+export async function loadFounderVerificationInTransaction(
+  tx: GrowthTransaction,
+  prospectId: string,
+  now: Date,
+): Promise<FounderVerificationSnapshot | null> {
+  return readFounderVerification(tx, prospectId, now);
+}
+
+async function readFounderVerification(
+  db: GrowthQueryExecutor,
+  prospectId: string,
+  now: Date,
+): Promise<FounderVerificationSnapshot | null> {
   const rows = await db<
     {
       contactId: string;
+      proofId: string;
       email: string;
       claimType: string;
       summary: string;
@@ -45,9 +71,18 @@ export async function loadFounderVerification(
       requestId: string;
     }[]
   >`
-    select e.contact_id as "contactId", c.email, e.claim_type as "claimType", e.claim_summary as summary, e.source_url as "sourceUrl", e.observed_at as "observedAt", e.verified_at as "verifiedAt", e.contact_version as "proofContactVersion", e.prospect_version as "proofProspectVersion", c.version as "contactVersion", p.version as "prospectVersion", p.primary_contact_id as "primaryContactId", e.request_id as "requestId"
+    with latest as (
+      select request_id, prospect_version
+      from growth.source_evidence
+      where origin='founder' and prospect_id=${prospectId}
+      group by request_id, prospect_version, contact_id, contact_version
+      having count(distinct claim_type)=2
+      order by prospect_version desc, request_id desc limit 1
+    )
+    select e.contact_id as "contactId", e.id as "proofId", c.email, e.claim_type as "claimType", e.claim_summary as summary, e.source_url as "sourceUrl", e.observed_at as "observedAt", e.verified_at as "verifiedAt", e.contact_version as "proofContactVersion", e.prospect_version as "proofProspectVersion", c.version as "contactVersion", p.version as "prospectVersion", p.primary_contact_id as "primaryContactId", e.request_id as "requestId"
     from growth.source_evidence e join growth.prospects p on p.id=e.prospect_id join growth.contacts c on c.id=e.contact_id
-    where e.origin='founder' and e.prospect_id=${prospectId} order by e.verified_at desc, e.request_id desc limit 2`;
+    join latest on latest.request_id=e.request_id and latest.prospect_version=e.prospect_version
+    where e.origin='founder' and e.prospect_id=${prospectId}`;
   const contact = rows.find((row) => row.claimType === "contact_email");
   const observation = rows.find(
     (row) => row.claimType === "business_observation",
@@ -78,6 +113,11 @@ export async function loadFounderVerification(
     effectiveEvidenceAt,
     freshUntil: new Date(effectiveEvidenceAt.getTime() + 30 * 86400000),
     status: current ? "current" : "stale",
+    requestId: contact.requestId,
+    contactProofId: contact.proofId,
+    observationProofId: observation.proofId,
+    proofContactVersion: contact.proofContactVersion,
+    proofProspectVersion: contact.proofProspectVersion,
     contactId: contact.contactId,
     email: contact.email,
     observation: observation.summary,

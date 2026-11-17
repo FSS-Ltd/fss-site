@@ -31,8 +31,8 @@ export type ProspectDetailContact = {
   lastName: string | null;
   roleTitle: string | null;
   email: string;
-  emailSourceUrl: string;
-  emailVerifiedAt: string;
+  emailSourceUrl: string | null;
+  emailVerifiedAt: string | null;
   subscriberType: string;
   lawfulBasis: string;
 };
@@ -208,8 +208,8 @@ async function fetchCoreRow(
       c.last_name as "contactLastName",
       c.role_title as "contactRoleTitle",
       c.email as "contactEmail",
-      c.email_source_url as "contactEmailSourceUrl",
-      c.email_verified_at as "contactEmailVerifiedAt",
+      case when c.email_source_visibility = 'standard' then c.email_source_url end as "contactEmailSourceUrl",
+      case when c.email_source_visibility = 'standard' then c.email_verified_at end as "contactEmailVerifiedAt",
       c.subscriber_type as "contactSubscriberType",
       c.lawful_basis as "contactLawfulBasis",
       wa.business_goal as "websiteBusinessGoal",
@@ -317,18 +317,14 @@ function toProspectDetail(
   auditSummary: readonly ProspectAuditEntry[],
 ): ProspectDetail {
   const contact: ProspectDetailContact | null =
-    core.contactEmail &&
-    core.contactEmailSourceUrl &&
-    core.contactEmailVerifiedAt &&
-    core.contactSubscriberType &&
-    core.contactLawfulBasis
+    core.contactEmail && core.contactSubscriberType && core.contactLawfulBasis
       ? {
           firstName: core.contactFirstName,
           lastName: core.contactLastName,
           roleTitle: core.contactRoleTitle,
           email: core.contactEmail,
           emailSourceUrl: core.contactEmailSourceUrl,
-          emailVerifiedAt: core.contactEmailVerifiedAt.toISOString(),
+          emailVerifiedAt: core.contactEmailVerifiedAt?.toISOString() ?? null,
           subscriberType: core.contactSubscriberType,
           lawfulBasis: core.contactLawfulBasis,
         }

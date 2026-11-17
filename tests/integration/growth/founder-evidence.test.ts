@@ -108,8 +108,12 @@ test(
       assert.equal(first.contactId, replay.contactId);
       const detail = await getProspectDetail(lead.prospectId, db);
       assert.equal(detail.status, "found");
-      if (detail.status === "found")
+      if (detail.status === "found") {
         assert.equal(detail.data.evidence.length, 0);
+        assert.ok(detail.data.contact);
+        assert.equal(detail.data.contact.emailSourceUrl, null);
+        assert.equal(detail.data.contact.emailVerifiedAt, null);
+      }
       const rows =
         await db`select origin, research_run_id, contact_id, contact_version, prospect_version from growth.source_evidence where request_id=${input.requestId}`;
       assert.equal(rows.length, 2);
@@ -219,11 +223,12 @@ test(
       const [unchanged] =
         await db`select version from growth.prospects where id=${lead.prospectId}`;
       assert.equal(unchanged?.version, first.prospectVersion);
+      const renewalRequestId = randomUUID();
       const renewal = await verifyFounderEvidence(
         db,
         {
           ...input,
-          requestId: randomUUID(),
+          requestId: renewalRequestId,
           expectedProspectVersion: first.prospectVersion,
           observedAt: new Date(),
           contactObservedAt: new Date(),
@@ -232,6 +237,55 @@ test(
         randomUUID(),
       );
       assert.equal(renewal.prospectVersion, first.prospectVersion + 1);
+      assert.equal(
+        (
+          await loadFounderVerification(
+            db,
+            lead.prospectId,
+            new Date(),
+            founder,
+          )
+        )?.status,
+        "current",
+      );
+      const laterRows = await db<
+        { verifiedAt: Date }[]
+      >`select verified_at as "verifiedAt" from growth.source_evidence where request_id=${renewalRequestId} limit 1`;
+      const oldReplayId = `ffffffff-${token.slice(9)}`;
+      await db`insert into growth.source_evidence (prospect_id,research_run_id,source_type,source_url,external_reference,claim_type,claim_summary,observed_at,verified_at,retention_class,origin,founder_actor_id,request_id,request_hash,contact_id,business_id,contact_version,prospect_version)
+        select prospect_id,research_run_id,source_type,source_url,external_reference,claim_type,claim_summary,observed_at,${laterRows[0]!.verifiedAt},retention_class,origin,founder_actor_id,${oldReplayId},request_hash,contact_id,business_id,contact_version,prospect_version from growth.source_evidence where request_id=${input.requestId}`;
+      assert.equal(
+        (
+          await loadFounderVerification(
+            db,
+            lead.prospectId,
+            new Date(),
+            founder,
+          )
+        )?.status,
+        "current",
+      );
+      let waitingRenewal: ReturnType<typeof verifyFounderEvidence> | undefined;
+      await db.begin(async (tx) => {
+        await tx`select id from growth.prospects where id=${lead.prospectId} for update`;
+        waitingRenewal = verifyFounderEvidence(
+          db,
+          {
+            ...input,
+            requestId: randomUUID(),
+            expectedProspectVersion: renewal.prospectVersion + 1,
+            observedAt: new Date(),
+            contactObservedAt: new Date(),
+          },
+          founder,
+          randomUUID(),
+        );
+        await tx`select pg_sleep(0.05)`;
+        await tx`update growth.prospects set version=version+1 where id=${lead.prospectId}`;
+      });
+      assert.ok(waitingRenewal);
+      const afterWait = await waitingRenewal;
+      assert.equal(afterWait.prospectVersion, renewal.prospectVersion + 2);
       assert.equal(
         (
           await loadFounderVerification(
@@ -273,6 +327,77 @@ test(
           randomUUID(),
         ),
       );
+    } finally {
+      await db.end();
+    }
+  },
+);
+
+test(
+  "research contact source remains visible after founder reverification",
+  { skip: !connection },
+  async () => {
+    if (!connection) return;
+    const db = postgres(connection, {
+      max: 4,
+      connection: { options: "-c role=growth_app" },
+    });
+    const token = randomUUID().replaceAll("-", "");
+    const founderEmail = "j.ntagengwa@faithfulsoftware.dev";
+    const founder = {
+      email: founderEmail,
+      actorId: createHash("sha256").update(founderEmail).digest("hex"),
+    };
+    const email = `${token}@example.com`;
+    const originalSource = `https://${token}.example.com/old`;
+    const verifiedAt = "2026-10-01T12:00:00Z";
+    try {
+      const { globalResearchRunSchema } =
+        await import("../../../lib/growth/research/global-schema");
+      const { createGlobalResearchFixture } =
+        await import("../../../lib/growth/research/global-test-fixture");
+      const { ingestResearchRun } =
+        await import("../../../lib/growth/research/ingest");
+      const run = globalResearchRunSchema.parse(createGlobalResearchFixture());
+      run.externalRunId = `verification-${token}`;
+      const candidate = run.prospects[0]!;
+      candidate.business.legalName = `research-${token}`;
+      candidate.business.websiteUrl = `https://${token}.example.com`;
+      candidate.business.firstPartySourceUrl = originalSource;
+      candidate.contact.email = email;
+      candidate.contact.emailSourceUrl = originalSource;
+      candidate.contact.emailVerifiedAt = verifiedAt;
+      candidate.evidence[0]!.sourceUrl = originalSource;
+      const result = await ingestResearchRun(db, run);
+      const prospectId = result.acceptedProspects[0]?.prospectId;
+      assert.ok(prospectId);
+      await verifyFounderEvidence(
+        db,
+        {
+          requestId: randomUUID(),
+          prospectId,
+          expectedProspectVersion: 1,
+          email,
+          firstName: null,
+          lastName: null,
+          contactSourceUrl: `https://${token}.example.com/private`,
+          contactObservedAt: new Date(),
+          observationSourceUrl: `https://${token}.example.com`,
+          observation: "Appointments are booked by telephone.",
+          observedAt: new Date(),
+        },
+        founder,
+        randomUUID(),
+      );
+      const detail = await getProspectDetail(prospectId, db);
+      assert.equal(detail.status, "found");
+      if (detail.status === "found") {
+        assert.equal(detail.data.contact?.emailSourceUrl, originalSource);
+        assert.equal(
+          detail.data.contact?.emailVerifiedAt,
+          "2026-10-01T12:00:00.000Z",
+        );
+      }
     } finally {
       await db.end();
     }

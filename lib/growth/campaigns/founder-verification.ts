@@ -56,7 +56,6 @@ export async function verifyFounderEvidence(
     !correlationId.trim()
   )
     throw new CrmError("invalid");
-  const now = new Date();
   const requestHash = createHash("sha256")
     .update(JSON.stringify(input))
     .digest("hex");
@@ -90,10 +89,6 @@ export async function verifyFounderEvidence(
         alreadyExisted: true,
       };
     }
-    for (const observed of [input.contactObservedAt, input.observedAt]) {
-      const age = now.getTime() - observed.getTime();
-      if (age < 0 || age > 30 * 86400000) throw new CrmError("invalid");
-    }
     const [prospect] = await tx<
       { businessId: string; contactId: string | null; version: number }[]
     >`select business_id as "businessId", primary_contact_id as "contactId", version from growth.prospects where id=${input.prospectId} for update`;
@@ -111,6 +106,12 @@ export async function verifyFounderEvidence(
     )
       throw new CrmError("contact_conflict");
     if (!existing && prospect.contactId) throw new CrmError("contact_conflict");
+    const now = new Date();
+    for (const observed of [input.contactObservedAt, input.observedAt]) {
+      const age = now.getTime() - observed.getTime();
+      if (age < 0 || age > 30 * 86400000) throw new CrmError("invalid");
+    }
+
     let contactId: string;
     let contactVersion: number;
     if (existing) {
@@ -119,14 +120,14 @@ export async function verifyFounderEvidence(
       if (other) throw new CrmError("contact_conflict");
       const [updated] = await tx<
         { version: number }[]
-      >`update growth.contacts set email_source_url=${input.contactSourceUrl}, email_verified_at=${now}, version=version+1, updated_at=now() where id=${existing.id} returning version`;
+      >`update growth.contacts set version=version+1, updated_at=now() where id=${existing.id} returning version`;
       if (!updated) throw new Error("Contact update returned no row.");
       contactId = existing.id;
       contactVersion = updated.version;
     } else {
       const [created] = await tx<
         { id: string; version: number }[]
-      >`insert into growth.contacts (business_id,first_name,last_name,role_title,email,email_source_url,email_verified_at,subscriber_type,lawful_basis) values (${prospect.businessId},${input.firstName},${input.lastName},null,${input.email},${input.contactSourceUrl},${now},'uncertain','research_only') returning id,version`;
+      >`insert into growth.contacts (business_id,first_name,last_name,role_title,email,email_source_url,email_verified_at,subscriber_type,lawful_basis,email_source_visibility) values (${prospect.businessId},${input.firstName},${input.lastName},null,${input.email},${input.contactSourceUrl},${now},'uncertain','research_only','private_founder') returning id,version`;
       if (!created) throw new Error("Contact insert returned no row.");
       contactId = created.id;
       contactVersion = created.version;
