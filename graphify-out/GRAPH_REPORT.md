@@ -1,15 +1,26 @@
-# Graph Report - agreement and proposal routing scope  (2026-11-11)
+# Scoped Graph Update (2026-11-17)
+
+- Current structural graph: 714 nodes and 887 edges from 198 tracked TypeScript files. Prior 121 sources were hash-verified; 77 selected Growth and Studio files were extracted locally with deterministic AST. No model tokens or external upload.
+- Scope includes selected CRM, research, outreach, provider integration, suppression, analytics and Studio client sources. SQL, documentation, styles, routes and other project domains remain outside this added extraction. [source-hashes.json](source-hashes.json) lists the exact corpus.
+- Existing agreement community analysis below, `graph.html`, benchmark and extraction snapshot are historical and were not regenerated for the expanded graph. Newly added nodes have no assigned communities.
+
+# Historical agreement and proposal routing report (2026-11-11)
+
+All counts and community analysis below describe the earlier 121-file graph.
 
 ## Corpus Check
+
 - 121 files · ~44,220 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
+
 - 378 nodes · 471 edges · 19 communities detected
 - Extraction: 71% EXTRACTED · 29% INFERRED · 0% AMBIGUOUS · INFERRED: 138 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
+
 - [[_COMMUNITY_Community 0|Community 0]]
 - [[_COMMUNITY_Community 1|Community 1]]
 - [[_COMMUNITY_Community 2|Community 2]]
@@ -31,6 +42,7 @@
 - [[_COMMUNITY_Community 27|Community 27]]
 
 ## God Nodes (most connected - your core abstractions)
+
 1. `signingOperation()` - 15 edges
 2. `writeAgreementContent()` - 11 edges
 3. `hasCompleteSigningEvidence()` - 9 edges
@@ -43,96 +55,117 @@
 10. `ensureSigningSpace()` - 7 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `agreementWorkspaceHref()` --calls--> `portalPath()`  [INFERRED]
+
+- `agreementWorkspaceHref()` --calls--> `portalPath()` [INFERRED]
   components/portal/agreements/staff-agreement-overview.tsx → lib/operations/auth/portal-url.ts
-- `signingWorkspaceHref()` --calls--> `portalPath()`  [INFERRED]
+- `signingWorkspaceHref()` --calls--> `portalPath()` [INFERRED]
   components/portal/agreements/staff-agreement-overview.tsx → lib/operations/auth/portal-url.ts
-- `signingOperation()` --calls--> `run()`  [INFERRED]
+- `signingOperation()` --calls--> `run()` [INFERRED]
   lib/operations/agreements/signing-service.ts → components/portal/agreements/signing-deadline-actions.tsx
-- `agreementHref()` --calls--> `portalPath()`  [INFERRED]
+- `agreementHref()` --calls--> `portalPath()` [INFERRED]
   components/portal/agreements/client-agreement-list.tsx → lib/operations/auth/portal-url.ts
-- `signingPounds()` --calls--> `formatMoney()`  [INFERRED]
+- `signingPounds()` --calls--> `formatMoney()` [INFERRED]
   lib/operations/agreements/signing-pdf-content.ts → components/portal/agreements/commercial-offer-summary.tsx
 
 ## Communities
 
 ### Community 0 - "Community 0"
+
 Cohesion: 0.08
 Nodes (27): retainBranch(), assertNoPendingExecution(), insertRevision(), listAgreementRegister(), loadAgreement(), loadAgreements(), readAgreementRegister(), withAgreementTransaction() (+19 more)
 
 ### Community 1 - "Community 1"
+
 Cohesion: 0.11
 Nodes (26): commercialOfferRouteConfiguration(), createCommercialOfferRouteHandler(), portalCommercialOfferRoute(), staffCommercialOfferRoute(), portalAuthConfigured(), readPortalAuthConfig(), resolvePortalOrigin(), deployedEnvironment() (+18 more)
 
 ### Community 2 - "Community 2"
+
 Cohesion: 0.12
 Nodes (14): formatGbp(), ClientAgreementDetail(), CompletionNotice(), oneOffTotal(), SigningRecord(), AgreementRow(), statusLabel(), clientSigningProgress() (+6 more)
 
 ### Community 3 - "Community 3"
+
 Cohesion: 0.12
 Nodes (15): contentFromForm(), beginEngagement(), save(), save(), formatGbp(), mergeContent(), numberValue(), textValue() (+7 more)
 
 ### Community 4 - "Community 4"
+
 Cohesion: 0.19
 Nodes (18): resendStaffAgreementNotification(), executePortalCommercialOfferCommand(), executeStaffCommercialOfferCommand(), publishStaffCommercialOffer(), executeFounderSigningCommand(), executePortalSigningCommand(), executeStaffSigningCommand(), approveAgreementSigning() (+10 more)
 
 ### Community 5 - "Community 5"
+
 Cohesion: 0.28
 Nodes (14): signingPounds(), writeAgreementContent(), writeExecutionRecord(), writeRevenueShare(), writeServiceLines(), ensureSigningSpace(), masthead(), signingDetail() (+6 more)
 
 ### Community 6 - "Community 6"
+
 Cohesion: 0.16
 Nodes (12): agreementNotificationEmail(), agreementNotificationIdempotencyKey(), dispatchAgreementNotifications(), escapeHtml(), agreementPath(), agreementHref(), agreementPath(), createInvitationActivationUrl() (+4 more)
 
 ### Community 7 - "Community 7"
+
 Cohesion: 0.15
 Nodes (6): save(), prefillFromEngagement(), replaceEngagement(), beginEngagement(), persist(), selectEngagement()
 
 ### Community 8 - "Community 8"
+
 Cohesion: 0.18
 Nodes (9): AgreementBuilderDraftConflict, draftConflict(), finaliseDraft(), loadStaffAgreementBuilderDraft(), saveStaffAgreementBuilderDraft(), toAgreementDraft(), AgreementBuilderDraftValidationError, builderValidationIssues() (+1 more)
 
 ### Community 9 - "Community 9"
+
 Cohesion: 0.24
 Nodes (7): emptyLine(), ensureClientProposedRecurringService(), isUntouchedStarterLine(), linesForAgreementDraft(), monthlyRecurringLine(), parseFeeLines(), parseInstallments()
 
 ### Community 10 - "Community 10"
+
 Cohesion: 0.2
 Nodes (5): completeDraft(), savedDraft(), content(), recurringDraft(), agreementDraft()
 
 ### Community 11 - "Community 11"
+
 Cohesion: 0.25
 Nodes (4): handler(), request(), errorMessage(), run()
 
 ### Community 12 - "Community 12"
+
 Cohesion: 0.25
 Nodes (2): getPortalCommercialOffer(), ClientOfferPage()
 
 ### Community 13 - "Community 13"
+
 Cohesion: 0.29
 Nodes (2): useAgreementBuilderGroups(), AgreementBuilderPeopleStep()
 
 ### Community 15 - "Community 15"
+
 Cohesion: 0.4
 Nodes (2): createAgreementRouteHandler(), setup()
 
 ### Community 16 - "Community 16"
+
 Cohesion: 0.5
 Nodes (1): EngagementCommandConflict
 
 ### Community 17 - "Community 17"
+
 Cohesion: 0.83
 Nodes (3): projectCompletion(), runSigningGrowthWorker(), signingGrowthValues()
 
 ### Community 21 - "Community 21"
+
 Cohesion: 1.0
 Nodes (2): resultFrom(), submit()
 
 ### Community 27 - "Community 27"
+
 Cohesion: 0.67
 Nodes (1): AgreementConflict
 
 ## Knowledge Gaps
+
 - **1 isolated node(s):** `PayloadTooLargeError`
   These have ≤1 connection - possible missing edges or undocumented components.
 - **Thin community `Community 12`** (8 nodes): `page.tsx`, `getPortalCommercialOffer()`, `getStaffCommercialOffer()`, `listPortalCommercialOffers()`, `listStaffCommercialOffers()`, `loadCommercialOffers()`, `commercial-repository.ts`, `ClientOfferPage()`
@@ -149,6 +182,7 @@ Nodes (1): AgreementConflict
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
+
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `prepareSigningInTransaction()` connect `Community 0` to `Community 4`?**
