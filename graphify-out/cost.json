@@ -69,6 +69,20 @@
       "output_tokens": 0,
       "files": 244,
       "method": "selected-corpus AST rebuild in <=160-file batches, TypeScript static imports, no-viz"
+    },
+    {
+      "date": "2026-11-17",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 253,
+      "method": "selected-corpus AST rebuild in <=160-file batches, TypeScript static imports, no-viz"
+    },
+    {
+      "date": "2026-11-17",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 257,
+      "method": "selected-corpus AST rebuild in <=160-file batches, TypeScript static imports, no-viz"
     }
   ],
   "total_input_tokens": 0,
