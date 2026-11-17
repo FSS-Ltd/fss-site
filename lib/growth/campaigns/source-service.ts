@@ -11,7 +11,7 @@ import {
 } from "../research/global-identity";
 import { sourceLeadInputSchema, type SourceLeadInput } from "./schemas";
 
-function normalizeSourceUrl(value: string): string {
+export function normalizeSourceUrl(value: string): string {
   const url = new URL(value);
   if (
     url.hostname === "facebook.com" ||

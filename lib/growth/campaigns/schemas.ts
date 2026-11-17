@@ -379,32 +379,6 @@ export const campaignReportSchema = z.object({
   ]),
 });
 export type CampaignReport = z.infer<typeof campaignReportSchema>;
-export const facebookWorkspaceResultSchema = z.discriminatedUnion("status", [
-  z.object({
-    status: z.literal("ready"),
-    destinations: z.array(
-      z.object({
-        id,
-        url: z.url(),
-        name: id,
-        kind: z.enum(["page", "group"]),
-        postingPermission: z.enum(["allowed", "unknown", "prohibited"]),
-        websiteUrl: publicUrl.nullable(),
-        rulesUrl: publicUrl.nullable(),
-        locality: z.string().nullable(),
-        rules: z.string().nullable(),
-        evidenceAt: date.nullable(),
-        activity: z.enum(["none", "followed", "joined", "posted"]),
-      }),
-    ),
-    slotsTotal: z.literal(2),
-    slotsUsed: z.number().int().min(0).max(2),
-  }),
-  z.object({ status: z.literal("error"), message: id }),
-]);
-export type FacebookWorkspaceResult = z.infer<
-  typeof facebookWorkspaceResultSchema
->;
 export const campaignDashboardResultSchema = z.discriminatedUnion("status", [
   z.object({
     status: z.literal("ready"),
