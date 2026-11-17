@@ -2,6 +2,7 @@ export type GrowthNavigationIcon =
   | "overview"
   | "prospects"
   | "outreach"
+  | "facebook"
   | "pipeline"
   | "deals"
   | "clients"
@@ -35,6 +36,12 @@ export const GROWTH_NAVIGATION_ITEMS = [
     accessibleLabel: "Open Outreach",
     href: "/growth/outreach",
     icon: "outreach",
+  },
+  {
+    label: "Facebook",
+    accessibleLabel: "Open Facebook",
+    href: "/growth/facebook",
+    icon: "facebook",
   },
   {
     label: "Pipeline",
