@@ -33,6 +33,7 @@ export type CampaignVariant = z.infer<typeof campaignVariantSchema>;
 export const campaignPolicySchema = z
   .object({
     version: z.number().int().positive(),
+    accountConnectionId: uuid.nullable().default(null),
     status: z.enum(["paused", "approved", "revoked"]).default("paused"),
     approvedAt: date.nullable().default(null),
     effectiveAt: date.nullable().default(null),

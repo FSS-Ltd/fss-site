@@ -494,3 +494,13 @@ test("campaign weekdays default to business days and reject duplicates", async (
     false,
   );
 });
+
+test("campaign policy retains an explicit Gmail account binding", async () => {
+  const { campaignPolicySchema } = await import("./schemas");
+  const accountConnectionId = "00000000-0000-4000-8000-000000000001";
+  const result = campaignPolicySchema.parse({
+    version: 1,
+    accountConnectionId,
+  });
+  assert.equal(Reflect.get(result, "accountConnectionId"), accountConnectionId);
+});

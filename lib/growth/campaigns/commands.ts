@@ -17,8 +17,27 @@ import {
 import {
   campaignCommandSchema,
   type CampaignCommand,
+  type CampaignPolicyDefinition,
   type CampaignCommandResult,
 } from "./schemas";
+
+async function validateAccountBinding(
+  tx: GrowthTransaction,
+  policy: CampaignPolicyDefinition,
+  founder: FounderSession,
+): Promise<void> {
+  if (!policy.accountConnectionId) return;
+  if (policy.provider !== "gmail") throw new Error("invalid_account_binding");
+  const [connection] = await tx<{ id: string }[]>`
+    select id from growth.integration_connections
+    where id = ${policy.accountConnectionId}
+      and provider = 'gmail' and subject_email = ${founder.email}
+      and status = 'connected' and google_subject is not null
+      and 'https://www.googleapis.com/auth/gmail.modify' = any(granted_scopes)
+    for share
+  `;
+  if (!connection) throw new Error("invalid_account_binding");
+}
 
 async function mutate(
   tx: GrowthTransaction,
@@ -34,8 +53,9 @@ async function mutate(
     throw new Error("not_available");
   if (command.type === "create") {
     validateCampaignDefinition(command.policy, 1, new Date(), false);
+    await validateAccountBinding(tx, command.policy, founder);
     const id = randomUUID();
-    await tx`insert into growth.campaigns(id,version,request_id,name,policy) values (${id},1,${command.requestId},${command.name},${tx.json(serializeCampaignDefinition(command.policy))})`;
+    await tx`insert into growth.campaigns(id,version,request_id,name,policy,account_connection_id) values (${id},1,${command.requestId},${command.name},${tx.json(serializeCampaignDefinition(command.policy))},${command.policy.accountConnectionId})`;
     return { campaignId: id, version: 1, membershipId: null, resultId: id };
   }
   const membershipId =
@@ -78,9 +98,10 @@ async function mutate(
   if (policy.status === "revoked") throw new Error("policy_revoked");
   if (command.type === "revise") {
     validateCampaignDefinition(command.policy, policy.version + 1, now, false);
+    await validateAccountBinding(tx, command.policy, founder);
     await tx`update growth.campaigns set status='paused' where id=${campaignId} and status='approved'`;
     await cancelCampaignJobs(tx, campaignId);
-    await tx`insert into growth.campaigns(id,version,request_id,name,policy) values (${campaignId},${policy.version + 1},${command.requestId},${policy.name},${tx.json(serializeCampaignDefinition(command.policy))})`;
+    await tx`insert into growth.campaigns(id,version,request_id,name,policy,account_connection_id) values (${campaignId},${policy.version + 1},${command.requestId},${policy.name},${tx.json(serializeCampaignDefinition(command.policy))},${command.policy.accountConnectionId})`;
     return {
       campaignId,
       version: policy.version + 1,

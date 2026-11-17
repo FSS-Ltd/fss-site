@@ -36,6 +36,7 @@ test(
     };
     const policy = {
       version: 1,
+      accountConnectionId: null,
       status: "paused" as const,
       approvedAt: null,
       approverId: null,
