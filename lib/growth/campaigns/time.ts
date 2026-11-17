@@ -15,3 +15,9 @@ export function campaignMonthAnniversary(firstSentAt: Date): Date {
   d.setDate(Math.min(day, next.getDate()));
   return new Date(d.getTime());
 }
+
+export function campaignCadenceDays(
+  family: "review" | "facebook" | "website",
+): readonly [number, number] {
+  return family === "review" ? [5, 10] : [2, 4];
+}

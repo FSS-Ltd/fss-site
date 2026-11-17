@@ -50,6 +50,12 @@ export function buildCampaignReport(
         later: 0,
         positiveReplies: 0,
         qualifiedMeetings: 0,
+        meetingMature: 0,
+        meetingUnknown: 0,
+        meetingCensored: 0,
+        paymentMature: 0,
+        paymentUnknown: 0,
+        paymentCensored: 0,
         paidConversions: 0,
         missingReplies: 0,
         positiveReplyRate: null,
@@ -62,27 +68,30 @@ export function buildCampaignReport(
       continue;
     }
     const end = addLondonDays(member.firstSentAt, 14);
-    if (end > input.cutoff) {
-      group.censored++;
-      continue;
+    if (end > input.cutoff) group.censored++;
+    else if (!member.replyObservationComplete) group.missingReplies++;
+    else {
+      group.mature++;
+      let positive = false;
+      for (const reply of member.replies) {
+        if (
+          replies.has(reply.id) ||
+          reply.occurredAt < member.firstSentAt ||
+          reply.occurredAt > end
+        )
+          continue;
+        replies.add(reply.id);
+        if (reply.reviewed && reply.kind === "positive") positive = true;
+      }
+      if (positive) group.positiveReplies++;
     }
-    if (!member.replyObservationComplete) {
-      group.missingReplies++;
-      continue;
-    }
-    group.mature++;
-    let positive = false;
-    for (const reply of member.replies) {
-      if (
-        replies.has(reply.id) ||
-        reply.occurredAt < member.firstSentAt ||
-        reply.occurredAt > end
-      )
-        continue;
-      replies.add(reply.id);
-      if (reply.reviewed && reply.kind === "positive") positive = true;
-    }
-    if (positive) group.positiveReplies++;
+    if (end > input.cutoff || member.meetingObservation === "censored")
+      group.meetingCensored++;
+    else if (member.meetingObservation === "unknown") group.meetingUnknown++;
+    else group.meetingMature++;
+    if (member.paymentObservation === "censored") group.paymentCensored++;
+    else if (member.paymentObservation === "unknown") group.paymentUnknown++;
+    else group.paymentMature++;
     let meeting = false,
       paid = false;
     for (const outcome of member.outcomes) {

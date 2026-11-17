@@ -93,6 +93,8 @@ test("report excludes immature observations and unreviewed or non-positive repli
         variantId: "a",
         firstSentAt: new Date("2026-01-01T12:00:00Z"),
         replyObservationComplete: true,
+        meetingObservation: "complete" as const,
+        paymentObservation: "complete" as const,
         replies: [
           {
             id: "r",
@@ -112,6 +114,8 @@ test("report excludes immature observations and unreviewed or non-positive repli
         variantId: "b",
         firstSentAt: new Date("2026-01-10T12:00:00Z"),
         replyObservationComplete: true,
+        meetingObservation: "complete" as const,
+        paymentObservation: "complete" as const,
         replies: [],
         outcomes: [],
       },
@@ -208,6 +212,8 @@ test("report deduplicates replies and counts only reviewed net cleared payments"
     variantId: "a",
     firstSentAt: new Date("2026-01-01"),
     replyObservationComplete: true,
+    meetingObservation: "complete" as const,
+    paymentObservation: "complete" as const,
     replies: [reply, reply],
     outcomes: [payment, payment],
   };
@@ -324,6 +330,8 @@ test("report separates missing and later observations and only selects a clear m
     variantId: index < 30 ? "a" : "b",
     firstSentAt: first,
     replyObservationComplete: true,
+    meetingObservation: "complete" as const,
+    paymentObservation: "complete" as const,
     replies:
       index < 30
         ? [
@@ -378,4 +386,85 @@ test("report separates missing and later observations and only selects a clear m
     members: [members[0], { ...members[30], market: "US" }],
   });
   assert.equal(confounded.winnerReason, "confounded");
+});
+
+test("campaign cadence stops after two follow-ups", async () => {
+  const { campaignCadenceDays } = await import("./time");
+  assert.deepEqual(campaignCadenceDays("review"), [5, 10]);
+  assert.deepEqual(campaignCadenceDays("facebook"), [2, 4]);
+  assert.deepEqual(campaignCadenceDays("website"), [2, 4]);
+});
+
+test("outcome evidence remains visible independently of reply completeness", () => {
+  const first = new Date("2026-01-01T12:00:00Z");
+  const member = {
+    membershipId: "independent",
+    businessId: "business",
+    market: "GB",
+    offer: "review",
+    policyVersion: 1,
+    variantId: "a",
+    firstSentAt: first,
+    replyObservationComplete: false,
+    meetingObservation: "complete" as const,
+    paymentObservation: "complete" as const,
+    replies: [],
+    outcomes: [
+      {
+        membershipId: "independent",
+        outcomeId: "meeting",
+        kind: "meeting" as const,
+        occurredAt: new Date("2026-01-03"),
+        reviewed: true,
+        evidenceId: "e",
+        netClearedPence: null,
+      },
+      {
+        membershipId: "independent",
+        outcomeId: "payment",
+        kind: "payment" as const,
+        occurredAt: new Date("2026-01-10"),
+        reviewed: true,
+        evidenceId: "e",
+        netClearedPence: 100,
+      },
+    ],
+  };
+  const group = buildCampaignReport({
+    firstSentAt: first,
+    cutoff: new Date("2026-02-01"),
+    members: [member],
+  }).groups[0];
+  assert.equal(group.missingReplies, 1);
+  assert.equal(group.qualifiedMeetings, 1);
+  assert.equal(group.paidConversions, 1);
+  assert.equal(group.meetingMature, 1);
+  assert.equal(group.paymentMature, 1);
+});
+
+test("outcome observation distinguishes missing and censored from confirmed absence", () => {
+  const first = new Date("2026-01-01T12:00:00Z");
+  const member = {
+    membershipId: "1",
+    businessId: "b",
+    market: "GB",
+    offer: "review",
+    policyVersion: 1,
+    variantId: "a",
+    firstSentAt: first,
+    replyObservationComplete: true,
+    meetingObservation: "unknown" as const,
+    paymentObservation: "censored" as const,
+    replies: [],
+    outcomes: [],
+  };
+  const group = buildCampaignReport({
+    firstSentAt: first,
+    cutoff: new Date("2026-02-01"),
+    members: [member],
+  }).groups[0];
+  assert.equal(group.meetingUnknown, 1);
+  assert.equal(group.paymentCensored, 1);
+  assert.equal(group.meetingMature, 0);
+  assert.equal(group.paymentMature, 0);
 });
