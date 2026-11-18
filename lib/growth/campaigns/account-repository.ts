@@ -60,6 +60,7 @@ type Decision = { status: "ready" } | { status: "held"; reason: string };
 
 type ReservationAccount = {
   bounds: AuthorityBounds;
+  googleSubject: string;
   grantEpoch: number;
   ramp: number;
   limits: Pick<
@@ -235,6 +236,7 @@ async function loadConfiguredAccount(
   return {
     status: "ready",
     account: {
+      googleSubject: connection.subject,
       bounds: {
         validatedAt: clock.now,
         expiresAt: new Date(

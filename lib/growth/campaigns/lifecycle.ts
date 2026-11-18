@@ -59,7 +59,7 @@ export async function cancelCampaignJobs(
   campaignId: string,
   membershipId?: string,
 ): Promise<void> {
-  await tx`update growth.outreach_jobs set status='cancelled',lease_owner=null,lease_until=null where campaign_id=${campaignId} and membership_id is not null and (${membershipId ?? null}::uuid is null or membership_id=${membershipId ?? null}::uuid) and job_type='follow_up' and status in ('pending','leased')`;
+  await tx`update growth.outreach_jobs set status='cancelled',lease_owner=null,lease_until=null,lease_revision=lease_revision+1 where campaign_id=${campaignId} and membership_id is not null and (${membershipId ?? null}::uuid is null or membership_id=${membershipId ?? null}::uuid) and job_type='follow_up' and status in ('pending','leased','held')`;
 }
 
 export function serializeCampaignDefinition(policy: CampaignPolicyDefinition) {

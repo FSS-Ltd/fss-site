@@ -98,21 +98,23 @@ test("job claims are bounded and distinct across workers", async () => {
   const prefix = `test-${crypto.randomUUID()}`;
   try {
     for (let i = 0; i < 30; i++)
-      await sql`insert into growth.outreach_jobs (job_type,due_at,idempotency_key) values ('test',now(),${`${prefix}-${i}`})`;
+      await sql`insert into growth.outreach_jobs (job_type,due_at,idempotency_key) values ('test','2000-01-01T00:00:00Z',${`${prefix}-${i}`})`;
     await assert.rejects(
       sql`select id from growth.claim_outreach_jobs(${prefix},null,interval '1 minute')`,
       /invalid/,
     );
     const [a, b] = await Promise.all([
       sql<
-        { id: string }[]
-      >`select id from growth.claim_outreach_jobs(${prefix},25,interval '1 minute')`,
+        { id: string; key: string }[]
+      >`select id,idempotency_key as key from growth.claim_outreach_jobs(${prefix},5,interval '1 minute')`,
       sql<
-        { id: string }[]
-      >`select id from growth.claim_outreach_jobs(${prefix},25,interval '1 minute')`,
+        { id: string; key: string }[]
+      >`select id,idempotency_key as key from growth.claim_outreach_jobs(${prefix},25,interval '1 minute')`,
     ]);
     assert.equal(a.length + b.length, 30);
-    assert.ok(a.length <= 25 && b.length <= 25);
+    assert.equal(a.length, 5);
+    assert.equal(b.length, 25);
+    assert.ok([...a, ...b].every((job) => job.key.startsWith(`${prefix}-`)));
     assert.equal(new Set([...a, ...b].map((job) => job.id)).size, 30);
   } finally {
     await sql`delete from growth.outreach_jobs where idempotency_key like ${`${prefix}-%`}`;
@@ -409,6 +411,31 @@ test("client matching rejects malformed domains and normalizes website ports", a
         if (error.message !== "rollback fixture") throw error;
       });
   } finally {
+    await sql.end();
+  }
+});
+
+test("job reclaim changes its lease revision", async () => {
+  const sql = postgres(url, { max: 1 });
+  const key = `fence-${crypto.randomUUID()}`;
+  try {
+    await sql`insert into growth.outreach_jobs(job_type,due_at,idempotency_key) values ('test','2000-01-01T00:00:00Z',${key})`;
+    await sql`insert into growth.outreach_jobs(job_type,due_at,idempotency_key,status) values ('test','1999-01-01T00:00:00Z',${`${key}-held`},'held')`;
+    const [first] = await sql<
+      { id: string; revision: string }[]
+    >`select id,lease_revision as revision from growth.claim_outreach_jobs(${key},1,interval '1 minute') where idempotency_key=${key}`;
+    assert.equal(first?.revision, "1");
+    await sql`update growth.outreach_jobs set lease_until=now()-interval '1 second' where id=${first.id}`;
+    const [second] = await sql<
+      { revision: string }[]
+    >`select lease_revision as revision from growth.claim_outreach_jobs(${key},1,interval '1 minute') where idempotency_key=${key}`;
+    assert.equal(second?.revision, "2");
+    const [held] = await sql<
+      { status: string; revision: string }[]
+    >`select status,lease_revision as revision from growth.outreach_jobs where idempotency_key=${`${key}-held`}`;
+    assert.deepEqual(held, { status: "held", revision: "0" });
+  } finally {
+    await sql`delete from growth.outreach_jobs where idempotency_key in (${key},${`${key}-held`})`;
     await sql.end();
   }
 });

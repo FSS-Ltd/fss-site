@@ -1,13 +1,19 @@
 import assert from "node:assert/strict";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { withGrowthTransaction } from "../../../lib/growth/db/client";
 import { loadReviewMembershipPreparationAuthority } from "../../../lib/growth/campaigns/founder-verification-reader";
 import { exerciseResearchPreparation } from "./research-preparation-assertions";
+import { exerciseGmailConfirmation } from "./reservation-confirmation-assertions";
+import { exerciseCrossVersionConfirmation } from "./reservation-cross-version-assertions";
 import { withTransitionClock } from "./reservation-clock";
 import type { FounderSession } from "../../../lib/growth/auth/require-founder";
 import type { GrowthDb } from "../../../lib/growth/db/types";
 import { executeCampaignCommand } from "../../../lib/growth/campaigns/commands";
 import { campaignPolicyDefinitionSchema } from "../../../lib/growth/campaigns/schemas";
+import { assignCampaignVariant } from "../../../lib/growth/campaigns/variants";
+import { buildCampaignCopy } from "../../../lib/growth/campaigns/copy";
+import { createGmailConfirmation } from "../../../lib/growth/campaigns/gmail-confirmation";
+import { loadControlledPreparation } from "../../../lib/growth/campaigns/controlled-preparation";
 import {
   reserveOutreachAttempt,
   beginOutreachSubmission,
@@ -202,6 +208,125 @@ export async function exerciseCampaignReservation(
       assert.equal(preparation?.policyApproverId, founder.actorId);
       assert.equal(await prepare(randomUUID()), null);
       await admin`update growth.campaign_memberships set status='active', sequence_id=${sequence} where id=${member}`;
+      const unboundAttempt = await reserveOutreachAttempt(db, {
+        messageId: message,
+        leaseToken: lease,
+        attemptKey: randomUUID(),
+      });
+      assert.equal(unboundAttempt.status, "ready");
+      if (unboundAttempt.status !== "ready")
+        throw new Error("reservation missing");
+      const rejectUnissued = createGmailConfirmation(db, async () => {
+        throw new Error("provider must not be called");
+      });
+      assert.deepEqual(
+        await rejectUnissued(unboundAttempt.value.reservationId),
+        { status: "held", reason: "issued_attempt_unknown" },
+      );
+      assert.deepEqual(
+        await beginOutreachSubmission(db, {
+          reservationId: unboundAttempt.value.reservationId,
+          leaseToken: lease,
+          fence: unboundAttempt.value.fence,
+          fingerprint: unboundAttempt.value.preparation.fingerprint,
+        }),
+        { status: "held", reason: "controlled_variant_unproven" },
+      );
+      await admin`update growth.outreach_reservations set status='submitting',submitted_at=now() where id=${unboundAttempt.value.reservationId}`;
+      await admin`update growth.outreach_reservations set status='accepted',provider_message_id='acceptance-only',provider_thread_id='acceptance-thread' where id=${unboundAttempt.value.reservationId}`;
+      assert.deepEqual(
+        await rejectUnissued(unboundAttempt.value.reservationId),
+        { status: "held", reason: "issued_attempt_unknown" },
+      );
+      await admin`delete from growth.audit_log where entity_id=${unboundAttempt.value.reservationId}`;
+      await admin`delete from growth.outreach_reservations where id=${unboundAttempt.value.reservationId}`;
+      await admin`update growth.email_messages set rfc_message_id=null where id=${message}`;
+      const [copyFacts] = await admin<
+        { email: string; observationId: string }[]
+      >`
+        select ct.normalised_email as email,e.id as "observationId"
+        from growth.contacts ct join growth.source_evidence e on e.contact_id=ct.id
+        where ct.id=${contact} and e.request_id=${proofRequest} and e.claim_type='business_observation'`;
+      assert.ok(copyFacts);
+      const variantId = assignCampaignVariant({
+        businessId: business,
+        market: "GB",
+        seed: `${campaign.id}:2`,
+        variantIds: ["a", "b"],
+      });
+      const variant = campaignPolicy.variants.find(
+        (item) => item.id === variantId,
+      );
+      assert.ok(variant);
+      const copy = buildCampaignCopy({
+        businessName: "Campaign authority test",
+        verifiedOwnerName: null,
+        verifiedObservation: "reviewed",
+        offer: "review",
+        previewArtifactId: null,
+        previewReviewed: false,
+        cta: variant.cta,
+      });
+      const copySha256 = createHash("sha256")
+        .update(JSON.stringify([copy.subject, copy.html, copy.text]))
+        .digest("hex");
+      const recipient = {
+        email: copyFacts.email,
+        contactId: contact,
+        contactVersion: 1,
+        prospectVersion: 1,
+      };
+      await admin`update growth.sequence_enrollments set template_snapshot=${admin.json({ reviewedRecipient: recipient, effectiveRecipient: recipient })} where id=${sequence}`;
+      await admin`update growth.email_messages set subject_snapshot=${copy.subject},html_snapshot=${copy.html},text_snapshot=${copy.text},controlled_preparation=${admin.json({ version: 1, variantId, variantVersion: variant.version, observationProofId: copyFacts.observationId, permissionId: permission, copySha256 })} where id=${message}`;
+      await admin`update growth.email_messages set text_snapshot='changed before issuance' where id=${message}`;
+      const changedAttempt = await reserveOutreachAttempt(db, {
+        messageId: message,
+        leaseToken: lease,
+        attemptKey: randomUUID(),
+      });
+      assert.equal(changedAttempt.status, "ready");
+      if (changedAttempt.status !== "ready")
+        throw new Error("reservation missing");
+      assert.deepEqual(
+        await beginOutreachSubmission(db, {
+          reservationId: changedAttempt.value.reservationId,
+          leaseToken: lease,
+          fence: changedAttempt.value.fence,
+          fingerprint: changedAttempt.value.preparation.fingerprint,
+        }),
+        { status: "held", reason: "controlled_variant_unproven" },
+      );
+      await admin`delete from growth.audit_log where entity_id=${changedAttempt.value.reservationId}`;
+      await admin`delete from growth.outreach_reservations where id=${changedAttempt.value.reservationId}`;
+      await admin`update growth.email_messages set text_snapshot=${copy.text},rfc_message_id=null where id=${message}`;
+      const followupId = randomUUID();
+      await admin`insert into growth.email_messages(id,sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key,subject_snapshot,html_snapshot,text_snapshot,controlled_preparation)
+        select ${followupId},sequence_enrollment_id,prospect_id,contact_id,channel,direction,1,'draft',${randomUUID()},subject_snapshot,html_snapshot,text_snapshot,controlled_preparation from growth.email_messages where id=${message}`;
+      try {
+        const preparation = {
+          messageId: message,
+          sequenceId: sequence,
+          recipient: copyFacts.email,
+          subject: copy.subject,
+          html: copy.html,
+          text: copy.text,
+          gmailThreadId: null,
+          references: [],
+          fingerprint: "a".repeat(64),
+        };
+        const check = (messageId: string) =>
+          withGrowthTransaction(db, (tx) =>
+            loadControlledPreparation(tx, {
+              membershipId: member,
+              connectionId: id,
+              preparation: { ...preparation, messageId },
+            }),
+          );
+        assert.ok(await check(message));
+        assert.equal(await check(followupId), null);
+      } finally {
+        await admin`delete from growth.email_messages where id=${followupId}`;
+      }
       await admin`delete from growth.outreach_outbox where event_id=${permissionEvent}`;
       await admin`delete from growth.outreach_events where id=${permissionEvent}`;
 
@@ -262,6 +387,7 @@ export async function exerciseCampaignReservation(
         await admin`update growth.outreach_account_controls set ramp=50 where connection_id=${id}`;
         await admin`delete from growth.audit_log where entity_type='outreach_reservation' and entity_id in (select id::text from growth.outreach_reservations where email_message_id in (${message},${manualMessage}))`;
         await admin`delete from growth.outreach_reservations where email_message_id in (${message},${manualMessage})`;
+        await admin`update growth.email_messages set rfc_message_id=null where id=${message}`;
         await admin`delete from growth.email_messages where id=${manualMessage}`;
         await admin`delete from growth.sequence_enrollments where id=${manualSequence}`;
         await admin`delete from growth.prospects where id=${manualProspect}`;
@@ -429,7 +555,31 @@ export async function exerciseCampaignReservation(
         ).status,
         "held",
       );
+      await exerciseGmailConfirmation(admin, db, {
+        campaign,
+        campaignBegin,
+        contact,
+        message,
+        member,
+        sequence,
+        prospect,
+        id,
+        email,
+        now,
+        copyFacts,
+        copy,
+        copySha256,
+      });
     } finally {
+      await admin`delete from growth.outreach_jobs where campaign_id=${campaign.id}`;
+      await admin`delete from growth.outreach_outbox where event_id in (select id from growth.outreach_events where campaign_id=${campaign.id} and event_type='gmail_sent_observed')`;
+      await admin`delete from growth.outreach_events where campaign_id=${campaign.id} and event_type='gmail_sent_observed'`;
+      await admin.begin(async (tx) => {
+        await tx`alter table growth.campaign_memberships disable trigger protect_campaign_confirmation`;
+        await tx`update growth.campaign_memberships set first_confirmation_reservation_id=null,confirmed_snapshot=null where id=${member}`;
+        await tx`alter table growth.campaign_memberships enable trigger protect_campaign_confirmation`;
+      });
+      await admin`delete from growth.email_messages where sequence_enrollment_id=${sequence} and step_number in (1,2)`;
       await admin`delete from growth.audit_log where entity_type='outreach_reservation' and entity_id in (select id::text from growth.outreach_reservations where email_message_id=${message})`;
       await admin`delete from growth.outreach_reservations where email_message_id in (${message},${oldMessage})`;
       await admin`delete from growth.campaign_memberships where id=${oldMember}`;
@@ -455,4 +605,11 @@ export async function exerciseCampaignReservation(
     await admin`delete from growth.audit_log where entity_type='campaign' and entity_id=${campaign.id}`;
     await admin`delete from growth.campaigns where id=${campaign.id}`;
   }
+  await exerciseCrossVersionConfirmation(admin, db, {
+    connectionId: id,
+    ownerEmail: email,
+    now,
+    founder,
+    policy: campaignPolicy,
+  });
 }

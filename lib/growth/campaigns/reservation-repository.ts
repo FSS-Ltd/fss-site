@@ -3,7 +3,7 @@ import {
   reservationLeaseSchema,
   type ReservationOutcome as Outcome,
 } from "./reservation-shared";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { z } from "zod";
 import { withGrowthTransaction } from "../db/client";
 import { lockGmailRouting } from "../sequences/gmail-thread-association";
@@ -23,6 +23,7 @@ import {
 import { authorityGate, gateFailure, type GateResult } from "./authority-gate";
 import { assessReservationBudget } from "./reservation-budget";
 import { campaignPolicyDefinitionSchema } from "./schemas";
+import { loadControlledPreparation } from "./controlled-preparation";
 import { londonDayKey } from "./time";
 
 export type ReservedOutreach = {
@@ -31,6 +32,49 @@ export type ReservedOutreach = {
   rfcMessageId: string;
   preparation: CanonicalOutreachPreparation;
 };
+export type IssuedSnapshot = {
+  version: 1;
+  kind: "direct_raw";
+  raw: string;
+  rawSha256: string;
+  rfcMessageId: string;
+  recipient: string;
+  from: string;
+  envelope: { to: string[]; cc: string[]; bcc: string[] };
+  connectionId: string;
+  googleSubject: string;
+  grantEpoch: number;
+  messageId: string;
+  sequenceId: string;
+  membershipId: string | null;
+  gmailThreadId: string | null;
+  campaign: Awaited<ReturnType<typeof loadControlledPreparation>>;
+};
+export type IssuedOutreach = ReservedOutreach & {
+  issuedSnapshot: IssuedSnapshot;
+};
+
+function renderPreparation(preparation: CanonicalOutreachPreparation) {
+  const parentMessageId = preparation.references.at(-1);
+  return renderGmailMime({
+    id: preparation.messageId,
+    from: CAMPAIGN_FOUNDER_EMAIL,
+    replyTo: CAMPAIGN_FOUNDER_EMAIL,
+    to: preparation.recipient,
+    subject: preparation.subject,
+    html: preparation.html,
+    text: preparation.text,
+    ...(preparation.gmailThreadId && parentMessageId
+      ? {
+          thread: {
+            gmailThreadId: preparation.gmailThreadId,
+            parentMessageId,
+            references: preparation.references,
+          },
+        }
+      : {}),
+  });
+}
 type Identity = {
   messageId: string;
   sequenceId: string;
@@ -158,7 +202,7 @@ async function checkBudget(
   if (!counts) return "invalid_budget";
   const outstanding = await tx<
     Pending[]
-  >`select status as state,provider_message_id as "providerId",recipient_count as "recipientCount" from growth.outreach_reservations where connection_id=${identity.connectionId} and status in ('reserved','submitting','uncertain','accepted') and (status in ('reserved','submitting','uncertain') or coalesce(actual_sent_at,completed_at,submitted_at,reserved_at) > ${new Date(now.getTime() - 86400000)}) and (${excluding}::uuid is null or id<>${excluding}::uuid)`;
+  >`select status as state,provider_message_id as "providerId",recipient_count as "recipientCount" from growth.outreach_reservations where connection_id=${identity.connectionId} and status in ('reserved','submitting','uncertain','accepted') and (status in ('reserved','submitting','uncertain') or confirmation_observed_at is null or confirmation_observed_at > ${new Date(now.getTime() - 86400000)}) and (${excluding}::uuid is null or id<>${excluding}::uuid)`;
   let campaignCeiling: number | null = null;
   if (identity.campaignId) {
     const [policy] = await tx<
@@ -288,25 +332,7 @@ export async function reserveOutreachAttempt(
     if (unresolved?.found) return held("attempt_unresolved");
     const budget = await checkBudget(tx, identity, day, account, now, null);
     if (budget !== "ready") return held(budget);
-    const parentMessageId = preparation.references.at(-1);
-    const rendered = renderGmailMime({
-      id: preparation.messageId,
-      from: CAMPAIGN_FOUNDER_EMAIL,
-      replyTo: CAMPAIGN_FOUNDER_EMAIL,
-      to: preparation.recipient,
-      subject: preparation.subject,
-      html: preparation.html,
-      text: preparation.text,
-      ...(preparation.gmailThreadId && parentMessageId
-        ? {
-            thread: {
-              gmailThreadId: preparation.gmailThreadId,
-              parentMessageId,
-              references: preparation.references,
-            },
-          }
-        : {}),
-    });
+    const rendered = renderPreparation(preparation);
     const [message] = await tx<
       { rfc: string | null }[]
     >`select rfc_message_id as rfc from growth.email_messages where id=${identity.messageId}`;
@@ -359,7 +385,7 @@ export async function beginOutreachSubmission(
     fence: number;
     fingerprint: string;
   },
-): Promise<Outcome<ReservedOutreach>> {
+): Promise<Outcome<IssuedOutreach>> {
   if (
     !reservationLeaseSchema
       .extend({ fingerprint: z.string().regex(/^[a-f0-9]{64}$/) })
@@ -417,6 +443,45 @@ export async function beginOutreachSubmission(
     >`select rfc_message_id as rfc from growth.email_messages where id=${identity.messageId}`;
     if (!message || message.rfc !== reservation.rfc)
       return held("rfc_message_id_changed");
+    const campaign = identity.membershipId
+      ? await loadControlledPreparation(tx, {
+          membershipId: identity.membershipId,
+          connectionId: identity.connectionId,
+          preparation,
+        })
+      : null;
+    if (identity.membershipId && !campaign)
+      return held("controlled_variant_unproven");
+    const rendered = renderPreparation(preparation);
+    if (rendered.rfcMessageId !== reservation.rfc)
+      return held("rfc_message_id_changed");
+    if (rendered.raw.length > 4_000_000)
+      return held("issued_payload_too_large");
+    const rawSha256 = createHash("sha256")
+      .update(Buffer.from(rendered.raw, "base64url"))
+      .digest("hex");
+    const issuedSnapshot: IssuedSnapshot = {
+      version: 1,
+      kind: "direct_raw",
+      raw: rendered.raw,
+      rawSha256,
+      rfcMessageId: reservation.rfc,
+      recipient: preparation.recipient.trim().toLowerCase(),
+      from: CAMPAIGN_FOUNDER_EMAIL,
+      envelope: {
+        to: [preparation.recipient.trim().toLowerCase()],
+        cc: [],
+        bcc: [],
+      },
+      connectionId: identity.connectionId,
+      googleSubject: account.googleSubject,
+      grantEpoch: account.grantEpoch,
+      messageId: identity.messageId,
+      sequenceId: identity.sequenceId,
+      membershipId: identity.membershipId,
+      gmailThreadId: rendered.gmailThreadId ?? null,
+      campaign,
+    };
     const budget = await checkBudget(
       tx,
       identity,
@@ -435,7 +500,8 @@ export async function beginOutreachSubmission(
       GateResult[]
     >`with ${authorityGate(tx, initial.day, submissionBounds, window)},
       updated as (
-        update growth.outreach_reservations r set status='submitting',submitted_at=g.at
+        update growth.outreach_reservations r set status='submitting',submitted_at=g.at,
+          issued_snapshot=${tx.json(issuedSnapshot)},issued_snapshot_hash=${rawSha256}
         from authority_gate g where g.day_ok and g.interval_ok and g.window_ok
           and r.id=${input.reservationId} and r.status='reserved' and r.fence=${input.fence}
           and r.lease_token=${input.leaseToken} and r.connection_id=${identity.connectionId}
@@ -458,6 +524,7 @@ export async function beginOutreachSubmission(
         fence: input.fence,
         rfcMessageId: reservation.rfc,
         preparation,
+        issuedSnapshot,
       },
     };
   });

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import type postgres from "postgres";
+import { exerciseConfirmationCapacity } from "./reservation-capacity-assertions";
 import { withTransitionClock } from "./reservation-clock";
 import type { GrowthDb } from "../../../lib/growth/db/types";
 import {
@@ -499,6 +500,13 @@ export async function exerciseLegacyReservation(
       beginOutreachSubmission(db, second),
     ]);
     assert.equal(begins.filter((entry) => entry.status === "ready").length, 1);
+    const [issued] = await admin<
+      { snapshot: { raw?: string } | null; hash: string | null }[]
+    >`
+      select issued_snapshot as snapshot,issued_snapshot_hash as hash
+      from growth.outreach_reservations where id=${second.reservationId}`;
+    assert.ok(issued?.snapshot?.raw);
+    assert.match(issued.hash ?? "", /^[a-f0-9]{64}$/);
     const [auditCount] = await admin<
       { count: number }[]
     >`select count(*)::int as count from growth.audit_log where entity_id=${second.reservationId} and action='outreach_reservation.submitting'`;
@@ -657,7 +665,7 @@ export async function exerciseLegacyReservation(
     assert.ok(limits);
     try {
       await admin`update growth.outreach_account_reviews set evidence=jsonb_set(evidence,'{evidence,messages}','62'::jsonb) where id=${limits.reviewId}`;
-      await admin`insert into growth.outreach_reservations(idempotency_key,email_message_id,sequence_id,account_id,london_day,status,connection_id,grant_epoch,rfc_message_id,recipient_count,authority_fingerprint,lease_token,lease_until,submitted_at,provider_message_id,provider_thread_id) values (${randomUUID()},${messageId3},${sequenceId},${id},(now() at time zone 'Europe/London')::date,'accepted',${id},1,'<matched@example.test>',1,${"a".repeat(64)},${leaseToken},now()+interval '5 minutes',now(),'0','thread')`;
+      await admin`insert into growth.outreach_reservations(idempotency_key,email_message_id,sequence_id,account_id,london_day,status,connection_id,grant_epoch,rfc_message_id,recipient_count,authority_fingerprint,lease_token,lease_until,submitted_at,provider_message_id,provider_thread_id) values (${randomUUID()},${messageId3},${sequenceId},${id},(now() at time zone 'Europe/London')::date,'accepted',${id},1,'<matched@example.test>',1,${"a".repeat(64)},${leaseToken},now()+interval '5 minutes',now()-interval '2 days','0','thread')`;
       await admin`insert into growth.outreach_reservations(idempotency_key,email_message_id,sequence_id,account_id,london_day,status,connection_id,grant_epoch,rfc_message_id,recipient_count,authority_fingerprint,lease_token,lease_until,submitted_at) values (${randomUUID()},${messageId3},${sequenceId},${id},(now() at time zone 'Europe/London')::date,'uncertain',${id},1,'<uncertain@example.test>',1,${"a".repeat(64)},${leaseToken},now()+interval '5 minutes',now())`;
       const overlap = await reserveOutreachAttempt(db, {
         messageId,
@@ -674,6 +682,15 @@ export async function exerciseLegacyReservation(
         }),
         { status: "held", reason: "provider_limit" },
       );
+      await admin`delete from growth.outreach_reservations where email_message_id=${messageId3}`;
+      await admin`update growth.outreach_account_reviews set evidence=jsonb_set(evidence,'{evidence,messages}','61'::jsonb) where id=${limits.reviewId}`;
+      await exerciseConfirmationCapacity(admin, db, {
+        connectionId: id,
+        sequenceId,
+        existingMessageId: messageId3,
+        candidateMessageId: messageId2,
+        leaseToken: leaseToken2,
+      });
     } finally {
       await admin`update growth.outreach_account_reviews set evidence=${admin.json(limits.evidence)} where id=${limits.reviewId}`;
     }

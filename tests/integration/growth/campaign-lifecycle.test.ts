@@ -22,6 +22,11 @@ test(
       max: 4,
       connection: { options: "-c role=growth_app" },
     });
+    const cleanupDb = postgres(connection, { max: 1 });
+    const leasedFollowupId = randomUUID(),
+      heldFollowupId = randomUUID(),
+      nonSendId = randomUUID(),
+      reportJobId = randomUUID();
     const email = "j.ntagengwa@faithfulsoftware.dev";
     const founder = {
       email,
@@ -429,8 +434,9 @@ test(
       const [afterRollback] =
         await db`select count(*)::int as count from growth.outreach_events where id=${eventId}`;
       assert.equal(afterRollback?.count, 0);
-      await db`insert into growth.outreach_jobs(campaign_id,policy_version,membership_id,job_type,due_at,idempotency_key,status,lease_owner,lease_until) values (${winningCampaignId},1,${member.value.id},'follow_up',now(),${randomUUID()},'leased','worker',now()+interval '1 minute')`;
-      const reportJobId = randomUUID();
+      await db`insert into growth.outreach_jobs(id,campaign_id,policy_version,membership_id,job_type,due_at,idempotency_key,status,lease_owner,lease_until) values (${leasedFollowupId},${winningCampaignId},1,${member.value.id},'follow_up',now(),${randomUUID()},'leased','worker',now()+interval '1 minute')`;
+      await db`insert into growth.outreach_jobs(id,campaign_id,policy_version,membership_id,job_type,due_at,idempotency_key,status) values (${heldFollowupId},${winningCampaignId},1,${member.value.id},'follow_up',now(),${randomUUID()},'held')`;
+      await db`insert into growth.outreach_jobs(id,campaign_id,policy_version,membership_id,job_type,due_at,idempotency_key,status) values (${nonSendId},${winningCampaignId},1,${member.value.id},'non_send',now(),${randomUUID()},'held')`;
       await db`insert into growth.outreach_jobs(id,campaign_id,policy_version,membership_id,job_type,due_at,idempotency_key,status) values (${reportJobId},${winningCampaignId},1,${member.value.id},'monthly_report',now(),${randomUUID()},'pending')`;
       await executeCampaignCommand(
         db,
@@ -445,12 +451,14 @@ test(
       );
       const jobs = await db<
         { jobType: string; status: string }[]
-      >`select job_type as "jobType",status from growth.outreach_jobs where membership_id=${member.value.id} order by job_type`;
+      >`select job_type as "jobType",status from growth.outreach_jobs where membership_id=${member.value.id} order by job_type,status`;
       assert.deepEqual(
         [...jobs],
         [
           { jobType: "follow_up", status: "cancelled" },
+          { jobType: "follow_up", status: "cancelled" },
           { jobType: "monthly_report", status: "pending" },
+          { jobType: "non_send", status: "held" },
         ],
       );
       await db`update growth.outreach_jobs set status='completed' where id=${reportJobId}`;
@@ -496,6 +504,8 @@ test(
         randomUUID(),
       );
     } finally {
+      await cleanupDb`delete from growth.outreach_jobs where id in (${leasedFollowupId},${heldFollowupId},${nonSendId},${reportJobId})`;
+      await cleanupDb.end();
       await db.end();
     }
   },
