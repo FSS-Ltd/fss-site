@@ -5,6 +5,7 @@ import postgres from "postgres";
 import { recordSent } from "../../../lib/growth/sequences/dispatcher-repository";
 import { createGmailReplySync } from "../../../lib/growth/sequences/gmail-sync";
 import { postgresGmailSyncRepository } from "../../../lib/growth/sequences/gmail-sync-repository";
+import type { GmailRoutingInput } from "../../../lib/growth/sequences/gmail-routing-repository";
 import {
   cleanUp,
   setUpApprovedGmailDraft,
@@ -50,17 +51,12 @@ test(
       let preliminary = false;
       const repository = {
         ...postgresGmailSyncRepository,
-        async findEnrollmentByThread(
-          db: typeof app,
-          thread: string,
-          grant: typeof binding,
-        ) {
-          const result =
-            await postgresGmailSyncRepository.findEnrollmentByThread(
-              db,
-              thread,
-              grant,
-            );
+        async classifyGmailRouting(db: typeof app, input: GmailRoutingInput) {
+          const result = await postgresGmailSyncRepository.classifyGmailRouting(
+            db,
+            input,
+          );
+          const thread = input.threadId;
           assert.equal(result.kind, "unique");
           preliminary = true;
           const writer = Promise.withResolvers<void>();
@@ -83,7 +79,7 @@ test(
             let waiting = false;
             for (let i = 0; i < 100 && !waiting; i++) {
               const [state] =
-                await holder`select exists(select 1 from pg_stat_activity where datname=current_database() and wait_event='advisory' and query like '%pg_advisory_xact_lock%') as waiting`;
+                await sql`select exists(select 1 from pg_stat_activity where datname=current_database() and wait_event='advisory' and query like '%pg_advisory_xact_lock%') as waiting`;
               waiting = state?.waiting === true;
               if (!waiting)
                 await new Promise((resolve) => setTimeout(resolve, 10));

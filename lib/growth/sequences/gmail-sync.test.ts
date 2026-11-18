@@ -125,6 +125,9 @@ function createFakeRepository(
   },
 ): GmailSyncRepository {
   return {
+    async classifyGmailRouting(db, input) {
+      return this.findEnrollmentByThread(db, input.threadId, input.binding);
+    },
     async loadReplySyncState() {
       return {
         cursor: state.cursor,

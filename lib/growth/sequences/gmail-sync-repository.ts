@@ -8,6 +8,7 @@ import { withGrowthTransaction } from "../db/client";
 import type { GrowthDb, GrowthTransaction } from "../db/types";
 import type { GmailGrantBinding } from "../integrations/gmail/live-client";
 import { stopSequenceInTransaction } from "./stop";
+import { classifyGmailRouting } from "./gmail-routing-repository";
 import { createSequenceStopTransaction } from "./stop-repository";
 import {
   commitReplyCoverage,
@@ -45,6 +46,7 @@ export type RecordInboundEventInput = {
 };
 
 export interface GmailSyncRepository {
+  classifyGmailRouting: typeof classifyGmailRouting;
   loadReplySyncState: typeof loadReplySyncState;
   commitReplyCoverage: typeof commitReplyCoverage;
   getCursor(db: GrowthDb, subjectEmail: string): Promise<string | null>;
@@ -219,6 +221,7 @@ async function activatePendingApproval(
 }
 
 export const postgresGmailSyncRepository: GmailSyncRepository = {
+  classifyGmailRouting,
   getCursor,
   setCursor,
   loadReplySyncState,

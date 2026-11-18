@@ -177,12 +177,18 @@ export function createGmailReplySync({
         return;
       }
 
-      const match = await repository.findEnrollmentByThread(
-        db,
-        metadata.gmailThreadId,
+      const match = await repository.classifyGmailRouting(db, {
         binding,
-      );
+        threadId: metadata.gmailThreadId,
+        inReplyTo: metadata.inReplyTo,
+        references: metadata.references,
+        fromAddress,
+      });
       if (match.kind === "none") return;
+      if (match.kind === "uncertain") {
+        recordUnknown(gmailMessageId, "unknown_account_thread");
+        return;
+      }
       if (match.kind === "ambiguous") {
         recordUnknown(gmailMessageId, "ambiguous_account_thread");
         return;

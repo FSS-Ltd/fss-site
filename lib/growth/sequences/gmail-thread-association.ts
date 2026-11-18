@@ -27,14 +27,17 @@ export async function lockGmailThread(
   await tx`select pg_advisory_xact_lock(hashtextextended(${`growth:gmail-thread:${threadId}`}, 0))`;
 }
 
-export async function findEnrollmentByThread(
+export type ThreadCandidate = ThreadEnrollment & {
+  bound: boolean;
+  hasAssociation: boolean;
+};
+
+export function gmailThreadCandidates(
   db: GrowthQueryExecutor,
   gmailThreadId: string,
   binding: GmailGrantBinding,
-): Promise<ThreadMatch> {
-  const rows = await db<
-    Array<ThreadEnrollment & { bound: boolean; hasAssociation: boolean }>
-  >`
+) {
+  return db<ThreadCandidate[]>`
     select se.id, se.status, se.prospect_id as "prospectId", se.contact_id as "contactId",
       exists(select 1 from growth.outreach_reservations r where r.sequence_id=se.id and r.connection_id=${binding.connectionId} and r.provider_thread_id=${gmailThreadId}
         and exists(select 1 from growth.outreach_account_controls c where c.connection_id=r.connection_id and c.verified_subject=${binding.googleSubject})) as bound,
@@ -45,6 +48,11 @@ export async function findEnrollmentByThread(
         or not exists(select 1 from growth.outreach_reservations r where r.sequence_id=se.id and r.provider_thread_id=${gmailThreadId} and r.connection_id is not null))
     limit 2
   `;
+}
+
+export function resolveGmailThreadCandidates(
+  rows: readonly ThreadCandidate[],
+): ThreadMatch {
   if (rows.length > 1) return { kind: "ambiguous" };
   const row = rows[0];
   if (!row) return { kind: "none" };
@@ -57,4 +65,14 @@ export async function findEnrollmentByThread(
   return row.bound
     ? { kind: "unique", enrollment }
     : { kind: "unknown", enrollment, safeToPause: !row.hasAssociation };
+}
+
+export async function findEnrollmentByThread(
+  db: GrowthQueryExecutor,
+  gmailThreadId: string,
+  binding: GmailGrantBinding,
+): Promise<ThreadMatch> {
+  return resolveGmailThreadCandidates(
+    await gmailThreadCandidates(db, gmailThreadId, binding),
+  );
 }
