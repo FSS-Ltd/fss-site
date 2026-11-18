@@ -201,49 +201,49 @@
       "label": ".close()",
       "file_type": "code",
       "source_file": "components/growth/facebook/workspace.test.tsx",
-      "source_location": "L38"
+      "source_location": "L39"
     },
     {
       "id": "workspace_test_events_emit",
       "label": ".emit()",
       "file_type": "code",
       "source_file": "components/growth/facebook/workspace.test.tsx",
-      "source_location": "L39"
+      "source_location": "L42"
     },
     {
       "id": "workspace_test_item",
       "label": "item()",
       "file_type": "code",
       "source_file": "components/growth/facebook/workspace.test.tsx",
-      "source_location": "L44"
+      "source_location": "L47"
     },
     {
       "id": "workspace_test_page",
       "label": "page()",
       "file_type": "code",
       "source_file": "components/growth/facebook/workspace.test.tsx",
-      "source_location": "L63"
+      "source_location": "L66"
     },
     {
       "id": "workspace_test_button",
       "label": "button()",
       "file_type": "code",
       "source_file": "components/growth/facebook/workspace.test.tsx",
-      "source_location": "L73"
+      "source_location": "L76"
     },
     {
       "id": "workspace_test_tick",
       "label": "tick()",
       "file_type": "code",
       "source_file": "components/growth/facebook/workspace.test.tsx",
-      "source_location": "L80"
+      "source_location": "L83"
     },
     {
       "id": "workspace_test_row",
       "label": "row()",
       "file_type": "code",
       "source_file": "components/growth/facebook/workspace.test.tsx",
-      "source_location": "L248"
+      "source_location": "L251"
     },
     {
       "id": "components_growth_facebook_workspace_tsx",
@@ -257,42 +257,35 @@
       "label": "authFailed()",
       "file_type": "code",
       "source_file": "components/growth/facebook/workspace.tsx",
-      "source_location": "L111"
+      "source_location": "L129"
     },
     {
       "id": "workspace_saved",
       "label": "saved()",
       "file_type": "code",
       "source_file": "components/growth/facebook/workspace.tsx",
-      "source_location": "L116"
+      "source_location": "L130"
     },
     {
       "id": "workspace_retain",
       "label": "retain()",
       "file_type": "code",
       "source_file": "components/growth/facebook/workspace.tsx",
-      "source_location": "L120"
+      "source_location": "L134"
     },
     {
       "id": "workspace_release",
       "label": "release()",
       "file_type": "code",
       "source_file": "components/growth/facebook/workspace.tsx",
-      "source_location": "L125"
+      "source_location": "L139"
     },
     {
       "id": "workspace_discard",
       "label": "discard()",
       "file_type": "code",
       "source_file": "components/growth/facebook/workspace.tsx",
-      "source_location": "L129"
-    },
-    {
-      "id": "workspace_if",
-      "label": "if()",
-      "file_type": "code",
-      "source_file": "components/growth/facebook/workspace.tsx",
-      "source_location": "L267"
+      "source_location": "L143"
     },
     {
       "id": "components_growth_prospects_preview_approval_tsx",
@@ -2126,7 +2119,7 @@
       "label": "useGrowthEvents()",
       "file_type": "code",
       "source_file": "lib/growth/client/use-growth-events.ts",
-      "source_location": "L15"
+      "source_location": "L16"
     },
     {
       "id": "lib_growth_crm_activity_service_ts",
@@ -8179,7 +8172,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/facebook/workspace.test.tsx",
-      "source_location": "L38",
+      "source_location": "L39",
       "weight": 1.0
     },
     {
@@ -8188,7 +8181,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/facebook/workspace.test.tsx",
-      "source_location": "L39",
+      "source_location": "L42",
       "weight": 1.0
     },
     {
@@ -8197,7 +8190,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/facebook/workspace.test.tsx",
-      "source_location": "L44",
+      "source_location": "L47",
       "weight": 1.0
     },
     {
@@ -8206,7 +8199,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/facebook/workspace.test.tsx",
-      "source_location": "L63",
+      "source_location": "L66",
       "weight": 1.0
     },
     {
@@ -8215,7 +8208,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/facebook/workspace.test.tsx",
-      "source_location": "L73",
+      "source_location": "L76",
       "weight": 1.0
     },
     {
@@ -8224,7 +8217,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/facebook/workspace.test.tsx",
-      "source_location": "L80",
+      "source_location": "L83",
       "weight": 1.0
     },
     {
@@ -8233,7 +8226,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/facebook/workspace.test.tsx",
-      "source_location": "L248",
+      "source_location": "L251",
       "weight": 1.0
     },
     {
@@ -8242,7 +8235,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/facebook/workspace.test.tsx",
-      "source_location": "L249",
+      "source_location": "L252",
       "weight": 1.0
     },
     {
@@ -8332,7 +8325,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/facebook/workspace.tsx",
-      "source_location": "L111",
+      "source_location": "L129",
       "weight": 1.0
     },
     {
@@ -8341,7 +8334,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/facebook/workspace.tsx",
-      "source_location": "L116",
+      "source_location": "L130",
       "weight": 1.0
     },
     {
@@ -8350,7 +8343,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/facebook/workspace.tsx",
-      "source_location": "L120",
+      "source_location": "L134",
       "weight": 1.0
     },
     {
@@ -8359,7 +8352,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/facebook/workspace.tsx",
-      "source_location": "L125",
+      "source_location": "L139",
       "weight": 1.0
     },
     {
@@ -8368,25 +8361,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/facebook/workspace.tsx",
-      "source_location": "L129",
-      "weight": 1.0
-    },
-    {
-      "source": "components_growth_facebook_workspace_tsx",
-      "target": "workspace_if",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "components/growth/facebook/workspace.tsx",
-      "source_location": "L267",
-      "weight": 1.0
-    },
-    {
-      "source": "workspace_if",
-      "target": "workspace_authfailed",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "components/growth/facebook/workspace.tsx",
-      "source_location": "L268",
+      "source_location": "L143",
       "weight": 1.0
     },
     {
@@ -14429,6 +14404,33 @@
       "weight": 1.0
     },
     {
+      "source": "lib_growth_client_use_growth_events_test_tsx",
+      "target": "use_growth_events_test_first",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/client/use-growth-events.test.tsx",
+      "source_location": "L186",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_client_use_growth_events_test_tsx",
+      "target": "use_growth_events_test_second",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/client/use-growth-events.test.tsx",
+      "source_location": "L194",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_client_use_growth_events_test_tsx",
+      "target": "use_growth_events_test_component",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/client/use-growth-events.test.tsx",
+      "source_location": "L198",
+      "weight": 1.0
+    },
+    {
       "source": "lib_growth_client_use_growth_events_ts",
       "target": "react",
       "relation": "imports_from",
@@ -14443,7 +14445,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/client/use-growth-events.ts",
-      "source_location": "L15",
+      "source_location": "L16",
       "weight": 1.0
     },
     {
@@ -18719,16 +18721,6 @@
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/integrations/gmail/reconciliation.ts",
       "source_location": "L233",
-      "weight": 1.0
-    },
-    {
-      "source": "page_clientofferpage",
-      "target": "workspace_if",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "app/(portal)/(client)/portal/agreements/offers/[offerId]/page.tsx",
-      "source_location": "L27",
       "weight": 1.0
     },
     {
