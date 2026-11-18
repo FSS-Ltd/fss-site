@@ -132,6 +132,13 @@
       "output_tokens": 0,
       "files": 310,
       "method": "selected-corpus AST rebuild in <=160-file batches, TypeScript static imports, no-viz"
+    },
+    {
+      "date": "2026-11-18",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 312,
+      "method": "selected-corpus AST rebuild in <=160-file batches, TypeScript static imports, no-viz"
     }
   ],
   "total_input_tokens": 0,

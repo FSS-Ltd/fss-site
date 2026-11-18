@@ -1762,42 +1762,49 @@
       "label": "loadFounderVerification()",
       "file_type": "code",
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L38"
+      "source_location": "L42"
     },
     {
       "id": "founder_verification_reader_readfounderverification",
       "label": "readFounderVerification()",
       "file_type": "code",
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L52"
+      "source_location": "L56"
     },
     {
       "id": "founder_verification_reader_readsourceproof",
       "label": "readSourceProof()",
       "file_type": "code",
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L165"
+      "source_location": "L169"
     },
     {
       "id": "founder_verification_reader_loadfoundersourceproof",
       "label": "loadFounderSourceProof()",
       "file_type": "code",
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L278"
+      "source_location": "L284"
+    },
+    {
+      "id": "founder_verification_reader_validateauthorityproof",
+      "label": "validateAuthorityProof()",
+      "file_type": "code",
+      "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
+      "source_location": "L315"
     },
     {
       "id": "founder_verification_reader_loadpolicyauthorizedsourceproof",
       "label": "loadPolicyAuthorizedSourceProof()",
       "file_type": "code",
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L294"
+      "source_location": "L365"
     },
     {
       "id": "founder_verification_reader_loadreviewmembershippreparationauthority",
       "label": "loadReviewMembershipPreparationAuthority()",
       "file_type": "code",
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L398"
+      "source_location": "L430"
     },
     {
       "id": "lib_growth_campaigns_founder_verification_ts",
@@ -1860,14 +1867,14 @@
       "label": "isSupportedPermission()",
       "file_type": "code",
       "source_file": "lib/growth/campaigns/permission-evidence.ts",
-      "source_location": "L19"
+      "source_location": "L36"
     },
     {
       "id": "permission_evidence_validpermissionevidence",
       "label": "validPermissionEvidence()",
       "file_type": "code",
       "source_file": "lib/growth/campaigns/permission-evidence.ts",
-      "source_location": "L31"
+      "source_location": "L48"
     },
     {
       "id": "lib_growth_campaigns_permissions_ts",
@@ -2078,6 +2085,20 @@
       "file_type": "code",
       "source_file": "lib/growth/campaigns/reservation-shared.ts",
       "source_location": "L27"
+    },
+    {
+      "id": "lib_growth_campaigns_review_preparation_query_ts",
+      "label": "review-preparation-query.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/campaigns/review-preparation-query.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "review_preparation_query_readreviewpreparationcandidate",
+      "label": "readReviewPreparationCandidate()",
+      "file_type": "code",
+      "source_file": "lib/growth/campaigns/review-preparation-query.ts",
+      "source_location": "L28"
     },
     {
       "id": "lib_growth_campaigns_schemas_ts",
@@ -4506,28 +4527,35 @@
       "label": "isSharedBusinessHost()",
       "file_type": "code",
       "source_file": "lib/growth/research/global-identity.ts",
-      "source_location": "L21"
+      "source_location": "L30"
+    },
+    {
+      "id": "global_identity_hasrelatedworkemail",
+      "label": "hasRelatedWorkEmail()",
+      "file_type": "code",
+      "source_file": "lib/growth/research/global-identity.ts",
+      "source_location": "L38"
     },
     {
       "id": "global_identity_normalizeregistration",
       "label": "normalizeRegistration()",
       "file_type": "code",
       "source_file": "lib/growth/research/global-identity.ts",
-      "source_location": "L28"
+      "source_location": "L45"
     },
     {
       "id": "global_identity_businesswebsitehost",
       "label": "businessWebsiteHost()",
       "file_type": "code",
       "source_file": "lib/growth/research/global-identity.ts",
-      "source_location": "L32"
+      "source_location": "L49"
     },
     {
       "id": "global_identity_globalcandidateidentitykeys",
       "label": "globalCandidateIdentityKeys()",
       "file_type": "code",
       "source_file": "lib/growth/research/global-identity.ts",
-      "source_location": "L46"
+      "source_location": "L63"
     },
     {
       "id": "lib_growth_research_global_ingest_ts",
@@ -4653,63 +4681,63 @@
       "label": "parseUrl()",
       "file_type": "code",
       "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L44"
+      "source_location": "L31"
     },
     {
       "id": "ingestion_schema_geturlhostname",
       "label": "getUrlHostname()",
       "file_type": "code",
       "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L52"
+      "source_location": "L39"
     },
     {
       "id": "ingestion_schema_ishttpurl",
       "label": "isHttpUrl()",
       "file_type": "code",
       "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L56"
+      "source_location": "L43"
     },
     {
       "id": "ingestion_schema_hostsarerelated",
       "label": "hostsAreRelated()",
       "file_type": "code",
       "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L61"
+      "source_location": "L48"
     },
     {
       "id": "ingestion_schema_isgooglemapsreferenceurl",
       "label": "isGoogleMapsReferenceUrl()",
       "file_type": "code",
       "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L67"
+      "source_location": "L54"
     },
     {
       "id": "ingestion_schema_requiredtext",
       "label": "requiredText()",
       "file_type": "code",
       "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L80"
+      "source_location": "L67"
     },
     {
       "id": "ingestion_schema_parsewebsiteemailnarrative",
       "label": "parseWebsiteEmailNarrative()",
       "file_type": "code",
       "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L349"
+      "source_location": "L336"
     },
     {
       "id": "ingestion_schema_parsefirstemailcandidate",
       "label": "parseFirstEmailCandidate()",
       "file_type": "code",
       "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L355"
+      "source_location": "L342"
     },
     {
       "id": "ingestion_schema_parseresearchruningestion",
       "label": "parseResearchRunIngestion()",
       "file_type": "code",
       "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L729"
+      "source_location": "L716"
     },
     {
       "id": "lib_growth_research_intake_schema_ts",
@@ -4723,6 +4751,13 @@
       "label": "limits.ts",
       "file_type": "code",
       "source_file": "lib/growth/research/limits.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "lib_growth_research_mailbox_domains_ts",
+      "label": "mailbox-domains.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/research/mailbox-domains.ts",
       "source_location": "L1"
     },
     {
@@ -13659,7 +13694,7 @@
     },
     {
       "source": "lib_growth_campaigns_founder_verification_reader_ts",
-      "target": "lib_growth_campaigns_account_repository",
+      "target": "lib_growth_campaigns_review_preparation_query",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
@@ -13668,11 +13703,20 @@
     },
     {
       "source": "lib_growth_campaigns_founder_verification_reader_ts",
+      "target": "lib_growth_campaigns_account_repository",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_founder_verification_reader_ts",
       "target": "lib_growth_http_public_url",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L4",
+      "source_location": "L8",
       "weight": 1.0
     },
     {
@@ -13681,7 +13725,7 @@
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L5",
+      "source_location": "L9",
       "weight": 1.0
     },
     {
@@ -13690,7 +13734,7 @@
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L9",
+      "source_location": "L13",
       "weight": 1.0
     },
     {
@@ -13699,7 +13743,7 @@
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L13",
+      "source_location": "L17",
       "weight": 1.0
     },
     {
@@ -13708,7 +13752,7 @@
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L14",
+      "source_location": "L18",
       "weight": 1.0
     },
     {
@@ -13717,7 +13761,7 @@
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L15",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -13726,7 +13770,7 @@
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L16",
+      "source_location": "L20",
       "weight": 1.0
     },
     {
@@ -13735,7 +13779,7 @@
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L17",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
@@ -13744,7 +13788,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L38",
+      "source_location": "L42",
       "weight": 1.0
     },
     {
@@ -13753,7 +13797,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L52",
+      "source_location": "L56",
       "weight": 1.0
     },
     {
@@ -13762,7 +13806,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L165",
+      "source_location": "L169",
       "weight": 1.0
     },
     {
@@ -13771,7 +13815,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L278",
+      "source_location": "L284",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_founder_verification_reader_ts",
+      "target": "founder_verification_reader_validateauthorityproof",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
+      "source_location": "L315",
       "weight": 1.0
     },
     {
@@ -13780,7 +13833,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L294",
+      "source_location": "L365",
       "weight": 1.0
     },
     {
@@ -13789,7 +13842,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L398",
+      "source_location": "L430",
       "weight": 1.0
     },
     {
@@ -13798,7 +13851,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L49",
+      "source_location": "L53",
       "weight": 1.0
     },
     {
@@ -13807,7 +13860,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L172",
+      "source_location": "L176",
       "weight": 1.0
     },
     {
@@ -13816,25 +13869,34 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L290",
+      "source_location": "L296",
+      "weight": 1.0
+    },
+    {
+      "source": "founder_verification_reader_validateauthorityproof",
+      "target": "founder_verification_reader_readsourceproof",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
+      "source_location": "L348",
       "weight": 1.0
     },
     {
       "source": "founder_verification_reader_loadpolicyauthorizedsourceproof",
-      "target": "founder_verification_reader_readsourceproof",
+      "target": "founder_verification_reader_validateauthorityproof",
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L372",
+      "source_location": "L415",
       "weight": 1.0
     },
     {
       "source": "founder_verification_reader_loadreviewmembershippreparationauthority",
-      "target": "founder_verification_reader_readsourceproof",
+      "target": "founder_verification_reader_validateauthorityproof",
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L488",
+      "source_location": "L448",
       "weight": 1.0
     },
     {
@@ -14010,11 +14072,20 @@
     },
     {
       "source": "lib_growth_campaigns_permission_evidence_ts",
+      "target": "lib_growth_http_public_url",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/permission-evidence.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_permission_evidence_ts",
       "target": "permission_evidence_issupportedpermission",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/permission-evidence.ts",
-      "source_location": "L19",
+      "source_location": "L36",
       "weight": 1.0
     },
     {
@@ -14023,7 +14094,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/permission-evidence.ts",
-      "source_location": "L31",
+      "source_location": "L48",
       "weight": 1.0
     },
     {
@@ -14032,7 +14103,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/permission-evidence.ts",
-      "source_location": "L47",
+      "source_location": "L64",
       "weight": 1.0
     },
     {
@@ -14681,6 +14752,33 @@
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/reservation-shared.ts",
       "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_review_preparation_query_ts",
+      "target": "node_crypto",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/review-preparation-query.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_review_preparation_query_ts",
+      "target": "lib_growth_db_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/review-preparation-query.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_review_preparation_query_ts",
+      "target": "review_preparation_query_readreviewpreparationcandidate",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/review-preparation-query.ts",
+      "source_location": "L28",
       "weight": 1.0
     },
     {
@@ -18563,24 +18661,6 @@
       "weight": 1.0
     },
     {
-      "source": "lib_growth_facebook_session_deadline_ts",
-      "target": "jwt",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/facebook/session-deadline.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_facebook_session_deadline_ts",
-      "target": "session_deadline_growthstreamdeadline",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/facebook/session-deadline.ts",
-      "source_location": "L5",
-      "weight": 1.0
-    },
-    {
       "source": "route_post",
       "target": "discovery_route_handler_createfacebookdiscoveryhandler",
       "relation": "calls",
@@ -19231,33 +19311,33 @@
       "weight": 1.0
     },
     {
+      "source": "founder_verification_reader_validateauthorityproof",
+      "target": "permission_evidence_validpermissionevidence",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
+      "source_location": "L326",
+      "weight": 1.0
+    },
+    {
+      "source": "founder_verification_reader_validateauthorityproof",
+      "target": "lifecycle_validatecampaigndefinition",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
+      "source_location": "L337",
+      "weight": 1.0
+    },
+    {
       "source": "founder_verification_reader_loadpolicyauthorizedsourceproof",
       "target": "account_repository_loadreservationaccount",
       "relation": "calls",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L306",
-      "weight": 1.0
-    },
-    {
-      "source": "founder_verification_reader_loadpolicyauthorizedsourceproof",
-      "target": "permission_evidence_validpermissionevidence",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L350",
-      "weight": 1.0
-    },
-    {
-      "source": "founder_verification_reader_loadpolicyauthorizedsourceproof",
-      "target": "lifecycle_validatecampaigndefinition",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L361",
+      "source_location": "L377",
       "weight": 1.0
     },
     {
@@ -19267,7 +19347,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L388",
+      "source_location": "L420",
       "weight": 1.0
     },
     {
@@ -19277,27 +19357,17 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L413",
+      "source_location": "L443",
       "weight": 1.0
     },
     {
       "source": "founder_verification_reader_loadreviewmembershippreparationauthority",
-      "target": "permission_evidence_validpermissionevidence",
+      "target": "review_preparation_query_readreviewpreparationcandidate",
       "relation": "calls",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L466",
-      "weight": 1.0
-    },
-    {
-      "source": "founder_verification_reader_loadreviewmembershippreparationauthority",
-      "target": "lifecycle_validatecampaigndefinition",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L477",
+      "source_location": "L446",
       "weight": 1.0
     },
     {
@@ -19307,7 +19377,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L500",
+      "source_location": "L456",
       "weight": 1.0
     },
     {
@@ -19718,6 +19788,24 @@
       "confidence_score": 0.8,
       "source_file": "lib/growth/facebook/session-deadline.test.ts",
       "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_session_deadline_ts",
+      "target": "jwt",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/session-deadline.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_session_deadline_ts",
+      "target": "session_deadline_growthstreamdeadline",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/session-deadline.ts",
+      "source_location": "L5",
       "weight": 1.0
     },
     {
@@ -21963,7 +22051,7 @@
     },
     {
       "source": "lib_growth_research_global_identity_ts",
-      "target": "lib_growth_research_global_schema",
+      "target": "lib_growth_research_mailbox_domains",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/global-identity.ts",
@@ -21972,11 +22060,29 @@
     },
     {
       "source": "lib_growth_research_global_identity_ts",
+      "target": "lib_growth_research_global_schema",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-identity.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_global_identity_ts",
       "target": "global_identity_issharedbusinesshost",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/global-identity.ts",
-      "source_location": "L21",
+      "source_location": "L30",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_global_identity_ts",
+      "target": "global_identity_hasrelatedworkemail",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-identity.ts",
+      "source_location": "L38",
       "weight": 1.0
     },
     {
@@ -21985,7 +22091,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/global-identity.ts",
-      "source_location": "L28",
+      "source_location": "L45",
       "weight": 1.0
     },
     {
@@ -21994,7 +22100,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/global-identity.ts",
-      "source_location": "L32",
+      "source_location": "L49",
       "weight": 1.0
     },
     {
@@ -22003,7 +22109,25 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/global-identity.ts",
-      "source_location": "L46",
+      "source_location": "L63",
+      "weight": 1.0
+    },
+    {
+      "source": "global_identity_hasrelatedworkemail",
+      "target": "global_identity_businesswebsitehost",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-identity.ts",
+      "source_location": "L39",
+      "weight": 1.0
+    },
+    {
+      "source": "global_identity_hasrelatedworkemail",
+      "target": "global_identity_issharedbusinesshost",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/global-identity.ts",
+      "source_location": "L40",
       "weight": 1.0
     },
     {
@@ -22012,7 +22136,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/global-identity.ts",
-      "source_location": "L50",
+      "source_location": "L67",
       "weight": 1.0
     },
     {
@@ -22021,7 +22145,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/global-identity.ts",
-      "source_location": "L51",
+      "source_location": "L68",
       "weight": 1.0
     },
     {
@@ -22422,7 +22546,7 @@
     },
     {
       "source": "lib_growth_research_ingestion_schema_ts",
-      "target": "zod",
+      "target": "lib_growth_research_mailbox_domains",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/ingestion-schema.ts",
@@ -22431,7 +22555,7 @@
     },
     {
       "source": "lib_growth_research_ingestion_schema_ts",
-      "target": "lib_growth_email_copy_policy",
+      "target": "zod",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/ingestion-schema.ts",
@@ -22440,11 +22564,20 @@
     },
     {
       "source": "lib_growth_research_ingestion_schema_ts",
+      "target": "lib_growth_email_copy_policy",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/ingestion-schema.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_ingestion_schema_ts",
       "target": "lib_growth_email_html_policy",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L4",
+      "source_location": "L5",
       "weight": 1.0
     },
     {
@@ -22453,7 +22586,7 @@
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L8",
+      "source_location": "L9",
       "weight": 1.0
     },
     {
@@ -22462,7 +22595,7 @@
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L9",
+      "source_location": "L10",
       "weight": 1.0
     },
     {
@@ -22471,7 +22604,7 @@
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L25",
+      "source_location": "L26",
       "weight": 1.0
     },
     {
@@ -22480,7 +22613,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L44",
+      "source_location": "L31",
       "weight": 1.0
     },
     {
@@ -22489,7 +22622,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L52",
+      "source_location": "L39",
       "weight": 1.0
     },
     {
@@ -22498,7 +22631,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L56",
+      "source_location": "L43",
       "weight": 1.0
     },
     {
@@ -22507,7 +22640,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L61",
+      "source_location": "L48",
       "weight": 1.0
     },
     {
@@ -22516,7 +22649,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L67",
+      "source_location": "L54",
       "weight": 1.0
     },
     {
@@ -22525,7 +22658,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L80",
+      "source_location": "L67",
       "weight": 1.0
     },
     {
@@ -22534,7 +22667,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L349",
+      "source_location": "L336",
       "weight": 1.0
     },
     {
@@ -22543,7 +22676,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L355",
+      "source_location": "L342",
       "weight": 1.0
     },
     {
@@ -22552,7 +22685,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L729",
+      "source_location": "L716",
       "weight": 1.0
     },
     {
@@ -22561,7 +22694,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L53",
+      "source_location": "L40",
       "weight": 1.0
     },
     {
@@ -22570,7 +22703,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L57",
+      "source_location": "L44",
       "weight": 1.0
     },
     {
@@ -22579,7 +22712,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L68",
+      "source_location": "L55",
       "weight": 1.0
     },
     {
@@ -35734,7 +35867,7 @@
     },
     {
       "source": "lib_growth_campaigns_founder_verification_reader_ts",
-      "target": "lib_growth_campaigns_account_repository_ts",
+      "target": "lib_growth_campaigns_review_preparation_query_ts",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1,
@@ -35744,12 +35877,22 @@
     },
     {
       "source": "lib_growth_campaigns_founder_verification_reader_ts",
+      "target": "lib_growth_campaigns_account_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_founder_verification_reader_ts",
       "target": "lib_growth_http_public_url_ts",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L4",
+      "source_location": "L8",
       "weight": 1
     },
     {
@@ -35759,7 +35902,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L5",
+      "source_location": "L9",
       "weight": 1
     },
     {
@@ -35769,7 +35912,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L9",
+      "source_location": "L13",
       "weight": 1
     },
     {
@@ -35779,7 +35922,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L13",
+      "source_location": "L17",
       "weight": 1
     },
     {
@@ -35789,7 +35932,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L14",
+      "source_location": "L18",
       "weight": 1
     },
     {
@@ -35799,7 +35942,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/campaigns/founder-verification-reader.ts",
-      "source_location": "L16",
+      "source_location": "L20",
       "weight": 1
     },
     {
@@ -35850,6 +35993,16 @@
       "confidence_score": 1,
       "source_file": "lib/growth/campaigns/permission-evidence.test.ts",
       "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_permission_evidence_ts",
+      "target": "lib_growth_http_public_url_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/permission-evidence.ts",
+      "source_location": "L2",
       "weight": 1
     },
     {
@@ -37094,12 +37247,22 @@
     },
     {
       "source": "lib_growth_research_global_identity_ts",
-      "target": "lib_growth_research_global_schema_ts",
+      "target": "lib_growth_research_mailbox_domains_ts",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/research/global-identity.ts",
       "source_location": "L1",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_global_identity_ts",
+      "target": "lib_growth_research_global_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/global-identity.ts",
+      "source_location": "L2",
       "weight": 1
     },
     {
@@ -37304,12 +37467,22 @@
     },
     {
       "source": "lib_growth_research_ingestion_schema_ts",
+      "target": "lib_growth_research_mailbox_domains_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/ingestion-schema.ts",
+      "source_location": "L1",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_ingestion_schema_ts",
       "target": "lib_growth_research_limits_ts",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L8",
+      "source_location": "L9",
       "weight": 1
     },
     {
@@ -37319,7 +37492,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/research/ingestion-schema.ts",
-      "source_location": "L9",
+      "source_location": "L10",
       "weight": 1
     },
     {

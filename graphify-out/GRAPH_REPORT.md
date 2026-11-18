@@ -1,18 +1,18 @@
 # Scoped Graph Rebuild (2026-11-18)
 
-- Persistent graph/extraction rebuilt at committed candidate revision `9c2650f01` (under review; known source-classification, permission-event and consent-eligibility findings remain open) from 310 selected TypeScript sources in 2 local Graphify AST batches (each at most 160 files): 1088 nodes and 1961 edges.
-- Installed Graphify omits cross-file static imports in this environment; supplemented 637 selected-file imports using the installed TypeScript compiler, with actual source lines and EXTRACTED confidence 1. Zero model tokens or external upload. No unreviewed working changes included.
+- Persistent graph/extraction rebuilt at reviewed revision `d61a02a9f` from 312 selected TypeScript sources in 2 local Graphify AST batches (each at most 160 files): 1093 nodes and 1970 edges.
+- Installed Graphify omits cross-file static imports in this environment; supplemented 641 selected-file imports using the installed TypeScript compiler, with actual source lines and EXTRACTED confidence 1. Zero model tokens or external upload. No unreviewed working changes included.
 - Source paths and the canonical CRM/source-service import check passed. Communities/cohesion are current, with generic algorithmic labels. Coverage remains selected Growth/Studio/agreement scopes, not the whole repository; SQL, docs, styles, most routes/TSX and dynamic imports are outside extraction. Exact corpus/hashes in source-hashes.json. Historical graph.html/benchmark.json remain unchanged by this no-viz pass.
 
 # Graph Report - .  (2026-11-18)
 
 ## Corpus Check
-- 310 files · ~144,777 words
+- 312 files · ~145,692 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1088 nodes · 1961 edges · 27 communities detected
-- Extraction: 86% EXTRACTED · 14% INFERRED · 0% AMBIGUOUS · INFERRED: 274 edges (avg confidence: 0.8)
+- 1093 nodes · 1970 edges · 27 communities detected
+- Extraction: 86% EXTRACTED · 14% INFERRED · 0% AMBIGUOUS · INFERRED: 273 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -71,72 +71,72 @@
 ## Communities
 
 ### Community 0 - "Community 0"
-Cohesion: 0.03
-Nodes (31): formatGbp(), completeDraft(), savedDraft(), AgreementBuilderDraftValidationError, builderValidationIssues(), content(), validateAgreementBuilderDraft(), ClientAgreementDetail() (+23 more)
+Cohesion: 0.04
+Nodes (57): executeAccountControlCommand(), assessAccountReadiness(), count(), validTime(), loadConfiguredAccount(), loadConfiguredAccountReadiness(), loadReservationAccount(), sameAccountScopes() (+49 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.04
-Nodes (51): executeAccountControlCommand(), assessAccountReadiness(), count(), validTime(), loadConfiguredAccount(), loadConfiguredAccountReadiness(), loadReservationAccount(), sameAccountScopes() (+43 more)
+Cohesion: 0.03
+Nodes (47): insertCandidateDetails(), request(), createFounderFirstEmailRevision(), InvalidFirstEmailRevisionContentError, requireParagraphs(), requireRetainedStandards(), requireSingleLineText(), ResearchIngestionError (+39 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.04
-Nodes (35): request(), createEditDraftHandler(), createFounderFirstEmailRevision(), InvalidFirstEmailRevisionContentError, requireParagraphs(), requireRetainedStandards(), requireSingleLineText(), ResearchIngestionError (+27 more)
+Nodes (33): emptyLine(), ensureClientProposedRecurringService(), isUntouchedStarterLine(), linesForAgreementDraft(), monthlyRecurringLine(), parseFeeLines(), parseInstallments(), contentFromForm() (+25 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.04
-Nodes (34): createGmailClient(), discardBody(), GoogleGmailClient, providerError(), readJson(), requireCredential(), createOutreachDispatcher(), prepareFirstEmailSend() (+26 more)
+Cohesion: 0.06
+Nodes (44): resendStaffAgreementNotification(), executePortalCommercialOfferCommand(), executeStaffCommercialOfferCommand(), publishStaffCommercialOffer(), retainBranch(), text(), createAgreementRouteHandler(), setup() (+36 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.04
-Nodes (44): resendStaffAgreementNotification(), AgreementBuilderDraftConflict, draftConflict(), finaliseDraft(), loadStaffAgreementBuilderDraft(), saveStaffAgreementBuilderDraft(), toAgreementDraft(), insertCandidateDetails() (+36 more)
+Cohesion: 0.05
+Nodes (18): formatGbp(), formatGbp(), ClientAgreementDetail(), CompletionNotice(), oneOffTotal(), SigningRecord(), AgreementRow(), statusLabel() (+10 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.06
-Nodes (25): emptyLine(), ensureClientProposedRecurringService(), isUntouchedStarterLine(), linesForAgreementDraft(), monthlyRecurringLine(), parseFeeLines(), parseInstallments(), contentFromForm() (+17 more)
+Cohesion: 0.05
+Nodes (32): createGmailClient(), discardBody(), GoogleGmailClient, providerError(), readJson(), requireCredential(), createOutreachDispatcher(), prepareFirstEmailSend() (+24 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.04
-Nodes (28): createFirstEmailApprover(), FirstEmailApprovalError, isFallbackKey(), createTransaction(), FirstEmailApprovalPersistenceError, ProspectPreviewApprovalPersistenceError, toJsonValue(), resolveVisual() (+20 more)
+Cohesion: 0.05
+Nodes (27): createFirstEmailApprover(), FirstEmailApprovalError, isFallbackKey(), createTransaction(), FirstEmailApprovalPersistenceError, ProspectPreviewApprovalPersistenceError, toJsonValue(), resolveVisual() (+19 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.05
-Nodes (19): CommandForm(), readCommercialOffer(), createFacebookDiscoveryHandler(), createGrowthEventHandler(), readFacebookEventUrl(), subscribeFacebookChanges(), validateFacebookEventUrl(), PayloadTooLargeError (+11 more)
+Nodes (19): CommandForm(), createFacebookDiscoveryHandler(), createGrowthEventHandler(), readFacebookEventUrl(), subscribeFacebookChanges(), validateFacebookEventUrl(), PayloadTooLargeError, createFacebookReadHandler() (+11 more)
 
 ### Community 8 - "Community 8"
-Cohesion: 0.09
-Nodes (31): agreementNotificationEmail(), agreementNotificationIdempotencyKey(), dispatchAgreementNotifications(), escapeHtml(), commercialOfferRouteConfiguration(), createCommercialOfferRouteHandler(), portalCommercialOfferRoute(), staffCommercialOfferRoute() (+23 more)
+Cohesion: 0.08
+Nodes (32): agreementNotificationEmail(), agreementNotificationIdempotencyKey(), dispatchAgreementNotifications(), escapeHtml(), commercialOfferRouteConfiguration(), createCommercialOfferRouteHandler(), portalCommercialOfferRoute(), staffCommercialOfferRoute() (+24 more)
 
 ### Community 9 - "Community 9"
-Cohesion: 0.09
-Nodes (13): appendCrmActivity(), requireCrmProspect(), CrmError, captureBusiness(), captureContact(), findCapture(), captureLead(), attachCrmContact() (+5 more)
+Cohesion: 0.06
+Nodes (26): fetchCitations(), fetchDraftRow(), fetchEmailAsset(), fetchHasEnrollment(), fetchSuppressed(), getMessageReview(), isFallbackKey(), resolveVisualForPreview() (+18 more)
 
 ### Community 10 - "Community 10"
 Cohesion: 0.09
-Nodes (23): InvalidStoredFirstEmailDraftError, parseStoredFirstEmailDraft(), sameFirstEmailCandidate(), FirstEmailTemplateRefreshError, refreshFirstEmailTemplate(), getUrlHostname(), isGoogleMapsReferenceUrl(), isHttpUrl() (+15 more)
+Nodes (23): calculateAccessTokenExpiry(), connectGmail(), GmailConnectionError, requireNonBlank(), buildGoogleAuthorizationUrl(), exchangeGoogleAuthorizationCode(), fetchGoogleIdentity(), GoogleOAuthError (+15 more)
 
 ### Community 11 - "Community 11"
-Cohesion: 0.08
-Nodes (18): fetchAuditSummary(), fetchCoreRow(), fetchEvidence(), getProspectDetail(), toProspectDetail(), buildFilterFragments(), decodeProspectCursor(), encodeProspectCursor() (+10 more)
+Cohesion: 0.09
+Nodes (13): appendCrmActivity(), requireCrmProspect(), CrmError, captureBusiness(), captureContact(), findCapture(), captureLead(), attachCrmContact() (+5 more)
 
 ### Community 12 - "Community 12"
+Cohesion: 0.08
+Nodes (22): createPreviewChangeRequest(), PreviewPilotRequestError, tx(), validateInput(), assertNoPendingExecution(), insertRevision(), listAgreementRegister(), loadAgreement() (+14 more)
+
+### Community 13 - "Community 13"
 Cohesion: 0.1
 Nodes (24): createSequenceStopper(), resolveActor(), SequenceStopError, validateRequest(), encodePayload(), isSuppressed(), normaliseEmail(), recordComplaint() (+16 more)
 
-### Community 13 - "Community 13"
-Cohesion: 0.13
-Nodes (22): calculateAccessTokenExpiry(), connectGmail(), GmailConnectionError, requireNonBlank(), buildGoogleAuthorizationUrl(), exchangeGoogleAuthorizationCode(), fetchGoogleIdentity(), GoogleOAuthError (+14 more)
-
 ### Community 14 - "Community 14"
-Cohesion: 0.18
-Nodes (24): retainBranch(), text(), signingPounds(), writeAgreementContent(), writeExecutionRecord(), writeRevenueShare(), writeServiceLines(), ensureSigningSpace() (+16 more)
-
-### Community 15 - "Community 15"
 Cohesion: 0.09
 Nodes (3): Events, item(), row()
 
-### Community 16 - "Community 16"
+### Community 15 - "Community 15"
 Cohesion: 0.09
 Nodes (12): submit(), publishCrmChange(), request(), errorMessage(), run(), Component(), FakeEventSource, refresh() (+4 more)
+
+### Community 16 - "Community 16"
+Cohesion: 0.12
+Nodes (8): completeDraft(), savedDraft(), content(), recurringDraft(), agreementDraft(), projectCompletion(), runSigningGrowthWorker(), signingGrowthValues()
 
 ### Community 17 - "Community 17"
 Cohesion: 0.19
@@ -167,8 +167,8 @@ Cohesion: 0.38
 Nodes (4): daysInMonth(), parseCalendarDate(), resolveLondonMonthRange(), resolveUtcWindow()
 
 ### Community 25 - "Community 25"
-Cohesion: 0.7
-Nodes (3): buildCampaignCopy(), buildCampaignSubject(), safe()
+Cohesion: 0.43
+Nodes (4): findEligibleDraftIds(), main(), readDatabaseUrl(), refreshDraft()
 
 ### Community 26 - "Community 26"
 Cohesion: 0.83
