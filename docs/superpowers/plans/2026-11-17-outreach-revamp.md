@@ -6,9 +6,15 @@
 
 **Architecture:** Keep one prospect store and the existing Gmail dispatcher. Add validated campaign policy versions, memberships, reservations, durable events/outbox and due jobs around existing ingestion, message snapshots and suppression. Pure campaign rules remain independent of database, HTTP and React.
 
-**Tech Stack:** Node 24, pnpm 9.7, Next 16.4.2, React 19, strict TypeScript, postgres, Zod 4, existing date-fns/timezone utilities and node:test. No new dependencies.
+**Tech Stack:** Node 24, pnpm 9.7, Next 16.4.5, React 19, strict TypeScript, postgres, Zod 4, existing date-fns/timezone utilities and node:test. No new dependencies.
 
 **Spec:** [Approved design](../specs/2026-11-17-outreach-revamp-design.md), [video brief](../../growth-os/research/2026-11-17-video-outreach-brief.md). Conversation approval supersedes the design file's old draft header. Approval to implement does not fill missing operational permission evidence or bypass release gates. Baseline environment is ready: Node 24.22.1, pnpm 9.7.0, 2,533 unit tests pass and typecheck is clean; disposable PostgreSQL 17 is available through `DIRECT_DATABASE_URL`. Use only the isolated test database for migrations/tests.
+
+## Execution status, 18 November 2026
+
+Task1 domain rules and Task2 persistence/lifecycle/account/reservation foundations are reviewed. Task3.1 signed research provenance (`d61a02a9f`), Task3.2 Gmail observation/routing (`df44ef7c9`) and Task3.3a recipient approval (`317991cae`) are reviewed, with current maps at `ceb387f11`. Task4 public/manual Facebook workspace (`97ab9ec0f`) passed scoped source and actual browser checks; final integrated UI jury is pending. Task3.3b atomic confirmation is in progress. Remaining sender integration, Resend, commercial/outcome/report/UI work, schedules and release gates are incomplete. No new sending automation, production deployment or first run has occurred.
+
+The original checklists below describe required task reach. Detailed per-slice execution and verification are recorded in the local SDD progress ledger; unchecked historical steps must not be read as proof that no work exists. Current source coverage and limitations are in [FEATURE_TREE.md](../../../FEATURE_TREE.md) and [Graphify report](../../../graphify-out/GRAPH_REPORT.md). Current cached Node is24.22.3. Earlier baseline version/count claims describe the planning-time run, not the latest revision.
 
 ## Global Constraints
 
@@ -26,7 +32,7 @@
 
 ## Source and reuse map
 
-Consulted `FEATURE_TREE.md` GROWTH-CRM, GROWTH-RESEARCH, GROWTH-OUTREACH, GROWTH-SUPPRESSION, GROWTH-FB-SOURCE and planned campaign IDs, plus `graphify-out/graph.json` nodes `lib_growth_crm_commands_ts`, `lib_growth_research_global_ingest_ts`, `lib_growth_sequences_dispatcher_ts` and their neighbors. Followed source references into CRM commands/capture, v2 ingestion/schema, dispatcher/repository, Gmail types/sync, dashboards and cron. Graph contains inferred edges and is not directed proof; source remains authoritative. Current structural coverage is 198 selected sources, not the entire repository.
+Consulted `FEATURE_TREE.md` GROWTH-CRM, GROWTH-RESEARCH, GROWTH-OUTREACH, GROWTH-SUPPRESSION, GROWTH-FB-SOURCE and planned campaign IDs, plus `graphify-out/graph.json` nodes `lib_growth_crm_commands_ts`, `lib_growth_research_global_ingest_ts`, `lib_growth_sequences_dispatcher_ts` and their neighbors. Followed source references into CRM commands/capture, v2 ingestion/schema, dispatcher/repository, Gmail types/sync, dashboards and cron. Graph contains inferred edges and is not directed proof; source remains authoritative. Planning-time structural coverage was198 selected sources; consult FEATURE_TREE.md for current selected coverage and gaps.
 
 Reuse `ingestGlobalResearchRun`, `executeCrmCommand`, `createOutreachDispatcher`, `createGmailReplySync`, private message snapshots, existing founder auth, HMAC intake, suppression and audit. `crm/change-events.ts` is browser cross-tab refresh only, not a backend/provider event bus. Gmail currently exposes history and metadata but no Sent listing or remaining-quota API; add the former, never invent the latter.
 
