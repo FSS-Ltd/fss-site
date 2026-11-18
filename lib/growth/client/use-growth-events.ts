@@ -9,6 +9,7 @@ export type GrowthEventState =
   | "auth-failed";
 export type GrowthRefresh = (
   signal: AbortSignal,
+  onAuthFailure: () => void,
 ) => Promise<"ok" | "auth-failed" | "error" | "superseded">;
 
 /** Keep refresh stable with useCallback; change it when the current view changes. */
@@ -51,7 +52,7 @@ export function useGrowthEvents(refresh: GrowthRefresh): {
         dirty = false;
         let result: Awaited<ReturnType<GrowthRefresh>>;
         try {
-          result = await refresh(abort.signal);
+          result = await refresh(abort.signal, stopForAuth);
         } catch {
           result = "error";
         }
@@ -107,6 +108,6 @@ export function useGrowthEvents(refresh: GrowthRefresh): {
       invalidateRef.current = () => {};
       stopRef.current = () => {};
     };
-  }, [refresh]);
+  }, [refresh, stopForAuth]);
   return { state, invalidate, stopForAuth };
 }

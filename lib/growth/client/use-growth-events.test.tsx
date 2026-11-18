@@ -175,3 +175,55 @@ test("authentication failure stays terminal when the selected view changes", asy
   assert.equal(calls, 1);
   await act(async () => root.unmount());
 });
+
+test("a pending old-view read can terminate the current stream immediately", async () => {
+  const container = document.createElement("div");
+  const root = createRoot(container);
+  let failAuth!: () => void;
+  let finish!: (result: "ok") => void;
+  let signal: AbortSignal | undefined;
+  let calls = 0;
+  const first: GrowthRefresh = async (value, stop) => {
+    calls++;
+    signal = value;
+    failAuth = stop;
+    return new Promise((resolve) => {
+      finish = resolve;
+    });
+  };
+  const second: GrowthRefresh = async () => {
+    calls++;
+    return "ok";
+  };
+  function Component({ refresh }: { refresh: GrowthRefresh }) {
+    return createElement("span", null, useGrowthEvents(refresh).state);
+  }
+  await act(async () =>
+    root.render(createElement(Component, { refresh: first })),
+  );
+  const oldSource = FakeEventSource.instance;
+  await act(async () => {
+    oldSource.emit("ready");
+    oldSource.emit("change");
+  });
+  await act(async () =>
+    root.render(createElement(Component, { refresh: second })),
+  );
+  const currentSource = FakeEventSource.instance;
+  assert.notEqual(currentSource, oldSource);
+  await act(async () => failAuth());
+  assert.equal(currentSource.closed, true);
+  assert.equal(signal?.aborted, true);
+  assert.equal(container.textContent, "auth-failed");
+  await act(async () => {
+    finish("ok");
+    currentSource.emit("change");
+  });
+  assert.equal(calls, 1);
+  await act(async () =>
+    root.render(createElement(Component, { refresh: first })),
+  );
+  assert.equal(FakeEventSource.instance, currentSource);
+  assert.equal(container.textContent, "auth-failed");
+  await act(async () => root.unmount());
+});

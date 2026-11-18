@@ -23,11 +23,30 @@ export function FacebookWorkspace() {
   const [error, setError] = useState("");
   const generation = useRef(0);
   const pageAbort = useRef<AbortController | null>(null);
+  const mounted = useRef(false);
+  const terminalAuth = useRef(false);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      pageAbort.current?.abort();
+    };
+  }, []);
+  const establishAuthFailure = useCallback((stop: () => void) => {
+    if (!mounted.current || terminalAuth.current) return;
+    terminalAuth.current = true;
+    generation.current++;
+    pageAbort.current?.abort();
+    stop();
+    setError("Session expired. Sign in again.");
+  }, []);
   const refresh = useCallback(
     async (
       signal: AbortSignal,
+      stop: () => void,
     ): Promise<"ok" | "error" | "auth-failed" | "superseded"> => {
       const current = ++generation.current;
+      const onAuthFailure = () => establishAuthFailure(stop);
       try {
         const ids = [
           ...new Set([
@@ -36,9 +55,13 @@ export function FacebookWorkspace() {
           ]),
         ];
         const [page, ...selections] = await Promise.all([
-          readWorkspace("", signal),
+          readWorkspace("", signal, onAuthFailure),
           ...ids.map((id) =>
-            readWorkspace(`?selectedId=${encodeURIComponent(id)}`, signal),
+            readWorkspace(
+              `?selectedId=${encodeURIComponent(id)}`,
+              signal,
+              onAuthFailure,
+            ),
           ),
         ]);
         const checked = new Set(ids);
@@ -60,7 +83,11 @@ export function FacebookWorkspace() {
           missing.forEach((id) => checked.add(id));
           const additional = await Promise.all(
             missing.map((id) =>
-              readWorkspace(`?selectedId=${encodeURIComponent(id)}`, signal),
+              readWorkspace(
+                `?selectedId=${encodeURIComponent(id)}`,
+                signal,
+                onAuthFailure,
+              ),
             ),
           );
           found.push(
@@ -92,27 +119,14 @@ export function FacebookWorkspace() {
           : "error";
       }
     },
-    [selectedId],
+    [selectedId, establishAuthFailure],
   );
   const {
     state: live,
     invalidate: manualRefresh,
     stopForAuth,
   } = useGrowthEvents(refresh);
-  useEffect(() => {
-    if (live === "auth-failed") pageAbort.current?.abort();
-  }, [live]);
-  useEffect(
-    () => () => {
-      pageAbort.current?.abort();
-    },
-    [],
-  );
-  const authFailed = () => {
-    stopForAuth();
-    pageAbort.current?.abort();
-    setError("Session expired. Sign in again.");
-  };
+  const authFailed = () => establishAuthFailure(stopForAuth);
   const saved = (id: string) => {
     if (selectedId === id) manualRefresh();
     else setSelectedId(id);
@@ -252,21 +266,26 @@ export function FacebookWorkspace() {
                   type="button"
                   disabled={live === "auth-failed"}
                   onClick={async () => {
+                    if (terminalAuth.current) return;
+                    const current = ++generation.current;
+                    pageAbort.current?.abort();
+                    const abort = new AbortController();
+                    pageAbort.current = abort;
                     try {
-                      const current = ++generation.current;
-                      pageAbort.current?.abort();
-                      const abort = new AbortController();
-                      pageAbort.current = abort;
                       const next = await readWorkspace(
                         `?cursor=${encodeURIComponent(workspace.nextCursor ?? "")}`,
                         abort.signal,
+                        authFailed,
                       );
-                      if (next && current === generation.current)
+                      if (
+                        !abort.signal.aborted &&
+                        current === generation.current
+                      )
                         setWorkspace(next);
                     } catch (error) {
-                      if (error instanceof Error && error.message === "auth") {
-                        authFailed();
-                      } else if (
+                      if (
+                        !abort.signal.aborted &&
+                        current === generation.current &&
                         !(error instanceof Error && error.name === "AbortError")
                       ) {
                         setError("Next page could not load. Try again.");

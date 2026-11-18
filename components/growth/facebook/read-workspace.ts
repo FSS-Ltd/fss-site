@@ -88,12 +88,16 @@ export const workspaceDtoSchema = z.object({
 export async function readWorkspace(
   query: string,
   signal: AbortSignal,
+  onAuthFailure?: () => void,
 ): Promise<ReadyWorkspace> {
   const response = await fetch(`/api/growth/facebook${query}`, {
     signal,
     cache: "no-store",
   });
-  if (response.status === 401) throw new Error("auth");
+  if (response.status === 401) {
+    onAuthFailure?.();
+    throw new Error("auth");
+  }
   if (!response.ok) throw new Error("read");
   const data: unknown = await response.json();
   const result = workspaceDtoSchema.safeParse(data);

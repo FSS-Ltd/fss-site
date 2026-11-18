@@ -35,7 +35,10 @@ class Events extends EventTarget {
     super();
     Events.instance = this;
   }
-  close() {}
+  closed = 0;
+  close() {
+    this.closed++;
+  }
   emit(name: string) {
     this.dispatchEvent(new Event(name));
   }
@@ -565,6 +568,230 @@ test("unmount cancels a pending expiry refresh", async () => {
     assert.equal(reads, 1);
   } finally {
     container.remove();
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("superseded refresh 401 closes the stream and aborts pagination", async () => {
+  const originalFetch = globalThis.fetch;
+  let resolveRefresh!: (response: Response) => void;
+  let resolvePage!: (response: Response) => void;
+  let pageSignal: AbortSignal | undefined;
+  let reads = 0;
+  globalThis.fetch = async (input, init) => {
+    reads++;
+    if (reads === 1) return Response.json(page([item("A")], "cursor"));
+    if (String(input).includes("cursor=")) {
+      pageSignal = init?.signal ?? undefined;
+      return new Promise<Response>((resolve) => {
+        resolvePage = resolve;
+      });
+    }
+    return new Promise<Response>((resolve) => {
+      resolveRefresh = resolve;
+    });
+  };
+  const container = document.createElement("div");
+  document.body.append(container);
+  const root = createRoot(container);
+  try {
+    await act(async () => {
+      root.render(createElement(FacebookWorkspace));
+    });
+    await act(async () => {
+      Events.instance.emit("ready");
+      await tick();
+    });
+    const source = Events.instance;
+    await act(async () => {
+      button(container, "Refresh").click();
+    });
+    await act(async () => {
+      button(container, "Next directory page").click();
+    });
+    await act(async () => {
+      resolveRefresh(new Response("{}", { status: 401 }));
+      await tick();
+    });
+    assert.equal(source.closed, 1);
+    assert.equal(pageSignal?.aborted, true);
+    assert.ok(container.querySelector('a[href="/growth/login"]'));
+    assert.equal(button(container, "Refresh").disabled, true);
+    assert.equal(button(container, "Next directory page").disabled, true);
+    await act(async () => {
+      resolvePage(Response.json(page([item("late")])));
+      source.emit("change");
+      await tick();
+    });
+    assert.equal(container.querySelector("#late"), null);
+    assert.equal(reads, 3);
+  } finally {
+    await act(async () => root.unmount());
+    container.remove();
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("a sibling 401 remains terminal after an aggregated read fails", async () => {
+  const originalFetch = globalThis.fetch;
+  let resolveSelected!: (response: Response) => void;
+  let reads = 0;
+  window.history.replaceState(null, "", "?selectedId=A");
+  globalThis.fetch = async (input) => {
+    reads++;
+    if (reads <= 2) return Response.json(page([item("A")]));
+    if (String(input).includes("selectedId="))
+      return new Promise<Response>((resolve) => {
+        resolveSelected = resolve;
+      });
+    return new Response("{}", { status: 500 });
+  };
+  const container = document.createElement("div");
+  document.body.append(container);
+  const root = createRoot(container);
+  try {
+    await act(async () => {
+      root.render(createElement(FacebookWorkspace));
+    });
+    await act(async () => {
+      Events.instance.emit("ready");
+      await tick();
+    });
+    const source = Events.instance;
+    await act(async () => {
+      button(container, "Refresh").click();
+      await tick();
+    });
+    await act(async () => {
+      resolveSelected(new Response("{}", { status: 401 }));
+      await tick();
+    });
+    assert.equal(source.closed, 1);
+    assert.ok(container.querySelector('a[href="/growth/login"]'));
+  } finally {
+    await act(async () => root.unmount());
+    container.remove();
+    window.history.replaceState(null, "", "/growth/facebook");
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("pagination 401 is terminal and an obsolete page error is ignored", async () => {
+  const originalFetch = globalThis.fetch;
+  const pending: Array<(response: Response) => void> = [];
+  let reads = 0;
+  globalThis.fetch = async (input) => {
+    reads++;
+    if (!String(input).includes("cursor="))
+      return Response.json(page([item("A")], "cursor"));
+    return new Promise<Response>((resolve) => {
+      pending.push(resolve);
+    });
+  };
+  const container = document.createElement("div");
+  document.body.append(container);
+  const root = createRoot(container);
+  try {
+    await act(async () => {
+      root.render(createElement(FacebookWorkspace));
+    });
+    await act(async () => {
+      Events.instance.emit("ready");
+      await tick();
+    });
+    const source = Events.instance;
+    await act(async () => {
+      button(container, "Next directory page").click();
+      button(container, "Next directory page").click();
+    });
+    await act(async () => {
+      pending[0](new Response("{}", { status: 500 }));
+      await tick();
+    });
+    assert.equal(container.querySelector('[role="alert"]'), null);
+    await act(async () => {
+      pending[1](new Response("{}", { status: 401 }));
+      await tick();
+    });
+    assert.equal(source.closed, 1);
+    assert.ok(container.querySelector('a[href="/growth/login"]'));
+    assert.equal(button(container, "Next directory page").disabled, true);
+    assert.equal(reads, 3);
+  } finally {
+    await act(async () => root.unmount());
+    container.remove();
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("an unmounted workspace ignores a late 401", async () => {
+  const originalFetch = globalThis.fetch;
+  let resolveRead!: (response: Response) => void;
+  globalThis.fetch = async () =>
+    new Promise<Response>((resolve) => {
+      resolveRead = resolve;
+    });
+  const container = document.createElement("div");
+  const root = createRoot(container);
+  try {
+    await act(async () => {
+      root.render(createElement(FacebookWorkspace));
+    });
+    const source = Events.instance;
+    await act(async () => {
+      source.emit("ready");
+    });
+    await act(async () => root.unmount());
+    await act(async () => {
+      resolveRead(new Response("{}", { status: 401 }));
+      await tick();
+    });
+    assert.equal(source.closed, 1);
+    assert.equal(container.textContent, "");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("an obsolete refresh failure cannot replace a newer page", async () => {
+  const originalFetch = globalThis.fetch;
+  let rejectRefresh!: (error: Error) => void;
+  let reads = 0;
+  globalThis.fetch = async (input) => {
+    reads++;
+    if (reads === 1) return Response.json(page([item("A")], "cursor"));
+    if (String(input).includes("cursor="))
+      return Response.json(page([item("B")]));
+    return new Promise<Response>((_resolve, reject) => {
+      rejectRefresh = reject;
+    });
+  };
+  const container = document.createElement("div");
+  const root = createRoot(container);
+  try {
+    await act(async () => {
+      root.render(createElement(FacebookWorkspace));
+    });
+    await act(async () => {
+      Events.instance.emit("ready");
+      await tick();
+    });
+    await act(async () => {
+      button(container, "Refresh").click();
+    });
+    await act(async () => {
+      button(container, "Next directory page").click();
+      await tick();
+    });
+    await act(async () => {
+      rejectRefresh(new Error("read"));
+      await tick();
+    });
+    assert.ok(container.querySelector("#B"));
+    assert.equal(container.querySelector('[role="alert"]'), null);
+    assert.match(container.textContent ?? "", /Live updates: connected/);
+  } finally {
+    await act(async () => root.unmount());
     globalThis.fetch = originalFetch;
   }
 });
