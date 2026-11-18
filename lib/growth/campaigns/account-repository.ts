@@ -1,19 +1,52 @@
 import { z } from "zod";
 import type { AuthorityBounds } from "./authority-bounds";
 import type { GrowthTransaction } from "../db/types";
-import { hasRequiredGmailScopes } from "../integrations/google-oauth";
+import {
+  hasRequiredGmailScopes,
+  sameAccountScopes,
+} from "../integrations/google-oauth";
+export {
+  sameAccountScopes,
+  normalizedAccountScopes,
+} from "../integrations/google-oauth";
 import { CAMPAIGN_FOUNDER_EMAIL } from "./authorization";
 import { healthReviewSchema, limitsReviewSchema } from "./account-contracts";
 import { assessAccountReadiness } from "./account-readiness";
-import { validUsageProvenance } from "./account-usage";
+import { validTransitionUsageProvenance } from "./account-usage";
 
-const normalizeScope = (scope: string) =>
-  scope === "https://www.googleapis.com/auth/userinfo.email" ? "email" : scope;
-export function sameAccountScopes(a: string[], b: string[]): boolean {
-  return (
-    [...new Set(a.map(normalizeScope))].sort().join("\n") ===
-    [...new Set(b.map(normalizeScope))].sort().join("\n")
-  );
+const accountReviewEnvelopeSchema = z.object({
+  evidence: z.unknown(),
+  googleSubject: z.string().optional(),
+  googleScopes: z.array(z.string()).optional(),
+});
+export function currentVisibilityExpiry(
+  evidence: unknown,
+  subject: string,
+  scopes: string[],
+  now: Date,
+): Date | null {
+  const envelope = accountReviewEnvelopeSchema.safeParse(evidence);
+  if (
+    !envelope.success ||
+    envelope.data.googleSubject !== subject ||
+    !envelope.data.googleScopes ||
+    !sameAccountScopes(envelope.data.googleScopes, scopes)
+  )
+    return null;
+  const limits = limitsReviewSchema.safeParse(envelope.data.evidence);
+  if (!limits.success) return null;
+  const visibility = limits.data.visibility;
+  if (
+    !visibility ||
+    visibility.reviewedAt > now ||
+    visibility.expiresAt <= now ||
+    visibility.expiresAt > limits.data.expiresAt ||
+    visibility.reviewedAt >= visibility.expiresAt ||
+    Object.values(visibility.paths).some((path) => path !== "covered") ||
+    visibility.recipientHeaders !== "complete"
+  )
+    return null;
+  return visibility.expiresAt;
 }
 type Decision = { status: "ready" } | { status: "held"; reason: string };
 
@@ -90,11 +123,9 @@ async function loadConfiguredAccount(
   const reviews = await tx<
     { id: string; evidence: unknown }[]
   >`select id,evidence from growth.outreach_account_reviews where connection_id=${connectionId} and id in (${control.limitsId},${control.healthId})`;
-  const envelope = z.object({ evidence: z.unknown() });
-  const limitsEnvelope = envelope.safeParse(
-    reviews.find((r) => r.id === control.limitsId)?.evidence,
-  );
-  const healthEnvelope = envelope.safeParse(
+  const limitsReview = reviews.find((r) => r.id === control.limitsId)?.evidence;
+  const limitsEnvelope = accountReviewEnvelopeSchema.safeParse(limitsReview);
+  const healthEnvelope = accountReviewEnvelopeSchema.safeParse(
     reviews.find((r) => r.id === control.healthId)?.evidence,
   );
   const limits = limitsReviewSchema.safeParse(
@@ -121,13 +152,23 @@ async function loadConfiguredAccount(
       historyStart: string | null;
       historyEnd: string | null;
       evidenceVersion: number | null;
+      observationSubject: string | null;
+      observationScopes: string[] | null;
+      observationRevision: number;
       ids: unknown;
     }[]
   >`
-    select account_id as "accountId",captured_at as "capturedAt",fresh_until as "expiresAt",complete,grant_epoch as grant,rolling_messages as messages,rolling_recipients as recipients,window_start as "windowStart",history_start as "historyStart",history_end as "historyEnd",evidence_version as "evidenceVersion",provider_message_ids as ids from growth.outreach_provider_usage where connection_id=${connectionId} ${locks === "acquire" ? tx`for share` : tx``}`;
+    select account_id as "accountId",captured_at as "capturedAt",fresh_until as "expiresAt",complete,grant_epoch as grant,rolling_messages as messages,rolling_recipients as recipients,window_start as "windowStart",history_start as "historyStart",history_end as "historyEnd",evidence_version as "evidenceVersion",observation_subject as "observationSubject",observation_scopes as "observationScopes",observation_revision as "observationRevision",provider_message_ids as ids from growth.outreach_provider_usage where connection_id=${connectionId} ${locks === "acquire" ? tx`for share` : tx``}`;
   const usage = rows.length === 1 ? rows[0] : undefined;
   const [clock] = await tx<{ now: Date }[]>`select clock_timestamp() as now`;
   if (!clock) return held("invalid_time");
+  const visibilityExpiry = currentVisibilityExpiry(
+    limitsReview,
+    connection.subject,
+    connection.scopes,
+    clock.now,
+  );
+  if (!visibilityExpiry) return held("visibility_unknown");
   const decision = assessAccountReadiness(
     {
       identity: {
@@ -148,14 +189,22 @@ async function loadConfiguredAccount(
                 !!usage.windowStart &&
                 usage.windowStart.getTime() <=
                   usage.capturedAt.getTime() - 24 * 60 * 60 * 1000 &&
-                !!usage.historyStart?.trim() &&
-                !!usage.historyEnd?.trim() &&
-                !!usage.evidenceVersion &&
-                validUsageProvenance(
+                !!usage.historyStart &&
+                /^\d{1,32}$/.test(usage.historyStart) &&
+                !!usage.historyEnd &&
+                /^\d{1,32}$/.test(usage.historyEnd) &&
+                BigInt(usage.historyEnd) >= BigInt(usage.historyStart) &&
+                usage.evidenceVersion === 2 &&
+                usage.observationRevision > 0 &&
+                usage.observationSubject === connection.subject &&
+                !!usage.observationScopes &&
+                sameAccountScopes(usage.observationScopes, connection.scopes) &&
+                validTransitionUsageProvenance(
                   usage.ids,
                   usage.messages,
                   usage.recipients,
                   usage.capturedAt,
+                  clock.now,
                 ),
               grantMatches: usage.grant === connection.version,
               messages: usage.messages,
@@ -166,15 +215,13 @@ async function loadConfiguredAccount(
     clock.now,
   );
   if (decision.status === "held") return decision;
-  const ids = z.array(z.object({ id: z.string() })).safeParse(usage?.ids);
   if (
     !limits.success ||
     !health.success ||
     !usage?.capturedAt ||
     !usage.expiresAt ||
     usage.messages === null ||
-    usage.recipients === null ||
-    !ids.success
+    usage.recipients === null
   )
     return held("usage_unknown");
   return {
@@ -185,6 +232,7 @@ async function loadConfiguredAccount(
         expiresAt: new Date(
           Math.min(
             limits.data.expiresAt.getTime(),
+            visibilityExpiry.getTime(),
             health.data.expiresAt.getTime(),
             usage.expiresAt.getTime(),
           ),
@@ -204,7 +252,7 @@ async function loadConfiguredAccount(
         accountId: usage.accountId,
         messages: usage.messages,
         recipients: usage.recipients,
-        providerIds: ids.data.map((item) => item.id),
+        providerIds: [],
       },
     },
   };

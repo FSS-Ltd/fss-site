@@ -12,6 +12,7 @@ import {
 import {
   loadConfiguredAccountReadiness,
   sameAccountScopes,
+  normalizedAccountScopes,
 } from "./account-repository";
 
 type Connection = {
@@ -114,6 +115,16 @@ export async function executeAccountControlCommand(
           command.evidence.observedAt.getTime() + 30 * day)
     )
       throw new Error("invalid_limits_time");
+    if (command.type === "record_limits" && command.evidence.visibility) {
+      const visibility = command.evidence.visibility;
+      if (
+        visibility.reviewedAt > now ||
+        visibility.expiresAt <= now ||
+        visibility.reviewedAt >= visibility.expiresAt ||
+        visibility.expiresAt > command.evidence.expiresAt
+      )
+        throw new Error("invalid_visibility_time");
+    }
     if (
       command.type === "record_health" &&
       (command.evidence.observedFrom >= command.evidence.observedUntil ||
@@ -162,7 +173,7 @@ export async function executeAccountControlCommand(
     }
     const reviewId = randomUUID();
     const version = control.version + 1;
-    await tx`insert into growth.outreach_account_reviews(id,connection_id,request_id,request_hash,actor_id,kind,evidence,resulting_version) values (${reviewId},${connection.id},${command.requestId},${hash},${founder.actorId},${command.type},${tx.json(JSON.parse(JSON.stringify({ ...command, limitsReviewId: control.limitsId, healthReviewId: control.healthId, previousRamp: control.ramp, newRamp: command.type === "approve_ramp" || command.type === "reduce_ramp" ? command.ramp : control.ramp })))},${version})`;
+    await tx`insert into growth.outreach_account_reviews(id,connection_id,request_id,request_hash,actor_id,kind,evidence,resulting_version) values (${reviewId},${connection.id},${command.requestId},${hash},${founder.actorId},${command.type},${tx.json(JSON.parse(JSON.stringify({ ...command, ...(command.type === "record_limits" ? { googleSubject: connection.subject, googleScopes: normalizedAccountScopes(connection.scopes) } : {}), limitsReviewId: control.limitsId, healthReviewId: control.healthId, previousRamp: control.ramp, newRamp: command.type === "approve_ramp" || command.type === "reduce_ramp" ? command.ramp : control.ramp })))},${version})`;
     const adverseHealth =
       command.type === "record_health" &&
       [
@@ -185,7 +196,7 @@ export async function executeAccountControlCommand(
       command.type === "approve_ramp" || command.type === "reduce_ramp"
         ? command.ramp
         : control.ramp;
-    await tx`update growth.outreach_account_controls set state=${state},ramp=${ramp},version=${version},verified_grant_epoch=${command.type === "activate" || command.type === "revalidate_grant" ? connection.version : control.grant},verified_scopes=${command.type === "revalidate_grant" ? connection.scopes : control.scopes},limits_review_id=${command.type === "record_limits" ? reviewId : control.limitsId},health_review_id=${command.type === "record_health" ? reviewId : control.healthId},last_ramp_at=${command.type === "approve_ramp" || (command.type === "activate" && !control.lastRampAt) ? now : control.lastRampAt},updated_at=${now} where connection_id=${connection.id}`;
+    await tx`update growth.outreach_account_controls set state=${state},ramp=${ramp},version=${version},verified_grant_epoch=${command.type === "activate" || command.type === "revalidate_grant" ? connection.version : control.grant},verified_scopes=${command.type === "revalidate_grant" ? connection.scopes : control.scopes},limits_review_id=${command.type === "record_limits" ? reviewId : command.type === "revalidate_grant" && !sameAccountScopes(control.scopes, connection.scopes) ? null : control.limitsId},health_review_id=${command.type === "record_health" ? reviewId : control.healthId},last_ramp_at=${command.type === "approve_ramp" || (command.type === "activate" && !control.lastRampAt) ? now : control.lastRampAt},updated_at=${now} where connection_id=${connection.id}`;
     await appendAuditEvent(tx, {
       correlationId,
       actorType: "founder",

@@ -263,6 +263,11 @@ test("reconciles a lost provider response through the RFC Message-ID and does no
         precedence: null,
         returnPath: null,
         autoResponseSuppress: null,
+        to: null,
+        cc: null,
+        bcc: null,
+        inReplyTo: null,
+        references: null,
       }),
     }),
   });

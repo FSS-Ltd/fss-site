@@ -44,6 +44,13 @@ export type StoredGmailCredential = {
   encryptionKeyVersion: string;
 };
 
+export type ConnectedGmailCredential = StoredGmailCredential & {
+  connectionId: string;
+  googleSubject: string | null;
+  grantEpoch: number;
+  grantedScopes: string[];
+};
+
 export type DisconnectStoredGmailConnectionInput = {
   subjectEmail: string;
   correlationId: string;
@@ -62,7 +69,7 @@ export type DisconnectStoredGmailConnectionResult = {
 export async function getConnectedGmailCredential(
   db: GrowthQueryExecutor,
   subjectEmail: string,
-): Promise<StoredGmailCredential | null> {
+): Promise<ConnectedGmailCredential | null> {
   const normalisedSubjectEmail = subjectEmail.trim().toLowerCase();
 
   if (!normalisedSubjectEmail) {
@@ -73,9 +80,15 @@ export async function getConnectedGmailCredential(
     Array<{
       encryptedRefreshToken: string | null;
       encryptionKeyVersion: string | null;
+      connectionId: string;
+      googleSubject: string | null;
+      grantEpoch: number;
+      grantedScopes: string[];
     }>
   >`
     select
+      ic.id as "connectionId", ic.google_subject as "googleSubject",
+      ic.version as "grantEpoch", ic.granted_scopes as "grantedScopes",
       ic.encrypted_refresh_token as "encryptedRefreshToken",
       ic.encryption_key_version as "encryptionKeyVersion"
     from growth.integration_connections ic
@@ -91,6 +104,10 @@ export async function getConnectedGmailCredential(
   return {
     encryptedRefreshToken: row.encryptedRefreshToken,
     encryptionKeyVersion: row.encryptionKeyVersion,
+    connectionId: row.connectionId,
+    googleSubject: row.googleSubject,
+    grantEpoch: row.grantEpoch,
+    grantedScopes: row.grantedScopes,
   };
 }
 

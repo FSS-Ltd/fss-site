@@ -19,7 +19,20 @@ const founder: FounderSession = {
   email: "founder@example.test",
   actorId: "a".repeat(64),
 };
-const gmailSyncActor = { type: "gmail_sync" as const, id: "gmail-sync" };
+const gmailSyncActor = {
+  type: "gmail_sync" as const,
+  id: "gmail-sync",
+  binding: {
+    connectionId: "account",
+    googleSubject: "subject",
+    grantEpoch: 1,
+    grantedScopes: [
+      "openid",
+      "email",
+      "https://www.googleapis.com/auth/gmail.modify",
+    ],
+  },
+};
 const sequenceId = "11111111-1111-4111-8111-111111111111";
 
 function lockedEnrollment(
@@ -73,6 +86,7 @@ function createFakeRepository(state: FakeState): SequenceStopRepository {
         },
         async insertDoNotContactSuppression(input) {
           state.suppressions.push(input);
+          return true;
         },
         async appendStopAudit(input) {
           state.audits.push(input);
@@ -157,6 +171,7 @@ test("do_not_contact and bounce insert a global suppression; other reasons do no
 test("repeating the same stop reason is idempotent and does not re-apply", async () => {
   const state = createFakeState({
     enrollment: lockedEnrollment({ status: "stopped_reply" }),
+    cancelledCount: 0,
   });
   const stopSequence = createStopper(state);
 
@@ -272,4 +287,74 @@ test("rejects malformed request input", async () => {
     }),
     TypeError,
   );
+});
+
+test("Gmail bounce replay preserves another terminal status and completes suppression", async () => {
+  const state = createFakeState({
+    enrollment: lockedEnrollment({ status: "stopped_reply" }),
+  });
+  const result = await createStopper(state)(db, {
+    sequenceId,
+    reason: "bounce",
+    actor: gmailSyncActor,
+    correlationId: "c",
+  });
+  assert.equal(result.status, "stopped_reply");
+  assert.equal(result.alreadyApplied, true);
+  assert.equal(state.applied.length, 0);
+  assert.equal(state.suppressions.length, 1);
+  assert.equal(state.audits.length, 1);
+});
+
+test("Gmail bounce replay completes suppression even when the status already matches", async () => {
+  const state = createFakeState({
+    enrollment: lockedEnrollment({ status: "stopped_bounce" }),
+  });
+  const result = await createStopper(state)(db, {
+    sequenceId,
+    reason: "bounce",
+    actor: gmailSyncActor,
+    correlationId: "c",
+  });
+  assert.equal(result.status, "stopped_bounce");
+  assert.equal(state.suppressions.length, 1);
+});
+
+test("Gmail stop checks the credential binding inside its transaction", async () => {
+  let checked: unknown;
+  const state = createFakeState();
+  const repository: SequenceStopRepository = {
+    async withTransaction(_db, operation) {
+      return createFakeRepository(state).withTransaction(_db, (tx) =>
+        operation({
+          ...tx,
+          async lockEnrollment(id, binding) {
+            checked = binding;
+            return tx.lockEnrollment(id, binding);
+          },
+        }),
+      );
+    },
+  };
+  const actor = {
+    type: "gmail_sync" as const,
+    id: "gmail-sync",
+    binding: {
+      connectionId: "account",
+      googleSubject: "subject",
+      grantEpoch: 1,
+      grantedScopes: [
+        "openid",
+        "email",
+        "https://www.googleapis.com/auth/gmail.modify",
+      ],
+    },
+  };
+  await createSequenceStopper({ repository })(db, {
+    sequenceId,
+    reason: "reply",
+    actor,
+    correlationId: "c",
+  });
+  assert.deepEqual(checked, actor.binding);
 });

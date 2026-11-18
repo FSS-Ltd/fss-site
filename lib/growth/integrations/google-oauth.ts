@@ -2,6 +2,20 @@ import { randomBytes } from "node:crypto";
 
 import { z } from "zod";
 
+const normalizeScope = (scope: string) =>
+  scope === "https://www.googleapis.com/auth/userinfo.email" ? "email" : scope;
+export function normalizedAccountScopes(scopes: string[]): string[] {
+  return [...new Set(scopes.map(normalizeScope))].sort();
+}
+export function sameAccountScopes(a: string[], b: string[]): boolean {
+  const left = normalizedAccountScopes(a);
+  const right = normalizedAccountScopes(b);
+  return (
+    left.length === right.length &&
+    left.every((scope, index) => scope === right[index])
+  );
+}
+
 const GOOGLE_AUTHORIZATION_ENDPOINT =
   "https://accounts.google.com/o/oauth2/v2/auth";
 const GOOGLE_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token";

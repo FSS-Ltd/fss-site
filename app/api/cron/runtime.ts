@@ -4,8 +4,10 @@ import {
   type GrowthServerEnv,
 } from "@/lib/growth/config/env";
 import type { GrowthDb } from "@/lib/growth/db/types";
-import { createLiveGmailClient } from "@/lib/growth/integrations/gmail/live-client";
-import type { GmailClient } from "@/lib/growth/integrations/gmail/types";
+import {
+  createBoundLiveGmailClient,
+  type BoundGmailClient,
+} from "@/lib/growth/integrations/gmail/live-client";
 import { parseTokenEncryptionKey } from "@/lib/growth/integrations/token-crypto";
 
 export function readCronEnv(): GrowthServerEnv {
@@ -15,9 +17,9 @@ export function readCronEnv(): GrowthServerEnv {
 export async function createCronGmailClient(
   db: GrowthDb,
   env: GrowthServerEnv,
-): Promise<GmailClient> {
+): Promise<BoundGmailClient> {
   const gmailEnv = requireGmailOAuthEnv(env);
-  return createLiveGmailClient(db, {
+  return createBoundLiveGmailClient(db, {
     clientId: gmailEnv.clientId,
     clientSecret: gmailEnv.clientSecret,
     subjectEmail: env.ownerEmail,

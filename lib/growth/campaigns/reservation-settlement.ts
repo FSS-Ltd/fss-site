@@ -8,9 +8,6 @@ import {
 import { z } from "zod";
 import { withGrowthTransaction } from "../db/client";
 import type { GrowthDb } from "../db/types";
-import { CAMPAIGN_FOUNDER_EMAIL } from "./authorization";
-import { hasRequiredGmailScopes } from "../integrations/google-oauth";
-import { sameAccountScopes } from "./account-repository";
 
 type Settlement =
   | { kind: "accepted"; providerMessageId: string; providerThreadId: string }
@@ -114,11 +111,12 @@ export async function reconcileOutreachAttempt(
   const [initial] = await db<
     {
       connectionId: string | null;
+      campaignId: string | null;
       grantEpoch: number | null;
       rfc: string | null;
       status: string;
     }[]
-  >`select connection_id as "connectionId",grant_epoch as "grantEpoch",rfc_message_id as rfc,status from growth.outreach_reservations where id=${input.reservationId}`;
+  >`select connection_id as "connectionId",campaign_id as "campaignId",grant_epoch as "grantEpoch",rfc_message_id as rfc,status from growth.outreach_reservations where id=${input.reservationId}`;
   if (
     !initial?.connectionId ||
     !initial.grantEpoch ||
@@ -126,85 +124,6 @@ export async function reconcileOutreachAttempt(
     !["submitting", "uncertain", "accepted"].includes(initial.status)
   )
     return held("reservation_not_reconcilable");
-  const profile = await input.gmailClient.getProfile();
-  if (profile.emailAddress.trim().toLowerCase() !== CAMPAIGN_FOUNDER_EMAIL)
-    return held("account_identity_changed");
-  const found = await input.gmailClient.findByRfcMessageId(initial.rfc);
-  if (
-    !found ||
-    found.rfcMessageId !== initial.rfc ||
-    !found.labelIds.includes("SENT")
-  )
-    return held("submission_uncertain");
-  const actualSentAt = new Date(found.receivedAt);
-  if (
-    !Number.isFinite(actualSentAt.getTime()) ||
-    !providerIdSchema.safeParse(found.messageId).success ||
-    !providerIdSchema.safeParse(found.gmailThreadId).success
-  )
-    return held("provider_evidence_invalid");
-  return withGrowthTransaction(db, async (tx) => {
-    const [clock] = await tx<{ now: Date }[]>`select clock_timestamp() as now`;
-    if (!clock || actualSentAt > clock.now)
-      return held("provider_evidence_invalid");
-    const [connection] = await tx<
-      {
-        version: number;
-        status: string;
-        subject: string | null;
-        scopes: string[];
-      }[]
-    >`select version,status,google_subject as subject,granted_scopes as scopes from growth.integration_connections where id=${initial.connectionId} and provider='gmail' and subject_email=${CAMPAIGN_FOUNDER_EMAIL} for share`;
-    if (
-      !connection ||
-      connection.version !== initial.grantEpoch ||
-      connection.status !== "connected"
-    )
-      return held("grant_changed");
-    const [control] = await tx<
-      { subject: string; scopes: string[] }[]
-    >`select verified_subject as subject,verified_scopes as scopes from growth.outreach_account_controls where connection_id=${initial.connectionId} for share`;
-    if (
-      !control ||
-      !connection.subject ||
-      connection.subject !== control.subject ||
-      !hasRequiredGmailScopes(connection.scopes) ||
-      !sameAccountScopes(connection.scopes, control.scopes)
-    )
-      return held("account_identity_changed");
-    const [current] = await tx<
-      {
-        status: string;
-        connectionId: string | null;
-        grantEpoch: number | null;
-        rfc: string | null;
-        providerId: string | null;
-        threadId: string | null;
-        actualSentAt: Date | null;
-        submittedAt: Date | null;
-      }[]
-    >`select status,connection_id as "connectionId",grant_epoch as "grantEpoch",rfc_message_id as rfc,provider_message_id as "providerId",provider_thread_id as "threadId",actual_sent_at as "actualSentAt",submitted_at as "submittedAt" from growth.outreach_reservations where id=${input.reservationId} for update`;
-    if (
-      !current ||
-      current.connectionId !== initial.connectionId ||
-      current.grantEpoch !== initial.grantEpoch ||
-      current.rfc !== initial.rfc ||
-      !current.submittedAt ||
-      actualSentAt < current.submittedAt ||
-      !["submitting", "uncertain", "accepted"].includes(current.status)
-    )
-      return held("reservation_changed");
-    if (
-      (current.providerId && current.providerId !== found.messageId) ||
-      (current.threadId && current.threadId !== found.gmailThreadId) ||
-      (current.actualSentAt &&
-        current.actualSentAt.getTime() !== actualSentAt.getTime())
-    )
-      return held("provider_evidence_conflict");
-    if (current.status === "accepted" && current.actualSentAt)
-      return { status: "ready", value: { state: "accepted", actualSentAt } };
-    await tx`update growth.outreach_reservations set status='accepted',provider_message_id=${found.messageId},provider_thread_id=${found.gmailThreadId},actual_sent_at=${actualSentAt},completed_at=coalesce(completed_at,clock_timestamp()) where id=${input.reservationId}`;
-    await auditReservation(tx, input.reservationId, "reconciled");
-    return { status: "ready", value: { state: "accepted", actualSentAt } };
-  });
+  if (initial.campaignId) return held("campaign_receipt_pending");
+  return held("actual_send_time_unproven");
 }

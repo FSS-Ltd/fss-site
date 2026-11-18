@@ -284,3 +284,8 @@ test("rejects missing, blank, and overlength Google subjects", async () => {
     );
   }
 });
+
+test("scope comparison cannot conflate a newline-containing value with two scopes", async () => {
+  const { sameAccountScopes } = await import("./google-oauth");
+  assert.equal(sameAccountScopes(["a\nb"], ["a", "b"]), false);
+});

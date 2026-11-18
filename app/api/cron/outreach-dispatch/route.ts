@@ -21,11 +21,15 @@ export async function GET(request: Request): Promise<Response> {
     },
     async () => {
       const db = getGrowthDb();
-      const gmailClient = await createCronGmailClient(db, env);
+      const { client: gmailClient, binding } = await createCronGmailClient(
+        db,
+        env,
+      );
 
       const sync = createGmailReplySync({
         repository: postgresGmailSyncRepository,
         gmailClient,
+        binding,
         founderEmail: env.ownerEmail,
       });
       const syncSummary = await sync(db);

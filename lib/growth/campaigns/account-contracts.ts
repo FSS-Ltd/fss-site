@@ -13,6 +13,19 @@ const base = {
   requestId: z.uuid(),
   expectedVersion: z.number().int().positive(),
 };
+const visibilitySchema = z.strictObject({
+  source: text,
+  reviewedAt: date,
+  expiresAt: date,
+  scope: text,
+  paths: z.strictObject({
+    mailbox: z.enum(["covered", "unknown"]),
+    aliases: z.enum(["covered", "unknown"]),
+    delegates: z.enum(["covered", "unknown"]),
+    automatic: z.enum(["covered", "unknown"]),
+  }),
+  recipientHeaders: z.enum(["complete", "unknown"]),
+});
 export const limitsReviewSchema = z.strictObject({
   source: text,
   edition: text,
@@ -29,6 +42,7 @@ export const limitsReviewSchema = z.strictObject({
   perMessage: z.number().int().positive(),
   messageReserve: z.number().int().min(50),
   recipientReserve: z.number().int().nonnegative(),
+  visibility: visibilitySchema.optional(),
 });
 export const healthReviewSchema = z.strictObject({
   source: text,

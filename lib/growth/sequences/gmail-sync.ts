@@ -1,13 +1,12 @@
 import { randomUUID } from "node:crypto";
 
 import type { GrowthDb } from "../db/types";
+import type { GmailGrantBinding } from "../integrations/gmail/live-client";
 import {
   GmailClientError,
   type GmailClient,
   type GmailMessageMetadata,
 } from "../integrations/gmail/types";
-import { scheduledFollowUpsForFirstSend } from "./dispatcher";
-import { recordSent, type RecordSentInput } from "./dispatcher-repository";
 import type { GmailSyncRepository } from "./gmail-sync-repository";
 import { stopSequence as defaultStopSequence } from "./stop";
 import type { StopSequenceInput, StoppedSequence } from "./stop";
@@ -71,18 +70,20 @@ type GmailSyncDependencies = {
     "listHistory" | "getMessageMetadata" | "getProfile"
   >;
   founderEmail: string;
+  binding: GmailGrantBinding;
   stop?: (db: GrowthDb, input: StopSequenceInput) => Promise<StoppedSequence>;
-  record?: (db: GrowthDb, input: RecordSentInput) => Promise<void>;
   createCorrelationId?: () => string;
+  now?: () => Date;
 };
 
 export function createGmailReplySync({
   repository,
   gmailClient,
   founderEmail,
+  binding,
   stop = defaultStopSequence,
-  record = recordSent,
   createCorrelationId = () => randomUUID(),
+  now = () => new Date(),
 }: GmailSyncDependencies) {
   const normalisedFounderEmail = founderEmail.trim().toLowerCase();
 
@@ -91,14 +92,52 @@ export function createGmailReplySync({
   ): Promise<GmailSyncSummary> {
     const summary = emptySummary();
 
-    const cursor = await repository.getCursor(db, founderEmail);
-    if (!cursor) {
-      const profile = await gmailClient.getProfile();
-      await repository.setCursor(db, founderEmail, profile.historyId);
+    const state = await repository.loadReplySyncState(db, binding);
+    const headRequestStarted = now();
+    const profile = await gmailClient.getProfile();
+    const headResponseEnded = now();
+    if (
+      profile.emailAddress.trim().toLowerCase() !== normalisedFounderEmail ||
+      !/^\d{1,32}$/.test(profile.historyId)
+    )
+      throw new Error("Gmail profile identity or history is invalid.");
+    if (!state.coverageId || !state.observedUntil || !state.historyCursor) {
+      await repository.commitReplyCoverage(db, {
+        binding,
+        expectedCursor: state.cursor,
+        expectedCoverageId: state.coverageId,
+        expectedObservedUntil: state.observedUntil,
+        historyStart: null,
+        historyEnd: profile.historyId,
+        observedFrom: null,
+        observedUntil: headResponseEnded,
+        headRequestedAt: headRequestStarted,
+        headRespondedAt: headResponseEnded,
+        state: "gap",
+        reason: "initial_history_unknown",
+        unknownObservations: [],
+      });
       return summary;
     }
+    const cursor = state.historyCursor;
+    if (!/^\d{1,32}$/.test(cursor))
+      throw new Error("Gmail history boundary is invalid.");
+    if (
+      BigInt(profile.historyId) < BigInt(cursor) ||
+      headRequestStarted <= state.observedUntil
+    )
+      throw new Error("Gmail history boundary is invalid.");
 
-    async function tryReconcileDraft(
+    let gapReason: string | null = null;
+    const unknownObservations: Array<{ messageId: string; reason: string }> =
+      [];
+    function recordUnknown(messageId: string, reason: string): void {
+      if (unknownObservations.length >= 1000)
+        throw new Error("Gmail unknown observation limit exceeded.");
+      unknownObservations.push({ messageId, reason });
+      gapReason = reason;
+    }
+    async function observePendingDraft(
       metadata: GmailMessageMetadata,
     ): Promise<void> {
       if (!metadata.rfcMessageId) return;
@@ -106,49 +145,64 @@ export function createGmailReplySync({
         db,
         metadata.rfcMessageId,
       );
-      if (!pending) return;
-
-      const sentAt = new Date(metadata.receivedAt);
-      await record(db, {
-        messageId: pending.id,
-        sequenceEnrollmentId: pending.sequenceEnrollmentId,
-        prospectId: pending.prospectId,
-        contactId: pending.contactId,
-        providerMessageId: metadata.messageId,
-        providerThreadId: metadata.gmailThreadId,
-        sentAt,
-        rfcMessageId: metadata.rfcMessageId,
-        subjectSnapshot: pending.subjectSnapshot ?? "",
-        htmlSnapshot: pending.htmlSnapshot ?? "",
-        textSnapshot: pending.textSnapshot ?? "",
-        followUps: scheduledFollowUpsForFirstSend(
-          pending.sequenceEnrollmentId,
-          sentAt,
-        ),
-      });
-      await repository.activatePendingApproval(
-        db,
-        pending.sequenceEnrollmentId,
-      );
-      summary.reconciledDrafts += 1;
+      if (pending)
+        recordUnknown(metadata.messageId, "unbound_draft_observation");
     }
 
-    async function processMessage(gmailMessageId: string): Promise<void> {
+    async function processMessage(
+      gmailMessageId: string,
+      gmailThreadId: string,
+      recordHistoryId: string,
+    ): Promise<void> {
       const metadata = await gmailClient.getMessageMetadata(gmailMessageId);
+      if (
+        metadata.messageId !== gmailMessageId ||
+        metadata.gmailThreadId !== gmailThreadId ||
+        !/^\d{1,32}$/.test(metadata.historyId) ||
+        BigInt(metadata.historyId) < BigInt(recordHistoryId) ||
+        BigInt(metadata.historyId) > BigInt(profile.historyId)
+      )
+        throw new Error("Gmail metadata history is inconsistent.");
       summary.processed += 1;
 
       const fromAddress = extractEmailAddress(metadata.from);
-      if (fromAddress === normalisedFounderEmail) {
+      if (
+        fromAddress === normalisedFounderEmail ||
+        metadata.labelIds.includes("SENT")
+      ) {
         summary.ownMessages += 1;
-        await tryReconcileDraft(metadata);
+        if (metadata.labelIds.includes("SENT"))
+          await observePendingDraft(metadata);
         return;
       }
 
-      const enrollment = await repository.findEnrollmentByThread(
+      const match = await repository.findEnrollmentByThread(
         db,
         metadata.gmailThreadId,
+        binding,
       );
-      if (!enrollment) return;
+      if (match.kind === "none") return;
+      if (match.kind === "ambiguous") {
+        recordUnknown(gmailMessageId, "ambiguous_account_thread");
+        return;
+      }
+      const enrollment = match.enrollment;
+      if (match.kind === "unknown") {
+        recordUnknown(gmailMessageId, "unknown_account_thread");
+        if (
+          match.safeToPause &&
+          !enrollment.status.startsWith("stopped_") &&
+          enrollment.status !== "completed"
+        ) {
+          await stop(db, {
+            sequenceId: enrollment.id,
+            reason: "pause",
+            actor: { type: "gmail_sync", id: "gmail-sync", binding },
+            correlationId: createCorrelationId(),
+          });
+        }
+        return;
+      }
 
       const isBounce = isBounceSender(fromAddress);
       const eventType = isBounce
@@ -158,6 +212,7 @@ export function createGmailReplySync({
           : "reply";
 
       const recorded = await repository.recordInboundEvent(db, {
+        binding,
         sequenceEnrollmentId: enrollment.id,
         prospectId: enrollment.prospectId,
         contactId: enrollment.contactId,
@@ -168,32 +223,33 @@ export function createGmailReplySync({
         subject: metadata.subject,
         receivedAt: new Date(metadata.receivedAt),
         eventType,
+        correlationId: createCorrelationId(),
       });
-      if (recorded.alreadyRecorded) return;
-
       if (eventType === "auto_response") {
-        summary.autoResponses += 1;
+        if (!recorded.alreadyRecorded) summary.autoResponses += 1;
         return;
       }
 
-      if (isBounce) {
-        summary.bounces += 1;
-      } else {
-        summary.replies += 1;
+      if (!recorded.alreadyRecorded) {
+        if (isBounce) {
+          summary.bounces += 1;
+        } else {
+          summary.replies += 1;
+        }
       }
-      await stop(db, {
-        sequenceId: enrollment.id,
-        reason: eventType,
-        actor: { type: "gmail_sync", id: "gmail-sync" },
-        correlationId: createCorrelationId(),
-      });
     }
 
     const seenMessageIds = new Set<string>();
+    const seenPageTokens = new Set<string>();
     let pageToken: string | undefined;
     let latestHistoryId = cursor;
+    let deleted = false;
+    let pageCount = 0;
+    let lastRecord = BigInt(cursor);
 
     for (;;) {
+      if (++pageCount > 20)
+        throw new Error("Gmail history page limit exceeded.");
       let page;
       try {
         page = await gmailClient.listHistory({
@@ -205,8 +261,21 @@ export function createGmailReplySync({
           error instanceof GmailClientError &&
           error.code === "HISTORY_ID_EXPIRED"
         ) {
-          const profile = await gmailClient.getProfile();
-          await repository.setCursor(db, founderEmail, profile.historyId);
+          await repository.commitReplyCoverage(db, {
+            binding,
+            expectedCursor: state.cursor,
+            expectedCoverageId: state.coverageId,
+            expectedObservedUntil: state.observedUntil,
+            historyStart: cursor,
+            historyEnd: profile.historyId,
+            observedFrom: state.observedUntil,
+            observedUntil: headResponseEnded,
+            headRequestedAt: headRequestStarted,
+            headRespondedAt: headResponseEnded,
+            state: "gap",
+            reason: "history_expired",
+            unknownObservations: [],
+          });
           summary.cursorReset = true;
           return summary;
         }
@@ -214,19 +283,61 @@ export function createGmailReplySync({
       }
 
       for (const record_ of page.records) {
+        if (
+          !/^\d{1,32}$/.test(record_.historyId) ||
+          BigInt(record_.historyId) <= lastRecord
+        )
+          throw new Error("Gmail history record is invalid.");
+        lastRecord = BigInt(record_.historyId);
+        if (lastRecord > BigInt(profile.historyId)) continue;
+        if (record_.messagesDeleted.length) {
+          deleted = true;
+          for (const message of record_.messagesDeleted)
+            recordUnknown(message.messageId, "message_deleted");
+        }
         for (const added of record_.messagesAdded) {
           if (seenMessageIds.has(added.messageId)) continue;
+          if (seenMessageIds.size >= 1000)
+            throw new Error("Gmail metadata read limit exceeded.");
           seenMessageIds.add(added.messageId);
-          await processMessage(added.messageId);
+          await processMessage(
+            added.messageId,
+            added.gmailThreadId,
+            record_.historyId,
+          );
         }
       }
 
       latestHistoryId = page.historyId;
       pageToken = page.nextPageToken;
       if (!pageToken) break;
+      if (seenPageTokens.has(pageToken)) {
+        throw new Error("Gmail history page token repeated.");
+      }
+      seenPageTokens.add(pageToken);
     }
 
-    await repository.setCursor(db, founderEmail, latestHistoryId);
+    if (
+      !/^\d{1,32}$/.test(latestHistoryId) ||
+      BigInt(latestHistoryId) < BigInt(profile.historyId)
+    )
+      throw new Error("Gmail history did not reach the requested head.");
+    await repository.commitReplyCoverage(db, {
+      binding,
+      expectedCursor: state.cursor,
+      expectedCoverageId: state.coverageId,
+      expectedObservedUntil: state.observedUntil,
+      historyStart: cursor,
+      historyEnd: profile.historyId,
+      observedFrom: state.observedUntil,
+      observedUntil:
+        deleted || gapReason ? headResponseEnded : headRequestStarted,
+      headRequestedAt: headRequestStarted,
+      headRespondedAt: headResponseEnded,
+      state: deleted || gapReason ? "gap" : "complete",
+      reason: gapReason ?? (deleted ? "message_deleted" : null),
+      unknownObservations,
+    });
     return summary;
   };
 }

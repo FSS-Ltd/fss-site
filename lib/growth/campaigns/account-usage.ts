@@ -38,3 +38,49 @@ export function validUsageProvenance(
   }
   return total === recipients;
 }
+
+export const transitionUsageSchema = z.strictObject({
+  id: z.string().trim().min(1).max(255),
+  transitionId: z.string().trim().min(1).max(600),
+  internalDate: z.iso.datetime(),
+  observedUpperBound: z.iso.datetime(),
+  recipientFingerprint: z.string().regex(/^[a-f0-9]{64}$/),
+  recipientCount: z.number().int().positive(),
+});
+
+export function validTransitionUsageProvenance(
+  value: unknown,
+  messages: number | null,
+  recipients: number | null,
+  cutoff: Date,
+  now: Date,
+): boolean {
+  const parsed = z.array(transitionUsageSchema).max(1000).safeParse(value);
+  if (
+    !parsed.success ||
+    !Number.isFinite(cutoff.getTime()) ||
+    !Number.isFinite(now.getTime()) ||
+    cutoff > now ||
+    parsed.data.length !== messages ||
+    recipients === null ||
+    !Number.isSafeInteger(recipients)
+  )
+    return false;
+  const transitions = new Set<string>();
+  let total = 0;
+  for (const entry of parsed.data) {
+    const upper = Date.parse(entry.observedUpperBound);
+    const internalDate = Date.parse(entry.internalDate);
+    if (
+      transitions.has(entry.transitionId) ||
+      upper > now.getTime() ||
+      upper <= cutoff.getTime() - 86400000 ||
+      internalDate > upper
+    )
+      return false;
+    transitions.add(entry.transitionId);
+    total += entry.recipientCount;
+    if (!Number.isSafeInteger(total)) return false;
+  }
+  return total === recipients;
+}

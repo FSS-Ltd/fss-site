@@ -40,6 +40,8 @@ function queriesOf(
 
 test("locks the enrollment, cancels pending messages, applies the stop, and audits atomically", async () => {
   const db = fakeTransaction((text) => {
+    if (text.startsWith("select p.business_id"))
+      return [{ businessId: "business-id" }];
     if (text.startsWith("select se.id")) {
       return [
         {
@@ -82,17 +84,21 @@ test("locks the enrollment, cancels pending messages, applies the stop, and audi
   assert.equal(result.cancelled.cancelledCount, 2);
 
   const queries = queriesOf(db);
-  assert.match(queries[0]?.text ?? "", /for update of se$/);
-  assert.match(queries[1]?.text ?? "", /status in \('queued', 'retry'\)/);
-  assert.match(queries[2]?.text ?? "", /update growth\.sequence_enrollments/);
-  assert.deepEqual(queries[2]?.values, [
+  assert.match(queries[1]?.text ?? "", /pg_advisory_xact_lock/);
+  assert.deepEqual(queries[1]?.values, [
+    "growth:outreach-business:business-id",
+  ]);
+  assert.match(queries[2]?.text ?? "", /for update of se for share of p$/);
+  assert.match(queries[3]?.text ?? "", /status in \('queued', 'retry'\)/);
+  assert.match(queries[4]?.text ?? "", /update growth\.sequence_enrollments/);
+  assert.deepEqual(queries[4]?.values, [
     "stopped_reply",
     new Date("2026-08-18T09:00:00.000Z"),
     "reply",
     "sequence-id",
   ]);
-  assert.match(queries[3]?.text ?? "", /insert into growth\.audit_log/);
-  assert.deepEqual(queries[3]?.values.slice(0, 6), [
+  assert.match(queries[5]?.text ?? "", /insert into growth\.audit_log/);
+  assert.deepEqual(queries[5]?.values.slice(0, 6), [
     "correlation-id",
     "cron",
     "gmail-sync",
@@ -129,4 +135,53 @@ test("inserts a suppression only once per email on conflict", async () => {
   const query = queriesOf(db)[0]!;
   assert.match(query.text, /insert into growth\.suppressions/);
   assert.match(query.text, /on conflict \(normalised_email\) do nothing/);
+});
+
+test("rejects stale account-thread attribution before committing an inbound effect", async () => {
+  const db = fakeTransaction((text) => {
+    if (text.startsWith("select p.business_id"))
+      return [{ businessId: "business-id" }];
+    if (text.startsWith("select status, google_subject"))
+      return [
+        {
+          status: "connected",
+          subject: "subject",
+          version: 1,
+          scopes: [
+            "openid",
+            "email",
+            "https://www.googleapis.com/auth/gmail.modify",
+          ],
+        },
+      ];
+    if (text.startsWith("select verified_subject"))
+      return [{ subject: "subject" }];
+    if (text.startsWith("select se.id"))
+      return [
+        {
+          id: "sequence-id",
+          status: "active",
+          normalisedEmail: "contact@example.test",
+          businessId: "business-id",
+          gmailThreadId: "thread",
+        },
+      ];
+    return [];
+  });
+  const binding = {
+    connectionId: "account",
+    googleSubject: "subject",
+    grantEpoch: 1,
+    grantedScopes: [
+      "openid",
+      "email",
+      "https://www.googleapis.com/auth/gmail.modify",
+    ],
+  };
+  await assert.rejects(
+    postgresSequenceStopRepository.withTransaction(db, (tx) =>
+      tx.lockEnrollment("sequence-id", binding, "thread"),
+    ),
+    /attribution/i,
+  );
 });

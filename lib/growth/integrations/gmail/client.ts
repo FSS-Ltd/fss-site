@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import {
   findGmailMessageByRfcId,
+  listGmailSentMessages,
   type GmailReadContext,
   readGmailHistoryPage,
   readGmailMessageMetadata,
@@ -438,6 +439,10 @@ class GoogleGmailClient implements GmailClient {
       }
       throw error;
     }
+  }
+
+  async listSentMessages(input: { pageToken?: string }) {
+    return listGmailSentMessages(this.getJson.bind(this), input);
   }
 
   async getMessageMetadata(messageId: string): Promise<GmailMessageMetadata> {

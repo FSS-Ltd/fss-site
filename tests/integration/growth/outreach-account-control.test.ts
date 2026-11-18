@@ -4,7 +4,10 @@ import test from "node:test";
 import postgres from "postgres";
 import { exerciseCampaignReservation } from "./reservation-campaign-assertions";
 import { exerciseLegacyReservation } from "./reservation-assertions";
-import { loadConfiguredAccountReadiness } from "../../../lib/growth/campaigns/account-repository";
+import {
+  loadConfiguredAccountReadiness,
+  loadReservationAccount,
+} from "../../../lib/growth/campaigns/account-repository";
 import { withGrowthTransaction } from "../../../lib/growth/db/client";
 import { executeAccountControlCommand } from "../../../lib/growth/campaigns/account-control";
 import type { AccountControlCommand } from "../../../lib/growth/campaigns/account-contracts";
@@ -29,8 +32,11 @@ test(
     const now = Date.now();
     const snapshotMessages = Array.from({ length: 10 }, (_, index) => ({
       id: String(index),
-      sentAt: new Date(now - 1000).toISOString(),
+      transitionId: `200:added:${index}`,
+      internalDate: new Date(now - 2000).toISOString(),
+      observedUpperBound: new Date(now - 1000).toISOString(),
       recipientCount: 1,
+      recipientFingerprint: "a".repeat(64),
     }));
     const readiness = (mode: "prerequisites" | "active") =>
       withGrowthTransaction(db, (tx) =>
@@ -69,6 +75,19 @@ test(
           perMessage: 100,
           messageReserve: 50,
           recipientReserve: 10,
+          visibility: {
+            source: "private review",
+            scope: "mailbox including manual and aliases",
+            reviewedAt: new Date(now - 1000),
+            expiresAt: new Date(now + 86400000),
+            paths: {
+              mailbox: "covered" as const,
+              aliases: "covered" as const,
+              delegates: "covered" as const,
+              automatic: "covered" as const,
+            },
+            recipientHeaders: "complete" as const,
+          },
         },
       };
       await assert.rejects(
@@ -103,11 +122,67 @@ test(
         ),
         /invalid_limits_time/,
       );
+      await assert.rejects(
+        executeAccountControlCommand(
+          db,
+          {
+            ...input,
+            evidence: {
+              ...input.evidence,
+              visibility: {
+                ...input.evidence.visibility,
+                reviewedAt: new Date(now + 60000),
+              },
+            },
+          },
+          founder,
+          randomUUID(),
+        ),
+        /invalid_visibility_time/,
+      );
+      await assert.rejects(
+        executeAccountControlCommand(
+          db,
+          {
+            ...input,
+            evidence: {
+              ...input.evidence,
+              visibility: {
+                ...input.evidence.visibility,
+                expiresAt: new Date(now + 2 * 86400000),
+              },
+            },
+          },
+          founder,
+          randomUUID(),
+        ),
+        /invalid_visibility_time/,
+      );
       const [first, replay] = await Promise.all([
         executeAccountControlCommand(db, input, founder, randomUUID()),
         executeAccountControlCommand(db, input, founder, randomUUID()),
       ]);
       assert.equal(first.reviewId, replay.reviewId);
+      const [binding] =
+        await admin`select evidence from growth.outreach_account_reviews where id=${first.reviewId}`;
+      assert.equal(binding?.evidence.googleSubject, "test-subject");
+      assert.deepEqual(binding?.evidence.googleScopes, [
+        "email",
+        "https://www.googleapis.com/auth/gmail.modify",
+        "openid",
+      ]);
+      await admin`update growth.outreach_account_reviews set evidence=evidence - 'googleSubject' where id=${first.reviewId}`;
+      assert.deepEqual(await readiness("prerequisites"), {
+        status: "held",
+        reason: "visibility_unknown",
+      });
+      await admin`update growth.outreach_account_reviews set evidence=${admin.json(binding!.evidence)} where id=${first.reviewId}`;
+      await admin`update growth.outreach_account_reviews set evidence=jsonb_set(evidence,'{evidence,visibility,paths,aliases}',to_jsonb('unknown'::text)) where id=${first.reviewId}`;
+      assert.deepEqual(await readiness("prerequisites"), {
+        status: "held",
+        reason: "visibility_unknown",
+      });
+      await admin`update growth.outreach_account_reviews set evidence=${admin.json(binding!.evidence)} where id=${first.reviewId}`;
       assert.equal(first.version, 2);
       const other = randomUUID();
       try {
@@ -232,7 +307,22 @@ test(
         /usage_unknown/,
       );
       await admin`delete from growth.outreach_provider_usage where account_id=${id}`;
-      await admin`insert into growth.outreach_provider_usage(account_id,observed_at,rolling_messages,rolling_recipients,complete,health,connection_id,grant_epoch,captured_at,window_start,history_start,history_end,fresh_until,evidence_version,provider_message_ids) values (${id},now(),10,10,true,'healthy',${id},1,now(),now() - interval '24 hours','start','end',now() + interval '4 minutes',1,${admin.json(snapshotMessages)})`;
+      const legacyMessages = snapshotMessages.map((message) => ({
+        id: message.id,
+        sentAt: message.observedUpperBound,
+        recipientCount: message.recipientCount,
+      }));
+      await admin`insert into growth.outreach_provider_usage(account_id,observed_at,rolling_messages,rolling_recipients,complete,health,connection_id,grant_epoch,captured_at,window_start,history_start,history_end,fresh_until,evidence_version,provider_message_ids) values (${id},now(),10,10,true,'healthy',${id},1,now(),now() - interval '24 hours','100','200',now() + interval '4 minutes',1,${admin.json(legacyMessages)})`;
+      assert.deepEqual(await readiness("prerequisites"), {
+        status: "held",
+        reason: "usage_unknown",
+      });
+      await admin`update growth.outreach_provider_usage set evidence_version=2,provider_message_ids=${admin.json(snapshotMessages)} where account_id=${id}`;
+      assert.deepEqual(await readiness("prerequisites"), {
+        status: "held",
+        reason: "usage_unknown",
+      });
+      await admin`update growth.outreach_provider_usage set observation_subject='test-subject',observation_scopes=${["openid", "email", "https://www.googleapis.com/auth/gmail.modify"]},observation_revision=1 where account_id=${id}`;
       assert.equal((await readiness("prerequisites")).status, "ready");
       assert.equal((await readiness("active")).status, "held");
       await executeAccountControlCommand(
@@ -312,6 +402,12 @@ test(
         randomUUID(),
       );
       assert.equal((await readiness("active")).status, "ready");
+      const accountForReservation = await withGrowthTransaction(db, (tx) =>
+        loadReservationAccount(tx, id),
+      );
+      assert.equal(accountForReservation.status, "ready");
+      if (accountForReservation.status === "ready")
+        assert.deepEqual(accountForReservation.account.usage.providerIds, []);
       await exerciseCampaignReservation(admin, db, { id, email, now, founder });
       await exerciseLegacyReservation(admin, db, { id, email });
       await assert.rejects(
@@ -372,12 +468,13 @@ test(
       );
       assert.equal(revalidated.version, 8);
       const [after] =
-        await admin`select state,ramp from growth.outreach_account_controls where connection_id=${id}`;
+        await admin`select state,ramp,limits_review_id from growth.outreach_account_controls where connection_id=${id}`;
       const [invalidated] =
         await admin`select complete,incomplete_reason from growth.outreach_provider_usage where account_id=${id}`;
       assert.equal(invalidated?.complete, false);
       assert.equal(invalidated?.incomplete_reason, "grant_revalidated");
       assert.equal(after?.state, "paused");
+      assert.equal(after?.limits_review_id, null);
       assert.equal((await readiness("active")).status, "held");
       assert.equal(after?.ramp, 50);
       await assert.rejects(
@@ -387,7 +484,7 @@ test(
           founder,
           randomUUID(),
         ),
-        /usage_unknown/,
+        /visibility_unknown/,
       );
       await admin`update growth.integration_connections set status='revoked',version=version+1 where id=${id}`;
       await executeAccountControlCommand(

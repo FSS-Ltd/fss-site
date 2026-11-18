@@ -210,7 +210,7 @@ export async function exerciseLegacyReservation(
         if (bound === "usage")
           await admin`update growth.outreach_provider_usage set fresh_until=${t1} where connection_id=${id}`;
         if (bound === "limits")
-          await admin`update growth.outreach_account_reviews set evidence=jsonb_set(evidence,'{evidence,expiresAt}',to_jsonb(${t1.toISOString()}::text)) where id=${limitsFixture.id}`;
+          await admin`update growth.outreach_account_reviews set evidence=jsonb_set(jsonb_set(evidence,'{evidence,expiresAt}',to_jsonb(${t1.toISOString()}::text)),'{evidence,visibility,expiresAt}',to_jsonb(${t1.toISOString()}::text)) where id=${limitsFixture.id}`;
         if (bound === "health")
           await admin`update growth.outreach_account_reviews set evidence=jsonb_set(evidence,'{evidence,expiresAt}',to_jsonb(${t1.toISOString()}::text)) where id=${healthFixture.id}`;
         assert.deepEqual(
@@ -240,7 +240,7 @@ export async function exerciseLegacyReservation(
     >`select provider_message_ids as ids from growth.outreach_provider_usage where connection_id=${id}`;
     assert.ok(usageFixture);
     const capture = new Date(t1.getTime() - 300000);
-    await admin`update growth.outreach_provider_usage set captured_at=${capture},window_start=${new Date(capture.getTime() - 86400000)},provider_message_ids=(select jsonb_agg(jsonb_set(value,'{sentAt}',to_jsonb(${new Date(capture.getTime() - 1000).toISOString()}::text))) from jsonb_array_elements(provider_message_ids)) where connection_id=${id}`;
+    await admin`update growth.outreach_provider_usage set captured_at=${capture},window_start=${new Date(capture.getTime() - 86400000)},provider_message_ids=(select jsonb_agg(jsonb_set(jsonb_set(value,'{observedUpperBound}',to_jsonb(${new Date(capture.getTime() - 1000).toISOString()}::text)),'{internalDate}',to_jsonb(${new Date(capture.getTime() - 2000).toISOString()}::text))) from jsonb_array_elements(provider_message_ids)) where connection_id=${id}`;
     try {
       const expired = await reserveOutreachAttempt(
         withTransitionClock(db, t0, new Date(t1.getTime() + 1)),
@@ -552,7 +552,7 @@ export async function exerciseLegacyReservation(
         reservationId: second.reservationId,
         gmailClient,
       }),
-      { status: "held", reason: "submission_uncertain" },
+      { status: "held", reason: "actual_send_time_unproven" },
     );
     const [providerClock] = await admin<
       { now: Date }[]
@@ -571,16 +571,24 @@ export async function exerciseLegacyReservation(
       precedence: null,
       returnPath: null,
       autoResponseSuppress: null,
+      to: null,
+      cc: null,
+      bcc: null,
+      inReplyTo: null,
+      references: null,
     };
     const reconciled = await reconcileOutreachAttempt(db, {
       reservationId: second.reservationId,
       gmailClient: { ...gmailClient, findByRfcMessageId: async () => metadata },
     });
-    assert.equal(reconciled.status, "ready", JSON.stringify(reconciled));
+    assert.deepEqual(reconciled, {
+      status: "held",
+      reason: "actual_send_time_unproven",
+    });
     const [sentEvidence] =
       await admin`select status,actual_sent_at from growth.outreach_reservations where id=${second.reservationId}`;
-    assert.equal(sentEvidence?.status, "accepted");
-    assert.ok(sentEvidence?.actual_sent_at);
+    assert.equal(sentEvidence?.status, "uncertain");
+    assert.equal(sentEvidence?.actual_sent_at, null);
     await admin`delete from growth.audit_log where entity_type='outreach_reservation' and entity_id in (select id::text from growth.outreach_reservations where email_message_id=${messageId})`;
     await admin`delete from growth.outreach_reservations where email_message_id=${messageId}`;
     await admin`update growth.email_messages set outreach_claim_previous_status='queued' where id=${messageId}`;
@@ -656,13 +664,7 @@ export async function exerciseLegacyReservation(
         leaseToken,
         attemptKey: randomUUID(),
       });
-      assert.equal(overlap.status, "ready");
-      if (overlap.status === "ready")
-        await cancelOutreachReservation(db, {
-          reservationId: overlap.value.reservationId,
-          leaseToken,
-          fence: overlap.value.fence,
-        });
+      assert.deepEqual(overlap, { status: "held", reason: "provider_limit" });
       await admin`insert into growth.outreach_reservations(idempotency_key,email_message_id,sequence_id,account_id,london_day,status,connection_id,grant_epoch,rfc_message_id,recipient_count,authority_fingerprint,lease_token,lease_until,submitted_at) values (${randomUUID()},${messageId3},${sequenceId},${id},(now() at time zone 'Europe/London')::date,'uncertain',${id},1,'<uncertain2@example.test>',1,${"a".repeat(64)},${leaseToken},now()+interval '5 minutes',now())`;
       assert.deepEqual(
         await reserveOutreachAttempt(db, {

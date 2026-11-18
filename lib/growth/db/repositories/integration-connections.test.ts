@@ -8,6 +8,7 @@ import type {
 } from "../types";
 import {
   disconnectStoredGmailConnection,
+  getConnectedGmailCredential,
   listIntegrationConnectionHealth,
   storeConnectedGmailConnection,
 } from "./integration-connections";
@@ -283,4 +284,28 @@ test("disconnect is fail-safe and idempotent when no Gmail credential exists", a
     ),
     false,
   );
+});
+
+test("reads Gmail credential and grant identity from one connected row", async () => {
+  const queries: string[] = [];
+  const row = {
+    connectionId: "connection",
+    googleSubject: "subject",
+    grantEpoch: 3,
+    grantedScopes: ["email"],
+    encryptedRefreshToken: "encrypted",
+    encryptionKeyVersion: "v1",
+  };
+  const db = (async (strings: TemplateStringsArray) => {
+    queries.push(strings.join("?"));
+    return [row];
+  }) as unknown as GrowthQueryExecutor;
+  assert.deepEqual(
+    await getConnectedGmailCredential(db, "founder@example.test"),
+    row,
+  );
+  assert.equal(queries.length, 1);
+  assert.match(queries[0]!, /google_subject/);
+  assert.match(queries[0]!, /encrypted_refresh_token/);
+  assert.match(queries[0]!, /status = 'connected'/);
 });
