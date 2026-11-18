@@ -1,9 +1,11 @@
 "use client";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useGrowthEvents } from "@/lib/growth/client/use-growth-events";
+import { FacebookAuthFailureContext } from "./command-form";
 import { DestinationRow } from "./destination-row";
 import { readWorkspace } from "./read-workspace";
 import { DestinationCapture } from "./destination-forms";
+import { useRulesExpiry } from "./use-rules-expiry";
 import type { Destination, ReadyWorkspace } from "./types";
 import styles from "./facebook.module.css";
 
@@ -20,8 +22,11 @@ export function FacebookWorkspace() {
   );
   const [error, setError] = useState("");
   const generation = useRef(0);
+  const pageAbort = useRef<AbortController | null>(null);
   const refresh = useCallback(
-    async (signal: AbortSignal): Promise<"ok" | "error" | "auth-failed"> => {
+    async (
+      signal: AbortSignal,
+    ): Promise<"ok" | "error" | "auth-failed" | "superseded"> => {
       const current = ++generation.current;
       try {
         const ids = [
@@ -44,7 +49,8 @@ export function FacebookWorkspace() {
         // A form can become active while the snapshot is in flight. Fetch any
         // newly retained off-page rows before applying the snapshot.
         while (true) {
-          if (signal.aborted || current !== generation.current) return "error";
+          if (signal.aborted || current !== generation.current)
+            return "superseded";
           const missing = retainedRef.current
             .map((item) => item.id)
             .filter(
@@ -61,7 +67,8 @@ export function FacebookWorkspace() {
             ...additional.flatMap((selection) => selection.destinations),
           );
         }
-        if (signal.aborted || current !== generation.current) return "error";
+        if (signal.aborted || current !== generation.current)
+          return "superseded";
         setWorkspace(page);
         setSelected(found.find((item) => item.id === selectedId) ?? null);
         const updated = retainedRef.current.map(
@@ -78,6 +85,8 @@ export function FacebookWorkspace() {
               ? "Session expired. Sign in again."
               : "Workspace could not load. Try refresh.",
           );
+        if (signal.aborted || current !== generation.current)
+          return "superseded";
         return e instanceof Error && e.message === "auth"
           ? "auth-failed"
           : "error";
@@ -85,9 +94,24 @@ export function FacebookWorkspace() {
     },
     [selectedId],
   );
-  const live = useGrowthEvents(refresh);
-  const manualRefresh = () => {
-    void refresh(new AbortController().signal);
+  const {
+    state: live,
+    invalidate: manualRefresh,
+    stopForAuth,
+  } = useGrowthEvents(refresh);
+  useEffect(() => {
+    if (live === "auth-failed") pageAbort.current?.abort();
+  }, [live]);
+  useEffect(
+    () => () => {
+      pageAbort.current?.abort();
+    },
+    [],
+  );
+  const authFailed = () => {
+    stopForAuth();
+    pageAbort.current?.abort();
+    setError("Session expired. Sign in again.");
   };
   const saved = (id: string) => {
     if (selectedId === id) manualRefresh();
@@ -107,7 +131,7 @@ export function FacebookWorkspace() {
     setRetained(retainedRef.current);
     setResetKeys((keys) => ({ ...keys, [id]: (keys[id] ?? 0) + 1 }));
   };
-  const rows = workspace
+  const pageRows = workspace
     ? [
         ...retained.filter(
           (item) => !workspace.destinations.some((d) => d.id === item.id),
@@ -120,112 +144,143 @@ export function FacebookWorkspace() {
         ...workspace.destinations,
       ]
     : [];
+  const rows = pageRows.map(
+    (item) => retained.find((entry) => entry.id === item.id) ?? item,
+  );
+  const now = useRulesExpiry(rows, manualRefresh);
   return (
-    <div className={styles.page}>
-      <header className={styles.header}>
-        <div>
-          <h1>Facebook</h1>
-          <p className={styles.subtitle}>
-            Public discovery and manual activity. Record actions after you
-            perform them.
-          </p>
-        </div>
-        <details>
-          <summary id="add-destination" className={styles.primary}>
-            Add destination
-          </summary>
-          <DestinationCapture saved={saved} />
-        </details>
-      </header>
-      <p role="status">
-        Live updates:{" "}
-        {live === "ready"
-          ? "connected"
-          : live === "unconfigured"
-            ? "unavailable; use refresh"
-            : live === "auth-failed"
-              ? "session expired"
-              : live}
-        .{" "}
-        <button
-          type="button"
-          className={styles.secondary}
-          onClick={manualRefresh}
-        >
-          Refresh
-        </button>
-      </p>
-      {error && <p role="alert">{error}</p>}
-      {!workspace && !error && <p>Loading destinations…</p>}
-      {workspace && (
-        <>
-          <section className={styles.pilot}>
-            <h2>Private pilots</h2>
-            <p>
-              {workspace.pilots.used} of {workspace.pilots.total} lifetime
-              allocations used · {workspace.pilots.remaining} remaining.
+    <FacebookAuthFailureContext.Provider value={authFailed}>
+      <div className={styles.page}>
+        <header className={styles.header}>
+          <div>
+            <h1>Facebook</h1>
+            <p className={styles.subtitle}>
+              Public discovery and manual activity. Record actions after you
+              perform them.
             </p>
-            <details>
-              <summary>Allocation terms and recipients</summary>
+          </div>
+          <details>
+            <summary id="add-destination" className={styles.primary}>
+              Add destination
+            </summary>
+            <DestinationCapture saved={saved} />
+          </details>
+        </header>
+        <p role="status">
+          Live updates:{" "}
+          {live === "ready"
+            ? "connected"
+            : live === "unconfigured"
+              ? "unavailable; use refresh"
+              : live === "auth-failed"
+                ? "session expired"
+                : live}
+          .{" "}
+          <button
+            type="button"
+            className={styles.secondary}
+            onClick={manualRefresh}
+            disabled={live === "auth-failed"}
+          >
+            Refresh
+          </button>
+        </p>
+        {error && (
+          <p role="alert">
+            {error}{" "}
+            {live === "auth-failed" && <a href="/growth/login">Sign in</a>}
+          </p>
+        )}
+        {!workspace && !error && <p>Loading destinations…</p>}
+        {workspace && (
+          <>
+            <section className={styles.pilot}>
+              <h2>Private pilots</h2>
               <p>
-                Each allocation is for a private one-page preview and one
-                accepted revision request. Allocation does not prove a preview
-                is complete or accessible. No payment is required; domain
-                ownership stays with the client.
+                {workspace.pilots.used} of {workspace.pilots.total} lifetime
+                allocations used · {workspace.pilots.remaining} remaining.
               </p>
-              <ul>
-                {workspace.pilots.allocations.map((a) => (
-                  <li key={a.slot}>
-                    <a href={`/growth/prospects/${a.prospectId}`}>{a.name}</a> ·
-                    slot {a.slot}
-                  </li>
-                ))}
-              </ul>
-            </details>
-          </section>
-          <section aria-label="Destination directory">
-            {rows.length === 0 && (
-              <p>
-                No destinations recorded.{" "}
-                <a href="#add-destination">Add a destination</a> to begin.
-              </p>
-            )}
-            {rows.map((item) => (
-              <DestinationRow
-                key={`${item.id}:${resetKeys[item.id] ?? 0}`}
-                item={retained.find((entry) => entry.id === item.id) ?? item}
-                saved={saved}
-                pilots={workspace.pilots}
-                retain={retain}
-                discard={discard}
-                release={release}
-                retained={retained.some((entry) => entry.id === item.id)}
-                refresh={manualRefresh}
-              />
-            ))}
-            {workspace.nextCursor && (
-              <button
-                type="button"
-                onClick={async () => {
-                  try {
-                    const current = ++generation.current;
-                    const next = await readWorkspace(
-                      `?cursor=${encodeURIComponent(workspace.nextCursor ?? "")}`,
-                      new AbortController().signal,
-                    );
-                    if (next && current === generation.current)
-                      setWorkspace(next);
-                  } catch {
-                    setError("Next page could not load. Try again.");
+              <details>
+                <summary>Allocation terms and recipients</summary>
+                <p>
+                  Each allocation is for a private one-page preview and one
+                  accepted revision request. Allocation does not prove a preview
+                  is complete or accessible. No payment is required; domain
+                  ownership stays with the client.
+                </p>
+                <ul>
+                  {workspace.pilots.allocations.map((a) => (
+                    <li key={a.slot}>
+                      <a href={`/growth/prospects/${a.prospectId}`}>{a.name}</a>{" "}
+                      · slot {a.slot}
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            </section>
+            <section aria-label="Destination directory">
+              {rows.length === 0 && (
+                <p>
+                  No destinations recorded.{" "}
+                  <a href="#add-destination">Add a destination</a> to begin.
+                </p>
+              )}
+              {rows.map((item) => (
+                <DestinationRow
+                  key={`${item.id}:${resetKeys[item.id] ?? 0}`}
+                  item={item}
+                  saved={saved}
+                  pilots={workspace.pilots}
+                  retain={retain}
+                  discard={discard}
+                  release={release}
+                  retained={retained.some((entry) => entry.id === item.id)}
+                  refresh={manualRefresh}
+                  keepVisible={(item) => {
+                    setSelected(item);
+                    setSelectedId(item.id);
+                  }}
+                  expiryPending={
+                    item.postReadiness === "allowed" &&
+                    !!item.review &&
+                    Date.parse(item.review.expiresAt) <= now
                   }
-                }}
-              >
-                Next directory page
-              </button>
-            )}
-          </section>
-        </>
-      )}
-    </div>
+                />
+              ))}
+              {workspace.nextCursor && (
+                <button
+                  type="button"
+                  disabled={live === "auth-failed"}
+                  onClick={async () => {
+                    try {
+                      const current = ++generation.current;
+                      pageAbort.current?.abort();
+                      const abort = new AbortController();
+                      pageAbort.current = abort;
+                      const next = await readWorkspace(
+                        `?cursor=${encodeURIComponent(workspace.nextCursor ?? "")}`,
+                        abort.signal,
+                      );
+                      if (next && current === generation.current)
+                        setWorkspace(next);
+                    } catch (error) {
+                      if (error instanceof Error && error.message === "auth") {
+                        authFailed();
+                      } else if (
+                        !(error instanceof Error && error.name === "AbortError")
+                      ) {
+                        setError("Next page could not load. Try again.");
+                      }
+                    }
+                  }}
+                >
+                  Next directory page
+                </button>
+              )}
+            </section>
+          </>
+        )}
+      </div>
+    </FacebookAuthFailureContext.Provider>
   );
 }

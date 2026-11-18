@@ -1,7 +1,15 @@
 "use client";
 
-import { useRef, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import styles from "./facebook.module.css";
+
+export const FacebookAuthFailureContext = createContext<() => void>(() => {});
 
 type Payload = Record<string, unknown>;
 export function CommandForm({
@@ -17,6 +25,7 @@ export function CommandForm({
   onConflict?: () => void;
   children?: ReactNode;
 }) {
+  const authFailed = useContext(FacebookAuthFailureContext);
   const retry = useRef<{ payload: string; id: string } | null>(null);
   const [pending, setPending] = useState(false);
   const [feedback, setFeedback] = useState("");
@@ -55,6 +64,7 @@ export function CommandForm({
             body: JSON.stringify({ ...payload, requestId }),
           });
           if (!response.ok) {
+            if (response.status === 401) authFailed();
             if (response.status === 409) onConflict?.();
             const location = response.headers.get("location");
             if (location?.startsWith("/growth/prospects/"))

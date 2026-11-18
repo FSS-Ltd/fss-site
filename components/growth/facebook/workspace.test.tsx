@@ -15,6 +15,12 @@ const { FacebookWorkspace } =
 const dom = new JSDOM("<!doctype html><body></body>", {
   url: "http://localhost/growth/facebook",
 });
+
+// React's legacy input polyfill expects these IE methods when jsdom is installed after React.
+Object.defineProperties(dom.window.HTMLElement.prototype, {
+  attachEvent: { value: () => {} },
+  detachEvent: { value: () => {} },
+});
 Object.assign(globalThis, {
   window: dom.window,
   document: dom.window.document,
@@ -120,6 +126,7 @@ test("retains multiple edited rows through paging and committed refresh; rebases
     });
     const disclosures = first.querySelectorAll("details");
     assert.equal(disclosures[0]?.open, true);
+    assert.ok(document.activeElement === first.querySelector("select"));
     assert.equal(
       [...disclosures].find(
         (entry) =>
@@ -144,10 +151,16 @@ test("retains multiple edited rows through paging and committed refresh; rebases
         input.dispatchEvent(new dom.window.Event("input", { bubbles: true }));
       });
     }
+    const focused = container.querySelector<HTMLInputElement>(
+      '#C input[name="summary"]',
+    );
+    assert.ok(focused);
+    focused.focus();
     await act(async () => {
       Events.instance.emit("change");
       await tick();
     });
+    assert.ok(document.activeElement === focused);
     for (const id of ["C", "D"])
       assert.equal(
         container.querySelector<HTMLInputElement>(
@@ -196,12 +209,16 @@ test("retains multiple edited rows through paging and committed refresh; rebases
     await act(async () => {
       button(row, "Use current version").click();
     });
+    assert.ok(
+      document.activeElement === form.querySelector('input[name="source"]'),
+    );
     await act(async () => {
       form.dispatchEvent(
         new dom.window.Event("submit", { bubbles: true, cancelable: true }),
       );
       await tick();
     });
+
     assert.equal(commands[1].expectedVersion, 2);
     assert.notEqual(commands[0].requestId, commands[1].requestId);
     assert.equal(linkInput.value, "second draft");
@@ -271,6 +288,12 @@ test("keeps an off-page pilot review pinned through refresh and other form compl
       await tick();
     });
     assert.match(c.textContent ?? "", /Prospect version 1/);
+    assert.equal(
+      document.activeElement,
+      c.querySelector(
+        'form[data-command="Confirm allocation"] button[type="submit"]',
+      ),
+    );
     await act(async () => {
       button(c, "Review rules").click();
     });
@@ -311,6 +334,13 @@ test("keeps an off-page pilot review pinned through refresh and other form compl
       commands.find((command) => command.type === "allocate_pilot")
         ?.expectedVersion,
       1,
+    );
+    assert.match(c.textContent ?? "", /Pilot allocation recorded/);
+    assert.ok(
+      document.activeElement ===
+        [...c.querySelectorAll("h3")].find(
+          (heading) => heading.textContent === "Linked prospects",
+        ),
     );
   } finally {
     await act(async () => root.unmount());
@@ -389,6 +419,151 @@ test("reconciles drafts started during a pending snapshot against page and off-p
     }
   } finally {
     await act(async () => root.unmount());
+    container.remove();
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("refreshes once at rules expiry and withholds stale allowed guidance on failure", async () => {
+  const originalFetch = globalThis.fetch;
+  let reads = 0;
+  const expiresAt = new Date(Date.now() + 100).toISOString();
+  const allowed: Destination = {
+    ...item("A"),
+    postReadiness: "allowed",
+    nextManualAction: "post",
+    review: {
+      id: "review",
+      destinationId: "A",
+      sourceUrl: "https://facebook.com/rules",
+      summary: "allowed",
+      actorId: "founder",
+      createdAt: new Date().toISOString(),
+      reviewedVersion: 1,
+      observedAt: new Date().toISOString(),
+      expiresAt,
+      decision: "allowed",
+    },
+  };
+  globalThis.fetch = async () => {
+    reads++;
+    return reads === 1
+      ? Response.json(page([allowed]))
+      : new Response("{}", { status: 503 });
+  };
+  const container = document.createElement("div");
+  document.body.append(container);
+  const root = createRoot(container);
+  try {
+    await act(async () => {
+      root.render(createElement(FacebookWorkspace));
+    });
+    await act(async () => {
+      Events.instance.emit("ready");
+      await tick();
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 180));
+    });
+    assert.equal(reads, 2);
+    assert.match(
+      container.textContent ?? "",
+      /Review expired; refresh required/,
+    );
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    });
+    assert.equal(reads, 2);
+  } finally {
+    await act(async () => root.unmount());
+    container.remove();
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("manual authentication failure closes the event stream and offers sign in", async () => {
+  const originalFetch = globalThis.fetch;
+  let reads = 0;
+  globalThis.fetch = async () => {
+    reads++;
+    return reads === 1
+      ? Response.json(page([item("A")]))
+      : new Response("{}", { status: 401 });
+  };
+  const container = document.createElement("div");
+  document.body.append(container);
+  const root = createRoot(container);
+  try {
+    await act(async () => {
+      root.render(createElement(FacebookWorkspace));
+    });
+    await act(async () => {
+      Events.instance.emit("ready");
+      await tick();
+    });
+    const source = Events.instance;
+    await act(async () => {
+      button(container, "Refresh").click();
+      await tick();
+    });
+    assert.match(container.textContent ?? "", /session expired/i);
+    assert.equal(
+      container.querySelector('a[href="/growth/login"]')?.textContent,
+      "Sign in",
+    );
+    assert.equal(button(container, "Refresh").disabled, true);
+    await act(async () => {
+      source.emit("change");
+      await tick();
+    });
+    assert.equal(reads, 2);
+  } finally {
+    await act(async () => root.unmount());
+    container.remove();
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("unmount cancels a pending expiry refresh", async () => {
+  const originalFetch = globalThis.fetch;
+  let reads = 0;
+  const now = new Date();
+  const allowed: Destination = {
+    ...item("A"),
+    postReadiness: "allowed",
+    nextManualAction: "post",
+    review: {
+      id: "review",
+      destinationId: "A",
+      sourceUrl: "https://facebook.com/rules",
+      summary: "allowed",
+      actorId: "founder",
+      createdAt: now.toISOString(),
+      reviewedVersion: 1,
+      observedAt: now.toISOString(),
+      expiresAt: new Date(now.getTime() + 150).toISOString(),
+      decision: "allowed",
+    },
+  };
+  globalThis.fetch = async () => {
+    reads++;
+    return Response.json(page([allowed]));
+  };
+  const container = document.createElement("div");
+  document.body.append(container);
+  const root = createRoot(container);
+  try {
+    await act(async () => {
+      root.render(createElement(FacebookWorkspace));
+    });
+    await act(async () => {
+      Events.instance.emit("ready");
+      await tick();
+    });
+    await act(async () => root.unmount());
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    assert.equal(reads, 1);
+  } finally {
     container.remove();
     globalThis.fetch = originalFetch;
   }

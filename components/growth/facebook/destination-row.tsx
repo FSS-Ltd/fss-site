@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CommandForm } from "./command-form";
 import {
   ActivityForm,
@@ -21,6 +21,8 @@ export function DestinationRow({
   release,
   retained,
   refresh,
+  expiryPending,
+  keepVisible,
 }: {
   item: Destination;
   saved: (id: string) => void;
@@ -30,26 +32,68 @@ export function DestinationRow({
   release: (id: string) => void;
   retained: boolean;
   refresh: () => void;
+  expiryPending: boolean;
+  keepVisible: (item: Destination) => void;
 }) {
   const [rulesVersion, setRulesVersion] = useState<number | null>(null);
   const [rulesOpen, setRulesOpen] = useState(false);
+  const [pilotMessage, setPilotMessage] = useState("");
   const last = item.activities[0];
   const dirtyForms = useRef(new Set<string>());
   const openPilots = useRef(new Set<string>());
+  const rulesActive = useRef(false);
+  const activityActive = useRef(false);
   const detailsRef = useRef<HTMLDetailsElement>(null);
   const activityRef = useRef<HTMLDetailsElement>(null);
+  const prospectHeading = useRef<HTMLHeadingElement>(null);
+  const rulesRef = useRef<HTMLDivElement>(null);
+  const rulesTrigger = useRef<HTMLButtonElement>(null);
+  const restoreRulesFocus = useRef(false);
+  useEffect(() => {
+    if (rulesOpen)
+      rulesRef.current?.querySelector<HTMLInputElement>("input")?.focus();
+    else if (restoreRulesFocus.current) {
+      rulesTrigger.current?.focus();
+      restoreRulesFocus.current = false;
+    }
+  }, [rulesOpen]);
   const completed = (label: string) => {
     dirtyForms.current.delete(label);
-    if (dirtyForms.current.size === 0 && openPilots.current.size === 0)
+    if (
+      dirtyForms.current.size === 0 &&
+      openPilots.current.size === 0 &&
+      !rulesActive.current &&
+      !activityActive.current
+    )
       release(item.id);
     saved(item.id);
   };
+  const openRules = () => {
+    if (rulesVersion === null) setRulesVersion(item.version);
+    rulesActive.current = true;
+    retain(item);
+    setRulesOpen(true);
+  };
+  const closeRules = () => {
+    rulesActive.current = false;
+    keepVisible(item);
+    if (
+      dirtyForms.current.size === 0 &&
+      openPilots.current.size === 0 &&
+      !activityActive.current
+    )
+      release(item.id);
+    restoreRulesFocus.current = true;
+    setRulesOpen(false);
+  };
   const openNext = () => {
     if (detailsRef.current) detailsRef.current.open = true;
-    if (item.nextManualAction === "review_rules") {
-      if (rulesVersion === null) setRulesVersion(item.version);
-      setRulesOpen(true);
-    } else if (activityRef.current) activityRef.current.open = true;
+    if (expiryPending || item.nextManualAction === "review_rules") {
+      openRules();
+    } else if (activityRef.current) {
+      activityRef.current.open = true;
+      activityRef.current.querySelector<HTMLSelectElement>("select")?.focus();
+    }
   };
   return (
     <article
@@ -85,7 +129,9 @@ export function DestinationRow({
         <div>
           <dt>Posting guidance</dt>
           <dd>
-            {item.postReadiness}{" "}
+            {expiryPending
+              ? "Review expired; refresh required"
+              : item.postReadiness}{" "}
             {item.review && `· expires ${date(item.review.expiresAt)}`}
           </dd>
         </div>
@@ -100,7 +146,7 @@ export function DestinationRow({
         <div>
           <dt>Next action</dt>
           <dd>
-            {item.nextManualAction === "review_rules"
+            {expiryPending || item.nextManualAction === "review_rules"
               ? "Review rules"
               : item.nextManualAction === "post"
                 ? "Post only after reviewing rules"
@@ -113,7 +159,7 @@ export function DestinationRow({
               className={styles.secondary}
               onClick={openNext}
             >
-              {item.nextManualAction === "review_rules"
+              {expiryPending || item.nextManualAction === "review_rules"
                 ? "Review rules"
                 : item.nextManualAction === "follow"
                   ? "Record completed follow"
@@ -147,23 +193,20 @@ export function DestinationRow({
           </p>
         )}
         {!rulesOpen && (
-          <button
-            type="button"
-            onClick={() => {
-              if (rulesVersion === null) setRulesVersion(item.version);
-              setRulesOpen(true);
-            }}
-          >
+          <button type="button" ref={rulesTrigger} onClick={openRules}>
             Review rules
           </button>
         )}
         {rulesVersion !== null && (
-          <div hidden={!rulesOpen}>
+          <div ref={rulesRef} hidden={!rulesOpen}>
             <RulesForm
               destination={{ ...item, version: rulesVersion }}
               onConflict={refresh}
               saved={() => {
+                rulesActive.current = false;
+                keepVisible(item);
                 setRulesVersion(null);
+                restoreRulesFocus.current = true;
                 setRulesOpen(false);
                 completed("Save rules review");
               }}
@@ -174,14 +217,19 @@ export function DestinationRow({
                 evidence, then{" "}
                 <button
                   type="button"
-                  onClick={() => setRulesVersion(item.version)}
+                  onClick={() => {
+                    setRulesVersion(item.version);
+                    rulesRef.current
+                      ?.querySelector<HTMLInputElement>("input")
+                      ?.focus();
+                  }}
                 >
                   Use current version
                 </button>{" "}
                 to keep these entries and submit a new review.
               </p>
             )}
-            <button type="button" onClick={() => setRulesOpen(false)}>
+            <button type="button" onClick={closeRules}>
               Close rules review
             </button>
           </div>
@@ -222,14 +270,34 @@ export function DestinationRow({
           ))}
         </ul>
         {item.activitiesHaveMore && <p>Showing the latest 20 activities.</p>}
-        <details ref={activityRef}>
+        <details
+          ref={activityRef}
+          onToggle={(event) => {
+            if (event.currentTarget.open) {
+              activityActive.current = true;
+              retain(item);
+            } else if (activityActive.current) {
+              activityActive.current = false;
+              keepVisible(item);
+              if (
+                !rulesActive.current &&
+                dirtyForms.current.size === 0 &&
+                openPilots.current.size === 0
+              )
+                release(item.id);
+            }
+          }}
+        >
           <summary>Record completed activity</summary>
           <ActivityForm
             destination={item}
             saved={() => completed("Record completed activity")}
           />
         </details>
-        <h3>Linked prospects</h3>
+        <h3 ref={prospectHeading} tabIndex={-1}>
+          Linked prospects
+        </h3>
+        {pilotMessage && <p role="status">{pilotMessage}</p>}
         <ul>
           {item.prospects.map((p) => (
             <li key={p.prospectId}>
@@ -246,13 +314,22 @@ export function DestinationRow({
                 }}
                 closed={() => {
                   openPilots.current.delete(p.prospectId);
+                  keepVisible(item);
                   if (
                     openPilots.current.size === 0 &&
-                    dirtyForms.current.size === 0
+                    dirtyForms.current.size === 0 &&
+                    !rulesActive.current &&
+                    !activityActive.current
                   )
                     release(item.id);
                 }}
-                saved={() => saved(item.id)}
+                saved={() => {
+                  setPilotMessage(
+                    "Pilot allocation recorded. The allocation count updates from the workspace.",
+                  );
+                  prospectHeading.current?.focus();
+                  saved(item.id);
+                }}
               />
             </li>
           ))}
@@ -297,10 +374,24 @@ function PilotAllocation({
   closed: () => void;
 }) {
   const [version, setVersion] = useState<number | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const restoreFocus = useRef(false);
+  useEffect(() => {
+    if (version !== null)
+      panelRef.current
+        ?.querySelector<HTMLButtonElement>("button[type=submit]")
+        ?.focus();
+    else if (restoreFocus.current) {
+      triggerRef.current?.focus();
+      restoreFocus.current = false;
+    }
+  }, [version]);
   return version === null ? (
     available && (
       <button
         type="button"
+        ref={triggerRef}
         onClick={() => {
           setVersion(prospect.version);
           opened();
@@ -310,7 +401,7 @@ function PilotAllocation({
       </button>
     )
   ) : (
-    <div>
+    <div ref={panelRef}>
       <p>
         Lifetime allocation for a private one-page preview and one accepted
         revision request. No payment is required. Domain ownership remains with
@@ -332,6 +423,7 @@ function PilotAllocation({
       <button
         type="button"
         onClick={() => {
+          restoreFocus.current = true;
           setVersion(null);
           closed();
         }}
