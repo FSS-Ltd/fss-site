@@ -3,7 +3,7 @@ import {
   intersectAuthorityBounds,
   type AuthorityBounds,
 } from "./authority-bounds";
-import { z } from "zod";
+import { validPermissionEvidence } from "./permission-evidence";
 import type { GrowthTransaction } from "../db/types";
 import { loadPolicyAuthorizedSourceProof } from "./founder-verification-reader";
 import { validateCampaignDefinition } from "./lifecycle";
@@ -182,6 +182,8 @@ export async function loadCanonicalOutreachPreparation(
     }
     if (
       !member.permissionId ||
+      !member.basis ||
+      !member.jurisdiction ||
       member.provider !== "gmail" ||
       member.basis !== parsed.data.permissionRequirement ||
       member.jurisdiction !== parsed.data.jurisdiction ||
@@ -189,22 +191,16 @@ export async function loadCanonicalOutreachPreparation(
       member.expiresAt <= input.now
     )
       return held("permission_invalid");
-    const evidence = z
-      .object({
-        observedAt: z.iso.datetime(),
-        explicitOptIn: z.boolean(),
-        summary: z.string().trim().min(1),
-        reference: z.object({
-          kind: z.enum(["private", "public"]),
-          value: z.string().trim().min(1),
-        }),
-      })
-      .safeParse(member.permission);
     if (
-      !evidence.success ||
-      new Date(evidence.data.observedAt) > input.now ||
-      (member.basis === "consent" && !evidence.data.explicitOptIn) ||
-      member.jurisdiction !== row.countryCode
+      member.jurisdiction !== row.countryCode ||
+      !validPermissionEvidence({
+        basis: member.basis,
+        provider: member.provider,
+        jurisdiction: member.jurisdiction,
+        offer: parsed.data.offer,
+        now: input.now,
+        evidence: member.permission,
+      })
     )
       return held("permission_invalid");
     const local = new Intl.DateTimeFormat("en-GB", {

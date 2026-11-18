@@ -77,3 +77,138 @@ test("accepts short reviewed copy and a natural-language opt-out", () => {
     "If you would rather I did not contact you again, reply and I will leave it there.";
   assert.equal(globalResearchRunSchema.safeParse(fixture).success, true);
 });
+
+test("accepts only a distinct, source-bound research proof pair", () => {
+  const fixture = createGlobalResearchFixture();
+  const candidate = fixture.prospects[0]!;
+  const contact = { ...candidate.evidence[0]!, claimType: "contact_email" };
+  const observation = {
+    ...candidate.evidence[0]!,
+    claimType: "business_observation",
+    claimSummary: "Customers request appointments by telephone.",
+  };
+  const proof = {
+    purpose: "campaign_source_proof",
+    contactEmail: { evidenceIndex: 0, email: candidate.contact.email },
+    businessObservation: { evidenceIndex: 1 },
+  };
+  const withProof = {
+    ...fixture,
+    prospects: [{ ...candidate, evidence: [contact, observation], proof }],
+  };
+  assert.equal(globalResearchRunSchema.safeParse(withProof).success, true);
+  assert.equal(
+    globalResearchRunSchema.safeParse({
+      ...withProof,
+      prospects: [
+        {
+          ...withProof.prospects[0],
+          proof: { ...proof, businessObservation: { evidenceIndex: 0 } },
+        },
+      ],
+    }).success,
+    false,
+  );
+  assert.equal(
+    globalResearchRunSchema.safeParse({
+      ...withProof,
+      prospects: [
+        {
+          ...withProof.prospects[0],
+          proof: {
+            ...proof,
+            contactEmail: { evidenceIndex: 0, email: "wrong@example.test" },
+          },
+        },
+      ],
+    }).success,
+    false,
+  );
+  const registry = {
+    ...candidate,
+    business: { ...candidate.business, companyNumber: "12345678" },
+    evidence: [
+      contact,
+      {
+        ...observation,
+        sourceType: "business_registry",
+        sourceUrl: "https://registry.example.test/12345678",
+        externalReference: "12345678",
+      },
+    ],
+    proof,
+  };
+  assert.equal(
+    globalResearchRunSchema.safeParse({ ...fixture, prospects: [registry] })
+      .success,
+    false,
+  );
+  const social = {
+    ...candidate,
+    business: {
+      ...candidate.business,
+      websiteUrl: "https://facebook.com/business-a",
+      firstPartySourceUrl: "https://facebook.com/business-a",
+    },
+    contact: {
+      ...candidate.contact,
+      emailSourceUrl: "https://facebook.com/business-b",
+    },
+    evidence: [
+      { ...contact, sourceUrl: "https://facebook.com/business-b" },
+      { ...observation, sourceUrl: "https://facebook.com/business-b" },
+    ],
+    proof,
+  };
+  assert.equal(
+    globalResearchRunSchema.safeParse({ ...fixture, prospects: [social] })
+      .success,
+    false,
+  );
+  const sharedUrl = "https://shared.wixsite.com/business-a";
+  const shared = {
+    ...candidate,
+    business: {
+      ...candidate.business,
+      websiteUrl: sharedUrl,
+      firstPartySourceUrl: sharedUrl,
+    },
+    contact: { ...candidate.contact, emailSourceUrl: sharedUrl },
+    evidence: [
+      { ...contact, sourceUrl: sharedUrl },
+      { ...observation, sourceUrl: sharedUrl },
+    ],
+    proof,
+  };
+  assert.equal(
+    globalResearchRunSchema.safeParse({ ...fixture, prospects: [shared] })
+      .success,
+    false,
+  );
+  for (const unsafe of [
+    "http://127.0.0.1/contact",
+    "http://0x7f000001/contact",
+    "http://[::1]/contact",
+    "https://user:pass@example.test/contact",
+  ]) {
+    const changed = {
+      ...candidate,
+      business: {
+        ...candidate.business,
+        websiteUrl: unsafe,
+        firstPartySourceUrl: unsafe,
+      },
+      contact: { ...candidate.contact, emailSourceUrl: unsafe },
+      evidence: [
+        { ...contact, sourceUrl: unsafe },
+        { ...observation, sourceUrl: unsafe },
+      ],
+      proof,
+    };
+    assert.equal(
+      globalResearchRunSchema.safeParse({ ...fixture, prospects: [changed] })
+        .success,
+      false,
+    );
+  }
+});

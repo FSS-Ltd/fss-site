@@ -1,3 +1,7 @@
+import {
+  isSupportedPermission,
+  validPermissionEvidence,
+} from "./permission-evidence";
 import type {
   CampaignPolicy,
   EligibilityDecision,
@@ -39,6 +43,11 @@ export function evaluateCampaignEligibility(
     !policy.capabilityEvidence ||
     !policy.jurisdiction ||
     !policy.permissionRequirement ||
+    !isSupportedPermission(
+      policy.permissionRequirement,
+      policy.provider,
+      policy.jurisdiction,
+    ) ||
     !policy.haltThresholds ||
     !policy.cadenceFamily ||
     policy.variants.length !== 2 ||
@@ -61,7 +70,16 @@ export function evaluateCampaignEligibility(
     snapshot.permissionExpiresAt <= now ||
     snapshot.permissionProvider !== policy.provider ||
     snapshot.permissionJurisdiction !== policy.jurisdiction ||
-    (policy.provider === "resend" && !snapshot.explicitOptIn)
+    (policy.provider === "resend" && !snapshot.explicitOptIn) ||
+    (policy.permissionRequirement === "requested_service" &&
+      !validPermissionEvidence({
+        basis: policy.permissionRequirement,
+        provider: policy.provider,
+        jurisdiction: policy.jurisdiction,
+        offer: policy.offer,
+        now,
+        evidence: snapshot.permissionDetails,
+      }))
   )
     return review("permission_missing");
   return { status: "eligible", reason: "eligible" };

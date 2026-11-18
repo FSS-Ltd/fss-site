@@ -219,11 +219,17 @@ export async function executeFacebookCommand(
 export async function ingestFacebookDiscovery(
   db: GrowthDb,
   raw: FacebookDiscoveryBatch,
-  agentId: string,
+  principal: { keyId: string; bodySha256: string },
   correlationId: string,
 ): Promise<{ count: number; alreadyExisted: boolean }> {
+  const agentId = principal.keyId;
   const batch = facebookDiscoveryBatchSchema.parse(raw);
-  if (!agentId.trim() || agentId.length > 200 || !correlationId.trim())
+  if (
+    !agentId.trim() ||
+    agentId.length > 200 ||
+    !/^[a-f0-9]{64}$/.test(principal.bodySha256) ||
+    !correlationId.trim()
+  )
     throw new FacebookError("invalid_agent_identity");
   if (batch.observedAt > new Date())
     throw new FacebookError("future_observation");
@@ -242,16 +248,26 @@ export async function ingestFacebookDiscovery(
   return withGrowthTransaction(db, async (tx) => {
     await tx`select pg_advisory_xact_lock(hashtextextended(${`growth:facebook-discovery:${batch.externalRunId}`},0))`;
     const [previous] = await tx<
-      { id: string; hash: string; actor: string; count: number }[]
-    >`select id,request_hash as hash,agent_id as actor,observation_count as count from growth.facebook_discovery_runs where external_run_id=${batch.externalRunId}`;
+      {
+        id: string;
+        hash: string;
+        actor: string;
+        count: number;
+        bodySha256: string | null;
+      }[]
+    >`select id,request_hash as hash,agent_id as actor,observation_count as count,signed_body_sha256 as "bodySha256" from growth.facebook_discovery_runs where external_run_id=${batch.externalRunId}`;
     if (previous) {
-      if (previous.hash !== requestHash || previous.actor !== agentId)
+      if (
+        previous.hash !== requestHash ||
+        previous.actor !== agentId ||
+        previous.bodySha256 !== principal.bodySha256
+      )
         throw new FacebookError("request_conflict");
       return { count: previous.count, alreadyExisted: true };
     }
     const [run] = await tx<
       { id: string }[]
-    >`insert into growth.facebook_discovery_runs(external_run_id,request_hash,agent_id,observed_at,observation_count) values (${batch.externalRunId},${requestHash},${agentId},${batch.observedAt},${batch.observations.length}) returning id`;
+    >`insert into growth.facebook_discovery_runs(external_run_id,request_hash,agent_id,observed_at,observation_count,signed_body_sha256) values (${batch.externalRunId},${requestHash},${agentId},${batch.observedAt},${batch.observations.length},${principal.bodySha256}) returning id`;
     if (!run) throw new FacebookError("discovery_insert_failed");
     for (const destination of batch.observations)
       await insertObservation(tx, destination, agentId, "signed_agent", run.id);

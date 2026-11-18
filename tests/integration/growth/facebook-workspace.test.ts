@@ -19,7 +19,10 @@ test(
   { skip: !url },
   async () => {
     if (!url) return;
-    const db = postgres(url, { max: 3 });
+    const db = postgres(url, {
+      max: 3,
+      connection: { options: "-c role=growth_app" },
+    });
     const now = new Date();
     const command = {
       type: "capture_destination" as const,
@@ -84,17 +87,57 @@ test(
         observations: [],
       };
       assert.equal(
-        (await ingestFacebookDiscovery(db, batch, "agent-a", randomUUID()))
-          .count,
+        (
+          await ingestFacebookDiscovery(
+            db,
+            batch,
+            { keyId: "agent-a", bodySha256: "a".repeat(64) },
+            randomUUID(),
+          )
+        ).count,
         0,
       );
       assert.equal(
-        (await ingestFacebookDiscovery(db, batch, "agent-a", randomUUID()))
-          .alreadyExisted,
+        (
+          await ingestFacebookDiscovery(
+            db,
+            batch,
+            { keyId: "agent-a", bodySha256: "a".repeat(64) },
+            randomUUID(),
+          )
+        ).alreadyExisted,
         true,
       );
       await assert.rejects(
-        ingestFacebookDiscovery(db, batch, "agent-b", randomUUID()),
+        ingestFacebookDiscovery(
+          db,
+          batch,
+          { keyId: "agent-b", bodySha256: "a".repeat(64) },
+          randomUUID(),
+        ),
+        /request_conflict/,
+      );
+      await assert.rejects(
+        ingestFacebookDiscovery(
+          db,
+          batch,
+          { keyId: "agent-a", bodySha256: "b".repeat(64) },
+          randomUUID(),
+        ),
+        /request_conflict/,
+      );
+      const legacy = { ...batch, externalRunId: randomUUID() };
+      const legacyHash = createHash("sha256")
+        .update(JSON.stringify(legacy))
+        .digest("hex");
+      await db`insert into growth.facebook_discovery_runs(external_run_id, request_hash, agent_id, observed_at, observation_count) values (${legacy.externalRunId},${legacyHash},'agent-a',${legacy.observedAt},0)`;
+      await assert.rejects(
+        ingestFacebookDiscovery(
+          db,
+          legacy,
+          { keyId: "agent-a", bodySha256: "a".repeat(64) },
+          randomUUID(),
+        ),
         /request_conflict/,
       );
     } finally {

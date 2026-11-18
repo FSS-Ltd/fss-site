@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
+import { withGrowthTransaction } from "../../../lib/growth/db/client";
+import { loadReviewMembershipPreparationAuthority } from "../../../lib/growth/campaigns/founder-verification-reader";
+import { exerciseResearchPreparation } from "./research-preparation-assertions";
 import { withTransitionClock } from "./reservation-clock";
 import type { FounderSession } from "../../../lib/growth/auth/require-founder";
 import type { GrowthDb } from "../../../lib/growth/db/types";
@@ -137,6 +140,11 @@ export async function exerciseCampaignReservation(
       founder,
       randomUUID(),
     );
+    await exerciseResearchPreparation(admin, db, {
+      campaignId: campaign.id,
+      connectionId: id,
+      founder,
+    });
     const business = randomUUID(),
       contact = randomUUID(),
       prospect = randomUUID(),
@@ -157,8 +165,46 @@ export async function exerciseCampaignReservation(
       await admin`insert into growth.email_messages(id,sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key,lease_token,lease_expires_at,outreach_claim_previous_status,subject_snapshot,html_snapshot,text_snapshot) values (${message},${sequence},${prospect},${contact},'gmail','outbound',0,'sending',${randomUUID()},${lease},now()+interval '5 minutes','queued','Subject','<p>Body</p>','Body')`;
       await admin`insert into growth.campaign_memberships(id,campaign_id,policy_version,business_id,prospect_id,request_id,status,sequence_id) values (${member},${campaign.id},2,${business},${prospect},${randomUUID()},'active',${sequence})`;
       await admin`insert into growth.source_evidence(prospect_id,source_type,source_url,claim_type,claim_summary,observed_at,verified_at,retention_class,origin,founder_actor_id,request_id,request_hash,contact_id,business_id,contact_version,prospect_version) select ${prospect},'founder_verified','https://example.test',claim,'reviewed',now()-interval '1 minute',now()-interval '1 minute','prospect_research','founder',${founder.actorId},${proofRequest},${"a".repeat(64)},${contact},${business},1,1 from unnest(array['contact_email','business_observation']) claim`;
-      await admin`insert into growth.outreach_permissions(id,membership_id,basis,provider,jurisdiction,expires_at,actor_id,evidence,contact_id,proof_request_id,contact_version,prospect_version) values (${permission},${member},'consent','gmail','GB',now()+interval '1 hour',${founder.actorId},${admin.json({ observedAt: new Date(now - 1000).toISOString(), explicitOptIn: true, summary: "reviewed", reference: { kind: "private", value: "permission" } })},${contact},${proofRequest},1,1)`;
-      await admin`update growth.campaign_memberships set current_permission_id=${permission} where id=${member}`;
+      const permissionEvent = randomUUID();
+      await executeCampaignCommand(
+        db,
+        {
+          type: "record_permission",
+          requestId: permissionEvent,
+          membershipId: member,
+          evidenceId: permission,
+          basis: "consent",
+          provider: "gmail",
+          jurisdiction: "GB",
+          expiresAt: new Date(now + 3600000),
+          observedAt: new Date(now - 1000),
+          explicitOptIn: true,
+          summary: "Recipient opted in.",
+          reference: { kind: "private", value: "permission" },
+          expectedProspectVersion: 1,
+          expectedContactVersion: 1,
+          proofRequestId: proofRequest,
+        },
+        founder,
+        randomUUID(),
+      );
+      await admin`update growth.campaign_memberships set status='review', sequence_id=null where id=${member}`;
+      const prepare = (eventId: string) =>
+        withGrowthTransaction(db, (tx) =>
+          loadReviewMembershipPreparationAuthority(tx, {
+            membershipId: member,
+            connectionId: id,
+            source: { kind: "permission_event", eventId },
+          }),
+        );
+      const preparation = await prepare(permissionEvent);
+      assert.equal(preparation?.proof.origin, "founder");
+      assert.equal(preparation?.policyApproverId, founder.actorId);
+      assert.equal(await prepare(randomUUID()), null);
+      await admin`update growth.campaign_memberships set status='active', sequence_id=${sequence} where id=${member}`;
+      await admin`delete from growth.outreach_outbox where event_id=${permissionEvent}`;
+      await admin`delete from growth.outreach_events where id=${permissionEvent}`;
+
       await admin`insert into growth.sequence_enrollments(id,prospect_id,contact_id,status) values (${oldSequence},${prospect},${contact},'completed')`;
       await admin`insert into growth.email_messages(id,sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key) values (${oldMessage},${oldSequence},${prospect},${contact},'gmail','outbound',0,'failed',${randomUUID()})`;
       await admin`insert into growth.campaign_memberships(id,campaign_id,policy_version,business_id,prospect_id,request_id,status,sequence_id) values (${oldMember},${campaign.id},1,${business},${prospect},${randomUUID()},'stopped',${oldSequence})`;

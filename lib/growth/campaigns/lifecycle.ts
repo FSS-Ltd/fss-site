@@ -1,5 +1,6 @@
 import type { GrowthTransaction } from "../db/types";
 import type { CampaignPolicyDefinition } from "./schemas";
+import { isSupportedPermission } from "./permission-evidence";
 
 export function validateCampaignDefinition(
   policy: CampaignPolicyDefinition,
@@ -39,6 +40,11 @@ export function validateCampaignDefinition(
       policy.expiresAt <= now ||
       !policy.offer ||
       !policy.permissionRequirement ||
+      !isSupportedPermission(
+        policy.permissionRequirement,
+        policy.provider,
+        policy.jurisdiction,
+      ) ||
       !policy.haltThresholds ||
       !policy.cadenceFamily ||
       policy.variants.length !== 2 ||

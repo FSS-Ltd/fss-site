@@ -97,10 +97,11 @@ export async function insertGlobalCandidateDetails(
     candidate: GlobalResearchCandidate;
     prospectId: string;
   },
-): Promise<void> {
+): Promise<string[]> {
   const { run, runId, candidateIndex, candidate, prospectId } = input;
+  const evidenceIds: string[] = [];
   for (const evidence of candidate.evidence) {
-    await tx`
+    const [row] = await tx<{ id: string }[]>`
       insert into growth.source_evidence (
         prospect_id, research_run_id, source_type, source_url, external_reference,
         claim_type, claim_summary, observed_at, verified_at, retention_class
@@ -108,8 +109,10 @@ export async function insertGlobalCandidateDetails(
         ${prospectId}, ${runId}, ${evidence.sourceType}, ${evidence.sourceUrl},
         ${evidence.externalReference}, ${evidence.claimType}, ${evidence.claimSummary},
         ${evidence.observedAt}, ${evidence.verifiedAt}, ${evidence.retentionClass}
-      )
+      ) returning id
     `;
+    if (!row) throw new Error("Evidence insert returned no ID.");
+    evidenceIds.push(row.id);
   }
   await tx`
     insert into growth.agent_tasks (
@@ -122,4 +125,5 @@ export async function insertGlobalCandidateDetails(
       1, now(), ${`${run.externalRunId}:candidate:${candidateIndex}:first-email-draft`}
     )
   `;
+  return evidenceIds;
 }

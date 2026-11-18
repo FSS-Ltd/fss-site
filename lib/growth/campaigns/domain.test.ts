@@ -172,6 +172,66 @@ test("automatic eligibility requires current approval, verified evidence, and ex
   );
   assert.equal(
     evaluateCampaignEligibility(
+      { ...policy, permissionRequirement: "requested_service" },
+      {
+        ...snapshot,
+        permissionBasis: "requested_service",
+        explicitOptIn: true,
+      },
+      now,
+    ).status,
+    "review",
+  );
+  assert.equal(
+    evaluateCampaignEligibility(
+      {
+        ...policy,
+        provider: "gmail",
+        jurisdiction: "GB",
+        permissionRequirement: "requested_service",
+      },
+      {
+        ...snapshot,
+        permissionProvider: "gmail",
+        permissionJurisdiction: "GB",
+        permissionBasis: "requested_service",
+      },
+      now,
+    ).status,
+    "review",
+  );
+  assert.equal(
+    evaluateCampaignEligibility(
+      {
+        ...policy,
+        provider: "gmail",
+        jurisdiction: "GB",
+        permissionRequirement: "requested_service",
+      },
+      {
+        ...snapshot,
+        permissionProvider: "gmail",
+        permissionJurisdiction: "GB",
+        permissionBasis: "requested_service",
+        permissionDetails: {
+          observedAt: "2026-01-20T00:00:00Z",
+          explicitOptIn: false,
+          summary: "Recipient requested this offer and sequence.",
+          reference: { kind: "private", value: "record" },
+          requestedService: {
+            requestedAt: "2026-01-19T00:00:00Z",
+            offerId: "review",
+            messageScope: "initial_and_two_followups",
+            attestsRecipientRequest: true,
+          },
+        },
+      },
+      now,
+    ).status,
+    "eligible",
+  );
+  assert.equal(
+    evaluateCampaignEligibility(
       policy,
       { ...snapshot, explicitOptIn: true, exclusion: "client" },
       now,

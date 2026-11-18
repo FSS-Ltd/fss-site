@@ -1,3 +1,8 @@
+import {
+  PayloadTooLargeError,
+  readRawBody,
+} from "../integrations/read-raw-body";
+import { createHash } from "node:crypto";
 import type {
   AgentSignatureResult,
   VerifyAgentRequestInput,
@@ -12,7 +17,11 @@ const AGENT_KEY_ID_HEADER = "x-fss-key-id";
 const AGENT_TIMESTAMP_HEADER = "x-fss-timestamp";
 const AGENT_SIGNATURE_HEADER = "x-fss-signature";
 
-class PayloadTooLargeError extends Error {}
+export type SignedResearchPrincipal = {
+  kind: "signed_research";
+  keyId: string;
+  bodySha256: string;
+};
 
 export type ResearchRunRouteDependencies = {
   agentKeyId: string;
@@ -20,62 +29,15 @@ export type ResearchRunRouteDependencies = {
   createCorrelationId: () => string;
   now: () => Date;
   verifyRequest: (input: VerifyAgentRequestInput) => AgentSignatureResult;
-  ingest: (input: ResearchIntake) => Promise<ResearchRunIngestionResult>;
+  ingest: (
+    input: ResearchIntake,
+    principal: SignedResearchPrincipal,
+  ) => Promise<ResearchRunIngestionResult>;
   reportUnexpectedError: (input: {
     correlationId: string;
     error: unknown;
   }) => void;
 };
-
-async function readRawBody(request: Request): Promise<Uint8Array<ArrayBuffer>> {
-  const declaredLength = request.headers.get("content-length");
-  if (
-    declaredLength !== null &&
-    /^\d+$/.test(declaredLength) &&
-    Number(declaredLength) > MAX_RESEARCH_BUNDLE_BYTES
-  ) {
-    throw new PayloadTooLargeError();
-  }
-
-  if (request.body === null) {
-    return new Uint8Array();
-  }
-
-  const reader = request.body.getReader();
-  const chunks: Uint8Array<ArrayBuffer>[] = [];
-  let totalBytes = 0;
-
-  try {
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) {
-        break;
-      }
-
-      const chunk = new Uint8Array(value);
-      totalBytes += chunk.byteLength;
-      if (totalBytes > MAX_RESEARCH_BUNDLE_BYTES) {
-        try {
-          await reader.cancel();
-        } catch {
-          // The byte limit remains authoritative if stream cleanup fails.
-        }
-        throw new PayloadTooLargeError();
-      }
-      chunks.push(chunk);
-    }
-  } finally {
-    reader.releaseLock();
-  }
-
-  const body = new Uint8Array(totalBytes);
-  let offset = 0;
-  for (const chunk of chunks) {
-    body.set(chunk, offset);
-    offset += chunk.byteLength;
-  }
-  return body;
-}
 
 function parseJson(rawBody: Uint8Array): unknown {
   const text = new TextDecoder("utf-8", { fatal: true }).decode(rawBody);
@@ -92,7 +54,7 @@ export function createResearchRunPostHandler(
 
     let rawBody: Uint8Array;
     try {
-      rawBody = await readRawBody(request);
+      rawBody = await readRawBody(request, MAX_RESEARCH_BUNDLE_BYTES);
     } catch (error) {
       if (error instanceof PayloadTooLargeError) {
         return fail(413, "payload_too_large", "Research bundle exceeds 4 MB.");
@@ -127,11 +89,19 @@ export function createResearchRunPostHandler(
     }
 
     try {
-      const result = await dependencies.ingest(parsed.data);
+      const result = await dependencies.ingest(parsed.data, {
+        kind: "signed_research",
+        keyId: dependencies.agentKeyId,
+        bodySha256: createHash("sha256").update(rawBody).digest("hex"),
+      });
       return createJsonResponse(result, 200);
     } catch (error) {
       if (error instanceof ResearchIngestionError) {
-        return fail(422, error.code, "The research bundle cannot be ingested.");
+        return fail(
+          error.code === "request_conflict" ? 409 : 422,
+          error.code,
+          "The research bundle cannot be ingested.",
+        );
       }
 
       dependencies.reportUnexpectedError({ correlationId, error });

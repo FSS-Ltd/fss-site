@@ -3,7 +3,8 @@ import type { FounderSession } from "../auth/require-founder";
 import type { GrowthTransaction } from "../db/types";
 import { requireCampaignFounder } from "./authorization";
 import { appendCampaignEventAndOutbox } from "./events";
-import { loadFounderVerification } from "./founder-verification-reader";
+import { loadFounderSourceProof } from "./founder-verification-reader";
+import { validPermissionEvidence } from "./permission-evidence";
 import { loadLatestCampaignPolicy } from "./repository";
 import { campaignCommandSchema, type CampaignCommand } from "./schemas";
 
@@ -96,16 +97,23 @@ export async function recordCampaignPermission(
   if (!contact || contact.version !== command.expectedContactVersion)
     throw new Error("contact_version_changed");
   const now = new Date();
-  const proof = await loadFounderVerification(
+  if (!!command.proofRequestId === !!command.researchProofId)
+    throw new Error("verification_required");
+  const reference = command.proofRequestId
+    ? { origin: "founder" as const, requestId: command.proofRequestId }
+    : command.researchProofId
+      ? { origin: "research" as const, bindingId: command.researchProofId }
+      : null;
+  if (!reference) throw new Error("verification_required");
+  const proof = await loadFounderSourceProof(
     tx,
     member.prospectId,
     now,
     founder,
+    reference,
   );
   if (
     !proof ||
-    proof.status !== "current" ||
-    proof.requestId !== command.proofRequestId ||
     proof.contactId !== prospect.contactId ||
     proof.proofContactVersion !== contact.version ||
     proof.proofProspectVersion !== prospect.version
@@ -116,8 +124,6 @@ export async function recordCampaignPermission(
     command.basis !== policy.definition.permissionRequirement ||
     command.jurisdiction !== policy.definition.jurisdiction ||
     command.jurisdiction !== prospect.country ||
-    ((command.provider === "resend" || command.basis === "consent") &&
-      !command.explicitOptIn) ||
     command.observedAt > now ||
     command.expiresAt <= now ||
     command.observedAt >= command.expiresAt
@@ -128,8 +134,27 @@ export async function recordCampaignPermission(
     reference: command.reference,
     observedAt: command.observedAt.toISOString(),
     explicitOptIn: command.explicitOptIn,
+    ...(command.requestedService
+      ? {
+          requestedService: {
+            ...command.requestedService,
+            requestedAt: command.requestedService.requestedAt.toISOString(),
+          },
+        }
+      : {}),
   };
-  await tx`insert into growth.outreach_permissions (id,membership_id,basis,provider,jurisdiction,expires_at,actor_id,evidence,contact_id,proof_request_id,contact_version,prospect_version) values (${command.evidenceId},${command.membershipId},${command.basis},${command.provider},${command.jurisdiction},${command.expiresAt},${founder.actorId},${tx.json(evidence)},${prospect.contactId},${command.proofRequestId},${contact.version},${prospect.version})`;
+  if (
+    !validPermissionEvidence({
+      basis: command.basis,
+      provider: command.provider,
+      jurisdiction: command.jurisdiction,
+      offer: policy.definition.offer,
+      now,
+      evidence,
+    })
+  )
+    throw new Error("permission_invalid");
+  await tx`insert into growth.outreach_permissions (id,membership_id,basis,provider,jurisdiction,expires_at,actor_id,evidence,contact_id,proof_request_id,contact_version,prospect_version,proof_origin,research_proof_id) values (${command.evidenceId},${command.membershipId},${command.basis},${command.provider},${command.jurisdiction},${command.expiresAt},${founder.actorId},${tx.json(evidence)},${prospect.contactId},${command.proofRequestId ?? null},${contact.version},${prospect.version},${reference.origin},${command.researchProofId ?? null})`;
   await tx`update growth.campaign_memberships set current_permission_id=${command.evidenceId},updated_at=now() where id=${command.membershipId}`;
   await appendCampaignEventAndOutbox(tx, {
     campaignId: member.campaignId,

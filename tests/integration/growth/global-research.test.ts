@@ -47,6 +47,14 @@ test(
       const result = await ingestResearchRun(sql, first);
       assert.equal(result.accepted, 1);
       assert.deepEqual(await ingestResearchRun(sql, first), result);
+      await assert.rejects(
+        ingestResearchRun(sql, first, {
+          kind: "signed_research",
+          keyId: "agent",
+          bodySha256: "a".repeat(64),
+        }),
+        /conflict/i,
+      );
       const rows = await sql<
         Array<{
           firstName: string | null;
@@ -220,6 +228,303 @@ test(
       await sql`delete from growth.research_runs where external_run_id like ${`${prefix}%`}`;
       await sql`delete from growth.suppressions where normalised_email like ${`%-${token}@gmail.com`}`;
       await sql.end();
+    }
+  },
+);
+
+test("proof-bearing research requires authenticated source principal", async () => {
+  const fixture = createGlobalResearchFixture();
+  const candidate = fixture.prospects[0]!;
+  const run = globalResearchRunSchema.parse({
+    ...fixture,
+    prospects: [
+      {
+        ...candidate,
+        evidence: [
+          { ...candidate.evidence[0]!, claimType: "contact_email" },
+          {
+            ...candidate.evidence[0]!,
+            claimType: "business_observation",
+            claimSummary: "Customers request appointments by telephone.",
+          },
+        ],
+        proof: {
+          purpose: "campaign_source_proof",
+          contactEmail: { evidenceIndex: 0, email: candidate.contact.email },
+          businessObservation: { evidenceIndex: 1 },
+        },
+      },
+    ],
+  });
+  const db = postgres("postgresql://postgres@127.0.0.1:1/unused", {
+    connect_timeout: 1,
+  });
+  try {
+    await assert.rejects(
+      ingestResearchRun(db, run),
+      (error) =>
+        error instanceof ResearchIngestionError &&
+        error.code === "signed_research_required",
+    );
+  } finally {
+    await db.end();
+  }
+});
+
+test(
+  "signed research binds actual evidence and rejects changed authenticated bytes",
+  { skip: !connectionString },
+  async () => {
+    if (!connectionString) return;
+    const db = postgres(connectionString, { max: 1 });
+    const fixture = createGlobalResearchFixture();
+    const candidate = fixture.prospects[0]!;
+    const token = randomUUID();
+    const url = `https://${token}.example.test/contact`;
+    const now = new Date(Date.now() - 60000).toISOString();
+    const source = {
+      ...candidate.evidence[0]!,
+      sourceUrl: url,
+      observedAt: now,
+      verifiedAt: now,
+    };
+    const run = globalResearchRunSchema.parse({
+      ...fixture,
+      externalRunId: token,
+      prospects: [
+        {
+          ...candidate,
+          business: {
+            ...candidate.business,
+            websiteUrl: url,
+            firstPartySourceUrl: url,
+            verifiedAt: now,
+          },
+          contact: {
+            ...candidate.contact,
+            email: `${token}@example.test`,
+            emailSourceUrl: url,
+            emailVerifiedAt: now,
+          },
+          evidence: [
+            { ...source, claimType: "contact_email" },
+            {
+              ...source,
+              claimType: "business_observation",
+              claimSummary: "Customers request appointments by telephone.",
+            },
+          ],
+          proof: {
+            purpose: "campaign_source_proof",
+            contactEmail: { evidenceIndex: 0, email: `${token}@example.test` },
+            businessObservation: { evidenceIndex: 1 },
+          },
+        },
+      ],
+    });
+    const principal = {
+      kind: "signed_research" as const,
+      keyId: "test-agent",
+      bodySha256: "a".repeat(64),
+    };
+    try {
+      await db`set role growth_app`;
+      const first = await ingestResearchRun(db, run, principal);
+      assert.deepEqual(await ingestResearchRun(db, run, principal), first);
+      const actualNow = Date.now;
+      try {
+        Date.now = () => actualNow() + 31 * 86400000;
+        assert.deepEqual(await ingestResearchRun(db, run, principal), first);
+      } finally {
+        Date.now = actualNow;
+      }
+      await assert.rejects(
+        ingestResearchRun(db, run, {
+          ...principal,
+          bodySha256: "b".repeat(64),
+        }),
+        /conflict/i,
+      );
+      const rows = await db<
+        { count: number }[]
+      >`select count(*)::integer as count from growth.research_source_proof_bindings where research_run_id=${first.runId}`;
+      assert.equal(rows[0]?.count, 1);
+      const [binding] = await db<
+        { id: string; contactEvidenceId: string }[]
+      >`select id, contact_evidence_id as "contactEvidenceId" from growth.research_source_proof_bindings where research_run_id=${first.runId}`;
+      assert.ok(binding);
+      const { loadFounderSourceProof } =
+        await import("../../../lib/growth/campaigns/founder-verification-reader");
+      const { createHash } = await import("node:crypto");
+      const email = "j.ntagengwa@faithfulsoftware.dev";
+      const founder = {
+        email,
+        actorId: createHash("sha256").update(email).digest("hex"),
+      };
+      const prospectId = first.acceptedProspects[0]!.prospectId;
+      const proof = await loadFounderSourceProof(
+        db,
+        prospectId,
+        new Date(),
+        founder,
+        { origin: "research", bindingId: binding.id },
+      );
+      assert.equal(proof?.origin, "research");
+      await db`update growth.businesses set first_party_source_url='https://different.example.test/contact' where id=(select business_id from growth.prospects where id=${prospectId})`;
+      assert.equal(
+        await loadFounderSourceProof(db, prospectId, new Date(), founder, {
+          origin: "research",
+          bindingId: binding.id,
+        }),
+        null,
+      );
+      await db`update growth.businesses set first_party_source_url=${url} where id=(select business_id from growth.prospects where id=${prospectId})`;
+
+      await assert.rejects(
+        db`insert into growth.research_source_proof_bindings(research_run_id,prospect_id,business_id,contact_id,prospect_version,contact_version,contact_evidence_id,observation_evidence_id) select research_run_id,prospect_id,${randomUUID()},contact_id,prospect_version,contact_version,contact_evidence_id,observation_evidence_id from growth.research_source_proof_bindings where id=${binding.id}`,
+        /invalid research proof binding/,
+      );
+      await assert.rejects(
+        db`insert into growth.research_source_proof_bindings(research_run_id,prospect_id,business_id,contact_id,prospect_version,contact_version,contact_evidence_id,observation_evidence_id) select research_run_id,prospect_id,business_id,contact_id,prospect_version,contact_version+1,contact_evidence_id,observation_evidence_id from growth.research_source_proof_bindings where id=${binding.id}`,
+        /invalid research proof binding/,
+      );
+
+      await assert.rejects(
+        db`update growth.source_evidence set claim_summary='altered' where id=${binding.contactEvidenceId}`,
+      );
+      await assert.rejects(
+        db`update growth.research_runs set signed_body_sha256=${"c".repeat(64)} where id=${first.runId}`,
+      );
+      await assert.rejects(
+        db`update growth.research_runs set external_run_id=${randomUUID()} where id=${first.runId}`,
+      );
+      await assert.rejects(
+        loadFounderSourceProof(
+          db,
+          prospectId,
+          new Date(),
+          { ...founder, actorId: "fake" },
+          { origin: "research", bindingId: binding.id },
+        ),
+      );
+      await db`update growth.prospects set version=version+1 where id=${prospectId}`;
+      assert.equal(
+        await loadFounderSourceProof(db, prospectId, new Date(), founder, {
+          origin: "research",
+          bindingId: binding.id,
+        }),
+        null,
+      );
+    } finally {
+      await db.end();
+    }
+  },
+);
+
+test(
+  "signed proof rejects future observation",
+  { skip: !connectionString },
+  async () => {
+    if (!connectionString) return;
+    const fixture = createGlobalResearchFixture();
+    const candidate = fixture.prospects[0]!;
+    const source = {
+      ...candidate.evidence[0]!,
+      observedAt: new Date(Date.now() + 86400000).toISOString(),
+    };
+    const run = globalResearchRunSchema.parse({
+      ...fixture,
+      prospects: [
+        {
+          ...candidate,
+          evidence: [
+            { ...source, claimType: "contact_email" },
+            {
+              ...source,
+              claimType: "business_observation",
+              claimSummary: "Customers request appointments by telephone.",
+            },
+          ],
+          proof: {
+            purpose: "campaign_source_proof",
+            contactEmail: { evidenceIndex: 0, email: candidate.contact.email },
+            businessObservation: { evidenceIndex: 1 },
+          },
+        },
+      ],
+    });
+    const db = postgres(connectionString, {
+      max: 1,
+      connection: { options: "-c role=growth_app" },
+    });
+    try {
+      await assert.rejects(
+        ingestResearchRun(db, run, {
+          kind: "signed_research",
+          keyId: "agent",
+          bodySha256: "a".repeat(64),
+        }),
+        (error) =>
+          error instanceof ResearchIngestionError &&
+          error.code === "invalid_proof",
+      );
+    } finally {
+      await db.end();
+    }
+  },
+);
+
+test(
+  "signed proof rejects stale observations",
+  { skip: !connectionString },
+  async () => {
+    if (!connectionString) return;
+    const fixture = createGlobalResearchFixture();
+    const candidate = fixture.prospects[0]!;
+    const stale = new Date(Date.now() - 31 * 86400000).toISOString();
+    const source = {
+      ...candidate.evidence[0]!,
+      observedAt: stale,
+      verifiedAt: stale,
+    };
+    const run = globalResearchRunSchema.parse({
+      ...fixture,
+      prospects: [
+        {
+          ...candidate,
+          evidence: [
+            { ...source, claimType: "contact_email" },
+            {
+              ...source,
+              claimType: "business_observation",
+              claimSummary: "Customers request appointments by telephone.",
+            },
+          ],
+          proof: {
+            purpose: "campaign_source_proof",
+            contactEmail: { evidenceIndex: 0, email: candidate.contact.email },
+            businessObservation: { evidenceIndex: 1 },
+          },
+        },
+      ],
+    });
+    const db = postgres(connectionString, {
+      max: 1,
+      connection: { options: "-c role=growth_app" },
+    });
+    try {
+      await assert.rejects(
+        ingestResearchRun(db, run, {
+          kind: "signed_research",
+          keyId: "agent",
+          bodySha256: "a".repeat(64),
+        }),
+        (error) =>
+          error instanceof ResearchIngestionError &&
+          error.code === "invalid_proof",
+      );
+    } finally {
+      await db.end();
     }
   },
 );

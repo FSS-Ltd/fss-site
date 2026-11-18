@@ -18,6 +18,13 @@ const SHARED_HOSTS = new Set([
   "business.site",
 ]);
 
+export function isSharedBusinessHost(url: string): boolean {
+  const host = new URL(url).hostname.toLowerCase().replace(/^www\./, "");
+  return [...SHARED_HOSTS].some(
+    (domain) => host === domain || host.endsWith(`.${domain}`),
+  );
+}
+
 export function normalizeRegistration(value: string | null): string | null {
   return value === null ? null : value.replace(/\s+/g, "").toUpperCase();
 }

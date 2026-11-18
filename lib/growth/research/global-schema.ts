@@ -2,6 +2,8 @@ import { z } from "zod";
 import { emailHtmlVisibleText, isSafeEmailHtml } from "../email/html-policy";
 import { offersEmailOptOut } from "../email/copy-policy";
 import { MAX_RESEARCH_BUNDLE_BYTES } from "./limits";
+import { isPublicHttpUrl } from "../http/public-url";
+import { businessWebsiteHost, isSharedBusinessHost } from "./global-identity";
 
 const COUNTRY_CODES = new Set(
   "AD AE AF AG AI AL AM AO AQ AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS BT BV BW BY BZ CA CC CD CF CG CH CI CK CL CM CN CO CR CU CV CW CX CY CZ DE DJ DK DM DO DZ EC EE EG EH ER ES ET FI FJ FK FM FO FR GA GB GD GE GF GG GH GI GL GM GN GP GQ GR GS GT GU GW GY HK HM HN HR HT HU ID IE IL IM IN IO IQ IR IS IT JE JM JO JP KE KG KH KI KM KN KP KR KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MF MG MH MK ML MM MN MO MP MQ MR MS MT MU MV MW MX MY MZ NA NC NE NF NG NI NL NO NP NR NU NZ OM PA PE PF PG PH PK PL PM PN PR PS PT PW PY QA RE RO RS RU RW SA SB SC SD SE SG SH SI SJ SK SL SM SN SO SR SS ST SV SX SY SZ TC TD TF TG TH TJ TK TL TM TN TO TR TT TV TW TZ UA UG UM US UY UZ VA VC VE VG VI VN VU WF WS YE YT ZA ZM ZW".split(
@@ -155,6 +157,24 @@ export const globalCandidateSchema = z
         "Maximum estimate must not be below the minimum.",
       ),
     evidence: z.array(evidenceSchema).min(1).max(25),
+    proof: z
+      .object({
+        purpose: z.literal("campaign_source_proof"),
+        contactEmail: z
+          .object({
+            evidenceIndex: z.number().int().nonnegative(),
+            email: z
+              .email()
+              .max(320)
+              .transform((value) => value.toLowerCase()),
+          })
+          .strict(),
+        businessObservation: z
+          .object({ evidenceIndex: z.number().int().nonnegative() })
+          .strict(),
+      })
+      .strict()
+      .optional(),
     firstEmail: globalFirstEmailSchema,
   })
   .strict()
@@ -194,6 +214,48 @@ export const globalCandidateSchema = z
         path: ["evidence"],
         message: "First-party evidence must match the verified business host.",
       });
+    }
+    if (candidate.proof) {
+      const contact =
+        candidate.evidence[candidate.proof.contactEmail.evidenceIndex];
+      const observation =
+        candidate.evidence[candidate.proof.businessObservation.evidenceIndex];
+      const businessHost = businessWebsiteHost(
+        candidate.business.firstPartySourceUrl,
+      );
+      const observationAssociated =
+        observation?.sourceType === "first_party" &&
+        businessWebsiteHost(observation.sourceUrl) === businessHost;
+      if (
+        !contact ||
+        !observation ||
+        !isPublicHttpUrl(candidate.business.firstPartySourceUrl) ||
+        !businessHost ||
+        isSharedBusinessHost(candidate.business.firstPartySourceUrl) ||
+        businessWebsiteHost(contact.sourceUrl) !== businessHost ||
+        (candidate.business.websiteUrl !== null &&
+          businessWebsiteHost(candidate.business.websiteUrl) !==
+            businessHost) ||
+        (candidate.business.websiteUrl !== null &&
+          !isPublicHttpUrl(candidate.business.websiteUrl)) ||
+        !isPublicHttpUrl(contact.sourceUrl) ||
+        !isPublicHttpUrl(observation.sourceUrl) ||
+        contact === observation ||
+        contact.claimType !== "contact_email" ||
+        contact.sourceType !== "first_party" ||
+        contact.sourceUrl !== candidate.contact.emailSourceUrl ||
+        candidate.proof.contactEmail.email !== candidate.contact.email ||
+        observation.claimType !== "business_observation" ||
+        observation.claimSummary.length < 20 ||
+        !observationAssociated
+      ) {
+        context.addIssue({
+          code: "custom",
+          path: ["proof"],
+          message:
+            "Proof must select distinct associated contact and observation evidence.",
+        });
+      }
     }
     const mapsReference = candidate.business.googleMapsReferenceUrl;
     if (mapsReference !== null) {

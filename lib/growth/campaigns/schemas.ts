@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { globalCandidateSchema } from "../research/global-schema";
 import { isCrmCountryCode } from "../crm/countries";
+import { isPublicHttpUrl } from "../http/public-url";
+import { permissionEvidenceSchema } from "./permission-evidence";
 
 const id = z.string().min(1);
 export const campaignTimestampSchema = z.union([
@@ -9,19 +11,12 @@ export const campaignTimestampSchema = z.union([
 ]);
 const date = campaignTimestampSchema;
 const uuid = z.uuid();
-const publicUrl = z.url().refine((value) => {
-  const url = new URL(value);
-  return (
-    ["http:", "https:"].includes(url.protocol) &&
-    !url.username &&
-    !url.password &&
-    url.hostname.includes(".") &&
-    !url.hostname.endsWith(".localhost") &&
-    !url.hostname.endsWith(".local") &&
-    !url.hostname.includes(":") &&
-    !/^\d+\.\d+\.\d+\.\d+$/.test(url.hostname)
+const publicUrl = z
+  .url()
+  .refine(
+    isPublicHttpUrl,
+    "A public HTTP URL without credentials is required.",
   );
-}, "A public HTTP URL without credentials is required.");
 export const campaignVariantSchema = z.object({
   id,
   version: z.number().int().positive(),
@@ -104,6 +99,7 @@ export const eligibilitySnapshotSchema = z.object({
   sourceVerifiedAt: date.nullable().default(null),
   contactVerifiedAt: date.nullable().default(null),
   permissionEvidence: id.nullable().default(null),
+  permissionDetails: permissionEvidenceSchema.optional(),
   permissionBasis: z
     .enum(["consent", "requested_service"])
     .nullable()
@@ -260,7 +256,16 @@ export const campaignCommandSchema = z.discriminatedUnion("type", [
     reference: evidenceReferenceSchema,
     expectedProspectVersion: z.number().int().positive(),
     expectedContactVersion: z.number().int().positive(),
-    proofRequestId: uuid,
+    proofRequestId: uuid.optional(),
+    researchProofId: uuid.optional(),
+    requestedService: z
+      .strictObject({
+        requestedAt: date,
+        offerId: id,
+        messageScope: z.literal("initial_and_two_followups"),
+        attestsRecipientRequest: z.literal(true),
+      })
+      .optional(),
   }),
   z.strictObject({
     type: z.literal("record_reply"),

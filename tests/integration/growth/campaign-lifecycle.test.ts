@@ -379,6 +379,10 @@ test(
         founder,
         randomUUID(),
       );
+      const [storedProof] = await db<
+        { origin: string | null }[]
+      >`select proof_origin as origin from growth.outreach_permissions where id=${permission.evidenceId}`;
+      assert.equal(storedProof?.origin, "founder");
       const repeated = await executeCampaignCommand(
         db,
         permission,
