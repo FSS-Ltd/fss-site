@@ -165,10 +165,119 @@ test("automatic eligibility requires current approval, verified evidence, and ex
   assert.equal(
     evaluateCampaignEligibility(
       policy,
-      { ...snapshot, explicitOptIn: true },
+      {
+        ...snapshot,
+        explicitOptIn: true,
+        permissionDetails: {
+          observedAt: "2026-01-20T00:00:00Z",
+          explicitOptIn: true,
+          summary: "Opted in",
+          reference: { kind: "private", value: "record" },
+        },
+      },
       now,
     ).status,
     "eligible",
+  );
+  const gmailPolicy = {
+    ...policy,
+    provider: "gmail" as const,
+    jurisdiction: "GB",
+  };
+  const gmailSnapshot = {
+    ...snapshot,
+    permissionProvider: "gmail" as const,
+    permissionJurisdiction: "GB",
+  };
+  assert.equal(
+    evaluateCampaignEligibility(gmailPolicy, gmailSnapshot, now).status,
+    "review",
+  );
+  assert.equal(
+    evaluateCampaignEligibility(
+      gmailPolicy,
+      { ...gmailSnapshot, explicitOptIn: true },
+      now,
+    ).status,
+    "review",
+  );
+  const consentDetails = {
+    observedAt: "2026-01-20T00:00:00Z",
+    explicitOptIn: true,
+    summary: "Recipient opted in",
+    reference: { kind: "private" as const, value: "record" },
+  };
+  assert.equal(
+    evaluateCampaignEligibility(
+      gmailPolicy,
+      {
+        ...gmailSnapshot,
+        explicitOptIn: true,
+        permissionDetails: consentDetails,
+      },
+      now,
+    ).status,
+    "eligible",
+  );
+  assert.equal(
+    evaluateCampaignEligibility(
+      gmailPolicy,
+      {
+        ...gmailSnapshot,
+        explicitOptIn: true,
+        permissionDetails: { ...consentDetails, explicitOptIn: false },
+      },
+      now,
+    ).status,
+    "review",
+  );
+  assert.equal(
+    evaluateCampaignEligibility(
+      gmailPolicy,
+      {
+        ...gmailSnapshot,
+        explicitOptIn: true,
+        permissionDetails: {
+          ...consentDetails,
+          reference: { kind: "public", value: "not-a-url" },
+        },
+      },
+      now,
+    ).status,
+    "review",
+  );
+  assert.equal(
+    evaluateCampaignEligibility(
+      gmailPolicy,
+      {
+        ...gmailSnapshot,
+        explicitOptIn: true,
+        permissionDetails: {
+          ...consentDetails,
+          observedAt: "2027-01-01T00:00:00Z",
+        },
+      },
+      now,
+    ).status,
+    "review",
+  );
+
+  assert.equal(
+    evaluateCampaignEligibility(
+      gmailPolicy,
+      {
+        ...gmailSnapshot,
+        explicitOptIn: false,
+        permissionDetails: {
+          observedAt: "2026-01-20T00:00:00Z",
+          explicitOptIn: false,
+          summary: "reviewed",
+          reference: { kind: "private", value: "record" },
+        },
+      },
+      now,
+    ).status,
+    "review",
   );
   assert.equal(
     evaluateCampaignEligibility(

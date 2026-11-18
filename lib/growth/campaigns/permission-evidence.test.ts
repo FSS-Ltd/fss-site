@@ -108,3 +108,31 @@ test("approval rejects unsupported requested-service policy while allowing draft
     /policy_not_approvable/,
   );
 });
+
+test("consent evidence rejects malformed or future references without throwing", () => {
+  const input = {
+    basis: "consent",
+    provider: "gmail",
+    jurisdiction: "GB",
+    offer: "offer",
+    now: new Date("2026-11-18T00:00:00Z"),
+    evidence: {
+      observedAt: "2026-11-17T00:00:00Z",
+      explicitOptIn: true,
+      summary: "Opted in",
+      reference: { kind: "public", value: "not-a-url" },
+    },
+  };
+  assert.equal(validPermissionEvidence(input), false);
+  assert.equal(
+    validPermissionEvidence({
+      ...input,
+      evidence: {
+        ...input.evidence,
+        observedAt: "2026-11-19T00:00:00Z",
+        reference: { kind: "private", value: "record" },
+      },
+    }),
+    false,
+  );
+});

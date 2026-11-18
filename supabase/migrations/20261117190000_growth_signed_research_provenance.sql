@@ -26,6 +26,7 @@ create table growth.research_source_proof_bindings (
   prospect_id uuid not null,
   business_id uuid not null,
   contact_id uuid not null,
+  verified_email text not null,
   prospect_version integer not null check (prospect_version > 0),
   contact_version integer not null check (contact_version > 0),
   contact_evidence_id uuid not null,
@@ -55,8 +56,12 @@ begin
     join growth.source_evidence oe on oe.id = new.observation_evidence_id
     where r.id = new.research_run_id and r.verified_key_id is not null and r.signed_body_sha256 is not null
       and p.primary_contact_id = c.id and p.version = new.prospect_version and c.version = new.contact_version
+      and new.verified_email = c.normalised_email
+      and length(new.verified_email) <= 320 and new.verified_email ~ '^[^[:space:]@]+@[^[:space:]@]+[.][^[:space:]@]+$'
+      and split_part(new.verified_email, '@', 2) = regexp_replace(substring(lower(business.first_party_source_url) from '^https?://([^/:?#]+)'), '^www[.]', '')
       and substring(lower(business.first_party_source_url) from '^https?://([^/:?#]+)') !~ '(@|:|^[0-9]+[.][0-9]+[.][0-9]+[.][0-9]+$|(^|[.])(localhost|local)$)'
-      and substring(lower(business.first_party_source_url) from '^https?://([^/:?#]+)') !~ '(^|[.])(facebook[.]com|instagram[.]com|linkedin[.]com|youtube[.]com|tiktok[.]com|google[.]com|maps[.]app[.]goo[.]gl|linktr[.]ee|wa[.]me|wixsite[.]com|wordpress[.]com|square[.]site|business[.]site)$'
+      -- Bounded exclusions mirror global-identity.ts; matching does not establish ownership.
+      and substring(lower(business.first_party_source_url) from '^https?://([^/:?#]+)') !~ '(^|[.])(facebook[.]com|instagram[.]com|linkedin[.]com|youtube[.]com|tiktok[.]com|google[.]com|maps[.]app[.]goo[.]gl|linktr[.]ee|wa[.]me|wixsite[.]com|wordpress[.]com|square[.]site|business[.]site|github[.]com|github[.]io|company-information[.]service[.]gov[.]uk|aol[.]com|gmail[.]com|googlemail[.]com|hotmail[.]com|icloud[.]com|live[.]com|outlook[.]com|proton[.]me|protonmail[.]com|yahoo[.]com|yahoo[.]co[.]uk)$'
       and (business.website_url is null or regexp_replace(substring(lower(business.website_url) from '^https?://([^/:?#]+)'), '^www[.]', '') = regexp_replace(substring(lower(business.first_party_source_url) from '^https?://([^/:?#]+)'), '^www[.]', ''))
       and ce.origin = 'research' and ce.claim_type = 'contact_email' and ce.source_type = 'first_party' and ce.source_url = c.email_source_url
       and regexp_replace(substring(lower(ce.source_url) from '^https?://([^/:?#]+)'), '^www[.]', '') = regexp_replace(substring(lower(business.first_party_source_url) from '^https?://([^/:?#]+)'), '^www[.]', '')

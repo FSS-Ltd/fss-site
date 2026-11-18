@@ -1,4 +1,24 @@
 import { z } from "zod";
+import { isPublicHttpUrl } from "../http/public-url";
+
+export const evidenceReferenceSchema = z.discriminatedUnion("kind", [
+  z.strictObject({
+    kind: z.literal("public"),
+    value: z
+      .url()
+      .refine(
+        (value) =>
+          isPublicHttpUrl(value) &&
+          ![".internal", ".localhost", ".local", ".test"].some((suffix) =>
+            new URL(value).hostname.toLowerCase().endsWith(suffix),
+          ),
+      ),
+  }),
+  z.strictObject({
+    kind: z.literal("private"),
+    value: z.string().trim().min(1).max(500),
+  }),
+]);
 
 export const requestedServiceSchema = z.strictObject({
   requestedAt: z.iso.datetime({ offset: true }),
@@ -9,11 +29,8 @@ export const requestedServiceSchema = z.strictObject({
 export const permissionEvidenceSchema = z.object({
   observedAt: z.iso.datetime({ offset: true }),
   explicitOptIn: z.boolean(),
-  summary: z.string().trim().min(1),
-  reference: z.object({
-    kind: z.enum(["private", "public"]),
-    value: z.string().trim().min(1),
-  }),
+  summary: z.string().trim().min(1).max(2000),
+  reference: evidenceReferenceSchema,
   requestedService: requestedServiceSchema.optional(),
 });
 export function isSupportedPermission(

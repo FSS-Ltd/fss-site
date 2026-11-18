@@ -112,8 +112,8 @@ export async function ingestGlobalResearchRun(
           throw new Error("Proof evidence missing.");
         const [binding] = await tx<
           { id: string }[]
-        >`insert into growth.research_source_proof_bindings (research_run_id, prospect_id, business_id, contact_id, prospect_version, contact_version, contact_evidence_id, observation_evidence_id)
-          select ${runId}, p.id, p.business_id, c.id, p.version, c.version, ${contactEvidenceId}, ${observationEvidenceId}
+        >`insert into growth.research_source_proof_bindings (research_run_id, prospect_id, business_id, contact_id, prospect_version, contact_version, contact_evidence_id, observation_evidence_id, verified_email)
+          select ${runId}, p.id, p.business_id, c.id, p.version, c.version, ${contactEvidenceId}, ${observationEvidenceId}, c.normalised_email
           from growth.prospects p join growth.contacts c on c.id=p.primary_contact_id and c.business_id=p.business_id
           where p.id=${inserted.prospectId} and c.id=${inserted.contactId} returning id`;
         if (!binding) throw new Error("Proof binding insert returned no ID.");

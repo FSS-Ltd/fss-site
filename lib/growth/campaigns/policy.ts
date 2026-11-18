@@ -71,15 +71,15 @@ export function evaluateCampaignEligibility(
     snapshot.permissionProvider !== policy.provider ||
     snapshot.permissionJurisdiction !== policy.jurisdiction ||
     (policy.provider === "resend" && !snapshot.explicitOptIn) ||
-    (policy.permissionRequirement === "requested_service" &&
-      !validPermissionEvidence({
-        basis: policy.permissionRequirement,
-        provider: policy.provider,
-        jurisdiction: policy.jurisdiction,
-        offer: policy.offer,
-        now,
-        evidence: snapshot.permissionDetails,
-      }))
+    (policy.permissionRequirement === "consent" && !snapshot.explicitOptIn) ||
+    !validPermissionEvidence({
+      basis: policy.permissionRequirement,
+      provider: policy.provider,
+      jurisdiction: policy.jurisdiction,
+      offer: policy.offer,
+      now,
+      evidence: snapshot.permissionDetails,
+    })
   )
     return review("permission_missing");
   return { status: "eligible", reason: "eligible" };

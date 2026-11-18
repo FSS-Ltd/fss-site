@@ -44,6 +44,7 @@ test(
     }
     try {
       const first = fixture("first");
+      first.prospects[0]!.prospect.fitScore = 100;
       const result = await ingestResearchRun(sql, first);
       assert.equal(result.accepted, 1);
       assert.deepEqual(await ingestResearchRun(sql, first), result);
@@ -235,6 +236,7 @@ test(
 test("proof-bearing research requires authenticated source principal", async () => {
   const fixture = createGlobalResearchFixture();
   const candidate = fixture.prospects[0]!;
+  candidate.contact.email = "office@example.test";
   const run = globalResearchRunSchema.parse({
     ...fixture,
     prospects: [
@@ -302,7 +304,7 @@ test(
           },
           contact: {
             ...candidate.contact,
-            email: `${token}@example.test`,
+            email: `office@${token}.example.test`,
             emailSourceUrl: url,
             emailVerifiedAt: now,
           },
@@ -316,7 +318,10 @@ test(
           ],
           proof: {
             purpose: "campaign_source_proof",
-            contactEmail: { evidenceIndex: 0, email: `${token}@example.test` },
+            contactEmail: {
+              evidenceIndex: 0,
+              email: `office@${token}.example.test`,
+            },
             businessObservation: { evidenceIndex: 1 },
           },
         },
@@ -370,6 +375,75 @@ test(
         { origin: "research", bindingId: binding.id },
       );
       assert.equal(proof?.origin, "research");
+      const [currentContact] = await db<
+        { id: string; version: number; email: string }[]
+      >`select c.id,c.version,c.email from growth.contacts c join growth.prospects p on p.primary_contact_id=c.id where p.id=${prospectId}`;
+      assert.ok(currentContact);
+      await db`update growth.contacts set email=${`changed@${token}.example.test`} where id=${currentContact.id}`;
+      const [changedContact] = await db<
+        { version: number }[]
+      >`select version from growth.contacts where id=${currentContact.id}`;
+      assert.equal(changedContact?.version, currentContact.version);
+      assert.equal(
+        await loadFounderSourceProof(db, prospectId, new Date(), founder, {
+          origin: "research",
+          bindingId: binding.id,
+        }),
+        null,
+      );
+      await db`update growth.contacts set email=${currentContact.email} where id=${currentContact.id}`;
+      await assert.rejects(
+        db.begin(async (tx) => {
+          await tx`update growth.contacts set email='office@unrelated.test' where id=${currentContact.id}`;
+          await tx`insert into growth.research_source_proof_bindings(research_run_id,prospect_id,business_id,contact_id,prospect_version,contact_version,contact_evidence_id,observation_evidence_id,verified_email) select research_run_id,prospect_id,business_id,contact_id,prospect_version,contact_version,contact_evidence_id,observation_evidence_id,'office@unrelated.test' from growth.research_source_proof_bindings where id=${binding.id}`;
+        }),
+        /invalid research proof binding/,
+      );
+
+      const malformedEmail = `office@${token}.example.test@other.test`;
+      await assert.rejects(
+        db.begin(async (tx) => {
+          await tx`update growth.contacts set email=${malformedEmail} where id=${currentContact.id}`;
+          await tx`insert into growth.research_source_proof_bindings(research_run_id,prospect_id,business_id,contact_id,prospect_version,contact_version,contact_evidence_id,observation_evidence_id,verified_email) select research_run_id,prospect_id,business_id,contact_id,prospect_version,contact_version,contact_evidence_id,observation_evidence_id,${malformedEmail} from growth.research_source_proof_bindings where id=${binding.id}`;
+        }),
+        /invalid research proof binding/,
+      );
+      for (const host of [
+        "find-and-update.company-information.service.gov.uk",
+        "github.com",
+        "github.io",
+        "gmail.com",
+      ]) {
+        const forbiddenUrl = `https://${host}/business`;
+        const forbiddenEmail = `contact@${host}`;
+        await assert.rejects(
+          db.begin(async (tx) => {
+            await tx`update growth.businesses set first_party_source_url=${forbiddenUrl},website_url=${forbiddenUrl} where id=(select business_id from growth.prospects where id=${prospectId})`;
+            await tx`update growth.contacts set email=${forbiddenEmail},email_source_url=${forbiddenUrl} where id=${currentContact.id}`;
+            const evidenceRows = await tx<
+              { id: string; claim: string }[]
+            >`insert into growth.source_evidence(prospect_id,research_run_id,source_type,source_url,claim_type,claim_summary,observed_at,verified_at,retention_class) select ${prospectId},${first.runId},'first_party',${forbiddenUrl},claim,'Substantive source observation.',now(),now(),'prospect_research' from unnest(array['contact_email','business_observation']) as claim returning id,claim_type as claim`;
+            const ce = evidenceRows.find(
+              (item) => item.claim === "contact_email",
+            );
+            const oe = evidenceRows.find(
+              (item) => item.claim === "business_observation",
+            );
+            if (!ce || !oe) throw new Error("Missing synthetic evidence.");
+            await tx`insert into growth.research_source_proof_bindings(research_run_id,prospect_id,business_id,contact_id,prospect_version,contact_version,contact_evidence_id,observation_evidence_id,verified_email) select research_run_id,prospect_id,business_id,contact_id,prospect_version,contact_version,${ce.id},${oe.id},${forbiddenEmail} from growth.research_source_proof_bindings where id=${binding.id}`;
+          }),
+          /invalid research proof binding/,
+        );
+      }
+
+      await assert.rejects(
+        db`update growth.research_source_proof_bindings set verified_email='other@example.test' where id=${binding.id}`,
+      );
+      await assert.rejects(
+        db`insert into growth.research_source_proof_bindings(research_run_id,prospect_id,business_id,contact_id,prospect_version,contact_version,contact_evidence_id,observation_evidence_id,verified_email) select research_run_id,prospect_id,business_id,contact_id,prospect_version,contact_version,contact_evidence_id,observation_evidence_id,'other@example.test' from growth.research_source_proof_bindings where id=${binding.id}`,
+        /invalid research proof binding/,
+      );
+
       await db`update growth.businesses set first_party_source_url='https://different.example.test/contact' where id=(select business_id from growth.prospects where id=${prospectId})`;
       assert.equal(
         await loadFounderSourceProof(db, prospectId, new Date(), founder, {
@@ -381,11 +455,11 @@ test(
       await db`update growth.businesses set first_party_source_url=${url} where id=(select business_id from growth.prospects where id=${prospectId})`;
 
       await assert.rejects(
-        db`insert into growth.research_source_proof_bindings(research_run_id,prospect_id,business_id,contact_id,prospect_version,contact_version,contact_evidence_id,observation_evidence_id) select research_run_id,prospect_id,${randomUUID()},contact_id,prospect_version,contact_version,contact_evidence_id,observation_evidence_id from growth.research_source_proof_bindings where id=${binding.id}`,
+        db`insert into growth.research_source_proof_bindings(research_run_id,prospect_id,business_id,contact_id,prospect_version,contact_version,contact_evidence_id,observation_evidence_id,verified_email) select research_run_id,prospect_id,${randomUUID()},contact_id,prospect_version,contact_version,contact_evidence_id,observation_evidence_id,verified_email from growth.research_source_proof_bindings where id=${binding.id}`,
         /invalid research proof binding/,
       );
       await assert.rejects(
-        db`insert into growth.research_source_proof_bindings(research_run_id,prospect_id,business_id,contact_id,prospect_version,contact_version,contact_evidence_id,observation_evidence_id) select research_run_id,prospect_id,business_id,contact_id,prospect_version,contact_version+1,contact_evidence_id,observation_evidence_id from growth.research_source_proof_bindings where id=${binding.id}`,
+        db`insert into growth.research_source_proof_bindings(research_run_id,prospect_id,business_id,contact_id,prospect_version,contact_version,contact_evidence_id,observation_evidence_id,verified_email) select research_run_id,prospect_id,business_id,contact_id,prospect_version,contact_version+1,contact_evidence_id,observation_evidence_id,verified_email from growth.research_source_proof_bindings where id=${binding.id}`,
         /invalid research proof binding/,
       );
 
@@ -428,6 +502,7 @@ test(
     if (!connectionString) return;
     const fixture = createGlobalResearchFixture();
     const candidate = fixture.prospects[0]!;
+    candidate.contact.email = "office@example.test";
     const source = {
       ...candidate.evidence[0]!,
       observedAt: new Date(Date.now() + 86400000).toISOString(),
@@ -481,6 +556,7 @@ test(
     if (!connectionString) return;
     const fixture = createGlobalResearchFixture();
     const candidate = fixture.prospects[0]!;
+    candidate.contact.email = "office@example.test";
     const stale = new Date(Date.now() - 31 * 86400000).toISOString();
     const source = {
       ...candidate.evidence[0]!,

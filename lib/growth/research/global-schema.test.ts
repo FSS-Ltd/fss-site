@@ -81,6 +81,7 @@ test("accepts short reviewed copy and a natural-language opt-out", () => {
 test("accepts only a distinct, source-bound research proof pair", () => {
   const fixture = createGlobalResearchFixture();
   const candidate = fixture.prospects[0]!;
+  candidate.contact.email = "office@example.test";
   const contact = { ...candidate.evidence[0]!, claimType: "contact_email" };
   const observation = {
     ...candidate.evidence[0]!,
@@ -122,6 +123,48 @@ test("accepts only a distinct, source-bound research proof pair", () => {
         },
       ],
     }).success,
+    false,
+  );
+  for (const host of [
+    "find-and-update.company-information.service.gov.uk",
+    "github.com",
+    "github.io",
+    "gmail.com",
+  ]) {
+    const sourceUrl = `https://${host}/business`;
+    const email = `contact@${host}`;
+    const relabeled = {
+      ...candidate,
+      business: {
+        ...candidate.business,
+        websiteUrl: sourceUrl,
+        firstPartySourceUrl: sourceUrl,
+      },
+      contact: { ...candidate.contact, email, emailSourceUrl: sourceUrl },
+      evidence: [
+        { ...contact, sourceUrl },
+        { ...observation, sourceUrl },
+      ],
+      proof: { ...proof, contactEmail: { evidenceIndex: 0, email } },
+    };
+    assert.equal(
+      globalResearchRunSchema.safeParse({ ...fixture, prospects: [relabeled] })
+        .success,
+      false,
+    );
+  }
+  const unrelated = {
+    ...candidate,
+    contact: { ...candidate.contact, email: "office@other.test" },
+    evidence: [contact, observation],
+    proof: {
+      ...proof,
+      contactEmail: { evidenceIndex: 0, email: "office@other.test" },
+    },
+  };
+  assert.equal(
+    globalResearchRunSchema.safeParse({ ...fixture, prospects: [unrelated] })
+      .success,
     false,
   );
   const registry = {

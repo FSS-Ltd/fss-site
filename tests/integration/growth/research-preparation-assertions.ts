@@ -20,7 +20,7 @@ export async function exerciseResearchPreparation(
     throw new Error("Missing fixture evidence.");
   const id = randomUUID();
   const url = `https://${id}.example.test/contact`;
-  const email = `${id}@example.test`;
+  const email = `office@${id}.example.test`;
   const when = new Date(Date.now() - 60000).toISOString();
   const evidence = {
     ...candidate.evidence[0],
@@ -88,11 +88,12 @@ export async function exerciseResearchPreparation(
   );
   try {
     const evidenceId = randomUUID();
+    const eventId = randomUUID();
     await executeCampaignCommand(
       db,
       {
         type: "record_permission",
-        requestId: randomUUID(),
+        requestId: eventId,
         membershipId: member.id,
         evidenceId,
         basis: "consent",
@@ -119,6 +120,45 @@ export async function exerciseResearchPreparation(
         }),
       );
     assert.equal((await prepare(ingested.runId))?.proof.origin, "research");
+    const prepareEvent = (event: string) =>
+      withGrowthTransaction(db, (tx) =>
+        loadReviewMembershipPreparationAuthority(tx, {
+          membershipId: member.id,
+          connectionId: input.connectionId,
+          source: { kind: "permission_event", eventId: event },
+        }),
+      );
+    assert.equal((await prepareEvent(eventId))?.proof.origin, "research");
+    assert.equal(await prepareEvent(randomUUID()), null);
+    await admin`update growth.outreach_permissions set evidence=jsonb_set(evidence,'{explicitOptIn}','false'::jsonb) where id=${evidenceId}`;
+    assert.equal(await prepareEvent(eventId), null);
+    await admin`update growth.outreach_permissions set evidence=jsonb_set(evidence,'{explicitOptIn}','true'::jsonb) where id=${evidenceId}`;
+    const nextEvent = randomUUID();
+    await executeCampaignCommand(
+      db,
+      {
+        type: "record_permission",
+        requestId: nextEvent,
+        membershipId: member.id,
+        evidenceId: randomUUID(),
+        basis: "consent",
+        provider: "gmail",
+        jurisdiction: "GB",
+        expiresAt: new Date(Date.now() + 3600000),
+        observedAt: new Date(Date.now() - 1000),
+        explicitOptIn: true,
+        summary: "Recipient renewed consent.",
+        reference: { kind: "private", value: "new-record" },
+        expectedProspectVersion: 1,
+        expectedContactVersion: 1,
+        researchProofId: binding.id,
+      },
+      input.founder,
+      randomUUID(),
+    );
+    assert.equal(await prepareEvent(eventId), null);
+    assert.equal((await prepareEvent(nextEvent))?.proof.origin, "research");
+
     assert.equal(await prepare(randomUUID()), null);
     await admin`update growth.prospects set version=version+1 where id=${prospectId}`;
     assert.equal(await prepare(ingested.runId), null);

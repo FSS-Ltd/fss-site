@@ -2,7 +2,10 @@ import { z } from "zod";
 import { globalCandidateSchema } from "../research/global-schema";
 import { isCrmCountryCode } from "../crm/countries";
 import { isPublicHttpUrl } from "../http/public-url";
-import { permissionEvidenceSchema } from "./permission-evidence";
+import {
+  permissionEvidenceSchema,
+  evidenceReferenceSchema,
+} from "./permission-evidence";
 
 const id = z.string().min(1);
 export const campaignTimestampSchema = z.union([
@@ -172,21 +175,6 @@ export const campaignOutcomeInputSchema = z.object({
   netClearedPence: z.number().int().nonnegative().nullable(),
 });
 export type CampaignOutcomeInput = z.infer<typeof campaignOutcomeInputSchema>;
-const evidenceReferenceSchema = z.discriminatedUnion("kind", [
-  z.strictObject({
-    kind: z.literal("public"),
-    value: publicUrl.refine(
-      (value) =>
-        ![".internal", ".localhost", ".local", ".test"].some((suffix) =>
-          new URL(value).hostname.toLowerCase().endsWith(suffix),
-        ),
-    ),
-  }),
-  z.strictObject({
-    kind: z.literal("private"),
-    value: z.string().trim().min(1).max(500),
-  }),
-]);
 const attestationSchema = z.strictObject({
   summary: z.string().trim().min(1).max(2000),
   reference: evidenceReferenceSchema,
