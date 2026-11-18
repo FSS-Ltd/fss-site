@@ -7,6 +7,9 @@ import { beginOutreachSubmission } from "../../../lib/growth/campaigns/reservati
 import { createGmailConfirmation } from "../../../lib/growth/campaigns/gmail-confirmation";
 import { exerciseReportCorrection } from "./reservation-report-assertions";
 import { freezeCampaignConfirmation } from "../../../lib/growth/campaigns/gmail-confirmation-campaign";
+import { exerciseDirectProofRace } from "./direct-proof-race-assertions";
+import { exerciseProoflessConfirmations } from "./proofless-confirmation-assertions";
+import { seedSyntheticDirectSubmission } from "./synthetic-direct-submission";
 
 export async function exerciseGmailConfirmation(
   admin: GrowthDb,
@@ -57,6 +60,28 @@ export async function exerciseGmailConfirmation(
   const issued = await beginOutreachSubmission(db, campaignBegin);
   assert.equal(issued.status, "ready");
   if (issued.status !== "ready") throw new Error("issue failed");
+  let unexpectedProviderCalls = 0;
+  const proofless = createGmailConfirmation(db, async () => {
+    unexpectedProviderCalls++;
+    throw new Error("proofless attempt called provider");
+  });
+  assert.deepEqual(await proofless(campaignBegin.reservationId), {
+    status: "held",
+    reason: "direct_submission_unproven",
+  });
+  assert.equal(unexpectedProviderCalls, 0);
+  await exerciseProoflessConfirmations(admin, db, {
+    originalId: campaignBegin.reservationId,
+    leaseToken: campaignBegin.leaseToken,
+    memberId: member,
+    campaignId: campaign.id,
+  });
+  await seedSyntheticDirectSubmission(
+    db,
+    campaignBegin.reservationId,
+    "confirmed-message",
+    "confirmed-thread",
+  );
   await admin`update growth.email_messages set text_snapshot='later changed draft' where id=${message}`;
   const [connection] = await admin<{ version: number; scopes: string[] }[]>`
         select version,granted_scopes as scopes from growth.integration_connections where id=${id}`;
@@ -69,11 +94,12 @@ export async function exerciseGmailConfirmation(
   let observedTo = copyFacts.email;
   let observedFrom = email;
   let observedMessage = "confirmed-message";
+  let observedThread = "confirmed-thread";
   let providerCreatedAt = new Date(now - 1000).toISOString();
   let observedCc: string | null = null;
   let observedBcc: string | null = null;
   let observedRfc = issued.value.rfcMessageId;
-  const confirm = createGmailConfirmation(db, async () => ({
+  const resolveClient = async () => ({
     binding: {
       connectionId: id,
       googleSubject: observedSubject,
@@ -89,7 +115,7 @@ export async function exerciseGmailConfirmation(
         });
         return {
           messageId: observedMessage,
-          gmailThreadId: "confirmed-thread",
+          gmailThreadId: observedThread,
           historyId: "200",
           labelIds: ["SENT"],
           receivedAt: providerCreatedAt,
@@ -108,7 +134,14 @@ export async function exerciseGmailConfirmation(
         };
       },
     },
-  }));
+  });
+  const confirm = createGmailConfirmation(db, resolveClient);
+  await exerciseDirectProofRace(
+    admin,
+    db,
+    resolveClient,
+    campaignBegin.reservationId,
+  );
   await admin`update growth.email_messages set provider_draft_id='manual-draft' where id=${message}`;
   assert.deepEqual(await confirm(campaignBegin.reservationId), {
     status: "held",
@@ -133,6 +166,12 @@ export async function exerciseGmailConfirmation(
     reason: "recipient_changed",
   });
   observedBcc = null;
+  observedThread = "different-thread";
+  assert.deepEqual(await confirm(campaignBegin.reservationId), {
+    status: "held",
+    reason: "direct_submission_conflict",
+  });
+  observedThread = "confirmed-thread";
   observedRfc = "<other@example.test>";
   assert.deepEqual(await confirm(campaignBegin.reservationId), {
     status: "held",
@@ -216,7 +255,7 @@ export async function exerciseGmailConfirmation(
   observedMessage = "different-message";
   assert.deepEqual(await confirm(campaignBegin.reservationId), {
     status: "held",
-    reason: "confirmation_conflict",
+    reason: "direct_submission_conflict",
   });
   observedMessage = "confirmed-message";
   providerCreatedAt = new Date(now - 2000).toISOString();
@@ -267,6 +306,14 @@ export async function exerciseGmailConfirmation(
     { copyHash: string }[]
   >`select confirmed_snapshot->>'copySha256' as "copyHash" from growth.campaign_memberships where id=${member}`;
   assert.equal(frozen?.copyHash, copySha256);
+  await assert.rejects(
+    db`update growth.outreach_reservations set direct_submission_evidence='{}'::jsonb where id=${campaignBegin.reservationId}`,
+    /direct submission evidence is immutable/,
+  );
+  await assert.rejects(
+    db`update growth.outreach_reservations set direct_submission_evidence=null where id=${campaignBegin.reservationId}`,
+    /direct submission evidence is immutable/,
+  );
   await assert.rejects(
     db`update growth.outreach_reservations set confirmation_receipt='{}'::jsonb where id=${campaignBegin.reservationId}`,
     /confirmation receipt is immutable/,

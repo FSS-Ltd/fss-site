@@ -20,6 +20,7 @@ import { limitsReviewSchema } from "./account-contracts";
 import { currentVisibilityExpiry } from "./account-repository";
 import { held, type ReservationOutcome } from "./reservation-shared";
 import { campaignPolicyDefinitionSchema } from "./schemas";
+import { matchesDirectSubmissionEvidence } from "./direct-submission-evidence";
 import {
   observeGmailConfirmation,
   type BoundReader,
@@ -118,14 +119,21 @@ async function persistGmailConfirmation(
         campaignId: string | null;
         policyVersion: number | null;
         submittedAt: Date | null;
+        evidence: unknown;
+        accountId: string;
+        grantEpoch: number | null;
       }[]
-    >`select status,connection_id as "connectionId",rfc_message_id as rfc,provider_message_id as "providerId",provider_thread_id as "threadId",issued_snapshot as snapshot,issued_snapshot_hash as hash,confirmation_receipt as receipt,confirmation_observed_at as "observedAt",membership_id as "memberId",sequence_id as "sequenceId",email_message_id as "messageId",campaign_id as "campaignId",policy_version as "policyVersion",submitted_at as "submittedAt" from growth.outreach_reservations where id=${fact.reservationId} for update`;
+    >`select status,connection_id as "connectionId",rfc_message_id as rfc,provider_message_id as "providerId",provider_thread_id as "threadId",issued_snapshot as snapshot,issued_snapshot_hash as hash,confirmation_receipt as receipt,confirmation_observed_at as "observedAt",membership_id as "memberId",sequence_id as "sequenceId",email_message_id as "messageId",campaign_id as "campaignId",policy_version as "policyVersion",submitted_at as "submittedAt",direct_submission_evidence as evidence,account_id as "accountId",grant_epoch as "grantEpoch" from growth.outreach_reservations where id=${fact.reservationId} for update`;
     const snapshot = z
       .object({
         googleSubject: z.string(),
         messageId: z.uuid(),
         sequenceId: z.uuid(),
         membershipId: z.uuid().nullable(),
+        connectionId: z.uuid(),
+        grantEpoch: z.number().int().positive(),
+        rfcMessageId: z.string(),
+        rawSha256: z.string(),
         campaign: campaignSchema.nullable(),
       })
       .safeParse(row?.snapshot);
@@ -145,8 +153,32 @@ async function persistGmailConfirmation(
       (row.threadId && row.threadId !== fact.providerThreadId)
     )
       return held("confirmation_conflict");
-    if (!["submitting", "uncertain", "accepted"].includes(row.status))
-      return held("attempt_not_confirmable");
+    const expectedEvidence = {
+      version: 1,
+      kind: "gmail_api_send_message_v1",
+      reservationId: fact.reservationId,
+      accountId: row.accountId,
+      connectionId: row.connectionId,
+      googleSubject: snapshot.data.googleSubject,
+      grantEpoch: row.grantEpoch,
+      rfcMessageId: row.rfc,
+      rawSha256: row.hash,
+      providerMessageId: fact.providerMessageId,
+      providerThreadId: fact.providerThreadId,
+    };
+    if (
+      row.status !== "accepted" ||
+      snapshot.data.connectionId !== row.connectionId ||
+      snapshot.data.grantEpoch !== row.grantEpoch ||
+      snapshot.data.rfcMessageId !== row.rfc ||
+      snapshot.data.rawSha256 !== row.hash ||
+      !matchesDirectSubmissionEvidence(row.evidence, expectedEvidence) ||
+      !matchesDirectSubmissionEvidence(
+        row.evidence,
+        fact.directSubmissionEvidence,
+      )
+    )
+      return held("direct_submission_unproven");
     const [message] = await tx<
       {
         prospectId: string;

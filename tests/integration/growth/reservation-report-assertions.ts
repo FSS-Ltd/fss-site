@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import type { GrowthDb } from "../../../lib/growth/db/types";
 import { withGrowthTransaction } from "../../../lib/growth/db/client";
 import { reviseCampaignReportJob } from "../../../lib/growth/campaigns/gmail-confirmation-campaign";
+import { seedSyntheticDirectSubmission } from "./synthetic-direct-submission";
 
 export async function exerciseReportCorrection(
   admin: GrowthDb,
@@ -15,6 +16,12 @@ export async function exerciseReportCorrection(
     await admin`insert into growth.outreach_reservations(id,idempotency_key,campaign_id,policy_version,membership_id,email_message_id,sequence_id,account_id,london_day,connection_id,grant_epoch,rfc_message_id,recipient_count,authority_fingerprint,lease_token,lease_until,fence)
       select ${newId},${randomUUID()},campaign_id,policy_version,membership_id,email_message_id,sequence_id,account_id,london_day,connection_id,grant_epoch,rfc_message_id,recipient_count,authority_fingerprint,lease_token,lease_until,fence+${offset} from growth.outreach_reservations where id=${input.reservationId}`;
     await admin`update growth.outreach_reservations set status='submitting',submitted_at=${at},issued_snapshot=(select issued_snapshot from growth.outreach_reservations where id=${input.reservationId}),issued_snapshot_hash=(select issued_snapshot_hash from growth.outreach_reservations where id=${input.reservationId}) where id=${newId}`;
+    await seedSyntheticDirectSubmission(
+      admin,
+      newId,
+      `earlier-${offset}`,
+      "confirmed-thread",
+    );
     await admin`update growth.outreach_reservations set status='accepted',provider_message_id=${`earlier-${offset}`},provider_thread_id='confirmed-thread',confirmation_receipt=(select jsonb_set(jsonb_set(jsonb_set(jsonb_set(confirmation_receipt,'{providerMessageId}',to_jsonb(${`earlier-${offset}`}::text)),'{observedFrom}',to_jsonb(${new Date(at.getTime() - 1000).toISOString()}::text)),'{providerCreatedAt}',to_jsonb(${new Date(at.getTime() - 1000).toISOString()}::text)),'{observedUntil}',to_jsonb(${at.toISOString()}::text)) from growth.outreach_reservations where id=${input.reservationId}),confirmation_observed_at=${at} where id=${newId}`;
     return newId;
   };

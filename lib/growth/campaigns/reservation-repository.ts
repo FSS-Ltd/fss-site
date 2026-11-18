@@ -202,7 +202,7 @@ async function checkBudget(
   if (!counts) return "invalid_budget";
   const outstanding = await tx<
     Pending[]
-  >`select status as state,provider_message_id as "providerId",recipient_count as "recipientCount" from growth.outreach_reservations where connection_id=${identity.connectionId} and status in ('reserved','submitting','uncertain','accepted') and (status in ('reserved','submitting','uncertain') or confirmation_observed_at is null or confirmation_observed_at > ${new Date(now.getTime() - 86400000)}) and (${excluding}::uuid is null or id<>${excluding}::uuid)`;
+  >`select status as state,provider_message_id as "providerId",recipient_count as "recipientCount" from growth.outreach_reservations where connection_id=${identity.connectionId} and status in ('reserved','submitting','uncertain','accepted') and (status in ('reserved','submitting','uncertain') or direct_submission_evidence is null or confirmation_observed_at is null or confirmation_observed_at > ${new Date(now.getTime() - 86400000)}) and (${excluding}::uuid is null or id<>${excluding}::uuid)`;
   let campaignCeiling: number | null = null;
   if (identity.campaignId) {
     const [policy] = await tx<

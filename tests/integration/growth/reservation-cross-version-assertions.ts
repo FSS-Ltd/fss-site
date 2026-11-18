@@ -8,6 +8,7 @@ import { createGmailConfirmation } from "../../../lib/growth/campaigns/gmail-con
 import { campaignMonthAnniversary } from "../../../lib/growth/campaigns/time";
 import type { CampaignPolicyDefinition } from "../../../lib/growth/campaigns/schemas";
 import { assignCampaignVariant } from "../../../lib/growth/campaigns/variants";
+import { seedSyntheticDirectSubmission } from "./synthetic-direct-submission";
 import {
   beginOutreachSubmission,
   reserveOutreachAttempt,
@@ -145,7 +146,7 @@ export async function exerciseCrossVersionConfirmation(
       leaseToken: lease,
       attemptKey: randomUUID(),
     });
-    assert.equal(reserved.status, "ready");
+    assert.equal(reserved.status, "ready", JSON.stringify(reserved));
     if (reserved.status !== "ready") throw new Error("reservation missing");
     const issued = await beginOutreachSubmission(db, {
       reservationId: reserved.value.reservationId,
@@ -157,6 +158,12 @@ export async function exerciseCrossVersionConfirmation(
     if (issued.status !== "ready") throw new Error("issuance missing");
     fixture.reservationId = issued.value.reservationId;
     fixture.rfc = issued.value.rfcMessageId;
+    await seedSyntheticDirectSubmission(
+      db,
+      fixture.reservationId,
+      `message-${member}`,
+      `thread-${member}`,
+    );
     return fixture;
   };
   try {

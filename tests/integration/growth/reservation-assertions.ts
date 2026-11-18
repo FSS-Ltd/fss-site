@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import type postgres from "postgres";
 import { exerciseConfirmationCapacity } from "./reservation-capacity-assertions";
 import { withTransitionClock } from "./reservation-clock";
+import { createGmailConfirmation } from "../../../lib/growth/campaigns/gmail-confirmation";
 import type { GrowthDb } from "../../../lib/growth/db/types";
 import {
   reserveOutreachAttempt,
@@ -500,6 +501,13 @@ export async function exerciseLegacyReservation(
       beginOutreachSubmission(db, second),
     ]);
     assert.equal(begins.filter((entry) => entry.status === "ready").length, 1);
+    const legacyConfirmation = createGmailConfirmation(db, async () => {
+      throw new Error("proofless legacy called provider");
+    });
+    assert.deepEqual(await legacyConfirmation(second.reservationId), {
+      status: "held",
+      reason: "direct_submission_unproven",
+    });
     const [issued] = await admin<
       { snapshot: { raw?: string } | null; hash: string | null }[]
     >`

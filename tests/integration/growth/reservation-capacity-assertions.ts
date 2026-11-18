@@ -4,6 +4,7 @@ import type { GrowthDb } from "../../../lib/growth/db/types";
 import { reserveOutreachAttempt } from "../../../lib/growth/campaigns/reservation-repository";
 import { cancelOutreachReservation } from "../../../lib/growth/campaigns/reservation-settlement";
 import { renderGmailMime } from "../../../lib/growth/email/gmail/mime";
+import { seedSyntheticDirectSubmission } from "./synthetic-direct-submission";
 
 export async function exerciseConfirmationCapacity(
   admin: GrowthDb,
@@ -51,6 +52,7 @@ export async function exerciseConfirmationCapacity(
     };
     await admin`insert into growth.outreach_reservations(id,idempotency_key,email_message_id,sequence_id,account_id,london_day,connection_id,grant_epoch,rfc_message_id,recipient_count,authority_fingerprint,lease_token,lease_until) values (${id},${randomUUID()},${input.existingMessageId},${input.sequenceId},${input.connectionId},(now() at time zone 'Europe/London')::date-2,${input.connectionId},1,${rfc},1,${hash},${input.leaseToken},now()+interval '1 minute')`;
     await admin`update growth.outreach_reservations set status='submitting',submitted_at=${before},issued_snapshot=${admin.json(snapshot)},issued_snapshot_hash=${hash} where id=${id}`;
+    await seedSyntheticDirectSubmission(admin, id, provider, "capacity-thread");
     const receipt = {
       basis: "gmail_fss_sent_observed",
       googleSubject: "test-subject",
@@ -91,7 +93,20 @@ export async function exerciseConfirmationCapacity(
     await admin`delete from growth.audit_log where entity_id=${available.value.reservationId}`;
     await admin`delete from growth.outreach_reservations where id=${available.value.reservationId}`;
     await admin`update growth.email_messages set rfc_message_id=null where id=${input.candidateMessageId}`;
+    // Recreate a legacy unproved receipt state to exercise the defensive capacity reader.
+    await admin.begin(async (tx) => {
+      await tx`alter table growth.outreach_reservations drop constraint confirmed_requires_direct_submission`;
+      await tx`alter table growth.outreach_reservations disable trigger protect_direct_submission_evidence`;
+      await tx`update growth.outreach_reservations set direct_submission_evidence=null where id=${old}`;
+      await tx`alter table growth.outreach_reservations enable trigger protect_direct_submission_evidence`;
+      await tx`alter table growth.outreach_reservations add constraint confirmed_requires_direct_submission check (confirmation_receipt is null or direct_submission_evidence is not null) not valid`;
+    });
+    assert.deepEqual(await reserve(), {
+      status: "held",
+      reason: "provider_limit",
+    });
   } finally {
     await admin`delete from growth.outreach_reservations where id in (${old},${recent})`;
+    await admin`alter table growth.outreach_reservations validate constraint confirmed_requires_direct_submission`;
   }
 }
