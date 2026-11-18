@@ -1996,6 +1996,27 @@
       "source_location": "L67"
     },
     {
+      "id": "lib_growth_campaigns_direct_submission_evidence_test_ts",
+      "label": "direct-submission-evidence.test.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/campaigns/direct-submission-evidence.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "lib_growth_campaigns_direct_submission_evidence_ts",
+      "label": "direct-submission-evidence.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/campaigns/direct-submission-evidence.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "direct_submission_evidence_matchesdirectsubmissionevidence",
+      "label": "matchesDirectSubmissionEvidence()",
+      "file_type": "code",
+      "source_file": "lib/growth/campaigns/direct-submission-evidence.ts",
+      "source_location": "L35"
+    },
+    {
       "id": "lib_growth_campaigns_dispatch_authority_ts",
       "label": "dispatch-authority.ts",
       "file_type": "code",
@@ -2140,7 +2161,7 @@
       "label": "observeGmailConfirmation()",
       "file_type": "code",
       "source_file": "lib/growth/campaigns/gmail-confirmation-observation.ts",
-      "source_location": "L51"
+      "source_location": "L56"
     },
     {
       "id": "lib_growth_campaigns_gmail_confirmation_ts",
@@ -2154,21 +2175,21 @@
       "label": "persistGmailConfirmation()",
       "file_type": "code",
       "source_file": "lib/growth/campaigns/gmail-confirmation.ts",
-      "source_location": "L50"
+      "source_location": "L51"
     },
     {
       "id": "gmail_confirmation_creategmailconfirmation",
       "label": "createGmailConfirmation()",
       "file_type": "code",
       "source_file": "lib/growth/campaigns/gmail-confirmation.ts",
-      "source_location": "L323"
+      "source_location": "L355"
     },
     {
       "id": "gmail_confirmation_createlivegmailconfirmation",
       "label": "createLiveGmailConfirmation()",
       "file_type": "code",
       "source_file": "lib/growth/campaigns/gmail-confirmation.ts",
-      "source_location": "L340"
+      "source_location": "L372"
     },
     {
       "id": "lib_growth_campaigns_lifecycle_ts",
@@ -8940,6 +8961,20 @@
       "source_location": "L475"
     },
     {
+      "id": "tests_integration_growth_direct_proof_race_assertions_ts",
+      "label": "direct-proof-race-assertions.ts",
+      "file_type": "code",
+      "source_file": "tests/integration/growth/direct-proof-race-assertions.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "direct_proof_race_assertions_exercisedirectproofrace",
+      "label": "exerciseDirectProofRace()",
+      "file_type": "code",
+      "source_file": "tests/integration/growth/direct-proof-race-assertions.ts",
+      "source_location": "L7"
+    },
+    {
       "id": "tests_integration_growth_facebook_workspace_test_ts",
       "label": "facebook-workspace.test.ts",
       "file_type": "code",
@@ -9143,6 +9178,20 @@
       "source_location": "L1"
     },
     {
+      "id": "tests_integration_growth_proofless_confirmation_assertions_ts",
+      "label": "proofless-confirmation-assertions.ts",
+      "file_type": "code",
+      "source_file": "tests/integration/growth/proofless-confirmation-assertions.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "proofless_confirmation_assertions_exerciseprooflessconfirmations",
+      "label": "exerciseProoflessConfirmations()",
+      "file_type": "code",
+      "source_file": "tests/integration/growth/proofless-confirmation-assertions.ts",
+      "source_location": "L7"
+    },
+    {
       "id": "tests_integration_growth_research_email_flow_ts",
       "label": "research-email-flow.ts",
       "file_type": "code",
@@ -9203,7 +9252,7 @@
       "label": "exerciseLegacyReservation()",
       "file_type": "code",
       "source_file": "tests/integration/growth/reservation-assertions.ts",
-      "source_location": "L17"
+      "source_location": "L18"
     },
     {
       "id": "tests_integration_growth_reservation_campaign_assertions_ts",
@@ -9231,7 +9280,7 @@
       "label": "exerciseConfirmationCapacity()",
       "file_type": "code",
       "source_file": "tests/integration/growth/reservation-capacity-assertions.ts",
-      "source_location": "L8"
+      "source_location": "L9"
     },
     {
       "id": "tests_integration_growth_reservation_clock_ts",
@@ -9259,7 +9308,7 @@
       "label": "exerciseGmailConfirmation()",
       "file_type": "code",
       "source_file": "tests/integration/growth/reservation-confirmation-assertions.ts",
-      "source_location": "L11"
+      "source_location": "L14"
     },
     {
       "id": "tests_integration_growth_reservation_cross_version_assertions_ts",
@@ -9273,7 +9322,7 @@
       "label": "exerciseCrossVersionConfirmation()",
       "file_type": "code",
       "source_file": "tests/integration/growth/reservation-cross-version-assertions.ts",
-      "source_location": "L30"
+      "source_location": "L31"
     },
     {
       "id": "tests_integration_growth_reservation_report_assertions_ts",
@@ -9287,7 +9336,7 @@
       "label": "exerciseReportCorrection()",
       "file_type": "code",
       "source_file": "tests/integration/growth/reservation-report-assertions.ts",
-      "source_location": "L7"
+      "source_location": "L8"
     },
     {
       "id": "tests_integration_growth_source_capture_test_ts",
@@ -9295,6 +9344,20 @@
       "file_type": "code",
       "source_file": "tests/integration/growth/source-capture.test.ts",
       "source_location": "L1"
+    },
+    {
+      "id": "tests_integration_growth_synthetic_direct_submission_ts",
+      "label": "synthetic-direct-submission.ts",
+      "file_type": "code",
+      "source_file": "tests/integration/growth/synthetic-direct-submission.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "synthetic_direct_submission_seedsyntheticdirectsubmission",
+      "label": "seedSyntheticDirectSubmission()",
+      "file_type": "code",
+      "source_file": "tests/integration/growth/synthetic-direct-submission.ts",
+      "source_location": "L5"
     }
   ],
   "edges": [
@@ -16094,6 +16157,60 @@
       "weight": 1.0
     },
     {
+      "source": "lib_growth_campaigns_direct_submission_evidence_test_ts",
+      "target": "strict",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/direct-submission-evidence.test.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_direct_submission_evidence_test_ts",
+      "target": "node_test",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/direct-submission-evidence.test.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_direct_submission_evidence_test_ts",
+      "target": "lib_growth_campaigns_direct_submission_evidence",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/direct-submission-evidence.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_direct_submission_evidence_ts",
+      "target": "zod",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/direct-submission-evidence.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_direct_submission_evidence_ts",
+      "target": "lib_growth_campaigns_reservation_shared",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/direct-submission-evidence.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_direct_submission_evidence_ts",
+      "target": "direct_submission_evidence_matchesdirectsubmissionevidence",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/direct-submission-evidence.ts",
+      "source_location": "L35",
+      "weight": 1.0
+    },
+    {
       "source": "lib_growth_campaigns_dispatch_authority_ts",
       "target": "node_crypto",
       "relation": "imports_from",
@@ -16779,11 +16896,20 @@
     },
     {
       "source": "lib_growth_campaigns_gmail_confirmation_observation_ts",
+      "target": "lib_growth_campaigns_direct_submission_evidence",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/gmail-confirmation-observation.ts",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_gmail_confirmation_observation_ts",
       "target": "gmail_confirmation_observation_observegmailconfirmation",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/gmail-confirmation-observation.ts",
-      "source_location": "L51",
+      "source_location": "L56",
       "weight": 1.0
     },
     {
@@ -16905,7 +17031,7 @@
     },
     {
       "source": "lib_growth_campaigns_gmail_confirmation_ts",
-      "target": "lib_growth_campaigns_gmail_confirmation_observation",
+      "target": "lib_growth_campaigns_direct_submission_evidence",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/gmail-confirmation.ts",
@@ -16914,11 +17040,20 @@
     },
     {
       "source": "lib_growth_campaigns_gmail_confirmation_ts",
+      "target": "lib_growth_campaigns_gmail_confirmation_observation",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/gmail-confirmation.ts",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_gmail_confirmation_ts",
       "target": "gmail_confirmation_persistgmailconfirmation",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/gmail-confirmation.ts",
-      "source_location": "L50",
+      "source_location": "L51",
       "weight": 1.0
     },
     {
@@ -16927,7 +17062,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/gmail-confirmation.ts",
-      "source_location": "L323",
+      "source_location": "L355",
       "weight": 1.0
     },
     {
@@ -16936,7 +17071,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/gmail-confirmation.ts",
-      "source_location": "L340",
+      "source_location": "L372",
       "weight": 1.0
     },
     {
@@ -16945,7 +17080,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/gmail-confirmation.ts",
-      "source_location": "L344",
+      "source_location": "L376",
       "weight": 1.0
     },
     {
@@ -19766,42 +19901,6 @@
       "weight": 1.0
     },
     {
-      "source": "lib_growth_dashboard_navigation_test_ts",
-      "target": "strict",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/dashboard/navigation.test.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_dashboard_navigation_test_ts",
-      "target": "node_test",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/dashboard/navigation.test.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_dashboard_navigation_test_ts",
-      "target": "lib_growth_dashboard_navigation",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/dashboard/navigation.test.ts",
-      "source_location": "L4",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_dashboard_navigation_ts",
-      "target": "navigation_getactivegrowthnavigationitem",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/dashboard/navigation.ts",
-      "source_location": "L93",
-      "weight": 1.0
-    },
-    {
       "source": "app_api_cron_gmail_sync_route_ts__route_get",
       "target": "runtime_readcronenv",
       "relation": "calls",
@@ -20468,7 +20567,17 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/gmail-confirmation-observation.ts",
-      "source_location": "L56",
+      "source_location": "L61",
+      "weight": 1.0
+    },
+    {
+      "source": "gmail_confirmation_observation_observegmailconfirmation",
+      "target": "direct_submission_evidence_matchesdirectsubmissionevidence",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/campaigns/gmail-confirmation-observation.ts",
+      "source_location": "L112",
       "weight": 1.0
     },
     {
@@ -20829,6 +20938,42 @@
       "confidence_score": 0.8,
       "source_file": "lib/growth/dashboard/message-review.ts",
       "source_location": "L298",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_dashboard_navigation_test_ts",
+      "target": "strict",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/dashboard/navigation.test.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_dashboard_navigation_test_ts",
+      "target": "node_test",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/dashboard/navigation.test.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_dashboard_navigation_test_ts",
+      "target": "lib_growth_dashboard_navigation",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/dashboard/navigation.test.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_dashboard_navigation_ts",
+      "target": "navigation_getactivegrowthnavigationitem",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/dashboard/navigation.ts",
+      "source_location": "L93",
       "weight": 1.0
     },
     {
@@ -33477,222 +33622,6 @@
       "weight": 1.0
     },
     {
-      "source": "lib_operations_agreements_service_ts",
-      "target": "zod",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/service.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_service_ts",
-      "target": "lib_operations_db_client",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/service.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_service_ts",
-      "target": "lib_operations_organisations_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/service.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_service_ts",
-      "target": "lib_operations_services_activation",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/service.ts",
-      "source_location": "L4",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_service_ts",
-      "target": "lib_operations_agreements_repository",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/service.ts",
-      "source_location": "L5",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_service_ts",
-      "target": "lib_operations_agreements_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/service.ts",
-      "source_location": "L11",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_service_ts",
-      "target": "lib_operations_agreements_validation",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/service.ts",
-      "source_location": "L12",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_service_ts",
-      "target": "service_asserteditable",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/service.ts",
-      "source_location": "L42",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_service_ts",
-      "target": "service_runagreementcommand",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/service.ts",
-      "source_location": "L52",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_service_ts",
-      "target": "service_executeagreementcommand",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/service.ts",
-      "source_location": "L153",
-      "weight": 1.0
-    },
-    {
-      "source": "service_runagreementcommand",
-      "target": "service_asserteditable",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/service.ts",
-      "source_location": "L88",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_commands_ts",
-      "target": "zod",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-commands.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_commands_ts",
-      "target": "lib_operations_auth_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-commands.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_commands_ts",
-      "target": "lib_operations_db_client",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-commands.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_commands_ts",
-      "target": "lib_operations_organisations_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-commands.ts",
-      "source_location": "L4",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_commands_ts",
-      "target": "lib_operations_auth_staff_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-commands.ts",
-      "source_location": "L5",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_commands_ts",
-      "target": "lib_operations_agreements_signing_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-commands.ts",
-      "source_location": "L6",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_commands_ts",
-      "target": "lib_operations_agreements_agreement_notification_service",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-commands.ts",
-      "source_location": "L7",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_commands_ts",
-      "target": "lib_operations_agreements_signing_repository",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-commands.ts",
-      "source_location": "L8",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_commands_ts",
-      "target": "lib_operations_auth_staff_transaction",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-commands.ts",
-      "source_location": "L9",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_commands_ts",
-      "target": "lib_operations_agreements_signing_service",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-commands.ts",
-      "source_location": "L10",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_commands_ts",
-      "target": "signing_commands_executefoundersigningcommand",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-commands.ts",
-      "source_location": "L56",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_commands_ts",
-      "target": "signing_commands_executestaffsigningcommand",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-commands.ts",
-      "source_location": "L88",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_commands_ts",
-      "target": "signing_commands_executeportalsigningcommand",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-commands.ts",
-      "source_location": "L159",
-      "weight": 1.0
-    },
-    {
       "source": "prospects_fetchprospectrows",
       "target": "gmail_sync_coverage_test_at",
       "relation": "calls",
@@ -34784,16 +34713,6 @@
     },
     {
       "source": "builder_draft_service_finalisedraft",
-      "target": "service_runagreementcommand",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/operations/agreements/builder-draft-service.ts",
-      "source_location": "L180",
-      "weight": 1.0
-    },
-    {
-      "source": "builder_draft_service_finalisedraft",
       "target": "change_requests_test_tx",
       "relation": "calls",
       "confidence": "INFERRED",
@@ -34873,63 +34792,219 @@
       "weight": 1.0
     },
     {
-      "source": "service_runagreementcommand",
-      "target": "repository_insertrevision",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
+      "source": "lib_operations_agreements_service_ts",
+      "target": "zod",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/service.ts",
-      "source_location": "L68",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_service_ts",
+      "target": "lib_operations_db_client",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/service.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_service_ts",
+      "target": "lib_operations_organisations_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/service.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_service_ts",
+      "target": "lib_operations_services_activation",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/service.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_service_ts",
+      "target": "lib_operations_agreements_repository",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/service.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_service_ts",
+      "target": "lib_operations_agreements_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/service.ts",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_service_ts",
+      "target": "lib_operations_agreements_validation",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/service.ts",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_service_ts",
+      "target": "service_asserteditable",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/service.ts",
+      "source_location": "L42",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_service_ts",
+      "target": "service_runagreementcommand",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/service.ts",
+      "source_location": "L52",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_service_ts",
+      "target": "service_executeagreementcommand",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/service.ts",
+      "source_location": "L153",
       "weight": 1.0
     },
     {
       "source": "service_runagreementcommand",
-      "target": "change_requests_test_tx",
+      "target": "service_asserteditable",
       "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
+      "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/service.ts",
-      "source_location": "L79",
+      "source_location": "L88",
       "weight": 1.0
     },
     {
-      "source": "service_runagreementcommand",
-      "target": "repository_loadagreement",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/operations/agreements/service.ts",
-      "source_location": "L80",
-      "weight": 1.0
-    },
-    {
-      "source": "service_runagreementcommand",
-      "target": "repository_assertnopendingexecution",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/operations/agreements/service.ts",
-      "source_location": "L89",
-      "weight": 1.0
-    },
-    {
-      "source": "service_executeagreementcommand",
-      "target": "repository_withagreementtransaction",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/operations/agreements/service.ts",
-      "source_location": "L163",
-      "weight": 1.0
-    },
-    {
-      "source": "signing_commands_executestaffsigningcommand",
-      "target": "agreement_notification_service_resendstaffagreementnotification",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
+      "source": "lib_operations_agreements_signing_commands_ts",
+      "target": "zod",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-commands.ts",
-      "source_location": "L136",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_commands_ts",
+      "target": "lib_operations_auth_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-commands.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_commands_ts",
+      "target": "lib_operations_db_client",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-commands.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_commands_ts",
+      "target": "lib_operations_organisations_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-commands.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_commands_ts",
+      "target": "lib_operations_auth_staff_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-commands.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_commands_ts",
+      "target": "lib_operations_agreements_signing_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-commands.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_commands_ts",
+      "target": "lib_operations_agreements_agreement_notification_service",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-commands.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_commands_ts",
+      "target": "lib_operations_agreements_signing_repository",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-commands.ts",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_commands_ts",
+      "target": "lib_operations_auth_staff_transaction",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-commands.ts",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_commands_ts",
+      "target": "lib_operations_agreements_signing_service",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-commands.ts",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_commands_ts",
+      "target": "signing_commands_executefoundersigningcommand",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-commands.ts",
+      "source_location": "L56",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_commands_ts",
+      "target": "signing_commands_executestaffsigningcommand",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-commands.ts",
+      "source_location": "L88",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_commands_ts",
+      "target": "signing_commands_executeportalsigningcommand",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-commands.ts",
+      "source_location": "L159",
       "weight": 1.0
     },
     {
@@ -38407,6 +38482,60 @@
       "weight": 1.0
     },
     {
+      "source": "tests_integration_growth_direct_proof_race_assertions_ts",
+      "target": "strict",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/direct-proof-race-assertions.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_direct_proof_race_assertions_ts",
+      "target": "postgres",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/direct-proof-race-assertions.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_direct_proof_race_assertions_ts",
+      "target": "lib_growth_db_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/direct-proof-race-assertions.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_direct_proof_race_assertions_ts",
+      "target": "lib_growth_campaigns_gmail_confirmation_observation",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/direct-proof-race-assertions.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_direct_proof_race_assertions_ts",
+      "target": "lib_growth_campaigns_gmail_confirmation",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/direct-proof-race-assertions.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_direct_proof_race_assertions_ts",
+      "target": "direct_proof_race_assertions_exercisedirectproofrace",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/direct-proof-race-assertions.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
       "source": "tests_integration_growth_facebook_workspace_test_ts",
       "target": "strict",
       "relation": "imports_from",
@@ -39874,6 +40003,60 @@
       "weight": 1.0
     },
     {
+      "source": "tests_integration_growth_proofless_confirmation_assertions_ts",
+      "target": "strict",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/proofless-confirmation-assertions.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_proofless_confirmation_assertions_ts",
+      "target": "node_crypto",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/proofless-confirmation-assertions.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_proofless_confirmation_assertions_ts",
+      "target": "lib_growth_db_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/proofless-confirmation-assertions.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_proofless_confirmation_assertions_ts",
+      "target": "lib_growth_campaigns_gmail_confirmation",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/proofless-confirmation-assertions.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_proofless_confirmation_assertions_ts",
+      "target": "lib_growth_campaigns_reservation_settlement",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/proofless-confirmation-assertions.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_proofless_confirmation_assertions_ts",
+      "target": "proofless_confirmation_assertions_exerciseprooflessconfirmations",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/proofless-confirmation-assertions.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
       "source": "tests_integration_growth_research_email_flow_ts",
       "target": "lib_growth_sequences_gmail_sync",
       "relation": "imports_from",
@@ -40226,7 +40409,7 @@
     },
     {
       "source": "tests_integration_growth_reservation_assertions_ts",
-      "target": "lib_growth_db_types",
+      "target": "lib_growth_campaigns_gmail_confirmation",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/reservation-assertions.ts",
@@ -40235,7 +40418,7 @@
     },
     {
       "source": "tests_integration_growth_reservation_assertions_ts",
-      "target": "lib_growth_campaigns_reservation_repository",
+      "target": "lib_growth_db_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/reservation-assertions.ts",
@@ -40244,11 +40427,20 @@
     },
     {
       "source": "tests_integration_growth_reservation_assertions_ts",
+      "target": "lib_growth_campaigns_reservation_repository",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/reservation-assertions.ts",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_reservation_assertions_ts",
       "target": "lib_growth_campaigns_reservation_settlement",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/reservation-assertions.ts",
-      "source_location": "L11",
+      "source_location": "L12",
       "weight": 1.0
     },
     {
@@ -40257,7 +40449,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/reservation-assertions.ts",
-      "source_location": "L17",
+      "source_location": "L18",
       "weight": 1.0
     },
     {
@@ -40478,11 +40670,20 @@
     },
     {
       "source": "tests_integration_growth_reservation_capacity_assertions_ts",
+      "target": "tests_integration_growth_synthetic_direct_submission",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/reservation-capacity-assertions.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_reservation_capacity_assertions_ts",
       "target": "reservation_capacity_assertions_exerciseconfirmationcapacity",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/reservation-capacity-assertions.ts",
-      "source_location": "L8",
+      "source_location": "L9",
       "weight": 1.0
     },
     {
@@ -40595,11 +40796,38 @@
     },
     {
       "source": "tests_integration_growth_reservation_confirmation_assertions_ts",
+      "target": "tests_integration_growth_direct_proof_race_assertions",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/reservation-confirmation-assertions.ts",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_reservation_confirmation_assertions_ts",
+      "target": "tests_integration_growth_proofless_confirmation_assertions",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/reservation-confirmation-assertions.ts",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_reservation_confirmation_assertions_ts",
+      "target": "tests_integration_growth_synthetic_direct_submission",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/reservation-confirmation-assertions.ts",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_reservation_confirmation_assertions_ts",
       "target": "reservation_confirmation_assertions_exercisegmailconfirmation",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/reservation-confirmation-assertions.ts",
-      "source_location": "L11",
+      "source_location": "L14",
       "weight": 1.0
     },
     {
@@ -40694,7 +40922,7 @@
     },
     {
       "source": "tests_integration_growth_reservation_cross_version_assertions_ts",
-      "target": "lib_growth_campaigns_reservation_repository",
+      "target": "tests_integration_growth_synthetic_direct_submission",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/reservation-cross-version-assertions.ts",
@@ -40703,11 +40931,20 @@
     },
     {
       "source": "tests_integration_growth_reservation_cross_version_assertions_ts",
+      "target": "lib_growth_campaigns_reservation_repository",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/reservation-cross-version-assertions.ts",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_reservation_cross_version_assertions_ts",
       "target": "reservation_cross_version_assertions_exercisecrossversionconfirmation",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/reservation-cross-version-assertions.ts",
-      "source_location": "L30",
+      "source_location": "L31",
       "weight": 1.0
     },
     {
@@ -40757,11 +40994,20 @@
     },
     {
       "source": "tests_integration_growth_reservation_report_assertions_ts",
+      "target": "tests_integration_growth_synthetic_direct_submission",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/reservation-report-assertions.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_reservation_report_assertions_ts",
       "target": "reservation_report_assertions_exercisereportcorrection",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/reservation-report-assertions.ts",
-      "source_location": "L7",
+      "source_location": "L8",
       "weight": 1.0
     },
     {
@@ -40816,6 +41062,133 @@
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/source-capture.test.ts",
       "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_synthetic_direct_submission_ts",
+      "target": "strict",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/synthetic-direct-submission.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_synthetic_direct_submission_ts",
+      "target": "lib_growth_db_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/synthetic-direct-submission.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_synthetic_direct_submission_ts",
+      "target": "synthetic_direct_submission_seedsyntheticdirectsubmission",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/synthetic-direct-submission.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_commands_executefoundersigningcommand",
+      "target": "signing_service_prepareagreementsigning",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/agreements/signing-commands.ts",
+      "source_location": "L65",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_commands_executefoundersigningcommand",
+      "target": "signing_service_approveagreementsigning",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/agreements/signing-commands.ts",
+      "source_location": "L73",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_commands_executefoundersigningcommand",
+      "target": "signing_service_cancelagreementsigning",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/agreements/signing-commands.ts",
+      "source_location": "L80",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_commands_executestaffsigningcommand",
+      "target": "signing_service_preparestaffagreementsigning",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/agreements/signing-commands.ts",
+      "source_location": "L97",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_commands_executestaffsigningcommand",
+      "target": "signing_service_approvestaffagreementsigning",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/agreements/signing-commands.ts",
+      "source_location": "L108",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_commands_executestaffsigningcommand",
+      "target": "signing_service_retrystaffagreementsigning",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/agreements/signing-commands.ts",
+      "source_location": "L120",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_commands_executestaffsigningcommand",
+      "target": "signing_service_extendstaffagreementsigning",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/agreements/signing-commands.ts",
+      "source_location": "L128",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_commands_executestaffsigningcommand",
+      "target": "signing_service_cancelstaffagreementsigning",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/agreements/signing-commands.ts",
+      "source_location": "L151",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_commands_executeportalsigningcommand",
+      "target": "signing_service_signportalagreement",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/agreements/signing-commands.ts",
+      "source_location": "L168",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_commands_executeportalsigningcommand",
+      "target": "signing_service_declineportalagreement",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/agreements/signing-commands.ts",
+      "source_location": "L175",
       "weight": 1.0
     },
     {
@@ -41230,6 +41603,16 @@
     },
     {
       "source": "signing_service_preparesigningintransaction",
+      "target": "service_asserteditable",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L68",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_service_preparesigningintransaction",
       "target": "signing_render_renderagreementsource",
       "relation": "calls",
       "confidence": "INFERRED",
@@ -41325,7 +41708,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "tests/integration/growth/reservation-assertions.ts",
-      "source_location": "L101",
+      "source_location": "L102",
       "weight": 1.0
     },
     {
@@ -41335,7 +41718,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "tests/integration/growth/reservation-assertions.ts",
-      "source_location": "L687",
+      "source_location": "L695",
       "weight": 1.0
     },
     {
@@ -41380,12 +41763,42 @@
     },
     {
       "source": "reservation_confirmation_assertions_exercisegmailconfirmation",
+      "target": "proofless_confirmation_assertions_exerciseprooflessconfirmations",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/integration/growth/reservation-confirmation-assertions.ts",
+      "source_location": "L73",
+      "weight": 1.0
+    },
+    {
+      "source": "reservation_confirmation_assertions_exercisegmailconfirmation",
+      "target": "synthetic_direct_submission_seedsyntheticdirectsubmission",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/integration/growth/reservation-confirmation-assertions.ts",
+      "source_location": "L79",
+      "weight": 1.0
+    },
+    {
+      "source": "reservation_confirmation_assertions_exercisegmailconfirmation",
+      "target": "direct_proof_race_assertions_exercisedirectproofrace",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/integration/growth/reservation-confirmation-assertions.ts",
+      "source_location": "L139",
+      "weight": 1.0
+    },
+    {
+      "source": "reservation_confirmation_assertions_exercisegmailconfirmation",
       "target": "reservation_report_assertions_exercisereportcorrection",
       "relation": "calls",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "tests/integration/growth/reservation-confirmation-assertions.ts",
-      "source_location": "L328",
+      "source_location": "L375",
       "weight": 1.0
     },
     {
@@ -43679,6 +44092,26 @@
       "weight": 1
     },
     {
+      "source": "lib_growth_campaigns_direct_submission_evidence_test_ts",
+      "target": "lib_growth_campaigns_direct_submission_evidence_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/direct-submission-evidence.test.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_direct_submission_evidence_ts",
+      "target": "lib_growth_campaigns_reservation_shared_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/direct-submission-evidence.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
       "source": "lib_growth_campaigns_dispatch_authority_ts",
       "target": "lib_growth_campaigns_authority_bounds_ts",
       "relation": "imports",
@@ -43999,6 +44432,16 @@
       "weight": 1
     },
     {
+      "source": "lib_growth_campaigns_gmail_confirmation_observation_ts",
+      "target": "lib_growth_campaigns_direct_submission_evidence_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/gmail-confirmation-observation.ts",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
       "source": "lib_growth_campaigns_gmail_confirmation_ts",
       "target": "lib_growth_campaigns_gmail_confirmation_campaign_ts",
       "relation": "imports",
@@ -44080,12 +44523,22 @@
     },
     {
       "source": "lib_growth_campaigns_gmail_confirmation_ts",
-      "target": "lib_growth_campaigns_gmail_confirmation_observation_ts",
+      "target": "lib_growth_campaigns_direct_submission_evidence_ts",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/campaigns/gmail-confirmation.ts",
       "source_location": "L23",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_gmail_confirmation_ts",
+      "target": "lib_growth_campaigns_gmail_confirmation_observation_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/gmail-confirmation.ts",
+      "source_location": "L24",
       "weight": 1
     },
     {
@@ -49049,6 +49502,26 @@
       "weight": 1
     },
     {
+      "source": "tests_integration_growth_direct_proof_race_assertions_ts",
+      "target": "lib_growth_campaigns_gmail_confirmation_observation_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/direct-proof-race-assertions.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_direct_proof_race_assertions_ts",
+      "target": "lib_growth_campaigns_gmail_confirmation_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/direct-proof-race-assertions.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
       "source": "tests_integration_growth_facebook_workspace_test_ts",
       "target": "lib_growth_facebook_service_ts",
       "relation": "imports",
@@ -49719,6 +50192,26 @@
       "weight": 1
     },
     {
+      "source": "tests_integration_growth_proofless_confirmation_assertions_ts",
+      "target": "lib_growth_campaigns_gmail_confirmation_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/proofless-confirmation-assertions.ts",
+      "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_proofless_confirmation_assertions_ts",
+      "target": "lib_growth_campaigns_reservation_settlement_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/proofless-confirmation-assertions.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
       "source": "tests_integration_growth_research_email_flow_ts",
       "target": "lib_growth_sequences_gmail_sync_ts",
       "relation": "imports",
@@ -49880,12 +50373,22 @@
     },
     {
       "source": "tests_integration_growth_reservation_assertions_ts",
+      "target": "lib_growth_campaigns_gmail_confirmation_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/reservation-assertions.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_reservation_assertions_ts",
       "target": "lib_growth_campaigns_reservation_repository_ts",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "tests/integration/growth/reservation-assertions.ts",
-      "source_location": "L7",
+      "source_location": "L8",
       "weight": 1
     },
     {
@@ -49895,7 +50398,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "tests/integration/growth/reservation-assertions.ts",
-      "source_location": "L11",
+      "source_location": "L12",
       "weight": 1
     },
     {
@@ -50039,6 +50542,16 @@
       "weight": 1
     },
     {
+      "source": "tests_integration_growth_reservation_capacity_assertions_ts",
+      "target": "tests_integration_growth_synthetic_direct_submission_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/reservation-capacity-assertions.ts",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
       "source": "tests_integration_growth_reservation_confirmation_assertions_ts",
       "target": "lib_growth_sequences_gmail_thread_association_ts",
       "relation": "imports",
@@ -50086,6 +50599,36 @@
       "confidence_score": 1,
       "source_file": "tests/integration/growth/reservation-confirmation-assertions.ts",
       "source_location": "L9",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_reservation_confirmation_assertions_ts",
+      "target": "tests_integration_growth_direct_proof_race_assertions_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/reservation-confirmation-assertions.ts",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_reservation_confirmation_assertions_ts",
+      "target": "tests_integration_growth_proofless_confirmation_assertions_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/reservation-confirmation-assertions.ts",
+      "source_location": "L11",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_reservation_confirmation_assertions_ts",
+      "target": "tests_integration_growth_synthetic_direct_submission_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/reservation-confirmation-assertions.ts",
+      "source_location": "L12",
       "weight": 1
     },
     {
@@ -50150,12 +50693,22 @@
     },
     {
       "source": "tests_integration_growth_reservation_cross_version_assertions_ts",
-      "target": "lib_growth_campaigns_reservation_repository_ts",
+      "target": "tests_integration_growth_synthetic_direct_submission_ts",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "tests/integration/growth/reservation-cross-version-assertions.ts",
       "source_location": "L11",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_reservation_cross_version_assertions_ts",
+      "target": "lib_growth_campaigns_reservation_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/reservation-cross-version-assertions.ts",
+      "source_location": "L12",
       "weight": 1
     },
     {
@@ -50166,6 +50719,16 @@
       "confidence_score": 1,
       "source_file": "tests/integration/growth/reservation-report-assertions.ts",
       "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_reservation_report_assertions_ts",
+      "target": "tests_integration_growth_synthetic_direct_submission_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/reservation-report-assertions.ts",
+      "source_location": "L6",
       "weight": 1
     },
     {
