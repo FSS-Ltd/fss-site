@@ -1,4 +1,5 @@
 import { withGrowthTransaction } from "../db/client";
+import { lockGmailThread } from "./gmail-thread-association";
 import type { GrowthDb } from "../db/types";
 
 export type ClaimedMessage = {
@@ -298,6 +299,7 @@ export async function recordSent(
   input: RecordSentInput,
 ): Promise<void> {
   await withGrowthTransaction(db, async (tx) => {
+    await lockGmailThread(tx, input.providerThreadId);
     await tx`
       update growth.email_messages
       set status = 'sent',

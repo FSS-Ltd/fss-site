@@ -87,6 +87,13 @@ test(
               automatic: "covered" as const,
             },
             recipientHeaders: "complete" as const,
+            supportedPaths: {
+              nativeMailbox: "included" as const,
+              fssGmailApi: "included" as const,
+              aliases: "none" as const,
+              delegation: "none" as const,
+              other: "none" as const,
+            },
           },
         },
       };

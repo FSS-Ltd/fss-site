@@ -228,6 +228,13 @@ test(
             automatic: "covered",
           },
           recipientHeaders: "complete",
+          supportedPaths: {
+            nativeMailbox: "included",
+            fssGmailApi: "included",
+            aliases: "none",
+            delegation: "none",
+            other: "none",
+          },
         },
       },
       googleSubject: "subject",

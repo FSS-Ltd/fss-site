@@ -8,6 +8,7 @@ import {
 import { z } from "zod";
 import { withGrowthTransaction } from "../db/client";
 import type { GrowthDb } from "../db/types";
+import { lockGmailThread } from "../sequences/gmail-thread-association";
 
 type Settlement =
   | { kind: "accepted"; providerMessageId: string; providerThreadId: string }
@@ -34,6 +35,8 @@ export async function settleOutreachAttempt(
   if (!reservationLeaseSchema.extend({ outcome }).safeParse(input).success)
     return held("invalid_input");
   return withGrowthTransaction(db, async (tx) => {
+    if (input.outcome.kind === "accepted")
+      await lockGmailThread(tx, input.outcome.providerThreadId);
     const [reservation] = await tx<
       {
         status: string;

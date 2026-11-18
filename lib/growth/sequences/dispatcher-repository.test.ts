@@ -141,12 +141,13 @@ test("records a sent message and inserts its follow-ups atomically", async () =>
   });
 
   const queries = queriesOf(db);
-  assert.match(queries[0]?.text ?? "", /update growth\.email_messages/);
-  assert.match(queries[0]?.text ?? "", /status = 'sent'/);
-  assert.match(queries[1]?.text ?? "", /update growth\.sequence_enrollments/);
-  assert.match(queries[2]?.text ?? "", /insert into growth\.email_messages/);
+  assert.match(queries[0]?.text ?? "", /pg_advisory_xact_lock/);
+  assert.match(queries[1]?.text ?? "", /update growth\.email_messages/);
+  assert.match(queries[1]?.text ?? "", /status = 'sent'/);
+  assert.match(queries[2]?.text ?? "", /update growth\.sequence_enrollments/);
+  assert.match(queries[3]?.text ?? "", /insert into growth\.email_messages/);
   assert.match(
-    queries[2]?.text ?? "",
+    queries[3]?.text ?? "",
     /on conflict \(idempotency_key\) do nothing/,
   );
 });

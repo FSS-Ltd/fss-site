@@ -1,6 +1,7 @@
 import type { FounderSession } from "../auth/require-founder";
 import type { GrowthDb } from "../db/types";
 import type { GmailGrantBinding } from "../integrations/gmail/live-client";
+import { hasRequiredGmailScopes } from "../integrations/google-oauth";
 import { postgresSequenceStopRepository } from "./stop-repository";
 
 const SEQUENCE_ID_PATTERN =
@@ -49,6 +50,7 @@ export type StopSequenceInput = {
   reason: StopReason;
   actor: FounderSession | GmailSyncActor | ResendWebhookActor;
   correlationId: string;
+  gmailThreadId?: string;
 };
 
 export type StoppedSequence = {
@@ -94,6 +96,7 @@ export interface SequenceStopTransaction {
     sequenceId: string,
     binding?: GmailGrantBinding,
     threadId?: string,
+    attribution?: "bound" | "unbound",
   ): Promise<LockedEnrollment | null>;
   cancelPendingMessages(
     sequenceId: string,
@@ -136,6 +139,27 @@ function resolveActor(actor: StopSequenceInput["actor"]): {
 
 function validateRequest(input: StopSequenceInput): void {
   const { actorId } = resolveActor(input.actor);
+  if ("type" in input.actor && input.actor.type === "gmail_sync") {
+    const binding = input.actor.binding;
+    if (
+      input.actor.id !== "gmail-sync" ||
+      !binding ||
+      typeof binding.connectionId !== "string" ||
+      !SEQUENCE_ID_PATTERN.test(binding.connectionId) ||
+      typeof binding.googleSubject !== "string" ||
+      !binding.googleSubject.trim() ||
+      binding.googleSubject.length > 255 ||
+      !Number.isSafeInteger(binding.grantEpoch) ||
+      binding.grantEpoch < 1 ||
+      !Array.isArray(binding.grantedScopes) ||
+      !binding.grantedScopes.every(
+        (scope) =>
+          typeof scope === "string" && scope.length > 0 && scope.length <= 500,
+      ) ||
+      !hasRequiredGmailScopes(binding.grantedScopes)
+    )
+      throw new TypeError("Sequence stop request is invalid.");
+  }
   if (
     !SEQUENCE_ID_PATTERN.test(input.sequenceId) ||
     !STOP_REASONS.includes(input.reason) ||
@@ -166,6 +190,8 @@ export async function stopSequenceInTransaction(
     "type" in input.actor && input.actor.type === "gmail_sync"
       ? input.actor.binding
       : undefined,
+    input.gmailThreadId,
+    input.gmailThreadId ? "unbound" : undefined,
   );
   if (!enrollment) throw new SequenceStopError("not_found");
 

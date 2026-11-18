@@ -25,6 +25,15 @@ const visibilitySchema = z.strictObject({
     automatic: z.enum(["covered", "unknown"]),
   }),
   recipientHeaders: z.enum(["complete", "unknown"]),
+  supportedPaths: z
+    .strictObject({
+      nativeMailbox: z.enum(["included", "none", "unknown"]),
+      fssGmailApi: z.enum(["included", "none", "unknown"]),
+      aliases: z.enum(["none", "native_send_as", "unknown"]),
+      delegation: z.enum(["none", "present", "unknown"]),
+      other: z.enum(["none", "external_smtp", "relay", "other", "unknown"]),
+    })
+    .optional(),
 });
 export const limitsReviewSchema = z.strictObject({
   source: text,

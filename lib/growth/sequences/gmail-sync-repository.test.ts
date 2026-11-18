@@ -14,6 +14,21 @@ function fakeDb(
   ) => {
     const text = strings.join("?").replace(/\s+/g, " ").trim();
     queries.push({ text, values });
+    if (
+      text.startsWith("select se.id") &&
+      text.includes('"hasAssociation"') &&
+      values.includes("gmail-thread-1")
+    )
+      return [
+        {
+          id: "enrollment-id",
+          status: "active",
+          prospectId: "prospect-id",
+          contactId: "contact-id",
+          bound: true,
+          hasAssociation: true,
+        },
+      ];
     if (text.startsWith("select status, google_subject"))
       return [
         {
@@ -103,7 +118,7 @@ test("inserts the inbound message then its event, and detects a duplicate", asyn
 
   const input = {
     binding: {
-      connectionId: "account",
+      connectionId: "11111111-1111-4111-8111-111111111112",
       googleSubject: "subject",
       grantEpoch: 1,
       grantedScopes: [
@@ -170,7 +185,7 @@ test("treats a matching inbound event as already recorded", async () => {
 
   const result = await postgresGmailSyncRepository.recordInboundEvent(db, {
     binding: {
-      connectionId: "account",
+      connectionId: "11111111-1111-4111-8111-111111111112",
       googleSubject: "subject",
       grantEpoch: 1,
       grantedScopes: [
@@ -225,7 +240,7 @@ test("does not choose an enrollment when a Gmail thread maps to multiple enrollm
       db,
       "shared-thread",
       {
-        connectionId: "account",
+        connectionId: "11111111-1111-4111-8111-111111111112",
         googleSubject: "subject",
         grantEpoch: 1,
         grantedScopes: [],
@@ -250,7 +265,7 @@ test("rejects an inbound provider ID already attributed to another enrollment", 
   await assert.rejects(
     postgresGmailSyncRepository.recordInboundEvent(db, {
       binding: {
-        connectionId: "account",
+        connectionId: "11111111-1111-4111-8111-111111111112",
         googleSubject: "subject",
         grantEpoch: 1,
         grantedScopes: [

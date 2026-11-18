@@ -16,6 +16,7 @@ import type {
   ThreadEnrollment,
 } from "./gmail-sync-repository";
 import type { StopSequenceInput, StoppedSequence } from "./stop";
+import { SequenceStopError } from "./stop";
 
 const FOUNDER_EMAIL = "j.ntagengwa@faithfulsoftware.dev";
 const db = {} as GrowthDb;
@@ -228,7 +229,7 @@ function createSync(
     gmailClient: createFakeGmailClient(state),
     founderEmail: FOUNDER_EMAIL,
     binding: {
-      connectionId: "account",
+      connectionId: "11111111-1111-4111-8111-111111111112",
       googleSubject: "subject",
       grantEpoch: 1,
       grantedScopes: [
@@ -304,7 +305,7 @@ test("stops the sequence as a reply for an inbound message from outside the foun
     type: "gmail_sync",
     id: "gmail-sync",
     binding: {
-      connectionId: "account",
+      connectionId: "11111111-1111-4111-8111-111111111112",
       googleSubject: "subject",
       grantEpoch: 1,
       grantedScopes: [
@@ -648,12 +649,13 @@ test("protectively pauses an unbound legacy thread and records a coverage gap", 
     enrollment: state.enrollmentsByThread.get("gmail-thread-1")!,
     safeToPause: true,
   });
+  let terminal = false;
   const sync = createGmailReplySync({
     repository,
     gmailClient: createFakeGmailClient(state),
     founderEmail: FOUNDER_EMAIL,
     binding: {
-      connectionId: "account",
+      connectionId: "11111111-1111-4111-8111-111111111112",
       googleSubject: "subject",
       grantEpoch: 1,
       grantedScopes: [
@@ -663,6 +665,7 @@ test("protectively pauses an unbound legacy thread and records a coverage gap", 
       ],
     },
     stop: async (_db, input) => {
+      if (terminal) throw new SequenceStopError("already_stopped");
       state.stops.push(input);
       return {
         sequenceId: input.sequenceId,
@@ -678,6 +681,10 @@ test("protectively pauses an unbound legacy thread and records a coverage gap", 
   assert.deepEqual(state.coverageWrites[0]?.unknownObservations, [
     { messageId: "gmail-message-1", reason: "unknown_account_thread" },
   ]);
+  terminal = true;
+  state.historyPages.push(historyPage(["gmail-message-1"]));
+  await sync(db);
+  assert.equal(state.coverageWrites[1]?.reason, "unknown_account_thread");
 });
 
 test("does not make more than 1000 metadata reads or advance a partial cursor", async () => {
@@ -709,7 +716,7 @@ test("does not make more than 1000 metadata reads or advance a partial cursor", 
     gmailClient: client,
     founderEmail: FOUNDER_EMAIL,
     binding: {
-      connectionId: "account",
+      connectionId: "11111111-1111-4111-8111-111111111112",
       googleSubject: "subject",
       grantEpoch: 1,
       grantedScopes: [
@@ -764,7 +771,7 @@ test("does not pause a thread whose prior subject does not match the bound accou
     gmailClient: createFakeGmailClient(state),
     founderEmail: FOUNDER_EMAIL,
     binding: {
-      connectionId: "account",
+      connectionId: "11111111-1111-4111-8111-111111111112",
       googleSubject: "subject",
       grantEpoch: 1,
       grantedScopes: [

@@ -46,21 +46,35 @@ test("cron Gmail client carries the identity from its credential row", async () 
 test("both cron routes stay disabled without provider work", async () => {
   const saved = { ...process.env };
   try {
-    Object.assign(process.env, source);
-    const gmail = await import("./gmail-sync/route");
-    const outreach = await import("./outreach-dispatch/route");
-    for (const route of [gmail, outreach]) {
-      const response = await route.GET(
-        new Request("https://example.test/api/cron", {
-          headers: { authorization: `Bearer ${source.CRON_SECRET}` },
-        }),
-      );
-      assert.equal(response.status, 200);
-      assert.deepEqual(await response.json(), {
-        ok: true,
-        skipped: "automations_disabled",
-      });
+    Object.assign(process.env, {
+      DIRECT_DATABASE_URL: "postgres://test:test@localhost/synthetic",
+      NODE_ENV: "production",
+    });
+    const inherited = { ...process.env };
+    try {
+      process.env = { ...source, NODE_ENV: "production" };
+      const gmail = await import("./gmail-sync/route");
+      const outreach = await import("./outreach-dispatch/route");
+      for (const route of [gmail, outreach]) {
+        const response = await route.GET(
+          new Request("https://example.test/api/cron", {
+            headers: { authorization: `Bearer ${source.CRON_SECRET}` },
+          }),
+        );
+        assert.equal(response.status, 200);
+        assert.deepEqual(await response.json(), {
+          ok: true,
+          skipped: "automations_disabled",
+        });
+      }
+    } finally {
+      process.env = inherited;
     }
+    assert.equal(
+      process.env.DIRECT_DATABASE_URL,
+      "postgres://test:test@localhost/synthetic",
+    );
+    assert.equal(process.env.NODE_ENV, "production");
   } finally {
     process.env = saved;
   }

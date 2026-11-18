@@ -43,7 +43,15 @@ export function currentVisibilityExpiry(
     visibility.expiresAt > limits.data.expiresAt ||
     visibility.reviewedAt >= visibility.expiresAt ||
     Object.values(visibility.paths).some((path) => path !== "covered") ||
-    visibility.recipientHeaders !== "complete"
+    visibility.recipientHeaders !== "complete" ||
+    !visibility.supportedPaths ||
+    visibility.supportedPaths.nativeMailbox === "unknown" ||
+    visibility.supportedPaths.fssGmailApi === "unknown" ||
+    (visibility.supportedPaths.nativeMailbox === "none" &&
+      visibility.supportedPaths.fssGmailApi === "none") ||
+    visibility.supportedPaths.aliases === "unknown" ||
+    visibility.supportedPaths.delegation !== "none" ||
+    visibility.supportedPaths.other !== "none"
   )
     return null;
   return visibility.expiresAt;

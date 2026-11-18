@@ -1,3 +1,9 @@
+import {
+  findEnrollmentByThread,
+  lockGmailThread,
+  type ThreadMatch,
+} from "./gmail-thread-association";
+export type { ThreadEnrollment, ThreadMatch } from "./gmail-thread-association";
 import { withGrowthTransaction } from "../db/client";
 import type { GrowthDb, GrowthTransaction } from "../db/types";
 import type { GmailGrantBinding } from "../integrations/gmail/live-client";
@@ -22,19 +28,6 @@ export type PendingDraft = {
   htmlSnapshot: string | null;
   textSnapshot: string | null;
 };
-
-export type ThreadEnrollment = {
-  id: string;
-  status: string;
-  prospectId: string;
-  contactId: string;
-};
-
-export type ThreadMatch =
-  | { kind: "none" }
-  | { kind: "ambiguous" }
-  | { kind: "unique"; enrollment: ThreadEnrollment }
-  | { kind: "unknown"; enrollment: ThreadEnrollment; safeToPause: boolean };
 
 export type RecordInboundEventInput = {
   binding: GmailGrantBinding;
@@ -72,7 +65,7 @@ export interface GmailSyncRepository {
   recordInboundEvent(
     db: GrowthDb,
     input: RecordInboundEventInput,
-  ): Promise<{ alreadyRecorded: boolean }>;
+  ): Promise<{ alreadyRecorded: boolean; attributionUnknown?: boolean }>;
   activatePendingApproval(
     db: GrowthDb,
     sequenceEnrollmentId: string,
@@ -125,43 +118,23 @@ async function findPendingDraftByRfcMessageId(
   return rows[0] ?? null;
 }
 
-async function findEnrollmentByThread(
-  db: GrowthDb,
-  gmailThreadId: string,
-  binding: GmailGrantBinding,
-): Promise<ThreadMatch> {
-  const rows = await db<
-    Array<ThreadEnrollment & { bound: boolean; hasAssociation: boolean }>
-  >`
-    select se.id, se.status, se.prospect_id as "prospectId", se.contact_id as "contactId",
-      exists(select 1 from growth.outreach_reservations r where r.sequence_id=se.id and r.connection_id=${binding.connectionId} and r.provider_thread_id=${gmailThreadId}
-        and exists(select 1 from growth.outreach_account_controls c where c.connection_id=r.connection_id and c.verified_subject=${binding.googleSubject})) as bound,
-      exists(select 1 from growth.outreach_reservations r where r.sequence_id=se.id and r.provider_thread_id=${gmailThreadId} and r.connection_id is not null) as "hasAssociation"
-    from growth.sequence_enrollments se
-    where se.gmail_thread_id = ${gmailThreadId}
-      and (exists(select 1 from growth.outreach_reservations r where r.sequence_id=se.id and r.connection_id=${binding.connectionId} and r.provider_thread_id=${gmailThreadId})
-        or not exists(select 1 from growth.outreach_reservations r where r.sequence_id=se.id and r.provider_thread_id=${gmailThreadId} and r.connection_id is not null))
-    limit 2
-  `;
-  if (rows.length > 1) return { kind: "ambiguous" };
-  const row = rows[0];
-  if (!row) return { kind: "none" };
-  const enrollment = {
-    id: row.id,
-    status: row.status,
-    prospectId: row.prospectId,
-    contactId: row.contactId,
-  };
-  return row.bound
-    ? { kind: "unique", enrollment }
-    : { kind: "unknown", enrollment, safeToPause: !row.hasAssociation };
-}
-
 async function recordInboundEvent(
   db: GrowthDb,
   input: RecordInboundEventInput,
-): Promise<{ alreadyRecorded: boolean }> {
+): Promise<{ alreadyRecorded: boolean; attributionUnknown?: boolean }> {
   return withGrowthTransaction(db, async (tx: GrowthTransaction) => {
+    await lockGmailThread(tx, input.gmailThreadId);
+    const match = await findEnrollmentByThread(
+      tx,
+      input.gmailThreadId,
+      input.binding,
+    );
+    if (
+      match.kind !== "unique" ||
+      match.enrollment.id !== input.sequenceEnrollmentId
+    ) {
+      return { alreadyRecorded: false, attributionUnknown: true };
+    }
     const stopTransaction = createSequenceStopTransaction(tx);
     const enrollment = await stopTransaction.lockEnrollment(
       input.sequenceEnrollmentId,

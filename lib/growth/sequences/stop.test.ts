@@ -23,7 +23,7 @@ const gmailSyncActor = {
   type: "gmail_sync" as const,
   id: "gmail-sync",
   binding: {
-    connectionId: "account",
+    connectionId: "11111111-1111-4111-8111-111111111112",
     googleSubject: "subject",
     grantEpoch: 1,
     grantedScopes: [
@@ -340,7 +340,7 @@ test("Gmail stop checks the credential binding inside its transaction", async ()
     type: "gmail_sync" as const,
     id: "gmail-sync",
     binding: {
-      connectionId: "account",
+      connectionId: "11111111-1111-4111-8111-111111111112",
       googleSubject: "subject",
       grantEpoch: 1,
       grantedScopes: [
@@ -357,4 +357,30 @@ test("Gmail stop checks the credential binding inside its transaction", async ()
     correlationId: "c",
   });
   assert.deepEqual(checked, actor.binding);
+});
+
+test("Gmail system stops reject malformed bindings before effects", async () => {
+  for (const binding of [
+    undefined,
+    {},
+    { ...gmailSyncActor.binding, connectionId: "not-a-uuid" },
+    { ...gmailSyncActor.binding, grantEpoch: 0 },
+    { ...gmailSyncActor.binding, grantedScopes: [] },
+    { ...gmailSyncActor.binding, googleSubject: " " },
+  ]) {
+    const state = createFakeState();
+    const actor = { ...gmailSyncActor, binding } as typeof gmailSyncActor;
+    await assert.rejects(
+      createStopper(state)(db, {
+        sequenceId,
+        reason: "bounce",
+        actor,
+        correlationId: "c",
+      }),
+      TypeError,
+    );
+    assert.equal(state.applied.length, 0);
+    assert.equal(state.suppressions.length, 0);
+    assert.equal(state.audits.length, 0);
+  }
 });

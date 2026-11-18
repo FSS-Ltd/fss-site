@@ -4,157 +4,20 @@ import test from "node:test";
 
 import postgres from "postgres";
 
-import { createFirstEmailApprover } from "../../../lib/growth/sequences/approval";
-import { postgresFirstEmailApprovalRepository } from "../../../lib/growth/sequences/approval-repository";
+import {
+  stopSequence,
+  type GmailSyncActor,
+} from "../../../lib/growth/sequences/stop";
 import { createGmailReplySync } from "../../../lib/growth/sequences/gmail-sync";
 import { postgresGmailSyncRepository } from "../../../lib/growth/sequences/gmail-sync-repository";
-import { ingestResearchRun } from "../../../lib/growth/research/ingest";
-import { createValidResearchRunFixture } from "../../../lib/growth/research/ingestion-schema.test-fixture";
 
 const connectionString = process.env.DIRECT_DATABASE_URL;
-const founder = { email: "founder@example.test", actorId: "f".repeat(64) };
-const FOUNDER_EMAIL = "j.ntagengwa@faithfulsoftware.dev";
-
-async function setUpBoundBaseline(sql: postgres.Sql, connectionId: string) {
-  const at = new Date("2026-01-01T00:00:00Z");
-  await sql`insert into growth.integration_connections(id,provider,subject_email,status,provider_cursor,google_subject,granted_scopes) values (${connectionId},'gmail',${FOUNDER_EMAIL},'connected','100','test-subject',${["openid", "email", "https://www.googleapis.com/auth/gmail.modify"]})`;
-  await sql`insert into growth.gmail_reply_coverage(connection_id,grant_epoch,google_subject,history_end,observed_until,head_requested_at,head_responded_at,state,reason) values (${connectionId},1,'test-subject','100',${at},${at},${at},'gap','initial_history_unknown')`;
-  return {
-    connectionId,
-    googleSubject: "test-subject",
-    grantEpoch: 1,
-    grantedScopes: [
-      "openid",
-      "email",
-      "https://www.googleapis.com/auth/gmail.modify",
-    ],
-  };
-}
-
-async function setUpApprovedGmailDraft(
-  sql: postgres.Sql,
-  externalRunId: string,
-  companyNumber: string,
-  contactEmail: string,
-) {
-  const fixture = createValidResearchRunFixture();
-  fixture.externalRunId = externalRunId;
-  const candidate = fixture.prospects[0]!;
-  candidate.business.companyNumber = companyNumber;
-  candidate.business.googlePlaceId = `place-${companyNumber}`;
-  candidate.contact.email = contactEmail;
-  const companiesHouseEvidence = candidate.evidence.find(
-    (evidence) => evidence.sourceType === "companies_house",
-  );
-  assert.ok(companiesHouseEvidence);
-  companiesHouseEvidence.externalReference = companyNumber;
-  companiesHouseEvidence.sourceUrl = `https://find-and-update.company-information.service.gov.uk/company/${companyNumber}`;
-
-  const ingestion = await ingestResearchRun(sql, fixture);
-  const prospectId = ingestion.acceptedProspects[0]!.prospectId;
-  const [identity] = await sql<Array<{ draftTaskId: string }>>`
-    select at.id as "draftTaskId"
-    from growth.agent_tasks at
-    where at.prospect_id = ${prospectId}
-      and at.task_type = 'first_email_draft'
-  `;
-  assert.ok(identity);
-
-  const approve = createFirstEmailApprover({
-    repository: postgresFirstEmailApprovalRepository,
-    gmailClient: {
-      createDraft: async () => ({
-        draftId: "provider-draft-1",
-        messageId: "provider-draft-message-1",
-        gmailThreadId: "provider-draft-thread-1",
-      }),
-    },
-    founderEmail: FOUNDER_EMAIL,
-    siteOrigin: "https://faithfulsoftwaresolutions.co.uk",
-  });
-  const approved = await approve(sql, {
-    draftTaskId: identity.draftTaskId,
-    expectedVersion: 1,
-    founder,
-    correlationId: `${externalRunId}-approve`,
-    sendMode: "gmail_draft",
-  });
-
-  return { prospectId, approved };
-}
-
-async function cleanUp(
-  sql: postgres.Sql,
-  externalRunId: string,
-  contactEmail: string,
-  companyNumber: string,
-) {
-  await sql`
-    update growth.sequence_enrollments set first_message_id = null
-    where prospect_id in (
-      select p.id from growth.prospects p
-      inner join growth.research_runs rr on rr.id = p.research_run_id
-      where rr.external_run_id = ${externalRunId}
-    )
-  `;
-  await sql`
-    delete from growth.email_events
-    where email_message_id in (
-      select em.id from growth.email_messages em
-      inner join growth.prospects p on p.id = em.prospect_id
-      inner join growth.research_runs rr on rr.id = p.research_run_id
-      where rr.external_run_id = ${externalRunId}
-    )
-  `;
-  await sql`
-    delete from growth.email_messages
-    where prospect_id in (
-      select p.id from growth.prospects p
-      inner join growth.research_runs rr on rr.id = p.research_run_id
-      where rr.external_run_id = ${externalRunId}
-    )
-  `;
-  await sql`
-    delete from growth.sequence_enrollments
-    where prospect_id in (
-      select p.id from growth.prospects p
-      inner join growth.research_runs rr on rr.id = p.research_run_id
-      where rr.external_run_id = ${externalRunId}
-    )
-  `;
-  await sql`delete from growth.audit_log where correlation_id like ${`${externalRunId}%`}`;
-  await sql`
-    delete from growth.agent_tasks
-    where research_run_id in (select id from growth.research_runs where external_run_id = ${externalRunId})
-  `;
-  await sql`
-    delete from growth.source_evidence
-    where research_run_id in (select id from growth.research_runs where external_run_id = ${externalRunId})
-  `;
-  await sql`
-    delete from growth.website_assessments
-    where prospect_id in (
-      select p.id from growth.prospects p
-      inner join growth.research_runs rr on rr.id = p.research_run_id
-      where rr.external_run_id = ${externalRunId}
-    )
-  `;
-  await sql`
-    delete from growth.prospect_previews
-    where prospect_id in (
-      select p.id from growth.prospects p
-      inner join growth.research_runs rr on rr.id = p.research_run_id
-      where rr.external_run_id = ${externalRunId}
-    )
-  `;
-  await sql`
-    delete from growth.prospects
-    where research_run_id in (select id from growth.research_runs where external_run_id = ${externalRunId})
-  `;
-  await sql`delete from growth.contacts where email = ${contactEmail}`;
-  await sql`delete from growth.businesses where company_number = ${companyNumber}`;
-  await sql`delete from growth.research_runs where external_run_id = ${externalRunId}`;
-}
+import {
+  cleanUp,
+  setUpApprovedGmailDraft,
+  setUpBoundBaseline,
+  FOUNDER_EMAIL,
+} from "./gmail-sync-fixtures";
 
 test(
   "unbound Gmail draft observation does not activate a sequence or create follow-ups",
@@ -182,6 +45,21 @@ test(
       );
 
       const binding = await setUpBoundBaseline(sql, connectionId);
+      // Deliberately bypass TypeScript to exercise the runtime trust boundary.
+      const malformedActor = {
+        type: "gmail_sync",
+        id: "gmail-sync",
+      } as GmailSyncActor;
+      await assert.rejects(
+        stopSequence(app, {
+          sequenceId: approved.sequenceEnrollmentId,
+          reason: "bounce",
+          actor: malformedActor,
+          correlationId: `${externalRunId}-malformed`,
+        }),
+        TypeError,
+      );
+
       const sync = createGmailReplySync({
         repository: postgresGmailSyncRepository,
         binding,
@@ -315,6 +193,59 @@ test(
       `;
 
       const binding = await setUpBoundBaseline(sql, connectionId);
+      const preliminary =
+        await postgresGmailSyncRepository.findEnrollmentByThread(
+          app,
+          "active-thread-1",
+          binding,
+        );
+      assert.equal(preliminary.kind, "unknown");
+      await sql`update growth.sequence_enrollments set gmail_thread_id='changed-thread' where id=${approved.sequenceEnrollmentId}`;
+      await assert.rejects(
+        stopSequence(app, {
+          sequenceId: approved.sequenceEnrollmentId,
+          reason: "pause",
+          actor: { type: "gmail_sync", id: "gmail-sync", binding },
+          gmailThreadId: "active-thread-1",
+          correlationId: `${externalRunId}-stale`,
+        }),
+        /attribution changed/,
+      );
+      const [unchanged] =
+        await sql`select status from growth.sequence_enrollments where id=${approved.sequenceEnrollmentId}`;
+      assert.equal(unchanged?.status, "active");
+      const [pending] =
+        await sql`select status from growth.email_messages where sequence_enrollment_id=${approved.sequenceEnrollmentId} and step_number=1`;
+      assert.equal(pending?.status, "queued");
+      await sql`update growth.sequence_enrollments set gmail_thread_id='active-thread-1' where id=${approved.sequenceEnrollmentId}`;
+      const unbound = await postgresGmailSyncRepository.findEnrollmentByThread(
+        app,
+        "active-thread-1",
+        binding,
+      );
+      assert.equal(unbound.kind, "unknown");
+      await sql`insert into growth.outreach_account_controls(connection_id,verified_subject,verified_grant_epoch,verified_scopes) values (${connectionId},'another-subject',1,${binding.grantedScopes})`;
+      await sql`insert into growth.outreach_provider_usage(account_id,connection_id,complete,health) values (${connectionId},${connectionId},false,'unknown')`;
+      await sql`insert into growth.outreach_reservations(idempotency_key,email_message_id,sequence_id,account_id,london_day,status,connection_id,grant_epoch,rfc_message_id,recipient_count,authority_fingerprint,lease_token,lease_until,submitted_at,provider_message_id,provider_thread_id) values (${randomUUID()},${approved.messageId},${approved.sequenceEnrollmentId},${connectionId},current_date,'accepted',${connectionId},1,'<different-subject@example.test>',1,${"a".repeat(64)},${randomUUID()},now()+interval '1 hour',now(),'different-subject-sent','active-thread-1')`;
+      await assert.rejects(
+        stopSequence(app, {
+          sequenceId: approved.sequenceEnrollmentId,
+          reason: "pause",
+          actor: { type: "gmail_sync", id: "gmail-sync", binding },
+          gmailThreadId: "active-thread-1",
+          correlationId: `${externalRunId}-contradictory`,
+        }),
+        /attribution changed/,
+      );
+      const [stillActive] =
+        await sql`select status from growth.sequence_enrollments where id=${approved.sequenceEnrollmentId}`;
+      assert.equal(stillActive?.status, "active");
+      const [stillQueued] =
+        await sql`select status from growth.email_messages where sequence_enrollment_id=${approved.sequenceEnrollmentId} and step_number=1`;
+      assert.equal(stillQueued?.status, "queued");
+      await sql`delete from growth.outreach_reservations where connection_id=${connectionId}`;
+      await sql`delete from growth.outreach_provider_usage where connection_id=${connectionId}`;
+      await sql`delete from growth.outreach_account_controls where connection_id=${connectionId}`;
       let revokeDuringRead = true;
       const sync = createGmailReplySync({
         repository: postgresGmailSyncRepository,
@@ -396,6 +327,9 @@ test(
       `;
       assert.equal(followUps[0]?.status, "cancelled");
     } finally {
+      await sql`delete from growth.outreach_reservations where connection_id=${connectionId}`;
+      await sql`delete from growth.outreach_provider_usage where connection_id=${connectionId}`;
+      await sql`delete from growth.outreach_account_controls where connection_id=${connectionId}`;
       await cleanUp(sql, externalRunId, contactEmail, companyNumber);
       await sql`delete from growth.gmail_reply_coverage where connection_id=${connectionId}`;
       await sql`
@@ -473,6 +407,12 @@ test(
       assert.equal(revokedState?.status, "active");
       assert.equal(revokedInbound?.count, 0);
       await sql`update growth.integration_connections set status='connected',version=1 where id=${connectionId}`;
+      await sql`update growth.integration_connections set granted_scopes=${["openid", "email"]} where id=${connectionId}`;
+      await assert.rejects(
+        postgresGmailSyncRepository.recordInboundEvent(app, input),
+        /grant changed/i,
+      );
+      await sql`update growth.integration_connections set granted_scopes=${binding.grantedScopes} where id=${connectionId}`;
       await sql`update growth.outreach_account_controls set verified_subject='different-subject' where connection_id=${connectionId}`;
       assert.equal(
         (
@@ -484,9 +424,10 @@ test(
         ).kind,
         "unknown",
       );
-      await assert.rejects(
-        postgresGmailSyncRepository.recordInboundEvent(app, input),
-        /attribution/i,
+      assert.equal(
+        (await postgresGmailSyncRepository.recordInboundEvent(app, input))
+          .attributionUnknown,
+        true,
       );
       await sql`update growth.outreach_account_controls set verified_subject='test-subject' where connection_id=${connectionId}`;
       await sql`create function growth.test_reject_gmail_stop_audit() returns trigger language plpgsql as $$ begin if new.action='sequence.stopped.reply' then raise exception 'injected stop failure'; end if; return new; end $$`;

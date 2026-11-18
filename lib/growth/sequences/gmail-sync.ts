@@ -8,8 +8,9 @@ import {
   type GmailMessageMetadata,
 } from "../integrations/gmail/types";
 import type { GmailSyncRepository } from "./gmail-sync-repository";
-import { stopSequence as defaultStopSequence } from "./stop";
+import { stopSequence as defaultStopSequence, SequenceStopError } from "./stop";
 import type { StopSequenceInput, StoppedSequence } from "./stop";
+import { GmailThreadAttributionChangedError } from "./gmail-thread-association";
 
 export type GmailSyncSummary = {
   processed: number;
@@ -194,12 +195,24 @@ export function createGmailReplySync({
           !enrollment.status.startsWith("stopped_") &&
           enrollment.status !== "completed"
         ) {
-          await stop(db, {
-            sequenceId: enrollment.id,
-            reason: "pause",
-            actor: { type: "gmail_sync", id: "gmail-sync", binding },
-            correlationId: createCorrelationId(),
-          });
+          try {
+            await stop(db, {
+              sequenceId: enrollment.id,
+              reason: "pause",
+              actor: { type: "gmail_sync", id: "gmail-sync", binding },
+              gmailThreadId: metadata.gmailThreadId,
+              correlationId: createCorrelationId(),
+            });
+          } catch (error) {
+            if (
+              !(error instanceof GmailThreadAttributionChangedError) &&
+              !(
+                error instanceof SequenceStopError &&
+                error.code === "already_stopped"
+              )
+            )
+              throw error;
+          }
         }
         return;
       }
@@ -225,6 +238,10 @@ export function createGmailReplySync({
         eventType,
         correlationId: createCorrelationId(),
       });
+      if (recorded.attributionUnknown) {
+        recordUnknown(gmailMessageId, "ambiguous_account_thread");
+        return;
+      }
       if (eventType === "auto_response") {
         if (!recorded.alreadyRecorded) summary.autoResponses += 1;
         return;

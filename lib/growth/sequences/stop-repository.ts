@@ -3,12 +3,33 @@ import { appendAuditEvent } from "../audit/service";
 import { withGrowthTransaction } from "../db/client";
 import type { GrowthTransaction } from "../db/types";
 import type { SequenceStopRepository, SequenceStopTransaction } from "./stop";
+import {
+  findEnrollmentByThread,
+  lockGmailThread,
+  GmailThreadAttributionChangedError,
+} from "./gmail-thread-association";
 
 export function createSequenceStopTransaction(
   transaction: GrowthTransaction,
 ): SequenceStopTransaction {
   return {
-    async lockEnrollment(sequenceId, binding, threadId) {
+    async lockEnrollment(sequenceId, binding, threadId, attribution = "bound") {
+      if (threadId) {
+        if (!binding) throw new Error("Gmail thread attribution is invalid.");
+        await lockGmailThread(transaction, threadId);
+        const match = await findEnrollmentByThread(
+          transaction,
+          threadId,
+          binding,
+        );
+        const valid =
+          attribution === "unbound"
+            ? match.kind === "unknown" &&
+              match.safeToPause &&
+              match.enrollment.id === sequenceId
+            : match.kind === "unique" && match.enrollment.id === sequenceId;
+        if (!valid) throw new GmailThreadAttributionChangedError();
+      }
       const [identity] = await transaction<Array<{ businessId: string }>>`
         select p.business_id as "businessId"
         from growth.sequence_enrollments se
@@ -18,7 +39,7 @@ export function createSequenceStopTransaction(
       if (!identity) return null;
       await transaction`select pg_advisory_xact_lock(hashtextextended(${`growth:outreach-business:${identity.businessId}`}, 0))`;
       if (binding) await lockCurrentGmailGrant(transaction, binding);
-      if (threadId) {
+      if (threadId && attribution === "bound") {
         if (!binding) throw new Error("Gmail thread attribution is invalid.");
         const [control] = await transaction<Array<{ subject: string }>>`
           select verified_subject as subject from growth.outreach_account_controls where connection_id=${binding.connectionId} for share
@@ -50,13 +71,29 @@ export function createSequenceStopTransaction(
       if (rows[0] && rows[0].businessId !== identity.businessId) {
         throw new Error("Sequence business changed while acquiring lock.");
       }
-      if (threadId && binding && rows[0]) {
+      if (threadId && binding && rows[0] && attribution === "bound") {
         const [association] = await transaction<Array<{ id: string }>>`
           select id from growth.outreach_reservations where sequence_id=${sequenceId}
             and connection_id=${binding.connectionId} and provider_thread_id=${threadId} limit 1 for share
         `;
         if (rows[0].gmailThreadId !== threadId || !association)
           throw new Error("Gmail thread attribution is invalid.");
+      }
+      if (threadId && rows[0] && rows[0].gmailThreadId !== threadId)
+        throw new GmailThreadAttributionChangedError();
+      if (threadId && binding && rows[0]) {
+        const match = await findEnrollmentByThread(
+          transaction,
+          threadId,
+          binding,
+        );
+        const valid =
+          attribution === "unbound"
+            ? match.kind === "unknown" &&
+              match.safeToPause &&
+              match.enrollment.id === sequenceId
+            : match.kind === "unique" && match.enrollment.id === sequenceId;
+        if (!valid) throw new GmailThreadAttributionChangedError();
       }
       return rows[0] ?? null;
     },
