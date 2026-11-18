@@ -103,6 +103,7 @@
 
 .envelopeValue {
   color: #07182e;
+  overflow-wrap: anywhere;
 }
 
 .previewToggle {
