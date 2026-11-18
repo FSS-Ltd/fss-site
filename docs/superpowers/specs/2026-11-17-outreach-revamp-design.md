@@ -116,13 +116,15 @@ Committed durable state is authoritative. Publish authenticated outbox events af
 
 Propose two variants per offer, with identical eligibility and deterministic 50/50 assignment by business ID and experiment seed, stratified by market. Experiment one changes only the permission CTA wording; subject generation follows the same verified business/owner policy for both arms. The three video offers are distinct offers, not arms A/B/C. Compare only within the same offer and market. Freeze cohort, offer, market, policy and variant version and assign a stable variant at first send. This is an experiment design proposal, not a video claim. Commit a durable due-time report job with the first actual send event, for its one-calendar-month anniversary in Europe/London; if the original day does not exist in the next month, clamp to its last valid day. Do not fix an upfront calendar date or use a Codex polling loop.
 
+Implementation clarification, 18 November: Resend's [event definitions](https://resend.com/docs/webhooks/event-types) distinguish API acceptance from delivery. Keep its exact transmission time unknown. For Resend, use the durable FSS observation of an authenticated, exactly attributed delivery confirmation as the conservative follow-up and month-anniversary anchor, with that basis named in the CRM and report. A delayed confirmation delays due work. Gmail keeps its verified SENT anchor. Compare formula arms within the same provider and anchor basis as well as offer and market; retain positive replies observed before confirmation and show unanchored members as unknown/censored. Never substitute acceptance or delivery-observation time into an actual-send timestamp. Daily confirmed-send dates require defensible evidence; otherwise show unknown. These provider-specific implementation choices remain subject to final release review.
+
 The primary outcome is the **14-day positive-reply rate** for recipients first sent during the first 14 London calendar days who have a complete 14-day observation window at report cutoff. A positive reply is manually reviewed and expresses explicit interest or requests a next step. Exclude bots, opt-outs and out-of-office replies. List later or otherwise censored recipients separately; do not infer a winner from incomplete observation. Secondary outcomes are qualified meetings within 14 days and paid conversions by report cutoff, with censoring shown. Show intervals, denominators, sample maturity, missing data and attribution windows; do not crown a thin or confounded result.
 
 Use provider thread and enrollment identifiers to attribute replies to one membership. The founder records an explicit membership origin for meetings and proposals. Paid conversion requires a reviewed link from that membership to engagement, agreement and invoice evidence of net cleared payment for its campaign offer. Unique provider and event IDs prevent duplicate counts; no overlapping campaigns receive credit for one outcome. Historical unmapped outcomes remain unknown. Provider acceptance, delivery where known and the rest of the funnel remain visible; opens are not primary; use only existing first-party observations and add no tracking pixels without a user request. No later recurring monthly report is assumed without a separate scope decision.
 
 ## Implementation phases and acceptance
 
-These phases are proposals for a later approved implementation plan, not permission to build.
+These phases are covered by the approved implementation plan. Production deployment and campaign activation retain their separate gates.
 
 1. **Policy and evidence:** confirm offer/pricing, video adaptations, legal/provider eligibility, Workspace quota and activation criteria. Acceptance: policy specifies permitted paths and every uncertain recipient remains review-only.
 2. **CRM and campaign state:** extend source-aware intake, campaign versions, memberships, events and reservation ledger with reversible migrations and indexed foreign keys. Acceptance: no duplicated prospect store; clients, opt-outs and legacy capture stay protected.
@@ -145,7 +147,7 @@ Roll out disabled, with reviewed preview and rollback plan. Preserve legacy camp
 
 ## Open decisions
 
-- Approve or revise the proposed FSS offers, pricing, free-build scope and capability evidence.
+- Commercial rates, full website scope, no setup fee, no minimum term and cancellation at any time are confirmed above. Actual delivery capability evidence and immutable application policy approval remain to be recorded.
 - Choose the specific markets, recipient windows, permission evidence, policy approver and halt thresholds after provider and legal review.
 - Confirm whether the proposed review follow-up days and one-month-only report match the intended workflow.
 - Confirm Workspace plan and account health, DKIM, approved send ramp and any approved infrastructure budget.
