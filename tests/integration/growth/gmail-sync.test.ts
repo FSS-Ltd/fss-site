@@ -6,8 +6,11 @@ import postgres from "postgres";
 
 import {
   stopSequence,
+  stopSequenceInTransaction,
   type GmailSyncActor,
 } from "../../../lib/growth/sequences/stop";
+import { createSequenceStopTransaction } from "../../../lib/growth/sequences/stop-repository";
+import { withGrowthTransaction } from "../../../lib/growth/db/client";
 import { createGmailReplySync } from "../../../lib/growth/sequences/gmail-sync";
 import { postgresGmailSyncRepository } from "../../../lib/growth/sequences/gmail-sync-repository";
 
@@ -205,8 +208,20 @@ test(
         stopSequence(app, {
           sequenceId: approved.sequenceEnrollmentId,
           reason: "pause",
-          actor: { type: "gmail_sync", id: "gmail-sync", binding },
-          gmailThreadId: "active-thread-1",
+          actor: {
+            type: "gmail_sync",
+            id: "gmail-sync",
+            binding,
+            observation: {
+              messageId: "reply-message-1",
+              historyId: "300",
+              fromHeader: null,
+              threadId: "active-thread-1",
+              inReplyTo: null,
+              references: null,
+              fromAddress: null,
+            },
+          },
           correlationId: `${externalRunId}-stale`,
         }),
         /attribution changed/,
@@ -231,8 +246,20 @@ test(
         stopSequence(app, {
           sequenceId: approved.sequenceEnrollmentId,
           reason: "pause",
-          actor: { type: "gmail_sync", id: "gmail-sync", binding },
-          gmailThreadId: "active-thread-1",
+          actor: {
+            type: "gmail_sync",
+            id: "gmail-sync",
+            binding,
+            observation: {
+              messageId: "reply-message-1",
+              historyId: "300",
+              fromHeader: null,
+              threadId: "active-thread-1",
+              inReplyTo: null,
+              references: null,
+              fromAddress: null,
+            },
+          },
           correlationId: `${externalRunId}-contradictory`,
         }),
         /attribution changed/,
@@ -388,6 +415,15 @@ test(
         contactId: identity.contactId,
         gmailMessageId: `atomic-${token}`,
         gmailThreadId: "thread",
+        observation: {
+          messageId: `atomic-${token}`,
+          historyId: "300",
+          fromHeader: null,
+          threadId: "thread",
+          inReplyTo: null,
+          references: null,
+          fromAddress: null,
+        },
         rfcMessageId: null,
         from: null,
         subject: null,
@@ -395,6 +431,45 @@ test(
         eventType: "reply" as const,
         correlationId: `atomic-${token}`,
       };
+      const missingActor = {
+        type: "gmail_sync",
+        id: "gmail-sync",
+        binding,
+      } as GmailSyncActor;
+      const wrongActor: GmailSyncActor = {
+        type: "gmail_sync",
+        id: "gmail-sync",
+        binding,
+        observation: { ...input.observation, threadId: "wrong-thread" },
+      };
+      await sql`insert into growth.email_messages(id,sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key) values (gen_random_uuid(),${approved.sequenceEnrollmentId},${identity.prospectId},${identity.contactId},'gmail','outbound',1,'queued',${`guard-${token}`})`;
+      for (const actor of [missingActor, wrongActor]) {
+        const command = {
+          sequenceId: approved.sequenceEnrollmentId,
+          reason: "bounce" as const,
+          actor,
+          correlationId: `guard-${token}`,
+        };
+        await assert.rejects(stopSequence(app, command));
+        await assert.rejects(
+          withGrowthTransaction(app, (tx) =>
+            stopSequenceInTransaction(
+              createSequenceStopTransaction(tx),
+              command,
+            ),
+          ),
+        );
+      }
+      const [guardStatus] =
+        await sql`select se.status, em.status as pending from growth.sequence_enrollments se join growth.email_messages em on em.sequence_enrollment_id=se.id and em.idempotency_key=${`guard-${token}`} where se.id=${approved.sequenceEnrollmentId}`;
+      assert.equal(guardStatus?.status, "active");
+      assert.equal(guardStatus?.pending, "queued");
+      const [guardAudit] =
+        await sql`select count(*)::int as count from growth.audit_log where correlation_id=${`guard-${token}`}`;
+      const [guardSuppression] =
+        await sql`select count(*)::int as count from growth.suppressions where normalised_email=${contactEmail}`;
+      assert.equal(guardAudit?.count, 0);
+      assert.equal(guardSuppression?.count, 0);
       await sql`update growth.integration_connections set status='revoked',version=version+1 where id=${connectionId}`;
       await assert.rejects(
         postgresGmailSyncRepository.recordInboundEvent(app, input),
@@ -429,6 +504,27 @@ test(
           .attributionUnknown,
         true,
       );
+      await assert.rejects(
+        stopSequence(app, {
+          sequenceId: approved.sequenceEnrollmentId,
+          reason: "bounce",
+          actor: {
+            type: "gmail_sync",
+            id: "gmail-sync",
+            binding,
+            observation: input.observation,
+          },
+          correlationId: `cross-account-${token}`,
+        }),
+        /attribution changed/,
+      );
+      const [crossStatus] =
+        await sql`select se.status, em.status as pending from growth.sequence_enrollments se join growth.email_messages em on em.sequence_enrollment_id=se.id and em.idempotency_key=${`guard-${token}`} where se.id=${approved.sequenceEnrollmentId}`;
+      const [crossAudit] =
+        await sql`select count(*)::int as count from growth.audit_log where correlation_id=${`cross-account-${token}`}`;
+      assert.equal(crossStatus?.status, "active");
+      assert.equal(crossStatus?.pending, "queued");
+      assert.equal(crossAudit?.count, 0);
       await sql`update growth.outreach_account_controls set verified_subject='test-subject' where connection_id=${connectionId}`;
       await sql`create function growth.test_reject_gmail_stop_audit() returns trigger language plpgsql as $$ begin if new.action='sequence.stopped.reply' then raise exception 'injected stop failure'; end if; return new; end $$`;
       await sql`create trigger test_reject_gmail_stop_audit before insert on growth.audit_log for each row execute function growth.test_reject_gmail_stop_audit()`;

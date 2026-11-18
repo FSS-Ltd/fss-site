@@ -3,8 +3,9 @@ import { appendAuditEvent } from "../audit/service";
 import { withGrowthTransaction } from "../db/client";
 import type { GrowthTransaction } from "../db/types";
 import type { SequenceStopRepository, SequenceStopTransaction } from "./stop";
+import { classifyGmailRoutingInTransaction } from "./gmail-routing-repository";
 import {
-  findEnrollmentByThread,
+  lockGmailRouting,
   lockGmailThread,
   GmailThreadAttributionChangedError,
 } from "./gmail-thread-association";
@@ -13,22 +14,18 @@ export function createSequenceStopTransaction(
   transaction: GrowthTransaction,
 ): SequenceStopTransaction {
   return {
-    async lockEnrollment(sequenceId, binding, threadId, attribution = "bound") {
+    async lockEnrollment(
+      sequenceId,
+      binding,
+      threadId,
+      attribution = "bound",
+      observation,
+    ) {
       if (threadId) {
-        if (!binding) throw new Error("Gmail thread attribution is invalid.");
+        if (!binding || !observation || observation.threadId !== threadId)
+          throw new Error("Gmail thread attribution is invalid.");
+        await lockGmailRouting(transaction);
         await lockGmailThread(transaction, threadId);
-        const match = await findEnrollmentByThread(
-          transaction,
-          threadId,
-          binding,
-        );
-        const valid =
-          attribution === "unbound"
-            ? match.kind === "unknown" &&
-              match.safeToPause &&
-              match.enrollment.id === sequenceId
-            : match.kind === "unique" && match.enrollment.id === sequenceId;
-        if (!valid) throw new GmailThreadAttributionChangedError();
       }
       const [identity] = await transaction<Array<{ businessId: string }>>`
         select p.business_id as "businessId"
@@ -45,7 +42,7 @@ export function createSequenceStopTransaction(
           select verified_subject as subject from growth.outreach_account_controls where connection_id=${binding.connectionId} for share
         `;
         if (!control || control.subject !== binding.googleSubject)
-          throw new Error("Gmail thread attribution is invalid.");
+          throw new GmailThreadAttributionChangedError();
       }
       const rows = await transaction<
         Array<{
@@ -77,23 +74,28 @@ export function createSequenceStopTransaction(
             and connection_id=${binding.connectionId} and provider_thread_id=${threadId} limit 1 for share
         `;
         if (rows[0].gmailThreadId !== threadId || !association)
-          throw new Error("Gmail thread attribution is invalid.");
+          throw new GmailThreadAttributionChangedError();
       }
       if (threadId && rows[0] && rows[0].gmailThreadId !== threadId)
         throw new GmailThreadAttributionChangedError();
-      if (threadId && binding && rows[0]) {
-        const match = await findEnrollmentByThread(
-          transaction,
-          threadId,
+      if (threadId && binding && observation && rows[0]) {
+        const match = await classifyGmailRoutingInTransaction(transaction, {
+          ...observation,
           binding,
-        );
+        });
         const valid =
           attribution === "unbound"
             ? match.kind === "unknown" &&
               match.safeToPause &&
               match.enrollment.id === sequenceId
             : match.kind === "unique" && match.enrollment.id === sequenceId;
-        if (!valid) throw new GmailThreadAttributionChangedError();
+        if (!valid)
+          throw new GmailThreadAttributionChangedError(
+            match.kind === "ambiguous" ||
+              (match.kind === "unique" && match.enrollment.id !== sequenceId)
+              ? "ambiguous"
+              : "unknown",
+          );
       }
       return rows[0] ?? null;
     },

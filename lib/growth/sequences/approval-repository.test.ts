@@ -84,6 +84,7 @@ test("locks the draft and prospect, creates the enrollment and message, and audi
   assert.equal(result.suppressed, false);
   assert.equal(result.created.sequenceEnrollmentId, "enrollment-id");
 
+  assert.match(queries.shift()?.text ?? "", /growth:gmail-routing/);
   assert.match(queries[0]?.text ?? "", /task_type = 'first_email_draft'/);
   assert.match(queries[0]?.text ?? "", /for update of at, p, c$/);
   assert.match(queries[1]?.text ?? "", /select exists/);
@@ -142,6 +143,9 @@ test("records a provider draft outside the approval transaction", async () => {
       ? [{ id: "message-id" }]
       : [];
   }) as unknown as GrowthDb;
+  Object.assign(db, {
+    begin: async <T>(operation: (tx: GrowthDb) => Promise<T>) => operation(db),
+  });
 
   await postgresFirstEmailApprovalRepository.recordProviderDraft(db, {
     messageId: "message-id",
@@ -149,6 +153,7 @@ test("records a provider draft outside the approval transaction", async () => {
     providerThreadId: "provider-thread-1",
   });
 
+  assert.match(queries.shift()?.text ?? "", /growth:gmail-routing/);
   assert.match(queries[0]?.text ?? "", /update growth\.email_messages/);
   assert.match(queries[0]?.text ?? "", /status = 'provider_draft'/);
   assert.deepEqual(queries[0]?.values, [

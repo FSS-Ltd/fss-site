@@ -31,7 +31,7 @@ function queriesOf(
     db as unknown as {
       __queries: Array<{ text: string; values: readonly unknown[] }>;
     }
-  ).__queries;
+  ).__queries.filter((query) => !query.text.includes("growth:gmail-routing"));
 }
 
 test("claims one due message with FOR UPDATE SKIP LOCKED and increments its attempt count", async () => {

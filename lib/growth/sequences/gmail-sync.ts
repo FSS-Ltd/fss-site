@@ -11,6 +11,7 @@ import type { GmailSyncRepository } from "./gmail-sync-repository";
 import { stopSequence as defaultStopSequence, SequenceStopError } from "./stop";
 import type { StopSequenceInput, StoppedSequence } from "./stop";
 import { GmailThreadAttributionChangedError } from "./gmail-thread-association";
+import { gmailFromAddress } from "./gmail-routing";
 
 export type GmailSyncSummary = {
   processed: number;
@@ -24,13 +25,6 @@ export type GmailSyncSummary = {
 
 const BOUNCE_SENDER_PATTERN =
   /mailer-daemon|postmaster|delivery-subsystem|bounce/i;
-
-function extractEmailAddress(header: string | null): string | null {
-  if (!header) return null;
-  const match = header.match(/<([^>]+)>/);
-  const candidate = (match ? match[1] : header).trim().toLowerCase();
-  return candidate || null;
-}
 
 function isBounceSender(fromAddress: string | null): boolean {
   return fromAddress !== null && BOUNCE_SENDER_PATTERN.test(fromAddress);
@@ -155,7 +149,8 @@ export function createGmailReplySync({
       gmailThreadId: string,
       recordHistoryId: string,
     ): Promise<void> {
-      const metadata = await gmailClient.getMessageMetadata(gmailMessageId);
+      const message = await gmailClient.getMessageMetadata(gmailMessageId);
+      const metadata = { ...message, labelIds: [...message.labelIds] };
       if (
         metadata.messageId !== gmailMessageId ||
         metadata.gmailThreadId !== gmailThreadId ||
@@ -166,7 +161,7 @@ export function createGmailReplySync({
         throw new Error("Gmail metadata history is inconsistent.");
       summary.processed += 1;
 
-      const fromAddress = extractEmailAddress(metadata.from);
+      const fromAddress = gmailFromAddress(metadata.from);
       if (
         fromAddress === normalisedFounderEmail ||
         metadata.labelIds.includes("SENT")
@@ -177,12 +172,21 @@ export function createGmailReplySync({
         return;
       }
 
-      const match = await repository.classifyGmailRouting(db, {
-        binding,
+      const observation = Object.freeze({
+        messageId: metadata.messageId,
+        historyId: metadata.historyId,
+        fromHeader: metadata.from,
         threadId: metadata.gmailThreadId,
         inReplyTo: metadata.inReplyTo,
         references: metadata.references,
         fromAddress,
+      });
+      const match = await repository.classifyGmailRouting(db, {
+        binding,
+        threadId: observation.threadId,
+        inReplyTo: observation.inReplyTo,
+        references: observation.references,
+        fromAddress: observation.fromAddress,
       });
       if (match.kind === "none") return;
       if (match.kind === "uncertain") {
@@ -205,8 +209,12 @@ export function createGmailReplySync({
             await stop(db, {
               sequenceId: enrollment.id,
               reason: "pause",
-              actor: { type: "gmail_sync", id: "gmail-sync", binding },
-              gmailThreadId: metadata.gmailThreadId,
+              actor: {
+                type: "gmail_sync",
+                id: "gmail-sync",
+                binding,
+                observation,
+              },
               correlationId: createCorrelationId(),
             });
           } catch (error) {
@@ -237,6 +245,7 @@ export function createGmailReplySync({
         contactId: enrollment.contactId,
         gmailMessageId,
         gmailThreadId: metadata.gmailThreadId,
+        observation,
         rfcMessageId: metadata.rfcMessageId,
         from: metadata.from,
         subject: metadata.subject,
@@ -245,7 +254,12 @@ export function createGmailReplySync({
         correlationId: createCorrelationId(),
       });
       if (recorded.attributionUnknown) {
-        recordUnknown(gmailMessageId, "ambiguous_account_thread");
+        recordUnknown(
+          gmailMessageId,
+          recorded.attributionAmbiguous
+            ? "ambiguous_account_thread"
+            : "unknown_account_thread",
+        );
         return;
       }
       if (eventType === "auto_response") {

@@ -32,6 +32,13 @@ export async function setUpApprovedGmailDraft(
   externalRunId: string,
   companyNumber: string,
   contactEmail: string,
+  createDraft?: () => Promise<{
+    draftId: string;
+    messageId: string;
+    gmailThreadId: string;
+  }>,
+  fixedMessageId?: string,
+  failDraftPersistence = false,
 ) {
   const fixture = createValidResearchRunFixture();
   fixture.externalRunId = externalRunId;
@@ -57,16 +64,26 @@ export async function setUpApprovedGmailDraft(
   assert.ok(identity);
 
   const approve = createFirstEmailApprover({
-    repository: postgresFirstEmailApprovalRepository,
+    repository: failDraftPersistence
+      ? {
+          ...postgresFirstEmailApprovalRepository,
+          recordProviderDraft: async () => {
+            throw new Error("synthetic persistence failure");
+          },
+        }
+      : postgresFirstEmailApprovalRepository,
     gmailClient: {
-      createDraft: async () => ({
-        draftId: "provider-draft-1",
-        messageId: "provider-draft-message-1",
-        gmailThreadId: "provider-draft-thread-1",
-      }),
+      createDraft:
+        createDraft ??
+        (async () => ({
+          draftId: "provider-draft-1",
+          messageId: "provider-draft-message-1",
+          gmailThreadId: "provider-draft-thread-1",
+        })),
     },
     founderEmail: FOUNDER_EMAIL,
     siteOrigin: "https://faithfulsoftwaresolutions.co.uk",
+    ...(fixedMessageId ? { createMessageId: () => fixedMessageId } : {}),
   });
   const approved = await approve(sql, {
     draftTaskId: identity.draftTaskId,

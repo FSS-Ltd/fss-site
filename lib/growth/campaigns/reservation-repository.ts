@@ -6,6 +6,7 @@ import {
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { withGrowthTransaction } from "../db/client";
+import { lockGmailRouting } from "../sequences/gmail-thread-association";
 import type { GrowthDb, GrowthTransaction } from "../db/types";
 import { renderGmailMime } from "../email/gmail/mime";
 import { CAMPAIGN_FOUNDER_EMAIL } from "./authorization";
@@ -204,6 +205,7 @@ export async function reserveOutreachAttempt(
   )
     return held("invalid_input");
   return withGrowthTransaction(db, async (tx) => {
+    await lockGmailRouting(tx);
     await lockKey(tx, `growth:outreach-attempt:${input.attemptKey}`);
     const identity = await preliminary(tx, input.messageId);
     if (!identity) return held("identity_unknown");
@@ -365,6 +367,7 @@ export async function beginOutreachSubmission(
   )
     return held("invalid_input");
   return withGrowthTransaction(db, async (tx) => {
+    await lockGmailRouting(tx);
     const [initial] = await tx<
       { messageId: string; attemptKey: string; day: string }[]
     >`select email_message_id as "messageId",idempotency_key as "attemptKey",london_day::text as day from growth.outreach_reservations where id=${input.reservationId}`;

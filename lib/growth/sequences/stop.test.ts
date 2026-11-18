@@ -5,6 +5,7 @@ import type { FounderSession } from "../auth/require-founder";
 import type { GrowthDb } from "../db/types";
 import {
   createSequenceStopper,
+  stopSequenceInTransaction,
   SequenceStopError,
   type ApplyStopInput,
   type AppendStopAuditInput,
@@ -22,6 +23,15 @@ const founder: FounderSession = {
 const gmailSyncActor = {
   type: "gmail_sync" as const,
   id: "gmail-sync",
+  observation: {
+    messageId: "gmail-message-1",
+    historyId: "200",
+    fromHeader: null,
+    threadId: "gmail-thread-1",
+    inReplyTo: null,
+    references: null,
+    fromAddress: null,
+  },
   binding: {
     connectionId: "11111111-1111-4111-8111-111111111112",
     googleSubject: "subject",
@@ -339,6 +349,7 @@ test("Gmail stop checks the credential binding inside its transaction", async ()
   const actor = {
     type: "gmail_sync" as const,
     id: "gmail-sync",
+    observation: gmailSyncActor.observation,
     binding: {
       connectionId: "11111111-1111-4111-8111-111111111112",
       googleSubject: "subject",
@@ -383,4 +394,74 @@ test("Gmail system stops reject malformed bindings before effects", async () => 
     assert.equal(state.suppressions.length, 0);
     assert.equal(state.audits.length, 0);
   }
+});
+
+test("Gmail stops reject a valid grant without observed thread context", async () => {
+  const state = createFakeState();
+  const actor = {
+    type: "gmail_sync",
+    id: "gmail-sync",
+    binding: gmailSyncActor.binding,
+  } as unknown as typeof gmailSyncActor;
+  await assert.rejects(
+    createStopper(state)(db, {
+      sequenceId,
+      reason: "bounce",
+      actor,
+      correlationId: "c",
+    }),
+    TypeError,
+  );
+  await createFakeRepository(state).withTransaction(db, async (tx) => {
+    await assert.rejects(
+      stopSequenceInTransaction(tx, {
+        sequenceId,
+        reason: "bounce",
+        actor,
+        correlationId: "c",
+      }),
+      TypeError,
+    );
+  });
+  assert.equal(state.applied.length, 0);
+  assert.equal(state.suppressions.length, 0);
+  assert.equal(state.audits.length, 0);
+});
+
+test("Gmail stops reject malformed observed provider identity", async () => {
+  for (const observation of [
+    { ...gmailSyncActor.observation, threadId: "" },
+    { ...gmailSyncActor.observation, messageId: "" },
+    { ...gmailSyncActor.observation, historyId: "bad" },
+    { ...gmailSyncActor.observation, inReplyTo: undefined },
+    { ...gmailSyncActor.observation, fromAddress: "different@example.test" },
+  ]) {
+    const state = createFakeState();
+    const actor = { ...gmailSyncActor, observation } as typeof gmailSyncActor;
+    await assert.rejects(
+      createStopper(state)(db, {
+        sequenceId,
+        reason: "reply",
+        actor,
+        correlationId: "c",
+      }),
+      TypeError,
+    );
+    assert.equal(state.applied.length, 0);
+    assert.equal(state.suppressions.length, 0);
+    assert.equal(state.audits.length, 0);
+  }
+});
+
+test("Resend provider stops retain their existing suppression path", async () => {
+  const state = createFakeState();
+  await createStopper(state)(db, {
+    sequenceId,
+    reason: "bounce",
+    actor: { type: "resend_webhook", id: "evt_test" },
+    correlationId: "evt_test",
+  });
+  assert.equal(state.applied[0]?.status, "stopped_bounce");
+  assert.equal(state.suppressions.length, 1);
+  assert.equal(state.audits[0]?.actorType, "provider");
 });

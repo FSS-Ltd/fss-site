@@ -1,5 +1,5 @@
 import { withGrowthTransaction } from "../db/client";
-import { lockGmailThread } from "./gmail-thread-association";
+import { lockGmailRouting, lockGmailThread } from "./gmail-thread-association";
 import type { GrowthDb } from "../db/types";
 
 export type ClaimedMessage = {
@@ -118,7 +118,9 @@ async function claimDueMessage(
     messageId?: string;
   },
 ): Promise<ClaimedMessage | null> {
-  const rows = await db<Array<ClaimedMessage>>`
+  return withGrowthTransaction(db, async (tx) => {
+    await lockGmailRouting(tx);
+    const rows = await tx<Array<ClaimedMessage>>`
     with target as (
       select em.id, em.status as "previousStatus",
         se.template_snapshot ->> 'followUpPolicy' = 'manual_only' as "manualOnly",
@@ -158,7 +160,8 @@ async function claimDueMessage(
       em.html_snapshot as "htmlSnapshot",
       em.text_snapshot as "textSnapshot"
   `;
-  return rows[0] ?? null;
+    return rows[0] ?? null;
+  });
 }
 
 async function getSendContext(
@@ -267,7 +270,9 @@ async function cancelMessage(
   db: GrowthDb,
   input: CancelMessageInput,
 ): Promise<void> {
-  await db`
+  await withGrowthTransaction(db, async (tx) => {
+    await lockGmailRouting(tx);
+    await tx`
     update growth.email_messages
     set status = 'cancelled',
         lease_token = null,
@@ -276,13 +281,16 @@ async function cancelMessage(
         updated_at = now()
     where id = ${input.messageId}
   `;
+  });
 }
 
 async function failMessage(
   db: GrowthDb,
   input: FailMessageInput,
 ): Promise<void> {
-  await db`
+  await withGrowthTransaction(db, async (tx) => {
+    await lockGmailRouting(tx);
+    await tx`
     update growth.email_messages
     set status = ${input.status},
         lease_token = null,
@@ -292,6 +300,7 @@ async function failMessage(
         updated_at = now()
     where id = ${input.messageId}
   `;
+  });
 }
 
 export async function recordSent(
@@ -299,6 +308,7 @@ export async function recordSent(
   input: RecordSentInput,
 ): Promise<void> {
   await withGrowthTransaction(db, async (tx) => {
+    await lockGmailRouting(tx);
     await lockGmailThread(tx, input.providerThreadId);
     await tx`
       update growth.email_messages

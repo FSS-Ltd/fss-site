@@ -2,7 +2,7 @@ import type { GrowthQueryExecutor, GrowthTransaction } from "../db/types";
 import type { GmailGrantBinding } from "../integrations/gmail/live-client";
 
 export class GmailThreadAttributionChangedError extends Error {
-  constructor() {
+  constructor(readonly classification: "unknown" | "ambiguous" = "unknown") {
     super("Gmail thread attribution changed.");
   }
 }
@@ -19,6 +19,12 @@ export type ThreadMatch =
   | { kind: "ambiguous" }
   | { kind: "unique"; enrollment: ThreadEnrollment }
   | { kind: "unknown"; enrollment: ThreadEnrollment; safeToPause: boolean };
+
+// Legacy evidence can be unbound, so serialize routing writers across accounts.
+// Acquire this before thread, business, grant or row locks; never across I/O.
+export async function lockGmailRouting(tx: GrowthTransaction): Promise<void> {
+  await tx`select pg_advisory_xact_lock(hashtextextended('growth:gmail-routing', 0))`;
+}
 
 export async function lockGmailThread(
   tx: GrowthTransaction,

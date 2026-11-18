@@ -2,6 +2,7 @@ import type postgres from "postgres";
 
 import { appendAuditEvent } from "../audit/service";
 import { withGrowthTransaction } from "../db/client";
+import { lockGmailRouting } from "./gmail-thread-association";
 import type { GrowthDb, GrowthTransaction } from "../db/types";
 import type {
   FirstEmailApprovalRepository,
@@ -207,13 +208,16 @@ function createTransaction(
 export const postgresFirstEmailApprovalRepository: FirstEmailApprovalRepository =
   {
     withTransaction(db, operation) {
-      return withGrowthTransaction(db, (transaction) =>
-        operation(createTransaction(transaction)),
-      );
+      return withGrowthTransaction(db, async (transaction) => {
+        await lockGmailRouting(transaction);
+        return operation(createTransaction(transaction));
+      });
     },
 
     async recordProviderDraft(db: GrowthDb, input) {
-      const rows = await db<Array<{ id: string }>>`
+      const rows = await withGrowthTransaction(db, async (tx) => {
+        await lockGmailRouting(tx);
+        return tx<Array<{ id: string }>>`
       update growth.email_messages
       set status = 'provider_draft',
           provider_draft_id = ${input.providerDraftId},
@@ -222,6 +226,7 @@ export const postgresFirstEmailApprovalRepository: FirstEmailApprovalRepository 
       where id = ${input.messageId}
       returning id
     `;
+      });
       if (!rows[0]) {
         throw new FirstEmailApprovalPersistenceError();
       }

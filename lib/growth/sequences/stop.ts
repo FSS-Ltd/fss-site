@@ -1,6 +1,10 @@
 import type { FounderSession } from "../auth/require-founder";
 import type { GrowthDb } from "../db/types";
 import type { GmailGrantBinding } from "../integrations/gmail/live-client";
+import {
+  validateGmailEffectObservation,
+  type GmailEffectObservation,
+} from "./gmail-routing-repository";
 import { hasRequiredGmailScopes } from "../integrations/google-oauth";
 import { postgresSequenceStopRepository } from "./stop-repository";
 
@@ -42,6 +46,7 @@ export type GmailSyncActor = {
   type: "gmail_sync";
   id: string;
   binding: GmailGrantBinding;
+  observation: GmailEffectObservation;
 };
 export type ResendWebhookActor = { type: "resend_webhook"; id: string };
 
@@ -50,7 +55,6 @@ export type StopSequenceInput = {
   reason: StopReason;
   actor: FounderSession | GmailSyncActor | ResendWebhookActor;
   correlationId: string;
-  gmailThreadId?: string;
 };
 
 export type StoppedSequence = {
@@ -97,6 +101,7 @@ export interface SequenceStopTransaction {
     binding?: GmailGrantBinding,
     threadId?: string,
     attribution?: "bound" | "unbound",
+    observation?: GmailEffectObservation,
   ): Promise<LockedEnrollment | null>;
   cancelPendingMessages(
     sequenceId: string,
@@ -141,6 +146,7 @@ function validateRequest(input: StopSequenceInput): void {
   const { actorId } = resolveActor(input.actor);
   if ("type" in input.actor && input.actor.type === "gmail_sync") {
     const binding = input.actor.binding;
+    const observation = input.actor.observation;
     if (
       input.actor.id !== "gmail-sync" ||
       !binding ||
@@ -156,9 +162,11 @@ function validateRequest(input: StopSequenceInput): void {
         (scope) =>
           typeof scope === "string" && scope.length > 0 && scope.length <= 500,
       ) ||
-      !hasRequiredGmailScopes(binding.grantedScopes)
+      !hasRequiredGmailScopes(binding.grantedScopes) ||
+      !["pause", "reply", "bounce"].includes(input.reason)
     )
       throw new TypeError("Sequence stop request is invalid.");
+    validateGmailEffectObservation(observation);
   }
   if (
     !SEQUENCE_ID_PATTERN.test(input.sequenceId) ||
@@ -185,13 +193,23 @@ export async function stopSequenceInTransaction(
   validateRequest(input);
   const { actorType, actorId } = resolveActor(input.actor);
   const targetStatus = STATUS_BY_REASON[input.reason];
+  const gmailActor =
+    "type" in input.actor && input.actor.type === "gmail_sync"
+      ? input.actor
+      : null;
+  const binding = gmailActor
+    ? {
+        ...gmailActor.binding,
+        grantedScopes: [...gmailActor.binding.grantedScopes],
+      }
+    : undefined;
+  const observation = gmailActor ? { ...gmailActor.observation } : undefined;
   const enrollment = await transaction.lockEnrollment(
     input.sequenceId,
-    "type" in input.actor && input.actor.type === "gmail_sync"
-      ? input.actor.binding
-      : undefined,
-    input.gmailThreadId,
-    input.gmailThreadId ? "unbound" : undefined,
+    binding,
+    observation?.threadId,
+    gmailActor ? (input.reason === "pause" ? "unbound" : "bound") : undefined,
+    observation,
   );
   if (!enrollment) throw new SequenceStopError("not_found");
 

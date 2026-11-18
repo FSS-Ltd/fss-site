@@ -14,6 +14,24 @@ function fakeDb(
   ) => {
     const text = strings.join("?").replace(/\s+/g, " ").trim();
     queries.push({ text, values });
+    if (text.startsWith("with thread_rows"))
+      return [
+        {
+          threadRows: [
+            {
+              id: "enrollment-id",
+              status: "active",
+              prospectId: "prospect-id",
+              contactId: "contact-id",
+              bound: true,
+              hasAssociation: true,
+            },
+          ],
+          candidates: [],
+          possibleExposure: false,
+          contactSignal: false,
+        },
+      ];
     if (
       text.startsWith("select se.id") &&
       text.includes('"hasAssociation"') &&
@@ -62,6 +80,7 @@ function fakeDb(
   }) as unknown as GrowthTransaction;
   Object.assign(tagged, {
     json: (value: unknown) => value,
+    array: (value: unknown) => value,
     __queries: queries,
     begin: async <T>(operation: (tx: GrowthTransaction) => Promise<T>) =>
       operation(tagged),
@@ -132,6 +151,15 @@ test("inserts the inbound message then its event, and detects a duplicate", asyn
     contactId: "contact-id",
     gmailMessageId: "gmail-message-1",
     gmailThreadId: "gmail-thread-1",
+    observation: {
+      messageId: "gmail-message-1",
+      historyId: "200",
+      threadId: "gmail-thread-1",
+      inReplyTo: null,
+      references: null,
+      fromAddress: "sam@example.test",
+      fromHeader: "sam@example.test",
+    },
     rfcMessageId: "<reply@example.test>",
     from: "sam@example.test",
     subject: "Re: A practical idea",
@@ -199,6 +227,15 @@ test("treats a matching inbound event as already recorded", async () => {
     contactId: "contact-id",
     gmailMessageId: "gmail-message-1",
     gmailThreadId: "gmail-thread-1",
+    observation: {
+      messageId: "gmail-message-1",
+      historyId: "200",
+      threadId: "gmail-thread-1",
+      inReplyTo: null,
+      references: null,
+      fromAddress: "sam@example.test",
+      fromHeader: "sam@example.test",
+    },
     rfcMessageId: null,
     from: "sam@example.test",
     subject: null,
@@ -279,6 +316,15 @@ test("rejects an inbound provider ID already attributed to another enrollment", 
       contactId: "c",
       gmailMessageId: "gmail-message-1",
       gmailThreadId: "gmail-thread-1",
+      observation: {
+        messageId: "gmail-message-1",
+        historyId: "200",
+        threadId: "gmail-thread-1",
+        inReplyTo: null,
+        references: null,
+        fromAddress: null,
+        fromHeader: null,
+      },
       rfcMessageId: null,
       from: null,
       subject: null,

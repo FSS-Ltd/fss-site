@@ -163,6 +163,7 @@ function createFakeRepository(
             type: "gmail_sync",
             id: "gmail-sync",
             binding: input.binding,
+            observation: input.observation,
           },
           correlationId: input.correlationId,
         });
@@ -307,6 +308,15 @@ test("stops the sequence as a reply for an inbound message from outside the foun
   assert.deepEqual(state.stops[0]?.actor, {
     type: "gmail_sync",
     id: "gmail-sync",
+    observation: {
+      messageId: "gmail-message-1",
+      historyId: "200",
+      fromHeader: "Sam Reader <sam@example.test>",
+      threadId: "gmail-thread-1",
+      inReplyTo: null,
+      references: null,
+      fromAddress: "sam@example.test",
+    },
     binding: {
       connectionId: "11111111-1111-4111-8111-111111111112",
       googleSubject: "subject",
@@ -318,6 +328,48 @@ test("stops the sequence as a reply for an inbound message from outside the foun
       ],
     },
   });
+});
+
+test("freezes fetched routing evidence before preliminary classification", async () => {
+  const enrollment = {
+    id: "enrollment-1",
+    status: "active",
+    prospectId: "p",
+    contactId: "c",
+  };
+  const state = createFakeState({
+    historyPages: [historyPage(["gmail-message-1"])],
+    enrollmentsByThread: new Map([["gmail-thread-1", enrollment]]),
+  });
+  const fetched = metadata();
+  state.metadataByMessageId.set("gmail-message-1", fetched);
+  const repository = createFakeRepository(state);
+  repository.classifyGmailRouting = async () => {
+    fetched.references = "<changed@example.test>";
+    fetched.from = "changed@example.test";
+    return { kind: "unique", enrollment };
+  };
+  const sync = createGmailReplySync({
+    repository,
+    gmailClient: createFakeGmailClient(state),
+    founderEmail: FOUNDER_EMAIL,
+    binding: {
+      connectionId: "11111111-1111-4111-8111-111111111112",
+      googleSubject: "subject",
+      grantEpoch: 1,
+      grantedScopes: [
+        "openid",
+        "email",
+        "https://www.googleapis.com/auth/gmail.modify",
+      ],
+    },
+  });
+  await sync(db);
+  assert.equal(state.recordedEvents[0]?.observation.references, null);
+  assert.equal(
+    state.recordedEvents[0]?.observation.fromHeader,
+    "Sam Reader <sam@example.test>",
+  );
 });
 
 test("does not stop the sequence for the founder's own sent message", async () => {

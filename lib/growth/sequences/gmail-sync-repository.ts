@@ -1,6 +1,5 @@
 import {
   findEnrollmentByThread,
-  lockGmailThread,
   type ThreadMatch,
 } from "./gmail-thread-association";
 export type { ThreadEnrollment, ThreadMatch } from "./gmail-thread-association";
@@ -8,7 +7,12 @@ import { withGrowthTransaction } from "../db/client";
 import type { GrowthDb, GrowthTransaction } from "../db/types";
 import type { GmailGrantBinding } from "../integrations/gmail/live-client";
 import { stopSequenceInTransaction } from "./stop";
-import { classifyGmailRouting } from "./gmail-routing-repository";
+import {
+  classifyGmailRouting,
+  validateGmailEffectObservation,
+  type GmailEffectObservation,
+} from "./gmail-routing-repository";
+import { GmailThreadAttributionChangedError } from "./gmail-thread-association";
 import { createSequenceStopTransaction } from "./stop-repository";
 import {
   commitReplyCoverage,
@@ -37,6 +41,7 @@ export type RecordInboundEventInput = {
   contactId: string;
   gmailMessageId: string;
   gmailThreadId: string;
+  observation: GmailEffectObservation;
   rfcMessageId: string | null;
   from: string | null;
   subject: string | null;
@@ -67,7 +72,11 @@ export interface GmailSyncRepository {
   recordInboundEvent(
     db: GrowthDb,
     input: RecordInboundEventInput,
-  ): Promise<{ alreadyRecorded: boolean; attributionUnknown?: boolean }>;
+  ): Promise<{
+    alreadyRecorded: boolean;
+    attributionUnknown?: boolean;
+    attributionAmbiguous?: boolean;
+  }>;
   activatePendingApproval(
     db: GrowthDb,
     sequenceEnrollmentId: string,
@@ -123,32 +132,53 @@ async function findPendingDraftByRfcMessageId(
 async function recordInboundEvent(
   db: GrowthDb,
   input: RecordInboundEventInput,
-): Promise<{ alreadyRecorded: boolean; attributionUnknown?: boolean }> {
+): Promise<{
+  alreadyRecorded: boolean;
+  attributionUnknown?: boolean;
+  attributionAmbiguous?: boolean;
+}> {
   return withGrowthTransaction(db, async (tx: GrowthTransaction) => {
-    await lockGmailThread(tx, input.gmailThreadId);
-    const match = await findEnrollmentByThread(
-      tx,
-      input.gmailThreadId,
-      input.binding,
-    );
+    validateGmailEffectObservation(input.observation);
+    const observation = { ...input.observation };
+    const binding = {
+      ...input.binding,
+      grantedScopes: [...input.binding.grantedScopes],
+    };
     if (
-      match.kind !== "unique" ||
-      match.enrollment.id !== input.sequenceEnrollmentId
-    ) {
-      return { alreadyRecorded: false, attributionUnknown: true };
-    }
+      observation.threadId !== input.gmailThreadId ||
+      observation.messageId !== input.gmailMessageId ||
+      observation.fromHeader !== input.from
+    )
+      throw new Error("Gmail thread attribution is invalid.");
     const stopTransaction = createSequenceStopTransaction(tx);
-    const enrollment = await stopTransaction.lockEnrollment(
-      input.sequenceEnrollmentId,
-      input.binding,
-      input.gmailThreadId,
-    );
-    if (!enrollment) throw new Error("Gmail thread attribution is invalid.");
+    try {
+      const enrollment = await stopTransaction.lockEnrollment(
+        input.sequenceEnrollmentId,
+        binding,
+        input.gmailThreadId,
+        "bound",
+        observation,
+      );
+      if (!enrollment)
+        return { alreadyRecorded: false, attributionUnknown: true };
+    } catch (error) {
+      if (!(error instanceof GmailThreadAttributionChangedError)) throw error;
+      return {
+        alreadyRecorded: false,
+        attributionUnknown: true,
+        attributionAmbiguous: error.classification === "ambiguous",
+      };
+    }
     if (input.eventType !== "auto_response") {
       await stopSequenceInTransaction(stopTransaction, {
         sequenceId: input.sequenceEnrollmentId,
         reason: input.eventType,
-        actor: { type: "gmail_sync", id: "gmail-sync", binding: input.binding },
+        actor: {
+          type: "gmail_sync",
+          id: "gmail-sync",
+          binding,
+          observation,
+        },
         correlationId: input.correlationId,
       });
     }
