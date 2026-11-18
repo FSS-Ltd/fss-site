@@ -2112,42 +2112,42 @@
       "label": "preliminary()",
       "file_type": "code",
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L50"
+      "source_location": "L51"
     },
     {
       "id": "reservation_repository_lockkey",
       "label": "lockKey()",
       "file_type": "code",
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L65"
+      "source_location": "L66"
     },
     {
       "id": "reservation_repository_lockedpreparation",
       "label": "lockedPreparation()",
       "file_type": "code",
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L68"
+      "source_location": "L69"
     },
     {
       "id": "reservation_repository_checkbudget",
       "label": "checkBudget()",
       "file_type": "code",
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L136"
+      "source_location": "L137"
     },
     {
       "id": "reservation_repository_reserveoutreachattempt",
       "label": "reserveOutreachAttempt()",
       "file_type": "code",
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L188"
+      "source_location": "L189"
     },
     {
       "id": "reservation_repository_beginoutreachsubmission",
       "label": "beginOutreachSubmission()",
       "file_type": "code",
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L352"
+      "source_location": "L354"
     },
     {
       "id": "lib_growth_campaigns_reservation_settlement_test_ts",
@@ -2168,21 +2168,21 @@
       "label": "settleOutreachAttempt()",
       "file_type": "code",
       "source_file": "lib/growth/campaigns/reservation-settlement.ts",
-      "source_location": "L17"
+      "source_location": "L20"
     },
     {
       "id": "reservation_settlement_canceloutreachreservation",
       "label": "cancelOutreachReservation()",
       "file_type": "code",
       "source_file": "lib/growth/campaigns/reservation-settlement.ts",
-      "source_location": "L77"
+      "source_location": "L81"
     },
     {
       "id": "reservation_settlement_reconcileoutreachattempt",
       "label": "reconcileOutreachAttempt()",
       "file_type": "code",
       "source_file": "lib/growth/campaigns/reservation-settlement.ts",
-      "source_location": "L102"
+      "source_location": "L107"
     },
     {
       "id": "lib_growth_campaigns_reservation_shared_ts",
@@ -5363,6 +5363,118 @@
       "source_location": "L1"
     },
     {
+      "id": "lib_growth_seo_audits_repository_ts",
+      "label": "repository.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "repository_validatelimit",
+      "label": "validateLimit()",
+      "file_type": "code",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L27"
+    },
+    {
+      "id": "repository_claimseoauditcandidates",
+      "label": "claimSeoAuditCandidates()",
+      "file_type": "code",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L38"
+    },
+    {
+      "id": "repository_releaseseoauditclaims",
+      "label": "releaseSeoAuditClaims()",
+      "file_type": "code",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L133"
+    },
+    {
+      "id": "repository_getseoauditdraftrendercontext",
+      "label": "getSeoAuditDraftRenderContext()",
+      "file_type": "code",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L181"
+    },
+    {
+      "id": "repository_seoauditdraftcompletionerror",
+      "label": "SeoAuditDraftCompletionError",
+      "file_type": "code",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L208"
+    },
+    {
+      "id": "repository_seoauditdraftcompletionerror_constructor",
+      "label": ".constructor()",
+      "file_type": "code",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L209"
+    },
+    {
+      "id": "repository_seoauditdraftpersistenceerror",
+      "label": "SeoAuditDraftPersistenceError",
+      "file_type": "code",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L220"
+    },
+    {
+      "id": "repository_seoauditdraftpersistenceerror_constructor",
+      "label": ".constructor()",
+      "file_type": "code",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L221"
+    },
+    {
+      "id": "repository_completeseoauditdraft",
+      "label": "completeSeoAuditDraft()",
+      "file_type": "code",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L239"
+    },
+    {
+      "id": "repository_seoauditapprovalerror",
+      "label": "SeoAuditApprovalError",
+      "file_type": "code",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L341"
+    },
+    {
+      "id": "repository_seoauditapprovalerror_constructor",
+      "label": ".constructor()",
+      "file_type": "code",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L342"
+    },
+    {
+      "id": "repository_validateapprovalinput",
+      "label": "validateApprovalInput()",
+      "file_type": "code",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L376"
+    },
+    {
+      "id": "repository_approveseoauditdraft",
+      "label": "approveSeoAuditDraft()",
+      "file_type": "code",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L389"
+    },
+    {
+      "id": "repository_listseoauditdrafts",
+      "label": "listSeoAuditDrafts()",
+      "file_type": "code",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L552"
+    },
+    {
+      "id": "lib_growth_sequences_approval_repository_test_ts",
+      "label": "approval-repository.test.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/sequences/approval-repository.test.ts",
+      "source_location": "L1"
+    },
+    {
       "id": "lib_growth_sequences_approval_repository_ts",
       "label": "approval-repository.ts",
       "file_type": "code",
@@ -5374,28 +5486,28 @@
       "label": "FirstEmailApprovalPersistenceError",
       "file_type": "code",
       "source_file": "lib/growth/sequences/approval-repository.ts",
-      "source_location": "L11"
+      "source_location": "L12"
     },
     {
       "id": "approval_repository_firstemailapprovalpersistenceerror_constructor",
       "label": ".constructor()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/approval-repository.ts",
-      "source_location": "L12"
+      "source_location": "L13"
     },
     {
       "id": "lib_growth_sequences_approval_repository_ts__approval_repository_tojsonvalue",
       "label": "toJsonValue()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/approval-repository.ts",
-      "source_location": "L18"
+      "source_location": "L19"
     },
     {
       "id": "lib_growth_sequences_approval_repository_ts__approval_repository_createtransaction",
       "label": "createTransaction()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/approval-repository.ts",
-      "source_location": "L23"
+      "source_location": "L24"
     },
     {
       "id": "lib_growth_sequences_approval_ts",
@@ -5514,56 +5626,56 @@
       "label": "getSendContext()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/dispatcher-repository.ts",
-      "source_location": "L164"
+      "source_location": "L167"
     },
     {
       "id": "dispatcher_repository_issuppressed",
       "label": "isSuppressed()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/dispatcher-repository.ts",
-      "source_location": "L191"
+      "source_location": "L194"
     },
     {
       "id": "dispatcher_repository_hasnewerinboundmessage",
       "label": "hasNewerInboundMessage()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/dispatcher-repository.ts",
-      "source_location": "L203"
+      "source_location": "L206"
     },
     {
       "id": "dispatcher_repository_getfollowuptemplate",
       "label": "getFollowUpTemplate()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/dispatcher-repository.ts",
-      "source_location": "L228"
+      "source_location": "L231"
     },
     {
       "id": "dispatcher_repository_getthreadreferences",
       "label": "getThreadReferences()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/dispatcher-repository.ts",
-      "source_location": "L247"
+      "source_location": "L250"
     },
     {
       "id": "dispatcher_repository_cancelmessage",
       "label": "cancelMessage()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/dispatcher-repository.ts",
-      "source_location": "L266"
+      "source_location": "L269"
     },
     {
       "id": "dispatcher_repository_failmessage",
       "label": "failMessage()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/dispatcher-repository.ts",
-      "source_location": "L281"
+      "source_location": "L287"
     },
     {
       "id": "dispatcher_repository_recordsent",
       "label": "recordSent()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/dispatcher-repository.ts",
-      "source_location": "L297"
+      "source_location": "L306"
     },
     {
       "id": "lib_growth_sequences_dispatcher_test_ts",
@@ -5895,11 +6007,32 @@
       "source_location": "L1"
     },
     {
+      "id": "gmail_routing_repository_validategmailobservation",
+      "label": "validateGmailObservation()",
+      "file_type": "code",
+      "source_file": "lib/growth/sequences/gmail-routing-repository.ts",
+      "source_location": "L35"
+    },
+    {
+      "id": "gmail_routing_repository_validategmaileffectobservation",
+      "label": "validateGmailEffectObservation()",
+      "file_type": "code",
+      "source_file": "lib/growth/sequences/gmail-routing-repository.ts",
+      "source_location": "L65"
+    },
+    {
       "id": "gmail_routing_repository_classifygmailrouting",
       "label": "classifyGmailRouting()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/gmail-routing-repository.ts",
-      "source_location": "L27"
+      "source_location": "L89"
+    },
+    {
+      "id": "gmail_routing_repository_classifygmailroutingintransaction",
+      "label": "classifyGmailRoutingInTransaction()",
+      "file_type": "code",
+      "source_file": "lib/growth/sequences/gmail-routing-repository.ts",
+      "source_location": "L99"
     },
     {
       "id": "lib_growth_sequences_gmail_routing_test_ts",
@@ -5916,11 +6049,18 @@
       "source_location": "L1"
     },
     {
+      "id": "gmail_routing_gmailfromaddress",
+      "label": "gmailFromAddress()",
+      "file_type": "code",
+      "source_file": "lib/growth/sequences/gmail-routing.ts",
+      "source_location": "L12"
+    },
+    {
       "id": "gmail_routing_assessgmailrouting",
       "label": "assessGmailRouting()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/gmail-routing.ts",
-      "source_location": "L13"
+      "source_location": "L20"
     },
     {
       "id": "lib_growth_sequences_gmail_sync_coverage_repository_ts",
@@ -5997,7 +6137,7 @@
       "label": "queriesOf()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/gmail-sync-repository.test.ts",
-      "source_location": "L72"
+      "source_location": "L91"
     },
     {
       "id": "lib_growth_sequences_gmail_sync_repository_ts",
@@ -6011,35 +6151,35 @@
       "label": "getCursor()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
-      "source_location": "L77"
+      "source_location": "L86"
     },
     {
       "id": "gmail_sync_repository_setcursor",
       "label": "setCursor()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
-      "source_location": "L89"
+      "source_location": "L98"
     },
     {
       "id": "gmail_sync_repository_findpendingdraftbyrfcmessageid",
       "label": "findPendingDraftByRfcMessageId()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
-      "source_location": "L101"
+      "source_location": "L110"
     },
     {
       "id": "gmail_sync_repository_recordinboundevent",
       "label": "recordInboundEvent()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
-      "source_location": "L123"
+      "source_location": "L132"
     },
     {
       "id": "gmail_sync_repository_activatependingapproval",
       "label": "activatePendingApproval()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
-      "source_location": "L212"
+      "source_location": "L242"
     },
     {
       "id": "lib_growth_sequences_gmail_sync_test_ts",
@@ -6081,14 +6221,14 @@
       "label": "createFakeGmailClient()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/gmail-sync.test.ts",
-      "source_location": "L182"
+      "source_location": "L183"
     },
     {
       "id": "gmail_sync_test_createsync",
       "label": "createSync()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/gmail-sync.test.ts",
-      "source_location": "L211"
+      "source_location": "L212"
     },
     {
       "id": "lib_growth_sequences_gmail_sync_ts",
@@ -6098,39 +6238,32 @@
       "source_location": "L1"
     },
     {
-      "id": "gmail_sync_extractemailaddress",
-      "label": "extractEmailAddress()",
-      "file_type": "code",
-      "source_file": "lib/growth/sequences/gmail-sync.ts",
-      "source_location": "L28"
-    },
-    {
       "id": "gmail_sync_isbouncesender",
       "label": "isBounceSender()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/gmail-sync.ts",
-      "source_location": "L35"
+      "source_location": "L29"
     },
     {
       "id": "gmail_sync_isautomatedresponse",
       "label": "isAutomatedResponse()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/gmail-sync.ts",
-      "source_location": "L39"
+      "source_location": "L33"
     },
     {
       "id": "gmail_sync_emptysummary",
       "label": "emptySummary()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/gmail-sync.ts",
-      "source_location": "L55"
+      "source_location": "L49"
     },
     {
       "id": "gmail_sync_creategmailreplysync",
       "label": "createGmailReplySync()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/gmail-sync.ts",
-      "source_location": "L80"
+      "source_location": "L74"
     },
     {
       "id": "lib_growth_sequences_gmail_thread_association_ts",
@@ -6154,32 +6287,39 @@
       "source_location": "L5"
     },
     {
+      "id": "gmail_thread_association_lockgmailrouting",
+      "label": "lockGmailRouting()",
+      "file_type": "code",
+      "source_file": "lib/growth/sequences/gmail-thread-association.ts",
+      "source_location": "L25"
+    },
+    {
       "id": "gmail_thread_association_lockgmailthread",
       "label": "lockGmailThread()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/gmail-thread-association.ts",
-      "source_location": "L23"
+      "source_location": "L29"
     },
     {
       "id": "gmail_thread_association_gmailthreadcandidates",
       "label": "gmailThreadCandidates()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/gmail-thread-association.ts",
-      "source_location": "L35"
+      "source_location": "L41"
     },
     {
       "id": "gmail_thread_association_resolvegmailthreadcandidates",
       "label": "resolveGmailThreadCandidates()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/gmail-thread-association.ts",
-      "source_location": "L53"
+      "source_location": "L59"
     },
     {
       "id": "gmail_thread_association_findenrollmentbythread",
       "label": "findEnrollmentByThread()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/gmail-thread-association.ts",
-      "source_location": "L70"
+      "source_location": "L76"
     },
     {
       "id": "lib_growth_sequences_message_action_route_ts",
@@ -6466,7 +6606,7 @@
       "label": "createSequenceStopTransaction()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/stop-repository.ts",
-      "source_location": "L12"
+      "source_location": "L13"
     },
     {
       "id": "lib_growth_sequences_stop_route_handler_ts",
@@ -6494,28 +6634,28 @@
       "label": "lockedEnrollment()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/stop.test.ts",
-      "source_location": "L38"
+      "source_location": "L48"
     },
     {
       "id": "stop_test_createfakestate",
       "label": "createFakeState()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/stop.test.ts",
-      "source_location": "L58"
+      "source_location": "L68"
     },
     {
       "id": "stop_test_createfakerepository",
       "label": "createFakeRepository()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/stop.test.ts",
-      "source_location": "L69"
+      "source_location": "L79"
     },
     {
       "id": "stop_test_createstopper",
       "label": "createStopper()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/stop.test.ts",
-      "source_location": "L102"
+      "source_location": "L112"
     },
     {
       "id": "lib_growth_sequences_stop_ts",
@@ -6529,42 +6669,42 @@
       "label": "SequenceStopError",
       "file_type": "code",
       "source_file": "lib/growth/sequences/stop.ts",
-      "source_location": "L120"
+      "source_location": "L125"
     },
     {
       "id": "stop_sequencestoperror_constructor",
       "label": ".constructor()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/stop.ts",
-      "source_location": "L121"
+      "source_location": "L126"
     },
     {
       "id": "stop_resolveactor",
       "label": "resolveActor()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/stop.ts",
-      "source_location": "L127"
+      "source_location": "L132"
     },
     {
       "id": "stop_validaterequest",
       "label": "validateRequest()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/stop.ts",
-      "source_location": "L140"
+      "source_location": "L145"
     },
     {
       "id": "stop_stopsequenceintransaction",
       "label": "stopSequenceInTransaction()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/stop.ts",
-      "source_location": "L180"
+      "source_location": "L188"
     },
     {
       "id": "stop_createsequencestopper",
       "label": "createSequenceStopper()",
       "file_type": "code",
       "source_file": "lib/growth/sequences/stop.ts",
-      "source_location": "L281"
+      "source_location": "L299"
     },
     {
       "id": "lib_operations_agreements_agreement_delivery_webhook_test_ts",
@@ -8275,10 +8415,38 @@
       "source_location": "L1"
     },
     {
+      "id": "tests_integration_growth_gmail_draft_uncertainty_test_ts",
+      "label": "gmail-draft-uncertainty.test.ts",
+      "file_type": "code",
+      "source_file": "tests/integration/growth/gmail-draft-uncertainty.test.ts",
+      "source_location": "L1"
+    },
+    {
       "id": "tests_integration_growth_gmail_reply_coverage_test_ts",
       "label": "gmail-reply-coverage.test.ts",
       "file_type": "code",
       "source_file": "tests/integration/growth/gmail-reply-coverage.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "tests_integration_growth_gmail_routing_effect_lock_test_ts",
+      "label": "gmail-routing-effect-lock.test.ts",
+      "file_type": "code",
+      "source_file": "tests/integration/growth/gmail-routing-effect-lock.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "gmail_routing_effect_lock_test_waitfor",
+      "label": "waitFor()",
+      "file_type": "code",
+      "source_file": "tests/integration/growth/gmail-routing-effect-lock.test.ts",
+      "source_location": "L59"
+    },
+    {
+      "id": "tests_integration_growth_gmail_routing_final_races_test_ts",
+      "label": "gmail-routing-final-races.test.ts",
+      "file_type": "code",
+      "source_file": "tests/integration/growth/gmail-routing-final-races.test.ts",
       "source_location": "L1"
     },
     {
@@ -8349,7 +8517,7 @@
       "label": "cleanUp()",
       "file_type": "code",
       "source_file": "tests/integration/growth/gmail-sync-fixtures.ts",
-      "source_location": "L82"
+      "source_location": "L99"
     },
     {
       "id": "tests_integration_growth_gmail_sync_race_test_ts",
@@ -15562,7 +15730,7 @@
     },
     {
       "source": "lib_growth_campaigns_reservation_repository_ts",
-      "target": "lib_growth_db_types",
+      "target": "lib_growth_sequences_gmail_thread_association",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
@@ -15571,7 +15739,7 @@
     },
     {
       "source": "lib_growth_campaigns_reservation_repository_ts",
-      "target": "lib_growth_email_gmail_mime",
+      "target": "lib_growth_db_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
@@ -15580,7 +15748,7 @@
     },
     {
       "source": "lib_growth_campaigns_reservation_repository_ts",
-      "target": "lib_growth_campaigns_authorization",
+      "target": "lib_growth_email_gmail_mime",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
@@ -15589,7 +15757,7 @@
     },
     {
       "source": "lib_growth_campaigns_reservation_repository_ts",
-      "target": "lib_growth_campaigns_account_repository",
+      "target": "lib_growth_campaigns_authorization",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
@@ -15598,7 +15766,7 @@
     },
     {
       "source": "lib_growth_campaigns_reservation_repository_ts",
-      "target": "lib_growth_campaigns_dispatch_authority",
+      "target": "lib_growth_campaigns_account_repository",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
@@ -15607,11 +15775,20 @@
     },
     {
       "source": "lib_growth_campaigns_reservation_repository_ts",
+      "target": "lib_growth_campaigns_dispatch_authority",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/reservation-repository.ts",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_reservation_repository_ts",
       "target": "lib_growth_campaigns_authority_bounds",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L18",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -15620,7 +15797,7 @@
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L22",
+      "source_location": "L23",
       "weight": 1.0
     },
     {
@@ -15629,7 +15806,7 @@
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L23",
+      "source_location": "L24",
       "weight": 1.0
     },
     {
@@ -15638,7 +15815,7 @@
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L24",
+      "source_location": "L25",
       "weight": 1.0
     },
     {
@@ -15647,7 +15824,7 @@
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L25",
+      "source_location": "L26",
       "weight": 1.0
     },
     {
@@ -15656,7 +15833,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L50",
+      "source_location": "L51",
       "weight": 1.0
     },
     {
@@ -15665,7 +15842,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L65",
+      "source_location": "L66",
       "weight": 1.0
     },
     {
@@ -15674,7 +15851,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L68",
+      "source_location": "L69",
       "weight": 1.0
     },
     {
@@ -15683,7 +15860,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L136",
+      "source_location": "L137",
       "weight": 1.0
     },
     {
@@ -15692,7 +15869,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L188",
+      "source_location": "L189",
       "weight": 1.0
     },
     {
@@ -15701,7 +15878,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L352",
+      "source_location": "L354",
       "weight": 1.0
     },
     {
@@ -15710,7 +15887,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L85",
+      "source_location": "L86",
       "weight": 1.0
     },
     {
@@ -15719,7 +15896,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L111",
+      "source_location": "L112",
       "weight": 1.0
     },
     {
@@ -15809,7 +15986,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/reservation-settlement.ts",
-      "source_location": "L17",
+      "source_location": "L20",
       "weight": 1.0
     },
     {
@@ -15818,7 +15995,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/reservation-settlement.ts",
-      "source_location": "L77",
+      "source_location": "L81",
       "weight": 1.0
     },
     {
@@ -15827,7 +16004,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/reservation-settlement.ts",
-      "source_location": "L102",
+      "source_location": "L107",
       "weight": 1.0
     },
     {
@@ -20153,7 +20330,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L98",
+      "source_location": "L99",
       "weight": 1.0
     },
     {
@@ -20163,7 +20340,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L110",
+      "source_location": "L111",
       "weight": 1.0
     },
     {
@@ -20173,7 +20350,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L110",
+      "source_location": "L111",
       "weight": 1.0
     },
     {
@@ -20183,7 +20360,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L114",
+      "source_location": "L115",
       "weight": 1.0
     },
     {
@@ -20193,7 +20370,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L127",
+      "source_location": "L128",
       "weight": 1.0
     },
     {
@@ -20203,7 +20380,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L170",
+      "source_location": "L171",
       "weight": 1.0
     },
     {
@@ -20213,7 +20390,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L205",
+      "source_location": "L206",
       "weight": 1.0
     },
     {
@@ -20223,7 +20400,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L366",
+      "source_location": "L368",
       "weight": 1.0
     },
     {
@@ -20233,7 +20410,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/reservation-settlement.ts",
-      "source_location": "L36",
+      "source_location": "L39",
       "weight": 1.0
     },
     {
@@ -20243,7 +20420,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/reservation-settlement.ts",
-      "source_location": "L82",
+      "source_location": "L86",
       "weight": 1.0
     },
     {
@@ -20253,7 +20430,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/reservation-settlement.ts",
-      "source_location": "L113",
+      "source_location": "L118",
       "weight": 1.0
     },
     {
@@ -25118,6 +25295,249 @@
       "weight": 1.0
     },
     {
+      "source": "lib_growth_seo_audits_repository_ts",
+      "target": "node_crypto",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_seo_audits_repository_ts",
+      "target": "lib_growth_audit_service",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_seo_audits_repository_ts",
+      "target": "lib_growth_db_client",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_seo_audits_repository_ts",
+      "target": "lib_growth_sequences_gmail_thread_association",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_seo_audits_repository_ts",
+      "target": "lib_growth_db_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_seo_audits_repository_ts",
+      "target": "lib_growth_sequences_schedule",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_seo_audits_repository_ts",
+      "target": "lib_growth_seo_audits_schema",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_seo_audits_repository_ts",
+      "target": "repository_validatelimit",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_seo_audits_repository_ts",
+      "target": "repository_claimseoauditcandidates",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L38",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_seo_audits_repository_ts",
+      "target": "repository_releaseseoauditclaims",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L133",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_seo_audits_repository_ts",
+      "target": "repository_getseoauditdraftrendercontext",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L181",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_seo_audits_repository_ts",
+      "target": "repository_seoauditdraftcompletionerror",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L208",
+      "weight": 1.0
+    },
+    {
+      "source": "repository_seoauditdraftcompletionerror",
+      "target": "repository_seoauditdraftcompletionerror_constructor",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L209",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_seo_audits_repository_ts",
+      "target": "repository_seoauditdraftpersistenceerror",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L220",
+      "weight": 1.0
+    },
+    {
+      "source": "repository_seoauditdraftpersistenceerror",
+      "target": "repository_seoauditdraftpersistenceerror_constructor",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L221",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_seo_audits_repository_ts",
+      "target": "repository_completeseoauditdraft",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L239",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_seo_audits_repository_ts",
+      "target": "repository_seoauditapprovalerror",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L341",
+      "weight": 1.0
+    },
+    {
+      "source": "repository_seoauditapprovalerror",
+      "target": "repository_seoauditapprovalerror_constructor",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L342",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_seo_audits_repository_ts",
+      "target": "repository_validateapprovalinput",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L376",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_seo_audits_repository_ts",
+      "target": "repository_approveseoauditdraft",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L389",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_seo_audits_repository_ts",
+      "target": "repository_listseoauditdrafts",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L552",
+      "weight": 1.0
+    },
+    {
+      "source": "repository_claimseoauditcandidates",
+      "target": "repository_validatelimit",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L43",
+      "weight": 1.0
+    },
+    {
+      "source": "repository_approveseoauditdraft",
+      "target": "repository_validateapprovalinput",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L395",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_sequences_approval_repository_test_ts",
+      "target": "strict",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/sequences/approval-repository.test.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_sequences_approval_repository_test_ts",
+      "target": "node_test",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/sequences/approval-repository.test.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_sequences_approval_repository_test_ts",
+      "target": "lib_growth_db_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/sequences/approval-repository.test.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_sequences_approval_repository_test_ts",
+      "target": "lib_growth_sequences_approval_repository",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/sequences/approval-repository.test.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
       "source": "lib_growth_sequences_approval_repository_ts",
       "target": "postgres",
       "relation": "imports_from",
@@ -25146,7 +25566,7 @@
     },
     {
       "source": "lib_growth_sequences_approval_repository_ts",
-      "target": "lib_growth_db_types",
+      "target": "lib_growth_sequences_gmail_thread_association",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/approval-repository.ts",
@@ -25155,7 +25575,7 @@
     },
     {
       "source": "lib_growth_sequences_approval_repository_ts",
-      "target": "lib_growth_sequences_approval",
+      "target": "lib_growth_db_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/approval-repository.ts",
@@ -25164,11 +25584,20 @@
     },
     {
       "source": "lib_growth_sequences_approval_repository_ts",
+      "target": "lib_growth_sequences_approval",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/sequences/approval-repository.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_sequences_approval_repository_ts",
       "target": "approval_repository_firstemailapprovalpersistenceerror",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/approval-repository.ts",
-      "source_location": "L11",
+      "source_location": "L12",
       "weight": 1.0
     },
     {
@@ -25177,7 +25606,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/approval-repository.ts",
-      "source_location": "L12",
+      "source_location": "L13",
       "weight": 1.0
     },
     {
@@ -25186,7 +25615,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/approval-repository.ts",
-      "source_location": "L18",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -25195,7 +25624,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/approval-repository.ts",
-      "source_location": "L23",
+      "source_location": "L24",
       "weight": 1.0
     },
     {
@@ -25582,7 +26011,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/dispatcher-repository.ts",
-      "source_location": "L164",
+      "source_location": "L167",
       "weight": 1.0
     },
     {
@@ -25591,7 +26020,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/dispatcher-repository.ts",
-      "source_location": "L191",
+      "source_location": "L194",
       "weight": 1.0
     },
     {
@@ -25600,7 +26029,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/dispatcher-repository.ts",
-      "source_location": "L203",
+      "source_location": "L206",
       "weight": 1.0
     },
     {
@@ -25609,7 +26038,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/dispatcher-repository.ts",
-      "source_location": "L228",
+      "source_location": "L231",
       "weight": 1.0
     },
     {
@@ -25618,7 +26047,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/dispatcher-repository.ts",
-      "source_location": "L247",
+      "source_location": "L250",
       "weight": 1.0
     },
     {
@@ -25627,7 +26056,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/dispatcher-repository.ts",
-      "source_location": "L266",
+      "source_location": "L269",
       "weight": 1.0
     },
     {
@@ -25636,7 +26065,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/dispatcher-repository.ts",
-      "source_location": "L281",
+      "source_location": "L287",
       "weight": 1.0
     },
     {
@@ -25645,7 +26074,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/dispatcher-repository.ts",
-      "source_location": "L297",
+      "source_location": "L306",
       "weight": 1.0
     },
     {
@@ -26599,7 +27028,7 @@
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-routing-repository.ts",
-      "source_location": "L11",
+      "source_location": "L12",
       "weight": 1.0
     },
     {
@@ -26608,7 +27037,25 @@
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-routing-repository.ts",
-      "source_location": "L12",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_sequences_gmail_routing_repository_ts",
+      "target": "gmail_routing_repository_validategmailobservation",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/sequences/gmail-routing-repository.ts",
+      "source_location": "L35",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_sequences_gmail_routing_repository_ts",
+      "target": "gmail_routing_repository_validategmaileffectobservation",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/sequences/gmail-routing-repository.ts",
+      "source_location": "L65",
       "weight": 1.0
     },
     {
@@ -26617,7 +27064,34 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-routing-repository.ts",
-      "source_location": "L27",
+      "source_location": "L89",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_sequences_gmail_routing_repository_ts",
+      "target": "gmail_routing_repository_classifygmailroutingintransaction",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/sequences/gmail-routing-repository.ts",
+      "source_location": "L99",
+      "weight": 1.0
+    },
+    {
+      "source": "gmail_routing_repository_validategmaileffectobservation",
+      "target": "gmail_routing_repository_validategmailobservation",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/sequences/gmail-routing-repository.ts",
+      "source_location": "L68",
+      "weight": 1.0
+    },
+    {
+      "source": "gmail_routing_repository_classifygmailroutingintransaction",
+      "target": "gmail_routing_repository_validategmailobservation",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/sequences/gmail-routing-repository.ts",
+      "source_location": "L103",
       "weight": 1.0
     },
     {
@@ -26667,11 +27141,20 @@
     },
     {
       "source": "lib_growth_sequences_gmail_routing_ts",
+      "target": "gmail_routing_gmailfromaddress",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/sequences/gmail-routing.ts",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_sequences_gmail_routing_ts",
       "target": "gmail_routing_assessgmailrouting",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-routing.ts",
-      "source_location": "L13",
+      "source_location": "L20",
       "weight": 1.0
     },
     {
@@ -26842,7 +27325,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-sync-repository.test.ts",
-      "source_location": "L72",
+      "source_location": "L91",
       "weight": 1.0
     },
     {
@@ -26860,7 +27343,7 @@
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
-      "source_location": "L7",
+      "source_location": "L6",
       "weight": 1.0
     },
     {
@@ -26869,7 +27352,7 @@
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
-      "source_location": "L8",
+      "source_location": "L7",
       "weight": 1.0
     },
     {
@@ -26878,7 +27361,7 @@
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
-      "source_location": "L9",
+      "source_location": "L8",
       "weight": 1.0
     },
     {
@@ -26887,7 +27370,7 @@
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
-      "source_location": "L10",
+      "source_location": "L9",
       "weight": 1.0
     },
     {
@@ -26896,7 +27379,16 @@
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
-      "source_location": "L11",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_sequences_gmail_sync_repository_ts",
+      "target": "lib_growth_sequences_gmail_thread_association",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
+      "source_location": "L15",
       "weight": 1.0
     },
     {
@@ -26905,7 +27397,7 @@
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
-      "source_location": "L12",
+      "source_location": "L16",
       "weight": 1.0
     },
     {
@@ -26914,7 +27406,7 @@
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
-      "source_location": "L13",
+      "source_location": "L17",
       "weight": 1.0
     },
     {
@@ -26923,7 +27415,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
-      "source_location": "L77",
+      "source_location": "L86",
       "weight": 1.0
     },
     {
@@ -26932,7 +27424,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
-      "source_location": "L89",
+      "source_location": "L98",
       "weight": 1.0
     },
     {
@@ -26941,7 +27433,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
-      "source_location": "L101",
+      "source_location": "L110",
       "weight": 1.0
     },
     {
@@ -26950,7 +27442,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
-      "source_location": "L123",
+      "source_location": "L132",
       "weight": 1.0
     },
     {
@@ -26959,7 +27451,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
-      "source_location": "L212",
+      "source_location": "L242",
       "weight": 1.0
     },
     {
@@ -27076,7 +27568,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-sync.test.ts",
-      "source_location": "L182",
+      "source_location": "L183",
       "weight": 1.0
     },
     {
@@ -27085,7 +27577,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-sync.test.ts",
-      "source_location": "L211",
+      "source_location": "L212",
       "weight": 1.0
     },
     {
@@ -27094,7 +27586,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-sync.test.ts",
-      "source_location": "L231",
+      "source_location": "L232",
       "weight": 1.0
     },
     {
@@ -27103,7 +27595,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-sync.test.ts",
-      "source_location": "L232",
+      "source_location": "L233",
       "weight": 1.0
     },
     {
@@ -27180,11 +27672,11 @@
     },
     {
       "source": "lib_growth_sequences_gmail_sync_ts",
-      "target": "gmail_sync_extractemailaddress",
-      "relation": "contains",
+      "target": "lib_growth_sequences_gmail_routing",
+      "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-sync.ts",
-      "source_location": "L28",
+      "source_location": "L14",
       "weight": 1.0
     },
     {
@@ -27193,7 +27685,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-sync.ts",
-      "source_location": "L35",
+      "source_location": "L29",
       "weight": 1.0
     },
     {
@@ -27202,7 +27694,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-sync.ts",
-      "source_location": "L39",
+      "source_location": "L33",
       "weight": 1.0
     },
     {
@@ -27211,7 +27703,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-sync.ts",
-      "source_location": "L55",
+      "source_location": "L49",
       "weight": 1.0
     },
     {
@@ -27220,7 +27712,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-sync.ts",
-      "source_location": "L80",
+      "source_location": "L74",
       "weight": 1.0
     },
     {
@@ -27229,7 +27721,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-sync.ts",
-      "source_location": "L94",
+      "source_location": "L88",
       "weight": 1.0
     },
     {
@@ -27270,11 +27762,20 @@
     },
     {
       "source": "lib_growth_sequences_gmail_thread_association_ts",
+      "target": "gmail_thread_association_lockgmailrouting",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/sequences/gmail-thread-association.ts",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_sequences_gmail_thread_association_ts",
       "target": "gmail_thread_association_lockgmailthread",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-thread-association.ts",
-      "source_location": "L23",
+      "source_location": "L29",
       "weight": 1.0
     },
     {
@@ -27283,7 +27784,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-thread-association.ts",
-      "source_location": "L35",
+      "source_location": "L41",
       "weight": 1.0
     },
     {
@@ -27292,7 +27793,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-thread-association.ts",
-      "source_location": "L53",
+      "source_location": "L59",
       "weight": 1.0
     },
     {
@@ -27301,7 +27802,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-thread-association.ts",
-      "source_location": "L70",
+      "source_location": "L76",
       "weight": 1.0
     },
     {
@@ -27310,7 +27811,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-thread-association.ts",
-      "source_location": "L75",
+      "source_location": "L81",
       "weight": 1.0
     },
     {
@@ -27319,7 +27820,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/gmail-thread-association.ts",
-      "source_location": "L76",
+      "source_location": "L82",
       "weight": 1.0
     },
     {
@@ -28215,7 +28716,7 @@
     },
     {
       "source": "lib_growth_sequences_stop_repository_ts",
-      "target": "lib_growth_sequences_gmail_thread_association",
+      "target": "lib_growth_sequences_gmail_routing_repository",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/stop-repository.ts",
@@ -28224,11 +28725,20 @@
     },
     {
       "source": "lib_growth_sequences_stop_repository_ts",
+      "target": "lib_growth_sequences_gmail_thread_association",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/sequences/stop-repository.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_sequences_stop_repository_ts",
       "target": "stop_repository_createsequencestoptransaction",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/stop-repository.ts",
-      "source_location": "L12",
+      "source_location": "L13",
       "weight": 1.0
     },
     {
@@ -28336,7 +28846,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/stop.test.ts",
-      "source_location": "L38",
+      "source_location": "L48",
       "weight": 1.0
     },
     {
@@ -28345,7 +28855,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/stop.test.ts",
-      "source_location": "L58",
+      "source_location": "L68",
       "weight": 1.0
     },
     {
@@ -28354,7 +28864,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/stop.test.ts",
-      "source_location": "L69",
+      "source_location": "L79",
       "weight": 1.0
     },
     {
@@ -28363,7 +28873,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/stop.test.ts",
-      "source_location": "L102",
+      "source_location": "L112",
       "weight": 1.0
     },
     {
@@ -28372,7 +28882,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/stop.test.ts",
-      "source_location": "L60",
+      "source_location": "L70",
       "weight": 1.0
     },
     {
@@ -28381,7 +28891,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/stop.test.ts",
-      "source_location": "L103",
+      "source_location": "L113",
       "weight": 1.0
     },
     {
@@ -28413,7 +28923,7 @@
     },
     {
       "source": "lib_growth_sequences_stop_ts",
-      "target": "lib_growth_integrations_google_oauth",
+      "target": "lib_growth_sequences_gmail_routing_repository",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/stop.ts",
@@ -28422,11 +28932,20 @@
     },
     {
       "source": "lib_growth_sequences_stop_ts",
+      "target": "lib_growth_integrations_google_oauth",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/sequences/stop.ts",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_sequences_stop_ts",
       "target": "lib_growth_sequences_stop_repository",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/stop.ts",
-      "source_location": "L5",
+      "source_location": "L9",
       "weight": 1.0
     },
     {
@@ -28435,7 +28954,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/stop.ts",
-      "source_location": "L120",
+      "source_location": "L125",
       "weight": 1.0
     },
     {
@@ -28444,7 +28963,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/stop.ts",
-      "source_location": "L121",
+      "source_location": "L126",
       "weight": 1.0
     },
     {
@@ -28453,7 +28972,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/stop.ts",
-      "source_location": "L127",
+      "source_location": "L132",
       "weight": 1.0
     },
     {
@@ -28462,7 +28981,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/stop.ts",
-      "source_location": "L140",
+      "source_location": "L145",
       "weight": 1.0
     },
     {
@@ -28471,7 +28990,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/stop.ts",
-      "source_location": "L180",
+      "source_location": "L188",
       "weight": 1.0
     },
     {
@@ -28480,7 +28999,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/stop.ts",
-      "source_location": "L281",
+      "source_location": "L299",
       "weight": 1.0
     },
     {
@@ -28489,7 +29008,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/stop.ts",
-      "source_location": "L141",
+      "source_location": "L146",
       "weight": 1.0
     },
     {
@@ -28498,7 +29017,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/stop.ts",
-      "source_location": "L185",
+      "source_location": "L193",
       "weight": 1.0
     },
     {
@@ -28507,7 +29026,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/sequences/stop.ts",
-      "source_location": "L186",
+      "source_location": "L194",
       "weight": 1.0
     },
     {
@@ -32912,123 +33431,6 @@
       "weight": 1.0
     },
     {
-      "source": "lib_operations_auth_portal_url_ts",
-      "target": "lib_operations_auth_release_flags",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/auth/portal-url.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_auth_portal_url_ts",
-      "target": "portal_url_portalpath",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/auth/portal-url.ts",
-      "source_location": "L4",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_auth_portal_url_ts",
-      "target": "portal_url_portalurl",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/auth/portal-url.ts",
-      "source_location": "L21",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_auth_portal_url_ts",
-      "target": "portal_url_createinvitationactivationurl",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/auth/portal-url.ts",
-      "source_location": "L41",
-      "weight": 1.0
-    },
-    {
-      "source": "portal_url_portalurl",
-      "target": "portal_url_portalpath",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/auth/portal-url.ts",
-      "source_location": "L37",
-      "weight": 1.0
-    },
-    {
-      "source": "portal_url_createinvitationactivationurl",
-      "target": "portal_url_portalurl",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/auth/portal-url.ts",
-      "source_location": "L47",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_auth_release_flags_ts",
-      "target": "release_flags_deployedenvironment",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/auth/release-flags.ts",
-      "source_location": "L12",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_auth_release_flags_ts",
-      "target": "release_flags_prefixfreeportalenabled",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/auth/release-flags.ts",
-      "source_location": "L20",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_auth_release_flags_ts",
-      "target": "release_flags_fssstudioenabled",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/auth/release-flags.ts",
-      "source_location": "L33",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_auth_release_flags_ts",
-      "target": "release_flags_growthoperationscutoverenabled",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/auth/release-flags.ts",
-      "source_location": "L45",
-      "weight": 1.0
-    },
-    {
-      "source": "release_flags_prefixfreeportalenabled",
-      "target": "release_flags_deployedenvironment",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/auth/release-flags.ts",
-      "source_location": "L24",
-      "weight": 1.0
-    },
-    {
-      "source": "release_flags_fssstudioenabled",
-      "target": "release_flags_deployedenvironment",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/auth/release-flags.ts",
-      "source_location": "L37",
-      "weight": 1.0
-    },
-    {
-      "source": "release_flags_growthoperationscutoverenabled",
-      "target": "release_flags_fssstudioenabled",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/auth/release-flags.ts",
-      "source_location": "L49",
-      "weight": 1.0
-    },
-    {
       "source": "read_route_handler_test_handler",
       "target": "read_route_handler_createfacebookreadhandler",
       "relation": "calls",
@@ -33535,7 +33937,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/sequences/dispatcher-repository.ts",
-      "source_location": "L261",
+      "source_location": "L264",
       "weight": 1.0
     },
     {
@@ -33739,13 +34141,83 @@
       "weight": 1.0
     },
     {
-      "source": "gmail_routing_repository_classifygmailrouting",
+      "source": "gmail_routing_repository_validategmaileffectobservation",
+      "target": "gmail_routing_gmailfromaddress",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/gmail-routing-repository.ts",
+      "source_location": "L83",
+      "weight": 1.0
+    },
+    {
+      "source": "gmail_routing_repository_classifygmailroutingintransaction",
       "target": "gmail_references_parsegmailreferences",
       "relation": "calls",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/sequences/gmail-routing-repository.ts",
-      "source_location": "L31",
+      "source_location": "L104",
+      "weight": 1.0
+    },
+    {
+      "source": "gmail_routing_repository_classifygmailroutingintransaction",
+      "target": "gmail_thread_association_lockgmailrouting",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/gmail-routing-repository.ts",
+      "source_location": "L105",
+      "weight": 1.0
+    },
+    {
+      "source": "gmail_routing_repository_classifygmailroutingintransaction",
+      "target": "gmail_thread_association_lockgmailthread",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/gmail-routing-repository.ts",
+      "source_location": "L106",
+      "weight": 1.0
+    },
+    {
+      "source": "gmail_routing_repository_classifygmailroutingintransaction",
+      "target": "grant_lockcurrentgmailgrant",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/gmail-routing-repository.ts",
+      "source_location": "L107",
+      "weight": 1.0
+    },
+    {
+      "source": "gmail_routing_repository_classifygmailroutingintransaction",
+      "target": "gmail_thread_association_gmailthreadcandidates",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/gmail-routing-repository.ts",
+      "source_location": "L123",
+      "weight": 1.0
+    },
+    {
+      "source": "gmail_routing_repository_classifygmailroutingintransaction",
+      "target": "gmail_thread_association_resolvegmailthreadcandidates",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/gmail-routing-repository.ts",
+      "source_location": "L178",
+      "weight": 1.0
+    },
+    {
+      "source": "gmail_routing_repository_classifygmailroutingintransaction",
+      "target": "gmail_routing_assessgmailrouting",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/gmail-routing-repository.ts",
+      "source_location": "L181",
       "weight": 1.0
     },
     {
@@ -33785,7 +34257,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/sequences/gmail-sync.test.ts",
-      "source_location": "L230",
+      "source_location": "L231",
       "weight": 1.0
     },
     {
@@ -33795,7 +34267,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/sequences/gmail-sync.ts",
-      "source_location": "L96",
+      "source_location": "L90",
       "weight": 1.0
     },
     {
@@ -33805,7 +34277,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/sequences/gmail-sync.ts",
-      "source_location": "L98",
+      "source_location": "L92",
       "weight": 1.0
     },
     {
@@ -33815,7 +34287,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/sequences/gmail-sync.ts",
-      "source_location": "L106",
+      "source_location": "L100",
       "weight": 1.0
     },
     {
@@ -33825,7 +34297,17 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/sequences/gmail-sync.ts",
-      "source_location": "L278",
+      "source_location": "L292",
+      "weight": 1.0
+    },
+    {
+      "source": "gmail_thread_association_lockgmailrouting",
+      "target": "change_requests_test_tx",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/sequences/gmail-thread-association.ts",
+      "source_location": "L26",
       "weight": 1.0
     },
     {
@@ -33835,7 +34317,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/sequences/gmail-thread-association.ts",
-      "source_location": "L27",
+      "source_location": "L33",
       "weight": 1.0
     },
     {
@@ -33885,7 +34367,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/sequences/stop.test.ts",
-      "source_location": "L103",
+      "source_location": "L113",
       "weight": 1.0
     },
     {
@@ -33895,17 +34377,17 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/sequences/stop.ts",
-      "source_location": "L159",
+      "source_location": "L165",
       "weight": 1.0
     },
     {
-      "source": "agreement_notifications_agreementnotificationemail",
-      "target": "portal_url_portalurl",
+      "source": "stop_validaterequest",
+      "target": "gmail_routing_repository_validategmaileffectobservation",
       "relation": "calls",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
-      "source_file": "lib/operations/agreements/agreement-notifications.ts",
-      "source_location": "L46",
+      "source_file": "lib/growth/sequences/stop.ts",
+      "source_location": "L169",
       "weight": 1.0
     },
     {
@@ -34679,16 +35161,6 @@
       "weight": 1.0
     },
     {
-      "source": "signing_route_staffsigningroute",
-      "target": "release_flags_fssstudioenabled",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/operations/agreements/signing-route.ts",
-      "source_location": "L146",
-      "weight": 1.0
-    },
-    {
       "source": "signing_route_foundersigningdownloadroute",
       "target": "signing_http_createsigningdownloadhandler",
       "relation": "calls",
@@ -34741,16 +35213,6 @@
     {
       "source": "signing_route_staffsigningdownloadroute",
       "target": "signing_worker_signingenabled",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/operations/agreements/signing-route.ts",
-      "source_location": "L231",
-      "weight": 1.0
-    },
-    {
-      "source": "signing_route_staffsigningdownloadroute",
-      "target": "release_flags_fssstudioenabled",
       "relation": "calls",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
@@ -34836,6 +35298,123 @@
       "confidence_score": 0.8,
       "source_file": "lib/operations/agreements/stage.ts",
       "source_location": "L38",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_auth_portal_url_ts",
+      "target": "lib_operations_auth_release_flags",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/portal-url.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_auth_portal_url_ts",
+      "target": "portal_url_portalpath",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/portal-url.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_auth_portal_url_ts",
+      "target": "portal_url_portalurl",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/portal-url.ts",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_auth_portal_url_ts",
+      "target": "portal_url_createinvitationactivationurl",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/portal-url.ts",
+      "source_location": "L41",
+      "weight": 1.0
+    },
+    {
+      "source": "portal_url_portalurl",
+      "target": "portal_url_portalpath",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/portal-url.ts",
+      "source_location": "L37",
+      "weight": 1.0
+    },
+    {
+      "source": "portal_url_createinvitationactivationurl",
+      "target": "portal_url_portalurl",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/portal-url.ts",
+      "source_location": "L47",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_auth_release_flags_ts",
+      "target": "release_flags_deployedenvironment",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/release-flags.ts",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_auth_release_flags_ts",
+      "target": "release_flags_prefixfreeportalenabled",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/release-flags.ts",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_auth_release_flags_ts",
+      "target": "release_flags_fssstudioenabled",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/release-flags.ts",
+      "source_location": "L33",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_auth_release_flags_ts",
+      "target": "release_flags_growthoperationscutoverenabled",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/release-flags.ts",
+      "source_location": "L45",
+      "weight": 1.0
+    },
+    {
+      "source": "release_flags_prefixfreeportalenabled",
+      "target": "release_flags_deployedenvironment",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/release-flags.ts",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "release_flags_fssstudioenabled",
+      "target": "release_flags_deployedenvironment",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/release-flags.ts",
+      "source_location": "L37",
+      "weight": 1.0
+    },
+    {
+      "source": "release_flags_growthoperationscutoverenabled",
+      "target": "release_flags_fssstudioenabled",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/auth/release-flags.ts",
+      "source_location": "L49",
       "weight": 1.0
     },
     {
@@ -36063,6 +36642,69 @@
       "weight": 1.0
     },
     {
+      "source": "tests_integration_growth_gmail_draft_uncertainty_test_ts",
+      "target": "strict",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/gmail-draft-uncertainty.test.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_gmail_draft_uncertainty_test_ts",
+      "target": "node_crypto",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/gmail-draft-uncertainty.test.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_gmail_draft_uncertainty_test_ts",
+      "target": "node_test",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/gmail-draft-uncertainty.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_gmail_draft_uncertainty_test_ts",
+      "target": "postgres",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/gmail-draft-uncertainty.test.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_gmail_draft_uncertainty_test_ts",
+      "target": "lib_growth_sequences_gmail_sync",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/gmail-draft-uncertainty.test.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_gmail_draft_uncertainty_test_ts",
+      "target": "lib_growth_sequences_gmail_sync_repository",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/gmail-draft-uncertainty.test.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_gmail_draft_uncertainty_test_ts",
+      "target": "tests_integration_growth_gmail_sync_fixtures",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/gmail-draft-uncertainty.test.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
       "source": "tests_integration_growth_gmail_reply_coverage_test_ts",
       "target": "strict",
       "relation": "imports_from",
@@ -36105,6 +36747,159 @@
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/gmail-reply-coverage.test.ts",
       "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_gmail_routing_effect_lock_test_ts",
+      "target": "strict",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/gmail-routing-effect-lock.test.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_gmail_routing_effect_lock_test_ts",
+      "target": "node_crypto",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/gmail-routing-effect-lock.test.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_gmail_routing_effect_lock_test_ts",
+      "target": "node_test",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/gmail-routing-effect-lock.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_gmail_routing_effect_lock_test_ts",
+      "target": "postgres",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/gmail-routing-effect-lock.test.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_gmail_routing_effect_lock_test_ts",
+      "target": "lib_growth_sequences_gmail_sync_repository",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/gmail-routing-effect-lock.test.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_gmail_routing_effect_lock_test_ts",
+      "target": "lib_growth_sequences_dispatcher_repository",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/gmail-routing-effect-lock.test.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_gmail_routing_effect_lock_test_ts",
+      "target": "tests_integration_growth_gmail_sync_fixtures",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/gmail-routing-effect-lock.test.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_gmail_routing_effect_lock_test_ts",
+      "target": "gmail_routing_effect_lock_test_waitfor",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/gmail-routing-effect-lock.test.ts",
+      "source_location": "L59",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_gmail_routing_final_races_test_ts",
+      "target": "strict",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/gmail-routing-final-races.test.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_gmail_routing_final_races_test_ts",
+      "target": "node_crypto",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/gmail-routing-final-races.test.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_gmail_routing_final_races_test_ts",
+      "target": "node_test",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/gmail-routing-final-races.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_gmail_routing_final_races_test_ts",
+      "target": "postgres",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/gmail-routing-final-races.test.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_gmail_routing_final_races_test_ts",
+      "target": "lib_growth_sequences_gmail_sync",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/gmail-routing-final-races.test.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_gmail_routing_final_races_test_ts",
+      "target": "lib_growth_sequences_gmail_sync_repository",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/gmail-routing-final-races.test.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_gmail_routing_final_races_test_ts",
+      "target": "lib_growth_sequences_dispatcher_repository",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/gmail-routing-final-races.test.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_gmail_routing_final_races_test_ts",
+      "target": "lib_growth_sequences_gmail_routing_repository",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/gmail-routing-final-races.test.ts",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_gmail_routing_final_races_test_ts",
+      "target": "tests_integration_growth_gmail_sync_fixtures",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/gmail-routing-final-races.test.ts",
+      "source_location": "L9",
       "weight": 1.0
     },
     {
@@ -36473,7 +37268,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/gmail-sync-fixtures.ts",
-      "source_location": "L82",
+      "source_location": "L99",
       "weight": 1.0
     },
     {
@@ -36604,16 +37399,7 @@
     },
     {
       "source": "tests_integration_growth_gmail_sync_test_ts",
-      "target": "lib_growth_sequences_gmail_sync",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/integration/growth/gmail-sync.test.ts",
-      "source_location": "L11",
-      "weight": 1.0
-    },
-    {
-      "source": "tests_integration_growth_gmail_sync_test_ts",
-      "target": "lib_growth_sequences_gmail_sync_repository",
+      "target": "lib_growth_sequences_stop_repository",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/gmail-sync.test.ts",
@@ -36622,11 +37408,38 @@
     },
     {
       "source": "tests_integration_growth_gmail_sync_test_ts",
-      "target": "tests_integration_growth_gmail_sync_fixtures",
+      "target": "lib_growth_db_client",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/gmail-sync.test.ts",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_gmail_sync_test_ts",
+      "target": "lib_growth_sequences_gmail_sync",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/gmail-sync.test.ts",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_gmail_sync_test_ts",
+      "target": "lib_growth_sequences_gmail_sync_repository",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/gmail-sync.test.ts",
       "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_gmail_sync_test_ts",
+      "target": "tests_integration_growth_gmail_sync_fixtures",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/gmail-sync.test.ts",
+      "source_location": "L18",
       "weight": 1.0
     },
     {
@@ -37339,6 +38152,16 @@
       "confidence_score": 0.8,
       "source_file": "lib/operations/http/commercial-offer-route.test.ts",
       "source_location": "L51",
+      "weight": 1.0
+    },
+    {
+      "source": "commercial_offer_route_staffcommercialofferroute",
+      "target": "release_flags_fssstudioenabled",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/operations/http/commercial-offer-route.ts",
+      "source_location": "L120",
       "weight": 1.0
     },
     {
@@ -39903,17 +40726,17 @@
     },
     {
       "source": "lib_growth_campaigns_reservation_repository_ts",
-      "target": "lib_growth_campaigns_authorization_ts",
+      "target": "lib_growth_sequences_gmail_thread_association_ts",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L11",
+      "source_location": "L9",
       "weight": 1
     },
     {
       "source": "lib_growth_campaigns_reservation_repository_ts",
-      "target": "lib_growth_campaigns_account_repository_ts",
+      "target": "lib_growth_campaigns_authorization_ts",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1,
@@ -39923,7 +40746,7 @@
     },
     {
       "source": "lib_growth_campaigns_reservation_repository_ts",
-      "target": "lib_growth_campaigns_dispatch_authority_ts",
+      "target": "lib_growth_campaigns_account_repository_ts",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1,
@@ -39933,12 +40756,22 @@
     },
     {
       "source": "lib_growth_campaigns_reservation_repository_ts",
+      "target": "lib_growth_campaigns_dispatch_authority_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/reservation-repository.ts",
+      "source_location": "L14",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_reservation_repository_ts",
       "target": "lib_growth_campaigns_authority_bounds_ts",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L18",
+      "source_location": "L19",
       "weight": 1
     },
     {
@@ -39948,7 +40781,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L22",
+      "source_location": "L23",
       "weight": 1
     },
     {
@@ -39958,7 +40791,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L23",
+      "source_location": "L24",
       "weight": 1
     },
     {
@@ -39968,7 +40801,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L24",
+      "source_location": "L25",
       "weight": 1
     },
     {
@@ -39978,7 +40811,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/campaigns/reservation-repository.ts",
-      "source_location": "L25",
+      "source_location": "L26",
       "weight": 1
     },
     {
@@ -41672,13 +42505,53 @@
       "weight": 1
     },
     {
+      "source": "lib_growth_seo_audits_repository_ts",
+      "target": "lib_growth_sequences_gmail_thread_association_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_seo_audits_repository_ts",
+      "target": "lib_growth_sequences_schedule_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/seo-audits/repository.ts",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_approval_repository_test_ts",
+      "target": "lib_growth_sequences_approval_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/approval-repository.test.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_approval_repository_ts",
+      "target": "lib_growth_sequences_gmail_thread_association_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/approval-repository.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
       "source": "lib_growth_sequences_approval_repository_ts",
       "target": "lib_growth_sequences_approval_ts",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/sequences/approval-repository.ts",
-      "source_location": "L6",
+      "source_location": "L7",
       "weight": 1
     },
     {
@@ -42098,7 +42971,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/sequences/gmail-routing-repository.ts",
-      "source_location": "L11",
+      "source_location": "L12",
       "weight": 1
     },
     {
@@ -42108,7 +42981,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/sequences/gmail-routing-repository.ts",
-      "source_location": "L12",
+      "source_location": "L13",
       "weight": 1
     },
     {
@@ -42208,7 +43081,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
-      "source_location": "L6",
+      "source_location": "L5",
       "weight": 1
     },
     {
@@ -42218,7 +43091,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
-      "source_location": "L9",
+      "source_location": "L8",
       "weight": 1
     },
     {
@@ -42228,7 +43101,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
-      "source_location": "L10",
+      "source_location": "L9",
       "weight": 1
     },
     {
@@ -42238,7 +43111,17 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
-      "source_location": "L11",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_gmail_sync_repository_ts",
+      "target": "lib_growth_sequences_gmail_thread_association_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
+      "source_location": "L15",
       "weight": 1
     },
     {
@@ -42248,17 +43131,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
-      "source_location": "L12",
-      "weight": 1
-    },
-    {
-      "source": "lib_growth_sequences_gmail_sync_repository_ts",
-      "target": "lib_growth_sequences_gmail_sync_coverage_repository_ts",
-      "relation": "imports",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1,
-      "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
-      "source_location": "L13",
+      "source_location": "L16",
       "weight": 1
     },
     {
@@ -42269,6 +43142,16 @@
       "confidence_score": 1,
       "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
       "source_location": "L17",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_gmail_sync_repository_ts",
+      "target": "lib_growth_sequences_gmail_sync_coverage_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/gmail-sync-repository.ts",
+      "source_location": "L21",
       "weight": 1
     },
     {
@@ -42379,6 +43262,16 @@
       "confidence_score": 1,
       "source_file": "lib/growth/sequences/gmail-sync.ts",
       "source_location": "L13",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_gmail_sync_ts",
+      "target": "lib_growth_sequences_gmail_routing_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/gmail-sync.ts",
+      "source_location": "L14",
       "weight": 1
     },
     {
@@ -42683,12 +43576,22 @@
     },
     {
       "source": "lib_growth_sequences_stop_repository_ts",
-      "target": "lib_growth_sequences_gmail_thread_association_ts",
+      "target": "lib_growth_sequences_gmail_routing_repository_ts",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/sequences/stop-repository.ts",
       "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_stop_repository_ts",
+      "target": "lib_growth_sequences_gmail_thread_association_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/stop-repository.ts",
+      "source_location": "L7",
       "weight": 1
     },
     {
@@ -42733,7 +43636,7 @@
     },
     {
       "source": "lib_growth_sequences_stop_ts",
-      "target": "lib_growth_integrations_google_oauth_ts",
+      "target": "lib_growth_sequences_gmail_routing_repository_ts",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1,
@@ -42743,12 +43646,22 @@
     },
     {
       "source": "lib_growth_sequences_stop_ts",
+      "target": "lib_growth_integrations_google_oauth_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/sequences/stop.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_sequences_stop_ts",
       "target": "lib_growth_sequences_stop_repository_ts",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/sequences/stop.ts",
-      "source_location": "L5",
+      "source_location": "L9",
       "weight": 1
     },
     {
@@ -44422,6 +45335,36 @@
       "weight": 1
     },
     {
+      "source": "tests_integration_growth_gmail_draft_uncertainty_test_ts",
+      "target": "lib_growth_sequences_gmail_sync_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/gmail-draft-uncertainty.test.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_gmail_draft_uncertainty_test_ts",
+      "target": "lib_growth_sequences_gmail_sync_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/gmail-draft-uncertainty.test.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_gmail_draft_uncertainty_test_ts",
+      "target": "tests_integration_growth_gmail_sync_fixtures_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/gmail-draft-uncertainty.test.ts",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
       "source": "tests_integration_growth_gmail_reply_coverage_test_ts",
       "target": "lib_growth_integrations_gmail_types_ts",
       "relation": "imports",
@@ -44429,6 +45372,86 @@
       "confidence_score": 1,
       "source_file": "tests/integration/growth/gmail-reply-coverage.test.ts",
       "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_gmail_routing_effect_lock_test_ts",
+      "target": "lib_growth_sequences_gmail_sync_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/gmail-routing-effect-lock.test.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_gmail_routing_effect_lock_test_ts",
+      "target": "lib_growth_sequences_dispatcher_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/gmail-routing-effect-lock.test.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_gmail_routing_effect_lock_test_ts",
+      "target": "tests_integration_growth_gmail_sync_fixtures_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/gmail-routing-effect-lock.test.ts",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_gmail_routing_final_races_test_ts",
+      "target": "lib_growth_sequences_gmail_sync_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/gmail-routing-final-races.test.ts",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_gmail_routing_final_races_test_ts",
+      "target": "lib_growth_sequences_gmail_sync_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/gmail-routing-final-races.test.ts",
+      "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_gmail_routing_final_races_test_ts",
+      "target": "lib_growth_sequences_dispatcher_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/gmail-routing-final-races.test.ts",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_gmail_routing_final_races_test_ts",
+      "target": "lib_growth_sequences_gmail_routing_repository_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/gmail-routing-final-races.test.ts",
+      "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_gmail_routing_final_races_test_ts",
+      "target": "tests_integration_growth_gmail_sync_fixtures_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/gmail-routing-final-races.test.ts",
+      "source_location": "L9",
       "weight": 1
     },
     {
@@ -44663,17 +45686,7 @@
     },
     {
       "source": "tests_integration_growth_gmail_sync_test_ts",
-      "target": "lib_growth_sequences_gmail_sync_ts",
-      "relation": "imports",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1,
-      "source_file": "tests/integration/growth/gmail-sync.test.ts",
-      "source_location": "L11",
-      "weight": 1
-    },
-    {
-      "source": "tests_integration_growth_gmail_sync_test_ts",
-      "target": "lib_growth_sequences_gmail_sync_repository_ts",
+      "target": "lib_growth_sequences_stop_repository_ts",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1,
@@ -44683,12 +45696,32 @@
     },
     {
       "source": "tests_integration_growth_gmail_sync_test_ts",
-      "target": "tests_integration_growth_gmail_sync_fixtures_ts",
+      "target": "lib_growth_sequences_gmail_sync_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/gmail-sync.test.ts",
+      "source_location": "L14",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_gmail_sync_test_ts",
+      "target": "lib_growth_sequences_gmail_sync_repository_ts",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "tests/integration/growth/gmail-sync.test.ts",
       "source_location": "L15",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_gmail_sync_test_ts",
+      "target": "tests_integration_growth_gmail_sync_fixtures_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/gmail-sync.test.ts",
+      "source_location": "L18",
       "weight": 1
     },
     {
