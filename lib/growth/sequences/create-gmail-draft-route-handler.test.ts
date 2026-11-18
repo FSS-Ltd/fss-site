@@ -26,7 +26,15 @@ function createRequest(
   );
 }
 
-const validBody = { expectedVersion: 1 };
+const validBody = {
+  expectedVersion: 1,
+  reviewedRecipient: {
+    email: "contact@example.test",
+    contactId: "33333333-3333-4333-8333-333333333333",
+    contactVersion: 1,
+    prospectVersion: 1,
+  },
+};
 
 function createHandler(
   overrides: Partial<Parameters<typeof createCreateGmailDraftHandler>[0]> = {},
@@ -79,6 +87,7 @@ test("creates a Gmail draft for the authorised founder", async () => {
   assert.deepEqual(receivedInput, {
     draftTaskId: "draft-id",
     expectedVersion: 1,
+    reviewedRecipient: validBody.reviewedRecipient,
     founder: {
       email: "j.ntagengwa@faithfulsoftware.dev",
       actorId: "a".repeat(64),
@@ -149,4 +158,20 @@ test("maps each approval error code to its documented HTTP status", async () => 
       `expected ${code} to map to ${status}`,
     );
   }
+});
+
+test("old approval payload is rejected before the action", async () => {
+  let calls = 0;
+  const handler = createHandler({
+    approveDraft: async () => {
+      calls++;
+      throw new Error("unexpected");
+    },
+  });
+  const response = await handler(
+    createRequest({ expectedVersion: 1 }),
+    context,
+  );
+  assert.equal(response.status, 422);
+  assert.equal(calls, 0);
 });

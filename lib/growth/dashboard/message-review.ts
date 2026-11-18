@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import type { ReviewedRecipient } from "../sequences/reviewed-recipient";
 
 import { renderApprovedFirstEmailContent } from "../email/gmail/render";
 import { EMAIL_ASSET_FALLBACK_KEYS } from "../email/assets/fallbacks";
@@ -54,6 +55,7 @@ export type MessageReviewData = {
   estimatedOneOffMaxPence: number;
   contactName: string;
   contactEmail: string;
+  reviewedRecipient: ReviewedRecipient;
   founderEmail: string;
   subject: string;
   previewHtml: string;
@@ -90,6 +92,8 @@ export type MessageReviewDraftRow = {
   recommendedOffer: string;
   estimatedOneOffMinPence: number;
   estimatedOneOffMaxPence: number;
+  contactId: string;
+  contactVersion: number;
   contactFirstName: string | null;
   contactLastName: string | null;
   contactEmail: string;
@@ -116,6 +120,8 @@ async function fetchDraftRow(
       p.recommended_offer as "recommendedOffer",
       p.estimated_one_off_min_pence as "estimatedOneOffMinPence",
       p.estimated_one_off_max_pence as "estimatedOneOffMaxPence",
+      c.id as "contactId",
+      c.version as "contactVersion",
       c.first_name as "contactFirstName",
       c.last_name as "contactLastName",
       c.email as "contactEmail",
@@ -397,7 +403,13 @@ export async function getMessageReview(
           [draft.contactFirstName, draft.contactLastName]
             .filter(Boolean)
             .join(" ") || "Business contact",
-        contactEmail: draft.contactEmail,
+        contactEmail: draft.normalisedEmail,
+        reviewedRecipient: {
+          email: draft.normalisedEmail,
+          contactId: draft.contactId,
+          contactVersion: draft.contactVersion,
+          prospectVersion: draft.prospectVersion,
+        },
         founderEmail,
         subject: content.subject,
         previewHtml: content.html,

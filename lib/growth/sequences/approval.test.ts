@@ -68,6 +68,7 @@ function lockedDraft(
     id: "11111111-1111-4111-8111-111111111111",
     prospectId: "22222222-2222-4222-8222-222222222222",
     contactId: "33333333-3333-4333-8333-333333333333",
+    contactVersion: 1,
     contactEmail: "contact@example.test",
     normalisedEmail: "contact@example.test",
     subscriberType: "corporate",
@@ -127,7 +128,10 @@ function createFakeRepository(state: FakeState): FirstEmailApprovalRepository {
       operation: (transaction: FirstEmailApprovalTransaction) => Promise<T>,
     ) {
       const transaction: FirstEmailApprovalTransaction = {
-        authorizeResearchContact: async () => {},
+        authorizeResearchContact: async () => ({
+          contactVersion: 2,
+          prospectVersion: 2,
+        }),
         async lockDraft(draftTaskId) {
           if (!state.draft || state.draft.id !== draftTaskId) return null;
           return state.draft;
@@ -191,6 +195,12 @@ const db = {} as GrowthDb;
 const baseInput = {
   draftTaskId: "11111111-1111-4111-8111-111111111111",
   expectedVersion: 1,
+  reviewedRecipient: {
+    email: "contact@example.test",
+    contactId: "33333333-3333-4333-8333-333333333333",
+    contactVersion: 1,
+    prospectVersion: 1,
+  },
   founder,
   correlationId: "correlation-id",
 } as const;
@@ -496,6 +506,59 @@ test("global research-only snapshots cannot create Gmail drafts or queue outreac
     assert.equal(providerCalls, 0);
     assert.equal(state.enrollments.length, 0);
     assert.equal(state.reviewStateUpdates.length, 0);
+    assert.equal(state.audits.length, 0);
+  }
+});
+
+test("rejects a changed recipient before creating a provider draft", async () => {
+  const state = createFakeState({
+    draft: lockedDraft({
+      contactEmail: "changed@example.test",
+      normalisedEmail: "changed@example.test",
+    }),
+  });
+  let providerCalls = 0;
+  const approve = createApprover(state, {
+    gmailClient: fakeGmailClient({
+      createDraft: async () => {
+        providerCalls++;
+        throw new Error("unexpected");
+      },
+    }),
+  });
+  await assert.rejects(
+    approve(db, {
+      ...baseInput,
+      sendMode: "gmail_draft",
+      reviewedRecipient: {
+        email: "contact@example.test",
+        contactId: "33333333-3333-4333-8333-333333333333",
+        contactVersion: 1,
+        prospectVersion: 1,
+      },
+    }),
+    (error: unknown) =>
+      error instanceof FirstEmailApprovalError &&
+      error.code === "version_conflict",
+  );
+  assert.equal(state.enrollments.length, 0);
+  assert.equal(providerCalls, 0);
+});
+
+test("rejects changed contact identity and versions before any writes", async () => {
+  for (const overrides of [
+    { contactId: "44444444-4444-4444-8444-444444444444" },
+    { contactVersion: 2 },
+    { prospectVersion: 2 },
+  ]) {
+    const state = createFakeState({ draft: lockedDraft(overrides) });
+    await assert.rejects(
+      createApprover(state)(db, { ...baseInput, sendMode: "queue" }),
+      (error: unknown) =>
+        error instanceof FirstEmailApprovalError &&
+        error.code === "version_conflict",
+    );
+    assert.equal(state.enrollments.length, 0);
     assert.equal(state.audits.length, 0);
   }
 });

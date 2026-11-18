@@ -24,6 +24,12 @@ const recipient = "business@example.test";
 const request = {
   draftTaskId: id,
   expectedVersion: 1,
+  reviewedRecipient: {
+    email: recipient,
+    contactId: id,
+    contactVersion: 1,
+    prospectVersion: 2,
+  },
   expectedProspectVersion: 2,
   fingerprint: researchEmailFingerprint(snapshot, recipient, 2),
   permission: {
@@ -44,6 +50,7 @@ function setup(overrides: Record<string, unknown> = {}) {
       id,
       prospectId: id,
       contactId: id,
+      contactVersion: 1,
       contactEmail: recipient,
       normalisedEmail: recipient,
       status: "completed",
@@ -70,6 +77,7 @@ function setup(overrides: Record<string, unknown> = {}) {
     },
     authorizeResearchContact: async (input) => {
       permissions.push(input);
+      return { contactVersion: 2, prospectVersion: 3 };
     },
   };
   const repository: FirstEmailApprovalRepository = {
@@ -91,6 +99,15 @@ test("explicit research approval freezes the exact email and recipient as a sing
   assert.equal(state.writes[0]?.message.htmlSnapshot, snapshot.email.html);
   assert.equal(state.writes[0]?.message.textSnapshot, snapshot.email.text);
   assert.equal(state.writes[0]?.followUpPolicy, "manual_only");
+  assert.deepEqual(
+    state.writes[0]?.reviewedRecipient,
+    request.reviewedRecipient,
+  );
+  assert.deepEqual(state.writes[0]?.effectiveRecipient, {
+    ...request.reviewedRecipient,
+    contactVersion: 2,
+    prospectVersion: 3,
+  });
   assert.equal(state.saved[0]?.reviewState, "approved");
   assert.equal(state.permissions.length, 1);
   assert.equal(state.audits.length, 1);
@@ -102,6 +119,12 @@ test("research approval rejects suppression, stale copy, stale contact state and
     { hasEnrollment: true },
     { prospectStatus: "rejected" },
     { prospectVersion: 3 },
+    { contactVersion: 2 },
+    { contactId: "44444444-4444-4444-8444-444444444444" },
+    {
+      contactEmail: "changed@example.test",
+      normalisedEmail: "changed@example.test",
+    },
     { outputSnapshot: { ...snapshot, draftVersion: 2 } },
   ]) {
     const state = setup(overrides);

@@ -13,6 +13,12 @@ const context = {
 };
 const body = {
   expectedVersion: 2,
+  reviewedRecipient: {
+    email: "contact@example.test",
+    contactId: "33333333-3333-4333-8333-333333333333",
+    contactVersion: 1,
+    prospectVersion: 3,
+  },
   expectedProspectVersion: 3,
   fingerprint: "a".repeat(64),
   permission: { basis: "consent", evidence: "Recipient asked for this email." },

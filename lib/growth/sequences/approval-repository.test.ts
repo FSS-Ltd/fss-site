@@ -12,6 +12,8 @@ test("locks the draft and prospect, creates the enrollment and message, and audi
   ) => {
     const text = strings.join("?").replace(/\s+/g, " ").trim();
     queries.push({ text, values });
+    if (text.startsWith("select p.business_id"))
+      return [{ businessId: "business-id", prospectId: "prospect-id" }];
     if (text.startsWith("select at.id")) {
       return [
         {
@@ -21,6 +23,8 @@ test("locks the draft and prospect, creates the enrollment and message, and audi
           outputSnapshot: { schemaVersion: "1.0" },
           completedAt: new Date("2026-08-17T06:00:00.000Z"),
           contactId: "contact-id",
+          contactVersion: 1,
+          businessId: "business-id",
           contactEmail: "contact@example.test",
           normalisedEmail: "contact@example.test",
           subscriberType: "corporate",
@@ -55,6 +59,19 @@ test("locks the draft and prospect, creates the enrollment and message, and audi
         prospectId: "prospect-id",
         contactId: "contact-id",
         enrollmentStatus: "active",
+        approvedRecipient: "contact@example.test",
+        reviewedRecipient: {
+          email: "contact@example.test",
+          contactId: "contact-id",
+          contactVersion: 1,
+          prospectVersion: 1,
+        },
+        effectiveRecipient: {
+          email: "contact@example.test",
+          contactId: "contact-id",
+          contactVersion: 1,
+          prospectVersion: 1,
+        },
         message: {
           id: "message-id",
           subjectSnapshot: "Subject",
@@ -85,8 +102,10 @@ test("locks the draft and prospect, creates the enrollment and message, and audi
   assert.equal(result.created.sequenceEnrollmentId, "enrollment-id");
 
   assert.match(queries.shift()?.text ?? "", /growth:gmail-routing/);
+  assert.match(queries.shift()?.text ?? "", /select p.business_id/);
+  assert.match(queries.shift()?.text ?? "", /pg_advisory_xact_lock/);
   assert.match(queries[0]?.text ?? "", /task_type = 'first_email_draft'/);
-  assert.match(queries[0]?.text ?? "", /for update of at, p, c$/);
+  assert.match(queries[0]?.text ?? "", /for update of at, p, c, b$/);
   assert.match(queries[1]?.text ?? "", /select exists/);
   assert.match(queries[2]?.text ?? "", /select exists/);
   assert.deepEqual(queries[2]?.values, ["contact@example.test"]);
@@ -98,7 +117,21 @@ test("locks the draft and prospect, creates the enrollment and message, and audi
     "prospect-id",
     "contact-id",
     "active",
-    {},
+    {
+      approvedRecipient: "contact@example.test",
+      reviewedRecipient: {
+        email: "contact@example.test",
+        contactId: "contact-id",
+        contactVersion: 1,
+        prospectVersion: 1,
+      },
+      effectiveRecipient: {
+        email: "contact@example.test",
+        contactId: "contact-id",
+        contactVersion: 1,
+        prospectVersion: 1,
+      },
+    },
   ]);
   assert.match(queries[4]?.text ?? "", /insert into growth\.email_messages/);
   assert.match(queries[5]?.text ?? "", /update growth\.sequence_enrollments/);
@@ -184,6 +217,19 @@ test("fails closed when the message insert returns no row", async () => {
         prospectId: "prospect-id",
         contactId: "contact-id",
         enrollmentStatus: "active",
+        approvedRecipient: "contact@example.test",
+        reviewedRecipient: {
+          email: "contact@example.test",
+          contactId: "contact-id",
+          contactVersion: 1,
+          prospectVersion: 1,
+        },
+        effectiveRecipient: {
+          email: "contact@example.test",
+          contactId: "contact-id",
+          contactVersion: 1,
+          prospectVersion: 1,
+        },
         message: {
           id: "message-id",
           subjectSnapshot: "Subject",
@@ -199,4 +245,28 @@ test("fails closed when the message insert returns no row", async () => {
       /could not be stored/i,
     );
   });
+});
+
+test("rejects crossed business identity after acquiring the business lock", async () => {
+  const transaction = (async (strings: TemplateStringsArray) => {
+    const text = strings.join("?").replace(/\s+/g, " ").trim();
+    if (text.startsWith("select p.business_id"))
+      return [{ businessId: "before", prospectId: "prospect" }];
+    if (text.startsWith("select at.id"))
+      return [{ businessId: "after", prospectId: "prospect" }];
+    return [];
+  }) as unknown as GrowthTransaction;
+  const db = {
+    begin: async <T>(operation: (tx: GrowthTransaction) => Promise<T>) =>
+      operation(transaction),
+  } as unknown as GrowthDb;
+  await assert.rejects(
+    postgresFirstEmailApprovalRepository.withTransaction(db, (tx) =>
+      tx.lockDraft("draft"),
+    ),
+    (error: unknown) =>
+      error instanceof Error &&
+      "code" in error &&
+      error.code === "version_conflict",
+  );
 });

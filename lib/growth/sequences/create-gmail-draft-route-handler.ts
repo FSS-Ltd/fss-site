@@ -22,8 +22,11 @@ import {
   type MessageActionRouteHandler,
 } from "./message-action-route";
 
+import { reviewedRecipientSchema } from "./reviewed-recipient";
+
 const bodySchema = z.object({
   expectedVersion: z.number().int().positive(),
+  reviewedRecipient: reviewedRecipientSchema,
 });
 
 const APPROVAL_ERROR_MAPPING: Record<
@@ -122,6 +125,7 @@ export function createCreateGmailDraftHandler(
       approveDraft(dependencies.db, {
         draftTaskId,
         expectedVersion: body.expectedVersion,
+        reviewedRecipient: body.reviewedRecipient,
         founder,
         correlationId,
         sendMode: "gmail_draft",

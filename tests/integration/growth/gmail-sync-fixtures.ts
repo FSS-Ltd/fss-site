@@ -55,9 +55,18 @@ export async function setUpApprovedGmailDraft(
 
   const ingestion = await ingestResearchRun(sql, fixture);
   const prospectId = ingestion.acceptedProspects[0]!.prospectId;
-  const [identity] = await sql<Array<{ draftTaskId: string }>>`
-    select at.id as "draftTaskId"
+  const [identity] = await sql<
+    Array<{
+      draftTaskId: string;
+      contactId: string;
+      contactVersion: number;
+      prospectVersion: number;
+    }>
+  >`
+    select at.id as "draftTaskId", p.primary_contact_id as "contactId", c.version as "contactVersion", p.version as "prospectVersion"
     from growth.agent_tasks at
+        join growth.prospects p on p.id = at.prospect_id
+        join growth.contacts c on c.id = p.primary_contact_id
     where at.prospect_id = ${prospectId}
       and at.task_type = 'first_email_draft'
   `;
@@ -88,6 +97,12 @@ export async function setUpApprovedGmailDraft(
   const approved = await approve(sql, {
     draftTaskId: identity.draftTaskId,
     expectedVersion: 1,
+    reviewedRecipient: {
+      email: contactEmail,
+      contactId: identity.contactId,
+      contactVersion: identity.contactVersion,
+      prospectVersion: identity.prospectVersion,
+    },
     founder,
     correlationId: `${externalRunId}-approve`,
     sendMode: "gmail_draft",

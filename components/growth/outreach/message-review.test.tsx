@@ -29,6 +29,12 @@ const researchMessage: MessageReviewData = {
   estimatedOneOffMaxPence: 0,
   contactName: "Business contact",
   contactEmail: "business@example.test",
+  reviewedRecipient: {
+    email: "business@example.test",
+    contactId: "33333333-3333-4333-8333-333333333333",
+    contactVersion: 1,
+    prospectVersion: 1,
+  },
   founderEmail: "founder@example.test",
   subject: "booking requests",
   previewHtml: "<p>A booking idea.</p>",

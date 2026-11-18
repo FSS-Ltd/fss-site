@@ -22,6 +22,10 @@ test(
     if (!connectionString) return;
 
     const sql = postgres(connectionString, { max: 2 });
+    const app = postgres(connectionString, {
+      max: 2,
+      connection: { options: "-c role=growth_app" },
+    });
     const token = randomUUID().replaceAll("-", "");
     const externalRunId = `integration-email-approval-${token}`;
     const companyNumber = token.slice(0, 12).toUpperCase();
@@ -61,17 +65,83 @@ test(
 
       const ingestion = await ingestResearchRun(sql, fixture);
       const prospectId = ingestion.acceptedProspects[0]!.prospectId;
-      const [identity] = await sql<Array<{ draftTaskId: string }>>`
-        select at.id as "draftTaskId"
+      const [identity] = await sql<
+        Array<{
+          draftTaskId: string;
+          contactId: string;
+          contactVersion: number;
+          prospectVersion: number;
+          businessId: string;
+        }>
+      >`
+        select p.business_id as "businessId", at.id as "draftTaskId", p.primary_contact_id as "contactId", c.version as "contactVersion", p.version as "prospectVersion"
         from growth.agent_tasks at
+        join growth.prospects p on p.id = at.prospect_id
+        join growth.contacts c on c.id = p.primary_contact_id
         where at.prospect_id = ${prospectId}
           and at.task_type = 'first_email_draft'
       `;
       assert.ok(identity);
 
-      const first = await approveQueued(sql, {
+      const staleRecipient = {
+        email: contactEmail,
+        contactId: identity.contactId,
+        contactVersion: identity.contactVersion,
+        prospectVersion: identity.prospectVersion,
+      };
+      const started = Promise.withResolvers<void>();
+      const release = Promise.withResolvers<void>();
+      const holder = app.begin(async (tx) => {
+        await tx`select pg_advisory_xact_lock(hashtextextended(${`growth:outreach-business:${identity.businessId}`}, 0))`;
+        started.resolve();
+        await release.promise;
+        await tx`update growth.contacts set version = version + 1 where id = ${identity.contactId}`;
+      });
+      await started.promise;
+      const stale = approveQueued(app, {
         draftTaskId: identity.draftTaskId,
         expectedVersion: 1,
+        reviewedRecipient: staleRecipient,
+        founder,
+        correlationId: `${externalRunId}-stale`,
+        sendMode: "queue",
+      });
+      try {
+        let waiting = false;
+        for (let attempt = 0; attempt < 100; attempt++) {
+          const [row] =
+            await sql`select exists(select 1 from pg_stat_activity where datname=current_database() and wait_event='advisory' and query like '%hashtextextended($1%') as waiting`;
+          if (row?.waiting) {
+            waiting = true;
+            break;
+          }
+          await new Promise((resolve) => setTimeout(resolve, 10));
+        }
+        assert.equal(waiting, true);
+      } finally {
+        release.resolve();
+      }
+      await holder;
+      await assert.rejects(
+        stale,
+        (error: unknown) =>
+          error instanceof FirstEmailApprovalError &&
+          error.code === "version_conflict",
+      );
+      const [effects] =
+        await sql`select (select count(*) from growth.sequence_enrollments where prospect_id = ${prospectId})::int as enrollments, (select count(*) from growth.email_messages where prospect_id = ${prospectId})::int as messages, (select count(*) from growth.audit_log where correlation_id = ${`${externalRunId}-stale`})::int as audits`;
+      assert.deepEqual(effects, { enrollments: 0, messages: 0, audits: 0 });
+      identity.contactVersion++;
+
+      const first = await approveQueued(app, {
+        draftTaskId: identity.draftTaskId,
+        expectedVersion: 1,
+        reviewedRecipient: {
+          email: contactEmail,
+          contactId: identity.contactId,
+          contactVersion: identity.contactVersion,
+          prospectVersion: identity.prospectVersion,
+        },
         founder,
         correlationId: correlationIds[0]!,
         sendMode: "queue",
@@ -82,6 +152,12 @@ test(
         approveQueued(sql, {
           draftTaskId: identity.draftTaskId,
           expectedVersion: 1,
+          reviewedRecipient: {
+            email: contactEmail,
+            contactId: identity.contactId,
+            contactVersion: identity.contactVersion,
+            prospectVersion: identity.prospectVersion,
+          },
           founder,
           correlationId: correlationIds[1]!,
           sendMode: "queue",
@@ -211,6 +287,7 @@ test(
       await sql`delete from growth.contacts where email = ${contactEmail}`;
       await sql`delete from growth.businesses where company_number = ${companyNumber}`;
       await sql`delete from growth.research_runs where external_run_id = ${externalRunId}`;
+      await app.end();
       await sql.end();
     }
   },
@@ -262,9 +339,18 @@ test(
 
       const ingestion = await ingestResearchRun(sql, fixture);
       const prospectId = ingestion.acceptedProspects[0]!.prospectId;
-      const [identity] = await sql<Array<{ draftTaskId: string }>>`
-        select at.id as "draftTaskId"
+      const [identity] = await sql<
+        Array<{
+          draftTaskId: string;
+          contactId: string;
+          contactVersion: number;
+          prospectVersion: number;
+        }>
+      >`
+        select at.id as "draftTaskId", p.primary_contact_id as "contactId", c.version as "contactVersion", p.version as "prospectVersion"
         from growth.agent_tasks at
+        join growth.prospects p on p.id = at.prospect_id
+        join growth.contacts c on c.id = p.primary_contact_id
         where at.prospect_id = ${prospectId}
           and at.task_type = 'first_email_draft'
       `;
@@ -281,6 +367,12 @@ test(
         approveDraft(sql, {
           draftTaskId: identity.draftTaskId,
           expectedVersion: 1,
+          reviewedRecipient: {
+            email: contactEmail,
+            contactId: identity.contactId,
+            contactVersion: identity.contactVersion,
+            prospectVersion: identity.prospectVersion,
+          },
           founder,
           correlationId,
           sendMode: "gmail_draft",
@@ -294,6 +386,12 @@ test(
       const result = await approveDraft(sql, {
         draftTaskId: identity.draftTaskId,
         expectedVersion: 1,
+        reviewedRecipient: {
+          email: contactEmail,
+          contactId: identity.contactId,
+          contactVersion: identity.contactVersion,
+          prospectVersion: identity.prospectVersion,
+        },
         founder,
         correlationId,
         sendMode: "gmail_draft",

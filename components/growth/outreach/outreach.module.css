@@ -287,6 +287,10 @@
   gap: 10px;
 }
 
+.actionRecipient {
+  overflow-wrap: anywhere;
+}
+
 .actionButton {
   border: 1px solid #d8e0e5;
   border-radius: 8px;
@@ -432,6 +436,7 @@
   margin: 14px 0;
   color: #3a4a63;
   font-size: 0.86rem;
+  overflow-wrap: anywhere;
 }
 
 .dialogActions {

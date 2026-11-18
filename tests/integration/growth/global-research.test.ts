@@ -28,6 +28,10 @@ test(
   async () => {
     if (!connectionString) return;
     const sql = postgres(connectionString, { max: 4 });
+    const app = postgres(connectionString, {
+      max: 4,
+      connection: { options: "-c role=growth_app" },
+    });
     const token = randomUUID().replaceAll("-", "");
     const prefix = `global-${token}`;
     function fixture(suffix: string): GlobalResearchRun {
@@ -214,7 +218,7 @@ test(
       const rolledBack =
         await sql`select id from growth.research_runs where external_run_id=${suppressed.externalRunId}`;
       assert.equal(rolledBack.length, 0);
-      await verifyResearchEmailFlow(sql, tasks[0]!.id, prefix);
+      await verifyResearchEmailFlow(sql, tasks[0]!.id, prefix, app);
     } finally {
       await sql`delete from growth.email_events where email_message_id in (select id from growth.email_messages where prospect_id in (select id from growth.prospects where research_run_id in (select id from growth.research_runs where external_run_id like ${`${prefix}%`})))`;
       await sql`update growth.sequence_enrollments set first_message_id=null where prospect_id in (select id from growth.prospects where research_run_id in (select id from growth.research_runs where external_run_id like ${`${prefix}%`}))`;
@@ -228,6 +232,7 @@ test(
       await sql`delete from growth.businesses where legal_name like ${`${prefix}%`}`;
       await sql`delete from growth.research_runs where external_run_id like ${`${prefix}%`}`;
       await sql`delete from growth.suppressions where normalised_email like ${`%-${token}@gmail.com`}`;
+      await app.end();
       await sql.end();
     }
   },

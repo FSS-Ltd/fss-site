@@ -57,7 +57,13 @@ export function createGlobalMessageReview(
         [draft.contactFirstName, draft.contactLastName]
           .filter(Boolean)
           .join(" ") || "Business contact",
-      contactEmail: draft.contactEmail,
+      contactEmail: draft.normalisedEmail,
+      reviewedRecipient: {
+        email: draft.normalisedEmail,
+        contactId: draft.contactId,
+        contactVersion: draft.contactVersion,
+        prospectVersion: draft.prospectVersion,
+      },
       founderEmail,
       subject: email.subject,
       previewHtml: email.html,

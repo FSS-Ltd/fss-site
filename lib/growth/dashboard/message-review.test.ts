@@ -72,6 +72,8 @@ function baseDraftRow(overrides: Partial<Record<string, unknown>> = {}) {
     recommendedOffer: "Website and enquiry workflow",
     estimatedOneOffMinPence: 450_000,
     estimatedOneOffMaxPence: 650_000,
+    contactId: "33333333-3333-4333-8333-333333333333",
+    contactVersion: 4,
     contactFirstName: "Alex",
     contactLastName: "Morgan",
     contactEmail: "alex@example.test",
@@ -144,6 +146,12 @@ test("returns a complete review for a fallback-visual draft: subject, recipient,
 
   assert.equal(result.data.subject, firstEmail.subject);
   assert.equal(result.data.contactEmail, "alex@example.test");
+  assert.deepEqual(result.data.reviewedRecipient, {
+    email: "alex@example.test",
+    contactId: "33333333-3333-4333-8333-333333333333",
+    contactVersion: 4,
+    prospectVersion: 2,
+  });
   assert.equal(result.data.contactName, "Alex Morgan");
   assert.equal(result.data.founderEmail, founderEmail);
   assert.ok(result.data.wordCount >= 140 && result.data.wordCount <= 220);

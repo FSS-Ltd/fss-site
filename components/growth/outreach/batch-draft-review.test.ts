@@ -28,6 +28,12 @@ function entry(): BatchDraftEntry {
       businessName: "Example",
       contactName: "Business contact",
       contactEmail: "business@example.test",
+      reviewedRecipient: {
+        email: "business@example.test",
+        contactId: "33333333-3333-4333-8333-333333333333",
+        contactVersion: 1,
+        prospectVersion: 3,
+      },
       subject: "Reviewed subject",
       previewText: "Reviewed copy.",
       eligibility: { ready: true, reasons: [] },
@@ -73,6 +79,20 @@ test("unavailable, malformed, and unauthorized review responses cannot be sent",
   );
   await assert.rejects(loadBatchDraft(id, new AbortController().signal));
   fetch.mock.mockImplementation(async () =>
+    Response.json({
+      status: "ready",
+      data: { ...entry().message, reviewedRecipient: undefined },
+    }),
+  );
+  await assert.rejects(loadBatchDraft(id, new AbortController().signal));
+  fetch.mock.mockImplementation(async () =>
+    Response.json({
+      status: "ready",
+      data: { ...entry().message, contactEmail: "different@example.test" },
+    }),
+  );
+  await assert.rejects(loadBatchDraft(id, new AbortController().signal));
+  fetch.mock.mockImplementation(async () =>
     Response.json({ message: "Unauthorized" }, { status: 401 }),
   );
   await assert.rejects(loadBatchDraft(id, new AbortController().signal));
@@ -107,6 +127,7 @@ test("sends research and legacy approvals through their versioned endpoints", as
       path: `/api/growth/messages/${id}/approve-research-send`,
       body: {
         expectedVersion: 2,
+        reviewedRecipient: draft.message!.reviewedRecipient,
         expectedProspectVersion: 3,
         fingerprint: "a".repeat(64),
         permission: {
@@ -117,7 +138,10 @@ test("sends research and legacy approvals through their versioned endpoints", as
     },
     {
       path: `/api/growth/messages/${id}/approve-send`,
-      body: { expectedVersion: 2 },
+      body: {
+        expectedVersion: 2,
+        reviewedRecipient: draft.message!.reviewedRecipient,
+      },
     },
   ]);
 });

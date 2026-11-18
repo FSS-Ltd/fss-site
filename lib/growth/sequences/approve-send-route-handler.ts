@@ -17,8 +17,11 @@ import {
   type MessageActionRouteHandler,
 } from "./message-action-route";
 
+import { reviewedRecipientSchema } from "./reviewed-recipient";
+
 const bodySchema = z.object({
   expectedVersion: z.number().int().positive(),
+  reviewedRecipient: reviewedRecipientSchema,
 });
 
 const ERROR_MAPPING: Record<
@@ -112,6 +115,7 @@ export function createApproveSendHandler(
       approveDraft(dependencies.db, {
         draftTaskId,
         expectedVersion: body.expectedVersion,
+        reviewedRecipient: body.reviewedRecipient,
         founder,
         correlationId,
         sendMode: "queue",

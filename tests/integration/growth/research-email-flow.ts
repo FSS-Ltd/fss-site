@@ -14,6 +14,7 @@ export async function verifyResearchEmailFlow(
   sql: GrowthDb,
   draftTaskId: string,
   prefix: string,
+  app: GrowthDb,
 ): Promise<void> {
   const founder = { email: "founder@example.test", actorId: "a".repeat(64) };
   const original = await getMessageReview(
@@ -52,6 +53,7 @@ export async function verifyResearchEmailFlow(
     draftTaskId,
     expectedVersion: 2,
     expectedProspectVersion: review.data.prospectVersion,
+    reviewedRecipient: review.data.reviewedRecipient,
     fingerprint: review.data.approvalFingerprint!,
     permission: {
       basis: "consent" as const,
@@ -61,14 +63,51 @@ export async function verifyResearchEmailFlow(
     correlationId: `${prefix}-approve`,
   };
   await assert.rejects(
-    approve(sql, {
+    approve(app, {
       ...input,
       expectedVersion: 1,
       fingerprint: original.data.approvalFingerprint!,
     }),
   );
-  const approved = await approve(sql, input);
-  await assert.rejects(approve(sql, input));
+  const approved = await approve(app, input);
+  const [approvalSnapshot] = await sql<
+    Array<{
+      snapshot: {
+        reviewedRecipient: typeof input.reviewedRecipient;
+        effectiveRecipient: typeof input.reviewedRecipient;
+        approvedRecipient: string;
+      };
+      contactVersion: number;
+      prospectVersion: number;
+    }>
+  >`
+    select se.template_snapshot as snapshot, c.version as "contactVersion", p.version as "prospectVersion"
+    from growth.sequence_enrollments se join growth.contacts c on c.id = se.contact_id
+    join growth.prospects p on p.id = se.prospect_id where se.id = ${approved.sequenceEnrollmentId}
+  `;
+  assert.ok(approvalSnapshot);
+  assert.deepEqual(
+    approvalSnapshot.snapshot.reviewedRecipient,
+    input.reviewedRecipient,
+  );
+  assert.equal(
+    approvalSnapshot.snapshot.approvedRecipient,
+    input.reviewedRecipient.email,
+  );
+  assert.deepEqual(approvalSnapshot.snapshot.effectiveRecipient, {
+    ...input.reviewedRecipient,
+    contactVersion: approvalSnapshot.contactVersion,
+    prospectVersion: approvalSnapshot.prospectVersion,
+  });
+  assert.equal(
+    approvalSnapshot.contactVersion,
+    input.reviewedRecipient.contactVersion + 1,
+  );
+  assert.equal(
+    approvalSnapshot.prospectVersion,
+    input.reviewedRecipient.prospectVersion + 1,
+  );
+  await assert.rejects(approve(app, input));
 
   // Keep another due record present: targeted delivery must not send it.
   const [other] = await sql<
@@ -82,11 +121,12 @@ export async function verifyResearchEmailFlow(
     sql,
   );
   assert.equal(otherReview.status, "ready");
-  const otherApproved = await approve(sql, {
+  const otherApproved = await approve(app, {
     ...input,
     draftTaskId: other.id,
     expectedVersion: otherReview.data.version,
     expectedProspectVersion: otherReview.data.prospectVersion,
+    reviewedRecipient: otherReview.data.reviewedRecipient,
     fingerprint: otherReview.data.approvalFingerprint!,
     correlationId: `${prefix}-other`,
   });
