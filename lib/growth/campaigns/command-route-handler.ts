@@ -61,6 +61,7 @@ const lifecycleCommand = z.discriminatedUnion("type", [
   z.strictObject({ type: z.literal("approve"), ...fields }),
   z.strictObject({ type: z.literal("pause"), ...fields }),
   z.strictObject({ type: z.literal("resume"), ...fields }),
+  z.strictObject({ type: z.literal("enrol"), ...fields, prospectId: z.uuid() }),
   z.strictObject({
     type: z.literal("create"),
     requestId: z.uuid(),
@@ -87,6 +88,15 @@ export function createCampaignCommandHandler(dependencies: {
     bodySchema: lifecycleCommand,
     action: async ({ body, founder, correlationId }) => {
       const execute = dependencies.execute ?? executeCampaignCommand;
+      if (body.type === "enrol") {
+        requireCampaignFounder(founder);
+        const [approved] = await dependencies.db<{ id: string }[]>`
+          select id from growth.campaigns where id=${body.campaignId} and version=${body.policyVersion}
+            and approved_by=${founder.actorId} and approved_at is not null
+        `;
+        if (!approved) throw new Error("policy_not_approved");
+        return execute(dependencies.db, body, founder, correlationId);
+      }
       if (body.type !== "create" && body.type !== "revise")
         return execute(dependencies.db, body, founder, correlationId);
       requireCampaignFounder(founder);
@@ -200,6 +210,10 @@ export function createCampaignCommandHandler(dependencies: {
       const known = new Set([
         "unsupported_stored_policy",
         "bound_provider_changed",
+        "prospect_not_found",
+        "identity_changed",
+        "excluded",
+        "active_membership_exists",
         "policy_version_changed",
         "policy_revoked",
         "already_approved",

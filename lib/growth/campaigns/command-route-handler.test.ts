@@ -303,3 +303,48 @@ test("revision rebuilds from the requested stored version and holds unknown stor
   assert.equal((await handle(request(payload))).status, 409);
   assert.equal(bodies.length, 4);
 });
+
+test("enrol adapter accepts only an exact founder-approved policy and leaves membership checks to the command", async () => {
+  const { createHash } = await import("node:crypto");
+  const email = "j.ntagengwa@faithfulsoftware.dev";
+  const actualFounder = {
+    email,
+    actorId: createHash("sha256").update(email).digest("hex"),
+  };
+  let approved = false;
+  const database = (async () =>
+    approved ? [{ id: command.campaignId }] : []) as unknown as GrowthDb;
+  let calls = 0;
+  const execute: typeof executeCampaignCommand = async (_db, input, actor) => {
+    calls++;
+    assert.equal(input.type, "enrol");
+    assert.deepEqual(actor, actualFounder);
+    return {
+      status: "ok",
+      id: command.campaignId,
+      version: 1,
+      alreadyExisted: false,
+    };
+  };
+  const handle = createCampaignCommandHandler({
+    db: database,
+    config: { origin: "https://example.com" },
+    authorizeFounder: async () => actualFounder,
+    execute,
+    createCorrelationId: () => "correlation",
+    reportUnexpectedError: () => {},
+  });
+  const input = {
+    type: "enrol",
+    requestId: command.requestId,
+    campaignId: command.campaignId,
+    policyVersion: 1,
+    prospectId: "7a71c3fc-4d35-4691-976b-2240fcd08828",
+  };
+  assert.equal((await handle(request(input))).status, 409);
+  assert.equal(calls, 0);
+  approved = true;
+  assert.equal((await handle(request(input))).status, 200);
+  assert.equal((await handle(request(input))).status, 200);
+  assert.equal(calls, 2);
+});
