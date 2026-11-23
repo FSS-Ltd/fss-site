@@ -1,6 +1,7 @@
 import { getGrowthDb } from "@/lib/growth/db/client";
 import { createCronRouteHandler } from "@/lib/growth/http/cron-auth";
 import { isLondonSummarySlot } from "@/lib/growth/campaigns/daily-runs";
+import { publishDailyOutreachSummary } from "@/lib/growth/campaigns/daily-summary";
 import { runMonthlyReportBatch } from "@/lib/growth/campaigns/monthly-report-worker";
 import { readCronEnv } from "../runtime";
 
@@ -20,7 +21,14 @@ export async function GET(request: Request): Promise<Response> {
         return { skipped: "outreach_summary_disabled" };
       if (!isLondonSummarySlot(new Date()))
         return { skipped: "outside_summary_slot" };
-      return { reports: await runMonthlyReportBatch(getGrowthDb()) };
+      const db = getGrowthDb();
+      const [daily, reports] = await Promise.allSettled([
+        publishDailyOutreachSummary(db),
+        runMonthlyReportBatch(db),
+      ]);
+      if (daily.status === "rejected") throw daily.reason;
+      if (reports.status === "rejected") throw reports.reason;
+      return { daily: daily.value, reports: reports.value };
     },
   )(request);
 }
