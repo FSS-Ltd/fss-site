@@ -193,6 +193,9 @@ test(
       });
       await admin`update growth.outreach_account_reviews set evidence=${admin.json(binding!.evidence)} where id=${first.reviewId}`;
       assert.equal(first.version, 2);
+      const [initialControl] =
+        await admin`select state from growth.outreach_account_controls where connection_id=${id}`;
+      assert.equal(initialControl?.state, "paused");
       const other = randomUUID();
       try {
         await admin`insert into growth.integration_connections(id,provider,subject_email,status,google_subject) values (${other},'gmail',${`${other}@example.test`},'connected','other-subject')`;
@@ -347,10 +350,70 @@ test(
         expectedVersion: 4,
       };
       await executeAccountControlCommand(db, nextHealth, founder, randomUUID());
+      const [renewed] =
+        await admin`select state from growth.outreach_account_controls where connection_id=${id}`;
+      assert.equal(renewed?.state, "active");
+      assert.equal((await readiness("active")).status, "ready");
+      await executeAccountControlCommand(
+        db,
+        {
+          ...health,
+          requestId: randomUUID(),
+          expectedVersion: 5,
+          evidence: { ...health.evidence, verdict: "unknown", complete: false },
+        },
+        founder,
+        randomUUID(),
+      );
+      const [unknown] =
+        await admin`select state from growth.outreach_account_controls where connection_id=${id}`;
+      assert.equal(unknown?.state, "active");
+      assert.deepEqual(await readiness("active"), {
+        status: "held",
+        reason: "health_unknown",
+      });
+      await executeAccountControlCommand(
+        db,
+        { ...health, requestId: randomUUID(), expectedVersion: 6 },
+        founder,
+        randomUUID(),
+      );
+      assert.equal((await readiness("active")).status, "ready");
+      await executeAccountControlCommand(
+        db,
+        {
+          ...health,
+          requestId: randomUUID(),
+          expectedVersion: 7,
+          evidence: { ...health.evidence, complaints: 1 },
+        },
+        founder,
+        randomUUID(),
+      );
+      const [adverse] =
+        await admin`select state from growth.outreach_account_controls where connection_id=${id}`;
+      assert.equal(adverse?.state, "halted");
+      await executeAccountControlCommand(
+        db,
+        { ...health, requestId: randomUUID(), expectedVersion: 8 },
+        founder,
+        randomUUID(),
+      );
+      const [stillHalted] =
+        await admin`select state from growth.outreach_account_controls where connection_id=${id}`;
+      assert.equal(stillHalted?.state, "halted");
+      assert.equal((await readiness("active")).status, "held");
+      await executeAccountControlCommand(
+        db,
+        { type: "activate", requestId: randomUUID(), expectedVersion: 9 },
+        founder,
+        randomUUID(),
+      );
+      assert.equal((await readiness("active")).status, "ready");
       const ramp = {
         type: "approve_ramp" as const,
         requestId: randomUUID(),
-        expectedVersion: 5,
+        expectedVersion: 10,
         ramp: 50 as const,
       };
       const results = await Promise.allSettled([
@@ -372,7 +435,7 @@ test(
           {
             type: "approve_ramp",
             requestId: randomUUID(),
-            expectedVersion: 6,
+            expectedVersion: 11,
             ramp: 100,
           },
           founder,
@@ -389,7 +452,7 @@ test(
             {
               type: "halt",
               requestId: randomUUID(),
-              expectedVersion: 6,
+              expectedVersion: 11,
               reason: "test",
             },
             founder,
@@ -399,14 +462,14 @@ test(
         );
         const [unchanged] =
           await admin`select version from growth.outreach_account_controls where connection_id=${id}`;
-        assert.equal(unchanged?.version, 6);
+        assert.equal(unchanged?.version, 11);
       } finally {
         await admin`drop trigger test_reject_account_audit on growth.audit_log`;
         await admin`drop function growth.test_reject_account_audit()`;
       }
       await executeAccountControlCommand(
         db,
-        { type: "activate", requestId: randomUUID(), expectedVersion: 6 },
+        { type: "activate", requestId: randomUUID(), expectedVersion: 11 },
         founder,
         randomUUID(),
       );
@@ -440,7 +503,7 @@ test(
       await assert.rejects(
         executeAccountControlCommand(
           db,
-          { type: "activate", requestId: randomUUID(), expectedVersion: 7 },
+          { type: "activate", requestId: randomUUID(), expectedVersion: 12 },
           founder,
           randomUUID(),
         ),
@@ -456,7 +519,7 @@ test(
       const revalidate = {
         type: "revalidate_grant" as const,
         requestId: randomUUID(),
-        expectedVersion: 7,
+        expectedVersion: 12,
         expectedGrantVersion: 3,
       };
       await assert.rejects(
@@ -481,7 +544,7 @@ test(
         founder,
         randomUUID(),
       );
-      assert.equal(revalidated.version, 8);
+      assert.equal(revalidated.version, 13);
       const [after] =
         await admin`select state,ramp,limits_review_id from growth.outreach_account_controls where connection_id=${id}`;
       const [invalidated] =
@@ -495,7 +558,7 @@ test(
       await assert.rejects(
         executeAccountControlCommand(
           db,
-          { type: "activate", requestId: randomUUID(), expectedVersion: 8 },
+          { type: "activate", requestId: randomUUID(), expectedVersion: 13 },
           founder,
           randomUUID(),
         ),
@@ -507,7 +570,7 @@ test(
         {
           type: "halt",
           requestId: randomUUID(),
-          expectedVersion: 8,
+          expectedVersion: 13,
           reason: "grant revoked",
         },
         founder,
@@ -515,7 +578,7 @@ test(
       );
       const [count] =
         await admin`select count(*)::int as value from growth.outreach_account_reviews where connection_id=${id}`;
-      assert.equal(count?.value, 8);
+      assert.equal(count?.value, 13);
     } finally {
       await admin`delete from growth.outreach_provider_usage where account_id=${id}`;
       await admin`update growth.outreach_account_controls set limits_review_id=null,health_review_id=null where connection_id=${id}`;

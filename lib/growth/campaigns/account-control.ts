@@ -191,9 +191,7 @@ export async function executeAccountControlCommand(
           ? "active"
           : command.type === "revalidate_grant"
             ? "paused"
-            : command.type === "record_health"
-              ? "paused"
-              : control.state;
+            : control.state;
     const ramp =
       command.type === "approve_ramp" || command.type === "reduce_ramp"
         ? command.ramp

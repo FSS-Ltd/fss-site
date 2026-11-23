@@ -223,8 +223,7 @@ export async function executeResendAccountCommand(
         ? "active"
         : command.type === "halt" || adverseHealth
           ? "halted"
-          : command.type === "resend_configure" ||
-              command.type === "record_health"
+          : command.type === "resend_configure"
             ? "paused"
             : control.state;
     await tx`update growth.outreach_account_controls set state=${state},ramp=${command.type === "approve_ramp" || command.type === "reduce_ramp" ? command.ramp : control.ramp},version=${version},resend_binding=${command.type === "resend_configure" ? tx.json(command.binding) : tx`resend_binding`},resend_binding_review_id=${command.type === "resend_configure" ? reviewId : tx`resend_binding_review_id`},health_review_id=${command.type === "record_health" ? reviewId : command.type === "resend_configure" ? null : tx`health_review_id`},last_ramp_at=${command.type === "approve_ramp" || (command.type === "activate" && !control.lastRampAt) ? now : control.lastRampAt},updated_at=${now} where connection_id=${connectionId}`;

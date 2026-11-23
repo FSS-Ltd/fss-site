@@ -85,6 +85,9 @@ test(
         runtime,
       );
       assert.equal(configured.version, 2);
+      const [initialControl] =
+        await admin`select state from growth.outreach_account_controls where connection_id=${configured.connectionId}`;
+      assert.equal(initialControl?.state, "paused");
       const replay = await executeResendAccountCommand(
         db,
         command,
@@ -169,6 +172,147 @@ test(
             "openid",
           ],
         });
+      const renewal = await executeResendAccountCommand(
+        db,
+        {
+          type: "record_health",
+          requestId: randomUUID(),
+          expectedVersion: activate.version,
+          connectionId: id,
+          evidence: health,
+        },
+        founder,
+        randomUUID(),
+        runtime,
+      );
+      const [renewed] =
+        await admin`select state from growth.outreach_account_controls where connection_id=${id}`;
+      assert.equal(renewed?.state, "active");
+      assert.equal(
+        (
+          await withGrowthTransaction(db, (tx) =>
+            loadResendAccountReadiness(tx, id, runtime),
+          )
+        ).status,
+        "ready",
+      );
+      await admin`update growth.outreach_account_controls set last_ramp_at=now() - interval '2 hours' where connection_id=${id}`;
+      const advanced = await executeResendAccountCommand(
+        db,
+        {
+          type: "approve_ramp",
+          requestId: randomUUID(),
+          expectedVersion: renewal.version,
+          connectionId: id,
+          ramp: 50,
+        },
+        founder,
+        randomUUID(),
+        runtime,
+      );
+      const unknownReview = await executeResendAccountCommand(
+        db,
+        {
+          type: "record_health",
+          requestId: randomUUID(),
+          expectedVersion: advanced.version,
+          connectionId: id,
+          evidence: { ...health, verdict: "unknown", complete: false },
+        },
+        founder,
+        randomUUID(),
+        runtime,
+      );
+      const [unknown] =
+        await admin`select state from growth.outreach_account_controls where connection_id=${id}`;
+      assert.equal(unknown?.state, "active");
+      assert.deepEqual(
+        await withGrowthTransaction(db, (tx) =>
+          loadResendAccountReadiness(tx, id, runtime),
+        ),
+        { status: "held", reason: "health_unknown" },
+      );
+      const restored = await executeResendAccountCommand(
+        db,
+        {
+          type: "record_health",
+          requestId: randomUUID(),
+          expectedVersion: unknownReview.version,
+          connectionId: id,
+          evidence: health,
+        },
+        founder,
+        randomUUID(),
+        runtime,
+      );
+      assert.equal(
+        (
+          await withGrowthTransaction(db, (tx) =>
+            loadResendAccountReadiness(tx, id, runtime),
+          )
+        ).status,
+        "ready",
+      );
+      const incident = await executeResendAccountCommand(
+        db,
+        {
+          type: "record_health",
+          requestId: randomUUID(),
+          expectedVersion: restored.version,
+          connectionId: id,
+          evidence: { ...health, complaints: 1 },
+        },
+        founder,
+        randomUUID(),
+        runtime,
+      );
+      const [halted] =
+        await admin`select state from growth.outreach_account_controls where connection_id=${id}`;
+      assert.equal(halted?.state, "halted");
+      const afterHalt = await executeResendAccountCommand(
+        db,
+        {
+          type: "record_health",
+          requestId: randomUUID(),
+          expectedVersion: incident.version,
+          connectionId: id,
+          evidence: health,
+        },
+        founder,
+        randomUUID(),
+        runtime,
+      );
+      const [stillHalted] =
+        await admin`select state from growth.outreach_account_controls where connection_id=${id}`;
+      assert.equal(stillHalted?.state, "halted");
+      assert.equal(
+        (
+          await withGrowthTransaction(db, (tx) =>
+            loadResendAccountReadiness(tx, id, runtime),
+          )
+        ).status,
+        "held",
+      );
+      const reactivated = await executeResendAccountCommand(
+        db,
+        {
+          type: "activate",
+          requestId: randomUUID(),
+          expectedVersion: afterHalt.version,
+          connectionId: id,
+        },
+        founder,
+        randomUUID(),
+        runtime,
+      );
+      assert.equal(
+        (
+          await withGrowthTransaction(db, (tx) =>
+            loadResendAccountReadiness(tx, id, runtime),
+          )
+        ).status,
+        "ready",
+      );
       await admin`update growth.integration_connections set status='disconnected' where id=${gmailId}`;
       assert.equal(
         (
@@ -232,7 +376,7 @@ test(
         {
           type: "resend_configure",
           requestId: randomUUID(),
-          expectedVersion: activate.version,
+          expectedVersion: reactivated.version,
           binding: rotatedBinding,
         },
         founder,
@@ -255,7 +399,7 @@ test(
       const [control] =
         await admin`select state,ramp,health_review_id as health from growth.outreach_account_controls where connection_id=${id}`;
       assert.equal(control?.state, "paused");
-      assert.equal(control?.ramp, 25);
+      assert.equal(control?.ramp, 50);
       assert.equal(control?.health, null);
       const [secrets] =
         await admin`select count(*)::int as count from growth.outreach_account_reviews where connection_id=${id} and (evidence::text like '%send-secret%' or evidence::text like '%usage-secret%')`;
