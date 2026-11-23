@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { websiteServiceTermsSchema } from "./website-service-offers";
 import { globalCandidateSchema } from "../research/global-schema";
 import { isCrmCountryCode } from "../crm/countries";
 import { isPublicHttpUrl } from "../http/public-url";
@@ -42,6 +43,7 @@ export const campaignPolicySchema = z
     expiresAt: date.nullable().default(null),
     approverId: id.nullable().default(null),
     offer: id.nullable().default(null),
+    commercialTerms: websiteServiceTermsSchema.optional(),
     capabilityEvidence: id.nullable().default(null),
     jurisdiction: id.nullable().default(null),
     provider: z.enum(["gmail", "resend"]).default("gmail"),

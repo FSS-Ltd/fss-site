@@ -1,3 +1,8 @@
+import {
+  isWebsiteServiceOffer,
+  matchesWebsiteServiceOffer,
+  type WebsiteServiceTerms,
+} from "./website-service-offers";
 import { buildCampaignCopy } from "./copy";
 import { assignCampaignVariant } from "./variants";
 import type { CampaignVariant } from "./schemas";
@@ -10,6 +15,7 @@ export function validateControlledCopy(input: {
   market: string;
   jurisdiction: string;
   offer: string;
+  commercialTerms?: WebsiteServiceTerms;
   variants: readonly CampaignVariant[];
   variantId: string;
   variantVersion: number;
@@ -25,7 +31,10 @@ export function validateControlledCopy(input: {
     !first ||
     !second ||
     first.id === second.id ||
-    (input.offer !== "review" && input.offer !== "website_preview")
+    (input.offer !== "review" &&
+      input.offer !== "website_preview" &&
+      (!isWebsiteServiceOffer(input.offer) ||
+        !matchesWebsiteServiceOffer(input.offer, input.commercialTerms)))
   )
     return false;
   const assigned = assignCampaignVariant({
@@ -47,6 +56,7 @@ export function validateControlledCopy(input: {
       verifiedOwnerName: null,
       verifiedObservation: input.observation,
       offer: input.offer,
+      commercialTerms: input.commercialTerms,
       previewArtifactId: null,
       previewReviewed: false,
       cta: variant.cta,

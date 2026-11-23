@@ -1,6 +1,10 @@
 import type { GrowthTransaction } from "../db/types";
 import type { CampaignPolicyDefinition } from "./schemas";
 import { isSupportedPermission } from "./permission-evidence";
+import {
+  isWebsiteServiceOffer,
+  matchesWebsiteServiceOffer,
+} from "./website-service-offers";
 
 export function validateCampaignDefinition(
   policy: CampaignPolicyDefinition,
@@ -16,6 +20,15 @@ export function validateCampaignDefinition(
     policy.providerReserve < 50
   )
     throw new Error("invalid_policy_definition");
+  if (
+    (policy.offer &&
+      isWebsiteServiceOffer(policy.offer) &&
+      !matchesWebsiteServiceOffer(policy.offer, policy.commercialTerms)) ||
+    (policy.commercialTerms &&
+      (!policy.offer ||
+        !matchesWebsiteServiceOffer(policy.offer, policy.commercialTerms)))
+  )
+    throw new Error("invalid_commercial_terms");
   const capability = policy.capabilityAttestation;
   const provider = policy.providerAttestation;
   if (

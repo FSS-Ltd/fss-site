@@ -1,3 +1,9 @@
+import {
+  isWebsiteServiceOffer,
+  matchesWebsiteServiceOffer,
+  type WebsiteServiceOfferId,
+  type WebsiteServiceTerms,
+} from "./website-service-offers";
 import { offersEmailOptOut } from "../email/copy-policy";
 import { escapeEmailHtmlText, isSafeEmailHtml } from "../email/html-policy";
 
@@ -25,7 +31,8 @@ export function buildCampaignCopy(input: {
   businessName: string;
   verifiedOwnerName: string | null;
   verifiedObservation: string;
-  offer: "review" | "website_preview";
+  offer: "review" | "website_preview" | WebsiteServiceOfferId;
+  commercialTerms?: WebsiteServiceTerms;
   previewArtifactId: string | null;
   previewReviewed: boolean;
   cta: string;
@@ -41,12 +48,24 @@ export function buildCampaignCopy(input: {
   const cta = safe(input.cta);
   if (!cta.endsWith("?")) throw new TypeError("CTA must be a question.");
   const intro = `I noticed ${observation} for ${business}.`;
-  const offer =
-    input.offer === "review"
-      ? "I could prepare a short plan for requesting and responding to reviews if that would be useful."
-      : input.previewReviewed && input.previewArtifactId
+  let offer: string;
+  if (input.offer === "review") {
+    offer =
+      "I could prepare a short plan for requesting and responding to reviews if that would be useful.";
+  } else if (input.offer === "website_preview") {
+    offer =
+      input.previewReviewed && input.previewArtifactId
         ? `We prepared a reviewed preview for ${business}.`
         : `I could prepare a private one-page preview for ${business} if that would be useful.`;
+  } else if (
+    isWebsiteServiceOffer(input.offer) &&
+    matchesWebsiteServiceOffer(input.offer, input.commercialTerms)
+  ) {
+    const terms = input.commercialTerms;
+    offer = `We offer a free entire website build excluding GoHighLevel service add-ons with ${terms.name} at £${terms.monthlyPence / 100}/month. ${terms.description} There is no setup fee, no minimum term, and you can cancel anytime.`;
+  } else {
+    throw new TypeError("Approved commercial terms are required.");
+  }
   const optOutSentence = "Reply if you prefer not to receive further emails.";
   const text = `${intro}\n\n${offer}\n\n${cta}\n\n${optOutSentence}`;
   const html = text
