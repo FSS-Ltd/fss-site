@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { Webhook } from "svix";
 import { z } from "zod";
 
@@ -6,6 +7,11 @@ import type { StopSequenceInput, StoppedSequence } from "../../sequences/stop";
 import { SequenceStopError } from "../../sequences/stop";
 import type { EmailSuppressionDependencies } from "../../email/suppression";
 import { recordComplaint, recordHardBounce } from "../../email/suppression";
+import {
+  extractResendDeliveryCandidate,
+  type ResendDeliveryCandidate,
+  type ResendWebhookAccountBinding,
+} from "./outreach-delivery-evidence";
 
 const KNOWN_EVENT_DATA_SCHEMA = z
   .object({
@@ -40,7 +46,12 @@ export type ResendWebhookHeaders = {
 };
 
 export type VerifyResendWebhookResult =
-  | { ok: true; payload: unknown; providerEventId: string }
+  | {
+      ok: true;
+      payload: unknown;
+      providerEventId: string;
+      bodySha256: string;
+    }
   | { ok: false };
 
 /** Verifies the raw request body against the Resend/Svix signature headers.
@@ -64,7 +75,12 @@ export function verifyResendWebhookSignature(
       "svix-timestamp": svixTimestamp,
       "svix-signature": svixSignature,
     });
-    return { ok: true, payload, providerEventId: svixId };
+    return {
+      ok: true,
+      payload,
+      providerEventId: svixId,
+      bodySha256: createHash("sha256").update(rawBody, "utf8").digest("hex"),
+    };
   } catch {
     return { ok: false };
   }
@@ -147,6 +163,12 @@ export type ResendWebhookDependencies = {
   stopSequence: (input: StopSequenceInput) => Promise<StoppedSequence>;
   appendAuditEvent: (input: AuditInput) => Promise<void>;
   now?: () => Date;
+  /** Reconcile must atomically verify the issuer and deduplicate the event. */
+  outreachDelivery?: {
+    secret: string;
+    binding: ResendWebhookAccountBinding;
+    reconcile: (candidate: ResendDeliveryCandidate) => Promise<void>;
+  };
 };
 
 function suppressionReasonForEventType(eventType: string): "bounce" | "do_not_contact" {
@@ -265,6 +287,19 @@ export async function handleResendWebhook(
 
   const verified = verifyResendWebhookSignature(input.rawBody, input.headers, input.secret);
   if (!verified.ok) return { status: "unauthorized" };
+
+  if (deps.outreachDelivery) {
+    const campaignVerified = verifyResendWebhookSignature(
+      input.rawBody,
+      input.headers,
+      deps.outreachDelivery.secret,
+    );
+    const candidate = extractResendDeliveryCandidate({
+      verified: campaignVerified,
+      binding: deps.outreachDelivery.binding,
+    });
+    if (candidate) await deps.outreachDelivery.reconcile(candidate);
+  }
 
   const parsed = parseResendWebhookPayload(verified.payload);
   if (!parsed.ok) return { status: "invalid_payload" };
