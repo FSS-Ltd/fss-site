@@ -31,35 +31,54 @@ function lastStartingBefore(
 }
 export function indexReportCoverage(
   records: readonly CoverageRecord[],
-): (connectionId: string, subject: string, from: Date, until: Date) => boolean {
+): (
+  connectionId: string,
+  subject: string,
+  from: Date,
+  until: Date,
+  grantEpoch?: number,
+) => boolean {
   const groups = new Map<string, Group>();
   for (const record of records) {
-    const key = JSON.stringify([record.connectionId, record.googleSubject]);
-    const group = groups.get(key) ?? { invalid: false, complete: [], gaps: [] };
-    groups.set(key, group);
-    const from = record.observedFrom?.getTime() ?? -Infinity,
-      until = record.observedUntil.getTime();
-    if (
-      !Number.isSafeInteger(record.grantEpoch) ||
-      record.grantEpoch <= 0 ||
-      !Number.isFinite(until) ||
-      (record.observedFrom !== null && !Number.isFinite(from)) ||
-      from >= until ||
-      (record.state === "complete" && !record.observedFrom)
-    ) {
-      group.invalid = true;
-      continue;
+    const keys = [
+      JSON.stringify([record.connectionId, record.googleSubject]),
+      JSON.stringify([
+        record.connectionId,
+        record.googleSubject,
+        record.grantEpoch,
+      ]),
+    ];
+    for (const key of keys) {
+      const group = groups.get(key) ?? {
+        invalid: false,
+        complete: [],
+        gaps: [],
+      };
+      groups.set(key, group);
+      const from = record.observedFrom?.getTime() ?? -Infinity,
+        until = record.observedUntil.getTime();
+      if (
+        !Number.isSafeInteger(record.grantEpoch) ||
+        record.grantEpoch <= 0 ||
+        !Number.isFinite(until) ||
+        (record.observedFrom !== null && !Number.isFinite(from)) ||
+        from >= until ||
+        (record.state === "complete" && !record.observedFrom)
+      ) {
+        group.invalid = true;
+        continue;
+      }
+      (record.state === "complete" ? group.complete : group.gaps).push({
+        from,
+        until,
+      });
     }
-    (record.state === "complete" ? group.complete : group.gaps).push({
-      from,
-      until,
-    });
   }
   for (const group of groups.values()) {
     group.complete = merge(group.complete);
     group.gaps = merge(group.gaps);
   }
-  return (connectionId, subject, from, until) => {
+  return (connectionId, subject, from, until, grantEpoch) => {
     const start = from.getTime(),
       end = until.getTime();
     if (
@@ -69,7 +88,13 @@ export function indexReportCoverage(
       !subject.trim()
     )
       return false;
-    const group = groups.get(JSON.stringify([connectionId, subject]));
+    const group = groups.get(
+      JSON.stringify(
+        grantEpoch === undefined
+          ? [connectionId, subject]
+          : [connectionId, subject, grantEpoch],
+      ),
+    );
     if (!group || group.invalid) return false;
     const gap = lastStartingBefore(group.gaps, end, false);
     if (gap && gap.until > start) return false;

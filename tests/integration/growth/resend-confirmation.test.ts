@@ -31,6 +31,13 @@ for (const scenario of [
           max: 2,
           connection: { options: "-c role=growth_app" },
         });
+      const monitorId = randomUUID();
+      const monitorSubject = `monitor-${randomUUID()}`;
+      const monitorScopes = [
+        "openid",
+        "email",
+        "https://www.googleapis.com/auth/gmail.modify",
+      ];
       const account = randomUUID(),
         campaign = randomUUID(),
         business = randomUUID(),
@@ -97,6 +104,17 @@ for (const scenario of [
         from: sender,
         replyTo: sender,
         recipient,
+        ...(scenario === "active"
+          ? {
+              monitoredMailbox: {
+                connectionId: monitorId,
+                googleSubject: monitorSubject,
+                grantEpoch: 1,
+                address: sender,
+                grantedScopes: monitorScopes,
+              },
+            }
+          : {}),
         campaign: {
           campaignId: campaign,
           policyVersion: 1,
@@ -139,6 +157,8 @@ for (const scenario of [
       const submittedAt = new Date(Date.now() - 60_000);
       try {
         await admin.begin(async (tx) => {
+          if (scenario === "active")
+            await tx`insert into growth.integration_connections(id,provider,subject_email,status,google_subject,granted_scopes) values (${monitorId},'gmail',${sender},'connected',${monitorSubject},${monitorScopes})`;
           await tx`insert into growth.integration_connections(id,provider,subject_email) values (${account},'resend',${sender})`;
           await tx`insert into growth.outreach_account_controls(connection_id,provider,state,verified_subject,verified_grant_epoch,verified_scopes,resend_team,resend_environment,resend_binding) values (${account},'resend','active',null,null,null,${binding.team},${binding.environment},${tx.json(binding)})`;
           await tx`insert into growth.outreach_account_reviews(id,connection_id,request_id,request_hash,actor_id,kind,evidence,resulting_version) values (${review},${account},${randomUUID()},repeat('a',64),${createHash("sha256").update("j.ntagengwa@faithfulsoftware.dev").digest("hex")},'resend_configure',${tx.json({ binding })},2)`;
@@ -568,9 +588,38 @@ for (const scenario of [
             projected.members[0].confirmation.basis,
             "resend_fss_delivery_observed",
           );
-          assert.equal(projected.members[0].replyCoverage, "unknown");
+          assert.equal(projected.members[0].replyCoverage, "censored");
           assert.equal(projected.members[0].comparisonFingerprint, null);
           assert.deepEqual(projected.sourceReceiptIds, [reservation]);
+          const { exerciseResendReportCoverage } =
+            await import("./report-resend-observation");
+          await exerciseResendReportCoverage(admin, db, {
+            campaignId: campaign,
+            membershipId: member,
+            reservationId: reservation,
+            monitorId,
+            sequenceId: sequence,
+            prospectId: prospect,
+            contactId: contact,
+            recipient,
+            address: sender,
+            subject: monitorSubject,
+          });
+        }
+        if (scenario === "paused") {
+          const { withGrowthTransaction } =
+            await import("../../../lib/growth/db/client");
+          const { loadReportEvidence } =
+            await import("../../../lib/growth/campaigns/report-evidence");
+          const historical = await withGrowthTransaction(db, (tx) =>
+            loadReportEvidence(
+              tx,
+              campaign,
+              new Date(Date.now() + 20 * 86400000),
+              reservation,
+            ),
+          );
+          assert.equal(historical.members[0]?.replyCoverage, "unknown");
         }
         const second = await send(wire.raw, wire.headers);
         if (second.status !== "ready") throw new Error(second.reason);
@@ -792,6 +841,7 @@ for (const scenario of [
           await admin`delete from growth.outreach_account_controls where connection_id=${account}`;
           await admin`delete from growth.outreach_provider_usage where account_id=${account}`;
           await admin`delete from growth.integration_connections where id=${account}`;
+          await admin`delete from growth.integration_connections where id=${monitorId}`;
         } finally {
           await db.end();
           await admin.end();

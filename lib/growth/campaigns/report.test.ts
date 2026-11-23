@@ -301,3 +301,28 @@ test("never compares provider bases or selects a sparse arm", () => {
   );
   assert.equal(buildCampaignReport(input(sparse)).winner, null);
 });
+
+test("Resend comparisons require complete mature observed reply coverage in both arms", () => {
+  const members = Array.from({ length: 60 }, (_, i) => {
+    const result = member(String(i), i < 30 ? "a" : "b");
+    result.confirmation.basis = "resend_fss_delivery_observed";
+    if (i < 30)
+      result.replies = [
+        {
+          id: `resend-${i}`,
+          kind: "positive",
+          reviewed: true,
+          occurredAt: new Date("2026-03-28"),
+          recordedAt: new Date("2026-03-29"),
+        },
+      ];
+    return result;
+  });
+  const reportInput: CampaignReportInput = {
+    ...input(members),
+    anchor: { basis: "resend_fss_delivery_observed", observedAt: anchor },
+  };
+  assert.equal(buildCampaignReport(reportInput).winner, "a");
+  members[30].replyCoverage = "unknown";
+  assert.equal(buildCampaignReport(reportInput).winner, null);
+});

@@ -88,3 +88,36 @@ test("invalid interval vetoes its account and subject only", () => {
   assert.equal(query("a", "s", time(1), time(2)), false);
   assert.equal(query("b", "s", time(1), time(2)), true);
 });
+
+test("an exact grant epoch must cover the whole window", () => {
+  const query = indexReportCoverage([
+    {
+      connectionId: "a",
+      googleSubject: "s",
+      grantEpoch: 1,
+      state: "complete",
+      observedFrom: time(0),
+      observedUntil: time(5),
+    },
+    {
+      connectionId: "a",
+      googleSubject: "s",
+      grantEpoch: 2,
+      state: "complete",
+      observedFrom: time(5),
+      observedUntil: time(10),
+    },
+    {
+      connectionId: "b",
+      googleSubject: "s",
+      grantEpoch: 1,
+      state: "complete",
+      observedFrom: time(0),
+      observedUntil: time(10),
+    },
+  ]);
+  assert.equal(query("a", "s", time(0), time(10)), true);
+  assert.equal(query("a", "s", time(0), time(10), 1), false);
+  assert.equal(query("a", "s", time(5), time(10), 2), true);
+  assert.equal(query("b", "s", time(0), time(10), 1), true);
+});
