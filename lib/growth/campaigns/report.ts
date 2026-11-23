@@ -147,6 +147,7 @@ export function buildCampaignReport(raw: CampaignReportInput): CampaignReport {
         !ambiguous.has(`reply:${reply.id}`) &&
         reply.reviewed &&
         reply.kind === "positive" &&
+        reply.recordedAt >= reply.occurredAt &&
         reply.recordedAt <= input.cutoff &&
         reply.occurredAt <= input.cutoff &&
         reply.occurredAt <= end &&
@@ -161,6 +162,7 @@ export function buildCampaignReport(raw: CampaignReportInput): CampaignReport {
           !ambiguous.has(`reply:${reply.id}`) &&
           reply.reviewed &&
           reply.kind === "positive" &&
+          reply.recordedAt >= reply.occurredAt &&
           reply.recordedAt <= input.cutoff &&
           reply.occurredAt <= input.cutoff &&
           reply.occurredAt <= end,
