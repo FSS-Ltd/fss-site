@@ -107,6 +107,15 @@ export async function exerciseResendReportCoverage(
     await admin`delete from growth.outreach_events where id=${crossedReview}`;
     await admin`delete from growth.email_events where id=${crossedEvent}`;
     await admin`delete from growth.email_messages where id=${crossedId}`;
+    await admin`update growth.contacts set email='changed@example.test' where id=${input.contactId}`;
+    result = await projection();
+    assert.equal(result.members[0]?.replyCoverage, "unknown");
+    assert.equal(result.members[0]?.replies[0]?.kind, "positive");
+    await admin`update growth.contacts set email=${input.recipient},version=version+1 where id=${input.contactId}`;
+    result = await projection();
+    assert.equal(result.members[0]?.replyCoverage, "unknown");
+    assert.equal(result.members[0]?.replies[0]?.kind, "positive");
+    await admin`update growth.contacts set version=version-1 where id=${input.contactId}`;
     await admin`update growth.integration_connections set version=version+1 where id=${input.monitorId}`;
     result = await projection();
     assert.equal(result.members[0]?.replyCoverage, "unknown");
