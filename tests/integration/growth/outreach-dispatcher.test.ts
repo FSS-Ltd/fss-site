@@ -106,14 +106,33 @@ test(
       );
 
       const [message] = await sql<
-        Array<{ status: string; attemptCount: number }>
+        Array<{
+          status: string;
+          attemptCount: number;
+          previousStatus: string | null;
+        }>
       >`
-        select status, attempt_count as "attemptCount"
+        select status, attempt_count as "attemptCount", outreach_claim_previous_status as "previousStatus"
         from growth.email_messages
         where id = ${approved.messageId}
       `;
       assert.equal(message?.status, "sending");
       assert.equal(message?.attemptCount, 1);
+      assert.equal(message?.previousStatus, "queued");
+      await sql`update growth.email_messages set lease_expires_at = now() - interval '1 second' where id = ${approved.messageId}`;
+      const reclaimed =
+        await postgresSequenceDispatchRepository.claimDueMessage(sql, {
+          now: new Date(),
+          leaseToken: randomUUID(),
+          leaseExpiresAt: new Date(Date.now() + 5 * 60 * 1000),
+          messageId: approved.messageId,
+        });
+      assert.equal(reclaimed?.previousStatus, "sending");
+      const [reclaimedMessage] = await sql<{ previousStatus: string | null }[]>`
+        select outreach_claim_previous_status as "previousStatus"
+        from growth.email_messages where id = ${approved.messageId}
+      `;
+      assert.equal(reclaimedMessage?.previousStatus, "sending");
     } finally {
       await sql`
         update growth.sequence_enrollments set first_message_id = null

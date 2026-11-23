@@ -138,6 +138,7 @@ async function claimDueMessage(
     )
     update growth.email_messages em
     set status = 'sending',
+        outreach_claim_previous_status = target."previousStatus",
         lease_token = ${input.leaseToken},
         lease_expires_at = ${input.leaseExpiresAt},
         attempt_count = em.attempt_count + 1,
