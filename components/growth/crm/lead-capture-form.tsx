@@ -3,6 +3,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { captureLeadSchema } from "@/lib/growth/crm/schemas";
 import { CountryField } from "./country-field";
+import { FacebookSourceForm } from "./facebook-source-form";
+import { useCrmRefresh } from "./crm-refresh-provider";
 import { CommandForm } from "./command-form";
 import { ContactSourceFields } from "./contact-source-fields";
 import { sourcedContact } from "./contact-form-values";
@@ -19,6 +21,33 @@ export type EnquiryDefaults = {
   challenge: string | null;
 };
 export function LeadCaptureForm({ enquiry }: { enquiry?: EnquiryDefaults }) {
+  const [source, setSource] = useState("company");
+  const { busy } = useCrmRefresh();
+  if (enquiry) return <CompanyLeadCaptureForm enquiry={enquiry} />;
+  return (
+    <>
+      <label className={styles.field}>
+        <span>Lead source</span>
+        <select
+          value={source}
+          disabled={busy}
+          onChange={(event) => setSource(event.target.value)}
+        >
+          <option value="company">Registered company</option>
+          <option value="facebook">Facebook page</option>
+        </select>
+      </label>
+      <div hidden={source !== "company"}>
+        <CompanyLeadCaptureForm />
+      </div>
+      <div hidden={source !== "facebook"}>
+        <FacebookSourceForm />
+      </div>
+    </>
+  );
+}
+
+function CompanyLeadCaptureForm({ enquiry }: { enquiry?: EnquiryDefaults }) {
   const router = useRouter();
   const [requestId] = useState(() => crypto.randomUUID());
   const [countryCode, setCountryCode] = useState("GB");
