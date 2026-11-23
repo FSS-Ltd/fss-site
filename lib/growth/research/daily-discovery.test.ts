@@ -199,7 +199,30 @@ test("runs restricted child in disposable workspace and rejects credential expos
       JSON.stringify({ succeeded: true, prospects: [], rejections: [] }),
       { mode: 0o600 },
     );
-    return true;
+    return {
+      success: true,
+      stdout:
+        JSON.stringify({
+          type: "item.completed",
+          item: {
+            id: "search-1",
+            type: "web_search",
+            query: "public business",
+            action: { type: "search", query: "public business" },
+          },
+        }) +
+        "\n" +
+        JSON.stringify({
+          type: "turn.completed",
+          usage: {
+            input_tokens: 0,
+            cached_input_tokens: 0,
+            output_tokens: 0,
+            reasoning_output_tokens: 0,
+          },
+        }) +
+        "\n",
+    };
   });
   assert.deepEqual(result, { succeeded: true, prospects: [], rejections: [] });
   assert.equal(existsSync(workspace), false);

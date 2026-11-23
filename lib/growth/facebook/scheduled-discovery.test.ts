@@ -314,7 +314,30 @@ test("runs bounded child research with a private output schema and cleans up", (
           outputPath,
           JSON.stringify({ succeeded: true, observations: [] }),
         );
-        return true;
+        return {
+          success: true,
+          stdout:
+            JSON.stringify({
+              type: "item.completed",
+              item: {
+                id: "search-1",
+                type: "web_search",
+                query: "public group",
+                action: { type: "search", query: "public group" },
+              },
+            }) +
+            "\n" +
+            JSON.stringify({
+              type: "turn.completed",
+              usage: {
+                input_tokens: 0,
+                cached_input_tokens: 0,
+                output_tokens: 0,
+                reasoning_output_tokens: 0,
+              },
+            }) +
+            "\n",
+        };
       },
     );
     assert.deepEqual(result, { succeeded: true, observations: [] });

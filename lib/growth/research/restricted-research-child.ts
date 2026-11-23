@@ -15,7 +15,110 @@ export type RestrictedResearchExecutor = (
   args: string[],
   cwd: string,
   env: NodeJS.ProcessEnv,
-) => boolean;
+) => { success: boolean; stdout: string };
+
+const MAX_EVENT_BYTES = 2 * 1024 * 1024;
+
+// This stream is private process evidence, never model-authored final JSON.
+function hasCompletedSearch(stdout: string): boolean {
+  if (!stdout || Buffer.byteLength(stdout, "utf8") > MAX_EVENT_BYTES)
+    return false;
+  let searched = false;
+  let completed = false;
+  try {
+    for (const line of stdout.split("\n")) {
+      if (!line.trim()) continue;
+      if (completed) return false;
+      const event: unknown = JSON.parse(line);
+      if (!event || typeof event !== "object" || Array.isArray(event))
+        return false;
+      const value = event as Record<string, unknown>;
+      if (value.type === "thread.started") {
+        if (typeof value.thread_id !== "string" || !value.thread_id.trim())
+          return false;
+        continue;
+      }
+      if (value.type === "turn.started") continue;
+      if (value.type === "turn.completed") {
+        if (
+          !value.usage ||
+          typeof value.usage !== "object" ||
+          Array.isArray(value.usage)
+        )
+          return false;
+        const usage = value.usage as Record<string, unknown>;
+        if (
+          ![
+            "input_tokens",
+            "cached_input_tokens",
+            "output_tokens",
+            "reasoning_output_tokens",
+          ].every(
+            (key) =>
+              typeof usage[key] === "number" &&
+              Number.isSafeInteger(usage[key]) &&
+              (usage[key] as number) >= 0,
+          )
+        )
+          return false;
+        completed = true;
+        continue;
+      }
+      if (
+        value.type !== "item.started" &&
+        value.type !== "item.updated" &&
+        value.type !== "item.completed"
+      )
+        return false;
+      if (
+        !value.item ||
+        typeof value.item !== "object" ||
+        Array.isArray(value.item)
+      )
+        return false;
+      const item = value.item as Record<string, unknown>;
+      if (
+        typeof item.id !== "string" ||
+        !item.id.trim() ||
+        typeof item.type !== "string"
+      )
+        return false;
+      if (
+        !["web_search", "agent_message", "reasoning", "todo_list"].includes(
+          item.type,
+        )
+      )
+        return false;
+      if (
+        (item.type === "agent_message" || item.type === "reasoning") &&
+        typeof item.text !== "string"
+      )
+        return false;
+      if (item.type === "todo_list" && !Array.isArray(item.items)) return false;
+      if (item.type === "web_search" && typeof item.query !== "string")
+        return false;
+      if (item.type === "web_search" && value.type === "item.completed") {
+        if (
+          typeof item.query !== "string" ||
+          !item.query.trim() ||
+          !item.action ||
+          typeof item.action !== "object" ||
+          Array.isArray(item.action)
+        )
+          return false;
+        const action = item.action as Record<string, unknown>;
+        if (
+          !["search", "open_page", "find_in_page"].includes(String(action.type))
+        )
+          return false;
+        if (action.type === "search") searched = true;
+      }
+    }
+  } catch {
+    return false;
+  }
+  return searched && completed;
+}
 
 export function runRestrictedResearchChild(input: {
   schema: object;
@@ -50,6 +153,7 @@ export function runRestrictedResearchChild(input: {
     const args = [
       "--search",
       "exec",
+      "--json",
       "--ephemeral",
       "--ignore-user-config",
       ...features.flatMap((feature) => ["--disable", feature]),
@@ -85,17 +189,27 @@ export function runRestrictedResearchChild(input: {
         const result = spawnSync(command, childArgs, {
           cwd,
           env: childEnv,
-          stdio: "ignore",
+          stdio: ["ignore", "pipe", "ignore"],
+          encoding: "utf8",
+          maxBuffer: MAX_EVENT_BYTES,
           timeout: 45 * 60 * 1000,
         });
-        return result.error === undefined && result.status === 0;
+        return {
+          success: result.error === undefined && result.status === 0,
+          stdout: result.stdout ?? "",
+        };
       });
-    if (!execute("codex", args, workspace, env))
+    const result = execute("codex", args, workspace, env);
+    if (!result.success || !hasCompletedSearch(result.stdout))
       throw new Error("research failed");
     const file = lstatSync(outputPath);
     if (!file.isFile() || file.size > 256 * 1024)
       throw new Error("invalid output");
-    return JSON.parse(readFileSync(outputPath, "utf8"));
+    try {
+      return JSON.parse(readFileSync(outputPath, "utf8"));
+    } catch {
+      throw new Error("invalid output");
+    }
   } finally {
     rmSync(workspace, { recursive: true, force: true });
   }

@@ -56,7 +56,18 @@ explicit `no_results` outcome. A failed search is not submitted. This requires
 contract. Reports contain counts and failure categories only.
 
 The restricted child has a disposable working directory and receives no signing
-secret. The parent validates the v2 contract and rejects child-supplied campaign
+secret. Its bounded private `codex exec --json` stream must show at least one
+completed native web-search **search** action and a successful terminal turn;
+opening or finding text on a page alone does not count. Missing, malformed,
+failed, oversized, or forbidden-tool event streams fail before signing, even
+when the model claims there were no results. Raw event streams, queries and
+child output are not logged. This check does not establish that the current
+model or CLI configuration actually exposes native search; verify availability
+separately before enabling the scheduled runner. The event shape follows the
+[pinned Codex 0.163.0 execution contract](https://github.com/openai/codex/blob/rust-v0.163.0/codex-rs/exec/src/exec_events.rs)
+and its [search completion test](https://github.com/openai/codex/blob/rust-v0.163.0/codex-rs/exec/tests/event_processor_with_json_output.rs).
+
+The parent validates the v2 contract and rejects child-supplied campaign
 proof before retrieving the existing Keychain secret and using the exact-byte
 submission client. This validates structure, not the truth of web claims. All
 records remain research-only: source verification, campaign targeting, recipient
