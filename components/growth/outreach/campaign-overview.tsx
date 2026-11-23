@@ -37,7 +37,13 @@ export function CampaignOverview({
           <h2 id="campaigns-heading">Campaigns</h2>
           <p>{result.londonDate} · Europe/London</p>
         </div>
-        <Link href="/growth/prospects">Review prospects</Link>
+        <div>
+          <Link href="/growth/prospects">Review prospects</Link>
+          {" · "}
+          <Link href="/growth/analytics#campaign-analysis-heading">
+            Campaign analysis
+          </Link>
+        </div>
       </header>
       <p className={styles.goal}>
         Daily goal 100 · target 150. Sending depends on eligible recipients and

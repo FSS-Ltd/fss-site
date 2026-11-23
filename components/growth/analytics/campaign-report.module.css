@@ -1,0 +1,93 @@
+.panel {
+  min-width: 0;
+  border: 1px solid #dce3e8;
+  border-radius: 12px;
+  background: #fff;
+  padding: 22px;
+  color: #07182e;
+}
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+}
+.header h2 {
+  margin: 0;
+  font-size: 1.02rem;
+}
+.header p,
+.panel p {
+  color: #526078;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+.header a {
+  color: #075f66;
+  font-weight: 650;
+}
+.header a:focus-visible,
+.snapshot summary:focus-visible {
+  outline: 3px solid #087f88;
+  outline-offset: 3px;
+}
+.campaigns,
+.arms {
+  display: grid;
+  gap: 12px;
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 0;
+}
+.campaigns > li,
+.arms > li {
+  min-width: 0;
+  border: 1px solid #e3e9ec;
+  border-radius: 8px;
+  padding: 14px;
+}
+.campaigns h3,
+.arms h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  overflow-wrap: anywhere;
+}
+.snapshot {
+  margin-top: 12px;
+}
+.snapshot summary {
+  color: #075f66;
+  font-weight: 650;
+  cursor: pointer;
+}
+.snapshotBody {
+  padding-top: 4px;
+}
+.cta {
+  font-weight: 650;
+}
+.numbers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 12px;
+}
+.numbers div {
+  min-width: 0;
+}
+.numbers dt {
+  color: #526078;
+  font-size: 0.75rem;
+}
+.numbers dd {
+  margin: 3px 0 0;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 480px) {
+  .panel {
+    padding: 16px;
+  }
+  .numbers {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
