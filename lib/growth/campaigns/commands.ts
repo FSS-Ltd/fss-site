@@ -1,5 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import { lockGmailRouting } from "../sequences/gmail-thread-association";
+import { reviewCampaignOutcome } from "./campaign-outcome-review";
 import { reviewCampaignReply } from "./campaign-reply-review";
 import type { FounderSession } from "../auth/require-founder";
 import { withGrowthTransaction } from "../db/client";
@@ -33,7 +34,8 @@ async function mutate(
   founder: FounderSession,
   correlationId: string,
 ): Promise<CampaignMutation> {
-  if (command.type === "record_outcome") throw new Error("not_available");
+  if (command.type === "record_outcome")
+    return reviewCampaignOutcome(tx, command, founder, correlationId);
   if (command.type === "record_reply")
     return reviewCampaignReply(tx, command, founder, correlationId);
   if (command.type === "create") {
@@ -158,7 +160,8 @@ export async function executeCampaignCommand(
     .update(JSON.stringify(command))
     .digest("hex");
   return withGrowthTransaction(db, async (tx) => {
-    if (command.type === "record_reply") await lockGmailRouting(tx);
+    if (command.type === "record_reply" || command.type === "record_outcome")
+      await lockGmailRouting(tx);
     await tx`select pg_advisory_xact_lock(hashtextextended(${`growth:campaign-command:${command.requestId}`},0))`;
     const [previous] = await tx<
       {
@@ -184,6 +187,10 @@ export async function executeCampaignCommand(
       };
     }
     const outcome = await mutate(tx, command, founder, correlationId);
+    const outcomeReview =
+      command.type === "record_outcome"
+        ? { outcome: command.outcome, occurredAt: requiredOutcomeTime(outcome) }
+        : undefined;
     if (command.type !== "enrol" && command.type !== "record_permission")
       await appendCampaignEventAndOutbox(tx, {
         ...outcome,
@@ -200,6 +207,7 @@ export async function executeCampaignCommand(
               },
             }
           : {}),
+        ...(outcomeReview ? { outcomeReview } : {}),
       });
     return {
       status: "ok",
@@ -208,4 +216,10 @@ export async function executeCampaignCommand(
       alreadyExisted: false,
     };
   });
+}
+
+function requiredOutcomeTime(outcome: CampaignMutation): Date {
+  if (!outcome.outcomeOccurredAt)
+    throw new Error("outcome_evidence_unavailable");
+  return outcome.outcomeOccurredAt;
 }

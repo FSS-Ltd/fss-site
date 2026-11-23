@@ -277,7 +277,23 @@ export const campaignCommandSchema = z.discriminatedUnion("type", [
   z.strictObject({
     type: z.literal("record_outcome"),
     ...mutation,
-    outcome: campaignOutcomeInputSchema,
+    membershipId: uuid,
+    expectedPolicyVersion: z.number().int().positive(),
+    expectedProspectVersion: z.number().int().positive(),
+    expectedContactVersion: z.number().int().positive(),
+    outcome: z.discriminatedUnion("kind", [
+      z.strictObject({
+        kind: z.literal("meeting"),
+        crmActivityId: uuid,
+        occurredAt: date,
+        qualified: z.literal(true),
+      }),
+      z.strictObject({
+        kind: z.literal("proposal"),
+        engagementId: uuid,
+        stageEventId: uuid,
+      }),
+    ]),
   }),
 ]);
 export type CampaignCommand = z.infer<typeof campaignCommandSchema>;

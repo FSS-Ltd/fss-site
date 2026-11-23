@@ -372,6 +372,15 @@ const replyRow = z.object({
   sourceProven: z.boolean(),
   reviewProven: z.boolean(),
 });
+const outcomeRow = z.object({
+  membershipId: z.string(),
+  id: z.string(),
+  kind: z.enum(["meeting", "proposal"]),
+  sourceId: z.string(),
+  occurredAt: date,
+  recordedAt: date,
+  reviewProven: z.boolean(),
+});
 const coverageRow = z.object({
   id: z.string(),
   connectionId: z.string(),
@@ -382,7 +391,7 @@ const coverageRow = z.object({
   observedUntil: date,
 });
 const resultRow = z.object({
-  kind: z.enum(["member", "reply", "coverage"]),
+  kind: z.enum(["member", "reply", "coverage", "outcome"]),
   payload: z.unknown(),
   snapshot: z.string(),
   readAt: date,
@@ -416,12 +425,24 @@ export async function loadReportEvidence(
       select m."membershipId",em.id,em.channel,em.received_at as "occurredAt",e.membership_id as "reviewMemberId",e.review_reply_kind as "reviewKind",e.occurred_at as "recordedAt",coalesce(e.actor_id=${createHash("sha256").update(CAMPAIGN_FOUNDER_EMAIL).digest("hex")} and e.request_id is not null and e.result_id=em.id and e.campaign_id=${campaignId} and e.policy_version=m."policyVersion",false) as "reviewProven",exists(select 1 from growth.email_events ev where ev.email_message_id=em.id and ev.provider='gmail' and ev.provider_event_id=em.provider_message_id and ev.event_type in ('reply','auto_response')) as "sourceProven"
       from members m join growth.email_messages em on em.sequence_enrollment_id=m."sequenceId" and em.direction='inbound' and em.status='received' left join growth.outreach_events e on e.review_inbound_message_id=em.id and e.event_type='record_reply'
       where em.received_at is null or em.received_at<=${cutoff} order by em.id,m."membershipId" limit 20001
+    ), outcomes as materialized (
+      select m."membershipId",e.id,e.review_outcome_kind as kind,coalesce(e.review_meeting_activity_id,e.review_proposal_event_id) as "sourceId",e.review_outcome_at as "occurredAt",e.occurred_at as "recordedAt",
+        coalesce(e.actor_id=${createHash("sha256").update(CAMPAIGN_FOUNDER_EMAIL).digest("hex")} and e.request_id is not null and e.request_hash ~ '^[a-f0-9]{64}$' and e.result_id=coalesce(e.review_meeting_activity_id,e.review_proposal_event_id) and e.campaign_id=${campaignId} and e.policy_version=m."policyVersion" and
+          ((e.review_outcome_kind='meeting' and a.activity_type='meeting' and a.prospect_id=cm.prospect_id)
+          or (e.review_outcome_kind='proposal' and se.dimension='commercial' and se.to_state='proposal' and de.prospect_id=cm.prospect_id and se.occurred_at=e.review_outcome_at)),false) as "reviewProven"
+      from members m join growth.campaign_memberships cm on cm.id=m."membershipId"
+      join growth.outreach_events e on e.membership_id=m."membershipId" and e.event_type='record_outcome'
+      left join growth.crm_activities a on a.id=e.review_meeting_activity_id
+      left join growth.commercial_stage_events se on se.id=e.review_proposal_event_id
+      left join growth.delivery_engagements de on de.id=se.engagement_id
+      where e.review_outcome_at<=${cutoff} order by e.id limit 20001
     ), coverage as materialized (
       select g.id,g.connection_id as "connectionId",g.google_subject as "googleSubject",g.grant_epoch as "grantEpoch",g.state,g.observed_from as "observedFrom",g.observed_until as "observedUntil" from growth.gmail_reply_coverage g where g.connection_id in (select distinct "connectionId" from members where coalesce(provider,'gmail')='gmail') and (g.observed_from is null or g.observed_from<=${cutoff}) order by g.id limit 20001
     ), snapshot as materialized (select pg_current_snapshot()::text as snapshot,statement_timestamp() as "readAt")
     select 'member' as kind,to_jsonb(members) as payload,snapshot.snapshot,snapshot."readAt" from members cross join snapshot
     union all select 'reply',to_jsonb(replies),snapshot.snapshot,snapshot."readAt" from replies cross join snapshot
-    union all select 'coverage',to_jsonb(coverage),snapshot.snapshot,snapshot."readAt" from coverage cross join snapshot`;
+    union all select 'coverage',to_jsonb(coverage),snapshot.snapshot,snapshot."readAt" from coverage cross join snapshot
+    union all select 'outcome',to_jsonb(outcomes),snapshot.snapshot,snapshot."readAt" from outcomes cross join snapshot`;
   const rows = raw.map((row) => resultRow.parse(row));
   const membersRaw = rows
     .filter((row) => row.kind === "member")
@@ -429,13 +450,17 @@ export async function loadReportEvidence(
   const replies = rows
     .filter((row) => row.kind === "reply")
     .map((row) => replyRow.parse(row.payload));
+  const outcomes = rows
+    .filter((row) => row.kind === "outcome")
+    .map((row) => outcomeRow.parse(row.payload));
   const coverage = rows
     .filter((row) => row.kind === "coverage")
     .map((row) => coverageRow.parse(row.payload));
   if (
     membersRaw.length > 5000 ||
     replies.length > 20000 ||
-    coverage.length > 20000
+    coverage.length > 20000 ||
+    outcomes.length > 20000
   )
     throw new Error("report_evidence_limit");
   const members: ReportMember[] = [];
@@ -451,6 +476,20 @@ export async function loadReportEvidence(
     }
   }
   const byId = new Map(members.map((member) => [member.membershipId, member]));
+  for (const outcome of outcomes) {
+    const member = byId.get(outcome.membershipId);
+    if (member && outcome.reviewProven)
+      member.outcomes.push({
+        membershipId: outcome.membershipId,
+        outcomeId: outcome.id,
+        kind: outcome.kind,
+        evidenceId: outcome.sourceId,
+        occurredAt: outcome.occurredAt,
+        recordedAt: outcome.recordedAt,
+        reviewed: true,
+        netClearedPence: null,
+      });
+  }
   const inboundByMember = new Map<string, Array<z.infer<typeof replyRow>>>();
   for (const reply of replies) {
     const group = inboundByMember.get(reply.membershipId) ?? [];
