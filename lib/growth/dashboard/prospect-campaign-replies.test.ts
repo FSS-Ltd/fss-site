@@ -66,7 +66,7 @@ function dbReturning(rows: object[]): GrowthQueryExecutor {
 test("projects only attributable receipt metadata and a safe Gmail link", async () => {
   let query = "";
   const db = (async (parts: TemplateStringsArray) => {
-    query = parts.join(" ");
+    query += parts.join(" ");
     return [row()];
   }) as unknown as GrowthQueryExecutor;
   const result = await getProspectCampaignReplies("prospect", founder, db, now);
@@ -161,4 +161,184 @@ test("retains a recorded classification but does not expose invalid classificati
       now,
     ),
   );
+});
+
+test("exact reference uses confirmed immutable Gmail evidence across thread and grant changes", async () => {
+  const base = row();
+  const recipient = "owner@example.com";
+  const sequenceId = "c2312dac-511f-446c-b86e-e33b06a44a65";
+  const contactId = "0652f8d1-5606-4ea8-880e-e88a4cf9f48e";
+  const attribution = {
+    basis: "gmail_exact_reference_v1",
+    outboundProvider: "gmail",
+    reservationId: base.reservationId,
+    rfcMessageId: base.rfc,
+    connectionId: base.connectionId,
+    googleSubject: "subject",
+    grantEpoch: 2,
+    recipient,
+  };
+  const exact = {
+    ...base,
+    threadId: "different-thread",
+    sequenceId,
+    policyProvider: "gmail",
+    policyConnectionId: base.connectionId,
+    attribution,
+    sourceReservationId: base.reservationId,
+    sender: recipient,
+    mailboxSubject: "subject",
+    mailboxAddress: email,
+    mailboxVersion: 3,
+  };
+  const source = {
+    id: base.reservationId,
+    membershipId: base.membershipId,
+    channel: "gmail",
+    sequenceId,
+    status: "active",
+    prospectId: "prospect",
+    contactId,
+    contactEmail: recipient,
+    rfc: base.rfc,
+    accountId: base.accountId,
+    connectionId: base.connectionId,
+    grantEpoch: 2,
+    generation: null,
+    key: "key",
+    hash: base.hash,
+    providerId: base.providerId,
+    threadId: base.providerThreadId,
+    snapshot: {
+      from: email,
+      recipient,
+      connectionId: base.connectionId,
+      googleSubject: "subject",
+      grantEpoch: 2,
+      rfcMessageId: base.rfc,
+      rawSha256: base.hash,
+    },
+    evidence: base.evidence,
+    receipt: {
+      basis: "gmail_fss_sent_observed",
+      providerMessageId: base.providerId,
+      providerThreadId: base.providerThreadId,
+      rfcMessageId: base.rfc,
+      googleSubject: "subject",
+      rawSha256: base.hash,
+      observationGrantEpoch: 2,
+    },
+    deliveryMatches: false,
+    membershipMatches: true,
+  };
+  async function read(proven: object[], observation = exact) {
+    let calls = 0;
+    const db = Object.assign(
+      async () => (++calls === 1 ? [] : calls === 2 ? [observation] : proven),
+      { array: (values: unknown[]) => values },
+    ) as unknown as GrowthQueryExecutor;
+    return getProspectCampaignReplies("prospect", founder, db, now);
+  }
+  const result = await read([source]);
+  assert.equal(result.status, "ready");
+  if (result.status !== "ready") return;
+  assert.equal(
+    result.items[0]?.gmailUrl,
+    "https://mail.google.com/mail/u/0/#all/different-thread",
+  );
+  assert.doesNotMatch(
+    JSON.stringify(result),
+    /owner@example|subject|sent@example/,
+  );
+  for (const bad of [
+    [{ ...source, evidence: null }],
+    [
+      source,
+      {
+        ...source,
+        id: "d8fd3d6d-9fc6-4a71-9a61-c20691c432df",
+        evidence: {
+          ...base.evidence,
+          reservationId: "d8fd3d6d-9fc6-4a71-9a61-c20691c432df",
+        },
+      },
+    ],
+    [{ ...source, membershipId: "another" }],
+  ]) {
+    const rejected = await read(bad);
+    if (rejected.status === "ready") assert.equal(rejected.items.length, 0);
+  }
+  const resendConnection = "b1280a7e-e5da-401e-bf1a-0bc11074db51";
+  const generation = "97fa7c69-7aa6-4d30-8f98-5b35d735069d";
+  const resend = {
+    ...source,
+    channel: "resend",
+    accountId: resendConnection,
+    connectionId: resendConnection,
+    generation,
+    deliveryMatches: true,
+    membershipMatches: true,
+    snapshot: {
+      recipient,
+      replyTo: email,
+      accountId: resendConnection,
+      connectionId: resendConnection,
+      sendGeneration: generation,
+      idempotencyKey: "key",
+      bodySha256: base.hash,
+      monitoredMailbox: {
+        connectionId: base.connectionId,
+        googleSubject: "subject",
+        grantEpoch: 2,
+        address: email,
+        grantedScopes: scopes,
+      },
+      campaign: {
+        effectiveRecipient: { email: recipient, contactId },
+        reviewedRecipient: { email: recipient, contactId },
+      },
+    },
+    evidence: {
+      version: 1,
+      kind: "resend_api_send_email_v1",
+      reservationId: base.reservationId,
+      accountId: resendConnection,
+      connectionId: resendConnection,
+      sendGeneration: generation,
+      idempotencyKey: "key",
+      bodySha256: base.hash,
+      providerMessageId: base.providerId,
+    },
+    receipt: {
+      basis: "resend_fss_delivery_observed",
+      providerMessageId: base.providerId,
+      providerEventId: "delivery",
+      bodySha256: base.hash,
+      rfcMessageId: base.rfc,
+      connectionId: resendConnection,
+      webhookGeneration: generation,
+      sendGeneration: generation,
+    },
+  };
+  const resendObservation = {
+    ...exact,
+    policyProvider: "resend",
+    policyConnectionId: resendConnection,
+    attribution: { ...attribution, outboundProvider: "resend" },
+  };
+  const resendResult = await read([resend], resendObservation);
+  if (resendResult.status === "ready")
+    assert.equal(resendResult.items.length, 1);
+  else assert.fail("Resend unavailable");
+  const unconfirmed = await read(
+    [{ ...resend, deliveryMatches: false }],
+    resendObservation,
+  );
+  if (unconfirmed.status === "ready") assert.equal(unconfirmed.items.length, 0);
+  const wrongMailbox = await read([source], {
+    ...exact,
+    mailboxSubject: "different",
+  });
+  if (wrongMailbox.status === "ready")
+    assert.equal(wrongMailbox.items.length, 0);
 });

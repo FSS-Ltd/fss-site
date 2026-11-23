@@ -194,8 +194,7 @@ export function CampaignReplyReview({ result }: { result: CampaignReplies }) {
         <>
           {result.items.length === 0 ? (
             <p>
-              No attributable Gmail replies were found among the messages
-              checked.
+              No attributable replies were found among the messages checked.
             </p>
           ) : (
             <>
