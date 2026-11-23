@@ -36,6 +36,8 @@ Release on the exact revision reviewed by Code Reviewer and Security Reviewer wi
 
 Keep `GROWTH_OS_OUTREACH_PREPARATION_ENABLED` and `GROWTH_OS_OUTREACH_SUMMARY_ENABLED` unset or false during the disabled rollout. Check the deployed signed intake, separate provider credentials and reviewed sender identities, account limits and health, current monitoring, provider signature handling and exact permitted recipients before enabling the applicable stage. Keep scheduler output limited to counts and machine failure categories.
 
+`GROWTH_OS_RESEND_OUTREACH_ENABLED` also defaults off. With both preparation and Resend flags enabled, the 08:30 route can prepare eligible Resend work. Only the dispatch route can issue it. Both reuse the invocation's existing bound Gmail sync and require current reply coverage for the exact reviewed monitoring mailbox. The Resend worker makes no provider request on idle, makes one bounded usage request when work is due, and processes at most 25 total preparation and send claims per invocation. The separate newsletter dispatcher uses its existing schedule.
+
 ### Provider bindings
 
 - Use the founder’s existing Gmail connection in Growth Settings. Verify the actual Workspace edition, required grant, monitoring continuity and a complete current usage observation before recording readiness. A connected account alone is insufficient evidence.
