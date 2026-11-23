@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { CampaignOverviewResult } from "@/lib/growth/dashboard/campaign-overview";
 import { formatGrowthDateTime } from "@/lib/growth/dashboard/formatters";
+import { CampaignLifecycleActions } from "./campaign-lifecycle-actions";
 import styles from "./campaign-overview.module.css";
 
 function campaignState(status: string, approved: boolean): string {
@@ -88,6 +89,12 @@ export function CampaignOverview({
                     : "No analysis date recorded"}
                 </p>
               </div>
+              <CampaignLifecycleActions
+                id={campaign.id}
+                version={campaign.version}
+                status={campaign.status}
+                approved={campaign.approved}
+              />
             </li>
           ))}
         </ul>

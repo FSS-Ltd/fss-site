@@ -108,3 +108,37 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+.actions {
+  margin-top: 16px;
+}
+.actions button {
+  border: 1px solid #075f66;
+  border-radius: 6px;
+  background: #fff;
+  padding: 8px 12px;
+  color: #075f66;
+  font-weight: 650;
+  cursor: pointer;
+}
+.actions button:disabled {
+  opacity: 0.65;
+  cursor: default;
+}
+.actions button:focus-visible {
+  outline: 3px solid #087f88;
+  outline-offset: 3px;
+}
+.actions p {
+  color: #526078;
+  font-size: 0.85rem;
+}
+.confirm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+.confirm p {
+  flex-basis: 100%;
+  margin: 0 0 4px;
+}

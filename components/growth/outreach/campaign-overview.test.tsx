@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import test from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
+import { AppRouterContext } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 const require = createRequire(import.meta.url);
 require.extensions[".css"] = (module) => {
@@ -15,32 +16,45 @@ const { CampaignOverview } =
 
 test("shows observed counts and a stored hold reason without claiming delivery", () => {
   const html = renderToStaticMarkup(
-    <CampaignOverview
-      result={{
-        status: "ready",
-        londonDate: "23 November 2026",
-        truncated: false,
-        rows: [
-          {
-            id: "one",
-            name: "Local campaign",
-            version: 2,
-            status: "approved",
-            approved: true,
-            offer: "Monthly terms unavailable",
-            prepared: 2,
-            held: 1,
-            attempts: 1,
-            accepted: 1,
-            confirmed: 0,
-            holdReason: "permission_invalid",
-            reportDue: null,
-            reportStatus: null,
-          },
-        ],
+    <AppRouterContext.Provider
+      value={{
+        back() {},
+        forward() {},
+        refresh() {},
+        push() {},
+        replace() {},
+        prefetch() {},
+        bfcacheId: "test",
       }}
-    />,
+    >
+      <CampaignOverview
+        result={{
+          status: "ready",
+          londonDate: "23 November 2026",
+          truncated: false,
+          rows: [
+            {
+              id: "one",
+              name: "Local campaign",
+              version: 2,
+              status: "approved",
+              approved: true,
+              offer: "Monthly terms unavailable",
+              prepared: 2,
+              held: 1,
+              attempts: 1,
+              accepted: 1,
+              confirmed: 0,
+              holdReason: "permission_invalid",
+              reportDue: null,
+              reportStatus: null,
+            },
+          ],
+        }}
+      />
+    </AppRouterContext.Provider>,
   );
+  assert.match(html, /Pause campaign/);
   assert.match(html, /Local campaign/);
   assert.match(html, /permission invalid/);
   assert.match(html, /Confirmed today<\/dt><dd>0/);

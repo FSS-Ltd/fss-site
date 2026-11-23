@@ -58,22 +58,48 @@ export async function getCampaignOverview(
 ): Promise<CampaignOverviewResult> {
   try {
     const rows = await db<Row[]>`
-      with latest as (
+      with bounds as (
+        select (date_trunc('day', ${now}::timestamptz at time zone 'Europe/London') at time zone 'Europe/London') as start_at,
+          ((date_trunc('day', ${now}::timestamptz at time zone 'Europe/London') + interval '1 day') at time zone 'Europe/London') as end_at,
+          (${now}::timestamptz at time zone 'Europe/London')::date as london_day
+      ), latest as (
         select distinct on (id) id, name, version, status, approved_at, policy
         from growth.campaigns order by id, version desc
-      ), selected as (
+      ), selected as materialized (
         select * from latest order by name, id limit 51
+      ), events as (
+        select e.campaign_id, count(*)::int as prepared
+        from growth.outreach_events e join selected c on c.id=e.campaign_id cross join bounds b
+        where e.event_type in ('first_message_prepared','follow_up_prepared')
+          and e.occurred_at >= b.start_at and e.occurred_at < b.end_at
+        group by e.campaign_id
+      ), jobs as (
+        select j.campaign_id, count(*) filter (where j.status='held')::int as held,
+          (array_agg(j.last_error_code order by j.due_at,j.id)
+            filter (where j.status='held' and j.last_error_code is not null))[1] as hold_reason,
+          max(j.due_at) filter (where j.job_type='monthly_report' and j.status in ('pending','leased','held')) as report_due,
+          max(j.status) filter (where j.job_type='monthly_report' and j.status in ('pending','leased','held')) as report_status
+        from growth.outreach_jobs j join selected c on c.id=j.campaign_id
+        group by j.campaign_id
+      ), reservations as (
+        select r.campaign_id,
+          count(*) filter (where r.london_day=b.london_day and r.issued_snapshot is not null)::int as attempts,
+          count(*) filter (where r.completed_at >= b.start_at and r.completed_at < b.end_at and r.direct_submission_evidence is not null)::int as accepted,
+          count(*) filter (where r.confirmation_observed_at >= b.start_at and r.confirmation_observed_at < b.end_at and r.confirmation_receipt is not null)::int as confirmed
+        from growth.outreach_reservations r join selected c on c.id=r.campaign_id cross join bounds b
+        where r.london_day=b.london_day
+          or (r.completed_at >= b.start_at and r.completed_at < b.end_at)
+          or (r.confirmation_observed_at >= b.start_at and r.confirmation_observed_at < b.end_at)
+        group by r.campaign_id
       )
       select c.id, c.name, c.version, c.status, c.approved_at as "approvedAt", c.policy,
-        (select count(*)::int from growth.outreach_events e where e.campaign_id=c.id and e.event_type in ('first_message_prepared','follow_up_prepared') and (e.occurred_at at time zone 'Europe/London')::date=(${now}::timestamptz at time zone 'Europe/London')::date) as prepared,
-        (select count(*)::int from growth.outreach_jobs j where j.campaign_id=c.id and j.status='held') as held,
-        (select count(*)::int from growth.outreach_reservations r where r.campaign_id=c.id and r.london_day=(${now}::timestamptz at time zone 'Europe/London')::date and r.issued_snapshot is not null) as attempts,
-        (select count(*)::int from growth.outreach_reservations r where r.campaign_id=c.id and (r.completed_at at time zone 'Europe/London')::date=(${now}::timestamptz at time zone 'Europe/London')::date and r.direct_submission_evidence is not null) as accepted,
-        (select count(*)::int from growth.outreach_reservations r where r.campaign_id=c.id and (r.confirmation_observed_at at time zone 'Europe/London')::date=(${now}::timestamptz at time zone 'Europe/London')::date and r.confirmation_receipt is not null) as confirmed,
-        (select j.last_error_code from growth.outreach_jobs j where j.campaign_id=c.id and j.status='held' and j.last_error_code is not null order by j.due_at,j.id limit 1) as "holdReason",
-        (select j.due_at from growth.outreach_jobs j where j.campaign_id=c.id and j.job_type='monthly_report' and j.status in ('pending','leased','held') limit 1) as "reportDue"
-        ,(select j.status from growth.outreach_jobs j where j.campaign_id=c.id and j.job_type='monthly_report' and j.status in ('pending','leased','held') limit 1) as "reportStatus"
-      from selected c order by c.name,c.id
+        coalesce(e.prepared,0) as prepared,coalesce(j.held,0) as held,
+        coalesce(r.attempts,0) as attempts,coalesce(r.accepted,0) as accepted,
+        coalesce(r.confirmed,0) as confirmed,j.hold_reason as "holdReason",
+        j.report_due as "reportDue",j.report_status as "reportStatus"
+      from selected c left join events e on e.campaign_id=c.id
+        left join jobs j on j.campaign_id=c.id left join reservations r on r.campaign_id=c.id
+      order by c.name,c.id
     `;
     return {
       status: "ready",
