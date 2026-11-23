@@ -132,7 +132,20 @@ test(
               await sp`update growth.outreach_reservations set status='submitting',submitted_at=now(),issued_snapshot=${sp.json({ ...snapshot, rawBody: emptySubject, bodySha256: emptySubjectHash })},issued_snapshot_hash=${emptySubjectHash} where id=${reservation}`;
             }),
           );
-          await tx`update growth.outreach_reservations set status='submitting',submitted_at=now(),issued_snapshot=${tx.json(snapshot)},issued_snapshot_hash=${bodySha256} where id=${reservation}`;
+          const familySnapshot = {
+            ...snapshot,
+            campaign: {
+              ...snapshot.campaign,
+              copyFamilyVersion: 1,
+              copyFamilySha256: "c".repeat(64),
+            },
+          };
+          await assert.rejects(
+            tx.savepoint(async (sp) => {
+              await sp`update growth.outreach_reservations set status='submitting',submitted_at=now(),issued_snapshot=${sp.json({ ...snapshot, campaign: { ...snapshot.campaign, copyFamilyVersion: 1 } })},issued_snapshot_hash=${bodySha256} where id=${reservation}`;
+            }),
+          );
+          await tx`update growth.outreach_reservations set status='submitting',submitted_at=now(),issued_snapshot=${tx.json(familySnapshot)},issued_snapshot_hash=${bodySha256} where id=${reservation}`;
           await assert.rejects(
             tx.savepoint(async (sp) => {
               await sp`update growth.outreach_reservations set resend_send_generation=${randomUUID()} where id=${reservation}`;
