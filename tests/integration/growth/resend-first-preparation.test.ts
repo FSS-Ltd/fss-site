@@ -128,7 +128,7 @@ for (const scenario of [
               sent: 1,
               received: 0,
               limit: 100,
-              resets_at: new Date(now + 8 * 86400000).toISOString(),
+              resets_at: new Date(now + 15 * 86400000).toISOString(),
             };
             const usage = {
               observedAt: new Date(now - 1000).toISOString(),
@@ -147,13 +147,13 @@ for (const scenario of [
               summary: "reviewed",
               reference: { kind: "private" as const, value: "review" },
               observedAt: new Date(now - 1000),
-              expiresAt: new Date(now + 8 * 86400000),
+              expiresAt: new Date(now + 15 * 86400000),
             };
             const policy = campaignPolicyDefinitionSchema.parse({
               version: 1,
               accountConnectionId: id,
               effectiveAt: new Date(now - 1000),
-              expiresAt: new Date(now + 8 * 86400000),
+              expiresAt: new Date(now + 15 * 86400000),
               offer: "review",
               capabilityEvidence: "review",
               jurisdiction: "GB",
@@ -262,7 +262,7 @@ for (const scenario of [
                 basis: "consent",
                 provider: "resend",
                 jurisdiction: "GB",
-                expiresAt: new Date(now + 8 * 86400000),
+                expiresAt: new Date(now + 15 * 86400000),
                 observedAt: new Date(now - 1000),
                 explicitOptIn: true,
                 summary: "Recipient opted in.",
@@ -443,7 +443,7 @@ for (const scenario of [
               edition: "workspace",
               path: "gmail",
               observedAt: new Date(now - 1000),
-              expiresAt: new Date(now + 8 * 86400000),
+              expiresAt: new Date(now + 15 * 86400000),
               messages: 500,
               recipients: [1000, 1000, 1000, 1000],
               perMessage: 100,
@@ -453,7 +453,7 @@ for (const scenario of [
                 source: "test",
                 scope: "mailbox",
                 reviewedAt: new Date(now - 1000),
-                expiresAt: new Date(now + 8 * 86400000),
+                expiresAt: new Date(now + 15 * 86400000),
                 paths: {
                   mailbox: "covered",
                   aliases: "covered",

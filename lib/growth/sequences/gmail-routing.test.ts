@@ -276,3 +276,103 @@ test("a bound Gmail thread accepts multiple confirmed references from its own se
     "ambiguous",
   );
 });
+
+test("changed thread selects one direct Resend reply only when all resolved references agree", () => {
+  const common = {
+    basis: "gmail_exact_reference_v1" as const,
+    outboundProvider: "resend" as const,
+    connectionId: "account",
+    googleSubject: "subject",
+    grantEpoch: 1,
+    recipient: "owner@example.test",
+  };
+  const first = {
+    enrollment,
+    attribution: {
+      ...common,
+      reservationId: "first",
+      rfcMessageId: "<first@example.test>",
+    },
+  };
+  const second = {
+    enrollment,
+    attribution: {
+      ...common,
+      reservationId: "second",
+      rfcMessageId: "<second@example.test>",
+    },
+  };
+  const candidates = [first, second].map((item) => ({
+    sequenceId: enrollment.id,
+    connectionId: "resend-account",
+    channel: "resend",
+    identityConflict: false,
+    reservationId: item.attribution.reservationId,
+  }));
+  const references = {
+    kind: "valid" as const,
+    ids: [first.attribution.rfcMessageId, second.attribution.rfcMessageId],
+  };
+  const input = {
+    ...base,
+    references,
+    inReplyTo: {
+      kind: "valid" as const,
+      ids: [second.attribution.rfcMessageId],
+    },
+    candidates,
+    proven: [first, second],
+  };
+  assert.deepEqual(assessGmailRouting(input), {
+    kind: "unique",
+    enrollment,
+    attribution: second.attribution,
+  });
+  for (const change of [
+    { inReplyTo: missing },
+    { inReplyTo: references },
+    {
+      proven: [
+        first,
+        { ...second, enrollment: { ...enrollment, id: "other" } },
+      ],
+    },
+    {
+      proven: [
+        first,
+        {
+          ...second,
+          attribution: {
+            ...second.attribution,
+            recipient: "other@example.test",
+          },
+        },
+      ],
+    },
+    {
+      candidates: [
+        ...candidates,
+        { ...candidates[0]!, reservationId: "unconfirmed" },
+      ],
+    },
+    {
+      candidates: [
+        candidates[0]!,
+        { ...candidates[1]!, connectionId: "other-account" },
+      ],
+    },
+    {
+      proven: [
+        first,
+        {
+          ...second,
+          attribution: {
+            ...second.attribution,
+            rfcMessageId: first.attribution.rfcMessageId,
+          },
+        },
+      ],
+    },
+  ])
+    assert.equal(assessGmailRouting({ ...input, ...change }).kind, "ambiguous");
+});

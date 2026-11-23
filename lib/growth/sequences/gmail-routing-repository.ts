@@ -233,6 +233,7 @@ export async function classifyGmailRoutingInTransaction(
   return assessGmailRouting({
     thread,
     references,
+    inReplyTo: parseGmailReferences(input.inReplyTo, null),
     candidates,
     candidatesOverflow: candidates.length > 100 || proven.length > 100,
     proven,

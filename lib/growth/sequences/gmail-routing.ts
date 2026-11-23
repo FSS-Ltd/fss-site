@@ -29,6 +29,7 @@ export function gmailFromAddress(header: string | null): string | null {
 export function assessGmailRouting(input: {
   thread: ThreadMatch;
   references: GmailReferences;
+  inReplyTo?: GmailReferences;
   candidates: readonly ReferenceCandidate[];
   candidatesOverflow: boolean;
   possibleExposure: boolean;
@@ -50,7 +51,73 @@ export function assessGmailRouting(input: {
       proven.some((candidate) => candidate.enrollment.id !== threadSequenceId)
     )
       return { kind: "ambiguous" };
-  } else if (proven.length > 1) return { kind: "ambiguous" };
+  } else if (proven.length > 1) {
+    const reply = input.inReplyTo;
+    if (
+      input.references.kind !== "valid" ||
+      reply?.kind !== "valid" ||
+      reply.ids.length !== 1
+    )
+      return { kind: "ambiguous" };
+    const referenceIds = input.references.ids;
+    const direct = proven.filter(
+      (item) => item.attribution.rfcMessageId === reply.ids[0],
+    );
+    const selected = direct[0];
+    if (
+      direct.length !== 1 ||
+      !selected ||
+      selected.attribution.outboundProvider !== "resend" ||
+      (input.thread.kind === "unknown" &&
+        input.thread.enrollment.id !== selected.enrollment.id)
+    )
+      return { kind: "ambiguous" };
+    const reservationIds = new Set(
+      proven.map((item) => item.attribution.reservationId),
+    );
+    const rfcs = new Set(proven.map((item) => item.attribution.rfcMessageId));
+    const connectionIds = new Set(
+      input.candidates.map((candidate) => candidate.connectionId),
+    );
+    if (
+      reservationIds.size !== proven.length ||
+      rfcs.size !== proven.length ||
+      connectionIds.size !== 1 ||
+      connectionIds.has(null) ||
+      proven.some(
+        (item) =>
+          item.enrollment.id !== selected.enrollment.id ||
+          item.enrollment.contactId !== selected.enrollment.contactId ||
+          item.enrollment.prospectId !== selected.enrollment.prospectId ||
+          item.attribution.outboundProvider !==
+            selected.attribution.outboundProvider ||
+          item.attribution.connectionId !== selected.attribution.connectionId ||
+          item.attribution.googleSubject !==
+            selected.attribution.googleSubject ||
+          item.attribution.grantEpoch !== selected.attribution.grantEpoch ||
+          item.attribution.recipient !== selected.attribution.recipient ||
+          !referenceIds.includes(item.attribution.rfcMessageId) ||
+          !input.candidates.some(
+            (candidate) =>
+              candidate.reservationId === item.attribution.reservationId,
+          ),
+      ) ||
+      input.candidates.some(
+        (candidate) =>
+          candidate.identityConflict ||
+          candidate.sequenceId !== selected.enrollment.id ||
+          candidate.channel !== "resend" ||
+          !candidate.reservationId ||
+          !reservationIds.has(candidate.reservationId),
+      )
+    )
+      return { kind: "ambiguous" };
+    return {
+      kind: "unique",
+      enrollment: selected.enrollment,
+      attribution: selected.attribution,
+    };
+  }
   const exact = proven[0];
   if (
     exact &&

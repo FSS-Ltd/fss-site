@@ -11,6 +11,8 @@ import { prepareResendFollowUp } from "../../../lib/growth/campaigns/prepare-fol
 import { reserveResendOutreachAttempt } from "../../../lib/growth/campaigns/resend-reservation-repository";
 import { submitReservedResendOutreach } from "../../../lib/growth/campaigns/resend-direct-submission";
 import { createResendOutreachTransport } from "../../../lib/growth/integrations/resend/outreach-transport";
+import { postgresGmailSyncRepository } from "../../../lib/growth/sequences/gmail-sync-repository";
+import { classifyGmailRouting } from "../../../lib/growth/sequences/gmail-routing-repository";
 import { postgresSequenceDispatchRepository } from "../../../lib/growth/sequences/dispatcher-repository";
 import type { GmailDueContext } from "../../../lib/growth/campaigns/gmail-due-context";
 import type { ResendRuntimeConfiguration } from "../../../lib/growth/campaigns/resend-account-control";
@@ -117,7 +119,7 @@ export async function exerciseResendFollowUp(
     gmailHealthId = randomUUID();
   await tx`insert into growth.outreach_account_reviews(id,connection_id,request_id,request_hash,actor_id,kind,evidence,resulting_version) values (${healthId},${input.connectionId},${randomUUID()},repeat('a',64),${input.founderId},'record_health',${tx.json({ evidence: health })},20),(${gmailHealthId},${input.gmailId},${randomUUID()},repeat('b',64),${input.founderId},'record_health',${tx.json({ googleSubject: "test-subject", googleScopes: scopes, evidence: health })},20)`;
   await tx`update growth.outreach_account_controls set health_review_id=case when connection_id=${input.connectionId} then ${healthId}::uuid else ${gmailHealthId}::uuid end where connection_id in (${input.connectionId},${input.gmailId})`;
-  const window = {
+  let window = {
     used: 1,
     sent: 1,
     received: 0,
@@ -163,11 +165,24 @@ export async function exerciseResendFollowUp(
       ) {
         providerPosts++;
         const body = JSON.parse(String(init.body));
-        assert.deepEqual(body.headers, {
-          "In-Reply-To": "<first@example.test>",
-          References: "<first@example.test>",
+        assert.deepEqual(
+          body.headers,
+          providerPosts === 1
+            ? {
+                "In-Reply-To": "<first@example.test>",
+                References: "<first@example.test>",
+              }
+            : {
+                "In-Reply-To": "<second@example.test>",
+                References: "<first@example.test> <second@example.test>",
+              },
+        );
+        return Response.json({
+          id:
+            providerPosts === 1
+              ? "worker-followup-id"
+              : "worker-second-followup-id",
         });
-        return Response.json({ id: "worker-followup-id" });
       }
       assert.equal(String(resource), "https://api.resend.com/usage");
       assert.equal(init?.method, "GET");
@@ -203,12 +218,162 @@ export async function exerciseResendFollowUp(
           assert.equal(outcome.status, "complete", JSON.stringify(outcome));
           assert.equal(outcome.followUpPrepared, 1);
           assert.equal(outcome.accepted, 1);
+          const nextEventId = randomUUID();
+          const nextEvent = JSON.stringify({
+            type: "email.delivered",
+            created_at: future.toISOString(),
+            data: {
+              email_id: "worker-followup-id",
+              message_id: "<second@example.test>",
+              from: input.runtime.binding.sender,
+              to: [input.recipient],
+            },
+          });
+          const delivered = await createResendConfirmation(futureDb, {
+            connectionId: input.connectionId,
+            binding: input.runtime.binding,
+            webhookSecret: secret,
+          })(nextEvent, {
+            "svix-id": nextEventId,
+            "svix-timestamp": String(Math.floor(future.getTime() / 1000)),
+            "svix-signature": new Webhook(secret).sign(
+              nextEventId,
+              future,
+              nextEvent,
+            ),
+          });
+          assert.equal(delivered.status, "ready", JSON.stringify(delivered));
+          const routingInput = {
+            binding: {
+              connectionId: input.gmailId,
+              googleSubject: "test-subject",
+              grantEpoch: 1,
+              grantedScopes: scopes,
+            },
+            threadId: `changed-${randomUUID()}`,
+            inReplyTo: "<second@example.test>",
+            references: "<first@example.test> <second@example.test>",
+            fromAddress: input.recipient,
+            fromHeader: input.recipient,
+          };
+          const routed = await classifyGmailRouting(futureDb, routingInput);
+          assert.equal(routed.kind, "unique");
+          if (routed.kind !== "unique")
+            throw new Error("missing exact reply route");
+          assert.equal(
+            routed.attribution?.rfcMessageId,
+            "<second@example.test>",
+          );
+          const inboundRollback = new Error("restore inbound fixture");
+          await assert.rejects(
+            tx.savepoint(async () => {
+              const gmailMessageId = `gmail-${randomUUID()}`;
+              const observation = {
+                messageId: gmailMessageId,
+                historyId: "301",
+                threadId: routingInput.threadId,
+                inReplyTo: routingInput.inReplyTo,
+                references: routingInput.references,
+                fromAddress: input.recipient,
+                fromHeader: input.recipient,
+              };
+              const recorded =
+                await postgresGmailSyncRepository.recordInboundEvent(futureDb, {
+                  binding: routingInput.binding,
+                  sequenceEnrollmentId: routed.enrollment.id,
+                  prospectId: routed.enrollment.prospectId,
+                  contactId: routed.enrollment.contactId,
+                  gmailMessageId,
+                  gmailThreadId: routingInput.threadId,
+                  observation,
+                  rfcMessageId: `<inbound-${randomUUID()}@example.test>`,
+                  from: input.recipient,
+                  subject: "A reply",
+                  receivedAt: future,
+                  eventType: "reply",
+                  correlationId: randomUUID(),
+                });
+              assert.equal(recorded.alreadyRecorded, false);
+              const [fact] = await tx<
+                { attribution: { rfcMessageId: string } }[]
+              >`select e.outreach_reply_attribution as attribution from growth.email_events e join growth.email_messages em on em.id=e.email_message_id where em.provider_message_id=${gmailMessageId}`;
+              assert.equal(
+                fact?.attribution.rfcMessageId,
+                "<second@example.test>",
+              );
+              throw inboundRollback;
+            }),
+            (error) => error === inboundRollback,
+          );
+          assert.equal(
+            (
+              await classifyGmailRouting(futureDb, {
+                ...routingInput,
+                inReplyTo: null,
+              })
+            ).kind,
+            "ambiguous",
+          );
+          const unconfirmed = randomUUID();
+          await tx`insert into growth.email_messages(id,sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key,rfc_message_id) select ${unconfirmed},se.id,se.prospect_id,se.contact_id,'resend','outbound',4,'draft',${randomUUID()},'<unconfirmed@example.test>' from growth.sequence_enrollments se join growth.campaign_memberships m on m.sequence_id=se.id where m.id=${input.memberId}`;
+          assert.equal(
+            (
+              await classifyGmailRouting(futureDb, {
+                ...routingInput,
+                references:
+                  routingInput.references + " <unconfirmed@example.test>",
+              })
+            ).kind,
+            "ambiguous",
+          );
+          await tx`delete from growth.email_messages where id=${unconfirmed}`;
+          const [secondJob] = await tx<
+            { due: Date }[]
+          >`select due_at as due from growth.outreach_jobs where membership_id=${input.memberId} and idempotency_key=${`campaign-followup:${input.memberId}:2`}`;
+          assert.ok(secondJob);
+          const secondTime = new Date(secondJob.due.getTime() + 1000),
+            secondBefore = new Date(secondTime.getTime() - 10000),
+            secondExpiry = new Date(secondTime.getTime() + 60000);
+          const laterHealth = {
+            ...health,
+            observedFrom: new Date(secondTime.getTime() - 20000),
+            observedUntil: secondBefore,
+            expiresAt: secondExpiry,
+          };
+          const laterResendReview = randomUUID(),
+            laterGmailReview = randomUUID();
+          await tx`insert into growth.outreach_account_reviews(id,connection_id,request_id,request_hash,actor_id,kind,evidence,resulting_version) values (${laterResendReview},${input.connectionId},${randomUUID()},repeat('c',64),${input.founderId},'record_health',${tx.json({ evidence: laterHealth })},21),(${laterGmailReview},${input.gmailId},${randomUUID()},repeat('d',64),${input.founderId},'record_health',${tx.json({ googleSubject: "test-subject", googleScopes: scopes, evidence: laterHealth })},21)`;
+          await tx`update growth.outreach_account_controls set health_review_id=case when connection_id=${input.connectionId} then ${laterResendReview}::uuid else ${laterGmailReview}::uuid end where connection_id in (${input.connectionId},${input.gmailId})`;
+          window = {
+            ...window,
+            resets_at: new Date(secondTime.getTime() + 3600000).toISOString(),
+          };
+          await tx`update growth.outreach_provider_usage set observed_at=${secondBefore},captured_at=${secondBefore},window_start=${new Date(secondBefore.getTime() - 86400000)},fresh_until=${secondExpiry} where account_id=${input.gmailId}`;
+          const secondCoverage = randomUUID();
+          await tx`update growth.integration_connections set provider_cursor='302' where id=${input.gmailId}`;
+          await tx`insert into growth.gmail_reply_coverage(id,connection_id,grant_epoch,google_subject,history_start,history_end,observed_from,observed_until,head_requested_at,head_responded_at,state) values (${secondCoverage},${input.gmailId},1,'test-subject','301','302',${before},${secondBefore},${secondBefore},${secondBefore},'complete')`;
+          const secondContext = { ...gmailContext, coverageId: secondCoverage };
+          mock.timers.setTime(secondTime.getTime());
+          try {
+            const secondOutcome = await createLiveResendOutreachWorker({
+              context: secondContext,
+            })(withFixtureClock(db, secondTime));
+            assert.equal(
+              secondOutcome.status,
+              "complete",
+              JSON.stringify(secondOutcome),
+            );
+            assert.equal(secondOutcome.followUpPrepared, 1);
+            assert.equal(secondOutcome.accepted, 1);
+          } finally {
+            mock.timers.setTime(future.getTime());
+          }
           throw workerRollback;
         }),
         (error) => error === workerRollback,
       );
-      assert.equal(providerReads, 2);
-      assert.equal(providerPosts, 1);
+      assert.equal(providerReads, 3);
+      assert.equal(providerPosts, 2);
     } finally {
       globalThis.fetch = originalFetch;
     }
