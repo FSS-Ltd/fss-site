@@ -21,6 +21,8 @@ import { loadReviewMembershipPreparationAuthority } from "../../../lib/growth/ca
 import { ingestResearchRun } from "../../../lib/growth/research/ingest";
 import { createGlobalResearchFixture } from "../../../lib/growth/research/global-test-fixture";
 import { exerciseExactResendReply } from "./exact-resend-reply-assertions";
+import { exerciseResendFollowUp } from "./resend-follow-up-assertions";
+import { loadResendFollowUpAnchor } from "../../../lib/growth/campaigns/resend-follow-up-anchor";
 import { globalResearchRunSchema } from "../../../lib/growth/research/global-schema";
 
 const url = process.env.DIRECT_DATABASE_URL;
@@ -29,6 +31,7 @@ for (const scenario of [
   "unknown",
   "not_invoked",
   "monitor_rotated",
+  "follow_up",
 ] as const)
   test(
     `Resend guarded preparation and ${scenario} evidence`,
@@ -44,6 +47,7 @@ for (const scenario of [
         "RESEND_OUTREACH_ENVIRONMENT",
         "RESEND_OUTREACH_SEND_GENERATION",
         "RESEND_OUTREACH_USAGE_GENERATION",
+        "RESEND_OUTREACH_WEBHOOK_GENERATION",
         "RESEND_OUTREACH_SEND_API_KEY",
         "RESEND_OUTREACH_USAGE_API_KEY",
       ] as const;
@@ -77,6 +81,7 @@ for (const scenario of [
               replyTo: founder.email,
               sendGeneration: randomUUID(),
               usageGeneration: randomUUID(),
+              webhookGeneration: randomUUID(),
             };
             const runtime = {
               binding,
@@ -90,6 +95,7 @@ for (const scenario of [
               RESEND_OUTREACH_ENVIRONMENT: binding.environment,
               RESEND_OUTREACH_SEND_GENERATION: binding.sendGeneration,
               RESEND_OUTREACH_USAGE_GENERATION: binding.usageGeneration,
+              RESEND_OUTREACH_WEBHOOK_GENERATION: binding.webhookGeneration,
               RESEND_OUTREACH_SEND_API_KEY: runtime.sendCredential,
               RESEND_OUTREACH_USAGE_API_KEY: runtime.usageCredential,
             });
@@ -118,7 +124,7 @@ for (const scenario of [
               sent: 1,
               received: 0,
               limit: 100,
-              resets_at: new Date(now + 3600000).toISOString(),
+              resets_at: new Date(now + 8 * 86400000).toISOString(),
             };
             const usage = {
               observedAt: new Date(now - 1000).toISOString(),
@@ -137,13 +143,13 @@ for (const scenario of [
               summary: "reviewed",
               reference: { kind: "private" as const, value: "review" },
               observedAt: new Date(now - 1000),
-              expiresAt: new Date(now + 3600000),
+              expiresAt: new Date(now + 8 * 86400000),
             };
             const policy = campaignPolicyDefinitionSchema.parse({
               version: 1,
               accountConnectionId: id,
               effectiveAt: new Date(now - 1000),
-              expiresAt: new Date(now + 3600000),
+              expiresAt: new Date(now + 8 * 86400000),
               offer: "review",
               capabilityEvidence: "review",
               jurisdiction: "GB",
@@ -252,7 +258,7 @@ for (const scenario of [
                 basis: "consent",
                 provider: "resend",
                 jurisdiction: "GB",
-                expiresAt: new Date(now + 3600000),
+                expiresAt: new Date(now + 8 * 86400000),
                 observedAt: new Date(now - 1000),
                 explicitOptIn: true,
                 summary: "Recipient opted in.",
@@ -433,7 +439,7 @@ for (const scenario of [
               edition: "workspace",
               path: "gmail",
               observedAt: new Date(now - 1000),
-              expiresAt: new Date(now + 3600000),
+              expiresAt: new Date(now + 8 * 86400000),
               messages: 500,
               recipients: [1000, 1000, 1000, 1000],
               perMessage: 100,
@@ -443,7 +449,7 @@ for (const scenario of [
                 source: "test",
                 scope: "mailbox",
                 reviewedAt: new Date(now - 1000),
-                expiresAt: new Date(now + 3600000),
+                expiresAt: new Date(now + 8 * 86400000),
                 paths: {
                   mailbox: "covered",
                   aliases: "covered",
@@ -596,7 +602,9 @@ for (const scenario of [
               submit.status,
               scenario === "unknown" || scenario === "monitor_rotated"
                 ? "uncertain"
-                : scenario,
+                : scenario === "follow_up"
+                  ? "accepted"
+                  : scenario,
             );
             assert.equal(
               posts,
@@ -636,7 +644,9 @@ for (const scenario of [
                       : "accepted",
               confirmed: null,
               providerId:
-                scenario === "accepted" ? "synthetic-message-id" : null,
+                scenario === "accepted" || scenario === "follow_up"
+                  ? "synthetic-message-id"
+                  : null,
             });
             if (scenario === "not_invoked" || scenario === "unknown") {
               const routing = await classifyGmailRouting(db, {
@@ -673,6 +683,16 @@ for (const scenario of [
                 ? 0
                 : 1,
             );
+            if (scenario === "follow_up") {
+              await exerciseResendFollowUp(tx, db, {
+                runtime,
+                connectionId: id,
+                gmailId: gmail,
+                memberId: member.id,
+                recipient: email,
+                founderId: founder.actorId,
+              });
+            }
             if (scenario === "accepted") {
               const [contact] = await tx<
                 { id: string }[]
@@ -691,6 +711,26 @@ for (const scenario of [
                 membershipId: member.id,
                 founder,
               });
+              await tx`update growth.integration_connections set version=version-1 where id=${gmail}`;
+              await tx`update growth.campaign_memberships set first_confirmation_reservation_id=${reserved.value.reservationId},confirmed_snapshot=(select issued_snapshot->'campaign' from growth.outreach_reservations where id=${reserved.value.reservationId}) where id=${member.id}`;
+              const anchorInput = {
+                membershipId: member.id,
+                connectionId: id,
+                step: 1 as const,
+                runtime,
+              };
+              const followUpAnchor = await loadResendFollowUpAnchor(
+                tx,
+                anchorInput,
+              );
+              assert.ok(followUpAnchor);
+              assert.equal(followUpAnchor.references.length, 1);
+              await tx`update growth.integration_connections set version=version+1 where id=${gmail}`;
+              assert.equal(
+                await loadResendFollowUpAnchor(tx, anchorInput),
+                null,
+              );
+              await tx`update growth.integration_connections set version=version-1 where id=${gmail}`;
             }
             throw rollback;
           }),

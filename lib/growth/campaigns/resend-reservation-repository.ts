@@ -31,6 +31,7 @@ import { londonDayKey } from "./time";
 
 type Identity = {
   messageId: string;
+  step: number;
   sequenceId: string;
   prospectId: string;
   contactId: string;
@@ -89,13 +90,13 @@ async function identify(
 ): Promise<Identity | null> {
   const rows = await tx<
     Identity[]
-  >`select em.id as "messageId",se.id as "sequenceId",p.id as "prospectId",ct.id as "contactId",p.business_id as "businessId",m.campaign_id as "campaignId",m.policy_version as "policyVersion",m.id as "membershipId",c.account_connection_id as "connectionId"
+  >`select em.id as "messageId",em.step_number as step,se.id as "sequenceId",p.id as "prospectId",ct.id as "contactId",p.business_id as "businessId",m.campaign_id as "campaignId",m.policy_version as "policyVersion",m.id as "membershipId",c.account_connection_id as "connectionId"
     from growth.email_messages em join growth.sequence_enrollments se on se.id=em.sequence_enrollment_id
     join growth.prospects p on p.id=se.prospect_id join growth.contacts ct on ct.id=se.contact_id
     join growth.campaign_memberships m on m.sequence_id=se.id
     join growth.campaigns c on c.id=m.campaign_id and c.version=m.policy_version
     join growth.integration_connections ic on ic.id=c.account_connection_id and ic.provider='resend'
-    where em.id=${messageId} and em.channel='resend' and em.direction='outbound' and em.step_number=0 and em.rfc_message_id is null and em.provider_message_id is null and c.policy->>'provider'='resend'`;
+    where em.id=${messageId} and em.channel='resend' and em.direction='outbound' and em.step_number in (0,1,2) and em.rfc_message_id is null and em.provider_message_id is null and c.policy->>'provider'='resend'`;
   return rows.length === 1 ? (rows[0] ?? null) : null;
 }
 
@@ -106,6 +107,7 @@ async function lockedPreparation(
   day: string,
   runtime: ResendRuntimeConfiguration,
   terminal: boolean,
+  coverageId?: string,
 ): Promise<ReservationOutcome<Locked>> {
   await lockKey(tx, `growth:outreach-day:${day}`);
   await lockKey(
@@ -156,6 +158,17 @@ async function lockedPreparation(
     resendRuntime: runtime,
   });
   if (preparation.status === "held") return preparation;
+  if (identity.step !== 0) {
+    const controlled = await loadControlledPreparation(tx, {
+      membershipId: identity.membershipId,
+      connectionId: identity.connectionId,
+      preparation: preparation.preparation,
+      coverageId,
+      resendRuntime: runtime,
+    });
+    if (!controlled?.copyFamilyVersion || !controlled.copyFamilySha256)
+      return held("controlled_variant_unproven");
+  }
   return {
     status: "ready",
     value: {
@@ -238,6 +251,7 @@ const reserveInputSchema = z.strictObject({
   messageId: z.uuid(),
   leaseToken: z.uuid(),
   attemptKey: z.string().regex(/^[A-Za-z0-9_/-]{1,256}$/),
+  coverageId: z.uuid().optional(),
 });
 export async function reserveResendOutreachAttempt(
   db: GrowthDb,
@@ -262,6 +276,7 @@ export async function reserveResendOutreachAttempt(
       day,
       runtime,
       false,
+      input.coverageId,
     );
     if (locked.status === "held") return locked;
     const { preparation, account, now, bounds, window } = locked.value;
@@ -362,6 +377,7 @@ export async function reserveResendOutreachAttempt(
 
 const beginInputSchema = reservationLeaseSchema.extend({
   fingerprint: z.string().regex(/^[a-f0-9]{64}$/),
+  coverageId: z.uuid().optional(),
 });
 export async function beginResendOutreachSubmission(
   db: GrowthDb,
@@ -386,6 +402,7 @@ export async function beginResendOutreachSubmission(
       initial.day,
       runtime,
       true,
+      input.coverageId,
     );
     if (locked.status === "held") return locked;
     const { preparation, account, now, bounds, window } = locked.value;
@@ -422,11 +439,15 @@ export async function beginResendOutreachSubmission(
       membershipId: identity.membershipId,
       connectionId: identity.connectionId,
       preparation,
+      coverageId: input.coverageId,
       resendRuntime: runtime,
     });
     if (!campaign?.copyFamilyVersion || !campaign.copyFamilySha256)
       return held("controlled_variant_unproven");
     const recipient = preparation.recipient.trim().toLowerCase();
+    const references = preparation.references.join(" ");
+    if (Buffer.byteLength(references, "utf8") > 320)
+      return held("thread_references_overflow");
     const rawBody = JSON.stringify({
       from: runtime.binding.sender,
       to: [recipient],
@@ -434,6 +455,14 @@ export async function beginResendOutreachSubmission(
       subject: preparation.subject,
       html: preparation.html,
       text: preparation.text,
+      ...(identity.step === 0
+        ? {}
+        : {
+            headers: {
+              "In-Reply-To": preparation.references.at(-1),
+              References: references,
+            },
+          }),
     });
     if (Buffer.byteLength(rawBody, "utf8") > 1048576)
       return held("issued_payload_too_large");

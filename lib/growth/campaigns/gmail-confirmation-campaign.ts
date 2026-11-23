@@ -1,9 +1,9 @@
-import { TZDateMini } from "@date-fns/tz";
 import { z } from "zod";
 import type { GrowthTransaction } from "../db/types";
 import { reviewedRecipientSchema } from "../sequences/reviewed-recipient";
 import {
   campaignCadenceDays,
+  campaignFollowUpDue,
   campaignMonthAnniversary,
   campaignSchedulingAnchor,
 } from "./time";
@@ -67,12 +67,6 @@ export type CampaignReportLeaseFence = {
   anchorReservationId: string;
 };
 
-function addLondonDays(anchor: Date, days: number): Date {
-  const date = new TZDateMini(anchor.getTime(), "Europe/London");
-  date.setDate(date.getDate() + days);
-  return new Date(date.getTime());
-}
-
 export async function freezeCampaignConfirmation(
   tx: GrowthTransaction,
   input: {
@@ -101,7 +95,7 @@ export async function freezeCampaignConfirmation(
   const offsets = campaignCadenceDays(campaign.cadenceFamily);
   for (let index = 0; index < 2; index++) {
     const step = index + 1,
-      due = addLondonDays(input.observedUntil, offsets[index]);
+      due = campaignFollowUpDue(input.observedUntil, offsets[index]);
     await tx`insert into growth.email_messages(sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key,scheduled_for) values (${input.sequenceId},${input.prospectId},${input.contactId},${input.provider ?? "gmail"},'outbound',${step},${terminal ? "cancelled" : "draft"},${`campaign-followup:${campaign.membershipId}:${step}`},${due})`;
     await tx`insert into growth.outreach_jobs(campaign_id,policy_version,membership_id,job_type,due_at,idempotency_key,status) values (${campaign.campaignId},${campaign.policyVersion},${campaign.membershipId},'follow_up',${due},${`campaign-followup:${campaign.membershipId}:${step}`},${terminal ? "cancelled" : paused ? "held" : "pending"})`;
   }

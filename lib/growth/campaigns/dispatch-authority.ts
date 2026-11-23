@@ -11,6 +11,7 @@ import type { GrowthTransaction } from "../db/types";
 import { loadPolicyAuthorizedSourceProof } from "./founder-verification-reader";
 import { validateCampaignDefinition } from "./lifecycle";
 import { campaignPolicyDefinitionSchema } from "./schemas";
+import { loadResendFollowUpAnchor } from "./resend-follow-up-anchor";
 
 export type CanonicalOutreachPreparation = {
   messageId: string;
@@ -157,7 +158,8 @@ export async function loadCanonicalOutreachPreparation(
   `;
   if (
     memberships.length > 1 ||
-    (input.resendRuntime && (memberships.length !== 1 || row.stepNumber !== 0))
+    (input.resendRuntime &&
+      (memberships.length !== 1 || ![0, 1, 2].includes(row.stepNumber)))
   )
     return held("membership_ambiguous");
   const snapshot = z
@@ -268,13 +270,26 @@ export async function loadCanonicalOutreachPreparation(
       end: parsed.data.windowEnd,
     };
   }
+  const resendAnchor =
+    input.resendRuntime && row.stepNumber !== 0 && memberships[0]
+      ? await loadResendFollowUpAnchor(tx, {
+          membershipId: memberships[0].id,
+          connectionId: input.connectionId,
+          step: row.stepNumber === 1 ? 1 : 2,
+          runtime: input.resendRuntime,
+        })
+      : null;
+  if (input.resendRuntime && row.stepNumber !== 0 && !resendAnchor)
+    return held("thread_unknown");
   const references =
     row.stepNumber === 0
       ? []
-      : (
-          await tx<
-            { rfc: string }[]
-          >`select em.rfc_message_id as rfc from growth.email_messages em
+      : resendAnchor
+        ? resendAnchor.references
+        : (
+            await tx<
+              { rfc: string }[]
+            >`select em.rfc_message_id as rfc from growth.email_messages em
             where em.sequence_enrollment_id=${row.sequenceId} and em.direction='outbound' and em.rfc_message_id is not null
               and (em.status='sent' or exists (
                 select 1 from growth.outreach_reservations r
@@ -283,11 +298,15 @@ export async function loadCanonicalOutreachPreparation(
                   and r.confirmation_receipt->>'basis'='gmail_fss_sent_observed'
                   and r.rfc_message_id=em.rfc_message_id
               )) order by em.step_number asc limit 51`
-        ).map((item) => item.rfc);
+          ).map((item) => item.rfc);
   if (row.stepNumber === 0 && row.gmailThreadId)
     return held("first_message_already_threaded");
   if (references.length > 50) return held("thread_references_overflow");
-  if (row.stepNumber !== 0 && (!row.gmailThreadId || references.length === 0))
+  if (
+    row.stepNumber !== 0 &&
+    ((input.resendRuntime ? row.gmailThreadId !== null : !row.gmailThreadId) ||
+      references.length === 0)
+  )
     return held("thread_unknown");
   const canonical = {
     messageId: row.messageId,

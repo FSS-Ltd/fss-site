@@ -19,6 +19,7 @@ type Input = {
   leaseToken: string;
   fence: number;
   fingerprint: string;
+  coverageId?: string;
 };
 type Result =
   | { status: "accepted" }

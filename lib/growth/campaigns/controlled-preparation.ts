@@ -11,6 +11,8 @@ import {
 } from "./controlled-copy";
 import { loadPolicyAuthorizedSourceProof } from "./founder-verification-reader";
 import { campaignPolicyDefinitionSchema } from "./schemas";
+import { loadResendFollowUpAnchor } from "./resend-follow-up-anchor";
+import { campaignCadenceDays, campaignFollowUpDue } from "./time";
 import {
   hasFollowUpReplyCoverage,
   loadFollowUpAnchor,
@@ -78,12 +80,13 @@ export async function loadControlledPreparation(
       observation: string;
       providerDraftId: string | null;
       step: number;
+      scheduledFor: Date | null;
     }[]
   >`
     select em.controlled_preparation as metadata,se.template_snapshot as recipients,c.policy,
       m.campaign_id as "campaignId",m.policy_version as "policyVersion",m.business_id as "businessId",
       b.legal_name as "businessName",b.country_code as market,m.current_permission_id as "permissionId",
-      ct.id as "contactId",ct.version as "contactVersion",p.version as "prospectVersion",e.claim_summary as observation,em.provider_draft_id as "providerDraftId",em.step_number as step
+      ct.id as "contactId",ct.version as "contactVersion",p.version as "prospectVersion",e.claim_summary as observation,em.provider_draft_id as "providerDraftId",em.step_number as step,em.scheduled_for as "scheduledFor"
     from growth.campaign_memberships m join growth.campaigns c on c.id=m.campaign_id and c.version=m.policy_version
     join growth.businesses b on b.id=m.business_id join growth.prospects p on p.id=m.prospect_id
     join growth.sequence_enrollments se on se.id=m.sequence_id join growth.contacts ct on ct.id=se.contact_id
@@ -100,6 +103,12 @@ export async function loadControlledPreparation(
   const reviewed = recipients.data.reviewedRecipient;
   if (row.step !== 0 && !metadata.data.coverageId) return null;
   if (row.step !== 0 && !input.coverageId) return null;
+  if (
+    row.step !== 0 &&
+    input.resendRuntime &&
+    metadata.data.coverageId !== input.coverageId
+  )
+    return null;
   const recipient = input.preparation.recipient.trim().toLowerCase();
   const digest = createHash("sha256")
     .update(
@@ -113,16 +122,33 @@ export async function loadControlledPreparation(
   const anchor =
     row.step === 0
       ? null
-      : await loadFollowUpAnchor(tx, {
-          membershipId: input.membershipId,
-          connectionId: input.connectionId,
-          step: row.step === 1 ? 1 : 2,
-        });
+      : input.resendRuntime
+        ? await loadResendFollowUpAnchor(tx, {
+            membershipId: input.membershipId,
+            connectionId: input.connectionId,
+            step: row.step === 1 ? 1 : 2,
+            runtime: input.resendRuntime,
+          })
+        : await loadFollowUpAnchor(tx, {
+            membershipId: input.membershipId,
+            connectionId: input.connectionId,
+            step: row.step === 1 ? 1 : 2,
+          });
   if (
     row.step !== 0 &&
     (!anchor ||
       anchor.subject !== input.preparation.subject ||
-      anchor.threadId !== input.preparation.gmailThreadId ||
+      ("monitoredMailbox" in anchor
+        ? input.preparation.gmailThreadId !== null ||
+          JSON.stringify(anchor.references) !==
+            JSON.stringify(input.preparation.references) ||
+          !row.scheduledFor ||
+          row.scheduledFor.getTime() !==
+            campaignFollowUpDue(
+              anchor.schedulingAnchor,
+              campaignCadenceDays(anchor.campaign.cadenceFamily)[row.step - 1],
+            ).getTime()
+        : anchor.threadId !== input.preparation.gmailThreadId) ||
       anchor.campaign.campaignId !== row.campaignId ||
       anchor.campaign.policyVersion !== row.policyVersion ||
       anchor.campaign.businessId !== row.businessId ||
@@ -144,8 +170,14 @@ export async function loadControlledPreparation(
   if (
     anchor &&
     !(await hasFollowUpReplyCoverage(tx, {
-      connectionId: input.connectionId,
-      googleSubject: anchor.googleSubject,
+      connectionId:
+        "monitoredMailbox" in anchor
+          ? anchor.monitoredMailbox.connectionId
+          : input.connectionId,
+      googleSubject:
+        "monitoredMailbox" in anchor
+          ? anchor.monitoredMailbox.googleSubject
+          : anchor.googleSubject,
       submittedAt: anchor.submittedAt,
       coverageId: input.coverageId,
     }))

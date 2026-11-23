@@ -5,6 +5,11 @@ import { withGrowthTransaction } from "../db/client";
 import type { GrowthDb } from "../db/types";
 import { lockGmailRouting } from "../sequences/gmail-thread-association";
 import { loadReservationAccount } from "./account-repository";
+import { loadResendAccountReadiness } from "./resend-account-repository";
+import { readResendOutreachRuntime } from "./resend-account-runtime";
+import type { ResendRuntimeConfiguration } from "./resend-account-control";
+import { loadResendFollowUpAnchor } from "./resend-follow-up-anchor";
+import { campaignCadenceDays, campaignFollowUpDue } from "./time";
 import { buildControlledFollowUp } from "./controlled-copy";
 import {
   hasFollowUpReplyCoverage,
@@ -32,6 +37,23 @@ export async function prepareFollowUp(
   db: GrowthDb,
   raw: z.infer<typeof inputSchema>,
 ): Promise<ReservationOutcome<FollowUpResult>> {
+  return prepareFollowUpWithRuntime(db, raw);
+}
+
+export async function prepareResendFollowUp(
+  db: GrowthDb,
+  raw: z.infer<typeof inputSchema>,
+): Promise<ReservationOutcome<FollowUpResult>> {
+  const runtime = readResendOutreachRuntime();
+  if (!runtime) return held("identity_or_configuration_unknown");
+  return prepareFollowUpWithRuntime(db, raw, runtime);
+}
+
+async function prepareFollowUpWithRuntime(
+  db: GrowthDb,
+  raw: z.infer<typeof inputSchema>,
+  runtime?: ResendRuntimeConfiguration,
+): Promise<ReservationOutcome<FollowUpResult>> {
   const parsed = inputSchema.safeParse(raw);
   if (!parsed.success) return held("invalid_input");
   const input = parsed.data;
@@ -54,7 +76,9 @@ export async function prepareFollowUp(
     if (!identity) return held("job_unavailable");
     await tx`select pg_advisory_xact_lock(hashtextextended(${`growth:campaign:${identity.campaignId}`},0))`;
     await tx`select pg_advisory_xact_lock(hashtextextended(${`growth:outreach-business:${identity.businessId}`},0))`;
-    const account = await loadReservationAccount(tx, input.connectionId);
+    const account = runtime
+      ? await loadResendAccountReadiness(tx, input.connectionId, runtime)
+      : await loadReservationAccount(tx, input.connectionId);
     if (account.status === "held") return account;
     await tx`select id from growth.campaigns where id=${identity.campaignId} and version=${identity.policyVersion} for share`;
     await tx`select id from growth.campaign_memberships where id=${identity.membershipId} for update`;
@@ -122,7 +146,7 @@ export async function prepareFollowUp(
       join growth.sequence_enrollments se on se.id=m.sequence_id and se.contact_id=${identity.contactId}
       join growth.prospects p on p.id=m.prospect_id and p.business_id=m.business_id and p.primary_contact_id=se.contact_id
       join growth.businesses b on b.id=p.business_id join growth.contacts ct on ct.id=se.contact_id
-      join growth.email_messages em on em.sequence_enrollment_id=se.id and em.step_number=${step} and em.idempotency_key=${job.key} and em.direction='outbound' and em.channel='gmail'
+      join growth.email_messages em on em.sequence_enrollment_id=se.id and em.step_number=${step} and em.idempotency_key=${job.key} and em.direction='outbound' and em.channel=${runtime ? "resend" : "gmail"}
       join growth.source_evidence e on e.id::text=m.confirmed_snapshot->'sourceProof'->>'observationProofId' and e.prospect_id=p.id and e.claim_type='business_observation'
       where m.id=${identity.membershipId} for update of em`;
     if (!message) return held("follow_up_unavailable");
@@ -161,26 +185,56 @@ export async function prepareFollowUp(
       message.hasReply
     )
       return held("follow_up_excluded");
-    const anchor = await loadFollowUpAnchor(tx, {
-      membershipId: identity.membershipId,
-      connectionId: input.connectionId,
-      step,
-    });
-    if (
-      !anchor ||
-      anchor.googleSubject !== account.account.googleSubject ||
-      !(await hasFollowUpReplyCoverage(tx, {
-        connectionId: input.connectionId,
-        googleSubject: anchor.googleSubject,
-        submittedAt: anchor.submittedAt,
-        coverageId: input.coverageId,
-      }))
-    )
-      return held("reply_coverage_unknown");
+    const anchor = runtime
+      ? await loadResendFollowUpAnchor(tx, {
+          membershipId: identity.membershipId,
+          connectionId: input.connectionId,
+          step,
+          runtime,
+        })
+      : await loadFollowUpAnchor(tx, {
+          membershipId: identity.membershipId,
+          connectionId: input.connectionId,
+          step,
+        });
+    if (!anchor) return held("reply_coverage_unknown");
+    if (runtime) {
+      if (
+        !("monitoredMailbox" in account) ||
+        !("monitoredMailbox" in anchor) ||
+        JSON.stringify(account.monitoredMailbox) !==
+          JSON.stringify(anchor.monitoredMailbox) ||
+        campaignFollowUpDue(
+          anchor.schedulingAnchor,
+          campaignCadenceDays(anchor.campaign.cadenceFamily)[step - 1],
+        ).getTime() !== job.dueAt.getTime() ||
+        !(await hasFollowUpReplyCoverage(tx, {
+          connectionId: anchor.monitoredMailbox.connectionId,
+          googleSubject: anchor.monitoredMailbox.googleSubject,
+          submittedAt: anchor.submittedAt,
+          coverageId: input.coverageId,
+        }))
+      )
+        return held("reply_coverage_unknown");
+    } else {
+      if (
+        !("account" in account) ||
+        !("googleSubject" in anchor) ||
+        anchor.googleSubject !== account.account.googleSubject ||
+        !(await hasFollowUpReplyCoverage(tx, {
+          connectionId: input.connectionId,
+          googleSubject: anchor.googleSubject,
+          submittedAt: anchor.submittedAt,
+          coverageId: input.coverageId,
+        }))
+      )
+        return held("reply_coverage_unknown");
+    }
     const proof = await loadPolicyAuthorizedSourceProof(tx, {
       membershipId: identity.membershipId,
       connectionId: input.connectionId,
       messageId: message.id,
+      resendRuntime: runtime,
     });
     const policy = campaignPolicyDefinitionSchema.safeParse(message.policy);
     if (
@@ -232,6 +286,9 @@ export async function prepareFollowUp(
       !finalClock ||
       finalClock.now >= job.leaseUntil ||
       finalClock.now >= proof.bounds.expiresAt ||
+      (runtime &&
+        "expiresAt" in account &&
+        finalClock.now >= account.expiresAt) ||
       finalClock.now < proof.bounds.validatedAt ||
       (proof.bounds.validThrough !== null &&
         finalClock.now > proof.bounds.validThrough)
@@ -240,7 +297,7 @@ export async function prepareFollowUp(
     const copySha256 = createHash("sha256")
       .update(JSON.stringify([copy.subject, copy.html, copy.text]))
       .digest("hex");
-    await tx`update growth.email_messages set subject_snapshot=${copy.subject},html_snapshot=${copy.html},text_snapshot=${copy.text},controlled_preparation=${tx.json({ version: 1, variantId: copy.variantId, variantVersion: copy.variantVersion, observationProofId: proof.proof.observationProofId, permissionId: anchor.campaign.permissionId, copySha256, coverageId: input.coverageId })},status='queued',updated_at=clock_timestamp() where id=${message.id}`;
+    await tx`update growth.email_messages set subject_snapshot=${copy.subject},html_snapshot=${copy.html},text_snapshot=${copy.text},controlled_preparation=${tx.json({ version: 1, variantId: copy.variantId, variantVersion: copy.variantVersion, observationProofId: proof.proof.observationProofId, permissionId: anchor.campaign.permissionId, copySha256, coverageId: input.coverageId, ...(runtime ? { copyFamilyVersion: anchor.campaign.copyFamilyVersion, copyFamilySha256: anchor.campaign.copyFamilySha256 } : {}) })},status='queued',updated_at=clock_timestamp() where id=${message.id}`;
     await tx`update growth.outreach_jobs set status='completed',lease_until=null where id=${input.jobId}`;
     const event = randomUUID();
     await tx`insert into growth.outreach_events(id,campaign_id,policy_version,membership_id,event_type) values (${event},${identity.campaignId},${identity.policyVersion},${identity.membershipId},'follow_up_prepared')`;

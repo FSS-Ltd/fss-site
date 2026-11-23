@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { campaignMonthAnniversary, campaignSchedulingAnchor } from "./time";
+import {
+  campaignFollowUpDue,
+  campaignMonthAnniversary,
+  campaignSchedulingAnchor,
+} from "./time";
 
 test("only rounds sub-millisecond Resend observations forward", () => {
   const at = new Date("2026-03-29T00:59:59.999Z");
@@ -45,5 +49,26 @@ test("rounds at a London date boundary before computing its month anniversary", 
       campaignSchedulingAnchor(at, "gmail_fss_sent_observed", false),
     ).toISOString(),
     "2026-02-28T23:59:59.999Z",
+  );
+});
+
+test("follow-up deadlines use London calendar days after sub-millisecond ceiling", () => {
+  const spring = campaignSchedulingAnchor(
+    new Date("2026-03-28T12:00:00.000Z"),
+    "resend_fss_delivery_observed",
+    true,
+  );
+  assert.equal(
+    campaignFollowUpDue(spring, 2).toISOString(),
+    "2026-03-30T11:00:00.001Z",
+  );
+  const autumn = campaignSchedulingAnchor(
+    new Date("2026-10-24T11:00:00.000Z"),
+    "resend_fss_delivery_observed",
+    true,
+  );
+  assert.equal(
+    campaignFollowUpDue(autumn, 2).toISOString(),
+    "2026-10-26T12:00:00.001Z",
   );
 });

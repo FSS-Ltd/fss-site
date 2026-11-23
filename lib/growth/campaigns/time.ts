@@ -16,6 +16,12 @@ export function campaignMonthAnniversary(firstSentAt: Date): Date {
   return new Date(d.getTime());
 }
 
+export function campaignFollowUpDue(anchor: Date, days: number): Date {
+  const date = new TZDateMini(anchor.getTime(), zone);
+  date.setDate(date.getDate() + days);
+  return new Date(date.getTime());
+}
+
 export function campaignCadenceDays(
   family: "review" | "facebook" | "website",
 ): readonly [number, number] {

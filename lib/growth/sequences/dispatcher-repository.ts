@@ -257,7 +257,7 @@ async function claimDueMessage(
       select r.id from growth.outreach_reservations r
       join growth.email_messages em on em.id=r.email_message_id
       where em.channel=${input.channel ?? "gmail"}
-        and (${input.channel ?? "gmail"}='gmail' or (em.step_number=0 and exists (
+        and (${input.channel ?? "gmail"}='gmail' or (em.step_number in (0,1,2) and (em.step_number=0 or em.controlled_preparation is not null) and exists (
           select 1 from growth.campaign_memberships m
           join growth.campaigns c on c.id=m.campaign_id and c.version=m.policy_version
           where m.sequence_id=em.sequence_enrollment_id and c.policy->>'provider'='resend'
@@ -280,7 +280,7 @@ async function claimDueMessage(
       from growth.email_messages em
       inner join growth.sequence_enrollments se on se.id = em.sequence_enrollment_id
       where em.channel=${input.channel ?? "gmail"}
-      and (${input.channel ?? "gmail"}='gmail' or (em.step_number=0 and exists (
+      and (${input.channel ?? "gmail"}='gmail' or (em.step_number in (0,1,2) and (em.step_number=0 or em.controlled_preparation is not null) and exists (
         select 1 from growth.campaign_memberships m
         join growth.campaigns c on c.id=m.campaign_id and c.version=m.policy_version
         where m.sequence_id=em.sequence_enrollment_id and c.policy->>'provider'='resend'
