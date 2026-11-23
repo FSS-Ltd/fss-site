@@ -8,7 +8,7 @@ import { assignCampaignVariant } from "./variants";
 import type { CampaignVariant } from "./schemas";
 
 // Facts must come from the locked policy and validated source records.
-export function validateControlledCopy(input: {
+type ControlledCopyFacts = {
   campaignId: string;
   policyVersion: number;
   businessId: string;
@@ -17,12 +17,17 @@ export function validateControlledCopy(input: {
   offer: string;
   commercialTerms?: WebsiteServiceTerms;
   variants: readonly CampaignVariant[];
-  variantId: string;
-  variantVersion: number;
   businessName: string;
   observation: string;
-  copy: { subject: string; html: string; text: string };
-}): boolean {
+};
+
+export function buildControlledFirstMessage(input: ControlledCopyFacts): {
+  subject: string;
+  html: string;
+  text: string;
+  variantId: string;
+  variantVersion: number;
+} | null {
   const [first, second] = input.variants;
   if (
     input.market !== input.jurisdiction ||
@@ -36,7 +41,7 @@ export function validateControlledCopy(input: {
       (!isWebsiteServiceOffer(input.offer) ||
         !matchesWebsiteServiceOffer(input.offer, input.commercialTerms)))
   )
-    return false;
+    return null;
   const assigned = assignCampaignVariant({
     businessId: input.businessId,
     market: input.market,
@@ -44,12 +49,7 @@ export function validateControlledCopy(input: {
     variantIds: [first.id, second.id],
   });
   const variant = input.variants.find((item) => item.id === assigned);
-  if (
-    !variant ||
-    variant.id !== input.variantId ||
-    variant.version !== input.variantVersion
-  )
-    return false;
+  if (!variant) return null;
   try {
     const copy = buildCampaignCopy({
       businessName: input.businessName,
@@ -61,12 +61,32 @@ export function validateControlledCopy(input: {
       previewReviewed: false,
       cta: variant.cta,
     });
-    return (
-      copy.subject === input.copy.subject &&
-      copy.html === input.copy.html &&
-      copy.text === input.copy.text
-    );
+    return {
+      subject: copy.subject,
+      html: copy.html,
+      text: copy.text,
+      variantId: variant.id,
+      variantVersion: variant.version,
+    };
   } catch {
-    return false;
+    return null;
   }
+}
+
+export function validateControlledCopy(
+  input: ControlledCopyFacts & {
+    variantId: string;
+    variantVersion: number;
+    copy: { subject: string; html: string; text: string };
+  },
+): boolean {
+  const result = buildControlledFirstMessage(input);
+  return (
+    result !== null &&
+    result.variantId === input.variantId &&
+    result.variantVersion === input.variantVersion &&
+    result.subject === input.copy.subject &&
+    result.html === input.copy.html &&
+    result.text === input.copy.text
+  );
 }

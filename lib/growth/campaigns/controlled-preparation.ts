@@ -101,6 +101,7 @@ export async function loadControlledPreparation(
       market: row.market,
       jurisdiction: policy.data.jurisdiction,
       offer: policy.data.offer,
+      commercialTerms: policy.data.commercialTerms,
       variants: policy.data.variants,
       variantId: metadata.data.variantId,
       variantVersion: metadata.data.variantVersion,
@@ -117,6 +118,9 @@ export async function loadControlledPreparation(
     membershipId: input.membershipId,
     market: row.market,
     offer: policy.data.offer,
+    ...(policy.data.commercialTerms
+      ? { commercialTerms: policy.data.commercialTerms }
+      : {}),
     cadenceFamily: policy.data.cadenceFamily,
     variantId: metadata.data.variantId,
     variantVersion: metadata.data.variantVersion,

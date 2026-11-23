@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { GrowthTransaction } from "../db/types";
 import { reviewedRecipientSchema } from "../sequences/reviewed-recipient";
 import { campaignCadenceDays, campaignMonthAnniversary } from "./time";
+import { websiteServiceTermsSchema } from "./website-service-offers";
 
 export const campaignSchema = z.object({
   campaignId: z.uuid(),
@@ -12,6 +13,7 @@ export const campaignSchema = z.object({
   cadenceFamily: z.enum(["review", "website", "facebook"]),
   market: z.string().min(1),
   offer: z.string().min(1),
+  commercialTerms: websiteServiceTermsSchema.optional(),
   variantId: z.string().min(1),
   variantVersion: z.number().int().positive(),
   copySha256: z.string().regex(/^[a-f0-9]{64}$/),
