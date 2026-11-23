@@ -129,6 +129,8 @@ export function validateLauncher(
   )
     fail();
   if (
+    o.node.includes(":") ||
+    o.codex.includes(":") ||
     !isAbsolute(o.node) ||
     realpathSync(o.node) !== realpathSync(executable) ||
     !/^v24\./.test(process.version)
