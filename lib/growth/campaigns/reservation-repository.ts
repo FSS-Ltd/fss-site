@@ -22,6 +22,7 @@ import {
 } from "./authority-bounds";
 import { authorityGate, gateFailure, type GateResult } from "./authority-gate";
 import { assessReservationBudget } from "./reservation-budget";
+import { loadSharedOutreachBudget } from "./shared-outreach-budget";
 import { campaignPolicyDefinitionSchema } from "./schemas";
 import { loadControlledPreparation } from "./controlled-preparation";
 import { londonDayKey } from "./time";
@@ -228,18 +229,18 @@ async function checkBudget(
   >["account"],
   now: Date,
   excluding: string | null,
-): Promise<string> {
+): Promise<Outcome<AuthorityBounds>> {
   const [unbound] = await tx<
     { found: boolean }[]
   >`select exists(select 1 from growth.outreach_reservations where connection_id is null and status <> 'cancelled') as found`;
-  if (unbound?.found) return "legacy_usage_unreconciled";
+  if (unbound?.found) return held("legacy_usage_unreconciled");
   const [counts] = await tx<
     { globalUsed: number; accountUsed: number; campaignUsed: number }[]
   >`
     select count(*)::int as "globalUsed",count(*) filter(where connection_id=${identity.connectionId} or account_id=${account.usage.accountId})::int as "accountUsed",count(*) filter(where campaign_id=${identity.campaignId})::int as "campaignUsed"
     from growth.outreach_reservations where london_day=${day}::date and not (connection_id is not null and ((status='cancelled' and submitted_at is null and issued_snapshot is null) or (status='rejected' and direct_noninvocation_evidence is not null))) and (${excluding}::uuid is null or id<>${excluding}::uuid)
   `;
-  if (!counts) return "invalid_budget";
+  if (!counts) return held("invalid_budget");
   const outstanding = await tx<
     Pending[]
   >`select case when status in ('rejected','cancelled','sent') then 'uncertain' else status end as state,provider_message_id as "providerId",recipient_count as "recipientCount" from growth.outreach_reservations where connection_id=${identity.connectionId} and (status in ('reserved','submitting','uncertain') or (status='accepted' and (direct_submission_evidence is null or confirmation_observed_at is null or confirmation_observed_at > ${new Date(now.getTime() - 86400000)})) or (status='rejected' and direct_noninvocation_evidence is null) or status='sent' or (status='cancelled' and (submitted_at is not null or issued_snapshot is not null))) and (${excluding}::uuid is null or id<>${excluding}::uuid)`;
@@ -249,14 +250,20 @@ async function checkBudget(
       { policy: unknown }[]
     >`select policy from growth.campaigns where id=${identity.campaignId} and version=${identity.policyVersion}`;
     const parsed = campaignPolicyDefinitionSchema.safeParse(policy?.policy);
-    if (!parsed.success) return "policy_not_authorized";
+    if (!parsed.success) return held("policy_not_authorized");
     campaignCeiling = parsed.data.dailyLimit;
   }
-  return assessReservationBudget({
+  // Resend does not contribute until its canonical sender and receipt path exist.
+  const shared = await loadSharedOutreachBudget(tx, {
+    resendDelivery: "unavailable",
+  });
+  if (shared.status === "held") return shared;
+  const result = assessReservationBudget({
     ...counts,
     campaignUsed: campaignCeiling === null ? null : counts.campaignUsed,
     campaignCeiling,
     accountRamp: account.ramp,
+    sharedRamp: shared.ramp,
     messages: account.usage.messages,
     recipients: account.usage.recipients,
     messageLimit: account.limits.messages,
@@ -268,6 +275,9 @@ async function checkBudget(
     outstanding,
     recipientCount: 1,
   });
+  return result === "ready"
+    ? { status: "ready", value: shared.bounds }
+    : held(result);
 }
 
 async function validReservedHistory(
@@ -422,7 +432,7 @@ export async function reserveOutreachAttempt(
         return held("claim_history_unproven");
     }
     const budget = await checkBudget(tx, identity, day, account, now, null);
-    if (budget !== "ready") return held(budget);
+    if (budget.status === "held") return budget;
     const rendered = renderPreparation(preparation);
     const [message] = await tx<
       { rfc: string | null }[]
@@ -439,7 +449,7 @@ export async function reserveOutreachAttempt(
     const reservationId = randomUUID();
     const [gate] = await tx<
       GateResult[]
-    >`with ${authorityGate(tx, day, bounds, window)},
+    >`with ${authorityGate(tx, day, intersectAuthorityBounds(bounds, budget.value), window)},
       inserted as (
         insert into growth.outreach_reservations(id,idempotency_key,campaign_id,policy_version,membership_id,email_message_id,sequence_id,account_id,london_day,connection_id,grant_epoch,rfc_message_id,recipient_count,authority_fingerprint,lease_token,lease_until,fence,reserved_at)
         select ${reservationId},${input.attemptKey},${identity.campaignId},${identity.policyVersion},${identity.membershipId},${identity.messageId},${identity.sequenceId},${account.usage.accountId},${day}::date,${identity.connectionId},${account.grantEpoch},${rendered.rfcMessageId},1,${preparation.fingerprint},${input.leaseToken},at + interval '5 minutes',${fence.value},at
@@ -592,8 +602,8 @@ export async function beginOutreachSubmission(
       now,
       input.reservationId,
     );
-    if (budget !== "ready") return held(budget);
-    const submissionBounds = intersectAuthorityBounds(bounds, {
+    if (budget.status === "held") return budget;
+    const submissionBounds = intersectAuthorityBounds(bounds, budget.value, {
       validatedAt: now,
       expiresAt: reservation.leaseUntil,
       validThrough: null,

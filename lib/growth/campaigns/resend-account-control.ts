@@ -3,6 +3,7 @@ import { z } from "zod";
 import { appendAuditEvent } from "../audit/service";
 import type { FounderSession } from "../auth/require-founder";
 import { withGrowthTransaction } from "../db/client";
+import { lockGmailRouting } from "../sequences/gmail-thread-association";
 import type { GrowthDb } from "../db/types";
 import { healthReviewSchema } from "./account-contracts";
 import { requireCampaignFounder } from "./authorization";
@@ -91,6 +92,7 @@ export async function executeResendAccountCommand(
     .update(JSON.stringify(command))
     .digest("hex");
   return withGrowthTransaction(db, async (tx) => {
+    await lockGmailRouting(tx);
     await tx`select pg_advisory_xact_lock(hashtextextended(${`growth:account-command:${command.requestId}`},0))`;
     const [prior] = await tx<
       {

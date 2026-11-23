@@ -8,6 +8,7 @@ test("deduplicates accepted provider IDs while retaining uncertain and reserved 
     accountUsed: 2,
     campaignUsed: 1,
     accountRamp: 25,
+    sharedRamp: 150,
     campaignCeiling: 150,
     messages: 10,
     recipients: 10,
@@ -59,5 +60,36 @@ test("deduplicates accepted provider IDs while retaining uncertain and reserved 
   assert.equal(
     assessReservationBudget({ ...input, recipientCount: 11 }),
     "recipient_limit",
+  );
+});
+
+test("the common daily ceiling is the highest currently ready account ramp", () => {
+  const input = {
+    globalUsed: 25,
+    accountUsed: 10,
+    campaignUsed: null,
+    accountRamp: 25,
+    sharedRamp: 25,
+    campaignCeiling: null,
+    messages: 10,
+    recipients: 10,
+    messageLimit: 500,
+    recipientLimits: [500, 500, 500, 500] as [number, number, number, number],
+    perMessage: 10,
+    messageReserve: 50,
+    recipientReserve: 0,
+    providerIds: [],
+    outstanding: [],
+    recipientCount: 1,
+  };
+  assert.equal(assessReservationBudget(input), "global_limit");
+  assert.equal(assessReservationBudget({ ...input, sharedRamp: 50 }), "ready");
+  assert.equal(
+    assessReservationBudget({ ...input, sharedRamp: 50, accountUsed: 25 }),
+    "account_limit",
+  );
+  assert.equal(
+    assessReservationBudget({ ...input, sharedRamp: 200 }),
+    "invalid_budget",
   );
 });

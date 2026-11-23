@@ -3,6 +3,7 @@ export type ReservationBudgetInput = {
   accountUsed: number;
   campaignUsed: number | null;
   accountRamp: number;
+  sharedRamp: number;
   campaignCeiling: number | null;
   messages: number;
   recipients: number;
@@ -39,6 +40,7 @@ export function assessReservationBudget(
   ];
   const positive = [
     input.accountRamp,
+    input.sharedRamp,
     input.messageLimit,
     ...input.recipientLimits,
     input.perMessage,
@@ -49,6 +51,8 @@ export function assessReservationBudget(
     counts.some((n) => !Number.isSafeInteger(n) || n < 0) ||
     positive.some((n) => !Number.isSafeInteger(n) || n <= 0) ||
     ![25, 50, 100, 150].includes(input.accountRamp) ||
+    ![25, 50, 100, 150].includes(input.sharedRamp) ||
+    input.sharedRamp < input.accountRamp ||
     (input.campaignCeiling !== null &&
       ![25, 50, 100, 150].includes(input.campaignCeiling)) ||
     !Number.isSafeInteger(input.messageReserve) ||
@@ -61,7 +65,7 @@ export function assessReservationBudget(
     (input.campaignUsed === null) !== (input.campaignCeiling === null)
   )
     return "invalid_budget";
-  if (input.globalUsed >= 150) return "global_limit";
+  if (input.globalUsed >= input.sharedRamp) return "global_limit";
   if (input.accountUsed >= input.accountRamp) return "account_limit";
   if (
     input.campaignUsed !== null &&

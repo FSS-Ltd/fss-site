@@ -2,6 +2,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { appendAuditEvent } from "../audit/service";
 import type { FounderSession } from "../auth/require-founder";
 import { withGrowthTransaction } from "../db/client";
+import { lockGmailRouting } from "../sequences/gmail-thread-association";
 import type { GrowthDb } from "../db/types";
 import { hasRequiredGmailScopes } from "../integrations/google-oauth";
 import { requireCampaignFounder } from "./authorization";
@@ -53,6 +54,7 @@ export async function executeAccountControlCommand(
     .update(JSON.stringify(command))
     .digest("hex");
   return withGrowthTransaction(db, async (tx) => {
+    await lockGmailRouting(tx);
     await tx`select pg_advisory_xact_lock(hashtextextended(${`growth:account-command:${command.requestId}`},0))`;
     const [prior] = await tx<
       {
