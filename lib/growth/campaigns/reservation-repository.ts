@@ -146,6 +146,19 @@ async function lockedPreparation(
   await lockKey(tx, `growth:outreach-business:${identity.businessId}`);
   const account = await loadReservationAccount(tx, identity.connectionId);
   if (account.status === "held") return account;
+  const [exposure] = await tx<{ unresolved: boolean }[]>`
+    select exists (
+      select 1 from growth.outreach_reservations r
+      where r.connection_id=${identity.connectionId} and r.issued_snapshot is not null and (
+        r.status in ('submitting','uncertain','sent')
+        or (r.status='accepted' and r.direct_submission_evidence is null)
+        or (r.status='rejected' and r.direct_noninvocation_evidence is null)
+        or (r.status='cancelled' and (r.submitted_at is not null or r.issued_snapshot is not null))
+      )
+    ) as unresolved
+  `;
+  if (!exposure || exposure.unresolved)
+    return held("account_submission_unresolved");
   if (identity.campaignId)
     await tx`select id from growth.campaigns where id=${identity.campaignId} and version=${identity.policyVersion} for share`;
   if (identity.membershipId)

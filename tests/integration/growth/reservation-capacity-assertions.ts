@@ -103,7 +103,7 @@ export async function exerciseConfirmationCapacity(
     });
     assert.deepEqual(await reserve(), {
       status: "held",
-      reason: "provider_limit",
+      reason: "account_submission_unresolved",
     });
   } finally {
     await admin`delete from growth.outreach_reservations where id in (${old},${recent})`;
