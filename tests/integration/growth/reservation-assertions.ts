@@ -393,6 +393,13 @@ export async function exerciseLegacyReservation(
       fence: ready.value.fence,
       fingerprint: ready.value.preparation.fingerprint,
     };
+    await admin.begin(async (writer) => {
+      await writer`lock table operations.contacts in row exclusive mode`;
+      assert.deepEqual(await beginOutreachSubmission(db, begin), {
+        status: "held",
+        reason: "terminal_fence_busy",
+      });
+    });
     await admin`update growth.outreach_account_controls set state='paused' where connection_id=${id}`;
     assert.deepEqual(await beginOutreachSubmission(db, begin), {
       status: "held",

@@ -115,6 +115,7 @@ async function lockedPreparation(
   identity: Identity,
   leaseToken: string,
   day: string,
+  terminal = false,
 ): Promise<
   Outcome<{
     preparation: CanonicalOutreachPreparation;
@@ -151,6 +152,12 @@ async function lockedPreparation(
   await tx`select id from growth.contacts where id=${identity.contactId} for share`;
   await tx`select id from growth.sequence_enrollments where id=${identity.sequenceId} for share`;
   await tx`select id from growth.email_messages where id=${identity.messageId} for update`;
+  if (terminal) {
+    const [fence] = await tx<
+      { acquired: boolean }[]
+    >`select growth.try_outreach_terminal_fence() as acquired`;
+    if (!fence?.acquired) return held("terminal_fence_busy");
+  }
   const [clock] = await tx<{ now: Date }[]>`select clock_timestamp() as now`;
   if (!clock || londonDayKey(clock.now) !== day) return held("day_changed");
   const current = await preliminary(tx, identity.messageId);
@@ -406,6 +413,7 @@ export async function beginOutreachSubmission(
       identity,
       input.leaseToken,
       initial.day,
+      true,
     );
     if (locked.status === "held") return locked;
     const { preparation, account, now, bounds, window } = locked.value;
