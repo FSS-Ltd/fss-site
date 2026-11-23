@@ -275,6 +275,14 @@
       "files": 430,
       "method": "deterministic scoped AST rebuild; under-review; no-viz",
       "target": "774ca3a2c23614dd178079fc5743e718600bd6a1"
+    },
+    {
+      "date": "2026-11-23",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 437,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "8da46c8e0339542dc1f77f3eb616c95e3792fbf7"
     }
   ],
   "total_input_tokens": 0,
