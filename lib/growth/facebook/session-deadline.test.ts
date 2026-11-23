@@ -18,10 +18,11 @@ async function request(
     headers: { cookie: `authjs.session-token=${token}` },
   });
 }
-test("deadline uses verified token expiry and rejects forged and expired tokens", async () => {
+test("deadline uses verified token expiry and rejects forged and expired tokens", async (t) => {
+  t.mock.timers.enable({ apis: ["Date"], now: 1_800_000_000_000 });
   const now = Date.now();
   const deadline = await growthStreamDeadline(await request(60), secret);
-  assert.ok(deadline && deadline > now && deadline <= now + 60000);
+  assert.equal(deadline, now + 60000);
   assert.equal(
     await growthStreamDeadline(await request(60, "b".repeat(32)), secret),
     null,
