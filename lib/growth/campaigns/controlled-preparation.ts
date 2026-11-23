@@ -6,6 +6,10 @@ import type { CanonicalOutreachPreparation } from "./dispatch-authority";
 import { validateControlledCopy } from "./controlled-copy";
 import { loadPolicyAuthorizedSourceProof } from "./founder-verification-reader";
 import { campaignPolicyDefinitionSchema } from "./schemas";
+import {
+  hasFollowUpReplyCoverage,
+  loadFollowUpAnchor,
+} from "./follow-up-anchor";
 
 const metadataSchema = z.strictObject({
   version: z.literal(1),
@@ -14,6 +18,7 @@ const metadataSchema = z.strictObject({
   observationProofId: z.uuid(),
   permissionId: z.uuid(),
   copySha256: z.string().regex(/^[a-f0-9]{64}$/),
+  coverageId: z.uuid().optional(),
 });
 const recipientSnapshotSchema = z.object({
   reviewedRecipient: reviewedRecipientSchema,
@@ -64,13 +69,15 @@ export async function loadControlledPreparation(
     join growth.email_messages em on em.sequence_enrollment_id=se.id and em.id=${input.preparation.messageId}
     join growth.source_evidence e on e.id=${proof.proof.observationProofId} and e.prospect_id=p.id and e.claim_type='business_observation'
     where m.id=${input.membershipId}`;
-  if (!row || row.providerDraftId !== null || row.step !== 0) return null;
+  if (!row || row.providerDraftId !== null || ![0, 1, 2].includes(row.step))
+    return null;
   const metadata = metadataSchema.safeParse(row.metadata);
   const recipients = recipientSnapshotSchema.safeParse(row.recipients);
   const policy = campaignPolicyDefinitionSchema.safeParse(row.policy);
   if (!metadata.success || !recipients.success || !policy.success) return null;
   const effective = recipients.data.effectiveRecipient;
   const reviewed = recipients.data.reviewedRecipient;
+  if (row.step !== 0 && !metadata.data.coverageId) return null;
   const recipient = input.preparation.recipient.trim().toLowerCase();
   const digest = createHash("sha256")
     .update(
@@ -81,6 +88,46 @@ export async function loadControlledPreparation(
       ]),
     )
     .digest("hex");
+  const anchor =
+    row.step === 0
+      ? null
+      : await loadFollowUpAnchor(tx, {
+          membershipId: input.membershipId,
+          connectionId: input.connectionId,
+          step: row.step === 1 ? 1 : 2,
+        });
+  if (
+    row.step !== 0 &&
+    (!anchor ||
+      anchor.subject !== input.preparation.subject ||
+      anchor.threadId !== input.preparation.gmailThreadId ||
+      anchor.campaign.campaignId !== row.campaignId ||
+      anchor.campaign.policyVersion !== row.policyVersion ||
+      anchor.campaign.businessId !== row.businessId ||
+      anchor.campaign.market !== row.market ||
+      anchor.campaign.offer !== policy.data.offer ||
+      anchor.campaign.variantId !== metadata.data.variantId ||
+      anchor.campaign.variantVersion !== metadata.data.variantVersion ||
+      anchor.campaign.permissionId !== metadata.data.permissionId ||
+      anchor.campaign.sourceProof.observationProofId !==
+        metadata.data.observationProofId ||
+      JSON.stringify(anchor.campaign.commercialTerms) !==
+        JSON.stringify(policy.data.commercialTerms) ||
+      JSON.stringify(anchor.campaign.reviewedRecipient) !==
+        JSON.stringify(reviewed) ||
+      JSON.stringify(anchor.campaign.effectiveRecipient) !==
+        JSON.stringify(effective))
+  )
+    return null;
+  if (
+    anchor &&
+    !(await hasFollowUpReplyCoverage(tx, {
+      connectionId: input.connectionId,
+      googleSubject: anchor.googleSubject,
+      submittedAt: anchor.submittedAt,
+    }))
+  )
+    return null;
   if (
     reviewed.email !== recipient ||
     effective.email !== recipient ||
@@ -107,6 +154,7 @@ export async function loadControlledPreparation(
       variantVersion: metadata.data.variantVersion,
       businessName: row.businessName,
       observation: row.observation,
+      step: row.step === 1 ? 1 : row.step === 2 ? 2 : 0,
       copy: input.preparation,
     })
   )

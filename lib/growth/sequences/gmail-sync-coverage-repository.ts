@@ -1,5 +1,5 @@
 import { withGrowthTransaction } from "../db/client";
-import type { GrowthDb } from "../db/types";
+import type { GrowthDb, GrowthQueryExecutor } from "../db/types";
 import type { GmailGrantBinding } from "../integrations/gmail/live-client";
 import {
   hasRequiredGmailScopes,
@@ -192,7 +192,7 @@ export async function loadReplySyncState(
 }
 
 export async function loadReplyCoverage(
-  db: GrowthDb,
+  db: GrowthQueryExecutor,
   connectionId: string,
   googleSubject: string,
   from: Date,

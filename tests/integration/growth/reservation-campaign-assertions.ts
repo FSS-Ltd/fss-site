@@ -4,6 +4,7 @@ import { withGrowthTransaction } from "../../../lib/growth/db/client";
 import { loadReviewMembershipPreparationAuthority } from "../../../lib/growth/campaigns/founder-verification-reader";
 import { exerciseResearchPreparation } from "./research-preparation-assertions";
 import { exerciseGmailConfirmation } from "./reservation-confirmation-assertions";
+import { exerciseFollowUpPreparation } from "./follow-up-preparation-assertions";
 import { exerciseCrossVersionConfirmation } from "./reservation-cross-version-assertions";
 import { withTransitionClock } from "./reservation-clock";
 import type { FounderSession } from "../../../lib/growth/auth/require-founder";
@@ -572,6 +573,15 @@ export async function exerciseCampaignReservation(
         copyFacts,
         copy,
         copySha256,
+      });
+      await exerciseFollowUpPreparation(admin, db, {
+        campaignId: campaign.id,
+        membershipId: member,
+        sequenceId: sequence,
+        connectionId: id,
+        firstMessageId: message,
+        recipient: copyFacts.email,
+        copy,
       });
     } finally {
       await admin`delete from growth.outreach_jobs where campaign_id=${campaign.id}`;
