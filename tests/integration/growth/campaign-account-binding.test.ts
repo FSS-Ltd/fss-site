@@ -61,12 +61,12 @@ test(
             : { accountConnectionId: accountId, provider };
         await assert.rejects(
           db`insert into growth.campaigns(id,version,request_id,name,policy,account_connection_id) values (${randomUUID()},1,${randomUUID()},'invalid',${db.json(directPolicy)},${accountId})`,
-          /campaign_bound_provider_gmail/,
+          /campaign_(?:bound_provider_supported|account_provider_fk)/,
         );
       }
       await assert.rejects(
         db`insert into growth.campaigns(id,version,request_id,name,policy,account_connection_id) values (${randomUUID()},1,${randomUUID()},'wrong-provider',${db.json({ accountConnectionId: resendId, provider: "gmail" })},${resendId})`,
-        /campaign_gmail_account_fk/,
+        /campaign_account_provider_fk/,
       );
       await db`insert into growth.campaigns(id,version,request_id,name,policy) values (${unboundCampaignId},1,${randomUUID()},'unbound',${db.json({})})`;
       await db`insert into growth.campaigns(id,version,request_id,name,policy,account_connection_id) values (${directCampaignId},1,${randomUUID()},'valid',${db.json({ accountConnectionId: accountId, provider: "gmail" })},${accountId})`;
