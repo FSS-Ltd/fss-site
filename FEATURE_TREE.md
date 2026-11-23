@@ -1,6 +1,6 @@
 # Project feature tree
 
-Source-backed baseline, 2026-11-17, checked against clean `origin/main` commit `618e7d730`. Selected Growth coverage was refreshed on 23 November against committed snapshot `01acd34ed`. This snapshot includes the reviewed confirmation fixture and manual capture code, standalone Gmail transport, sender prerequisites, and the local Facebook discovery runner. See each feature for its own test and review status.
+Source-backed baseline, 2026-11-17, checked against clean `origin/main` commit `618e7d730`. Selected Growth coverage was refreshed on 23 November against committed snapshot `760f68020`. This snapshot includes the reviewed confirmation fixture and manual capture code, standalone Gmail transport, sender prerequisites, and the local daily research and Facebook discovery runners. See each feature for its own test and review status.
 
 ## Coverage and navigation
 
@@ -68,6 +68,13 @@ Graphify: [graph](graphify-out/graph.json), [audit report](graphify-out/GRAPH_RE
 
 - Status: implemented. Entry: `app/api/growth/prospects/[id]/request-research/route.ts`, `lib/growth/research/scheduled-workflow.ts#runScheduledResearchWorkflow`. Canonical global ingestion: `lib/growth/research/global-ingest.ts#ingestGlobalResearchRun`, `lib/growth/research/global-repository.ts#inspectGlobalCandidate`.
 - depends_on GROWTH-CRM, INFRA, evidence validation and suppression checks; used_by GROWTH-OUTREACH. Graph node: `lib_growth_research_global_ingest_ts`. Tests: `tests/integration/growth/global-research.test.ts`, `lib/growth/research/global-identity.test.ts`.
+
+
+### GROWTH-RESEARCH-DAILY: signed daily prospect research
+
+- Status: partial. `scripts/run-daily-research.ts` calls `lib/growth/research/daily-discovery.ts#runDailyResearch`. It prepares up to ten research-only candidates in one canonical London-date batch. A private atomic file preserves exact bytes across retries and restarts. Concurrent starts can repeat searches before the winning file is published. The operator retains the private batch for replay and manages its retention.
+- Uses GROWTH-RESEARCH, GROWTH-SIGNED-PROOF, INFRA, the shared restricted research child also used by GROWTH-FB-DISCOVERY, and the existing `submission-client.ts#submitGlobalResearch` signed transport. Successful zero-result searches go through the same authenticated route. `supabase/migrations/20261118160000_growth_signed_empty_research.sql` permits zero targets only with nonblank verified signer and exact body-hash format. Child-supplied proof is rejected. Campaign targeting, membership, verified permission and sending authority require downstream policy paths.
+- Verification: root exact snapshot 103-migration replay, six PostgreSQL global-research tests, malformed signer/hash constraint cases, 32 focused unit/route tests and TypeScript passed. Independent source review, effective CLI tool isolation, live schedule and signer remain pending. Debug using the redacted wrapper result and canonical research run. Graph nodes `scripts_run_daily_research_ts`, `lib_growth_research_daily_discovery_ts`, `lib_growth_research_restricted_research_child_ts`. Runbook: `docs/growth-os/runbooks/global-research.md`.
 
 ### GROWTH-VERIFICATION: founder source and contact proof
 

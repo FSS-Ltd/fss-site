@@ -5412,6 +5412,55 @@
       "source_location": "L13"
     },
     {
+      "id": "lib_growth_research_daily_discovery_test_ts",
+      "label": "daily-discovery.test.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/research/daily-discovery.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "lib_growth_research_daily_discovery_ts",
+      "label": "daily-discovery.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/research/daily-discovery.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "daily_discovery_researchdailyprospects",
+      "label": "researchDailyProspects()",
+      "file_type": "code",
+      "source_file": "lib/growth/research/daily-discovery.ts",
+      "source_location": "L51"
+    },
+    {
+      "id": "daily_discovery_builddailyresearchrunid",
+      "label": "buildDailyResearchRunId()",
+      "file_type": "code",
+      "source_file": "lib/growth/research/daily-discovery.ts",
+      "source_location": "L75"
+    },
+    {
+      "id": "daily_discovery_readprivate",
+      "label": "readPrivate()",
+      "file_type": "code",
+      "source_file": "lib/growth/research/daily-discovery.ts",
+      "source_location": "L87"
+    },
+    {
+      "id": "daily_discovery_publish",
+      "label": "publish()",
+      "file_type": "code",
+      "source_file": "lib/growth/research/daily-discovery.ts",
+      "source_location": "L114"
+    },
+    {
+      "id": "daily_discovery_rundailyresearch",
+      "label": "runDailyResearch()",
+      "file_type": "code",
+      "source_file": "lib/growth/research/daily-discovery.ts",
+      "source_location": "L131"
+    },
+    {
       "id": "lib_growth_research_errors_ts",
       "label": "errors.ts",
       "file_type": "code",
@@ -9092,6 +9141,20 @@
       "file_type": "code",
       "source_file": "scripts/refresh-pending-first-email-drafts.ts",
       "source_location": "L183"
+    },
+    {
+      "id": "scripts_run_daily_research_ts",
+      "label": "run-daily-research.ts",
+      "file_type": "code",
+      "source_file": "scripts/run-daily-research.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "run_daily_research_main",
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "scripts/run-daily-research.ts",
+      "source_location": "L8"
     },
     {
       "id": "scripts_run_scheduled_facebook_discovery_ts",
@@ -27120,6 +27183,213 @@
       "weight": 1.0
     },
     {
+      "source": "lib_growth_research_daily_discovery_test_ts",
+      "target": "strict",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/daily-discovery.test.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_daily_discovery_test_ts",
+      "target": "node_fs",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/daily-discovery.test.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_daily_discovery_test_ts",
+      "target": "node_os",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/daily-discovery.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_daily_discovery_test_ts",
+      "target": "node_path",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/daily-discovery.test.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_daily_discovery_test_ts",
+      "target": "node_test",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/daily-discovery.test.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_daily_discovery_test_ts",
+      "target": "lib_growth_research_global_test_fixture",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/daily-discovery.test.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_daily_discovery_test_ts",
+      "target": "lib_growth_research_daily_discovery",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/daily-discovery.test.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_daily_discovery_ts",
+      "target": "node_crypto",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/daily-discovery.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_daily_discovery_ts",
+      "target": "node_fs",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/daily-discovery.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_daily_discovery_ts",
+      "target": "node_path",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/daily-discovery.ts",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_daily_discovery_ts",
+      "target": "zod",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/daily-discovery.ts",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_daily_discovery_ts",
+      "target": "lib_growth_research_global_schema",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/daily-discovery.ts",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_daily_discovery_ts",
+      "target": "lib_growth_research_limits",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/daily-discovery.ts",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_daily_discovery_ts",
+      "target": "lib_growth_research_submission_client",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/daily-discovery.ts",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_daily_discovery_ts",
+      "target": "lib_growth_research_restricted_research_child",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/daily-discovery.ts",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_daily_discovery_ts",
+      "target": "daily_discovery_researchdailyprospects",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/daily-discovery.ts",
+      "source_location": "L51",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_daily_discovery_ts",
+      "target": "daily_discovery_builddailyresearchrunid",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/daily-discovery.ts",
+      "source_location": "L75",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_daily_discovery_ts",
+      "target": "daily_discovery_readprivate",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/daily-discovery.ts",
+      "source_location": "L87",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_daily_discovery_ts",
+      "target": "daily_discovery_publish",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/daily-discovery.ts",
+      "source_location": "L114",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_daily_discovery_ts",
+      "target": "daily_discovery_rundailyresearch",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/daily-discovery.ts",
+      "source_location": "L131",
+      "weight": 1.0
+    },
+    {
+      "source": "daily_discovery_rundailyresearch",
+      "target": "daily_discovery_builddailyresearchrunid",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/daily-discovery.ts",
+      "source_location": "L138",
+      "weight": 1.0
+    },
+    {
+      "source": "daily_discovery_rundailyresearch",
+      "target": "daily_discovery_readprivate",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/daily-discovery.ts",
+      "source_location": "L159",
+      "weight": 1.0
+    },
+    {
+      "source": "daily_discovery_rundailyresearch",
+      "target": "daily_discovery_publish",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/daily-discovery.ts",
+      "source_location": "L191",
+      "weight": 1.0
+    },
+    {
       "source": "lib_growth_research_errors_ts",
       "target": "errors_researchingestionerror",
       "relation": "contains",
@@ -34176,87 +34446,6 @@
       "weight": 1.0
     },
     {
-      "source": "lib_operations_agreements_commercial_types_ts",
-      "target": "zod",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/commercial-types.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_commercial_types_ts",
-      "target": "lib_operations_agreements_validation",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/commercial-types.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_commercial_types_ts",
-      "target": "lib_operations_agreements_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/commercial-types.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_commercial_types_ts",
-      "target": "lib_operations_agreements_signing_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/commercial-types.ts",
-      "source_location": "L4",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_commercial_types_ts",
-      "target": "commercial_types_recurringtotalminor",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/commercial-types.ts",
-      "source_location": "L153",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_commercial_types_ts",
-      "target": "commercial_types_commercialselectiondraft",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/commercial-types.ts",
-      "source_location": "L159",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_engagement_command_test_ts",
-      "target": "strict",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/engagement-command.test.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_engagement_command_test_ts",
-      "target": "node_test",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/engagement-command.test.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_engagement_command_test_ts",
-      "target": "lib_operations_agreements_engagement_command",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/engagement-command.test.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
       "source": "view_service_executeviewcommand",
       "target": "change_requests_test_tx",
       "relation": "calls",
@@ -34804,6 +34993,16 @@
       "confidence_score": 0.8,
       "source_file": "lib/growth/research/candidate-details.ts",
       "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "daily_discovery_researchdailyprospects",
+      "target": "restricted_research_child_runrestrictedresearchchild",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/research/daily-discovery.ts",
+      "source_location": "L61",
       "weight": 1.0
     },
     {
@@ -35484,6 +35683,87 @@
       "confidence_score": 0.8,
       "source_file": "lib/operations/agreements/commercial-service.ts",
       "source_location": "L44",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_commercial_types_ts",
+      "target": "zod",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/commercial-types.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_commercial_types_ts",
+      "target": "lib_operations_agreements_validation",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/commercial-types.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_commercial_types_ts",
+      "target": "lib_operations_agreements_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/commercial-types.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_commercial_types_ts",
+      "target": "lib_operations_agreements_signing_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/commercial-types.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_commercial_types_ts",
+      "target": "commercial_types_recurringtotalminor",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/commercial-types.ts",
+      "source_location": "L153",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_commercial_types_ts",
+      "target": "commercial_types_commercialselectiondraft",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/commercial-types.ts",
+      "source_location": "L159",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_engagement_command_test_ts",
+      "target": "strict",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/engagement-command.test.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_engagement_command_test_ts",
+      "target": "node_test",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/engagement-command.test.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_engagement_command_test_ts",
+      "target": "lib_operations_agreements_engagement_command",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/engagement-command.test.ts",
+      "source_location": "L3",
       "weight": 1.0
     },
     {
@@ -39300,6 +39580,42 @@
       "confidence": "EXTRACTED",
       "source_file": "scripts/refresh-pending-first-email-drafts.ts",
       "source_location": "L217",
+      "weight": 1.0
+    },
+    {
+      "source": "scripts_run_daily_research_ts",
+      "target": "node_child_process",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/run-daily-research.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "scripts_run_daily_research_ts",
+      "target": "node_path",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/run-daily-research.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "scripts_run_daily_research_ts",
+      "target": "lib_growth_research_daily_discovery",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/run-daily-research.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "scripts_run_daily_research_ts",
+      "target": "run_daily_research_main",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/run-daily-research.ts",
+      "source_location": "L8",
       "weight": 1.0
     },
     {
@@ -47753,6 +48069,56 @@
       "weight": 1
     },
     {
+      "source": "lib_growth_research_daily_discovery_test_ts",
+      "target": "lib_growth_research_daily_discovery_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/daily-discovery.test.ts",
+      "source_location": "L7",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_daily_discovery_ts",
+      "target": "lib_growth_research_global_schema_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/daily-discovery.ts",
+      "source_location": "L16",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_daily_discovery_ts",
+      "target": "lib_growth_research_limits_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/daily-discovery.ts",
+      "source_location": "L17",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_daily_discovery_ts",
+      "target": "lib_growth_research_submission_client_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/daily-discovery.ts",
+      "source_location": "L18",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_research_daily_discovery_ts",
+      "target": "lib_growth_research_restricted_research_child_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/research/daily-discovery.ts",
+      "source_location": "L22",
+      "weight": 1
+    },
+    {
       "source": "lib_growth_research_global_identity_ts",
       "target": "lib_growth_research_mailbox_domains_ts",
       "relation": "imports",
@@ -50950,6 +51316,16 @@
       "confidence_score": 1,
       "source_file": "scripts/refresh-pending-first-email-drafts.ts",
       "source_location": "L11",
+      "weight": 1
+    },
+    {
+      "source": "scripts_run_daily_research_ts",
+      "target": "lib_growth_research_daily_discovery_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "scripts/run-daily-research.ts",
+      "source_location": "L3",
       "weight": 1
     },
     {
