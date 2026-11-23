@@ -114,3 +114,14 @@ export async function readDailyOutreachSummary(
   >`select evidence from growth.daily_outreach_summaries where london_day=${day}::date`;
   return row ? summarySchema.parse(row.evidence) : null;
 }
+
+// Read one retained snapshot, never a reconstructed live total.
+export async function readLatestDailyOutreachSummary(
+  db: GrowthDb,
+): Promise<DailyOutreachSummary | null> {
+  const [row] = await db<{ evidence: unknown }[]>`
+    select evidence from growth.daily_outreach_summaries
+    where london_day <= (statement_timestamp() at time zone 'Europe/London')::date
+    order by london_day desc limit 1`;
+  return row ? summarySchema.parse(row.evidence) : null;
+}

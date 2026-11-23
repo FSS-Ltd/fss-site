@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { CampaignDailySummary } from "./campaign-daily-summary";
+import type { CampaignDailySummaryResult } from "@/lib/growth/dashboard/campaign-daily-summary";
 import type { CampaignAccountsResult } from "@/lib/growth/dashboard/campaign-accounts";
 import { CampaignAccountReadiness } from "./campaign-account-readiness";
 import type { CampaignOverviewResult } from "@/lib/growth/dashboard/campaign-overview";
@@ -16,9 +18,11 @@ function campaignState(status: string, approved: boolean): string {
 export function CampaignOverview({
   result,
   accounts = { status: "unavailable" },
+  dailySummary = { status: "unavailable" },
 }: {
   result: CampaignOverviewResult;
   accounts?: CampaignAccountsResult;
+  dailySummary?: CampaignDailySummaryResult;
 }): React.JSX.Element {
   if (result.status === "error")
     return (
@@ -45,10 +49,7 @@ export function CampaignOverview({
           </Link>
         </div>
       </header>
-      <p className={styles.goal}>
-        Daily goal 100 · target 150. Sending depends on eligible recipients and
-        approved account capacity.
-      </p>
+      <CampaignDailySummary result={dailySummary} />
       <CampaignAccountReadiness result={accounts} />
       <CampaignPolicyEditor accounts={accounts} />
       {result.rows.length === 0 ? (
