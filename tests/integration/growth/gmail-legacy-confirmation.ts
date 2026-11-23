@@ -17,7 +17,10 @@ export async function exerciseLegacyConfirmation(
     rfcMessageId: string;
   },
 ): Promise<void> {
-  const providerCreatedAt = new Date().toISOString();
+  const [submitted] = await admin<{ at: Date | null }[]>`
+    select submitted_at as at from growth.outreach_reservations where id=${input.reservationId}`;
+  assert.ok(submitted?.at);
+  const providerCreatedAt = submitted.at.toISOString();
   const confirm = createGmailConfirmation(db, async () => ({
     binding: input.binding,
     client: {

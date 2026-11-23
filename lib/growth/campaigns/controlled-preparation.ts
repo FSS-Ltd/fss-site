@@ -32,6 +32,7 @@ export async function loadControlledPreparation(
     membershipId: string;
     connectionId: string;
     preparation: CanonicalOutreachPreparation;
+    coverageId?: string;
   },
 ) {
   const proof = await loadPolicyAuthorizedSourceProof(tx, {
@@ -78,6 +79,7 @@ export async function loadControlledPreparation(
   const effective = recipients.data.effectiveRecipient;
   const reviewed = recipients.data.reviewedRecipient;
   if (row.step !== 0 && !metadata.data.coverageId) return null;
+  if (row.step !== 0 && !input.coverageId) return null;
   const recipient = input.preparation.recipient.trim().toLowerCase();
   const digest = createHash("sha256")
     .update(
@@ -125,6 +127,7 @@ export async function loadControlledPreparation(
       connectionId: input.connectionId,
       googleSubject: anchor.googleSubject,
       submittedAt: anchor.submittedAt,
+      coverageId: input.coverageId,
     }))
   )
     return null;

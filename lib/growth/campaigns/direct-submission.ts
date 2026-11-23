@@ -16,6 +16,7 @@ import {
 } from "./reservation-repository";
 import { auditReservation, providerIdSchema } from "./reservation-shared";
 import { withinSubmissionClock } from "./submission-clock";
+import { cancelOutreachReservation } from "./reservation-settlement";
 
 export type DirectSubmissionResult =
   | { status: "accepted" }
@@ -37,6 +38,7 @@ type Input = {
   leaseToken: string;
   fence: number;
   fingerprint: string;
+  coverageId?: string;
   bound: {
     binding: GmailGrantBinding;
     client: Pick<GuardedGmailClient, "sendMessageOnce">;
@@ -154,8 +156,20 @@ export async function submitReservedOutreach(
     leaseToken: input.leaseToken,
     fence: input.fence,
     fingerprint: input.fingerprint,
+    ...(input.coverageId ? { coverageId: input.coverageId } : {}),
   });
-  if (issued.status !== "ready") return issued;
+  if (issued.status !== "ready") {
+    try {
+      await cancelOutreachReservation(db, {
+        reservationId: input.reservationId,
+        leaseToken: input.leaseToken,
+        fence: input.fence,
+      });
+    } catch {
+      return { status: "held", reason: "reservation_release_failed" };
+    }
+    return issued;
+  }
   const { issuedSnapshot: snapshot, submissionClock } = issued.value;
   const { binding, client } = input.bound;
   if (

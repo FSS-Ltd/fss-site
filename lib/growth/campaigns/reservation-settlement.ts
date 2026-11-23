@@ -87,17 +87,32 @@ export async function cancelOutreachReservation(
   return withGrowthTransaction(db, async (tx) => {
     await lockGmailRouting(tx);
     const [row] = await tx<
-      { status: string; fence: number; leaseToken: string | null }[]
-    >`select status,fence,lease_token as "leaseToken" from growth.outreach_reservations where id=${input.reservationId} for update`;
+      {
+        status: string;
+        fence: number;
+        leaseToken: string | null;
+        submittedAt: Date | null;
+        issuedSnapshot: unknown;
+      }[]
+    >`select status,fence,lease_token as "leaseToken",submitted_at as "submittedAt",issued_snapshot as "issuedSnapshot" from growth.outreach_reservations where id=${input.reservationId} for update`;
     if (
       !row ||
       row.fence !== input.fence ||
       row.leaseToken !== input.leaseToken
     )
       return held("reservation_lease_invalid");
-    if (row.status === "cancelled")
+    if (
+      row.status === "cancelled" &&
+      row.submittedAt === null &&
+      row.issuedSnapshot === null
+    )
       return { status: "ready", value: { state: "cancelled" } };
-    if (row.status !== "reserved") return held("submission_uncertain");
+    if (
+      row.status !== "reserved" ||
+      row.submittedAt !== null ||
+      row.issuedSnapshot !== null
+    )
+      return held("submission_uncertain");
     await tx`update growth.outreach_reservations set status='cancelled',completed_at=clock_timestamp() where id=${input.reservationId}`;
     await auditReservation(tx, input.reservationId, "cancelled");
     return { status: "ready", value: { state: "cancelled" } };

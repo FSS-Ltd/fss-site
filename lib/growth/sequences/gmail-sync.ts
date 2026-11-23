@@ -21,6 +21,7 @@ export type GmailSyncSummary = {
   ownMessages: number;
   reconciledDrafts: number;
   cursorReset: boolean;
+  coverageId: string | null;
 };
 
 const BOUNCE_SENDER_PATTERN =
@@ -55,6 +56,7 @@ function emptySummary(): GmailSyncSummary {
     ownMessages: 0,
     reconciledDrafts: 0,
     cursorReset: false,
+    coverageId: null,
   };
 }
 
@@ -97,7 +99,7 @@ export function createGmailReplySync({
     )
       throw new Error("Gmail profile identity or history is invalid.");
     if (!state.coverageId || !state.observedUntil || !state.historyCursor) {
-      await repository.commitReplyCoverage(db, {
+      summary.coverageId = await repository.commitReplyCoverage(db, {
         binding,
         expectedCursor: state.cursor,
         expectedCoverageId: state.coverageId,
@@ -298,7 +300,7 @@ export function createGmailReplySync({
           error instanceof GmailClientError &&
           error.code === "HISTORY_ID_EXPIRED"
         ) {
-          await repository.commitReplyCoverage(db, {
+          summary.coverageId = await repository.commitReplyCoverage(db, {
             binding,
             expectedCursor: state.cursor,
             expectedCoverageId: state.coverageId,
@@ -359,7 +361,7 @@ export function createGmailReplySync({
       BigInt(latestHistoryId) < BigInt(profile.historyId)
     )
       throw new Error("Gmail history did not reach the requested head.");
-    await repository.commitReplyCoverage(db, {
+    summary.coverageId = await repository.commitReplyCoverage(db, {
       binding,
       expectedCursor: state.cursor,
       expectedCoverageId: state.coverageId,

@@ -36,6 +36,7 @@ const MESSAGE_HOLDS = new Set([
   "permission_invalid",
   "policy_not_authorized",
   "research_permission_changed",
+  "reply_coverage_unknown",
   "rfc_message_id_changed",
   "thread_references_overflow",
   "thread_unknown",
@@ -83,7 +84,12 @@ type Dependencies = {
   ) => Promise<{ status: "complete" } | { status: "held"; reason: string }>;
   reserve: (
     db: GrowthDb,
-    input: { messageId: string; leaseToken: string; attemptKey: string },
+    input: {
+      messageId: string;
+      leaseToken: string;
+      attemptKey: string;
+      coverageId?: string;
+    },
   ) => Promise<ReservationOutcome<ReservedOutreach>>;
   submit: (
     db: GrowthDb,
@@ -92,6 +98,7 @@ type Dependencies = {
       leaseToken: string;
       fence: number;
       fingerprint: string;
+      coverageId?: string;
       bound: BoundGmailClient;
     },
   ) => Promise<SubmissionResult>;
@@ -120,6 +127,7 @@ export function createOutreachDispatcher({
     db: GrowthDb,
     dispatchAt: Date,
     messageId?: string,
+    coverageId?: string | null,
   ): Promise<DispatchSummary> {
     const summary: DispatchSummary = {
       claimed: 0,
@@ -177,6 +185,7 @@ export function createOutreachDispatcher({
         messageId: claimed.id,
         leaseToken,
         attemptKey: `outreach:${claimed.id}:${leaseToken}`,
+        ...(coverageId ? { coverageId } : {}),
       });
       if (reservation.status === "held") {
         summary.held += 1;
@@ -191,6 +200,7 @@ export function createOutreachDispatcher({
           leaseToken,
           fence,
           fingerprint: preparation.fingerprint,
+          ...(coverageId ? { coverageId } : {}),
           bound,
         });
       } catch {

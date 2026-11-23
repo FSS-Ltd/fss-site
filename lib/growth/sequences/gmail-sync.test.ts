@@ -261,6 +261,7 @@ test("bootstraps the cursor without processing history on the first run", async 
     ownMessages: 0,
     reconciledDrafts: 0,
     cursorReset: false,
+    coverageId: "coverage-new",
   });
   assert.deepEqual(state.cursorsSet, ["999"]);
   assert.deepEqual(
@@ -302,6 +303,7 @@ test("stops the sequence as a reply for an inbound message from outside the foun
   const summary = await sync(db);
 
   assert.equal(summary.replies, 1);
+  assert.equal(summary.coverageId, "coverage-new");
   assert.equal(state.stops.length, 1);
   assert.equal(state.stops[0]?.reason, "reply");
   assert.equal(state.stops[0]?.sequenceId, "enrollment-1");

@@ -10,6 +10,9 @@ import {
 } from "../../../lib/growth/campaigns/reservation-repository";
 import { createGmailConfirmation } from "../../../lib/growth/campaigns/gmail-confirmation";
 import { seedSyntheticDirectSubmission } from "./synthetic-direct-submission";
+import { submitReservedOutreach } from "../../../lib/growth/campaigns/direct-submission";
+import { postgresSequenceDispatchRepository } from "../../../lib/growth/sequences/dispatcher-repository";
+import { withTransitionClock } from "./reservation-clock";
 
 export async function exerciseFollowUpPreparation(
   admin: GrowthDb,
@@ -55,7 +58,9 @@ export async function exerciseFollowUpPreparation(
   const second = jobs.find((job) => job.key.endsWith(":2"));
   assert.ok(first && second);
   const coverageId = randomUUID();
+  let replacementCoverageId: string | null = null;
   let followUpReservationId: string | null = null;
+  const abandonedReservations: string[] = [];
   let nextCoverageId: string | null = null;
   const coverageEnd = new Date();
   const coverageStart = new Date(anchor.submittedAt.getTime() - 1000);
@@ -159,6 +164,7 @@ export async function exerciseFollowUpPreparation(
       loadControlledPreparation(tx, {
         membershipId,
         connectionId,
+        coverageId,
         preparation: {
           messageId: message.id,
           sequenceId,
@@ -179,6 +185,7 @@ export async function exerciseFollowUpPreparation(
         loadControlledPreparation(tx, {
           membershipId,
           connectionId,
+          coverageId,
           preparation: {
             messageId: message.id,
             sequenceId,
@@ -200,6 +207,7 @@ export async function exerciseFollowUpPreparation(
         loadControlledPreparation(tx, {
           membershipId,
           connectionId,
+          coverageId,
           preparation: {
             messageId: message.id,
             sequenceId,
@@ -215,12 +223,126 @@ export async function exerciseFollowUpPreparation(
       ),
       null,
     );
-    const leaseToken = randomUUID();
+    let leaseToken = randomUUID();
     await admin`update growth.email_messages set status='sending',lease_token=${leaseToken},lease_expires_at=clock_timestamp()+interval '5 minutes',outreach_claim_previous_status='queued',outreach_guarded_claim=true where id=${message.id}`;
+    assert.deepEqual(
+      await reserveOutreachAttempt(db, {
+        messageId: message.id,
+        leaseToken,
+        attemptKey: randomUUID(),
+      }),
+      { status: "held", reason: "reply_coverage_unknown" },
+    );
+    assert.deepEqual(
+      await reserveOutreachAttempt(db, {
+        messageId: message.id,
+        leaseToken,
+        attemptKey: randomUUID(),
+        coverageId: randomUUID(),
+      }),
+      { status: "held", reason: "reply_coverage_unknown" },
+    );
+    const firstReservation = await reserveOutreachAttempt(db, {
+      messageId: message.id,
+      leaseToken,
+      attemptKey: randomUUID(),
+      coverageId,
+    });
+    assert.equal(firstReservation.status, "ready");
+    abandonedReservations.push(firstReservation.value.reservationId);
+    replacementCoverageId = randomUUID();
+    const replacementEnd = new Date();
+    await admin`update growth.integration_connections set provider_cursor='302' where id=${connectionId}`;
+    await admin`insert into growth.gmail_reply_coverage(id,connection_id,grant_epoch,google_subject,history_start,history_end,observed_from,observed_until,head_requested_at,head_responded_at,state)
+      values (${replacementCoverageId},${connectionId},1,'test-subject','301','302',${coverageEnd},${replacementEnd},${replacementEnd},${replacementEnd},'complete')`;
+    let providerCalls = 0;
+    const stale = await submitReservedOutreach(db, {
+      reservationId: firstReservation.value.reservationId,
+      leaseToken,
+      fence: firstReservation.value.fence,
+      fingerprint: firstReservation.value.preparation.fingerprint,
+      coverageId,
+      bound: {
+        binding: {
+          connectionId,
+          googleSubject: "test-subject",
+          grantEpoch: 1,
+          grantedScopes: [
+            "openid",
+            "email",
+            "https://www.googleapis.com/auth/gmail.modify",
+          ],
+        },
+        client: {
+          sendMessageOnce: async () => {
+            providerCalls++;
+            throw new Error("unexpected provider call");
+          },
+        },
+      },
+    });
+    assert.deepEqual(stale, {
+      status: "held",
+      reason: "reply_coverage_unknown",
+    });
+    assert.equal(providerCalls, 0);
+    const [cancelled] = await admin<
+      { status: string; submitted: Date | null; snapshot: unknown }[]
+    >`select status,submitted_at as submitted,issued_snapshot as snapshot from growth.outreach_reservations where id=${firstReservation.value.reservationId}`;
+    assert.deepEqual(cancelled, {
+      status: "cancelled",
+      submitted: null,
+      snapshot: null,
+    });
+    await admin`update growth.email_messages set lease_expires_at=clock_timestamp()-interval '1 second' where id=${message.id}`;
+    leaseToken = randomUUID();
+    assert.ok(
+      await postgresSequenceDispatchRepository.claimDueMessage(db, {
+        now: new Date(),
+        leaseToken,
+        leaseExpiresAt: new Date(Date.now() + 300000),
+        messageId: message.id,
+      }),
+    );
+    const crashedReservation = await reserveOutreachAttempt(db, {
+      messageId: message.id,
+      leaseToken,
+      attemptKey: randomUUID(),
+      coverageId: replacementCoverageId,
+    });
+    assert.equal(crashedReservation.status, "ready");
+    abandonedReservations.push(crashedReservation.value.reservationId);
+    const [expiry] = await admin<
+      { at: Date }[]
+    >`select lease_until as at from growth.outreach_reservations where id=${crashedReservation.value.reservationId}`;
+    assert.ok(expiry);
+    const afterExpiry = new Date(expiry.at.getTime() + 1000);
+    leaseToken = randomUUID();
+    assert.ok(
+      await postgresSequenceDispatchRepository.claimDueMessage(
+        withTransitionClock(db, afterExpiry, afterExpiry, false, 0, false),
+        {
+          now: afterExpiry,
+          leaseToken,
+          leaseExpiresAt: new Date(afterExpiry.getTime() + 300000),
+          messageId: message.id,
+        },
+      ),
+    );
+    const [recovered] = await admin<
+      { status: string; submitted: Date | null; snapshot: unknown }[]
+    >`select status,submitted_at as submitted,issued_snapshot as snapshot from growth.outreach_reservations where id=${crashedReservation.value.reservationId}`;
+    assert.deepEqual(recovered, {
+      status: "cancelled",
+      submitted: null,
+      snapshot: null,
+    });
+    await admin`update growth.email_messages set lease_expires_at=clock_timestamp()+interval '5 minutes' where id=${message.id}`;
     const reserved = await reserveOutreachAttempt(db, {
       messageId: message.id,
       leaseToken,
       attemptKey: randomUUID(),
+      coverageId: replacementCoverageId,
     });
     assert.equal(reserved.status, "ready");
     followUpReservationId = reserved.value.reservationId;
@@ -229,14 +351,45 @@ export async function exerciseFollowUpPreparation(
       leaseToken,
       fence: reserved.value.fence,
       fingerprint: reserved.value.preparation.fingerprint,
+      coverageId: replacementCoverageId,
     });
     assert.equal(issued.status, "ready");
+    const afterIssuedExpiry = new Date(Date.now() + 600000);
+    assert.equal(
+      await postgresSequenceDispatchRepository.claimDueMessage(
+        withTransitionClock(
+          db,
+          afterIssuedExpiry,
+          afterIssuedExpiry,
+          false,
+          0,
+          false,
+        ),
+        {
+          now: afterIssuedExpiry,
+          leaseToken: randomUUID(),
+          leaseExpiresAt: new Date(afterIssuedExpiry.getTime() + 300000),
+          messageId: message.id,
+        },
+      ),
+      null,
+    );
+    const [inFlight] = await admin<
+      { status: string; snapshot: unknown }[]
+    >`select status,issued_snapshot as snapshot from growth.outreach_reservations where id=${issued.value.reservationId}`;
+    assert.equal(inFlight?.status, "submitting");
+    assert.ok(inFlight.snapshot);
     await seedSyntheticDirectSubmission(
       db,
       issued.value.reservationId,
       "followup-message",
       anchor.threadId,
     );
+    const [submitted] = await admin<
+      { at: Date | null }[]
+    >`select submitted_at as at from growth.outreach_reservations where id=${issued.value.reservationId}`;
+    assert.ok(submitted?.at);
+    const providerCreatedAt = submitted.at.toISOString();
     const confirm = createGmailConfirmation(db, async () => ({
       binding: {
         connectionId,
@@ -251,14 +404,14 @@ export async function exerciseFollowUpPreparation(
       client: {
         getProfile: async () => ({
           emailAddress: "j.ntagengwa@faithfulsoftware.dev",
-          historyId: "301",
+          historyId: "302",
         }),
         findByRfcMessageId: async () => ({
           messageId: "followup-message",
           gmailThreadId: anchor.threadId,
-          historyId: "301",
+          historyId: "302",
           labelIds: ["SENT"],
-          receivedAt: new Date(Date.now() - 1000).toISOString(),
+          receivedAt: providerCreatedAt,
           from: "j.ntagengwa@faithfulsoftware.dev",
           to: recipient,
           cc: null,
@@ -277,9 +430,9 @@ export async function exerciseFollowUpPreparation(
     assert.equal((await confirm(issued.value.reservationId)).status, "ready");
     nextCoverageId = randomUUID();
     const nextEnd = new Date();
-    await admin`update growth.integration_connections set provider_cursor='302' where id=${connectionId}`;
+    await admin`update growth.integration_connections set provider_cursor='303' where id=${connectionId}`;
     await admin`insert into growth.gmail_reply_coverage(id,connection_id,grant_epoch,google_subject,history_start,history_end,observed_from,observed_until,head_requested_at,head_responded_at,state)
-      values (${nextCoverageId},${connectionId},1,'test-subject','301','302',${coverageEnd},${nextEnd},${nextEnd},${nextEnd},'complete')`;
+      values (${nextCoverageId},${connectionId},1,'test-subject','302','303',${replacementEnd},${nextEnd},${nextEnd},${nextEnd},'complete')`;
     const finalFollowUp = await prepareFollowUp(db, {
       ...call,
       jobId: second.id,
@@ -303,8 +456,14 @@ export async function exerciseFollowUpPreparation(
       await admin`delete from growth.audit_log where entity_id=${followUpReservationId}`;
       await admin`delete from growth.outreach_reservations where id=${followUpReservationId}`;
     }
+    for (const reservationId of abandonedReservations) {
+      await admin`delete from growth.audit_log where entity_id=${reservationId}`;
+      await admin`delete from growth.outreach_reservations where id=${reservationId}`;
+    }
     if (nextCoverageId)
       await admin`delete from growth.gmail_reply_coverage where id=${nextCoverageId}`;
+    if (replacementCoverageId)
+      await admin`delete from growth.gmail_reply_coverage where id=${replacementCoverageId}`;
     await admin`delete from growth.gmail_reply_coverage where id=${coverageId}`;
     await admin`update growth.integration_connections set provider_cursor=null where id=${connectionId}`;
   }

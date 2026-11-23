@@ -2,6 +2,7 @@ import { withGrowthTransaction } from "../db/client";
 import { lockGmailRouting, lockGmailThread } from "./gmail-thread-association";
 import type { GrowthDb } from "../db/types";
 import { renderPublishedFollowUpContent } from "../email/gmail/render";
+import { auditReservation } from "../campaigns/reservation-shared";
 
 export type ClaimedMessage = {
   id: string;
@@ -250,6 +251,19 @@ async function claimDueMessage(
 ): Promise<ClaimedMessage | null> {
   return withGrowthTransaction(db, async (tx) => {
     await lockGmailRouting(tx);
+    const [expired] = await tx<{ id: string }[]>`
+      select r.id from growth.outreach_reservations r
+      join growth.email_messages em on em.id=r.email_message_id
+      where r.status='reserved' and r.connection_id is not null
+        and r.submitted_at is null and r.issued_snapshot is null
+        and r.lease_until<=clock_timestamp() and em.status='sending'
+        and em.lease_expires_at<=clock_timestamp() and em.lease_token=r.lease_token
+        and (${input.messageId ?? null}::uuid is null or em.id=${input.messageId ?? null}::uuid)
+      order by r.lease_until,r.id for update of r,em skip locked limit 1`;
+    if (expired) {
+      await tx`update growth.outreach_reservations set status='cancelled',completed_at=clock_timestamp() where id=${expired.id} and status='reserved' and submitted_at is null and issued_snapshot is null`;
+      await auditReservation(tx, expired.id, "cancelled");
+    }
     const rows = await tx<Array<ClaimedMessage>>`
     with target as (
       select em.id, em.status as "previousStatus",

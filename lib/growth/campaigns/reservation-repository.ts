@@ -119,6 +119,7 @@ async function lockedPreparation(
   leaseToken: string,
   day: string,
   terminal = false,
+  coverageId?: string,
 ): Promise<
   Outcome<{
     preparation: CanonicalOutreachPreparation;
@@ -187,6 +188,22 @@ async function lockedPreparation(
     now: clock.now,
   });
   if (preparation.status === "held") return preparation;
+  if (identity.membershipId) {
+    const [message] = await tx<
+      { step: number }[]
+    >`select step_number as step from growth.email_messages where id=${identity.messageId}`;
+    if (!message) return held("message_unprepared");
+    if (
+      message.step > 0 &&
+      !(await loadControlledPreparation(tx, {
+        membershipId: identity.membershipId,
+        connectionId: identity.connectionId,
+        preparation: preparation.preparation,
+        coverageId,
+      }))
+    )
+      return held("reply_coverage_unknown");
+  }
   return {
     status: "ready",
     value: {
@@ -279,13 +296,19 @@ async function validReservedHistory(
 
 export async function reserveOutreachAttempt(
   db: GrowthDb,
-  input: { messageId: string; leaseToken: string; attemptKey: string },
+  input: {
+    messageId: string;
+    leaseToken: string;
+    attemptKey: string;
+    coverageId?: string;
+  },
 ): Promise<Outcome<ReservedOutreach>> {
   if (
     !z
       .strictObject({
         messageId: z.uuid(),
         leaseToken: z.uuid(),
+        coverageId: z.uuid().optional(),
         attemptKey: z
           .string()
           .min(1)
@@ -303,7 +326,14 @@ export async function reserveOutreachAttempt(
     const [clock] = await tx<{ now: Date }[]>`select clock_timestamp() as now`;
     if (!clock) return held("invalid_time");
     const day = londonDayKey(clock.now);
-    const locked = await lockedPreparation(tx, identity, input.leaseToken, day);
+    const locked = await lockedPreparation(
+      tx,
+      identity,
+      input.leaseToken,
+      day,
+      false,
+      input.coverageId,
+    );
     if (locked.status === "held") return locked;
     const { preparation, account, now, bounds, window } = locked.value;
     const [existing] = await tx<
@@ -445,11 +475,15 @@ export async function beginOutreachSubmission(
     leaseToken: string;
     fence: number;
     fingerprint: string;
+    coverageId?: string;
   },
 ): Promise<Outcome<IssuedOutreach>> {
   if (
     !reservationLeaseSchema
-      .extend({ fingerprint: z.string().regex(/^[a-f0-9]{64}$/) })
+      .extend({
+        fingerprint: z.string().regex(/^[a-f0-9]{64}$/),
+        coverageId: z.uuid().optional(),
+      })
       .safeParse(input).success
   )
     return held("invalid_input");
@@ -468,6 +502,7 @@ export async function beginOutreachSubmission(
       input.leaseToken,
       initial.day,
       true,
+      input.coverageId,
     );
     if (locked.status === "held") return locked;
     const { preparation, account, now, bounds, window } = locked.value;
@@ -512,6 +547,7 @@ export async function beginOutreachSubmission(
           membershipId: identity.membershipId,
           connectionId: identity.connectionId,
           preparation,
+          coverageId: input.coverageId,
         })
       : null;
     if (identity.membershipId && !campaign)

@@ -29,7 +29,9 @@ export async function GET(request: Request): Promise<Response> {
         binding,
         founderEmail: env.ownerEmail,
       });
-      return sync(db);
+      const { coverageId, ...summary } = await sync(db);
+      void coverageId;
+      return summary;
     },
   );
 

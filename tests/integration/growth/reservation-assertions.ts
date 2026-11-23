@@ -7,6 +7,7 @@ import { submitReservedOutreach } from "../../../lib/growth/campaigns/direct-sub
 import { exerciseConfirmationCapacity } from "./reservation-capacity-assertions";
 import { exerciseLegacyConfirmation } from "./gmail-legacy-confirmation";
 import { exerciseConfirmationDueFairness } from "./gmail-confirmation-due";
+import { postgresSequenceDispatchRepository } from "../../../lib/growth/sequences/dispatcher-repository";
 import { withTransitionClock } from "./reservation-clock";
 import { createGmailConfirmation } from "../../../lib/growth/campaigns/gmail-confirmation";
 import type { GrowthDb } from "../../../lib/growth/db/types";
@@ -1134,9 +1135,47 @@ export async function exerciseLegacyReservation(
       await admin`delete from growth.audit_log where entity_type='outreach_reservation' and entity_id=${failureReservation.value.reservationId}`;
       await admin`delete from growth.outreach_reservations where id=${failureReservation.value.reservationId}`;
       assert.deepEqual(await submitReservedOutreach(db, waitingInput), {
-        status: "not_invoked",
-        reason: "guard_rejected",
+        status: "held",
+        reason: "reservation_lease_invalid",
       });
+      assert.equal(calls, 0);
+      const [released] = await admin<
+        { status: string; issued: unknown; submitted: Date | null }[]
+      >`select status,issued_snapshot as issued,submitted_at as submitted from growth.outreach_reservations where id=${waiting.value.reservationId}`;
+      assert.deepEqual(released, {
+        status: "cancelled",
+        issued: null,
+        submitted: null,
+      });
+      await admin`update growth.email_messages set lease_expires_at=clock_timestamp()-interval '1 second' where id=${waitingMessage}`;
+      const freshLease = randomUUID();
+      assert.ok(
+        await postgresSequenceDispatchRepository.claimDueMessage(db, {
+          now: new Date(),
+          leaseToken: freshLease,
+          leaseExpiresAt: new Date(Date.now() + 300000),
+          messageId: waitingMessage,
+        }),
+      );
+      const waitingAgain = await reserveOutreachAttempt(db, {
+        messageId: waitingMessage,
+        leaseToken: freshLease,
+        attemptKey: randomUUID(),
+      });
+      assert.ok(waitingAgain.status === "ready");
+      assert.deepEqual(
+        await submitReservedOutreach(db, {
+          ...waitingInput,
+          reservationId: waitingAgain.value.reservationId,
+          leaseToken: freshLease,
+          fence: waitingAgain.value.fence,
+          fingerprint: waitingAgain.value.preparation.fingerprint,
+        }),
+        {
+          status: "not_invoked",
+          reason: "guard_rejected",
+        },
+      );
       assert.equal(calls, 1);
       const fresh = await reserveOutreachAttempt(db, freshInput);
       assert.ok(fresh.status === "ready");
@@ -1276,7 +1315,7 @@ export async function exerciseLegacyReservation(
     const [largeState] = await admin<
       { status: string; snapshot: unknown }[]
     >`select status,issued_snapshot as snapshot from growth.outreach_reservations where id=${large.value.reservationId}`;
-    assert.deepEqual(largeState, { status: "reserved", snapshot: null });
+    assert.deepEqual(largeState, { status: "cancelled", snapshot: null });
     await exerciseConfirmationDueFairness(
       admin,
       db,

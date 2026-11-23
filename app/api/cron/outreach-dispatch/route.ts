@@ -30,14 +30,19 @@ export async function GET(request: Request): Promise<Response> {
         binding,
         founderEmail: env.ownerEmail,
       });
-      const syncSummary = await sync(db);
+      const { coverageId, ...syncSummary } = await sync(db);
 
       const dispatch = createLiveOutreachDispatcher({
         repository: postgresSequenceDispatchRepository,
         bound,
         founderEmail: env.ownerEmail,
       });
-      const dispatchSummary = await dispatch(db, new Date());
+      const dispatchSummary = await dispatch(
+        db,
+        new Date(),
+        undefined,
+        coverageId,
+      );
 
       return { sync: syncSummary, dispatch: dispatchSummary };
     },
