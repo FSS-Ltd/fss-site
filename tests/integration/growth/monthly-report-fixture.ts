@@ -101,9 +101,9 @@ export async function seedMonthlyReport(admin: GrowthDb) {
     await tx`update growth.campaign_memberships set first_confirmation_reservation_id=${reservationId},confirmed_snapshot=${admin.json(campaign)} where id=${membershipId}`;
     await tx`insert into growth.outreach_jobs(id,campaign_id,policy_version,job_type,due_at,idempotency_key,status,lease_owner,lease_until,lease_revision,anchor_reservation_id,anchor_revision) values (${jobId},${campaignId},1,'monthly_report',${campaignMonthAnniversary(observedAt)},${randomUUID()},'leased','report-worker',now()+interval '1 hour',1,${reservationId},1)`;
   });
-  const createEarlierReceipt = async () => {
+  const createEarlierReceipt = async (offsetMs = 60_000) => {
     const earlierId = randomUUID();
-    const earlierAt = new Date(observedAt.getTime() - 60_000);
+    const earlierAt = new Date(observedAt.getTime() - offsetMs);
     const earlierProvider = `earlier-${randomUUID()}`;
     await admin`insert into growth.outreach_reservations(id,idempotency_key,campaign_id,policy_version,membership_id,email_message_id,sequence_id,account_id,london_day,connection_id,grant_epoch,rfc_message_id,recipient_count,authority_fingerprint,lease_token,lease_until,fence)
       select ${earlierId},${randomUUID()},campaign_id,policy_version,membership_id,email_message_id,sequence_id,account_id,london_day,connection_id,grant_epoch,rfc_message_id,recipient_count,authority_fingerprint,lease_token,lease_until,fence+1 from growth.outreach_reservations where id=${reservationId}`;

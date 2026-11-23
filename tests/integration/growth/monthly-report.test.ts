@@ -262,3 +262,42 @@ test(
     }
   },
 );
+
+test(
+  "rejects another receipt for the same membership at the same millisecond",
+  { skip: !url },
+  async () => {
+    if (!url) return;
+    const admin = postgres(url, { max: 1 });
+    const db = postgres(url, {
+      max: 2,
+      connection: { options: "-c role=growth_app" },
+    });
+    const { seedMonthlyReport } = await import("./monthly-report-fixture");
+    let fixture: Awaited<ReturnType<typeof seedMonthlyReport>> | undefined;
+    try {
+      fixture = await seedMonthlyReport(admin);
+      const other = await fixture.createEarlierReceipt(0);
+      await admin`update growth.outreach_jobs set anchor_reservation_id=${other.id},anchor_revision=2,lease_revision=2 where id=${fixture.jobId}`;
+      const result = await publishMonthlyReport(db, {
+        jobId: fixture.jobId,
+        leaseOwner: "report-worker",
+        leaseRevision: "2",
+        anchorRevision: 2,
+        anchorReservationId: other.id,
+      });
+      assert.deepEqual(result, {
+        status: "held",
+        reason: "report_evidence_unknown",
+      });
+      const [rows] = await admin<
+        { count: number }[]
+      >`select count(*)::int as count from growth.experiment_reviews where report_job_id=${fixture.jobId}`;
+      assert.equal(rows?.count, 0);
+    } finally {
+      if (fixture) await fixture.cleanup();
+      await db.end();
+      await admin.end();
+    }
+  },
+);

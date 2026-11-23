@@ -84,7 +84,7 @@ export async function publishMonthlyReport(
     // The selected reservation itself, not merely another receipt with the same time, must be proven.
     const [proof] = await tx<
       { membershipId: string }[]
-    >`select membership_id as "membershipId" from growth.outreach_reservations where id=${input.anchorReservationId} and campaign_id=${identity.campaignId} and policy_version=${job.policyVersion}`;
+    >`select r.membership_id as "membershipId" from growth.outreach_reservations r join growth.campaign_memberships m on m.id=r.membership_id and m.first_confirmation_reservation_id=r.id and m.campaign_id=r.campaign_id and m.policy_version=r.policy_version where r.id=${input.anchorReservationId} and r.campaign_id=${identity.campaignId} and r.policy_version=${job.policyVersion}`;
     if (
       !anchor ||
       !proof ||
