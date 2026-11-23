@@ -36,6 +36,13 @@ Release on the exact revision reviewed by Code Reviewer and Security Reviewer wi
 
 Keep `GROWTH_OS_OUTREACH_PREPARATION_ENABLED` unset or false during the disabled rollout. Check the deployed signed intake, separate provider credentials and reviewed sender identities, account limits and health, current monitoring, provider signature handling and exact permitted recipients before enabling the applicable stage. Do not print credentials or signed bodies in scheduler output.
 
+### Provider bindings
+
+- Use the founder’s existing Gmail connection in Growth Settings. Verify the actual Workspace edition, required grant, monitoring continuity and a complete current usage observation before recording readiness. A connected account alone is insufficient evidence.
+- In Resend, review the actual team, environment, verified sender domain and monitored business Gmail Reply-To. The server reads `RESEND_OUTREACH_TEAM`, `RESEND_OUTREACH_ENVIRONMENT`, `RESEND_OUTREACH_FROM_EMAIL` and `RESEND_OUTREACH_REPLY_TO_EMAIL` for that binding.
+- Keep the sending and usage keys separately scoped in `RESEND_OUTREACH_SEND_API_KEY` and `RESEND_OUTREACH_USAGE_API_KEY`. The usage endpoint requires a full-access key. Review their independently recorded generation IDs in `RESEND_OUTREACH_SEND_GENERATION` and `RESEND_OUTREACH_USAGE_GENERATION`. [Resend account usage API](https://resend.com/changelog/account-usage-api)
+- Point the separately reviewed outreach webhook at `/api/webhooks/resend/outreach` for delivery, bounce and complaint events. The server uses `RESEND_OUTREACH_WEBHOOK_SECRET` and the reviewed `RESEND_OUTREACH_WEBHOOK_GENERATION`. A delivery can receive a retryable response while the prior acceptance is being recorded. Verify scoped delivery, permanent-bounce and complaint handling before enabling sends. [Resend webhook events](https://resend.com/docs/webhooks/event-types)
+
 After activation, run the same release-pinned 07:00 research entry point once and verify the signed CRM receipt for that London day. A scheduler record is configuration evidence. The CRM run receipt is execution evidence. Email delivery requires its own verified provider observation.
 
 To stop campaign work, pause the campaign and the affected sending account, then disable the applicable scheduled entries. Retain membership, permission, suppression, receipt and audit history. Reconcile uncertain reservations before any subsequent resume.
