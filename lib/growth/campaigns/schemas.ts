@@ -357,6 +357,7 @@ const reportMemberSchema = z.object({
 export const campaignReportInputSchema = z.object({
   anchor: z.object({ basis: confirmationBasisSchema, observedAt: date }),
   cutoff: date,
+  evidenceAsOf: date.optional(),
   members: z.array(reportMemberSchema),
 });
 export type CampaignReportInput = z.infer<typeof campaignReportInputSchema>;

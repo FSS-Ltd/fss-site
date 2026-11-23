@@ -29,8 +29,12 @@ function interval(successes: number, total: number): [number, number] | null {
 
 export function buildCampaignReport(raw: CampaignReportInput): CampaignReport {
   const input = campaignReportInputSchema.parse(raw);
-  if (input.anchor.observedAt > input.cutoff)
+  if (
+    input.anchor.observedAt > input.cutoff ||
+    (input.evidenceAsOf && input.evidenceAsOf < input.cutoff)
+  )
     throw new Error("invalid_report_cutoff");
+  const evidenceAsOf = input.evidenceAsOf ?? input.cutoff;
   const members = new Map<string, CampaignReportInput["members"][number]>();
   const conflicts = new Set<string>();
   for (const member of input.members) {
@@ -139,7 +143,7 @@ export function buildCampaignReport(raw: CampaignReportInput): CampaignReport {
         ambiguous.has(`reply:${reply.id}`) ||
         (reply.occurredAt <= input.cutoff &&
           reply.occurredAt <= end &&
-          (reply.recordedAt > input.cutoff ||
+          (reply.recordedAt > evidenceAsOf ||
             reply.recordedAt < reply.occurredAt)),
     );
     const positive = member.replies.filter(
@@ -148,7 +152,7 @@ export function buildCampaignReport(raw: CampaignReportInput): CampaignReport {
         reply.reviewed &&
         reply.kind === "positive" &&
         reply.recordedAt >= reply.occurredAt &&
-        reply.recordedAt <= input.cutoff &&
+        reply.recordedAt <= evidenceAsOf &&
         reply.occurredAt <= input.cutoff &&
         reply.occurredAt <= end &&
         validOrigin &&
@@ -163,7 +167,7 @@ export function buildCampaignReport(raw: CampaignReportInput): CampaignReport {
           reply.reviewed &&
           reply.kind === "positive" &&
           reply.recordedAt >= reply.occurredAt &&
-          reply.recordedAt <= input.cutoff &&
+          reply.recordedAt <= evidenceAsOf &&
           reply.occurredAt <= input.cutoff &&
           reply.occurredAt <= end,
       )
@@ -190,7 +194,7 @@ export function buildCampaignReport(raw: CampaignReportInput): CampaignReport {
           outcome.occurredAt <= input.cutoff &&
           (ambiguous.has(`outcome:${outcome.outcomeId}`) ||
             ambiguous.has(`source:${outcome.kind}:${outcome.evidenceId}`) ||
-            outcome.recordedAt > input.cutoff ||
+            outcome.recordedAt > evidenceAsOf ||
             outcome.recordedAt < outcome.occurredAt),
       );
     if (end > input.cutoff || member.meetingObservation === "censored")
@@ -215,7 +219,7 @@ export function buildCampaignReport(raw: CampaignReportInput): CampaignReport {
         outcome.membershipId === member.membershipId &&
         outcome.reviewed &&
         outcome.recordedAt >= outcome.occurredAt &&
-        outcome.recordedAt <= input.cutoff &&
+        outcome.recordedAt <= evidenceAsOf &&
         outcome.occurredAt <= input.cutoff,
     );
     const outcomes = knownOutcomes.filter(

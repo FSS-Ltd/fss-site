@@ -83,12 +83,22 @@ export async function publishMonthlyReport(
       ).getTime() !== job.due.getTime()
     )
       return held("job_lease_invalid");
-    const evidence = await loadReportEvidence(tx, identity.campaignId, job.due);
+    if (
+      job.basis !== "gmail_fss_sent_observed" &&
+      job.basis !== "resend_fss_delivery_observed"
+    )
+      return held("report_anchor_unknown");
+    const evidence = await loadReportEvidence(
+      tx,
+      identity.campaignId,
+      job.due,
+      input.anchorReservationId,
+    );
+    if (evidence.readAt < job.due) return held("report_evidence_unknown");
     const anchor = evidence.members.find(
       (member) =>
         member.confirmation.observedAt.getTime() ===
-          job.observedAt?.getTime() &&
-        member.confirmation.basis === "gmail_fss_sent_observed",
+          job.observedAt?.getTime() && member.confirmation.basis === job.basis,
     );
     // The selected reservation itself, not merely another receipt with the same time, must be proven.
     const [proof] = await tx<
@@ -101,17 +111,20 @@ export async function publishMonthlyReport(
         (member) =>
           member.membershipId === proof.membershipId &&
           member.confirmation.observedAt.getTime() ===
-            job.observedAt?.getTime(),
+            job.observedAt?.getTime() &&
+          member.confirmation.basis === job.basis,
       ) ||
       evidence.unsupported ||
+      evidence.earlierThanAnchor ||
       evidence.members.some(
         (member) => member.confirmation.observedAt < job.observedAt!,
       )
     )
       return held("report_evidence_unknown");
     const report = buildCampaignReport({
-      anchor: { basis: "gmail_fss_sent_observed", observedAt: job.observedAt },
+      anchor: { basis: job.basis, observedAt: job.observedAt },
       cutoff: job.due,
+      evidenceAsOf: evidence.readAt,
       members: evidence.members,
     });
     const [previous] = await tx<
@@ -119,7 +132,12 @@ export async function publishMonthlyReport(
     >`select id from growth.experiment_reviews where report_job_id=${input.jobId} and generation_kind='scheduled_report' and anchor_revision<${input.anchorRevision} order by anchor_revision desc limit 1`;
     const reportId = randomUUID();
     const payload = {
-      version: 1,
+      version: 2,
+      visibility: {
+        basis: "postgres_statement_snapshot",
+        snapshot: evidence.snapshot,
+        readAt: evidence.readAt.toISOString(),
+      },
       jobLease: { owner: input.leaseOwner, revision: input.leaseRevision },
       sourceAvailabilityAtCutoff: "unknown",
       sourceAvailabilityReason: "commit_time_unavailable",
@@ -131,7 +149,7 @@ export async function publishMonthlyReport(
         coverageIds: evidence.sourceCoverageIds,
       },
       lateReviewedPositives: evidence.lateReviewedPositives,
-      comparisonCopyIdentity: "unknown",
+      comparisonCopyIdentity: "frozen_when_available",
       report,
     };
     await tx`insert into growth.experiment_reviews(id,campaign_id,policy_version,reviewed_by,reviewed_at,evidence,generation_kind,report_job_id,anchor_reservation_id,anchor_revision,report_cutoff,generated_at,supersedes_id)

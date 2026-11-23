@@ -143,3 +143,90 @@ test("holds tampered content, receipt, direct submission and mismatched frozen a
   );
   assert.equal(projectConfirmation({ ...row, campaignId: randomUUID() }), null);
 });
+
+test("recognises only the exact frozen family, policy and deterministic arm", async () => {
+  const { controlledCopyFamilyFingerprint } = await import("./controlled-copy");
+  const { assignCampaignVariant } = await import("./variants");
+  const row = fixture();
+  const variants = [
+    { id: "a", version: 1, cta: "Interested?" },
+    { id: "b", version: 1, cta: "May I?" },
+  ];
+  const variantId = assignCampaignVariant({
+    businessId: row.businessId,
+    market: "GB",
+    seed: `${row.campaignId}:1`,
+    variantIds: ["a", "b"],
+  });
+  const family = controlledCopyFamilyFingerprint({
+    familyVersion: 1,
+    campaignId: row.campaignId,
+    policyVersion: 1,
+    market: "GB",
+    jurisdiction: "GB",
+    offer: "review",
+    permissionRequirement: "consent",
+    cadenceFamily: "review",
+    provider: "gmail",
+  });
+  const campaign = {
+    ...row.confirmedSnapshot,
+    variantId,
+    copyFamilyVersion: 1,
+    copyFamilySha256: family,
+  };
+  const comparable = {
+    ...row,
+    policy: {
+      version: 1,
+      offer: "review",
+      jurisdiction: "GB",
+      cadenceFamily: "review",
+      permissionRequirement: "consent",
+      variants,
+    },
+    confirmedSnapshot: campaign,
+    controlledPreparation: {
+      version: 1,
+      variantId,
+      variantVersion: 1,
+      observationProofId: campaign.sourceProof.observationProofId,
+      permissionId: campaign.permissionId,
+      copySha256: campaign.copySha256,
+      copyFamilyVersion: 1,
+      copyFamilySha256: family,
+    },
+    snapshot: { ...row.snapshot, campaign },
+  };
+  assert.equal(
+    projectConfirmation(comparable)?.comparisonFingerprint,
+    `1:${family}`,
+  );
+  const altered = { ...campaign, copyFamilySha256: "c".repeat(64) };
+  assert.equal(
+    projectConfirmation({
+      ...comparable,
+      confirmedSnapshot: altered,
+      snapshot: { ...row.snapshot, campaign: altered },
+    })?.comparisonFingerprint,
+    null,
+  );
+  const wrongArm = { ...campaign, variantId: variantId === "a" ? "b" : "a" };
+  assert.equal(
+    projectConfirmation({
+      ...comparable,
+      confirmedSnapshot: wrongArm,
+      snapshot: { ...row.snapshot, campaign: wrongArm },
+    })?.comparisonFingerprint,
+    null,
+  );
+  const unsupported = { ...campaign, copyFamilyVersion: 2 };
+  assert.equal(
+    projectConfirmation({
+      ...comparable,
+      confirmedSnapshot: unsupported,
+      snapshot: { ...row.snapshot, campaign: unsupported },
+    })?.comparisonFingerprint,
+    null,
+  );
+});

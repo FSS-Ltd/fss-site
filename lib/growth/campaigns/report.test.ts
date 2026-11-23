@@ -238,3 +238,66 @@ test("marks outcome coverage unknown when evidence arrived after cutoff", () => 
   assert.equal(group.meetingMature, 0);
   assert.equal(group.meetingUnknown, 1);
 });
+
+test("generation-visible reviews are distinct from the scheduled event cutoff", () => {
+  const m = member("late");
+  m.replies = [
+    {
+      id: "late-review",
+      kind: "positive",
+      reviewed: true,
+      occurredAt: new Date("2026-03-28"),
+      recordedAt: new Date("2026-05-01"),
+    },
+  ];
+  const historical = input([m]);
+  assert.equal(
+    buildCampaignReport(historical).groups[0].knownPositiveReplies,
+    0,
+  );
+  assert.equal(
+    buildCampaignReport({ ...historical, evidenceAsOf: new Date("2026-05-02") })
+      .groups[0].knownPositiveReplies,
+    1,
+  );
+  assert.throws(
+    () =>
+      buildCampaignReport({
+        ...historical,
+        evidenceAsOf: new Date("2026-04-01"),
+      }),
+    /invalid_report_cutoff/,
+  );
+});
+
+test("never compares provider bases or selects a sparse arm", () => {
+  const two = Array.from({ length: 60 }, (_, i) => {
+    const m = member(String(i), i < 30 ? "a" : "b");
+    if (i >= 30) m.confirmation.basis = "resend_fss_delivery_observed";
+    if (i < 30)
+      m.replies = [
+        {
+          id: `r-${i}`,
+          kind: "positive",
+          reviewed: true,
+          occurredAt: new Date("2026-03-28"),
+          recordedAt: new Date("2026-03-29"),
+        },
+      ];
+    return m;
+  });
+  assert.equal(buildCampaignReport(input(two)).winnerReason, "confounded");
+  assert.equal(buildCampaignReport(input(two)).winner, null);
+  const sparse = two.slice(0, 58).map((m) => ({
+    ...m,
+    confirmation: {
+      ...m.confirmation,
+      basis: "gmail_fss_sent_observed" as const,
+    },
+  }));
+  assert.equal(
+    buildCampaignReport(input(sparse)).winnerReason,
+    "insufficient_evidence",
+  );
+  assert.equal(buildCampaignReport(input(sparse)).winner, null);
+});

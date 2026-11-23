@@ -301,3 +301,116 @@ test(
     }
   },
 );
+
+test(
+  "publishes a generation-visible Gmail winner only with classified replies and continuous coverage",
+  { skip: !url },
+  async () => {
+    if (!url) return;
+    const target = new URL(url);
+    if (
+      !["127.0.0.1", "localhost", "[::1]"].includes(target.hostname) ||
+      target.pathname !== "/fss_growth_test"
+    )
+      throw new Error("synthetic local database required");
+    const admin = postgres(url, { max: 1 }),
+      db = postgres(url, {
+        max: 3,
+        connection: { options: "-c role=growth_app" },
+      });
+    const { seedComparableReport } =
+      await import("./report-comparison-fixture");
+    const { withGrowthTransaction } =
+      await import("../../../lib/growth/db/client");
+    const { loadReportEvidence } =
+      await import("../../../lib/growth/campaigns/report-evidence");
+    const { buildCampaignReport } =
+      await import("../../../lib/growth/campaigns/report");
+    let fixture: Awaited<ReturnType<typeof seedComparableReport>> | undefined;
+    try {
+      fixture = await seedComparableReport(admin);
+      const cutoff = new Date("2026-02-28T11:00:00Z");
+      const getEvidence = () =>
+        withGrowthTransaction(db, (tx) =>
+          loadReportEvidence(tx, fixture!.campaignId, cutoff),
+        );
+      const clean = await getEvidence();
+      assert.equal(clean.observedCompleteAtRead, 60);
+      assert.equal(clean.lateReviewedPositives.length, 20);
+      const [firstB] = fixture.ids.filter((item) => item.variant === "b");
+      assert.ok(firstB);
+      const inbound = randomUUID(),
+        providerId = `unreviewed-${randomUUID()}`;
+      await admin`insert into growth.email_messages(id,sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key,provider_message_id,provider_thread_id,received_at) values (${inbound},${firstB.sequence},${firstB.prospect},${firstB.contact},'gmail','inbound',0,'received',${randomUUID()},${providerId},${firstB.thread},'2026-02-02T12:00:00Z')`;
+      await admin`insert into growth.email_events(email_message_id,provider,provider_event_id,event_type,occurred_at) values (${inbound},'gmail',${providerId},'reply','2026-02-02T12:00:00Z')`;
+      const incomplete = await getEvidence();
+      assert.equal(incomplete.observedCompleteAtRead, 59);
+      const noWinner = buildCampaignReport({
+        anchor: {
+          basis: "gmail_fss_sent_observed",
+          observedAt: clean.members[0].confirmation.observedAt,
+        },
+        cutoff,
+        evidenceAsOf: incomplete.readAt,
+        members: incomplete.members,
+      });
+      assert.equal(noWinner.winner, null);
+      assert.equal(
+        noWinner.groups.reduce((sum, g) => sum + g.missingReplies, 0),
+        1,
+      );
+      await admin`delete from growth.email_events where email_message_id=${inbound}`;
+      await admin`delete from growth.email_messages where id=${inbound}`;
+      const gap = randomUUID();
+      await admin`insert into growth.gmail_reply_coverage(id,connection_id,grant_epoch,google_subject,history_start,history_end,observed_from,observed_until,head_requested_at,head_responded_at,state,reason) select ${gap},connection_id,grant_epoch,google_subject,'200','201','2026-02-01T00:00:00Z','2026-02-01T01:00:00Z','2026-02-01T01:01:00Z','2026-02-01T01:02:00Z','gap','synthetic_gap' from growth.gmail_reply_coverage where connection_id=${fixture.connectionId} and state='complete'`;
+      const gapped = await getEvidence();
+      assert.equal(gapped.observedCompleteAtRead, 0);
+      await admin`delete from growth.gmail_reply_coverage where id=${gap}`;
+      const result = await publishMonthlyReport(db, {
+        jobId: fixture.jobId,
+        leaseOwner: "report-worker",
+        leaseRevision: "1",
+        anchorRevision: 1,
+        anchorReservationId: fixture.anchorId,
+      });
+      if (result.status !== "ready") throw new Error(result.reason);
+      const [stored] = await admin<
+        {
+          evidence: {
+            version: number;
+            sourceAvailabilityAtCutoff: string;
+            visibility: { basis: string; snapshot: string; readAt: string };
+            report: {
+              winner: string | null;
+              winnerReason: string;
+              groups: Array<{ mature: number; positiveReplies: number }>;
+            };
+            lateReviewedPositives: unknown[];
+          };
+        }[]
+      >`select evidence from growth.experiment_reviews where id=${result.value.reportId}`;
+      assert.equal(stored?.evidence.version, 2);
+      assert.equal(
+        stored?.evidence.visibility.basis,
+        "postgres_statement_snapshot",
+      );
+      assert.ok(stored?.evidence.visibility.snapshot);
+      assert.equal(stored?.evidence.sourceAvailabilityAtCutoff, "unknown");
+      assert.equal(stored?.evidence.report.winner, "a");
+      assert.equal(stored?.evidence.report.winnerReason, "clear_interval");
+      assert.deepEqual(
+        stored?.evidence.report.groups.map((g) => g.mature),
+        [30, 30],
+      );
+      assert.deepEqual(
+        stored?.evidence.report.groups.map((g) => g.positiveReplies),
+        [20, 0],
+      );
+      assert.equal(stored?.evidence.lateReviewedPositives.length, 20);
+    } finally {
+      if (fixture) await fixture.cleanup();
+      await db.end();
+      await admin.end();
+    }
+  },
+);

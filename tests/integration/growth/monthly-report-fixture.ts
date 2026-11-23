@@ -131,7 +131,7 @@ export async function seedMonthlyReport(
       values (${replyId},${sequenceId},${prospectId},${contactId},'gmail','inbound',0,'received',${randomUUID()},${providerMessage},${threadId},${receivedAt})`;
     await admin`insert into growth.email_events(email_message_id,provider,provider_event_id,event_type,occurred_at) values (${replyId},'gmail',${providerMessage},'reply',${receivedAt})`;
     await admin`insert into growth.outreach_events(id,campaign_id,policy_version,membership_id,event_type,occurred_at,request_id,request_hash,actor_id,result_id,review_inbound_message_id,review_reply_kind)
-      values (${eventId},${campaignId},1,${membershipId},'record_reply',${reviewedAt},${eventId},${"a".repeat(64)},${"b".repeat(64)},${replyId},${replyId},'positive')`;
+      values (${eventId},${campaignId},1,${membershipId},'record_reply',${reviewedAt},${eventId},${"a".repeat(64)},${createHash("sha256").update("j.ntagengwa@faithfulsoftware.dev").digest("hex")},${replyId},${replyId},'positive')`;
     return replyId;
   };
   const cleanup = async () => {

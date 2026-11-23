@@ -149,7 +149,21 @@ for (const scenario of [
           await tx`insert into growth.prospects(id,business_id,primary_contact_id,status,fit_score,opportunity_summary,recommended_offer,estimated_one_off_min_pence,estimated_one_off_max_pence,assigned_owner_email) values (${prospect},${business},${contact},'ready_for_email_review',0,'test','test',0,0,'j.ntagengwa@faithfulsoftware.dev')`;
           await tx`insert into growth.sequence_enrollments(id,prospect_id,contact_id,status) values (${sequence},${prospect},${contact},'active')`;
           await tx`insert into growth.email_messages(id,sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key) values (${message},${sequence},${prospect},${contact},'resend','outbound',0,'queued',${randomUUID()})`;
-          await tx`insert into growth.campaigns(id,version,request_id,name,policy,account_connection_id) values (${campaign},1,${randomUUID()},'receipt test',${tx.json({ accountConnectionId: account, provider: "resend" })},${account})`;
+          await tx`insert into growth.campaigns(id,version,request_id,name,policy,account_connection_id) values (${campaign},1,${randomUUID()},'receipt test',${tx.json(
+            {
+              version: 1,
+              accountConnectionId: account,
+              provider: "resend",
+              offer: "review",
+              jurisdiction: "GB",
+              permissionRequirement: "consent",
+              cadenceFamily: "review",
+              variants: [
+                { id: "a", version: 1, cta: "May I?" },
+                { id: "b", version: 1, cta: "Could I?" },
+              ],
+            },
+          )},${account})`;
           await tx`insert into growth.campaign_memberships(id,campaign_id,policy_version,business_id,prospect_id,sequence_id,request_id,status) values (${member},${campaign},1,${business},${prospect},${sequence},${randomUUID()},'active')`;
           await tx`insert into growth.outreach_reservations(id,idempotency_key,campaign_id,policy_version,membership_id,email_message_id,sequence_id,account_id,london_day,connection_id,outreach_provider,resend_send_generation,recipient_count,authority_fingerprint,lease_token,lease_until,fence) values (${reservation},${attempt},${campaign},1,${member},${message},${sequence},${account},current_date,${account},'resend',${generation},1,repeat('a',64),${lease},now()+interval '5 minutes',1)`;
           await tx`update growth.outreach_reservations set status='submitting',submitted_at=${submittedAt}::timestamptz + interval '321 microseconds',issued_snapshot=${tx.json(snapshot)},issued_snapshot_hash=${bodySha256} where id=${reservation}`;
@@ -540,6 +554,24 @@ for (const scenario of [
           status:
             scenario === "adverse_before_delivery" ? "cancelled" : "queued",
         });
+        if (scenario === "active") {
+          const { withGrowthTransaction } =
+            await import("../../../lib/growth/db/client");
+          const { loadReportEvidence } =
+            await import("../../../lib/growth/campaigns/report-evidence");
+          const projected = await withGrowthTransaction(db, (tx) =>
+            loadReportEvidence(tx, campaign, new Date(), reservation),
+          );
+          assert.equal(projected.unsupported, 0);
+          assert.equal(projected.members.length, 1);
+          assert.equal(
+            projected.members[0].confirmation.basis,
+            "resend_fss_delivery_observed",
+          );
+          assert.equal(projected.members[0].replyCoverage, "unknown");
+          assert.equal(projected.members[0].comparisonFingerprint, null);
+          assert.deepEqual(projected.sourceReceiptIds, [reservation]);
+        }
         const second = await send(wire.raw, wire.headers);
         if (second.status !== "ready") throw new Error(second.reason);
         assert.equal(second.value.replay, true);
