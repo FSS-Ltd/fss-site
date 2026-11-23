@@ -73,7 +73,7 @@ for (const scenario of [
               environment: "development" as const,
               sender,
               domain: sender.split("@")[1]!,
-              replyTo: sender,
+              replyTo: founder.email,
               sendGeneration: randomUUID(),
               usageGeneration: randomUUID(),
             };
@@ -84,7 +84,7 @@ for (const scenario of [
             };
             Object.assign(process.env, {
               RESEND_OUTREACH_FROM_EMAIL: sender,
-              RESEND_OUTREACH_REPLY_TO_EMAIL: sender,
+              RESEND_OUTREACH_REPLY_TO_EMAIL: binding.replyTo,
               RESEND_OUTREACH_TEAM: binding.team,
               RESEND_OUTREACH_ENVIRONMENT: binding.environment,
               RESEND_OUTREACH_SEND_GENERATION: binding.sendGeneration,
@@ -126,7 +126,7 @@ for (const scenario of [
               monthly: window,
               rateLimit: { limit: 1, duration: "1000ms" },
             };
-            await tx`insert into growth.integration_connections(id,provider,subject_email,status,google_subject,granted_scopes) values (${gmail},'gmail',${sender},'connected','test-subject',${["openid", "email", "https://www.googleapis.com/auth/gmail.modify"]})`;
+            await tx`insert into growth.integration_connections(id,provider,subject_email,status,google_subject,granted_scopes) values (${gmail},'gmail',${binding.replyTo},'connected','test-subject',${["openid", "email", "https://www.googleapis.com/auth/gmail.modify"]})`;
             await tx`insert into growth.integration_connections(id,provider,subject_email) values (${id},'resend',${sender})`;
             await tx`insert into growth.outreach_account_controls(connection_id,provider,state,verified_subject,verified_grant_epoch,verified_scopes,resend_team,resend_environment,resend_binding) values (${id},'resend','active',null,null,null,${binding.team},${binding.environment},${tx.json(binding)})`;
             await tx`insert into growth.outreach_account_reviews(id,connection_id,request_id,request_hash,actor_id,kind,evidence,resulting_version) values (${review},${id},${randomUUID()},repeat('a',64),${founder.actorId},'resend_configure',${tx.json({ binding })},2), (${healthReview},${id},${randomUUID()},repeat('b',64),${founder.actorId},'record_health',${tx.json({ evidence: health })},3)`;
@@ -418,7 +418,7 @@ for (const scenario of [
               "held",
             );
             await tx`update growth.outreach_permissions set evidence=jsonb_set(evidence,'{explicitOptIn}','true'::jsonb) where id=${permissionId}`;
-            const founderGmail = randomUUID(),
+            const founderGmail = gmail,
               limitsReview = randomUUID(),
               gmailHealthReview = randomUUID();
             const scopes = [
@@ -426,8 +426,7 @@ for (const scenario of [
               "email",
               "https://www.googleapis.com/auth/gmail.modify",
             ];
-            await tx`insert into growth.integration_connections(id,provider,subject_email,status,google_subject,granted_scopes) values (${founderGmail},'gmail',${founder.email},'connected','founder-subject',${scopes})`;
-            await tx`insert into growth.outreach_account_controls(connection_id,provider,state,verified_subject,verified_grant_epoch,verified_scopes) values (${founderGmail},'gmail','active','founder-subject',1,${scopes})`;
+            await tx`insert into growth.outreach_account_controls(connection_id,provider,state,verified_subject,verified_grant_epoch,verified_scopes) values (${founderGmail},'gmail','active','test-subject',1,${scopes})`;
             const limits = {
               source: "test",
               edition: "workspace",
@@ -461,12 +460,12 @@ for (const scenario of [
               },
             };
             const envelope = {
-              googleSubject: "founder-subject",
+              googleSubject: "test-subject",
               googleScopes: scopes,
             };
             await tx`insert into growth.outreach_account_reviews(id,connection_id,request_id,request_hash,actor_id,kind,evidence,resulting_version) values (${limitsReview},${founderGmail},${randomUUID()},repeat('c',64),${founder.actorId},'record_limits',${tx.json({ ...envelope, evidence: limits })},2),(${gmailHealthReview},${founderGmail},${randomUUID()},repeat('d',64),${founder.actorId},'record_health',${tx.json({ ...envelope, evidence: health })},3)`;
             await tx`update growth.outreach_account_controls set limits_review_id=${limitsReview},health_review_id=${gmailHealthReview} where connection_id=${founderGmail}`;
-            await tx`insert into growth.outreach_provider_usage(account_id,observed_at,rolling_messages,rolling_recipients,complete,health,connection_id,grant_epoch,captured_at,window_start,history_start,history_end,fresh_until,evidence_version,provider_message_ids,observation_subject,observation_scopes,observation_revision) values (${founderGmail},now(),0,0,true,'healthy',${founderGmail},1,now(),now()-interval '24 hours','100','200',now()+interval '1 minute',2,'[]'::jsonb,'founder-subject',${scopes},1)`;
+            await tx`insert into growth.outreach_provider_usage(account_id,observed_at,rolling_messages,rolling_recipients,complete,health,connection_id,grant_epoch,captured_at,window_start,history_start,history_end,fresh_until,evidence_version,provider_message_ids,observation_subject,observation_scopes,observation_revision) values (${founderGmail},now(),0,0,true,'healthy',${founderGmail},1,now(),now()-interval '24 hours','100','200',now()+interval '1 minute',2,'[]'::jsonb,'test-subject',${scopes},1)`;
             const invalidAttempt = {
               messageId: prepared.id,
               leaseToken: claimInput.leaseToken,
@@ -505,8 +504,8 @@ for (const scenario of [
             const replacedMonitorRollback = new Error("restore monitor");
             await assert.rejects(
               tx.savepoint(async (sp) => {
-                await sp`delete from growth.integration_connections where id=${gmail}`;
-                await sp`insert into growth.integration_connections(id,provider,subject_email,status,google_subject,granted_scopes) values (${randomUUID()},'gmail',${sender},'connected','test-subject',${["openid", "email", "https://www.googleapis.com/auth/gmail.modify"]})`;
+                await sp`update growth.integration_connections set subject_email=${`old-${randomUUID()}@example.test`} where id=${gmail}`;
+                await sp`insert into growth.integration_connections(id,provider,subject_email,status,google_subject,granted_scopes) values (${randomUUID()},'gmail',${binding.replyTo},'connected','test-subject',${["openid", "email", "https://www.googleapis.com/auth/gmail.modify"]})`;
                 assert.equal(
                   (await beginResendOutreachSubmission(db, beginInput)).status,
                   "held",
@@ -618,7 +617,7 @@ for (const scenario of [
               connectionId: gmail,
               googleSubject: "test-subject",
               grantEpoch: 1,
-              address: sender,
+              address: binding.replyTo,
               grantedScopes: [
                 "email",
                 "https://www.googleapis.com/auth/gmail.modify",
@@ -665,6 +664,8 @@ for (const scenario of [
                 contactId: contact.id,
                 recipient: email,
                 sendGeneration: binding.sendGeneration,
+                membershipId: member.id,
+                founder,
               });
             }
             throw rollback;

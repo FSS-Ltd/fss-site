@@ -2,6 +2,7 @@ import type { FounderSession } from "../auth/require-founder";
 import type { GrowthTransaction } from "../db/types";
 import { createSequenceStopTransaction } from "../sequences/stop-repository";
 import { stopSequenceInTransaction } from "../sequences/stop";
+import { loadExactReplyReviewContext } from "./campaign-exact-reply-review";
 import { matchesDirectSubmissionEvidence } from "./direct-submission-evidence";
 import { cancelCampaignJobs } from "./lifecycle";
 import type { CampaignCommand } from "./schemas";
@@ -15,6 +16,13 @@ export async function reviewCampaignReply(
   founder: FounderSession,
   correlationId: string,
 ): Promise<CampaignMutation> {
+  const [mode] = await tx<
+    { exact: boolean }[]
+  >`select exists(select 1 from growth.email_messages em join growth.email_events ev on ev.email_message_id=em.id and ev.provider='gmail' and ev.provider_event_id=em.provider_message_id where em.id=${command.inboundMessageId} and ev.outreach_reply_attribution is not null) as exact`;
+  if (mode?.exact) {
+    const context = await loadExactReplyReviewContext(tx, command, founder);
+    return applyReplyReview(tx, command, founder, correlationId, context);
+  }
   const [identity] = await tx<
     { campaignId: string; businessId: string; connectionId: string | null }[]
   >`
@@ -155,19 +163,41 @@ export async function reviewCampaignReply(
     where sequence_id=${member.sequenceId}`;
   if (attribution?.count !== 1) throw new Error("reply_evidence_ambiguous");
 
+  return applyReplyReview(tx, command, founder, correlationId, {
+    campaignId: member.campaignId,
+    version: member.version,
+    sequenceId: member.sequenceId,
+    sequenceStatus: sequence.status,
+  });
+}
+
+async function applyReplyReview(
+  tx: GrowthTransaction,
+  command: ReviewCommand,
+  founder: FounderSession,
+  correlationId: string,
+  context: {
+    campaignId: string;
+    version: number;
+    sequenceId: string;
+    sequenceStatus: string;
+  },
+): Promise<CampaignMutation> {
   if (command.kind !== "bot" && command.kind !== "out_of_office") {
     const stop = createSequenceStopTransaction(tx);
-    if (["pending_approval", "active", "paused"].includes(sequence.status)) {
+    if (
+      ["pending_approval", "active", "paused"].includes(context.sequenceStatus)
+    ) {
       await stopSequenceInTransaction(stop, {
-        sequenceId: member.sequenceId,
+        sequenceId: context.sequenceId,
         reason: command.kind === "opt_out" ? "do_not_contact" : "reply",
         actor: founder,
         correlationId,
       });
     } else {
-      const enrollment = await stop.lockEnrollment(member.sequenceId);
+      const enrollment = await stop.lockEnrollment(context.sequenceId);
       if (!enrollment) throw new Error("review_context_changed");
-      await stop.cancelPendingMessages(member.sequenceId);
+      await stop.cancelPendingMessages(context.sequenceId);
       if (command.kind === "opt_out") {
         const inserted = await stop.insertDoNotContactSuppression({
           normalisedEmail: enrollment.normalisedEmail,
@@ -181,18 +211,18 @@ export async function reviewCampaignReply(
             correlationId,
             actorType: "founder",
             actorId: founder.actorId,
-            sequenceId: member.sequenceId,
+            sequenceId: context.sequenceId,
             reason: "do_not_contact",
           });
       }
     }
-    await cancelCampaignJobs(tx, member.campaignId, command.membershipId);
+    await cancelCampaignJobs(tx, context.campaignId, command.membershipId);
     await tx`update growth.campaign_memberships set status='replied',updated_at=clock_timestamp()
       where id=${command.membershipId} and status in ('active','paused','review')`;
   }
   return {
-    campaignId: member.campaignId,
-    version: member.version,
+    campaignId: context.campaignId,
+    version: context.version,
     membershipId: command.membershipId,
     resultId: command.inboundMessageId,
   };

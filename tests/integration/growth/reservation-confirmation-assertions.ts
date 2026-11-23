@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
+import { executeCampaignCommand } from "../../../lib/growth/campaigns/commands";
 import type { GrowthDb } from "../../../lib/growth/db/types";
 import { withGrowthTransaction } from "../../../lib/growth/db/client";
 import { postgresGmailSyncRepository } from "../../../lib/growth/sequences/gmail-sync-repository";
@@ -316,6 +317,7 @@ export async function exerciseGmailConfirmation(
     fromAddress: copyFacts.email,
     fromHeader: `Owner <${copyFacts.email}>`,
   };
+  const reviewRequest = randomUUID();
   try {
     const recorded = await postgresGmailSyncRepository.recordInboundEvent(db, {
       binding: {
@@ -345,7 +347,37 @@ export async function exerciseGmailConfirmation(
       reservationId: campaignBegin.reservationId,
       provider: "gmail",
     });
+    const [reviewFacts] = await admin<
+      { inboundId: string; policy: number; prospect: number; contact: number }[]
+    >`select em.id as "inboundId",m.policy_version as policy,p.version as prospect,c.version as contact from growth.email_messages em join growth.campaign_memberships m on m.sequence_id=em.sequence_enrollment_id join growth.prospects p on p.id=m.prospect_id join growth.contacts c on c.id=p.primary_contact_id where em.provider_message_id=${inboundId} and m.id=${member}`;
+    assert.ok(reviewFacts);
+    const founder = {
+      email,
+      actorId: createHash("sha256").update(email).digest("hex"),
+    };
+    const review = {
+      type: "record_reply" as const,
+      requestId: reviewRequest,
+      membershipId: member,
+      inboundMessageId: reviewFacts.inboundId,
+      expectedPolicyVersion: reviewFacts.policy,
+      expectedProspectVersion: reviewFacts.prospect,
+      expectedContactVersion: reviewFacts.contact,
+      kind: "bot" as const,
+    };
+    await admin`update growth.integration_connections set version=version+1 where id=${id}`;
+    try {
+      assert.equal(
+        (await executeCampaignCommand(db, review, founder, reviewRequest)).id,
+        reviewFacts.inboundId,
+      );
+    } finally {
+      await admin`update growth.integration_connections set version=${connection.version} where id=${id}`;
+    }
   } finally {
+    await admin`delete from growth.outreach_outbox where event_id in (select id from growth.outreach_events where request_id=${reviewRequest})`;
+    await admin`delete from growth.outreach_events where request_id=${reviewRequest}`;
+    await admin`delete from growth.audit_log where correlation_id=${reviewRequest}`;
     await admin`delete from growth.email_events where email_message_id in (select id from growth.email_messages where provider_message_id=${inboundId})`;
     await admin`delete from growth.email_messages where provider_message_id=${inboundId}`;
   }

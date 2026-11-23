@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
+import type { FounderSession } from "../../../lib/growth/auth/require-founder";
+import { executeCampaignCommand } from "../../../lib/growth/campaigns/commands";
 import type { GrowthDb, GrowthTransaction } from "../../../lib/growth/db/types";
 import { classifyGmailRouting } from "../../../lib/growth/sequences/gmail-routing-repository";
 import { postgresGmailSyncRepository } from "../../../lib/growth/sequences/gmail-sync-repository";
@@ -17,6 +19,8 @@ export async function exerciseExactResendReply(
     contactId: string;
     recipient: string;
     sendGeneration: string;
+    membershipId: string;
+    founder: FounderSession;
   },
 ): Promise<void> {
   const [submitted] = await tx<
@@ -190,6 +194,38 @@ export async function exerciseExactResendReply(
   assert.equal(
     (await postgresGmailSyncRepository.recordInboundEvent(db, record))
       .alreadyRecorded,
+    true,
+  );
+  const [reviewFacts] = await tx<
+    { inboundId: string; policy: number; prospect: number; contact: number }[]
+  >`select em.id as "inboundId",m.policy_version as policy,p.version as prospect,c.version as contact from growth.email_messages em join growth.campaign_memberships m on m.sequence_id=em.sequence_enrollment_id join growth.prospects p on p.id=m.prospect_id join growth.contacts c on c.id=p.primary_contact_id where em.provider_message_id=${messageId} and m.id=${input.membershipId}`;
+  assert.ok(reviewFacts);
+  const review = {
+    type: "record_reply" as const,
+    requestId: randomUUID(),
+    membershipId: input.membershipId,
+    inboundMessageId: reviewFacts.inboundId,
+    expectedPolicyVersion: reviewFacts.policy,
+    expectedProspectVersion: reviewFacts.prospect,
+    expectedContactVersion: reviewFacts.contact,
+    kind: "bot" as const,
+  };
+  await tx`update growth.integration_connections set google_subject='different-subject' where id=${input.monitorId}`;
+  await assert.rejects(
+    executeCampaignCommand(db, review, input.founder, randomUUID()),
+    /review_context_changed/,
+  );
+  await tx`update growth.integration_connections set google_subject='test-subject',version=version+1 where id=${input.monitorId}`;
+  const reviewed = await executeCampaignCommand(
+    db,
+    review,
+    input.founder,
+    randomUUID(),
+  );
+  assert.equal(reviewed.id, reviewFacts.inboundId);
+  assert.equal(
+    (await executeCampaignCommand(db, review, input.founder, randomUUID()))
+      .alreadyExisted,
     true,
   );
 }
