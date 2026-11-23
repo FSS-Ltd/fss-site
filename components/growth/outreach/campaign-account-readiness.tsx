@@ -1,4 +1,8 @@
 import Link from "next/link";
+import {
+  CampaignAccountActions,
+  ResendSetupAction,
+} from "./campaign-account-actions";
 import type { CampaignAccountsResult } from "@/lib/growth/dashboard/campaign-accounts";
 import { formatGrowthDateTime } from "@/lib/growth/dashboard/formatters";
 import styles from "./campaign-overview.module.css";
@@ -56,12 +60,14 @@ export function CampaignAccountReadiness({
                   <dd>{evidence(account.usageObservation)}</dd>
                 </div>
               </dl>
+              <CampaignAccountActions account={account} />
               <p>
                 Recorded evidence does not itself establish readiness. Campaign,
                 recipient and current account checks still apply.
               </p>
             </section>
           ))}
+          <ResendSetupAction setup={result.resendSetup} />
           {result.resendConfiguration === "unknown" && (
             <p>
               Resend account configuration is unavailable or not associated with

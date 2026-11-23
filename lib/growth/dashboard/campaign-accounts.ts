@@ -21,6 +21,16 @@ export type CampaignAccount = {
   selectable: boolean;
   readiness: { status: "ready" } | { status: "held"; reason: string };
   recordedRamp: number | null;
+  control: {
+    state: "paused" | "active" | "halted";
+    version: number;
+    ramp: 25 | 50 | 100 | 150;
+    prerequisites: { status: "ready" } | { status: "held"; reason: string };
+    advance: {
+      next: 50 | 100 | 150;
+      readiness: { status: "ready" } | { status: "held"; reason: string };
+    } | null;
+  } | null;
   limitsEvidence: { observedAt: string; expiresAt: string } | null;
   healthEvidence: { observedAt: string; expiresAt: string } | null;
   usageObservation: { observedAt: string; expiresAt: string } | null;
@@ -30,6 +40,9 @@ export type CampaignAccountsResult =
       status: "ready";
       accounts: CampaignAccount[];
       resendConfiguration: "available" | "unknown";
+      resendSetup:
+        | { status: "available"; sender: string; expectedVersion: number }
+        | { status: "held"; reason: string };
     }
   | { status: "unavailable" };
 
@@ -69,6 +82,37 @@ function gmailEvidence(
       }
     : null;
 }
+type ControlRow = {
+  state: string | null;
+  controlVersion: number | null;
+  ramp: number | null;
+  lastRampAt: Date | null;
+};
+function controlFields(row: ControlRow) {
+  if (
+    (row.state !== "paused" &&
+      row.state !== "active" &&
+      row.state !== "halted") ||
+    !row.controlVersion ||
+    !Number.isSafeInteger(row.controlVersion) ||
+    row.controlVersion < 1 ||
+    ![25, 50, 100, 150].includes(row.ramp ?? 0)
+  )
+    return null;
+  const state: "paused" | "active" | "halted" = row.state;
+  const ramp = z
+    .union([z.literal(25), z.literal(50), z.literal(100), z.literal(150)])
+    .parse(row.ramp);
+  return {
+    state,
+    version: row.controlVersion,
+    ramp,
+    lastRampAt: row.lastRampAt,
+  };
+}
+function nextRamp(ramp: 25 | 50 | 100 | 150): 50 | 100 | 150 | null {
+  return ramp === 25 ? 50 : ramp === 50 ? 100 : ramp === 100 ? 150 : null;
+}
 // No credentials, raw review evidence or provider calls cross this boundary.
 export async function getCampaignAccounts(
   founder: FounderSession,
@@ -86,6 +130,9 @@ export async function getCampaignAccounts(
           subject: string | null;
           scopes: string[];
           ramp: number | null;
+          state: string | null;
+          controlVersion: number | null;
+          lastRampAt: Date | null;
           limits: unknown;
           health: unknown;
           usageAt: Date | null;
@@ -93,7 +140,7 @@ export async function getCampaignAccounts(
         }[]
       >`
         select i.id, i.subject_email as sender, i.status, i.google_subject as subject,
-          i.granted_scopes as scopes, c.ramp, l.evidence as limits, h.evidence as health,
+          i.granted_scopes as scopes, c.ramp,c.state,c.version as "controlVersion",c.last_ramp_at as "lastRampAt", l.evidence as limits, h.evidence as health,
           u.captured_at as "usageAt", u.fresh_until as "usageExpires"
         from growth.integration_connections i
         left join growth.outreach_account_controls c on c.connection_id=i.id and c.provider='gmail'
@@ -114,6 +161,20 @@ export async function getCampaignAccounts(
           gmail.id,
           "active",
         );
+        const known = controlFields(gmail);
+        const prerequisites = known
+          ? await loadConfiguredAccountReadiness(tx, gmail.id, "prerequisites")
+          : null;
+        const next = known?.state === "active" ? nextRamp(known.ramp) : null;
+        const advanceReadiness =
+          next && known?.lastRampAt
+            ? await loadConfiguredAccountReadiness(
+                tx,
+                gmail.id,
+                "prerequisites",
+                known.lastRampAt,
+              )
+            : null;
         accounts.push({
           id: gmail.id,
           provider: "gmail",
@@ -126,6 +187,24 @@ export async function getCampaignAccounts(
             ),
           readiness,
           recordedRamp: gmail.ramp,
+          control:
+            known && prerequisites
+              ? {
+                  state: known.state,
+                  version: known.version,
+                  ramp: known.ramp,
+                  prerequisites,
+                  advance: next
+                    ? {
+                        next,
+                        readiness: advanceReadiness ?? {
+                          status: "held",
+                          reason: "ramp_history_unknown",
+                        },
+                      }
+                    : null,
+                }
+              : null,
           limitsEvidence: gmailEvidence(
             gmail.limits,
             gmail.subject,
@@ -149,25 +228,70 @@ export async function getCampaignAccounts(
       }
       const usableRuntime =
         runtime && runtime.binding.replyTo === founder.email ? runtime : null;
-      if (usableRuntime) {
+      let resendSetup: Extract<
+        CampaignAccountsResult,
+        { status: "ready" }
+      >["resendSetup"] = { status: "held", reason: "runtime_binding_unknown" };
+      if (
+        usableRuntime &&
+        usableRuntime.binding.webhookGeneration &&
+        !usableRuntime.webhookSecret
+      ) {
+        resendSetup = { status: "held", reason: "webhook_secret_unknown" };
+      } else if (usableRuntime) {
         const resendRows = await tx<
-          { id: string; sender: string; ramp: number }[]
+          {
+            id: string;
+            sender: string;
+            ramp: number | null;
+            state: string | null;
+            controlVersion: number | null;
+            lastRampAt: Date | null;
+            provider: string | null;
+            team: string | null;
+            environment: string | null;
+          }[]
         >`
-          select i.id, i.subject_email as sender, c.ramp
-          from growth.integration_connections i
-          join growth.outreach_account_controls c on c.connection_id=i.id and c.provider='resend'
-          where i.provider='resend' and i.subject_email=${usableRuntime.binding.sender}
-            and c.resend_team=${usableRuntime.binding.team} and c.resend_environment=${usableRuntime.binding.environment}
-          limit 1
-        `;
+          select i.id,i.subject_email as sender,c.ramp,c.state,c.version as "controlVersion",c.last_ramp_at as "lastRampAt",c.provider,c.resend_team as team,c.resend_environment as environment
+          from growth.integration_connections i left join growth.outreach_account_controls c on c.connection_id=i.id
+          where i.provider='resend' and i.subject_email=${usableRuntime.binding.sender} limit 1`;
         const resend = resendRows[0];
-        if (resend) {
+        const matching =
+          !resend ||
+          resend.provider === null ||
+          (resend.provider === "resend" &&
+            resend.team === usableRuntime.binding.team &&
+            resend.environment === usableRuntime.binding.environment);
+        if (matching)
+          resendSetup = {
+            status: "available",
+            sender: usableRuntime.binding.sender,
+            expectedVersion: resend?.controlVersion ?? 0,
+          };
+        else
+          resendSetup = { status: "held", reason: "existing_binding_differs" };
+        const known = resend && matching ? controlFields(resend) : null;
+        if (resend && known && resend.provider === "resend") {
           const readiness = await loadResendAccountReadiness(
             tx,
             resend.id,
             usableRuntime,
             "active",
           );
+          const prerequisites = await loadResendAccountReadiness(
+            tx,
+            resend.id,
+            usableRuntime,
+            "prerequisites",
+          );
+          const next = known.state === "active" ? nextRamp(known.ramp) : null;
+          const advanceReadiness =
+            prerequisites.status === "held"
+              ? prerequisites
+              : !known.lastRampAt ||
+                  prerequisites.healthObservedFrom <= known.lastRampAt
+                ? { status: "held" as const, reason: "health_review_reused" }
+                : { status: "ready" as const };
           accounts.push({
             id: resend.id,
             provider: "resend",
@@ -176,6 +300,16 @@ export async function getCampaignAccounts(
             readiness:
               readiness.status === "ready" ? { status: "ready" } : readiness,
             recordedRamp: resend.ramp,
+            control: {
+              state: known.state,
+              version: known.version,
+              ramp: known.ramp,
+              prerequisites:
+                prerequisites.status === "ready"
+                  ? { status: "ready" }
+                  : prerequisites,
+              advance: next ? { next, readiness: advanceReadiness } : null,
+            },
             limitsEvidence: null,
             healthEvidence: null,
             usageObservation: null,
@@ -186,6 +320,7 @@ export async function getCampaignAccounts(
         status: "ready",
         accounts,
         resendConfiguration: usableRuntime ? "available" : "unknown",
+        resendSetup,
       };
     });
   } catch {

@@ -253,3 +253,49 @@
 .account dd {
   margin: 2px 0 0;
 }
+.accountActions {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+.accountActions button {
+  width: fit-content;
+  border: 1px solid #075f66;
+  border-radius: 6px;
+  padding: 8px 12px;
+  background: #fff;
+  color: #075f66;
+  font-weight: 650;
+}
+.accountActions button:disabled {
+  opacity: 0.65;
+}
+.accountActions button:focus-visible,
+.accountInput input:focus-visible,
+.accountInput select:focus-visible {
+  outline: 3px solid #087f88;
+  outline-offset: 3px;
+}
+.accountInput {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+.accountInput label {
+  display: grid;
+  gap: 5px;
+  font-size: 0.85rem;
+  font-weight: 650;
+}
+.accountInput input,
+.accountInput select {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid #8c9aa7;
+  border-radius: 5px;
+  background: #fff;
+  color: #07182e;
+  font: inherit;
+}

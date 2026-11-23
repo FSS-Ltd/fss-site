@@ -31,6 +31,7 @@ test("shows observed counts and a stored hold reason without claiming delivery",
         accounts={{
           status: "ready",
           resendConfiguration: "unknown",
+          resendSetup: { status: "held", reason: "runtime_binding_unknown" },
           accounts: [
             {
               id: "c",
@@ -39,6 +40,7 @@ test("shows observed counts and a stored hold reason without claiming delivery",
               selectable: true,
               readiness: { status: "held", reason: "usage_unknown" },
               recordedRamp: 25,
+              control: null,
               limitsEvidence: null,
               healthEvidence: null,
               usageObservation: null,
