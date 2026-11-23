@@ -19,11 +19,15 @@ export async function appendCampaignEventAndOutbox(
     type: CampaignCommand["type"];
     founder: FounderSession;
     correlationId: string;
+    replyReview?: {
+      inboundMessageId: string;
+      kind: Extract<CampaignCommand, { type: "record_reply" }>["kind"];
+    };
   },
 ): Promise<void> {
   requireCampaignFounder(input.founder);
   if (!input.correlationId.trim()) throw new Error("invalid_correlation_id");
-  await tx`insert into growth.outreach_events(id,campaign_id,policy_version,membership_id,event_type,request_id,request_hash,actor_id,result_id) values (${input.requestId},${input.campaignId},${input.version},${input.membershipId},${input.type},${input.requestId},${input.requestHash},${input.founder.actorId},${input.resultId})`;
+  await tx`insert into growth.outreach_events(id,campaign_id,policy_version,membership_id,event_type,request_id,request_hash,actor_id,result_id,review_inbound_message_id,review_reply_kind) values (${input.requestId},${input.campaignId},${input.version},${input.membershipId},${input.type},${input.requestId},${input.requestHash},${input.founder.actorId},${input.resultId},${input.replyReview?.inboundMessageId ?? null},${input.replyReview?.kind ?? null})`;
   await tx`insert into growth.outreach_outbox(id,event_id) values (${randomUUID()},${input.requestId})`;
   await appendAuditEvent(tx, {
     correlationId: input.correlationId,

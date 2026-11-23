@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { createHash, randomUUID } from "node:crypto";
 import { withGrowthTransaction } from "../../../lib/growth/db/client";
 import { loadReviewMembershipPreparationAuthority } from "../../../lib/growth/campaigns/founder-verification-reader";
+import { exerciseCampaignReplyReview } from "./campaign-reply-review-assertions";
 import { exerciseResearchPreparation } from "./research-preparation-assertions";
 import { exerciseGmailConfirmation } from "./reservation-confirmation-assertions";
 import { exerciseFollowUpPreparation } from "./follow-up-preparation-assertions";
@@ -583,6 +584,13 @@ export async function exerciseCampaignReservation(
         firstMessageId: message,
         recipient: copyFacts.email,
         copy,
+      });
+      await exerciseCampaignReplyReview(admin, db, {
+        membershipId: member,
+        sequenceId: sequence,
+        prospectId: prospect,
+        contactId: contact,
+        founder,
       });
     } finally {
       await admin`delete from growth.outreach_jobs where campaign_id=${campaign.id}`;

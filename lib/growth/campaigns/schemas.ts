@@ -261,7 +261,10 @@ export const campaignCommandSchema = z.discriminatedUnion("type", [
     type: z.literal("record_reply"),
     ...mutation,
     membershipId: uuid,
-    providerReplyId: id,
+    inboundMessageId: uuid,
+    expectedPolicyVersion: z.number().int().positive(),
+    expectedProspectVersion: z.number().int().positive(),
+    expectedContactVersion: z.number().int().positive(),
     kind: z.enum([
       "positive",
       "negative",
@@ -270,7 +273,6 @@ export const campaignCommandSchema = z.discriminatedUnion("type", [
       "opt_out",
       "unknown",
     ]),
-    occurredAt: date,
   }),
   z.strictObject({
     type: z.literal("record_outcome"),

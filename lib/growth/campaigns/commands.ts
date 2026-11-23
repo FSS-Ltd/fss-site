@@ -1,4 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
+import { lockGmailRouting } from "../sequences/gmail-thread-association";
+import { reviewCampaignReply } from "./campaign-reply-review";
 import type { FounderSession } from "../auth/require-founder";
 import { withGrowthTransaction } from "../db/client";
 import type { GrowthDb, GrowthTransaction } from "../db/types";
@@ -31,8 +33,9 @@ async function mutate(
   founder: FounderSession,
   correlationId: string,
 ): Promise<CampaignMutation> {
-  if (command.type === "record_reply" || command.type === "record_outcome")
-    throw new Error("not_available");
+  if (command.type === "record_outcome") throw new Error("not_available");
+  if (command.type === "record_reply")
+    return reviewCampaignReply(tx, command, founder, correlationId);
   if (command.type === "create") {
     validateCampaignDefinition(command.policy, 1, new Date(), false);
     await validateCampaignAccountBinding(tx, command.policy, founder);
@@ -155,6 +158,7 @@ export async function executeCampaignCommand(
     .update(JSON.stringify(command))
     .digest("hex");
   return withGrowthTransaction(db, async (tx) => {
+    if (command.type === "record_reply") await lockGmailRouting(tx);
     await tx`select pg_advisory_xact_lock(hashtextextended(${`growth:campaign-command:${command.requestId}`},0))`;
     const [previous] = await tx<
       {
@@ -188,6 +192,14 @@ export async function executeCampaignCommand(
         type: command.type,
         founder,
         correlationId,
+        ...(command.type === "record_reply"
+          ? {
+              replyReview: {
+                inboundMessageId: command.inboundMessageId,
+                kind: command.kind,
+              },
+            }
+          : {}),
       });
     return {
       status: "ok",
