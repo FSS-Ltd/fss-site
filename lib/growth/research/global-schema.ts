@@ -313,6 +313,7 @@ export const globalResearchRunSchema = z
     runDate: z.iso.date(),
     timezone: z.literal("Europe/London"),
     promptVersion: text(120),
+    outcome: z.literal("no_results").optional(),
     prospects: z.array(globalCandidateSchema).max(10),
     rejections: z
       .array(
@@ -335,10 +336,14 @@ export const globalResearchRunSchema = z
   })
   .strict()
   .superRefine((run, context) => {
-    if (!run.prospects.length && !run.rejections.length)
+    if (
+      (!run.prospects.length && !run.rejections.length) !==
+      (run.outcome === "no_results")
+    )
       context.addIssue({
         code: "custom",
-        message: "A run must contain at least one candidate.",
+        message:
+          "Empty runs require the no_results outcome; nonempty runs must omit it.",
       });
     if (
       new TextEncoder().encode(JSON.stringify(run)).byteLength >

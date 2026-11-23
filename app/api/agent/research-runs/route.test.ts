@@ -394,3 +394,19 @@ test("passes the verified key and hash of exact bytes to ingestion", async () =>
     bodySha256: createHash("sha256").update(body).digest("hex"),
   });
 });
+
+test("passes an explicitly empty signed v2 run to ingestion", async () => {
+  const harness = createHarness();
+  const payload = {
+    ...createGlobalResearchFixture(),
+    prospects: [],
+    rejections: [],
+    outcome: "no_results",
+  };
+  const response = await harness.handler(
+    createRequest(JSON.stringify(payload)),
+  );
+  assert.equal(response.status, 200);
+  assert.equal(harness.ingestedInputs.length, 1);
+  assert.equal(harness.ingestedInputs[0]?.schemaVersion, "2.0");
+});

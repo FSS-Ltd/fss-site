@@ -609,3 +609,47 @@ test(
     }
   },
 );
+
+test(
+  "signed empty research persists and replays without creating prospects",
+  { skip: !connectionString },
+  async () => {
+    if (!connectionString) return;
+    const db = postgres(connectionString, { max: 1 });
+    const run = globalResearchRunSchema.parse({
+      ...createGlobalResearchFixture(),
+      externalRunId: randomUUID(),
+      prospects: [],
+      rejections: [],
+      outcome: "no_results",
+    });
+    const principal = {
+      kind: "signed_research" as const,
+      keyId: "test-agent",
+      bodySha256: "a".repeat(64),
+    };
+    try {
+      await db`set role growth_app`;
+      await assert.rejects(ingestResearchRun(db, run), /signed research/i);
+      const first = await ingestResearchRun(db, run, principal);
+      assert.equal(first.accepted, 0);
+      assert.equal(first.duplicates, 0);
+      assert.equal(first.rejected, 0);
+      assert.deepEqual(first.acceptedProspects, []);
+      assert.deepEqual(await ingestResearchRun(db, run, principal), first);
+      await assert.rejects(
+        ingestResearchRun(db, run, {
+          ...principal,
+          bodySha256: "b".repeat(64),
+        }),
+        /conflict/i,
+      );
+      const [row] = await db<
+        { target: number; status: string }[]
+      >`select target_count as target, status from growth.research_runs where id=${first.runId}`;
+      assert.deepEqual(row, { target: 0, status: "completed" });
+    } finally {
+      await db.end();
+    }
+  },
+);

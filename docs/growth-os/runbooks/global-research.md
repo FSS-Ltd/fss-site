@@ -33,3 +33,36 @@ Text-only research drafts need no concept visual or concept disclaimer. Legacy d
 ## Known boundary
 
 Registration deduplication currently uses country plus registration number, not subnational registry jurisdiction. Omit a registration number unless its country-wide identity is established; use website, Maps and email identity for businesses whose registration numbers are only locally unique.
+
+## Daily research-only runner (not scheduled)
+
+The daily entry point is callable for a later 07:00 Europe/London
+schedule, including weekends. It does not create or enable a schedule. After
+release and separate activation approval, run from a clean release-pinned
+checkout with Node 24:
+
+```sh
+node --import tsx scripts/run-daily-research.ts /absolute/private/state-directory
+```
+
+Choose an owner-only local directory outside the repository and synced storage.
+The runner stores one private immutable batch per London calendar day, up to ten
+prospects and 100 rejections, before signing. It reuses those exact bytes on
+later invocations, including after an uncertain response. Keep the file until
+reconciliation is complete; securely remove it only under an approved retention
+procedure. A completed search with no candidates or rejections submits the
+explicit `no_results` outcome. A failed search is not submitted. This requires
+`20261118160000_growth_signed_empty_research.sql` before deploying the new
+contract. Reports contain counts and failure categories only.
+
+The restricted child has a disposable working directory and receives no signing
+secret. The parent validates the v2 contract and rejects child-supplied campaign
+proof before retrieving the existing Keychain secret and using the exact-byte
+submission client. This validates structure, not the truth of web claims. All
+records remain research-only: source verification, campaign targeting, recipient
+permission and an approved offer remain separate gates. One batch per day is a
+fixed discovery budget, not a promise of ten eligible recipients. The historical
+weekday preview-writing command remains separate and unchanged.
+
+Actual child-tool isolation, local automation timezone behavior, policy binding,
+production deployment, and the first signed run require separate release review.

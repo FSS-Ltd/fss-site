@@ -21,10 +21,14 @@ export async function ingestGlobalResearchRun(
   principal?: SignedResearchPrincipal,
 ): Promise<ResearchRunIngestionResult> {
   const run = globalResearchRunSchema.parse(input);
-  if (!principal && run.prospects.some((candidate) => candidate.proof))
+  if (
+    !principal &&
+    (run.outcome === "no_results" ||
+      run.prospects.some((candidate) => candidate.proof))
+  )
     throw new ResearchIngestionError(
       "signed_research_required",
-      "Signed research is required for proof.",
+      "Signed research is required for proof or an empty completed run.",
     );
   if (
     principal &&

@@ -255,3 +255,24 @@ test("accepts only a distinct, source-bound research proof pair", () => {
     );
   }
 });
+
+test("accepts only explicitly completed empty research runs", () => {
+  const base = {
+    ...createGlobalResearchFixture(),
+    prospects: [],
+    rejections: [],
+  };
+  assert.equal(globalResearchRunSchema.safeParse(base).success, false);
+  assert.equal(
+    globalResearchRunSchema.safeParse({ ...base, outcome: "no_results" })
+      .success,
+    true,
+  );
+  assert.equal(
+    globalResearchRunSchema.safeParse({
+      ...createGlobalResearchFixture(),
+      outcome: "no_results",
+    }).success,
+    false,
+  );
+});
