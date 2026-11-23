@@ -5,44 +5,55 @@ import { reviewedRecipientSchema } from "../sequences/reviewed-recipient";
 import { campaignCadenceDays, campaignMonthAnniversary } from "./time";
 import { websiteServiceTermsSchema } from "./website-service-offers";
 
-export const campaignSchema = z.object({
-  campaignId: z.uuid(),
-  policyVersion: z.number().int().positive(),
-  membershipId: z.uuid(),
-  businessId: z.uuid(),
-  cadenceFamily: z.enum(["review", "website", "facebook"]),
-  market: z.string().min(1),
-  offer: z.string().min(1),
-  commercialTerms: websiteServiceTermsSchema.optional(),
-  variantId: z.string().min(1),
-  variantVersion: z.number().int().positive(),
-  copySha256: z.string().regex(/^[a-f0-9]{64}$/),
-  permissionId: z.uuid(),
-  reviewedRecipient: reviewedRecipientSchema,
-  effectiveRecipient: reviewedRecipientSchema,
-  sourceProof: z.discriminatedUnion("origin", [
-    z.object({
-      origin: z.literal("founder"),
-      requestId: z.uuid(),
-      contactId: z.uuid(),
-      contactProofId: z.uuid(),
-      observationProofId: z.uuid(),
-      proofContactVersion: z.number().int().positive(),
-      proofProspectVersion: z.number().int().positive(),
-      freshUntil: z.iso.datetime(),
-    }),
-    z.object({
-      origin: z.literal("research"),
-      bindingId: z.uuid(),
-      contactId: z.uuid(),
-      contactProofId: z.uuid(),
-      observationProofId: z.uuid(),
-      proofContactVersion: z.number().int().positive(),
-      proofProspectVersion: z.number().int().positive(),
-      freshUntil: z.iso.datetime(),
-    }),
-  ]),
-});
+export const campaignSchema = z
+  .object({
+    campaignId: z.uuid(),
+    policyVersion: z.number().int().positive(),
+    membershipId: z.uuid(),
+    businessId: z.uuid(),
+    cadenceFamily: z.enum(["review", "website", "facebook"]),
+    market: z.string().min(1),
+    offer: z.string().min(1),
+    commercialTerms: websiteServiceTermsSchema.optional(),
+    variantId: z.string().min(1),
+    variantVersion: z.number().int().positive(),
+    copySha256: z.string().regex(/^[a-f0-9]{64}$/),
+    copyFamilyVersion: z.number().int().positive().optional(),
+    copyFamilySha256: z
+      .string()
+      .regex(/^[a-f0-9]{64}$/)
+      .optional(),
+    permissionId: z.uuid(),
+    reviewedRecipient: reviewedRecipientSchema,
+    effectiveRecipient: reviewedRecipientSchema,
+    sourceProof: z.discriminatedUnion("origin", [
+      z.object({
+        origin: z.literal("founder"),
+        requestId: z.uuid(),
+        contactId: z.uuid(),
+        contactProofId: z.uuid(),
+        observationProofId: z.uuid(),
+        proofContactVersion: z.number().int().positive(),
+        proofProspectVersion: z.number().int().positive(),
+        freshUntil: z.iso.datetime(),
+      }),
+      z.object({
+        origin: z.literal("research"),
+        bindingId: z.uuid(),
+        contactId: z.uuid(),
+        contactProofId: z.uuid(),
+        observationProofId: z.uuid(),
+        proofContactVersion: z.number().int().positive(),
+        proofProspectVersion: z.number().int().positive(),
+        freshUntil: z.iso.datetime(),
+      }),
+    ]),
+  })
+  .refine(
+    (value) =>
+      (value.copyFamilyVersion === undefined) ===
+      (value.copyFamilySha256 === undefined),
+  );
 
 export type CampaignReportLeaseFence = {
   jobId: string;

@@ -3,6 +3,8 @@ import test from "node:test";
 import {
   buildControlledFirstMessage,
   validateControlledCopy,
+  controlledCopyFamilyFingerprint,
+  CONTROLLED_FIRST_COPY_FAMILY_VERSION,
 } from "./controlled-copy";
 import { websiteServiceOffers } from "./website-service-offers";
 import { campaignSchema } from "./gmail-confirmation-campaign";
@@ -108,4 +110,65 @@ test("confirmation retains the exact issued commercial terms", () => {
     },
   });
   assert.deepEqual(snapshot.commercialTerms, offer);
+  assert.equal(snapshot.copyFamilyVersion, undefined);
+  assert.equal(snapshot.copyFamilySha256, undefined);
+  const frozen = campaignSchema.parse({
+    ...snapshot,
+    copyFamilyVersion: 1,
+    copyFamilySha256: "b".repeat(64),
+  });
+  assert.equal(frozen.copyFamilySha256, "b".repeat(64));
+  assert.equal(
+    campaignSchema.safeParse({ ...snapshot, copyFamilyVersion: 1 }).success,
+    false,
+  );
+});
+
+test("copy family is shared across arms and binds the common policy contract", () => {
+  const family = {
+    familyVersion: CONTROLLED_FIRST_COPY_FAMILY_VERSION,
+    campaignId: facts.campaignId,
+    policyVersion: 1,
+    market: "GB",
+    jurisdiction: "GB",
+    offer: "review",
+    permissionRequirement: "consent",
+    cadenceFamily: "review",
+    provider: "resend",
+  };
+  const armA = { ...family, variantId: "a", cta: "May I?" };
+  const armB = { ...family, variantId: "b", cta: "Could I?" };
+  const fingerprint = controlledCopyFamilyFingerprint(armA);
+  assert.equal(
+    fingerprint,
+    "047bd0aeb7db93969d1b2dd957900a42325a1528ad9d13cbfa954734746e8a84",
+  );
+  assert.equal(controlledCopyFamilyFingerprint(armB), fingerprint);
+  assert.notEqual(
+    controlledCopyFamilyFingerprint({ ...family, familyVersion: 2 }),
+    fingerprint,
+  );
+  assert.notEqual(
+    controlledCopyFamilyFingerprint({ ...family, provider: "gmail" }),
+    fingerprint,
+  );
+  assert.notEqual(
+    controlledCopyFamilyFingerprint({
+      ...family,
+      campaignId: facts.businessId,
+    }),
+    fingerprint,
+  );
+  const terms = websiteServiceOffers.lead_review_essentials_v1;
+  assert.notEqual(
+    controlledCopyFamilyFingerprint({ ...family, commercialTerms: terms }),
+    fingerprint,
+  );
+  assert.equal(
+    controlledCopyFamilyFingerprint({
+      ...family,
+      commercialTerms: { ...terms, id: terms.id },
+    }),
+    controlledCopyFamilyFingerprint({ ...family, commercialTerms: terms }),
+  );
 });

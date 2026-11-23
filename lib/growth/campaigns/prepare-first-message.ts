@@ -10,7 +10,11 @@ import { loadReservationAccount } from "./account-repository";
 import { loadResendAccountReadiness } from "./resend-account-repository";
 import { resendBindingSchema } from "./resend-account-readiness";
 import type { ResendRuntimeConfiguration } from "./resend-account-control";
-import { buildControlledFirstMessage } from "./controlled-copy";
+import {
+  buildControlledFirstMessage,
+  controlledCopyFamilyFingerprint,
+  CONTROLLED_FIRST_COPY_FAMILY_VERSION,
+} from "./controlled-copy";
 import { loadReviewMembershipPreparationAuthority } from "./founder-verification-reader";
 import { held, type ReservationOutcome } from "./reservation-shared";
 import { campaignPolicyDefinitionSchema } from "./schemas";
@@ -185,7 +189,20 @@ async function prepareFirstMessageInTransaction(
     .update(JSON.stringify([copy.subject, copy.html, copy.text]))
     .digest("hex");
   await tx`insert into growth.sequence_enrollments(id,prospect_id,contact_id,status,template_snapshot) values (${sequenceId},${identity.prospectId},${prospect.contactId},'active',${tx.json({ approvedRecipient: facts.email, reviewedRecipient: recipient.data, effectiveRecipient: recipient.data })})`;
-  await tx`insert into growth.email_messages(id,sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key,scheduled_for,subject_snapshot,html_snapshot,text_snapshot,controlled_preparation) values (${messageId},${sequenceId},${identity.prospectId},${prospect.contactId},${resendRuntime ? "resend" : "gmail"},'outbound',0,'queued',${messageKey},clock_timestamp(),${copy.subject},${copy.html},${copy.text},${tx.json({ version: 1, variantId: copy.variantId, variantVersion: copy.variantVersion, observationProofId: authority.proof.observationProofId, permissionId: facts.permissionId, copySha256: digest })})`;
+  const copyFamilyVersion = CONTROLLED_FIRST_COPY_FAMILY_VERSION;
+  const copyFamilySha256 = controlledCopyFamilyFingerprint({
+    familyVersion: copyFamilyVersion,
+    campaignId: identity.campaignId,
+    policyVersion: identity.policyVersion,
+    market: facts.market,
+    jurisdiction: policy.data.jurisdiction,
+    offer: policy.data.offer,
+    commercialTerms: policy.data.commercialTerms,
+    permissionRequirement: policy.data.permissionRequirement,
+    cadenceFamily: policy.data.cadenceFamily,
+    provider: policy.data.provider,
+  });
+  await tx`insert into growth.email_messages(id,sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key,scheduled_for,subject_snapshot,html_snapshot,text_snapshot,controlled_preparation) values (${messageId},${sequenceId},${identity.prospectId},${prospect.contactId},${resendRuntime ? "resend" : "gmail"},'outbound',0,'queued',${messageKey},clock_timestamp(),${copy.subject},${copy.html},${copy.text},${tx.json({ version: 1, variantId: copy.variantId, variantVersion: copy.variantVersion, observationProofId: authority.proof.observationProofId, permissionId: facts.permissionId, copySha256: digest, copyFamilyVersion, copyFamilySha256 })})`;
   await tx`update growth.sequence_enrollments set first_message_id=${messageId} where id=${sequenceId}`;
   await tx`update growth.campaign_memberships set sequence_id=${sequenceId},status='active',updated_at=clock_timestamp() where id=${input.membershipId}`;
   await tx`insert into growth.outreach_events(id,campaign_id,policy_version,membership_id,event_type) values (${eventId},${identity.campaignId},${identity.policyVersion},${input.membershipId},'first_message_prepared')`;

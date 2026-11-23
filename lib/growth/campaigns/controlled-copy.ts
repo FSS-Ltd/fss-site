@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import {
   isWebsiteServiceOffer,
   matchesWebsiteServiceOffer,
@@ -8,6 +9,54 @@ import { assignCampaignVariant } from "./variants";
 import type { CampaignVariant } from "./schemas";
 import { escapeEmailHtmlText, isSafeEmailHtml } from "../email/html-policy";
 import { offersEmailOptOut } from "../email/copy-policy";
+
+// Bump when the shared first-message template or its rendering semantics change.
+export const CONTROLLED_FIRST_COPY_FAMILY_VERSION = 1;
+
+export function controlledCopyFamilyFingerprint(input: {
+  familyVersion: number;
+  campaignId: string;
+  policyVersion: number;
+  market: string;
+  jurisdiction: string;
+  offer: string;
+  commercialTerms?: WebsiteServiceTerms;
+  permissionRequirement: string | null;
+  cadenceFamily: string | null;
+  provider: string;
+}): string {
+  const terms = input.commercialTerms;
+  const canonicalTerms = terms
+    ? [
+        terms.id,
+        terms.name,
+        terms.monthlyPence,
+        terms.description,
+        terms.currency,
+        terms.services,
+        terms.websiteScope,
+        terms.setupFeePence,
+        terms.minimumTerm,
+        terms.cancellation,
+      ]
+    : null;
+  return createHash("sha256")
+    .update(
+      JSON.stringify([
+        input.familyVersion,
+        input.campaignId,
+        input.policyVersion,
+        input.market,
+        input.jurisdiction,
+        input.offer,
+        canonicalTerms,
+        input.permissionRequirement,
+        input.cadenceFamily,
+        input.provider,
+      ]),
+    )
+    .digest("hex");
+}
 
 // Facts must come from the locked policy and validated source records.
 type ControlledCopyFacts = {

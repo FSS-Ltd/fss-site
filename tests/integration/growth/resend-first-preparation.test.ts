@@ -278,9 +278,19 @@ test(
           assert.equal(result.prepared, 1);
           await tx`reset role`;
           const [prepared] = await tx<
-            { channel: string; status: string }[]
-          >`select em.channel,em.status from growth.campaign_memberships m join growth.email_messages em on em.sequence_enrollment_id=m.sequence_id where m.id=${member.id}`;
-          assert.deepEqual(prepared, { channel: "resend", status: "queued" });
+            {
+              channel: string;
+              status: string;
+              metadata: { copyFamilyVersion: number; copyFamilySha256: string };
+            }[]
+          >`select em.channel,em.status,em.controlled_preparation as metadata from growth.campaign_memberships m join growth.email_messages em on em.sequence_enrollment_id=m.sequence_id where m.id=${member.id}`;
+          assert.equal(prepared?.channel, "resend");
+          assert.equal(prepared?.status, "queued");
+          assert.equal(prepared?.metadata.copyFamilyVersion, 1);
+          assert.match(
+            prepared?.metadata.copyFamilySha256 ?? "",
+            /^[a-f0-9]{64}$/,
+          );
           throw rollback;
         }),
         (error) => error === rollback,

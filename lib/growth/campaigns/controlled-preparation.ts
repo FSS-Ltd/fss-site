@@ -3,7 +3,11 @@ import { z } from "zod";
 import type { GrowthTransaction } from "../db/types";
 import { reviewedRecipientSchema } from "../sequences/reviewed-recipient";
 import type { CanonicalOutreachPreparation } from "./dispatch-authority";
-import { validateControlledCopy } from "./controlled-copy";
+import {
+  validateControlledCopy,
+  controlledCopyFamilyFingerprint,
+  CONTROLLED_FIRST_COPY_FAMILY_VERSION,
+} from "./controlled-copy";
 import { loadPolicyAuthorizedSourceProof } from "./founder-verification-reader";
 import { campaignPolicyDefinitionSchema } from "./schemas";
 import {
@@ -11,15 +15,28 @@ import {
   loadFollowUpAnchor,
 } from "./follow-up-anchor";
 
-const metadataSchema = z.strictObject({
-  version: z.literal(1),
-  variantId: z.string().min(1).max(200),
-  variantVersion: z.number().int().positive(),
-  observationProofId: z.uuid(),
-  permissionId: z.uuid(),
-  copySha256: z.string().regex(/^[a-f0-9]{64}$/),
-  coverageId: z.uuid().optional(),
-});
+const metadataSchema = z
+  .strictObject({
+    version: z.literal(1),
+    variantId: z.string().min(1).max(200),
+    variantVersion: z.number().int().positive(),
+    observationProofId: z.uuid(),
+    permissionId: z.uuid(),
+    copySha256: z.string().regex(/^[a-f0-9]{64}$/),
+    coverageId: z.uuid().optional(),
+    copyFamilyVersion: z
+      .literal(CONTROLLED_FIRST_COPY_FAMILY_VERSION)
+      .optional(),
+    copyFamilySha256: z
+      .string()
+      .regex(/^[a-f0-9]{64}$/)
+      .optional(),
+  })
+  .refine(
+    (value) =>
+      (value.copyFamilyVersion === undefined) ===
+      (value.copyFamilySha256 === undefined),
+  );
 const recipientSnapshotSchema = z.object({
   reviewedRecipient: reviewedRecipientSchema,
   effectiveRecipient: reviewedRecipientSchema,
@@ -141,6 +158,22 @@ export async function loadControlledPreparation(
     metadata.data.permissionId !== row.permissionId ||
     metadata.data.observationProofId !== proof.proof.observationProofId ||
     metadata.data.copySha256 !== digest ||
+    (metadata.data.copyFamilyVersion !== undefined &&
+      (!policy.data.offer ||
+        !policy.data.jurisdiction ||
+        metadata.data.copyFamilySha256 !==
+          controlledCopyFamilyFingerprint({
+            familyVersion: metadata.data.copyFamilyVersion,
+            campaignId: row.campaignId,
+            policyVersion: row.policyVersion,
+            market: row.market,
+            jurisdiction: policy.data.jurisdiction,
+            offer: policy.data.offer,
+            commercialTerms: policy.data.commercialTerms,
+            permissionRequirement: policy.data.permissionRequirement,
+            cadenceFamily: policy.data.cadenceFamily,
+            provider: policy.data.provider,
+          }))) ||
     !policy.data.offer ||
     !policy.data.jurisdiction ||
     !policy.data.cadenceFamily ||
@@ -176,6 +209,12 @@ export async function loadControlledPreparation(
     variantId: metadata.data.variantId,
     variantVersion: metadata.data.variantVersion,
     copySha256: digest,
+    ...(metadata.data.copyFamilyVersion === undefined
+      ? {}
+      : {
+          copyFamilyVersion: metadata.data.copyFamilyVersion,
+          copyFamilySha256: metadata.data.copyFamilySha256,
+        }),
     assignment: "sha256_campaign_policy_v1" as const,
     permissionId: row.permissionId,
     sourceProof: {
