@@ -5,6 +5,7 @@ import postgres from "postgres";
 import { exerciseCampaignReservation } from "./reservation-campaign-assertions";
 import { exerciseLegacyReservation } from "./reservation-assertions";
 import { exerciseActualCronDispatch } from "./actual-cron-dispatch";
+import { exerciseOutreachPrepareRoute } from "./outreach-prepare-route-assertions";
 import {
   loadConfiguredAccountReadiness,
   loadReservationAccount,
@@ -416,6 +417,7 @@ test(
       assert.equal(accountForReservation.status, "ready");
       if (accountForReservation.status === "ready")
         assert.deepEqual(accountForReservation.account.usage.providerIds, []);
+      await exerciseOutreachPrepareRoute(admin, db, { id, email, url });
       await exerciseCampaignReservation(admin, db, { id, email, now, founder });
       await exerciseLegacyReservation(admin, db, { id, email });
       await exerciseActualCronDispatch(admin, db, {

@@ -16,8 +16,13 @@ const binding = {
 
 test("claims only the first preparation stage with a fixed bound", async () => {
   const queries: string[] = [];
-  const db = (async (strings: TemplateStringsArray) => {
+  let values: readonly unknown[] = [];
+  const db = (async (
+    strings: TemplateStringsArray,
+    ...args: readonly unknown[]
+  ) => {
     queries.push(strings.join("?"));
+    values = args;
     return [];
   }) as unknown as GrowthDb;
   Object.assign(db, {
@@ -30,7 +35,7 @@ test("claims only the first preparation stage with a fixed bound", async () => {
   assert.deepEqual(result, { claimed: 0, prepared: 0, held: 0, retry: 0 });
   assert.match(queries.join(" "), /job_type\s*=\s*'first_preparation'/);
   assert.match(queries.join(" "), /skip locked/i);
-  assert.match(queries.join(" "), /limit 25/i);
+  assert.ok(values.includes(25));
 });
 
 test("invalid worker input cannot claim jobs", async () => {
@@ -41,4 +46,24 @@ test("invalid worker input cannot claim jobs", async () => {
     runFirstPreparationBatch(db, { binding, workerId: "" }),
     /invalid_batch/,
   );
+});
+
+test("respects a smaller shared batch allowance", async () => {
+  let values: readonly unknown[] = [];
+  const db = (async (
+    _strings: TemplateStringsArray,
+    ...args: readonly unknown[]
+  ) => {
+    values = args;
+    return [];
+  }) as unknown as GrowthDb;
+  Object.assign(db, {
+    begin: async <T>(f: (tx: GrowthDb) => Promise<T>) => f(db),
+  });
+  await runFirstPreparationBatch(db, {
+    binding,
+    workerId: "worker",
+    limit: 13,
+  });
+  assert.ok(values.includes(13));
 });

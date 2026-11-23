@@ -13,6 +13,7 @@ import { seedSyntheticDirectSubmission } from "./synthetic-direct-submission";
 import { submitReservedOutreach } from "../../../lib/growth/campaigns/direct-submission";
 import { postgresSequenceDispatchRepository } from "../../../lib/growth/sequences/dispatcher-repository";
 import { withTransitionClock } from "./reservation-clock";
+import { exerciseDueFollowUpLease } from "./outreach-due-follow-up-assertions";
 
 export async function exerciseFollowUpPreparation(
   admin: GrowthDb,
@@ -52,6 +53,7 @@ export async function exerciseFollowUpPreparation(
   await admin`update growth.email_messages set status='draft',scheduled_for=clock_timestamp()-interval '1 minute' where sequence_enrollment_id=${sequenceId} and step_number in (1,2)`;
   await admin`update growth.outreach_jobs j set status='leased',lease_owner='test-follow-up',lease_revision=lease_revision+1,lease_until=clock_timestamp()+interval '5 minutes',due_at=em.scheduled_for
     from growth.email_messages em where j.membership_id=${membershipId} and j.job_type='follow_up' and em.idempotency_key=j.idempotency_key`;
+  await exerciseDueFollowUpLease(admin, db, { membershipId, connectionId });
   const jobs = await admin<{ id: string; key: string; revision: string }[]>`
     select id,idempotency_key as key,lease_revision::text as revision from growth.outreach_jobs where membership_id=${membershipId} and job_type='follow_up' order by key`;
   const first = jobs.find((job) => job.key.endsWith(":1"));

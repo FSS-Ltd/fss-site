@@ -6,6 +6,7 @@ import { prepareFirstMessageForJob } from "./prepare-first-message";
 
 const batchSchema = z.strictObject({
   workerId: z.string().trim().min(1).max(200),
+  limit: z.number().int().min(1).max(25).optional(),
   binding: z.strictObject({
     connectionId: z.uuid(),
     googleSubject: z.string().min(1),
@@ -23,7 +24,7 @@ export type FirstPreparationBatchSummary = {
 // Caller supplies the actual same-row credential binding after its one batch usage refresh.
 export async function runFirstPreparationBatch(
   db: GrowthDb,
-  input: { binding: GmailGrantBinding; workerId: string },
+  input: { binding: GmailGrantBinding; workerId: string; limit?: number },
 ): Promise<FirstPreparationBatchSummary> {
   if (!batchSchema.safeParse(input).success) throw new Error("invalid_batch");
   const jobs = await withGrowthTransaction(
@@ -40,7 +41,7 @@ export async function runFirstPreparationBatch(
         and e.membership_id=j.membership_id and c.account_connection_id=${input.binding.connectionId}
         and j.idempotency_key='first-preparation:'||e.id::text
         and j.due_at<=clock_timestamp() and (j.status='pending' or (j.status='leased' and j.lease_until<=clock_timestamp()))
-      order by j.due_at,j.id for update of j skip locked limit 25
+      order by j.due_at,j.id for update of j skip locked limit ${input.limit ?? 25}
     ) update growth.outreach_jobs j set status='leased',lease_owner=${input.workerId},lease_until=clock_timestamp()+interval '5 minutes',lease_revision=j.lease_revision+1
       from due where j.id=due.id returning j.id,j.lease_revision::text as revision`,
   );
