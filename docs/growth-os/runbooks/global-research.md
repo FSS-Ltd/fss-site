@@ -38,14 +38,35 @@ Registration deduplication currently uses country plus registration number, not 
 
 The daily entry point is callable for a later 07:00 Europe/London
 schedule, including weekends. It does not create or enable a schedule. After
-release and separate activation approval, run from a clean release-pinned
-checkout with Node 24:
+release and separate activation approval, use the pinned launcher from a dedicated
+clean checkout at the exact reviewed full commit. Install and verify the locked
+dependencies in that checkout before release. Prepare three existing directories
+outside the checkout and synced storage: owner-only business and Facebook state
+directories, and an authenticated Codex home owned by the user and not writable
+by other users. Use absolute, canonical paths and Codex CLI 0.163.0. An existing
+Codex home can have public traversal permissions; an `auth.json` file, if
+present, must be owner-only. Do not copy credentials.
+
+Start the bootstrap with a clean environment and an absolute Node 24 executable:
 
 ```sh
-node --import tsx scripts/run-daily-research.ts /absolute/private/state-directory
+env -i HOME="/absolute/home" PATH="/usr/bin:/bin" \
+  /absolute/node24/bin/node /absolute/checkout/scripts/outreach-research-pinned.mjs \
+  --mode business --checkout /absolute/checkout --revision FULL_REVIEWED_COMMIT \
+  --node /absolute/node24/bin/node --codex /absolute/codex/bin/codex \
+  --business-state /absolute/private/business --facebook-state /absolute/private/facebook \
+  --codex-home /absolute/private/codex-home
 ```
 
-Choose an owner-only local directory outside the repository and synced storage.
+Use `--mode facebook` for the separate Facebook discovery run. Add `--replay`
+only to resume today's existing private body or Facebook receipt; an existing
+body without that flag and a replay without existing state are rejected. The
+launcher does not fetch, reset, register or activate schedules. It checks the
+checkout, paths and runtime before starting either existing runner, and emits
+only the mode and status. It does not verify the installed dependency tree or
+establish that native search works; both remain release checks.
+
+Choose owner-only local directories outside the repository and synced storage.
 The runner stores one private immutable batch per London calendar day, up to ten
 prospects and 100 rejections, before signing. It reuses those exact bytes on
 later invocations, including after an uncertain response. Keep the file until
