@@ -118,6 +118,7 @@ test("pins clean checkout and redacts output and child environment", () => {
     writeFileSync(join(f.root, "codex-home", "auth.json"), "{}", {
       mode: 0o644,
     });
+    chmodSync(join(f.root, "codex-home", "auth.json"), 0o644);
     assert.equal(invoke(f.args, f.env).status, 1);
     chmodSync(join(f.root, "codex-home", "auth.json"), 0o600);
     const withSecret = invoke(f.args, {
