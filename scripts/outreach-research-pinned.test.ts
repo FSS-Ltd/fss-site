@@ -83,7 +83,19 @@ function fixture() {
   return { root, checkout, business, facebook, args, env, git };
 }
 function invoke(args: string[], env: NodeJS.ProcessEnv) {
-  return spawnSync(process.execPath, args, { env, encoding: "utf8" });
+  // Node's coverage runner adds NODE_V8_COVERAGE even to an explicit child env.
+  // Reproduce the documented clean bootstrap rather than weakening validation.
+  const entries = Object.entries(env).flatMap(([key, value]) =>
+    value === undefined ? [] : [`${key}=${value}`],
+  );
+  return spawnSync(
+    "/usr/bin/env",
+    ["-i", ...entries, process.execPath, ...args],
+    {
+      env: { ...env },
+      encoding: "utf8",
+    },
+  );
 }
 test("pins clean checkout and redacts output and child environment", () => {
   const f = fixture();
@@ -101,7 +113,12 @@ test("pins clean checkout and redacts output and child environment", () => {
     );
     const facebookArgs = [...f.args];
     facebookArgs[facebookArgs.indexOf("--mode") + 1] = "facebook";
-    assert.equal(invoke(facebookArgs, f.env).status, 0);
+    const facebookResult = invoke(facebookArgs, f.env);
+    assert.equal(
+      facebookResult.status,
+      0,
+      facebookResult.stdout + facebookResult.stderr,
+    );
     assert.equal(
       JSON.parse(readFileSync(join(f.facebook, "called"), "utf8")).mode,
       "facebook",
