@@ -5,7 +5,11 @@ import type { GrowthDb } from "../../../lib/growth/db/types";
 import { withGrowthTransaction } from "../../../lib/growth/db/client";
 import { executeCampaignCommand } from "../../../lib/growth/campaigns/commands";
 import { loadReviewMembershipPreparationAuthority } from "../../../lib/growth/campaigns/founder-verification-reader";
-import { prepareFirstMessage } from "../../../lib/growth/campaigns/prepare-first-message";
+import {
+  prepareFirstMessage,
+  prepareFirstMessageForJob,
+} from "../../../lib/growth/campaigns/prepare-first-message";
+import { runFirstPreparationBatch } from "../../../lib/growth/campaigns/first-preparation-worker";
 import { ingestResearchRun } from "../../../lib/growth/research/ingest";
 import { createGlobalResearchFixture } from "../../../lib/growth/research/global-test-fixture";
 import { globalResearchRunSchema } from "../../../lib/growth/research/global-schema";
@@ -87,30 +91,75 @@ export async function exerciseResearchPreparation(
     input.founder,
     randomUUID(),
   );
+  const savedFetch = globalThis.fetch;
+  globalThis.fetch = async () => {
+    throw new Error("unexpected provider request");
+  };
   try {
     const evidenceId = randomUUID();
     const eventId = randomUUID();
+    const firstPermission = {
+      type: "record_permission",
+      requestId: eventId,
+      membershipId: member.id,
+      evidenceId,
+      basis: "consent",
+      provider: "gmail",
+      jurisdiction: "GB",
+      expiresAt: new Date(Date.now() + 3600000),
+      observedAt: new Date(Date.now() - 1000),
+      explicitOptIn: true,
+      summary: "Recipient opted in.",
+      reference: { kind: "private", value: "record" },
+      expectedProspectVersion: 1,
+      expectedContactVersion: 1,
+      researchProofId: binding.id,
+    } as const;
     await executeCampaignCommand(
       db,
-      {
-        type: "record_permission",
-        requestId: eventId,
-        membershipId: member.id,
-        evidenceId,
-        basis: "consent",
-        provider: "gmail",
-        jurisdiction: "GB",
-        expiresAt: new Date(Date.now() + 3600000),
-        observedAt: new Date(Date.now() - 1000),
-        explicitOptIn: true,
-        summary: "Recipient opted in.",
-        reference: { kind: "private", value: "record" },
-        expectedProspectVersion: 1,
-        expectedContactVersion: 1,
-        researchProofId: binding.id,
-      },
+      firstPermission,
       input.founder,
       randomUUID(),
+    );
+    assert.equal(
+      (
+        await executeCampaignCommand(
+          db,
+          firstPermission,
+          input.founder,
+          randomUUID(),
+        )
+      ).alreadyExisted,
+      true,
+    );
+    const [firstJob] = await admin<
+      { id: string }[]
+    >`select j.id from growth.outreach_jobs j join growth.outreach_outbox o on o.id=j.outbox_id where o.event_id=${eventId} and j.job_type='first_preparation'`;
+    assert.ok(firstJob);
+    await admin`delete from growth.outreach_jobs where id=${firstJob.id}`;
+    assert.equal(
+      (
+        await executeCampaignCommand(
+          db,
+          firstPermission,
+          input.founder,
+          randomUUID(),
+        )
+      ).alreadyExisted,
+      true,
+    );
+    const [recovered] = await admin<
+      { count: number }[]
+    >`select count(*)::int as count from growth.outreach_jobs j join growth.outreach_outbox o on o.id=j.outbox_id where o.event_id=${eventId} and j.job_type='first_preparation'`;
+    assert.equal(recovered?.count, 1);
+    await assert.rejects(
+      executeCampaignCommand(
+        db,
+        { ...firstPermission, summary: "Different evidence." },
+        input.founder,
+        randomUUID(),
+      ),
+      /request_conflict/,
     );
     const prepare = (runId: string) =>
       withGrowthTransaction(db, (tx) =>
@@ -159,6 +208,14 @@ export async function exerciseResearchPreparation(
     );
     assert.equal(await prepareEvent(eventId), null);
     assert.equal((await prepareEvent(nextEvent))?.proof.origin, "research");
+    const jobs = await admin<{ id: string; eventId: string }[]>`
+      select j.id,o.event_id as "eventId" from growth.outreach_jobs j join growth.outreach_outbox o on o.id=j.outbox_id
+      where j.membership_id=${member.id} and j.job_type='first_preparation' order by j.due_at,j.id`;
+    assert.equal(jobs.length, 2);
+    assert.deepEqual(
+      new Set(jobs.map((job) => job.eventId)),
+      new Set([eventId, nextEvent]),
+    );
 
     assert.equal(await prepare(randomUUID()), null);
     await admin`update growth.prospects set version=version+1 where id=${prospectId}`;
@@ -206,6 +263,63 @@ export async function exerciseResearchPreparation(
     await admin`delete from growth.sequence_enrollments where id=${priorSequence}`;
     await admin`create function growth.test_prepare_audit_failure() returns trigger language plpgsql as $$ begin if new.action='campaign.first_message_prepared' then raise exception 'test prepare audit failure'; end if; return new; end $$`;
     await admin`create trigger test_prepare_audit_failure before insert on growth.audit_log for each row execute function growth.test_prepare_audit_failure()`;
+    const [credential] = await admin<
+      { subject: string; epoch: number; scopes: string[] }[]
+    >`
+      select google_subject as subject,version as epoch,granted_scopes as scopes from growth.integration_connections where id=${input.connectionId}`;
+    assert.ok(credential);
+    const grant = {
+      connectionId: input.connectionId,
+      googleSubject: credential.subject,
+      grantEpoch: credential.epoch,
+      grantedScopes: credential.scopes,
+    };
+    const currentJob = jobs.find((item) => item.eventId === nextEvent);
+    assert.ok(currentJob);
+    await admin`update growth.outreach_jobs set status='leased',lease_owner='grant-test',lease_revision=lease_revision+1,lease_until=clock_timestamp()+interval '1 minute' where id=${currentJob.id}`;
+    const [grantLease] = await admin<
+      { revision: string }[]
+    >`select lease_revision::text as revision from growth.outreach_jobs where id=${currentJob.id}`;
+    assert.ok(grantLease);
+    assert.deepEqual(
+      await prepareFirstMessageForJob(db, {
+        jobId: currentJob.id,
+        leaseOwner: "grant-test",
+        leaseRevision: grantLease.revision,
+        binding: { ...grant, googleSubject: "different-subject" },
+      }),
+      { status: "held", reason: "grant_changed" },
+    );
+    const [grantHeld] = await admin<
+      { status: string; reason: string }[]
+    >`select status,last_error_code as reason from growth.outreach_jobs where id=${currentJob.id}`;
+    assert.deepEqual(grantHeld, { status: "held", reason: "grant_changed" });
+    await admin`update growth.outreach_jobs set status='pending',lease_owner=null,lease_until=null,last_error_code=null where id=${currentJob.id}`;
+    await admin`update growth.outreach_account_controls set state='paused' where connection_id=${input.connectionId}`;
+    await admin`update growth.outreach_jobs set status='leased',lease_owner='retry-test',lease_revision=lease_revision+1,lease_until=clock_timestamp()+interval '1 minute' where id=${currentJob.id}`;
+    const [retryLease] = await admin<
+      { revision: string }[]
+    >`select lease_revision::text as revision from growth.outreach_jobs where id=${currentJob.id}`;
+    assert.ok(retryLease);
+    assert.deepEqual(
+      await prepareFirstMessageForJob(db, {
+        jobId: currentJob.id,
+        leaseOwner: "retry-test",
+        leaseRevision: retryLease.revision,
+        binding: grant,
+      }),
+      { status: "held", reason: "job_retry" },
+    );
+    const [retryState] = await admin<
+      { status: string; reason: string; future: boolean }[]
+    >`select status,last_error_code as reason,due_at>clock_timestamp() as future from growth.outreach_jobs where id=${currentJob.id}`;
+    assert.deepEqual(retryState, {
+      status: "pending",
+      reason: "account_not_active",
+      future: true,
+    });
+    await admin`update growth.outreach_account_controls set state='active' where connection_id=${input.connectionId}`;
+    await admin`update growth.outreach_jobs set due_at=clock_timestamp() where id=${currentJob.id}`;
     try {
       await assert.rejects(
         prepareFirstMessage(db, preparation),
@@ -221,10 +335,58 @@ export async function exerciseResearchPreparation(
         sequenceId: null,
         count: 0,
       });
+      await assert.rejects(
+        runFirstPreparationBatch(db, {
+          binding: grant,
+          workerId: "first-preparation-test",
+        }),
+        /test prepare audit failure/,
+      );
+      const [job] = await admin<{ status: string; revision: string }[]>`
+        select j.status,j.lease_revision::text as revision from growth.outreach_jobs j join growth.outreach_outbox o on o.id=j.outbox_id
+        where o.event_id=${nextEvent} and j.job_type='first_preparation'`;
+      assert.equal(job?.status, "leased");
+      assert.ok(job);
+      await admin`update growth.outreach_jobs set lease_until=clock_timestamp()-interval '1 second' where id=(select j.id from growth.outreach_jobs j join growth.outreach_outbox o on o.id=j.outbox_id where o.event_id=${nextEvent})`;
+      assert.deepEqual(
+        await prepareFirstMessageForJob(db, {
+          jobId: jobs.find((item) => item.eventId === nextEvent)!.id,
+          leaseOwner: "first-preparation-test",
+          leaseRevision: job.revision,
+          binding: grant,
+        }),
+        { status: "held", reason: "job_lease_invalid" },
+      );
     } finally {
       await admin`drop trigger test_prepare_audit_failure on growth.audit_log`;
       await admin`drop function growth.test_prepare_audit_failure()`;
     }
+    const workerResult = await runFirstPreparationBatch(db, {
+      binding: grant,
+      workerId: "first-preparation-test",
+    });
+    assert.equal(workerResult.prepared, 1);
+    const [completed] = await admin<{ id: string; revision: string }[]>`
+      select j.id,j.lease_revision::text as revision from growth.outreach_jobs j join growth.outreach_outbox o on o.id=j.outbox_id where o.event_id=${nextEvent} and j.status='completed'`;
+    assert.ok(completed);
+    assert.deepEqual(
+      await prepareFirstMessageForJob(db, {
+        jobId: completed.id,
+        leaseOwner: "grant-test",
+        leaseRevision: grantLease.revision,
+        binding: grant,
+      }),
+      { status: "held", reason: "job_lease_invalid" },
+    );
+    const replay = await prepareFirstMessageForJob(db, {
+      jobId: completed.id,
+      leaseOwner: "first-preparation-test",
+      leaseRevision: completed.revision,
+      binding: grant,
+    });
+    assert.equal(replay.status, "ready");
+    if (replay.status === "ready")
+      assert.equal(replay.value.alreadyExisted, true);
     const results = await Promise.all([
       prepareFirstMessage(db, preparation),
       prepareFirstMessage(db, preparation),
@@ -238,7 +400,7 @@ export async function exerciseResearchPreparation(
           (result) => result.status === "ready" && result.value.alreadyExisted,
         )
         .sort(),
-      [false, true],
+      [true, true],
     );
     const [prepared] = await admin<
       {
@@ -270,7 +432,30 @@ export async function exerciseResearchPreparation(
         reason: "existing_sequence",
       },
     );
+    // Synthetic event copies exercise only stage selection and the batch cap.
+    for (let index = 0; index < 26; index += 1) {
+      const event = randomUUID();
+      const outbox = randomUUID();
+      await admin`insert into growth.outreach_events(id,campaign_id,policy_version,membership_id,event_type,request_id,request_hash,actor_id,result_id)
+        select ${event},campaign_id,policy_version,membership_id,event_type,${event},request_hash,actor_id,result_id from growth.outreach_events where id=${nextEvent}`;
+      await admin`insert into growth.outreach_outbox(id,event_id) values (${outbox},${event})`;
+      await admin`insert into growth.outreach_jobs(campaign_id,policy_version,membership_id,outbox_id,job_type,due_at,idempotency_key)
+        select campaign_id,policy_version,membership_id,${outbox},'first_preparation',clock_timestamp(),${`first-preparation:${event}`} from growth.outreach_events where id=${event}`;
+    }
+    const firstBatch = await runFirstPreparationBatch(db, {
+      binding: grant,
+      workerId: "cap-test",
+    });
+    const secondBatch = await runFirstPreparationBatch(db, {
+      binding: grant,
+      workerId: "cap-test",
+    });
+    assert.equal(firstBatch.claimed, 25);
+    assert.equal(firstBatch.held, 25);
+    assert.equal(secondBatch.claimed, 1);
+    assert.equal(secondBatch.held, 1);
   } finally {
+    globalThis.fetch = savedFetch;
     const [memberRow] = await admin<
       { sequenceId: string | null }[]
     >`select sequence_id as "sequenceId" from growth.campaign_memberships where id=${member.id}`;
@@ -280,6 +465,7 @@ export async function exerciseResearchPreparation(
       await admin`delete from growth.email_messages where sequence_enrollment_id=${memberRow.sequenceId}`;
       await admin`delete from growth.sequence_enrollments where id=${memberRow.sequenceId}`;
     }
+    await admin`delete from growth.outreach_jobs where membership_id=${member.id} and job_type='first_preparation'`;
     await admin`delete from growth.outreach_outbox where event_id in (select id from growth.outreach_events where membership_id=${member.id})`;
     await admin`delete from growth.outreach_events where membership_id=${member.id}`;
     await admin`update growth.campaign_memberships set current_permission_id=null where id=${member.id}`;

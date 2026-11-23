@@ -330,6 +330,7 @@ export async function exerciseCampaignReservation(
       } finally {
         await admin`delete from growth.email_messages where id=${followupId}`;
       }
+      await admin`delete from growth.outreach_jobs where job_type='first_preparation' and outbox_id in (select id from growth.outreach_outbox where event_id=${permissionEvent})`;
       await admin`delete from growth.outreach_outbox where event_id=${permissionEvent}`;
       await admin`delete from growth.outreach_events where id=${permissionEvent}`;
 
@@ -613,6 +614,7 @@ export async function exerciseCampaignReservation(
       await admin`delete from growth.businesses where id=${business}`;
     }
   } finally {
+    await admin`delete from growth.outreach_jobs where campaign_id=${campaign.id} and job_type='first_preparation'`;
     await admin`delete from growth.outreach_outbox where event_id in (select id from growth.outreach_events where campaign_id=${campaign.id})`;
     await admin`delete from growth.outreach_events where campaign_id=${campaign.id}`;
     await admin`delete from growth.audit_log where entity_type='campaign' and entity_id=${campaign.id}`;

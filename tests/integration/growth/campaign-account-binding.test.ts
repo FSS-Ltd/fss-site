@@ -172,6 +172,7 @@ test(
       );
     } finally {
       if (campaignId) {
+        await admin`delete from growth.outreach_jobs where campaign_id=${campaignId} and job_type='first_preparation'`;
         await admin`delete from growth.outreach_outbox where event_id in (select id from growth.outreach_events where campaign_id=${campaignId})`;
         await admin`delete from growth.outreach_events where campaign_id=${campaignId}`;
         await admin`delete from growth.audit_log where entity_type='campaign' and entity_id=${campaignId}`;

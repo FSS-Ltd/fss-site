@@ -10,7 +10,10 @@ import {
   validateCampaignDefinition,
   serializeCampaignDefinition,
 } from "./lifecycle";
-import { recordCampaignPermission } from "./permissions";
+import {
+  enqueueFirstPreparation,
+  recordCampaignPermission,
+} from "./permissions";
 import {
   loadLatestCampaignPolicy,
   persistCampaignMembership,
@@ -179,6 +182,8 @@ export async function executeCampaignCommand(
         previous.actorId !== founder.actorId
       )
         throw new Error("request_conflict");
+      if (command.type === "record_permission")
+        await enqueueFirstPreparation(tx, command.requestId);
       return {
         status: "ok",
         id: previous.resultId,

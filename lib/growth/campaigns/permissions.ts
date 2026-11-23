@@ -12,6 +12,30 @@ type PermissionCommand = Extract<
   CampaignCommand,
   { type: "record_permission" }
 >;
+
+export async function enqueueFirstPreparation(
+  tx: GrowthTransaction,
+  eventId: string,
+): Promise<void> {
+  const key = `first-preparation:${eventId}`;
+  await tx`
+    insert into growth.outreach_jobs(campaign_id,policy_version,membership_id,outbox_id,job_type,due_at,idempotency_key)
+    select e.campaign_id,e.policy_version,e.membership_id,o.id,'first_preparation',clock_timestamp(),${key}
+    from growth.outreach_events e join growth.outreach_outbox o on o.event_id=e.id
+    join growth.campaign_memberships m on m.id=e.membership_id and m.campaign_id=e.campaign_id and m.policy_version=e.policy_version
+    join growth.campaigns c on c.id=e.campaign_id and c.version=e.policy_version
+    join growth.outreach_permissions p on p.id=e.result_id and p.membership_id=e.membership_id and p.id=m.current_permission_id
+    where e.id=${eventId} and e.event_type='record_permission' and p.provider='gmail'
+      and c.account_connection_id is not null and c.policy->>'provider'='gmail'
+    on conflict (idempotency_key) do nothing`;
+  const [conflict] = await tx<{ conflict: boolean }[]>`
+    select exists(select 1 from growth.outreach_jobs j left join growth.outreach_outbox o on o.id=j.outbox_id
+      left join growth.outreach_events e on e.id=o.event_id
+      where j.idempotency_key=${key} and (j.job_type<>'first_preparation' or e.id is distinct from ${eventId}::uuid
+        or j.campaign_id is distinct from e.campaign_id or j.policy_version is distinct from e.policy_version
+        or j.membership_id is distinct from e.membership_id)) as conflict`;
+  if (conflict?.conflict) throw new Error("preparation_job_conflict");
+}
 export async function recordCampaignPermission(
   tx: GrowthTransaction,
   raw: PermissionCommand,
@@ -49,6 +73,7 @@ export async function recordCampaignPermission(
       previous.resultId !== command.evidenceId
     )
       throw new Error("request_conflict");
+    await enqueueFirstPreparation(tx, command.requestId);
     return {
       campaignId: previous.campaignId,
       version: previous.version,
@@ -167,6 +192,7 @@ export async function recordCampaignPermission(
     founder,
     correlationId,
   });
+  await enqueueFirstPreparation(tx, command.requestId);
   return {
     campaignId: member.campaignId,
     version: member.version,
