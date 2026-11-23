@@ -13,7 +13,7 @@ function basis(value: string): string {
 }
 function verdict(reason: string): string {
   if (reason === "clear_interval")
-    return "A leading variant was recorded in this snapshot.";
+    return "A leading variant was recorded in this observed comparison.";
   if (reason === "insufficient_evidence")
     return "No winner: insufficient evidence.";
   if (reason === "confounded") return "No comparison: conditions differ.";
@@ -42,12 +42,27 @@ function Snapshot({ item }: { item: ReportSnapshot }) {
           {verdict(report.winnerReason)}{" "}
           {report.winner && `Recorded leading variant: ${report.winner}.`}
         </p>
-        <p>
-          Evidence available at cutoff: unknown. Complete reply coverage
-          observed at report read: {item.observedCoverage}. Outcome source
-          coverage and comparable copy identity: unknown. Ambiguous evidence:{" "}
-          {report.ambiguousEvidence}.
-        </p>
+        {item.version === 1 ? (
+          <p>
+            Evidence available at cutoff: unknown. Complete reply coverage
+            observed at report read: {item.observedCoverage}. Outcome source
+            coverage and comparable copy identity: unknown. Ambiguous evidence:{" "}
+            {report.ambiguousEvidence}.
+          </p>
+        ) : (
+          <p>
+            PostgreSQL statement snapshot read{" "}
+            {item.readAt
+              ? formatGrowthDateTime(item.readAt)
+              : "at an unknown time"}
+            . Reply events are limited to the cutoff; classifications and
+            coverage reflect what was visible at that read. Historical source
+            availability at cutoff and outcome source coverage are unknown.
+            Complete reply coverage observed at read: {item.observedCoverage}.
+            Copy identity is compared only where frozen evidence exists.
+            Ambiguous evidence: {report.ambiguousEvidence}.
+          </p>
+        )}
         <p>
           The cohort spans 14 London calendar dates; each recipient needs a
           14-day observation period. Offer terms are unavailable in this
