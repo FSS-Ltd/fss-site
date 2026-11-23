@@ -28,6 +28,12 @@ type Dependencies = {
       replay: boolean;
     }>
   >;
+  adverse?: (
+    config: Configuration,
+    connectionId: string,
+    rawBody: string,
+    headers: ResendWebhookHeaders,
+  ) => Promise<ReservationOutcome<{ ignored: boolean; replay: boolean }>>;
   reportUnexpectedError?: (error: unknown) => void;
 };
 function response(status: number, code: string): Response {
@@ -37,7 +43,7 @@ function response(status: number, code: string): Response {
   );
 }
 
-/** Scoped deliveries only. This endpoint never invokes the newsletter webhook. */
+/** Scoped outreach events only. This endpoint never invokes the newsletter webhook. */
 export function createResendOutreachWebhookHandler(
   deps: Dependencies,
 ): (request: Request) => Promise<Response> {
@@ -70,12 +76,36 @@ export function createResendOutreachWebhookHandler(
       if (
         !verified.payload ||
         typeof verified.payload !== "object" ||
-        !("type" in verified.payload) ||
-        verified.payload.type !== "email.delivered"
+        !("type" in verified.payload)
+      )
+        return response(422, "unsupported_event");
+      const type = verified.payload.type;
+      if (
+        type !== "email.delivered" &&
+        type !== "email.bounced" &&
+        type !== "email.complained"
       )
         return response(422, "unsupported_event");
       const connectionId = await deps.resolveConnection(config.binding);
       if (!connectionId) return response(503, "account_unavailable");
+      if (type !== "email.delivered") {
+        if (!deps.adverse) return response(503, "configuration_unavailable");
+        const result = await deps.adverse(
+          config,
+          connectionId,
+          rawBody,
+          headers,
+        );
+        if (result.status === "ready")
+          return response(200, result.value.ignored ? "ignored" : "recorded");
+        if (
+          ["issuer_unknown", "webhook_binding_unknown"].includes(result.reason)
+        )
+          return response(503, "receipt_pending");
+        if (result.reason === "adverse_unverified")
+          return response(422, "invalid_event");
+        return response(409, "receipt_conflict");
+      }
       const candidate = extractResendDeliveryCandidate({
         verified,
         binding: {

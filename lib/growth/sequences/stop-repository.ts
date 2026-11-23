@@ -110,6 +110,11 @@ export function createSequenceStopTransaction(
             updated_at = now()
         where sequence_enrollment_id = ${sequenceId}
           and status in ('queued', 'retry')
+          and not exists (
+            select 1 from growth.outreach_reservations r
+            where r.email_message_id = growth.email_messages.id
+              and r.confirmation_receipt is not null
+          )
         returning id
       `;
       return { cancelledCount: rows.length };

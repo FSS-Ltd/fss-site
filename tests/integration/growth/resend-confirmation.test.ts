@@ -13,6 +13,7 @@ for (const scenario of [
   "prior_reply",
   "revoked",
   "unsupported_snapshot",
+  "adverse_before_delivery",
 ] as const) {
   test(
     `signed Resend delivery preserves lifecycle for ${scenario}`,
@@ -43,6 +44,18 @@ for (const scenario of [
         lease = randomUUID(),
         attempt = randomUUID(),
         review = randomUUID();
+      const otherBusiness = randomUUID(),
+        otherContact = randomUUID(),
+        otherProspect = randomUUID(),
+        otherSequence = randomUUID(),
+        otherMember = randomUUID(),
+        otherJob = randomUUID();
+      const legacyContact = randomUUID(),
+        legacyProspect = randomUUID(),
+        legacySequence = randomUUID(),
+        legacyMessage = randomUUID(),
+        legacyLease = randomUUID();
+      const legacyEmail = `legacy-${randomUUID()}@example.test`;
       const webhookGeneration = randomUUID(),
         sender = `outreach-${randomUUID()}@example.test`,
         recipient = `owner-${randomUUID()}@example.test`,
@@ -174,6 +187,8 @@ for (const scenario of [
           await import("../../../app/api/webhooks/resend/outreach/handler");
         const { resolveResendOutreachConnection } =
           await import("../../../app/api/webhooks/resend/outreach/account");
+        const { createResendAdverseEventHandler } =
+          await import("../../../lib/growth/campaigns/resend-adverse-event");
         const ingress = createResendOutreachWebhookHandler({
           readConfiguration: () => ({ binding, webhookSecret: secret }),
           resolveConnection: (configured) =>
@@ -183,6 +198,11 @@ for (const scenario of [
               raw,
               headers,
             ),
+          adverse: (configured, connectionId, raw, headers) =>
+            createResendAdverseEventHandler(db, {
+              ...configured,
+              connectionId,
+            })(raw, headers),
         });
         const incoming = (raw: string, headers: Record<string, string>) =>
           new Request("https://example.test/api/webhooks/resend/outreach", {
@@ -200,6 +220,22 @@ for (const scenario of [
         assert.deepEqual(await send(early.raw, early.headers), {
           status: "held",
           reason: "issuer_unknown",
+        });
+        const earlyBounce = signed(
+          {
+            ...event,
+            type: "email.bounced",
+            data: { ...event.data, bounce: { type: "Permanent" } },
+          },
+          "b".repeat(256),
+        );
+        const earlyAdverseResponse = await ingress(
+          incoming(earlyBounce.raw, earlyBounce.headers),
+        );
+        assert.equal(earlyAdverseResponse.status, 503);
+        assert.deepEqual(await earlyAdverseResponse.json(), {
+          ok: false,
+          code: "receipt_pending",
         });
         const proof = {
           version: 1,
@@ -263,6 +299,18 @@ for (const scenario of [
             first: null,
             receipt: null,
             jobs: 0,
+          });
+          const adverse = await ingress(
+            incoming(earlyBounce.raw, earlyBounce.headers),
+          );
+          assert.equal(adverse.status, 200);
+          const [legacySafety] = await admin<
+            { state: string; businessOnly: number; receipt: unknown }[]
+          >`select c.state,(select count(*)::int from growth.suppressions where business_id=${business} and normalised_email is null) as "businessOnly",r.confirmation_receipt as receipt from growth.outreach_account_controls c join growth.outreach_reservations r on r.id=${reservation} where c.connection_id=${account}`;
+          assert.deepEqual(legacySafety, {
+            state: "halted",
+            businessOnly: 1,
+            receipt: null,
           });
           return;
         }
@@ -362,6 +410,16 @@ for (const scenario of [
         >`select confirmation_receipt as receipt from growth.outreach_reservations where id=${reservation}`;
         assert.equal(noReceipt?.receipt, null);
         await admin`delete from growth.resend_delivery_events where provider_event_id=${eventId}`;
+        if (scenario === "adverse_before_delivery") {
+          const earlyApplied = await ingress(
+            incoming(earlyBounce.raw, earlyBounce.headers),
+          );
+          assert.equal(earlyApplied.status, 200);
+          assert.deepEqual(await earlyApplied.json(), {
+            ok: true,
+            code: "recorded",
+          });
+        }
         if (scenario === "paused" || scenario === "stopped")
           await admin`update growth.campaign_memberships set status=${scenario} where id=${member}`;
         if (scenario === "revoked")
@@ -382,7 +440,10 @@ for (const scenario of [
         const [afterFailure] = await admin<
           { receipt: unknown; events: number }[]
         >`select confirmation_receipt as receipt,(select count(*)::int from growth.resend_delivery_events where outreach_reservation_id=${reservation}) as events from growth.outreach_reservations where id=${reservation}`;
-        assert.deepEqual(afterFailure, { receipt: null, events: 0 });
+        assert.deepEqual(afterFailure, {
+          receipt: null,
+          events: scenario === "adverse_before_delivery" ? 1 : 0,
+        });
         const [rollback] = await admin<
           {
             first: string | null;
@@ -394,7 +455,7 @@ for (const scenario of [
         assert.deepEqual(rollback, {
           first: null,
           jobs: 0,
-          eventCount: 0,
+          eventCount: scenario === "adverse_before_delivery" ? 1 : 0,
           provider: null,
           rfc: null,
         });
@@ -434,7 +495,9 @@ for (const scenario of [
           { status: string; channel: string; step: number }[]
         >`select j.status,em.channel,em.step_number as step from growth.outreach_jobs j join growth.email_messages em on em.idempotency_key=j.idempotency_key where j.membership_id=${member} and j.job_type='follow_up' order by step`;
         const followupStatus =
-          scenario === "stopped" || scenario === "prior_reply"
+          scenario === "stopped" ||
+          scenario === "prior_reply" ||
+          scenario === "adverse_before_delivery"
             ? "cancelled"
             : "held";
         assert.deepEqual(Array.from(followups), [
@@ -474,7 +537,8 @@ for (const scenario of [
           provider: providerId,
           rfc: "<actual@example.test>",
           sent: null,
-          status: "queued",
+          status:
+            scenario === "adverse_before_delivery" ? "cancelled" : "queued",
         });
         const second = await send(wire.raw, wire.headers);
         if (second.status !== "ready") throw new Error(second.reason);
@@ -499,6 +563,163 @@ for (const scenario of [
           admin`update growth.outreach_reservations set confirmation_receipt='{}' where id=${reservation}`,
           /immutable/,
         );
+        if (scenario === "active") {
+          // Same email already belongs to another business's suppression; the
+          // attributed business must still receive an independent real guard.
+          await admin`insert into growth.businesses(id,legal_name,corporate_type,corporate_status,sector,locality,first_party_source_url,country_code) values (${otherBusiness},'Unrelated business','limited_company','active','Test','Test','https://example.test','GB')`;
+          await admin`insert into growth.contacts(id,business_id,email,email_source_url,email_verified_at,subscriber_type,lawful_basis) values (${otherContact},${otherBusiness},${`other-${randomUUID()}@example.test`},'https://example.test',now(),'corporate','consent'),(${legacyContact},${business},${legacyEmail},'https://example.test',now(),'corporate','consent')`;
+          await admin`update growth.prospects set status='lost' where id=${prospect}`;
+          await admin`insert into growth.prospects(id,business_id,primary_contact_id,status,fit_score,opportunity_summary,recommended_offer,estimated_one_off_min_pence,estimated_one_off_max_pence,assigned_owner_email) values (${otherProspect},${otherBusiness},${otherContact},'ready_for_email_review',0,'test','test',0,0,'j.ntagengwa@faithfulsoftware.dev'),(${legacyProspect},${business},${legacyContact},'ready_for_email_review',0,'test','test',0,0,'j.ntagengwa@faithfulsoftware.dev')`;
+          await admin`insert into growth.sequence_enrollments(id,prospect_id,contact_id,status) values (${otherSequence},${otherProspect},${otherContact},'active'),(${legacySequence},${legacyProspect},${legacyContact},'active')`;
+          await admin`insert into growth.email_messages(id,sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key,lease_token,lease_expires_at,subject_snapshot,html_snapshot,text_snapshot) values (${legacyMessage},${legacySequence},${legacyProspect},${legacyContact},'gmail','outbound',0,'sending',${randomUUID()},${legacyLease},now()+interval '1 hour','Subject','<p>Body</p>','Body')`;
+          await admin`insert into growth.campaign_memberships(id,campaign_id,policy_version,business_id,prospect_id,sequence_id,request_id,status) values (${otherMember},${campaign},1,${otherBusiness},${otherProspect},${otherSequence},${randomUUID()},'active')`;
+          await admin`insert into growth.outreach_jobs(id,campaign_id,policy_version,membership_id,job_type,due_at,idempotency_key,status) values (${otherJob},${campaign},1,${otherMember},'follow_up',now(),${randomUUID()},'held')`;
+          await admin`insert into growth.suppressions(normalised_email,business_id,reason,source,created_by) values (${recipient},${otherBusiness},'bounce','test','fixture')`;
+          const priorHealth = randomUUID();
+          await admin`insert into growth.outreach_account_reviews(id,connection_id,request_id,request_hash,actor_id,kind,evidence,resulting_version) values (${priorHealth},${account},${randomUUID()},repeat('a',64),${createHash("sha256").update("j.ntagengwa@faithfulsoftware.dev").digest("hex")},'record_health','{}',4)`;
+          await admin`update growth.outreach_account_controls set health_review_id=${priorHealth} where connection_id=${account}`;
+          const [newsletterBefore] = await admin<
+            { count: number }[]
+          >`select count(*)::int as count from growth.newsletter_subscribers where normalised_email=${recipient}`;
+          const soft = signed(
+            {
+              ...event,
+              type: "email.bounced",
+              data: { ...event.data, bounce: { type: "Transient" } },
+            },
+            `soft-${randomUUID()}`,
+          );
+          const softResponse = await ingress(incoming(soft.raw, soft.headers));
+          assert.equal(softResponse.status, 200);
+          assert.deepEqual(await softResponse.json(), {
+            ok: true,
+            code: "ignored",
+          });
+          const wrong = signed(
+            {
+              ...event,
+              type: "email.complained",
+              data: { ...event.data, to: ["wrong@example.test"] },
+            },
+            `wrong-${randomUUID()}`,
+          );
+          assert.equal(
+            (await ingress(incoming(wrong.raw, wrong.headers))).status,
+            409,
+          );
+          await admin`revoke insert on growth.audit_log from growth_app`;
+          try {
+            assert.equal(
+              (await ingress(incoming(earlyBounce.raw, earlyBounce.headers)))
+                .status,
+              503,
+            );
+          } finally {
+            await admin`grant insert on growth.audit_log to growth_app`;
+          }
+          const [rolledBack] = await admin<
+            { state: string; businessOnly: number; seq: string }[]
+          >`select c.state,(select count(*)::int from growth.suppressions where business_id=${business} and normalised_email is null) as "businessOnly",(select status from growth.sequence_enrollments where id=${sequence}) as seq from growth.outreach_account_controls c where c.connection_id=${account}`;
+          assert.deepEqual(rolledBack, {
+            state: "active",
+            businessOnly: 0,
+            seq: "active",
+          });
+          const [bounceResponse, replayBounce] = await Promise.all([
+            ingress(incoming(earlyBounce.raw, earlyBounce.headers)),
+            ingress(incoming(earlyBounce.raw, earlyBounce.headers)),
+          ]);
+          assert.equal(bounceResponse.status, 200);
+          assert.deepEqual(await bounceResponse.json(), {
+            ok: true,
+            code: "recorded",
+          });
+          assert.equal(replayBounce.status, 200);
+          const complaint = signed(
+            { ...event, type: "email.complained" },
+            `complaint-${randomUUID()}`,
+          );
+          assert.equal(
+            (await ingress(incoming(complaint.raw, complaint.headers))).status,
+            200,
+          );
+          const [suppression] = await admin<
+            { preserved: string; businessOnly: number; legacyByEmail: number }[]
+          >`select (select business_id::text from growth.suppressions where normalised_email=${recipient}) as preserved,(select count(*)::int from growth.suppressions where business_id=${business} and normalised_email is null) as "businessOnly",(select count(*)::int from growth.suppressions where normalised_email=${legacyEmail}) as "legacyByEmail"`;
+          assert.deepEqual(suppression, {
+            preserved: otherBusiness,
+            businessOnly: 1,
+            legacyByEmail: 0,
+          });
+          const [afterAdverse] = await admin<
+            {
+              state: string;
+              memberStatus: string;
+              otherJobStatus: string;
+              events: number;
+              receipt: unknown;
+            }[]
+          >`select c.state,m.status as "memberStatus",(select status from growth.outreach_jobs where id=${otherJob}) as "otherJobStatus",(select count(*)::int from growth.resend_delivery_events where outreach_reservation_id=${reservation}) as events,r.confirmation_receipt as receipt from growth.outreach_account_controls c join growth.campaign_memberships m on m.id=${member} join growth.outreach_reservations r on r.id=${reservation} where c.connection_id=${account}`;
+          const [newsletterAfter] = await admin<
+            { count: number }[]
+          >`select count(*)::int as count from growth.newsletter_subscribers where normalised_email=${recipient}`;
+          assert.equal(newsletterAfter?.count, newsletterBefore?.count);
+          const [history] = await admin<
+            { pointer: string | null; retained: boolean }[]
+          >`select health_review_id as pointer,exists(select 1 from growth.outreach_account_reviews where id=${priorHealth}) as retained from growth.outreach_account_controls where connection_id=${account}`;
+          assert.deepEqual(history, { pointer: null, retained: true });
+          const [deliveredMessage] = await admin<
+            { status: string; sent: Date | null; rfc: string }[]
+          >`select status,sent_at as sent,rfc_message_id as rfc from growth.email_messages where id=${message}`;
+          assert.deepEqual(deliveredMessage, {
+            status: "queued",
+            sent: null,
+            rfc: "<actual@example.test>",
+          });
+          const [futureJobs] = await admin<
+            { cancelled: number }[]
+          >`select count(*)::int as cancelled from growth.outreach_jobs where membership_id=${member} and job_type='follow_up' and status='cancelled'`;
+          assert.equal(futureJobs?.cancelled, 2);
+          assert.equal(afterAdverse?.state, "halted");
+          assert.equal(afterAdverse?.memberStatus, "stopped");
+          assert.equal(afterAdverse?.otherJobStatus, "held");
+          assert.equal(afterAdverse?.events, 3);
+          assert.deepEqual(afterAdverse?.receipt, first.value.receipt);
+          // Simulate an email-only legacy preview having queued the second
+          // contact: the real terminal authority must still see the business row.
+          await admin`update growth.sequence_enrollments set status='active' where id=${legacySequence}`;
+          const { withGrowthTransaction } =
+            await import("../../../lib/growth/db/client");
+          const { loadCanonicalOutreachPreparation } =
+            await import("../../../lib/growth/campaigns/dispatch-authority");
+          const [legacyContext] = await admin<
+            {
+              isClient: boolean;
+              hasReply: boolean;
+              emailSuppressed: boolean;
+              state: string;
+            }[]
+          >`select growth.is_outreach_client(${legacyProspect}) as "isClient",exists(select 1 from growth.email_messages where sequence_enrollment_id=${legacySequence} and direction='inbound') as "hasReply",exists(select 1 from growth.suppressions where normalised_email=${legacyEmail}) as "emailSuppressed",status as state from growth.sequence_enrollments where id=${legacySequence}`;
+          assert.deepEqual(legacyContext, {
+            isClient: false,
+            hasReply: false,
+            emailSuppressed: false,
+            state: "active",
+          });
+          const decision = await withGrowthTransaction(db, (tx) =>
+            loadCanonicalOutreachPreparation(tx, {
+              messageId: legacyMessage,
+              leaseToken: legacyLease,
+              connectionId: account,
+              grantEpoch: null,
+              now: new Date(),
+            }),
+          );
+          assert.deepEqual(decision, {
+            status: "held",
+            reason: "outreach_excluded",
+          });
+        }
         const [stored] = await admin<
           {
             rfc: string | null;
@@ -515,7 +736,8 @@ for (const scenario of [
         });
       } finally {
         try {
-          await admin`delete from growth.audit_log where entity_id=${reservation}`;
+          await admin`delete from growth.audit_log where entity_id in (${reservation},${account},${sequence},${legacySequence})`;
+          await admin`delete from growth.suppressions where business_id in (${business},${otherBusiness})`;
           await admin`delete from growth.resend_delivery_events where outreach_reservation_id=${reservation}`;
           await admin`delete from growth.outreach_outbox where event_id in (select id from growth.outreach_events where campaign_id=${campaign})`;
           await admin`delete from growth.outreach_events where campaign_id=${campaign}`;
@@ -526,12 +748,12 @@ for (const scenario of [
             await tx`alter table growth.campaign_memberships enable trigger protect_campaign_confirmation`;
           });
           await admin`delete from growth.outreach_reservations where id=${reservation}`;
-          await admin`delete from growth.campaign_memberships where id=${member}`;
-          await admin`delete from growth.email_messages where sequence_enrollment_id=${sequence}`;
-          await admin`delete from growth.sequence_enrollments where id=${sequence}`;
-          await admin`delete from growth.prospects where id=${prospect}`;
-          await admin`delete from growth.contacts where id=${contact}`;
-          await admin`delete from growth.businesses where id=${business}`;
+          await admin`delete from growth.campaign_memberships where id in (${member},${otherMember})`;
+          await admin`delete from growth.email_messages where sequence_enrollment_id in (${sequence},${legacySequence})`;
+          await admin`delete from growth.sequence_enrollments where id in (${sequence},${legacySequence},${otherSequence})`;
+          await admin`delete from growth.prospects where id in (${prospect},${legacyProspect},${otherProspect})`;
+          await admin`delete from growth.contacts where id in (${contact},${legacyContact},${otherContact})`;
+          await admin`delete from growth.businesses where id in (${business},${otherBusiness})`;
           await admin`delete from growth.campaigns where id=${campaign}`;
           await admin`update growth.outreach_account_controls set resend_binding_review_id=null where connection_id=${account}`;
           await admin`delete from growth.outreach_account_reviews where connection_id=${account}`;

@@ -1,4 +1,5 @@
 import { readResendOutreachRuntime } from "@/lib/growth/campaigns/resend-account-runtime";
+import { createResendAdverseEventHandler } from "@/lib/growth/campaigns/resend-adverse-event";
 import { createResendConfirmation } from "@/lib/growth/campaigns/resend-confirmation";
 import { getGrowthDb } from "@/lib/growth/db/client";
 import { createResendOutreachWebhookHandler } from "./handler";
@@ -17,6 +18,12 @@ const handler = createResendOutreachWebhookHandler({
     resolveResendOutreachConnection(getGrowthDb(), binding),
   confirm: (config, connectionId, rawBody, headers) =>
     createResendConfirmation(getGrowthDb(), {
+      connectionId,
+      binding: config.binding,
+      webhookSecret: config.webhookSecret,
+    })(rawBody, headers),
+  adverse: (config, connectionId, rawBody, headers) =>
+    createResendAdverseEventHandler(getGrowthDb(), {
       connectionId,
       binding: config.binding,
       webhookSecret: config.webhookSecret,

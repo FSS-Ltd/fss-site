@@ -114,7 +114,7 @@ test("holds unconfigured, unrecognized, unsafe or unresolved requests", async ()
     503,
   );
   assert.equal(
-    (await handler(request({ ...event, type: "email.bounced" }))).status,
+    (await handler(request({ ...event, type: "email.opened" }))).status,
     422,
   );
   assert.equal(calls, 0);
@@ -178,4 +178,42 @@ test("enforces the byte limit and returns redacted errors", async () => {
     { method: "POST", body: bytes },
   );
   assert.equal((await handler(invalid)).status, 400);
+});
+
+test("routes authenticated adverse events without invoking delivery confirmation", async () => {
+  let calls = 0,
+    deliveries = 0;
+  const handler = createResendOutreachWebhookHandler({
+    readConfiguration: () => ({ binding, webhookSecret: secret }),
+    resolveConnection: async () => connectionId,
+    confirm: async () => {
+      deliveries++;
+      return { status: "held", reason: "unused" };
+    },
+    adverse: async (_config, id, raw) => {
+      calls++;
+      assert.equal(id, connectionId);
+      const payload = JSON.parse(raw) as { type: string };
+      return {
+        status: "ready",
+        value: { ignored: payload.type === "email.bounced", replay: false },
+      };
+    },
+  });
+  const soft = await handler(
+    request({
+      ...event,
+      type: "email.bounced",
+      data: { ...event.data, bounce: { type: "Transient" } },
+    }),
+  );
+  assert.equal(soft.status, 200);
+  assert.deepEqual(await soft.json(), { ok: true, code: "ignored" });
+  const complaint = await handler(
+    request({ ...event, type: "email.complained" }),
+  );
+  assert.equal(complaint.status, 200);
+  assert.deepEqual(await complaint.json(), { ok: true, code: "recorded" });
+  assert.equal(calls, 2);
+  assert.equal(deliveries, 0);
 });
