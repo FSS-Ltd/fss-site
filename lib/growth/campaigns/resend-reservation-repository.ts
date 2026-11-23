@@ -69,6 +69,7 @@ export type ResendIssuedSnapshot = {
   from: string;
   replyTo: string;
   recipient: string;
+  monitoredMailbox: ReadyAccount["monitoredMailbox"];
   campaign: Campaign;
 };
 export type ResendReservation = {
@@ -158,7 +159,17 @@ async function lockedPreparation(
   return {
     status: "ready",
     value: {
-      preparation: preparation.preparation,
+      preparation: {
+        ...preparation.preparation,
+        fingerprint: createHash("sha256")
+          .update(
+            JSON.stringify([
+              preparation.preparation.fingerprint,
+              account.monitoredMailbox,
+            ]),
+          )
+          .digest("hex"),
+      },
       account,
       now: clock.now,
       bounds: intersectAuthorityBounds(preparation.bounds, {
@@ -442,6 +453,7 @@ export async function beginResendOutreachSubmission(
       from: runtime.binding.sender,
       replyTo: runtime.binding.replyTo,
       recipient,
+      monitoredMailbox: account.monitoredMailbox,
       campaign,
     };
     const budget = await checkBudget(

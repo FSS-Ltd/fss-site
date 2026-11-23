@@ -2,7 +2,10 @@ import { createHash } from "node:crypto";
 import { z } from "zod";
 import { withGrowthTransaction } from "../db/client";
 import type { GrowthDb, GrowthTransaction } from "../db/types";
-import { hasRequiredGmailScopes } from "../integrations/google-oauth";
+import {
+  hasRequiredGmailScopes,
+  normalizedAccountScopes,
+} from "../integrations/google-oauth";
 import { readResendUsage } from "../integrations/resend/usage";
 import { healthReviewSchema } from "./account-contracts";
 import { CAMPAIGN_FOUNDER_EMAIL } from "./authorization";
@@ -18,7 +21,19 @@ export async function loadResendAccountReadiness(
   runtime: ResendRuntimeConfiguration,
   mode: "active" | "prerequisites" = "active",
 ): Promise<
-  | { status: "ready"; expiresAt: Date; healthObservedFrom: Date; ramp: number }
+  | {
+      status: "ready";
+      expiresAt: Date;
+      healthObservedFrom: Date;
+      ramp: number;
+      monitoredMailbox: {
+        connectionId: string;
+        googleSubject: string;
+        grantEpoch: number;
+        address: string;
+        grantedScopes: string[];
+      };
+    }
   | { status: "held"; reason: string }
 > {
   // Configuration locks the connection before its control. Usage writers also
@@ -62,9 +77,17 @@ export async function loadResendAccountReadiness(
     !row.complete
   )
     return { status: "held", reason: "identity_or_usage_unknown" };
-  const [gmail] = await tx<
-    { status: string; subject: string | null; scopes: string[] }[]
-  >`select status,google_subject as subject,granted_scopes as scopes from growth.integration_connections where provider='gmail' and subject_email=${binding.data.replyTo} for share`;
+  const gmailRows = await tx<
+    {
+      connectionId: string;
+      status: string;
+      subject: string | null;
+      grantEpoch: number;
+      address: string;
+      scopes: string[];
+    }[]
+  >`select id as "connectionId",status,google_subject as subject,version as "grantEpoch",subject_email as address,granted_scopes as scopes from growth.integration_connections where provider='gmail' and subject_email=${binding.data.replyTo} for share`;
+  const gmail = gmailRows.length === 1 ? gmailRows[0] : undefined;
   const [clock] = await tx<{ now: Date }[]>`select clock_timestamp() as now`;
   if (!clock) return { status: "held", reason: "invalid_time" };
   const decision = assessResendAccountReadiness(
@@ -81,6 +104,17 @@ export async function loadResendAccountReadiness(
         !!gmail &&
         gmail.status === "connected" &&
         !!gmail.subject &&
+        gmail.subject.length <= 512 &&
+        gmail.subject === gmail.subject.trim() &&
+        Number.isSafeInteger(gmail.grantEpoch) &&
+        gmail.grantEpoch > 0 &&
+        gmail.scopes.length <= 30 &&
+        gmail.scopes.every(
+          (scope) =>
+            typeof scope === "string" &&
+            scope.length > 0 &&
+            scope === scope.trim(),
+        ) &&
         hasRequiredGmailScopes(gmail.scopes),
     },
     clock.now,
@@ -88,11 +122,20 @@ export async function loadResendAccountReadiness(
   );
   return decision.status === "held"
     ? decision
-    : {
-        ...decision,
-        ramp: row.ramp,
-        healthObservedFrom: healthEnvelope.data.evidence.observedFrom,
-      };
+    : gmail?.subject
+      ? {
+          ...decision,
+          monitoredMailbox: {
+            connectionId: gmail.connectionId,
+            googleSubject: gmail.subject,
+            grantEpoch: gmail.grantEpoch,
+            address: gmail.address,
+            grantedScopes: normalizedAccountScopes(gmail.scopes),
+          },
+          ramp: row.ramp,
+          healthObservedFrom: healthEnvelope.data.evidence.observedFrom,
+        }
+      : { status: "held", reason: "identity_or_configuration_unknown" };
 }
 
 export async function refreshResendAccountUsage(

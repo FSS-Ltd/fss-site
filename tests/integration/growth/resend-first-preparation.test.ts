@@ -22,7 +22,12 @@ import { createGlobalResearchFixture } from "../../../lib/growth/research/global
 import { globalResearchRunSchema } from "../../../lib/growth/research/global-schema";
 
 const url = process.env.DIRECT_DATABASE_URL;
-for (const scenario of ["accepted", "unknown", "not_invoked"] as const)
+for (const scenario of [
+  "accepted",
+  "unknown",
+  "not_invoked",
+  "monitor_rotated",
+] as const)
   test(
     `Resend guarded preparation and ${scenario} evidence`,
     { skip: !url },
@@ -496,6 +501,37 @@ for (const scenario of ["accepted", "unknown", "not_invoked"] as const)
               fence: reserved.value.fence,
               fingerprint: reserved.value.preparation.fingerprint,
             };
+            const replacedMonitorRollback = new Error("restore monitor");
+            await assert.rejects(
+              tx.savepoint(async (sp) => {
+                await sp`delete from growth.integration_connections where id=${gmail}`;
+                await sp`insert into growth.integration_connections(id,provider,subject_email,status,google_subject,granted_scopes) values (${randomUUID()},'gmail',${sender},'connected','test-subject',${["openid", "email", "https://www.googleapis.com/auth/gmail.modify"]})`;
+                assert.equal(
+                  (await beginResendOutreachSubmission(db, beginInput)).status,
+                  "held",
+                );
+                throw replacedMonitorRollback;
+              }),
+              (error) => error === replacedMonitorRollback,
+            );
+            await tx`update growth.integration_connections set google_subject='replacement-subject' where id=${gmail}`;
+            assert.equal(
+              (await beginResendOutreachSubmission(db, beginInput)).status,
+              "held",
+            );
+            await tx`update growth.integration_connections set google_subject='test-subject' where id=${gmail}`;
+            await tx`update growth.integration_connections set version=version+1 where id=${gmail}`;
+            assert.equal(
+              (await beginResendOutreachSubmission(db, beginInput)).status,
+              "held",
+            );
+            await tx`update growth.integration_connections set version=version-1 where id=${gmail}`;
+            await tx`update growth.integration_connections set granted_scopes='{}' where id=${gmail}`;
+            assert.equal(
+              (await beginResendOutreachSubmission(db, beginInput)).status,
+              "held",
+            );
+            await tx`update growth.integration_connections set granted_scopes=${["openid", "email", "https://www.googleapis.com/auth/gmail.modify"]} where id=${gmail}`;
             process.env.RESEND_OUTREACH_USAGE_GENERATION = randomUUID();
             assert.equal(
               (await beginResendOutreachSubmission(db, beginInput)).status,
@@ -533,16 +569,40 @@ for (const scenario of ["accepted", "unknown", "not_invoked"] as const)
                   }
                 : transport;
             };
+            const rawQuery = tx as unknown as (
+              strings: TemplateStringsArray,
+              ...values: unknown[]
+            ) => Promise<unknown>;
+            const rotatedDb = Object.assign(
+              async (strings: TemplateStringsArray, ...values: unknown[]) => {
+                if (strings.join("?").includes('g.id as "monitorId"'))
+                  await tx`update growth.integration_connections set version=version+1 where id=${gmail}`;
+                return rawQuery(strings, ...values);
+              },
+              {
+                begin: async <T>(
+                  operation: (inner: GrowthTransaction) => Promise<T>,
+                ) => operation(tx),
+                json: tx.json,
+              },
+            ) as unknown as GrowthDb;
             const submit = await submitReservedResendOutreach(
-              db,
+              scenario === "monitor_rotated" ? rotatedDb : db,
               sendInput,
               factory,
             );
             assert.equal(
               submit.status,
-              scenario === "unknown" ? "uncertain" : scenario,
+              scenario === "unknown" || scenario === "monitor_rotated"
+                ? "uncertain"
+                : scenario,
             );
-            assert.equal(posts, scenario === "not_invoked" ? 0 : 1);
+            assert.equal(
+              posts,
+              scenario === "not_invoked" || scenario === "monitor_rotated"
+                ? 0
+                : 1,
+            );
             const [receipt] = await tx<
               {
                 status: string;
@@ -550,13 +610,29 @@ for (const scenario of ["accepted", "unknown", "not_invoked"] as const)
                 providerId: string | null;
               }[]
             >`select status,confirmation_observed_at as confirmed,provider_message_id as "providerId" from growth.outreach_reservations where id=${reserved.value.reservationId}`;
+            const [issued] = await tx<
+              { monitor: unknown }[]
+            >`select issued_snapshot->'monitoredMailbox' as monitor from growth.outreach_reservations where id=${reserved.value.reservationId}`;
+            assert.deepEqual(issued?.monitor, {
+              connectionId: gmail,
+              googleSubject: "test-subject",
+              grantEpoch: 1,
+              address: sender,
+              grantedScopes: [
+                "email",
+                "https://www.googleapis.com/auth/gmail.modify",
+                "openid",
+              ],
+            });
             assert.deepEqual(receipt, {
               status:
                 scenario === "unknown"
                   ? "uncertain"
                   : scenario === "not_invoked"
                     ? "rejected"
-                    : "accepted",
+                    : scenario === "monitor_rotated"
+                      ? "submitting"
+                      : "accepted",
               confirmed: null,
               providerId:
                 scenario === "accepted" ? "synthetic-message-id" : null,
@@ -567,7 +643,12 @@ for (const scenario of ["accepted", "unknown", "not_invoked"] as const)
               factory,
             );
             assert.equal(repeated.status, "held");
-            assert.equal(posts, scenario === "not_invoked" ? 0 : 1);
+            assert.equal(
+              posts,
+              scenario === "not_invoked" || scenario === "monitor_rotated"
+                ? 0
+                : 1,
+            );
             throw rollback;
           }),
           (error) => error === rollback,

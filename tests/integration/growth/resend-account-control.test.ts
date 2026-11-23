@@ -157,6 +157,18 @@ test(
         loadResendAccountReadiness(tx, id, runtime),
       );
       assert.equal(ready.status, "ready");
+      if (ready.status === "ready")
+        assert.deepEqual(ready.monitoredMailbox, {
+          connectionId: gmailId,
+          googleSubject: "reply-subject",
+          grantEpoch: 1,
+          address: binding.replyTo,
+          grantedScopes: [
+            "email",
+            "https://www.googleapis.com/auth/gmail.modify",
+            "openid",
+          ],
+        });
       await admin`update growth.integration_connections set status='disconnected' where id=${gmailId}`;
       assert.equal(
         (

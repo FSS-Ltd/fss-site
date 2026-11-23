@@ -1,5 +1,6 @@
 import { withGrowthTransaction } from "../db/client";
 import type { GrowthDb } from "../db/types";
+import { sameAccountScopes } from "../integrations/google-oauth";
 import {
   createResendOutreachTransport,
   type ResendOutreachResult,
@@ -114,10 +115,32 @@ export async function submitReservedResendOutreach(
     return { status: "uncertain", reason: "binding_changed" };
   try {
     const [stored] = await db<
-      { matches: boolean }[]
-    >`select issued_snapshot=${db.json(snapshot)} and issued_snapshot_hash=${snapshot.bodySha256} as matches from growth.outreach_reservations where id=${input.reservationId} and status='submitting' and fence=${input.fence} and lease_token=${input.leaseToken} and outreach_provider='resend'`;
+      {
+        matches: boolean;
+        monitorId: string | null;
+        status: string | null;
+        subject: string | null;
+        epoch: number | null;
+        address: string | null;
+        scopes: string[] | null;
+      }[]
+    >`select r.issued_snapshot=${db.json(snapshot)} and r.issued_snapshot_hash=${snapshot.bodySha256} as matches,
+      g.id as "monitorId",g.status,g.google_subject as subject,g.version as epoch,g.subject_email as address,g.granted_scopes as scopes
+      from growth.outreach_reservations r left join growth.integration_connections g on g.id=${snapshot.monitoredMailbox.connectionId} and g.provider='gmail'
+      where r.id=${input.reservationId} and r.status='submitting' and r.fence=${input.fence} and r.lease_token=${input.leaseToken} and r.outreach_provider='resend'`;
     if (!stored?.matches)
       return { status: "uncertain", reason: "persistence_failed" };
+    const monitor = snapshot.monitoredMailbox;
+    if (
+      stored.monitorId !== monitor.connectionId ||
+      stored.status !== "connected" ||
+      stored.subject !== monitor.googleSubject ||
+      stored.epoch !== monitor.grantEpoch ||
+      stored.address !== monitor.address ||
+      !stored.scopes ||
+      !sameAccountScopes(stored.scopes, monitor.grantedScopes)
+    )
+      return { status: "uncertain", reason: "binding_changed" };
   } catch {
     return { status: "uncertain", reason: "persistence_failed" };
   }

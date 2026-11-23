@@ -145,7 +145,40 @@ test(
               await sp`update growth.outreach_reservations set status='submitting',submitted_at=now(),issued_snapshot=${sp.json({ ...snapshot, campaign: { ...snapshot.campaign, copyFamilyVersion: 1 } })},issued_snapshot_hash=${bodySha256} where id=${reservation}`;
             }),
           );
+          const monitor = {
+            connectionId: randomUUID(),
+            googleSubject: "subject",
+            grantEpoch: 1,
+            address: sender,
+            grantedScopes: ["https://www.googleapis.com/auth/gmail.modify"],
+          };
+          for (const invalidMonitor of [
+            { ...monitor, connectionId: "not-a-uuid" },
+            { ...monitor, googleSubject: "" },
+            { ...monitor, grantEpoch: 0 },
+            { ...monitor, grantEpoch: 2147483648 },
+            { ...monitor, address: `wrong-${sender}` },
+            { ...monitor, grantedScopes: [] },
+            {
+              ...monitor,
+              grantedScopes: [
+                "https://www.googleapis.com/auth/gmail.modify",
+                7,
+              ],
+            },
+            { ...monitor, token: "forbidden" },
+          ]) {
+            await assert.rejects(
+              tx.savepoint(async (sp) => {
+                await sp`update growth.outreach_reservations set status='submitting',submitted_at=now(),issued_snapshot=${sp.json({ ...familySnapshot, monitoredMailbox: invalidMonitor })},issued_snapshot_hash=${bodySha256} where id=${reservation}`;
+              }),
+            );
+          }
           await tx`update growth.outreach_reservations set status='submitting',submitted_at=now(),issued_snapshot=${tx.json(familySnapshot)},issued_snapshot_hash=${bodySha256} where id=${reservation}`;
+          const [legacy] = await tx<
+            { monitored: unknown }[]
+          >`select issued_snapshot->'monitoredMailbox' as monitored from growth.outreach_reservations where id=${reservation}`;
+          assert.equal(legacy?.monitored, null);
           await assert.rejects(
             tx.savepoint(async (sp) => {
               await sp`update growth.outreach_reservations set resend_send_generation=${randomUUID()} where id=${reservation}`;
