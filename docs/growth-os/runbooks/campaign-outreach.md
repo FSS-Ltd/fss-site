@@ -10,9 +10,9 @@ This runbook follows the [approved outreach design](../../superpowers/specs/2026
 | 07:30                  | Discover public Facebook destinations                    | Signed directory observations for founder rules review and manual activity                       |
 | 08:30                  | Prepare eligible email                                   | Current permission event, leased preparation job, frozen offer and assigned CTA                  |
 | 09:00–17:00 by default | Submit due messages within the approved recipient window | Reservation, exact attempt evidence, provider acceptance and separately verified confirmation    |
-| 17:30                  | Review CRM progress and consume due monthly reports      | Daily counts in Outreach and immutable monthly snapshots in Analytics                            |
+| 17:30                  | Record daily CRM progress and consume due monthly reports | Immutable daily snapshot and separate monthly snapshots in Analytics                             |
 
-The 08:30 and 17:30 Vercel entries accept the five-minute London window. A preparation run that misses its slot can be picked up by an existing dispatch invocation when the preparation flag is enabled. A due monthly report waits for the next accepted report slot and the worker claims at most five per invocation. Confirm actual Vercel schedule delivery before activation. [Vercel cron documentation](https://vercel.com/docs/schedules/cron-jobs)
+The 08:30 and 17:30 Vercel entries accept the five-minute London window. A preparation run that misses its slot can be picked up by an existing dispatch invocation when the preparation flag is enabled. A due monthly report waits for the next accepted report slot and the worker claims at most five per invocation. The daily summary records the state observed at its actual run, with later traffic outside that snapshot. Confirm actual Vercel schedule delivery before activation. [Vercel cron documentation](https://vercel.com/docs/schedules/cron-jobs)
 
 ## Research and approval
 
@@ -34,7 +34,7 @@ A report becomes due one calendar month after the first verified confirmation un
 
 Release on the exact revision reviewed by Code Reviewer and Security Reviewer with required CI green on the revision and test merge. Rehearse the committed migrations, private app role, customer exclusions and stored opt-outs. Complete the in-app browser checks and required design-craft jury. Record separate founder decisions for production deployment and campaign activation.
 
-Keep `GROWTH_OS_OUTREACH_PREPARATION_ENABLED` unset or false during the disabled rollout. Check the deployed signed intake, separate provider credentials and reviewed sender identities, account limits and health, current monitoring, provider signature handling and exact permitted recipients before enabling the applicable stage. Do not print credentials or signed bodies in scheduler output.
+Keep `GROWTH_OS_OUTREACH_PREPARATION_ENABLED` and `GROWTH_OS_OUTREACH_SUMMARY_ENABLED` unset or false during the disabled rollout. Check the deployed signed intake, separate provider credentials and reviewed sender identities, account limits and health, current monitoring, provider signature handling and exact permitted recipients before enabling the applicable stage. Keep scheduler output limited to counts and machine failure categories.
 
 ### Provider bindings
 
