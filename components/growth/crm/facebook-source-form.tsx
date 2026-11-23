@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import Link from "next/link";
+import { useRef, useState } from "react";
 import { CommandForm } from "./command-form";
 import { CountryField } from "./country-field";
 import { facebookSourceCommand } from "./facebook-source-values";
@@ -10,6 +11,10 @@ import styles from "./crm.module.css";
 export function FacebookSourceForm() {
   const router = useRouter();
   const [requestId] = useState(() => crypto.randomUUID());
+  const intent = useRef<{ requestId: string; payload: string | null }>({
+    requestId,
+    payload: null,
+  });
   const [countryCode, setCountryCode] = useState("GB");
   return (
     <section className={styles.panel}>
@@ -21,9 +26,31 @@ export function FacebookSourceForm() {
       <CommandForm
         label="Capture Facebook prospect"
         submitLabel="Create lead"
-        buildCommand={(data) => facebookSourceCommand(data, requestId)}
+        buildCommand={(data) => {
+          let command = facebookSourceCommand(data, intent.current.requestId);
+          const payload = JSON.stringify({ ...command, requestId: undefined });
+          if (
+            intent.current.payload !== null &&
+            intent.current.payload !== payload
+          ) {
+            command = { ...command, requestId: crypto.randomUUID() };
+          }
+          intent.current = { requestId: command.requestId, payload };
+          return command;
+        }}
+        renderSuccess={(result) =>
+          result.alreadyExisted && result.prospectId ? (
+            <p>
+              A record already exists. Some submitted details may not have been
+              saved. Review the record before continuing.{" "}
+              <Link href={`/growth/prospects/${result.prospectId}`}>
+                Open saved details
+              </Link>
+            </p>
+          ) : null
+        }
         onSuccess={(result) => {
-          if (result.prospectId)
+          if (result.prospectId && !result.alreadyExisted)
             router.push(`/growth/prospects/${result.prospectId}`);
         }}
       >

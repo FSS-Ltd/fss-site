@@ -13,9 +13,17 @@ const loader = Module as unknown as {
   _load: (request: string, ...rest: unknown[]) => unknown;
 };
 const originalLoad = loader._load;
+const navigations: string[] = [];
 loader._load = function (request, ...rest) {
   if (request === "next/navigation")
-    return { useRouter: () => ({ push() {}, refresh() {} }) };
+    return {
+      useRouter: () => ({
+        push(path: string) {
+          navigations.push(path);
+        },
+        refresh() {},
+      }),
+    };
   return originalLoad.call(this, request, ...rest);
 };
 const { LeadCaptureForm } =
@@ -26,10 +34,16 @@ loader._load = originalLoad;
 const dom = new JSDOM("<!doctype html><body></body>", {
   url: "http://localhost",
 });
+Object.assign(dom.window.HTMLElement.prototype, {
+  attachEvent() {},
+  detachEvent() {},
+});
 Object.assign(globalThis, {
   window: dom.window,
+  self: dom.window,
   document: dom.window.document,
   HTMLElement: dom.window.HTMLElement,
+  CustomEvent: dom.window.CustomEvent,
   FormData: dom.window.FormData,
   IS_REACT_ACT_ENVIRONMENT: true,
 });
@@ -132,6 +146,141 @@ test("source selection submits Facebook capture and preserves the company form",
     assert.equal(legacy.sourceUrl, "https://example.com");
   } finally {
     await act(async () => root.unmount());
+    globalThis.fetch = originalFetch;
+  }
+});
+
+async function setupFacebookForm() {
+  const container = document.createElement("div");
+  document.body.append(container);
+  const root = createRoot(container);
+  await act(async () =>
+    root.render(
+      createElement(CrmRefreshProvider, null, createElement(LeadCaptureForm)),
+    ),
+  );
+  const selector =
+    container.querySelector<HTMLSelectElement>("select:not([name])");
+  assert.ok(selector);
+  await act(async () => {
+    selector.value = "facebook";
+    selector.dispatchEvent(new dom.window.Event("change", { bubbles: true }));
+  });
+  const form = container.querySelector<HTMLFormElement>(
+    'form[aria-label="Capture Facebook prospect"]',
+  );
+  assert.ok(form);
+  const set = (name: string, value: string) => {
+    (form.elements.namedItem(name) as HTMLInputElement).value = value;
+  };
+  for (const [name, value] of Object.entries({
+    sourceUrl: "https://facebook.com/example",
+    businessName: "Example",
+    opportunity: "Website review",
+    offer: "Website",
+    observedAt: "2026-01-01T10:00",
+  }))
+    set(name, value);
+  const submit = async () => {
+    await act(async () => {
+      form.dispatchEvent(
+        new dom.window.Event("submit", { bubbles: true, cancelable: true }),
+      );
+    });
+  };
+  const cleanup = async () => {
+    await act(async () => root.unmount());
+    container.remove();
+  };
+  return { container, form, set, submit, cleanup };
+}
+
+test("identical retries reuse payload and edited retries use a new request ID", async () => {
+  const bodies: string[] = [];
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (_input, init) => {
+    bodies.push(String(init?.body));
+    throw new Error("Connection lost");
+  };
+  const view = await setupFacebookForm();
+  try {
+    await view.submit();
+    await view.submit();
+    assert.equal(bodies[0], bodies[1]);
+    view.set("offer", "New offer");
+    await view.submit();
+    assert.notEqual(
+      JSON.parse(bodies[1]).requestId,
+      JSON.parse(bodies[2]).requestId,
+    );
+    assert.equal(JSON.parse(bodies[2]).offer, "New offer");
+  } finally {
+    await view.cleanup();
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("existing result keeps the form and links to saved details without navigation", async () => {
+  const originalFetch = globalThis.fetch;
+  const id = "11111111-1111-4111-8111-111111111111";
+  globalThis.fetch = async () =>
+    new Response(JSON.stringify({ prospectId: id, alreadyExisted: true }), {
+      status: 200,
+    });
+  const view = await setupFacebookForm();
+  navigations.length = 0;
+  try {
+    await view.submit();
+    assert.equal(navigations.length, 0);
+    assert.match(view.container.textContent ?? "", /record already exists/i);
+    const link = view.container.querySelector<HTMLAnchorElement>(
+      `a[href="/growth/prospects/${id}"]`,
+    );
+    assert.ok(link);
+    assert.equal(
+      (view.form.elements.namedItem("offer") as HTMLInputElement).value,
+      "Website",
+    );
+    assert.doesNotMatch(view.container.textContent ?? "", /Saved\./);
+  } finally {
+    await view.cleanup();
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("invalid required and future source fields show feedback and focus without sending", async () => {
+  const originalFetch = globalThis.fetch;
+  let calls = 0;
+  globalThis.fetch = async () => {
+    calls++;
+    return new Response("{}");
+  };
+  const view = await setupFacebookForm();
+  try {
+    for (const name of ["businessName", "opportunity", "offer"]) {
+      const old = (view.form.elements.namedItem(name) as HTMLInputElement)
+        .value;
+      view.set(name, "   ");
+      await view.submit();
+      assert.equal(document.activeElement, view.form.elements.namedItem(name));
+      assert.equal(
+        (view.form.elements.namedItem(name) as HTMLInputElement).getAttribute(
+          "aria-invalid",
+        ),
+        "true",
+      );
+      view.set(name, old);
+    }
+    view.set("observedAt", "2099-01-01T10:00");
+    await view.submit();
+    assert.equal(
+      document.activeElement,
+      view.form.elements.namedItem("observedAt"),
+    );
+    assert.match(view.container.textContent ?? "", /future/i);
+    assert.equal(calls, 0);
+  } finally {
+    await view.cleanup();
     globalThis.fetch = originalFetch;
   }
 });

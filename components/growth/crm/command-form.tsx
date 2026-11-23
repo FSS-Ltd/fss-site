@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import type { CrmCommand, CrmCommandResult } from "@/lib/growth/crm/schemas";
 import { FormValidation } from "./form-validation";
 import { useCrmCommand } from "./use-crm-command";
@@ -13,16 +13,20 @@ export function CommandForm({
   buildCommand,
   children,
   onSuccess,
+  renderSuccess,
 }: {
   label: string;
   submitLabel: string;
   buildCommand: (data: FormData) => CrmCommand;
   children: ReactNode;
   onSuccess?: (result: CrmCommandResult, form: HTMLFormElement) => void;
+  renderSuccess?: (result: CrmCommandResult) => ReactNode;
 }) {
   const { busy, saving, feedback, run, report, clearFeedback } =
     useCrmCommand();
   const router = useRouter();
+  const [result, setResult] = useState<CrmCommandResult | null>(null);
+  const customSuccess = result && renderSuccess?.(result);
   return (
     <form
       aria-label={label}
@@ -30,10 +34,12 @@ export function CommandForm({
       className={styles.form}
       onChange={() => {
         if (feedback) clearFeedback();
+        setResult(null);
       }}
       onSubmit={async (event) => {
         event.preventDefault();
         const form = event.currentTarget;
+        setResult(null);
         let command: CrmCommand;
         try {
           command = buildCommand(new FormData(form));
@@ -47,7 +53,10 @@ export function CommandForm({
           return;
         }
         const result = await run(command);
-        if (result) onSuccess?.(result, form);
+        if (result) {
+          setResult(result);
+          onSuccess?.(result, form);
+        }
       }}
     >
       <FormValidation errors={feedback?.fieldErrors ?? []}>
@@ -63,7 +72,7 @@ export function CommandForm({
           role={feedback.error ? "alert" : "status"}
           className={feedback.error ? styles.error : styles.success}
         >
-          <p>{feedback.message}</p>
+          {customSuccess || <p>{feedback.message}</p>}
           {feedback.fieldErrors && (
             <ul>
               {feedback.fieldErrors.map((issue) => (

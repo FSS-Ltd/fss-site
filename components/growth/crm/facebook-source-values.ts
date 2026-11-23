@@ -2,8 +2,31 @@ import { z } from "zod";
 import { sourceLeadInputSchema } from "@/lib/growth/campaigns/schemas";
 import { fieldText, localInstant, nullableText } from "./form-values";
 
+const facebookSourceSchema = sourceLeadInputSchema.superRefine(
+  (input, context) => {
+    for (const [name, label] of [
+      ["businessName", "business name"],
+      ["opportunity", "opportunity"],
+      ["offer", "recommended offer"],
+    ] as const) {
+      if (!input[name].trim())
+        context.addIssue({
+          code: "custom",
+          path: [name],
+          message: `Enter ${label}.`,
+        });
+    }
+    if (input.observedAt.getTime() > Date.now())
+      context.addIssue({
+        code: "custom",
+        path: ["observedAt"],
+        message: "Observation time cannot be in the future.",
+      });
+  },
+);
+
 export function facebookSourceCommand(data: FormData, requestId: string) {
-  const result = sourceLeadInputSchema.safeParse({
+  const result = facebookSourceSchema.safeParse({
     requestId,
     sourceType: "facebook_page",
     sourceUrl: fieldText(data, "sourceUrl"),
