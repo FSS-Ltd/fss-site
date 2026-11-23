@@ -13,6 +13,7 @@ import {
   type FirstPreparationBatchSummary,
 } from "./first-preparation-worker";
 import { prepareFollowUp } from "./prepare-follow-up";
+import type { GmailDueContext } from "./gmail-due-context";
 
 const MAX_BATCH = 25;
 const FIRST_SHARE = 13;
@@ -187,22 +188,31 @@ export async function settleFollowUp(
   });
 }
 
-export function createLiveOutreachDueWorker(input: {
-  bound: BoundGmailClient;
-  founderEmail: string;
-}) {
+export function createLiveOutreachDueWorker(
+  input: {
+    founderEmail: string;
+  } & (
+    | { bound: BoundGmailClient; context?: never }
+    | { context: GmailDueContext; bound?: never }
+  ),
+) {
+  const bound = input.context ? input.context.bound : input.bound;
   return createOutreachDueWorker({
-    bound: input.bound,
+    bound,
     workerId: randomUUID(),
-    refreshUsage: (db, bound) =>
-      refreshGmailUsage(db, { ...bound, subjectEmail: input.founderEmail }),
-    sync: (db, bound) =>
-      createGmailReplySync({
-        repository: postgresGmailSyncRepository,
-        gmailClient: bound.client,
-        binding: bound.binding,
-        founderEmail: input.founderEmail,
-      })(db),
+    refreshUsage: input.context
+      ? async () => input.context.usage
+      : (db, bound) =>
+          refreshGmailUsage(db, { ...bound, subjectEmail: input.founderEmail }),
+    sync: input.context
+      ? async () => ({ coverageId: input.context.coverageId })
+      : (db, bound) =>
+          createGmailReplySync({
+            repository: postgresGmailSyncRepository,
+            gmailClient: bound.client,
+            binding: bound.binding,
+            founderEmail: input.founderEmail,
+          })(db),
     first: runFirstPreparationBatch,
     claimFollowUps,
     prepareFollowUp,

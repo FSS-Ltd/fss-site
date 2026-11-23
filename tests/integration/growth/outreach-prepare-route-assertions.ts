@@ -50,6 +50,7 @@ export async function exerciseOutreachPrepareRoute(
       TOKEN_ENCRYPTION_KEY: key.toString("base64"),
       CRON_SECRET: "c".repeat(32),
       GROWTH_OS_AUTOMATIONS_ENABLED: "true",
+      GROWTH_OS_OUTREACH_PREPARATION_ENABLED: "true",
     };
     for (const mode of ["complete", "held"]) {
       await run(

@@ -4,6 +4,9 @@ import { postgresSequenceDispatchRepository } from "@/lib/growth/sequences/dispa
 import { createGmailReplySync } from "@/lib/growth/sequences/gmail-sync";
 import { postgresGmailSyncRepository } from "@/lib/growth/sequences/gmail-sync-repository";
 import { createCronRouteHandler } from "@/lib/growth/http/cron-auth";
+import { isOutreachPreparationEnabled } from "@/lib/growth/campaigns/london-preparation-slot";
+import { observeLiveGmailDueContext } from "@/lib/growth/campaigns/gmail-due-context";
+import { createLiveOutreachDueWorker } from "@/lib/growth/campaigns/outreach-due-worker";
 
 import { createCronGmailClient, readCronEnv } from "../runtime";
 
@@ -22,6 +25,36 @@ export async function GET(request: Request): Promise<Response> {
     async () => {
       const db = getGrowthDb();
       const bound = await createCronGmailClient(db, env);
+      if (
+        isOutreachPreparationEnabled(
+          process.env.GROWTH_OS_OUTREACH_PREPARATION_ENABLED,
+        )
+      ) {
+        const context = await observeLiveGmailDueContext(db, {
+          bound,
+          founderEmail: env.ownerEmail,
+        });
+        const preparation = await createLiveOutreachDueWorker({
+          context,
+          founderEmail: env.ownerEmail,
+        })(db);
+        const dispatch = createLiveOutreachDispatcher({
+          repository: postgresSequenceDispatchRepository,
+          context,
+          founderEmail: env.ownerEmail,
+        });
+        const dispatchSummary = await dispatch(
+          db,
+          new Date(),
+          undefined,
+          context.coverageId,
+        );
+        return {
+          sync: context.syncSummary,
+          preparation,
+          dispatch: dispatchSummary,
+        };
+      }
       const { client: gmailClient, binding } = bound;
 
       const sync = createGmailReplySync({

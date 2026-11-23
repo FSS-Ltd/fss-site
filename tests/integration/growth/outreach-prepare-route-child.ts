@@ -37,7 +37,7 @@ async function main(): Promise<void> {
     }
     if (url.pathname.endsWith("/history"))
       return Response.json({
-        historyId: mode === "held" ? "invalid" : "200",
+        historyId: mode === "held" && profileRequests >= 2 ? "invalid" : "200",
         history: [],
       });
     if (url.pathname.endsWith("/messages"))
@@ -45,11 +45,28 @@ async function main(): Promise<void> {
     throw new Error("unexpected Gmail path");
   };
   const { GET } = await import("../../../app/api/cron/outreach-prepare/route");
-  const response = await GET(
-    new Request("https://example.test/api/cron/outreach-prepare", {
+  const request = new Request(
+    "https://example.test/api/cron/outreach-prepare",
+    {
       headers: { authorization: `Bearer ${"c".repeat(32)}` },
-    }),
+    },
   );
+  const NativeDate = globalThis.Date;
+  globalThis.Date = new Proxy(NativeDate, {
+    construct(target, args, newTarget) {
+      if (args.length === 0) {
+        globalThis.Date = NativeDate;
+        return new NativeDate("2026-01-05T08:30:00Z");
+      }
+      return Reflect.construct(target, args, newTarget);
+    },
+  });
+  let response: Response;
+  try {
+    response = await GET(request);
+  } finally {
+    globalThis.Date = NativeDate;
+  }
   const body = await response.json();
   assert.equal(response.status, 200);
   assert.equal(body.ok, true);

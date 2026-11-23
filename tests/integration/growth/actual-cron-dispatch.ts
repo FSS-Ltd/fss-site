@@ -36,6 +36,8 @@ export async function exerciseActualCronDispatch(
   const dbUrl = new URL(input.url);
   dbUrl.searchParams.set("options", "-c role=growth_app");
   let posts = 0;
+  let tokenRequests = 0;
+  let profileRequests = 0;
   let providerCreatedAt = 0;
   let configured = false;
   try {
@@ -63,12 +65,14 @@ export async function exerciseActualCronDispatch(
     configured = true;
     globalThis.fetch = async (resource, init) => {
       const url = new URL(String(resource));
-      if (url.href === "https://oauth2.googleapis.com/token")
+      if (url.href === "https://oauth2.googleapis.com/token") {
+        tokenRequests++;
         return Response.json({
           access_token: "synthetic-access",
           expires_in: 3600,
           token_type: "Bearer",
         });
+      }
       if (url.origin !== "https://gmail.googleapis.com")
         throw new Error("unexpected network");
       if (url.pathname.endsWith("/messages/send") && init?.method === "POST") {
@@ -79,8 +83,10 @@ export async function exerciseActualCronDispatch(
           threadId: `fixture-thread-${posts}`,
         });
       }
-      if (url.pathname.endsWith("/profile"))
+      if (url.pathname.endsWith("/profile")) {
+        profileRequests++;
         return Response.json({ emailAddress: input.email, historyId: "200" });
+      }
       if (url.pathname.endsWith("/history"))
         return Response.json({ historyId: "200", history: [] });
       if (url.pathname.endsWith("/messages/fixture-provider-2"))
@@ -256,6 +262,21 @@ export async function exerciseActualCronDispatch(
     assert.ok(stored?.proof);
     assert.ok(stored?.receipt);
     assert.equal(stored?.sentAt, null);
+    process.env.GROWTH_OS_OUTREACH_PREPARATION_ENABLED = "true";
+    tokenRequests = 0;
+    profileRequests = 0;
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    const sharedResponse = await route.GET(
+      new Request("https://example.test/api/cron/outreach-dispatch", {
+        headers: { authorization: `Bearer ${"c".repeat(32)}` },
+      }),
+    );
+    const sharedBody = await sharedResponse.json();
+    assert.equal(sharedResponse.status, 200, JSON.stringify(sharedBody));
+    assert.ok(sharedBody.preparation);
+    assert.equal(tokenRequests, 1);
+    assert.equal(profileRequests, 2);
+    assert.equal(posts, 2);
   } finally {
     globalThis.fetch = savedFetch;
     if (configured) {

@@ -7,6 +7,7 @@ import { reserveOutreachAttempt } from "../campaigns/reservation-repository";
 import { submitReservedOutreach } from "../campaigns/direct-submission";
 import { createGmailConfirmation } from "../campaigns/gmail-confirmation";
 import { refreshGmailUsage } from "../integrations/gmail/usage-service";
+import type { GmailDueContext } from "../campaigns/gmail-due-context";
 import type { SequenceDispatchRepository } from "./dispatcher-repository";
 import {
   AUTOMATED_FOLLOW_UP_LABELS,
@@ -237,18 +238,25 @@ export function createOutreachDispatcher({
   };
 }
 
-export function createLiveOutreachDispatcher(input: {
-  repository: SequenceDispatchRepository;
-  bound: BoundGmailClient;
-  founderEmail: string;
-  maxMessagesPerRun?: number;
-}) {
+export function createLiveOutreachDispatcher(
+  input: {
+    repository: SequenceDispatchRepository;
+    founderEmail: string;
+    maxMessagesPerRun?: number;
+  } & (
+    | { bound: BoundGmailClient; context?: never }
+    | { context: GmailDueContext; bound?: never }
+  ),
+) {
+  const bound = input.context ? input.context.bound : input.bound;
   return createOutreachDispatcher({
     repository: input.repository,
-    bound: input.bound,
+    bound,
     maxMessagesPerRun: input.maxMessagesPerRun,
-    refreshUsage: (db, bound) =>
-      refreshGmailUsage(db, { ...bound, subjectEmail: input.founderEmail }),
+    refreshUsage: input.context
+      ? async () => input.context.usage
+      : (db, bound) =>
+          refreshGmailUsage(db, { ...bound, subjectEmail: input.founderEmail }),
     reserve: reserveOutreachAttempt,
     submit: submitReservedOutreach,
     confirm: (db, reservationId, bound) =>
