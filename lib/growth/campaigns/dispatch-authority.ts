@@ -6,6 +6,7 @@ import {
   type AuthorityBounds,
 } from "./authority-bounds";
 import { validPermissionEvidence } from "./permission-evidence";
+import type { ResendRuntimeConfiguration } from "./resend-account-control";
 import type { GrowthTransaction } from "../db/types";
 import { loadPolicyAuthorizedSourceProof } from "./founder-verification-reader";
 import { validateCampaignDefinition } from "./lifecycle";
@@ -79,8 +80,9 @@ export async function loadCanonicalOutreachPreparation(
     messageId: string;
     leaseToken: string;
     connectionId: string;
-    grantEpoch: number;
+    grantEpoch: number | null;
     now: Date;
+    resendRuntime?: ResendRuntimeConfiguration;
   },
 ): Promise<PreparationDecision> {
   const held = (reason: string): PreparationDecision => ({
@@ -101,7 +103,7 @@ export async function loadCanonicalOutreachPreparation(
     from growth.email_messages em join growth.sequence_enrollments se on se.id=em.sequence_enrollment_id
     join growth.prospects p on p.id=se.prospect_id join growth.contacts ct on ct.id=se.contact_id
     join growth.businesses b on b.id=p.business_id
-    where em.id=${input.messageId} and em.channel='gmail' and em.direction='outbound'
+    where em.id=${input.messageId} and em.channel=${input.resendRuntime ? "resend" : "gmail"} and em.direction='outbound'
   `;
   if (
     !row ||
@@ -153,7 +155,11 @@ export async function loadCanonicalOutreachPreparation(
     left join growth.outreach_permissions p on p.id=m.current_permission_id and p.membership_id=m.id
     where m.sequence_id=${row.sequenceId}
   `;
-  if (memberships.length > 1) return held("membership_ambiguous");
+  if (
+    memberships.length > 1 ||
+    (input.resendRuntime && (memberships.length !== 1 || row.stepNumber !== 0))
+  )
+    return held("membership_ambiguous");
   const snapshot = z
     .object({ effectiveRecipient: reviewedRecipientSchema })
     .safeParse(row.templateSnapshot);
@@ -197,7 +203,8 @@ export async function loadCanonicalOutreachPreparation(
       !member.permissionId ||
       !member.basis ||
       !member.jurisdiction ||
-      member.provider !== "gmail" ||
+      member.provider !== (input.resendRuntime ? "resend" : "gmail") ||
+      member.provider !== parsed.data.provider ||
       member.basis !== parsed.data.permissionRequirement ||
       member.jurisdiction !== parsed.data.jurisdiction ||
       !member.expiresAt ||
@@ -238,6 +245,7 @@ export async function loadCanonicalOutreachPreparation(
       membershipId: member.id,
       messageId: row.messageId,
       connectionId: input.connectionId,
+      resendRuntime: input.resendRuntime,
     });
     if (!proof) return held("verification_required");
     campaignAuthority = { member, proof: proof.proof };

@@ -7,6 +7,8 @@ import { executeCampaignCommand } from "../../../lib/growth/campaigns/commands";
 import { campaignPolicyDefinitionSchema } from "../../../lib/growth/campaigns/schemas";
 import { serializeCampaignDefinition } from "../../../lib/growth/campaigns/lifecycle";
 import { runFirstPreparationBatch } from "../../../lib/growth/campaigns/first-preparation-worker";
+import { loadCanonicalOutreachPreparation } from "../../../lib/growth/campaigns/dispatch-authority";
+import { loadControlledPreparation } from "../../../lib/growth/campaigns/controlled-preparation";
 import { postgresSequenceDispatchRepository } from "../../../lib/growth/sequences/dispatcher-repository";
 import { loadReviewMembershipPreparationAuthority } from "../../../lib/growth/campaigns/founder-verification-reader";
 import { ingestResearchRun } from "../../../lib/growth/research/ingest";
@@ -327,6 +329,38 @@ test(
             { status: string }[]
           >`select status from growth.outreach_reservations where id=${reservation}`;
           assert.equal(cancelled?.status, "cancelled");
+          const canonical = await loadCanonicalOutreachPreparation(tx, {
+            messageId: prepared.id,
+            leaseToken: claimInput.leaseToken,
+            connectionId: id,
+            grantEpoch: null,
+            now: new Date(),
+            resendRuntime: runtime,
+          });
+          assert.equal(canonical.status, "ready");
+          if (canonical.status !== "ready")
+            throw new Error("canonical authority missing");
+          const controlled = await loadControlledPreparation(tx, {
+            membershipId: member.id,
+            connectionId: id,
+            preparation: canonical.preparation,
+            resendRuntime: runtime,
+          });
+          assert.ok(controlled?.copyFamilySha256);
+          await tx`update growth.outreach_permissions set evidence=jsonb_set(evidence,'{explicitOptIn}','false'::jsonb) where id=${permissionId}`;
+          assert.equal(
+            (
+              await loadCanonicalOutreachPreparation(tx, {
+                messageId: prepared.id,
+                leaseToken: claimInput.leaseToken,
+                connectionId: id,
+                grantEpoch: null,
+                now: new Date(),
+                resendRuntime: runtime,
+              })
+            ).status,
+            "held",
+          );
           throw rollback;
         }),
         (error) => error === rollback,

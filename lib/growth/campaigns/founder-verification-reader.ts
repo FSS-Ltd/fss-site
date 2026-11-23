@@ -371,14 +371,31 @@ export async function loadPolicyAuthorizedSourceProof(
     membershipId: string;
     messageId: string;
     connectionId: string;
+    resendRuntime?: ResendRuntimeConfiguration;
   },
 ): Promise<{
   proof: SourceProof;
   bounds: AuthorityBounds;
 } | null> {
   const [clock] = await db<{ now: Date }[]>`select clock_timestamp() as now`;
-  const account = await loadReservationAccount(db, input.connectionId, "held");
-  if (!clock || account.status !== "ready") return null;
+  if (!clock) return null;
+  const provider = input.resendRuntime ? "resend" : "gmail";
+  const account = input.resendRuntime
+    ? await loadResendAccountReadiness(
+        db,
+        input.connectionId,
+        input.resendRuntime,
+      )
+    : await loadReservationAccount(db, input.connectionId, "held");
+  if (account.status !== "ready") return null;
+  const accountBounds: AuthorityBounds =
+    "account" in account
+      ? account.account.bounds
+      : {
+          validatedAt: clock.now,
+          expiresAt: account.expiresAt,
+          validThrough: null,
+        };
   const now = clock.now;
   const [authority] = await db<
     {
@@ -410,7 +427,7 @@ export async function loadPolicyAuthorizedSourceProof(
     join growth.email_messages em on em.sequence_enrollment_id=se.id and em.id=${input.messageId} and em.contact_id=se.contact_id
     where m.id=${input.membershipId} and m.status='active' and se.status='active'
       and c.status='approved' and c.approved_by is not null and c.approved_at is not null and c.approved_at <= ${now}
-      and c.account_connection_id=${input.connectionId} and p.provider='gmail' and p.contact_id=se.contact_id and p.actor_id=${createHash("sha256").update("j.ntagengwa@faithfulsoftware.dev").digest("hex")}
+      and c.account_connection_id=${input.connectionId} and p.provider=${provider} and em.channel=${provider} and c.policy->>'provider'=p.provider and p.contact_id=se.contact_id and p.actor_id=${createHash("sha256").update("j.ntagengwa@faithfulsoftware.dev").digest("hex")}
       and p.expires_at > ${now} and p.proof_origin in ('founder','research')
       and c.version=(select max(version) from growth.campaigns where id=c.id)
   `;
@@ -420,9 +437,9 @@ export async function loadPolicyAuthorizedSourceProof(
   const { result } = validated;
   const proof = result.proof;
   return {
-    bounds: intersectAuthorityBounds(account.account.bounds, {
+    bounds: intersectAuthorityBounds(accountBounds, {
       validatedAt: now,
-      expiresAt: account.account.bounds.expiresAt,
+      expiresAt: accountBounds.expiresAt,
       validThrough: result.validThrough,
     }),
     proof,

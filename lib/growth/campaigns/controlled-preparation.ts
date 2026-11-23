@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { z } from "zod";
 import type { GrowthTransaction } from "../db/types";
 import { reviewedRecipientSchema } from "../sequences/reviewed-recipient";
+import type { ResendRuntimeConfiguration } from "./resend-account-control";
 import type { CanonicalOutreachPreparation } from "./dispatch-authority";
 import {
   validateControlledCopy,
@@ -50,12 +51,14 @@ export async function loadControlledPreparation(
     connectionId: string;
     preparation: CanonicalOutreachPreparation;
     coverageId?: string;
+    resendRuntime?: ResendRuntimeConfiguration;
   },
 ) {
   const proof = await loadPolicyAuthorizedSourceProof(tx, {
     membershipId: input.membershipId,
     messageId: input.preparation.messageId,
     connectionId: input.connectionId,
+    resendRuntime: input.resendRuntime,
   });
   if (!proof) return null;
   const [row] = await tx<
