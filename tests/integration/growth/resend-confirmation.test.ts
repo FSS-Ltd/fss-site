@@ -170,7 +170,33 @@ for (const scenario of [
           binding,
           webhookSecret: secret,
         });
+        const { createResendOutreachWebhookHandler } =
+          await import("../../../app/api/webhooks/resend/outreach/handler");
+        const { resolveResendOutreachConnection } =
+          await import("../../../app/api/webhooks/resend/outreach/account");
+        const ingress = createResendOutreachWebhookHandler({
+          readConfiguration: () => ({ binding, webhookSecret: secret }),
+          resolveConnection: (configured) =>
+            resolveResendOutreachConnection(db, configured),
+          confirm: (configured, connectionId, raw, headers) =>
+            createResendConfirmation(db, { ...configured, connectionId })(
+              raw,
+              headers,
+            ),
+        });
+        const incoming = (raw: string, headers: Record<string, string>) =>
+          new Request("https://example.test/api/webhooks/resend/outreach", {
+            method: "POST",
+            body: raw,
+            headers,
+          });
         const early = signed(event);
+        const earlyResponse = await ingress(incoming(early.raw, early.headers));
+        assert.equal(earlyResponse.status, 503);
+        assert.deepEqual(await earlyResponse.json(), {
+          ok: false,
+          code: "receipt_pending",
+        });
         assert.deepEqual(await send(early.raw, early.headers), {
           status: "held",
           reason: "issuer_unknown",
@@ -372,16 +398,16 @@ for (const scenario of [
           provider: null,
           rfc: null,
         });
-        const [first, concurrent] = await Promise.all([
+        const [first, routeResponse] = await Promise.all([
           send(wire.raw, wire.headers),
-          send(wire.raw, wire.headers),
+          ingress(incoming(wire.raw, wire.headers)),
         ]);
         if (first.status !== "ready") throw new Error(first.reason);
-        if (concurrent.status !== "ready") throw new Error(concurrent.reason);
-        assert.deepEqual([first.value.replay, concurrent.value.replay].sort(), [
-          false,
-          true,
-        ]);
+        assert.equal(routeResponse.status, 200);
+        assert.deepEqual(await routeResponse.json(), {
+          ok: true,
+          code: "recorded",
+        });
         assert.equal(first.value.receipt.basis, "resend_fss_delivery_observed");
         assert.equal(first.value.receipt.rfcMessageId, "<actual@example.test>");
         assert.equal(
