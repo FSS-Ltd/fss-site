@@ -74,7 +74,8 @@ async function main(): Promise<void> {
   assert.equal(body.first.claimed, 0);
   assert.equal(body.followUp.claimed, 0);
   assert.equal(sendPosts, 0);
-  assert.ok(profileRequests > 0);
+  assert.equal(profileRequests, 2);
+  profileRequests = 0;
   process.env.GROWTH_OS_RESEND_OUTREACH_ENABLED = "true";
   globalThis.Date = new Proxy(NativeDate, {
     construct(target, args, newTarget) {
@@ -99,6 +100,7 @@ async function main(): Promise<void> {
       { status: "held", reason: "account_binding_unknown" },
     );
     assert.equal(sendPosts, 0);
+    assert.equal(profileRequests, 2);
   } finally {
     globalThis.Date = NativeDate;
   }
