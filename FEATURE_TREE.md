@@ -1,6 +1,6 @@
 # Project feature tree
 
-Source-backed baseline, 2026-11-17, checked against clean `origin/main` commit `618e7d730`. Selected Growth coverage was refreshed on 23 November against committed snapshot `e1bc90f64`. This snapshot includes the reviewed confirmation fixture and manual capture code, standalone Gmail transport, sender prerequisites, the local daily research and Facebook discovery runners, and the first monthly-offer policy and copy slice. See each feature for its own test and review status.
+Source-backed baseline, 2026-11-17, checked against clean `origin/main` commit `618e7d730`. Selected Growth coverage was refreshed on 23 November against committed snapshot `c78f8a256`. This snapshot includes the reviewed confirmation fixture and manual capture code, standalone Gmail transport, sender prerequisites, the local daily research and Facebook discovery runners, the first monthly-offer policy and copy slice, and the standalone Resend transport and usage slice. See each feature for its own test and review status.
 
 ## Coverage and navigation
 
@@ -158,6 +158,13 @@ Graphify: [graph](graphify-out/graph.json), [audit report](graphify-out/GRAPH_RE
 
 - Status: implemented for the transport boundary at `c2bc4f6da`; actual sender integration remains partial. `lib/growth/integrations/gmail/client.ts#sendMessageOnce` and `lib/growth/integrations/gmail/types.ts#GuardedGmailClient` reuse bounded MIME and same-row credentials from `lib/growth/integrations/gmail/live-client.ts#createBoundLiveGmailClient`. The required synchronous gate runs after credential preparation and immediately before one send fetch with manual redirect handling. It records zero-invocation versus potentially invoked status, reports accepted IDs only on validated success, and exposes sanitized failure status. Used by the pending GROWTH-SEND-AUTHORITY integration; production sender constructors still retain legacy dispatch in this snapshot.
 - `lib/growth/integrations/gmail/client.test.ts` and existing bound-client tests passed 36 focused checks using mocked fetch. Independent transport Security review passed. No live provider or durable proof producer was verified by this slice. `lib/growth/sequences/dispatcher-repository.ts` now persists the original claim status at `ce31ad464`. `supabase/migrations/20261118150000_growth_outreach_terminal_fence.sql` and `lib/growth/campaigns/reservation-repository.ts` add a short private terminal client/suppression read fence at `4b2853f0e`. Root replayed 102 migrations and reproduced 12 focused PostgreSQL checks across account, claim, fence and Facebook; review of the complete sender remains pending.
+
+
+### GROWTH-RESEND-OUTREACH: campaign transport and usage
+
+- Status: partial. `lib/growth/integrations/resend/usage.ts#readResendUsage` reads the documented account-wide sent-plus-received counters from the fixed provider endpoint, with strict response size, reset and freshness checks. A null provider limit leaves the application budgets in force. `outreach-transport.ts#createResendOutreachTransport` accepts bounded exact one-recipient body bytes and a committed idempotency key, with a required last synchronous gate before one provider POST. Provider acceptance and unknown outcomes remain explicit.
+- Uses GROWTH-POLICY and intended consumers GROWTH-SEND-AUTHORITY and GROWTH-BUDGETS for current campaign opt-in, reviewed account and usage binding, committed durable attempt and shared limits. Canonical sender, account controls, authenticated delivery receipts and monitored-mailbox reply attribution remain pending. Existing newsletter and transactional traffic uses `integrations/resend/client.ts`.
+- Verification at source snapshot `c78f8a256`. Root ran 22 focused tests across Resend transport, usage, existing client and monthly offers, plus TypeScript. Independent review and actual provider checks remain pending. Graph nodes `lib_growth_integrations_resend_outreach_transport_ts` and `lib_growth_integrations_resend_usage_ts`. Tests: `lib/growth/integrations/resend/outreach-transport.test.ts` and `lib/growth/integrations/resend/usage.test.ts`.
 
 ### GROWTH-FB-MANUAL-CAPTURE: create a research lead from a public page
 

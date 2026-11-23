@@ -5132,6 +5132,62 @@
       "source_location": "L201"
     },
     {
+      "id": "lib_growth_integrations_resend_outreach_transport_test_ts",
+      "label": "outreach-transport.test.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/integrations/resend/outreach-transport.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "lib_growth_integrations_resend_outreach_transport_ts",
+      "label": "outreach-transport.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/integrations/resend/outreach-transport.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "outreach_transport_createresendoutreachtransport",
+      "label": "createResendOutreachTransport()",
+      "file_type": "code",
+      "source_file": "lib/growth/integrations/resend/outreach-transport.ts",
+      "source_location": "L42"
+    },
+    {
+      "id": "lib_growth_integrations_resend_usage_test_ts",
+      "label": "usage.test.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/integrations/resend/usage.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "usage_test_payload",
+      "label": "payload()",
+      "file_type": "code",
+      "source_file": "lib/growth/integrations/resend/usage.test.ts",
+      "source_location": "L6"
+    },
+    {
+      "id": "lib_growth_integrations_resend_usage_ts",
+      "label": "usage.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/integrations/resend/usage.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "usage_readboundedresendjson",
+      "label": "readBoundedResendJson()",
+      "file_type": "code",
+      "source_file": "lib/growth/integrations/resend/usage.ts",
+      "source_location": "L35"
+    },
+    {
+      "id": "usage_readresendusage",
+      "label": "readResendUsage()",
+      "file_type": "code",
+      "source_file": "lib/growth/integrations/resend/usage.ts",
+      "source_location": "L67"
+    },
+    {
       "id": "lib_growth_integrations_resend_webhook_repository_ts",
       "label": "webhook-repository.ts",
       "file_type": "code",
@@ -26630,6 +26686,132 @@
       "weight": 1.0
     },
     {
+      "source": "lib_growth_integrations_resend_outreach_transport_test_ts",
+      "target": "strict",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/integrations/resend/outreach-transport.test.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_integrations_resend_outreach_transport_test_ts",
+      "target": "node_test",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/integrations/resend/outreach-transport.test.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_integrations_resend_outreach_transport_test_ts",
+      "target": "lib_growth_integrations_resend_outreach_transport",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/integrations/resend/outreach-transport.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_integrations_resend_outreach_transport_ts",
+      "target": "zod",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/integrations/resend/outreach-transport.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_integrations_resend_outreach_transport_ts",
+      "target": "lib_growth_integrations_resend_usage",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/integrations/resend/outreach-transport.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_integrations_resend_outreach_transport_ts",
+      "target": "outreach_transport_createresendoutreachtransport",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/integrations/resend/outreach-transport.ts",
+      "source_location": "L42",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_integrations_resend_usage_test_ts",
+      "target": "strict",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/integrations/resend/usage.test.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_integrations_resend_usage_test_ts",
+      "target": "node_test",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/integrations/resend/usage.test.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_integrations_resend_usage_test_ts",
+      "target": "lib_growth_integrations_resend_usage",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/integrations/resend/usage.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_integrations_resend_usage_test_ts",
+      "target": "usage_test_payload",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/integrations/resend/usage.test.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_integrations_resend_usage_ts",
+      "target": "zod",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/integrations/resend/usage.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_integrations_resend_usage_ts",
+      "target": "usage_readboundedresendjson",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/integrations/resend/usage.ts",
+      "source_location": "L35",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_integrations_resend_usage_ts",
+      "target": "usage_readresendusage",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/integrations/resend/usage.ts",
+      "source_location": "L67",
+      "weight": 1.0
+    },
+    {
+      "source": "usage_readresendusage",
+      "target": "usage_readboundedresendjson",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/integrations/resend/usage.ts",
+      "source_location": "L93",
+      "weight": 1.0
+    },
+    {
       "source": "lib_growth_integrations_resend_webhook_repository_ts",
       "target": "lib_growth_db_types",
       "relation": "imports_from",
@@ -34208,249 +34390,6 @@
       "weight": 1.0
     },
     {
-      "source": "lib_operations_agreements_builder_draft_validation_ts",
-      "target": "lib_operations_agreements_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/builder-draft-validation.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_builder_draft_validation_ts",
-      "target": "lib_operations_agreements_builder_draft_schema",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/builder-draft-validation.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_builder_draft_validation_ts",
-      "target": "lib_operations_agreements_commercial_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/builder-draft-validation.ts",
-      "source_location": "L6",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_builder_draft_validation_ts",
-      "target": "lib_operations_agreements_validation",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/builder-draft-validation.ts",
-      "source_location": "L7",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_builder_draft_validation_ts",
-      "target": "lib_operations_agreements_builder_draft_validation_messages",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/builder-draft-validation.ts",
-      "source_location": "L8",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_builder_draft_validation_ts",
-      "target": "builder_draft_validation_agreementbuilderdraftvalidationerror",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/builder-draft-validation.ts",
-      "source_location": "L20",
-      "weight": 1.0
-    },
-    {
-      "source": "builder_draft_validation_agreementbuilderdraftvalidationerror",
-      "target": "builder_draft_validation_agreementbuilderdraftvalidationerror_constructor",
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/builder-draft-validation.ts",
-      "source_location": "L21",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_builder_draft_validation_ts",
-      "target": "builder_draft_validation_validateagreementbuilderdraft",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/builder-draft-validation.ts",
-      "source_location": "L28",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_commercial_presentation_test_ts",
-      "target": "strict",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/commercial-presentation.test.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_commercial_presentation_test_ts",
-      "target": "node_test",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/commercial-presentation.test.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_commercial_presentation_test_ts",
-      "target": "lib_operations_agreements_fixtures",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/commercial-presentation.test.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_commercial_presentation_test_ts",
-      "target": "lib_operations_agreements_commercial_presentation",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/commercial-presentation.test.ts",
-      "source_location": "L4",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_commercial_presentation_test_ts",
-      "target": "lib_operations_agreements_commercial_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/commercial-presentation.test.ts",
-      "source_location": "L5",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_commercial_presentation_ts",
-      "target": "money",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/commercial-presentation.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_commercial_presentation_ts",
-      "target": "lib_operations_agreements_commercial_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/commercial-presentation.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_commercial_presentation_ts",
-      "target": "commercial_presentation_submittedcommercialterms",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/commercial-presentation.ts",
-      "source_location": "L4",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_commercial_repository_ts",
-      "target": "lib_operations_db_client",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/commercial-repository.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_commercial_repository_ts",
-      "target": "lib_operations_auth_staff_transaction",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/commercial-repository.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_commercial_repository_ts",
-      "target": "lib_operations_auth_staff_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/commercial-repository.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_commercial_repository_ts",
-      "target": "lib_operations_db_portal_client",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/commercial-repository.ts",
-      "source_location": "L4",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_commercial_repository_ts",
-      "target": "lib_operations_auth_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/commercial-repository.ts",
-      "source_location": "L5",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_commercial_repository_ts",
-      "target": "lib_operations_agreements_commercial_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/commercial-repository.ts",
-      "source_location": "L6",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_commercial_repository_ts",
-      "target": "commercial_repository_loadcommercialoffers",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/commercial-repository.ts",
-      "source_location": "L8",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_commercial_repository_ts",
-      "target": "commercial_repository_liststaffcommercialoffers",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/commercial-repository.ts",
-      "source_location": "L24",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_commercial_repository_ts",
-      "target": "commercial_repository_listportalcommercialoffers",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/commercial-repository.ts",
-      "source_location": "L33",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_commercial_repository_ts",
-      "target": "commercial_repository_getstaffcommercialoffer",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/commercial-repository.ts",
-      "source_location": "L48",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_commercial_repository_ts",
-      "target": "commercial_repository_getportalcommercialoffer",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/commercial-repository.ts",
-      "source_location": "L61",
-      "weight": 1.0
-    },
-    {
       "source": "task_service_executetaskcommand",
       "target": "change_requests_test_tx",
       "relation": "calls",
@@ -34938,6 +34877,16 @@
       "confidence_score": 0.8,
       "source_file": "lib/growth/integrations/read-raw-body.ts",
       "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "usage_readboundedresendjson",
+      "target": "read_route_handler_test_read",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/integrations/resend/usage.ts",
+      "source_location": "L52",
       "weight": 1.0
     },
     {
@@ -35661,16 +35610,6 @@
       "weight": 1.0
     },
     {
-      "source": "builder_draft_service_toagreementdraft",
-      "target": "builder_draft_validation_validateagreementbuilderdraft",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/operations/agreements/builder-draft-service.ts",
-      "source_location": "L80",
-      "weight": 1.0
-    },
-    {
       "source": "builder_draft_service_finalisedraft",
       "target": "change_requests_test_tx",
       "relation": "calls",
@@ -35681,13 +35620,246 @@
       "weight": 1.0
     },
     {
-      "source": "builder_draft_validation_validateagreementbuilderdraft",
-      "target": "builder_draft_validation_messages_buildervalidationissues",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
+      "source": "lib_operations_agreements_builder_draft_validation_ts",
+      "target": "lib_operations_agreements_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/builder-draft-validation.ts",
-      "source_location": "L38",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_builder_draft_validation_ts",
+      "target": "lib_operations_agreements_builder_draft_schema",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/builder-draft-validation.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_builder_draft_validation_ts",
+      "target": "lib_operations_agreements_commercial_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/builder-draft-validation.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_builder_draft_validation_ts",
+      "target": "lib_operations_agreements_validation",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/builder-draft-validation.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_builder_draft_validation_ts",
+      "target": "lib_operations_agreements_builder_draft_validation_messages",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/builder-draft-validation.ts",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_builder_draft_validation_ts",
+      "target": "builder_draft_validation_agreementbuilderdraftvalidationerror",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/builder-draft-validation.ts",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "builder_draft_validation_agreementbuilderdraftvalidationerror",
+      "target": "builder_draft_validation_agreementbuilderdraftvalidationerror_constructor",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/builder-draft-validation.ts",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_builder_draft_validation_ts",
+      "target": "builder_draft_validation_validateagreementbuilderdraft",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/builder-draft-validation.ts",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_commercial_presentation_test_ts",
+      "target": "strict",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/commercial-presentation.test.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_commercial_presentation_test_ts",
+      "target": "node_test",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/commercial-presentation.test.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_commercial_presentation_test_ts",
+      "target": "lib_operations_agreements_fixtures",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/commercial-presentation.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_commercial_presentation_test_ts",
+      "target": "lib_operations_agreements_commercial_presentation",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/commercial-presentation.test.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_commercial_presentation_test_ts",
+      "target": "lib_operations_agreements_commercial_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/commercial-presentation.test.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_commercial_presentation_ts",
+      "target": "money",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/commercial-presentation.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_commercial_presentation_ts",
+      "target": "lib_operations_agreements_commercial_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/commercial-presentation.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_commercial_presentation_ts",
+      "target": "commercial_presentation_submittedcommercialterms",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/commercial-presentation.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_commercial_repository_ts",
+      "target": "lib_operations_db_client",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/commercial-repository.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_commercial_repository_ts",
+      "target": "lib_operations_auth_staff_transaction",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/commercial-repository.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_commercial_repository_ts",
+      "target": "lib_operations_auth_staff_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/commercial-repository.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_commercial_repository_ts",
+      "target": "lib_operations_db_portal_client",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/commercial-repository.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_commercial_repository_ts",
+      "target": "lib_operations_auth_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/commercial-repository.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_commercial_repository_ts",
+      "target": "lib_operations_agreements_commercial_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/commercial-repository.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_commercial_repository_ts",
+      "target": "commercial_repository_loadcommercialoffers",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/commercial-repository.ts",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_commercial_repository_ts",
+      "target": "commercial_repository_liststaffcommercialoffers",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/commercial-repository.ts",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_commercial_repository_ts",
+      "target": "commercial_repository_listportalcommercialoffers",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/commercial-repository.ts",
+      "source_location": "L33",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_commercial_repository_ts",
+      "target": "commercial_repository_getstaffcommercialoffer",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/commercial-repository.ts",
+      "source_location": "L48",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_commercial_repository_ts",
+      "target": "commercial_repository_getportalcommercialoffer",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/commercial-repository.ts",
+      "source_location": "L61",
       "weight": 1.0
     },
     {
@@ -48338,6 +48510,36 @@
       "confidence_score": 1,
       "source_file": "lib/growth/integrations/google-oauth.test.ts",
       "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_integrations_resend_outreach_transport_test_ts",
+      "target": "lib_growth_integrations_resend_outreach_transport_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/integrations/resend/outreach-transport.test.ts",
+      "source_location": "L3",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_integrations_resend_outreach_transport_ts",
+      "target": "lib_growth_integrations_resend_usage_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/integrations/resend/outreach-transport.ts",
+      "source_location": "L2",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_integrations_resend_usage_test_ts",
+      "target": "lib_growth_integrations_resend_usage_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/integrations/resend/usage.test.ts",
+      "source_location": "L3",
       "weight": 1
     },
     {
