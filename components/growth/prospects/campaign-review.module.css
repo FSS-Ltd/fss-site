@@ -102,3 +102,37 @@
 .form label.checkbox input {
   width: auto;
 }
+.replies {
+  display: grid;
+  gap: 12px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.reply {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #dce3e8;
+  border-radius: 8px;
+}
+.reply h4 {
+  margin: 0;
+  font-size: 0.9rem;
+}
+.reply label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.85rem;
+  font-weight: 650;
+}
+.reply select {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #8c9aa7;
+  border-radius: 5px;
+  padding: 8px;
+  background: #fff;
+  color: #07182e;
+  font: inherit;
+}

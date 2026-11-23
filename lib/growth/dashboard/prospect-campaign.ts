@@ -1,3 +1,7 @@
+import {
+  getProspectCampaignReplies,
+  type CampaignReplies,
+} from "./prospect-campaign-replies";
 import type { FounderSession } from "../auth/require-founder";
 import { requireCampaignFounder } from "../campaigns/authorization";
 import { founderVerificationInputSchema } from "../campaigns/founder-verification";
@@ -25,6 +29,7 @@ export type ProspectCampaignResult =
         freshUntil: string;
       } | null;
       reviewStatus: "available" | "excluded" | "already_in_outreach";
+      replies: CampaignReplies;
       membership: {
         id: string;
         campaignName: string;
@@ -58,54 +63,55 @@ export async function getProspectCampaign(
 ): Promise<ProspectCampaignResult> {
   requireCampaignFounder(founder);
   try {
-    const [source, eligibility, rows, memberships] = await Promise.all([
-      loadFounderVerification(db, prospectId, now, founder),
-      db<
-        {
-          status: string;
-          isClient: boolean;
-          suppressed: boolean;
-          active: boolean;
-        }[]
-      >`
+    const [source, eligibility, rows, memberships, replies] = await Promise.all(
+      [
+        loadFounderVerification(db, prospectId, now, founder),
+        db<
+          {
+            status: string;
+            isClient: boolean;
+            suppressed: boolean;
+            active: boolean;
+          }[]
+        >`
         select p.status,growth.is_outreach_client(p.id) as "isClient",
           exists(select 1 from growth.suppressions s left join growth.contacts c on c.id=p.primary_contact_id
             where s.business_id=p.business_id or s.normalised_email=c.normalised_email or s.normalised_email=lower(trim(p.source_details->>'email'))) as suppressed,
           (exists(select 1 from growth.campaign_memberships m where m.business_id=p.business_id and m.status in ('review','active','paused'))
             or exists(select 1 from growth.sequence_enrollments se join growth.prospects other on other.id=se.prospect_id where other.business_id=p.business_id and se.status in ('pending_approval','active','paused'))) as active
         from growth.prospects p where p.id=${prospectId}`,
-      db<
-        {
-          id: string;
-          name: string;
-          version: number;
-          status: "approved" | "paused";
-          approvedAt: Date;
-          approvedBy: string;
-          policy: unknown;
-        }[]
-      >`
+        db<
+          {
+            id: string;
+            name: string;
+            version: number;
+            status: "approved" | "paused";
+            approvedAt: Date;
+            approvedBy: string;
+            policy: unknown;
+          }[]
+        >`
         select id,name,version,status,approved_at as "approvedAt",approved_by as "approvedBy",policy
         from (select distinct on (id) id,name,version,status,approved_at,approved_by,policy from growth.campaigns order by id,version desc) latest
         where status in ('approved','paused') and approved_by=${founder.actorId} and approved_at is not null
         order by name,id limit 51`,
-      db<
-        {
-          id: string;
-          campaignName: string;
-          policyVersion: number;
-          status: string;
-          policyStatus: string;
-          approvedBy: string | null;
-          approvedAt: Date | null;
-          latestVersion: number;
-          country: string;
-          policy: unknown;
-          permissionExpiresAt: Date | null;
-          preparationStatus: string | null;
-          preparationReason: string | null;
-        }[]
-      >`
+        db<
+          {
+            id: string;
+            campaignName: string;
+            policyVersion: number;
+            status: string;
+            policyStatus: string;
+            approvedBy: string | null;
+            approvedAt: Date | null;
+            latestVersion: number;
+            country: string;
+            policy: unknown;
+            permissionExpiresAt: Date | null;
+            preparationStatus: string | null;
+            preparationReason: string | null;
+          }[]
+        >`
         select m.id,c.name as "campaignName",m.policy_version as "policyVersion",m.status,c.status as "policyStatus",c.approved_by as "approvedBy",c.approved_at as "approvedAt",
           (select max(version) from growth.campaigns where id=m.campaign_id) as "latestVersion",b.country_code as country,c.policy,
           perm.expires_at as "permissionExpiresAt",j.status as "preparationStatus",j.last_error_code as "preparationReason"
@@ -116,7 +122,9 @@ export async function getProspectCampaign(
         left join growth.outreach_outbox o on o.event_id=e.id
         left join growth.outreach_jobs j on j.outbox_id=o.id and j.membership_id=m.id and j.job_type='first_preparation'
         where m.prospect_id=${prospectId} and m.status in ('review','active','paused') order by m.created_at desc limit 2`,
-    ]);
+        getProspectCampaignReplies(prospectId, founder, db, now),
+      ],
+    );
     if (
       source &&
       (!founderVerificationInputSchema.shape.contactSourceUrl.safeParse(
@@ -244,6 +252,7 @@ export async function getProspectCampaign(
           }
         : null,
       reviewStatus,
+      replies,
       membership,
       campaigns: campaigns.slice(0, 50),
       truncated: rows.length > 50,

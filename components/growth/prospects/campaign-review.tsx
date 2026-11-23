@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { ProspectCampaignResult } from "@/lib/growth/dashboard/prospect-campaign";
 import { formatGrowthDateTime } from "@/lib/growth/dashboard/formatters";
+import { CampaignReplyReview } from "./campaign-reply-review";
 import { CampaignPermissionForm } from "./campaign-permission-form";
 import { SourceVerificationForm } from "./source-verification-form";
 import styles from "./campaign-review.module.css";
@@ -254,6 +255,7 @@ export function CampaignReview({
               )}
             </div>
           )}
+          <CampaignReplyReview result={result.replies} />
           {message && (
             <p ref={feedback} tabIndex={-1} role={done ? "status" : "alert"}>
               {message}

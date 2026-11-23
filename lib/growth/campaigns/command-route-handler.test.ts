@@ -549,3 +549,39 @@ test("requested-service permission requires explicit scope and binds the stored 
     422,
   );
 });
+
+test("reply review accepts only supported classifications and exact message versions", async () => {
+  const seen: Parameters<typeof executeCampaignCommand>[1][] = [];
+  const execute: typeof executeCampaignCommand = async (_db, input) => {
+    seen.push(input);
+    return {
+      status: "ok",
+      id: command.campaignId,
+      version: 1,
+      alreadyExisted: false,
+    };
+  };
+  const handle = handler(execute);
+  const input = {
+    type: "record_reply",
+    requestId: command.requestId,
+    membershipId: command.campaignId,
+    inboundMessageId: "7a71c3fc-4d35-4691-976b-2240fcd08828",
+    expectedPolicyVersion: 1,
+    expectedProspectVersion: 2,
+    expectedContactVersion: 3,
+    kind: "opt_out",
+  };
+  assert.equal((await handle(request(input))).status, 200);
+  assert.equal((await handle(request(input))).status, 200);
+  assert.deepEqual(seen[0], seen[1]);
+  assert.equal((await handle(request({ ...input, kind: "open" }))).status, 422);
+  assert.equal(
+    (await handle(request({ ...input, expectedContactVersion: 0 }))).status,
+    422,
+  );
+  assert.equal(
+    (await handle(request({ ...input, body: "untrusted" }))).status,
+    422,
+  );
+});

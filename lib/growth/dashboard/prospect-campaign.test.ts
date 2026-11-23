@@ -12,6 +12,7 @@ const now = new Date("2026-11-23T09:00:00Z");
 function database(active: boolean): GrowthQueryExecutor {
   const tx = async (parts: TemplateStringsArray) => {
     const query = parts.join(" ");
+    if (query.includes("with candidates as materialized")) return [];
     if (query.includes("from growth.source_evidence e join")) return [];
     if (query.includes("from growth.prospects p where"))
       return [{ status: "new", isClient: false, suppressed: false, active }];
@@ -33,6 +34,7 @@ test("does not infer source verification, consent, or campaigns from absent evid
     status: "ready",
     verification: null,
     reviewStatus: "available",
+    replies: { status: "ready", items: [], truncated: false },
     membership: null,
     campaigns: [],
     truncated: false,
@@ -112,6 +114,7 @@ test("requires current matching source and only exposes valid approved policy ve
   let isClient = false;
   const db = (async (parts: TemplateStringsArray) => {
     const q = parts.join(" ");
+    if (q.includes("with candidates as materialized")) return [];
     if (q.includes("from growth.source_evidence e join"))
       return [
         { ...common, claimType: "contact_email", summary: "contact" },

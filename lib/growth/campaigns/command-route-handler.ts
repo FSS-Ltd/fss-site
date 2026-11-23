@@ -64,6 +64,23 @@ const lifecycleCommand = z.discriminatedUnion("type", [
   z.strictObject({ type: z.literal("resume"), ...fields }),
   z.strictObject({ type: z.literal("enrol"), ...fields, prospectId: z.uuid() }),
   z.strictObject({
+    type: z.literal("record_reply"),
+    requestId: z.uuid(),
+    membershipId: z.uuid(),
+    inboundMessageId: z.uuid(),
+    expectedPolicyVersion: z.number().int().positive(),
+    expectedProspectVersion: z.number().int().positive(),
+    expectedContactVersion: z.number().int().positive(),
+    kind: z.enum([
+      "positive",
+      "negative",
+      "bot",
+      "out_of_office",
+      "opt_out",
+      "unknown",
+    ]),
+  }),
+  z.strictObject({
     type: z.literal("record_permission"),
     requestId: z.uuid(),
     membershipId: z.uuid(),
@@ -297,6 +314,12 @@ export function createCampaignCommandHandler(dependencies: {
     mapActionError: (error) => {
       if (!(error instanceof Error)) return null;
       const permissionMessages: Record<string, string> = {
+        review_context_changed:
+          "The campaign, prospect or contact changed. Refresh before reviewing this reply.",
+        reply_evidence_unavailable:
+          "This reply is unavailable or has already been reviewed.",
+        reply_evidence_ambiguous:
+          "The reply attribution is ambiguous and cannot be reviewed here.",
         verification_required: "Current source verification is required.",
         prospect_version_changed:
           "The prospect changed. Refresh and review its source evidence.",
@@ -316,6 +339,9 @@ export function createCampaignCommandHandler(dependencies: {
       const known = new Set([
         "unsupported_stored_policy",
         "bound_provider_changed",
+        "review_context_changed",
+        "reply_evidence_unavailable",
+        "reply_evidence_ambiguous",
         "verification_required",
         "prospect_version_changed",
         "contact_version_changed",

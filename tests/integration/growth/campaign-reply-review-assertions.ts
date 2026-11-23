@@ -75,6 +75,40 @@ export async function exerciseCampaignReplyReview(
       ),
       /reply_evidence_unavailable/,
     );
+    const competingSequence = randomUUID();
+    await admin`insert into growth.sequence_enrollments(id,prospect_id,contact_id,status,gmail_thread_id) values (${competingSequence},${input.prospectId},${input.contactId},'completed','confirmed-thread')`;
+    try {
+      await assert.rejects(
+        executeCampaignCommand(
+          db,
+          { ...base, requestId: randomUUID() },
+          input.founder,
+          randomUUID(),
+        ),
+        /reply_evidence_ambiguous/,
+      );
+    } finally {
+      await admin`delete from growth.sequence_enrollments where id=${competingSequence}`;
+    }
+    const [binding] = await admin<{ id: string; subject: string }[]>`
+      select c.account_connection_id as id,ctrl.verified_subject as subject
+      from growth.campaign_memberships m join growth.campaigns c on c.id=m.campaign_id and c.version=m.policy_version
+      join growth.outreach_account_controls ctrl on ctrl.connection_id=c.account_connection_id where m.id=${input.membershipId}`;
+    assert.ok(binding);
+    await admin`update growth.outreach_account_controls set verified_subject='replaced-subject' where connection_id=${binding.id}`;
+    try {
+      await assert.rejects(
+        executeCampaignCommand(
+          db,
+          { ...base, requestId: randomUUID() },
+          input.founder,
+          randomUUID(),
+        ),
+        /review_context_changed/,
+      );
+    } finally {
+      await admin`update growth.outreach_account_controls set verified_subject=${binding.subject} where connection_id=${binding.id}`;
+    }
     const failureId = "ab8fbb5d-6b85-482b-b734-73943183bf02";
     await admin`alter table growth.audit_log add constraint test_reply_review_rollback check (correlation_id <> 'ab8fbb5d-6b85-482b-b734-73943183bf02') not valid`;
     try {
@@ -101,12 +135,23 @@ export async function exerciseCampaignReplyReview(
       ),
       /founder_authorization_required/,
     );
-    const result = await executeCampaignCommand(
-      db,
-      base,
-      input.founder,
-      base.requestId,
-    );
+    const [grant] = await admin<
+      { version: number }[]
+    >`select version from growth.integration_connections where id=${binding.id}`;
+    assert.ok(grant);
+    await admin`update growth.integration_connections set version=version+1 where id=${binding.id}`;
+    const result = await (async () => {
+      try {
+        return await executeCampaignCommand(
+          db,
+          base,
+          input.founder,
+          base.requestId,
+        );
+      } finally {
+        await admin`update growth.integration_connections set version=${grant.version} where id=${binding.id}`;
+      }
+    })();
     const replay = await executeCampaignCommand(
       db,
       base,

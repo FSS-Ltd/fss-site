@@ -32,6 +32,7 @@ test("current verified evidence and approved campaign remain explicitly review o
         result={{
           status: "ready",
           reviewStatus: "available",
+          replies: { status: "ready", items: [], truncated: false },
           membership: null,
           verification: {
             status: "current",
@@ -77,6 +78,7 @@ test("stale evidence and failures do not expose enrolment", () => {
         result={{
           status: "ready",
           reviewStatus: "available",
+          replies: { status: "ready", items: [], truncated: false },
           membership: null,
           verification: null,
           campaigns: [
@@ -107,6 +109,7 @@ test("permission capture requires explicit opt-in and shows recorded job state",
         result={{
           status: "ready",
           reviewStatus: "already_in_outreach",
+          replies: { status: "ready", items: [], truncated: false },
           verification: {
             status: "current",
             requestId: "c8f19d64-bfbb-4d62-a578-e3f48ea6c435",
