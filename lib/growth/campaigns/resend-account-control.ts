@@ -70,6 +70,7 @@ export type ResendRuntimeConfiguration = {
   binding: ResendBinding;
   sendCredential: string;
   usageCredential: string;
+  webhookSecret?: string;
 };
 
 export async function executeResendAccountCommand(
@@ -122,7 +123,9 @@ export async function executeResendAccountCommand(
       if (
         JSON.stringify(runtimeBinding) !== JSON.stringify(command.binding) ||
         !runtime.sendCredential.trim() ||
-        !runtime.usageCredential.trim()
+        !runtime.usageCredential.trim() ||
+        (runtimeBinding.webhookGeneration !== undefined &&
+          !runtime.webhookSecret?.trim())
       )
         throw new Error("runtime_binding_unknown");
       const [existing] = await tx<

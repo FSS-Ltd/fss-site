@@ -18,6 +18,7 @@ export const resendBindingSchema = z
     replyTo: z.email().max(320).toLowerCase(),
     sendGeneration: z.uuid(),
     usageGeneration: z.uuid(),
+    webhookGeneration: z.uuid().optional(),
   })
   .refine((value) => value.sender.split("@")[1] === value.domain);
 export type ResendBinding = z.infer<typeof resendBindingSchema>;

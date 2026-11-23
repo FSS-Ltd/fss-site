@@ -14,6 +14,7 @@ export function readResendOutreachRuntime(
     replyTo: env.RESEND_OUTREACH_REPLY_TO_EMAIL,
     sendGeneration: env.RESEND_OUTREACH_SEND_GENERATION,
     usageGeneration: env.RESEND_OUTREACH_USAGE_GENERATION,
+    webhookGeneration: env.RESEND_OUTREACH_WEBHOOK_GENERATION,
   });
   const sendCredential = env.RESEND_OUTREACH_SEND_API_KEY;
   const usageCredential = env.RESEND_OUTREACH_USAGE_API_KEY;
@@ -25,5 +26,11 @@ export function readResendOutreachRuntime(
       env.VERCEL_ENV !== binding.data.environment)
   )
     return null;
-  return { binding: binding.data, sendCredential, usageCredential };
+  const webhookSecret = env.RESEND_OUTREACH_WEBHOOK_SECRET;
+  return {
+    binding: binding.data,
+    sendCredential,
+    usageCredential,
+    ...(webhookSecret?.trim() ? { webhookSecret } : {}),
+  };
 }
