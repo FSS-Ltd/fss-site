@@ -227,3 +227,29 @@
   padding: 0;
   border: 0;
 }
+.account {
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid #dce3e8;
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+}
+.account h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+.account p,
+.account dl {
+  color: #526078;
+  font-size: 0.85rem;
+}
+.account dl {
+  display: grid;
+  gap: 8px;
+}
+.account dt {
+  font-weight: 650;
+}
+.account dd {
+  margin: 2px 0 0;
+}

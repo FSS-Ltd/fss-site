@@ -2,17 +2,23 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import type { CampaignAccountsResult } from "@/lib/growth/dashboard/campaign-accounts";
 import type { CampaignOverviewRow } from "@/lib/growth/dashboard/campaign-overview";
 import { CampaignPolicyFields } from "./campaign-policy-fields";
 import styles from "./campaign-overview.module.css";
 
 export function CampaignPolicyEditor({
   campaign,
+  accounts,
 }: {
   campaign?: CampaignOverviewRow;
+  accounts: CampaignAccountsResult;
 }) {
   const router = useRouter();
   const [initial] = useState(() => campaign?.editorPolicy ?? null);
+  const [provider, setProvider] = useState<"gmail" | "resend">(
+    () => campaign?.editorPolicy?.provider ?? "gmail",
+  );
   const [initialVersion] = useState(() => campaign?.version);
   const [pending, setPending] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -46,6 +52,7 @@ export function CampaignPolicyEditor({
     const editor = {
       offer: value("offer"),
       provider: value("provider"),
+      accountSelection: value("accountSelection"),
       jurisdiction: value("jurisdiction").toUpperCase(),
       permissionRequirement: value("permission"),
       effectiveAt: value("effectiveAt"),
@@ -124,7 +131,12 @@ export function CampaignPolicyEditor({
               <input name="name" required maxLength={200} />
             </label>
           )}
-          <CampaignPolicyFields policy={initial} />
+          <CampaignPolicyFields
+            policy={initial}
+            accounts={accounts}
+            provider={provider}
+            onProviderChange={setProvider}
+          />
         </fieldset>
         <button
           type="submit"

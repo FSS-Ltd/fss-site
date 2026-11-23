@@ -41,6 +41,9 @@ const editor = z
       "ai_front_desk_v1",
     ]),
     provider: z.enum(["gmail", "resend"]),
+    accountSelection: z
+      .union([z.literal("keep"), z.literal("unbound"), z.uuid()])
+      .default("keep"),
     jurisdiction: z.string().length(2),
     permissionRequirement: z.enum(["consent", "requested_service"]),
     effectiveAt: z.iso.datetime({ offset: true }),
@@ -99,7 +102,8 @@ export function createCampaignCommandHandler(dependencies: {
         previous = editable.policy;
         if (
           previous.accountConnectionId &&
-          previous.provider !== body.editor.provider
+          previous.provider !== body.editor.provider &&
+          body.editor.accountSelection === "keep"
         )
           throw new Error("bound_provider_changed");
       }
@@ -121,7 +125,12 @@ export function createCampaignCommandHandler(dependencies: {
         status: "paused",
         approvedAt: null,
         approverId: null,
-        accountConnectionId: previous?.accountConnectionId ?? null,
+        accountConnectionId:
+          input.accountSelection === "keep"
+            ? (previous?.accountConnectionId ?? null)
+            : input.accountSelection === "unbound"
+              ? null
+              : input.accountSelection,
         offer: input.offer,
         commercialTerms: isWebsiteServiceOffer(input.offer)
           ? websiteServiceOffers[input.offer]

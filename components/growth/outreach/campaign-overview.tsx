@@ -1,4 +1,6 @@
 import Link from "next/link";
+import type { CampaignAccountsResult } from "@/lib/growth/dashboard/campaign-accounts";
+import { CampaignAccountReadiness } from "./campaign-account-readiness";
 import type { CampaignOverviewResult } from "@/lib/growth/dashboard/campaign-overview";
 import { formatGrowthDateTime } from "@/lib/growth/dashboard/formatters";
 import { CampaignPolicyEditor } from "./campaign-policy-editor";
@@ -13,8 +15,10 @@ function campaignState(status: string, approved: boolean): string {
 
 export function CampaignOverview({
   result,
+  accounts = { status: "unavailable" },
 }: {
   result: CampaignOverviewResult;
+  accounts?: CampaignAccountsResult;
 }): React.JSX.Element {
   if (result.status === "error")
     return (
@@ -39,7 +43,8 @@ export function CampaignOverview({
         Daily goal 100 · target 150. Sending depends on eligible recipients and
         approved account capacity.
       </p>
-      <CampaignPolicyEditor />
+      <CampaignAccountReadiness result={accounts} />
+      <CampaignPolicyEditor accounts={accounts} />
       {result.rows.length === 0 ? (
         <p className={styles.empty}>No campaigns have been created yet.</p>
       ) : (
@@ -91,7 +96,7 @@ export function CampaignOverview({
                     : "No analysis date recorded"}
                 </p>
               </div>
-              <CampaignPolicyEditor campaign={campaign} />
+              <CampaignPolicyEditor campaign={campaign} accounts={accounts} />
               <CampaignLifecycleActions
                 id={campaign.id}
                 version={campaign.version}

@@ -28,6 +28,23 @@ test("shows observed counts and a stored hold reason without claiming delivery",
       }}
     >
       <CampaignOverview
+        accounts={{
+          status: "ready",
+          resendConfiguration: "unknown",
+          accounts: [
+            {
+              id: "c",
+              provider: "gmail",
+              sender: "founder@example.com",
+              selectable: true,
+              readiness: { status: "held", reason: "usage_unknown" },
+              recordedRamp: 25,
+              limitsEvidence: null,
+              healthEvidence: null,
+              usageObservation: null,
+            },
+          ],
+        }}
         result={{
           status: "ready",
           londonDate: "23 November 2026",
@@ -56,6 +73,9 @@ test("shows observed counts and a stored hold reason without claiming delivery",
     </AppRouterContext.Provider>,
   );
   assert.match(html, /Pause campaign/);
+  assert.match(html, /founder@example.com/);
+  assert.match(html, /Held: usage unknown/);
+  assert.match(html, /Recorded ramp/);
   assert.match(html, /Local campaign/);
   assert.match(html, /permission invalid/);
   assert.match(html, /Confirmed today<\/dt><dd>0/);

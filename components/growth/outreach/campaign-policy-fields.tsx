@@ -1,3 +1,4 @@
+import type { CampaignAccountsResult } from "@/lib/growth/dashboard/campaign-accounts";
 import type { CampaignOverviewRow } from "@/lib/growth/dashboard/campaign-overview";
 import styles from "./campaign-overview.module.css";
 
@@ -65,7 +66,17 @@ function EvidenceFields({
   );
 }
 
-export function CampaignPolicyFields({ policy }: { policy: Policy | null }) {
+export function CampaignPolicyFields({
+  policy,
+  accounts,
+  provider,
+  onProviderChange,
+}: {
+  policy: Policy | null;
+  accounts: CampaignAccountsResult;
+  provider: "gmail" | "resend";
+  onProviderChange: (provider: "gmail" | "resend") => void;
+}) {
   return (
     <div className={styles.policyFields}>
       <fieldset className={styles.fieldGroup}>
@@ -111,7 +122,15 @@ export function CampaignPolicyFields({ policy }: { policy: Policy | null }) {
         </label>
         <label>
           Provider
-          <select name="provider" defaultValue={policy?.provider ?? "gmail"}>
+          <select
+            name="provider"
+            value={provider}
+            onChange={(event) =>
+              onProviderChange(
+                event.target.value === "resend" ? "resend" : "gmail",
+              )
+            }
+          >
             <option value="gmail">Gmail</option>
             <option value="resend">Resend</option>
           </select>
@@ -130,10 +149,33 @@ export function CampaignPolicyFields({ policy }: { policy: Policy | null }) {
             <option value="requested_service">Requested service</option>
           </select>
         </label>
+        <label>
+          Sending account
+          <select
+            key={provider}
+            name="accountSelection"
+            defaultValue={policy ? "keep" : "unbound"}
+          >
+            {policy && <option value="keep">Keep current binding</option>}
+            <option value="unbound">Unbound</option>
+            {accounts.status === "ready" &&
+              accounts.accounts
+                .filter(
+                  (account) =>
+                    account.provider === provider && account.selectable,
+                )
+                .map((account) => (
+                  <option key={account.id} value={account.id}>
+                    {account.sender}
+                  </option>
+                ))}
+          </select>
+        </label>
         <p>
-          {policy?.accountConnectionId
-            ? "The existing account binding will be retained. Changing its provider is unavailable here."
-            : "No account is bound. Binding and account readiness are separate steps."}
+          Account choice does not establish readiness or recipient permission.{" "}
+          {accounts.status === "unavailable"
+            ? "Account choices are unavailable; the current binding can be kept."
+            : "Only supported stored connections are offered."}
         </p>
       </fieldset>
       <fieldset className={styles.fieldGroup}>

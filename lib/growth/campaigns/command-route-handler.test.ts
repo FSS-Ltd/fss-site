@@ -262,7 +262,44 @@ test("revision rebuilds from the requested stored version and holds unknown stor
   assert.equal(revised.policy.accountConnectionId, account);
   assert.equal(revised.policy.dailyLimit, 50);
   assert.equal(revised.policy.variants[0]?.version, 3);
+  const replacement = "d55a4e25-d712-4d92-b854-7ba22e34fbc7";
+  assert.equal(
+    (
+      await handle(
+        request({
+          ...payload,
+          editor: { ...editor, accountSelection: replacement },
+        }),
+      )
+    ).status,
+    200,
+  );
+  const selected = bodies.at(-1);
+  assert.ok(selected && selected.type === "revise");
+  assert.equal(selected.policy.accountConnectionId, replacement);
+  assert.equal(
+    (
+      await handle(
+        request({
+          ...payload,
+          editor: { ...editor, accountSelection: "unbound" },
+        }),
+      )
+    ).status,
+    200,
+  );
+  const unbound = bodies.at(-1);
+  assert.ok(unbound && unbound.type === "revise");
+  assert.equal(unbound.policy.accountConnectionId, null);
+  assert.equal(
+    (
+      await handle(
+        request({ ...payload, editor: { ...editor, provider: "resend" } }),
+      )
+    ).status,
+    409,
+  );
   storedPolicy = { ...stored, futureField: "retain me" };
   assert.equal((await handle(request(payload))).status, 409);
-  assert.equal(bodies.length, 2);
+  assert.equal(bodies.length, 4);
 });

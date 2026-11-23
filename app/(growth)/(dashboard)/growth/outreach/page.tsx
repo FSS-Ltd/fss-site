@@ -5,6 +5,7 @@ import { SeoAuditList } from "@/components/growth/outreach/seo-audit-list";
 import { getOutreachList } from "@/lib/growth/dashboard/outreach";
 import { getOutreachDrafts } from "@/lib/growth/dashboard/outreach-drafts";
 import { getSeoAuditList } from "@/lib/growth/dashboard/seo-audits";
+import { getCampaignAccounts } from "@/lib/growth/dashboard/campaign-accounts";
 import { getCampaignOverview } from "@/lib/growth/dashboard/campaign-overview";
 import { CampaignOverview } from "@/components/growth/outreach/campaign-overview";
 import { requireFounder } from "@/lib/growth/auth/require-founder";
@@ -12,13 +13,14 @@ import { requireFounder } from "@/lib/growth/auth/require-founder";
 import styles from "@/components/growth/outreach/outreach.module.css";
 
 export default async function OutreachPage() {
-  await requireFounder();
-  const [result, draftsResult, seoAuditResult, campaignResult] =
+  const founder = await requireFounder();
+  const [result, draftsResult, seoAuditResult, campaignResult, accountsResult] =
     await Promise.all([
       getOutreachList(),
       getOutreachDrafts(),
       getSeoAuditList(),
       getCampaignOverview(),
+      getCampaignAccounts(founder),
     ]);
   return (
     <div className={styles.page}>
@@ -29,7 +31,9 @@ export default async function OutreachPage() {
         </p>
       </header>
       <OutreachWorkspace
-        campaigns={<CampaignOverview result={campaignResult} />}
+        campaigns={
+          <CampaignOverview result={campaignResult} accounts={accountsResult} />
+        }
         drafts={<OutreachDrafts result={draftsResult} />}
         sequences={<OutreachList result={result} />}
         audits={<SeoAuditList result={seoAuditResult} />}
