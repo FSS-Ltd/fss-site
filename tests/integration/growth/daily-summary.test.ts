@@ -65,6 +65,7 @@ test(
     let crossId: string | undefined;
     let unknownId: string | undefined;
     const legacyId = randomUUID();
+    const prooflessId = randomUUID();
     const [clock] = await admin<
       { day: string; at: Date }[]
     >`select (statement_timestamp() at time zone 'Europe/London')::date::text as day, statement_timestamp() as at`;
@@ -99,13 +100,18 @@ test(
         await tx`update growth.outreach_reservations set confirmation_receipt=jsonb_set(confirmation_receipt,'{possibleInvocationFrom}',to_jsonb(to_char(date_trunc('milliseconds',submitted_at) at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'))) where id=${cross.id}`;
         await tx`alter table growth.outreach_reservations enable trigger protect_outreach_confirmation`;
       });
+      await admin`insert into growth.outreach_reservations(id,idempotency_key,campaign_id,policy_version,membership_id,email_message_id,sequence_id,account_id,london_day,connection_id,grant_epoch,rfc_message_id,recipient_count,authority_fingerprint,lease_token,lease_until,fence)
+        select ${prooflessId},${randomUUID()},campaign_id,policy_version,membership_id,email_message_id,sequence_id,account_id,london_day,connection_id,grant_epoch,rfc_message_id,recipient_count,authority_fingerprint,${randomUUID()},clock_timestamp()+interval '5 minutes',fence+3 from growth.outreach_reservations where id=${fixture.reservationId}`;
+      await admin`update growth.outreach_reservations set status='submitting',submitted_at=${new Date(clock.at.getTime() - 1000)},issued_snapshot=(select issued_snapshot from growth.outreach_reservations where id=${fixture.reservationId}),issued_snapshot_hash=(select issued_snapshot_hash from growth.outreach_reservations where id=${fixture.reservationId}) where id=${prooflessId}`;
+      await admin`update growth.outreach_reservations set status='accepted',provider_message_id=${randomUUID()},provider_thread_id=${randomUUID()} where id=${prooflessId}`;
       await admin`insert into growth.outreach_events(id,campaign_id,policy_version,membership_id,event_type) values (${eventId},${fixture.campaignId},1,${fixture.membershipId},'first_message_prepared')`;
       await admin`insert into growth.outreach_jobs(id,campaign_id,policy_version,membership_id,job_type,due_at,idempotency_key,status,last_error_code) values (${randomUUID()},${fixture.campaignId},1,${fixture.membershipId},'first_preparation',clock_timestamp(),${randomUUID()},'held','permission_missing')`;
       const first = await publishDailyOutreachSummary(db);
       assert.equal(first.preparationEvents, 1);
       assert.equal(first.heldJobsAtRead, 1);
       assert.equal(first.heldReasons.permission, 1);
-      assert.equal(first.issuedAttempts, 2);
+      assert.equal(first.issuedAttempts, 3);
+      assert.equal(first.unconfirmedAttempts, 1);
       assert.equal(first.acceptedAtRead, 2);
       assert.equal(first.observedConfirmations, 3);
       assert.equal(first.observedUnknownDay, 1);
@@ -122,6 +128,7 @@ test(
       if (unknownId)
         await admin`delete from growth.outreach_reservations where id=${unknownId}`;
       await admin`delete from growth.outreach_reservations where id=${legacyId}`;
+      await admin`delete from growth.outreach_reservations where id=${prooflessId}`;
       await fixture.cleanup();
       await db.end();
       await admin.end();

@@ -73,7 +73,7 @@ export async function publishDailyOutreachSummary(
         'version',1,'londonDay',l.day::text,'generatedAt',to_char(l.at at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"'),
         'dayStatus','partial_at_run', 'preparationEvents',c.event_count,
         'issuedAttempts',(select count(*) from reservations where submitted_at >= l.start_at and submitted_at <= l.at),
-        'acceptedAtRead',(select count(*) from reservations where submitted_at >= l.start_at and submitted_at <= l.at and status in ('accepted','sent')),
+        'acceptedAtRead',(select count(*) from reservations where submitted_at >= l.start_at and submitted_at <= l.at and status='accepted' and direct_submission_evidence is not null and provider_message_id is not null),
         'observedConfirmations',(select count(*) from reservations where confirmation_receipt is not null and confirmation_observed_at >= l.start_at and confirmation_observed_at <= l.at),
         'confirmedWithinDay',(select count(*) from reservations where confirmation_receipt is not null and bounded_invocation and submitted_at >= l.start_at and confirmation_observed_at >= submitted_at and confirmation_observed_at <= l.at),
         'observedCrossDay',(select count(*) from reservations where confirmation_receipt is not null and bounded_invocation and confirmation_observed_at >= l.start_at and confirmation_observed_at <= l.at and submitted_at < l.start_at),
