@@ -14,6 +14,11 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import test from "node:test";
 import { buildFacebookRunId } from "../lib/growth/facebook/scheduled-discovery";
+import {
+  buildDailyResearchRunId,
+  runDailyResearch,
+} from "../lib/growth/research/daily-discovery";
+import { runPinnedResearch } from "./outreach-research-pinned-runner";
 
 const launcherSource = resolve("scripts/outreach-research-pinned.mjs");
 function fixture() {
@@ -194,7 +199,7 @@ test("real Facebook replay consumes a cached receipt without credentials or HTTP
   }
 });
 
-test("real replay requires existing state and new mode refuses existing receipt", () => {
+test("explicit replay requires existing state and normal mode resumes receipt", () => {
   const state = mkdtempSync(join(tmpdir(), "fss-replay-gate-"));
   const runner = resolve("scripts/outreach-research-pinned-runner.ts");
   const env: NodeJS.ProcessEnv = {
@@ -222,7 +227,73 @@ test("real replay requires existing state and new mode refuses existing receipt"
         ["--import", "tsx", runner, "facebook", state, "new"],
         { env, stdio: "ignore" },
       ).status,
-      1,
+      0,
+    );
+  } finally {
+    rmSync(state, { recursive: true, force: true });
+  }
+});
+
+test("normal business retry submits retained exact bytes without invoking search", async () => {
+  const state = mkdtempSync(join(tmpdir(), "fss-business-replay-"));
+  const now = new Date("2026-11-23T07:00:00Z");
+  const runId = buildDailyResearchRunId(now);
+  const path = join(state, `${runId}.json`);
+  const body = JSON.stringify({
+    schemaVersion: "2.0",
+    externalRunId: runId,
+    runDate: "2026-11-23",
+    timezone: "Europe/London",
+    promptVersion: "daily-research-v2",
+    prospects: [],
+    rejections: [],
+    outcome: "no_results",
+  });
+  try {
+    writeFileSync(path, body, { mode: 0o600 });
+    let submissions = 0;
+    const ports = {
+      now,
+      secret: () => "test-only-secret-at-least-thirty-two-characters",
+      business: (input: Parameters<typeof runDailyResearch>[0]) =>
+        runDailyResearch({
+          ...input,
+          submit: async ({ rawBody }) => {
+            assert.equal(rawBody, body);
+            submissions++;
+            return {
+              ok: true as const,
+              result: {
+                ok: true as const,
+                runId: "00000000-0000-4000-8000-000000000001",
+                accepted: 0,
+                duplicates: 0,
+                rejected: 0,
+                acceptedProspects: [],
+              },
+              attempts: 1,
+            };
+          },
+        }),
+    };
+    assert.equal(
+      await runPinnedResearch(["business", state, "new"], ports),
+      true,
+    );
+    assert.equal(
+      await runPinnedResearch(["business", state, "replay"], ports),
+      true,
+    );
+    assert.equal(submissions, 2);
+    assert.equal(
+      await runPinnedResearch(["business", state, "new"], {
+        ...ports,
+        business: (input) => {
+          rmSync(path);
+          return runDailyResearch(input);
+        },
+      }),
+      false,
     );
   } finally {
     rmSync(state, { recursive: true, force: true });

@@ -59,8 +59,9 @@ env -i HOME="/absolute/home" PATH="/usr/bin:/bin" \
 ```
 
 Use `--mode facebook` for the separate Facebook discovery run. Add `--replay`
-only to resume today's existing private body or Facebook receipt; an existing
-body without that flag and a replay without existing state are rejected. The
+to require today's existing private body or Facebook receipt; it refuses to
+start fresh research when none exists. Normal scheduled invocations also resume
+an existing body or receipt without searching again. The
 launcher does not fetch, reset, register or activate schedules. It checks the
 checkout, paths and runtime before starting either existing runner, and emits
 only the mode and status. It does not verify the installed dependency tree or
