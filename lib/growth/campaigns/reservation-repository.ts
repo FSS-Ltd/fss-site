@@ -111,7 +111,10 @@ async function preliminary(
   `;
   return rows.length === 1 ? (rows[0] ?? null) : null;
 }
-async function lockKey(tx: GrowthTransaction, key: string): Promise<void> {
+export async function lockKey(
+  tx: GrowthTransaction,
+  key: string,
+): Promise<void> {
   await tx`select pg_advisory_xact_lock(hashtextextended(${key},0))`;
 }
 async function lockedPreparation(
@@ -280,7 +283,7 @@ async function checkBudget(
     : held(result);
 }
 
-async function validReservedHistory(
+export async function validReservedHistory(
   tx: GrowthTransaction,
   messageId: string,
   leaseToken: string,

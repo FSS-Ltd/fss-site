@@ -429,6 +429,12 @@ export async function loadPolicyAuthorizedSourceProof(
       and c.status='approved' and c.approved_by is not null and c.approved_at is not null and c.approved_at <= ${now}
       and c.account_connection_id=${input.connectionId} and p.provider=${provider} and em.channel=${provider} and c.policy->>'provider'=p.provider and p.contact_id=se.contact_id and p.actor_id=${createHash("sha256").update("j.ntagengwa@faithfulsoftware.dev").digest("hex")}
       and p.expires_at > ${now} and p.proof_origin in ('founder','research')
+      and (${provider}='gmail' or (p.basis='consent' and exists (
+        select 1 from growth.outreach_events e join growth.outreach_outbox o on o.event_id=e.id
+        where e.event_type='record_permission' and e.membership_id=m.id and e.campaign_id=m.campaign_id
+          and e.policy_version=m.policy_version and e.result_id=p.id and e.request_id=e.id
+          and e.actor_id=p.actor_id and e.request_hash is not null
+      )))
       and c.version=(select max(version) from growth.campaigns where id=c.id)
   `;
   if (!authority) return null;
