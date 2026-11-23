@@ -30,6 +30,7 @@ export async function readReviewPreparationCandidate(
   input: {
     membershipId: string;
     connectionId: string;
+    provider?: "gmail" | "resend";
     source: PreparationSource;
   },
   now: Date,
@@ -51,7 +52,7 @@ export async function readReviewPreparationCandidate(
     where m.id=${input.membershipId} and m.status='review' and m.sequence_id is null
       and c.status='approved' and c.approved_by is not null and c.approved_at is not null and c.approved_at <= ${now}
       and c.account_connection_id=${input.connectionId} and c.version=(select max(version) from growth.campaigns where id=c.id)
-      and p.provider='gmail' and p.expires_at > ${now} and p.proof_origin in ('founder','research') and p.actor_id=${createHash("sha256").update("j.ntagengwa@faithfulsoftware.dev").digest("hex")}
+      and p.provider=${input.provider ?? "gmail"} and c.policy->>'provider'=p.provider and p.expires_at > ${now} and p.proof_origin in ('founder','research') and p.actor_id=${createHash("sha256").update("j.ntagengwa@faithfulsoftware.dev").digest("hex")}
       and b.corporate_status='active' and prospect.status in ('ready_for_email_review','contacted')
       and not growth.is_outreach_client(prospect.id)
       and not exists(select 1 from growth.suppressions s where s.business_id=prospect.business_id or s.normalised_email=contact.normalised_email)

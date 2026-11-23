@@ -1,18 +1,15 @@
 import { z } from "zod";
 import { withGrowthTransaction } from "../db/client";
 import type { GrowthDb } from "../db/types";
-import type { GmailGrantBinding } from "../integrations/gmail/live-client";
-import { prepareFirstMessageForJob } from "./prepare-first-message";
+import {
+  preparationBindingSchema,
+  prepareFirstMessageForJob,
+} from "./prepare-first-message";
 
 const batchSchema = z.strictObject({
   workerId: z.string().trim().min(1).max(200),
   limit: z.number().int().min(1).max(25).optional(),
-  binding: z.strictObject({
-    connectionId: z.uuid(),
-    googleSubject: z.string().min(1),
-    grantEpoch: z.number().int().positive(),
-    grantedScopes: z.array(z.string()).min(1),
-  }),
+  binding: preparationBindingSchema,
 });
 export type FirstPreparationBatchSummary = {
   claimed: number;
@@ -24,7 +21,7 @@ export type FirstPreparationBatchSummary = {
 // Caller supplies the actual same-row credential binding after its one batch usage refresh.
 export async function runFirstPreparationBatch(
   db: GrowthDb,
-  input: { binding: GmailGrantBinding; workerId: string; limit?: number },
+  input: z.infer<typeof batchSchema>,
 ): Promise<FirstPreparationBatchSummary> {
   if (!batchSchema.safeParse(input).success) throw new Error("invalid_batch");
   const jobs = await withGrowthTransaction(
@@ -36,7 +33,7 @@ export async function runFirstPreparationBatch(
       join growth.outreach_events e on e.id=o.event_id and e.event_type='record_permission'
       join growth.campaigns c on c.id=j.campaign_id and c.version=j.policy_version
       join growth.campaign_memberships m on m.id=j.membership_id and m.campaign_id=j.campaign_id and m.policy_version=j.policy_version
-      join growth.outreach_permissions p on p.id=e.result_id and p.membership_id=m.id and p.provider='gmail'
+      join growth.outreach_permissions p on p.id=e.result_id and p.membership_id=m.id and p.provider=${"provider" in input.binding ? "resend" : "gmail"} and c.policy->>'provider'=p.provider
       where j.job_type='first_preparation' and e.campaign_id=j.campaign_id and e.policy_version=j.policy_version
         and e.membership_id=j.membership_id and c.account_connection_id=${input.binding.connectionId}
         and j.idempotency_key='first-preparation:'||e.id::text

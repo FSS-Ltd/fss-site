@@ -7,6 +7,9 @@ import { lockCurrentGmailGrant } from "../integrations/gmail/grant";
 import { lockGmailRouting } from "../sequences/gmail-thread-association";
 import { reviewedRecipientSchema } from "../sequences/reviewed-recipient";
 import { loadReservationAccount } from "./account-repository";
+import { loadResendAccountReadiness } from "./resend-account-repository";
+import { resendBindingSchema } from "./resend-account-readiness";
+import type { ResendRuntimeConfiguration } from "./resend-account-control";
 import { buildControlledFirstMessage } from "./controlled-copy";
 import { loadReviewMembershipPreparationAuthority } from "./founder-verification-reader";
 import { held, type ReservationOutcome } from "./reservation-shared";
@@ -39,6 +42,7 @@ export async function prepareFirstMessage(
 async function prepareFirstMessageInTransaction(
   tx: GrowthTransaction,
   input: z.infer<typeof inputSchema>,
+  resendRuntime?: ResendRuntimeConfiguration,
 ): Promise<ReservationOutcome<FirstMessage>> {
   await lockGmailRouting(tx);
   const [identity] = await tx<
@@ -51,10 +55,12 @@ async function prepareFirstMessageInTransaction(
   >`
       select campaign_id as "campaignId",business_id as "businessId",prospect_id as "prospectId",policy_version as "policyVersion" from growth.campaign_memberships where id=${input.membershipId}`;
   if (!identity) return held("membership_unavailable");
+  const account = resendRuntime
+    ? await loadResendAccountReadiness(tx, input.connectionId, resendRuntime)
+    : await loadReservationAccount(tx, input.connectionId);
+  if (account.status === "held") return account;
   await tx`select pg_advisory_xact_lock(hashtextextended(${`growth:campaign:${identity.campaignId}`},0))`;
   await tx`select pg_advisory_xact_lock(hashtextextended(${`growth:outreach-business:${identity.businessId}`},0))`;
-  const account = await loadReservationAccount(tx, input.connectionId);
-  if (account.status === "held") return account;
   await tx`select id from growth.campaigns where id=${identity.campaignId} and version=${identity.policyVersion} for share`;
   const [member] = await tx<
     {
@@ -106,6 +112,7 @@ async function prepareFirstMessageInTransaction(
     membershipId: input.membershipId,
     connectionId: input.connectionId,
     source: { kind: "permission_event", eventId: input.permissionEventId },
+    resendRuntime,
   });
   if (!authority) return held("preparation_not_authorized");
   const [facts] = await tx<
@@ -178,7 +185,7 @@ async function prepareFirstMessageInTransaction(
     .update(JSON.stringify([copy.subject, copy.html, copy.text]))
     .digest("hex");
   await tx`insert into growth.sequence_enrollments(id,prospect_id,contact_id,status,template_snapshot) values (${sequenceId},${identity.prospectId},${prospect.contactId},'active',${tx.json({ approvedRecipient: facts.email, reviewedRecipient: recipient.data, effectiveRecipient: recipient.data })})`;
-  await tx`insert into growth.email_messages(id,sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key,scheduled_for,subject_snapshot,html_snapshot,text_snapshot,controlled_preparation) values (${messageId},${sequenceId},${identity.prospectId},${prospect.contactId},'gmail','outbound',0,'queued',${messageKey},clock_timestamp(),${copy.subject},${copy.html},${copy.text},${tx.json({ version: 1, variantId: copy.variantId, variantVersion: copy.variantVersion, observationProofId: authority.proof.observationProofId, permissionId: facts.permissionId, copySha256: digest })})`;
+  await tx`insert into growth.email_messages(id,sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key,scheduled_for,subject_snapshot,html_snapshot,text_snapshot,controlled_preparation) values (${messageId},${sequenceId},${identity.prospectId},${prospect.contactId},${resendRuntime ? "resend" : "gmail"},'outbound',0,'queued',${messageKey},clock_timestamp(),${copy.subject},${copy.html},${copy.text},${tx.json({ version: 1, variantId: copy.variantId, variantVersion: copy.variantVersion, observationProofId: authority.proof.observationProofId, permissionId: facts.permissionId, copySha256: digest })})`;
   await tx`update growth.sequence_enrollments set first_message_id=${messageId} where id=${sequenceId}`;
   await tx`update growth.campaign_memberships set sequence_id=${sequenceId},status='active',updated_at=clock_timestamp() where id=${input.membershipId}`;
   await tx`insert into growth.outreach_events(id,campaign_id,policy_version,membership_id,event_type) values (${eventId},${identity.campaignId},${identity.policyVersion},${input.membershipId},'first_message_prepared')`;
@@ -197,16 +204,29 @@ async function prepareFirstMessageInTransaction(
   };
 }
 
-const jobInputSchema = z.strictObject({
-  jobId: z.uuid(),
-  leaseOwner: z.string().trim().min(1).max(200),
-  leaseRevision: z.string().regex(/^[1-9][0-9]*$/),
-  binding: z.strictObject({
+export const preparationBindingSchema = z.union([
+  z.strictObject({
     connectionId: z.uuid(),
     googleSubject: z.string().min(1),
     grantEpoch: z.number().int().positive(),
     grantedScopes: z.array(z.string()).min(1),
   }),
+  z.strictObject({
+    provider: z.literal("resend"),
+    connectionId: z.uuid(),
+    runtime: z.strictObject({
+      binding: resendBindingSchema,
+      sendCredential: z.string().min(1),
+      usageCredential: z.string().min(1),
+    }),
+  }),
+]);
+
+const jobInputSchema = z.strictObject({
+  jobId: z.uuid(),
+  leaseOwner: z.string().trim().min(1).max(200),
+  leaseRevision: z.string().regex(/^[1-9][0-9]*$/),
+  binding: preparationBindingSchema,
 });
 const RETRYABLE_PREPARATION_HOLDS = new Set([
   "terminal_fence_busy",
@@ -238,10 +258,18 @@ export async function prepareFirstMessageForJob(
       join growth.outreach_events e on e.id=o.event_id and e.event_type='record_permission'
       join growth.campaign_memberships m on m.id=j.membership_id and m.campaign_id=j.campaign_id and m.policy_version=j.policy_version
       join growth.campaigns c on c.id=m.campaign_id and c.version=m.policy_version and c.account_connection_id=${input.binding.connectionId}
-      join growth.outreach_permissions p on p.id=e.result_id and p.membership_id=m.id and p.provider='gmail'
+      join growth.outreach_permissions p on p.id=e.result_id and p.membership_id=m.id and p.provider=${"provider" in input.binding ? "resend" : "gmail"} and c.policy->>'provider'=p.provider
       where j.id=${input.jobId} and j.job_type='first_preparation' and e.campaign_id=m.campaign_id
         and e.policy_version=m.policy_version and e.membership_id=m.id and j.idempotency_key='first-preparation:'||e.id::text`;
     if (!identity) return held("job_unavailable");
+    // Hold the account rows before the campaign and job locks under the routing lock.
+    if ("provider" in input.binding)
+      await loadResendAccountReadiness(
+        tx,
+        input.binding.connectionId,
+        input.binding.runtime,
+      );
+    else await loadReservationAccount(tx, input.binding.connectionId);
     await tx`select pg_advisory_xact_lock(hashtextextended(${`growth:campaign:${identity.campaignId}`},0))`;
     await tx`select pg_advisory_xact_lock(hashtextextended(${`growth:outreach-business:${identity.businessId}`},0))`;
     const [job] = await tx<
@@ -282,19 +310,25 @@ export async function prepareFirstMessageForJob(
     if (job.status !== "leased" || !job.validLease)
       return held("job_lease_invalid");
     let grantValid = true;
-    try {
-      await lockCurrentGmailGrant(tx, input.binding);
-    } catch (error) {
-      if (error instanceof Error && error.message === "Gmail grant changed.")
-        grantValid = false;
-      else throw error;
+    if (!("provider" in input.binding)) {
+      try {
+        await lockCurrentGmailGrant(tx, input.binding);
+      } catch (error) {
+        if (error instanceof Error && error.message === "Gmail grant changed.")
+          grantValid = false;
+        else throw error;
+      }
     }
     const result = grantValid
-      ? await prepareFirstMessageInTransaction(tx, {
-          membershipId: identity.membershipId,
-          connectionId: input.binding.connectionId,
-          permissionEventId: identity.eventId,
-        })
+      ? await prepareFirstMessageInTransaction(
+          tx,
+          {
+            membershipId: identity.membershipId,
+            connectionId: input.binding.connectionId,
+            permissionEventId: identity.eventId,
+          },
+          "provider" in input.binding ? input.binding.runtime : undefined,
+        )
       : held("grant_changed");
     const reason = result.status === "held" ? result.reason : null;
     const retry = reason !== null && RETRYABLE_PREPARATION_HOLDS.has(reason);

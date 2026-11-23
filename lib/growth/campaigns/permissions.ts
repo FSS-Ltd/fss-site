@@ -25,8 +25,8 @@ export async function enqueueFirstPreparation(
     join growth.campaign_memberships m on m.id=e.membership_id and m.campaign_id=e.campaign_id and m.policy_version=e.policy_version
     join growth.campaigns c on c.id=e.campaign_id and c.version=e.policy_version
     join growth.outreach_permissions p on p.id=e.result_id and p.membership_id=e.membership_id and p.id=m.current_permission_id
-    where e.id=${eventId} and e.event_type='record_permission' and p.provider='gmail'
-      and c.account_connection_id is not null and c.policy->>'provider'='gmail'
+    where e.id=${eventId} and e.event_type='record_permission' and p.provider in ('gmail','resend')
+      and c.account_connection_id is not null and c.policy->>'provider'=p.provider
     on conflict (idempotency_key) do nothing`;
   const [conflict] = await tx<{ conflict: boolean }[]>`
     select exists(select 1 from growth.outreach_jobs j left join growth.outreach_outbox o on o.id=j.outbox_id

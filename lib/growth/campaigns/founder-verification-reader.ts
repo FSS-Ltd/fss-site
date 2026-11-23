@@ -5,6 +5,8 @@ import {
   type PreparationSource,
 } from "./review-preparation-query";
 import { loadReservationAccount } from "./account-repository";
+import { loadResendAccountReadiness } from "./resend-account-repository";
+import type { ResendRuntimeConfiguration } from "./resend-account-control";
 import { isPublicHttpUrl } from "../http/public-url";
 import {
   businessWebsiteHost,
@@ -320,6 +322,7 @@ async function validateAuthorityProof(
   const parsed = campaignPolicyDefinitionSchema.safeParse(authority.policy);
   if (
     !parsed.success ||
+    authority.provider !== parsed.data.provider ||
     authority.basis !== parsed.data.permissionRequirement ||
     authority.jurisdiction !== parsed.data.jurisdiction ||
     authority.jurisdiction !== authority.country ||
@@ -433,6 +436,7 @@ export async function loadReviewMembershipPreparationAuthority(
     membershipId: string;
     connectionId: string;
     source: PreparationSource;
+    resendRuntime?: ResendRuntimeConfiguration;
   },
 ): Promise<{
   proof: SourceProof;
@@ -440,10 +444,30 @@ export async function loadReviewMembershipPreparationAuthority(
   bounds: AuthorityBounds;
 } | null> {
   const [clock] = await db<{ now: Date }[]>`select clock_timestamp() as now`;
-  const account = await loadReservationAccount(db, input.connectionId, "held");
-  if (!clock || account.status !== "ready") return null;
+  if (!clock) return null;
+  const provider = input.resendRuntime ? "resend" : "gmail";
+  const account = input.resendRuntime
+    ? await loadResendAccountReadiness(
+        db,
+        input.connectionId,
+        input.resendRuntime,
+      )
+    : await loadReservationAccount(db, input.connectionId, "held");
+  if (account.status !== "ready") return null;
+  const accountBounds: AuthorityBounds =
+    "account" in account
+      ? account.account.bounds
+      : {
+          validatedAt: clock.now,
+          expiresAt: account.expiresAt,
+          validThrough: null,
+        };
   const now = clock.now;
-  const row = await readReviewPreparationCandidate(db, input, now);
+  const row = await readReviewPreparationCandidate(
+    db,
+    { ...input, provider },
+    now,
+  );
   if (!row) return null;
   const validated = await validateAuthorityProof(db, row, now);
   if (!validated || !validated.policy.expiresAt) return null;
@@ -453,7 +477,7 @@ export async function loadReviewMembershipPreparationAuthority(
   return {
     proof: result.proof,
     policyApproverId: row.approvedBy,
-    bounds: intersectAuthorityBounds(account.account.bounds, {
+    bounds: intersectAuthorityBounds(accountBounds, {
       validatedAt: now,
       expiresAt: new Date(
         Math.min(
