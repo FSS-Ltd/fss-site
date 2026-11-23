@@ -1,12 +1,19 @@
 import assert from "node:assert/strict";
 import { createHmac } from "node:crypto";
-import { mkdtempSync, readFileSync, rmSync, symlinkSync } from "node:fs";
+import {
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 import {
   buildFacebookRunId,
   runFacebookDiscovery,
+  researchPublicDestinations,
 } from "./scheduled-discovery";
 
 test("uses London calendar date in winter and summer", () => {
@@ -253,4 +260,29 @@ test("refuses a symlinked state directory before research or credentials", async
   } finally {
     rmSync(parent, { recursive: true, force: true });
   }
+});
+
+test("runs bounded child research with a private output schema and cleans up", () => {
+  let outputPath = "";
+  const result = researchPublicDestinations(
+    process.cwd(),
+    (command, args, cwd) => {
+      assert.equal(command, "codex");
+      assert.equal(cwd, process.cwd());
+      assert.ok(args.includes("--search"));
+      assert.equal(args[args.indexOf("--sandbox") + 1], "read-only");
+      const schemaPath = args[args.indexOf("--output-schema") + 1];
+      outputPath = args[args.indexOf("--output-last-message") + 1];
+      const schema = JSON.parse(readFileSync(schemaPath, "utf8"));
+      assert.equal(schema.properties.observations.maxItems, 10);
+      assert.match(args.at(-1) ?? "", /at most ten public searches/);
+      writeFileSync(
+        outputPath,
+        JSON.stringify({ succeeded: true, observations: [] }),
+      );
+      return true;
+    },
+  );
+  assert.deepEqual(result, { succeeded: true, observations: [] });
+  assert.throws(() => readFileSync(outputPath));
 });

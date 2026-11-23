@@ -66,7 +66,19 @@ export function buildFacebookRunId(date: Date): string {
     .replace("-0600-", "-0730-");
 }
 
-function researchPublicDestinations(repositoryRoot: string): Research {
+type ChildExecutor = (command: string, args: string[], cwd: string) => boolean;
+
+export function researchPublicDestinations(
+  repositoryRoot: string,
+  execute: ChildExecutor = (command, args, cwd) => {
+    const result = spawnSync(command, args, {
+      cwd,
+      stdio: "ignore",
+      timeout: 45 * 60 * 1000,
+    });
+    return result.error === undefined && result.status === 0;
+  },
+): Research {
   const workspace = mkdtempSync(join(tmpdir(), "fss-facebook-research-"));
   chmodSync(workspace, 0o700);
   try {
@@ -115,7 +127,7 @@ function researchPublicDestinations(repositoryRoot: string): Research {
     );
     const prompt =
       "Find up to ten active public Facebook pages or groups relevant to UK local business owners for a founder to review for manual follow or join. Make at most ten public searches and use public evidence only; include only destinations supported by evidence of activity and business relevance. Return destination name, type, Facebook URL, locality and website when known, plus public source URL, factual activity summary and observed timestamp for each. Use ISO 8601 timestamps with timezone. Never access private groups, bypass login, join, follow, post, review posting rules, submit data, read credentials or inspect local user files. Return succeeded=false if search or evidence gathering fails; a successful search may return zero observations. Return only schema-conformant JSON.";
-    const child = spawnSync(
+    const succeeded = execute(
       "codex",
       [
         "--search",
@@ -140,9 +152,9 @@ function researchPublicDestinations(repositoryRoot: string): Research {
         outputPath,
         prompt,
       ],
-      { cwd: repositoryRoot, stdio: "ignore", timeout: 45 * 60 * 1000 },
+      repositoryRoot,
     );
-    if (child.error || child.status !== 0) throw new Error("research failed");
+    if (!succeeded) throw new Error("research failed");
     const file = lstatSync(outputPath);
     if (!file.isFile() || file.size > 256 * 1024)
       throw new Error("invalid output");
