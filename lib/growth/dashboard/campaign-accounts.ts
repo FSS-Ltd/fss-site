@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { hasRequiredGmailScopes } from "../integrations/google-oauth";
 import {
   healthReviewSchema,
   limitsReviewSchema,
@@ -19,6 +20,8 @@ export type CampaignAccount = {
   provider: "gmail" | "resend";
   sender: string;
   selectable: boolean;
+  evidenceVersion: number | null;
+  grantRevalidation: { version: number; grantVersion: number } | null;
   readiness: { status: "ready" } | { status: "held"; reason: string };
   recordedRamp: number | null;
   control: {
@@ -58,14 +61,14 @@ function gmailEvidence(
   kind: "limits" | "health",
 ) {
   const parsed = envelope.safeParse(value);
-  if (
-    !parsed.success ||
-    !subject ||
-    parsed.data.googleSubject !== subject ||
-    !sameAccountScopes(parsed.data.googleScopes, scopes)
-  )
-    return null;
   if (kind === "limits") {
+    if (
+      !parsed.success ||
+      !subject ||
+      parsed.data.googleSubject !== subject ||
+      !sameAccountScopes(parsed.data.googleScopes, scopes)
+    )
+      return null;
     const review = limitsReviewSchema.safeParse(parsed.data.evidence);
     return review.success
       ? {
@@ -74,7 +77,9 @@ function gmailEvidence(
         }
       : null;
   }
-  const review = healthReviewSchema.safeParse(parsed.data.evidence);
+  const healthEnvelope = z.object({ evidence: z.unknown() }).safeParse(value);
+  if (!healthEnvelope.success) return null;
+  const review = healthReviewSchema.safeParse(healthEnvelope.data.evidence);
   return review.success
     ? {
         observedAt: review.data.observedUntil.toISOString(),
@@ -127,6 +132,9 @@ export async function getCampaignAccounts(
           id: string;
           sender: string;
           status: string;
+          grantVersion: number;
+          verifiedSubject: string | null;
+          verifiedScopes: string[] | null;
           subject: string | null;
           scopes: string[];
           ramp: number | null;
@@ -140,7 +148,7 @@ export async function getCampaignAccounts(
         }[]
       >`
         select i.id, i.subject_email as sender, i.status, i.google_subject as subject,
-          i.granted_scopes as scopes, c.ramp,c.state,c.version as "controlVersion",c.last_ramp_at as "lastRampAt", l.evidence as limits, h.evidence as health,
+          i.granted_scopes as scopes, i.version as "grantVersion", c.verified_subject as "verifiedSubject", c.verified_scopes as "verifiedScopes", c.ramp,c.state,c.version as "controlVersion",c.last_ramp_at as "lastRampAt", l.evidence as limits, h.evidence as health,
           u.captured_at as "usageAt", u.fresh_until as "usageExpires"
         from growth.integration_connections i
         left join growth.outreach_account_controls c on c.connection_id=i.id and c.provider='gmail'
@@ -182,9 +190,28 @@ export async function getCampaignAccounts(
           selectable:
             gmail.status === "connected" &&
             !!gmail.subject &&
-            gmail.scopes.includes(
-              "https://www.googleapis.com/auth/gmail.modify",
-            ),
+            hasRequiredGmailScopes(gmail.scopes),
+          evidenceVersion:
+            gmail.status === "connected" &&
+            !!gmail.subject &&
+            hasRequiredGmailScopes(gmail.scopes) &&
+            (gmail.controlVersion === null ||
+              (known &&
+                gmail.verifiedSubject === gmail.subject &&
+                gmail.verifiedScopes &&
+                sameAccountScopes(gmail.verifiedScopes, gmail.scopes)))
+              ? (known?.version ?? (gmail.controlVersion === null ? 1 : null))
+              : null,
+          grantRevalidation:
+            known &&
+            gmail.subject &&
+            gmail.verifiedSubject === gmail.subject &&
+            gmail.verifiedScopes &&
+            !sameAccountScopes(gmail.verifiedScopes, gmail.scopes) &&
+            gmail.status === "connected" &&
+            hasRequiredGmailScopes(gmail.scopes)
+              ? { version: known.version, grantVersion: gmail.grantVersion }
+              : null,
           readiness,
           recordedRamp: gmail.ramp,
           control:
@@ -250,10 +277,12 @@ export async function getCampaignAccounts(
             provider: string | null;
             team: string | null;
             environment: string | null;
+            health: unknown;
           }[]
         >`
-          select i.id,i.subject_email as sender,c.ramp,c.state,c.version as "controlVersion",c.last_ramp_at as "lastRampAt",c.provider,c.resend_team as team,c.resend_environment as environment
+          select i.id,i.subject_email as sender,c.ramp,c.state,c.version as "controlVersion",c.last_ramp_at as "lastRampAt",c.provider,c.resend_team as team,c.resend_environment as environment,h.evidence as health
           from growth.integration_connections i left join growth.outreach_account_controls c on c.connection_id=i.id
+          left join growth.outreach_account_reviews h on h.id=c.health_review_id and h.connection_id=i.id
           where i.provider='resend' and i.subject_email=${usableRuntime.binding.sender} limit 1`;
         const resend = resendRows[0];
         const matching =
@@ -297,6 +326,8 @@ export async function getCampaignAccounts(
             provider: "resend",
             sender: resend.sender,
             selectable: readiness.status === "ready",
+            evidenceVersion: known.version,
+            grantRevalidation: null,
             readiness:
               readiness.status === "ready" ? { status: "ready" } : readiness,
             recordedRamp: resend.ramp,
@@ -311,7 +342,7 @@ export async function getCampaignAccounts(
               advance: next ? { next, readiness: advanceReadiness } : null,
             },
             limitsEvidence: null,
-            healthEvidence: null,
+            healthEvidence: gmailEvidence(resend.health, null, [], "health"),
             usageObservation: null,
           });
         }

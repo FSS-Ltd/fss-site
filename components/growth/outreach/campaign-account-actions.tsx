@@ -12,17 +12,21 @@ type Action =
   | "halt"
   | "approve_ramp"
   | "reduce_ramp"
-  | "configure";
+  | "configure"
+  | "revalidate_grant";
 type Intent = {
   action: Action;
   provider: "gmail" | "resend";
   expectedVersion: number;
   ramp?: 25 | 50 | 100 | 150;
   reason?: string;
+  expectedGrantVersion?: number;
 };
 function description(intent: Intent): string {
   if (intent.action === "configure")
     return "Save the current server-defined Resend binding. This pauses the account and resets its health review and usage observation.";
+  if (intent.action === "revalidate_grant")
+    return "Revalidate the current Gmail grant. The account will pause and changed scopes invalidate prior visibility evidence.";
   if (intent.action === "activate")
     return "Activate this account if its current prerequisites still pass. Campaigns remain separately controlled.";
   if (intent.action === "halt")
@@ -40,7 +44,11 @@ function AccountActionForm({
     begin: (
       event: React.MouseEvent<HTMLButtonElement>,
       action: Action,
-      extra?: { ramp?: 25 | 50 | 100 | 150; reason?: string },
+      extra?: {
+        ramp?: 25 | 50 | 100 | 150;
+        reason?: string;
+        expectedGrantVersion?: number;
+      },
     ) => void,
     disabled: boolean,
   ) => React.ReactNode;
@@ -62,7 +70,11 @@ function AccountActionForm({
   function begin(
     event: React.MouseEvent<HTMLButtonElement>,
     action: Action,
-    extra: { ramp?: 25 | 50 | 100 | 150; reason?: string } = {},
+    extra: {
+      ramp?: 25 | 50 | 100 | 150;
+      reason?: string;
+      expectedGrantVersion?: number;
+    } = {},
   ) {
     setTrigger(event.currentTarget);
     setIntent({ action, provider, expectedVersion: version, ...extra });
@@ -206,8 +218,8 @@ export function CampaignAccountActions({
   if (!control)
     return (
       <p>
-        Account controls are unavailable until a control record exists. Limits
-        and health evidence entry is not available here.
+        Account controls appear after the first evidence record creates a paused
+        control.
       </p>
     );
   return (
@@ -220,6 +232,20 @@ export function CampaignAccountActions({
       <AccountActionForm provider={account.provider} version={control.version}>
         {(begin, disabled) => (
           <>
+            {account.grantRevalidation && (
+              <button
+                type="button"
+                disabled={disabled}
+                onClick={(event) =>
+                  begin(event, "revalidate_grant", {
+                    expectedGrantVersion:
+                      account.grantRevalidation?.grantVersion,
+                  })
+                }
+              >
+                Review changed Gmail grant
+              </button>
+            )}
             {control.state !== "active" &&
               (control.prerequisites.status === "ready" ? (
                 <button
@@ -311,7 +337,6 @@ export function CampaignAccountActions({
           </>
         )}
       </AccountActionForm>
-      <p>Limits and health evidence entry is not available here.</p>
     </details>
   );
 }

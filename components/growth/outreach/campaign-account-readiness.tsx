@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CampaignAccountEvidence } from "./campaign-account-evidence";
 import {
   CampaignAccountActions,
   ResendSetupAction,
@@ -60,6 +61,7 @@ export function CampaignAccountReadiness({
                   <dd>{evidence(account.usageObservation)}</dd>
                 </div>
               </dl>
+              <CampaignAccountEvidence account={account} />
               <CampaignAccountActions account={account} />
               <p>
                 Recorded evidence does not itself establish readiness. Campaign,

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { healthReviewSchema, limitsReviewSchema } from "./account-contracts";
 import { requireFounder, type FounderSession } from "../auth/require-founder";
 import type { GrowthDb } from "../db/types";
 import {
@@ -24,6 +25,25 @@ const tier = z.union([
 ]);
 const commandSchema = z.discriminatedUnion("action", [
   z.strictObject({ action: z.literal("activate"), ...common }),
+  z.strictObject({
+    action: z.literal("record_health"),
+    ...common,
+    evidence: healthReviewSchema,
+  }),
+  z.strictObject({
+    action: z.literal("record_limits"),
+    provider: z.literal("gmail"),
+    requestId: z.uuid(),
+    expectedVersion: z.number().int().positive(),
+    evidence: limitsReviewSchema,
+  }),
+  z.strictObject({
+    action: z.literal("revalidate_grant"),
+    provider: z.literal("gmail"),
+    requestId: z.uuid(),
+    expectedVersion: z.number().int().positive(),
+    expectedGrantVersion: z.number().int().positive(),
+  }),
   z.strictObject({
     action: z.literal("halt"),
     ...common,
@@ -65,6 +85,31 @@ export function createAccountCommandHandler(deps: {
           requestId: body.requestId,
           expectedVersion: body.expectedVersion,
         };
+        if (body.action === "record_limits")
+          return execute(
+            deps.db,
+            { type: body.action, ...base, evidence: body.evidence },
+            founder,
+            correlationId,
+          );
+        if (body.action === "record_health")
+          return execute(
+            deps.db,
+            { type: "record_health", ...base, evidence: body.evidence },
+            founder,
+            correlationId,
+          );
+        if (body.action === "revalidate_grant")
+          return execute(
+            deps.db,
+            {
+              type: "revalidate_grant",
+              ...base,
+              expectedGrantVersion: body.expectedGrantVersion,
+            },
+            founder,
+            correlationId,
+          );
         if (body.action === "activate")
           return execute(
             deps.db,
@@ -127,6 +172,14 @@ export function createAccountCommandHandler(deps: {
         expectedVersion: body.expectedVersion,
         connectionId,
       };
+      if (body.action === "record_health")
+        return execute(
+          deps.db,
+          { type: "record_health", ...base, evidence: body.evidence },
+          founder,
+          correlationId,
+          runtime,
+        );
       if (body.action === "activate")
         return execute(
           deps.db,
@@ -173,6 +226,12 @@ export function createAccountCommandHandler(deps: {
         "quota_exhausted",
         "runtime_binding_unknown",
         "request_conflict",
+        "grant_version_changed",
+        "invalid_limits_time",
+        "invalid_visibility_time",
+        "invalid_health_time",
+        "invalid_health_review",
+        "inconsistent_health_counts",
       ]);
       return known.has(error.message)
         ? {

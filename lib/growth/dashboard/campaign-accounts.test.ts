@@ -29,7 +29,12 @@ test("shows only the founder connection, with unknown readiness and no raw evide
       sender: email,
       status: "connected",
       subject: "subject",
-      scopes: ["https://www.googleapis.com/auth/gmail.modify"],
+      scopes: [
+        "openid",
+        "email",
+        "https://www.googleapis.com/auth/gmail.modify",
+      ],
+      controlVersion: null,
       ramp: null,
       limits: { secret: "private evidence" },
       health: null,
@@ -42,6 +47,7 @@ test("shows only the founder connection, with unknown readiness and no raw evide
   if (result.status !== "ready") return;
   assert.equal(result.accounts.length, 1);
   assert.equal(result.accounts[0]?.selectable, true);
+  assert.equal(result.accounts[0]?.evidenceVersion, 1);
   assert.deepEqual(result.accounts[0]?.readiness, {
     status: "held",
     reason: "identity_or_grant_unknown",
@@ -80,7 +86,11 @@ test("does not mark activation ready when persisted prerequisites are held", asy
       sender: email,
       status: "connected",
       subject: "subject",
-      scopes: ["https://www.googleapis.com/auth/gmail.modify"],
+      scopes: [
+        "openid",
+        "email",
+        "https://www.googleapis.com/auth/gmail.modify",
+      ],
       state: "paused",
       controlVersion: 2,
       lastRampAt: null,
@@ -135,4 +145,47 @@ test("offers a first Resend configuration only from the server-owned runtime", a
   });
   if (wrongMailbox.status === "ready")
     assert.equal(wrongMailbox.resendSetup.status, "held");
+});
+
+test("exposes changed Gmail scopes for revalidation without reporting readiness", async () => {
+  const result = await getCampaignAccounts(
+    founder,
+    database({
+      id: "connection",
+      sender: email,
+      status: "connected",
+      subject: "subject",
+      grantVersion: 4,
+      verifiedSubject: "subject",
+      verifiedScopes: [
+        "openid",
+        "email",
+        "https://www.googleapis.com/auth/gmail.modify",
+        "old-scope",
+      ],
+      scopes: [
+        "openid",
+        "email",
+        "https://www.googleapis.com/auth/gmail.modify",
+      ],
+      state: "paused",
+      controlVersion: 2,
+      lastRampAt: null,
+      ramp: 25,
+      limits: null,
+      health: null,
+      usageAt: null,
+      usageExpires: null,
+    }),
+    null,
+  );
+  assert.equal(result.status, "ready");
+  if (result.status === "ready") {
+    assert.deepEqual(result.accounts[0]?.grantRevalidation, {
+      version: 2,
+      grantVersion: 4,
+    });
+    assert.equal(result.accounts[0]?.readiness.status, "held");
+    assert.equal(result.accounts[0]?.evidenceVersion, null);
+  }
 });

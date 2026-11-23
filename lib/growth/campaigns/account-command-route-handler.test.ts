@@ -245,3 +245,139 @@ test("returns safe conflicts when the canonical service rejects stale state", as
   assert.equal(response.status, 409);
   assert.match(await response.text(), /account_version_changed/);
 });
+
+test("records founder health evidence for both providers without accepting account identity", async () => {
+  const seenGmail: Parameters<typeof executeAccountControlCommand>[1][] = [];
+  const seenResend: Parameters<typeof executeResendAccountCommand>[1][] = [];
+  const gmail: typeof executeAccountControlCommand = async (_db, command) => {
+    seenGmail.push(command);
+    return result;
+  };
+  const resend: typeof executeResendAccountCommand = async (_db, command) => {
+    seenResend.push(command);
+    return result;
+  };
+  const evidence = {
+    source: "review",
+    observedFrom: "2026-11-22T00:00:00Z",
+    observedUntil: "2026-11-22T12:00:00Z",
+    expiresAt: "2026-11-23T00:00:00Z",
+    complete: false,
+    verdict: "unknown",
+    sends: null,
+    attempts: null,
+    hardBounces: null,
+    complaints: null,
+    rateIncidents: null,
+    authIncidents: null,
+    authentication: {
+      spf: { status: "unknown", source: "review" },
+      dkim: { status: "unknown", source: "review" },
+      dmarc: { status: "unknown", source: "review" },
+    },
+  };
+  const run = handler(database(), gmail, resend);
+  const action = {
+    provider: "gmail",
+    action: "record_health",
+    requestId,
+    expectedVersion: 1,
+    evidence,
+  };
+  assert.equal((await run(request(action))).status, 200);
+  assert.equal(seenGmail[0]?.type, "record_health");
+  assert.equal(
+    (await run(request({ ...action, provider: "resend" }))).status,
+    200,
+  );
+  assert.equal(seenResend[0]?.type, "record_health");
+  if (seenResend[0]?.type === "record_health")
+    assert.equal(seenResend[0].connectionId, connectionId);
+  assert.equal((await run(request({ ...action, connectionId }))).status, 422);
+  assert.equal(
+    (
+      await run(
+        request({ ...action, evidence: { ...evidence, verdict: "assumed" } }),
+      )
+    ).status,
+    422,
+  );
+});
+
+test("allows Gmail grant revalidation but rejects it for Resend", async () => {
+  const seen: Parameters<typeof executeAccountControlCommand>[1][] = [];
+  const gmail: typeof executeAccountControlCommand = async (_db, command) => {
+    seen.push(command);
+    return result;
+  };
+  const resend: typeof executeResendAccountCommand = async () => result;
+  const run = handler(database(), gmail, resend);
+  const action = {
+    provider: "gmail",
+    action: "revalidate_grant",
+    requestId,
+    expectedVersion: 3,
+    expectedGrantVersion: 7,
+  };
+  assert.equal((await run(request(action))).status, 200);
+  assert.deepEqual(seen[0], {
+    type: "revalidate_grant",
+    requestId,
+    expectedVersion: 3,
+    expectedGrantVersion: 7,
+  });
+  assert.equal(
+    (await run(request({ ...action, provider: "resend" }))).status,
+    422,
+  );
+});
+
+test("accepts reviewed Gmail limits only and forwards their visibility evidence", async () => {
+  const seen: Parameters<typeof executeAccountControlCommand>[1][] = [];
+  const gmail: typeof executeAccountControlCommand = async (_db, command) => {
+    seen.push(command);
+    return result;
+  };
+  const resend: typeof executeResendAccountCommand = async () => result;
+  const evidence = {
+    source: "Workspace",
+    edition: "Business",
+    path: "Gmail API",
+    observedAt: "2026-11-22T00:00:00Z",
+    expiresAt: "2026-11-30T00:00:00Z",
+    messages: 100,
+    recipients: [100, 100, 100, 100],
+    perMessage: 10,
+    messageReserve: 50,
+    recipientReserve: 0,
+    visibility: {
+      source: "review",
+      reviewedAt: "2026-11-22T00:00:00Z",
+      expiresAt: "2026-11-30T00:00:00Z",
+      scope: "mailbox",
+      paths: {
+        mailbox: "unknown",
+        aliases: "unknown",
+        delegates: "unknown",
+        automatic: "unknown",
+      },
+      recipientHeaders: "unknown",
+    },
+  };
+  const action = {
+    provider: "gmail",
+    action: "record_limits",
+    requestId,
+    expectedVersion: 1,
+    evidence,
+  };
+  const run = handler(database(), gmail, resend);
+  assert.equal((await run(request(action))).status, 200);
+  assert.equal(seen[0]?.type, "record_limits");
+  if (seen[0]?.type === "record_limits")
+    assert.equal(seen[0].evidence.visibility?.paths.mailbox, "unknown");
+  assert.equal(
+    (await run(request({ ...action, provider: "resend" }))).status,
+    422,
+  );
+});

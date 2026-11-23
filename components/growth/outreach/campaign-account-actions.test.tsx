@@ -27,6 +27,8 @@ const account: CampaignAccount = {
   provider: "gmail",
   sender: "founder@example.com",
   selectable: true,
+  evidenceVersion: 1,
+  grantRevalidation: null,
   readiness: { status: "held", reason: "account_not_active" },
   recordedRamp: 25,
   limitsEvidence: null,
@@ -51,7 +53,6 @@ test("held readiness explains the missing evidence and offers explicit halt", ()
   assert.match(html, /Reason for halt/);
   assert.match(html, /Halt account/);
   assert.doesNotMatch(html, /Activate account/);
-  assert.match(html, /evidence entry is not available here/);
 });
 
 test("actual ready prerequisites expose activation and explicit server-bound setup", () => {
@@ -121,4 +122,27 @@ test("ramp advancement appears only when its own review passes", () => {
     </AppRouterContext.Provider>,
   );
   assert.match(html, /Approve ramp to 50/);
+});
+
+test("evidence forms disclose unknowns and use provider-specific fields", () => {
+  const { CampaignAccountEvidence } =
+    require("./campaign-account-evidence") as typeof import("./campaign-account-evidence");
+  const render = (value: CampaignAccount) =>
+    renderToStaticMarkup(
+      <AppRouterContext.Provider value={router}>
+        <CampaignAccountEvidence account={value} />
+      </AppRouterContext.Provider>,
+    );
+  const gmail = render(account);
+  assert.match(gmail, /Record Gmail limits and visibility evidence/);
+  assert.match(gmail, /SPF status/);
+  assert.match(gmail, /blank if unknown/);
+  assert.match(gmail, /Recording evidence does not activate sending/);
+  const resend = render({ ...account, provider: "resend" });
+  assert.doesNotMatch(resend, /Record Gmail limits/);
+  assert.match(resend, /Record health and authentication evidence/);
+  assert.match(
+    render({ ...account, evidenceVersion: null }),
+    /Evidence entry is held/,
+  );
 });
