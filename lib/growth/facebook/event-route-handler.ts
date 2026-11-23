@@ -21,6 +21,15 @@ export function createGrowthEventHandler(
     if (!readRequestHasRegisteredOrigin(request, deps.origin))
       return new Response(null, { status: 400 });
     try {
+      const params = new URL(request.url).searchParams;
+      const topics = params.getAll("topic");
+      if (
+        [...params.keys()].some((key) => key !== "topic") ||
+        topics.length > 1 ||
+        (topics[0] && topics[0] !== "daily-summary")
+      )
+        return new Response(null, { status: 400 });
+      const topic = topics[0] === "daily-summary" ? "daily-summary" : "audit";
       await deps.authorizeFounder();
       const deadline = await deps.deadline(request);
       if (deadline === null || deadline <= Date.now())
@@ -87,17 +96,24 @@ export function createGrowthEventHandler(
       if (!closed) {
         let subscription: Awaited<ReturnType<Subscription>> | "closed";
         try {
-          const pending = (deps.subscribe ?? subscribeFacebookChanges)(url, {
-            ready: () => send("ready", "{}"),
-            change: (id) => {
-              if (
-                /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
-                  id,
+          const pending = (deps.subscribe ?? subscribeFacebookChanges)(
+            url,
+            {
+              ready: () => send("ready", "{}"),
+              change: (id) => {
+                if (topic === "daily-summary" && id === "changed")
+                  send("change", "{}");
+                else if (
+                  topic === "audit" &&
+                  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+                    id,
+                  )
                 )
-              )
-                send("change", id);
+                  send("change", id);
+              },
             },
-          }).then((subscription) => {
+            topic,
+          ).then((subscription) => {
             if (subscription.status === "listening") {
               if (closed) void subscription.close().catch(() => undefined);
               else subscriptionState.close = subscription.close;

@@ -1,35 +1,10 @@
-import { z } from "zod";
 import type { GrowthDb } from "../db/types";
 
-const count = z.number().int().nonnegative();
-const summarySchema = z.object({
-  version: z.literal(1),
-  londonDay: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  generatedAt: z.string().datetime(),
-  dayStatus: z.literal("partial_at_run"),
-  preparationEvents: count,
-  issuedAttempts: count,
-  acceptedAtRead: count,
-  observedConfirmations: count,
-  confirmedWithinDay: count,
-  observedCrossDay: count,
-  observedUnknownDay: count,
-  unconfirmedAttempts: count,
-  heldJobsAtRead: count,
-  heldReasons: z.object({
-    permission: count,
-    account: count,
-    coverage: count,
-    other: count,
-  }),
-  goal: z.object({
-    minimum: z.literal(100),
-    target: z.literal(150),
-    conditional: z.literal(true),
-  }),
-  limitations: z.array(z.string()),
-});
-export type DailyOutreachSummary = z.infer<typeof summarySchema>;
+import {
+  summarySchema,
+  type DailyOutreachSummary,
+} from "./daily-summary-contract";
+export type { DailyOutreachSummary } from "./daily-summary-contract";
 
 // The database determines both the London date and the evidence snapshot. A rerun
 // returns the first immutable publication, including its original run time.
@@ -90,7 +65,14 @@ export async function publishDailyOutreachSummary(
       ) from limits l cross join counts c
       where c.event_count<=50000 and c.reservation_count<=50000 and c.job_count<=50000
       on conflict (london_day) do nothing returning evidence
-    ) select l.day::text as day, published.evidence from limits l
+    ), publication_audit as (
+      insert into growth.audit_log(correlation_id,actor_type,actor_id,action,entity_type,entity_id,metadata)
+      select 'outreach-daily-summary:' || l.day::text,'cron','outreach-daily-summary',
+        'outreach_daily_summary.published','outreach_daily_summary',l.day::text,'{}'::jsonb
+      from inserted cross join limits l returning id
+    ), notification as materialized (
+      select pg_catalog.pg_notify('growth_daily_summary_changed','changed') from publication_audit
+    ) select l.day::text as day, published.evidence,(select count(*) from notification) as notification_count from limits l
       left join lateral (
         select evidence from inserted
         union all select s.evidence from growth.daily_outreach_summaries s where s.london_day=l.day

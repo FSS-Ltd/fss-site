@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CampaignDailySummary } from "./campaign-daily-summary";
+import { CampaignDailyLive } from "./campaign-daily-live";
 import type { CampaignDailySummaryResult } from "@/lib/growth/dashboard/campaign-daily-summary";
 import type { CampaignAccountsResult } from "@/lib/growth/dashboard/campaign-accounts";
 import { CampaignAccountReadiness } from "./campaign-account-readiness";
@@ -49,7 +49,14 @@ export function CampaignOverview({
           </Link>
         </div>
       </header>
-      <CampaignDailySummary result={dailySummary} />
+      <CampaignDailyLive
+        key={
+          dailySummary.status === "ready"
+            ? dailySummary.summary.generatedAt
+            : dailySummary.status
+        }
+        initial={dailySummary}
+      />
       <CampaignAccountReadiness result={accounts} />
       <CampaignPolicyEditor accounts={accounts} />
       {result.rows.length === 0 ? (

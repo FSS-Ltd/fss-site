@@ -7,6 +7,7 @@ import {
   type ReactNode,
   type KeyboardEvent,
 } from "react";
+import { OutreachVisibility } from "./outreach-visibility";
 import styles from "./outreach-workspace.module.css";
 
 export function OutreachWorkspace({
@@ -94,7 +95,9 @@ export function OutreachWorkspace({
           aria-labelledby={`${id}-tab-${index}`}
           hidden={active !== index}
         >
-          {content}
+          <OutreachVisibility.Provider value={active === index}>
+            {content}
+          </OutreachVisibility.Provider>
         </div>
       ))}
     </div>

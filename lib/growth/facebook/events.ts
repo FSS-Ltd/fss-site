@@ -27,6 +27,7 @@ export function validateFacebookEventUrl(value: string): void {
 export async function subscribeFacebookChanges(
   url: string | undefined,
   callbacks: { ready: () => void; change: (auditId: string) => void },
+  topic: "audit" | "daily-summary" = "audit",
 ): Promise<
   | { status: "unconfigured" }
   | { status: "listening"; close: () => Promise<void> }
@@ -64,9 +65,15 @@ export async function subscribeFacebookChanges(
       throw new Error("invalid_growth_event_role");
     let closed = false;
     const listener = await db.listen(
-      "growth_audit_changed",
+      topic === "audit"
+        ? "growth_audit_changed"
+        : "growth_daily_summary_changed",
       (payload) => {
-        if (!closed && UUID.test(payload)) callbacks.change(payload);
+        if (
+          !closed &&
+          (topic === "audit" ? UUID.test(payload) : payload === "changed")
+        )
+          callbacks.change(payload);
       },
       () => {
         if (!closed) callbacks.ready();

@@ -13,7 +13,10 @@ export type GrowthRefresh = (
 ) => Promise<"ok" | "auth-failed" | "error" | "superseded">;
 
 /** Keep refresh stable with useCallback; change it when the current view changes. */
-export function useGrowthEvents(refresh: GrowthRefresh): {
+export function useGrowthEvents(
+  refresh: GrowthRefresh,
+  topic: "audit" | "daily-summary" = "audit",
+): {
   state: GrowthEventState;
   invalidate: () => void;
   stopForAuth: () => void;
@@ -72,7 +75,11 @@ export function useGrowthEvents(refresh: GrowthRefresh): {
     stopRef.current = stop;
     const connect = () => {
       if (stopped) return;
-      source = new EventSource("/api/growth/events");
+      source = new EventSource(
+        topic === "audit"
+          ? "/api/growth/events"
+          : "/api/growth/events?topic=daily-summary",
+      );
       source.addEventListener("ready", () => {
         connected = true;
         backoff = 1000;
@@ -108,6 +115,6 @@ export function useGrowthEvents(refresh: GrowthRefresh): {
       invalidateRef.current = () => {};
       stopRef.current = () => {};
     };
-  }, [refresh, stopForAuth]);
+  }, [refresh, stopForAuth, topic]);
   return { state, invalidate, stopForAuth };
 }

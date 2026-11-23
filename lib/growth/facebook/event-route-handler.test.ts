@@ -252,3 +252,46 @@ test("callbacks at the deadline close setup before the timer runs", async (t) =>
   await Promise.resolve();
   assert.equal(closes, 1);
 });
+
+test("daily topic emits only its redacted marker and rejects unknown topics", async () => {
+  let chosen = "";
+  let closed = false;
+  const abort = new AbortController();
+  const handler = createGrowthEventHandler({
+    origin,
+    authorizeFounder: async () => founder,
+    deadline: async () => Date.now() + 10000,
+    eventUrl: () => "postgres://x",
+    subscribe: async (_url, callbacks, topic) => {
+      chosen = topic ?? "audit";
+      callbacks.ready();
+      callbacks.change("private");
+      callbacks.change("changed");
+      return {
+        status: "listening",
+        close: async () => {
+          closed = true;
+        },
+      };
+    },
+  });
+  const response = await handler(
+    new Request(`${origin}/api/growth/events?topic=daily-summary`, {
+      signal: abort.signal,
+    }),
+  );
+  const reader = response.body!.getReader();
+  const decoder = new TextDecoder();
+  assert.match(decoder.decode((await reader.read()).value), /event: ready/);
+  const event = decoder.decode((await reader.read()).value);
+  assert.match(event, /event: change\ndata: \{\}/);
+  assert.doesNotMatch(event, /private|changed/);
+  assert.equal(chosen, "daily-summary");
+  abort.abort();
+  assert.equal(closed, true);
+  assert.equal(
+    (await handler(new Request(`${origin}/api/growth/events?topic=other`)))
+      .status,
+    400,
+  );
+});
