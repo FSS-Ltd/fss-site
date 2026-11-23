@@ -450,7 +450,10 @@ test(
           saved.id,
         );
       } finally {
-        await cleanupDb`delete from operations.organisations where id=${organisationId}`;
+        await cleanupDb.begin(async (tx) => {
+          await tx`delete from operations.audit_events where organisation_id=${organisationId}`;
+          await tx`delete from operations.organisations where id=${organisationId}`;
+        });
       }
       const [previousStatus] = await db<
         { status: string }[]
