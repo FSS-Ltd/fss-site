@@ -1,6 +1,6 @@
 # Project feature tree
 
-Source-backed baseline, 2026-11-17, checked against clean `origin/main` commit `618e7d730`. Selected Growth coverage was refreshed on 23 November against committed snapshot `7717d39a5`. This snapshot includes the reviewed confirmation fixture and manual capture code, standalone Gmail transport, sender prerequisites, the local daily research and Facebook discovery runners, the monthly-offer policy and copy slice, the standalone Resend transport and usage slice, and controlled first-message preparation. See each feature for its own test and review status.
+Source-backed baseline, 2026-11-17, checked against clean `origin/main` commit `618e7d730`. Selected Growth coverage was refreshed on 23 November against committed snapshot `5269b9541`. This snapshot includes the reviewed confirmation fixture and manual capture code, standalone Gmail transport, sender prerequisites, the local daily research and Facebook discovery runners, the monthly-offer policy and copy slice, the standalone Resend transport and usage slice, controlled first-message preparation, and the isolated guarded Gmail producer. See each feature for its own test and review status.
 
 ## Coverage and navigation
 
@@ -160,6 +160,13 @@ Graphify: [graph](graphify-out/graph.json), [audit report](graphify-out/GRAPH_RE
 - `lib/growth/integrations/gmail/client.test.ts` and existing bound-client tests passed 36 focused checks using mocked fetch. Independent transport Security review passed. No live provider or durable proof producer was verified by this slice. `lib/growth/sequences/dispatcher-repository.ts` now persists the original claim status at `ce31ad464`. `supabase/migrations/20261118150000_growth_outreach_terminal_fence.sql` and `lib/growth/campaigns/reservation-repository.ts` add a short private terminal client/suppression read fence at `4b2853f0e`. Root replayed 102 migrations and reproduced 12 focused PostgreSQL checks across account, claim, fence and Facebook; review of the complete sender remains pending.
 
 
+
+
+### GROWTH-GMAIL-DIRECT-SUBMISSION: durable guarded invocation
+
+- Status: partial and under review. `lib/growth/campaigns/direct-submission.ts#submitReservedOutreach` commits the canonical issued snapshot before the guarded Gmail client can invoke one POST. `submission-clock.ts#withinSubmissionClock` is checked after credentials and before that POST. Valid successful IDs are recorded with exact durable identity and MIME proof. Definite non-invocation is immutable, and ambiguous effects remain uncertain. Supported authentication/quota incidents attempt an atomic account halt.
+- Uses GROWTH-GMAIL-SINGLE-TRANSPORT, GROWTH-GMAIL-IDENTITY, GROWTH-SEND-AUTHORITY and GROWTH-BUDGETS. `supabase/migrations/20261118170000_growth_direct_noninvocation.sql` adds guarded-claim provenance and immutable definite non-invocation. The reservation transaction counts new attempts on commit, not claim. Routing and budget distinguish all-definitely-unissued messages from historic generic rejects.
+- Root exact `5269b9541` TypeScript, 31 focused Node24 tests and three serial local account, routing and terminal-fence PostgreSQL tests passed. Scoped review found that a failed outcome transaction could leave an unresolved attempt without blocking a different message. That account-wide guard and both live sender integrations remain pending at this snapshot. Graph nodes `lib_growth_campaigns_direct_submission_ts` and `lib_growth_campaigns_submission_clock_ts`; tests in `submission-clock.test.ts` and `tests/integration/growth/reservation-assertions.ts`.
 
 ### GROWTH-FIRST-PREPARATION: queue first campaign messages from recorded permission
 
