@@ -1,509 +1,288 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-
 import type { GrowthDb } from "../db/types";
+import type { BoundGmailClient } from "../integrations/gmail/live-client";
 import {
-  GmailClientError,
-  type GmailClient,
-} from "../integrations/gmail/types";
-import { createOutreachDispatcher } from "./dispatcher";
-import type {
-  CancelMessageInput,
-  ClaimedMessage,
-  FailMessageInput,
-  FollowUpTemplate,
-  RecordSentInput,
-  SendContext,
-  SequenceDispatchRepository,
-  ThreadReferences,
+  createOutreachDispatcher,
+  scheduledFollowUpsForFirstSend,
+} from "./dispatcher";
+import {
+  postgresSequenceDispatchRepository,
+  type ClaimedMessage,
 } from "./dispatcher-repository";
 
-const FOUNDER_EMAIL = "j.ntagengwa@faithfulsoftware.dev";
-const NOW = new Date("2026-08-18T09:00:00.000Z");
-
-function claimedFirstEmail(
-  overrides: Partial<ClaimedMessage> = {},
-): ClaimedMessage {
-  return {
-    id: "11111111-1111-4111-8111-111111111111",
-    previousStatus: "queued",
-    sequenceEnrollmentId: "22222222-2222-4222-8222-222222222222",
-    prospectId: "33333333-3333-4333-8333-333333333333",
-    contactId: "44444444-4444-4444-8444-444444444444",
-    stepNumber: 0,
-    attemptCount: 1,
-    rfcMessageId:
-      "<growthos.11111111-1111-4111-8111-111111111111@faithfulsoftware.dev>",
-    idempotencyKey: "first_email:draft-id",
-    subjectSnapshot: "A practical idea",
-    htmlSnapshot: "<p>Body</p>",
-    textSnapshot: "Body",
-    ...overrides,
-  };
-}
-
-function sendContext(overrides: Partial<SendContext> = {}): SendContext {
-  return {
-    enrollmentStatus: "active",
+const db = {} as GrowthDb;
+const bound = { binding: { connectionId: "connection" } } as BoundGmailClient;
+const now = new Date("2026-08-18T09:00:00.000Z");
+const claimed: ClaimedMessage = {
+  id: "11111111-1111-4111-8111-111111111111",
+  previousStatus: "queued",
+  sequenceEnrollmentId: "22222222-2222-4222-8222-222222222222",
+  prospectId: "33333333-3333-4333-8333-333333333333",
+  contactId: "44444444-4444-4444-8444-444444444444",
+  stepNumber: 0,
+  attemptCount: 1,
+  rfcMessageId: null,
+  idempotencyKey: "first",
+  subjectSnapshot: "Subject",
+  htmlSnapshot: "<p>Body</p>",
+  textSnapshot: "Body",
+};
+const reserved = {
+  reservationId: "55555555-5555-4555-8555-555555555555",
+  fence: 1,
+  rfcMessageId: "<example>",
+  preparation: {
+    messageId: claimed.id,
+    sequenceId: claimed.sequenceEnrollmentId,
+    recipient: "a@example.test",
+    subject: "Subject",
+    html: "<p>Body</p>",
+    text: "Body",
     gmailThreadId: null,
-    contactEmail: "contact@example.test",
-    normalisedEmail: "contact@example.test",
-    firstName: "Sam",
-    businessName: "Example & Sons",
-    firstEmailSubject: "A practical idea",
-    ...overrides,
-  };
-}
-
-type FakeState = {
-  queue: ClaimedMessage[];
-  contexts: Map<string, SendContext>;
-  suppressed: Set<string>;
-  inboundByEnrollment: Set<string>;
-  templates: Map<string, FollowUpTemplate>;
-  references: Map<string, ThreadReferences>;
-  cancels: CancelMessageInput[];
-  fails: FailMessageInput[];
-  sent: RecordSentInput[];
+    references: [],
+    fingerprint: "a".repeat(64),
+  },
 };
 
-function createFakeState(overrides: Partial<FakeState> = {}): FakeState {
-  return {
-    queue: [claimedFirstEmail()],
-    contexts: new Map([
-      ["22222222-2222-4222-8222-222222222222", sendContext()],
-    ]),
-    suppressed: new Set(),
-    inboundByEnrollment: new Set(),
-    templates: new Map(),
-    references: new Map(),
-    cancels: [],
-    fails: [],
-    sent: [],
-    ...overrides,
-  };
-}
-
-function createFakeRepository(state: FakeState): SequenceDispatchRepository {
-  return {
-    async claimDueMessage() {
-      return state.queue.shift() ?? null;
+test("accepted submission remains unconfirmed when observation is held", async () => {
+  let claims = 0;
+  let submitted = 0;
+  const dispatch = createOutreachDispatcher({
+    bound,
+    now: () => now,
+    createLeaseToken: () => "lease",
+    maxMessagesPerRun: 1,
+    repository: {
+      ...postgresSequenceDispatchRepository,
+      claimPendingConfirmations: async () => [],
+      claimDueMessage: async () => {
+        claims++;
+        return claimed;
+      },
+      prepareLegacyMessage: async (_db, input) => {
+        assert.equal(input.claimed, claimed);
+        return { status: "ready" };
+      },
     },
-    async getSendContext(_db, sequenceEnrollmentId) {
-      return state.contexts.get(sequenceEnrollmentId) ?? null;
+    refreshUsage: async (_db, account) => {
+      assert.equal(account, bound);
+      return { status: "complete" };
     },
-    async isSuppressed(_db, normalisedEmail) {
-      return state.suppressed.has(normalisedEmail);
+    reserve: async (_db, input) => {
+      assert.equal(input.leaseToken, "lease");
+      return { status: "ready", value: reserved };
     },
-    async hasNewerInboundMessage(_db, sequenceEnrollmentId) {
-      return state.inboundByEnrollment.has(sequenceEnrollmentId);
+    submit: async (_db, input) => {
+      submitted++;
+      assert.equal(input.bound, bound);
+      assert.equal(input.fingerprint, reserved.preparation.fingerprint);
+      return { status: "accepted" };
     },
-    async getFollowUpTemplate(_db, templateKey) {
-      return state.templates.get(templateKey) ?? null;
-    },
-    async getThreadReferences(_db, sequenceEnrollmentId) {
-      return (
-        state.references.get(sequenceEnrollmentId) ?? {
-          parentMessageId: null,
-          references: [],
-        }
-      );
-    },
-    async cancelMessage(_db, input) {
-      state.cancels.push(input);
-    },
-    async failMessage(_db, input) {
-      state.fails.push(input);
-    },
-    async recordSent(_db, input) {
-      state.sent.push(input);
-    },
-  };
-}
-
-function fakeGmailClient(
-  overrides: Partial<
-    Pick<GmailClient, "sendMessage" | "findByRfcMessageId">
-  > = {},
-): Pick<GmailClient, "sendMessage" | "findByRfcMessageId"> {
-  return {
-    sendMessage:
-      overrides.sendMessage ??
-      (async () => ({
-        messageId: "provider-message-1",
-        gmailThreadId: "provider-thread-1",
-      })),
-    findByRfcMessageId: overrides.findByRfcMessageId ?? (async () => null),
-  };
-}
-
-const db = {} as GrowthDb;
-
-function createDispatch(
-  state: FakeState,
-  overrides: {
-    gmailClient?: Pick<GmailClient, "sendMessage" | "findByRfcMessageId">;
-  } = {},
-) {
-  return createOutreachDispatcher({
-    repository: createFakeRepository(state),
-    gmailClient: overrides.gmailClient ?? fakeGmailClient(),
-    founderEmail: FOUNDER_EMAIL,
-    now: () => NOW,
-    createLeaseToken: () => "lease-token",
+    confirm: async () => ({ status: "held", reason: "not_observed" }),
   });
-}
+  const summary = await dispatch(db, now);
+  assert.equal(claims, 1);
+  assert.equal(submitted, 1);
+  assert.equal(summary.accepted, 1);
+  assert.equal(summary.confirmed, 0);
+});
 
-test("sends a due first email and schedules the automatic Day 5 and 14 follow-ups", async () => {
-  const state = createFakeState();
-  const dispatch = createDispatch(state);
-
-  const summary = await dispatch(db, NOW);
-
-  assert.deepEqual(summary, {
-    claimed: 1,
-    sent: 1,
-    cancelled: 0,
-    reconciled: 0,
-    retryableFailures: 0,
-    permanentFailures: 0,
+test("uncertain submission stops the batch without a retry or confirmation", async () => {
+  let claims = 0;
+  let confirmed = 0;
+  const dispatch = createOutreachDispatcher({
+    bound,
+    now: () => now,
+    createLeaseToken: () => "lease",
+    repository: {
+      ...postgresSequenceDispatchRepository,
+      claimPendingConfirmations: async () => [],
+      claimDueMessage: async () => {
+        claims++;
+        return claimed;
+      },
+      prepareLegacyMessage: async () => ({ status: "ready" }),
+    },
+    refreshUsage: async () => ({ status: "complete" }),
+    reserve: async () => ({ status: "ready", value: reserved }),
+    submit: async () => ({ status: "uncertain", reason: "transport_unknown" }),
+    confirm: async () => {
+      confirmed++;
+      return { status: "ready" };
+    },
   });
-  assert.equal(state.sent.length, 1);
-  const recorded = state.sent[0]!;
-  assert.equal(recorded.providerMessageId, "provider-message-1");
-  assert.equal(recorded.followUps?.length, 2);
+  const summary = await dispatch(db, now);
+  assert.equal(summary.uncertain, 1);
+  assert.equal(claims, 1);
+  assert.equal(confirmed, 0);
+});
+
+test("legacy cadence keeps the day 5 and day 14 follow-ups", () => {
   assert.deepEqual(
-    recorded.followUps?.map((followUp) => followUp.stepNumber).sort(),
+    scheduledFollowUpsForFirstSend(claimed.sequenceEnrollmentId, now).map(
+      (item) => item.stepNumber,
+    ),
     [1, 3],
   );
 });
 
-test("stops claiming once no messages are due", async () => {
-  const state = createFakeState({ queue: [] });
-  const dispatch = createDispatch(state);
-
-  const summary = await dispatch(db, NOW);
-
-  assert.deepEqual(summary, {
-    claimed: 0,
-    sent: 0,
-    cancelled: 0,
-    reconciled: 0,
-    retryableFailures: 0,
-    permanentFailures: 0,
-  });
-});
-
-test("cancels a message when the enrollment is no longer active", async () => {
-  const state = createFakeState({
-    contexts: new Map([
-      [
-        "22222222-2222-4222-8222-222222222222",
-        sendContext({ enrollmentStatus: "paused" }),
-      ],
-    ]),
-  });
-  const dispatch = createDispatch(state);
-
-  const summary = await dispatch(db, NOW);
-
-  assert.equal(summary.cancelled, 1);
-  assert.equal(state.cancels[0]?.errorCode, "enrollment_not_active");
-});
-
-test("cancels a message when the contact is suppressed", async () => {
-  const state = createFakeState({
-    suppressed: new Set(["contact@example.test"]),
-  });
-  const dispatch = createDispatch(state);
-
-  const summary = await dispatch(db, NOW);
-
-  assert.equal(summary.cancelled, 1);
-  assert.equal(state.cancels[0]?.errorCode, "suppressed_contact");
-  assert.equal(state.sent.length, 0);
-});
-
-test("cancels a message when a newer inbound reply exists", async () => {
-  const state = createFakeState({
-    inboundByEnrollment: new Set(["22222222-2222-4222-8222-222222222222"]),
-  });
-  const dispatch = createDispatch(state);
-
-  const summary = await dispatch(db, NOW);
-
-  assert.equal(summary.cancelled, 1);
-  assert.equal(state.cancels[0]?.errorCode, "reply_detected");
-});
-
-test("reconciles a lost provider response through the RFC Message-ID and does not resend", async () => {
-  let sendCalled = false;
-  const state = createFakeState({
-    queue: [claimedFirstEmail({ previousStatus: "retry", attemptCount: 2 })],
-  });
-  const dispatch = createDispatch(state, {
-    gmailClient: fakeGmailClient({
-      sendMessage: async () => {
-        sendCalled = true;
-        return {
-          messageId: "should-not-be-used",
-          gmailThreadId: "should-not-be-used",
-        };
-      },
-      findByRfcMessageId: async () => ({
-        messageId: "reconciled-message-1",
-        gmailThreadId: "reconciled-thread-1",
-        historyId: "1",
-        labelIds: [],
-        receivedAt: NOW.toISOString(),
-        from: FOUNDER_EMAIL,
-        subject: "A practical idea",
-        rfcMessageId: claimedFirstEmail().rfcMessageId,
-        autoSubmitted: null,
-        precedence: null,
-        returnPath: null,
-        autoResponseSuppress: null,
-        to: null,
-        cc: null,
-        bcc: null,
-        inReplyTo: null,
-        references: null,
-      }),
-    }),
-  });
-
-  const summary = await dispatch(db, NOW);
-
-  assert.equal(sendCalled, false);
-  assert.equal(summary.reconciled, 1);
-  assert.equal(summary.sent, 0);
-  assert.equal(state.sent[0]?.providerMessageId, "reconciled-message-1");
-});
-
-test("marks a retryable provider failure for retry and a permanent failure as failed", async () => {
-  const retryable = createFakeState();
-  const retryDispatch = createDispatch(retryable, {
-    gmailClient: fakeGmailClient({
-      sendMessage: async () => {
-        throw new GmailClientError("RETRYABLE_PROVIDER_ERROR");
-      },
-    }),
-  });
-  const retrySummary = await retryDispatch(db, NOW);
-  assert.equal(retrySummary.retryableFailures, 1);
-  assert.equal(retryable.fails[0]?.status, "retry");
-
-  const permanent = createFakeState();
-  const permanentDispatch = createDispatch(permanent, {
-    gmailClient: fakeGmailClient({
-      sendMessage: async () => {
-        throw new GmailClientError("PERMANENT_PROVIDER_ERROR");
-      },
-    }),
-  });
-  const permanentSummary = await permanentDispatch(db, NOW);
-  assert.equal(permanentSummary.permanentFailures, 1);
-  assert.equal(permanent.fails[0]?.status, "failed");
-});
-
-test("sends a due follow-up through its published template with merge fields and threading", async () => {
-  let sentInput: Parameters<GmailClient["sendMessage"]>[0] | undefined;
-  const state = createFakeState({
-    queue: [
-      claimedFirstEmail({
-        id: "55555555-5555-4555-8555-555555555555",
-        stepNumber: 1,
-        subjectSnapshot: null,
-        htmlSnapshot: null,
-        textSnapshot: null,
-        rfcMessageId: null,
-      }),
-    ],
-    contexts: new Map([
-      [
-        "22222222-2222-4222-8222-222222222222",
-        sendContext({ gmailThreadId: "thread-1" }),
-      ],
-    ]),
-    templates: new Map([
-      [
-        "gmail_follow_up_day_5",
-        {
-          htmlTemplate: "<p>Hi {{firstName}},</p><p>{{businessName}}</p>",
-          textTemplate: "Hi {{firstName}},\n\n{{businessName}}",
-          requiredFields: ["firstName", "businessName"],
-        },
-      ],
-    ]),
-    references: new Map([
-      [
-        "22222222-2222-4222-8222-222222222222",
-        {
-          parentMessageId: "<growthos.first@faithfulsoftware.dev>",
-          references: ["<growthos.first@faithfulsoftware.dev>"],
-        },
-      ],
-    ]),
-  });
-  const dispatch = createDispatch(state, {
-    gmailClient: fakeGmailClient({
-      sendMessage: async (input) => {
-        sentInput = input;
-        return { messageId: "provider-message-2", gmailThreadId: "thread-1" };
-      },
-    }),
-  });
-
-  const summary = await dispatch(db, NOW);
-
-  assert.equal(summary.sent, 1);
-  assert.equal(sentInput?.gmailThreadId, "thread-1");
-  assert.equal(state.sent[0]?.followUps, null);
-  assert.match(state.sent[0]?.htmlSnapshot ?? "", /Sam/);
-  assert.match(state.sent[0]?.htmlSnapshot ?? "", /Example &amp; Sons/);
-});
-
-test("sends the founder-approved Day 11 SEO audit from its stored snapshot", async () => {
-  let sentInput: Parameters<GmailClient["sendMessage"]>[0] | undefined;
-  const state = createFakeState({
-    queue: [
-      claimedFirstEmail({
-        id: "55555555-5555-4555-8555-555555555556",
-        stepNumber: 2,
-        subjectSnapshot: "Your practical SEO audit",
-        htmlSnapshot: "<p>Download the audit.</p>",
-        textSnapshot: "Download the audit.",
-        rfcMessageId: null,
-      }),
-    ],
-    contexts: new Map([
-      [
-        "22222222-2222-4222-8222-222222222222",
-        sendContext({ gmailThreadId: "thread-1" }),
-      ],
-    ]),
-    references: new Map([
-      [
-        "22222222-2222-4222-8222-222222222222",
-        {
-          parentMessageId: "<growthos.second@faithfulsoftware.dev>",
-          references: ["<growthos.first@faithfulsoftware.dev>"],
-        },
-      ],
-    ]),
-  });
-  const dispatch = createDispatch(state, {
-    gmailClient: fakeGmailClient({
-      sendMessage: async (input) => {
-        sentInput = input;
-        return { messageId: "provider-message-3", gmailThreadId: "thread-1" };
-      },
-    }),
-  });
-
-  const summary = await dispatch(db, NOW);
-
-  assert.equal(summary.sent, 1);
-  assert.equal(sentInput?.gmailThreadId, "thread-1");
-  assert.equal(state.sent[0]?.subjectSnapshot, "Your practical SEO audit");
-  assert.equal(state.sent[0]?.htmlSnapshot, "<p>Download the audit.</p>");
-  assert.equal(state.templates.size, 0);
-});
-
-test("blocks a follow-up send when a required merge field is missing", async () => {
-  const state = createFakeState({
-    queue: [
-      claimedFirstEmail({
-        stepNumber: 1,
-        subjectSnapshot: null,
-        htmlSnapshot: null,
-        textSnapshot: null,
-      }),
-    ],
-    contexts: new Map([
-      [
-        "22222222-2222-4222-8222-222222222222",
-        sendContext({ gmailThreadId: "thread-1", businessName: "" }),
-      ],
-    ]),
-  });
-  const dispatch = createDispatch(state);
-
-  const summary = await dispatch(db, NOW);
-
-  assert.equal(summary.permanentFailures, 1);
-  assert.equal(state.fails[0]?.errorCode, "missing_merge_field");
-  assert.equal(state.sent.length, 0);
-});
-
-test("respects the maximum messages per run", async () => {
-  const state = createFakeState({
-    queue: [
-      claimedFirstEmail({ id: "11111111-1111-4111-8111-111111111111" }),
-      claimedFirstEmail({ id: "66666666-6666-4666-8666-666666666666" }),
-      claimedFirstEmail({ id: "77777777-7777-4777-8777-777777777777" }),
-    ],
-  });
+test("a failed confirmation keeps acceptance pending and stops the batch", async () => {
+  let claims = 0;
   const dispatch = createOutreachDispatcher({
-    repository: createFakeRepository(state),
-    gmailClient: fakeGmailClient(),
-    founderEmail: FOUNDER_EMAIL,
-    now: () => NOW,
-    createLeaseToken: () => "lease-token",
-    maxMessagesPerRun: 2,
+    bound,
+    now: () => now,
+    createLeaseToken: () => "lease",
+    repository: {
+      ...postgresSequenceDispatchRepository,
+      claimPendingConfirmations: async () => [],
+      claimDueMessage: async () => {
+        claims++;
+        return claimed;
+      },
+      prepareLegacyMessage: async () => ({ status: "ready" }),
+    },
+    refreshUsage: async () => ({ status: "complete" }),
+    reserve: async () => ({ status: "ready", value: reserved }),
+    submit: async () => ({ status: "accepted" }),
+    confirm: async () => {
+      throw new Error("provider read failed");
+    },
   });
+  const summary = await dispatch(db, now);
+  assert.equal(summary.accepted, 1);
+  assert.equal(summary.confirmed, 0);
+  assert.equal(claims, 1);
+});
 
-  const summary = await dispatch(db, NOW);
+test("an unexpected submission error remains uncertain and stops the batch", async () => {
+  let claims = 0;
+  const dispatch = createOutreachDispatcher({
+    bound,
+    now: () => now,
+    createLeaseToken: () => "lease",
+    repository: {
+      ...postgresSequenceDispatchRepository,
+      claimPendingConfirmations: async () => [],
+      claimDueMessage: async () => {
+        claims++;
+        return claimed;
+      },
+      prepareLegacyMessage: async () => ({ status: "ready" }),
+    },
+    refreshUsage: async () => ({ status: "complete" }),
+    reserve: async () => ({ status: "ready", value: reserved }),
+    submit: async () => {
+      throw new Error("submission lost");
+    },
+    confirm: async () => ({ status: "ready" }),
+  });
+  const summary = await dispatch(db, now);
+  assert.equal(summary.uncertain, 1);
+  assert.equal(claims, 1);
+});
 
+test("later batches confirm accepted receipts even when one observation remains held", async () => {
+  const seen: string[] = [];
+  const dispatch = createOutreachDispatcher({
+    bound,
+    now: () => now,
+    repository: {
+      ...postgresSequenceDispatchRepository,
+      claimPendingConfirmations: async () => ["old", "new"],
+    },
+    refreshUsage: async () => ({ status: "held", reason: "usage_unknown" }),
+    reserve: async () => ({ status: "held", reason: "unused" }),
+    submit: async () => ({ status: "held", reason: "unused" }),
+    confirm: async (_db, id) => {
+      seen.push(id);
+      return id === "old"
+        ? { status: "held", reason: "not_observed" }
+        : { status: "ready" };
+    },
+  });
+  const summary = await dispatch(db, now);
+  assert.deepEqual(seen, ["old", "new"]);
+  assert.equal(summary.confirmed, 1);
+  assert.equal(summary.claimed, 0);
+});
+
+test("targeted send does not scan unrelated pending confirmations", async () => {
+  let scans = 0;
+  const dispatch = createOutreachDispatcher({
+    bound,
+    repository: {
+      ...postgresSequenceDispatchRepository,
+      claimPendingConfirmations: async () => {
+        scans++;
+        return [];
+      },
+    },
+    refreshUsage: async () => ({ status: "held", reason: "usage_unknown" }),
+    reserve: async () => ({ status: "held", reason: "unused" }),
+    submit: async () => ({ status: "held", reason: "unused" }),
+    confirm: async () => ({ status: "held", reason: "unused" }),
+  });
+  await dispatch(db, now, claimed.id);
+  assert.equal(scans, 0);
+});
+
+test("a message-specific hold does not starve the next due message", async () => {
+  const excluded: string[][] = [];
+  let claims = 0;
+  const dispatch = createOutreachDispatcher({
+    bound,
+    now: () => now,
+    createLeaseToken: () => "lease",
+    repository: {
+      ...postgresSequenceDispatchRepository,
+      claimPendingConfirmations: async () => [],
+      claimDueMessage: async (_db, input) => {
+        excluded.push([...(input.excludeMessageIds ?? [])]);
+        claims++;
+        return claims === 1
+          ? claimed
+          : claims === 2
+            ? { ...claimed, id: "other" }
+            : null;
+      },
+      prepareLegacyMessage: async (_db, input) =>
+        input.messageId === claimed.id
+          ? { status: "held", reason: "message_unprepared" }
+          : { status: "ready" },
+    },
+    refreshUsage: async () => ({ status: "complete" }),
+    reserve: async () => ({ status: "ready", value: reserved }),
+    submit: async () => ({ status: "accepted" }),
+    confirm: async () => ({ status: "ready" }),
+  });
+  const summary = await dispatch(db, now);
   assert.equal(summary.claimed, 2);
-  assert.equal(state.queue.length, 1);
+  assert.equal(summary.confirmed, 1);
+  assert.deepEqual(excluded[1], [claimed.id]);
 });
 
-test("single-email approvals send without automatic follow-ups", async () => {
-  const state = createFakeState({
-    queue: [
-      claimedFirstEmail({
-        manualOnly: true,
-        approvedRecipient: "contact@example.test",
-      }),
-    ],
+test("a shared budget hold stops the batch before another claim", async () => {
+  let claims = 0;
+  const dispatch = createOutreachDispatcher({
+    bound,
+    now: () => now,
+    createLeaseToken: () => "lease",
+    repository: {
+      ...postgresSequenceDispatchRepository,
+      claimPendingConfirmations: async () => [],
+      claimDueMessage: async () => {
+        claims++;
+        return claimed;
+      },
+      prepareLegacyMessage: async () => ({ status: "ready" }),
+    },
+    refreshUsage: async () => ({ status: "complete" }),
+    reserve: async () => ({ status: "held", reason: "account_limit" }),
+    submit: async () => ({ status: "held", reason: "unused" }),
+    confirm: async () => ({ status: "held", reason: "unused" }),
   });
-  const item = state.queue[0]!;
-  state.contexts.set(
-    item.sequenceEnrollmentId,
-    sendContext({
-      lawfulBasis: "consent",
-      corporateStatus: "active",
-      prospectStatus: "ready_for_email_review",
-    }),
-  );
-  const summary = await createDispatch(state)(db, NOW);
-  assert.equal(summary.sent, 1);
-  assert.equal(state.sent[0]?.followUps, null);
-});
-
-test("single-email delivery rechecks permission and exact approved recipient", async () => {
-  for (const override of [
-    { normalisedEmail: "replacement@example.test" },
-    { lawfulBasis: "research_only" },
-    { prospectStatus: "rejected" },
-  ]) {
-    const item = claimedFirstEmail({
-      manualOnly: true,
-      approvedRecipient: "contact@example.test",
-    });
-    const state = createFakeState({ queue: [item] });
-    state.contexts.set(
-      item.sequenceEnrollmentId,
-      sendContext({
-        lawfulBasis: "consent",
-        corporateStatus: "active",
-        prospectStatus: "ready_for_email_review",
-        ...override,
-      }),
-    );
-    const summary = await createDispatch(state)(db, NOW);
-    assert.equal(summary.cancelled, 1);
-    assert.equal(state.sent.length, 0);
-  }
+  const summary = await dispatch(db, now);
+  assert.equal(summary.held, 1);
+  assert.equal(claims, 1);
 });

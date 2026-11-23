@@ -110,15 +110,17 @@ test(
           status: string;
           attemptCount: number;
           previousStatus: string | null;
+          guarded: boolean;
         }>
       >`
-        select status, attempt_count as "attemptCount", outreach_claim_previous_status as "previousStatus"
+        select status, attempt_count as "attemptCount", outreach_claim_previous_status as "previousStatus", outreach_guarded_claim as guarded
         from growth.email_messages
         where id = ${approved.messageId}
       `;
       assert.equal(message?.status, "sending");
-      assert.equal(message?.attemptCount, 1);
+      assert.equal(message?.attemptCount, 0);
       assert.equal(message?.previousStatus, "queued");
+      assert.equal(message?.guarded, true);
       await sql`update growth.email_messages set lease_expires_at = now() - interval '1 second' where id = ${approved.messageId}`;
       const reclaimed =
         await postgresSequenceDispatchRepository.claimDueMessage(sql, {
@@ -196,7 +198,7 @@ test(
 );
 
 test(
-  "dispatching an approved queue sends the first email and schedules its follow-ups, then reclaims an expired lease",
+  "a usage hold preserves approved work and an expired guarded claim is reclaimed",
   { skip: !connectionString },
   async () => {
     if (!connectionString) return;
@@ -267,50 +269,23 @@ test(
       const dispatchAt = new Date();
       const dispatch = createOutreachDispatcher({
         repository: postgresSequenceDispatchRepository,
-        gmailClient: {
-          sendMessage: async () => ({
-            messageId: "provider-message-1",
-            gmailThreadId: "provider-thread-1",
-          }),
-          findByRfcMessageId: async () => null,
-        },
-        founderEmail: FOUNDER_EMAIL,
-        now: () => dispatchAt,
+        bound:
+          {} as import("../../../lib/growth/integrations/gmail/live-client").BoundGmailClient,
+        refreshUsage: async () => ({ status: "held", reason: "usage_unknown" }),
+        reserve: async () => ({ status: "held", reason: "unused" }),
+        submit: async () => ({ status: "held", reason: "unused" }),
+        confirm: async () => ({ status: "held", reason: "unused" }),
       });
+      const summary = await dispatch(sql, dispatchAt, approved.messageId);
+      assert.equal(summary.held, 1);
+      const [message] = await sql<{ status: string; sentAt: Date | null }[]>`
+        select status,sent_at as "sentAt" from growth.email_messages where id=${approved.messageId}`;
+      assert.equal(message?.status, "queued");
+      assert.equal(message?.sentAt, null);
 
-      const summary = await dispatch(sql, dispatchAt);
-      assert.equal(summary.claimed, 1);
-      assert.equal(summary.sent, 1);
-
-      const [message] = await sql<
-        Array<{
-          status: string;
-          sentAt: Date | null;
-          providerMessageId: string | null;
-        }>
-      >`
-        select status, sent_at as "sentAt", provider_message_id as "providerMessageId"
-        from growth.email_messages
-        where id = ${approved.messageId}
-      `;
-      assert.equal(message?.status, "sent");
-      assert.ok(message?.sentAt);
-      assert.equal(message?.providerMessageId, "provider-message-1");
-
-      const followUps = await sql<
-        Array<{ stepNumber: number; status: string }>
-      >`
-        select step_number as "stepNumber", status
-        from growth.email_messages
-        where prospect_id = ${prospectId} and step_number > 0
-        order by step_number
-      `;
-      assert.deepEqual(
-        followUps.map((row) => row.stepNumber),
-        [1, 3],
-      );
-      assert.ok(followUps.every((row) => row.status === "queued"));
-
+      // Historical follow-up fixture for the separate expired-lease claim check.
+      await sql`insert into growth.email_messages (id,sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key,scheduled_for)
+        values (gen_random_uuid(),${approved.sequenceEnrollmentId},${prospectId},${identity.contactId},'gmail','outbound',1,'queued',${`follow_up:1:${approved.sequenceEnrollmentId}`},${dispatchAt})`;
       // Simulate a crashed worker: force one follow-up into 'sending' with an
       // expired lease, and confirm the dispatcher reclaims it.
       const [followUp] = await sql<Array<{ id: string }>>`
@@ -321,6 +296,7 @@ test(
       await sql`
         update growth.email_messages
         set status = 'sending',
+            outreach_guarded_claim = true,
             lease_token = ${randomUUID()},
             lease_expires_at = ${new Date(Date.now() - 60_000)},
             scheduled_for = ${new Date(Date.now() - 60_000)}
@@ -335,7 +311,7 @@ test(
         });
       assert.equal(reclaimed?.id, followUp.id);
       assert.equal(reclaimed?.previousStatus, "sending");
-      assert.equal(reclaimed?.attemptCount, 1);
+      assert.equal(reclaimed?.attemptCount, 0);
     } finally {
       await sql`
         update growth.sequence_enrollments set first_message_id = null

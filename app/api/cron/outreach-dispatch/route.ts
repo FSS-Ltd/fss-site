@@ -1,5 +1,5 @@
 import { getGrowthDb } from "@/lib/growth/db/client";
-import { createOutreachDispatcher } from "@/lib/growth/sequences/dispatcher";
+import { createLiveOutreachDispatcher } from "@/lib/growth/sequences/dispatcher";
 import { postgresSequenceDispatchRepository } from "@/lib/growth/sequences/dispatcher-repository";
 import { createGmailReplySync } from "@/lib/growth/sequences/gmail-sync";
 import { postgresGmailSyncRepository } from "@/lib/growth/sequences/gmail-sync-repository";
@@ -21,10 +21,8 @@ export async function GET(request: Request): Promise<Response> {
     },
     async () => {
       const db = getGrowthDb();
-      const { client: gmailClient, binding } = await createCronGmailClient(
-        db,
-        env,
-      );
+      const bound = await createCronGmailClient(db, env);
+      const { client: gmailClient, binding } = bound;
 
       const sync = createGmailReplySync({
         repository: postgresGmailSyncRepository,
@@ -34,9 +32,9 @@ export async function GET(request: Request): Promise<Response> {
       });
       const syncSummary = await sync(db);
 
-      const dispatch = createOutreachDispatcher({
+      const dispatch = createLiveOutreachDispatcher({
         repository: postgresSequenceDispatchRepository,
-        gmailClient,
+        bound,
         founderEmail: env.ownerEmail,
       });
       const dispatchSummary = await dispatch(db, new Date());

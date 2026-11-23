@@ -266,7 +266,15 @@ export async function loadCanonicalOutreachPreparation(
       : (
           await tx<
             { rfc: string }[]
-          >`select rfc_message_id as rfc from growth.email_messages where sequence_enrollment_id=${row.sequenceId} and direction='outbound' and status='sent' and rfc_message_id is not null order by step_number asc limit 51`
+          >`select em.rfc_message_id as rfc from growth.email_messages em
+            where em.sequence_enrollment_id=${row.sequenceId} and em.direction='outbound' and em.rfc_message_id is not null
+              and (em.status='sent' or exists (
+                select 1 from growth.outreach_reservations r
+                where r.email_message_id=em.id and r.sequence_id=em.sequence_enrollment_id
+                  and r.status='accepted' and r.confirmation_observed_at is not null
+                  and r.confirmation_receipt->>'basis'='gmail_fss_sent_observed'
+                  and r.rfc_message_id=em.rfc_message_id
+              )) order by em.step_number asc limit 51`
         ).map((item) => item.rfc);
   if (row.stepNumber === 0 && row.gmailThreadId)
     return held("first_message_already_threaded");

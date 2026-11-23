@@ -34,7 +34,7 @@ function queriesOf(
   ).__queries.filter((query) => !query.text.includes("growth:gmail-routing"));
 }
 
-test("claims one due message with FOR UPDATE SKIP LOCKED and increments its attempt count", async () => {
+test("claims one due message without counting an unissued attempt", async () => {
   const db = fakeDb((text) => {
     if (text.startsWith("with target")) {
       return [
@@ -68,7 +68,10 @@ test("claims one due message with FOR UPDATE SKIP LOCKED and increments its atte
   assert.match(query.text, /for update of em skip locked/);
   assert.match(query.text, /status in \('queued', 'retry'\)/);
   assert.match(query.text, /lease_expires_at < \?/);
-  assert.match(query.text, /attempt_count = em\.attempt_count \+ 1/);
+  assert.doesNotMatch(query.text, /attempt_count = em\.attempt_count \+ 1/);
+  assert.match(query.text, /outreach_guarded_claim/);
+  assert.match(query.text, /confirmation_observed_at is not null/);
+  assert.match(query.text, /direct_noninvocation_evidence is not null/);
 });
 
 test("returns null when nothing is due", async () => {
@@ -150,4 +153,83 @@ test("records a sent message and inserts its follow-ups atomically", async () =>
     queries[3]?.text ?? "",
     /on conflict \(idempotency_key\) do nothing/,
   );
+});
+
+test("preparation holds when the claim lease is no longer current", async () => {
+  const db = fakeDb(() => []);
+  const result = await postgresSequenceDispatchRepository.prepareLegacyMessage(
+    db,
+    {
+      messageId: "message-id",
+      leaseToken: "lease-token",
+      claimed: {
+        id: "message-id",
+        previousStatus: "queued",
+        sequenceEnrollmentId: "sequence-id",
+        prospectId: "prospect-id",
+        contactId: "contact-id",
+        stepNumber: 0,
+        attemptCount: 1,
+        rfcMessageId: null,
+        idempotencyKey: "key",
+        subjectSnapshot: null,
+        htmlSnapshot: null,
+        textSnapshot: null,
+      },
+    },
+  );
+  assert.deepEqual(result, { status: "held", reason: "lease_invalid" });
+});
+
+test("preparation refuses content changed after the claim", async () => {
+  const db = fakeDb((text) => {
+    if (text.startsWith("select p.id as"))
+      return [
+        {
+          prospectId: "prospect-id",
+          businessId: "business-id",
+          contactId: "contact-id",
+          sequenceId: "sequence-id",
+        },
+      ];
+    if (text.startsWith("select em.step_number as"))
+      return [
+        {
+          step: 0,
+          subject: "changed",
+          html: "<p>Body</p>",
+          text: "Body",
+          firstName: "Sam",
+          businessName: "Example",
+          firstSubject: "changed",
+          campaign: false,
+        },
+      ];
+    return [];
+  });
+  const result = await postgresSequenceDispatchRepository.prepareLegacyMessage(
+    db,
+    {
+      messageId: "message-id",
+      leaseToken: "lease-token",
+      claimed: {
+        id: "message-id",
+        previousStatus: "queued",
+        sequenceEnrollmentId: "sequence-id",
+        prospectId: "prospect-id",
+        contactId: "contact-id",
+        stepNumber: 0,
+        attemptCount: 1,
+        rfcMessageId: null,
+        idempotencyKey: "key",
+        subjectSnapshot: "reviewed",
+        htmlSnapshot: "<p>Body</p>",
+        textSnapshot: "Body",
+      },
+    },
+  );
+  assert.deepEqual(result, {
+    status: "held",
+    reason: "claimed_content_changed",
+  });
 });

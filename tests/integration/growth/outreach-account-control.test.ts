@@ -4,6 +4,7 @@ import test from "node:test";
 import postgres from "postgres";
 import { exerciseCampaignReservation } from "./reservation-campaign-assertions";
 import { exerciseLegacyReservation } from "./reservation-assertions";
+import { exerciseActualCronDispatch } from "./actual-cron-dispatch";
 import {
   loadConfiguredAccountReadiness,
   loadReservationAccount,
@@ -417,6 +418,11 @@ test(
         assert.deepEqual(accountForReservation.account.usage.providerIds, []);
       await exerciseCampaignReservation(admin, db, { id, email, now, founder });
       await exerciseLegacyReservation(admin, db, { id, email });
+      await exerciseActualCronDispatch(admin, db, {
+        connectionId: id,
+        email,
+        url,
+      });
       await assert.rejects(
         admin`insert into growth.outreach_provider_usage(account_id,complete,health,connection_id) values (${randomUUID()},false,'unknown',${id})`,
       );

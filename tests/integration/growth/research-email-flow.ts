@@ -130,55 +130,30 @@ export async function verifyResearchEmailFlow(
     fingerprint: otherReview.data.approvalFingerprint!,
     correlationId: `${prefix}-other`,
   });
-  const sentRaw: string[] = [];
+  // A held account must not call the provider, even for a targeted approval.
   const dispatch = createOutreachDispatcher({
     repository: postgresSequenceDispatchRepository,
-    founderEmail: founder.email,
-    maxMessagesPerRun: 1,
-    gmailClient: {
-      sendMessage: async ({ raw }) => {
-        sentRaw.push(raw);
-        return {
-          messageId: `mock-send-${prefix}`,
-          gmailThreadId: `mock-thread-${prefix}`,
-        };
-      },
-      findByRfcMessageId: async () => null,
-    },
+    bound:
+      {} as import("../../../lib/growth/integrations/gmail/live-client").BoundGmailClient,
+    refreshUsage: async () => ({ status: "held", reason: "usage_unknown" }),
+    reserve: async () => ({ status: "held", reason: "unused" }),
+    submit: async () => ({ status: "held", reason: "unused" }),
+    confirm: async () => ({ status: "held", reason: "unused" }),
   });
-  const sent = await dispatch(sql, new Date(), approved.messageId);
-  assert.equal(
-    sent.sent,
-    1,
-    JSON.stringify({
-      summary: sent,
-      rows: await sql`select status,last_error_code,last_error_summary from growth.email_messages where id=${approved.messageId}`,
-    }),
-  );
-  assert.equal(sentRaw.length, 1);
-  const [stored] = await sql<
-    {
-      status: string;
-      html: string;
-      text: string;
-      enrollmentStatus: string;
-      followUps: number;
-    }[]
-  >`
-    select em.status, em.html_snapshot as html, em.text_snapshot as text, se.status as "enrollmentStatus",
-      (select count(*)::int from growth.email_messages where sequence_enrollment_id = se.id and step_number > 0) as "followUps"
-    from growth.email_messages em join growth.sequence_enrollments se on se.id=em.sequence_enrollment_id where em.id=${approved.messageId}`;
-  assert.equal(stored?.status, "sent");
+  const held = await dispatch(sql, new Date(), approved.messageId);
+  assert.equal(held.held, 1);
+  const [stored] = await sql<{ status: string; html: string; text: string }[]>`
+    select status,html_snapshot as html,text_snapshot as text from growth.email_messages where id=${approved.messageId}`;
+  assert.equal(stored?.status, "queued");
   assert.equal(stored?.text, review.data.previewText);
   assert.equal(stored?.html, review.data.previewHtml);
-  assert.equal(stored?.enrollmentStatus, "active");
-  assert.equal(stored?.followUps, 0);
   const [pending] = await sql<
     { status: string }[]
   >`select status from growth.email_messages where id=${otherApproved.messageId}`;
   assert.equal(pending?.status, "queued");
-  assert.equal((await dispatch(sql, new Date(), approved.messageId)).sent, 0);
-  assert.equal(sentRaw.length, 1);
+  // Historical sent fixture for the separate reply-routing assertions below.
+  await sql`update growth.email_messages set status='sent',provider_message_id=${`mock-send-${prefix}`},provider_thread_id=${`mock-thread-${prefix}`},rfc_message_id=${`<mock-${prefix}@example.test>`},sent_at=now() where id=${approved.messageId}`;
+  await sql`update growth.sequence_enrollments set gmail_thread_id=${`mock-thread-${prefix}`} where id=${approved.sequenceEnrollmentId}`;
   const replyMessageId = `reply-${prefix}`;
   const threadId = `mock-thread-${prefix}`;
   const connectionId = randomUUID();

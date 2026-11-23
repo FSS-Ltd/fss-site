@@ -26,6 +26,7 @@ import {
   type BoundReader,
   type VerifiedConfirmation,
 } from "./gmail-confirmation-observation";
+import { scheduleFollowUps } from "../sequences/schedule";
 
 const receiptSchema = z.object({
   basis: z.literal("gmail_fss_sent_observed"),
@@ -36,6 +37,7 @@ const receiptSchema = z.object({
   rawSha256: z.string(),
   observationGrantEpoch: z.number().int().positive(),
   providerCreatedAt: z.iso.datetime(),
+  possibleInvocationFrom: z.iso.datetime().nullable().optional(),
 });
 export type GmailConfirmationResult = {
   reservationId: string;
@@ -45,7 +47,7 @@ export type GmailConfirmationResult = {
     observedAt: Date;
     observationGrantEpoch: number;
   };
-  coverageOrigin: { kind: "unknown" };
+  coverageOrigin: { kind: "unknown" } | { kind: "bounded"; from: Date };
   campaign: z.infer<typeof campaignSchema> | null;
 };
 async function persistGmailConfirmation(
@@ -190,9 +192,10 @@ async function persistGmailConfirmation(
         sequenceThread: string | null;
         sequenceStatus: string;
         providerDraftId: string | null;
+        guardedClaim: boolean;
       }[]
     >`
-      select em.prospect_id as "prospectId",em.contact_id as "contactId",em.step_number as step,em.provider_message_id as "providerId",em.provider_thread_id as "threadId",em.rfc_message_id as rfc,se.gmail_thread_id as "sequenceThread",se.status as "sequenceStatus",em.provider_draft_id as "providerDraftId"
+      select em.prospect_id as "prospectId",em.contact_id as "contactId",em.step_number as step,em.provider_message_id as "providerId",em.provider_thread_id as "threadId",em.rfc_message_id as rfc,se.gmail_thread_id as "sequenceThread",se.status as "sequenceStatus",em.provider_draft_id as "providerDraftId",em.outreach_guarded_claim as "guardedClaim"
       from growth.email_messages em join growth.sequence_enrollments se on se.id=em.sequence_enrollment_id where em.id=${row.messageId} and se.id=${row.sequenceId} for update of em,se`;
     if (
       !message ||
@@ -244,6 +247,10 @@ async function persistGmailConfirmation(
         receipt.data.rfcMessageId !== fact.rfcMessageId ||
         receipt.data.googleSubject !== fact.binding.googleSubject ||
         receipt.data.rawSha256 !== fact.rawSha256 ||
+        (receipt.data.possibleInvocationFrom != null &&
+          (!message.guardedClaim ||
+            receipt.data.possibleInvocationFrom !==
+              row.submittedAt.toISOString())) ||
         receipt.data.providerCreatedAt !== fact.providerCreatedAt.toISOString()
       )
         return held("confirmation_conflict");
@@ -257,7 +264,12 @@ async function persistGmailConfirmation(
             observedAt: row.observedAt,
             observationGrantEpoch: receipt.data.observationGrantEpoch,
           },
-          coverageOrigin: { kind: "unknown" },
+          coverageOrigin: receipt.data.possibleInvocationFrom
+            ? {
+                kind: "bounded",
+                from: new Date(receipt.data.possibleInvocationFrom),
+              }
+            : { kind: "unknown" },
           campaign: snapshot.data.campaign,
         },
       };
@@ -290,11 +302,48 @@ async function persistGmailConfirmation(
       observedFrom: fact.observedFrom.toISOString(),
       observedUntil: fact.observedUntil.toISOString(),
       providerCreatedAt: fact.providerCreatedAt.toISOString(),
-      possibleInvocationFrom: null,
+      possibleInvocationFrom: message.guardedClaim
+        ? row.submittedAt.toISOString()
+        : null,
     };
     await tx`update growth.outreach_reservations set status='accepted',provider_message_id=${fact.providerMessageId},provider_thread_id=${fact.providerThreadId},confirmation_receipt=${tx.json(receipt)},confirmation_observed_at=${fact.observedUntil} where id=${fact.reservationId}`;
     await tx`update growth.email_messages set provider_message_id=${fact.providerMessageId},provider_thread_id=${fact.providerThreadId} where id=${row.messageId}`;
     await tx`update growth.sequence_enrollments set gmail_thread_id=${fact.providerThreadId} where id=${row.sequenceId}`;
+    if (
+      !campaign &&
+      message.step === 0 &&
+      message.sequenceStatus === "active"
+    ) {
+      const [legacy] = await tx<{ manualOnly: boolean | null }[]>`
+        select template_snapshot->>'followUpPolicy' = 'manual_only' as "manualOnly"
+        from growth.sequence_enrollments where id=${row.sequenceId}`;
+      if (legacy && legacy.manualOnly !== true) {
+        const schedule = scheduleFollowUps(fact.observedUntil);
+        for (const followUp of [
+          { step: 1, scheduledFor: schedule.day_5 },
+          { step: 3, scheduledFor: schedule.day_14 },
+        ]) {
+          const key = `follow_up:${followUp.step}:${row.sequenceId}`;
+          const inserted = await tx<{ id: string }[]>`
+            insert into growth.email_messages (
+              id,sequence_enrollment_id,prospect_id,contact_id,channel,direction,
+              step_number,status,idempotency_key,scheduled_for
+            ) values (
+              gen_random_uuid(),${row.sequenceId},${message.prospectId},${message.contactId},
+              'gmail','outbound',${followUp.step},'queued',
+              ${key},${followUp.scheduledFor}
+            ) on conflict (idempotency_key) do nothing returning id`;
+          if (inserted.length === 0) {
+            const [existing] = await tx<{ valid: boolean }[]>`
+              select sequence_enrollment_id=${row.sequenceId} and prospect_id=${message.prospectId}
+                and contact_id=${message.contactId} and step_number=${followUp.step}
+                and channel='gmail' and direction='outbound' as valid
+              from growth.email_messages where idempotency_key=${key} for update`;
+            if (!existing?.valid) throw new Error("legacy_followup_conflict");
+          }
+        }
+      }
+    }
     if (campaign && member && !member.first && message.step === 0) {
       const [currentPolicy] = await tx<
         { status: string; policy: unknown; newer: boolean }[]
@@ -345,7 +394,9 @@ async function persistGmailConfirmation(
           observedAt: fact.observedUntil,
           observationGrantEpoch: fact.binding.grantEpoch,
         },
-        coverageOrigin: { kind: "unknown" },
+        coverageOrigin: message.guardedClaim
+          ? { kind: "bounded", from: row.submittedAt }
+          : { kind: "unknown" },
         campaign,
       },
     };

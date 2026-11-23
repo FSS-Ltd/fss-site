@@ -5,6 +5,8 @@ import { createGmailClient } from "../../../lib/growth/integrations/gmail/client
 import type postgres from "postgres";
 import { submitReservedOutreach } from "../../../lib/growth/campaigns/direct-submission";
 import { exerciseConfirmationCapacity } from "./reservation-capacity-assertions";
+import { exerciseLegacyConfirmation } from "./gmail-legacy-confirmation";
+import { exerciseConfirmationDueFairness } from "./gmail-confirmation-due";
 import { withTransitionClock } from "./reservation-clock";
 import { createGmailConfirmation } from "../../../lib/growth/campaigns/gmail-confirmation";
 import type { GrowthDb } from "../../../lib/growth/db/types";
@@ -1275,11 +1277,27 @@ export async function exerciseLegacyReservation(
       { status: string; snapshot: unknown }[]
     >`select status,issued_snapshot as snapshot from growth.outreach_reservations where id=${large.value.reservationId}`;
     assert.deepEqual(largeState, { status: "reserved", snapshot: null });
+    await exerciseConfirmationDueFairness(
+      admin,
+      db,
+      acceptedLease.reservationId,
+      id,
+    );
+    await exerciseLegacyConfirmation(admin, db, {
+      reservationId: acceptedLease.reservationId,
+      sequenceId,
+      messageId: messageId2,
+      contactEmail,
+      email,
+      binding,
+      rfcMessageId: retried.value.rfcMessageId,
+    });
   } finally {
     await admin`delete from growth.audit_log where entity_type='outreach_reservation' and entity_id in (select id::text from growth.outreach_reservations where email_message_id in (${messageId},${messageId2},${messageId3},${haltMessage},${credentialMessage},${failureMessage},${waitingMessage},${freshMessage},${prooflessMessage},${largeMessage},${expiryMessage}))`;
     await admin`delete from growth.outreach_reservations where email_message_id in (${messageId},${messageId2},${messageId3},${haltMessage},${credentialMessage},${failureMessage},${waitingMessage},${freshMessage},${prooflessMessage},${largeMessage},${expiryMessage})`;
     await admin`delete from growth.outreach_provider_usage where account_id=${otherAccount}`;
     await admin`delete from growth.integration_connections where id=${otherConnection}`;
+    await admin`delete from growth.email_messages where sequence_enrollment_id=${sequenceId} and step_number in (1,3)`;
     await admin`delete from growth.email_messages where id in (${messageId},${messageId2},${messageId3},${haltMessage},${credentialMessage},${failureMessage},${waitingMessage},${freshMessage},${prooflessMessage},${largeMessage},${expiryMessage})`;
     await admin`delete from growth.sequence_enrollments where id=${sequenceId}`;
     await admin`delete from growth.prospects where id=${prospectId}`;
