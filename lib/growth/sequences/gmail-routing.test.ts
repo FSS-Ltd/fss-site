@@ -204,3 +204,75 @@ test("exact confirmed references can bind an otherwise unassociated Gmail thread
     "ambiguous",
   );
 });
+
+test("a bound Gmail thread accepts multiple confirmed references from its own sequence", () => {
+  const gmail = {
+    basis: "gmail_exact_reference_v1" as const,
+    outboundProvider: "gmail" as const,
+    connectionId: "account",
+    googleSubject: "subject",
+    grantEpoch: 1,
+    recipient: "owner@example.test",
+  };
+  const first = {
+    enrollment,
+    attribution: {
+      ...gmail,
+      reservationId: "one",
+      rfcMessageId: "<one@example.test>",
+    },
+  };
+  const second = {
+    enrollment,
+    attribution: {
+      ...gmail,
+      reservationId: "two",
+      rfcMessageId: "<two@example.test>",
+    },
+  };
+  const candidates = ["one", "two"].map((reservationId) => ({
+    sequenceId: enrollment.id,
+    connectionId: "account",
+    channel: "gmail",
+    identityConflict: false,
+    reservationId,
+  }));
+  const thread = { kind: "unique" as const, enrollment };
+  assert.equal(
+    assessGmailRouting({
+      ...base,
+      thread,
+      references: {
+        kind: "valid",
+        ids: [first.attribution.rfcMessageId, second.attribution.rfcMessageId],
+      },
+      candidates,
+      proven: [first, second],
+    }).kind,
+    "unique",
+  );
+  assert.equal(
+    assessGmailRouting({
+      ...base,
+      thread,
+      references: valid,
+      candidates,
+      proven: [
+        first,
+        { ...second, enrollment: { ...enrollment, id: "other" } },
+      ],
+    }).kind,
+    "ambiguous",
+  );
+  assert.equal(
+    assessGmailRouting({
+      ...base,
+      thread,
+      references: valid,
+      candidates,
+      proven: [first, second],
+      candidatesOverflow: true,
+    }).kind,
+    "ambiguous",
+  );
+});

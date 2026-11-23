@@ -44,7 +44,13 @@ export function assessGmailRouting(input: {
   )
     return { kind: "uncertain" };
   const proven = input.proven ?? [];
-  if (proven.length > 1) return { kind: "ambiguous" };
+  if (input.thread.kind === "unique") {
+    const threadSequenceId = input.thread.enrollment.id;
+    if (
+      proven.some((candidate) => candidate.enrollment.id !== threadSequenceId)
+    )
+      return { kind: "ambiguous" };
+  } else if (proven.length > 1) return { kind: "ambiguous" };
   const exact = proven[0];
   if (
     exact &&
