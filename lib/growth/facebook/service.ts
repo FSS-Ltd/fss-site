@@ -67,6 +67,17 @@ function validateObservation(destination: Destination, now: Date): void {
   if (destination.observation.observedAt > now)
     throw new FacebookError("future_observation");
 }
+export function validateFacebookDiscoveryBatch(
+  batch: FacebookDiscoveryBatch,
+  now: Date,
+): void {
+  if (batch.observedAt > now) throw new FacebookError("future_observation");
+  for (const destination of batch.observations)
+    validateObservation(destination, now);
+  const urls = batch.observations.map((item) => normalizeSourceUrl(item.url));
+  if (new Set(urls).size !== urls.length)
+    throw new FacebookError("duplicate_destination");
+}
 async function audit(
   tx: GrowthTransaction,
   actorType: "founder" | "agent",
@@ -231,13 +242,7 @@ export async function ingestFacebookDiscovery(
     !correlationId.trim()
   )
     throw new FacebookError("invalid_agent_identity");
-  if (batch.observedAt > new Date())
-    throw new FacebookError("future_observation");
-  for (const destination of batch.observations)
-    validateObservation(destination, new Date());
-  const urls = batch.observations.map((item) => normalizeSourceUrl(item.url));
-  if (new Set(urls).size !== urls.length)
-    throw new FacebookError("duplicate_destination");
+  validateFacebookDiscoveryBatch(batch, new Date());
   const requestHash = hash({
     ...batch,
     observations: batch.observations.map((item) => ({

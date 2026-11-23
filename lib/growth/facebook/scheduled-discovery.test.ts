@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { createHmac } from "node:crypto";
 import {
+  existsSync,
   mkdtempSync,
   readFileSync,
   rmSync,
@@ -264,25 +265,123 @@ test("refuses a symlinked state directory before research or credentials", async
 
 test("runs bounded child research with a private output schema and cleans up", () => {
   let outputPath = "";
-  const result = researchPublicDestinations(
-    process.cwd(),
-    (command, args, cwd) => {
-      assert.equal(command, "codex");
-      assert.equal(cwd, process.cwd());
-      assert.ok(args.includes("--search"));
-      assert.equal(args[args.indexOf("--sandbox") + 1], "read-only");
-      const schemaPath = args[args.indexOf("--output-schema") + 1];
-      outputPath = args[args.indexOf("--output-last-message") + 1];
-      const schema = JSON.parse(readFileSync(schemaPath, "utf8"));
-      assert.equal(schema.properties.observations.maxItems, 10);
-      assert.match(args.at(-1) ?? "", /at most ten public searches/);
-      writeFileSync(
-        outputPath,
-        JSON.stringify({ succeeded: true, observations: [] }),
-      );
-      return true;
+  const previousSecret = process.env.TEST_PRIVATE_SECRET;
+  process.env.TEST_PRIVATE_SECRET = "never-forward";
+  try {
+    const result = researchPublicDestinations(
+      process.cwd(),
+      (command, args, cwd, env) => {
+        assert.equal(command, "codex");
+        assert.notEqual(cwd, process.cwd());
+        assert.equal(args[args.indexOf("--cd") + 1], cwd);
+        assert.equal(env.HOME, process.env.HOME);
+        assert.equal(env.TEST_PRIVATE_SECRET, undefined);
+        for (const feature of [
+          "shell_tool",
+          "apps",
+          "hooks",
+          "multi_agent",
+          "plugins",
+          "unified_exec",
+          "computer_use",
+          "browser_use",
+          "view_image",
+        ]) {
+          assert.ok(
+            args.some(
+              (value, index) =>
+                value === "--disable" && args[index + 1] === feature,
+            ),
+          );
+        }
+        assert.ok(
+          args.some(
+            (value, index) =>
+              value === "--enable" &&
+              args[index + 1] === "skip_host_skill_discovery",
+          ),
+        );
+        assert.equal(args.includes("--ignore-rules"), false);
+        assert.ok(args.includes("--ignore-user-config"));
+        assert.ok(args.includes("--search"));
+        assert.equal(args[args.indexOf("--sandbox") + 1], "read-only");
+        const schemaPath = args[args.indexOf("--output-schema") + 1];
+        outputPath = args[args.indexOf("--output-last-message") + 1];
+        const schema = JSON.parse(readFileSync(schemaPath, "utf8"));
+        assert.equal(schema.properties.observations.maxItems, 10);
+        assert.match(args.at(-1) ?? "", /at most ten public searches/);
+        writeFileSync(
+          outputPath,
+          JSON.stringify({ succeeded: true, observations: [] }),
+        );
+        return true;
+      },
+    );
+    assert.deepEqual(result, { succeeded: true, observations: [] });
+    assert.throws(() => readFileSync(outputPath));
+  } finally {
+    if (previousSecret === undefined) delete process.env.TEST_PRIVATE_SECRET;
+    else process.env.TEST_PRIVATE_SECRET = previousSecret;
+  }
+});
+
+test("rejects duplicate canonical destinations and future observations without poisoning same-day retry", async () => {
+  const destination = {
+    url: "https://www.facebook.com/groups/example?utm_source=one",
+    name: "Example",
+    kind: "group",
+    locality: null,
+    websiteUrl: null,
+    observation: {
+      sourceUrl: "https://facebook.com/groups/example",
+      summary: "Active public group",
+      observedAt: "2026-01-01T07:00:00Z",
     },
-  );
-  assert.deepEqual(result, { succeeded: true, observations: [] });
-  assert.throws(() => readFileSync(outputPath));
+  };
+  for (const observations of [
+    [
+      destination,
+      {
+        ...destination,
+        url: "http://m.facebook.com/groups/example/?fbclid=two",
+      },
+    ],
+    [
+      {
+        ...destination,
+        observation: {
+          ...destination.observation,
+          observedAt: "2026-01-01T09:00:00Z",
+        },
+      },
+    ],
+  ]) {
+    const dir = mkdtempSync(join(tmpdir(), "facebook-test-"));
+    try {
+      const now = new Date("2026-01-01T08:00:00Z");
+      const base = {
+        now,
+        repositoryRoot: process.cwd(),
+        stateDirectory: dir,
+        secret: () => "s".repeat(32),
+        request: async () => Response.json({ count: 0, alreadyExisted: false }),
+      };
+      const invalid = await runFacebookDiscovery({
+        ...base,
+        research: () => ({ succeeded: true, observations }),
+      });
+      assert.equal(invalid.ok, false);
+      assert.equal(
+        existsSync(join(dir, `${buildFacebookRunId(now)}.json`)),
+        false,
+      );
+      const valid = await runFacebookDiscovery({
+        ...base,
+        research: () => ({ succeeded: true, observations: [] }),
+      });
+      assert.equal(valid.ok, true);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  }
 });

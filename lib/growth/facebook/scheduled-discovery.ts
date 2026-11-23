@@ -1,26 +1,30 @@
-import { spawnSync } from "node:child_process";
 import { createHmac, randomUUID } from "node:crypto";
 import {
-  chmodSync,
   closeSync,
   constants,
   fstatSync,
   linkSync,
   lstatSync,
   mkdirSync,
-  mkdtempSync,
   openSync,
   readFileSync,
   rmSync,
   unlinkSync,
   writeFileSync,
 } from "node:fs";
-import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 import { z } from "zod";
 import { buildWeekdayExternalRunId } from "../research/scheduled-agent-runner";
-import { facebookDiscoveryBatchSchema } from "./contracts";
+import {
+  runRestrictedResearchChild,
+  type RestrictedResearchExecutor,
+} from "../research/restricted-research-child";
+import {
+  facebookDiscoveryBatchSchema,
+  type FacebookDiscoveryBatch,
+} from "./contracts";
+import { validateFacebookDiscoveryBatch } from "./service";
 
 const endpoint = "https://faithfulsoftware.dev/api/agent/facebook-discovery";
 const resultSchema = z
@@ -66,102 +70,50 @@ export function buildFacebookRunId(date: Date): string {
     .replace("-0600-", "-0730-");
 }
 
-type ChildExecutor = (command: string, args: string[], cwd: string) => boolean;
-
 export function researchPublicDestinations(
-  repositoryRoot: string,
-  execute: ChildExecutor = (command, args, cwd) => {
-    const result = spawnSync(command, args, {
-      cwd,
-      stdio: "ignore",
-      timeout: 45 * 60 * 1000,
-    });
-    return result.error === undefined && result.status === 0;
-  },
+  _repositoryRoot: string,
+  execute?: RestrictedResearchExecutor,
 ): Research {
-  const workspace = mkdtempSync(join(tmpdir(), "fss-facebook-research-"));
-  chmodSync(workspace, 0o700);
-  try {
-    const schemaPath = join(workspace, "schema.json");
-    const outputPath = join(workspace, "output.json");
-    const text = { type: "string" };
-    const nullableText = { type: ["string", "null"] };
-    const observation = {
-      type: "object",
-      additionalProperties: false,
-      required: ["sourceUrl", "summary", "observedAt"],
-      properties: { sourceUrl: text, summary: text, observedAt: text },
-    };
-    const destination = {
-      type: "object",
-      additionalProperties: false,
-      required: [
-        "url",
-        "name",
-        "kind",
-        "locality",
-        "websiteUrl",
-        "observation",
-      ],
-      properties: {
-        url: text,
-        name: text,
-        kind: { type: "string", enum: ["page", "group"] },
-        locality: nullableText,
-        websiteUrl: nullableText,
-        observation,
-      },
-    };
-    writeFileSync(
-      schemaPath,
-      JSON.stringify({
-        type: "object",
-        additionalProperties: false,
-        required: ["succeeded", "observations"],
-        properties: {
-          succeeded: { type: "boolean" },
-          observations: { type: "array", maxItems: 10, items: destination },
-        },
-      }),
-      { mode: 0o600 },
-    );
-    const prompt =
-      "Find up to ten active public Facebook pages or groups relevant to UK local business owners for a founder to review for manual follow or join. Make at most ten public searches and use public evidence only; include only destinations supported by evidence of activity and business relevance. Return destination name, type, Facebook URL, locality and website when known, plus public source URL, factual activity summary and observed timestamp for each. Use ISO 8601 timestamps with timezone. Never access private groups, bypass login, join, follow, post, review posting rules, submit data, read credentials or inspect local user files. Return succeeded=false if search or evidence gathering fails; a successful search may return zero observations. Return only schema-conformant JSON.";
-    const succeeded = execute(
-      "codex",
-      [
-        "--search",
-        "exec",
-        "--ephemeral",
-        "--ignore-user-config",
-        "--ignore-rules",
-        "--sandbox",
-        "read-only",
-        "--skip-git-repo-check",
-        "--color",
-        "never",
-        "--model",
-        "gpt-5.6-sol",
-        "--config",
-        'model_reasoning_effort="high"',
-        "--cd",
-        repositoryRoot,
-        "--output-schema",
-        schemaPath,
-        "--output-last-message",
-        outputPath,
-        prompt,
-      ],
-      repositoryRoot,
-    );
-    if (!succeeded) throw new Error("research failed");
-    const file = lstatSync(outputPath);
-    if (!file.isFile() || file.size > 256 * 1024)
-      throw new Error("invalid output");
-    return researchSchema.parse(JSON.parse(readFileSync(outputPath, "utf8")));
-  } finally {
-    rmSync(workspace, { recursive: true, force: true });
-  }
+  const text = { type: "string" };
+  const nullableText = { type: ["string", "null"] };
+  const observation = {
+    type: "object",
+    additionalProperties: false,
+    required: ["sourceUrl", "summary", "observedAt"],
+    properties: { sourceUrl: text, summary: text, observedAt: text },
+  };
+  const destination = {
+    type: "object",
+    additionalProperties: false,
+    required: ["url", "name", "kind", "locality", "websiteUrl", "observation"],
+    properties: {
+      url: text,
+      name: text,
+      kind: { type: "string", enum: ["page", "group"] },
+      locality: nullableText,
+      websiteUrl: nullableText,
+      observation,
+    },
+  };
+  const schema = {
+    type: "object",
+    additionalProperties: false,
+    required: ["succeeded", "observations"],
+    properties: {
+      succeeded: { type: "boolean" },
+      observations: { type: "array", maxItems: 10, items: destination },
+    },
+  };
+  const prompt =
+    "Find up to ten active public Facebook pages or groups relevant to UK local business owners for a founder to review for manual follow or join. Make at most ten public searches and use public evidence only; include only destinations supported by evidence of activity and business relevance. Return destination name, type, Facebook URL, locality and website when known, plus public source URL, factual activity summary and observed timestamp for each. Use ISO 8601 timestamps with timezone. Never access private groups, bypass login, join, follow, post, review posting rules, submit data, read credentials or inspect local user files. Return succeeded=false if search or evidence gathering fails; a successful search may return zero observations. Return only schema-conformant JSON.";
+  return researchSchema.parse(
+    runRestrictedResearchChild({
+      schema,
+      prompt,
+      model: "gpt-5.6-sol",
+      execute,
+    }),
+  );
 }
 
 function ensurePrivateDirectory(path: string): void {
@@ -272,13 +224,19 @@ export async function runFacebookDiscovery(input: Options): Promise<Report> {
         return fail("research_failed");
       }
       if (!research.succeeded) return fail("research_failed");
-      const batch = facebookDiscoveryBatchSchema.parse({
-        version: 1,
-        purpose: "facebook_public_discovery",
-        externalRunId: runId,
-        observedAt: date.toISOString(),
-        observations: research.observations,
-      });
+      let batch: FacebookDiscoveryBatch;
+      try {
+        batch = facebookDiscoveryBatchSchema.parse({
+          version: 1,
+          purpose: "facebook_public_discovery",
+          externalRunId: runId,
+          observedAt: date.toISOString(),
+          observations: research.observations,
+        });
+        validateFacebookDiscoveryBatch(batch, input.now ?? new Date());
+      } catch {
+        return fail("research_failed");
+      }
       publishPrivateFile(input.stateDirectory, bodyPath, JSON.stringify(batch));
       const completed = readPrivateFile(receiptPath);
       if (completed !== null) {
