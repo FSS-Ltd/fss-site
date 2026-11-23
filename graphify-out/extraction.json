@@ -239,6 +239,20 @@
       "source_location": "L1"
     },
     {
+      "id": "components_growth_crm_command_form_tsx",
+      "label": "command-form.tsx",
+      "file_type": "code",
+      "source_file": "components/growth/crm/command-form.tsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "command_form_async",
+      "label": "async()",
+      "file_type": "code",
+      "source_file": "components/growth/crm/command-form.tsx",
+      "source_location": "L39"
+    },
+    {
       "id": "components_growth_crm_facebook_source_form_tsx",
       "label": "facebook-source-form.tsx",
       "file_type": "code",
@@ -250,7 +264,7 @@
       "label": "FacebookSourceForm()",
       "file_type": "code",
       "source_file": "components/growth/crm/facebook-source-form.tsx",
-      "source_location": "L10"
+      "source_location": "L11"
     },
     {
       "id": "components_growth_crm_facebook_source_values_test_ts",
@@ -278,7 +292,7 @@
       "label": "facebookSourceCommand()",
       "file_type": "code",
       "source_file": "components/growth/crm/facebook-source-values.ts",
-      "source_location": "L5"
+      "source_location": "L28"
     },
     {
       "id": "components_growth_crm_lead_capture_form_test_tsx",
@@ -292,14 +306,35 @@
       "label": "push()",
       "file_type": "code",
       "source_file": "components/growth/crm/lead-capture-form.test.tsx",
-      "source_location": "L18"
+      "source_location": "L21"
     },
     {
       "id": "lead_capture_form_test_refresh",
       "label": "refresh()",
       "file_type": "code",
       "source_file": "components/growth/crm/lead-capture-form.test.tsx",
-      "source_location": "L18"
+      "source_location": "L24"
+    },
+    {
+      "id": "lead_capture_form_test_attachevent",
+      "label": "attachEvent()",
+      "file_type": "code",
+      "source_file": "components/growth/crm/lead-capture-form.test.tsx",
+      "source_location": "L38"
+    },
+    {
+      "id": "lead_capture_form_test_detachevent",
+      "label": "detachEvent()",
+      "file_type": "code",
+      "source_file": "components/growth/crm/lead-capture-form.test.tsx",
+      "source_location": "L39"
+    },
+    {
+      "id": "lead_capture_form_test_setupfacebookform",
+      "label": "setupFacebookForm()",
+      "file_type": "code",
+      "source_file": "components/growth/crm/lead-capture-form.test.tsx",
+      "source_location": "L153"
     },
     {
       "id": "components_growth_crm_lead_capture_form_tsx",
@@ -2105,7 +2140,7 @@
       "label": "loadCanonicalOutreachPreparation()",
       "file_type": "code",
       "source_file": "lib/growth/campaigns/dispatch-authority.ts",
-      "source_location": "L74"
+      "source_location": "L76"
     },
     {
       "id": "lib_growth_campaigns_domain_test_ts",
@@ -4019,6 +4054,76 @@
       "source_location": "L23"
     },
     {
+      "id": "lib_growth_facebook_scheduled_discovery_test_ts",
+      "label": "scheduled-discovery.test.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/facebook/scheduled-discovery.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "scheduled_discovery_test_request",
+      "label": "request()",
+      "file_type": "code",
+      "source_file": "lib/growth/facebook/scheduled-discovery.test.ts",
+      "source_location": "L37"
+    },
+    {
+      "id": "lib_growth_facebook_scheduled_discovery_ts",
+      "label": "scheduled-discovery.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "scheduled_discovery_buildfacebookrunid",
+      "label": "buildFacebookRunId()",
+      "file_type": "code",
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L67"
+    },
+    {
+      "id": "scheduled_discovery_researchpublicdestinations",
+      "label": "researchPublicDestinations()",
+      "file_type": "code",
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L73"
+    },
+    {
+      "id": "scheduled_discovery_ensureprivatedirectory",
+      "label": "ensurePrivateDirectory()",
+      "file_type": "code",
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L119"
+    },
+    {
+      "id": "scheduled_discovery_readprivatefile",
+      "label": "readPrivateFile()",
+      "file_type": "code",
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L136"
+    },
+    {
+      "id": "scheduled_discovery_removependingbody",
+      "label": "removePendingBody()",
+      "file_type": "code",
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L163"
+    },
+    {
+      "id": "scheduled_discovery_publishprivatefile",
+      "label": "publishPrivateFile()",
+      "file_type": "code",
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L172"
+    },
+    {
+      "id": "scheduled_discovery_runfacebookdiscovery",
+      "label": "runFacebookDiscovery()",
+      "file_type": "code",
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L193"
+    },
+    {
       "id": "lib_growth_facebook_service_ts",
       "label": "service.ts",
       "file_type": "code",
@@ -4061,25 +4166,32 @@
       "source_location": "L66"
     },
     {
+      "id": "service_validatefacebookdiscoverybatch",
+      "label": "validateFacebookDiscoveryBatch()",
+      "file_type": "code",
+      "source_file": "lib/growth/facebook/service.ts",
+      "source_location": "L70"
+    },
+    {
       "id": "service_audit",
       "label": "audit()",
       "file_type": "code",
       "source_file": "lib/growth/facebook/service.ts",
-      "source_location": "L70"
+      "source_location": "L81"
     },
     {
       "id": "service_executefacebookcommand",
       "label": "executeFacebookCommand()",
       "file_type": "code",
       "source_file": "lib/growth/facebook/service.ts",
-      "source_location": "L87"
+      "source_location": "L98"
     },
     {
       "id": "service_ingestfacebookdiscovery",
       "label": "ingestFacebookDiscovery()",
       "file_type": "code",
       "source_file": "lib/growth/facebook/service.ts",
-      "source_location": "L219"
+      "source_location": "L230"
     },
     {
       "id": "lib_growth_facebook_session_deadline_test_ts",
@@ -5718,6 +5830,20 @@
       "file_type": "code",
       "source_file": "lib/growth/research/repository.ts",
       "source_location": "L48"
+    },
+    {
+      "id": "lib_growth_research_restricted_research_child_ts",
+      "label": "restricted-research-child.ts",
+      "file_type": "code",
+      "source_file": "lib/growth/research/restricted-research-child.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "restricted_research_child_runrestrictedresearchchild",
+      "label": "runRestrictedResearchChild()",
+      "file_type": "code",
+      "source_file": "lib/growth/research/restricted-research-child.ts",
+      "source_location": "L20"
     },
     {
       "id": "lib_growth_research_route_handler_ts",
@@ -8968,6 +9094,20 @@
       "source_location": "L183"
     },
     {
+      "id": "scripts_run_scheduled_facebook_discovery_ts",
+      "label": "run-scheduled-facebook-discovery.ts",
+      "file_type": "code",
+      "source_file": "scripts/run-scheduled-facebook-discovery.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "run_scheduled_facebook_discovery_main",
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "scripts/run-scheduled-facebook-discovery.ts",
+      "source_location": "L8"
+    },
+    {
       "id": "tests_e2e_outreach_send_all_spec_ts",
       "label": "outreach-send-all.spec.ts",
       "file_type": "code",
@@ -10419,6 +10559,78 @@
       "weight": 1.0
     },
     {
+      "source": "components_growth_crm_command_form_tsx",
+      "target": "navigation",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/crm/command-form.tsx",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_crm_command_form_tsx",
+      "target": "link",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/crm/command-form.tsx",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_crm_command_form_tsx",
+      "target": "react",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/crm/command-form.tsx",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_crm_command_form_tsx",
+      "target": "schemas",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/crm/command-form.tsx",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_crm_command_form_tsx",
+      "target": "components_growth_crm_form_validation",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/crm/command-form.tsx",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_crm_command_form_tsx",
+      "target": "components_growth_crm_use_crm_command",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/crm/command-form.tsx",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_crm_command_form_tsx",
+      "target": "components_growth_crm_crm_module_css",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/crm/command-form.tsx",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_crm_command_form_tsx",
+      "target": "command_form_async",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/crm/command-form.tsx",
+      "source_location": "L39",
+      "weight": 1.0
+    },
+    {
       "source": "components_growth_crm_facebook_source_form_tsx",
       "target": "navigation",
       "relation": "imports_from",
@@ -10429,7 +10641,7 @@
     },
     {
       "source": "components_growth_crm_facebook_source_form_tsx",
-      "target": "react",
+      "target": "link",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/crm/facebook-source-form.tsx",
@@ -10438,7 +10650,7 @@
     },
     {
       "source": "components_growth_crm_facebook_source_form_tsx",
-      "target": "components_growth_crm_command_form",
+      "target": "react",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/crm/facebook-source-form.tsx",
@@ -10447,7 +10659,7 @@
     },
     {
       "source": "components_growth_crm_facebook_source_form_tsx",
-      "target": "components_growth_crm_country_field",
+      "target": "components_growth_crm_command_form",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/crm/facebook-source-form.tsx",
@@ -10456,7 +10668,7 @@
     },
     {
       "source": "components_growth_crm_facebook_source_form_tsx",
-      "target": "components_growth_crm_facebook_source_values",
+      "target": "components_growth_crm_country_field",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/crm/facebook-source-form.tsx",
@@ -10465,7 +10677,7 @@
     },
     {
       "source": "components_growth_crm_facebook_source_form_tsx",
-      "target": "components_growth_crm_form_field",
+      "target": "components_growth_crm_facebook_source_values",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/crm/facebook-source-form.tsx",
@@ -10474,7 +10686,7 @@
     },
     {
       "source": "components_growth_crm_facebook_source_form_tsx",
-      "target": "components_growth_crm_crm_module_css",
+      "target": "components_growth_crm_form_field",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/crm/facebook-source-form.tsx",
@@ -10483,11 +10695,20 @@
     },
     {
       "source": "components_growth_crm_facebook_source_form_tsx",
+      "target": "components_growth_crm_crm_module_css",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/crm/facebook-source-form.tsx",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_crm_facebook_source_form_tsx",
       "target": "facebook_source_form_facebooksourceform",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/crm/facebook-source-form.tsx",
-      "source_location": "L10",
+      "source_location": "L11",
       "weight": 1.0
     },
     {
@@ -10568,7 +10789,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/crm/facebook-source-values.ts",
-      "source_location": "L5",
+      "source_location": "L28",
       "weight": 1.0
     },
     {
@@ -10631,7 +10852,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/crm/lead-capture-form.test.tsx",
-      "source_location": "L18",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
@@ -10640,7 +10861,34 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/crm/lead-capture-form.test.tsx",
-      "source_location": "L18",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_crm_lead_capture_form_test_tsx",
+      "target": "lead_capture_form_test_attachevent",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/crm/lead-capture-form.test.tsx",
+      "source_location": "L38",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_crm_lead_capture_form_test_tsx",
+      "target": "lead_capture_form_test_detachevent",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/crm/lead-capture-form.test.tsx",
+      "source_location": "L39",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_crm_lead_capture_form_test_tsx",
+      "target": "lead_capture_form_test_setupfacebookform",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/crm/lead-capture-form.test.tsx",
+      "source_location": "L153",
       "weight": 1.0
     },
     {
@@ -16666,7 +16914,7 @@
     },
     {
       "source": "lib_growth_campaigns_dispatch_authority_ts",
-      "target": "node_crypto",
+      "target": "zod",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/dispatch-authority.ts",
@@ -16675,7 +16923,7 @@
     },
     {
       "source": "lib_growth_campaigns_dispatch_authority_ts",
-      "target": "lib_growth_campaigns_authority_bounds",
+      "target": "lib_growth_sequences_reviewed_recipient",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/dispatch-authority.ts",
@@ -16684,25 +16932,25 @@
     },
     {
       "source": "lib_growth_campaigns_dispatch_authority_ts",
+      "target": "node_crypto",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/dispatch-authority.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_dispatch_authority_ts",
+      "target": "lib_growth_campaigns_authority_bounds",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/dispatch-authority.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_dispatch_authority_ts",
       "target": "lib_growth_campaigns_permission_evidence",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/campaigns/dispatch-authority.ts",
-      "source_location": "L6",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_campaigns_dispatch_authority_ts",
-      "target": "lib_growth_db_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/campaigns/dispatch-authority.ts",
-      "source_location": "L7",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_campaigns_dispatch_authority_ts",
-      "target": "lib_growth_campaigns_founder_verification_reader",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/dispatch-authority.ts",
@@ -16711,7 +16959,7 @@
     },
     {
       "source": "lib_growth_campaigns_dispatch_authority_ts",
-      "target": "lib_growth_campaigns_lifecycle",
+      "target": "lib_growth_db_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/dispatch-authority.ts",
@@ -16720,7 +16968,7 @@
     },
     {
       "source": "lib_growth_campaigns_dispatch_authority_ts",
-      "target": "lib_growth_campaigns_schemas",
+      "target": "lib_growth_campaigns_founder_verification_reader",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/dispatch-authority.ts",
@@ -16729,11 +16977,29 @@
     },
     {
       "source": "lib_growth_campaigns_dispatch_authority_ts",
+      "target": "lib_growth_campaigns_lifecycle",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/dispatch-authority.ts",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_dispatch_authority_ts",
+      "target": "lib_growth_campaigns_schemas",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/dispatch-authority.ts",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_dispatch_authority_ts",
       "target": "dispatch_authority_loadcanonicaloutreachpreparation",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/campaigns/dispatch-authority.ts",
-      "source_location": "L74",
+      "source_location": "L76",
       "weight": 1.0
     },
     {
@@ -19572,42 +19838,6 @@
       "weight": 1.0
     },
     {
-      "source": "lib_growth_crm_view_service_ts",
-      "target": "lib_growth_db_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/crm/view-service.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_crm_view_service_ts",
-      "target": "lib_growth_crm_errors",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/crm/view-service.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_crm_view_service_ts",
-      "target": "lib_growth_crm_schemas",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/crm/view-service.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_crm_view_service_ts",
-      "target": "view_service_executeviewcommand",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/crm/view-service.ts",
-      "source_location": "L9",
-      "weight": 1.0
-    },
-    {
       "source": "app_api_cron_gmail_sync_route_ts__route_get",
       "target": "runtime_readcronenv",
       "relation": "calls",
@@ -19615,6 +19845,16 @@
       "confidence_score": 0.8,
       "source_file": "app/api/cron/gmail-sync/route.ts",
       "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "command_form_async",
+      "target": "signing_deadline_actions_run",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/growth/crm/command-form.tsx",
+      "source_location": "L55",
       "weight": 1.0
     },
     {
@@ -20154,7 +20394,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/dispatch-authority.ts",
-      "source_location": "L111",
+      "source_location": "L113",
       "weight": 1.0
     },
     {
@@ -20164,7 +20404,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/dispatch-authority.ts",
-      "source_location": "L179",
+      "source_location": "L192",
       "weight": 1.0
     },
     {
@@ -20174,7 +20414,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/dispatch-authority.ts",
-      "source_location": "L196",
+      "source_location": "L209",
       "weight": 1.0
     },
     {
@@ -20184,7 +20424,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/dispatch-authority.ts",
-      "source_location": "L224",
+      "source_location": "L237",
       "weight": 1.0
     },
     {
@@ -20194,7 +20434,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/dispatch-authority.ts",
-      "source_location": "L231",
+      "source_location": "L244",
       "weight": 1.0
     },
     {
@@ -20685,6 +20925,42 @@
       "confidence_score": 0.8,
       "source_file": "lib/growth/crm/task-service.ts",
       "source_location": "L29",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_crm_view_service_ts",
+      "target": "lib_growth_db_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/crm/view-service.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_crm_view_service_ts",
+      "target": "lib_growth_crm_errors",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/crm/view-service.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_crm_view_service_ts",
+      "target": "lib_growth_crm_schemas",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/crm/view-service.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_crm_view_service_ts",
+      "target": "view_service_executeviewcommand",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/crm/view-service.ts",
+      "source_location": "L9",
       "weight": 1.0
     },
     {
@@ -23388,6 +23664,267 @@
       "weight": 1.0
     },
     {
+      "source": "lib_growth_facebook_scheduled_discovery_test_ts",
+      "target": "strict",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/scheduled-discovery.test.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_scheduled_discovery_test_ts",
+      "target": "node_crypto",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/scheduled-discovery.test.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_scheduled_discovery_test_ts",
+      "target": "node_fs",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/scheduled-discovery.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_scheduled_discovery_test_ts",
+      "target": "node_os",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/scheduled-discovery.test.ts",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_scheduled_discovery_test_ts",
+      "target": "node_path",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/scheduled-discovery.test.ts",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_scheduled_discovery_test_ts",
+      "target": "node_test",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/scheduled-discovery.test.ts",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_scheduled_discovery_test_ts",
+      "target": "lib_growth_facebook_scheduled_discovery",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/scheduled-discovery.test.ts",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_scheduled_discovery_test_ts",
+      "target": "scheduled_discovery_test_request",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/scheduled-discovery.test.ts",
+      "source_location": "L37",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_scheduled_discovery_ts",
+      "target": "node_crypto",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_scheduled_discovery_ts",
+      "target": "node_fs",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_scheduled_discovery_ts",
+      "target": "node_path",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_scheduled_discovery_ts",
+      "target": "promises",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_scheduled_discovery_ts",
+      "target": "zod",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_scheduled_discovery_ts",
+      "target": "lib_growth_research_scheduled_agent_runner",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_scheduled_discovery_ts",
+      "target": "lib_growth_research_restricted_research_child",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_scheduled_discovery_ts",
+      "target": "lib_growth_facebook_contracts",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_scheduled_discovery_ts",
+      "target": "lib_growth_facebook_service",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_scheduled_discovery_ts",
+      "target": "scheduled_discovery_buildfacebookrunid",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L67",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_scheduled_discovery_ts",
+      "target": "scheduled_discovery_researchpublicdestinations",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L73",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_scheduled_discovery_ts",
+      "target": "scheduled_discovery_ensureprivatedirectory",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L119",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_scheduled_discovery_ts",
+      "target": "scheduled_discovery_readprivatefile",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L136",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_scheduled_discovery_ts",
+      "target": "scheduled_discovery_removependingbody",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L163",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_scheduled_discovery_ts",
+      "target": "scheduled_discovery_publishprivatefile",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L172",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_scheduled_discovery_ts",
+      "target": "scheduled_discovery_runfacebookdiscovery",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L193",
+      "weight": 1.0
+    },
+    {
+      "source": "scheduled_discovery_runfacebookdiscovery",
+      "target": "scheduled_discovery_buildfacebookrunid",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L200",
+      "weight": 1.0
+    },
+    {
+      "source": "scheduled_discovery_runfacebookdiscovery",
+      "target": "scheduled_discovery_ensureprivatedirectory",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L206",
+      "weight": 1.0
+    },
+    {
+      "source": "scheduled_discovery_runfacebookdiscovery",
+      "target": "scheduled_discovery_readprivatefile",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L207",
+      "weight": 1.0
+    },
+    {
+      "source": "scheduled_discovery_runfacebookdiscovery",
+      "target": "scheduled_discovery_removependingbody",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L210",
+      "weight": 1.0
+    },
+    {
+      "source": "scheduled_discovery_runfacebookdiscovery",
+      "target": "scheduled_discovery_publishprivatefile",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L240",
+      "weight": 1.0
+    },
+    {
       "source": "lib_growth_facebook_service_ts",
       "target": "node_crypto",
       "relation": "imports_from",
@@ -23506,7 +24043,7 @@
     },
     {
       "source": "lib_growth_facebook_service_ts",
-      "target": "service_audit",
+      "target": "service_validatefacebookdiscoverybatch",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/facebook/service.ts",
@@ -23515,11 +24052,20 @@
     },
     {
       "source": "lib_growth_facebook_service_ts",
+      "target": "service_audit",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/service.ts",
+      "source_location": "L81",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_facebook_service_ts",
       "target": "service_executefacebookcommand",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/facebook/service.ts",
-      "source_location": "L87",
+      "source_location": "L98",
       "weight": 1.0
     },
     {
@@ -23528,7 +24074,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/facebook/service.ts",
-      "source_location": "L219",
+      "source_location": "L230",
+      "weight": 1.0
+    },
+    {
+      "source": "service_validatefacebookdiscoverybatch",
+      "target": "service_validateobservation",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/facebook/service.ts",
+      "source_location": "L76",
       "weight": 1.0
     },
     {
@@ -23537,16 +24092,16 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/facebook/service.ts",
-      "source_location": "L96",
+      "source_location": "L107",
       "weight": 1.0
     },
     {
       "source": "service_ingestfacebookdiscovery",
-      "target": "service_validateobservation",
+      "target": "service_validatefacebookdiscoverybatch",
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/facebook/service.ts",
-      "source_location": "L237",
+      "source_location": "L245",
       "weight": 1.0
     },
     {
@@ -23555,7 +24110,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/facebook/service.ts",
-      "source_location": "L241",
+      "source_location": "L246",
       "weight": 1.0
     },
     {
@@ -27705,6 +28260,51 @@
       "confidence": "EXTRACTED",
       "source_file": "lib/growth/research/repository.ts",
       "source_location": "L48",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_restricted_research_child_ts",
+      "target": "node_child_process",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/restricted-research-child.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_restricted_research_child_ts",
+      "target": "node_fs",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/restricted-research-child.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_restricted_research_child_ts",
+      "target": "node_os",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/restricted-research-child.ts",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_restricted_research_child_ts",
+      "target": "node_path",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/restricted-research-child.ts",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_research_restricted_research_child_ts",
+      "target": "restricted_research_child_runrestrictedresearchchild",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/research/restricted-research-child.ts",
+      "source_location": "L20",
       "weight": 1.0
     },
     {
@@ -33657,165 +34257,13 @@
       "weight": 1.0
     },
     {
-      "source": "lib_operations_agreements_engagement_command_ts",
-      "target": "zod",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/engagement-command.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_engagement_service_ts",
-      "target": "zod",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/engagement-service.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_engagement_service_ts",
-      "target": "lib_operations_auth_staff_transaction",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/engagement-service.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_engagement_service_ts",
-      "target": "lib_operations_auth_staff_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/engagement-service.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_engagement_service_ts",
-      "target": "lib_operations_db_client",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/engagement-service.ts",
-      "source_location": "L4",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_engagement_service_ts",
-      "target": "lib_operations_agreements_engagement_command",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/engagement-service.ts",
-      "source_location": "L5",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_engagement_service_ts",
-      "target": "engagement_service_engagementcommandconflict",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/engagement-service.ts",
-      "source_location": "L13",
-      "weight": 1.0
-    },
-    {
-      "source": "engagement_service_engagementcommandconflict",
-      "target": "engagement_service_engagementcommandconflict_constructor",
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/engagement-service.ts",
+      "source": "view_service_executeviewcommand",
+      "target": "change_requests_test_tx",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/crm/view-service.ts",
       "source_location": "L14",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_engagement_service_ts",
-      "target": "engagement_service_completestaffengagementcommand",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/engagement-service.ts",
-      "source_location": "L22",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_fixtures_ts",
-      "target": "lib_operations_agreements_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/fixtures.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_fixtures_ts",
-      "target": "fixtures_agreementdraft",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/fixtures.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_fixtures_ts",
-      "target": "fixtures_signatureevidence",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/fixtures.ts",
-      "source_location": "L39",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_lifecycle_service_ts",
-      "target": "zod",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/lifecycle-service.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_lifecycle_service_ts",
-      "target": "lib_operations_db_client",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/lifecycle-service.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_lifecycle_service_ts",
-      "target": "lib_operations_auth_staff_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/lifecycle-service.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_lifecycle_service_ts",
-      "target": "lib_operations_auth_staff_transaction",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/lifecycle-service.ts",
-      "source_location": "L4",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_lifecycle_service_ts",
-      "target": "lib_operations_agreements_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/lifecycle-service.ts",
-      "source_location": "L5",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_lifecycle_service_ts",
-      "target": "lifecycle_service_changestaffagreementlifecycle",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/lifecycle-service.ts",
-      "source_location": "L15",
       "weight": 1.0
     },
     {
@@ -33886,6 +34334,46 @@
       "confidence_score": 0.8,
       "source_file": "lib/growth/facebook/read-route-handler.test.ts",
       "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "scheduled_discovery_buildfacebookrunid",
+      "target": "scheduled_agent_runner_buildweekdayexternalrunid",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L68",
+      "weight": 1.0
+    },
+    {
+      "source": "scheduled_discovery_researchpublicdestinations",
+      "target": "restricted_research_child_runrestrictedresearchchild",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L110",
+      "weight": 1.0
+    },
+    {
+      "source": "scheduled_discovery_runfacebookdiscovery",
+      "target": "service_validatefacebookdiscoverybatch",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L236",
+      "weight": 1.0
+    },
+    {
+      "source": "scheduled_discovery_runfacebookdiscovery",
+      "target": "research_email_send_route_test_request",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L274",
       "weight": 1.0
     },
     {
@@ -34949,16 +35437,6 @@
       "weight": 1.0
     },
     {
-      "source": "builder_draft_service_test_completedraft",
-      "target": "fixtures_agreementdraft",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/operations/agreements/builder-draft-service.test.ts",
-      "source_location": "L44",
-      "weight": 1.0
-    },
-    {
       "source": "builder_draft_service_toagreementdraft",
       "target": "builder_draft_validation_validateagreementbuilderdraft",
       "relation": "calls",
@@ -34989,16 +35467,6 @@
       "weight": 1.0
     },
     {
-      "source": "builder_draft_validation_test_content",
-      "target": "fixtures_agreementdraft",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/operations/agreements/builder-draft-validation.test.ts",
-      "source_location": "L8",
-      "weight": 1.0
-    },
-    {
       "source": "builder_draft_validation_validateagreementbuilderdraft",
       "target": "builder_draft_validation_messages_buildervalidationissues",
       "relation": "calls",
@@ -35019,13 +35487,165 @@
       "weight": 1.0
     },
     {
-      "source": "commercial_types_test_recurringdraft",
+      "source": "lib_operations_agreements_engagement_command_ts",
+      "target": "zod",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/engagement-command.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_engagement_service_ts",
+      "target": "zod",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/engagement-service.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_engagement_service_ts",
+      "target": "lib_operations_auth_staff_transaction",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/engagement-service.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_engagement_service_ts",
+      "target": "lib_operations_auth_staff_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/engagement-service.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_engagement_service_ts",
+      "target": "lib_operations_db_client",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/engagement-service.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_engagement_service_ts",
+      "target": "lib_operations_agreements_engagement_command",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/engagement-service.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_engagement_service_ts",
+      "target": "engagement_service_engagementcommandconflict",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/engagement-service.ts",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "engagement_service_engagementcommandconflict",
+      "target": "engagement_service_engagementcommandconflict_constructor",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/engagement-service.ts",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_engagement_service_ts",
+      "target": "engagement_service_completestaffengagementcommand",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/engagement-service.ts",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_fixtures_ts",
+      "target": "lib_operations_agreements_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/fixtures.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_fixtures_ts",
       "target": "fixtures_agreementdraft",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/operations/agreements/commercial-types.test.ts",
-      "source_location": "L21",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/fixtures.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_fixtures_ts",
+      "target": "fixtures_signatureevidence",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/fixtures.ts",
+      "source_location": "L39",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_lifecycle_service_ts",
+      "target": "zod",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/lifecycle-service.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_lifecycle_service_ts",
+      "target": "lib_operations_db_client",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/lifecycle-service.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_lifecycle_service_ts",
+      "target": "lib_operations_auth_staff_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/lifecycle-service.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_lifecycle_service_ts",
+      "target": "lib_operations_auth_staff_transaction",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/lifecycle-service.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_lifecycle_service_ts",
+      "target": "lib_operations_agreements_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/lifecycle-service.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_lifecycle_service_ts",
+      "target": "lifecycle_service_changestaffagreementlifecycle",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/lifecycle-service.ts",
+      "source_location": "L15",
       "weight": 1.0
     },
     {
@@ -38680,6 +39300,60 @@
       "confidence": "EXTRACTED",
       "source_file": "scripts/refresh-pending-first-email-drafts.ts",
       "source_location": "L217",
+      "weight": 1.0
+    },
+    {
+      "source": "scripts_run_scheduled_facebook_discovery_ts",
+      "target": "node_child_process",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/run-scheduled-facebook-discovery.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "scripts_run_scheduled_facebook_discovery_ts",
+      "target": "node_os",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/run-scheduled-facebook-discovery.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "scripts_run_scheduled_facebook_discovery_ts",
+      "target": "node_path",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/run-scheduled-facebook-discovery.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "scripts_run_scheduled_facebook_discovery_ts",
+      "target": "node_url",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/run-scheduled-facebook-discovery.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "scripts_run_scheduled_facebook_discovery_ts",
+      "target": "lib_growth_facebook_scheduled_discovery",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/run-scheduled-facebook-discovery.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "scripts_run_scheduled_facebook_discovery_ts",
+      "target": "run_scheduled_facebook_discovery_main",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/run-scheduled-facebook-discovery.ts",
+      "source_location": "L8",
       "weight": 1.0
     },
     {
@@ -42495,7 +43169,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "tests/integration/growth/reservation-assertions.ts",
-      "source_location": "L102",
+      "source_location": "L111",
       "weight": 1.0
     },
     {
@@ -42505,7 +43179,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "tests/integration/growth/reservation-assertions.ts",
-      "source_location": "L702",
+      "source_location": "L723",
       "weight": 1.0
     },
     {
@@ -42525,7 +43199,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "tests/integration/growth/reservation-campaign-assertions.ts",
-      "source_location": "L427",
+      "source_location": "L429",
       "weight": 1.0
     },
     {
@@ -42535,7 +43209,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "tests/integration/growth/reservation-campaign-assertions.ts",
-      "source_location": "L558",
+      "source_location": "L560",
       "weight": 1.0
     },
     {
@@ -42545,7 +43219,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "tests/integration/growth/reservation-campaign-assertions.ts",
-      "source_location": "L608",
+      "source_location": "L610",
       "weight": 1.0
     },
     {
@@ -42919,13 +43593,33 @@
       "weight": 1
     },
     {
+      "source": "components_growth_crm_command_form_tsx",
+      "target": "lib_growth_crm_schemas_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/growth/crm/command-form.tsx",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "components_growth_crm_facebook_source_form_tsx",
+      "target": "components_growth_crm_command_form_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/growth/crm/facebook-source-form.tsx",
+      "source_location": "L5",
+      "weight": 1
+    },
+    {
       "source": "components_growth_crm_facebook_source_form_tsx",
       "target": "components_growth_crm_facebook_source_values_ts",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "components/growth/crm/facebook-source-form.tsx",
-      "source_location": "L6",
+      "source_location": "L7",
       "weight": 1
     },
     {
@@ -42966,6 +43660,16 @@
       "confidence_score": 1,
       "source_file": "components/growth/crm/lead-capture-form.tsx",
       "source_location": "L6",
+      "weight": 1
+    },
+    {
+      "source": "components_growth_crm_lead_capture_form_tsx",
+      "target": "components_growth_crm_command_form_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/growth/crm/lead-capture-form.tsx",
+      "source_location": "L8",
       "weight": 1
     },
     {
@@ -44950,7 +45654,7 @@
     },
     {
       "source": "lib_growth_campaigns_dispatch_authority_ts",
-      "target": "lib_growth_campaigns_authority_bounds_ts",
+      "target": "lib_growth_sequences_reviewed_recipient_ts",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1,
@@ -44960,17 +45664,17 @@
     },
     {
       "source": "lib_growth_campaigns_dispatch_authority_ts",
-      "target": "lib_growth_campaigns_permission_evidence_ts",
+      "target": "lib_growth_campaigns_authority_bounds_ts",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/campaigns/dispatch-authority.ts",
-      "source_location": "L6",
+      "source_location": "L4",
       "weight": 1
     },
     {
       "source": "lib_growth_campaigns_dispatch_authority_ts",
-      "target": "lib_growth_campaigns_founder_verification_reader_ts",
+      "target": "lib_growth_campaigns_permission_evidence_ts",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1,
@@ -44980,12 +45684,22 @@
     },
     {
       "source": "lib_growth_campaigns_dispatch_authority_ts",
+      "target": "lib_growth_campaigns_founder_verification_reader_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/campaigns/dispatch-authority.ts",
+      "source_location": "L10",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_campaigns_dispatch_authority_ts",
       "target": "lib_growth_campaigns_lifecycle_ts",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/campaigns/dispatch-authority.ts",
-      "source_location": "L9",
+      "source_location": "L11",
       "weight": 1
     },
     {
@@ -44995,7 +45709,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "lib/growth/campaigns/dispatch-authority.ts",
-      "source_location": "L10",
+      "source_location": "L12",
       "weight": 1
     },
     {
@@ -46496,6 +47210,56 @@
       "confidence_score": 1,
       "source_file": "lib/growth/facebook/route-handler.ts",
       "source_location": "L9",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_facebook_scheduled_discovery_test_ts",
+      "target": "lib_growth_facebook_scheduled_discovery_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/facebook/scheduled-discovery.test.ts",
+      "source_location": "L14",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_facebook_scheduled_discovery_ts",
+      "target": "lib_growth_research_scheduled_agent_runner_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L18",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_facebook_scheduled_discovery_ts",
+      "target": "lib_growth_research_restricted_research_child_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L19",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_facebook_scheduled_discovery_ts",
+      "target": "lib_growth_facebook_contracts_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L23",
+      "weight": 1
+    },
+    {
+      "source": "lib_growth_facebook_scheduled_discovery_ts",
+      "target": "lib_growth_facebook_service_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "lib/growth/facebook/scheduled-discovery.ts",
+      "source_location": "L27",
       "weight": 1
     },
     {
@@ -50186,6 +50950,16 @@
       "confidence_score": 1,
       "source_file": "scripts/refresh-pending-first-email-drafts.ts",
       "source_location": "L11",
+      "weight": 1
+    },
+    {
+      "source": "scripts_run_scheduled_facebook_discovery_ts",
+      "target": "lib_growth_facebook_scheduled_discovery_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "scripts/run-scheduled-facebook-discovery.ts",
+      "source_location": "L5",
       "weight": 1
     },
     {
