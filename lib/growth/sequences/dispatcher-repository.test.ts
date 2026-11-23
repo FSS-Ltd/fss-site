@@ -275,3 +275,27 @@ test("preparation refuses content changed after the claim", async () => {
     reason: "claimed_content_changed",
   });
 });
+
+test("claim and expired cleanup are both scoped to the selected provider", async () => {
+  for (const channel of [undefined, "resend"] as const) {
+    const db = fakeDb(() => []);
+    await postgresSequenceDispatchRepository.claimDueMessage(db, {
+      now: new Date(),
+      leaseToken: "test-lease",
+      leaseExpiresAt: new Date(),
+      ...(channel ? { channel } : {}),
+    });
+    const queries = queriesOf(db);
+    const cleanup = queries.find((q) =>
+      q.text.startsWith("select r.id from growth.outreach_reservations"),
+    );
+    const claim = queries.find((q) => q.text.startsWith("with target"));
+    assert.ok(cleanup && claim);
+    for (const query of [cleanup, claim]) {
+      assert.match(query.text, /em\.channel=\?/);
+      assert.ok(query.values.includes(channel ?? "gmail"));
+      assert.match(query.text, /em\.step_number=0/);
+      assert.match(query.text, /c\.policy->>'provider'='resend'/);
+    }
+  }
+});

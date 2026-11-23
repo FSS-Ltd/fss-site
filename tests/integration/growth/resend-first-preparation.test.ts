@@ -7,6 +7,7 @@ import { executeCampaignCommand } from "../../../lib/growth/campaigns/commands";
 import { campaignPolicyDefinitionSchema } from "../../../lib/growth/campaigns/schemas";
 import { serializeCampaignDefinition } from "../../../lib/growth/campaigns/lifecycle";
 import { runFirstPreparationBatch } from "../../../lib/growth/campaigns/first-preparation-worker";
+import { postgresSequenceDispatchRepository } from "../../../lib/growth/sequences/dispatcher-repository";
 import { loadReviewMembershipPreparationAuthority } from "../../../lib/growth/campaigns/founder-verification-reader";
 import { ingestResearchRun } from "../../../lib/growth/research/ingest";
 import { createGlobalResearchFixture } from "../../../lib/growth/research/global-test-fixture";
@@ -279,11 +280,13 @@ test(
           await tx`reset role`;
           const [prepared] = await tx<
             {
+              id: string;
+              sequenceId: string;
               channel: string;
               status: string;
               metadata: { copyFamilyVersion: number; copyFamilySha256: string };
             }[]
-          >`select em.channel,em.status,em.controlled_preparation as metadata from growth.campaign_memberships m join growth.email_messages em on em.sequence_enrollment_id=m.sequence_id where m.id=${member.id}`;
+          >`select em.id,em.sequence_enrollment_id as "sequenceId",em.channel,em.status,em.controlled_preparation as metadata from growth.campaign_memberships m join growth.email_messages em on em.sequence_enrollment_id=m.sequence_id where m.id=${member.id}`;
           assert.equal(prepared?.channel, "resend");
           assert.equal(prepared?.status, "queued");
           assert.equal(prepared?.metadata.copyFamilyVersion, 1);
@@ -291,6 +294,39 @@ test(
             prepared?.metadata.copyFamilySha256 ?? "",
             /^[a-f0-9]{64}$/,
           );
+          assert.ok(prepared);
+          const oldLease = randomUUID(),
+            reservation = randomUUID();
+          await tx`update growth.email_messages set status='sending',outreach_guarded_claim=true,outreach_claim_previous_status='queued',lease_token=${oldLease},lease_expires_at=clock_timestamp()-interval '1 minute',attempt_count=1 where id=${prepared.id}`;
+          await tx`insert into growth.outreach_reservations(id,idempotency_key,campaign_id,policy_version,membership_id,email_message_id,sequence_id,account_id,london_day,connection_id,outreach_provider,resend_send_generation,recipient_count,authority_fingerprint,lease_token,lease_until,fence)
+            values (${reservation},${randomUUID()},${campaignId},1,${member.id},${prepared.id},${prepared.sequenceId},${id},current_date,${id},'resend',${binding.sendGeneration},1,repeat('a',64),${oldLease},clock_timestamp()-interval '1 minute',1)`;
+          const claimInput = {
+            now: new Date(),
+            leaseToken: randomUUID(),
+            leaseExpiresAt: new Date(Date.now() + 60000),
+            messageId: prepared.id,
+          };
+          assert.equal(
+            await postgresSequenceDispatchRepository.claimDueMessage(
+              db,
+              claimInput,
+            ),
+            null,
+          );
+          const [untouched] = await tx<
+            { status: string }[]
+          >`select status from growth.outreach_reservations where id=${reservation}`;
+          assert.equal(untouched?.status, "reserved");
+          const claimed =
+            await postgresSequenceDispatchRepository.claimDueMessage(db, {
+              ...claimInput,
+              channel: "resend",
+            });
+          assert.equal(claimed?.id, prepared.id);
+          const [cancelled] = await tx<
+            { status: string }[]
+          >`select status from growth.outreach_reservations where id=${reservation}`;
+          assert.equal(cancelled?.status, "cancelled");
           throw rollback;
         }),
         (error) => error === rollback,

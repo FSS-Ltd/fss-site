@@ -96,6 +96,7 @@ export interface SequenceDispatchRepository {
       leaseExpiresAt: Date;
       messageId?: string;
       excludeMessageIds?: readonly string[];
+      channel?: "gmail" | "resend";
     },
   ): Promise<ClaimedMessage | null>;
   getSendContext(
@@ -247,6 +248,7 @@ async function claimDueMessage(
     leaseExpiresAt: Date;
     messageId?: string;
     excludeMessageIds?: readonly string[];
+    channel?: "gmail" | "resend";
   },
 ): Promise<ClaimedMessage | null> {
   return withGrowthTransaction(db, async (tx) => {
@@ -254,7 +256,13 @@ async function claimDueMessage(
     const [expired] = await tx<{ id: string }[]>`
       select r.id from growth.outreach_reservations r
       join growth.email_messages em on em.id=r.email_message_id
-      where r.status='reserved' and r.connection_id is not null
+      where em.channel=${input.channel ?? "gmail"}
+        and (${input.channel ?? "gmail"}='gmail' or (em.step_number=0 and exists (
+          select 1 from growth.campaign_memberships m
+          join growth.campaigns c on c.id=m.campaign_id and c.version=m.policy_version
+          where m.sequence_id=em.sequence_enrollment_id and c.policy->>'provider'='resend'
+        )))
+        and r.status='reserved' and r.connection_id is not null
         and r.submitted_at is null and r.issued_snapshot is null
         and r.lease_until<=clock_timestamp() and em.status='sending'
         and em.lease_expires_at<=clock_timestamp() and em.lease_token=r.lease_token
@@ -271,7 +279,13 @@ async function claimDueMessage(
         se.template_snapshot ->> 'approvedRecipient' as "approvedRecipient"
       from growth.email_messages em
       inner join growth.sequence_enrollments se on se.id = em.sequence_enrollment_id
-      where ((
+      where em.channel=${input.channel ?? "gmail"}
+      and (${input.channel ?? "gmail"}='gmail' or (em.step_number=0 and exists (
+        select 1 from growth.campaign_memberships m
+        join growth.campaigns c on c.id=m.campaign_id and c.version=m.policy_version
+        where m.sequence_id=em.sequence_enrollment_id and c.policy->>'provider'='resend'
+      )))
+      and ((
           em.status in ('queued', 'retry') and em.scheduled_for <= ${input.now}
         ) or (
           em.status = 'sending' and em.lease_expires_at < ${input.now}
