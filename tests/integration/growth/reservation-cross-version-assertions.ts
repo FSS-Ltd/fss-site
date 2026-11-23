@@ -9,6 +9,7 @@ import { campaignMonthAnniversary } from "../../../lib/growth/campaigns/time";
 import type { CampaignPolicyDefinition } from "../../../lib/growth/campaigns/schemas";
 import { assignCampaignVariant } from "../../../lib/growth/campaigns/variants";
 import { seedSyntheticDirectSubmission } from "./synthetic-direct-submission";
+import { withTransitionClock } from "./reservation-clock";
 import {
   beginOutreachSubmission,
   reserveOutreachAttempt,
@@ -39,13 +40,22 @@ export async function exerciseCrossVersionConfirmation(
     policy: CampaignPolicyDefinition;
   },
 ): Promise<void> {
+  const [initialClock] = await admin<
+    { now: Date }[]
+  >`select clock_timestamp() as now`;
+  assert.ok(initialClock);
+  const utcHour = initialClock.now.getUTCHours();
+  const policy = {
+    ...input.policy,
+    recipientTimezone: utcHour >= 6 && utcHour <= 17 ? "UTC" : "Etc/GMT+12",
+  };
   const created = await executeCampaignCommand(
     db,
     {
       type: "create",
       requestId: randomUUID(),
       name: "Cross-version confirmation",
-      policy: input.policy,
+      policy,
     },
     input.founder,
     randomUUID(),
@@ -141,20 +151,67 @@ export async function exerciseCrossVersionConfirmation(
       .update(JSON.stringify([copy.subject, copy.html, copy.text]))
       .digest("hex");
     await admin`update growth.email_messages set subject_snapshot=${copy.subject},html_snapshot=${copy.html},text_snapshot=${copy.text},controlled_preparation=${admin.json({ version: 1, variantId, variantVersion: variant.version, observationProofId: source.id, permissionId: permission, copySha256 })} where id=${message}`;
-    const reserved = await reserveOutreachAttempt(db, {
-      messageId: message,
-      leaseToken: lease,
-      attemptKey: randomUUID(),
+    const [baseline] = await admin<
+      {
+        now: Date;
+        unbound: number;
+        globalUsed: number;
+        accountUsed: number;
+        ramp: number;
+      }[]
+    >`with sample as (select clock_timestamp() as now), usage as (select account_id from growth.outreach_provider_usage where connection_id=${input.connectionId})
+      select sample.now,
+        (select count(*)::int from growth.outreach_reservations where connection_id is null and status <> 'cancelled') as unbound,
+        count(r.id)::int as "globalUsed",
+        count(r.id) filter (where r.connection_id=${input.connectionId} or r.account_id=(select account_id from usage))::int as "accountUsed",
+        (select ramp from growth.outreach_account_controls where connection_id=${input.connectionId}) as ramp
+      from sample left join growth.outreach_reservations r on r.london_day=(sample.now at time zone 'Europe/London')::date and r.status <> 'cancelled'
+      group by sample.now`;
+    assert.ok(baseline);
+    const context = JSON.stringify({
+      version,
+      timezone: policy.recipientTimezone,
+      ...baseline,
     });
-    assert.equal(reserved.status, "ready", JSON.stringify(reserved));
+    assert.equal(baseline.unbound, 0, context);
+    assert.equal(baseline.ramp, 50, context);
+    assert.ok(
+      baseline.globalUsed < 150 && baseline.accountUsed < baseline.ramp,
+      context,
+    );
+    const clockDb = withTransitionClock(db, baseline.now, baseline.now);
+    let reserved: Awaited<ReturnType<typeof reserveOutreachAttempt>>;
+    try {
+      reserved = await reserveOutreachAttempt(clockDb, {
+        messageId: message,
+        leaseToken: lease,
+        attemptKey: randomUUID(),
+      });
+    } catch (error) {
+      throw new Error(`reservation failed: ${context}`, { cause: error });
+    }
+    assert.equal(
+      reserved.status,
+      "ready",
+      `${context} result=${JSON.stringify(reserved)}`,
+    );
     if (reserved.status !== "ready") throw new Error("reservation missing");
-    const issued = await beginOutreachSubmission(db, {
-      reservationId: reserved.value.reservationId,
-      leaseToken: lease,
-      fence: reserved.value.fence,
-      fingerprint: reserved.value.preparation.fingerprint,
-    });
-    assert.equal(issued.status, "ready");
+    let issued: Awaited<ReturnType<typeof beginOutreachSubmission>>;
+    try {
+      issued = await beginOutreachSubmission(clockDb, {
+        reservationId: reserved.value.reservationId,
+        leaseToken: lease,
+        fence: reserved.value.fence,
+        fingerprint: reserved.value.preparation.fingerprint,
+      });
+    } catch (error) {
+      throw new Error(`issuance failed: ${context}`, { cause: error });
+    }
+    assert.equal(
+      issued.status,
+      "ready",
+      `${context} result=${JSON.stringify(issued)}`,
+    );
     if (issued.status !== "ready") throw new Error("issuance missing");
     fixture.reservationId = issued.value.reservationId;
     fixture.rfc = issued.value.rfcMessageId;
@@ -192,7 +249,7 @@ export async function exerciseCrossVersionConfirmation(
         requestId: randomUUID(),
         campaignId,
         policyVersion: 1,
-        policy: { ...input.policy, version: 2 },
+        policy: { ...policy, version: 2 },
       },
       input.founder,
       randomUUID(),
