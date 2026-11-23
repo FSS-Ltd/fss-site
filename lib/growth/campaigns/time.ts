@@ -21,3 +21,15 @@ export function campaignCadenceDays(
 ): readonly [number, number] {
   return family === "review" ? [5, 10] : [2, 4];
 }
+
+/** A millisecond clock cannot represent an observation's remaining microseconds. */
+export function campaignSchedulingAnchor(
+  observedAt: Date,
+  basis: string | null,
+  hasSubMillisecond: boolean,
+): Date {
+  return new Date(
+    observedAt.getTime() +
+      (basis === "resend_fss_delivery_observed" && hasSubMillisecond ? 1 : 0),
+  );
+}

@@ -2,7 +2,11 @@ import { TZDateMini } from "@date-fns/tz";
 import { z } from "zod";
 import type { GrowthTransaction } from "../db/types";
 import { reviewedRecipientSchema } from "../sequences/reviewed-recipient";
-import { campaignCadenceDays, campaignMonthAnniversary } from "./time";
+import {
+  campaignCadenceDays,
+  campaignMonthAnniversary,
+  campaignSchedulingAnchor,
+} from "./time";
 import { websiteServiceTermsSchema } from "./website-service-offers";
 
 export const campaignSchema = z
@@ -81,6 +85,7 @@ export async function freezeCampaignConfirmation(
     sequenceId: string;
     reservationId: string;
     observedUntil: Date;
+    provider?: "gmail" | "resend";
   },
 ): Promise<void> {
   const { campaign } = input;
@@ -89,6 +94,7 @@ export async function freezeCampaignConfirmation(
     !["active", "paused"].includes(input.memberStatus) ||
     !["active", "paused"].includes(input.sequenceStatus);
   const paused =
+    input.provider === "resend" ||
     !input.policyReady ||
     input.memberStatus === "paused" ||
     input.sequenceStatus === "paused";
@@ -96,7 +102,7 @@ export async function freezeCampaignConfirmation(
   for (let index = 0; index < 2; index++) {
     const step = index + 1,
       due = addLondonDays(input.observedUntil, offsets[index]);
-    await tx`insert into growth.email_messages(sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key,scheduled_for) values (${input.sequenceId},${input.prospectId},${input.contactId},'gmail','outbound',${step},${terminal ? "cancelled" : "draft"},${`campaign-followup:${campaign.membershipId}:${step}`},${due})`;
+    await tx`insert into growth.email_messages(sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key,scheduled_for) values (${input.sequenceId},${input.prospectId},${input.contactId},${input.provider ?? "gmail"},'outbound',${step},${terminal ? "cancelled" : "draft"},${`campaign-followup:${campaign.membershipId}:${step}`},${due})`;
     await tx`insert into growth.outreach_jobs(campaign_id,policy_version,membership_id,job_type,due_at,idempotency_key,status) values (${campaign.campaignId},${campaign.policyVersion},${campaign.membershipId},'follow_up',${due},${`campaign-followup:${campaign.membershipId}:${step}`},${terminal ? "cancelled" : paused ? "held" : "pending"})`;
   }
   await reviseCampaignReportJob(tx, {
@@ -114,16 +120,31 @@ export async function reviseCampaignReportJob(
     reservationId: string;
   },
 ): Promise<void> {
-  const [anchor] = await tx<{ observedAt: Date | null }[]>`
-    select confirmation_observed_at as "observedAt" from growth.outreach_reservations
+  const [anchor] = await tx<
+    {
+      observedAt: Date | null;
+      basis: string | null;
+      hasSubMillisecond: boolean;
+    }[]
+  >`
+    select confirmation_observed_at as "observedAt",confirmation_receipt->>'basis' as basis,
+      confirmation_observed_at <> date_trunc('milliseconds',confirmation_observed_at) as "hasSubMillisecond"
+    from growth.outreach_reservations
     where id=${input.reservationId} and campaign_id=${input.campaignId} and policy_version=${input.policyVersion} and confirmation_receipt is not null`;
   if (!anchor?.observedAt) throw new Error("report_anchor_unknown");
+  const schedulingAnchor = campaignSchedulingAnchor(
+    anchor.observedAt,
+    anchor.basis,
+    anchor.hasSubMillisecond,
+  );
   const [job] = await tx<
-    { id: string; status: string; anchorAt: Date | null }[]
-  >`select j.id,j.status,r.confirmation_observed_at as "anchorAt" from growth.outreach_jobs j left join growth.outreach_reservations r on r.id=j.anchor_reservation_id where j.campaign_id=${input.campaignId} and j.job_type='monthly_report' and j.membership_id is null for update of j`;
+    { id: string; status: string; anchorAt: Date | null; later: boolean }[]
+  >`select j.id,j.status,r.confirmation_observed_at as "anchorAt",
+      r.confirmation_observed_at > (select confirmation_observed_at from growth.outreach_reservations where id=${input.reservationId}) as later
+    from growth.outreach_jobs j left join growth.outreach_reservations r on r.id=j.anchor_reservation_id where j.campaign_id=${input.campaignId} and j.job_type='monthly_report' and j.membership_id is null for update of j`;
   if (!job)
-    await tx`insert into growth.outreach_jobs(campaign_id,policy_version,job_type,due_at,idempotency_key,anchor_reservation_id,anchor_revision) values (${input.campaignId},${input.policyVersion},'monthly_report',${campaignMonthAnniversary(anchor.observedAt)},${`campaign-report:${input.campaignId}`},${input.reservationId},1)`;
+    await tx`insert into growth.outreach_jobs(campaign_id,policy_version,job_type,due_at,idempotency_key,anchor_reservation_id,anchor_revision) values (${input.campaignId},${input.policyVersion},'monthly_report',${campaignMonthAnniversary(schedulingAnchor)},${`campaign-report:${input.campaignId}`},${input.reservationId},1)`;
   else if (!job.anchorAt) throw new Error("report_anchor_unknown");
-  else if (anchor.observedAt < job.anchorAt)
-    await tx`update growth.outreach_jobs set policy_version=${input.policyVersion},anchor_reservation_id=${input.reservationId},anchor_revision=anchor_revision+1,due_at=${campaignMonthAnniversary(anchor.observedAt)},status=case when status in ('leased','completed') then 'held' else status end,lease_revision=lease_revision+1,lease_owner=null,lease_until=null where id=${job.id}`;
+  else if (job.later)
+    await tx`update growth.outreach_jobs set policy_version=${input.policyVersion},anchor_reservation_id=${input.reservationId},anchor_revision=anchor_revision+1,due_at=${campaignMonthAnniversary(schedulingAnchor)},status=case when status in ('leased','completed') then 'held' else status end,lease_revision=lease_revision+1,lease_owner=null,lease_until=null where id=${job.id}`;
 }

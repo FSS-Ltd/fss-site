@@ -6,7 +6,7 @@ import type { GrowthDb } from "../db/types";
 import { lockGmailRouting } from "../sequences/gmail-thread-association";
 import { loadReportEvidence } from "./report-evidence";
 import { buildCampaignReport } from "./report";
-import { campaignMonthAnniversary } from "./time";
+import { campaignMonthAnniversary, campaignSchedulingAnchor } from "./time";
 import { held, type ReservationOutcome } from "./reservation-shared";
 
 const fenceSchema = z.strictObject({
@@ -44,12 +44,15 @@ export async function publishMonthlyReport(
         anchorId: string;
         anchorRevision: number;
         observedAt: Date | null;
+        basis: string | null;
+        hasSubMillisecond: boolean;
       }[]
     >`
       select j.status,j.lease_owner as owner,j.lease_revision::text as revision,
         coalesce(j.lease_until>clock_timestamp() and j.due_at<=clock_timestamp(),false) as valid,
         j.policy_version as "policyVersion",j.due_at as due,j.anchor_reservation_id as "anchorId",
-        j.anchor_revision as "anchorRevision",r.confirmation_observed_at as "observedAt"
+        j.anchor_revision as "anchorRevision",r.confirmation_observed_at as "observedAt",r.confirmation_receipt->>'basis' as basis,
+        r.confirmation_observed_at <> date_trunc('milliseconds',r.confirmation_observed_at) as "hasSubMillisecond"
       from growth.outreach_jobs j left join growth.outreach_reservations r on r.id=j.anchor_reservation_id
       where j.id=${input.jobId} and j.campaign_id=${identity.campaignId} and j.job_type='monthly_report' and j.membership_id is null for update of j`;
     if (
@@ -71,7 +74,13 @@ export async function publishMonthlyReport(
       job.status !== "leased" ||
       !job.valid ||
       !job.observedAt ||
-      campaignMonthAnniversary(job.observedAt).getTime() !== job.due.getTime()
+      campaignMonthAnniversary(
+        campaignSchedulingAnchor(
+          job.observedAt,
+          job.basis,
+          job.hasSubMillisecond,
+        ),
+      ).getTime() !== job.due.getTime()
     )
       return held("job_lease_invalid");
     const evidence = await loadReportEvidence(tx, identity.campaignId, job.due);
