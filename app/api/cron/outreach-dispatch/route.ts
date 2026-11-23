@@ -6,6 +6,7 @@ import { postgresGmailSyncRepository } from "@/lib/growth/sequences/gmail-sync-r
 import { createCronRouteHandler } from "@/lib/growth/http/cron-auth";
 import { isOutreachPreparationEnabled } from "@/lib/growth/campaigns/london-preparation-slot";
 import { observeLiveGmailDueContext } from "@/lib/growth/campaigns/gmail-due-context";
+import { createLiveResendOutreachWorker } from "@/lib/growth/campaigns/resend-outreach-worker";
 import { createLiveOutreachDueWorker } from "@/lib/growth/campaigns/outreach-due-worker";
 
 import { createCronGmailClient, readCronEnv } from "../runtime";
@@ -49,6 +50,15 @@ export async function GET(request: Request): Promise<Response> {
           undefined,
           context.coverageId,
         );
+        if (process.env.GROWTH_OS_RESEND_OUTREACH_ENABLED === "true") {
+          const resend = await createLiveResendOutreachWorker({ context })(db);
+          return {
+            sync: context.syncSummary,
+            preparation,
+            dispatch: dispatchSummary,
+            resend,
+          };
+        }
         return {
           sync: context.syncSummary,
           preparation,

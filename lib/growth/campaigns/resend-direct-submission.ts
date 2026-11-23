@@ -13,6 +13,7 @@ import {
   type ResendIssuedSnapshot,
 } from "./resend-reservation-repository";
 import { withinSubmissionClock } from "./submission-clock";
+import type { GmailDueContext } from "./gmail-due-context";
 
 type Input = {
   reservationId: string;
@@ -97,8 +98,9 @@ export async function submitReservedResendOutreach(
   transportFactory: (
     credential: string,
   ) => Transport = createResendOutreachTransport,
+  gmailContext?: GmailDueContext,
 ): Promise<Result> {
-  const issued = await beginResendOutreachSubmission(db, input);
+  const issued = await beginResendOutreachSubmission(db, input, gmailContext);
   if (issued.status !== "ready") return issued;
   const {
     issuedSnapshot: snapshot,
@@ -108,6 +110,8 @@ export async function submitReservedResendOutreach(
   const runtime = readResendOutreachRuntime();
   if (
     !runtime ||
+    (gmailContext &&
+      process.env.GROWTH_OS_RESEND_OUTREACH_ENABLED !== "true") ||
     JSON.stringify(runtime.binding) !== JSON.stringify(runtimeBinding) ||
     runtime.binding.sendGeneration !== snapshot.sendGeneration ||
     runtime.binding.sender !== snapshot.from ||
@@ -124,9 +128,11 @@ export async function submitReservedResendOutreach(
         epoch: number | null;
         address: string | null;
         scopes: string[] | null;
+        coverageValid: boolean;
       }[]
     >`select r.issued_snapshot=${db.json(snapshot)} and r.issued_snapshot_hash=${snapshot.bodySha256} as matches,
-      g.id as "monitorId",g.status,g.google_subject as subject,g.version as epoch,g.subject_email as address,g.granted_scopes as scopes
+      g.id as "monitorId",g.status,g.google_subject as subject,g.version as epoch,g.subject_email as address,g.granted_scopes as scopes,
+      (${gmailContext?.coverageId ?? null}::uuid is null or exists(select 1 from growth.gmail_reply_coverage v where v.id=${gmailContext?.coverageId ?? null}::uuid and v.connection_id=g.id and v.google_subject=g.google_subject and v.grant_epoch=g.version and v.state='complete' and v.history_end=g.provider_cursor and v.observed_until<=clock_timestamp())) as "coverageValid"
       from growth.outreach_reservations r left join growth.integration_connections g on g.id=${snapshot.monitoredMailbox.connectionId} and g.provider='gmail'
       where r.id=${input.reservationId} and r.status='submitting' and r.fence=${input.fence} and r.lease_token=${input.leaseToken} and r.outreach_provider='resend'`;
     if (!stored?.matches)
@@ -138,6 +144,7 @@ export async function submitReservedResendOutreach(
       stored.subject !== monitor.googleSubject ||
       stored.epoch !== monitor.grantEpoch ||
       stored.address !== monitor.address ||
+      !stored.coverageValid ||
       !stored.scopes ||
       !sameAccountScopes(stored.scopes, monitor.grantedScopes)
     )
@@ -154,9 +161,12 @@ export async function submitReservedResendOutreach(
         const current = readResendOutreachRuntime();
         return (
           !!current &&
+          (!gmailContext ||
+            process.env.GROWTH_OS_RESEND_OUTREACH_ENABLED === "true") &&
           JSON.stringify(current.binding) === JSON.stringify(runtime.binding) &&
           current.sendCredential === runtime.sendCredential &&
           current.usageCredential === runtime.usageCredential &&
+          current.webhookSecret === runtime.webhookSecret &&
           withinSubmissionClock(submissionClock, new Date())
         );
       },

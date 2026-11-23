@@ -4,12 +4,15 @@ import { mock } from "node:test";
 import { Webhook } from "svix";
 import type { GrowthDb, GrowthTransaction } from "../../../lib/growth/db/types";
 import { createResendConfirmation } from "../../../lib/growth/campaigns/resend-confirmation";
+import { createLiveResendOutreachWorker } from "../../../lib/growth/campaigns/resend-outreach-worker";
+import { claimResendFollowUps } from "../../../lib/growth/campaigns/resend-follow-up-due";
 import { loadResendFollowUpAnchor } from "../../../lib/growth/campaigns/resend-follow-up-anchor";
 import { prepareResendFollowUp } from "../../../lib/growth/campaigns/prepare-follow-up";
 import { reserveResendOutreachAttempt } from "../../../lib/growth/campaigns/resend-reservation-repository";
 import { submitReservedResendOutreach } from "../../../lib/growth/campaigns/resend-direct-submission";
 import { createResendOutreachTransport } from "../../../lib/growth/integrations/resend/outreach-transport";
 import { postgresSequenceDispatchRepository } from "../../../lib/growth/sequences/dispatcher-repository";
+import type { GmailDueContext } from "../../../lib/growth/campaigns/gmail-due-context";
 import type { ResendRuntimeConfiguration } from "../../../lib/growth/campaigns/resend-account-control";
 
 // Replace only database clock reads inside this rollback-only synthetic fixture.
@@ -133,14 +136,103 @@ export async function exerciseResendFollowUp(
   const coverageId = randomUUID();
   await tx`update growth.integration_connections set provider_cursor='301' where id=${input.gmailId}`;
   await tx`insert into growth.gmail_reply_coverage(id,connection_id,grant_epoch,google_subject,history_start,history_end,observed_from,observed_until,head_requested_at,head_responded_at,state) values (${coverageId},${input.gmailId},1,'test-subject','300','301',${new Date(at.getTime() - 1000)},${before},${before},${before},'complete')`;
-  await tx`update growth.outreach_jobs set status='leased',lease_owner='resend-followup-test',lease_revision=lease_revision+1,lease_until=${expiry} where id=${job.id}`;
-  const [leased] = await tx<
-    { revision: string }[]
-  >`select lease_revision::text as revision from growth.outreach_jobs where id=${job.id}`;
-  assert.ok(leased);
+  // Test-only representation; the production route supplies the branded result of its actual sync.
+  const gmailContext = {
+    bound: {
+      binding: {
+        connectionId: input.gmailId,
+        googleSubject: "test-subject",
+        grantEpoch: 1,
+        grantedScopes: scopes,
+      },
+    },
+    coverageId,
+    usage: { status: "complete" },
+  } as unknown as GmailDueContext;
   const futureDb = withFixtureClock(db, future);
   mock.timers.enable({ apis: ["Date"], now: future });
   try {
+    const workerRollback = new Error("restore worker fixture");
+    const originalFetch = globalThis.fetch;
+    let providerReads = 0,
+      providerPosts = 0;
+    globalThis.fetch = async (resource, init) => {
+      if (
+        String(resource) === "https://api.resend.com/emails" &&
+        init?.method === "POST"
+      ) {
+        providerPosts++;
+        const body = JSON.parse(String(init.body));
+        assert.deepEqual(body.headers, {
+          "In-Reply-To": "<first@example.test>",
+          References: "<first@example.test>",
+        });
+        return Response.json({ id: "worker-followup-id" });
+      }
+      assert.equal(String(resource), "https://api.resend.com/usage");
+      assert.equal(init?.method, "GET");
+      providerReads++;
+      return Response.json({
+        object: "usage",
+        emails: { daily: window, monthly: window },
+        rate_limit: { limit: 1, duration: "1000ms" },
+      });
+    };
+    try {
+      await assert.rejects(
+        tx.savepoint(async () => {
+          const outcome = await createLiveResendOutreachWorker({
+            context: gmailContext,
+            prepareOnly: true,
+          })(futureDb);
+          assert.equal(outcome.status, "complete", JSON.stringify(outcome));
+          assert.equal(outcome.followUpClaimed, 1);
+          assert.equal(outcome.followUpPrepared, 1);
+          assert.equal(outcome.followUpHeld, 0);
+          throw workerRollback;
+        }),
+        (error) => error === workerRollback,
+      );
+      assert.equal(providerReads, 1);
+      assert.equal(providerPosts, 0);
+      await assert.rejects(
+        tx.savepoint(async () => {
+          const outcome = await createLiveResendOutreachWorker({
+            context: gmailContext,
+          })(futureDb);
+          assert.equal(outcome.status, "complete", JSON.stringify(outcome));
+          assert.equal(outcome.followUpPrepared, 1);
+          assert.equal(outcome.accepted, 1);
+          throw workerRollback;
+        }),
+        (error) => error === workerRollback,
+      );
+      assert.equal(providerReads, 2);
+      assert.equal(providerPosts, 1);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+    const claimInput = {
+      connectionId: input.connectionId,
+      runtime: input.runtime,
+      coverageId,
+      workerId: "resend-followup-test",
+      limit: 1,
+    };
+    assert.deepEqual(
+      await claimResendFollowUps(futureDb, {
+        ...claimInput,
+        coverageId: randomUUID(),
+      }),
+      [],
+    );
+    const [stillHeld] = await tx<
+      { status: string }[]
+    >`select status from growth.outreach_jobs where id=${job.id}`;
+    assert.equal(stillHeld?.status, "held");
+    const [leased] = await claimResendFollowUps(futureDb, claimInput);
+    assert.equal(leased?.id, job.id);
+    assert.ok(leased);
     const prepareInput = {
       jobId: job.id,
       leaseOwner: "resend-followup-test",
@@ -190,12 +282,16 @@ export async function exerciseResendFollowUp(
       },
     );
     assert.equal(claimed?.id, prepared.value.messageId);
-    const reserved = await reserveResendOutreachAttempt(futureDb, {
-      messageId: prepared.value.messageId,
-      leaseToken,
-      attemptKey: randomUUID(),
-      coverageId,
-    });
+    const reserved = await reserveResendOutreachAttempt(
+      futureDb,
+      {
+        messageId: prepared.value.messageId,
+        leaseToken,
+        attemptKey: randomUUID(),
+        coverageId,
+      },
+      gmailContext,
+    );
     assert.equal(reserved.status, "ready", JSON.stringify(reserved));
     if (reserved.status !== "ready") return;
     assert.equal(
@@ -216,18 +312,84 @@ export async function exerciseResendFollowUp(
       fingerprint: reserved.value.preparation.fingerprint,
       coverageId,
     };
+    process.env.GROWTH_OS_RESEND_OUTREACH_ENABLED = "false";
+    assert.deepEqual(
+      await submitReservedResendOutreach(
+        futureDb,
+        submitInput,
+        undefined,
+        gmailContext,
+      ),
+      { status: "held", reason: "reply_coverage_unknown" },
+    );
+    process.env.GROWTH_OS_RESEND_OUTREACH_ENABLED = "true";
+    await tx`update growth.integration_connections set provider_cursor='302' where id=${input.gmailId}`;
+    assert.deepEqual(
+      await submitReservedResendOutreach(
+        futureDb,
+        submitInput,
+        undefined,
+        gmailContext,
+      ),
+      { status: "held", reason: "reply_coverage_unknown" },
+    );
+    await tx`update growth.integration_connections set provider_cursor='301' where id=${input.gmailId}`;
     await tx`insert into growth.suppressions(normalised_email,reason,source,created_by) values (${input.recipient},'opt_out','manual','test')`;
     assert.equal(
-      (await submitReservedResendOutreach(futureDb, submitInput)).status,
+      (
+        await submitReservedResendOutreach(
+          futureDb,
+          submitInput,
+          undefined,
+          gmailContext,
+        )
+      ).status,
       "held",
     );
     await tx`delete from growth.suppressions where normalised_email=${input.recipient}`;
     await tx`update growth.integration_connections set version=version+1 where id=${input.gmailId}`;
     assert.equal(
-      (await submitReservedResendOutreach(futureDb, submitInput)).status,
+      (
+        await submitReservedResendOutreach(
+          futureDb,
+          submitInput,
+          undefined,
+          gmailContext,
+        )
+      ).status,
       "held",
     );
     await tx`update growth.integration_connections set version=version-1 where id=${input.gmailId}`;
+    const preflightRollback = new Error("restore preflight fixture");
+    await assert.rejects(
+      tx.savepoint(async (sp) => {
+        const changedDb = new Proxy(futureDb, {
+          apply(target, receiver, args: [TemplateStringsArray, ...unknown[]]) {
+            if (args[0].join("?").includes('g.id as "monitorId"')) {
+              return (async () => {
+                await sp`update growth.integration_connections set provider_cursor='302' where id=${input.gmailId}`;
+                return Reflect.apply(target, receiver, args);
+              })();
+            }
+            return Reflect.apply(target, receiver, args);
+          },
+        });
+        const stopped = await submitReservedResendOutreach(
+          changedDb,
+          submitInput,
+          () => {
+            throw new Error("unexpected network");
+          },
+          gmailContext,
+        );
+        assert.deepEqual(stopped, {
+          status: "uncertain",
+          reason: "binding_changed",
+        });
+        throw preflightRollback;
+      }),
+      (error) => error === preflightRollback,
+    );
     let posts = 0;
     const result = await submitReservedResendOutreach(
       futureDb,
@@ -250,6 +412,7 @@ export async function exerciseResendFollowUp(
             return Response.json({ id: "followup-synthetic-id" });
           },
         }),
+      gmailContext,
     );
     assert.equal(result.status, "accepted", JSON.stringify(result));
     assert.equal(posts, 1);

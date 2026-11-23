@@ -277,6 +277,23 @@ export async function exerciseActualCronDispatch(
     assert.equal(tokenRequests, 1);
     assert.equal(profileRequests, 2);
     assert.equal(posts, 2);
+    process.env.GROWTH_OS_RESEND_OUTREACH_ENABLED = "true";
+    tokenRequests = 0;
+    profileRequests = 0;
+    const enabledResponse = await route.GET(
+      new Request("https://example.test/api/cron/outreach-dispatch", {
+        headers: { authorization: `Bearer ${"c".repeat(32)}` },
+      }),
+    );
+    const enabledBody = await enabledResponse.json();
+    assert.equal(enabledResponse.status, 200, JSON.stringify(enabledBody));
+    assert.deepEqual(
+      { status: enabledBody.resend.status, reason: enabledBody.resend.reason },
+      { status: "held", reason: "account_binding_unknown" },
+    );
+    assert.equal(tokenRequests, 1);
+    assert.equal(profileRequests, 2);
+    assert.equal(posts, 2);
   } finally {
     globalThis.fetch = savedFetch;
     if (configured) {

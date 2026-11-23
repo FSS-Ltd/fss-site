@@ -48,6 +48,8 @@ for (const scenario of [
         "RESEND_OUTREACH_SEND_GENERATION",
         "RESEND_OUTREACH_USAGE_GENERATION",
         "RESEND_OUTREACH_WEBHOOK_GENERATION",
+        "RESEND_OUTREACH_WEBHOOK_SECRET",
+        "GROWTH_OS_RESEND_OUTREACH_ENABLED",
         "RESEND_OUTREACH_SEND_API_KEY",
         "RESEND_OUTREACH_USAGE_API_KEY",
       ] as const;
@@ -96,6 +98,8 @@ for (const scenario of [
               RESEND_OUTREACH_SEND_GENERATION: binding.sendGeneration,
               RESEND_OUTREACH_USAGE_GENERATION: binding.usageGeneration,
               RESEND_OUTREACH_WEBHOOK_GENERATION: binding.webhookGeneration,
+              RESEND_OUTREACH_WEBHOOK_SECRET: "test-hook",
+              GROWTH_OS_RESEND_OUTREACH_ENABLED: "true",
               RESEND_OUTREACH_SEND_API_KEY: runtime.sendCredential,
               RESEND_OUTREACH_USAGE_API_KEY: runtime.usageCredential,
             });

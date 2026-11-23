@@ -7,13 +7,18 @@ import {
 import { loadResendAccountReadiness } from "./resend-account-repository";
 import { readResendOutreachRuntime } from "./resend-account-runtime";
 import { CAMPAIGN_FOUNDER_EMAIL } from "./authorization";
+import type { GmailDueContext } from "./gmail-due-context";
+import { loadCurrentResendGmailBounds } from "./resend-gmail-context";
 
 type ReadyRamp = { ramp: number; bounds: AuthorityBounds };
 
 /** Caller holds the global routing lock until the reservation transaction ends. */
 export async function loadSharedOutreachBudget(
   tx: GrowthTransaction,
-  capabilities: { resendDelivery: "enabled" | "unavailable" },
+  capabilities: {
+    resendDelivery: "enabled" | "unavailable";
+    gmailContext?: GmailDueContext;
+  },
 ): Promise<
   | { status: "ready"; ramp: number; bounds: AuthorityBounds }
   | { status: "held"; reason: string }
@@ -51,15 +56,26 @@ export async function loadSharedOutreachBudget(
         control.connectionId,
         runtime,
       );
-      if (account.status === "ready")
-        candidates.push({
-          ramp: account.ramp,
-          bounds: {
-            validatedAt: start.now,
-            expiresAt: account.expiresAt,
-            validThrough: null,
-          },
+      if (
+        account.status === "ready" &&
+        capabilities.resendDelivery === "enabled" &&
+        capabilities.gmailContext
+      ) {
+        const gmailBounds = await loadCurrentResendGmailBounds(tx, {
+          account,
+          runtime,
+          context: capabilities.gmailContext,
         });
+        if (gmailBounds)
+          candidates.push({
+            ramp: account.ramp,
+            bounds: intersectAuthorityBounds(gmailBounds, {
+              validatedAt: start.now,
+              expiresAt: account.expiresAt,
+              validThrough: null,
+            }),
+          });
+      }
     }
   }
   const [clock] = await tx<{ now: Date }[]>`select clock_timestamp() as now`;

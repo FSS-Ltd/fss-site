@@ -11,6 +11,7 @@ import { londonDayKey } from "../../../lib/growth/campaigns/time";
 import { withGrowthTransaction } from "../../../lib/growth/db/client";
 import { exerciseSharedLedger } from "./shared-outreach-ledger";
 import { withTransitionClock } from "./reservation-clock";
+import type { GmailDueContext } from "../../../lib/growth/campaigns/gmail-due-context";
 import { lockGmailRouting } from "../../../lib/growth/sequences/gmail-thread-association";
 
 const url = process.env.DIRECT_DATABASE_URL;
@@ -39,11 +40,13 @@ test(
       replyTo: email,
       sendGeneration: randomUUID(),
       usageGeneration: randomUUID(),
+      webhookGeneration: randomUUID(),
     };
     const runtime = {
       binding,
       sendCredential: "send-secret",
       usageCredential: "usage-secret",
+      webhookSecret: "synthetic-webhook",
     };
     const env = {
       RESEND_OUTREACH_TEAM: binding.team,
@@ -52,6 +55,9 @@ test(
       RESEND_OUTREACH_REPLY_TO_EMAIL: binding.replyTo,
       RESEND_OUTREACH_SEND_GENERATION: binding.sendGeneration,
       RESEND_OUTREACH_USAGE_GENERATION: binding.usageGeneration,
+      RESEND_OUTREACH_WEBHOOK_GENERATION: binding.webhookGeneration,
+      RESEND_OUTREACH_WEBHOOK_SECRET: runtime.webhookSecret,
+      GROWTH_OS_RESEND_OUTREACH_ENABLED: "true",
       RESEND_OUTREACH_SEND_API_KEY: runtime.sendCredential,
       RESEND_OUTREACH_USAGE_API_KEY: runtime.usageCredential,
     };
@@ -122,6 +128,7 @@ test(
       },
     ];
     let resendId: string | null = null;
+    const coverageId = randomUUID();
     try {
       Object.assign(process.env, env);
       delete process.env.VERCEL_ENV;
@@ -223,12 +230,34 @@ test(
         randomUUID(),
         runtime,
       );
+      await admin`update growth.integration_connections set provider_cursor='200' where id=${gmailId}`;
+      await admin`insert into growth.gmail_reply_coverage(id,connection_id,grant_epoch,google_subject,history_start,history_end,observed_from,observed_until,head_requested_at,head_responded_at,state) values (${coverageId},${gmailId},1,'fixture-subject','100','200',${new Date(now - 10000)},${new Date(now - 1000)},${new Date(now - 1000)},${new Date(now - 1000)},'complete')`;
+      // The server-only branded context is represented by a local fake, backed by actual fixture rows.
+      const gmailContext = {
+        bound: {
+          binding: {
+            connectionId: gmailId,
+            googleSubject: "fixture-subject",
+            grantEpoch: 1,
+            grantedScopes: [
+              "openid",
+              "email",
+              "https://www.googleapis.com/auth/gmail.modify",
+            ],
+          },
+        },
+        coverageId,
+        usage: { status: "complete" },
+      } as unknown as GmailDueContext;
       const read = (
         resendDelivery: "enabled" | "unavailable" = "unavailable",
       ) =>
         withGrowthTransaction(db, async (tx) => {
           await lockGmailRouting(tx);
-          return loadSharedOutreachBudget(tx, { resendDelivery });
+          return loadSharedOutreachBudget(tx, {
+            resendDelivery,
+            ...(resendDelivery === "enabled" ? { gmailContext } : {}),
+          });
         });
       let common = await read();
       assert.equal(common.status === "ready" && common.ramp, 25);
@@ -346,6 +375,19 @@ test(
       await exerciseSharedLedger(admin, db, gmailId, email);
       common = await read("enabled");
       assert.equal(common.status === "ready" && common.ramp, 50);
+      process.env.GROWTH_OS_RESEND_OUTREACH_ENABLED = "false";
+      common = await read("enabled");
+      assert.equal(common.status === "ready" && common.ramp, 25);
+      process.env.GROWTH_OS_RESEND_OUTREACH_ENABLED = "true";
+      const noContext = await withGrowthTransaction(db, async (tx) => {
+        await lockGmailRouting(tx);
+        return loadSharedOutreachBudget(tx, { resendDelivery: "enabled" });
+      });
+      assert.equal(noContext.status === "ready" && noContext.ramp, 25);
+      await admin`update growth.integration_connections set provider_cursor='201' where id=${gmailId}`;
+      common = await read("enabled");
+      assert.equal(common.status === "ready" && common.ramp, 25);
+      await admin`update growth.integration_connections set provider_cursor='200' where id=${gmailId}`;
       const [usageRow] =
         await admin`select resend_usage->>'validUntil' as expiry from growth.outreach_provider_usage where connection_id=${resendId}`;
       if (common.status === "ready")
@@ -426,6 +468,7 @@ test(
       }
       if (originalVercel === undefined) delete process.env.VERCEL_ENV;
       else process.env.VERCEL_ENV = originalVercel;
+      await admin`delete from growth.gmail_reply_coverage where id=${coverageId}`;
       for (const id of [resendId, gmailId]) {
         if (!id) continue;
         await admin`delete from growth.outreach_provider_usage where account_id=${id}`;

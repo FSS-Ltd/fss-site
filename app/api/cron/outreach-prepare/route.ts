@@ -1,5 +1,6 @@
 import { getGrowthDb } from "@/lib/growth/db/client";
 import { createCronRouteHandler } from "@/lib/growth/http/cron-auth";
+import { createLiveResendOutreachWorker } from "@/lib/growth/campaigns/resend-outreach-worker";
 import { createLiveOutreachDueWorker } from "@/lib/growth/campaigns/outreach-due-worker";
 import { observeLiveGmailDueContext } from "@/lib/growth/campaigns/gmail-due-context";
 import {
@@ -34,10 +35,17 @@ export async function GET(request: Request): Promise<Response> {
         bound,
         founderEmail: env.ownerEmail,
       });
-      return createLiveOutreachDueWorker({
+      const preparation = await createLiveOutreachDueWorker({
         context,
         founderEmail: env.ownerEmail,
       })(db);
+      if (process.env.GROWTH_OS_RESEND_OUTREACH_ENABLED !== "true")
+        return preparation;
+      const resend = await createLiveResendOutreachWorker({
+        context,
+        prepareOnly: true,
+      })(db);
+      return { preparation, resend };
     },
   );
   return handler(request);

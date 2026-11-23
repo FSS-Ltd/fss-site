@@ -28,6 +28,8 @@ import { loadSharedOutreachBudget } from "./shared-outreach-budget";
 import { campaignPolicyDefinitionSchema } from "./schemas";
 import type { SubmissionClock } from "./submission-clock";
 import { londonDayKey } from "./time";
+import type { GmailDueContext } from "./gmail-due-context";
+import { loadCurrentResendGmailBounds } from "./resend-gmail-context";
 
 type Identity = {
   messageId: string;
@@ -108,6 +110,7 @@ async function lockedPreparation(
   runtime: ResendRuntimeConfiguration,
   terminal: boolean,
   coverageId?: string,
+  gmailContext?: GmailDueContext,
 ): Promise<ReservationOutcome<Locked>> {
   await lockKey(tx, `growth:outreach-day:${day}`);
   await lockKey(
@@ -126,6 +129,15 @@ async function lockedPreparation(
     runtime,
   );
   if (account.status === "held") return account;
+  const gmailBounds =
+    gmailContext && coverageId === gmailContext.coverageId
+      ? await loadCurrentResendGmailBounds(tx, {
+          account,
+          runtime,
+          context: gmailContext,
+        })
+      : null;
+  if (gmailContext && !gmailBounds) return held("reply_coverage_unknown");
   const [exposure] = await tx<
     { unresolved: boolean }[]
   >`select exists(select 1 from growth.outreach_reservations r where r.connection_id=${identity.connectionId} and r.issued_snapshot is not null and (r.status in ('submitting','uncertain','sent') or (r.status='accepted' and r.direct_submission_evidence is null) or (r.status='rejected' and r.direct_noninvocation_evidence is null) or (r.status='cancelled' and (r.submitted_at is not null or r.issued_snapshot is not null)))) as unresolved`;
@@ -185,11 +197,15 @@ async function lockedPreparation(
       },
       account,
       now: clock.now,
-      bounds: intersectAuthorityBounds(preparation.bounds, {
-        validatedAt: clock.now,
-        expiresAt: account.expiresAt,
-        validThrough: null,
-      }),
+      bounds: intersectAuthorityBounds(
+        preparation.bounds,
+        {
+          validatedAt: clock.now,
+          expiresAt: account.expiresAt,
+          validThrough: null,
+        },
+        ...(gmailBounds ? [gmailBounds] : []),
+      ),
       window: preparation.window,
     },
   };
@@ -212,6 +228,7 @@ async function checkBudget(
   day: string,
   account: ReadyAccount,
   excluding: string | null,
+  gmailContext?: GmailDueContext,
 ): Promise<ReservationOutcome<AuthorityBounds>> {
   const [unbound] = await tx<
     { found: boolean }[]
@@ -231,9 +248,10 @@ async function checkBudget(
     { count: number }[]
   >`select count(*)::int as count from growth.outreach_reservations where connection_id=${identity.connectionId} and (status in ('reserved','submitting','uncertain') or (status='accepted' and (confirmation_observed_at is null or confirmation_observed_at >= ${new Date(usage.data.observedAt)})) or (status='rejected' and direct_noninvocation_evidence is null)) and (${excluding}::uuid is null or id<>${excluding}::uuid)`;
   if (!pending) return held("usage_unknown");
-  // Until the full Resend delivery path is active, only a separately ready Gmail account can set the shared ceiling.
+  // Resend can raise the shared ceiling only with this invocation’s verified Gmail context.
   const shared = await loadSharedOutreachBudget(tx, {
-    resendDelivery: "unavailable",
+    resendDelivery: gmailContext ? "enabled" : "unavailable",
+    gmailContext,
   });
   if (shared.status === "held") return shared;
   if (counts.globalUsed >= shared.ramp) return held("global_limit");
@@ -256,6 +274,7 @@ const reserveInputSchema = z.strictObject({
 export async function reserveResendOutreachAttempt(
   db: GrowthDb,
   input: z.infer<typeof reserveInputSchema>,
+  gmailContext?: GmailDueContext,
 ): Promise<ReservationOutcome<ResendReservation>> {
   if (!reserveInputSchema.safeParse(input).success)
     return held("invalid_input");
@@ -277,6 +296,7 @@ export async function reserveResendOutreachAttempt(
       runtime,
       false,
       input.coverageId,
+      gmailContext,
     );
     if (locked.status === "held") return locked;
     const { preparation, account, now, bounds, window } = locked.value;
@@ -350,7 +370,14 @@ export async function reserveResendOutreachAttempt(
       history.leases !== history.attempts
     )
       return held("claim_history_unproven");
-    const budget = await checkBudget(tx, identity, day, account, null);
+    const budget = await checkBudget(
+      tx,
+      identity,
+      day,
+      account,
+      null,
+      gmailContext,
+    );
     if (budget.status === "held") return budget;
     const [fence] = await tx<
       { value: number }[]
@@ -382,6 +409,7 @@ const beginInputSchema = reservationLeaseSchema.extend({
 export async function beginResendOutreachSubmission(
   db: GrowthDb,
   input: z.infer<typeof beginInputSchema>,
+  gmailContext?: GmailDueContext,
 ): Promise<ReservationOutcome<ResendIssuance>> {
   if (!beginInputSchema.safeParse(input).success) return held("invalid_input");
   const runtime = readResendOutreachRuntime();
@@ -403,6 +431,7 @@ export async function beginResendOutreachSubmission(
       runtime,
       true,
       input.coverageId,
+      gmailContext,
     );
     if (locked.status === "held") return locked;
     const { preparation, account, now, bounds, window } = locked.value;
@@ -491,6 +520,7 @@ export async function beginResendOutreachSubmission(
       initial.day,
       account,
       input.reservationId,
+      gmailContext,
     );
     if (budget.status === "held") return budget;
     const submissionBounds = intersectAuthorityBounds(bounds, budget.value, {

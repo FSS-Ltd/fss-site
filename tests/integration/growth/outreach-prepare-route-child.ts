@@ -75,6 +75,33 @@ async function main(): Promise<void> {
   assert.equal(body.followUp.claimed, 0);
   assert.equal(sendPosts, 0);
   assert.ok(profileRequests > 0);
+  process.env.GROWTH_OS_RESEND_OUTREACH_ENABLED = "true";
+  globalThis.Date = new Proxy(NativeDate, {
+    construct(target, args, newTarget) {
+      if (args.length === 0) {
+        globalThis.Date = NativeDate;
+        return new NativeDate("2026-01-05T08:30:00Z");
+      }
+      return Reflect.construct(target, args, newTarget);
+    },
+  });
+  try {
+    const enabled = await GET(
+      new Request("https://example.test/api/cron/outreach-prepare", {
+        headers: { authorization: `Bearer ${"c".repeat(32)}` },
+      }),
+    );
+    const result = await enabled.json();
+    assert.equal(enabled.status, 200);
+    assert.equal(result.preparation.usage, mode);
+    assert.deepEqual(
+      { status: result.resend.status, reason: result.resend.reason },
+      { status: "held", reason: "account_binding_unknown" },
+    );
+    assert.equal(sendPosts, 0);
+  } finally {
+    globalThis.Date = NativeDate;
+  }
   const { getGrowthDb } = await import("../../../lib/growth/db/client");
   await getGrowthDb().end();
 }

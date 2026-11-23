@@ -21,6 +21,13 @@ import { readResendOutreachRuntime } from "./resend-account-runtime";
 import type { ResendRuntimeConfiguration } from "./resend-account-control";
 import { reserveResendOutreachAttempt } from "./resend-reservation-repository";
 import { submitReservedResendOutreach } from "./resend-direct-submission";
+import type { GmailDueContext } from "./gmail-due-context";
+import {
+  claimResendFollowUps,
+  holdResendFollowUp,
+} from "./resend-follow-up-due";
+import { prepareResendFollowUp } from "./prepare-follow-up";
+import { loadCurrentResendGmailBounds } from "./resend-gmail-context";
 
 const MAX_BATCH = 25;
 const MESSAGE_HOLDS = new Set([
@@ -84,7 +91,12 @@ type Ports = {
     ) => Promise<Claim | null>;
     reserve: (
       db: GrowthDb,
-      input: { messageId: string; leaseToken: string; attemptKey: string },
+      input: {
+        messageId: string;
+        leaseToken: string;
+        attemptKey: string;
+        coverageId?: string;
+      },
     ) => Promise<Reservation>;
     submit: (
       db: GrowthDb,
@@ -93,6 +105,7 @@ type Ports = {
         leaseToken: string;
         fence: number;
         fingerprint: string;
+        coverageId?: string;
       },
     ) => Promise<Submission>;
     cancelReservation: typeof cancelOutreachReservation;
@@ -107,12 +120,21 @@ type Ports = {
     ) => Promise<boolean>;
   };
   workerId: string;
+  prepareOnly?: boolean;
+  follow?: (
+    db: GrowthDb,
+    context: Context,
+    limit: number,
+  ) => Promise<{ claimed: number; prepared: number; held: number }>;
 };
 export type ResendWorkerSummary = {
   status: "idle" | "complete" | "held";
   reason?: string;
   first: FirstPreparationBatchSummary;
   claimed: number;
+  followUpClaimed: number;
+  followUpPrepared: number;
+  followUpHeld: number;
   accepted: number;
   notInvoked: number;
   uncertain: number;
@@ -132,6 +154,9 @@ export function createResendOutreachWorker(ports: Ports) {
       status: "idle",
       first: emptyFirst(),
       claimed: 0,
+      followUpClaimed: 0,
+      followUpPrepared: 0,
+      followUpHeld: 0,
       accepted: 0,
       notInvoked: 0,
       uncertain: 0,
@@ -169,6 +194,21 @@ export function createResendOutreachWorker(ports: Ports) {
     )
       throw new Error("invalid_first_batch_count");
     summary.first = first;
+    if (ports.follow && first.claimed < MAX_BATCH) {
+      const follow = await ports.follow(db, context, MAX_BATCH - first.claimed);
+      if (
+        [follow.claimed, follow.prepared, follow.held].some(
+          (value) => !Number.isInteger(value) || value < 0,
+        ) ||
+        follow.claimed > MAX_BATCH - first.claimed ||
+        follow.prepared + follow.held !== follow.claimed
+      )
+        throw new Error("invalid_follow_up_batch_count");
+      summary.followUpClaimed = follow.claimed;
+      summary.followUpPrepared = follow.prepared;
+      summary.followUpHeld = follow.held;
+    }
+    if (ports.prepareOnly) return { ...summary, status: "complete" };
     const dispatch = ports.dispatch;
     if (!dispatch)
       return {
@@ -180,7 +220,7 @@ export function createResendOutreachWorker(ports: Ports) {
     if (availability.status === "held")
       return { ...summary, status: "held", reason: availability.reason };
     const excluded: string[] = [];
-    for (let i = first.claimed; i < MAX_BATCH; i++) {
+    for (let i = first.claimed + summary.followUpClaimed; i < MAX_BATCH; i++) {
       const messageId = await dispatch.next(db, context.connectionId, excluded);
       if (!messageId) break;
       excluded.push(messageId);
@@ -331,9 +371,12 @@ async function hasDueWork(
     where j.job_type='first_preparation' and c.account_connection_id=${connectionId} and c.policy->>'provider'='resend'
       and j.due_at<=clock_timestamp() and (j.status='pending' or (j.status='leased' and j.lease_until<=clock_timestamp()))
     union all
+    select 1 from growth.outreach_jobs j join growth.campaigns c on c.id=j.campaign_id and c.version=j.policy_version
+    where j.job_type='follow_up' and c.account_connection_id=${connectionId} and c.policy->>'provider'='resend' and j.due_at<=clock_timestamp() and (j.status='pending' or (j.status='held' and (j.last_error_code is null or j.last_error_code in ('reply_coverage_unknown','usage_unknown','terminal_fence_busy','account_not_active','preparation_expired'))) or (j.status='leased' and j.lease_until<=clock_timestamp()))
+    union all
     select 1 from growth.email_messages em join growth.campaign_memberships m on m.sequence_id=em.sequence_enrollment_id
     join growth.campaigns c on c.id=m.campaign_id and c.version=m.policy_version
-    where em.channel='resend' and em.direction='outbound' and em.step_number=0 and c.account_connection_id=${connectionId} and c.policy->>'provider'='resend'
+    where em.channel='resend' and em.direction='outbound' and em.step_number in (0,1,2) and (em.step_number=0 or em.controlled_preparation is not null) and c.account_connection_id=${connectionId} and c.policy->>'provider'='resend'
       and ((em.status in ('queued','retry') and em.scheduled_for<=clock_timestamp()) or (em.status='sending' and em.lease_expires_at<=clock_timestamp()))
   ) as due`;
   return row?.due === true;
@@ -348,7 +391,7 @@ async function nextMessage(
     { id: string }[]
   >`select em.id from growth.email_messages em join growth.campaign_memberships m on m.sequence_id=em.sequence_enrollment_id
     join growth.campaigns c on c.id=m.campaign_id and c.version=m.policy_version
-    where em.channel='resend' and em.direction='outbound' and em.step_number=0 and c.account_connection_id=${connectionId} and c.policy->>'provider'='resend'
+    where em.channel='resend' and em.direction='outbound' and em.step_number in (0,1,2) and (em.step_number=0 or em.controlled_preparation is not null) and c.account_connection_id=${connectionId} and c.policy->>'provider'='resend'
       and not (em.id=any(${excluded}::uuid[])) and ((em.status in ('queued','retry') and em.scheduled_for<=clock_timestamp()) or (em.status='sending' and em.lease_expires_at<=clock_timestamp()))
     order by coalesce(em.scheduled_for,em.lease_expires_at),em.id limit 1`;
   return row?.id ?? null;
@@ -405,41 +448,108 @@ function runtimeIsCurrent(context: Context): boolean {
   );
 }
 
-/** Actual server ports are constructed here; no route calls this factory yet. */
-export function createLiveResendOutreachWorker() {
+/** Construct server ports; sending requires the current route’s bound Gmail context. */
+export function createLiveResendOutreachWorker(input?: {
+  context: GmailDueContext;
+  prepareOnly?: boolean;
+}) {
   return createResendOutreachWorker({
-    context: loadContext,
+    context: (db) =>
+      input && process.env.GROWTH_OS_RESEND_OUTREACH_ENABLED !== "true"
+        ? Promise.resolve(null)
+        : loadContext(db),
     due: hasDueWork,
     refresh: (db, context) =>
       runtimeIsCurrent(context)
         ? refreshResendAccountUsage(db, context.connectionId, context.runtime)
         : Promise.resolve({ status: "held", reason: "binding_changed" }),
-    readiness: (db, context) =>
-      runtimeIsCurrent(context)
-        ? withGrowthTransaction(db, (tx) =>
-            loadResendAccountReadiness(
-              tx,
-              context.connectionId,
-              context.runtime,
-            ),
-          )
-        : Promise.resolve({ status: "held", reason: "binding_changed" }),
+    readiness: async (db, context) => {
+      if (!runtimeIsCurrent(context))
+        return { status: "held", reason: "binding_changed" };
+      if (
+        !input ||
+        input.context.usage.status !== "complete" ||
+        !input.context.coverageId
+      )
+        return { status: "held", reason: "reply_coverage_unknown" };
+      return withGrowthTransaction(db, async (tx) => {
+        await lockGmailRouting(tx);
+        const account = await loadResendAccountReadiness(
+          tx,
+          context.connectionId,
+          context.runtime,
+        );
+        if (account.status === "held") return account;
+        return (await loadCurrentResendGmailBounds(tx, {
+          account,
+          runtime: context.runtime,
+          context: input.context,
+        }))
+          ? { status: "ready" }
+          : { status: "held", reason: "reply_coverage_unknown" };
+      });
+    },
     first: runFirstPreparationBatch,
     workerId: randomUUID(),
+    prepareOnly: input?.prepareOnly,
+    follow: input?.context.coverageId
+      ? async (db, context, limit) => {
+          const coverageId = input.context.coverageId;
+          if (!coverageId) return { claimed: 0, prepared: 0, held: 0 };
+          const workerId = randomUUID();
+          const jobs = await claimResendFollowUps(db, {
+            connectionId: context.connectionId,
+            runtime: context.runtime,
+            coverageId,
+            workerId,
+            limit,
+          });
+          let prepared = 0,
+            held = 0;
+          for (const job of jobs) {
+            const request = {
+              jobId: job.id,
+              leaseOwner: workerId,
+              leaseRevision: job.revision,
+              connectionId: context.connectionId,
+              coverageId,
+            };
+            const result = await prepareResendFollowUp(db, request);
+            if (result.status === "held") {
+              held++;
+              await holdResendFollowUp(db, {
+                ...request,
+                reason: result.reason,
+              });
+            } else prepared++;
+          }
+          return { claimed: jobs.length, prepared, held };
+        }
+      : undefined,
     dispatch: {
-      // The route and monitored-reply coverage are not wired, so the real worker cannot send.
-      available: async () => ({
-        status: "held",
-        reason: "delivery_path_unavailable",
-      }),
+      available: async () =>
+        input
+          ? { status: "ready" }
+          : { status: "held", reason: "delivery_path_unavailable" },
       next: nextMessage,
       claim: (db, input) =>
         postgresSequenceDispatchRepository.claimDueMessage(db, {
           ...input,
           channel: "resend",
         }),
-      reserve: reserveResendOutreachAttempt,
-      submit: submitReservedResendOutreach,
+      reserve: (db, request) =>
+        reserveResendOutreachAttempt(
+          db,
+          { ...request, coverageId: input?.context.coverageId ?? undefined },
+          input?.context,
+        ),
+      submit: (db, request) =>
+        submitReservedResendOutreach(
+          db,
+          { ...request, coverageId: input?.context.coverageId ?? undefined },
+          undefined,
+          input?.context,
+        ),
       cancelReservation: cancelOutreachReservation,
       closeClaim,
     },

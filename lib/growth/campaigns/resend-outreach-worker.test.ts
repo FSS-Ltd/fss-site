@@ -244,3 +244,40 @@ test("live factory performs no provider request when the reviewed account has no
     }
   }
 });
+
+test("preparation-only invocation never claims or invokes a transport", async () => {
+  const { ports, calls } = setup();
+  ports.prepareOnly = true;
+  ports.follow = async (_db, _context, limit) => {
+    assert.equal(limit, 25);
+    calls.push("follow");
+    return { claimed: 2, prepared: 1, held: 1 };
+  };
+  const result = await createResendOutreachWorker(ports)(db);
+  assert.equal(result.status, "complete");
+  assert.equal(result.followUpClaimed, 2);
+  assert.equal(result.followUpPrepared, 1);
+  assert.equal(result.followUpHeld, 1);
+  assert.deepEqual(calls, [
+    "context",
+    "due",
+    "refresh",
+    "readiness",
+    "first:25",
+    "follow",
+  ]);
+});
+
+test("follow-up preparation and dispatch share one bounded batch", async () => {
+  const { ports, calls } = setup();
+  ports.first = async () => ({ claimed: 20, prepared: 20, held: 0, retry: 0 });
+  ports.follow = async (_db, _context, limit) => {
+    assert.equal(limit, 5);
+    return { claimed: 5, prepared: 5, held: 0 };
+  };
+  const result = await createResendOutreachWorker(ports)(db);
+  assert.equal(result.status, "complete");
+  assert.equal(result.followUpClaimed, 5);
+  assert.equal(result.claimed, 0);
+  assert.equal(calls.includes("claim"), false);
+});
