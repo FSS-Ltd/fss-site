@@ -78,3 +78,56 @@ test("returns a safe error on database failure", async () => {
   assert.equal(result.status, "error");
   assert.doesNotMatch(JSON.stringify(result), /private database details/);
 });
+
+test("only exposes safely round-trippable stored policy for revision", async () => {
+  const { campaignPolicyDefinitionSchema } =
+    await import("../campaigns/schemas");
+  const { serializeCampaignDefinition } =
+    await import("../campaigns/lifecycle");
+  const proof = {
+    summary: "Reviewed",
+    reference: { kind: "private", value: "proof" },
+    observedAt: "2026-11-20T12:00:00Z",
+    expiresAt: "2026-12-20T12:00:00Z",
+  };
+  const policy = serializeCampaignDefinition(
+    campaignPolicyDefinitionSchema.parse({
+      version: 1,
+      offer: "review",
+      jurisdiction: "GB",
+      capabilityEvidence: "proof",
+      capabilityAttestation: proof,
+      providerAttestation: {
+        ...proof,
+        provider: "gmail",
+        jurisdiction: "GB",
+        confirmed: true,
+      },
+    }),
+  );
+  const row = {
+    id: "x",
+    name: "X",
+    version: 1,
+    status: "paused",
+    approvedAt: null,
+    prepared: 0,
+    held: 0,
+    attempts: 0,
+    accepted: 0,
+    confirmed: 0,
+    holdReason: null,
+    reportDue: null,
+    reportStatus: null,
+  };
+  const result = await getCampaignOverview(
+    dbReturning([
+      { ...row, policy },
+      { ...row, id: "unknown", policy: { ...policy, futureSetting: true } },
+    ]),
+  );
+  assert.equal(result.status, "ready");
+  if (result.status !== "ready") return;
+  assert.equal(result.rows[0]?.editorPolicy?.offer, "review");
+  assert.equal(result.rows[1]?.editorPolicy, null);
+});

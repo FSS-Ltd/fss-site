@@ -34,6 +34,7 @@ test("shows observed counts and a stored hold reason without claiming delivery",
           truncated: false,
           rows: [
             {
+              editorPolicy: null,
               id: "one",
               name: "Local campaign",
               version: 2,
@@ -64,16 +65,32 @@ test("shows observed counts and a stored hold reason without claiming delivery",
 
 test("shows distinct empty and error states", () => {
   const empty = renderToStaticMarkup(
-    <CampaignOverview
-      result={{
-        status: "ready",
-        londonDate: "23 November 2026",
-        truncated: false,
-        rows: [],
+    <AppRouterContext.Provider
+      value={{
+        back() {},
+        forward() {},
+        refresh() {},
+        push() {},
+        replace() {},
+        prefetch() {},
+        bfcacheId: "test",
       }}
-    />,
+    >
+      <CampaignOverview
+        result={{
+          status: "ready",
+          londonDate: "23 November 2026",
+          truncated: false,
+          rows: [],
+        }}
+      />
+    </AppRouterContext.Provider>,
   );
   assert.match(empty, /No campaigns have been created yet/);
+  assert.match(empty, /Create campaign/);
+  assert.match(empty, /£297\/month/);
+  assert.match(empty, /£497\/month/);
+  assert.match(empty, /£797\/month/);
   const error = renderToStaticMarkup(
     <CampaignOverview result={{ status: "error", reference: "reference-1" }} />,
   );

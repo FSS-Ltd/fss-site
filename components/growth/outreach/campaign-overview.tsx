@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { CampaignOverviewResult } from "@/lib/growth/dashboard/campaign-overview";
 import { formatGrowthDateTime } from "@/lib/growth/dashboard/formatters";
+import { CampaignPolicyEditor } from "./campaign-policy-editor";
 import { CampaignLifecycleActions } from "./campaign-lifecycle-actions";
 import styles from "./campaign-overview.module.css";
 
@@ -38,6 +39,7 @@ export function CampaignOverview({
         Daily goal 100 · target 150. Sending depends on eligible recipients and
         approved account capacity.
       </p>
+      <CampaignPolicyEditor />
       {result.rows.length === 0 ? (
         <p className={styles.empty}>No campaigns have been created yet.</p>
       ) : (
@@ -89,6 +91,7 @@ export function CampaignOverview({
                     : "No analysis date recorded"}
                 </p>
               </div>
+              <CampaignPolicyEditor campaign={campaign} />
               <CampaignLifecycleActions
                 id={campaign.id}
                 version={campaign.version}

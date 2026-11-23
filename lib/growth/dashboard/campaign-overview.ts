@@ -1,4 +1,6 @@
 import { randomUUID } from "node:crypto";
+import { readEditableCampaignPolicy } from "../campaigns/campaign-policy-editor";
+import { serializeCampaignDefinition } from "../campaigns/lifecycle";
 import { getGrowthDb } from "../db/client";
 import type { GrowthQueryExecutor } from "../db/types";
 import {
@@ -21,6 +23,7 @@ export type CampaignOverviewRow = {
   holdReason: string | null;
   reportDue: string | null;
   reportStatus: string | null;
+  editorPolicy: ReturnType<typeof serializeCampaignDefinition> | null;
 };
 export type CampaignOverviewResult =
   | {
@@ -31,7 +34,10 @@ export type CampaignOverviewResult =
     }
   | { status: "error"; reference: string };
 
-type Row = Omit<CampaignOverviewRow, "approved" | "offer" | "reportDue"> & {
+type Row = Omit<
+  CampaignOverviewRow,
+  "approved" | "offer" | "reportDue" | "editorPolicy"
+> & {
   approvedAt: Date | null;
   policy: unknown;
   reportDue: Date | null;
@@ -109,6 +115,7 @@ export async function getCampaignOverview(
           ...row,
           approved: approvedAt !== null,
           offer: offerLabel(policy),
+          editorPolicy: readEditableCampaignPolicy(policy)?.serialized ?? null,
           reportDue: reportDue?.toISOString() ?? null,
         })),
       truncated: rows.length > 50,
