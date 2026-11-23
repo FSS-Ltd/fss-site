@@ -181,12 +181,30 @@ export function buildCampaignReport(raw: CampaignReportInput): CampaignReport {
       group.mature++;
       if (positive.length) group.positiveReplies++;
     }
+    const uncertainOutcome = (kind: "meeting" | "payment") =>
+      member.outcomes.some(
+        (outcome) =>
+          outcome.kind === kind &&
+          outcome.occurredAt <= input.cutoff &&
+          (ambiguous.has(`outcome:${outcome.outcomeId}`) ||
+            ambiguous.has(`source:${outcome.kind}:${outcome.evidenceId}`) ||
+            outcome.recordedAt > input.cutoff ||
+            outcome.recordedAt < outcome.occurredAt),
+      );
     if (end > input.cutoff || member.meetingObservation === "censored")
       group.meetingCensored++;
-    else if (member.meetingObservation === "unknown") group.meetingUnknown++;
+    else if (
+      member.meetingObservation === "unknown" ||
+      uncertainOutcome("meeting")
+    )
+      group.meetingUnknown++;
     else group.meetingMature++;
     if (member.paymentObservation === "censored") group.paymentCensored++;
-    else if (member.paymentObservation === "unknown") group.paymentUnknown++;
+    else if (
+      member.paymentObservation === "unknown" ||
+      uncertainOutcome("payment")
+    )
+      group.paymentUnknown++;
     else group.paymentMature++;
     const knownOutcomes = member.outcomes.filter(
       (outcome) =>

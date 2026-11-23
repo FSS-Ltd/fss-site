@@ -217,3 +217,24 @@ test("holds a comparison if the anchor is absent or a prior observation exists",
   m.confirmation.observedAt = new Date("2026-03-26");
   assert.equal(buildCampaignReport(input([m])).winnerReason, "unknown");
 });
+
+test("marks outcome coverage unknown when evidence arrived after cutoff", () => {
+  const m = member("late-outcome");
+  m.meetingObservation = "complete";
+  m.outcomes = [
+    {
+      membershipId: m.membershipId,
+      outcomeId: "meeting",
+      kind: "meeting",
+      reviewed: true,
+      evidenceId: "meeting-evidence",
+      occurredAt: new Date("2026-03-28"),
+      recordedAt: new Date("2026-05-01"),
+      netClearedPence: null,
+    },
+  ];
+  const group = buildCampaignReport(input([m])).groups[0];
+  assert.equal(group.qualifiedMeetings, 0);
+  assert.equal(group.meetingMature, 0);
+  assert.equal(group.meetingUnknown, 1);
+});
