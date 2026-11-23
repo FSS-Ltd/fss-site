@@ -9,6 +9,7 @@ import type { GmailGrantBinding } from "../integrations/gmail/live-client";
 import { stopSequenceInTransaction } from "./stop";
 import {
   classifyGmailRouting,
+  classifyGmailRoutingInTransaction,
   validateGmailEffectObservation,
   type GmailEffectObservation,
 } from "./gmail-routing-repository";
@@ -169,6 +170,22 @@ async function recordInboundEvent(
         attributionAmbiguous: error.classification === "ambiguous",
       };
     }
+    const routing = await classifyGmailRoutingInTransaction(tx, {
+      ...observation,
+      binding,
+    });
+    if (
+      routing.kind !== "unique" ||
+      routing.enrollment.id !== input.sequenceEnrollmentId ||
+      routing.enrollment.prospectId !== input.prospectId ||
+      routing.enrollment.contactId !== input.contactId
+    )
+      return {
+        alreadyRecorded: false,
+        attributionUnknown: true,
+        attributionAmbiguous: routing.kind === "ambiguous",
+      };
+    const attribution = routing.attribution ?? null;
     if (input.eventType !== "auto_response") {
       await stopSequenceInTransaction(stopTransaction, {
         sequenceId: input.sequenceEnrollmentId,
@@ -204,9 +221,11 @@ async function recordInboundEvent(
           sequenceEnrollmentId: string;
           gmailThreadId: string;
           eventType: string;
+          attributionMatches: boolean;
         }>
       >`
-        select em.sequence_enrollment_id as "sequenceEnrollmentId", em.provider_thread_id as "gmailThreadId", e.event_type as "eventType"
+        select em.sequence_enrollment_id as "sequenceEnrollmentId", em.provider_thread_id as "gmailThreadId", e.event_type as "eventType",
+          e.outreach_reply_attribution is not distinct from ${attribution ? tx.json(attribution) : null} as "attributionMatches"
         from growth.email_messages em
         join growth.email_events e on e.email_message_id = em.id and e.provider = 'gmail' and e.provider_event_id = ${input.gmailMessageId}
         where em.channel = 'gmail' and em.provider_message_id = ${input.gmailMessageId} and em.direction = 'inbound'
@@ -215,7 +234,8 @@ async function recordInboundEvent(
         !existing ||
         existing.sequenceEnrollmentId !== input.sequenceEnrollmentId ||
         existing.gmailThreadId !== input.gmailThreadId ||
-        existing.eventType !== input.eventType
+        existing.eventType !== input.eventType ||
+        !existing.attributionMatches
       ) {
         throw new Error("Gmail inbound event attribution conflict.");
       }
@@ -224,10 +244,10 @@ async function recordInboundEvent(
 
     const eventRows = await tx<Array<{ id: string }>>`
       insert into growth.email_events (
-        email_message_id, provider, provider_event_id, event_type, occurred_at, sanitised_payload
+        email_message_id, provider, provider_event_id, event_type, occurred_at, sanitised_payload, outreach_reply_reservation_id, outreach_reply_attribution
       ) values (
         ${insertedMessageId}, 'gmail', ${input.gmailMessageId}, ${input.eventType}, ${input.receivedAt},
-        ${tx.json({ from: input.from, subject: input.subject })}
+        ${tx.json({ from: input.from, subject: input.subject })}, ${attribution?.reservationId ?? null}, ${attribution ? tx.json(attribution) : null}
       )
       on conflict (provider, provider_event_id) do nothing
       returning id

@@ -1,3 +1,5 @@
+import { loadProvenReferences } from "./gmail-reference-attribution";
+import { parseGmailRecipients } from "../integrations/gmail/recipients";
 import { withGrowthTransaction } from "../db/client";
 import type { GrowthDb, GrowthTransaction } from "../db/types";
 import { lockCurrentGmailGrant } from "../integrations/gmail/grant";
@@ -23,6 +25,7 @@ export type GmailRoutingInput = {
   inReplyTo: string | null;
   references: string | null;
   fromAddress: string | null;
+  fromHeader?: string | null;
 };
 export type GmailEffectObservation = Readonly<
   Omit<GmailRoutingInput, "binding"> & {
@@ -45,6 +48,13 @@ export function validateGmailObservation(
   )
     throw new TypeError("Gmail observation is invalid.");
   const observation = value;
+  if (
+    "fromHeader" in value &&
+    value.fromHeader !== undefined &&
+    value.fromHeader !== null &&
+    (typeof value.fromHeader !== "string" || value.fromHeader.length > 32768)
+  )
+    throw new TypeError("Gmail observation is invalid.");
   if (
     typeof observation.threadId !== "string" ||
     !observation.threadId.trim() ||
@@ -136,11 +146,13 @@ export async function classifyGmailRoutingInTransaction(
         union
         select email_message_id as id from growth.outreach_reservations where rfc_message_id=any(${tx.array(ids)}::text[])
       ), reference_rows as (
-        select distinct em.sequence_enrollment_id as "sequenceId", em.channel, r.connection_id as "connectionId",
+        select distinct em.sequence_enrollment_id as "sequenceId", em.channel, r.connection_id as "connectionId",r.id as "reservationId",
           (r.rfc_message_id is not null and em.rfc_message_id is distinct from r.rfc_message_id) as "identityConflict"
         from referenced_messages ref
         join growth.email_messages em on em.id=ref.id and em.direction='outbound'
         left join growth.outreach_reservations r on r.email_message_id=em.id
+          and not ((r.status='cancelled' and r.submitted_at is null and r.issued_snapshot is null)
+            or (r.status='rejected' and r.direct_noninvocation_evidence is not null))
         limit 101
       )
       select coalesce((select jsonb_agg(to_jsonb(t)) from thread_rows t),'[]'::jsonb) as "threadRows",
@@ -173,6 +185,10 @@ export async function classifyGmailRoutingInTransaction(
                     or issued.provider_thread_id is distinct from se.gmail_thread_id
                     or not exists(select 1 from growth.outreach_account_controls control where control.connection_id=issued.connection_id and control.verified_subject=${input.binding.googleSubject})))
             )
+        ) or exists (
+          select 1 from growth.outreach_reservations rr join growth.email_messages rem on rem.id=rr.email_message_id
+          where rem.channel='resend' and rem.direction='outbound' and rr.issued_snapshot is not null
+            and (rr.issued_snapshot->'monitoredMailbox'->>'connectionId' is null or rr.issued_snapshot->'monitoredMailbox'->>'connectionId'=${input.binding.connectionId})
         ) end as "possibleExposure",
         case when exists(select 1 from thread_rows where bound) or (select count(*) from thread_rows) > 1 then false else exists (
           select 1 from growth.sequence_enrollments se
@@ -189,12 +205,36 @@ export async function classifyGmailRoutingInTransaction(
   if (!snapshot) throw new Error("Gmail routing evidence unavailable.");
   const thread = resolveGmailThreadCandidates(snapshot.threadRows);
   const candidates = snapshot.candidates;
+  const from = parseGmailRecipients({
+    to: input.fromHeader ?? null,
+    cc: null,
+    bcc: null,
+  });
+  const exactFrom =
+    from && from.to.length === 1 && from.to[0] === address ? from.to[0] : null;
+  const [mailbox] =
+    exactFrom && ids.length
+      ? await tx<
+          { address: string }[]
+        >`select subject_email as address from growth.integration_connections where id=${input.binding.connectionId} and provider='gmail' for share`
+      : [];
+  const proven =
+    exactFrom && ids.length && mailbox?.address
+      ? await loadProvenReferences(
+          tx,
+          ids,
+          exactFrom,
+          input.binding,
+          mailbox.address,
+        )
+      : [];
 
   return assessGmailRouting({
     thread,
     references,
     candidates,
-    candidatesOverflow: candidates.length > 100,
+    candidatesOverflow: candidates.length > 100 || proven.length > 100,
+    proven,
     possibleExposure: snapshot.possibleExposure,
     contactSignal: snapshot.contactSignal,
     connectionId: input.binding.connectionId,

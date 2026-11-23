@@ -1,11 +1,20 @@
 import type { GmailReferences } from "./gmail-references";
-import type { ThreadMatch } from "./gmail-thread-association";
+import type {
+  ExactReplyAttribution,
+  ThreadEnrollment,
+  ThreadMatch,
+} from "./gmail-thread-association";
 
 export type ReferenceCandidate = {
   sequenceId: string;
   connectionId: string | null;
   channel: string;
   identityConflict: boolean;
+  reservationId?: string | null;
+};
+export type ProvenReference = {
+  enrollment: ThreadEnrollment;
+  attribution: ExactReplyAttribution;
 };
 export type GmailRouting = ThreadMatch | { kind: "uncertain" };
 
@@ -25,6 +34,7 @@ export function assessGmailRouting(input: {
   possibleExposure: boolean;
   contactSignal: boolean;
   connectionId: string;
+  proven?: readonly ProvenReference[];
 }): GmailRouting {
   if (input.thread.kind === "ambiguous" || input.candidatesOverflow)
     return { kind: "ambiguous" };
@@ -33,6 +43,34 @@ export function assessGmailRouting(input: {
     input.references.kind === "over_limit"
   )
     return { kind: "uncertain" };
+  const proven = input.proven ?? [];
+  if (proven.length > 1) return { kind: "ambiguous" };
+  const exact = proven[0];
+  if (
+    exact &&
+    input.references.kind === "valid" &&
+    input.thread.kind !== "unique"
+  ) {
+    if (
+      input.thread.kind === "unknown" &&
+      input.thread.enrollment.id !== exact.enrollment.id
+    )
+      return { kind: "ambiguous" };
+    if (
+      input.candidates.some(
+        (candidate) =>
+          candidate.identityConflict ||
+          candidate.sequenceId !== exact.enrollment.id ||
+          candidate.reservationId !== exact.attribution.reservationId,
+      )
+    )
+      return { kind: "ambiguous" };
+    return {
+      kind: "unique",
+      enrollment: exact.enrollment,
+      attribution: exact.attribution,
+    };
+  }
   const sequences = new Set(
     input.candidates.map((candidate) => candidate.sequenceId),
   );

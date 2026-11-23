@@ -19,6 +19,7 @@ import { postgresSequenceDispatchRepository } from "../../../lib/growth/sequence
 import { loadReviewMembershipPreparationAuthority } from "../../../lib/growth/campaigns/founder-verification-reader";
 import { ingestResearchRun } from "../../../lib/growth/research/ingest";
 import { createGlobalResearchFixture } from "../../../lib/growth/research/global-test-fixture";
+import { exerciseExactResendReply } from "./exact-resend-reply-assertions";
 import { globalResearchRunSchema } from "../../../lib/growth/research/global-schema";
 
 const url = process.env.DIRECT_DATABASE_URL;
@@ -649,6 +650,23 @@ for (const scenario of [
                 ? 0
                 : 1,
             );
+            if (scenario === "accepted") {
+              const [contact] = await tx<
+                { id: string }[]
+              >`select contact_id as id from growth.sequence_enrollments where id=${prepared.sequenceId}`;
+              assert.ok(contact);
+              await exerciseExactResendReply(tx, db, {
+                reservationId: reserved.value.reservationId,
+                connectionId: id,
+                monitorId: gmail,
+                sequenceId: prepared.sequenceId,
+                messageId: prepared.id,
+                prospectId,
+                contactId: contact.id,
+                recipient: email,
+                sendGeneration: binding.sendGeneration,
+              });
+            }
             throw rollback;
           }),
           (error) => error === rollback,

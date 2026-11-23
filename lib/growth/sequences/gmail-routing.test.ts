@@ -111,3 +111,96 @@ test("permits a bound thread with consistent references but holds conflicts", ()
     "uncertain",
   );
 });
+
+test("exact confirmed references can bind an otherwise unassociated Gmail thread", () => {
+  const attribution = {
+    basis: "gmail_exact_reference_v1" as const,
+    outboundProvider: "resend" as const,
+    reservationId: "reservation",
+    rfcMessageId: "<a@example.test>",
+    connectionId: "account",
+    googleSubject: "subject",
+    grantEpoch: 1,
+    recipient: "owner@example.test",
+  };
+  const proven = [{ enrollment, attribution }];
+  assert.notEqual(
+    assessGmailRouting({
+      ...base,
+      references: valid,
+      candidates: [
+        {
+          sequenceId: enrollment.id,
+          connectionId: "resend-account",
+          channel: "resend",
+          identityConflict: false,
+          reservationId: "historical-no-monitor",
+        },
+      ],
+    }).kind,
+    "unique",
+  );
+  const candidates = [
+    {
+      sequenceId: enrollment.id,
+      connectionId: "resend-account",
+      channel: "resend",
+      identityConflict: false,
+      reservationId: "reservation",
+    },
+  ];
+  assert.deepEqual(
+    assessGmailRouting({
+      ...base,
+      references: valid,
+      candidates,
+      proven,
+      possibleExposure: true,
+    }),
+    { kind: "unique", enrollment, attribution },
+  );
+  assert.equal(
+    assessGmailRouting({
+      ...base,
+      references: valid,
+      candidates,
+      proven: [...proven, ...proven],
+    }).kind,
+    "ambiguous",
+  );
+  assert.equal(
+    assessGmailRouting({
+      ...base,
+      references: valid,
+      candidates: [
+        ...candidates,
+        { ...candidates[0]!, reservationId: "other" },
+      ],
+      proven,
+    }).kind,
+    "ambiguous",
+  );
+  assert.equal(
+    assessGmailRouting({
+      ...base,
+      references: { kind: "malformed" },
+      candidates,
+      proven,
+    }).kind,
+    "uncertain",
+  );
+  assert.equal(
+    assessGmailRouting({
+      ...base,
+      thread: {
+        kind: "unknown",
+        enrollment: { ...enrollment, id: "other" },
+        safeToPause: false,
+      },
+      references: valid,
+      candidates,
+      proven,
+    }).kind,
+    "ambiguous",
+  );
+});

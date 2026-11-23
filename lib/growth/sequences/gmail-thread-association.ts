@@ -14,10 +14,25 @@ export type ThreadEnrollment = {
   contactId: string;
 };
 
+export type ExactReplyAttribution = {
+  basis: "gmail_exact_reference_v1";
+  outboundProvider: "gmail" | "resend";
+  reservationId: string;
+  rfcMessageId: string;
+  connectionId: string;
+  googleSubject: string;
+  grantEpoch: number;
+  recipient: string;
+};
+
 export type ThreadMatch =
   | { kind: "none" }
   | { kind: "ambiguous" }
-  | { kind: "unique"; enrollment: ThreadEnrollment }
+  | {
+      kind: "unique";
+      enrollment: ThreadEnrollment;
+      attribution?: ExactReplyAttribution;
+    }
   | { kind: "unknown"; enrollment: ThreadEnrollment; safeToPause: boolean };
 
 // Legacy evidence can be unbound, so serialize routing writers across accounts.

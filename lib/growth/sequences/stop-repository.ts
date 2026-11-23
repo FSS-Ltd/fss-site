@@ -36,14 +36,6 @@ export function createSequenceStopTransaction(
       if (!identity) return null;
       await transaction`select pg_advisory_xact_lock(hashtextextended(${`growth:outreach-business:${identity.businessId}`}, 0))`;
       if (binding) await lockCurrentGmailGrant(transaction, binding);
-      if (threadId && attribution === "bound") {
-        if (!binding) throw new Error("Gmail thread attribution is invalid.");
-        const [control] = await transaction<Array<{ subject: string }>>`
-          select verified_subject as subject from growth.outreach_account_controls where connection_id=${binding.connectionId} for share
-        `;
-        if (!control || control.subject !== binding.googleSubject)
-          throw new GmailThreadAttributionChangedError();
-      }
       const rows = await transaction<
         Array<{
           id: string;
@@ -68,16 +60,6 @@ export function createSequenceStopTransaction(
       if (rows[0] && rows[0].businessId !== identity.businessId) {
         throw new Error("Sequence business changed while acquiring lock.");
       }
-      if (threadId && binding && rows[0] && attribution === "bound") {
-        const [association] = await transaction<Array<{ id: string }>>`
-          select id from growth.outreach_reservations where sequence_id=${sequenceId}
-            and connection_id=${binding.connectionId} and provider_thread_id=${threadId} limit 1 for share
-        `;
-        if (rows[0].gmailThreadId !== threadId || !association)
-          throw new GmailThreadAttributionChangedError();
-      }
-      if (threadId && rows[0] && rows[0].gmailThreadId !== threadId)
-        throw new GmailThreadAttributionChangedError();
       if (threadId && binding && observation && rows[0]) {
         const match = await classifyGmailRoutingInTransaction(transaction, {
           ...observation,
@@ -96,6 +78,22 @@ export function createSequenceStopTransaction(
               ? "ambiguous"
               : "unknown",
           );
+        const exact = match.kind === "unique" && !!match.attribution;
+        if (!exact && rows[0].gmailThreadId !== threadId)
+          throw new GmailThreadAttributionChangedError();
+        if (attribution === "bound" && !exact) {
+          const [control] = await transaction<Array<{ subject: string }>>`
+            select verified_subject as subject from growth.outreach_account_controls where connection_id=${binding.connectionId} for share`;
+          const [association] = await transaction<Array<{ id: string }>>`
+            select id from growth.outreach_reservations where sequence_id=${sequenceId}
+              and connection_id=${binding.connectionId} and provider_thread_id=${threadId} limit 1 for share`;
+          if (
+            !control ||
+            control.subject !== binding.googleSubject ||
+            !association
+          )
+            throw new GmailThreadAttributionChangedError();
+        }
       }
       return rows[0] ?? null;
     },

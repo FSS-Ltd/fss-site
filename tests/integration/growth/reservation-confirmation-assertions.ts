@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import type { GrowthDb } from "../../../lib/growth/db/types";
 import { withGrowthTransaction } from "../../../lib/growth/db/client";
+import { postgresGmailSyncRepository } from "../../../lib/growth/sequences/gmail-sync-repository";
+import { classifyGmailRouting } from "../../../lib/growth/sequences/gmail-routing-repository";
 import { lockGmailRouting } from "../../../lib/growth/sequences/gmail-thread-association";
 import { beginOutreachSubmission } from "../../../lib/growth/campaigns/reservation-repository";
 import { createGmailConfirmation } from "../../../lib/growth/campaigns/gmail-confirmation";
@@ -281,6 +283,73 @@ export async function exerciseGmailConfirmation(
     firstConfirmation,
   );
   await admin`update growth.integration_connections set version=${connection.version} where id=${id}`;
+  const changedSubjectReply = await classifyGmailRouting(db, {
+    binding: {
+      connectionId: id,
+      googleSubject: "test-subject",
+      grantEpoch: connection.version,
+      grantedScopes: connection.scopes,
+    },
+    threadId: `changed-thread-${randomUUID()}`,
+    inReplyTo: issued.value.rfcMessageId,
+    references: null,
+    fromAddress: copyFacts.email,
+    fromHeader: `Owner <${copyFacts.email}>`,
+  });
+  assert.equal(changedSubjectReply.kind, "unique");
+  if (changedSubjectReply.kind !== "unique")
+    throw new Error("Gmail exact reference missing");
+  assert.equal(changedSubjectReply.enrollment.id, sequence);
+  assert.equal(changedSubjectReply.attribution?.outboundProvider, "gmail");
+  assert.equal(
+    changedSubjectReply.attribution?.reservationId,
+    campaignBegin.reservationId,
+  );
+  const changedThread = `changed-thread-${randomUUID()}`;
+  const inboundId = `changed-inbound-${randomUUID()}`;
+  const observation = {
+    messageId: inboundId,
+    historyId: "200",
+    threadId: changedThread,
+    inReplyTo: issued.value.rfcMessageId,
+    references: null,
+    fromAddress: copyFacts.email,
+    fromHeader: `Owner <${copyFacts.email}>`,
+  };
+  try {
+    const recorded = await postgresGmailSyncRepository.recordInboundEvent(db, {
+      binding: {
+        connectionId: id,
+        googleSubject: "test-subject",
+        grantEpoch: connection.version,
+        grantedScopes: connection.scopes,
+      },
+      sequenceEnrollmentId: sequence,
+      prospectId: prospect,
+      contactId: contact,
+      gmailMessageId: inboundId,
+      gmailThreadId: changedThread,
+      observation,
+      rfcMessageId: `<inbound-${randomUUID()}@example.test>`,
+      from: observation.fromHeader,
+      subject: "Changed subject",
+      receivedAt: new Date(),
+      eventType: "reply",
+      correlationId: randomUUID(),
+    });
+    assert.equal(recorded.alreadyRecorded, false);
+    const [stored] = await admin<
+      { reservationId: string; provider: string }[]
+    >`select e.outreach_reply_reservation_id as "reservationId",e.outreach_reply_attribution->>'outboundProvider' as provider from growth.email_events e join growth.email_messages em on em.id=e.email_message_id where em.provider_message_id=${inboundId}`;
+    assert.deepEqual(stored, {
+      reservationId: campaignBegin.reservationId,
+      provider: "gmail",
+    });
+  } finally {
+    await admin`delete from growth.email_events where email_message_id in (select id from growth.email_messages where provider_message_id=${inboundId})`;
+    await admin`delete from growth.email_messages where provider_message_id=${inboundId}`;
+  }
+
   const [confirmed] = await admin<
     {
       receipts: number;

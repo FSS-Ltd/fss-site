@@ -189,6 +189,7 @@ export function createGmailReplySync({
         inReplyTo: observation.inReplyTo,
         references: observation.references,
         fromAddress: observation.fromAddress,
+        fromHeader: observation.fromHeader,
       });
       if (match.kind === "none") return;
       if (match.kind === "uncertain") {
