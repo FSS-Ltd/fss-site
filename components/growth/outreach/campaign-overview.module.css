@@ -1,0 +1,110 @@
+.panel {
+  min-width: 0;
+  border: 1px solid #dce3e8;
+  border-radius: 12px;
+  background: #fff;
+  padding: 22px;
+  color: #07182e;
+}
+.header,
+.title,
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+}
+.header h2,
+.title h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+.header p,
+.title p,
+.footer p {
+  margin: 4px 0 0;
+  color: #526078;
+  font-size: 0.85rem;
+}
+.header a {
+  align-self: center;
+  color: #075f66;
+  font-weight: 650;
+}
+.header a:focus-visible {
+  outline: 3px solid #087f88;
+  outline-offset: 3px;
+}
+.goal {
+  margin: 20px 0;
+  color: #526078;
+  font-size: 0.88rem;
+}
+.list {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.campaign {
+  min-width: 0;
+  border: 1px solid #e3e9ec;
+  border-radius: 10px;
+  padding: 18px;
+}
+.title h3,
+.title p,
+.footer p {
+  overflow-wrap: anywhere;
+}
+.state {
+  align-self: start;
+  border-radius: 6px;
+  background: #e6f3f4;
+  padding: 5px 9px;
+  color: #075f66;
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 16px;
+  margin: 22px 0;
+}
+.metrics div {
+  min-width: 0;
+}
+.metrics dt {
+  color: #526078;
+  font-size: 0.78rem;
+}
+.metrics dd {
+  margin: 5px 0 0;
+  font-size: 1.35rem;
+  font-weight: 750;
+}
+.footer {
+  border-top: 1px solid #e3e9ec;
+  padding-top: 12px;
+}
+.empty,
+.note {
+  color: #526078;
+  font-size: 0.85rem;
+}
+.note {
+  margin: 20px 0 0;
+}
+@media (max-width: 480px) {
+  .panel {
+    padding: 16px;
+  }
+  .campaign {
+    padding: 14px;
+  }
+  .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
