@@ -1,3 +1,5 @@
+import { z } from "zod";
+import { reviewedRecipientSchema } from "../sequences/reviewed-recipient";
 import { createHash } from "node:crypto";
 import {
   intersectAuthorityBounds,
@@ -152,7 +154,18 @@ export async function loadCanonicalOutreachPreparation(
     where m.sequence_id=${row.sequenceId}
   `;
   if (memberships.length > 1) return held("membership_ambiguous");
-  if (memberships.length === 0 && row.approvedRecipient !== row.normalizedEmail)
+  const snapshot = z
+    .object({ effectiveRecipient: reviewedRecipientSchema })
+    .safeParse(row.templateSnapshot);
+  const effective = snapshot.success ? snapshot.data.effectiveRecipient : null;
+  if (
+    !effective ||
+    effective.email !== row.normalizedEmail ||
+    effective.contactId !== row.contactId ||
+    effective.contactVersion !== row.contactVersion ||
+    effective.prospectVersion !== row.prospectVersion ||
+    (memberships.length === 0 && row.approvedRecipient !== row.normalizedEmail)
+  )
     return held("legacy_approval_unbound");
   let campaignAuthority: unknown = null;
   let bounds: AuthorityBounds = {

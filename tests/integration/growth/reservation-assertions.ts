@@ -55,6 +55,15 @@ export async function exerciseLegacyReservation(
       { status: "held", reason: "legacy_approval_unbound" },
     );
     await admin`update growth.sequence_enrollments set template_snapshot=${admin.json({ approvedRecipient: contactEmail })} where id=${sequenceId}`;
+    assert.deepEqual(
+      await reserveOutreachAttempt(db, {
+        messageId,
+        leaseToken,
+        attemptKey: randomUUID(),
+      }),
+      { status: "held", reason: "legacy_approval_unbound" },
+    );
+    await admin`update growth.sequence_enrollments set template_snapshot=${admin.json({ approvedRecipient: contactEmail, effectiveRecipient: { email: contactEmail, contactId, contactVersion: 1, prospectVersion: 1 } })} where id=${sequenceId}`;
     await admin`update growth.email_messages set outreach_claim_previous_status=null where id=${messageId}`;
     assert.deepEqual(
       await reserveOutreachAttempt(db, {
@@ -400,6 +409,18 @@ export async function exerciseLegacyReservation(
         reason: "terminal_fence_busy",
       });
     });
+    await admin`update growth.contacts set version=version+1 where id=${contactId}`;
+    assert.deepEqual(await beginOutreachSubmission(db, begin), {
+      status: "held",
+      reason: "legacy_approval_unbound",
+    });
+    await admin`update growth.contacts set version=1 where id=${contactId}`;
+    await admin`update growth.prospects set version=version+1 where id=${prospectId}`;
+    assert.deepEqual(await beginOutreachSubmission(db, begin), {
+      status: "held",
+      reason: "legacy_approval_unbound",
+    });
+    await admin`update growth.prospects set version=1 where id=${prospectId}`;
     await admin`update growth.outreach_account_controls set state='paused' where connection_id=${id}`;
     assert.deepEqual(await beginOutreachSubmission(db, begin), {
       status: "held",
@@ -473,7 +494,7 @@ export async function exerciseLegacyReservation(
       ).status,
       "ready",
     );
-    await admin`update growth.contacts set email=${contactEmail},version=version+1 where id=${contactId}`;
+    await admin`update growth.contacts set email=${contactEmail},version=1 where id=${contactId}`;
     await admin`update growth.email_messages set outreach_claim_previous_status='retry' where id=${messageId}`;
     const next = await reserveOutreachAttempt(db, {
       messageId,
