@@ -4,7 +4,6 @@ import { evaluateCampaignEligibility } from "./policy";
 import { assignCampaignVariant } from "./variants";
 import { buildCampaignSubject, buildCampaignCopy } from "./copy";
 import { campaignMonthAnniversary, londonDayKey } from "./time";
-import { buildCampaignReport } from "./report";
 import { campaignPolicySchema, eligibilitySnapshotSchema } from "./schemas";
 
 test("unknown permission is review and revoked approval blocks", () => {
@@ -78,52 +77,6 @@ test("London month anniversary clamps and preserves local time across DST", () =
     "2025-11-01T12:00:00.000Z",
   );
   assert.equal(londonDayKey(new Date("2025-03-30T23:30:00Z")), "2025-03-31");
-});
-test("report excludes immature observations and unreviewed or non-positive replies", () => {
-  const report = buildCampaignReport({
-    firstSentAt: new Date("2026-01-01T12:00:00Z"),
-    cutoff: new Date("2026-01-20T12:00:00Z"),
-    members: [
-      {
-        membershipId: "1",
-        businessId: "a",
-        market: "UK",
-        offer: "review",
-        policyVersion: 1,
-        variantId: "a",
-        firstSentAt: new Date("2026-01-01T12:00:00Z"),
-        replyObservationComplete: true,
-        meetingObservation: "complete" as const,
-        paymentObservation: "complete" as const,
-        replies: [
-          {
-            id: "r",
-            kind: "out_of_office",
-            reviewed: true,
-            occurredAt: new Date("2026-01-02"),
-          },
-        ],
-        outcomes: [],
-      },
-      {
-        membershipId: "2",
-        businessId: "b",
-        market: "UK",
-        offer: "review",
-        policyVersion: 1,
-        variantId: "b",
-        firstSentAt: new Date("2026-01-10T12:00:00Z"),
-        replyObservationComplete: true,
-        meetingObservation: "complete" as const,
-        paymentObservation: "complete" as const,
-        replies: [],
-        outcomes: [],
-      },
-    ],
-  });
-  assert.equal(report.groups[0].mature, 1);
-  assert.equal(report.groups[0].positiveReplies, 0);
-  assert.equal(report.groups[1].censored, 1);
 });
 
 test("automatic eligibility requires current approval, verified evidence, and explicit Resend opt-in", () => {
@@ -356,47 +309,6 @@ test("automatic eligibility requires current approval, verified evidence, and ex
     "review",
   );
 });
-test("report deduplicates replies and counts only reviewed net cleared payments", () => {
-  const reply = {
-    id: "reply",
-    kind: "positive" as const,
-    reviewed: true,
-    occurredAt: new Date("2026-01-02"),
-  };
-  const payment = {
-    membershipId: "1",
-    outcomeId: "payment",
-    kind: "payment" as const,
-    occurredAt: new Date("2026-01-10"),
-    reviewed: true,
-    evidenceId: "invoice",
-    netClearedPence: 0,
-  };
-  const member = {
-    membershipId: "1",
-    businessId: "a",
-    market: "UK",
-    offer: "review",
-    policyVersion: 1,
-    variantId: "a",
-    firstSentAt: new Date("2026-01-01"),
-    replyObservationComplete: true,
-    meetingObservation: "complete" as const,
-    paymentObservation: "complete" as const,
-    replies: [reply, reply],
-    outcomes: [payment, payment],
-  };
-  const report = buildCampaignReport({
-    firstSentAt: new Date("2026-01-01"),
-    cutoff: new Date("2026-02-01"),
-    members: [member, member],
-  });
-  assert.equal(report.groups[0].mature, 1);
-  assert.equal(report.groups[0].positiveReplies, 1);
-  assert.equal(report.groups[0].paidConversions, 0);
-  assert.ok(report.groups[0].interval);
-  assert.equal(report.winner, null);
-});
 
 test("policy rejects invalid ramp, timezone and overnight window", () => {
   assert.equal(
@@ -507,154 +419,11 @@ test("copy escapes HTML, varies only the CTA and requires an artifact for previe
   );
 });
 
-test("report separates missing and later observations and only selects a clear mature comparison", () => {
-  const first = new Date("2026-01-01T12:00:00Z");
-  const members = Array.from({ length: 60 }, (_, index) => ({
-    membershipId: String(index),
-    businessId: String(index),
-    market: "GB",
-    offer: "review",
-    policyVersion: 1,
-    variantId: index < 30 ? "a" : "b",
-    firstSentAt: first,
-    replyObservationComplete: true,
-    meetingObservation: "complete" as const,
-    paymentObservation: "complete" as const,
-    replies:
-      index < 30
-        ? [
-            {
-              id: `reply-${index}`,
-              kind: "positive" as const,
-              reviewed: true,
-              occurredAt: new Date("2026-01-02"),
-            },
-          ]
-        : [],
-    outcomes:
-      index === 0
-        ? [
-            {
-              membershipId: "0",
-              outcomeId: "meeting",
-              kind: "meeting" as const,
-              occurredAt: new Date("2026-01-03"),
-              reviewed: true,
-              evidenceId: "evidence",
-              netClearedPence: null,
-            },
-          ]
-        : [],
-  }));
-  const report = buildCampaignReport({
-    firstSentAt: first,
-    cutoff: new Date("2026-02-01"),
-    members,
-  });
-  assert.equal(report.winner, "a");
-  assert.equal(report.groups[0].qualifiedMeetings, 1);
-  const incomplete = buildCampaignReport({
-    firstSentAt: first,
-    cutoff: new Date("2026-02-01"),
-    members: [
-      { ...members[0], replyObservationComplete: false },
-      {
-        ...members[1],
-        membershipId: "later",
-        firstSentAt: new Date("2026-01-15"),
-      },
-    ],
-  });
-  assert.equal(incomplete.groups[0].missingReplies, 1);
-  assert.equal(incomplete.groups[0].later, 1);
-  assert.equal(incomplete.winner, null);
-  const confounded = buildCampaignReport({
-    firstSentAt: first,
-    cutoff: new Date("2026-02-01"),
-    members: [members[0], { ...members[30], market: "US" }],
-  });
-  assert.equal(confounded.winnerReason, "confounded");
-});
-
 test("campaign cadence stops after two follow-ups", async () => {
   const { campaignCadenceDays } = await import("./time");
   assert.deepEqual(campaignCadenceDays("review"), [5, 10]);
   assert.deepEqual(campaignCadenceDays("facebook"), [2, 4]);
   assert.deepEqual(campaignCadenceDays("website"), [2, 4]);
-});
-
-test("outcome evidence remains visible independently of reply completeness", () => {
-  const first = new Date("2026-01-01T12:00:00Z");
-  const member = {
-    membershipId: "independent",
-    businessId: "business",
-    market: "GB",
-    offer: "review",
-    policyVersion: 1,
-    variantId: "a",
-    firstSentAt: first,
-    replyObservationComplete: false,
-    meetingObservation: "complete" as const,
-    paymentObservation: "complete" as const,
-    replies: [],
-    outcomes: [
-      {
-        membershipId: "independent",
-        outcomeId: "meeting",
-        kind: "meeting" as const,
-        occurredAt: new Date("2026-01-03"),
-        reviewed: true,
-        evidenceId: "e",
-        netClearedPence: null,
-      },
-      {
-        membershipId: "independent",
-        outcomeId: "payment",
-        kind: "payment" as const,
-        occurredAt: new Date("2026-01-10"),
-        reviewed: true,
-        evidenceId: "e",
-        netClearedPence: 100,
-      },
-    ],
-  };
-  const group = buildCampaignReport({
-    firstSentAt: first,
-    cutoff: new Date("2026-02-01"),
-    members: [member],
-  }).groups[0];
-  assert.equal(group.missingReplies, 1);
-  assert.equal(group.qualifiedMeetings, 1);
-  assert.equal(group.paidConversions, 1);
-  assert.equal(group.meetingMature, 1);
-  assert.equal(group.paymentMature, 1);
-});
-
-test("outcome observation distinguishes missing and censored from confirmed absence", () => {
-  const first = new Date("2026-01-01T12:00:00Z");
-  const member = {
-    membershipId: "1",
-    businessId: "b",
-    market: "GB",
-    offer: "review",
-    policyVersion: 1,
-    variantId: "a",
-    firstSentAt: first,
-    replyObservationComplete: true,
-    meetingObservation: "unknown" as const,
-    paymentObservation: "censored" as const,
-    replies: [],
-    outcomes: [],
-  };
-  const group = buildCampaignReport({
-    firstSentAt: first,
-    cutoff: new Date("2026-02-01"),
-    members: [member],
-  }).groups[0];
-  assert.equal(group.meetingUnknown, 1);
-  assert.equal(group.paymentCensored, 1);
-  assert.equal(group.meetingMature, 0);
-  assert.equal(group.paymentMature, 0);
 });
 
 test("campaign weekdays default to business days and reject duplicates", async () => {

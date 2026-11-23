@@ -324,7 +324,12 @@ const replySchema = z.object({
   ]),
   reviewed: z.boolean(),
   occurredAt: date,
+  recordedAt: date,
 });
+const confirmationBasisSchema = z.enum([
+  "gmail_fss_sent_observed",
+  "resend_fss_delivery_observed",
+]);
 const reportMemberSchema = z.object({
   membershipId: id,
   businessId: id,
@@ -332,15 +337,23 @@ const reportMemberSchema = z.object({
   offer: id,
   policyVersion: z.number().int().positive(),
   variantId: id,
-  firstSentAt: date,
-  replyObservationComplete: z.boolean(),
+  variantVersion: z.number().int().positive(),
+  cta: id,
+  comparisonFingerprint: id.nullable(),
+  commercialTermsFingerprint: id.nullable(),
+  confirmation: z.object({
+    basis: confirmationBasisSchema,
+    observedAt: date,
+    possibleInvocationFrom: date.nullable(),
+  }),
+  replyCoverage: z.enum(["complete", "unknown", "censored"]),
   meetingObservation: z.enum(["complete", "unknown", "censored"]),
   paymentObservation: z.enum(["complete", "unknown", "censored"]),
   replies: z.array(replySchema),
-  outcomes: z.array(campaignOutcomeInputSchema),
+  outcomes: z.array(campaignOutcomeInputSchema.extend({ recordedAt: date })),
 });
 export const campaignReportInputSchema = z.object({
-  firstSentAt: date,
+  anchor: z.object({ basis: confirmationBasisSchema, observedAt: date }),
   cutoff: date,
   members: z.array(reportMemberSchema),
 });
@@ -350,11 +363,20 @@ const groupSchema = z.object({
   offer: id,
   policyVersion: z.number(),
   variantId: id,
+  variantVersion: z.number(),
+  cta: id,
+  comparisonFingerprint: id.nullable(),
+  commercialTermsFingerprint: id.nullable(),
+  basis: confirmationBasisSchema,
   mature: z.number(),
   censored: z.number(),
   later: z.number(),
   positiveReplies: z.number(),
+  knownPositiveReplies: z.number(),
+  preAnchorPositiveReplies: z.number(),
+  unknownOriginPositiveReplies: z.number(),
   qualifiedMeetings: z.number(),
+  unknownOriginMeetings: z.number(),
   meetingMature: z.number(),
   meetingUnknown: z.number(),
   meetingCensored: z.number(),
@@ -362,19 +384,22 @@ const groupSchema = z.object({
   paymentUnknown: z.number(),
   paymentCensored: z.number(),
   paidConversions: z.number(),
+  unknownOriginPayments: z.number(),
   missingReplies: z.number(),
   positiveReplyRate: z.number().nullable(),
   interval: z.tuple([z.number(), z.number()]).nullable(),
 });
 export const campaignReportSchema = z.object({
-  firstSentAt: date,
+  anchor: z.object({ basis: confirmationBasisSchema, observedAt: date }),
   cutoff: date,
   groups: z.array(groupSchema),
+  ambiguousEvidence: z.number().int().nonnegative(),
   winner: z.string().nullable(),
   winnerReason: z.enum([
     "clear_interval",
     "insufficient_evidence",
     "confounded",
+    "unknown",
   ]),
 });
 export type CampaignReport = z.infer<typeof campaignReportSchema>;
