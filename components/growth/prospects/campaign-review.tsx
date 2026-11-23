@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { ProspectCampaignResult } from "@/lib/growth/dashboard/prospect-campaign";
 import { formatGrowthDateTime } from "@/lib/growth/dashboard/formatters";
+import { CampaignPermissionForm } from "./campaign-permission-form";
 import { SourceVerificationForm } from "./source-verification-form";
 import styles from "./campaign-review.module.css";
 
@@ -138,10 +139,48 @@ export function CampaignReview({
             version={version}
             contact={contact}
           />
+          {result.membership && (
+            <div className={styles.enrol}>
+              <h3>Review membership · {result.membership.campaignName}</h3>
+              <p>
+                Policy version {result.membership.policyVersion} · membership{" "}
+                {result.membership.status.replaceAll("_", " ")} ·{" "}
+                {result.membership.provider} ·{" "}
+                {result.membership.jurisdiction ?? "jurisdiction unknown"}
+              </p>
+              <p>
+                {result.membership.permissionExpiresAt
+                  ? `Permission recorded; expires ${formatGrowthDateTime(result.membership.permissionExpiresAt)}.`
+                  : "No current permission record."}{" "}
+                A record does not establish send eligibility.
+              </p>
+              <p>
+                {result.membership.preparation
+                  ? `Preparation job: ${result.membership.preparation.status.replaceAll("_", " ")}${result.membership.preparation.reason ? ` · ${result.membership.preparation.reason.replaceAll("_", " ")}` : ""}.`
+                  : "No preparation job recorded for this permission."}
+              </p>
+              {result.membership.canRecord &&
+              result.verification?.status === "current" ? (
+                <CampaignPermissionForm
+                  membership={result.membership}
+                  verification={result.verification}
+                />
+              ) : (
+                <p>
+                  Permission recording is unavailable. Check the current source,
+                  approved policy, jurisdiction and exclusion state.
+                </p>
+              )}
+            </div>
+          )}
           {result.reviewStatus === "excluded" ? (
             <p>This prospect is excluded from outreach review.</p>
           ) : result.reviewStatus === "already_in_outreach" ? (
-            <p>This business already has an outreach membership or sequence.</p>
+            !result.membership && (
+              <p>
+                This business already has an outreach membership or sequence.
+              </p>
+            )
           ) : !result.verification ||
             result.verification.status !== "current" ? (
             <p>Verify current source evidence before choosing a campaign.</p>

@@ -348,3 +348,204 @@ test("enrol adapter accepts only an exact founder-approved policy and leaves mem
   assert.equal((await handle(request(input))).status, 200);
   assert.equal(calls, 2);
 });
+
+test("permission adapter derives provider and jurisdiction from the stored membership, with explicit attestation and stable replay", async () => {
+  const { createHash } = await import("node:crypto");
+  const email = "j.ntagengwa@faithfulsoftware.dev";
+  const actualFounder = {
+    email,
+    actorId: createHash("sha256").update(email).digest("hex"),
+  };
+  const proof = {
+    summary: "Reviewed",
+    reference: { kind: "private", value: "proof" },
+    observedAt: "2026-11-20T12:00:00Z",
+    expiresAt: "2026-12-20T12:00:00Z",
+  };
+  const policy = {
+    version: 2,
+    offer: "review",
+    jurisdiction: "GB",
+    permissionRequirement: "consent",
+    capabilityEvidence: "proof",
+    capabilityAttestation: proof,
+    providerAttestation: {
+      ...proof,
+      provider: "gmail",
+      jurisdiction: "GB",
+      confirmed: true,
+    },
+  };
+  const database = (async () => [
+    { version: 2, country: "GB", policy },
+  ]) as unknown as GrowthDb;
+  const seen: Parameters<typeof executeCampaignCommand>[1][] = [];
+  const execute: typeof executeCampaignCommand = async (_db, input) => {
+    seen.push(input);
+    return {
+      status: "ok",
+      id: command.requestId,
+      version: 2,
+      alreadyExisted: false,
+    };
+  };
+  const handle = createCampaignCommandHandler({
+    db: database,
+    config: { origin: "https://example.com" },
+    authorizeFounder: async () => actualFounder,
+    execute,
+    createCorrelationId: () => "correlation",
+    reportUnexpectedError: () => {},
+  });
+  const input = {
+    type: "record_permission",
+    requestId: command.requestId,
+    membershipId: command.campaignId,
+    expectedPolicyVersion: 2,
+    expectedProspectVersion: 4,
+    expectedContactVersion: 3,
+    proofRequestId: "7a71c3fc-4d35-4691-976b-2240fcd08828",
+    summary: "Recipient opted in",
+    reference: { kind: "private", value: "signed-record" },
+    observedAt: proof.observedAt,
+    expiresAt: proof.expiresAt,
+    attestation: { kind: "consent", explicitOptIn: true },
+  };
+  assert.equal((await handle(request(input))).status, 200);
+  assert.equal((await handle(request(input))).status, 200);
+  assert.deepEqual(seen[0], seen[1]);
+  const saved = seen[0];
+  assert.ok(saved && saved.type === "record_permission");
+  assert.equal(saved.provider, "gmail");
+  assert.equal(saved.jurisdiction, "GB");
+  assert.equal(saved.evidenceId, input.requestId);
+  assert.equal(saved.proofRequestId, input.proofRequestId);
+  assert.equal(
+    (await handle(request({ ...input, provider: "resend" }))).status,
+    422,
+  );
+  assert.equal(
+    (
+      await handle(
+        request({
+          ...input,
+          attestation: { kind: "consent", explicitOptIn: false },
+        }),
+      )
+    ).status,
+    422,
+  );
+  assert.equal(
+    (await handle(request({ ...input, observedAt: "2026-11-20" }))).status,
+    422,
+  );
+  assert.equal(
+    (
+      await handle(
+        request({
+          ...input,
+          attestation: {
+            kind: "requested_service",
+            requestedAt: proof.observedAt,
+            attestsRecipientRequest: true,
+            messageScope: "initial_and_two_followups",
+          },
+        }),
+      )
+    ).status,
+    409,
+  );
+});
+
+test("requested-service permission requires explicit scope and binds the stored offer", async () => {
+  const { createHash } = await import("node:crypto");
+  const email = "j.ntagengwa@faithfulsoftware.dev";
+  const actualFounder = {
+    email,
+    actorId: createHash("sha256").update(email).digest("hex"),
+  };
+  const proof = {
+    summary: "Reviewed",
+    reference: { kind: "private", value: "proof" },
+    observedAt: "2026-11-20T12:00:00Z",
+    expiresAt: "2026-12-20T12:00:00Z",
+  };
+  const policy = {
+    version: 2,
+    offer: "review",
+    jurisdiction: "GB",
+    permissionRequirement: "requested_service",
+    capabilityEvidence: "proof",
+    capabilityAttestation: proof,
+    providerAttestation: {
+      ...proof,
+      provider: "gmail",
+      jurisdiction: "GB",
+      confirmed: true,
+    },
+  };
+  const db = (async () => [{ version: 2, policy }]) as unknown as GrowthDb;
+  let saved: Parameters<typeof executeCampaignCommand>[1] | undefined;
+  const execute: typeof executeCampaignCommand = async (_db, input) => {
+    saved = input;
+    return {
+      status: "ok",
+      id: command.requestId,
+      version: 2,
+      alreadyExisted: false,
+    };
+  };
+  const handle = createCampaignCommandHandler({
+    db,
+    config: { origin: "https://example.com" },
+    authorizeFounder: async () => actualFounder,
+    execute,
+    createCorrelationId: () => "ref",
+    reportUnexpectedError: () => {},
+  });
+  const input = {
+    type: "record_permission",
+    requestId: command.requestId,
+    membershipId: command.campaignId,
+    expectedPolicyVersion: 2,
+    expectedProspectVersion: 4,
+    expectedContactVersion: 3,
+    proofRequestId: "7a71c3fc-4d35-4691-976b-2240fcd08828",
+    summary: "Recipient asked for the review service",
+    reference: { kind: "public", value: "https://example.com/request" },
+    observedAt: proof.observedAt,
+    expiresAt: proof.expiresAt,
+    attestation: {
+      kind: "requested_service",
+      requestedAt: proof.observedAt,
+      attestsRecipientRequest: true,
+      messageScope: "initial_and_two_followups",
+    },
+  };
+  assert.equal((await handle(request(input))).status, 200);
+  assert.ok(saved && saved.type === "record_permission");
+  assert.equal(saved.requestedService?.offerId, "review");
+  assert.equal(saved.explicitOptIn, false);
+  assert.equal(
+    (
+      await handle(
+        request({
+          ...input,
+          attestation: { ...input.attestation, attestsRecipientRequest: false },
+        }),
+      )
+    ).status,
+    422,
+  );
+  assert.equal(
+    (
+      await handle(
+        request({
+          ...input,
+          reference: { kind: "public", value: "http://127.0.0.1/" },
+        }),
+      )
+    ).status,
+    422,
+  );
+});

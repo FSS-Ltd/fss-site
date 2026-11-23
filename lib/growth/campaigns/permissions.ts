@@ -24,8 +24,13 @@ export async function enqueueFirstPreparation(
     from growth.outreach_events e join growth.outreach_outbox o on o.event_id=e.id
     join growth.campaign_memberships m on m.id=e.membership_id and m.campaign_id=e.campaign_id and m.policy_version=e.policy_version
     join growth.campaigns c on c.id=e.campaign_id and c.version=e.policy_version
+    join growth.prospects prospect on prospect.id=m.prospect_id
     join growth.outreach_permissions p on p.id=e.result_id and p.membership_id=e.membership_id and p.id=m.current_permission_id
     where e.id=${eventId} and e.event_type='record_permission' and p.provider in ('gmail','resend')
+      and m.status in ('review','active','paused') and prospect.status not in ('suppressed','rejected','won','lost')
+      and not growth.is_outreach_client(prospect.id)
+      and not exists(select 1 from growth.suppressions s left join growth.contacts contact on contact.id=prospect.primary_contact_id
+        where s.business_id=prospect.business_id or s.normalised_email=contact.normalised_email or s.normalised_email=lower(trim(prospect.source_details->>'email')))
       and c.account_connection_id is not null and c.policy->>'provider'=p.provider
     on conflict (idempotency_key) do nothing`;
   const [conflict] = await tx<{ conflict: boolean }[]>`
@@ -108,14 +113,31 @@ export async function recordCampaignPermission(
   )
     throw new Error("policy_version_changed");
   const [prospect] = await tx<
-    { version: number; contactId: string | null; country: string }[]
-  >`select p.version,p.primary_contact_id as "contactId",b.country_code as country from growth.prospects p join growth.businesses b on b.id=p.business_id where p.id=${member.prospectId} for update of p`;
+    {
+      version: number;
+      contactId: string | null;
+      country: string;
+      status: string;
+      isClient: boolean;
+      suppressed: boolean;
+    }[]
+  >`select p.version,p.primary_contact_id as "contactId",b.country_code as country,p.status,
+      growth.is_outreach_client(p.id) as "isClient",
+      exists(select 1 from growth.suppressions s left join growth.contacts c on c.id=p.primary_contact_id
+        where s.business_id=p.business_id or s.normalised_email=c.normalised_email or s.normalised_email=lower(trim(p.source_details->>'email'))) as suppressed
+    from growth.prospects p join growth.businesses b on b.id=p.business_id where p.id=${member.prospectId} for update of p`;
   if (
     !prospect ||
     !prospect.contactId ||
     prospect.version !== command.expectedProspectVersion
   )
     throw new Error("prospect_version_changed");
+  if (
+    prospect.isClient ||
+    prospect.suppressed ||
+    ["suppressed", "rejected", "won", "lost"].includes(prospect.status)
+  )
+    throw new Error("excluded");
   const [contact] = await tx<
     { version: number }[]
   >`select version from growth.contacts where id=${prospect.contactId} for update`;

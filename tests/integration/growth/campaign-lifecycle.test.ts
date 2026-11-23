@@ -395,6 +395,90 @@ test(
         randomUUID(),
       );
       assert.equal(repeated.id, saved.id);
+      const emailSuppression = `${token}@example.com`;
+      await db`insert into growth.suppressions(normalised_email,reason,source,created_by) values (${emailSuppression},'opt out','test',${founder.actorId})`;
+      try {
+        const [beforeReplay] = await db<
+          { count: number }[]
+        >`select count(*)::int as count from growth.outreach_jobs where membership_id=${member.value.id}`;
+        const replayWhileSuppressed = await executeCampaignCommand(
+          db,
+          permission,
+          founder,
+          randomUUID(),
+        );
+        assert.equal(replayWhileSuppressed.id, saved.id);
+        const [afterReplay] = await db<
+          { count: number }[]
+        >`select count(*)::int as count from growth.outreach_jobs where membership_id=${member.value.id}`;
+        assert.equal(afterReplay?.count, beforeReplay?.count);
+        await assert.rejects(
+          executeCampaignCommand(
+            db,
+            {
+              ...permission,
+              requestId: randomUUID(),
+              evidenceId: randomUUID(),
+            },
+            founder,
+            randomUUID(),
+          ),
+          /excluded/,
+        );
+      } finally {
+        await cleanupDb`delete from growth.suppressions where normalised_email=${emailSuppression} and source='test'`;
+      }
+      const organisationId = randomUUID();
+      await cleanupDb`insert into operations.organisations(id,legal_name,display_name,trading_status,timezone,created_by,review_reference) values (${organisationId},${`member-${token}`},${`member-${token}`},'active','Europe/London',${founder.actorId},'synthetic test')`;
+      try {
+        await assert.rejects(
+          executeCampaignCommand(
+            db,
+            {
+              ...permission,
+              requestId: randomUUID(),
+              evidenceId: randomUUID(),
+            },
+            founder,
+            randomUUID(),
+          ),
+          /excluded/,
+        );
+        assert.equal(
+          (await executeCampaignCommand(db, permission, founder, randomUUID()))
+            .id,
+          saved.id,
+        );
+      } finally {
+        await cleanupDb`delete from operations.organisations where id=${organisationId}`;
+      }
+      const [previousStatus] = await db<
+        { status: string }[]
+      >`select status from growth.prospects where id=${lead.prospectId}`;
+      assert.ok(previousStatus);
+      await db`update growth.prospects set status='rejected' where id=${lead.prospectId}`;
+      try {
+        await assert.rejects(
+          executeCampaignCommand(
+            db,
+            {
+              ...permission,
+              requestId: randomUUID(),
+              evidenceId: randomUUID(),
+            },
+            founder,
+            randomUUID(),
+          ),
+          /excluded/,
+        );
+        assert.equal(
+          (await executeCampaignCommand(db, permission, founder, randomUUID()))
+            .id,
+          saved.id,
+        );
+      } finally {
+        await db`update growth.prospects set status=${previousStatus.status} where id=${lead.prospectId}`;
+      }
       const renewed = await executeCampaignCommand(
         db,
         { ...permission, requestId: randomUUID(), evidenceId: randomUUID() },

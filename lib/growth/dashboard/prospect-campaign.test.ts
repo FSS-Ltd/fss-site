@@ -16,6 +16,7 @@ function database(active: boolean): GrowthQueryExecutor {
     if (query.includes("from growth.prospects p where"))
       return [{ status: "new", isClient: false, suppressed: false, active }];
     if (query.includes("from (select distinct on (id)")) return [];
+    if (query.includes("from growth.campaign_memberships m join")) return [];
     throw new Error("unexpected query");
   };
   return tx as unknown as GrowthQueryExecutor;
@@ -32,6 +33,7 @@ test("does not infer source verification, consent, or campaigns from absent evid
     status: "ready",
     verification: null,
     reviewStatus: "available",
+    membership: null,
     campaigns: [],
     truncated: false,
   });
@@ -104,8 +106,10 @@ test("requires current matching source and only exposes valid approved policy ve
     contactVersion: 3,
     prospectVersion: 4,
     primaryContactId: "contact",
-    requestId: "request",
+    requestId: "c8f19d64-bfbb-4d62-a578-e3f48ea6c435",
   };
+  let memberRows: object[] = [];
+  let isClient = false;
   const db = (async (parts: TemplateStringsArray) => {
     const q = parts.join(" ");
     if (q.includes("from growth.source_evidence e join"))
@@ -119,8 +123,15 @@ test("requires current matching source and only exposes valid approved policy ve
       ];
     if (q.includes("from growth.prospects p where"))
       return [
-        { status: "new", isClient: false, suppressed: false, active: false },
+        {
+          status: "new",
+          isClient,
+          suppressed: false,
+          active: memberRows.length > 0,
+        },
       ];
+    if (q.includes("from growth.campaign_memberships m join"))
+      return memberRows;
     if (q.includes("from (select distinct on (id)"))
       return [
         {
@@ -141,7 +152,49 @@ test("requires current matching source and only exposes valid approved policy ve
   assert.equal(result.verification?.status, "current");
   assert.equal(result.campaigns[0]?.version, 2);
   assert.equal(result.campaigns[0]?.status, "paused");
+  memberRows = [
+    {
+      id: "membership",
+      campaignName: "Review",
+      policyVersion: 2,
+      status: "review",
+      policyStatus: "paused",
+      approvedBy: founder.actorId,
+      approvedAt: observedAt,
+      latestVersion: 2,
+      country: "GB",
+      policy,
+      permissionExpiresAt: new Date("2026-12-22T09:00:00Z"),
+      preparationStatus: "held",
+      preparationReason: "permission_invalid",
+    },
+  ];
+  const memberResult = await getProspectCampaign(
+    "prospect",
+    4,
+    founder,
+    db,
+    now,
+  );
+  assert.equal(memberResult.status, "ready");
+  if (memberResult.status === "ready") {
+    assert.equal(memberResult.membership?.canRecord, true);
+    assert.equal(
+      memberResult.membership?.preparation?.reason,
+      "permission_invalid",
+    );
+    assert.equal(memberResult.verification?.contactVersion, 3);
+  }
+  isClient = true;
+  const excluded = await getProspectCampaign("prospect", 4, founder, db, now);
+  if (excluded.status === "ready") {
+    assert.equal(excluded.reviewStatus, "excluded");
+    assert.equal(excluded.membership?.canRecord, false);
+  }
+  isClient = false;
   const stale = await getProspectCampaign("prospect", 5, founder, db, now);
-  if (stale.status === "ready")
+  if (stale.status === "ready") {
     assert.equal(stale.verification?.status, "stale");
+    assert.equal(stale.membership?.canRecord, false);
+  }
 });

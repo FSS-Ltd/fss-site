@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { campaignPolicyDefinitionSchema } from "./schemas";
+import { evidenceReferenceSchema } from "./permission-evidence";
 import { readEditableCampaignPolicy } from "./campaign-policy-editor";
 import { requireCampaignFounder } from "./authorization";
 import {
@@ -63,6 +64,31 @@ const lifecycleCommand = z.discriminatedUnion("type", [
   z.strictObject({ type: z.literal("resume"), ...fields }),
   z.strictObject({ type: z.literal("enrol"), ...fields, prospectId: z.uuid() }),
   z.strictObject({
+    type: z.literal("record_permission"),
+    requestId: z.uuid(),
+    membershipId: z.uuid(),
+    expectedPolicyVersion: z.number().int().positive(),
+    expectedProspectVersion: z.number().int().positive(),
+    expectedContactVersion: z.number().int().positive(),
+    proofRequestId: z.uuid(),
+    summary: z.string().trim().min(1).max(2000),
+    reference: evidenceReferenceSchema,
+    observedAt: z.iso.datetime({ offset: true }),
+    expiresAt: z.iso.datetime({ offset: true }),
+    attestation: z.discriminatedUnion("kind", [
+      z.strictObject({
+        kind: z.literal("consent"),
+        explicitOptIn: z.literal(true),
+      }),
+      z.strictObject({
+        kind: z.literal("requested_service"),
+        requestedAt: z.iso.datetime({ offset: true }),
+        attestsRecipientRequest: z.literal(true),
+        messageScope: z.literal("initial_and_two_followups"),
+      }),
+    ]),
+  }),
+  z.strictObject({
     type: z.literal("create"),
     requestId: z.uuid(),
     name: z.string().trim().min(1).max(200),
@@ -88,6 +114,69 @@ export function createCampaignCommandHandler(dependencies: {
     bodySchema: lifecycleCommand,
     action: async ({ body, founder, correlationId }) => {
       const execute = dependencies.execute ?? executeCampaignCommand;
+      if (body.type === "record_permission") {
+        requireCampaignFounder(founder);
+        const [membership] = await dependencies.db<
+          { version: number; policy: unknown }[]
+        >`
+          select m.policy_version as version,c.policy
+          from growth.campaign_memberships m
+          join growth.campaigns c on c.id=m.campaign_id and c.version=m.policy_version
+          where m.id=${body.membershipId}
+        `;
+        const parsed = campaignPolicyDefinitionSchema.safeParse(
+          membership?.policy,
+        );
+        if (
+          !membership ||
+          membership.version !== body.expectedPolicyVersion ||
+          !parsed.success
+        )
+          throw new Error("permission_invalid");
+        const policy = parsed.data;
+        const { offer, jurisdiction, permissionRequirement } = policy;
+        if (
+          !offer ||
+          !jurisdiction ||
+          !permissionRequirement ||
+          permissionRequirement !== body.attestation.kind
+        )
+          throw new Error("permission_invalid");
+        // The request ID is also the identifier of the newly created permission row.
+        // Source proof remains an existing, independently verified request ID.
+        return execute(
+          dependencies.db,
+          {
+            type: "record_permission",
+            requestId: body.requestId,
+            evidenceId: body.requestId,
+            membershipId: body.membershipId,
+            basis: permissionRequirement,
+            provider: policy.provider,
+            jurisdiction,
+            expectedProspectVersion: body.expectedProspectVersion,
+            expectedContactVersion: body.expectedContactVersion,
+            proofRequestId: body.proofRequestId,
+            summary: body.summary,
+            reference: body.reference,
+            observedAt: new Date(body.observedAt),
+            expiresAt: new Date(body.expiresAt),
+            explicitOptIn: body.attestation.kind === "consent",
+            ...(body.attestation.kind === "requested_service"
+              ? {
+                  requestedService: {
+                    requestedAt: new Date(body.attestation.requestedAt),
+                    offerId: offer,
+                    messageScope: body.attestation.messageScope,
+                    attestsRecipientRequest: true as const,
+                  },
+                }
+              : {}),
+          },
+          founder,
+          correlationId,
+        );
+      }
       if (body.type === "enrol") {
         requireCampaignFounder(founder);
         const [approved] = await dependencies.db<{ id: string }[]>`
@@ -207,9 +296,31 @@ export function createCampaignCommandHandler(dependencies: {
     },
     mapActionError: (error) => {
       if (!(error instanceof Error)) return null;
+      const permissionMessages: Record<string, string> = {
+        verification_required: "Current source verification is required.",
+        prospect_version_changed:
+          "The prospect changed. Refresh and review its source evidence.",
+        contact_version_changed:
+          "The contact changed. Refresh and review its source evidence.",
+        membership_unavailable: "The review membership is unavailable.",
+        permission_invalid:
+          "The permission evidence does not match the current policy or jurisdiction.",
+        excluded: "This prospect is excluded from outreach.",
+      };
+      if (Object.hasOwn(permissionMessages, error.message))
+        return {
+          status: 409,
+          code: error.message,
+          message: permissionMessages[error.message]!,
+        };
       const known = new Set([
         "unsupported_stored_policy",
         "bound_provider_changed",
+        "verification_required",
+        "prospect_version_changed",
+        "contact_version_changed",
+        "membership_unavailable",
+        "permission_invalid",
         "prospect_not_found",
         "identity_changed",
         "excluded",

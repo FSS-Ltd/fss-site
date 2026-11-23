@@ -32,8 +32,12 @@ test("current verified evidence and approved campaign remain explicitly review o
         result={{
           status: "ready",
           reviewStatus: "available",
+          membership: null,
           verification: {
             status: "current",
+            requestId: "c8f19d64-bfbb-4d62-a578-e3f48ea6c435",
+            contactVersion: 1,
+            prospectVersion: 4,
             email: "person@example.com",
             observation: "Offers bookings",
             contactSourceUrl: "https://example.com/contact",
@@ -73,6 +77,7 @@ test("stale evidence and failures do not expose enrolment", () => {
         result={{
           status: "ready",
           reviewStatus: "available",
+          membership: null,
           verification: null,
           campaigns: [
             {
@@ -90,4 +95,54 @@ test("stale evidence and failures do not expose enrolment", () => {
   );
   assert.match(html, /Verify current source evidence/);
   assert.doesNotMatch(html, /Add for review/);
+});
+
+test("permission capture requires explicit opt-in and shows recorded job state", () => {
+  const html = renderToStaticMarkup(
+    <AppRouterContext.Provider value={router}>
+      <CampaignReview
+        prospectId="x"
+        version={4}
+        contact={null}
+        result={{
+          status: "ready",
+          reviewStatus: "already_in_outreach",
+          verification: {
+            status: "current",
+            requestId: "c8f19d64-bfbb-4d62-a578-e3f48ea6c435",
+            contactVersion: 3,
+            prospectVersion: 4,
+            email: "person@example.com",
+            observation: "Offers bookings",
+            contactSourceUrl: "https://example.com/contact",
+            contactObservedAt: "2026-11-22T09:00:00.000Z",
+            observationSourceUrl: "https://example.com/",
+            observedAt: "2026-11-22T09:00:00.000Z",
+            freshUntil: "2026-12-22T09:00:00.000Z",
+          },
+          membership: {
+            id: "m",
+            campaignName: "Campaign",
+            policyVersion: 2,
+            status: "review",
+            provider: "gmail",
+            jurisdiction: "GB",
+            basis: "consent",
+            offer: "review",
+            canRecord: true,
+            permissionExpiresAt: "2026-12-22T09:00:00.000Z",
+            preparation: { status: "held", reason: "permission_invalid" },
+          },
+          campaigns: [],
+          truncated: false,
+        }}
+      />
+    </AppRouterContext.Provider>,
+  );
+  assert.match(html, /Preparation job: held/);
+  assert.match(html, /permission invalid/);
+  assert.match(html, /recipient explicitly opted in/);
+  assert.match(html, /type="checkbox"[^>]*required/);
+  assert.doesNotMatch(html, /type="checkbox"[^>]*checked/);
+  assert.match(html, /contact details, not permission/);
 });

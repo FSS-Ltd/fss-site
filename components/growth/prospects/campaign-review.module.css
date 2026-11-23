@@ -94,3 +94,11 @@
     padding: 16px;
   }
 }
+.form label.checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.form label.checkbox input {
+  width: auto;
+}
