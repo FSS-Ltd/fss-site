@@ -1,5 +1,8 @@
 import { z } from "zod";
-import { campaignPolicyDefinitionSchema } from "./schemas";
+import {
+  campaignPolicyDefinitionSchema,
+  campaignTimestampSchema,
+} from "./schemas";
 import { evidenceReferenceSchema } from "./permission-evidence";
 import { readEditableCampaignPolicy } from "./campaign-policy-editor";
 import { requireCampaignFounder } from "./authorization";
@@ -78,6 +81,27 @@ const lifecycleCommand = z.discriminatedUnion("type", [
       "out_of_office",
       "opt_out",
       "unknown",
+    ]),
+  }),
+  z.strictObject({
+    type: z.literal("record_outcome"),
+    requestId: z.uuid(),
+    membershipId: z.uuid(),
+    expectedPolicyVersion: z.number().int().positive(),
+    expectedProspectVersion: z.number().int().positive(),
+    expectedContactVersion: z.number().int().positive(),
+    outcome: z.discriminatedUnion("kind", [
+      z.strictObject({
+        kind: z.literal("meeting"),
+        crmActivityId: z.uuid(),
+        occurredAt: campaignTimestampSchema,
+        qualified: z.literal(true),
+      }),
+      z.strictObject({
+        kind: z.literal("proposal"),
+        engagementId: z.uuid(),
+        stageEventId: z.uuid(),
+      }),
     ]),
   }),
   z.strictObject({
@@ -314,6 +338,12 @@ export function createCampaignCommandHandler(dependencies: {
     mapActionError: (error) => {
       if (!(error instanceof Error)) return null;
       const permissionMessages: Record<string, string> = {
+        outcome_context_changed:
+          "The campaign, prospect, contact or confirmation changed. Refresh and review again.",
+        outcome_evidence_unavailable:
+          "This meeting or proposal event is unavailable or outside the eligible period.",
+        outcome_evidence_attributed:
+          "This evidence was already attributed to a campaign.",
         review_context_changed:
           "The campaign, prospect or contact changed. Refresh before reviewing this reply.",
         reply_evidence_unavailable:

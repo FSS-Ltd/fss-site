@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { ProspectCampaignResult } from "@/lib/growth/dashboard/prospect-campaign";
 import { formatGrowthDateTime } from "@/lib/growth/dashboard/formatters";
+import { CampaignOutcomeReview } from "./campaign-outcome-review";
+import type { ProspectOutcomes } from "@/lib/growth/dashboard/prospect-campaign-outcomes";
 import { CampaignReplyReview } from "./campaign-reply-review";
 import { CampaignPermissionForm } from "./campaign-permission-form";
 import { SourceVerificationForm } from "./source-verification-form";
@@ -19,11 +21,13 @@ export function CampaignReview({
   prospectId,
   version,
   contact,
+  outcomes = { status: "unavailable" },
 }: {
   result: ProspectCampaignResult;
   prospectId: string;
   version: number;
   contact: Contact;
+  outcomes?: ProspectOutcomes;
 }) {
   const router = useRouter();
   const [selection, setSelection] = useState("");
@@ -256,6 +260,7 @@ export function CampaignReview({
             </div>
           )}
           <CampaignReplyReview result={result.replies} />
+          <CampaignOutcomeReview result={outcomes} />
           {message && (
             <p ref={feedback} tabIndex={-1} role={done ? "status" : "alert"}>
               {message}

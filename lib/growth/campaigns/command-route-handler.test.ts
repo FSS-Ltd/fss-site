@@ -585,3 +585,83 @@ test("reply review accepts only supported classifications and exact message vers
     422,
   );
 });
+
+test("outcome review accepts only qualified meeting or proposal event with current versions", async () => {
+  const seen: Parameters<typeof executeCampaignCommand>[1][] = [];
+  const execute: typeof executeCampaignCommand = async (_db, input) => {
+    seen.push(input);
+    return {
+      status: "ok",
+      id: command.campaignId,
+      version: 1,
+      alreadyExisted: false,
+    };
+  };
+  const run = handler(execute);
+  const input = {
+    type: "record_outcome",
+    requestId: command.requestId,
+    membershipId: command.campaignId,
+    expectedPolicyVersion: 1,
+    expectedProspectVersion: 2,
+    expectedContactVersion: 3,
+    outcome: {
+      kind: "meeting",
+      crmActivityId: "7a71c3fc-4d35-4691-976b-2240fcd08828",
+      occurredAt: "2026-11-22T12:00:00Z",
+      qualified: true,
+    },
+  };
+  assert.equal((await run(request(input))).status, 200);
+  assert.equal((await run(request(input))).status, 200);
+  assert.deepEqual(seen[0], seen[1]);
+  assert.equal(
+    (
+      await run(
+        request({ ...input, outcome: { ...input.outcome, qualified: false } }),
+      )
+    ).status,
+    422,
+  );
+  assert.equal(
+    (await run(request({ ...input, outcome: { kind: "paid" } }))).status,
+    422,
+  );
+  assert.equal(
+    (
+      await run(
+        request({
+          ...input,
+          outcome: {
+            kind: "proposal",
+            engagementId: command.campaignId,
+            stageEventId: input.outcome.crmActivityId,
+          },
+        }),
+      )
+    ).status,
+    200,
+  );
+  assert.equal(
+    (
+      await run(
+        request({
+          ...input,
+          outcome: {
+            kind: "proposal",
+            engagementId: command.campaignId,
+            stageEventId: input.outcome.crmActivityId,
+            occurredAt: input.outcome.occurredAt,
+          },
+        }),
+      )
+    ).status,
+    422,
+  );
+  const conflict = handler(async () => {
+    throw new Error("outcome_evidence_attributed");
+  });
+  const response = await conflict(request(input));
+  assert.equal(response.status, 409);
+  assert.match(await response.text(), /outcome_evidence_attributed/);
+});

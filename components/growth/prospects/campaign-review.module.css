@@ -136,3 +136,27 @@
   color: #07182e;
   font: inherit;
 }
+
+.outcomeForm {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+  min-width: 0;
+}
+.outcomeForm input:not([type="checkbox"]) {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid #8c9aa7;
+  border-radius: 5px;
+  font: inherit;
+}
+.outcomeForm label.checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.outcomeForm button {
+  justify-self: start;
+}

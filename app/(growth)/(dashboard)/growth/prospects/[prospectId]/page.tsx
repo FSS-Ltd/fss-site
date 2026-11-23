@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 
 import { CampaignReview } from "@/components/growth/prospects/campaign-review";
 import { requireFounder } from "@/lib/growth/auth/require-founder";
+import { getProspectCampaignOutcomes } from "@/lib/growth/dashboard/prospect-campaign-outcomes";
 import { getProspectCampaign } from "@/lib/growth/dashboard/prospect-campaign";
 import { ProspectDetailView } from "@/components/growth/prospects/prospect-detail";
 import styles from "@/components/growth/prospects/prospects.module.css";
@@ -24,9 +25,10 @@ export default async function ProspectDetailPage({
   const founder = await requireFounder();
   const { prospectId } = await params;
   const now = new Date().toISOString();
-  const [result, integrations] = await Promise.all([
+  const [result, integrations, outcomes] = await Promise.all([
     getProspectDetail(prospectId),
     getIntegrationHealthSummary(),
+    getProspectCampaignOutcomes(prospectId, founder),
   ]);
 
   if (result.status === "not_found") {
@@ -59,6 +61,7 @@ export default async function ProspectDetailPage({
         <>
           <CampaignReview
             result={campaignReview}
+            outcomes={outcomes}
             prospectId={result.data.id}
             version={result.data.version}
             contact={result.data.contact}
