@@ -168,7 +168,7 @@ export async function exerciseCampaignReservation(
       await admin`insert into growth.contacts(id,business_id,email,email_source_url,email_verified_at,subscriber_type,lawful_basis) values (${contact},${business},${`${randomUUID()}@example.test`},'https://example.test',now(),'corporate','consent')`;
       await admin`insert into growth.prospects(id,business_id,primary_contact_id,status,fit_score,opportunity_summary,recommended_offer,estimated_one_off_min_pence,estimated_one_off_max_pence,assigned_owner_email) values (${prospect},${business},${contact},'ready_for_email_review',0,'test','test',0,0,${email})`;
       await admin`insert into growth.sequence_enrollments(id,prospect_id,contact_id,status) values (${sequence},${prospect},${contact},'active')`;
-      await admin`insert into growth.email_messages(id,sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key,lease_token,lease_expires_at,outreach_claim_previous_status,subject_snapshot,html_snapshot,text_snapshot) values (${message},${sequence},${prospect},${contact},'gmail','outbound',0,'sending',${randomUUID()},${lease},now()+interval '5 minutes','queued','Subject','<p>Body</p>','Body')`;
+      await admin`insert into growth.email_messages(id,sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key,lease_token,lease_expires_at,outreach_claim_previous_status,outreach_guarded_claim,subject_snapshot,html_snapshot,text_snapshot) values (${message},${sequence},${prospect},${contact},'gmail','outbound',0,'sending',${randomUUID()},${lease},now()+interval '5 minutes','queued',true,'Subject','<p>Body</p>','Body')`;
       await admin`update growth.sequence_enrollments set template_snapshot=(select jsonb_build_object('approvedRecipient',normalised_email,'effectiveRecipient',jsonb_build_object('email',normalised_email,'contactId',id,'contactVersion',version,'prospectVersion',1)) from growth.contacts where id=${contact}) where id=${sequence}`;
 
       await admin`insert into growth.campaign_memberships(id,campaign_id,policy_version,business_id,prospect_id,request_id,status,sequence_id) values (${member},${campaign.id},2,${business},${prospect},${randomUUID()},'active',${sequence})`;
@@ -242,7 +242,7 @@ export async function exerciseCampaignReservation(
       );
       await admin`delete from growth.audit_log where entity_id=${unboundAttempt.value.reservationId}`;
       await admin`delete from growth.outreach_reservations where id=${unboundAttempt.value.reservationId}`;
-      await admin`update growth.email_messages set rfc_message_id=null where id=${message}`;
+      await admin`update growth.email_messages set rfc_message_id=null,attempt_count=0 where id=${message}`;
       const [copyFacts] = await admin<
         { email: string; observationId: string }[]
       >`
@@ -300,7 +300,7 @@ export async function exerciseCampaignReservation(
       );
       await admin`delete from growth.audit_log where entity_id=${changedAttempt.value.reservationId}`;
       await admin`delete from growth.outreach_reservations where id=${changedAttempt.value.reservationId}`;
-      await admin`update growth.email_messages set text_snapshot=${copy.text},rfc_message_id=null where id=${message}`;
+      await admin`update growth.email_messages set text_snapshot=${copy.text},rfc_message_id=null,attempt_count=0 where id=${message}`;
       const followupId = randomUUID();
       await admin`insert into growth.email_messages(id,sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key,subject_snapshot,html_snapshot,text_snapshot,controlled_preparation)
         select ${followupId},sequence_enrollment_id,prospect_id,contact_id,channel,direction,1,'draft',${randomUUID()},subject_snapshot,html_snapshot,text_snapshot,controlled_preparation from growth.email_messages where id=${message}`;
@@ -360,7 +360,7 @@ export async function exerciseCampaignReservation(
         await admin`insert into growth.contacts(id,business_id,email,email_source_url,email_verified_at,subscriber_type,lawful_basis) values (${manualContact},${manualBusiness},${manualEmail},'https://example.test',now(),'corporate','consent')`;
         await admin`insert into growth.prospects(id,business_id,primary_contact_id,status,fit_score,opportunity_summary,recommended_offer,estimated_one_off_min_pence,estimated_one_off_max_pence,assigned_owner_email) values (${manualProspect},${manualBusiness},${manualContact},'ready_for_email_review',0,'test','test',0,0,${email})`;
         await admin`insert into growth.sequence_enrollments(id,prospect_id,contact_id,status,template_snapshot) values (${manualSequence},${manualProspect},${manualContact},'active',${admin.json({ followUpPolicy: "manual_only", approvedRecipient: manualEmail, effectiveRecipient: { email: manualEmail, contactId: manualContact, contactVersion: 1, prospectVersion: 1 } })})`;
-        await admin`insert into growth.email_messages(id,sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key,lease_token,lease_expires_at,outreach_claim_previous_status,subject_snapshot,html_snapshot,text_snapshot) values (${manualMessage},${manualSequence},${manualProspect},${manualContact},'gmail','outbound',0,'sending',${randomUUID()},${manualLease},now()+interval '5 minutes','queued','Manual','<p>Manual</p>','Manual')`;
+        await admin`insert into growth.email_messages(id,sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key,lease_token,lease_expires_at,outreach_claim_previous_status,outreach_guarded_claim,subject_snapshot,html_snapshot,text_snapshot) values (${manualMessage},${manualSequence},${manualProspect},${manualContact},'gmail','outbound',0,'sending',${randomUUID()},${manualLease},now()+interval '5 minutes','queued',true,'Manual','<p>Manual</p>','Manual')`;
         await admin`update growth.outreach_account_controls set ramp=25 where connection_id=${id}`;
         await admin`insert into growth.outreach_reservations(idempotency_key,email_message_id,sequence_id,account_id,london_day,status,connection_id,grant_epoch,rfc_message_id,recipient_count,authority_fingerprint,lease_token,lease_until,submitted_at) select gen_random_uuid()::text,${manualMessage},${manualSequence},${id},(now() at time zone 'Europe/London')::date,'rejected',${id},1,'<seed@example.test>',1,${"a".repeat(64)},${manualLease},now()+interval '5 minutes',now() from generate_series(1,24)`;
         const mixedRace = await Promise.all([
@@ -382,14 +382,15 @@ export async function exerciseCampaignReservation(
         assert.ok(
           mixedRace.some(
             (result) =>
-              result.status === "held" && result.reason === "account_limit",
+              result.status === "held" &&
+              result.reason === "attempt_unresolved",
           ),
         );
       } finally {
         await admin`update growth.outreach_account_controls set ramp=50 where connection_id=${id}`;
         await admin`delete from growth.audit_log where entity_type='outreach_reservation' and entity_id in (select id::text from growth.outreach_reservations where email_message_id in (${message},${manualMessage}))`;
         await admin`delete from growth.outreach_reservations where email_message_id in (${message},${manualMessage})`;
-        await admin`update growth.email_messages set rfc_message_id=null where id=${message}`;
+        await admin`update growth.email_messages set rfc_message_id=null,attempt_count=0 where id=${message}`;
         await admin`delete from growth.email_messages where id=${manualMessage}`;
         await admin`delete from growth.sequence_enrollments where id=${manualSequence}`;
         await admin`delete from growth.prospects where id=${manualProspect}`;
@@ -497,7 +498,7 @@ export async function exerciseCampaignReservation(
           );
           await admin`delete from growth.audit_log where entity_type='outreach_reservation' and entity_id=${reserve.value.reservationId}`;
           await admin`delete from growth.outreach_reservations where id=${reserve.value.reservationId}`;
-          await admin`update growth.email_messages set rfc_message_id=null where id=${message}`;
+          await admin`update growth.email_messages set rfc_message_id=null,attempt_count=0 where id=${message}`;
         } finally {
           await admin.begin(async (tx) => {
             await tx`alter table growth.source_evidence disable trigger protect_founder_source_evidence`;

@@ -8,6 +8,7 @@ export function withTransitionClock(
   finish: Date,
   expectBudget = true,
   minClocks = 3,
+  expectTerminal = true,
 ): GrowthDb {
   return new Proxy(db, {
     get(target, property, receiver) {
@@ -62,8 +63,8 @@ export function withTransitionClock(
           const result = await operation(wrapped);
           assert.equal(
             terminal,
-            1,
-            `terminal statement intercepted once: ${JSON.stringify(result)}`,
+            expectTerminal ? 1 : 0,
+            `terminal statement intercepted as expected: ${JSON.stringify(result)}`,
           );
           return result;
         });

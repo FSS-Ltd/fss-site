@@ -25,6 +25,8 @@ import { assessReservationBudget } from "./reservation-budget";
 import { campaignPolicyDefinitionSchema } from "./schemas";
 import { loadControlledPreparation } from "./controlled-preparation";
 import { londonDayKey } from "./time";
+import type { SubmissionClock } from "./submission-clock";
+import { MAX_GMAIL_RAW_MESSAGE_BYTES } from "../integrations/gmail/client";
 
 export type ReservedOutreach = {
   reservationId: string;
@@ -52,6 +54,7 @@ export type IssuedSnapshot = {
 };
 export type IssuedOutreach = ReservedOutreach & {
   issuedSnapshot: IssuedSnapshot;
+  submissionClock: SubmissionClock;
 };
 
 function renderPreparation(preparation: CanonicalOutreachPreparation) {
@@ -204,12 +207,12 @@ async function checkBudget(
     { globalUsed: number; accountUsed: number; campaignUsed: number }[]
   >`
     select count(*)::int as "globalUsed",count(*) filter(where connection_id=${identity.connectionId} or account_id=${account.usage.accountId})::int as "accountUsed",count(*) filter(where campaign_id=${identity.campaignId})::int as "campaignUsed"
-    from growth.outreach_reservations where london_day=${day}::date and status <> 'cancelled' and (${excluding}::uuid is null or id<>${excluding}::uuid)
+    from growth.outreach_reservations where london_day=${day}::date and not (connection_id is not null and ((status='cancelled' and submitted_at is null and issued_snapshot is null) or (status='rejected' and direct_noninvocation_evidence is not null))) and (${excluding}::uuid is null or id<>${excluding}::uuid)
   `;
   if (!counts) return "invalid_budget";
   const outstanding = await tx<
     Pending[]
-  >`select status as state,provider_message_id as "providerId",recipient_count as "recipientCount" from growth.outreach_reservations where connection_id=${identity.connectionId} and status in ('reserved','submitting','uncertain','accepted') and (status in ('reserved','submitting','uncertain') or direct_submission_evidence is null or confirmation_observed_at is null or confirmation_observed_at > ${new Date(now.getTime() - 86400000)}) and (${excluding}::uuid is null or id<>${excluding}::uuid)`;
+  >`select case when status in ('rejected','cancelled','sent') then 'uncertain' else status end as state,provider_message_id as "providerId",recipient_count as "recipientCount" from growth.outreach_reservations where connection_id=${identity.connectionId} and (status in ('reserved','submitting','uncertain') or (status='accepted' and (direct_submission_evidence is null or confirmation_observed_at is null or confirmation_observed_at > ${new Date(now.getTime() - 86400000)})) or (status='rejected' and direct_noninvocation_evidence is null) or status='sent' or (status='cancelled' and (submitted_at is not null or issued_snapshot is not null))) and (${excluding}::uuid is null or id<>${excluding}::uuid)`;
   let campaignCeiling: number | null = null;
   if (identity.campaignId) {
     const [policy] = await tx<
@@ -235,6 +238,30 @@ async function checkBudget(
     outstanding,
     recipientCount: 1,
   });
+}
+
+async function validReservedHistory(
+  tx: GrowthTransaction,
+  messageId: string,
+  leaseToken: string,
+): Promise<boolean> {
+  const [history] = await tx<
+    {
+      guarded: boolean;
+      attempts: number;
+      total: number;
+      leases: number;
+      current: number;
+      unsafe: boolean;
+    }[]
+  >`select em.outreach_guarded_claim as guarded,em.attempt_count as attempts,(select count(*)::int from growth.outreach_reservations r where r.email_message_id=em.id) as total,(select count(distinct r.lease_token)::int from growth.outreach_reservations r where r.email_message_id=em.id) as leases,(select count(*)::int from growth.outreach_reservations r where r.email_message_id=em.id and r.lease_token=${leaseToken}) as current,exists(select 1 from growth.outreach_reservations r where r.email_message_id=em.id and r.lease_token is distinct from ${leaseToken} and (r.connection_id is null or not ((r.status='cancelled' and r.submitted_at is null and r.issued_snapshot is null) or (r.status='rejected' and r.direct_noninvocation_evidence is not null)))) as unsafe from growth.email_messages em where em.id=${messageId}`;
+  return (
+    !!history?.guarded &&
+    history.total === history.leases &&
+    history.total === history.attempts &&
+    history.current === 1 &&
+    !history.unsafe
+  );
 }
 
 export async function reserveOutreachAttempt(
@@ -282,6 +309,10 @@ export async function reserveOutreachAttempt(
     >`select london_day::text as day,id,authority_fingerprint as fingerprint,status,fence,rfc_message_id as rfc,lease_until as "leaseUntil",lease_token as "leaseToken",connection_id as "connectionId",grant_epoch as "grantEpoch" from growth.outreach_reservations where idempotency_key=${input.attemptKey} for update`;
     if (existing) {
       if (
+        !(await validReservedHistory(tx, identity.messageId, input.leaseToken))
+      )
+        return held("claim_history_unproven");
+      if (
         existing.status !== "reserved" ||
         existing.fingerprint !== preparation.fingerprint ||
         existing.leaseToken !== input.leaseToken ||
@@ -324,19 +355,29 @@ export async function reserveOutreachAttempt(
         attempts: number;
         previousStatus: string | null;
         ledgerExists: boolean;
+        guarded: boolean;
       }[]
-    >`select em.attempt_count as attempts,em.outreach_claim_previous_status as "previousStatus",exists(select 1 from growth.outreach_reservations r where r.email_message_id=em.id) as "ledgerExists" from growth.email_messages em where em.id=${identity.messageId}`;
-    if (!history || !history.previousStatus)
+    >`select em.attempt_count as attempts,em.outreach_claim_previous_status as "previousStatus",em.outreach_guarded_claim as guarded,exists(select 1 from growth.outreach_reservations r where r.email_message_id=em.id) as "ledgerExists" from growth.email_messages em where em.id=${identity.messageId}`;
+    if (!history || !history.previousStatus || !history.guarded)
       return held("claim_provenance_unknown");
-    if (
-      !history.ledgerExists &&
-      (history.previousStatus !== "queued" || history.attempts > 1)
-    )
+    if (!history.ledgerExists && history.attempts > 0)
       return held("legacy_attempt_unreconciled");
     const [unresolved] = await tx<
       { found: boolean }[]
-    >`select exists(select 1 from growth.outreach_reservations where email_message_id=${identity.messageId} and (connection_id is null or status not in ('rejected','cancelled'))) as found`;
+    >`select exists(select 1 from growth.outreach_reservations where email_message_id=${identity.messageId} and (connection_id is null or not ((status='cancelled' and submitted_at is null and issued_snapshot is null) or (status='rejected' and direct_noninvocation_evidence is not null)))) as found`;
     if (unresolved?.found) return held("attempt_unresolved");
+    {
+      const [coverage] = await tx<
+        { leases: number; total: number; current: boolean }[]
+      >`select count(distinct lease_token)::int as leases,count(*)::int as total,coalesce(bool_or(lease_token=${input.leaseToken}),false) as current from growth.outreach_reservations where email_message_id=${identity.messageId}`;
+      if (
+        !coverage ||
+        coverage.current ||
+        coverage.total !== coverage.leases ||
+        coverage.leases !== history.attempts
+      )
+        return held("claim_history_unproven");
+    }
     const budget = await checkBudget(tx, identity, day, account, now, null);
     if (budget !== "ready") return held(budget);
     const rendered = renderPreparation(preparation);
@@ -361,7 +402,7 @@ export async function reserveOutreachAttempt(
         select ${reservationId},${input.attemptKey},${identity.campaignId},${identity.policyVersion},${identity.membershipId},${identity.messageId},${identity.sequenceId},${account.usage.accountId},${day}::date,${identity.connectionId},${account.grantEpoch},${rendered.rfcMessageId},1,${preparation.fingerprint},${input.leaseToken},at + interval '5 minutes',${fence.value},at
         from authority_gate where day_ok and interval_ok and window_ok returning id
       ), message_write as (
-        update growth.email_messages set rfc_message_id=coalesce(rfc_message_id,${rendered.rfcMessageId})
+        update growth.email_messages set rfc_message_id=coalesce(rfc_message_id,${rendered.rfcMessageId}),attempt_count=attempt_count+1
         where id=${identity.messageId} and (rfc_message_id is null or rfc_message_id=${rendered.rfcMessageId}) and exists(select 1 from inserted) returning id
       ), audit_write as (
         insert into growth.audit_log(correlation_id,actor_type,actor_id,action,entity_type,entity_id,metadata)
@@ -417,6 +458,8 @@ export async function beginOutreachSubmission(
     );
     if (locked.status === "held") return locked;
     const { preparation, account, now, bounds, window } = locked.value;
+    if (!(await validReservedHistory(tx, identity.messageId, input.leaseToken)))
+      return held("claim_history_unproven");
     const [reservation] = await tx<
       {
         status: string;
@@ -463,7 +506,9 @@ export async function beginOutreachSubmission(
     const rendered = renderPreparation(preparation);
     if (rendered.rfcMessageId !== reservation.rfc)
       return held("rfc_message_id_changed");
-    if (rendered.raw.length > 4_000_000)
+    if (
+      Buffer.byteLength(rendered.raw, "base64url") > MAX_GMAIL_RAW_MESSAGE_BYTES
+    )
       return held("issued_payload_too_large");
     const rawSha256 = createHash("sha256")
       .update(Buffer.from(rendered.raw, "base64url"))
@@ -533,6 +578,11 @@ export async function beginOutreachSubmission(
         rfcMessageId: reservation.rfc,
         preparation,
         issuedSnapshot,
+        submissionClock: {
+          londonDay: initial.day,
+          bounds: submissionBounds,
+          window,
+        },
       },
     };
   });

@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
+import { mock } from "node:test";
+import { createGmailClient } from "../../../lib/growth/integrations/gmail/client";
 import type postgres from "postgres";
+import { submitReservedOutreach } from "../../../lib/growth/campaigns/direct-submission";
 import { exerciseConfirmationCapacity } from "./reservation-capacity-assertions";
 import { withTransitionClock } from "./reservation-clock";
 import { createGmailConfirmation } from "../../../lib/growth/campaigns/gmail-confirmation";
@@ -28,6 +31,11 @@ export async function exerciseLegacyReservation(
     messageId = randomUUID(),
     messageId2 = randomUUID(),
     messageId3 = randomUUID(),
+    haltMessage = randomUUID(),
+    credentialMessage = randomUUID(),
+    failureMessage = randomUUID(),
+    largeMessage = randomUUID(),
+    expiryMessage = randomUUID(),
     leaseToken = randomUUID(),
     leaseToken2 = randomUUID(),
     otherAccount = randomUUID(),
@@ -38,7 +46,7 @@ export async function exerciseLegacyReservation(
     await admin`insert into growth.contacts(id,business_id,email,email_source_url,email_verified_at,subscriber_type,lawful_basis) values (${contactId},${businessId},${contactEmail},'https://example.test',now(),'corporate','consent')`;
     await admin`insert into growth.prospects(id,business_id,primary_contact_id,status,fit_score,opportunity_summary,recommended_offer,estimated_one_off_min_pence,estimated_one_off_max_pence,assigned_owner_email) values (${prospectId},${businessId},${contactId},'ready_for_email_review',0,'test','test',0,0,${email})`;
     await admin`insert into growth.sequence_enrollments(id,prospect_id,contact_id,status) values (${sequenceId},${prospectId},${contactId},'active')`;
-    await admin`insert into growth.email_messages(id,sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key,lease_token,lease_expires_at,outreach_claim_previous_status) values (${messageId},${sequenceId},${prospectId},${contactId},'gmail','outbound',0,'sending',${randomUUID()},${leaseToken},now()+interval '5 minutes','queued')`;
+    await admin`insert into growth.email_messages(id,sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key,lease_token,lease_expires_at,outreach_claim_previous_status,outreach_guarded_claim) values (${messageId},${sequenceId},${prospectId},${contactId},'gmail','outbound',0,'sending',${randomUUID()},${leaseToken},now()+interval '5 minutes','queued',true)`;
     const missing = await reserveOutreachAttempt(db, {
       messageId,
       leaseToken,
@@ -73,7 +81,17 @@ export async function exerciseLegacyReservation(
       }),
       { status: "held", reason: "claim_provenance_unknown" },
     );
-    await admin`update growth.email_messages set outreach_claim_previous_status='retry' where id=${messageId}`;
+    await admin`update growth.email_messages set outreach_claim_previous_status='retry',attempt_count=1 where id=${messageId}`;
+    await admin`update growth.email_messages set outreach_guarded_claim=false where id=${messageId}`;
+    assert.deepEqual(
+      await reserveOutreachAttempt(db, {
+        messageId,
+        leaseToken,
+        attemptKey: randomUUID(),
+      }),
+      { status: "held", reason: "claim_provenance_unknown" },
+    );
+    await admin`update growth.email_messages set outreach_guarded_claim=true where id=${messageId}`;
     assert.deepEqual(
       await reserveOutreachAttempt(db, {
         messageId,
@@ -82,7 +100,7 @@ export async function exerciseLegacyReservation(
       }),
       { status: "held", reason: "legacy_attempt_unreconciled" },
     );
-    await admin`update growth.email_messages set outreach_claim_previous_status='queued' where id=${messageId}`;
+    await admin`update growth.email_messages set outreach_claim_previous_status='queued',attempt_count=0 where id=${messageId}`;
 
     // Move only synthetic fixture times to the next London midnight, after all checks.
     const [clockFixture] = await admin<
@@ -139,7 +157,7 @@ export async function exerciseLegacyReservation(
       );
       await admin`delete from growth.audit_log where entity_type='outreach_reservation' and entity_id=${nextDay.value.reservationId}`;
       await admin`delete from growth.outreach_reservations where id=${nextDay.value.reservationId}`;
-      await admin`update growth.email_messages set rfc_message_id=null where id=${messageId}`;
+      await admin`update growth.email_messages set rfc_message_id=null,attempt_count=0 where id=${messageId}`;
       const attemptKey = randomUUID();
       const reserved = await reserveOutreachAttempt(
         withTransitionClock(db, beforeMidnight, beforeMidnight),
@@ -152,6 +170,45 @@ export async function exerciseLegacyReservation(
         { messageId, leaseToken, attemptKey },
       );
       assert.deepEqual(replay, reserved);
+      await admin`update growth.email_messages set outreach_guarded_claim=false where id=${messageId}`;
+      assert.deepEqual(
+        await reserveOutreachAttempt(
+          withTransitionClock(
+            db,
+            beforeMidnight,
+            beforeMidnight,
+            false,
+            3,
+            false,
+          ),
+          { messageId, leaseToken, attemptKey },
+        ),
+        { status: "held", reason: "claim_history_unproven" },
+      );
+      assert.deepEqual(
+        await beginOutreachSubmission(
+          withTransitionClock(
+            db,
+            beforeMidnight,
+            beforeMidnight,
+            false,
+            3,
+            false,
+          ),
+          {
+            reservationId: reserved.value.reservationId,
+            leaseToken,
+            fence: reserved.value.fence,
+            fingerprint: reserved.value.preparation.fingerprint,
+          },
+        ),
+        { status: "held", reason: "claim_history_unproven" },
+      );
+      await admin`update growth.email_messages set outreach_guarded_claim=true where id=${messageId}`;
+      const [replayState] = await admin<
+        { attempts: number }[]
+      >`select attempt_count as attempts from growth.email_messages where id=${messageId}`;
+      assert.equal(replayState?.attempts, 1);
       const expiredReplay = await reserveOutreachAttempt(
         withTransitionClock(db, beforeMidnight, clockFixture.midnight, false),
         { messageId, leaseToken, attemptKey },
@@ -197,7 +254,7 @@ export async function exerciseLegacyReservation(
       );
       await admin`delete from growth.audit_log where entity_type='outreach_reservation' and entity_id=${begin.reservationId}`;
       await admin`delete from growth.outreach_reservations where id=${begin.reservationId}`;
-      await admin`update growth.email_messages set rfc_message_id=null where id=${messageId}`;
+      await admin`update growth.email_messages set rfc_message_id=null,attempt_count=0 where id=${messageId}`;
     } finally {
       await admin`update growth.outreach_account_reviews set evidence=${admin.json(healthFixture.evidence)} where id=${healthFixture.id}`;
       await admin`update growth.outreach_provider_usage set captured_at=${clockFixture.captured},fresh_until=${clockFixture.expires},window_start=${clockFixture.windowStart} where connection_id=${id}`;
@@ -268,7 +325,7 @@ export async function exerciseLegacyReservation(
       assert.ok(valid.status === "ready");
       await admin`delete from growth.audit_log where entity_type='outreach_reservation' and entity_id=${valid.value.reservationId}`;
       await admin`delete from growth.outreach_reservations where id=${valid.value.reservationId}`;
-      await admin`update growth.email_messages set rfc_message_id=null where id=${messageId}`;
+      await admin`update growth.email_messages set rfc_message_id=null,attempt_count=0 where id=${messageId}`;
     } finally {
       await admin`update growth.outreach_provider_usage set captured_at=${clockFixture.captured},fresh_until=${clockFixture.expires},window_start=${clockFixture.windowStart},provider_message_ids=${admin.json(usageFixture.ids)} where connection_id=${id}`;
     }
@@ -319,7 +376,7 @@ export async function exerciseLegacyReservation(
       assert.equal(state?.audits, 1);
       await admin`delete from growth.audit_log where entity_type='outreach_reservation' and entity_id=${reserve.value.reservationId}`;
       await admin`delete from growth.outreach_reservations where id=${reserve.value.reservationId}`;
-      await admin`update growth.email_messages set rfc_message_id=null where id=${messageId}`;
+      await admin`update growth.email_messages set rfc_message_id=null,attempt_count=0 where id=${messageId}`;
     } finally {
       await admin`update growth.outreach_provider_usage set captured_at=${clockFixture.captured},fresh_until=${clockFixture.expires},window_start=${clockFixture.windowStart} where connection_id=${id}`;
       await admin`update growth.email_messages set lease_expires_at=${clockFixture.lease} where id=${messageId}`;
@@ -495,7 +552,9 @@ export async function exerciseLegacyReservation(
       "ready",
     );
     await admin`update growth.contacts set email=${contactEmail},version=1 where id=${contactId}`;
-    await admin`update growth.email_messages set outreach_claim_previous_status='retry' where id=${messageId}`;
+    await admin`delete from growth.audit_log where entity_type='outreach_reservation' and entity_id=${begin.reservationId}`;
+    await admin`delete from growth.outreach_reservations where id=${begin.reservationId}`;
+    await admin`update growth.email_messages set outreach_claim_previous_status='queued',attempt_count=0 where id=${messageId}`;
     const next = await reserveOutreachAttempt(db, {
       messageId,
       leaseToken,
@@ -635,9 +694,9 @@ export async function exerciseLegacyReservation(
     assert.equal(sentEvidence?.actual_sent_at, null);
     await admin`delete from growth.audit_log where entity_type='outreach_reservation' and entity_id in (select id::text from growth.outreach_reservations where email_message_id=${messageId})`;
     await admin`delete from growth.outreach_reservations where email_message_id=${messageId}`;
-    await admin`update growth.email_messages set outreach_claim_previous_status='queued' where id=${messageId}`;
+    await admin`update growth.email_messages set outreach_claim_previous_status='queued',attempt_count=0 where id=${messageId}`;
     await admin`update growth.outreach_account_controls set ramp=25 where connection_id=${id}`;
-    await admin`insert into growth.email_messages(id,sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key,lease_token,lease_expires_at,outreach_claim_previous_status,subject_snapshot,html_snapshot,text_snapshot) values (${messageId2},${sequenceId},${prospectId},${contactId},'gmail','outbound',0,'sending',${randomUUID()},${leaseToken2},now()+interval '5 minutes','queued','Second','<p>Second</p>','Second')`;
+    await admin`insert into growth.email_messages(id,sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key,lease_token,lease_expires_at,outreach_claim_previous_status,outreach_guarded_claim,subject_snapshot,html_snapshot,text_snapshot) values (${messageId2},${sequenceId},${prospectId},${contactId},'gmail','outbound',0,'sending',${randomUUID()},${leaseToken2},now()+interval '5 minutes','queued',true,'Second','<p>Second</p>','Second')`;
     await admin`insert into growth.outreach_reservations(idempotency_key,email_message_id,sequence_id,account_id,london_day,status,connection_id,grant_epoch,rfc_message_id,recipient_count,authority_fingerprint,lease_token,lease_until,submitted_at) select gen_random_uuid()::text,${messageId},${sequenceId},${id},(now() at time zone 'Europe/London')::date,'rejected',${id},1,'<synthetic@example.test>',1,${"a".repeat(64)},${leaseToken},now()+interval '5 minutes',now() from generate_series(1,24)`;
     const lastSlot = await Promise.all([
       reserveOutreachAttempt(db, {
@@ -657,11 +716,14 @@ export async function exerciseLegacyReservation(
     );
     assert.ok(
       lastSlot.some(
-        (entry) => entry.status === "held" && entry.reason === "account_limit",
+        (entry) =>
+          entry.status === "held" && entry.reason === "attempt_unresolved",
       ),
     );
-    await admin`delete from growth.audit_log where entity_type='outreach_reservation' and entity_id in (select id::text from growth.outreach_reservations where email_message_id in (${messageId},${messageId2},${messageId3}))`;
-    await admin`delete from growth.outreach_reservations where email_message_id in (${messageId},${messageId2},${messageId3})`;
+    await admin`delete from growth.audit_log where action='outreach_account.provider_halt' and correlation_id in (select id::text from growth.outreach_reservations where email_message_id in (${messageId},${messageId2},${messageId3},${haltMessage},${credentialMessage},${failureMessage},${largeMessage},${expiryMessage}))`;
+    await admin`delete from growth.audit_log where entity_type='outreach_reservation' and entity_id in (select id::text from growth.outreach_reservations where email_message_id in (${messageId},${messageId2},${messageId3},${haltMessage},${credentialMessage},${failureMessage},${largeMessage},${expiryMessage}))`;
+    await admin`delete from growth.outreach_reservations where email_message_id in (${messageId},${messageId2},${messageId3},${haltMessage},${credentialMessage},${failureMessage},${largeMessage},${expiryMessage})`;
+    await admin`update growth.email_messages set attempt_count=0 where id in (${messageId},${messageId2})`;
     await admin`update growth.outreach_account_controls set ramp=150 where connection_id=${id}`;
     await admin`insert into growth.integration_connections(id,provider,subject_email,status,google_subject) values (${otherConnection},'gmail',${`${randomUUID()}@example.test`},'connected','other-subject')`;
     await admin`insert into growth.outreach_provider_usage(account_id,complete,health,connection_id) values (${otherAccount},false,'unknown',${otherConnection})`;
@@ -692,8 +754,9 @@ export async function exerciseLegacyReservation(
         (entry) => entry.status === "held" && entry.reason === "global_limit",
       ),
     );
-    await admin`delete from growth.audit_log where entity_type='outreach_reservation' and entity_id in (select id::text from growth.outreach_reservations where email_message_id in (${messageId},${messageId2},${messageId3}))`;
-    await admin`delete from growth.outreach_reservations where email_message_id in (${messageId},${messageId2},${messageId3})`;
+    await admin`delete from growth.audit_log where entity_type='outreach_reservation' and entity_id in (select id::text from growth.outreach_reservations where email_message_id in (${messageId},${messageId2},${messageId3},${haltMessage},${credentialMessage},${failureMessage},${largeMessage},${expiryMessage}))`;
+    await admin`delete from growth.outreach_reservations where email_message_id in (${messageId},${messageId2},${messageId3},${haltMessage},${credentialMessage},${failureMessage},${largeMessage},${expiryMessage})`;
+    await admin`update growth.email_messages set attempt_count=0 where id in (${messageId},${messageId2})`;
     await admin`update growth.outreach_account_controls set ramp=50 where connection_id=${id}`;
     const [limits] = await admin<
       { reviewId: string; evidence: postgres.JSONValue }[]
@@ -741,28 +804,55 @@ export async function exerciseLegacyReservation(
       leaseToken: leaseToken2,
       fence: rejectedAttempt.value.fence,
     };
-    assert.equal(
-      (
-        await beginOutreachSubmission(db, {
-          ...rejectedLease,
-          fingerprint: rejectedAttempt.value.preparation.fingerprint,
-        })
-      ).status,
-      "ready",
+    const binding = {
+      connectionId: id,
+      googleSubject: "test-subject",
+      grantEpoch: 1,
+      grantedScopes: [
+        "openid",
+        "email",
+        "https://www.googleapis.com/auth/gmail.modify",
+      ],
+    };
+    assert.deepEqual(
+      await submitReservedOutreach(db, {
+        ...rejectedLease,
+        fingerprint: rejectedAttempt.value.preparation.fingerprint,
+        bound: {
+          binding,
+          client: {
+            sendMessageOnce: async () => ({
+              status: "not_invoked",
+              reason: "guard_rejected",
+            }),
+          },
+        },
+      }),
+      { status: "not_invoked", reason: "guard_rejected" },
     );
-    assert.equal(
-      (
-        await settleOutreachAttempt(db, {
-          ...rejectedLease,
-          outcome: { kind: "rejected" },
-        })
-      ).status,
-      "ready",
+    const [safe] = await admin<
+      { evidence: { kind: string } | null }[]
+    >`select direct_noninvocation_evidence as evidence from growth.outreach_reservations where id=${rejectedLease.reservationId}`;
+    assert.equal(safe?.evidence?.kind, "gmail_send_not_invoked_v1");
+    await assert.rejects(
+      admin`update growth.outreach_reservations set direct_noninvocation_evidence=null where id=${rejectedLease.reservationId}`,
+      /immutable/,
     );
+    const nextLease = randomUUID();
+    await admin`update growth.email_messages set attempt_count=2,lease_token=${nextLease},outreach_claim_previous_status='sending' where id=${messageId2}`;
+    assert.deepEqual(
+      await reserveOutreachAttempt(db, {
+        messageId: messageId2,
+        leaseToken: nextLease,
+        attemptKey: randomUUID(),
+      }),
+      { status: "held", reason: "claim_history_unproven" },
+    );
+    await admin`update growth.email_messages set attempt_count=1,lease_token=${nextLease} where id=${messageId2}`;
     await admin`update growth.email_messages set outreach_claim_previous_status='retry' where id=${messageId2}`;
     const retried = await reserveOutreachAttempt(db, {
       messageId: messageId2,
-      leaseToken: leaseToken2,
+      leaseToken: nextLease,
       attemptKey: randomUUID(),
     });
     assert.ok(retried.status === "ready");
@@ -775,50 +865,278 @@ export async function exerciseLegacyReservation(
     assert.equal(attemptCount?.count, 2);
     const acceptedLease = {
       reservationId: retried.value.reservationId,
-      leaseToken: leaseToken2,
+      leaseToken: nextLease,
       fence: retried.value.fence,
     };
-    assert.equal(
-      (
-        await beginOutreachSubmission(db, {
-          ...acceptedLease,
-          fingerprint: retried.value.preparation.fingerprint,
-        })
-      ).status,
-      "ready",
-    );
-    const accepted = {
-      kind: "accepted" as const,
-      providerMessageId: "accepted-provider",
-      providerThreadId: "accepted-thread",
-    };
-    assert.equal(
-      (await settleOutreachAttempt(db, { ...acceptedLease, outcome: accepted }))
-        .status,
-      "ready",
-    );
-    assert.equal(
-      (await settleOutreachAttempt(db, { ...acceptedLease, outcome: accepted }))
-        .status,
-      "ready",
-    );
-    assert.deepEqual(
-      await settleOutreachAttempt(db, {
-        ...acceptedLease,
-        outcome: { ...accepted, providerMessageId: "different" },
-      }),
-      { status: "held", reason: "settlement_conflict" },
-    );
+    let calls = 0;
+    const direct = await submitReservedOutreach(db, {
+      ...acceptedLease,
+      fingerprint: retried.value.preparation.fingerprint,
+      bound: {
+        binding,
+        client: {
+          sendMessageOnce: async (payload, gate) => {
+            calls++;
+            assert.equal(gate(), true);
+            const [stored] = await admin<
+              { raw: string }[]
+            >`select issued_snapshot->>'raw' as raw from growth.outreach_reservations where id=${acceptedLease.reservationId}`;
+            assert.equal(payload.raw, stored?.raw);
+            return {
+              status: "accepted",
+              result: {
+                messageId: "accepted-provider",
+                gmailThreadId: "accepted-thread",
+              },
+            };
+          },
+        },
+      },
+    });
+    assert.deepEqual(direct, { status: "accepted" });
+    assert.equal(calls, 1);
+    const [proof] = await admin<
+      {
+        evidence: { providerMessageId: string; rawSha256: string };
+        hash: string;
+      }[]
+    >`select direct_submission_evidence as evidence,issued_snapshot_hash as hash from growth.outreach_reservations where id=${acceptedLease.reservationId}`;
+    assert.equal(proof?.evidence.providerMessageId, "accepted-provider");
+    assert.equal(proof?.evidence.rawSha256, proof?.hash);
     const [acceptedState] =
       await admin`select status,actual_sent_at from growth.outreach_reservations where id=${acceptedLease.reservationId}`;
     assert.equal(acceptedState?.status, "accepted");
     assert.equal(acceptedState?.actual_sent_at, null);
+    await admin`insert into growth.email_messages(id,sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key,lease_token,lease_expires_at,outreach_claim_previous_status,outreach_guarded_claim,subject_snapshot,html_snapshot,text_snapshot) values (${haltMessage},${sequenceId},${prospectId},${contactId},'gmail','outbound',0,'sending',${randomUUID()},${leaseToken},now()+interval '5 minutes','queued',true,'Halt','<p>Halt</p>','Halt')`;
+    const haltReservation = await reserveOutreachAttempt(db, {
+      messageId: haltMessage,
+      leaseToken,
+      attemptKey: randomUUID(),
+    });
+    assert.ok(haltReservation.status === "ready");
+    const [beforeHalt] = await admin<
+      { version: number }[]
+    >`select version from growth.outreach_account_controls where connection_id=${id}`;
+    assert.ok(beforeHalt);
+    const halted = await submitReservedOutreach(db, {
+      reservationId: haltReservation.value.reservationId,
+      leaseToken,
+      fence: haltReservation.value.fence,
+      fingerprint: haltReservation.value.preparation.fingerprint,
+      bound: {
+        binding,
+        client: {
+          sendMessageOnce: async (_payload, gate) => {
+            assert.equal(gate(), true);
+            return {
+              status: "invoked_unknown",
+              errorCode: "AUTHENTICATION_FAILED",
+              providerStatus: 401,
+            };
+          },
+        },
+      },
+    });
+    assert.deepEqual(halted, {
+      status: "uncertain",
+      reason: "transport_unknown",
+    });
+    const [haltedState] = await admin<
+      { state: string; status: string; evidence: unknown }[]
+    >`select c.state,r.status,r.direct_noninvocation_evidence as evidence from growth.outreach_account_controls c join growth.outreach_reservations r on r.connection_id=c.connection_id where r.id=${haltReservation.value.reservationId}`;
+    assert.deepEqual(haltedState, {
+      state: "halted",
+      status: "uncertain",
+      evidence: null,
+    });
+    const [haltAudit] = await admin<
+      { actor: string; reason: string }[]
+    >`select actor_type as actor,metadata->>'reasonCode' as reason from growth.audit_log where correlation_id=${haltReservation.value.reservationId} and action='outreach_account.provider_halt'`;
+    assert.deepEqual(haltAudit, { actor: "system", reason: "provider_401" });
+    await admin`update growth.outreach_account_controls set state='active',version=${beforeHalt.version} where connection_id=${id}`;
+    await admin`insert into growth.email_messages(id,sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key,lease_token,lease_expires_at,outreach_claim_previous_status,outreach_guarded_claim,subject_snapshot,html_snapshot,text_snapshot) values (${credentialMessage},${sequenceId},${prospectId},${contactId},'gmail','outbound',0,'sending',${randomUUID()},${leaseToken},now()+interval '5 minutes','queued',true,'Credential','<p>Credential</p>','Credential')`;
+    const credentialReservation = await reserveOutreachAttempt(db, {
+      messageId: credentialMessage,
+      leaseToken,
+      attemptKey: randomUUID(),
+    });
+    assert.ok(credentialReservation.status === "ready");
+    const credentialResult = await submitReservedOutreach(db, {
+      reservationId: credentialReservation.value.reservationId,
+      leaseToken,
+      fence: credentialReservation.value.fence,
+      fingerprint: credentialReservation.value.preparation.fingerprint,
+      bound: {
+        binding,
+        client: {
+          sendMessageOnce: async () => ({
+            status: "not_invoked",
+            reason: "credential_preparation_failed",
+            errorCode: "AUTHENTICATION_FAILED",
+          }),
+        },
+      },
+    });
+    assert.deepEqual(credentialResult, {
+      status: "not_invoked",
+      reason: "credential_preparation_failed",
+    });
+    const [credentialState] = await admin<
+      { state: string; status: string; evidence: { reason: string } | null }[]
+    >`select c.state,r.status,r.direct_noninvocation_evidence as evidence from growth.outreach_account_controls c join growth.outreach_reservations r on r.connection_id=c.connection_id where r.id=${credentialReservation.value.reservationId}`;
+    assert.equal(credentialState?.state, "halted");
+    assert.equal(credentialState?.status, "rejected");
+    assert.equal(
+      credentialState?.evidence?.reason,
+      "credential_preparation_failed",
+    );
+    await admin`update growth.outreach_account_controls set state='active',version=${beforeHalt.version} where connection_id=${id}`;
+    await admin`insert into growth.email_messages(id,sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key,lease_token,lease_expires_at,outreach_claim_previous_status,outreach_guarded_claim,subject_snapshot,html_snapshot,text_snapshot) values (${failureMessage},${sequenceId},${prospectId},${contactId},'gmail','outbound',0,'sending',${randomUUID()},${leaseToken},now()+interval '5 minutes','queued',true,'Failure','<p>Failure</p>','Failure')`;
+    const failureReservation = await reserveOutreachAttempt(db, {
+      messageId: failureMessage,
+      leaseToken,
+      attemptKey: randomUUID(),
+    });
+    assert.ok(failureReservation.status === "ready");
+    await admin`create function growth.test_reject_provider_halt() returns trigger language plpgsql as $$ begin if new.action='outreach_account.provider_halt' then raise exception 'synthetic halt failure'; end if; return new; end $$`;
+    await admin`create trigger test_reject_provider_halt before insert on growth.audit_log for each row execute function growth.test_reject_provider_halt()`;
+    try {
+      const failedHalt = await submitReservedOutreach(db, {
+        reservationId: failureReservation.value.reservationId,
+        leaseToken,
+        fence: failureReservation.value.fence,
+        fingerprint: failureReservation.value.preparation.fingerprint,
+        bound: {
+          binding,
+          client: {
+            sendMessageOnce: async () => ({
+              status: "invoked_unknown",
+              errorCode: "AUTHENTICATION_FAILED",
+              providerStatus: 401,
+            }),
+          },
+        },
+      });
+      assert.deepEqual(failedHalt, {
+        status: "uncertain",
+        reason: "persistence_failed",
+      });
+      const [failedState] = await admin<
+        { state: string; status: string; evidence: unknown }[]
+      >`select c.state,r.status,r.direct_noninvocation_evidence as evidence from growth.outreach_account_controls c join growth.outreach_reservations r on r.connection_id=c.connection_id where r.id=${failureReservation.value.reservationId}`;
+      assert.deepEqual(failedState, {
+        state: "active",
+        status: "submitting",
+        evidence: null,
+      });
+      assert.deepEqual(
+        await submitReservedOutreach(db, {
+          reservationId: failureReservation.value.reservationId,
+          leaseToken,
+          fence: failureReservation.value.fence,
+          fingerprint: failureReservation.value.preparation.fingerprint,
+          bound: {
+            binding,
+            client: {
+              sendMessageOnce: async () => {
+                throw new Error("must not send again");
+              },
+            },
+          },
+        }),
+        { status: "held", reason: "reservation_lease_invalid" },
+      );
+    } finally {
+      await admin`drop trigger test_reject_provider_halt on growth.audit_log`;
+      await admin`drop function growth.test_reject_provider_halt()`;
+    }
+    await admin`insert into growth.email_messages(id,sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key,lease_token,lease_expires_at,outreach_claim_previous_status,outreach_guarded_claim,subject_snapshot,html_snapshot,text_snapshot) values (${expiryMessage},${sequenceId},${prospectId},${contactId},'gmail','outbound',0,'sending',${randomUUID()},${leaseToken},now()+interval '5 minutes','queued',true,'Expiry','<p>Expiry</p>','Expiry')`;
+    const expiry = await reserveOutreachAttempt(db, {
+      messageId: expiryMessage,
+      leaseToken,
+      attemptKey: randomUUID(),
+    });
+    assert.ok(expiry.status === "ready");
+    let postCount = 0;
+    const liveClient = createGmailClient(
+      {
+        clientId: "test-client",
+        clientSecret: "test-secret",
+        refreshToken: "test-token",
+      },
+      {
+        fetch: async (url) => {
+          if (String(url).endsWith("/token")) {
+            mock.timers.setTime(Date.now() + 2 * 86_400_000);
+            return Response.json({
+              access_token: "test-access",
+              expires_in: 3600,
+              token_type: "Bearer",
+            });
+          }
+          postCount++;
+          return Response.json({ id: "unexpected", threadId: "unexpected" });
+        },
+      },
+    );
+    mock.timers.enable({ apis: ["Date"], now: Date.now() });
+    try {
+      assert.deepEqual(
+        await submitReservedOutreach(db, {
+          reservationId: expiry.value.reservationId,
+          leaseToken,
+          fence: expiry.value.fence,
+          fingerprint: expiry.value.preparation.fingerprint,
+          bound: { binding, client: liveClient },
+        }),
+        { status: "not_invoked", reason: "guard_rejected" },
+      );
+    } finally {
+      mock.timers.reset();
+    }
+    assert.equal(postCount, 0);
+    const [expiryState] = await admin<
+      { status: string; reason: string }[]
+    >`select status,direct_noninvocation_evidence->>'reason' as reason from growth.outreach_reservations where id=${expiry.value.reservationId}`;
+    assert.deepEqual(expiryState, {
+      status: "rejected",
+      reason: "guard_rejected",
+    });
+    const largeBody = "a".repeat(1_048_576);
+    await admin`insert into growth.email_messages(id,sequence_enrollment_id,prospect_id,contact_id,channel,direction,step_number,status,idempotency_key,lease_token,lease_expires_at,outreach_claim_previous_status,outreach_guarded_claim,subject_snapshot,html_snapshot,text_snapshot) values (${largeMessage},${sequenceId},${prospectId},${contactId},'gmail','outbound',0,'sending',${randomUUID()},${leaseToken},now()+interval '5 minutes','queued',true,'Large',${largeBody},'Large')`;
+    const large = await reserveOutreachAttempt(db, {
+      messageId: largeMessage,
+      leaseToken,
+      attemptKey: randomUUID(),
+    });
+    assert.ok(large.status === "ready");
+    assert.deepEqual(
+      await submitReservedOutreach(db, {
+        reservationId: large.value.reservationId,
+        leaseToken,
+        fence: large.value.fence,
+        fingerprint: large.value.preparation.fingerprint,
+        bound: {
+          binding,
+          client: {
+            sendMessageOnce: async () => {
+              throw new Error("oversized message must not be sent");
+            },
+          },
+        },
+      }),
+      { status: "held", reason: "issued_payload_too_large" },
+    );
+    const [largeState] = await admin<
+      { status: string; snapshot: unknown }[]
+    >`select status,issued_snapshot as snapshot from growth.outreach_reservations where id=${large.value.reservationId}`;
+    assert.deepEqual(largeState, { status: "reserved", snapshot: null });
   } finally {
-    await admin`delete from growth.audit_log where entity_type='outreach_reservation' and entity_id in (select id::text from growth.outreach_reservations where email_message_id in (${messageId},${messageId2},${messageId3}))`;
-    await admin`delete from growth.outreach_reservations where email_message_id in (${messageId},${messageId2},${messageId3})`;
+    await admin`delete from growth.audit_log where entity_type='outreach_reservation' and entity_id in (select id::text from growth.outreach_reservations where email_message_id in (${messageId},${messageId2},${messageId3},${haltMessage},${credentialMessage},${failureMessage},${largeMessage},${expiryMessage}))`;
+    await admin`delete from growth.outreach_reservations where email_message_id in (${messageId},${messageId2},${messageId3},${haltMessage},${credentialMessage},${failureMessage},${largeMessage},${expiryMessage})`;
     await admin`delete from growth.outreach_provider_usage where account_id=${otherAccount}`;
     await admin`delete from growth.integration_connections where id=${otherConnection}`;
-    await admin`delete from growth.email_messages where id in (${messageId},${messageId2},${messageId3})`;
+    await admin`delete from growth.email_messages where id in (${messageId},${messageId2},${messageId3},${haltMessage},${credentialMessage},${failureMessage},${largeMessage},${expiryMessage})`;
     await admin`delete from growth.sequence_enrollments where id=${sequenceId}`;
     await admin`delete from growth.prospects where id=${prospectId}`;
     await admin`delete from growth.contacts where id=${contactId}`;

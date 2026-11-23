@@ -92,7 +92,7 @@ export async function exerciseConfirmationCapacity(
     });
     await admin`delete from growth.audit_log where entity_id=${available.value.reservationId}`;
     await admin`delete from growth.outreach_reservations where id=${available.value.reservationId}`;
-    await admin`update growth.email_messages set rfc_message_id=null where id=${input.candidateMessageId}`;
+    await admin`update growth.email_messages set rfc_message_id=null,attempt_count=0 where id=${input.candidateMessageId}`;
     // Recreate a legacy unproved receipt state to exercise the defensive capacity reader.
     await admin.begin(async (tx) => {
       await tx`alter table growth.outreach_reservations drop constraint confirmed_requires_direct_submission`;

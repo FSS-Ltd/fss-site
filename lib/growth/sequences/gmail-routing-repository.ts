@@ -121,7 +121,17 @@ export async function classifyGmailRoutingInTransaction(
     }>
   >`
       with thread_rows as (${gmailThreadCandidates(tx, input.threadId, input.binding)}),
-      referenced_messages as (
+      safe_messages as (
+        select em.id from growth.email_messages em
+        where em.direction='outbound' and em.channel='gmail' and em.attempt_count > 0
+          and em.status not in ('draft','provider_draft','sent')
+          and em.provider_draft_id is null and em.provider_message_id is null
+          and (select count(distinct r.lease_token) from growth.outreach_reservations r where r.email_message_id=em.id) = em.attempt_count
+          and (select count(*) from growth.outreach_reservations r where r.email_message_id=em.id) = em.attempt_count
+          and not exists (select 1 from growth.outreach_reservations r where r.email_message_id=em.id
+            and (r.connection_id is null or not ((r.status='cancelled' and r.submitted_at is null and r.issued_snapshot is null)
+              or (r.status='rejected' and r.direct_noninvocation_evidence is not null))))
+      ), referenced_messages as (
         select id from growth.email_messages where rfc_message_id=any(${tx.array(ids)}::text[])
         union
         select email_message_id as id from growth.outreach_reservations where rfc_message_id=any(${tx.array(ids)}::text[])
@@ -139,6 +149,7 @@ export async function classifyGmailRoutingInTransaction(
           select 1 from growth.email_messages em
           join growth.sequence_enrollments se on se.id=em.sequence_enrollment_id
           where em.channel='gmail' and em.direction='outbound'
+            and not exists(select 1 from safe_messages safe where safe.id=em.id)
             and not exists(select 1 from thread_rows observed where observed.id=se.id)
             and (
               em.status in ('draft','provider_draft','sending') or em.provider_draft_id is not null
@@ -169,6 +180,7 @@ export async function classifyGmailRoutingInTransaction(
           where ${address}::text is not null and (c.normalised_email=${address} or lower(se.template_snapshot->>'approvedRecipient')=${address})
             and not exists(select 1 from thread_rows observed where observed.id=se.id)
             and exists(select 1 from growth.email_messages outbound where outbound.sequence_enrollment_id=se.id and outbound.direction='outbound'
+              and not exists(select 1 from safe_messages safe where safe.id=outbound.id)
               and (outbound.channel='gmail' and (outbound.status in ('draft','provider_draft') or outbound.provider_draft_id is not null or outbound.attempt_count>0)
                 or not exists(select 1 from growth.outreach_reservations known where known.email_message_id=outbound.id and known.connection_id is not null)
                 or exists(select 1 from growth.outreach_reservations current_account where current_account.email_message_id=outbound.id and current_account.connection_id=${input.binding.connectionId})))
