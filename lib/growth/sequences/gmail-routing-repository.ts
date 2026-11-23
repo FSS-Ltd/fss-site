@@ -188,6 +188,7 @@ export async function classifyGmailRoutingInTransaction(
         ) or exists (
           select 1 from growth.outreach_reservations rr join growth.email_messages rem on rem.id=rr.email_message_id
           where rem.channel='resend' and rem.direction='outbound' and rr.issued_snapshot is not null
+            and (rr.outreach_provider='resend' and rr.status='rejected' and rr.direct_noninvocation_evidence->>'kind'='resend_send_not_invoked_v1') is not true
             and (rr.issued_snapshot->'monitoredMailbox'->>'connectionId' is null or rr.issued_snapshot->'monitoredMailbox'->>'connectionId'=${input.binding.connectionId})
         ) end as "possibleExposure",
         case when exists(select 1 from thread_rows where bound) or (select count(*) from thread_rows) > 1 then false else exists (

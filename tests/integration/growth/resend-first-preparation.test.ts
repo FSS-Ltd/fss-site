@@ -15,6 +15,7 @@ import {
 } from "../../../lib/growth/campaigns/resend-reservation-repository";
 import { submitReservedResendOutreach } from "../../../lib/growth/campaigns/resend-direct-submission";
 import { createResendOutreachTransport } from "../../../lib/growth/integrations/resend/outreach-transport";
+import { classifyGmailRouting } from "../../../lib/growth/sequences/gmail-routing-repository";
 import { postgresSequenceDispatchRepository } from "../../../lib/growth/sequences/dispatcher-repository";
 import { loadReviewMembershipPreparationAuthority } from "../../../lib/growth/campaigns/founder-verification-reader";
 import { ingestResearchRun } from "../../../lib/growth/research/ingest";
@@ -637,6 +638,29 @@ for (const scenario of [
               providerId:
                 scenario === "accepted" ? "synthetic-message-id" : null,
             });
+            if (scenario === "not_invoked" || scenario === "unknown") {
+              const routing = await classifyGmailRouting(db, {
+                binding: {
+                  connectionId: gmail,
+                  googleSubject: "test-subject",
+                  grantEpoch: 1,
+                  grantedScopes: [
+                    "openid",
+                    "email",
+                    "https://www.googleapis.com/auth/gmail.modify",
+                  ],
+                },
+                threadId: `unrelated-${randomUUID()}`,
+                inReplyTo: null,
+                references: null,
+                fromAddress: null,
+                fromHeader: null,
+              });
+              assert.equal(
+                routing.kind,
+                scenario === "not_invoked" ? "none" : "uncertain",
+              );
+            }
             const repeated = await submitReservedResendOutreach(
               db,
               sendInput,
