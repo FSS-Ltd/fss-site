@@ -4,7 +4,10 @@ import { campaignMonthAnniversary } from "../../../lib/growth/campaigns/time";
 
 // All identifiers and observations here are synthetic. The database transitions
 // follow the same issued -> direct submission -> confirmed receipt guards.
-export async function seedMonthlyReport(admin: GrowthDb) {
+export async function seedMonthlyReport(
+  admin: GrowthDb,
+  sender = "sender@example.test",
+) {
   const campaignId = randomUUID(),
     businessId = randomUUID(),
     contactId = randomUUID(),
@@ -59,7 +62,7 @@ export async function seedMonthlyReport(admin: GrowthDb) {
     kind: "direct_raw",
     raw,
     rawSha256: hash,
-    from: "sender@example.test",
+    from: sender,
     googleSubject: subject,
     connectionId,
     grantEpoch: 1,
@@ -85,7 +88,7 @@ export async function seedMonthlyReport(admin: GrowthDb) {
     possibleInvocationFrom: submittedAt.toISOString(),
   };
   await admin.begin(async (tx) => {
-    await tx`insert into growth.integration_connections(id,provider,subject_email,status,google_subject,granted_scopes) values (${connectionId},'gmail','sender@example.test','connected',${subject},${["openid", "email", "https://www.googleapis.com/auth/gmail.modify"]})`;
+    await tx`insert into growth.integration_connections(id,provider,subject_email,status,google_subject,granted_scopes) values (${connectionId},'gmail',${sender},'connected',${subject},${["openid", "email", "https://www.googleapis.com/auth/gmail.modify"]})`;
     await tx`insert into growth.outreach_provider_usage(account_id,connection_id,complete,health) values (${accountId},${connectionId},false,'unknown')`;
     await tx`insert into growth.campaigns(id,version,request_id,name,policy,account_connection_id) values (${campaignId},1,${randomUUID()},'synthetic report',${admin.json({ version: 1, accountConnectionId: connectionId, provider: "gmail", offer: "review", variants: [{ id: "a", version: 1, cta: "Interested?" }] })},${connectionId})`;
     await tx`insert into growth.businesses(id,legal_name,corporate_type,corporate_status,sector,locality,first_party_source_url,country_code) values (${businessId},'Synthetic report','limited_company','active','Test','Test','https://example.test','GB')`;

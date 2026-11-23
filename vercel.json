@@ -35,6 +35,10 @@
       "schedule": "30 7,8 * * *"
     },
     {
+      "path": "/api/cron/outreach-summary",
+      "schedule": "30 16,17 * * *"
+    },
+    {
       "path": "/api/cron/resend-dispatch",
       "schedule": "0 0,3,6,9,12,15,18,21 * * *"
     },
