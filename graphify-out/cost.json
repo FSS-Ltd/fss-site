@@ -203,6 +203,22 @@
       "files": 395,
       "method": "deterministic scoped AST rebuild; under-review; no-viz",
       "target": "d0e23386a51af36e486e7f5818b02af0b47205fd"
+    },
+    {
+      "date": "2026-11-23",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 401,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "81d7566ae6eadd17d297e099591e150e43f59c5e"
+    },
+    {
+      "date": "2026-11-23",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 402,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "4b2853f0ed7f42e8d6437537e6dcb0ad3f8689c4"
     }
   ],
   "total_input_tokens": 0,
