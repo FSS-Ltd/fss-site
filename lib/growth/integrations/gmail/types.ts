@@ -24,6 +24,27 @@ export type GmailSendResult = {
   gmailThreadId: string;
 };
 
+export type GmailGuardedSendOutcome =
+  | { status: "accepted"; result: GmailSendResult }
+  | { status: "not_invoked"; reason: "invalid_input" | "guard_rejected" }
+  | {
+      status: "not_invoked";
+      reason: "credential_preparation_failed";
+      errorCode: GmailClientErrorCode;
+    }
+  | {
+      status: "invoked_unknown";
+      errorCode: GmailClientErrorCode;
+      providerStatus?: number;
+    };
+
+export interface GuardedGmailClient extends GmailClient {
+  sendMessageOnce(
+    input: GmailSendInput,
+    gate: () => boolean,
+  ): Promise<GmailGuardedSendOutcome>;
+}
+
 export type GmailHistoryInput = {
   startHistoryId: string;
   pageToken?: string;

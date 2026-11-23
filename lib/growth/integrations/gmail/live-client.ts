@@ -7,7 +7,7 @@ import { hasRequiredGmailScopes } from "../google-oauth";
 import { parseStoredToken } from "../gmail-disconnect";
 import { decryptRefreshToken, type TokenDecryptionKeys } from "../token-crypto";
 import { createGmailClient } from "./client";
-import type { GmailClient } from "./types";
+import type { GmailClient, GuardedGmailClient } from "./types";
 
 export class GmailNotConnectedError extends Error {
   constructor() {
@@ -38,7 +38,7 @@ export async function createLiveGmailClient(
 function clientFromCredential(
   credential: StoredGmailCredential,
   config: LiveGmailClientConfig,
-): GmailClient {
+): GuardedGmailClient {
   const refreshToken = decryptRefreshToken(
     parseStoredToken(credential),
     config.decryptionKeys,
@@ -58,7 +58,7 @@ export type GmailGrantBinding = {
 };
 
 export type BoundGmailClient = {
-  client: GmailClient;
+  client: GuardedGmailClient;
   binding: GmailGrantBinding;
 };
 

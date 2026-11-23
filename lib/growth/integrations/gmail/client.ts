@@ -11,7 +11,9 @@ import {
   GmailClientError,
   GmailHistoryResponseError,
   GmailTokenResponseError,
-  type GmailClient,
+  type GuardedGmailClient,
+  type GmailClientErrorCode,
+  type GmailGuardedSendOutcome,
   type GmailCreateDraftInput,
   type GmailDraftResult,
   type GmailHistoryInput,
@@ -27,8 +29,8 @@ const GMAIL_API_BASE = "https://gmail.googleapis.com/gmail/v1/users/me";
 const REQUEST_TIMEOUT_MS = 10_000;
 const ACCESS_TOKEN_EXPIRY_SKEW_SECONDS = 60;
 const MAX_JSON_RESPONSE_BYTES = 256 * 1024;
-const MAX_RAW_MESSAGE_BYTES = 1024 * 1024;
-const MAX_RAW_MESSAGE_CHARS = Math.ceil(MAX_RAW_MESSAGE_BYTES / 3) * 4;
+export const MAX_GMAIL_RAW_MESSAGE_BYTES = 1024 * 1024;
+const MAX_RAW_MESSAGE_CHARS = Math.ceil(MAX_GMAIL_RAW_MESSAGE_BYTES / 3) * 4;
 const RETRYABLE_FORBIDDEN_REASONS = new Set([
   "rateLimitExceeded",
   "userRateLimitExceeded",
@@ -57,7 +59,7 @@ function isCanonicalRawMessage(value: string): boolean {
   }
   const decoded = Buffer.from(value, "base64url");
   return (
-    decoded.byteLength <= MAX_RAW_MESSAGE_BYTES &&
+    decoded.byteLength <= MAX_GMAIL_RAW_MESSAGE_BYTES &&
     decoded.toString("base64url") === value
   );
 }
@@ -209,7 +211,13 @@ async function providerError(response: Response): Promise<GmailClientError> {
   return new GmailClientError("PERMANENT_PROVIDER_ERROR");
 }
 
-class GoogleGmailClient implements GmailClient {
+function gmailErrorCode(error: unknown): GmailClientErrorCode {
+  return error instanceof GmailClientError
+    ? error.code
+    : "RETRYABLE_PROVIDER_ERROR";
+}
+
+class GoogleGmailClient implements GuardedGmailClient {
   private accessToken?: CachedAccessToken;
   private refreshPromise?: Promise<CachedAccessToken>;
   private readonly fetchImpl: FetchLike;
@@ -427,6 +435,83 @@ class GoogleGmailClient implements GmailClient {
     };
   }
 
+  async sendMessageOnce(
+    input: GmailSendInput,
+    gate: () => boolean,
+  ): Promise<GmailGuardedSendOutcome> {
+    const parsedInput = rawMessageInputSchema.safeParse(input);
+    if (!parsedInput.success)
+      return { status: "not_invoked", reason: "invalid_input" };
+
+    let accessToken: CachedAccessToken;
+    try {
+      accessToken = await this.getFreshAccessToken();
+    } catch (error) {
+      return {
+        status: "not_invoked",
+        reason: "credential_preparation_failed",
+        errorCode: gmailErrorCode(error),
+      };
+    }
+
+    const body = JSON.stringify({
+      raw: parsedInput.data.raw,
+      ...(parsedInput.data.gmailThreadId
+        ? { threadId: parsedInput.data.gmailThreadId }
+        : {}),
+    });
+    const init: RequestInit = {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${accessToken.value}`,
+        "Content-Type": "application/json",
+      },
+      body,
+      redirect: "manual",
+    };
+    try {
+      if (gate() !== true)
+        return { status: "not_invoked", reason: "guard_rejected" };
+    } catch {
+      return { status: "not_invoked", reason: "guard_rejected" };
+    }
+
+    let providerStatus: number | undefined;
+    try {
+      const response = await this.fetchProvider(
+        `${GMAIL_API_BASE}/messages/send`,
+        init,
+      );
+      providerStatus = response.status;
+      if (!response.ok) {
+        if (response.status === 401) {
+          await discardBody(response);
+          throw new GmailClientError("AUTHENTICATION_FAILED");
+        }
+        throw await providerError(response);
+      }
+      const parsed = sentMessageResponseSchema.safeParse(
+        await readJson(response),
+      );
+      if (!parsed.success)
+        throw new GmailClientError("INVALID_PROVIDER_RESPONSE");
+      return {
+        status: "accepted",
+        result: {
+          messageId: parsed.data.id,
+          gmailThreadId: parsed.data.threadId,
+        },
+      };
+    } catch (error) {
+      return {
+        status: "invoked_unknown",
+        errorCode: gmailErrorCode(error),
+        ...(providerStatus === undefined ? {} : { providerStatus }),
+      };
+    }
+  }
+
   async listHistory(input: GmailHistoryInput): Promise<GmailHistoryResult> {
     try {
       return await readGmailHistoryPage(this.getJson.bind(this), input);
@@ -468,7 +553,7 @@ class GoogleGmailClient implements GmailClient {
 export function createGmailClient(
   config: GmailClientConfig,
   dependencies: GmailClientDependencies = {},
-): GmailClient {
+): GuardedGmailClient {
   return new GoogleGmailClient(config, dependencies);
 }
 
