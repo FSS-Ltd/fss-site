@@ -109,3 +109,42 @@ test("accepts only a completed native search in a successful execution stream", 
     /research failed/,
   );
 });
+
+test("keeps the bundled code-mode host available while disabling restricted tools", () => {
+  runRestrictedResearchChild({
+    schema: {},
+    prompt: "synthetic",
+    model: "test-model",
+    execute: (_command, args) => {
+      const disabled = args.flatMap((arg, index) =>
+        arg === "--disable" ? [args[index + 1]] : [],
+      );
+      assert.equal(disabled.includes("code_mode_host"), false);
+      for (const feature of [
+        "shell_tool",
+        "unified_exec",
+        "apps",
+        "hooks",
+        "multi_agent",
+        "plugins",
+        "computer_use",
+        "browser_use",
+        "browser_use_external",
+        "browser_use_full_cdp_access",
+        "view_image",
+        "image_generation",
+        "skill_mcp_dependency_install",
+        "workspace_dependencies",
+        "in_app_browser",
+      ])
+        assert.ok(disabled.includes(feature), feature);
+      assert.ok(args.includes("skip_host_skill_discovery"));
+      assert.ok(args.includes("suppress_unstable_features_warning=true"));
+      assert.ok(args.includes("--ignore-user-config"));
+      assert.ok(args.includes("--ephemeral"));
+      assert.equal(args[args.indexOf("--sandbox") + 1], "read-only");
+      writeFileSync(args[args.indexOf("--output-last-message") + 1]!, "{}");
+      return { success: true, stdout: jsonl(search, completed) };
+    },
+  });
+});
