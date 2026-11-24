@@ -9,11 +9,20 @@ if (!url)
 assertDisposableGrowthDatabase(url);
 
 test("fixture database guard rejects external and non-test targets", () => {
+  assert.doesNotThrow(() =>
+    assertDisposableGrowthDatabase(
+      "postgresql://postgres:postgres@127.0.0.1:5432/fss_growth_test",
+    ),
+  );
   for (const target of [
     "postgresql://postgres:postgres@localhost:5432/fss_growth_test",
     "postgresql://postgres:postgres@127.0.0.1:5432/postgres",
     "postgresql://postgres:postgres@example.com:5432/fss_growth_test",
     "postgresql://postgres:postgres@127.0.0.1:5433/fss_growth_test",
+    "postgresql://postgres:postgres@127.0.0.1:5432/fss_growth_test?host=example.com",
+    "postgresql://postgres:postgres@127.0.0.1:5432/fss_growth_test#fragment",
+    "postgresql://postgres:postgres@127%2e0%2e0%2e1:5432/fss_growth_test",
+    "postgresql://postgres:postgres@127.1:5432/fss_growth_test",
   ])
     assert.throws(() => assertDisposableGrowthDatabase(target));
 });

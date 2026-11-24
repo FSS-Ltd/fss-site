@@ -4,10 +4,15 @@ import { randomUUID } from "node:crypto";
 export function assertDisposableGrowthDatabase(value: string): URL {
   const url = new URL(value);
   if (
+    !/^postgres(?:ql)?:\/\/[^@/?#]+@127\.0\.0\.1:(?:5432|55487|55488|55489|55491)\/fss_growth_test$/.test(
+      value,
+    ) ||
     !["postgres:", "postgresql:"].includes(url.protocol) ||
     url.hostname !== "127.0.0.1" ||
     !["5432", "55487", "55488", "55489", "55491"].includes(url.port) ||
-    url.pathname !== "/fss_growth_test"
+    url.pathname !== "/fss_growth_test" ||
+    url.search !== "" ||
+    url.hash !== ""
   )
     throw new Error("A disposable local fss_growth_test database is required.");
   return url;

@@ -7,11 +7,17 @@ async function main(): Promise<void> {
   const mode = process.env.PREP_TEST_MODE;
   if (mode !== "complete" && mode !== "held")
     throw new Error("invalid fixture mode");
-  const database = assertDisposableGrowthDatabase(
-    process.env.DATABASE_URL ?? "",
-  );
-  if (database.searchParams.get("options") !== "-c role=growth_app")
+  const databaseUrl = process.env.DATABASE_URL ?? "";
+  const database = new URL(databaseUrl);
+  if (
+    database.searchParams.size !== 1 ||
+    database.searchParams.get("options") !== "-c role=growth_app" ||
+    databaseUrl.includes("#")
+  )
     throw new Error("invalid fixture database");
+  assertDisposableGrowthDatabase(
+    databaseUrl.slice(0, databaseUrl.indexOf("?")),
+  );
   globalThis.fetch = async (resource, init) => {
     const url = new URL(String(resource));
     if (url.href === "https://oauth2.googleapis.com/token")
