@@ -35,6 +35,27 @@
   outline: 3px solid #087f88;
   outline-offset: 3px;
 }
+.operatorControls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 20px;
+  margin: 16px 0;
+}
+.operatorControls .editor {
+  margin-top: 0;
+}
+.operatorControls a {
+  color: #075f66;
+  font-weight: 650;
+}
+.operatorControls a:hover {
+  text-decoration: underline;
+}
+.operatorControls a:focus-visible {
+  outline: 3px solid #087f88;
+  outline-offset: 3px;
+}
 .goal {
   margin: 20px 0;
   color: #526078;

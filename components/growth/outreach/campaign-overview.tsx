@@ -49,6 +49,10 @@ export function CampaignOverview({
           </Link>
         </div>
       </header>
+      <div className={styles.operatorControls}>
+        <CampaignPolicyEditor accounts={accounts} />
+        <a href="#daily-summary-heading">Daily summary</a>
+      </div>
       {result.rows.length === 0 ? (
         <p className={styles.empty}>No campaigns have been created yet.</p>
       ) : (
@@ -124,7 +128,6 @@ export function CampaignOverview({
           initial={dailySummary}
         />
         <CampaignAccountReadiness result={accounts} />
-        <CampaignPolicyEditor accounts={accounts} />
       </div>
       <p className={styles.note}>
         Confirmation reflects the recorded provider observation. Account
