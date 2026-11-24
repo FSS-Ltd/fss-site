@@ -41,9 +41,8 @@
 }
 .campaigns > li {
   min-width: 0;
-  border: 1px solid #e3e9ec;
-  border-radius: 8px;
-  padding: 14px;
+  border-top: 1px solid #dce3e8;
+  padding: 14px 0 0;
 }
 .campaigns h3 {
   margin: 0;
@@ -113,10 +112,7 @@
 .comparison {
   min-width: 0;
   margin-top: 14px;
-  border: 1px solid #dce9e8;
-  border-radius: 8px;
-  background: #f7faf9;
-  padding: 12px;
+  padding: 0;
 }
 .comparisonHeading {
   display: flex;
@@ -128,10 +124,6 @@
 .comparisonHeading h4 {
   margin: 0;
   font-size: 0.9rem;
-}
-.comparisonHeading span {
-  color: #526078;
-  font-size: 0.72rem;
 }
 .panel .interpretation {
   margin: 4px 0 0;

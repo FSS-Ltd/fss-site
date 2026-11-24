@@ -13,7 +13,7 @@ function basis(value: string): string {
 }
 function verdict(reason: string, winner: string | null): string {
   if (reason === "clear_interval" && winner)
-    return `Leading observed variant: ${winner}.`;
+    return `Variant ${winner} leads in this observed comparison.`;
   if (reason === "insufficient_evidence")
     return "No winner: insufficient evidence.";
   if (reason === "confounded") return "No comparison: conditions differ.";
@@ -26,26 +26,19 @@ function Snapshot({ item }: { item: ReportSnapshot }) {
   return (
     <details className={styles.snapshot} open={item.current}>
       <summary>
-        {item.current ? "Current" : "Superseded"} snapshot · anchor revision{" "}
-        {item.revision}
+        {item.current ? "Current report" : "Superseded snapshot"}
       </summary>
       <div className={styles.snapshotBody}>
         <div className={styles.verdict}>
           <span>Comparison result</span>
           <p>{verdict(report.winnerReason, report.winner)}</p>
         </div>
-        <p className={styles.coverage}>
-          Complete reply coverage observed at read: {item.observedCoverage} ·
-          Ambiguous evidence: {report.ambiguousEvidence}. Outcome source
-          coverage is unknown.
-        </p>
         {report.groups.length === 0 ? (
           <p>No eligible comparison groups recorded.</p>
         ) : (
           <div className={styles.comparison}>
             <div className={styles.comparisonHeading}>
               <h4>Positive reply rate</h4>
-              <span>Positive / mature · 95% interval</span>
             </div>
             <p className={styles.interpretation}>
               Mature recipients have a 14-day observation period. Bars use a
@@ -136,10 +129,16 @@ function Snapshot({ item }: { item: ReportSnapshot }) {
             </details>
           </div>
         )}
+        <p className={styles.coverage}>
+          Complete reply coverage observed at read: {item.observedCoverage} ·
+          Ambiguous evidence: {report.ambiguousEvidence}. We do not know whether
+          all meetings and payments were captured.
+        </p>
         <details className={styles.methodology}>
           <summary>Snapshot provenance and methodology</summary>
           <p>
-            Generated {formatGrowthDateTime(item.generatedAt)} · cutoff{" "}
+            Anchor revision {item.revision} · generated{" "}
+            {formatGrowthDateTime(item.generatedAt)} · cutoff{" "}
             {formatGrowthDateTime(report.cutoff.toISOString())}
           </p>
           <p>

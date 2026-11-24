@@ -185,7 +185,7 @@ test("shows a V2 winner only when supplied by the validated snapshot reader", ()
       }}
     />,
   );
-  assert.match(html, /Leading observed variant: a/);
+  assert.match(html, /Variant a leads in this observed comparison/);
   assert.match(
     html,
     /Historical source availability at cutoff and outcome source coverage are unknown/,
