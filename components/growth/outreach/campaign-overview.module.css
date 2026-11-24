@@ -49,9 +49,8 @@
 }
 .campaign {
   min-width: 0;
-  border: 1px solid #e3e9ec;
-  border-radius: 10px;
-  padding: 18px;
+  border-top: 1px solid #dce3e8;
+  padding: 20px 0;
 }
 .title h3,
 .title p,
@@ -71,7 +70,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
   gap: 16px;
-  margin: 22px 0;
+  margin: 18px 0 12px;
 }
 .metrics div {
   min-width: 0;
@@ -82,12 +81,46 @@
 }
 .metrics dd {
   margin: 5px 0 0;
-  font-size: 1.35rem;
-  font-weight: 750;
+  font-size: 1.1rem;
+  font-weight: 700;
 }
-.footer {
-  border-top: 1px solid #e3e9ec;
-  padding-top: 12px;
+.campaignControls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 18px;
+  margin-top: 12px;
+}
+.campaignControls .actions,
+.campaignControls .editor {
+  margin-top: 0;
+}
+.holdReason,
+.reportDate {
+  margin: 0;
+  color: #526078;
+  font-size: 0.85rem;
+}
+.holdReason {
+  flex-basis: 100%;
+}
+.operations {
+  border-top: 1px solid #dce3e8;
+  margin-top: 20px;
+  padding-top: 16px;
+}
+.operations > p {
+  color: #526078;
+  font-size: 0.85rem;
+}
+.operations > section h3 {
+  margin: 12px 0 4px;
+  font-size: 0.95rem;
+}
+.operations > section > p {
+  margin: 0;
+  color: #526078;
+  font-size: 0.85rem;
 }
 .empty,
 .note {
@@ -102,7 +135,7 @@
     padding: 16px;
   }
   .campaign {
-    padding: 14px;
+    padding: 16px 0;
   }
   .metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -298,4 +331,14 @@
   background: #fff;
   color: #07182e;
   font: inherit;
+}
+
+.actions button:not(:disabled):hover,
+.editor button:not(:disabled):hover,
+.accountActions button:not(:disabled):hover {
+  background: #e6f3f4;
+}
+.editor summary:hover,
+.header a:hover {
+  text-decoration: underline;
 }

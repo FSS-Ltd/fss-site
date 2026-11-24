@@ -35,7 +35,7 @@ export default async function OutreachPage() {
       <header>
         <h1 className={styles.heading}>Outreach</h1>
         <p className={styles.subtitle}>
-          Review email drafts and manage founder-approved Gmail sequences.
+          Review email drafts and manage founder-approved outreach campaigns.
         </p>
       </header>
       <OutreachWorkspace

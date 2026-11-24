@@ -49,16 +49,6 @@ export function CampaignOverview({
           </Link>
         </div>
       </header>
-      <CampaignDailyLive
-        key={
-          dailySummary.status === "ready"
-            ? dailySummary.summary.generatedAt
-            : dailySummary.status
-        }
-        initial={dailySummary}
-      />
-      <CampaignAccountReadiness result={accounts} />
-      <CampaignPolicyEditor accounts={accounts} />
       {result.rows.length === 0 ? (
         <p className={styles.empty}>No campaigns have been created yet.</p>
       ) : (
@@ -75,6 +65,20 @@ export function CampaignOverview({
                 <span className={styles.state}>
                   {campaignState(campaign.status, campaign.approved)}
                 </span>
+              </div>
+              <div className={styles.campaignControls}>
+                <p className={styles.holdReason}>
+                  {campaign.held
+                    ? `Held reason: ${campaign.holdReason?.replaceAll("_", " ") ?? "Unavailable"}`
+                    : "No held jobs"}
+                </p>
+                <CampaignPolicyEditor campaign={campaign} accounts={accounts} />
+                <CampaignLifecycleActions
+                  id={campaign.id}
+                  version={campaign.version}
+                  status={campaign.status}
+                  approved={campaign.approved}
+                />
               </div>
               <dl className={styles.metrics}>
                 <div>
@@ -98,25 +102,11 @@ export function CampaignOverview({
                   <dd>{campaign.confirmed}</dd>
                 </div>
               </dl>
-              <div className={styles.footer}>
-                <p>
-                  {campaign.held
-                    ? `Held reason: ${campaign.holdReason?.replaceAll("_", " ") ?? "Unavailable"}`
-                    : "No held jobs"}
-                </p>
-                <p>
-                  {campaign.reportDue
-                    ? `Analysis ${campaign.reportStatus === "held" ? "held, originally due" : "due"} ${formatGrowthDateTime(campaign.reportDue)}`
-                    : "No analysis date recorded"}
-                </p>
-              </div>
-              <CampaignPolicyEditor campaign={campaign} accounts={accounts} />
-              <CampaignLifecycleActions
-                id={campaign.id}
-                version={campaign.version}
-                status={campaign.status}
-                approved={campaign.approved}
-              />
+              <p className={styles.reportDate}>
+                {campaign.reportDue
+                  ? `Analysis ${campaign.reportStatus === "held" ? "held, originally due" : "due"} ${formatGrowthDateTime(campaign.reportDue)}`
+                  : "No analysis date recorded"}
+              </p>
             </li>
           ))}
         </ul>
@@ -124,6 +114,18 @@ export function CampaignOverview({
       {result.truncated && (
         <p className={styles.empty}>Showing the first 50 campaigns.</p>
       )}
+      <div className={styles.operations}>
+        <CampaignDailyLive
+          key={
+            dailySummary.status === "ready"
+              ? dailySummary.summary.generatedAt
+              : dailySummary.status
+          }
+          initial={dailySummary}
+        />
+        <CampaignAccountReadiness result={accounts} />
+        <CampaignPolicyEditor accounts={accounts} />
+      </div>
       <p className={styles.note}>
         Confirmation reflects the recorded provider observation. Account
         readiness and delivery are unavailable in this view.

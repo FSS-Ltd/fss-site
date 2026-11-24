@@ -83,6 +83,11 @@ test("shows observed counts and a stored hold reason without claiming delivery",
   assert.match(html, /Local campaign/);
   assert.match(html, /permission invalid/);
   assert.match(html, /Confirmed today<\/dt><dd>0/);
+  assert.ok(
+    html.indexOf("permission invalid") < html.indexOf("Prepared today"),
+  );
+  assert.ok(html.indexOf("Pause campaign") < html.indexOf("Prepared today"));
+  assert.ok(html.indexOf("Local campaign") < html.indexOf("Daily summary"));
   assert.match(html, /delivery are unavailable/);
   assert.doesNotMatch(html, />Running</);
 });
