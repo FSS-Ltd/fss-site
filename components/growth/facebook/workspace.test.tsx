@@ -118,6 +118,19 @@ test("retains multiple edited rows through paging and committed refresh; rebases
       Events.instance.emit("ready");
       await tick();
     });
+    const destination = container.querySelector("#A");
+    assert.ok(destination);
+    assert.match(
+      destination.textContent ?? "",
+      /Posting guidance unknown; review rules before posting/,
+    );
+    assert.equal(
+      destination
+        .querySelector('a[aria-label="Open A on Facebook"]')
+        ?.getAttribute("href"),
+      "https://facebook.com/page",
+    );
+    assert.ok(button(destination, "Record completed follow"));
     await act(async () => {
       button(container, "Next directory page").click();
       await tick();

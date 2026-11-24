@@ -110,8 +110,13 @@ export function DestinationRow({
       }}
     >
       <h2>{item.name}</h2>
-      <a href={item.url} target="_blank" rel="noopener noreferrer">
-        {item.url}
+      <a
+        href={item.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`Open ${item.name} on Facebook`}
+      >
+        Open Facebook {item.kind}
       </a>
       <p>
         {item.kind === "page" ? "Page" : "Group"}
@@ -119,28 +124,18 @@ export function DestinationRow({
       </p>
       <dl className={styles.facts}>
         <div>
-          <dt>Public observation</dt>
-          <dd>
-            {item.latestObservation
-              ? `${item.latestObservation.summary} · ${date(item.latestObservation.observedAt)}`
-              : "None recorded"}
-          </dd>
-        </div>
-        <div>
           <dt>Posting guidance</dt>
           <dd>
             {expiryPending
               ? "Review expired; refresh required"
-              : item.postReadiness}{" "}
+              : item.postReadiness === "allowed"
+                ? "Posting allowed by current review"
+                : item.postReadiness === "prohibited"
+                  ? "Posting prohibited by current review"
+                  : item.postReadiness === "stale"
+                    ? "Review is stale; review rules before posting"
+                    : "Posting guidance unknown; review rules before posting"}{" "}
             {item.review && `· expires ${date(item.review.expiresAt)}`}
-          </dd>
-        </div>
-        <div>
-          <dt>Last completed action</dt>
-          <dd>
-            {last
-              ? `${last.activity} · ${date(last.occurredAt)}`
-              : "None recorded"}
           </dd>
         </div>
         <div>
@@ -167,6 +162,22 @@ export function DestinationRow({
                     ? "Record completed join"
                     : "Record completed activity"}
             </button>
+          </dd>
+        </div>
+        <div>
+          <dt>Public observation</dt>
+          <dd>
+            {item.latestObservation
+              ? `${item.latestObservation.summary} · ${date(item.latestObservation.observedAt)}`
+              : "None recorded"}
+          </dd>
+        </div>
+        <div>
+          <dt>Last completed action</dt>
+          <dd>
+            {last
+              ? `${last.activity} · ${date(last.occurredAt)}`
+              : "None recorded"}
           </dd>
         </div>
       </dl>
