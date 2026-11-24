@@ -1,3 +1,4 @@
+import { assertDisposableGrowthDatabase } from "./disposable-database";
 import assert from "node:assert/strict";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
@@ -10,10 +11,7 @@ export async function exerciseOutreachPrepareRoute(
   db: GrowthDb,
   input: { id: string; email: string; url: string },
 ): Promise<void> {
-  const target = new URL(input.url);
-  assert.equal(target.hostname, "127.0.0.1");
-  assert.ok(["55488", "55489"].includes(target.port));
-  assert.equal(target.pathname, "/fss_growth_test");
+  assertDisposableGrowthDatabase(input.url);
   const [role] = await db<{ role: string }[]>`select current_user as role`;
   assert.equal(role?.role, "growth_app");
   const [before] = await admin<

@@ -1,15 +1,22 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import postgres from "postgres";
+import { assertDisposableGrowthDatabase } from "./disposable-database";
 
 const url = process.env.DIRECT_DATABASE_URL;
-if (
-  !url ||
-  !/^postgres(?:ql)?:\/\/[^@]+@(?:127\.0\.0\.1|localhost):5548[78]\/fss_growth_test$/.test(
-    url,
-  )
-)
+if (!url)
   throw new Error("A disposable local fss_growth_test database is required.");
+assertDisposableGrowthDatabase(url);
+
+test("fixture database guard rejects external and non-test targets", () => {
+  for (const target of [
+    "postgresql://postgres:postgres@localhost:5432/fss_growth_test",
+    "postgresql://postgres:postgres@127.0.0.1:5432/postgres",
+    "postgresql://postgres:postgres@example.com:5432/fss_growth_test",
+    "postgresql://postgres:postgres@127.0.0.1:5433/fss_growth_test",
+  ])
+    assert.throws(() => assertDisposableGrowthDatabase(target));
+});
 
 const tables = [
   "campaigns",

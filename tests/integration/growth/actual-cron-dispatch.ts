@@ -1,3 +1,4 @@
+import { assertDisposableGrowthDatabase } from "./disposable-database";
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import type { GrowthDb } from "../../../lib/growth/db/types";
@@ -13,10 +14,7 @@ export async function exerciseActualCronDispatch(
   db: GrowthDb,
   input: { connectionId: string; email: string; url: string },
 ): Promise<void> {
-  const target = new URL(input.url);
-  assert.equal(target.hostname, "127.0.0.1");
-  assert.equal(target.port, "55488");
-  assert.equal(target.pathname, "/fss_growth_test");
+  assertDisposableGrowthDatabase(input.url);
   const [role] = await db<{ role: string }[]>`select current_user as role`;
   assert.equal(role?.role, "growth_app");
   const business = randomUUID(),

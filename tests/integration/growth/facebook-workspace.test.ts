@@ -1,3 +1,4 @@
+import { withGrowthLogin } from "./disposable-database";
 import assert from "node:assert/strict";
 import { createHash, randomUUID } from "node:crypto";
 import test from "node:test";
@@ -483,50 +484,48 @@ test(
       await import("../../../lib/growth/facebook/events");
     const admin = postgres(url, { max: 2 });
     const received: string[] = [];
-    const eventUrl = new URL(url);
-    eventUrl.username = "growth_app";
-    eventUrl.password = "";
-    await admin`alter role growth_app login`;
+
     let subscription:
       | Awaited<ReturnType<typeof subscribeFacebookChanges>>
       | undefined;
     try {
-      subscription = await subscribeFacebookChanges(eventUrl.toString(), {
-        ready: () => {},
-        change: (id) => received.push(id),
-      });
-      assert.equal(subscription.status, "listening");
-      let id = "";
-      await admin.begin(async (tx) => {
-        const [row] = await tx<
-          { id: string }[]
-        >`insert into growth.audit_log(correlation_id,actor_type,actor_id,action,entity_type,entity_id,metadata) values ('test','system','test','facebook.test','facebook','test','{}') returning id`;
-        id = row!.id;
-        await new Promise((resolve) => setTimeout(resolve, 50));
-        assert.ok(!received.includes(id));
-      });
-      await new Promise((resolve) => setTimeout(resolve, 100));
-      assert.equal(received.filter((item) => item === id).length, 1);
-      let rolledBack = "";
-      await assert.rejects(
-        admin.begin(async (tx) => {
+      await withGrowthLogin(url, false, async (eventUrl) => {
+        subscription = await subscribeFacebookChanges(eventUrl, {
+          ready: () => {},
+          change: (id) => received.push(id),
+        });
+        assert.equal(subscription.status, "listening");
+        let id = "";
+        await admin.begin(async (tx) => {
           const [row] = await tx<
             { id: string }[]
-          >`insert into growth.audit_log(correlation_id,actor_type,actor_id,action,entity_type,entity_id,metadata) values ('test','system','test','facebook.rollback','facebook','test','{}') returning id`;
-          rolledBack = row!.id;
-          throw new Error("rollback");
-        }),
-        /rollback/,
-      );
-      await new Promise((resolve) => setTimeout(resolve, 50));
-      assert.ok(!received.includes(rolledBack));
-      if (subscription.status === "listening") {
-        await subscription.close();
-        await subscription.close();
-      }
+          >`insert into growth.audit_log(correlation_id,actor_type,actor_id,action,entity_type,entity_id,metadata) values ('test','system','test','facebook.test','facebook','test','{}') returning id`;
+          id = row!.id;
+          await new Promise((resolve) => setTimeout(resolve, 50));
+          assert.ok(!received.includes(id));
+        });
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        assert.equal(received.filter((item) => item === id).length, 1);
+        let rolledBack = "";
+        await assert.rejects(
+          admin.begin(async (tx) => {
+            const [row] = await tx<
+              { id: string }[]
+            >`insert into growth.audit_log(correlation_id,actor_type,actor_id,action,entity_type,entity_id,metadata) values ('test','system','test','facebook.rollback','facebook','test','{}') returning id`;
+            rolledBack = row!.id;
+            throw new Error("rollback");
+          }),
+          /rollback/,
+        );
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        assert.ok(!received.includes(rolledBack));
+        if (subscription.status === "listening") {
+          await subscription.close();
+          await subscription.close();
+        }
+      });
     } finally {
       if (subscription?.status === "listening") await subscription.close();
-      await admin`alter role growth_app nologin`;
       await admin.end();
     }
   },
@@ -654,29 +653,52 @@ test(
 );
 
 test(
+  "temporary Growth login restores credentials and flags after failure",
+  { skip: !url },
+  async () => {
+    if (!url) return;
+    const admin = postgres(url, { max: 1 });
+    const readRole = () =>
+      admin`select rolpassword, rolcanlogin, rolcreaterole from pg_authid where rolname='growth_app'`;
+    try {
+      const before = await readRole();
+      await assert.rejects(
+        withGrowthLogin(url, true, async (eventUrl) => {
+          const client = postgres(eventUrl, { max: 1 });
+          try {
+            const [role] = await client`select current_user, session_user`;
+            assert.equal(role?.current_user, "growth_app");
+            assert.equal(role?.session_user, "growth_app");
+            throw new Error("fixture failure");
+          } finally {
+            await client.end();
+          }
+        }),
+        /fixture failure/,
+      );
+      assert.deepEqual(await readRole(), before);
+    } finally {
+      await admin.end();
+    }
+  },
+);
+
+test(
   "event listener rejects a Growth role with elevated privileges",
   { skip: !url },
   async () => {
     if (!url) return;
     const { subscribeFacebookChanges } =
       await import("../../../lib/growth/facebook/events");
-    const admin = postgres(url, { max: 1 });
-    const eventUrl = new URL(url);
-    eventUrl.username = "growth_app";
-    eventUrl.password = "";
-    await admin`alter role growth_app login createrole`;
-    try {
+    await withGrowthLogin(url, true, async (eventUrl) => {
       await assert.rejects(
-        subscribeFacebookChanges(eventUrl.toString(), {
+        subscribeFacebookChanges(eventUrl, {
           ready: () => {},
           change: () => {},
         }),
         /invalid_growth_event_role/,
       );
-    } finally {
-      await admin`alter role growth_app nologin nocreaterole`;
-      await admin.end();
-    }
+    });
   },
 );
 

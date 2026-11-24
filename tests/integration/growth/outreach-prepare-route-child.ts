@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { assertDisposableGrowthDatabase } from "./disposable-database";
 
 async function main(): Promise<void> {
   let sendPosts = 0;
@@ -6,13 +7,10 @@ async function main(): Promise<void> {
   const mode = process.env.PREP_TEST_MODE;
   if (mode !== "complete" && mode !== "held")
     throw new Error("invalid fixture mode");
-  const database = new URL(process.env.DATABASE_URL ?? "");
-  if (
-    database.hostname !== "127.0.0.1" ||
-    !["55488", "55489"].includes(database.port) ||
-    database.pathname !== "/fss_growth_test" ||
-    database.searchParams.get("options") !== "-c role=growth_app"
-  )
+  const database = assertDisposableGrowthDatabase(
+    process.env.DATABASE_URL ?? "",
+  );
+  if (database.searchParams.get("options") !== "-c role=growth_app")
     throw new Error("invalid fixture database");
   globalThis.fetch = async (resource, init) => {
     const url = new URL(String(resource));
