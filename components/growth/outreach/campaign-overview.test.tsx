@@ -130,3 +130,52 @@ test("shows distinct empty and error states", () => {
   assert.match(error, /role="alert"/);
   assert.match(error, /reference-1/);
 });
+
+test("keeps inactive counts available without a zero-count grid", () => {
+  const html = renderToStaticMarkup(
+    <AppRouterContext.Provider
+      value={{
+        back() {},
+        forward() {},
+        refresh() {},
+        push() {},
+        replace() {},
+        prefetch() {},
+        bfcacheId: "test",
+      }}
+    >
+      <CampaignOverview
+        result={{
+          status: "ready",
+          londonDate: "23 November 2026",
+          truncated: false,
+          rows: [
+            {
+              editorPolicy: null,
+              id: "idle",
+              name: "Idle campaign",
+              version: 1,
+              status: "paused",
+              approved: false,
+              offer: "Review",
+              prepared: 0,
+              held: 0,
+              attempts: 0,
+              accepted: 0,
+              confirmed: 0,
+              holdReason: null,
+              reportDue: null,
+              reportStatus: null,
+            },
+          ],
+        }}
+      />
+    </AppRouterContext.Provider>,
+  );
+  assert.match(html, /<summary>No activity recorded today<\/summary>/);
+  assert.match(
+    html,
+    /Prepared today: 0 · Held jobs: 0 · Issued attempts today: 0 · Accepted today: 0 · Confirmed today: 0/,
+  );
+  assert.doesNotMatch(html, /aria-label="Today&#x27;s campaign activity"/);
+});

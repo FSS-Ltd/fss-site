@@ -60,15 +60,23 @@ export function CampaignOverview({
           {result.rows.map((campaign) => (
             <li key={campaign.id} className={styles.campaign}>
               <div className={styles.title}>
-                <div>
-                  <h3>{campaign.name}</h3>
-                  <p>
-                    {campaign.offer} · Version {campaign.version}
-                  </p>
+                <div className={styles.identity}>
+                  <div>
+                    <h3>{campaign.name}</h3>
+                    <p>
+                      {campaign.offer} · Version {campaign.version}
+                    </p>
+                  </div>
+                  <span className={styles.state}>
+                    {campaignState(campaign.status, campaign.approved)}
+                  </span>
                 </div>
-                <span className={styles.state}>
-                  {campaignState(campaign.status, campaign.approved)}
-                </span>
+                <CampaignLifecycleActions
+                  id={campaign.id}
+                  version={campaign.version}
+                  status={campaign.status}
+                  approved={campaign.approved}
+                />
               </div>
               <div className={styles.campaignControls}>
                 <p className={styles.holdReason}>
@@ -77,35 +85,46 @@ export function CampaignOverview({
                     : "No held jobs"}
                 </p>
                 <CampaignPolicyEditor campaign={campaign} accounts={accounts} />
-                <CampaignLifecycleActions
-                  id={campaign.id}
-                  version={campaign.version}
-                  status={campaign.status}
-                  approved={campaign.approved}
-                />
               </div>
-              <dl className={styles.metrics}>
-                <div>
-                  <dt>Prepared today</dt>
-                  <dd>{campaign.prepared}</dd>
-                </div>
-                <div>
-                  <dt>Held jobs</dt>
-                  <dd>{campaign.held}</dd>
-                </div>
-                <div>
-                  <dt>Issued attempts today</dt>
-                  <dd>{campaign.attempts}</dd>
-                </div>
-                <div>
-                  <dt>Accepted today</dt>
-                  <dd>{campaign.accepted}</dd>
-                </div>
-                <div>
-                  <dt>Confirmed today</dt>
-                  <dd>{campaign.confirmed}</dd>
-                </div>
-              </dl>
+              {campaign.prepared ||
+              campaign.held ||
+              campaign.attempts ||
+              campaign.accepted ||
+              campaign.confirmed ? (
+                <dl
+                  className={styles.stages}
+                  aria-label="Today's campaign activity"
+                >
+                  <div>
+                    <dt>Prepared today</dt>
+                    <dd>{campaign.prepared}</dd>
+                  </div>
+                  <div>
+                    <dt>Issued attempts today</dt>
+                    <dd>{campaign.attempts}</dd>
+                  </div>
+                  <div>
+                    <dt>Accepted today</dt>
+                    <dd>{campaign.accepted}</dd>
+                  </div>
+                  <div>
+                    <dt>Confirmed today</dt>
+                    <dd>{campaign.confirmed}</dd>
+                  </div>
+                  <div>
+                    <dt>Held jobs</dt>
+                    <dd>{campaign.held}</dd>
+                  </div>
+                </dl>
+              ) : (
+                <details className={styles.inactive}>
+                  <summary>No activity recorded today</summary>
+                  <p>
+                    Prepared today: 0 · Held jobs: 0 · Issued attempts today: 0
+                    · Accepted today: 0 · Confirmed today: 0
+                  </p>
+                </details>
+              )}
               <p className={styles.reportDate}>
                 {campaign.reportDue
                   ? `Analysis ${campaign.reportStatus === "held" ? "held, originally due" : "due"} ${formatGrowthDateTime(campaign.reportDue)}`

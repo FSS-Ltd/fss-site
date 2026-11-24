@@ -363,3 +363,121 @@
 .header a:hover {
   text-decoration: underline;
 }
+
+/* Campaign operations */
+.operatorControls {
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid #dce3e8;
+  border-radius: 8px;
+  background: #f5f9f9;
+}
+.operatorControls .editor {
+  min-width: 0;
+}
+.operatorControls .editor[open] {
+  flex-basis: 100%;
+}
+.operatorControls .editor form {
+  max-width: 760px;
+}
+.operatorControls .editor > summary,
+.campaignControls .editor > summary,
+.inactive > summary {
+  width: fit-content;
+  border-radius: 6px;
+  padding: 8px 10px;
+  color: #075f66;
+  cursor: pointer;
+}
+.operatorControls .editor > summary {
+  background: #075f66;
+  color: white;
+}
+.operatorControls .editor > summary:hover {
+  background: #064b51;
+}
+.operatorControls a {
+  padding: 8px 10px;
+  border-radius: 6px;
+}
+.operatorControls a:hover,
+.campaignControls .editor > summary:hover,
+.inactive > summary:hover {
+  background: #e6f3f4;
+  text-decoration: none;
+}
+.identity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  gap: 8px 14px;
+  min-width: 0;
+}
+.title > .actions {
+  margin: 0;
+}
+.title > .actions > button {
+  background: #075f66;
+  color: white;
+}
+.title > .actions > button:not(:disabled):hover {
+  background: #064b51;
+}
+.campaignControls {
+  margin-top: 8px;
+}
+.campaignControls .holdReason {
+  flex-basis: auto;
+}
+.campaignControls .note {
+  margin: 0;
+}
+.stages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 0;
+  margin: 14px 0 10px;
+}
+.stages div {
+  padding: 0 16px;
+  border-left: 1px solid #dce3e8;
+}
+.stages div:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+.stages dt {
+  color: #526078;
+  font-size: 0.78rem;
+}
+.stages dd {
+  margin: 3px 0 0;
+  color: #07182e;
+  font-weight: 700;
+}
+.inactive {
+  margin: 8px 0;
+  font-size: 0.85rem;
+}
+.inactive > summary {
+  padding-left: 0;
+  color: #526078;
+}
+.inactive > summary:focus-visible {
+  outline: 3px solid #087f88;
+  outline-offset: 3px;
+}
+.inactive p {
+  color: #526078;
+  line-height: 1.5;
+}
+@media (min-width: 640px) {
+  .fieldGroup {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .fieldGroup p,
+  .fieldGroup label:has(textarea) {
+    grid-column: 1 / -1;
+  }
+}
