@@ -1,0 +1,162 @@
+.panel {
+  min-width: 0;
+  border: 1px solid #dce3e8;
+  border-radius: 12px;
+  background: #fff;
+  padding: 22px;
+  color: #07182e;
+}
+.panel h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+.panel h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+.panel p {
+  color: #526078;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+.panel a,
+.disclosure summary {
+  color: #075f66;
+  font-weight: 650;
+}
+.panel a:focus-visible,
+.panel summary:focus-visible,
+.panel button:focus-visible,
+.panel input:focus-visible,
+.panel select:focus-visible,
+.panel textarea:focus-visible {
+  outline: 3px solid #087f88;
+  outline-offset: 3px;
+}
+.evidence {
+  margin-top: 16px;
+}
+.disclosure {
+  margin-top: 16px;
+}
+.disclosure summary {
+  cursor: pointer;
+}
+.form fieldset {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 0;
+  margin: 16px 0;
+  border: 0;
+}
+.form label,
+.enrol label {
+  display: grid;
+  gap: 5px;
+  font-size: 0.85rem;
+  font-weight: 650;
+}
+.form input,
+.form textarea,
+.enrol select {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #8c9aa7;
+  border-radius: 5px;
+  padding: 8px;
+  color: #07182e;
+  background: #fff;
+  font: inherit;
+}
+.form textarea {
+  min-height: 70px;
+}
+.panel button {
+  border: 1px solid #075f66;
+  border-radius: 6px;
+  padding: 8px 12px;
+  background: #fff;
+  color: #075f66;
+  font-weight: 650;
+}
+.panel button:disabled {
+  opacity: 0.65;
+}
+.enrol {
+  margin-top: 18px;
+  border-top: 1px solid #e3e9ec;
+  padding-top: 16px;
+}
+@media (max-width: 480px) {
+  .panel {
+    padding: 16px;
+  }
+}
+.form label.checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.form label.checkbox input {
+  width: auto;
+}
+.replies {
+  display: grid;
+  gap: 12px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.reply {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #dce3e8;
+  border-radius: 8px;
+}
+.reply h4 {
+  margin: 0;
+  font-size: 0.9rem;
+}
+.reply label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.85rem;
+  font-weight: 650;
+}
+.reply select {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #8c9aa7;
+  border-radius: 5px;
+  padding: 8px;
+  background: #fff;
+  color: #07182e;
+  font: inherit;
+}
+
+.outcomeForm {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+  min-width: 0;
+}
+.outcomeForm input:not([type="checkbox"]) {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid #8c9aa7;
+  border-radius: 5px;
+  font: inherit;
+}
+.outcomeForm label.checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.outcomeForm button {
+  justify-self: start;
+}

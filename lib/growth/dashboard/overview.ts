@@ -331,7 +331,7 @@ async function fetchFirstEmailsTab(
     left join lateral (
       select count(*)::int as count
       from growth.source_evidence se
-      where se.prospect_id = p.id
+      where se.prospect_id = p.id and se.origin = 'research'
     ) evidence on true
     left join lateral (
       select
@@ -377,7 +377,7 @@ async function fetchRepliesTab(
     left join lateral (
       select count(*)::int as count
       from growth.source_evidence se
-      where se.prospect_id = p.id
+      where se.prospect_id = p.id and se.origin = 'research'
     ) evidence on true
     inner join lateral (
       select em.received_at, em.sequence_enrollment_id
@@ -420,7 +420,7 @@ async function fetchFollowUpsTab(
     left join lateral (
       select count(*)::int as count
       from growth.source_evidence se
-      where se.prospect_id = p.id
+      where se.prospect_id = p.id and se.origin = 'research'
     ) evidence on true
     where em.direction = 'outbound'
       and em.step_number > 0

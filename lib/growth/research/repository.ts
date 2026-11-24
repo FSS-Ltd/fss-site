@@ -1,3 +1,5 @@
+import type { SignedResearchPrincipal } from "./route-handler";
+import { ResearchIngestionError } from "./errors";
 import { appendAuditEvent } from "../audit/service";
 import { withGrowthTransaction } from "../db/client";
 import type { GrowthTransaction } from "../db/types";
@@ -45,6 +47,7 @@ export function candidateIdentityLockKeys(
 
 export function createPostgresResearchTransaction(
   tx: GrowthTransaction,
+  principal?: SignedResearchPrincipal,
 ): ResearchIngestionTransaction {
   return {
     async lockExternalRun(externalRunId) {
@@ -58,6 +61,8 @@ export function createPostgresResearchTransaction(
     async findRunResult(externalRunId) {
       const rows = await tx<
         Array<{
+          verifiedKeyId: string | null;
+          signedBodySha256: string | null;
           runId: string;
           accepted: number;
           duplicates: number;
@@ -69,6 +74,7 @@ export function createPostgresResearchTransaction(
         }>
       >`
         select
+          rr.verified_key_id as "verifiedKeyId", rr.signed_body_sha256 as "signedBodySha256",
           rr.id as "runId",
           rr.accepted_count as accepted,
           rr.duplicate_count as duplicates,
@@ -93,7 +99,23 @@ export function createPostgresResearchTransaction(
         limit 1
       `;
       const row = rows[0];
-      return row === undefined ? null : { ok: true, ...row };
+      if (!row) return null;
+      if (
+        row.verifiedKeyId !== (principal?.keyId ?? null) ||
+        row.signedBodySha256 !== (principal?.bodySha256 ?? null)
+      )
+        throw new ResearchIngestionError(
+          "request_conflict",
+          "Research run identity conflict.",
+        );
+      return {
+        ok: true,
+        runId: row.runId,
+        accepted: row.accepted,
+        duplicates: row.duplicates,
+        rejected: row.rejected,
+        acceptedProspects: row.acceptedProspects,
+      };
     },
 
     async lockCandidateIdentities(candidates) {
@@ -114,7 +136,7 @@ export function createPostgresResearchTransaction(
           target_count,
           rejected_count,
           prompt_version,
-          started_at
+          started_at, verified_key_id, signed_body_sha256
         ) values (
           ${input.externalRunId},
           ${input.runDate},
@@ -123,7 +145,7 @@ export function createPostgresResearchTransaction(
           ${input.prospects.length + input.rejections.length},
           ${input.rejections.length},
           ${input.promptVersion},
-          now()
+          now(), ${principal?.keyId ?? null}, ${principal?.bodySha256 ?? null}
         )
         returning id
       `;
@@ -296,7 +318,7 @@ export function createPostgresResearchTransaction(
       await appendAuditEvent(tx, {
         correlationId: externalRunId,
         actorType: "agent",
-        actorId: "weekday-agent-v1",
+        actorId: principal?.keyId ?? "weekday-agent-v1",
         action: "prospect.research_ingested",
         entityType: "prospect",
         entityId: prospectId,
@@ -322,7 +344,7 @@ export function createPostgresResearchTransaction(
       await appendAuditEvent(tx, {
         correlationId: externalRunId,
         actorType: "agent",
-        actorId: "weekday-agent-v1",
+        actorId: principal?.keyId ?? "weekday-agent-v1",
         action: "research_run.completed",
         entityType: "research_run",
         entityId: runId,
@@ -376,9 +398,9 @@ export function createPostgresResearchTransaction(
 
 export const postgresResearchIngestionRepository: ResearchIngestionRepository =
   {
-    withTransaction(db, operation) {
+    withTransaction(db, operation, principal) {
       return withGrowthTransaction(db, (tx) =>
-        operation(createPostgresResearchTransaction(tx)),
+        operation(createPostgresResearchTransaction(tx, principal)),
       );
     },
   };

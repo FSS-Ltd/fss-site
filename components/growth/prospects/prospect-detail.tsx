@@ -1,7 +1,7 @@
 import { crmCountryName } from "@/lib/growth/crm/countries";
 import { ExternalLink, Mail, MapPin } from "lucide-react";
 import Link from "next/link";
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import {
   formatGrowthCurrency,
@@ -16,8 +16,6 @@ import { PreviewApproval } from "./preview-approval";
 import { ProspectActions } from "./prospect-actions";
 import styles from "./prospects.module.css";
 import { WebsiteAssessment } from "./website-assessment";
-
-type ScoreRingStyle = CSSProperties & Record<`--${string}`, string | number>;
 
 export function ProspectDetailView({
   integrations,
@@ -41,11 +39,6 @@ export function ProspectDetailView({
 
       <div className={styles.card}>
         <div className={styles.detailHeader}>
-          <span
-            className={styles.detailScoreRing}
-            data-score={prospect.fitScore}
-            style={{ "--score": prospect.fitScore } as ScoreRingStyle}
-          />
           <div>
             <h1 className={styles.detailHeading}>
               {prospect.business.legalName}
@@ -75,6 +68,9 @@ export function ProspectDetailView({
                 {formatGrowthStatusLabel(prospect.status)}
               </span>
             </div>
+            <p className={styles.detailScore}>
+              Recorded fit score: {prospect.fitScore}/100
+            </p>
           </div>
         </div>
       </div>

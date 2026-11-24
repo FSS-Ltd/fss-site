@@ -1,3 +1,4 @@
+import { PERSONAL_MAILBOX_DOMAINS } from "./mailbox-domains";
 import type { GlobalResearchCandidate } from "./global-schema";
 
 // A shared hosting/social hostname does not identify the business using it.
@@ -17,6 +18,29 @@ const SHARED_HOSTS = new Set([
   "square.site",
   "business.site",
 ]);
+
+const NONBUSINESS_HOSTS = [
+  ...SHARED_HOSTS,
+  "github.com",
+  "github.io",
+  "company-information.service.gov.uk",
+  ...PERSONAL_MAILBOX_DOMAINS,
+];
+
+export function isSharedBusinessHost(url: string): boolean {
+  const host = new URL(url).hostname.toLowerCase().replace(/^www\./, "");
+  return NONBUSINESS_HOSTS.some(
+    (domain) => host === domain || host.endsWith(`.${domain}`),
+  );
+}
+
+// This bounded classifier cannot prove website ownership; the signed verifier must establish it.
+export function hasRelatedWorkEmail(sourceUrl: string, email: string): boolean {
+  const host = businessWebsiteHost(sourceUrl);
+  if (!host || isSharedBusinessHost(sourceUrl)) return false;
+  const parts = email.trim().toLowerCase().split("@");
+  return parts.length === 2 && parts[1] === host;
+}
 
 export function normalizeRegistration(value: string | null): string | null {
   return value === null ? null : value.replace(/\s+/g, "").toUpperCase();

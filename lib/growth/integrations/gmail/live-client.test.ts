@@ -64,3 +64,96 @@ test("rejects when the decryption key version does not match", async () => {
     }),
   );
 });
+
+test("binds a live client to the same credential row and grant", async () => {
+  const encrypted = encryptRefreshToken("refresh-token-value", {
+    version: "v1",
+    key: encryptionKey,
+  });
+  const { createBoundLiveGmailClient } = await import("./live-client");
+  const result = await createBoundLiveGmailClient(
+    fakeDb({
+      encryptedRefreshToken: JSON.stringify(encrypted),
+      encryptionKeyVersion: "v1",
+      connectionId: "account",
+      googleSubject: "subject",
+      grantEpoch: 7,
+      grantedScopes: [
+        "openid",
+        "email",
+        "https://www.googleapis.com/auth/gmail.modify",
+      ],
+    }),
+    {
+      clientId: "id",
+      clientSecret: "secret",
+      subjectEmail: "j.ntagengwa@faithfulsoftware.dev",
+      decryptionKeys: { v1: encryptionKey },
+    },
+  );
+  assert.deepEqual(result.binding, {
+    connectionId: "account",
+    googleSubject: "subject",
+    grantEpoch: 7,
+    grantedScopes: [
+      "openid",
+      "email",
+      "https://www.googleapis.com/auth/gmail.modify",
+    ],
+  });
+  assert.equal(typeof result.client.listSentMessages, "function");
+});
+
+test("refuses bound observation without the credential row's verified subject", async () => {
+  const encrypted = encryptRefreshToken("refresh-token-value", {
+    version: "v1",
+    key: encryptionKey,
+  });
+  const { createBoundLiveGmailClient } = await import("./live-client");
+  await assert.rejects(
+    createBoundLiveGmailClient(
+      fakeDb({
+        encryptedRefreshToken: JSON.stringify(encrypted),
+        encryptionKeyVersion: "v1",
+        connectionId: "account",
+        googleSubject: null,
+        grantEpoch: 7,
+        grantedScopes: ["openid", "email"],
+      }),
+      {
+        clientId: "id",
+        clientSecret: "secret",
+        subjectEmail: "j.ntagengwa@faithfulsoftware.dev",
+        decryptionKeys: { v1: encryptionKey },
+      },
+    ),
+    GmailNotConnectedError,
+  );
+});
+
+test("bound client rejects a connected grant missing required Gmail scope", async () => {
+  const encrypted = encryptRefreshToken("refresh-token-value", {
+    version: "v1",
+    key: encryptionKey,
+  });
+  const { createBoundLiveGmailClient } = await import("./live-client");
+  await assert.rejects(
+    createBoundLiveGmailClient(
+      fakeDb({
+        encryptedRefreshToken: JSON.stringify(encrypted),
+        encryptionKeyVersion: "v1",
+        connectionId: "account",
+        googleSubject: "subject",
+        grantEpoch: 1,
+        grantedScopes: ["email"],
+      }),
+      {
+        clientId: "id",
+        clientSecret: "secret",
+        subjectEmail: "j.ntagengwa@faithfulsoftware.dev",
+        decryptionKeys: { v1: encryptionKey },
+      },
+    ),
+    GmailNotConnectedError,
+  );
+});

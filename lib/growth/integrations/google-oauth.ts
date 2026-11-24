@@ -2,6 +2,20 @@ import { randomBytes } from "node:crypto";
 
 import { z } from "zod";
 
+const normalizeScope = (scope: string) =>
+  scope === "https://www.googleapis.com/auth/userinfo.email" ? "email" : scope;
+export function normalizedAccountScopes(scopes: string[]): string[] {
+  return [...new Set(scopes.map(normalizeScope))].sort();
+}
+export function sameAccountScopes(a: string[], b: string[]): boolean {
+  const left = normalizedAccountScopes(a);
+  const right = normalizedAccountScopes(b);
+  return (
+    left.length === right.length &&
+    left.every((scope, index) => scope === right[index])
+  );
+}
+
 const GOOGLE_AUTHORIZATION_ENDPOINT =
   "https://accounts.google.com/o/oauth2/v2/auth";
 const GOOGLE_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token";
@@ -22,6 +36,13 @@ const REQUIRED_GMAIL_SCOPE_OPTIONS = [
   ["https://www.googleapis.com/auth/gmail.modify"],
 ] as const;
 
+export function hasRequiredGmailScopes(scopes: readonly string[]): boolean {
+  const granted = new Set(scopes);
+  return REQUIRED_GMAIL_SCOPE_OPTIONS.every((options) =>
+    options.some((scope) => granted.has(scope)),
+  );
+}
+
 const googleTokenResponseSchema = z.object({
   access_token: z.string().min(1),
   expires_in: z.number().int().positive(),
@@ -31,7 +52,11 @@ const googleTokenResponseSchema = z.object({
 });
 
 const googleIdentityResponseSchema = z.object({
-  sub: z.string().min(1).max(255),
+  sub: z
+    .string()
+    .min(1)
+    .max(255)
+    .refine((value) => value.trim().length > 0),
   email: z.string().email(),
   email_verified: z.boolean(),
 });
@@ -171,11 +196,7 @@ export async function exchangeGoogleAuthorizationCode(
   }
 
   const grantedScopes = parsed.data.scope.split(/\s+/).filter(Boolean);
-  const grantedScopeSet = new Set(grantedScopes);
-  const hasRequiredScopes = REQUIRED_GMAIL_SCOPE_OPTIONS.every((options) =>
-    options.some((scope) => grantedScopeSet.has(scope)),
-  );
-  if (!hasRequiredScopes) {
+  if (!hasRequiredGmailScopes(grantedScopes)) {
     throw new GoogleOAuthError(
       "INVALID_TOKEN_RESPONSE",
       "Google returned an invalid token response.",

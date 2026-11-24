@@ -14,10 +14,73 @@ function fakeDb(
   ) => {
     const text = strings.join("?").replace(/\s+/g, " ").trim();
     queries.push({ text, values });
+    if (text.startsWith("with thread_rows"))
+      return [
+        {
+          threadRows: [
+            {
+              id: "enrollment-id",
+              status: "active",
+              prospectId: "prospect-id",
+              contactId: "contact-id",
+              bound: true,
+              hasAssociation: true,
+            },
+          ],
+          candidates: [],
+          possibleExposure: false,
+          contactSignal: false,
+        },
+      ];
+    if (
+      text.startsWith("select se.id") &&
+      text.includes('"hasAssociation"') &&
+      values.includes("gmail-thread-1")
+    )
+      return [
+        {
+          id: "enrollment-id",
+          status: "active",
+          prospectId: "prospect-id",
+          contactId: "contact-id",
+          bound: true,
+          hasAssociation: true,
+        },
+      ];
+    if (text.startsWith("select status, google_subject"))
+      return [
+        {
+          status: "connected",
+          subject: "subject",
+          version: 1,
+          scopes: [
+            "openid",
+            "email",
+            "https://www.googleapis.com/auth/gmail.modify",
+          ],
+        },
+      ];
+    if (text.startsWith("select p.business_id"))
+      return [{ businessId: "business" }];
+    if (text.startsWith("select verified_subject"))
+      return [{ subject: "subject" }];
+    if (text.startsWith("select se.id") && text.includes("for update of se"))
+      return [
+        {
+          id: "enrollment-id",
+          status: "active",
+          normalisedEmail: "a@example.test",
+          businessId: "business",
+          gmailThreadId: "gmail-thread-1",
+        },
+      ];
+    if (text.startsWith("select id from growth.outreach_reservations"))
+      return [{ id: "reservation" }];
     return handler(text, values);
   }) as unknown as GrowthTransaction;
   Object.assign(tagged, {
     json: (value: unknown) => value,
+    array: (value: unknown) => value,
     __queries: queries,
     begin: async <T>(operation: (tx: GrowthTransaction) => Promise<T>) =>
       operation(tagged),
@@ -66,50 +129,129 @@ test("inserts the inbound message then its event, and detects a duplicate", asyn
     if (text.startsWith("insert into growth.email_messages")) {
       return [{ id: "inbound-message-id" }];
     }
+    if (text.startsWith("insert into growth.email_events")) {
+      return [{ id: "inbound-event-id" }];
+    }
     return [];
   });
 
-  const result = await postgresGmailSyncRepository.recordInboundEvent(db, {
+  const input = {
+    binding: {
+      connectionId: "11111111-1111-4111-8111-111111111112",
+      googleSubject: "subject",
+      grantEpoch: 1,
+      grantedScopes: [
+        "openid",
+        "email",
+        "https://www.googleapis.com/auth/gmail.modify",
+      ],
+    },
     sequenceEnrollmentId: "enrollment-id",
     prospectId: "prospect-id",
     contactId: "contact-id",
     gmailMessageId: "gmail-message-1",
     gmailThreadId: "gmail-thread-1",
+    observation: {
+      messageId: "gmail-message-1",
+      historyId: "200",
+      threadId: "gmail-thread-1",
+      inReplyTo: null,
+      references: null,
+      fromAddress: "sam@example.test",
+      fromHeader: "sam@example.test",
+    },
     rfcMessageId: "<reply@example.test>",
     from: "sam@example.test",
     subject: "Re: A practical idea",
     receivedAt: new Date("2026-08-18T09:00:00.000Z"),
-    eventType: "reply",
-  });
+    eventType: "auto_response" as const,
+    correlationId: "test",
+  };
+  const result = await postgresGmailSyncRepository.recordInboundEvent(
+    db,
+    input,
+  );
 
   assert.equal(result.alreadyRecorded, false);
   const queries = queriesOf(db);
-  assert.match(queries[0]?.text ?? "", /insert into growth\.email_messages/);
+  const inserted = queries.find((query) =>
+    query.text.startsWith("insert into growth.email_messages"),
+  );
+  assert.match(inserted?.text ?? "", /insert into growth\.email_messages/);
   assert.match(
-    queries[0]?.text ?? "",
+    inserted?.text ?? "",
     /on conflict \(channel, provider_message_id\) where provider_message_id is not null do nothing/,
   );
-  assert.match(queries[1]?.text ?? "", /insert into growth\.email_events/);
+  assert.ok(
+    queries.some((query) =>
+      query.text.startsWith("insert into growth.email_events"),
+    ),
+  );
+  const conflictingDb = fakeDb((text) =>
+    text.startsWith("insert into growth.email_messages")
+      ? [{ id: "new-message-id" }]
+      : [],
+  );
+  await assert.rejects(
+    postgresGmailSyncRepository.recordInboundEvent(conflictingDb, input),
+    /Gmail inbound event attribution conflict/,
+  );
 });
 
-test("treats a conflicting inbound message insert as already recorded", async () => {
-  const db = fakeDb(() => []);
+test("treats a matching inbound event as already recorded", async () => {
+  const db = fakeDb((text) =>
+    text.startsWith("select em.sequence_enrollment_id")
+      ? [
+          {
+            sequenceEnrollmentId: "enrollment-id",
+            gmailThreadId: "gmail-thread-1",
+            eventType: "auto_response",
+            attributionMatches: true,
+          },
+        ]
+      : [],
+  );
 
   const result = await postgresGmailSyncRepository.recordInboundEvent(db, {
+    binding: {
+      connectionId: "11111111-1111-4111-8111-111111111112",
+      googleSubject: "subject",
+      grantEpoch: 1,
+      grantedScopes: [
+        "openid",
+        "email",
+        "https://www.googleapis.com/auth/gmail.modify",
+      ],
+    },
     sequenceEnrollmentId: "enrollment-id",
     prospectId: "prospect-id",
     contactId: "contact-id",
     gmailMessageId: "gmail-message-1",
     gmailThreadId: "gmail-thread-1",
+    observation: {
+      messageId: "gmail-message-1",
+      historyId: "200",
+      threadId: "gmail-thread-1",
+      inReplyTo: null,
+      references: null,
+      fromAddress: "sam@example.test",
+      fromHeader: "sam@example.test",
+    },
     rfcMessageId: null,
     from: "sam@example.test",
     subject: null,
     receivedAt: new Date(),
-    eventType: "reply",
+    eventType: "auto_response",
+    correlationId: "test",
   });
 
   assert.equal(result.alreadyRecorded, true);
-  assert.equal(queriesOf(db).length, 1);
+  assert.equal(
+    queriesOf(db).filter((query) =>
+      query.text.startsWith("insert into growth.email_events"),
+    ).length,
+    0,
+  );
 });
 
 test("activates a pending-approval enrollment only", async () => {
@@ -123,4 +265,75 @@ test("activates a pending-approval enrollment only", async () => {
   const query = queriesOf(db)[0]!;
   assert.match(query.text, /status = 'active'/);
   assert.match(query.text, /status = 'pending_approval'/);
+});
+
+test("does not choose an enrollment when a Gmail thread maps to multiple enrollments", async () => {
+  const db = fakeDb(() => [
+    { id: "one", status: "active", prospectId: "p1", contactId: "c1" },
+    { id: "two", status: "active", prospectId: "p2", contactId: "c2" },
+  ]);
+
+  assert.deepEqual(
+    await postgresGmailSyncRepository.findEnrollmentByThread(
+      db,
+      "shared-thread",
+      {
+        connectionId: "11111111-1111-4111-8111-111111111112",
+        googleSubject: "subject",
+        grantEpoch: 1,
+        grantedScopes: [],
+      },
+    ),
+    { kind: "ambiguous" },
+  );
+});
+
+test("rejects an inbound provider ID already attributed to another enrollment", async () => {
+  const db = fakeDb((text) =>
+    text.startsWith("select em.sequence_enrollment_id")
+      ? [
+          {
+            sequenceEnrollmentId: "other",
+            gmailThreadId: "gmail-thread-1",
+            eventType: "auto_response",
+            attributionMatches: true,
+          },
+        ]
+      : [],
+  );
+  await assert.rejects(
+    postgresGmailSyncRepository.recordInboundEvent(db, {
+      binding: {
+        connectionId: "11111111-1111-4111-8111-111111111112",
+        googleSubject: "subject",
+        grantEpoch: 1,
+        grantedScopes: [
+          "openid",
+          "email",
+          "https://www.googleapis.com/auth/gmail.modify",
+        ],
+      },
+      sequenceEnrollmentId: "enrollment-id",
+      prospectId: "prospect-id",
+      contactId: "contact-id",
+      gmailMessageId: "gmail-message-1",
+      gmailThreadId: "gmail-thread-1",
+      observation: {
+        messageId: "gmail-message-1",
+        historyId: "200",
+        threadId: "gmail-thread-1",
+        inReplyTo: null,
+        references: null,
+        fromAddress: null,
+        fromHeader: null,
+      },
+      rfcMessageId: null,
+      from: null,
+      subject: null,
+      receivedAt: new Date(),
+      eventType: "auto_response",
+      correlationId: "test",
+    }),
+    /conflict/i,
+  );
 });

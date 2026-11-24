@@ -267,3 +267,25 @@ test("treats provider rejection and network failure as unconfirmed revocation", 
   );
   await assert.rejects(revokeGoogleOAuthToken(" "), /must not be blank/i);
 });
+
+test("rejects missing, blank, and overlength Google subjects", async () => {
+  for (const sub of [undefined, "", "   ", "x".repeat(256)]) {
+    await assert.rejects(
+      fetchGoogleIdentity("access-token", async () =>
+        Response.json({
+          sub,
+          email: "founder@example.com",
+          email_verified: true,
+        }),
+      ),
+      (error: unknown) =>
+        error instanceof GoogleOAuthError &&
+        error.code === "INVALID_IDENTITY_RESPONSE",
+    );
+  }
+});
+
+test("scope comparison cannot conflate a newline-containing value with two scopes", async () => {
+  const { sameAccountScopes } = await import("./google-oauth");
+  assert.equal(sameAccountScopes(["a\nb"], ["a", "b"]), false);
+});

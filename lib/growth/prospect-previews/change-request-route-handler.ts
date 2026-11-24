@@ -8,6 +8,7 @@ import {
   type MessageActionRouteHandler,
 } from "../sequences/message-action-route";
 import {
+  PreviewPilotRequestError,
   createPreviewChangeRequest as defaultCreatePreviewChangeRequest,
   type CreatePreviewChangeRequestInput,
   type PreviewChangeRequest,
@@ -17,6 +18,7 @@ const bodySchema = z
   .object({
     compositionDigest: z.string().regex(/^[a-f0-9]{64}$/),
     notes: z.string().trim().min(1).max(2_000),
+    requestId: z.uuid().optional(),
   })
   .strict();
 
@@ -46,7 +48,8 @@ export function createPreviewChangeRequestRouteHandler(
   dependencies: PreviewChangeRequestRouteDependencies,
 ): MessageActionRouteHandler {
   const createChangeRequest =
-    dependencies.createPreviewChangeRequest ?? defaultCreatePreviewChangeRequest;
+    dependencies.createPreviewChangeRequest ??
+    defaultCreatePreviewChangeRequest;
 
   return createMessageActionHandler({
     config: dependencies.config,
@@ -61,6 +64,7 @@ export function createPreviewChangeRequestRouteHandler(
           compositionDigest: body.compositionDigest,
           notes: body.notes,
           createdBy: founder.actorId,
+          ...(body.requestId ? { requestId: body.requestId } : {}),
         },
         dependencies.db,
       );
@@ -76,6 +80,15 @@ export function createPreviewChangeRequestRouteHandler(
             code: "not_found",
             message: "The source package is no longer available for review.",
           }
-        : null,
+        : error instanceof PreviewPilotRequestError
+          ? {
+              status: error.code === "pilot_request_id_required" ? 422 : 409,
+              code: error.code,
+              message:
+                error.code === "pilot_revision_already_requested"
+                  ? "The pilot revision has already been requested. Add clarifications to CRM notes."
+                  : "The revision request could not be accepted. Refresh and try again.",
+            }
+          : null,
   });
 }

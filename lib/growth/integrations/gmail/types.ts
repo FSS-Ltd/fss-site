@@ -24,9 +24,31 @@ export type GmailSendResult = {
   gmailThreadId: string;
 };
 
+export type GmailGuardedSendOutcome =
+  | { status: "accepted"; result: GmailSendResult }
+  | { status: "not_invoked"; reason: "invalid_input" | "guard_rejected" }
+  | {
+      status: "not_invoked";
+      reason: "credential_preparation_failed";
+      errorCode: GmailClientErrorCode;
+    }
+  | {
+      status: "invoked_unknown";
+      errorCode: GmailClientErrorCode;
+      providerStatus?: number;
+    };
+
+export interface GuardedGmailClient extends GmailClient {
+  sendMessageOnce(
+    input: GmailSendInput,
+    gate: () => boolean,
+  ): Promise<GmailGuardedSendOutcome>;
+}
+
 export type GmailHistoryInput = {
   startHistoryId: string;
   pageToken?: string;
+  includeLabelChanges?: boolean;
 };
 
 export type GmailHistoryMessage = {
@@ -38,6 +60,8 @@ export type GmailHistoryRecord = {
   historyId: string;
   messagesAdded: GmailHistoryMessage[];
   messagesDeleted: GmailHistoryMessage[];
+  labelsAdded?: Array<GmailHistoryMessage & { labelIds: string[] }>;
+  labelsRemoved?: Array<GmailHistoryMessage & { labelIds: string[] }>;
 };
 
 export type GmailHistoryResult = {
@@ -53,6 +77,11 @@ export type GmailMessageMetadata = {
   labelIds: string[];
   receivedAt: string;
   from: string | null;
+  to: string | null;
+  cc: string | null;
+  bcc: string | null;
+  inReplyTo: string | null;
+  references: string | null;
   subject: string | null;
   rfcMessageId: string | null;
   autoSubmitted: string | null;
@@ -66,6 +95,9 @@ export interface GmailClient {
   sendDraft(draftId: string): Promise<GmailSendResult>;
   sendMessage(input: GmailSendInput): Promise<GmailSendResult>;
   listHistory(input: GmailHistoryInput): Promise<GmailHistoryResult>;
+  listSentMessages(input: {
+    pageToken?: string;
+  }): Promise<{ messages: GmailHistoryMessage[]; nextPageToken?: string }>;
   getMessageMetadata(messageId: string): Promise<GmailMessageMetadata>;
   findByRfcMessageId(
     rfcMessageId: string,

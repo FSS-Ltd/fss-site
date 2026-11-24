@@ -26,6 +26,8 @@ export function ResearchEmailReviewScenario(): React.JSX.Element {
       recommendedOffer: "Customer portal",
       estimatedOneOffMinPence: 0,
       estimatedOneOffMaxPence: 0,
+      contactId: "33333333-3333-4333-8333-333333333333",
+      contactVersion: 1,
       contactFirstName: null,
       contactLastName: null,
       contactEmail: "business@example.test",

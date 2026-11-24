@@ -6,8 +6,8 @@
 
 .tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
-  overflow-x: auto;
   border-bottom: 1px solid #dce3e8;
   padding-bottom: 8px;
 }
@@ -22,6 +22,10 @@
   font-size: 0.86rem;
   font-weight: 650;
   cursor: pointer;
+}
+
+.tab:hover {
+  background: #f1f7f7;
 }
 
 .tab[aria-selected="true"] {
@@ -61,8 +65,13 @@
 }
 
 @media (max-width: 480px) {
+  .tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .tab {
-    padding: 10px 12px;
+    min-height: 44px;
+    padding: 10px 8px;
     font-size: 0.8rem;
   }
 }

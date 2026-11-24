@@ -1,9 +1,13 @@
-import { getConnectedGmailCredential } from "../../db/repositories/integration-connections";
+import {
+  getConnectedGmailCredential,
+  type StoredGmailCredential,
+} from "../../db/repositories/integration-connections";
 import type { GrowthQueryExecutor } from "../../db/types";
+import { hasRequiredGmailScopes } from "../google-oauth";
 import { parseStoredToken } from "../gmail-disconnect";
 import { decryptRefreshToken, type TokenDecryptionKeys } from "../token-crypto";
 import { createGmailClient } from "./client";
-import type { GmailClient } from "./types";
+import type { GmailClient, GuardedGmailClient } from "./types";
 
 export class GmailNotConnectedError extends Error {
   constructor() {
@@ -28,15 +32,58 @@ export async function createLiveGmailClient(
     throw new GmailNotConnectedError();
   }
 
-  const encryptedToken = parseStoredToken(credential);
+  return clientFromCredential(credential, config);
+}
+
+function clientFromCredential(
+  credential: StoredGmailCredential,
+  config: LiveGmailClientConfig,
+): GuardedGmailClient {
   const refreshToken = decryptRefreshToken(
-    encryptedToken,
+    parseStoredToken(credential),
     config.decryptionKeys,
   );
-
   return createGmailClient({
     clientId: config.clientId,
     clientSecret: config.clientSecret,
     refreshToken,
   });
+}
+
+export type GmailGrantBinding = {
+  connectionId: string;
+  googleSubject: string;
+  grantEpoch: number;
+  grantedScopes: string[];
+};
+
+export type BoundGmailClient = {
+  client: GuardedGmailClient;
+  binding: GmailGrantBinding;
+};
+
+export async function createBoundLiveGmailClient(
+  db: GrowthQueryExecutor,
+  config: LiveGmailClientConfig,
+): Promise<BoundGmailClient> {
+  const credential = await getConnectedGmailCredential(db, config.subjectEmail);
+  if (
+    !credential ||
+    !credential.connectionId ||
+    !credential.googleSubject ||
+    !Number.isSafeInteger(credential.grantEpoch) ||
+    credential.grantEpoch <= 0 ||
+    !Array.isArray(credential.grantedScopes) ||
+    !hasRequiredGmailScopes(credential.grantedScopes)
+  )
+    throw new GmailNotConnectedError();
+  return {
+    client: clientFromCredential(credential, config),
+    binding: {
+      connectionId: credential.connectionId,
+      googleSubject: credential.googleSubject,
+      grantEpoch: credential.grantEpoch,
+      grantedScopes: credential.grantedScopes,
+    },
+  };
 }

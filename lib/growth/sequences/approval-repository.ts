@@ -2,7 +2,9 @@ import type postgres from "postgres";
 
 import { appendAuditEvent } from "../audit/service";
 import { withGrowthTransaction } from "../db/client";
+import { lockGmailRouting } from "./gmail-thread-association";
 import type { GrowthDb, GrowthTransaction } from "../db/types";
+import { FirstEmailApprovalError } from "./approval";
 import type {
   FirstEmailApprovalRepository,
   FirstEmailApprovalTransaction,
@@ -25,16 +27,34 @@ function createTransaction(
 ): FirstEmailApprovalTransaction {
   return {
     async authorizeResearchContact(input) {
-      await transaction`
+      const contacts = await transaction<Array<{ version: number }>>`
         update growth.contacts
         set lawful_basis = ${input.basis === "consent" ? "consent" : "legitimate_interests"}::growth.lawful_basis,
             subscriber_type = case when ${input.basis} = 'corporate_legitimate_interests' then 'corporate'::growth.subscriber_type else subscriber_type end,
             version = version + 1, updated_at = now()
         where id = ${input.contactId}
+        returning version
       `;
-      await transaction`update growth.prospects set version = version + 1, updated_at = now() where id = ${input.prospectId}`;
+      const prospects = await transaction<
+        Array<{ version: number }>
+      >`update growth.prospects set version = version + 1, updated_at = now() where id = ${input.prospectId} returning version`;
+      if (!contacts[0] || !prospects[0])
+        throw new FirstEmailApprovalPersistenceError();
+      return {
+        contactVersion: contacts[0].version,
+        prospectVersion: prospects[0].version,
+      };
     },
     async lockDraft(draftTaskId) {
+      const [identity] = await transaction<
+        Array<{ businessId: string; prospectId: string }>
+      >`
+        select p.business_id as "businessId", p.id as "prospectId"
+        from growth.agent_tasks at inner join growth.prospects p on p.id = at.prospect_id
+        where at.id = ${draftTaskId} and at.task_type = 'first_email_draft'
+      `;
+      if (!identity) return null;
+      await transaction`select pg_advisory_xact_lock(hashtextextended(${`growth:outreach-business:${identity.businessId}`}, 0))`;
       const rows = await transaction<
         Array<{
           id: string;
@@ -43,6 +63,8 @@ function createTransaction(
           outputSnapshot: unknown;
           completedAt: Date | null;
           contactId: string;
+          contactVersion: number;
+          businessId: string;
           contactEmail: string;
           normalisedEmail: string;
           subscriberType: string;
@@ -58,6 +80,8 @@ function createTransaction(
           at.output_snapshot as "outputSnapshot",
           at.completed_at as "completedAt",
           p.primary_contact_id as "contactId",
+          c.version as "contactVersion",
+          p.business_id as "businessId",
           c.email as "contactEmail",
           c.normalised_email as "normalisedEmail",
           c.subscriber_type as "subscriberType",
@@ -66,14 +90,19 @@ function createTransaction(
           p.version as "prospectVersion"
         from growth.agent_tasks at
         inner join growth.prospects p on p.id = at.prospect_id
-        inner join growth.contacts c on c.id = p.primary_contact_id
+        inner join growth.contacts c on c.id = p.primary_contact_id and c.business_id = p.business_id
         inner join growth.businesses b on b.id = p.business_id
         where at.id = ${draftTaskId}
           and at.task_type = 'first_email_draft'
-        for update of at, p, c
+        for update of at, p, c, b
       `;
       const draft = rows[0];
-      if (!draft) return null;
+      if (!draft) throw new FirstEmailApprovalError("version_conflict");
+      if (
+        draft.businessId !== identity.businessId ||
+        draft.prospectId !== identity.prospectId
+      )
+        throw new FirstEmailApprovalError("version_conflict");
 
       const enrollmentRows = await transaction<Array<{ exists: boolean }>>`
         select exists (
@@ -125,12 +154,14 @@ function createTransaction(
     },
 
     async createEnrollmentAndFirstMessage(input) {
-      const templateSnapshot: postgres.JSONValue = input.followUpPolicy
-        ? {
-            followUpPolicy: input.followUpPolicy,
-            approvedRecipient: input.approvedRecipient ?? null,
-          }
-        : {};
+      const templateSnapshot: postgres.JSONValue = {
+        ...(input.followUpPolicy
+          ? { followUpPolicy: input.followUpPolicy }
+          : {}),
+        approvedRecipient: input.approvedRecipient,
+        reviewedRecipient: input.reviewedRecipient,
+        effectiveRecipient: input.effectiveRecipient,
+      };
       const enrollmentRows = await transaction<Array<{ id: string }>>`
         insert into growth.sequence_enrollments (
           prospect_id, contact_id, status, template_snapshot
@@ -207,13 +238,16 @@ function createTransaction(
 export const postgresFirstEmailApprovalRepository: FirstEmailApprovalRepository =
   {
     withTransaction(db, operation) {
-      return withGrowthTransaction(db, (transaction) =>
-        operation(createTransaction(transaction)),
-      );
+      return withGrowthTransaction(db, async (transaction) => {
+        await lockGmailRouting(transaction);
+        return operation(createTransaction(transaction));
+      });
     },
 
     async recordProviderDraft(db: GrowthDb, input) {
-      const rows = await db<Array<{ id: string }>>`
+      const rows = await withGrowthTransaction(db, async (tx) => {
+        await lockGmailRouting(tx);
+        return tx<Array<{ id: string }>>`
       update growth.email_messages
       set status = 'provider_draft',
           provider_draft_id = ${input.providerDraftId},
@@ -222,6 +256,7 @@ export const postgresFirstEmailApprovalRepository: FirstEmailApprovalRepository 
       where id = ${input.messageId}
       returning id
     `;
+      });
       if (!rows[0]) {
         throw new FirstEmailApprovalPersistenceError();
       }

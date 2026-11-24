@@ -7,6 +7,7 @@ import {
   OUTREACH_STATE_VALUES,
   PROSPECT_STATUS_VALUES,
   SUPPRESSION_FILTER_VALUES,
+  SOURCE_FILTER_VALUES,
   type ProspectFilterFacets,
   type ProspectListQuery,
 } from "@/lib/growth/dashboard/prospects";
@@ -41,6 +42,7 @@ const SUPPRESSED_LABELS: Record<
 };
 
 const FILTER_LABELS: Partial<Record<keyof ProspectListQuery, string>> = {
+  source: "Source",
   q: "Search",
   sector: "Sector",
   location: "Location",
@@ -56,6 +58,7 @@ export function buildProspectsHref(
 ): string {
   const params = new URLSearchParams();
   const merged: Record<string, string | null> = {
+    source: !query.source || query.source === "all" ? null : query.source,
     q: query.q || null,
     sector: query.sector || null,
     location: query.location || null,
@@ -80,6 +83,11 @@ function activeFilterChips(
 ): { key: keyof ProspectListQuery; label: string }[] {
   const chips: { key: keyof ProspectListQuery; label: string }[] = [];
 
+  if (query.source && query.source !== "all")
+    chips.push({
+      key: "source",
+      label: `Source: ${formatGrowthStatusLabel(query.source)}`,
+    });
   if (query.q)
     chips.push({ key: "q", label: `${FILTER_LABELS.q}: "${query.q}"` });
   if (query.sector)
@@ -133,6 +141,25 @@ export function ProspectFilters({
         method="GET"
       >
         <div className={styles.filtersRow}>
+          <div className={styles.field}>
+            <label className={styles.fieldLabel} htmlFor="prospect-source">
+              Source
+            </label>
+            <select
+              className={styles.select}
+              defaultValue={query.source ?? "all"}
+              id="prospect-source"
+              name="source"
+            >
+              {SOURCE_FILTER_VALUES.map((value) => (
+                <option key={value} value={value}>
+                  {value === "all"
+                    ? "All sources"
+                    : formatGrowthStatusLabel(value)}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className={styles.field}>
             <label className={styles.fieldLabel} htmlFor="prospect-search">
               Search

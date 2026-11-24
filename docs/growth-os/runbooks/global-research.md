@@ -33,3 +33,72 @@ Text-only research drafts need no concept visual or concept disclaimer. Legacy d
 ## Known boundary
 
 Registration deduplication currently uses country plus registration number, not subnational registry jurisdiction. Omit a registration number unless its country-wide identity is established; use website, Maps and email identity for businesses whose registration numbers are only locally unique.
+
+## Daily research-only runner (not scheduled)
+
+The daily entry point is callable for a later 07:00 Europe/London
+schedule, including weekends. It does not create or enable a schedule. After
+release and separate activation approval, use the pinned launcher from a dedicated
+clean checkout at the exact reviewed full commit. Install and verify the locked
+dependencies in that checkout before release. Prepare three existing directories
+outside the checkout and synced storage: owner-only business and Facebook state
+directories, and an authenticated Codex home owned by the user and not writable
+by other users. Use absolute, canonical paths and Codex CLI 0.163.0. An existing
+Codex home can have public traversal permissions; an `auth.json` file, if
+present, must be owner-only. Do not copy credentials.
+
+Start the bootstrap with a clean environment and an absolute Node 24 executable:
+
+```sh
+env -i HOME="/absolute/home" PATH="/usr/bin:/bin" \
+  /absolute/node24/bin/node /absolute/checkout/scripts/outreach-research-pinned.mjs \
+  --mode business --checkout /absolute/checkout --revision FULL_REVIEWED_COMMIT \
+  --node /absolute/node24/bin/node --codex /absolute/codex/bin/codex \
+  --business-state /absolute/private/business --facebook-state /absolute/private/facebook \
+  --codex-home /absolute/private/codex-home
+```
+
+Use `--mode facebook` for the separate Facebook discovery run. Add `--replay`
+to require today's existing private body or Facebook receipt; it refuses to
+start fresh research when none exists. Normal scheduled invocations also resume
+an existing body or receipt without searching again. The
+launcher does not fetch, reset, register or activate schedules. It checks the
+checkout, paths and runtime before starting either existing runner, and emits
+only the mode and status. It does not verify the installed dependency tree or
+establish that native search works; both remain release checks.
+
+Choose owner-only local directories outside the repository and synced storage.
+The runner stores one private immutable batch per London calendar day, up to ten
+prospects and 100 rejections, before signing. It reuses those exact bytes on
+later invocations, including after an uncertain response. Keep the file until
+reconciliation is complete; securely remove it only under an approved retention
+procedure. A completed search with no candidates or rejections submits the
+explicit `no_results` outcome. A failed search is not submitted. This requires
+`20261118160000_growth_signed_empty_research.sql` before deploying the new
+contract. Reports contain counts and failure categories only.
+
+The restricted child has a disposable working directory and receives no signing
+secret. Use the official Codex 0.163.0 distribution with its bundled code-mode
+host. The configured models use that host to reach native search. The child
+disables shell, browser, apps, plugins, and skill instructions and uses the
+read-only sandbox. Its bounded private `codex exec --json` stream must show at least one
+completed native web-search **search** action and a successful terminal turn;
+opening or finding text on a page alone does not count. Missing, malformed,
+failed, oversized, or forbidden-tool event streams fail before signing, even
+when the model claims there were no results. Raw event streams, queries and
+child output are not logged. Harmless authenticated public-source probes passed
+for both configured models. Recheck the installed helper and live tool evidence
+in the scheduler's environment before enabling the runner. The event shape follows the
+[pinned Codex 0.163.0 execution contract](https://github.com/openai/codex/blob/rust-v0.163.0/codex-rs/exec/src/exec_events.rs)
+and its [search completion test](https://github.com/openai/codex/blob/rust-v0.163.0/codex-rs/exec/tests/event_processor_with_json_output.rs).
+
+The parent validates the v2 contract and rejects child-supplied campaign
+proof before retrieving the existing Keychain secret and using the exact-byte
+submission client. This validates structure, not the truth of web claims. All
+records remain research-only: source verification, campaign targeting, recipient
+permission and an approved offer remain separate gates. One batch per day is a
+fixed discovery budget, not a promise of ten eligible recipients. The historical
+weekday preview-writing command remains separate and unchanged.
+
+Actual child-tool isolation, local automation timezone behavior, policy binding,
+production deployment, and the first signed run require separate release review.

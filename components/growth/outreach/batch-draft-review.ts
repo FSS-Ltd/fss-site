@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { reviewedRecipientSchema } from "../../../lib/growth/sequences/reviewed-recipient";
 import {
   postResearchDraftAction,
   type ResearchDraftResponse,
@@ -7,22 +8,32 @@ import type { ResearchPermission } from "./research-permission-fields";
 
 const reviewSchema = z.object({
   status: z.literal("ready"),
-  data: z.object({
-    draftTaskId: z.uuid(),
-    version: z.number().int().positive(),
-    prospectVersion: z.number().int().positive(),
-    businessName: z.string(),
-    contactName: z.string(),
-    contactEmail: z.string(),
-    subject: z.string(),
-    previewText: z.string(),
-    researchOnly: z.boolean().optional(),
-    approvalFingerprint: z
-      .string()
-      .regex(/^[0-9a-f]{64}$/)
-      .optional(),
-    eligibility: z.object({ ready: z.boolean(), reasons: z.array(z.string()) }),
-  }),
+  data: z
+    .object({
+      draftTaskId: z.uuid(),
+      version: z.number().int().positive(),
+      prospectVersion: z.number().int().positive(),
+      businessName: z.string(),
+      contactName: z.string(),
+      contactEmail: z.string(),
+      reviewedRecipient: reviewedRecipientSchema,
+      subject: z.string(),
+      previewText: z.string(),
+      researchOnly: z.boolean().optional(),
+      approvalFingerprint: z
+        .string()
+        .regex(/^[0-9a-f]{64}$/)
+        .optional(),
+      eligibility: z.object({
+        ready: z.boolean(),
+        reasons: z.array(z.string()),
+      }),
+    })
+    .refine(
+      (data) =>
+        data.contactEmail === data.reviewedRecipient.email &&
+        data.prospectVersion === data.reviewedRecipient.prospectVersion,
+    ),
 });
 
 export type BatchReviewMessage = z.infer<typeof reviewSchema>["data"];
@@ -76,10 +87,14 @@ export async function sendBatchDraft(
     message.researchOnly
       ? {
           expectedVersion: message.version,
+          reviewedRecipient: message.reviewedRecipient,
           expectedProspectVersion: message.prospectVersion,
           fingerprint: message.approvalFingerprint,
           permission,
         }
-      : { expectedVersion: message.version },
+      : {
+          expectedVersion: message.version,
+          reviewedRecipient: message.reviewedRecipient,
+        },
   );
 }

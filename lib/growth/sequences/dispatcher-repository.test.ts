@@ -31,10 +31,10 @@ function queriesOf(
     db as unknown as {
       __queries: Array<{ text: string; values: readonly unknown[] }>;
     }
-  ).__queries;
+  ).__queries.filter((query) => !query.text.includes("growth:gmail-routing"));
 }
 
-test("claims one due message with FOR UPDATE SKIP LOCKED and increments its attempt count", async () => {
+test("claims one due message without counting an unissued attempt", async () => {
   const db = fakeDb((text) => {
     if (text.startsWith("with target")) {
       return [
@@ -64,11 +64,56 @@ test("claims one due message with FOR UPDATE SKIP LOCKED and increments its atte
   });
 
   assert.equal(claimed?.id, "message-id");
-  const query = queriesOf(db)[0]!;
+  const query = queriesOf(db).find((item) =>
+    item.text.startsWith("with target"),
+  );
+  assert.ok(query);
   assert.match(query.text, /for update of em skip locked/);
   assert.match(query.text, /status in \('queued', 'retry'\)/);
   assert.match(query.text, /lease_expires_at < \?/);
-  assert.match(query.text, /attempt_count = em\.attempt_count \+ 1/);
+  assert.doesNotMatch(query.text, /attempt_count = em\.attempt_count \+ 1/);
+  assert.match(query.text, /outreach_guarded_claim/);
+  assert.match(query.text, /confirmation_observed_at is not null/);
+  assert.match(query.text, /direct_noninvocation_evidence is not null/);
+});
+
+test("reclaims only expired, unissued reservations before claiming", async () => {
+  const db = fakeDb((text) =>
+    text.startsWith("select r.id from growth.outreach_reservations")
+      ? [{ id: "reservation-id" }]
+      : [],
+  );
+  await postgresSequenceDispatchRepository.claimDueMessage(db, {
+    now: new Date("2026-08-18T09:00:00.000Z"),
+    leaseToken: "lease-token",
+    leaseExpiresAt: new Date("2026-08-18T09:05:00.000Z"),
+  });
+  const queries = queriesOf(db);
+  const selection = queries.find((item) =>
+    item.text.startsWith("select r.id from growth.outreach_reservations"),
+  );
+  const cancellation = queries.find((item) =>
+    item.text.startsWith("update growth.outreach_reservations"),
+  );
+  assert.ok(selection && cancellation);
+  assert.match(selection.text, /r\.status='reserved'/);
+  assert.match(
+    selection.text,
+    /r\.submitted_at is null and r\.issued_snapshot is null/,
+  );
+  assert.match(selection.text, /r\.lease_until<=clock_timestamp\(\)/);
+  assert.match(
+    selection.text,
+    /em\.lease_expires_at<=clock_timestamp\(\) and em\.lease_token=r\.lease_token/,
+  );
+  assert.match(
+    cancellation.text,
+    /status='reserved' and submitted_at is null and issued_snapshot is null/,
+  );
+  assert.ok(
+    queries.indexOf(cancellation) <
+      queries.findIndex((item) => item.text.startsWith("with target")),
+  );
 });
 
 test("returns null when nothing is due", async () => {
@@ -141,12 +186,116 @@ test("records a sent message and inserts its follow-ups atomically", async () =>
   });
 
   const queries = queriesOf(db);
-  assert.match(queries[0]?.text ?? "", /update growth\.email_messages/);
-  assert.match(queries[0]?.text ?? "", /status = 'sent'/);
-  assert.match(queries[1]?.text ?? "", /update growth\.sequence_enrollments/);
-  assert.match(queries[2]?.text ?? "", /insert into growth\.email_messages/);
+  assert.match(queries[0]?.text ?? "", /pg_advisory_xact_lock/);
+  assert.match(queries[1]?.text ?? "", /update growth\.email_messages/);
+  assert.match(queries[1]?.text ?? "", /status = 'sent'/);
+  assert.match(queries[2]?.text ?? "", /update growth\.sequence_enrollments/);
+  assert.match(queries[3]?.text ?? "", /insert into growth\.email_messages/);
   assert.match(
-    queries[2]?.text ?? "",
+    queries[3]?.text ?? "",
     /on conflict \(idempotency_key\) do nothing/,
   );
+});
+
+test("preparation holds when the claim lease is no longer current", async () => {
+  const db = fakeDb(() => []);
+  const result = await postgresSequenceDispatchRepository.prepareLegacyMessage(
+    db,
+    {
+      messageId: "message-id",
+      leaseToken: "lease-token",
+      claimed: {
+        id: "message-id",
+        previousStatus: "queued",
+        sequenceEnrollmentId: "sequence-id",
+        prospectId: "prospect-id",
+        contactId: "contact-id",
+        stepNumber: 0,
+        attemptCount: 1,
+        rfcMessageId: null,
+        idempotencyKey: "key",
+        subjectSnapshot: null,
+        htmlSnapshot: null,
+        textSnapshot: null,
+      },
+    },
+  );
+  assert.deepEqual(result, { status: "held", reason: "lease_invalid" });
+});
+
+test("preparation refuses content changed after the claim", async () => {
+  const db = fakeDb((text) => {
+    if (text.startsWith("select p.id as"))
+      return [
+        {
+          prospectId: "prospect-id",
+          businessId: "business-id",
+          contactId: "contact-id",
+          sequenceId: "sequence-id",
+        },
+      ];
+    if (text.startsWith("select em.step_number as"))
+      return [
+        {
+          step: 0,
+          subject: "changed",
+          html: "<p>Body</p>",
+          text: "Body",
+          firstName: "Sam",
+          businessName: "Example",
+          firstSubject: "changed",
+          campaign: false,
+        },
+      ];
+    return [];
+  });
+  const result = await postgresSequenceDispatchRepository.prepareLegacyMessage(
+    db,
+    {
+      messageId: "message-id",
+      leaseToken: "lease-token",
+      claimed: {
+        id: "message-id",
+        previousStatus: "queued",
+        sequenceEnrollmentId: "sequence-id",
+        prospectId: "prospect-id",
+        contactId: "contact-id",
+        stepNumber: 0,
+        attemptCount: 1,
+        rfcMessageId: null,
+        idempotencyKey: "key",
+        subjectSnapshot: "reviewed",
+        htmlSnapshot: "<p>Body</p>",
+        textSnapshot: "Body",
+      },
+    },
+  );
+  assert.deepEqual(result, {
+    status: "held",
+    reason: "claimed_content_changed",
+  });
+});
+
+test("claim and expired cleanup are both scoped to the selected provider", async () => {
+  for (const channel of [undefined, "resend"] as const) {
+    const db = fakeDb(() => []);
+    await postgresSequenceDispatchRepository.claimDueMessage(db, {
+      now: new Date(),
+      leaseToken: "test-lease",
+      leaseExpiresAt: new Date(),
+      ...(channel ? { channel } : {}),
+    });
+    const queries = queriesOf(db);
+    const cleanup = queries.find((q) =>
+      q.text.startsWith("select r.id from growth.outreach_reservations"),
+    );
+    const claim = queries.find((q) => q.text.startsWith("with target"));
+    assert.ok(cleanup && claim);
+    for (const query of [cleanup, claim]) {
+      assert.match(query.text, /em\.channel=\?/);
+      assert.ok(query.values.includes(channel ?? "gmail"));
+      assert.match(query.text, /em\.step_number=0/);
+      assert.match(query.text, /c\.policy->>'provider'='resend'/);
+    }
+  }
 });

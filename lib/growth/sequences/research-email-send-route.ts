@@ -1,13 +1,13 @@
 import { requireFounder, type FounderSession } from "../auth/require-founder";
 import type { GrowthDb } from "../db/types";
 import {
-  createLiveGmailClient,
+  createBoundLiveGmailClient,
   GmailNotConnectedError,
 } from "../integrations/gmail/live-client";
 import type { TokenDecryptionKeys } from "../integrations/token-crypto";
 import { FirstEmailApprovalError } from "./approval";
 import { postgresFirstEmailApprovalRepository } from "./approval-repository";
-import { createOutreachDispatcher } from "./dispatcher";
+import { createLiveOutreachDispatcher } from "./dispatcher";
 import { postgresSequenceDispatchRepository } from "./dispatcher-repository";
 import {
   createMessageActionHandler,
@@ -48,7 +48,7 @@ export function createResearchEmailSendHandler(
   const send =
     dependencies.send ??
     (async (input) => {
-      const gmailClient = await createLiveGmailClient(dependencies.db, {
+      const bound = await createBoundLiveGmailClient(dependencies.db, {
         clientId: dependencies.gmailClientId,
         clientSecret: dependencies.gmailClientSecret,
         subjectEmail: dependencies.founderEmail,
@@ -58,9 +58,9 @@ export function createResearchEmailSendHandler(
         repository: postgresFirstEmailApprovalRepository,
         founderEmail: dependencies.founderEmail,
       })(dependencies.db, input);
-      const dispatch = createOutreachDispatcher({
+      const dispatch = createLiveOutreachDispatcher({
         repository: postgresSequenceDispatchRepository,
-        gmailClient,
+        bound,
         founderEmail: dependencies.founderEmail,
         maxMessagesPerRun: 1,
       });
@@ -71,13 +71,7 @@ export function createResearchEmailSendHandler(
       );
       return {
         status:
-          summary.sent + summary.reconciled > 0
-            ? ("sent" as const)
-            : summary.permanentFailures > 0
-              ? ("failed" as const)
-              : summary.cancelled > 0
-                ? ("cancelled" as const)
-                : ("pending" as const),
+          summary.confirmed > 0 ? ("sent" as const) : ("pending" as const),
         sequenceEnrollmentId: approved.sequenceEnrollmentId,
       };
     });

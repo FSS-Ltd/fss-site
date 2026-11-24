@@ -1,3 +1,4 @@
+import { PERSONAL_MAILBOX_DOMAINS } from "./mailbox-domains";
 import { z } from "zod";
 import { offersEmailOptOut } from "../email/copy-policy";
 
@@ -23,20 +24,6 @@ import {
   type WebsiteAssessmentCandidate,
 } from "./types";
 import { experienceBriefSchema } from "../prospect-previews/experience-brief";
-
-const PERSONAL_MAILBOX_DOMAINS = new Set([
-  "aol.com",
-  "gmail.com",
-  "googlemail.com",
-  "hotmail.com",
-  "icloud.com",
-  "live.com",
-  "outlook.com",
-  "proton.me",
-  "protonmail.com",
-  "yahoo.com",
-  "yahoo.co.uk",
-]);
 
 const WEEKDAY_RESEARCH_RUN_ID_PATTERN =
   /^weekday-\d{4}-\d{2}-\d{2}-0600-europe-london-v\d+(?:-correction-\d+)?$/;

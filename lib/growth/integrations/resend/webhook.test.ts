@@ -364,3 +364,125 @@ test("handleResendWebhook: invalid signature is reported the same as a missing o
 // unsubscribes are handled by the dedicated signed-token route
 // (app/api/newsletter/unsubscribe/route.ts), not by this webhook. There is
 // no real event type to test here.
+
+test("campaign hook requires its independently signed account binding and receives replays for atomic reconciliation", async () => {
+  const state = createFakeState();
+  const deps = createFakeDeps(state);
+  const body = JSON.stringify({
+    type: "email.delivered",
+    created_at: "2026-11-23T12:00:00.000Z",
+    data: {
+      email_id: "provider_123",
+      message_id: "<provider.123@example.test>",
+      from: "FSS <sender@example.test>",
+      to: ["owner@example.test"],
+    },
+  });
+  const headers = signedHeaders(body);
+  const seen = new Set<string>();
+  let calls = 0;
+  deps.outreachDelivery = {
+    secret: SECRET,
+    binding: {
+      connectionId: "11111111-1111-4111-8111-111111111111",
+      team: "team-1",
+      environment: "production",
+      sender: "sender@example.test",
+      webhookGeneration: "22222222-2222-4222-8222-222222222222",
+    },
+    async reconcile(candidate) {
+      calls++;
+      seen.add(candidate.providerEventId);
+    },
+  };
+  assert.deepEqual(
+    await handleResendWebhook({ rawBody: body, headers, secret: SECRET }, deps),
+    { status: "applied", duplicate: false },
+  );
+  assert.deepEqual(
+    await handleResendWebhook({ rawBody: body, headers, secret: SECRET }, deps),
+    { status: "applied", duplicate: true },
+  );
+  assert.equal(calls, 2);
+  assert.equal(seen.size, 1);
+
+  const invalidBinding = {
+    ...deps.outreachDelivery,
+    secret: Buffer.from("other-secret").toString("base64"),
+  };
+  deps.outreachDelivery = invalidBinding;
+  await handleResendWebhook({ rawBody: body, headers, secret: SECRET }, deps);
+  assert.equal(calls, 2);
+});
+
+test("unmatched campaign delivery leaves existing webhook handling intact", async () => {
+  const state = createFakeState();
+  const deps = createFakeDeps(state);
+  let calls = 0;
+  deps.outreachDelivery = {
+    secret: SECRET,
+    binding: {
+      connectionId: "11111111-1111-4111-8111-111111111111",
+      team: "team-1",
+      environment: "production",
+      sender: "sender@example.test",
+      webhookGeneration: "22222222-2222-4222-8222-222222222222",
+    },
+    async reconcile() {
+      calls++;
+    },
+  };
+  const body = JSON.stringify({
+    type: "email.delivered",
+    created_at: "2026-11-23T12:00:00.000Z",
+    data: {
+      email_id: "provider_123",
+      message_id: "<provider.123@example.test>",
+      from: "other@example.test",
+      to: ["owner@example.test"],
+    },
+  });
+  const result = await handleResendWebhook(
+    { rawBody: body, headers: signedHeaders(body), secret: SECRET },
+    deps,
+  );
+  assert.deepEqual(result, { status: "applied", duplicate: false });
+  assert.equal(calls, 0);
+  assert.equal(state.events.size, 1);
+});
+
+test("failed campaign reconciliation leaves the generic event available for retry", async () => {
+  const state = createFakeState();
+  const deps = createFakeDeps(state);
+  deps.outreachDelivery = {
+    secret: SECRET,
+    binding: {
+      connectionId: "11111111-1111-4111-8111-111111111111",
+      team: "team-1",
+      environment: "production",
+      sender: "sender@example.test",
+      webhookGeneration: "22222222-2222-4222-8222-222222222222",
+    },
+    async reconcile() {
+      throw new Error("receipt transaction failed");
+    },
+  };
+  const body = JSON.stringify({
+    type: "email.delivered",
+    created_at: "2026-11-23T12:00:00.000Z",
+    data: {
+      email_id: "provider_123",
+      message_id: "<provider.123@example.test>",
+      from: "sender@example.test",
+      to: ["owner@example.test"],
+    },
+  });
+  await assert.rejects(
+    handleResendWebhook(
+      { rawBody: body, headers: signedHeaders(body), secret: SECRET },
+      deps,
+    ),
+    /receipt transaction failed/,
+  );
+  assert.equal(state.events.size, 0);
+});

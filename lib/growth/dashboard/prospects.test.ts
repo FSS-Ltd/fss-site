@@ -167,6 +167,7 @@ test("parseProspectListQuery defaults every filter to unset and canonicalises in
     status: "all",
     outreach: "all",
     suppressed: "all",
+    source: "all",
     after: null,
   });
 });

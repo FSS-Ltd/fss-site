@@ -68,7 +68,7 @@ function createTransaction(
             select se.source_url
             from growth.source_evidence se
             where se.prospect_id = p.id
-              and se.source_type = 'first_party'
+              and se.origin = 'research' and se.source_type = 'first_party'
             order by se.verified_at desc, se.created_at desc
             limit 1
           ) as "firstPartyEvidenceUrl",

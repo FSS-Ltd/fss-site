@@ -151,6 +151,7 @@ export function MessageActionsFrame({
           Mark needs redraft
         </button>
 
+        <p className={styles.actionRecipient}>To: {message.contactEmail}</p>
         <button
           className={styles.actionButton}
           disabled={busy || !message.eligibility.ready}
@@ -158,7 +159,10 @@ export function MessageActionsFrame({
             run(
               "create-gmail-draft",
               `/api/growth/messages/${message.draftTaskId}/create-gmail-draft`,
-              { expectedVersion: message.version },
+              {
+                expectedVersion: message.version,
+                reviewedRecipient: message.reviewedRecipient,
+              },
             )
           }
           type="button"
@@ -389,7 +393,10 @@ export function MessageActionsFrame({
                 run(
                   "approve-send",
                   `/api/growth/messages/${message.draftTaskId}/approve-send`,
-                  { expectedVersion: message.version },
+                  {
+                    expectedVersion: message.version,
+                    reviewedRecipient: message.reviewedRecipient,
+                  },
                 )
               }
               type="button"

@@ -19,7 +19,7 @@ export async function POST(request: Request): Promise<Response> {
     createCorrelationId: randomUUID,
     now: () => new Date(),
     verifyRequest: verifyAgentRequest,
-    ingest: (input) => ingestResearchRun(db, input),
+    ingest: (input, principal) => ingestResearchRun(db, input, principal),
     reportUnexpectedError: ({ correlationId, error }) => {
       console.error("Growth OS research ingestion failed.", {
         correlationId,

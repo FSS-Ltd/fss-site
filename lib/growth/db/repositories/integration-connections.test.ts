@@ -8,6 +8,7 @@ import type {
 } from "../types";
 import {
   disconnectStoredGmailConnection,
+  getConnectedGmailCredential,
   listIntegrationConnectionHealth,
   storeConnectedGmailConnection,
 } from "./integration-connections";
@@ -101,6 +102,7 @@ test("upserts a connected Gmail row and audit event in one transaction", async (
 
   const id = await storeConnectedGmailConnection(db, {
     subjectEmail: "founder@example.test",
+    googleSubject: "google-subject",
     encryptedRefreshToken: storedToken,
     grantedScopes: ["openid", "email", "gmail.modify"],
     accessTokenExpiresAt: new Date("2026-08-17T13:00:00.000Z"),
@@ -117,6 +119,7 @@ test("upserts a connected Gmail row and audit event in one transaction", async (
   assert.match(queries[0]?.text ?? "", /version = ic\.version \+ 1/);
   assert.deepEqual(queries[0]?.values, [
     "founder@example.test",
+    "google-subject",
     JSON.stringify(storedToken),
     "v1",
     ["openid", "email", "gmail.modify"],
@@ -148,6 +151,7 @@ test("fails closed when the Gmail upsert returns no connection", async () => {
   await assert.rejects(
     storeConnectedGmailConnection(db, {
       subjectEmail: "founder@example.test",
+      googleSubject: "google-subject",
       encryptedRefreshToken: {
         version: "v1",
         iv: "iv",
@@ -280,4 +284,28 @@ test("disconnect is fail-safe and idempotent when no Gmail credential exists", a
     ),
     false,
   );
+});
+
+test("reads Gmail credential and grant identity from one connected row", async () => {
+  const queries: string[] = [];
+  const row = {
+    connectionId: "connection",
+    googleSubject: "subject",
+    grantEpoch: 3,
+    grantedScopes: ["email"],
+    encryptedRefreshToken: "encrypted",
+    encryptionKeyVersion: "v1",
+  };
+  const db = (async (strings: TemplateStringsArray) => {
+    queries.push(strings.join("?"));
+    return [row];
+  }) as unknown as GrowthQueryExecutor;
+  assert.deepEqual(
+    await getConnectedGmailCredential(db, "founder@example.test"),
+    row,
+  );
+  assert.equal(queries.length, 1);
+  assert.match(queries[0]!, /google_subject/);
+  assert.match(queries[0]!, /encrypted_refresh_token/);
+  assert.match(queries[0]!, /status = 'connected'/);
 });

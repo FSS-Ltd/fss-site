@@ -1,0 +1,201 @@
+.panel {
+  min-width: 0;
+  border: 1px solid #dce3e8;
+  border-radius: 12px;
+  background: #fff;
+  padding: 22px;
+  color: #07182e;
+}
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+}
+.header h2 {
+  margin: 0;
+  font-size: 1.02rem;
+}
+.header p,
+.panel p {
+  color: #526078;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+.header a {
+  color: #075f66;
+  font-weight: 650;
+}
+.header a:focus-visible,
+.snapshot summary:focus-visible {
+  outline: 3px solid #087f88;
+  outline-offset: 3px;
+}
+.campaigns,
+.arms {
+  display: grid;
+  gap: 12px;
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 0;
+}
+.campaigns > li {
+  min-width: 0;
+  border-top: 1px solid #dce3e8;
+  padding: 14px 0 0;
+}
+.campaigns h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  overflow-wrap: anywhere;
+}
+.snapshot {
+  margin-top: 12px;
+}
+.snapshot summary {
+  color: #075f66;
+  font-weight: 650;
+  cursor: pointer;
+}
+.snapshotBody {
+  padding-top: 4px;
+}
+.cta {
+  font-weight: 650;
+}
+.numbers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 12px;
+}
+.numbers div {
+  min-width: 0;
+}
+.numbers dt {
+  color: #526078;
+  font-size: 0.75rem;
+}
+.numbers dd {
+  margin: 3px 0 0;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 480px) {
+  .panel {
+    padding: 16px;
+  }
+  .numbers {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.verdict {
+  margin-top: 16px;
+  border-left: 3px solid #087f88;
+  padding: 2px 0 2px 12px;
+}
+.verdict span {
+  color: #526078;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.verdict p {
+  margin: 4px 0 0;
+  color: #07182e;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+.coverage {
+  margin: 12px 0 0;
+}
+.comparison {
+  min-width: 0;
+  margin-top: 14px;
+  padding: 0;
+}
+.comparisonHeading {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 2px 8px;
+}
+.comparisonHeading h4 {
+  margin: 0;
+  font-size: 0.9rem;
+}
+.panel .interpretation {
+  margin: 4px 0 0;
+  font-size: 0.75rem;
+}
+.arms {
+  gap: 0;
+  margin-top: 8px;
+}
+.arms > li {
+  min-width: 0;
+  border-top: 1px solid #dce9e8;
+  padding: 9px 0;
+}
+.armTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.armTop h5,
+.detailGroup h5 {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: 0.85rem;
+}
+.armTop strong {
+  font-size: 1rem;
+}
+.panel .armContext,
+.panel .armMetrics {
+  margin: 3px 0 0;
+  font-size: 0.74rem;
+  line-height: 1.35;
+}
+.panel .armMetrics {
+  color: #07182e;
+}
+.rateTrack {
+  height: 5px;
+  margin-top: 6px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: #dce9e8;
+}
+.rateTrack span {
+  display: block;
+  height: 100%;
+  background: #087f88;
+}
+.detailGroup {
+  margin-top: 14px;
+}
+.detailGroup .cta {
+  margin: 4px 0;
+}
+.evidence,
+.methodology {
+  margin-top: 14px;
+  border-top: 1px solid #dce3e8;
+  padding-top: 12px;
+}
+.evidence summary,
+.methodology summary {
+  color: #075f66;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+.evidence summary:focus-visible,
+.methodology summary:focus-visible {
+  outline: 3px solid #087f88;
+  outline-offset: 3px;
+}

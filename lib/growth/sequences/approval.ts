@@ -19,12 +19,18 @@ import {
   type StoredFirstEmailVisual,
 } from "./first-email-draft-snapshot";
 
+import {
+  reviewedRecipientSchema,
+  type ReviewedRecipient,
+} from "./reviewed-recipient";
+
 const DRAFT_TASK_ID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const FOUNDER_ACTOR_ID_PATTERN = /^[0-9a-f]{64}$/;
 
 export type LockedApprovalDraft = StoredFirstEmailDraft & {
   contactId: string;
+  contactVersion: number;
   contactEmail: string;
   normalisedEmail: string;
   subscriberType: string;
@@ -59,7 +65,9 @@ export type CreateEnrollmentAndMessageInput = {
   contactId: string;
   enrollmentStatus: "active" | "pending_approval";
   followUpPolicy?: "manual_only";
-  approvedRecipient?: string;
+  approvedRecipient: string;
+  reviewedRecipient: ReviewedRecipient;
+  effectiveRecipient: ReviewedRecipient;
   message: FirstEmailMessageWrite;
 };
 
@@ -81,7 +89,7 @@ export interface FirstEmailApprovalTransaction {
     contactId: string;
     prospectId: string;
     basis: "corporate_legitimate_interests" | "consent";
-  }): Promise<void>;
+  }): Promise<{ contactVersion: number; prospectVersion: number }>;
   lockDraft(draftTaskId: string): Promise<LockedApprovalDraft | null>;
   isSuppressed(normalisedEmail: string): Promise<boolean>;
   getApprovedAsset(
@@ -112,6 +120,7 @@ export interface FirstEmailApprovalRepository {
 export type ApproveFirstEmailInput = {
   draftTaskId: string;
   expectedVersion: number;
+  reviewedRecipient: ReviewedRecipient;
   founder: FounderSession;
   correlationId: string;
   sendMode: "queue" | "gmail_draft";
@@ -183,6 +192,7 @@ async function resolveVisual(
 function validateRequest(input: ApproveFirstEmailInput): void {
   if (
     !DRAFT_TASK_ID_PATTERN.test(input.draftTaskId) ||
+    !reviewedRecipientSchema.safeParse(input.reviewedRecipient).success ||
     !Number.isInteger(input.expectedVersion) ||
     input.expectedVersion < 1 ||
     !input.correlationId.trim() ||
@@ -192,6 +202,19 @@ function validateRequest(input: ApproveFirstEmailInput): void {
   ) {
     throw new TypeError("First-email approval request is invalid.");
   }
+}
+
+export function matchesReviewedRecipient(
+  draft: LockedApprovalDraft,
+  reviewed: ReviewedRecipient,
+): boolean {
+  return (
+    draft.normalisedEmail === reviewed.email &&
+    draft.contactEmail.trim().toLowerCase() === reviewed.email &&
+    draft.contactId === reviewed.contactId &&
+    draft.contactVersion === reviewed.contactVersion &&
+    draft.prospectVersion === reviewed.prospectVersion
+  );
 }
 
 type FirstEmailApproverDependencies = {
@@ -240,7 +263,10 @@ export function createFirstEmailApprover({
         ) {
           throw new FirstEmailApprovalError("not_approvable");
         }
-        if (stored.version !== input.expectedVersion) {
+        if (
+          stored.version !== input.expectedVersion ||
+          !matchesReviewedRecipient(draft, input.reviewedRecipient)
+        ) {
           throw new FirstEmailApprovalError("version_conflict");
         }
         if (await transaction.isSuppressed(draft.normalisedEmail)) {
@@ -267,7 +293,7 @@ export function createFirstEmailApprover({
         const rendered = renderGmailMime({
           id: messageId,
           from: founderEmail,
-          to: draft.contactEmail,
+          to: input.reviewedRecipient.email,
           replyTo: founderEmail,
           subject: content.subject,
           html: content.html,
@@ -285,6 +311,9 @@ export function createFirstEmailApprover({
             prospectId: draft.prospectId,
             contactId: draft.contactId,
             enrollmentStatus,
+            approvedRecipient: input.reviewedRecipient.email,
+            reviewedRecipient: input.reviewedRecipient,
+            effectiveRecipient: input.reviewedRecipient,
             message: {
               id: messageId,
               subjectSnapshot: content.subject,

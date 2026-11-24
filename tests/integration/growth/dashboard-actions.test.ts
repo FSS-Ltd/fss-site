@@ -15,6 +15,7 @@ import {
   createPostgresNewsletterIssueDependencies,
   UNSUBSCRIBE_URL_PLACEHOLDER,
 } from "../../../lib/growth/newsletter/issues";
+import { getMessageReview } from "../../../lib/growth/dashboard/message-review";
 import { createApproveSendHandler } from "../../../lib/growth/sequences/approve-send-route-handler";
 import { createNeedsRedraftHandler } from "../../../lib/growth/sequences/needs-redraft-route-handler";
 import { createStopRouteHandler } from "../../../lib/growth/sequences/stop-route-handler";
@@ -349,10 +350,20 @@ test(
         reportUnexpectedError: () => undefined,
       });
 
+      const review = await getMessageReview(
+        draftTaskId,
+        OWNER_EMAIL,
+        ROUTE_ORIGIN,
+        sql,
+      );
+      assert.equal(review.status, "ready");
       const approveResponse = await approveHandler(
         createRequest(
           `${ROUTE_ORIGIN}/api/growth/messages/${draftTaskId}/approve-send`,
-          { expectedVersion: 1 },
+          {
+            expectedVersion: 1,
+            reviewedRecipient: review.data.reviewedRecipient,
+          },
         ),
         context,
       );

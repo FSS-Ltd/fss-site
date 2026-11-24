@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import { appendAuditEvent } from "../audit/service";
 import { withGrowthTransaction } from "../db/client";
+import { lockGmailRouting } from "../sequences/gmail-thread-association";
 import type { GrowthDb, GrowthQueryExecutor } from "../db/types";
 import { scheduleFollowUp } from "../sequences/schedule";
 
@@ -394,6 +395,7 @@ export async function approveSeoAuditDraft(
   validateApprovalInput(input);
 
   return withGrowthTransaction(db, async (transaction) => {
+    await lockGmailRouting(transaction);
     const rows = await transaction<ApprovalRow[]>`
       select
         audit.id,

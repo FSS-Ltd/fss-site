@@ -1,5 +1,11 @@
 import type { FounderSession } from "../auth/require-founder";
 import type { GrowthDb } from "../db/types";
+import type { GmailGrantBinding } from "../integrations/gmail/live-client";
+import {
+  validateGmailEffectObservation,
+  type GmailEffectObservation,
+} from "./gmail-routing-repository";
+import { hasRequiredGmailScopes } from "../integrations/google-oauth";
 import { postgresSequenceStopRepository } from "./stop-repository";
 
 const SEQUENCE_ID_PATTERN =
@@ -36,7 +42,12 @@ const TERMINAL_STATUSES = new Set([
 
 const SUPPRESSING_REASONS = new Set<StopReason>(["do_not_contact", "bounce"]);
 
-export type GmailSyncActor = { type: "gmail_sync"; id: string };
+export type GmailSyncActor = {
+  type: "gmail_sync";
+  id: string;
+  binding: GmailGrantBinding;
+  observation: GmailEffectObservation;
+};
 export type ResendWebhookActor = { type: "resend_webhook"; id: string };
 
 export type StopSequenceInput = {
@@ -85,14 +96,20 @@ export type AppendStopAuditInput = {
 };
 
 export interface SequenceStopTransaction {
-  lockEnrollment(sequenceId: string): Promise<LockedEnrollment | null>;
+  lockEnrollment(
+    sequenceId: string,
+    binding?: GmailGrantBinding,
+    threadId?: string,
+    attribution?: "bound" | "unbound",
+    observation?: GmailEffectObservation,
+  ): Promise<LockedEnrollment | null>;
   cancelPendingMessages(
     sequenceId: string,
   ): Promise<CancelPendingMessagesResult>;
   applyStop(input: ApplyStopInput): Promise<void>;
   insertDoNotContactSuppression(
     input: InsertDoNotContactSuppressionInput,
-  ): Promise<void>;
+  ): Promise<boolean>;
   appendStopAudit(input: AppendStopAuditInput): Promise<void>;
 }
 
@@ -127,6 +144,30 @@ function resolveActor(actor: StopSequenceInput["actor"]): {
 
 function validateRequest(input: StopSequenceInput): void {
   const { actorId } = resolveActor(input.actor);
+  if ("type" in input.actor && input.actor.type === "gmail_sync") {
+    const binding = input.actor.binding;
+    const observation = input.actor.observation;
+    if (
+      input.actor.id !== "gmail-sync" ||
+      !binding ||
+      typeof binding.connectionId !== "string" ||
+      !SEQUENCE_ID_PATTERN.test(binding.connectionId) ||
+      typeof binding.googleSubject !== "string" ||
+      !binding.googleSubject.trim() ||
+      binding.googleSubject.length > 255 ||
+      !Number.isSafeInteger(binding.grantEpoch) ||
+      binding.grantEpoch < 1 ||
+      !Array.isArray(binding.grantedScopes) ||
+      !binding.grantedScopes.every(
+        (scope) =>
+          typeof scope === "string" && scope.length > 0 && scope.length <= 500,
+      ) ||
+      !hasRequiredGmailScopes(binding.grantedScopes) ||
+      !["pause", "reply", "bounce"].includes(input.reason)
+    )
+      throw new TypeError("Sequence stop request is invalid.");
+    validateGmailEffectObservation(observation);
+  }
   if (
     !SEQUENCE_ID_PATTERN.test(input.sequenceId) ||
     !STOP_REASONS.includes(input.reason) ||
@@ -144,6 +185,117 @@ type SequenceStopperDependencies = {
   now?: () => Date;
 };
 
+export async function stopSequenceInTransaction(
+  transaction: SequenceStopTransaction,
+  input: StopSequenceInput,
+  now: () => Date = () => new Date(),
+): Promise<StoppedSequence> {
+  validateRequest(input);
+  const { actorType, actorId } = resolveActor(input.actor);
+  const targetStatus = STATUS_BY_REASON[input.reason];
+  const gmailActor =
+    "type" in input.actor && input.actor.type === "gmail_sync"
+      ? input.actor
+      : null;
+  const binding = gmailActor
+    ? {
+        ...gmailActor.binding,
+        grantedScopes: [...gmailActor.binding.grantedScopes],
+      }
+    : undefined;
+  const observation = gmailActor ? { ...gmailActor.observation } : undefined;
+  const enrollment = await transaction.lockEnrollment(
+    input.sequenceId,
+    binding,
+    observation?.threadId,
+    gmailActor ? (input.reason === "pause" ? "unbound" : "bound") : undefined,
+    observation,
+  );
+  if (!enrollment) throw new SequenceStopError("not_found");
+
+  if (
+    "type" in input.actor &&
+    input.actor.type === "gmail_sync" &&
+    (input.reason === "reply" || input.reason === "bounce") &&
+    TERMINAL_STATUSES.has(enrollment.status)
+  ) {
+    const { cancelledCount } = await transaction.cancelPendingMessages(
+      input.sequenceId,
+    );
+    const suppressed =
+      input.reason === "bounce" &&
+      (await transaction.insertDoNotContactSuppression({
+        normalisedEmail: enrollment.normalisedEmail,
+        businessId: enrollment.businessId,
+        reason: input.reason,
+        source: "gmail_sync",
+        createdBy: actorId,
+      }));
+    if (cancelledCount > 0 || suppressed) {
+      await transaction.appendStopAudit({
+        correlationId: input.correlationId,
+        actorType,
+        actorId,
+        sequenceId: input.sequenceId,
+        reason: input.reason,
+      });
+    }
+    return {
+      sequenceId: input.sequenceId,
+      status: enrollment.status,
+      alreadyApplied: true,
+    };
+  }
+
+  if (enrollment.status === targetStatus) {
+    return {
+      sequenceId: input.sequenceId,
+      status: enrollment.status,
+      alreadyApplied: true,
+    };
+  }
+  if (TERMINAL_STATUSES.has(enrollment.status)) {
+    throw new SequenceStopError("already_stopped");
+  }
+
+  await transaction.cancelPendingMessages(input.sequenceId);
+  await transaction.applyStop({
+    sequenceId: input.sequenceId,
+    status: targetStatus,
+    reason: input.reason,
+    stoppedAt: now(),
+  });
+
+  if (SUPPRESSING_REASONS.has(input.reason)) {
+    await transaction.insertDoNotContactSuppression({
+      normalisedEmail: enrollment.normalisedEmail,
+      businessId: enrollment.businessId,
+      reason: input.reason,
+      source:
+        actorType === "founder"
+          ? "founder"
+          : actorType === "provider"
+            ? "resend_webhook"
+            : "gmail_sync",
+      createdBy: actorId,
+    });
+  }
+
+  await transaction.appendStopAudit({
+    correlationId: input.correlationId,
+    actorType,
+    actorId,
+    sequenceId: input.sequenceId,
+    reason: input.reason,
+  });
+
+  return {
+    sequenceId: input.sequenceId,
+    status: targetStatus,
+    alreadyApplied: false,
+  };
+}
+
 export function createSequenceStopper({
   repository,
   now = () => new Date(),
@@ -152,57 +304,9 @@ export function createSequenceStopper({
     db: GrowthDb,
     input: StopSequenceInput,
   ): Promise<StoppedSequence> {
-    validateRequest(input);
-    const { actorType, actorId } = resolveActor(input.actor);
-    const targetStatus = STATUS_BY_REASON[input.reason];
-
-    return repository.withTransaction(db, async (transaction) => {
-      const enrollment = await transaction.lockEnrollment(input.sequenceId);
-      if (!enrollment) throw new SequenceStopError("not_found");
-
-      if (enrollment.status === targetStatus) {
-        return {
-          sequenceId: input.sequenceId,
-          status: enrollment.status,
-          alreadyApplied: true,
-        };
-      }
-      if (TERMINAL_STATUSES.has(enrollment.status)) {
-        throw new SequenceStopError("already_stopped");
-      }
-
-      await transaction.cancelPendingMessages(input.sequenceId);
-      await transaction.applyStop({
-        sequenceId: input.sequenceId,
-        status: targetStatus,
-        reason: input.reason,
-        stoppedAt: now(),
-      });
-
-      if (SUPPRESSING_REASONS.has(input.reason)) {
-        await transaction.insertDoNotContactSuppression({
-          normalisedEmail: enrollment.normalisedEmail,
-          businessId: enrollment.businessId,
-          reason: input.reason,
-          source: actorType === "founder" ? "founder" : actorType === "provider" ? "resend_webhook" : "gmail_sync",
-          createdBy: actorId,
-        });
-      }
-
-      await transaction.appendStopAudit({
-        correlationId: input.correlationId,
-        actorType,
-        actorId,
-        sequenceId: input.sequenceId,
-        reason: input.reason,
-      });
-
-      return {
-        sequenceId: input.sequenceId,
-        status: targetStatus,
-        alreadyApplied: false,
-      };
-    });
+    return repository.withTransaction(db, (transaction) =>
+      stopSequenceInTransaction(transaction, input, now),
+    );
   };
 }
 

@@ -8,7 +8,6 @@ import {
   type GmailHistoryResult,
   type GmailMessageMetadata,
 } from "../integrations/gmail/types";
-import type { RecordSentInput } from "./dispatcher-repository";
 import { createGmailReplySync } from "./gmail-sync";
 import type {
   GmailSyncRepository,
@@ -17,6 +16,7 @@ import type {
   ThreadEnrollment,
 } from "./gmail-sync-repository";
 import type { StopSequenceInput, StoppedSequence } from "./stop";
+import { SequenceStopError } from "./stop";
 
 const FOUNDER_EMAIL = "j.ntagengwa@faithfulsoftware.dev";
 const db = {} as GrowthDb;
@@ -27,7 +27,7 @@ function metadata(
   return {
     messageId: "gmail-message-1",
     gmailThreadId: "gmail-thread-1",
-    historyId: "100",
+    historyId: "200",
     labelIds: ["INBOX"],
     receivedAt: "2026-08-18T09:00:00.000Z",
     from: "Sam Reader <sam@example.test>",
@@ -37,6 +37,11 @@ function metadata(
     precedence: null,
     returnPath: null,
     autoResponseSuppress: null,
+    to: null,
+    cc: null,
+    bcc: null,
+    inReplyTo: null,
+    references: null,
     ...overrides,
   };
 }
@@ -49,7 +54,7 @@ function historyPage(
     historyId: "200",
     records: [
       {
-        historyId: "200",
+        historyId: overrides.historyId ?? "200",
         messagesAdded: messageIds.map((messageId) => ({
           messageId,
           gmailThreadId: "gmail-thread-1",
@@ -67,14 +72,22 @@ type FakeState = {
   historyPages: GmailHistoryResult[];
   historyError: GmailClientError | null;
   profileHistoryId: string;
+  headOverride?: string;
   pendingDrafts: Map<string, PendingDraft>;
   enrollmentsByThread: Map<string, ThreadEnrollment>;
   recordedEvents: RecordInboundEventInput[];
   alreadyRecordedMessageIds: Set<string>;
   activated: string[];
   stops: StopSequenceInput[];
-  recorded: RecordSentInput[];
+  recorded: unknown[];
   cursorsSet: string[];
+  coverageWrites: Array<{
+    state: string;
+    reason: string | null;
+    historyStart: string | null;
+    historyEnd: string;
+    unknownObservations: Array<{ messageId: string; reason: string }>;
+  }>;
 };
 
 function createFakeState(overrides: Partial<FakeState> = {}): FakeState {
@@ -92,12 +105,42 @@ function createFakeState(overrides: Partial<FakeState> = {}): FakeState {
     stops: [],
     recorded: [],
     cursorsSet: [],
+    coverageWrites: [],
     ...overrides,
   };
 }
 
-function createFakeRepository(state: FakeState): GmailSyncRepository {
+function createFakeRepository(
+  state: FakeState,
+  stop = async (
+    _db: GrowthDb,
+    input: StopSequenceInput,
+  ): Promise<StoppedSequence> => {
+    state.stops.push(input);
+    return {
+      sequenceId: input.sequenceId,
+      status: "stopped",
+      alreadyApplied: false,
+    };
+  },
+): GmailSyncRepository {
   return {
+    async classifyGmailRouting(db, input) {
+      return this.findEnrollmentByThread(db, input.threadId, input.binding);
+    },
+    async loadReplySyncState() {
+      return {
+        cursor: state.cursor,
+        historyCursor: state.cursor,
+        coverageId: state.cursor ? "coverage-id" : null,
+        observedUntil: state.cursor ? new Date("2026-01-01T00:00:00Z") : null,
+      };
+    },
+    async commitReplyCoverage(_db, input) {
+      state.coverageWrites.push(input);
+      state.cursorsSet.push(input.historyEnd);
+      return "coverage-new";
+    },
     async getCursor() {
       return state.cursor;
     },
@@ -108,13 +151,27 @@ function createFakeRepository(state: FakeState): GmailSyncRepository {
       return state.pendingDrafts.get(rfcMessageId) ?? null;
     },
     async findEnrollmentByThread(_db, gmailThreadId) {
-      return state.enrollmentsByThread.get(gmailThreadId) ?? null;
+      const enrollment = state.enrollmentsByThread.get(gmailThreadId);
+      return enrollment ? { kind: "unique", enrollment } : { kind: "none" };
     },
     async recordInboundEvent(_db, input) {
+      if (input.eventType !== "auto_response")
+        await stop(_db, {
+          sequenceId: input.sequenceEnrollmentId,
+          reason: input.eventType,
+          actor: {
+            type: "gmail_sync",
+            id: "gmail-sync",
+            binding: input.binding,
+            observation: input.observation,
+          },
+          correlationId: input.correlationId,
+        });
       if (state.alreadyRecordedMessageIds.has(input.gmailMessageId)) {
         return { alreadyRecorded: true };
       }
       state.recordedEvents.push(input);
+      state.alreadyRecordedMessageIds.add(input.gmailMessageId);
       return { alreadyRecorded: false };
     },
     async activatePendingApproval(_db, sequenceEnrollmentId) {
@@ -140,7 +197,14 @@ function createFakeGmailClient(
       return found;
     },
     async getProfile() {
-      return { emailAddress: FOUNDER_EMAIL, historyId: state.profileHistoryId };
+      return {
+        emailAddress: FOUNDER_EMAIL,
+        historyId:
+          state.headOverride ??
+          (state.cursor && !state.historyError
+            ? (state.historyPages.at(-1)?.historyId ?? state.cursor)
+            : state.profileHistoryId),
+      };
     },
   };
 }
@@ -149,28 +213,36 @@ function createSync(
   state: FakeState,
   overrides: {
     stop?: (db: GrowthDb, input: StopSequenceInput) => Promise<StoppedSequence>;
-    record?: (db: GrowthDb, input: RecordSentInput) => Promise<void>;
   } = {},
 ) {
+  const stop =
+    overrides.stop ??
+    (async (
+      _db: GrowthDb,
+      input: StopSequenceInput,
+    ): Promise<StoppedSequence> => {
+      state.stops.push(input);
+      return {
+        sequenceId: input.sequenceId,
+        status: "stopped",
+        alreadyApplied: false,
+      };
+    });
   return createGmailReplySync({
-    repository: createFakeRepository(state),
+    repository: createFakeRepository(state, stop),
     gmailClient: createFakeGmailClient(state),
     founderEmail: FOUNDER_EMAIL,
-    stop:
-      overrides.stop ??
-      (async (_db, input) => {
-        state.stops.push(input);
-        return {
-          sequenceId: input.sequenceId,
-          status: "stopped",
-          alreadyApplied: false,
-        };
-      }),
-    record:
-      overrides.record ??
-      (async (_db, input) => {
-        state.recorded.push(input);
-      }),
+    binding: {
+      connectionId: "11111111-1111-4111-8111-111111111112",
+      googleSubject: "subject",
+      grantEpoch: 1,
+      grantedScopes: [
+        "openid",
+        "email",
+        "https://www.googleapis.com/auth/gmail.modify",
+      ],
+    },
+    stop,
     createCorrelationId: () => "correlation-id",
   });
 }
@@ -189,8 +261,25 @@ test("bootstraps the cursor without processing history on the first run", async 
     ownMessages: 0,
     reconciledDrafts: 0,
     cursorReset: false,
+    coverageId: "coverage-new",
   });
   assert.deepEqual(state.cursorsSet, ["999"]);
+  assert.deepEqual(
+    state.coverageWrites.map(({ state, reason, historyStart, historyEnd }) => ({
+      state,
+      reason,
+      historyStart,
+      historyEnd,
+    })),
+    [
+      {
+        state: "gap",
+        reason: "initial_history_unknown",
+        historyStart: null,
+        historyEnd: "999",
+      },
+    ],
+  );
 });
 
 test("stops the sequence as a reply for an inbound message from outside the founder mailbox", async () => {
@@ -214,13 +303,75 @@ test("stops the sequence as a reply for an inbound message from outside the foun
   const summary = await sync(db);
 
   assert.equal(summary.replies, 1);
+  assert.equal(summary.coverageId, "coverage-new");
   assert.equal(state.stops.length, 1);
   assert.equal(state.stops[0]?.reason, "reply");
   assert.equal(state.stops[0]?.sequenceId, "enrollment-1");
   assert.deepEqual(state.stops[0]?.actor, {
     type: "gmail_sync",
     id: "gmail-sync",
+    observation: {
+      messageId: "gmail-message-1",
+      historyId: "200",
+      fromHeader: "Sam Reader <sam@example.test>",
+      threadId: "gmail-thread-1",
+      inReplyTo: null,
+      references: null,
+      fromAddress: "sam@example.test",
+    },
+    binding: {
+      connectionId: "11111111-1111-4111-8111-111111111112",
+      googleSubject: "subject",
+      grantEpoch: 1,
+      grantedScopes: [
+        "openid",
+        "email",
+        "https://www.googleapis.com/auth/gmail.modify",
+      ],
+    },
   });
+});
+
+test("freezes fetched routing evidence before preliminary classification", async () => {
+  const enrollment = {
+    id: "enrollment-1",
+    status: "active",
+    prospectId: "p",
+    contactId: "c",
+  };
+  const state = createFakeState({
+    historyPages: [historyPage(["gmail-message-1"])],
+    enrollmentsByThread: new Map([["gmail-thread-1", enrollment]]),
+  });
+  const fetched = metadata();
+  state.metadataByMessageId.set("gmail-message-1", fetched);
+  const repository = createFakeRepository(state);
+  repository.classifyGmailRouting = async () => {
+    fetched.references = "<changed@example.test>";
+    fetched.from = "changed@example.test";
+    return { kind: "unique", enrollment };
+  };
+  const sync = createGmailReplySync({
+    repository,
+    gmailClient: createFakeGmailClient(state),
+    founderEmail: FOUNDER_EMAIL,
+    binding: {
+      connectionId: "11111111-1111-4111-8111-111111111112",
+      googleSubject: "subject",
+      grantEpoch: 1,
+      grantedScopes: [
+        "openid",
+        "email",
+        "https://www.googleapis.com/auth/gmail.modify",
+      ],
+    },
+  });
+  await sync(db);
+  assert.equal(state.recordedEvents[0]?.observation.references, null);
+  assert.equal(
+    state.recordedEvents[0]?.observation.fromHeader,
+    "Sam Reader <sam@example.test>",
+  );
 });
 
 test("does not stop the sequence for the founder's own sent message", async () => {
@@ -310,7 +461,7 @@ test("resets the cursor to the current profile history ID when the history ID ex
   assert.deepEqual(state.cursorsSet, ["999"]);
 });
 
-test("processes each message once across a duplicate history page", async () => {
+test("does not advance coverage for duplicate history records across pages", async () => {
   const state = createFakeState({
     historyPages: [
       historyPage(["gmail-message-1"]),
@@ -331,6 +482,7 @@ test("processes each message once across a duplicate history page", async () => 
       ],
     ]),
   });
+  state.historyPages[1]!.records[0]!.historyId = "200";
   state.historyPages[0] = {
     ...state.historyPages[0]!,
     nextPageToken: "page-2",
@@ -338,13 +490,12 @@ test("processes each message once across a duplicate history page", async () => 
   state.metadataByMessageId.set("gmail-message-1", metadata());
   const sync = createSync(state);
 
-  const summary = await sync(db);
-
-  assert.equal(summary.processed, 1);
-  assert.equal(summary.replies, 1);
+  await assert.rejects(sync(db), /history record/i);
+  assert.equal(state.recordedEvents.length, 1);
+  assert.deepEqual(state.coverageWrites, []);
 });
 
-test("skips a duplicate inbound event already recorded by a prior sync run", async () => {
+test("retries an inbound event after an atomic stop failure", async () => {
   const state = createFakeState({
     historyPages: [historyPage(["gmail-message-1"])],
     enrollmentsByThread: new Map([
@@ -358,18 +509,27 @@ test("skips a duplicate inbound event already recorded by a prior sync run", asy
         },
       ],
     ]),
-    alreadyRecordedMessageIds: new Set(["gmail-message-1"]),
   });
   state.metadataByMessageId.set("gmail-message-1", metadata());
-  const sync = createSync(state);
+  await assert.rejects(
+    createSync(state, {
+      stop: async () => {
+        throw new Error("stop failed");
+      },
+    })(db),
+    /stop failed/,
+  );
+  assert.deepEqual(state.cursorsSet, []);
 
-  const summary = await sync(db);
+  const summary = await createSync(state)(db);
 
-  assert.equal(summary.replies, 0);
-  assert.equal(state.stops.length, 0);
+  assert.equal(summary.replies, 1);
+  assert.equal(state.recordedEvents.length, 1);
+  assert.equal(state.stops.length, 1);
+  assert.equal(state.stops[0]?.reason, "reply");
 });
 
-test("reconciles a founder-sent provider draft through its RFC Message-ID and activates the sequence", async () => {
+test("holds an unbound provider draft observation rather than marking it sent", async () => {
   const state = createFakeState({
     historyPages: [historyPage(["gmail-message-1"])],
     pendingDrafts: new Map([
@@ -392,16 +552,20 @@ test("reconciles a founder-sent provider draft through its RFC Message-ID and ac
     metadata({
       from: `Founder <${FOUNDER_EMAIL}>`,
       rfcMessageId: "<growthos.first@faithfulsoftware.dev>",
+      labelIds: ["SENT"],
     }),
   );
   const sync = createSync(state);
 
   const summary = await sync(db);
 
-  assert.equal(summary.reconciledDrafts, 1);
-  assert.deepEqual(state.activated, ["enrollment-1"]);
-  assert.equal(state.recorded[0]?.messageId, "message-1");
-  assert.equal(state.recorded[0]?.followUps?.length, 2);
+  assert.equal(summary.reconciledDrafts, 0);
+  assert.deepEqual(state.activated, []);
+  assert.equal(state.recorded.length, 0);
+  assert.equal(state.coverageWrites[0]?.reason, "unbound_draft_observation");
+  assert.deepEqual(state.coverageWrites[0]?.unknownObservations, [
+    { messageId: "gmail-message-1", reason: "unbound_draft_observation" },
+  ]);
 });
 
 test("does nothing for an own message that matches no pending draft (unsent or deleted)", async () => {
@@ -436,4 +600,244 @@ test("ignores an inbound message on a thread that is not one of ours", async () 
   assert.equal(summary.processed, 1);
   assert.equal(summary.replies, 0);
   assert.equal(state.stops.length, 0);
+});
+
+test("does not advance the cursor when history repeats a page token", async () => {
+  const state = createFakeState({
+    historyPages: [
+      historyPage([], { nextPageToken: "repeated" }),
+      historyPage([], { historyId: "201", nextPageToken: "repeated" }),
+    ],
+  });
+
+  await assert.rejects(createSync(state)(db), /history page/i);
+  assert.deepEqual(state.cursorsSet, []);
+});
+
+test("does not reconcile a founder draft without SENT evidence", async () => {
+  const state = createFakeState({
+    historyPages: [historyPage(["gmail-message-1"])],
+    pendingDrafts: new Map([
+      [
+        "<growthos.first@faithfulsoftware.dev>",
+        {
+          id: "message-1",
+          sequenceEnrollmentId: "enrollment-1",
+          prospectId: "prospect-1",
+          contactId: "contact-1",
+          subjectSnapshot: null,
+          htmlSnapshot: null,
+          textSnapshot: null,
+        },
+      ],
+    ]),
+  });
+  state.metadataByMessageId.set(
+    "gmail-message-1",
+    metadata({
+      from: FOUNDER_EMAIL,
+      labelIds: ["DRAFT"],
+      rfcMessageId: "<growthos.first@faithfulsoftware.dev>",
+    }),
+  );
+  await createSync(state)(db);
+  assert.equal(state.recorded.length, 0);
+});
+
+test("does not treat an alias SENT message as an inbound reply", async () => {
+  const state = createFakeState({
+    historyPages: [historyPage(["gmail-message-1"])],
+    enrollmentsByThread: new Map([
+      [
+        "gmail-thread-1",
+        {
+          id: "enrollment-1",
+          status: "active",
+          prospectId: "prospect-1",
+          contactId: "contact-1",
+        },
+      ],
+    ]),
+  });
+  state.metadataByMessageId.set(
+    "gmail-message-1",
+    metadata({ from: "alias@example.test", labelIds: ["SENT"] }),
+  );
+  await createSync(state)(db);
+  assert.equal(state.recordedEvents.length, 0);
+  assert.equal(state.stops.length, 0);
+});
+
+test("marks deleted history as an explicit coverage gap", async () => {
+  const page = historyPage([]);
+  page.records[0]!.messagesDeleted = [
+    { messageId: "gone", gmailThreadId: "thread" },
+  ];
+  const state = createFakeState({ historyPages: [page] });
+  await createSync(state)(db);
+  assert.equal(state.coverageWrites[0]?.state, "gap");
+  assert.equal(state.coverageWrites[0]?.reason, "message_deleted");
+});
+
+test("does not process a history record beyond the captured head", async () => {
+  const state = createFakeState({
+    historyPages: [historyPage(["future"], { historyId: "300" })],
+    headOverride: "150",
+  });
+  await createSync(state)(db);
+  assert.equal(state.recordedEvents.length, 0);
+  assert.equal(state.coverageWrites[0]?.historyEnd, "150");
+});
+
+test("protectively pauses an unbound legacy thread and records a coverage gap", async () => {
+  const state = createFakeState({
+    historyPages: [historyPage(["gmail-message-1"])],
+    enrollmentsByThread: new Map([
+      [
+        "gmail-thread-1",
+        { id: "legacy", status: "active", prospectId: "p", contactId: "c" },
+      ],
+    ]),
+  });
+  state.metadataByMessageId.set("gmail-message-1", metadata());
+  const repository = createFakeRepository(state);
+  repository.findEnrollmentByThread = async () => ({
+    kind: "unknown",
+    enrollment: state.enrollmentsByThread.get("gmail-thread-1")!,
+    safeToPause: true,
+  });
+  let terminal = false;
+  const sync = createGmailReplySync({
+    repository,
+    gmailClient: createFakeGmailClient(state),
+    founderEmail: FOUNDER_EMAIL,
+    binding: {
+      connectionId: "11111111-1111-4111-8111-111111111112",
+      googleSubject: "subject",
+      grantEpoch: 1,
+      grantedScopes: [
+        "openid",
+        "email",
+        "https://www.googleapis.com/auth/gmail.modify",
+      ],
+    },
+    stop: async (_db, input) => {
+      if (terminal) throw new SequenceStopError("already_stopped");
+      state.stops.push(input);
+      return {
+        sequenceId: input.sequenceId,
+        status: "paused",
+        alreadyApplied: false,
+      };
+    },
+  });
+  await sync(db);
+  assert.equal(state.stops[0]?.reason, "pause");
+  assert.equal(state.recordedEvents.length, 0);
+  assert.equal(state.coverageWrites[0]?.reason, "unknown_account_thread");
+  assert.deepEqual(state.coverageWrites[0]?.unknownObservations, [
+    { messageId: "gmail-message-1", reason: "unknown_account_thread" },
+  ]);
+  terminal = true;
+  state.historyPages.push(historyPage(["gmail-message-1"]));
+  await sync(db);
+  assert.equal(state.coverageWrites[1]?.reason, "unknown_account_thread");
+});
+
+test("does not make more than 1000 metadata reads or advance a partial cursor", async () => {
+  const ids = Array.from({ length: 1001 }, (_, index) => `message-${index}`);
+  const state = createFakeState({
+    historyPages: [
+      historyPage(ids.slice(0, 500), { nextPageToken: "next" }),
+      historyPage(ids.slice(500), { historyId: "201" }),
+    ],
+  });
+  for (const id of ids)
+    state.metadataByMessageId.set(
+      id,
+      metadata({
+        messageId: id,
+        gmailThreadId: "gmail-thread-1",
+        historyId: "201",
+      }),
+    );
+  let reads = 0;
+  const client = createFakeGmailClient(state);
+  const read = client.getMessageMetadata;
+  client.getMessageMetadata = async (id) => {
+    reads++;
+    return read(id);
+  };
+  const sync = createGmailReplySync({
+    repository: createFakeRepository(state),
+    gmailClient: client,
+    founderEmail: FOUNDER_EMAIL,
+    binding: {
+      connectionId: "11111111-1111-4111-8111-111111111112",
+      googleSubject: "subject",
+      grantEpoch: 1,
+      grantedScopes: [
+        "openid",
+        "email",
+        "https://www.googleapis.com/auth/gmail.modify",
+      ],
+    },
+  });
+  await assert.rejects(sync(db), /metadata.*limit/i);
+  assert.equal(reads, 1000);
+  assert.deepEqual(state.coverageWrites, []);
+});
+
+test("does not mark coverage complete from metadata newer than the captured head", async () => {
+  const state = createFakeState({
+    historyPages: [historyPage(["gmail-message-1"])],
+    headOverride: "200",
+  });
+  state.metadataByMessageId.set(
+    "gmail-message-1",
+    metadata({ historyId: "201" }),
+  );
+  await assert.rejects(createSync(state)(db), /metadata.*history/i);
+  assert.deepEqual(state.coverageWrites, []);
+});
+
+test("does not pause a thread whose prior subject does not match the bound account", async () => {
+  const state = createFakeState({
+    historyPages: [historyPage(["gmail-message-1"])],
+    enrollmentsByThread: new Map([
+      [
+        "gmail-thread-1",
+        {
+          id: "other-subject",
+          status: "active",
+          prospectId: "p",
+          contactId: "c",
+        },
+      ],
+    ]),
+  });
+  state.metadataByMessageId.set("gmail-message-1", metadata());
+  const repository = createFakeRepository(state);
+  repository.findEnrollmentByThread = async () => ({
+    kind: "unknown",
+    enrollment: state.enrollmentsByThread.get("gmail-thread-1")!,
+    safeToPause: false,
+  });
+  await createGmailReplySync({
+    repository,
+    gmailClient: createFakeGmailClient(state),
+    founderEmail: FOUNDER_EMAIL,
+    binding: {
+      connectionId: "11111111-1111-4111-8111-111111111112",
+      googleSubject: "subject",
+      grantEpoch: 1,
+      grantedScopes: [
+        "openid",
+        "email",
+        "https://www.googleapis.com/auth/gmail.modify",
+      ],
+    },
+  })(db);
+  assert.equal(state.stops.length, 0);
+  assert.equal(state.coverageWrites[0]?.reason, "unknown_account_thread");
 });

@@ -13,6 +13,404 @@
       "output_tokens": 0,
       "files": 121,
       "method": "deterministic AST scope rebuild with per-file cache"
+    },
+    {
+      "date": "2026-11-17",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 7,
+      "method": "deterministic AST incremental campaign domain merge; generic reclustered groups; no-viz"
+    },
+    {
+      "date": "2026-11-17",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 8,
+      "method": "deterministic AST incremental source capture merge; no-viz"
+    },
+    {
+      "date": "2026-11-17",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 11,
+      "method": "deterministic AST incremental founder verification merge; no-viz"
+    },
+    {
+      "date": "2026-11-17",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 220,
+      "method": "selected-corpus AST rebuild in two <=160-file batches preserving incoming references; no-viz"
+    },
+    {
+      "date": "2026-11-17",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 227,
+      "method": "selected-corpus AST rebuild in <=160-file batches, TypeScript static imports, no-viz"
+    },
+    {
+      "date": "2026-11-17",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 235,
+      "method": "selected-corpus AST rebuild in <=160-file batches, TypeScript static imports, no-viz"
+    },
+    {
+      "date": "2026-11-17",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 236,
+      "method": "selected-corpus AST rebuild in <=160-file batches, TypeScript static imports, no-viz"
+    },
+    {
+      "date": "2026-11-17",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 244,
+      "method": "selected-corpus AST rebuild in <=160-file batches, TypeScript static imports, no-viz"
+    },
+    {
+      "date": "2026-11-17",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 253,
+      "method": "selected-corpus AST rebuild in <=160-file batches, TypeScript static imports, no-viz"
+    },
+    {
+      "date": "2026-11-17",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 257,
+      "method": "selected-corpus AST rebuild in <=160-file batches, TypeScript static imports, no-viz"
+    },
+    {
+      "date": "2026-11-17",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 266,
+      "method": "selected-corpus AST rebuild in <=160-file batches, TypeScript static imports, no-viz"
+    },
+    {
+      "date": "2026-11-17",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 276,
+      "method": "selected-corpus AST rebuild in <=160-file batches, TypeScript static imports, no-viz"
+    },
+    {
+      "date": "2026-11-17",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 283,
+      "method": "selected-corpus AST rebuild in <=160-file batches, TypeScript static imports, no-viz"
+    },
+    {
+      "date": "2026-11-17",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 297,
+      "method": "selected-corpus AST rebuild in <=160-file batches, TypeScript static imports, no-viz"
+    },
+    {
+      "date": "2026-11-17",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 297,
+      "method": "selected-corpus AST rebuild in <=160-file batches, TypeScript static imports, no-viz"
+    },
+    {
+      "date": "2026-11-18",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 297,
+      "method": "selected-corpus AST rebuild in <=160-file batches, TypeScript static imports, no-viz"
+    },
+    {
+      "date": "2026-11-18",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 310,
+      "method": "selected-corpus AST rebuild in <=160-file batches, TypeScript static imports, no-viz"
+    },
+    {
+      "date": "2026-11-18",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 312,
+      "method": "selected-corpus AST rebuild in <=160-file batches, TypeScript static imports, no-viz"
+    },
+    {
+      "date": "2026-11-18",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 337,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "1bd44edcfe156ad351ed304c28a40dca7103552b"
+    },
+    {
+      "date": "2026-11-18",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 337,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "1bd44edcfe156ad351ed304c28a40dca7103552b"
+    },
+    {
+      "date": "2026-11-18",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 351,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "c6076fac4f8cb9456722eeadad4ef4016a320748"
+    },
+    {
+      "date": "2026-11-18",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 356,
+      "method": "deterministic scoped AST rebuild; reviewed; no-viz",
+      "target": "df44ef7c91626750b8649b3486d7a19532fcdb4e"
+    },
+    {
+      "date": "2026-11-18",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 376,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "d4e41eb6b7e7a68047733a646be94666bd35c065"
+    },
+    {
+      "date": "2026-11-18",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 378,
+      "method": "deterministic scoped AST rebuild; reviewed; no-viz",
+      "target": "317991cae49348993cbaf57275c70104bf1b3100"
+    },
+    {
+      "date": "2026-11-18",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 390,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "219ce0a14d72b85f125f5d55c684d416ec0f8ef9"
+    },
+    {
+      "date": "2026-11-18",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 395,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "d0e23386a51af36e486e7f5818b02af0b47205fd"
+    },
+    {
+      "date": "2026-11-23",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 401,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "81d7566ae6eadd17d297e099591e150e43f59c5e"
+    },
+    {
+      "date": "2026-11-23",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 402,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "4b2853f0ed7f42e8d6437537e6dcb0ad3f8689c4"
+    },
+    {
+      "date": "2026-11-23",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 407,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "01acd34ed9727892d71cf3078ffc43e16f523249"
+    },
+    {
+      "date": "2026-11-23",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 410,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "760f68020b36553142bdb187d41baf6c7fbfb44c"
+    },
+    {
+      "date": "2026-11-23",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 412,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "e1bc90f64cd09c61e73bb24a36ee6042ab7d3a95"
+    },
+    {
+      "date": "2026-11-23",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 416,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "c78f8a256d9cab60082dcce823d3b2b33896db02"
+    },
+    {
+      "date": "2026-11-23",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 418,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "7717d39a5691a901ddb7dff6450e5fa47a67b933"
+    },
+    {
+      "date": "2026-11-23",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 422,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "5269b9541d456af38476f2970a4ce2a39eb3dced"
+    },
+    {
+      "date": "2026-11-23",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 430,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "774ca3a2c23614dd178079fc5743e718600bd6a1"
+    },
+    {
+      "date": "2026-11-23",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 437,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "8da46c8e0339542dc1f77f3eb616c95e3792fbf7"
+    },
+    {
+      "date": "2026-11-23",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 442,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "628239938f3f1cb262406e80b9377b205ae02ef8"
+    },
+    {
+      "date": "2026-11-23",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 445,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "716cf50b9e9ac5dcd42ce5943f0aa78f2b6a6b21"
+    },
+    {
+      "date": "2026-11-23",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 464,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "03d99dc9973278450cb3d9a0565c8eb1a9939633"
+    },
+    {
+      "date": "2026-11-23",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 468,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "f0708095d5beae91c4d49f632c7b219dd7aeabf4"
+    },
+    {
+      "date": "2026-11-23",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 490,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "e1aaa8dd5d64924473f60a288660d530963843a6"
+    },
+    {
+      "date": "2026-11-23",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 501,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "35527a90fffad92e543f95aec089a40a407ce89d"
+    },
+    {
+      "date": "2026-11-23",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 521,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "c9ea3d6e25046f0ea1a7d37dbe1d2cdcc733d4e4"
+    },
+    {
+      "date": "2026-11-23",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 525,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "438e0e96d98e41ecd7f3549a626da3850279b696"
+    },
+    {
+      "date": "2026-11-23",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 542,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "fa952bfd658571ad72240f8efcb8d02ea5d1f160"
+    },
+    {
+      "date": "2026-11-23",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 551,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "968dd3e7b39f0579ade7d81c31aa8c988f30f7e9"
+    },
+    {
+      "date": "2026-11-23",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 567,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "ce75ebf76716fc226931fce3abac7634b8ea9e64"
+    },
+    {
+      "date": "2026-11-23",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 570,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "77b0f3f898e3cfe3e5b2f6d46900cb14484bca5b"
+    },
+    {
+      "date": "2026-11-24",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 571,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "962c0d0e412ff0941dbe7ac55266a23b924b4ab9"
+    },
+    {
+      "date": "2026-11-24",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 572,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "58b6c9fcda67ec8d35b926a72aa56f53fbcb796f"
+    },
+    {
+      "date": "2026-11-24",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 572,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "5fcd4e8e048a96422030d5d5d7ee3118e72cc5b0"
+    },
+    {
+      "date": "2026-11-24",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 573,
+      "method": "deterministic scoped AST rebuild; under-review; no-viz",
+      "target": "b8f638c12cc069f3647edb857a7b9a4086f51469"
     }
   ],
   "total_input_tokens": 0,

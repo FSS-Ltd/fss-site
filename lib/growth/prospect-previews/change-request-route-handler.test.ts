@@ -38,7 +38,10 @@ test("requires founder authentication before storing a preview change request", 
   });
 
   const response = await handler(
-    request({ compositionDigest: COMPOSITION_DIGEST, notes: "Use more local proof." }),
+    request({
+      compositionDigest: COMPOSITION_DIGEST,
+      notes: "Use more local proof.",
+    }),
     context(),
   );
 
@@ -56,13 +59,19 @@ test("rejects a missing source-package digest before creating a change request",
     }),
     createPreviewChangeRequest: async () => {
       changeRequestCalls += 1;
-      return { id: "22222222-2222-4222-8222-222222222222", generationPrNumber: 12 };
+      return {
+        id: "22222222-2222-4222-8222-222222222222",
+        generationPrNumber: 12,
+      };
     },
     createCorrelationId: () => "correlation-id",
     reportUnexpectedError: () => undefined,
   });
 
-  const response = await handler(request({ notes: "Use more local proof." }), context());
+  const response = await handler(
+    request({ notes: "Use more local proof." }),
+    context(),
+  );
 
   assert.equal(response.status, 422);
   assert.equal(changeRequestCalls, 0);
@@ -79,14 +88,20 @@ test("stores founder feedback only against its selected source package", async (
     }),
     createPreviewChangeRequest: async (received) => {
       input = received;
-      return { id: "22222222-2222-4222-8222-222222222222", generationPrNumber: 12 };
+      return {
+        id: "22222222-2222-4222-8222-222222222222",
+        generationPrNumber: 12,
+      };
     },
     createCorrelationId: () => "correlation-id",
     reportUnexpectedError: () => undefined,
   });
 
   const response = await handler(
-    request({ compositionDigest: COMPOSITION_DIGEST, notes: "Use more local proof." }),
+    request({
+      compositionDigest: COMPOSITION_DIGEST,
+      notes: "Use more local proof.",
+    }),
     context(),
   );
 
@@ -119,7 +134,10 @@ test("returns not found when the selected source package is no longer reviewable
   });
 
   const response = await handler(
-    request({ compositionDigest: COMPOSITION_DIGEST, notes: "Use more local proof." }),
+    request({
+      compositionDigest: COMPOSITION_DIGEST,
+      notes: "Use more local proof.",
+    }),
     context(),
   );
 
@@ -130,4 +148,58 @@ test("returns not found when the selected source package is no longer reviewable
     message: "The source package is no longer available for review.",
     correlationId: "correlation-id",
   });
+});
+
+test("passes a stable request ID through to pilot revision storage", async () => {
+  let received: unknown;
+  const handler = createPreviewChangeRequestRouteHandler({
+    db: {} as GrowthDb,
+    config: { origin: "https://faithfulsoftware.dev" },
+    authorizeFounder: async () => ({
+      email: "founder@example.test",
+      actorId: "a".repeat(64),
+    }),
+    createPreviewChangeRequest: async (input) => {
+      received = input;
+      return { id: PROSPECT_ID, generationPrNumber: 12 };
+    },
+    createCorrelationId: () => "correlation-id",
+    reportUnexpectedError: () => undefined,
+  });
+  const response = await handler(
+    request({
+      compositionDigest: COMPOSITION_DIGEST,
+      notes: "Changes",
+      requestId: PROSPECT_ID,
+    }),
+    context(),
+  );
+  assert.equal(response.status, 200);
+  assert.equal((received as { requestId: string }).requestId, PROSPECT_ID);
+});
+
+test("returns a conflict when the pilot revision is already used", async () => {
+  const { PreviewPilotRequestError } = await import("./change-requests");
+  const handler = createPreviewChangeRequestRouteHandler({
+    db: {} as GrowthDb,
+    config: { origin: "https://faithfulsoftware.dev" },
+    authorizeFounder: async () => ({
+      email: "founder@example.test",
+      actorId: "a".repeat(64),
+    }),
+    createPreviewChangeRequest: async () => {
+      throw new PreviewPilotRequestError("pilot_revision_already_requested");
+    },
+    createCorrelationId: () => "correlation-id",
+    reportUnexpectedError: () => undefined,
+  });
+  const response = await handler(
+    request({
+      compositionDigest: COMPOSITION_DIGEST,
+      notes: "Changes",
+      requestId: PROSPECT_ID,
+    }),
+    context(),
+  );
+  assert.equal(response.status, 409);
 });

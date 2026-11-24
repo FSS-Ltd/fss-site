@@ -22,6 +22,7 @@ const MAX_INTEGRATION_CONNECTIONS = 5;
 
 export type StoreConnectedGmailConnectionInput = {
   subjectEmail: string;
+  googleSubject: string;
   encryptedRefreshToken: EncryptedToken;
   grantedScopes: readonly string[];
   accessTokenExpiresAt: Date;
@@ -43,6 +44,13 @@ export type StoredGmailCredential = {
   encryptionKeyVersion: string;
 };
 
+export type ConnectedGmailCredential = StoredGmailCredential & {
+  connectionId: string;
+  googleSubject: string | null;
+  grantEpoch: number;
+  grantedScopes: string[];
+};
+
 export type DisconnectStoredGmailConnectionInput = {
   subjectEmail: string;
   correlationId: string;
@@ -61,7 +69,7 @@ export type DisconnectStoredGmailConnectionResult = {
 export async function getConnectedGmailCredential(
   db: GrowthQueryExecutor,
   subjectEmail: string,
-): Promise<StoredGmailCredential | null> {
+): Promise<ConnectedGmailCredential | null> {
   const normalisedSubjectEmail = subjectEmail.trim().toLowerCase();
 
   if (!normalisedSubjectEmail) {
@@ -72,9 +80,15 @@ export async function getConnectedGmailCredential(
     Array<{
       encryptedRefreshToken: string | null;
       encryptionKeyVersion: string | null;
+      connectionId: string;
+      googleSubject: string | null;
+      grantEpoch: number;
+      grantedScopes: string[];
     }>
   >`
     select
+      ic.id as "connectionId", ic.google_subject as "googleSubject",
+      ic.version as "grantEpoch", ic.granted_scopes as "grantedScopes",
       ic.encrypted_refresh_token as "encryptedRefreshToken",
       ic.encryption_key_version as "encryptionKeyVersion"
     from growth.integration_connections ic
@@ -90,6 +104,10 @@ export async function getConnectedGmailCredential(
   return {
     encryptedRefreshToken: row.encryptedRefreshToken,
     encryptionKeyVersion: row.encryptionKeyVersion,
+    connectionId: row.connectionId,
+    googleSubject: row.googleSubject,
+    grantEpoch: row.grantEpoch,
+    grantedScopes: row.grantedScopes,
   };
 }
 
@@ -135,6 +153,7 @@ export function storeConnectedGmailConnection(
       insert into growth.integration_connections as ic (
         provider,
         subject_email,
+        google_subject,
         encrypted_refresh_token,
         encryption_key_version,
         granted_scopes,
@@ -146,6 +165,7 @@ export function storeConnectedGmailConnection(
       ) values (
         'gmail',
         ${input.subjectEmail},
+        ${input.googleSubject},
         ${JSON.stringify(input.encryptedRefreshToken)},
         ${input.encryptedRefreshToken.version},
         ${input.grantedScopes},
@@ -156,7 +176,8 @@ export function storeConnectedGmailConnection(
         null
       )
       on conflict (provider, subject_email) do update
-      set encrypted_refresh_token = excluded.encrypted_refresh_token,
+      set google_subject = excluded.google_subject,
+          encrypted_refresh_token = excluded.encrypted_refresh_token,
           encryption_key_version = excluded.encryption_key_version,
           granted_scopes = excluded.granted_scopes,
           access_token_expires_at = excluded.access_token_expires_at,
@@ -166,6 +187,7 @@ export function storeConnectedGmailConnection(
           last_error_code = null,
           version = ic.version + 1,
           updated_at = now()
+      where ic.google_subject is null or ic.google_subject = excluded.google_subject
       returning id
     `;
     const connectionId = rows[0]?.id;

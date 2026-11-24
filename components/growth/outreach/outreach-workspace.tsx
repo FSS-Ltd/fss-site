@@ -7,15 +7,16 @@ import {
   type ReactNode,
   type KeyboardEvent,
 } from "react";
+import { OutreachVisibility } from "./outreach-visibility";
 import styles from "./outreach-workspace.module.css";
 
-const TABS = ["Email drafts", "Sequences", "Audit follow-ups"] as const;
-
 export function OutreachWorkspace({
+  campaigns,
   drafts,
   sequences,
   audits,
 }: {
+  campaigns?: ReactNode;
   drafts: ReactNode;
   sequences: ReactNode;
   audits: ReactNode;
@@ -23,7 +24,14 @@ export function OutreachWorkspace({
   const id = useId();
   const [active, setActive] = useState(0);
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
-  const panels = [drafts, sequences, audits];
+  const tabs =
+    campaigns === undefined
+      ? ["Email drafts", "Sequences", "Audit follow-ups"]
+      : ["Campaigns", "Email drafts", "Sequences", "Audit follow-ups"];
+  const panels =
+    campaigns === undefined
+      ? [drafts, sequences, audits]
+      : [campaigns, drafts, sequences, audits];
 
   function navigate(
     event: KeyboardEvent<HTMLButtonElement>,
@@ -32,16 +40,16 @@ export function OutreachWorkspace({
     let next: number;
     switch (event.key) {
       case "ArrowRight":
-        next = (index + 1) % TABS.length;
+        next = (index + 1) % tabs.length;
         break;
       case "ArrowLeft":
-        next = (index + TABS.length - 1) % TABS.length;
+        next = (index + tabs.length - 1) % tabs.length;
         break;
       case "Home":
         next = 0;
         break;
       case "End":
-        next = TABS.length - 1;
+        next = tabs.length - 1;
         break;
       default:
         return;
@@ -58,7 +66,7 @@ export function OutreachWorkspace({
         aria-label="Outreach sections"
         className={styles.tabs}
       >
-        {TABS.map((label, index) => (
+        {tabs.map((label, index) => (
           <button
             key={label}
             type="button"
@@ -80,14 +88,16 @@ export function OutreachWorkspace({
       </div>
       {panels.map((content, index) => (
         <div
-          key={TABS[index]}
+          key={tabs[index]}
           role="tabpanel"
           tabIndex={0}
           id={`${id}-panel-${index}`}
           aria-labelledby={`${id}-tab-${index}`}
           hidden={active !== index}
         >
-          {content}
+          <OutreachVisibility.Provider value={active === index}>
+            {content}
+          </OutreachVisibility.Provider>
         </div>
       ))}
     </div>

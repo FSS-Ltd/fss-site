@@ -22,6 +22,7 @@ export function SideNavigation({ pathname }: { pathname: string }) {
             key={item.href}
           >
             <NavigationIcon name={item.icon} />
+            <span className={styles.sideNavLabel}>{item.label}</span>
           </GrowthNavigationLink>
         ))}
       </nav>

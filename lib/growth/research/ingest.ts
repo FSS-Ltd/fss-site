@@ -1,3 +1,4 @@
+import type { SignedResearchPrincipal } from "./route-handler";
 import { ResearchIngestionError } from "./errors";
 import { ingestGlobalResearchRun } from "./global-ingest";
 import type { ResearchIntake } from "./intake-schema";
@@ -58,75 +59,80 @@ export function createResearchRunIngester(
 ): (
   db: GrowthDb,
   input: ResearchRunIngestion,
+  principal?: SignedResearchPrincipal,
 ) => Promise<ResearchRunIngestionResult> {
-  return async (db, input) => {
+  return async (db, input, principal) => {
     const visuals = input.prospects.map(selectVisual);
 
-    return repository.withTransaction(db, async (transaction) => {
-      await transaction.lockExternalRun(input.externalRunId);
-      const existing = await transaction.findRunResult(input.externalRunId);
-      if (existing !== null) {
-        return existing;
-      }
-
-      await transaction.lockCandidateIdentities(input.prospects);
-      const runId = await transaction.insertRun(input);
-      let accepted = 0;
-      let duplicates = 0;
-
-      for (const [candidateIndex, candidate] of input.prospects.entries()) {
-        const inspection = await transaction.inspectCandidate(candidate);
-        if (inspection.kind === "suppressed_contact") {
-          throw new ResearchIngestionError(
-            "suppressed_contact",
-            "The candidate address is suppressed.",
-          );
-        }
-        if (
-          inspection.kind === "duplicate_business" ||
-          inspection.kind === "duplicate_contact"
-        ) {
-          duplicates += 1;
-          continue;
+    return repository.withTransaction(
+      db,
+      async (transaction) => {
+        await transaction.lockExternalRun(input.externalRunId);
+        const existing = await transaction.findRunResult(input.externalRunId);
+        if (existing !== null) {
+          return existing;
         }
 
-        const inserted = await transaction.insertCandidateCore({
-          runId,
-          candidate,
-        });
-        const visual = visuals[candidateIndex]!;
-        await transaction.insertCandidateDetails({
-          runId,
-          candidateIndex,
-          candidate,
-          inserted,
-          visual,
-          externalRunId: input.externalRunId,
-          promptVersion: input.promptVersion,
-        });
-        await transaction.insertDraftPreview({
-          prospectId: inserted.prospectId,
-          content: createDraftPreviewSnapshot(candidate),
-        });
-        await transaction.appendProspectAuditEvent({
-          externalRunId: input.externalRunId,
-          prospectId: inserted.prospectId,
-          fitScore: candidate.prospect.fitScore,
-        });
-        accepted += 1;
-      }
+        await transaction.lockCandidateIdentities(input.prospects);
+        const runId = await transaction.insertRun(input);
+        let accepted = 0;
+        let duplicates = 0;
 
-      await transaction.completeRun(runId, {
-        accepted,
-        duplicates,
-        rejected: input.rejections.length,
-      });
-      await transaction.appendRunAuditEvent({
-        externalRunId: input.externalRunId,
-        runId,
-      });
-      return transaction.readRunResult(runId);
-    });
+        for (const [candidateIndex, candidate] of input.prospects.entries()) {
+          const inspection = await transaction.inspectCandidate(candidate);
+          if (inspection.kind === "suppressed_contact") {
+            throw new ResearchIngestionError(
+              "suppressed_contact",
+              "The candidate address is suppressed.",
+            );
+          }
+          if (
+            inspection.kind === "duplicate_business" ||
+            inspection.kind === "duplicate_contact"
+          ) {
+            duplicates += 1;
+            continue;
+          }
+
+          const inserted = await transaction.insertCandidateCore({
+            runId,
+            candidate,
+          });
+          const visual = visuals[candidateIndex]!;
+          await transaction.insertCandidateDetails({
+            runId,
+            candidateIndex,
+            candidate,
+            inserted,
+            visual,
+            externalRunId: input.externalRunId,
+            promptVersion: input.promptVersion,
+          });
+          await transaction.insertDraftPreview({
+            prospectId: inserted.prospectId,
+            content: createDraftPreviewSnapshot(candidate),
+          });
+          await transaction.appendProspectAuditEvent({
+            externalRunId: input.externalRunId,
+            prospectId: inserted.prospectId,
+            fitScore: candidate.prospect.fitScore,
+          });
+          accepted += 1;
+        }
+
+        await transaction.completeRun(runId, {
+          accepted,
+          duplicates,
+          rejected: input.rejections.length,
+        });
+        await transaction.appendRunAuditEvent({
+          externalRunId: input.externalRunId,
+          runId,
+        });
+        return transaction.readRunResult(runId);
+      },
+      principal,
+    );
   };
 }
 
@@ -137,8 +143,9 @@ const ingestLegacyResearchRun = createResearchRunIngester(
 export async function ingestResearchRun(
   db: GrowthDb,
   input: ResearchIntake,
+  principal?: SignedResearchPrincipal,
 ): Promise<ResearchRunIngestionResult> {
   return input.schemaVersion === "2.0"
-    ? ingestGlobalResearchRun(db, input)
-    : ingestLegacyResearchRun(db, input);
+    ? ingestGlobalResearchRun(db, input, principal)
+    : ingestLegacyResearchRun(db, input, principal);
 }

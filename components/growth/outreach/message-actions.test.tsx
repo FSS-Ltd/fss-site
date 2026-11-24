@@ -34,6 +34,12 @@ function baseMessage(
     estimatedOneOffMaxPence: 600_000,
     contactName: "Daniel Smith",
     contactEmail: "daniel@smithandsonsplumbing.co.uk",
+    reviewedRecipient: {
+      email: "daniel@smithandsonsplumbing.co.uk",
+      contactId: "33333333-3333-4333-8333-333333333333",
+      contactVersion: 1,
+      prospectVersion: 2,
+    },
     founderEmail: "j.ntagengwa@faithfulsoftware.dev",
     subject: "A simpler way to capture plumbing enquiries after hours",
     previewHtml: "<p>Hi Daniel,</p>",

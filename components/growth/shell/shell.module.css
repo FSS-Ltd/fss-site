@@ -467,3 +467,62 @@
     font-weight: 700;
   }
 }
+
+@media (min-width: 1024px) and (max-width: 1535px) {
+  .sideRail {
+    width: 150px;
+  }
+  .sideNav {
+    align-items: stretch;
+    padding: 20px 8px;
+  }
+  .sideNavLink {
+    display: flex;
+    width: auto;
+    height: auto;
+    min-height: 44px;
+    gap: 10px;
+    padding: 0 10px;
+    font-size: 0.8rem;
+    font-weight: 650;
+  }
+  .main {
+    padding-left: 182px;
+  }
+}
+.sideNavLabel {
+  display: none;
+}
+@media (min-width: 1024px) and (max-width: 1535px) {
+  .sideNavLabel {
+    display: inline;
+  }
+}
+@media (max-width: 360px) {
+  .topBar {
+    grid-template-columns: minmax(0, 1fr) max-content;
+    gap: 8px;
+    padding-inline: 12px;
+  }
+  .brand {
+    min-width: 0;
+    gap: 7px;
+    font-size: 0.85rem;
+  }
+  .brandMark {
+    height: 20px;
+    flex: none;
+  }
+  .brand span {
+    min-width: 0;
+    white-space: normal;
+    line-height: 1.1;
+  }
+  .accountArea {
+    gap: 6px;
+  }
+  .avatar {
+    width: 32px;
+    height: 32px;
+  }
+}

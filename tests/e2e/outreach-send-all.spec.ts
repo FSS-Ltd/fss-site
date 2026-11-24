@@ -21,6 +21,12 @@ function review(id: string, researchOnly = true): MessageReviewData {
     estimatedOneOffMaxPence: 0,
     contactName: "Business contact",
     contactEmail: `${id.slice(0, 4)}@example.test`,
+    reviewedRecipient: {
+      email: `${id.slice(0, 4)}@example.test`,
+      contactId: id,
+      contactVersion: 1,
+      prospectVersion: 3,
+    },
     founderEmail: "founder@example.test",
     subject: "A reviewed email",
     previewText: "Useful copy.\n\nReply unsubscribe to opt out.",
@@ -119,6 +125,7 @@ test("send all reviews the displayed drafts, skips blocked recipients, and repor
   expect(requests[0]!.body).toMatchObject({
     expectedVersion: 2,
     expectedProspectVersion: 3,
+    reviewedRecipient: review(draftId).reviewedRecipient,
     fingerprint: "a".repeat(64),
     permission: {
       basis: "consent",
@@ -212,12 +219,27 @@ test("legacy batch sends once per recipient and blocks dismissal while sending",
   ).toBeDisabled();
   await page.keyboard.press("Escape");
   await expect(dialog).toBeVisible();
-  expect(requests).toEqual([{ expectedVersion: 2 }]);
+  expect(requests).toEqual([
+    {
+      expectedVersion: 2,
+      reviewedRecipient: review(draftId, false).reviewedRecipient,
+    },
+  ]);
   release();
   await expect(dialog.getByRole("status")).toContainText(
     "Batch complete. 2 processed.",
   );
-  expect(requests).toEqual([{ expectedVersion: 2 }, { expectedVersion: 2 }]);
+  expect(requests).toEqual([
+    {
+      expectedVersion: 2,
+      reviewedRecipient: review(draftId, false).reviewedRecipient,
+    },
+    {
+      expectedVersion: 2,
+      reviewedRecipient: review("33333333-3333-4333-8333-333333333333", false)
+        .reviewedRecipient,
+    },
+  ]);
   await expect(
     dialog.getByText("Approval saved. Delivery has not yet been confirmed.", {
       exact: true,

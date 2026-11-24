@@ -122,6 +122,7 @@ export function ResearchMessageActions({
                         `/api/growth/messages/${message.draftTaskId}/approve-research-send`,
                         {
                           expectedVersion: message.version,
+                          reviewedRecipient: message.reviewedRecipient,
                           expectedProspectVersion: message.prospectVersion,
                           fingerprint: message.approvalFingerprint,
                           permission,

@@ -42,6 +42,11 @@ function metadataResponse(
             "<growthos.123e4567-e89b-42d3-a456-426614174000@faithfulsoftware.dev>",
         },
         { name: "Auto-Submitted", value: "no" },
+        { name: "To", value: "to@example.test" },
+        { name: "Cc", value: "cc@example.test" },
+        { name: "Bcc", value: "bcc@example.test" },
+        { name: "In-Reply-To", value: "<previous@example.test>" },
+        { name: "References", value: "<previous@example.test>" },
       ],
     },
     ...overrides,
@@ -157,6 +162,11 @@ test("fetches only reconciliation metadata and normalises selected headers", asy
     labelIds: ["INBOX"],
     receivedAt: "2026-08-17T13:20:00.000Z",
     from: "Founder <founder@example.test>",
+    to: "to@example.test",
+    cc: "cc@example.test",
+    bcc: "bcc@example.test",
+    inReplyTo: "<previous@example.test>",
+    references: "<previous@example.test>",
     subject: "Re: A practical idea",
     rfcMessageId:
       "<growthos.123e4567-e89b-42d3-a456-426614174000@faithfulsoftware.dev>",
@@ -170,6 +180,11 @@ test("fetches only reconciliation metadata and normalises selected headers", asy
   assert.equal(url.searchParams.get("format"), "METADATA");
   assert.deepEqual(url.searchParams.getAll("metadataHeaders"), [
     "From",
+    "To",
+    "Cc",
+    "Bcc",
+    "In-Reply-To",
+    "References",
     "Subject",
     "Message-ID",
     "Auto-Submitted",
@@ -340,5 +355,141 @@ test("rejects invalid reconciliation inputs and ambiguous provider results", asy
     (error: unknown) =>
       error instanceof GmailClientError &&
       error.code === "INVALID_PROVIDER_RESPONSE",
+  );
+});
+
+test("includes label transitions when requested for Sent observation", async () => {
+  let historyRequest: Request | undefined;
+  const client = createGmailClient(config, {
+    fetch: async (input, init) => {
+      if (String(input).endsWith("/token")) return tokenResponse();
+      historyRequest = new Request(input, init);
+      return Response.json({
+        historyId: "204",
+        history: [
+          {
+            id: "203",
+            labelsAdded: [
+              { message: { id: "m1", threadId: "t1" }, labelIds: ["SENT"] },
+            ],
+            labelsRemoved: [
+              { message: { id: "m2", threadId: "t2" }, labelIds: ["SENT"] },
+            ],
+          },
+        ],
+      });
+    },
+  });
+  const result = await client.listHistory({
+    startHistoryId: "200",
+    includeLabelChanges: true,
+  });
+  assert.deepEqual(
+    new URL(historyRequest!.url).searchParams.getAll("historyTypes"),
+    ["messageAdded", "messageDeleted", "labelAdded", "labelRemoved"],
+  );
+  assert.deepEqual(result.records[0]?.labelsAdded, [
+    { messageId: "m1", gmailThreadId: "t1", labelIds: ["SENT"] },
+  ]);
+  assert.deepEqual(result.records[0]?.labelsRemoved, [
+    { messageId: "m2", gmailThreadId: "t2", labelIds: ["SENT"] },
+  ]);
+});
+
+test("lists at most 100 Sent messages including trash without a date filter", async () => {
+  let request: Request | undefined;
+  const client = createGmailClient(config, {
+    fetch: async (input, init) => {
+      if (String(input).endsWith("/token")) return tokenResponse();
+      request = new Request(input, init);
+      return Response.json({
+        messages: [{ id: "m1", threadId: "t1" }],
+        nextPageToken: "next",
+      });
+    },
+  });
+  const page = await client.listSentMessages({ pageToken: "p" });
+  const url = new URL(request!.url);
+  assert.equal(url.searchParams.get("maxResults"), "100");
+  assert.equal(url.searchParams.get("labelIds"), "SENT");
+  assert.equal(url.searchParams.get("includeSpamTrash"), "true");
+  assert.equal(url.searchParams.get("q"), null);
+  assert.equal(url.searchParams.get("pageToken"), "p");
+  assert.deepEqual(page, {
+    messages: [{ messageId: "m1", gmailThreadId: "t1" }],
+    nextPageToken: "next",
+  });
+});
+
+test("validates SENT observations without claiming internalDate is a transmission time", async () => {
+  const { validateGmailSentObservation } = await import("./reconciliation");
+  const binding = {
+    connectionId: "account",
+    googleSubject: "subject",
+    grantEpoch: 1,
+    grantedScopes: [
+      "openid",
+      "email",
+      "https://www.googleapis.com/auth/gmail.modify",
+    ],
+  };
+  const metadata = {
+    messageId: "m1",
+    gmailThreadId: "t1",
+    historyId: "100",
+    labelIds: ["SENT"],
+    receivedAt: "2026-11-01T12:00:00.000Z",
+    from: "founder@example.test",
+    to: "a@example.test",
+    cc: null,
+    bcc: null,
+    inReplyTo: null,
+    references: null,
+    subject: null,
+    rfcMessageId: "<expected@example.test>",
+    autoSubmitted: null,
+    precedence: null,
+    returnPath: null,
+    autoResponseSuppress: null,
+  };
+  const input = {
+    binding,
+    currentBinding: binding,
+    profile: { emailAddress: "founder@example.test", historyId: "100" },
+    expectedEmail: "founder@example.test",
+    expectedRfcMessageId: "<expected@example.test>",
+    metadata,
+    observedFrom: new Date("2026-11-17T12:00:00Z"),
+    observedUntil: new Date("2026-11-17T12:00:01Z"),
+  };
+  const result = validateGmailSentObservation(input);
+  assert.equal(result.kind, "observed");
+  if (result.kind === "observed") {
+    assert.equal(result.providerCreatedAt.toISOString(), metadata.receivedAt);
+    assert.equal(
+      result.observedUntil.toISOString(),
+      "2026-11-17T12:00:01.000Z",
+    );
+  }
+  assert.equal(
+    validateGmailSentObservation({
+      ...input,
+      metadata: { ...metadata, labelIds: ["DRAFT"] },
+    }).kind,
+    "unknown",
+  );
+  assert.equal(
+    validateGmailSentObservation({
+      ...input,
+      currentBinding: { ...binding, grantEpoch: 2 },
+    }).kind,
+    "unknown",
+  );
+  assert.equal(
+    validateGmailSentObservation({
+      ...input,
+      metadata: { ...metadata, receivedAt: "2026-11-18T00:00:00.000Z" },
+    }).kind,
+    "unknown",
   );
 });

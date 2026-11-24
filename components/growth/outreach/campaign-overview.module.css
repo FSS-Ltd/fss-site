@@ -1,0 +1,555 @@
+.panel {
+  min-width: 0;
+  border: 1px solid #dce3e8;
+  border-radius: 12px;
+  background: #fff;
+  padding: 22px;
+  color: #07182e;
+}
+.header,
+.title,
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+}
+.header h2,
+.title h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+.header p,
+.title p,
+.footer p {
+  margin: 4px 0 0;
+  color: #526078;
+  font-size: 0.85rem;
+}
+.header a {
+  align-self: center;
+  color: #075f66;
+  font-weight: 650;
+}
+.header a:focus-visible {
+  outline: 3px solid #087f88;
+  outline-offset: 3px;
+}
+.operatorControls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 20px;
+  margin: 16px 0;
+}
+.operatorControls .editor {
+  margin-top: 0;
+}
+.operatorControls a {
+  color: #075f66;
+  font-weight: 650;
+}
+.operatorControls a:hover {
+  text-decoration: underline;
+}
+.operatorControls a:focus-visible {
+  outline: 3px solid #087f88;
+  outline-offset: 3px;
+}
+.goal {
+  margin: 20px 0;
+  color: #526078;
+  font-size: 0.88rem;
+}
+.list {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.campaign {
+  min-width: 0;
+  border-top: 1px solid #dce3e8;
+  padding: 20px 0;
+}
+.title h3,
+.title p,
+.footer p {
+  overflow-wrap: anywhere;
+}
+.state {
+  align-self: start;
+  border-radius: 6px;
+  background: #e6f3f4;
+  padding: 5px 9px;
+  color: #075f66;
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 16px;
+  margin: 18px 0 12px;
+}
+.metrics div {
+  min-width: 0;
+}
+.metrics dt {
+  color: #526078;
+  font-size: 0.78rem;
+}
+.metrics dd {
+  margin: 5px 0 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+.campaignControls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 18px;
+  margin-top: 12px;
+}
+.campaignControls .actions,
+.campaignControls .editor {
+  margin-top: 0;
+}
+.holdReason,
+.reportDate {
+  margin: 0;
+  color: #526078;
+  font-size: 0.85rem;
+}
+.holdReason {
+  flex-basis: 100%;
+}
+.operations {
+  border-top: 1px solid #dce3e8;
+  margin-top: 20px;
+  padding-top: 16px;
+}
+.operations > p {
+  color: #526078;
+  font-size: 0.85rem;
+}
+.operations > section h3 {
+  margin: 12px 0 4px;
+  font-size: 0.95rem;
+}
+.operations > section > p {
+  margin: 0;
+  color: #526078;
+  font-size: 0.85rem;
+}
+.empty,
+.note {
+  color: #526078;
+  font-size: 0.85rem;
+}
+.note {
+  margin: 20px 0 0;
+}
+@media (max-width: 480px) {
+  .panel {
+    padding: 16px;
+  }
+  .campaign {
+    padding: 16px 0;
+  }
+  .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.actions {
+  margin-top: 16px;
+}
+.actions button {
+  border: 1px solid #075f66;
+  border-radius: 6px;
+  background: #fff;
+  padding: 8px 12px;
+  color: #075f66;
+  font-weight: 650;
+  cursor: pointer;
+}
+.actions button:disabled {
+  opacity: 0.65;
+  cursor: default;
+}
+.actions button:focus-visible {
+  outline: 3px solid #087f88;
+  outline-offset: 3px;
+}
+.actions p {
+  color: #526078;
+  font-size: 0.85rem;
+}
+.confirm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+.confirm p {
+  flex-basis: 100%;
+  margin: 0 0 4px;
+}
+.editor {
+  margin-top: 16px;
+}
+.editor summary {
+  color: #075f66;
+  font-weight: 650;
+  cursor: pointer;
+}
+.editor summary:focus-visible,
+.editor button:focus-visible,
+.editor input:focus-visible,
+.editor select:focus-visible,
+.editor textarea:focus-visible {
+  outline: 3px solid #087f88;
+  outline-offset: 3px;
+}
+.editor form {
+  margin-top: 12px;
+}
+.editor form > label,
+.fieldGroup label {
+  display: grid;
+  gap: 5px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.policyFields {
+  display: grid;
+  gap: 14px;
+  margin: 16px 0;
+}
+.fieldGroup {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  margin: 0;
+  padding: 14px;
+  border: 1px solid #dce3e8;
+  border-radius: 8px;
+}
+.fieldGroup legend {
+  font-weight: 700;
+}
+.fieldGroup p,
+.editor form > p {
+  color: #526078;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+.editor input:not([type="checkbox"]),
+.editor textarea,
+.editor select {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid #8c9aa7;
+  border-radius: 5px;
+  color: #07182e;
+  background: white;
+  font: inherit;
+}
+.editor textarea {
+  min-height: 70px;
+}
+.editor button {
+  padding: 9px 12px;
+  border: 1px solid #075f66;
+  border-radius: 6px;
+  color: #075f66;
+  background: #fff;
+  font-weight: 650;
+}
+.checkbox {
+  display: flex;
+  gap: 8px;
+  align-items: start;
+  font-size: 0.85rem;
+}
+.editorInputs {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.account {
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid #dce3e8;
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+}
+.account h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+.account p,
+.account dl {
+  color: #526078;
+  font-size: 0.85rem;
+}
+.account dl {
+  display: grid;
+  gap: 8px;
+}
+.account dt {
+  font-weight: 650;
+}
+.account dd {
+  margin: 2px 0 0;
+}
+.accountActions {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+.accountActions button {
+  width: fit-content;
+  border: 1px solid #075f66;
+  border-radius: 6px;
+  padding: 8px 12px;
+  background: #fff;
+  color: #075f66;
+  font-weight: 650;
+}
+.accountActions button:disabled {
+  opacity: 0.65;
+}
+.accountActions button:focus-visible,
+.accountInput input:focus-visible,
+.accountInput select:focus-visible {
+  outline: 3px solid #087f88;
+  outline-offset: 3px;
+}
+.accountInput {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+.accountInput label {
+  display: grid;
+  gap: 5px;
+  font-size: 0.85rem;
+  font-weight: 650;
+}
+.accountInput input,
+.accountInput select {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid #8c9aa7;
+  border-radius: 5px;
+  background: #fff;
+  color: #07182e;
+  font: inherit;
+}
+
+.actions button:not(:disabled):hover,
+.editor button:not(:disabled):hover,
+.accountActions button:not(:disabled):hover {
+  background: #e6f3f4;
+}
+.editor summary:hover,
+.header a:hover {
+  text-decoration: underline;
+}
+
+/* Campaign operations */
+.operatorControls {
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid #dce3e8;
+  border-radius: 8px;
+  background: #f5f9f9;
+}
+.operatorControls .editor {
+  min-width: 0;
+}
+.operatorControls .editor[open] {
+  flex-basis: 100%;
+}
+.operatorControls .editor form {
+  max-width: 760px;
+}
+.operatorControls .editor > summary,
+.campaignControls .editor > summary,
+.inactive > summary {
+  width: fit-content;
+  border-radius: 6px;
+  padding: 8px 10px;
+  color: #075f66;
+  cursor: pointer;
+}
+.operatorControls .editor > summary {
+  background: #075f66;
+  color: white;
+}
+.operatorControls .editor > summary:hover {
+  background: #064b51;
+}
+.operatorControls a {
+  padding: 8px 10px;
+  border-radius: 6px;
+}
+.operatorControls a:hover,
+.campaignControls .editor > summary:hover,
+.inactive > summary:hover {
+  background: #e6f3f4;
+  text-decoration: none;
+}
+.identity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  gap: 8px 14px;
+  min-width: 0;
+}
+.title > .actions {
+  margin: 0;
+}
+.title > .actions > button {
+  background: #075f66;
+  color: white;
+}
+.title > .actions > button:not(:disabled):hover {
+  background: #064b51;
+}
+.campaignControls {
+  margin-top: 8px;
+}
+.campaignControls .holdReason {
+  flex-basis: auto;
+}
+.campaignControls .note {
+  margin: 0;
+}
+.stages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 0;
+  margin: 14px 0 10px;
+}
+.stages div {
+  padding: 0 16px;
+  border-left: 1px solid #dce3e8;
+}
+.stages div:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+.stages dt {
+  color: #526078;
+  font-size: 0.78rem;
+}
+.stages dd {
+  margin: 3px 0 0;
+  color: #07182e;
+  font-weight: 700;
+}
+.inactive {
+  margin: 8px 0;
+  font-size: 0.85rem;
+}
+.inactive > summary {
+  padding-left: 0;
+  color: #526078;
+}
+.inactive > summary:focus-visible {
+  outline: 3px solid #087f88;
+  outline-offset: 3px;
+}
+.inactive p {
+  color: #526078;
+  line-height: 1.5;
+}
+@media (min-width: 640px) {
+  .fieldGroup {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .fieldGroup p,
+  .fieldGroup label:has(textarea) {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Decision queue */
+.list {
+  gap: 0;
+  border-bottom: 1px solid #dce3e8;
+}
+.list > .campaign {
+  padding: 16px 0;
+}
+.title {
+  align-items: center;
+}
+.identity {
+  align-items: center;
+}
+.title h3 {
+  font-size: 1rem;
+}
+.campaignControls {
+  margin-top: 4px;
+}
+.campaignControls .editor > summary {
+  padding-left: 0;
+}
+.activity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 20px;
+}
+.activity .inactive {
+  margin: 0;
+}
+.activity .reportDate {
+  padding: 8px 0;
+}
+.activity .stages {
+  flex-basis: 100%;
+}
+.operatorControls .editor form {
+  max-width: none;
+}
+@media (min-width: 900px) {
+  .operatorControls .policyFields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+  .operatorControls .policyFields > .checkbox {
+    grid-column: 1 / -1;
+  }
+  .operatorControls .fieldGroup {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .operatorControls .fieldGroup p,
+  .operatorControls .fieldGroup label:has(textarea) {
+    grid-column: auto;
+  }
+}
+@media (max-width: 480px) {
+  .title {
+    gap: 8px;
+  }
+  .identity {
+    gap: 6px 10px;
+  }
+  .activity {
+    gap: 0 12px;
+  }
+  .activity .reportDate {
+    padding: 0 0 8px;
+  }
+}

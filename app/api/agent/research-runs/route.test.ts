@@ -370,3 +370,43 @@ test("malformed global source URLs return validation errors", async () => {
   assert.equal(response.status, 422);
   assert.equal(harness.ingestedInputs.length, 0);
 });
+
+test("passes the verified key and hash of exact bytes to ingestion", async () => {
+  let principal: unknown;
+  const body = JSON.stringify(validPayload(), null, 2);
+  const handler = createResearchRunPostHandler({
+    agentKeyId: "weekday-agent-v1",
+    agentHmacSecret: "test-secret",
+    createCorrelationId: () => CORRELATION_ID,
+    now: () => NOW,
+    verifyRequest: () => ({ ok: true }),
+    ingest: async (_input, verified) => {
+      principal = verified;
+      return SUCCESS_RESULT;
+    },
+    reportUnexpectedError: () => {},
+  });
+  assert.equal((await handler(createRequest(body))).status, 200);
+  const { createHash } = await import("node:crypto");
+  assert.deepEqual(principal, {
+    kind: "signed_research",
+    keyId: "weekday-agent-v1",
+    bodySha256: createHash("sha256").update(body).digest("hex"),
+  });
+});
+
+test("passes an explicitly empty signed v2 run to ingestion", async () => {
+  const harness = createHarness();
+  const payload = {
+    ...createGlobalResearchFixture(),
+    prospects: [],
+    rejections: [],
+    outcome: "no_results",
+  };
+  const response = await harness.handler(
+    createRequest(JSON.stringify(payload)),
+  );
+  assert.equal(response.status, 200);
+  assert.equal(harness.ingestedInputs.length, 1);
+  assert.equal(harness.ingestedInputs[0]?.schemaVersion, "2.0");
+});

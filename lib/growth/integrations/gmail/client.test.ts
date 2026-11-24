@@ -716,3 +716,177 @@ test("rejects invalid Gmail mutation inputs and response schemas", async () => {
       error.message === "The Gmail provider request failed.",
   );
 });
+
+test("guarded send checks the gate after refresh and makes no send request if time expired", async () => {
+  let now = 100;
+  let sends = 0;
+  const client = createGmailClient(config, {
+    fetch: async (input) => {
+      if (String(input).endsWith("/token")) {
+        now = 200;
+        return tokenResponse("access-token");
+      }
+      sends += 1;
+      return Response.json({ id: "id", threadId: "thread" });
+    },
+  });
+  assert.deepEqual(
+    await client.sendMessageOnce({ raw: "UmF3IE1JTUU" }, () => now < 200),
+    {
+      status: "not_invoked",
+      reason: "guard_rejected",
+    },
+  );
+  assert.equal(sends, 0);
+});
+
+test("guarded send submits exact committed bytes once and does not follow redirects", async () => {
+  let sendRequest: Request | undefined;
+  const client = createGmailClient(config, {
+    fetch: async (input, init) => {
+      if (String(input).endsWith("/token"))
+        return tokenResponse("access-token");
+      sendRequest = new Request(input, init);
+      return Response.json({ id: "message", threadId: "thread" });
+    },
+  });
+  assert.deepEqual(
+    await client.sendMessageOnce(
+      { raw: "UmF3IE1JTUU", gmailThreadId: "original" },
+      () => true,
+    ),
+    {
+      status: "accepted",
+      result: { messageId: "message", gmailThreadId: "thread" },
+    },
+  );
+  assert.equal(
+    sendRequest?.url,
+    "https://gmail.googleapis.com/gmail/v1/users/me/messages/send",
+  );
+  assert.equal(sendRequest?.method, "POST");
+  assert.equal(sendRequest?.redirect, "manual");
+  assert.deepEqual(await sendRequest?.json(), {
+    raw: "UmF3IE1JTUU",
+    threadId: "original",
+  });
+});
+
+test("guarded send never retries provider errors, redirects, or network failures", async () => {
+  for (const failure of [
+    () => new Response(null, { status: 401 }),
+    () => new Response(null, { status: 403 }),
+    () => new Response(null, { status: 429 }),
+    () => new Response(null, { status: 503 }),
+    () =>
+      new Response(null, {
+        status: 307,
+        headers: { Location: "https://example.com/" },
+      }),
+    () => {
+      throw new Error("private network detail");
+    },
+  ]) {
+    let sends = 0;
+    let refreshes = 0;
+    const client = createGmailClient(config, {
+      fetch: async (input) => {
+        if (String(input).endsWith("/token")) {
+          refreshes += 1;
+          return tokenResponse("access-token");
+        }
+        sends += 1;
+        return failure();
+      },
+    });
+    const outcome = await client.sendMessageOnce(
+      { raw: "UmF3IE1JTUU" },
+      () => true,
+    );
+    assert.equal(outcome.status, "invoked_unknown");
+    assert.equal(sends, 1);
+    assert.equal(refreshes, 1);
+  }
+});
+
+test("guarded send identifies credential failure before invocation", async () => {
+  let sends = 0;
+  const client = createGmailClient(config, {
+    fetch: async (input) => {
+      if (String(input).endsWith("/token"))
+        return new Response(null, { status: 400 });
+      sends += 1;
+      throw new Error("unexpected send");
+    },
+  });
+  assert.deepEqual(
+    await client.sendMessageOnce({ raw: "UmF3IE1JTUU" }, () => true),
+    {
+      status: "not_invoked",
+      reason: "credential_preparation_failed",
+      errorCode: "AUTHENTICATION_FAILED",
+    },
+  );
+  assert.equal(sends, 0);
+});
+
+test("guarded send rejects malformed input and a throwing gate before sending", async () => {
+  let sends = 0;
+  const client = createGmailClient(config, {
+    fetch: async (input) => {
+      if (String(input).endsWith("/token"))
+        return tokenResponse("access-token");
+      sends += 1;
+      return Response.json({ id: "id", threadId: "thread" });
+    },
+  });
+  assert.deepEqual(
+    await client.sendMessageOnce({ raw: "invalid=" }, () => true),
+    {
+      status: "not_invoked",
+      reason: "invalid_input",
+    },
+  );
+  assert.deepEqual(
+    await client.sendMessageOnce({ raw: "UmF3IE1JTUU" }, () => {
+      throw new Error("private");
+    }),
+    {
+      status: "not_invoked",
+      reason: "guard_rejected",
+    },
+  );
+  assert.equal(sends, 0);
+});
+
+test("guarded send retains sanitized incident status and treats invalid success as unknown", async () => {
+  for (const status of [401, 403, 429]) {
+    const client = createGmailClient(config, {
+      fetch: async (input) =>
+        String(input).endsWith("/token")
+          ? tokenResponse("access-token")
+          : new Response(null, { status }),
+    });
+    const outcome = await client.sendMessageOnce(
+      { raw: "UmF3IE1JTUU" },
+      () => true,
+    );
+    assert.equal(outcome.status, "invoked_unknown");
+    if (outcome.status === "invoked_unknown")
+      assert.equal(outcome.providerStatus, status);
+  }
+  const client = createGmailClient(config, {
+    fetch: async (input) =>
+      String(input).endsWith("/token")
+        ? tokenResponse("access-token")
+        : Response.json({ id: "missing-thread" }),
+  });
+  assert.deepEqual(
+    await client.sendMessageOnce({ raw: "UmF3IE1JTUU" }, () => true),
+    {
+      status: "invoked_unknown",
+      errorCode: "INVALID_PROVIDER_RESPONSE",
+      providerStatus: 200,
+    },
+  );
+});

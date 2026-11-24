@@ -13,6 +13,7 @@ test("defines the approved founder dashboard navigation", () => {
       { label: "Overview", href: "/growth" },
       { label: "Prospects", href: "/growth/prospects" },
       { label: "Outreach", href: "/growth/outreach" },
+      { label: "Facebook", href: "/growth/facebook" },
       { label: "Pipeline", href: "/growth/pipeline" },
       { label: "Deals", href: "/growth/deals" },
       { label: "Clients", href: "/growth/clients" },

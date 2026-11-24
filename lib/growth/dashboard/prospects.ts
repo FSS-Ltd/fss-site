@@ -49,7 +49,21 @@ export const SUPPRESSION_FILTER_VALUES = [
 ] as const;
 export type SuppressionFilter = (typeof SUPPRESSION_FILTER_VALUES)[number];
 
+export const SOURCE_FILTER_VALUES = [
+  "all",
+  "research",
+  "facebook_page",
+  "facebook_group",
+  "manual",
+  "web",
+  "google_maps",
+  "referral",
+  "inbound",
+] as const;
+export type SourceFilter = (typeof SOURCE_FILTER_VALUES)[number];
+
 export type ProspectListQuery = {
+  source?: SourceFilter;
   q: string;
   sector: string;
   location: string;
@@ -128,6 +142,10 @@ export function parseProspectListQuery(
   );
 
   return {
+    source: parseEnumParam(
+      SOURCE_FILTER_VALUES,
+      firstValue(searchParams.source),
+    ),
     q: q.success ? q.data : "",
     sector: sector.success ? sector.data : "",
     location: location.success ? location.data : "",
@@ -220,7 +238,13 @@ function buildFilterFragments(
             where s.normalised_email = c.normalised_email
           )`;
 
+  const source =
+    !query.source || query.source === "all"
+      ? db``
+      : db`and p.source_type = ${query.source}`;
+
   return {
+    source,
     search,
     sector,
     location,
@@ -271,7 +295,7 @@ async function fetchProspectRows(
       p.recommended_offer as "recommendedOffer",
       p.status,
       p.estimated_one_off_max_pence as "potentialValuePence",
-      c.lawful_basis = 'research_only' as "researchOnly",
+      (c.id is null or c.lawful_basis = 'research_only') as "researchOnly",
       p.next_action as "nextAction",
       p.next_action_due_at as "nextActionDueAt",
       coalesce(seq.state, 'not_started') as "outreachState"
@@ -286,6 +310,7 @@ async function fetchProspectRows(
       limit 1
     ) seq on true
     where true
+      ${fragments.source}
       ${fragments.search}
       ${fragments.sector}
       ${fragments.location}
@@ -335,6 +360,7 @@ async function fetchProspectTotalCount(
       limit 1
     ) seq on true
     where true
+      ${fragments.source}
       ${fragments.search}
       ${fragments.sector}
       ${fragments.location}

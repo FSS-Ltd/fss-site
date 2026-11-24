@@ -5,6 +5,7 @@ import type { GrowthDb } from "../db/types";
 import { renderGmailMime } from "../email/gmail/mime";
 import {
   FirstEmailApprovalError,
+  matchesReviewedRecipient,
   type ApprovedFirstEmailMessage,
   type FirstEmailApprovalRepository,
 } from "./approval";
@@ -14,10 +15,13 @@ import {
   researchOutreachPermissionSchema,
 } from "./research-email-snapshot";
 
+import { reviewedRecipientSchema } from "./reviewed-recipient";
+
 export const researchEmailApprovalBodySchema = z
   .object({
     expectedVersion: z.number().int().positive(),
     expectedProspectVersion: z.number().int().positive(),
+    reviewedRecipient: reviewedRecipientSchema,
     fingerprint: z.string().regex(/^[0-9a-f]{64}$/),
     permission: researchOutreachPermissionSchema,
   })
@@ -55,6 +59,7 @@ export function createResearchEmailApprover({
     const body = researchEmailApprovalBodySchema.parse({
       expectedVersion: input.expectedVersion,
       expectedProspectVersion: input.expectedProspectVersion,
+      reviewedRecipient: input.reviewedRecipient,
       fingerprint: input.fingerprint,
       permission: input.permission,
     });
@@ -75,6 +80,7 @@ export function createResearchEmailApprover({
       )
         throw new FirstEmailApprovalError("not_approvable");
       if (
+        !matchesReviewedRecipient(draft, body.reviewedRecipient) ||
         snapshot.draftVersion !== body.expectedVersion ||
         draft.prospectVersion !== body.expectedProspectVersion ||
         researchEmailFingerprint(
@@ -93,11 +99,11 @@ export function createResearchEmailApprover({
       const rendered = renderGmailMime({
         id: messageId,
         from: founderEmail,
-        to: draft.contactEmail,
+        to: body.reviewedRecipient.email,
         replyTo: founderEmail,
         ...snapshot.email,
       });
-      await tx.authorizeResearchContact({
+      const effectiveVersions = await tx.authorizeResearchContact({
         contactId: draft.contactId,
         prospectId: draft.prospectId,
         basis: body.permission.basis,
@@ -108,7 +114,12 @@ export function createResearchEmailApprover({
           contactId: draft.contactId,
           enrollmentStatus: "active",
           followUpPolicy: "manual_only",
-          approvedRecipient: draft.normalisedEmail,
+          approvedRecipient: body.reviewedRecipient.email,
+          reviewedRecipient: body.reviewedRecipient,
+          effectiveRecipient: {
+            ...body.reviewedRecipient,
+            ...effectiveVersions,
+          },
           message: {
             id: messageId,
             subjectSnapshot: snapshot.email.subject,

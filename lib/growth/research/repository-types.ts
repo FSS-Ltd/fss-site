@@ -1,3 +1,4 @@
+import type { SignedResearchPrincipal } from "./route-handler";
 import type { GrowthDb } from "../db/types";
 import type { StoredProspectPreviewSnapshot } from "../prospect-previews/types";
 import type {
@@ -99,5 +100,6 @@ export interface ResearchIngestionRepository {
   withTransaction<T>(
     db: GrowthDb,
     operation: (transaction: ResearchIngestionTransaction) => Promise<T>,
+    principal?: SignedResearchPrincipal,
   ): Promise<T>;
 }

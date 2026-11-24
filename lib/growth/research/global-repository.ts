@@ -32,7 +32,7 @@ export async function inspectGlobalCandidate(
           where c.normalised_email = ${email} and p.status = 'suppressed')) as suppressed,
       exists (select 1 from growth.businesses b where
         (${registration}::text is not null and b.country_code = ${candidate.business.countryCode}
-          and upper(regexp_replace(b.company_number, '[[:space:]]+', '', 'g')) = ${registration})
+          and (upper(regexp_replace(b.company_number, '[[:space:]]+', '', 'g')) = ${registration} or exists (select 1 from growth.prospects source where source.business_id = b.id and upper(regexp_replace(source.source_details->>'registrationNumber', '[[:space:]]+', '', 'g')) = ${registration})))
         or (${candidate.business.googlePlaceId}::text is not null and b.google_place_id = ${candidate.business.googlePlaceId})
         or (${host}::text is not null and substring(lower(coalesce(b.website_url, b.first_party_source_url)) from '^https?://(?:www[.])?([^/:?#]+)') = ${host})
       ) as "businessExists",
@@ -97,10 +97,11 @@ export async function insertGlobalCandidateDetails(
     candidate: GlobalResearchCandidate;
     prospectId: string;
   },
-): Promise<void> {
+): Promise<string[]> {
   const { run, runId, candidateIndex, candidate, prospectId } = input;
+  const evidenceIds: string[] = [];
   for (const evidence of candidate.evidence) {
-    await tx`
+    const [row] = await tx<{ id: string }[]>`
       insert into growth.source_evidence (
         prospect_id, research_run_id, source_type, source_url, external_reference,
         claim_type, claim_summary, observed_at, verified_at, retention_class
@@ -108,8 +109,10 @@ export async function insertGlobalCandidateDetails(
         ${prospectId}, ${runId}, ${evidence.sourceType}, ${evidence.sourceUrl},
         ${evidence.externalReference}, ${evidence.claimType}, ${evidence.claimSummary},
         ${evidence.observedAt}, ${evidence.verifiedAt}, ${evidence.retentionClass}
-      )
+      ) returning id
     `;
+    if (!row) throw new Error("Evidence insert returned no ID.");
+    evidenceIds.push(row.id);
   }
   await tx`
     insert into growth.agent_tasks (
@@ -122,4 +125,5 @@ export async function insertGlobalCandidateDetails(
       1, now(), ${`${run.externalRunId}:candidate:${candidateIndex}:first-email-draft`}
     )
   `;
+  return evidenceIds;
 }

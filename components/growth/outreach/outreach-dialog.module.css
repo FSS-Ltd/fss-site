@@ -62,6 +62,7 @@
   border-radius: 10px;
   background: #f8fafb;
   padding: 16px;
+  overflow-wrap: anywhere;
 }
 
 .recipient h3,

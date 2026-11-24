@@ -115,6 +115,7 @@ test("connects only the verified founder Gmail identity and stores an encrypted 
   ]);
   assert.deepEqual(storedInput!, {
     subjectEmail: "j.ntagengwa@faithfulsoftware.dev",
+    googleSubject: "google-subject",
     encryptedRefreshToken: {
       version: "v1",
       iv: "initialisation-vector",

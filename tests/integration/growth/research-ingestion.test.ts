@@ -435,3 +435,44 @@ test(
     }
   },
 );
+
+test(
+  "legacy signed runs preserve exact signer and byte replay",
+  { skip: !connectionString },
+  async () => {
+    if (!connectionString) return;
+    const db = postgres(connectionString, {
+      max: 1,
+      connection: { options: "-c role=growth_app" },
+    });
+    const token = randomUUID().replaceAll("-", "");
+    const run = createRun(`signed-legacy-${token}`, {
+      companyNumber: token.slice(0, 12).toUpperCase(),
+      emailLocalPart: `legacy-${token}`,
+      googlePlaceId: `legacy-${token}`,
+    });
+    const principal = {
+      kind: "signed_research" as const,
+      keyId: "agent-a",
+      bodySha256: "a".repeat(64),
+    };
+    try {
+      const result = await ingestResearchRun(db, run, principal);
+      assert.deepEqual(await ingestResearchRun(db, run, principal), result);
+      await assert.rejects(
+        ingestResearchRun(db, run, { ...principal, keyId: "agent-b" }),
+        /conflict/i,
+      );
+      await assert.rejects(
+        ingestResearchRun(db, run, {
+          ...principal,
+          bodySha256: "b".repeat(64),
+        }),
+        /conflict/i,
+      );
+      await assert.rejects(ingestResearchRun(db, run), /conflict/i);
+    } finally {
+      await db.end();
+    }
+  },
+);

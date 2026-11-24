@@ -1,5 +1,29 @@
+import {
+  findEnrollmentByThread,
+  type ThreadMatch,
+} from "./gmail-thread-association";
+export type { ThreadEnrollment, ThreadMatch } from "./gmail-thread-association";
 import { withGrowthTransaction } from "../db/client";
 import type { GrowthDb, GrowthTransaction } from "../db/types";
+import type { GmailGrantBinding } from "../integrations/gmail/live-client";
+import { stopSequenceInTransaction } from "./stop";
+import {
+  classifyGmailRouting,
+  classifyGmailRoutingInTransaction,
+  validateGmailEffectObservation,
+  type GmailEffectObservation,
+} from "./gmail-routing-repository";
+import { GmailThreadAttributionChangedError } from "./gmail-thread-association";
+import { createSequenceStopTransaction } from "./stop-repository";
+import {
+  commitReplyCoverage,
+  loadReplySyncState,
+} from "./gmail-sync-coverage-repository";
+export {
+  commitReplyCoverage,
+  loadReplySyncState,
+  loadReplyCoverage,
+} from "./gmail-sync-coverage-repository";
 
 export type PendingDraft = {
   id: string;
@@ -11,27 +35,26 @@ export type PendingDraft = {
   textSnapshot: string | null;
 };
 
-export type ThreadEnrollment = {
-  id: string;
-  status: string;
-  prospectId: string;
-  contactId: string;
-};
-
 export type RecordInboundEventInput = {
+  binding: GmailGrantBinding;
   sequenceEnrollmentId: string;
   prospectId: string;
   contactId: string;
   gmailMessageId: string;
   gmailThreadId: string;
+  observation: GmailEffectObservation;
   rfcMessageId: string | null;
   from: string | null;
   subject: string | null;
   receivedAt: Date;
   eventType: "reply" | "bounce" | "auto_response";
+  correlationId: string;
 };
 
 export interface GmailSyncRepository {
+  classifyGmailRouting: typeof classifyGmailRouting;
+  loadReplySyncState: typeof loadReplySyncState;
+  commitReplyCoverage: typeof commitReplyCoverage;
   getCursor(db: GrowthDb, subjectEmail: string): Promise<string | null>;
   setCursor(
     db: GrowthDb,
@@ -45,11 +68,16 @@ export interface GmailSyncRepository {
   findEnrollmentByThread(
     db: GrowthDb,
     gmailThreadId: string,
-  ): Promise<ThreadEnrollment | null>;
+    binding: GmailGrantBinding,
+  ): Promise<ThreadMatch>;
   recordInboundEvent(
     db: GrowthDb,
     input: RecordInboundEventInput,
-  ): Promise<{ alreadyRecorded: boolean }>;
+  ): Promise<{
+    alreadyRecorded: boolean;
+    attributionUnknown?: boolean;
+    attributionAmbiguous?: boolean;
+  }>;
   activatePendingApproval(
     db: GrowthDb,
     sequenceEnrollmentId: string,
@@ -102,23 +130,75 @@ async function findPendingDraftByRfcMessageId(
   return rows[0] ?? null;
 }
 
-async function findEnrollmentByThread(
-  db: GrowthDb,
-  gmailThreadId: string,
-): Promise<ThreadEnrollment | null> {
-  const rows = await db<Array<ThreadEnrollment>>`
-    select id, status, prospect_id as "prospectId", contact_id as "contactId"
-    from growth.sequence_enrollments
-    where gmail_thread_id = ${gmailThreadId}
-  `;
-  return rows[0] ?? null;
-}
-
 async function recordInboundEvent(
   db: GrowthDb,
   input: RecordInboundEventInput,
-): Promise<{ alreadyRecorded: boolean }> {
+): Promise<{
+  alreadyRecorded: boolean;
+  attributionUnknown?: boolean;
+  attributionAmbiguous?: boolean;
+}> {
   return withGrowthTransaction(db, async (tx: GrowthTransaction) => {
+    validateGmailEffectObservation(input.observation);
+    const observation = { ...input.observation };
+    const binding = {
+      ...input.binding,
+      grantedScopes: [...input.binding.grantedScopes],
+    };
+    if (
+      observation.threadId !== input.gmailThreadId ||
+      observation.messageId !== input.gmailMessageId ||
+      observation.fromHeader !== input.from
+    )
+      throw new Error("Gmail thread attribution is invalid.");
+    const stopTransaction = createSequenceStopTransaction(tx);
+    try {
+      const enrollment = await stopTransaction.lockEnrollment(
+        input.sequenceEnrollmentId,
+        binding,
+        input.gmailThreadId,
+        "bound",
+        observation,
+      );
+      if (!enrollment)
+        return { alreadyRecorded: false, attributionUnknown: true };
+    } catch (error) {
+      if (!(error instanceof GmailThreadAttributionChangedError)) throw error;
+      return {
+        alreadyRecorded: false,
+        attributionUnknown: true,
+        attributionAmbiguous: error.classification === "ambiguous",
+      };
+    }
+    const routing = await classifyGmailRoutingInTransaction(tx, {
+      ...observation,
+      binding,
+    });
+    if (
+      routing.kind !== "unique" ||
+      routing.enrollment.id !== input.sequenceEnrollmentId ||
+      routing.enrollment.prospectId !== input.prospectId ||
+      routing.enrollment.contactId !== input.contactId
+    )
+      return {
+        alreadyRecorded: false,
+        attributionUnknown: true,
+        attributionAmbiguous: routing.kind === "ambiguous",
+      };
+    const attribution = routing.attribution ?? null;
+    if (input.eventType !== "auto_response") {
+      await stopSequenceInTransaction(stopTransaction, {
+        sequenceId: input.sequenceEnrollmentId,
+        reason: input.eventType,
+        actor: {
+          type: "gmail_sync",
+          id: "gmail-sync",
+          binding,
+          observation,
+        },
+        correlationId: input.correlationId,
+      });
+    }
     const messageRows = await tx<Array<{ id: string }>>`
       insert into growth.email_messages (
         sequence_enrollment_id, prospect_id, contact_id,
@@ -136,18 +216,44 @@ async function recordInboundEvent(
     `;
     const insertedMessageId = messageRows[0]?.id;
     if (!insertedMessageId) {
+      const [existing] = await tx<
+        Array<{
+          sequenceEnrollmentId: string;
+          gmailThreadId: string;
+          eventType: string;
+          attributionMatches: boolean;
+        }>
+      >`
+        select em.sequence_enrollment_id as "sequenceEnrollmentId", em.provider_thread_id as "gmailThreadId", e.event_type as "eventType",
+          e.outreach_reply_attribution is not distinct from ${attribution ? tx.json(attribution) : null} as "attributionMatches"
+        from growth.email_messages em
+        join growth.email_events e on e.email_message_id = em.id and e.provider = 'gmail' and e.provider_event_id = ${input.gmailMessageId}
+        where em.channel = 'gmail' and em.provider_message_id = ${input.gmailMessageId} and em.direction = 'inbound'
+      `;
+      if (
+        !existing ||
+        existing.sequenceEnrollmentId !== input.sequenceEnrollmentId ||
+        existing.gmailThreadId !== input.gmailThreadId ||
+        existing.eventType !== input.eventType ||
+        !existing.attributionMatches
+      ) {
+        throw new Error("Gmail inbound event attribution conflict.");
+      }
       return { alreadyRecorded: true };
     }
 
-    await tx`
+    const eventRows = await tx<Array<{ id: string }>>`
       insert into growth.email_events (
-        email_message_id, provider, provider_event_id, event_type, occurred_at, sanitised_payload
+        email_message_id, provider, provider_event_id, event_type, occurred_at, sanitised_payload, outreach_reply_reservation_id, outreach_reply_attribution
       ) values (
         ${insertedMessageId}, 'gmail', ${input.gmailMessageId}, ${input.eventType}, ${input.receivedAt},
-        ${tx.json({ from: input.from, subject: input.subject })}
+        ${tx.json({ from: input.from, subject: input.subject })}, ${attribution?.reservationId ?? null}, ${attribution ? tx.json(attribution) : null}
       )
       on conflict (provider, provider_event_id) do nothing
+      returning id
     `;
+    if (!eventRows[0])
+      throw new Error("Gmail inbound event attribution conflict.");
 
     return { alreadyRecorded: false };
   });
@@ -165,8 +271,11 @@ async function activatePendingApproval(
 }
 
 export const postgresGmailSyncRepository: GmailSyncRepository = {
+  classifyGmailRouting,
   getCursor,
   setCursor,
+  loadReplySyncState,
+  commitReplyCoverage,
   findPendingDraftByRfcMessageId,
   findEnrollmentByThread,
   recordInboundEvent,
