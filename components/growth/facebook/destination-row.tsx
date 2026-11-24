@@ -124,6 +124,14 @@ export function DestinationRow({
       </p>
       <dl className={styles.facts}>
         <div>
+          <dt>Public observation</dt>
+          <dd>
+            {item.latestObservation
+              ? `${item.latestObservation.summary} · ${date(item.latestObservation.observedAt)}`
+              : "None recorded"}
+          </dd>
+        </div>
+        <div>
           <dt>Posting guidance</dt>
           <dd>
             {expiryPending
@@ -141,14 +149,15 @@ export function DestinationRow({
         <div>
           <dt>Next action</dt>
           <dd>
-            {expiryPending || item.nextManualAction === "review_rules"
-              ? "Review rules"
-              : item.nextManualAction === "post"
-                ? "Post only after reviewing rules"
-                : item.nextManualAction === "follow"
-                  ? "Follow, then record"
-                  : "Join, then record"}
-            <br />
+            {!expiryPending && item.nextManualAction !== "review_rules" && (
+              <p className={styles.actionHint}>
+                {item.nextManualAction === "post"
+                  ? "Post only after reviewing rules"
+                  : item.nextManualAction === "follow"
+                    ? "Follow, then record"
+                    : "Join, then record"}
+              </p>
+            )}
             <button
               type="button"
               className={styles.secondary}
@@ -162,14 +171,6 @@ export function DestinationRow({
                     ? "Record completed join"
                     : "Record completed activity"}
             </button>
-          </dd>
-        </div>
-        <div>
-          <dt>Public observation</dt>
-          <dd>
-            {item.latestObservation
-              ? `${item.latestObservation.summary} · ${date(item.latestObservation.observedAt)}`
-              : "None recorded"}
           </dd>
         </div>
         <div>

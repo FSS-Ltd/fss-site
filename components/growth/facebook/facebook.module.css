@@ -33,9 +33,12 @@
 }
 .facts {
   display: grid;
-  grid-template-columns: 1fr 1fr 1.2fr 1fr;
+  grid-template-columns: 1.2fr 1fr 1fr 1fr;
   gap: 1rem;
   margin: 1rem 0;
+  padding: 0.9rem 1rem;
+  border-left: 3px solid #087f88;
+  background: #f3f8f8;
 }
 .facts dt {
   font-weight: 700;
@@ -44,6 +47,9 @@
 }
 .facts dd {
   margin: 0.3rem 0 0;
+}
+.actionHint {
+  margin: 0 0 0.5rem;
 }
 .form {
   display: grid;
@@ -105,7 +111,8 @@
     display: block;
   }
   .facts {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
   }
 }
 .primary {

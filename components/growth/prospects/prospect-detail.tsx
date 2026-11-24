@@ -68,7 +68,9 @@ export function ProspectDetailView({
                 {formatGrowthStatusLabel(prospect.status)}
               </span>
             </div>
-            <p className={styles.detailScore}>Fit score: {prospect.fitScore}</p>
+            <p className={styles.detailScore}>
+              Recorded fit score: {prospect.fitScore}/100
+            </p>
           </div>
         </div>
       </div>

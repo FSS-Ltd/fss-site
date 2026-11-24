@@ -122,7 +122,7 @@ test("retains multiple edited rows through paging and committed refresh; rebases
     assert.ok(destination);
     assert.match(
       destination.textContent ?? "",
-      /Posting guidance unknown; review rules before posting/,
+      /Public observation[\s\S]*Posting guidance[\s\S]*Posting guidance unknown; review rules before posting[\s\S]*Next action/,
     );
     assert.equal(
       destination
