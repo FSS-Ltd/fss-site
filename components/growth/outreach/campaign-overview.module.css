@@ -481,3 +481,75 @@
     grid-column: 1 / -1;
   }
 }
+
+/* Decision queue */
+.list {
+  gap: 0;
+  border-bottom: 1px solid #dce3e8;
+}
+.list > .campaign {
+  padding: 16px 0;
+}
+.title {
+  align-items: center;
+}
+.identity {
+  align-items: center;
+}
+.title h3 {
+  font-size: 1rem;
+}
+.campaignControls {
+  margin-top: 4px;
+}
+.campaignControls .editor > summary {
+  padding-left: 0;
+}
+.activity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 20px;
+}
+.activity .inactive {
+  margin: 0;
+}
+.activity .reportDate {
+  padding: 8px 0;
+}
+.activity .stages {
+  flex-basis: 100%;
+}
+.operatorControls .editor form {
+  max-width: none;
+}
+@media (min-width: 900px) {
+  .operatorControls .policyFields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+  .operatorControls .policyFields > .checkbox {
+    grid-column: 1 / -1;
+  }
+  .operatorControls .fieldGroup {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .operatorControls .fieldGroup p,
+  .operatorControls .fieldGroup label:has(textarea) {
+    grid-column: auto;
+  }
+}
+@media (max-width: 480px) {
+  .title {
+    gap: 8px;
+  }
+  .identity {
+    gap: 6px 10px;
+  }
+  .activity {
+    gap: 0 12px;
+  }
+  .activity .reportDate {
+    padding: 0 0 8px;
+  }
+}

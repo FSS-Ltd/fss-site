@@ -172,7 +172,10 @@ test("keeps inactive counts available without a zero-count grid", () => {
       />
     </AppRouterContext.Provider>,
   );
-  assert.match(html, /<summary>No activity recorded today<\/summary>/);
+  assert.match(
+    html,
+    /<summary>No activity recorded today · No held jobs<\/summary>/,
+  );
   assert.match(
     html,
     /Prepared today: 0 · Held jobs: 0 · Issued attempts today: 0 · Accepted today: 0 · Confirmed today: 0/,
