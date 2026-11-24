@@ -124,14 +124,6 @@ export function DestinationRow({
       </p>
       <dl className={styles.facts}>
         <div>
-          <dt>Public observation</dt>
-          <dd>
-            {item.latestObservation
-              ? `${item.latestObservation.summary} · ${date(item.latestObservation.observedAt)}`
-              : "None recorded"}
-          </dd>
-        </div>
-        <div>
           <dt>Posting guidance</dt>
           <dd>
             {expiryPending
@@ -171,6 +163,14 @@ export function DestinationRow({
                     ? "Record completed join"
                     : "Record completed activity"}
             </button>
+          </dd>
+        </div>
+        <div>
+          <dt>Public observation</dt>
+          <dd>
+            {item.latestObservation
+              ? `${item.latestObservation.summary} · ${date(item.latestObservation.observedAt)}`
+              : "None recorded"}
           </dd>
         </div>
         <div>
