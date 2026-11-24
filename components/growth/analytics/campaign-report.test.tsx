@@ -192,3 +192,75 @@ test("shows a V2 winner only when supplied by the validated snapshot reader", ()
     /Historical source availability at cutoff and outcome source coverage are unknown/,
   );
 });
+
+test("puts outcomes before methodology and distinguishes unknown from zero rates", () => {
+  const anchor = new Date("2026-03-27T12:00:00Z");
+  const cutoff = new Date("2026-04-27T11:00:00Z");
+  const member = (id: string, replyCoverage: "complete" | "unknown") => ({
+    membershipId: id,
+    businessId: id,
+    market: "GB",
+    offer: "review",
+    policyVersion: 1,
+    variantId: id,
+    variantVersion: 1,
+    cta: id,
+    comparisonFingerprint: "same",
+    commercialTermsFingerprint: "terms",
+    confirmation: {
+      basis: "gmail_fss_sent_observed" as const,
+      observedAt: anchor,
+      possibleInvocationFrom: anchor,
+    },
+    replyCoverage,
+    meetingObservation: "unknown" as const,
+    paymentObservation: "unknown" as const,
+    replies: [],
+    outcomes: [],
+  });
+  const report = buildCampaignReport({
+    anchor: { basis: "gmail_fss_sent_observed", observedAt: anchor },
+    cutoff,
+    members: [member("a", "complete"), member("b", "unknown")],
+  });
+  const html = renderToStaticMarkup(
+    <CampaignReports
+      result={{
+        status: "ready",
+        truncated: false,
+        campaigns: [
+          {
+            id: "c",
+            name: "Campaign",
+            job: {
+              status: "completed",
+              dueAt: cutoff.toISOString(),
+              reason: null,
+            },
+            truncated: false,
+            snapshots: [
+              {
+                status: "available",
+                revision: 1,
+                current: true,
+                generatedAt: cutoff.toISOString(),
+                report,
+                observedCoverage: 1,
+                version: 1,
+                readAt: null,
+              },
+            ],
+          },
+        ],
+      }}
+    />,
+  );
+  assert.ok(
+    html.indexOf("Mature sample") <
+      html.indexOf("Snapshot provenance and methodology"),
+  );
+  assert.match(html, /0\.0%/);
+  assert.match(html, /Unknown/);
+  assert.equal((html.match(/class="rateTrack"/g) ?? []).length, 1);
+  assert.match(html, /Variant evidence and coverage/);
+});

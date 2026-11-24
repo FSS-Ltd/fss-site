@@ -30,43 +30,17 @@ function Snapshot({ item }: { item: ReportSnapshot }) {
         {item.revision}
       </summary>
       <div className={styles.snapshotBody}>
-        <p>
-          Generated {formatGrowthDateTime(item.generatedAt)} · cutoff{" "}
-          {formatGrowthDateTime(report.cutoff.toISOString())}
-        </p>
-        <p>
-          Anchor: {basis(report.anchor.basis)} ·{" "}
-          {formatGrowthDateTime(report.anchor.observedAt.toISOString())}
-        </p>
-        <p>
-          {verdict(report.winnerReason)}{" "}
-          {report.winner && `Recorded leading variant: ${report.winner}.`}
-        </p>
-        {item.version === 1 ? (
+        <div className={styles.verdict}>
+          <span>Comparison result</span>
           <p>
-            Evidence available at cutoff: unknown. Complete reply coverage
-            observed at report read: {item.observedCoverage}. Outcome source
-            coverage and comparable copy identity: unknown. Ambiguous evidence:{" "}
-            {report.ambiguousEvidence}.
+            {verdict(report.winnerReason)}{" "}
+            {report.winner && `Recorded leading variant: ${report.winner}.`}
           </p>
-        ) : (
-          <p>
-            PostgreSQL statement snapshot read{" "}
-            {item.readAt
-              ? formatGrowthDateTime(item.readAt)
-              : "at an unknown time"}
-            . Reply events are limited to the cutoff; classifications and
-            coverage reflect what was visible at that read. Historical source
-            availability at cutoff and outcome source coverage are unknown.
-            Complete reply coverage observed at read: {item.observedCoverage}.
-            Copy identity is compared only where frozen evidence exists.
-            Ambiguous evidence: {report.ambiguousEvidence}.
-          </p>
-        )}
-        <p>
-          The cohort spans 14 London calendar dates; each recipient needs a
-          14-day observation period. Offer terms are unavailable in this
-          snapshot.
+        </div>
+        <p className={styles.coverage}>
+          Complete reply coverage observed at read: {item.observedCoverage} ·
+          Ambiguous evidence: {report.ambiguousEvidence}. Outcome source
+          coverage is unknown.
         </p>
         {report.groups.length === 0 ? (
           <p>No eligible comparison groups recorded.</p>
@@ -80,10 +54,6 @@ function Snapshot({ item }: { item: ReportSnapshot }) {
                   {group.variantId} · version {group.variantVersion}
                 </h4>
                 <p className={styles.cta}>{group.cta}</p>
-                <p>
-                  {group.market} · {group.offer.replaceAll("_", " ")} · policy{" "}
-                  {group.policyVersion} · {basis(group.basis)}
-                </p>
                 <dl className={styles.numbers}>
                   <div>
                     <dt>Mature sample</dt>
@@ -92,10 +62,6 @@ function Snapshot({ item }: { item: ReportSnapshot }) {
                   <div>
                     <dt>Positive replies (mature)</dt>
                     <dd>{group.positiveReplies}</dd>
-                  </div>
-                  <div>
-                    <dt>Known positive replies</dt>
-                    <dd>{group.knownPositiveReplies}</dd>
                   </div>
                   <div>
                     <dt>Reply rate</dt>
@@ -113,38 +79,101 @@ function Snapshot({ item }: { item: ReportSnapshot }) {
                         : `${(group.interval[0] * 100).toFixed(1)}–${(group.interval[1] * 100).toFixed(1)}%`}
                     </dd>
                   </div>
-                  <div>
-                    <dt>Censored</dt>
-                    <dd>{group.censored}</dd>
-                  </div>
-                  <div>
-                    <dt>Later</dt>
-                    <dd>{group.later}</dd>
-                  </div>
-                  <div>
-                    <dt>Missing replies</dt>
-                    <dd>{group.missingReplies}</dd>
-                  </div>
-                  <div>
-                    <dt>Observed reviewed meetings</dt>
-                    <dd>{group.qualifiedMeetings}</dd>
-                  </div>
-                  <div>
-                    <dt>Observed reviewed payments</dt>
-                    <dd>{group.paidConversions}</dd>
-                  </div>
                 </dl>
-                <p>
-                  Meeting coverage: {group.meetingMature} complete,{" "}
-                  {group.meetingUnknown} unknown, {group.meetingCensored}{" "}
-                  censored. Payment coverage: {group.paymentMature} complete,{" "}
-                  {group.paymentUnknown} unknown, {group.paymentCensored}{" "}
-                  censored.
-                </p>
+                {group.positiveReplyRate !== null && (
+                  <div aria-hidden="true">
+                    <div className={styles.rateTrack}>
+                      <span
+                        style={{ width: `${group.positiveReplyRate * 100}%` }}
+                      />
+                    </div>
+                    <div className={styles.scale}>
+                      <span>0%</span>
+                      <span>100%</span>
+                    </div>
+                  </div>
+                )}
+                <details className={styles.evidence}>
+                  <summary>Variant evidence and coverage</summary>
+                  <p>
+                    {group.market} · {group.offer.replaceAll("_", " ")} · policy{" "}
+                    {group.policyVersion} · {basis(group.basis)}
+                  </p>
+                  <dl className={styles.numbers}>
+                    <div>
+                      <dt>Known positive replies</dt>
+                      <dd>{group.knownPositiveReplies}</dd>
+                    </div>
+                    <div>
+                      <dt>Censored</dt>
+                      <dd>{group.censored}</dd>
+                    </div>
+                    <div>
+                      <dt>Later</dt>
+                      <dd>{group.later}</dd>
+                    </div>
+                    <div>
+                      <dt>Missing replies</dt>
+                      <dd>{group.missingReplies}</dd>
+                    </div>
+                    <div>
+                      <dt>Observed reviewed meetings</dt>
+                      <dd>{group.qualifiedMeetings}</dd>
+                    </div>
+                    <div>
+                      <dt>Observed reviewed payments</dt>
+                      <dd>{group.paidConversions}</dd>
+                    </div>
+                  </dl>
+                  <p>
+                    Meeting coverage: {group.meetingMature} complete,{" "}
+                    {group.meetingUnknown} unknown, {group.meetingCensored}{" "}
+                    censored. Payment coverage: {group.paymentMature} complete,{" "}
+                    {group.paymentUnknown} unknown, {group.paymentCensored}{" "}
+                    censored.
+                  </p>
+                </details>
               </li>
             ))}
           </ul>
         )}
+        <details className={styles.methodology}>
+          <summary>Snapshot provenance and methodology</summary>
+          <p>
+            Generated {formatGrowthDateTime(item.generatedAt)} · cutoff{" "}
+            {formatGrowthDateTime(report.cutoff.toISOString())}
+          </p>
+          <p>
+            Anchor: {basis(report.anchor.basis)} ·{" "}
+            {formatGrowthDateTime(report.anchor.observedAt.toISOString())}
+          </p>
+          {item.version === 1 ? (
+            <p>
+              Evidence available at cutoff: unknown. Complete reply coverage
+              observed at report read: {item.observedCoverage}. Outcome source
+              coverage and comparable copy identity: unknown. Ambiguous
+              evidence: {report.ambiguousEvidence}.
+            </p>
+          ) : (
+            <p>
+              PostgreSQL statement snapshot read{" "}
+              {item.readAt
+                ? formatGrowthDateTime(item.readAt)
+                : "at an unknown time"}
+              . Reply events are limited to the cutoff; classifications and
+              coverage reflect what was visible at that read. Historical source
+              availability at cutoff and outcome source coverage are unknown.
+              Complete reply coverage observed at read: {item.observedCoverage}.
+              Copy identity is compared only where frozen evidence exists.
+              Ambiguous evidence: {report.ambiguousEvidence}.
+            </p>
+          )}
+          <p>
+            The cohort spans 14 London calendar dates; each recipient needs a
+            14-day observation period. Offer terms are unavailable in this
+            snapshot.
+          </p>
+        </details>
       </div>
     </details>
   );
