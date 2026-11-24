@@ -133,13 +133,18 @@ test("keeps the bundled code-mode host available while disabling restricted tool
         "browser_use_full_cdp_access",
         "view_image",
         "image_generation",
+        "skill_search",
         "skill_mcp_dependency_install",
         "workspace_dependencies",
         "in_app_browser",
       ])
         assert.ok(disabled.includes(feature), feature);
-      assert.ok(args.includes("skip_host_skill_discovery"));
-      assert.ok(args.includes("suppress_unstable_features_warning=true"));
+      assert.ok(args.includes("skills.include_instructions=false"));
+      assert.equal(args.includes("skip_host_skill_discovery"), false);
+      assert.equal(
+        args.includes("suppress_unstable_features_warning=true"),
+        false,
+      );
       assert.ok(args.includes("--ignore-user-config"));
       assert.ok(args.includes("--ephemeral"));
       assert.equal(args[args.indexOf("--sandbox") + 1], "read-only");

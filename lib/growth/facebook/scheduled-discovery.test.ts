@@ -286,6 +286,7 @@ test("runs bounded child research with a private output schema and cleans up", (
           "computer_use",
           "browser_use",
           "view_image",
+          "skill_search",
         ]) {
           assert.ok(
             args.some(
@@ -294,13 +295,7 @@ test("runs bounded child research with a private output schema and cleans up", (
             ),
           );
         }
-        assert.ok(
-          args.some(
-            (value, index) =>
-              value === "--enable" &&
-              args[index + 1] === "skip_host_skill_discovery",
-          ),
-        );
+        assert.ok(args.includes("skills.include_instructions=false"));
         assert.equal(args.includes("--ignore-rules"), false);
         assert.ok(args.includes("--ignore-user-config"));
         assert.ok(args.includes("--search"));
