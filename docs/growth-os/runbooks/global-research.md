@@ -78,14 +78,17 @@ explicit `no_results` outcome. A failed search is not submitted. This requires
 contract. Reports contain counts and failure categories only.
 
 The restricted child has a disposable working directory and receives no signing
-secret. Its bounded private `codex exec --json` stream must show at least one
+secret. Use the official Codex 0.163.0 distribution with its bundled code-mode
+host. The configured models use that host to reach native search. The child
+disables shell, browser, apps, plugins, and skill instructions and uses the
+read-only sandbox. Its bounded private `codex exec --json` stream must show at least one
 completed native web-search **search** action and a successful terminal turn;
 opening or finding text on a page alone does not count. Missing, malformed,
 failed, oversized, or forbidden-tool event streams fail before signing, even
 when the model claims there were no results. Raw event streams, queries and
-child output are not logged. This check does not establish that the current
-model or CLI configuration actually exposes native search; verify availability
-separately before enabling the scheduled runner. The event shape follows the
+child output are not logged. Harmless authenticated public-source probes passed
+for both configured models. Recheck the installed helper and live tool evidence
+in the scheduler's environment before enabling the runner. The event shape follows the
 [pinned Codex 0.163.0 execution contract](https://github.com/openai/codex/blob/rust-v0.163.0/codex-rs/exec/src/exec_events.rs)
 and its [search completion test](https://github.com/openai/codex/blob/rust-v0.163.0/codex-rs/exec/tests/event_processor_with_json_output.rs).
 

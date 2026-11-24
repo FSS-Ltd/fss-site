@@ -16,7 +16,7 @@ The 08:30 and 17:30 Vercel entries accept the five-minute London window. A prepa
 
 ## Research and approval
 
-Use the release-pinned local runner and the private state location described in [Global research](global-research.md). The business and Facebook runners keep separate signed run identities. A valid empty search records zero results. A failed search stays failed. The installed CLI trials returned zero completed native searches, including the explicit live setting. Treat live search capability as unverified until a harmless authenticated run returns real tool evidence.
+Use the release-pinned local runner and the private state location described in [Global research](global-research.md). The business and Facebook runners keep separate signed run identities. A valid empty search records zero results. A failed search stays failed. Both configured models passed harmless authenticated native-search probes. Repeat this check in the scheduler's environment before activation.
 
 In Growth, qualify the business and confirm the current contact and source observation. Record the permission scope under the selected versioned campaign. Resend requires explicit campaign-purpose opt-in. Gmail campaign delivery requires the approved consent or specifically requested service path. A public Facebook page or published mailbox establishes a source, and its outreach permission requires separate evidence. Keep Facebook posting manual and review current destination rules in the separate workspace. [Resend acceptable use](https://resend.com/legal/acceptable-use), [Gmail program policies](https://support.google.com/mail/answer/16734397)
 

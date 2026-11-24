@@ -11548,7 +11548,7 @@
       "label": "exerciseActualCronDispatch()",
       "file_type": "code",
       "source_file": "tests/integration/growth/actual-cron-dispatch.ts",
-      "source_location": "L11"
+      "source_location": "L12"
     },
     {
       "id": "tests_integration_growth_authority_gate_test_ts",
@@ -11698,6 +11698,27 @@
       "source_location": "L7"
     },
     {
+      "id": "tests_integration_growth_disposable_database_ts",
+      "label": "disposable-database.ts",
+      "file_type": "code",
+      "source_file": "tests/integration/growth/disposable-database.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "disposable_database_assertdisposablegrowthdatabase",
+      "label": "assertDisposableGrowthDatabase()",
+      "file_type": "code",
+      "source_file": "tests/integration/growth/disposable-database.ts",
+      "source_location": "L4"
+    },
+    {
+      "id": "disposable_database_withgrowthlogin",
+      "label": "withGrowthLogin()",
+      "file_type": "code",
+      "source_file": "tests/integration/growth/disposable-database.ts",
+      "source_location": "L21"
+    },
+    {
       "id": "tests_integration_growth_exact_resend_reply_assertions_ts",
       "label": "exact-resend-reply-assertions.ts",
       "file_type": "code",
@@ -11723,7 +11744,14 @@
       "label": "source()",
       "file_type": "code",
       "source_file": "tests/integration/growth/facebook-workspace.test.ts",
-      "source_location": "L565"
+      "source_location": "L564"
+    },
+    {
+      "id": "facebook_workspace_test_readrole",
+      "label": "readRole()",
+      "file_type": "code",
+      "source_file": "tests/integration/growth/facebook-workspace.test.ts",
+      "source_location": "L661"
     },
     {
       "id": "tests_integration_growth_first_email_approval_test_ts",
@@ -12017,7 +12045,7 @@
       "label": "exerciseOutreachPrepareRoute()",
       "file_type": "code",
       "source_file": "tests/integration/growth/outreach-prepare-route-assertions.ts",
-      "source_location": "L8"
+      "source_location": "L9"
     },
     {
       "id": "tests_integration_growth_outreach_prepare_route_child_ts",
@@ -12031,7 +12059,7 @@
       "label": "main()",
       "file_type": "code",
       "source_file": "tests/integration/growth/outreach-prepare-route-child.ts",
-      "source_location": "L3"
+      "source_location": "L4"
     },
     {
       "id": "tests_integration_growth_outreach_terminal_fence_test_ts",
@@ -53753,7 +53781,7 @@
     },
     {
       "source": "tests_integration_growth_actual_cron_dispatch_ts",
-      "target": "strict",
+      "target": "tests_integration_growth_disposable_database",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/actual-cron-dispatch.ts",
@@ -53762,7 +53790,7 @@
     },
     {
       "source": "tests_integration_growth_actual_cron_dispatch_ts",
-      "target": "node_crypto",
+      "target": "strict",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/actual-cron-dispatch.ts",
@@ -53771,7 +53799,7 @@
     },
     {
       "source": "tests_integration_growth_actual_cron_dispatch_ts",
-      "target": "lib_growth_db_types",
+      "target": "node_crypto",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/actual-cron-dispatch.ts",
@@ -53780,7 +53808,7 @@
     },
     {
       "source": "tests_integration_growth_actual_cron_dispatch_ts",
-      "target": "lib_growth_integrations_token_crypto",
+      "target": "lib_growth_db_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/actual-cron-dispatch.ts",
@@ -53789,7 +53817,7 @@
     },
     {
       "source": "tests_integration_growth_actual_cron_dispatch_ts",
-      "target": "lib_growth_research_global_test_fixture",
+      "target": "lib_growth_integrations_token_crypto",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/actual-cron-dispatch.ts",
@@ -53798,7 +53826,7 @@
     },
     {
       "source": "tests_integration_growth_actual_cron_dispatch_ts",
-      "target": "lib_growth_research_global_schema",
+      "target": "lib_growth_research_global_test_fixture",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/actual-cron-dispatch.ts",
@@ -53807,7 +53835,7 @@
     },
     {
       "source": "tests_integration_growth_actual_cron_dispatch_ts",
-      "target": "lib_growth_research_ingest",
+      "target": "lib_growth_research_global_schema",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/actual-cron-dispatch.ts",
@@ -53816,7 +53844,7 @@
     },
     {
       "source": "tests_integration_growth_actual_cron_dispatch_ts",
-      "target": "lib_growth_dashboard_message_review",
+      "target": "lib_growth_research_ingest",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/actual-cron-dispatch.ts",
@@ -53825,11 +53853,20 @@
     },
     {
       "source": "tests_integration_growth_actual_cron_dispatch_ts",
+      "target": "lib_growth_dashboard_message_review",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/actual-cron-dispatch.ts",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_actual_cron_dispatch_ts",
       "target": "actual_cron_dispatch_exerciseactualcrondispatch",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/actual-cron-dispatch.ts",
-      "source_location": "L11",
+      "source_location": "L12",
       "weight": 1.0
     },
     {
@@ -54199,6 +54236,15 @@
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/campaign-schema.test.ts",
       "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_campaign_schema_test_ts",
+      "target": "tests_integration_growth_disposable_database",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/campaign-schema.test.ts",
+      "source_location": "L4",
       "weight": 1.0
     },
     {
@@ -54598,6 +54644,51 @@
       "weight": 1.0
     },
     {
+      "source": "tests_integration_growth_disposable_database_ts",
+      "target": "postgres",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/disposable-database.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_disposable_database_ts",
+      "target": "node_crypto",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/disposable-database.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_disposable_database_ts",
+      "target": "disposable_database_assertdisposablegrowthdatabase",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/disposable-database.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_disposable_database_ts",
+      "target": "disposable_database_withgrowthlogin",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/disposable-database.ts",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "disposable_database_withgrowthlogin",
+      "target": "disposable_database_assertdisposablegrowthdatabase",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/disposable-database.ts",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
       "source": "tests_integration_growth_exact_resend_reply_assertions_ts",
       "target": "strict",
       "relation": "imports_from",
@@ -54671,7 +54762,7 @@
     },
     {
       "source": "tests_integration_growth_facebook_workspace_test_ts",
-      "target": "strict",
+      "target": "tests_integration_growth_disposable_database",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/facebook-workspace.test.ts",
@@ -54680,7 +54771,7 @@
     },
     {
       "source": "tests_integration_growth_facebook_workspace_test_ts",
-      "target": "node_crypto",
+      "target": "strict",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/facebook-workspace.test.ts",
@@ -54689,7 +54780,7 @@
     },
     {
       "source": "tests_integration_growth_facebook_workspace_test_ts",
-      "target": "node_test",
+      "target": "node_crypto",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/facebook-workspace.test.ts",
@@ -54698,7 +54789,7 @@
     },
     {
       "source": "tests_integration_growth_facebook_workspace_test_ts",
-      "target": "postgres",
+      "target": "node_test",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/facebook-workspace.test.ts",
@@ -54707,7 +54798,7 @@
     },
     {
       "source": "tests_integration_growth_facebook_workspace_test_ts",
-      "target": "lib_growth_facebook_service",
+      "target": "postgres",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/facebook-workspace.test.ts",
@@ -54716,11 +54807,29 @@
     },
     {
       "source": "tests_integration_growth_facebook_workspace_test_ts",
+      "target": "lib_growth_facebook_service",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/facebook-workspace.test.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_facebook_workspace_test_ts",
       "target": "facebook_workspace_test_source",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/facebook-workspace.test.ts",
-      "source_location": "L565",
+      "source_location": "L564",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_facebook_workspace_test_ts",
+      "target": "facebook_workspace_test_readrole",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/facebook-workspace.test.ts",
+      "source_location": "L661",
       "weight": 1.0
     },
     {
@@ -56570,7 +56679,7 @@
     },
     {
       "source": "tests_integration_growth_outreach_prepare_route_assertions_ts",
-      "target": "strict",
+      "target": "tests_integration_growth_disposable_database",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/outreach-prepare-route-assertions.ts",
@@ -56579,7 +56688,7 @@
     },
     {
       "source": "tests_integration_growth_outreach_prepare_route_assertions_ts",
-      "target": "node_child_process",
+      "target": "strict",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/outreach-prepare-route-assertions.ts",
@@ -56588,7 +56697,7 @@
     },
     {
       "source": "tests_integration_growth_outreach_prepare_route_assertions_ts",
-      "target": "node_util",
+      "target": "node_child_process",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/outreach-prepare-route-assertions.ts",
@@ -56597,7 +56706,7 @@
     },
     {
       "source": "tests_integration_growth_outreach_prepare_route_assertions_ts",
-      "target": "lib_growth_db_types",
+      "target": "node_util",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/outreach-prepare-route-assertions.ts",
@@ -56606,7 +56715,7 @@
     },
     {
       "source": "tests_integration_growth_outreach_prepare_route_assertions_ts",
-      "target": "lib_growth_integrations_token_crypto",
+      "target": "lib_growth_db_types",
       "relation": "imports_from",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/outreach-prepare-route-assertions.ts",
@@ -56615,11 +56724,20 @@
     },
     {
       "source": "tests_integration_growth_outreach_prepare_route_assertions_ts",
+      "target": "lib_growth_integrations_token_crypto",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/outreach-prepare-route-assertions.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_outreach_prepare_route_assertions_ts",
       "target": "outreach_prepare_route_assertions_exerciseoutreachprepareroute",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/outreach-prepare-route-assertions.ts",
-      "source_location": "L8",
+      "source_location": "L9",
       "weight": 1.0
     },
     {
@@ -56633,11 +56751,20 @@
     },
     {
       "source": "tests_integration_growth_outreach_prepare_route_child_ts",
+      "target": "tests_integration_growth_disposable_database",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/integration/growth/outreach-prepare-route-child.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_integration_growth_outreach_prepare_route_child_ts",
       "target": "outreach_prepare_route_child_main",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/integration/growth/outreach-prepare-route-child.ts",
-      "source_location": "L3",
+      "source_location": "L4",
       "weight": 1.0
     },
     {
@@ -58959,6 +59086,16 @@
       "weight": 1.0
     },
     {
+      "source": "actual_cron_dispatch_exerciseactualcrondispatch",
+      "target": "disposable_database_assertdisposablegrowthdatabase",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/integration/growth/actual-cron-dispatch.ts",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
       "source": "follow_up_preparation_assertions_exercisefollowuppreparation",
       "target": "outreach_due_follow_up_assertions_exerciseduefollowuplease",
       "relation": "calls",
@@ -58996,6 +59133,26 @@
       "confidence_score": 0.8,
       "source_file": "tests/integration/growth/gmail-confirmation-due.ts",
       "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "outreach_prepare_route_assertions_exerciseoutreachprepareroute",
+      "target": "disposable_database_assertdisposablegrowthdatabase",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/integration/growth/outreach-prepare-route-assertions.ts",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "outreach_prepare_route_child_main",
+      "target": "disposable_database_assertdisposablegrowthdatabase",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/integration/growth/outreach-prepare-route-child.ts",
+      "source_location": "L18",
       "weight": 1.0
     },
     {
@@ -71270,17 +71427,17 @@
     },
     {
       "source": "tests_integration_growth_actual_cron_dispatch_ts",
-      "target": "lib_growth_research_global_schema_ts",
+      "target": "tests_integration_growth_disposable_database_ts",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "tests/integration/growth/actual-cron-dispatch.ts",
-      "source_location": "L6",
+      "source_location": "L1",
       "weight": 1
     },
     {
       "source": "tests_integration_growth_actual_cron_dispatch_ts",
-      "target": "lib_growth_research_ingest_ts",
+      "target": "lib_growth_research_global_schema_ts",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1,
@@ -71290,12 +71447,22 @@
     },
     {
       "source": "tests_integration_growth_actual_cron_dispatch_ts",
-      "target": "lib_growth_dashboard_message_review_ts",
+      "target": "lib_growth_research_ingest_ts",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "tests/integration/growth/actual-cron-dispatch.ts",
       "source_location": "L8",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_actual_cron_dispatch_ts",
+      "target": "lib_growth_dashboard_message_review_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/actual-cron-dispatch.ts",
+      "source_location": "L9",
       "weight": 1
     },
     {
@@ -71446,6 +71613,16 @@
       "confidence_score": 1,
       "source_file": "tests/integration/growth/campaign-reply-review-assertions.ts",
       "source_location": "L5",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_campaign_schema_test_ts",
+      "target": "tests_integration_growth_disposable_database_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/campaign-schema.test.ts",
+      "source_location": "L4",
       "weight": 1
     },
     {
@@ -71600,12 +71777,22 @@
     },
     {
       "source": "tests_integration_growth_facebook_workspace_test_ts",
+      "target": "tests_integration_growth_disposable_database_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/facebook-workspace.test.ts",
+      "source_location": "L1",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_facebook_workspace_test_ts",
       "target": "lib_growth_facebook_service_ts",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "confidence_score": 1,
       "source_file": "tests/integration/growth/facebook-workspace.test.ts",
-      "source_location": "L5",
+      "source_location": "L6",
       "weight": 1
     },
     {
@@ -72476,6 +72663,26 @@
       "confidence_score": 1,
       "source_file": "tests/integration/growth/outreach-due-follow-up-assertions.ts",
       "source_location": "L4",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_outreach_prepare_route_assertions_ts",
+      "target": "tests_integration_growth_disposable_database_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/outreach-prepare-route-assertions.ts",
+      "source_location": "L1",
+      "weight": 1
+    },
+    {
+      "source": "tests_integration_growth_outreach_prepare_route_child_ts",
+      "target": "tests_integration_growth_disposable_database_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "tests/integration/growth/outreach-prepare-route-child.ts",
+      "source_location": "L2",
       "weight": 1
     },
     {
