@@ -1,6 +1,6 @@
 # Scoped Graph Rebuild (2026-11-24)
 
-- TARGET `58b6c9fcda67ec8d35b926a72aa56f53fbcb796f` is under-review; BASE `962c0d0e412ff0941dbe7ac55266a23b924b4ab9`. 572 selected committed TypeScript files, AST batches of at most 160.
+- TARGET `5fcd4e8e048a96422030d5d5d7ee3118e72cc5b0` is under-review; BASE `58b6c9fcda67ec8d35b926a72aa56f53fbcb796f`. 572 selected committed TypeScript files, AST batches of at most 160.
 - 5 colliding symbol IDs namespaced by source; 5 unresolved inferred edges omitted.
 - 1464 selected-to-selected static import/export declarations resolved with TypeScript; source lines are extracted facts, not semantic proof. Zero model tokens and external uploads.
 - Coverage is partial: docs, SQL, styles, dynamic imports, most routes and unselected files remain outside scope; TSX symbol extraction is limited. See source-hashes.json for exact coverage. graph.html and benchmark.json are historical, unchanged by this no-viz run.
@@ -8,7 +8,7 @@
 # Graph Report - .  (2026-11-24)
 
 ## Corpus Check
-- 572 files · ~309,372 words
+- 572 files · ~309,568 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary

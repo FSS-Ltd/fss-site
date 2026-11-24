@@ -474,7 +474,7 @@
       "label": "member()",
       "file_type": "code",
       "source_file": "components/growth/analytics/campaign-report.test.tsx",
-      "source_location": "L199"
+      "source_location": "L198"
     },
     {
       "id": "components_growth_analytics_campaign_report_tsx",
@@ -502,7 +502,7 @@
       "label": "formatGrowthDateTime()",
       "file_type": "code",
       "source_file": "components/growth/analytics/campaign-report.tsx",
-      "source_location": "L143"
+      "source_location": "L142"
     },
     {
       "id": "components_growth_crm_command_form_tsx",
@@ -14398,7 +14398,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/analytics/campaign-report.test.tsx",
-      "source_location": "L199",
+      "source_location": "L198",
       "weight": 1.0
     },
     {
@@ -14461,7 +14461,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/analytics/campaign-report.tsx",
-      "source_location": "L143",
+      "source_location": "L142",
       "weight": 1.0
     },
     {
@@ -14470,7 +14470,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/analytics/campaign-report.tsx",
-      "source_location": "L218",
+      "source_location": "L217",
       "weight": 1.0
     },
     {
@@ -15100,7 +15100,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/facebook/destination-row.tsx",
-      "source_location": "L190",
+      "source_location": "L191",
       "weight": 1.0
     },
     {
@@ -15109,7 +15109,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/facebook/destination-row.tsx",
-      "source_location": "L252",
+      "source_location": "L253",
       "weight": 1.0
     },
     {
@@ -15118,7 +15118,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/facebook/destination-row.tsx",
-      "source_location": "L270",
+      "source_location": "L271",
       "weight": 1.0
     },
     {
