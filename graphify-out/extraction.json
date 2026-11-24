@@ -502,7 +502,7 @@
       "label": "formatGrowthDateTime()",
       "file_type": "code",
       "source_file": "components/growth/analytics/campaign-report.tsx",
-      "source_location": "L142"
+      "source_location": "L141"
     },
     {
       "id": "components_growth_crm_command_form_tsx",
@@ -1406,6 +1406,20 @@
       "file_type": "code",
       "source_file": "components/growth/shell/navigation-icon.tsx",
       "source_location": "L1"
+    },
+    {
+      "id": "components_growth_shell_side_navigation_tsx",
+      "label": "side-navigation.tsx",
+      "file_type": "code",
+      "source_file": "components/growth/shell/side-navigation.tsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "side_navigation_sidenavigation",
+      "label": "SideNavigation()",
+      "file_type": "code",
+      "source_file": "components/growth/shell/side-navigation.tsx",
+      "source_location": "L10"
     },
     {
       "id": "components_portal_agreements_agreement_builder_currency_test_tsx",
@@ -14461,7 +14475,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/analytics/campaign-report.tsx",
-      "source_location": "L142",
+      "source_location": "L141",
       "weight": 1.0
     },
     {
@@ -14470,7 +14484,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/growth/analytics/campaign-report.tsx",
-      "source_location": "L217",
+      "source_location": "L216",
       "weight": 1.0
     },
     {
@@ -17693,6 +17707,51 @@
       "confidence": "EXTRACTED",
       "source_file": "components/growth/shell/navigation-icon.tsx",
       "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_shell_side_navigation_tsx",
+      "target": "navigation",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/shell/side-navigation.tsx",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_shell_side_navigation_tsx",
+      "target": "components_growth_shell_navigation_icon",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/shell/side-navigation.tsx",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_shell_side_navigation_tsx",
+      "target": "components_growth_shell_navigation_link",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/shell/side-navigation.tsx",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_shell_side_navigation_tsx",
+      "target": "components_growth_shell_shell_module_css",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/shell/side-navigation.tsx",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "components_growth_shell_side_navigation_tsx",
+      "target": "side_navigation_sidenavigation",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "components/growth/shell/side-navigation.tsx",
+      "source_location": "L10",
       "weight": 1.0
     },
     {
@@ -22484,33 +22543,6 @@
       "weight": 1.0
     },
     {
-      "source": "lib_growth_campaigns_campaign_reply_review_test_ts",
-      "target": "strict",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/campaigns/campaign-reply-review.test.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_campaigns_campaign_reply_review_test_ts",
-      "target": "node_test",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/campaigns/campaign-reply-review.test.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_campaigns_campaign_reply_review_test_ts",
-      "target": "lib_growth_campaigns_schemas",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/campaigns/campaign-reply-review.test.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
       "source": "app_api_agent_research_runs_route_ts__route_post",
       "target": "account_command_route_handler_test_handler",
       "relation": "calls",
@@ -23168,6 +23200,33 @@
       "confidence_score": 0.8,
       "source_file": "lib/growth/campaigns/account-repository.ts",
       "source_location": "L211",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_campaign_reply_review_test_ts",
+      "target": "strict",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/campaign-reply-review.test.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_campaign_reply_review_test_ts",
+      "target": "node_test",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/campaign-reply-review.test.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_campaigns_campaign_reply_review_test_ts",
+      "target": "lib_growth_campaigns_schemas",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/campaigns/campaign-reply-review.test.ts",
+      "source_location": "L3",
       "weight": 1.0
     },
     {
@@ -35636,60 +35695,6 @@
       "weight": 1.0
     },
     {
-      "source": "lib_growth_integrations_gmail_connection_test_ts",
-      "target": "strict",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/integrations/gmail-connection.test.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_integrations_gmail_connection_test_ts",
-      "target": "node_test",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/integrations/gmail-connection.test.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_integrations_gmail_connection_test_ts",
-      "target": "lib_growth_db_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/integrations/gmail-connection.test.ts",
-      "source_location": "L4",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_integrations_gmail_connection_test_ts",
-      "target": "lib_growth_integrations_google_oauth",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/integrations/gmail-connection.test.ts",
-      "source_location": "L5",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_integrations_gmail_connection_test_ts",
-      "target": "lib_growth_integrations_gmail_connection",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/integrations/gmail-connection.test.ts",
-      "source_location": "L10",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_growth_integrations_gmail_connection_test_ts",
-      "target": "gmail_connection_test_createdependencies",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/growth/integrations/gmail-connection.test.ts",
-      "source_location": "L40",
-      "weight": 1.0
-    },
-    {
       "source": "campaign_reply_review_applyreplyreview",
       "target": "lifecycle_cancelcampaignjobs",
       "relation": "calls",
@@ -37187,6 +37192,60 @@
       "confidence_score": 0.8,
       "source_file": "lib/growth/http/founder-request.ts",
       "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_integrations_gmail_connection_test_ts",
+      "target": "strict",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/integrations/gmail-connection.test.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_integrations_gmail_connection_test_ts",
+      "target": "node_test",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/integrations/gmail-connection.test.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_integrations_gmail_connection_test_ts",
+      "target": "lib_growth_db_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/integrations/gmail-connection.test.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_integrations_gmail_connection_test_ts",
+      "target": "lib_growth_integrations_google_oauth",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/integrations/gmail-connection.test.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_integrations_gmail_connection_test_ts",
+      "target": "lib_growth_integrations_gmail_connection",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/integrations/gmail-connection.test.ts",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_growth_integrations_gmail_connection_test_ts",
+      "target": "gmail_connection_test_createdependencies",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/growth/integrations/gmail-connection.test.ts",
+      "source_location": "L40",
       "weight": 1.0
     },
     {
@@ -50222,330 +50281,6 @@
       "weight": 1.0
     },
     {
-      "source": "lib_operations_agreements_signing_service_ts",
-      "target": "node_crypto",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_service_ts",
-      "target": "zod",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_service_ts",
-      "target": "lib_operations_db_client",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_service_ts",
-      "target": "lib_operations_db_portal_client",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L4",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_service_ts",
-      "target": "lib_operations_auth_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L5",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_service_ts",
-      "target": "lib_operations_auth_staff_transaction",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L6",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_service_ts",
-      "target": "lib_operations_auth_staff_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L7",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_service_ts",
-      "target": "lib_operations_organisations_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L8",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_service_ts",
-      "target": "lib_operations_agreements_repository",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L9",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_service_ts",
-      "target": "lib_operations_agreements_service",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L14",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_service_ts",
-      "target": "lib_operations_agreements_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L15",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_service_ts",
-      "target": "lib_operations_agreements_signing_render",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L16",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_service_ts",
-      "target": "lib_operations_agreements_signing_repository",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L17",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_service_ts",
-      "target": "lib_operations_agreements_signing_types",
-      "relation": "imports_from",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L18",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_service_ts",
-      "target": "signing_service_signingoperation",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L37",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_service_ts",
-      "target": "signing_service_preparesigningintransaction",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L58",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_service_ts",
-      "target": "signing_service_prepareagreementsigning",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L96",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_service_ts",
-      "target": "signing_service_preparestaffagreementsigning",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L119",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_service_ts",
-      "target": "signing_service_approveagreementsigning",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L141",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_service_ts",
-      "target": "signing_service_approvestaffagreementsigning",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L161",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_service_ts",
-      "target": "signing_service_cancelagreementsigning",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L182",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_service_ts",
-      "target": "signing_service_cancelstaffagreementsigning",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L200",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_service_ts",
-      "target": "signing_service_retrystaffagreementsigning",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L219",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_service_ts",
-      "target": "signing_service_extendstaffagreementsigning",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L236",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_service_ts",
-      "target": "signing_service_signportalagreement",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L261",
-      "weight": 1.0
-    },
-    {
-      "source": "lib_operations_agreements_signing_service_ts",
-      "target": "signing_service_declineportalagreement",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L286",
-      "weight": 1.0
-    },
-    {
-      "source": "signing_service_prepareagreementsigning",
-      "target": "signing_service_signingoperation",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L106",
-      "weight": 1.0
-    },
-    {
-      "source": "signing_service_preparestaffagreementsigning",
-      "target": "signing_service_signingoperation",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L129",
-      "weight": 1.0
-    },
-    {
-      "source": "signing_service_approveagreementsigning",
-      "target": "signing_service_signingoperation",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L153",
-      "weight": 1.0
-    },
-    {
-      "source": "signing_service_approvestaffagreementsigning",
-      "target": "signing_service_signingoperation",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L173",
-      "weight": 1.0
-    },
-    {
-      "source": "signing_service_cancelagreementsigning",
-      "target": "signing_service_signingoperation",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L192",
-      "weight": 1.0
-    },
-    {
-      "source": "signing_service_cancelstaffagreementsigning",
-      "target": "signing_service_signingoperation",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L210",
-      "weight": 1.0
-    },
-    {
-      "source": "signing_service_retrystaffagreementsigning",
-      "target": "signing_service_signingoperation",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L229",
-      "weight": 1.0
-    },
-    {
-      "source": "signing_service_extendstaffagreementsigning",
-      "target": "signing_service_signingoperation",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L252",
-      "weight": 1.0
-    },
-    {
-      "source": "signing_service_signportalagreement",
-      "target": "signing_service_signingoperation",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L269",
-      "weight": 1.0
-    },
-    {
-      "source": "signing_service_declineportalagreement",
-      "target": "signing_service_signingoperation",
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L294",
-      "weight": 1.0
-    },
-    {
       "source": "client_googlegmailclient_fetchprovider",
       "target": "google_oauth_test_fetchimpl",
       "relation": "calls",
@@ -51646,36 +51381,6 @@
       "weight": 1.0
     },
     {
-      "source": "commercial_service_publishstaffcommercialoffer",
-      "target": "signing_service_signingoperation",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/operations/agreements/commercial-service.ts",
-      "source_location": "L56",
-      "weight": 1.0
-    },
-    {
-      "source": "commercial_service_executestaffcommercialoffercommand",
-      "target": "signing_service_signingoperation",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/operations/agreements/commercial-service.ts",
-      "source_location": "L116",
-      "weight": 1.0
-    },
-    {
-      "source": "commercial_service_executeportalcommercialoffercommand",
-      "target": "signing_service_signingoperation",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/operations/agreements/commercial-service.ts",
-      "source_location": "L184",
-      "weight": 1.0
-    },
-    {
       "source": "commercial_types_test_recurringdraft",
       "target": "fixtures_agreementdraft",
       "relation": "calls",
@@ -51756,76 +51461,6 @@
       "weight": 1.0
     },
     {
-      "source": "signing_commands_executefoundersigningcommand",
-      "target": "signing_service_prepareagreementsigning",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/operations/agreements/signing-commands.ts",
-      "source_location": "L65",
-      "weight": 1.0
-    },
-    {
-      "source": "signing_commands_executefoundersigningcommand",
-      "target": "signing_service_approveagreementsigning",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/operations/agreements/signing-commands.ts",
-      "source_location": "L73",
-      "weight": 1.0
-    },
-    {
-      "source": "signing_commands_executefoundersigningcommand",
-      "target": "signing_service_cancelagreementsigning",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/operations/agreements/signing-commands.ts",
-      "source_location": "L80",
-      "weight": 1.0
-    },
-    {
-      "source": "signing_commands_executestaffsigningcommand",
-      "target": "signing_service_preparestaffagreementsigning",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/operations/agreements/signing-commands.ts",
-      "source_location": "L97",
-      "weight": 1.0
-    },
-    {
-      "source": "signing_commands_executestaffsigningcommand",
-      "target": "signing_service_approvestaffagreementsigning",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/operations/agreements/signing-commands.ts",
-      "source_location": "L108",
-      "weight": 1.0
-    },
-    {
-      "source": "signing_commands_executestaffsigningcommand",
-      "target": "signing_service_retrystaffagreementsigning",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/operations/agreements/signing-commands.ts",
-      "source_location": "L120",
-      "weight": 1.0
-    },
-    {
-      "source": "signing_commands_executestaffsigningcommand",
-      "target": "signing_service_extendstaffagreementsigning",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/operations/agreements/signing-commands.ts",
-      "source_location": "L128",
-      "weight": 1.0
-    },
-    {
       "source": "signing_commands_executestaffsigningcommand",
       "target": "agreement_notification_service_resendstaffagreementnotification",
       "relation": "calls",
@@ -51833,36 +51468,6 @@
       "confidence_score": 0.8,
       "source_file": "lib/operations/agreements/signing-commands.ts",
       "source_location": "L136",
-      "weight": 1.0
-    },
-    {
-      "source": "signing_commands_executestaffsigningcommand",
-      "target": "signing_service_cancelstaffagreementsigning",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/operations/agreements/signing-commands.ts",
-      "source_location": "L151",
-      "weight": 1.0
-    },
-    {
-      "source": "signing_commands_executeportalsigningcommand",
-      "target": "signing_service_signportalagreement",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/operations/agreements/signing-commands.ts",
-      "source_location": "L168",
-      "weight": 1.0
-    },
-    {
-      "source": "signing_commands_executeportalsigningcommand",
-      "target": "signing_service_declineportalagreement",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/operations/agreements/signing-commands.ts",
-      "source_location": "L175",
       "weight": 1.0
     },
     {
@@ -52276,73 +51881,327 @@
       "weight": 1.0
     },
     {
-      "source": "signing_service_preparesigningintransaction",
-      "target": "change_requests_test_tx",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "node_crypto",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L65",
+      "source_location": "L1",
       "weight": 1.0
     },
     {
-      "source": "signing_service_preparesigningintransaction",
-      "target": "repository_loadagreement",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "zod",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L66",
+      "source_location": "L2",
       "weight": 1.0
     },
     {
-      "source": "signing_service_preparesigningintransaction",
-      "target": "service_asserteditable",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "lib_operations_db_client",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L68",
+      "source_location": "L3",
       "weight": 1.0
     },
     {
-      "source": "signing_service_preparesigningintransaction",
-      "target": "signing_render_renderagreementsource",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "lib_operations_db_portal_client",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L73",
+      "source_location": "L4",
       "weight": 1.0
     },
     {
-      "source": "signing_service_preparesigningintransaction",
-      "target": "signing_render_signinghash",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "lib_operations_auth_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L79",
+      "source_location": "L5",
       "weight": 1.0
     },
     {
-      "source": "signing_service_preparesigningintransaction",
-      "target": "repository_insertrevision",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "lib_operations_auth_staff_transaction",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L82",
+      "source_location": "L6",
       "weight": 1.0
     },
     {
-      "source": "signing_service_preparesigningintransaction",
-      "target": "signing_repository_loadsigningapprovals",
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "lib_operations_auth_staff_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
       "source_file": "lib/operations/agreements/signing-service.ts",
-      "source_location": "L93",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "lib_operations_organisations_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "lib_operations_agreements_repository",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "lib_operations_agreements_service",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "lib_operations_agreements_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "lib_operations_agreements_signing_render",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "lib_operations_agreements_signing_repository",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "lib_operations_agreements_signing_types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "signing_service_signingoperation",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L37",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "signing_service_preparesigningintransaction",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L58",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "signing_service_prepareagreementsigning",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L96",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "signing_service_preparestaffagreementsigning",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L119",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "signing_service_approveagreementsigning",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L141",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "signing_service_approvestaffagreementsigning",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L161",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "signing_service_cancelagreementsigning",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L182",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "signing_service_cancelstaffagreementsigning",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L200",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "signing_service_retrystaffagreementsigning",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L219",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "signing_service_extendstaffagreementsigning",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L236",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "signing_service_signportalagreement",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L261",
+      "weight": 1.0
+    },
+    {
+      "source": "lib_operations_agreements_signing_service_ts",
+      "target": "signing_service_declineportalagreement",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L286",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_service_prepareagreementsigning",
+      "target": "signing_service_signingoperation",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L106",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_service_preparestaffagreementsigning",
+      "target": "signing_service_signingoperation",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L129",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_service_approveagreementsigning",
+      "target": "signing_service_signingoperation",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L153",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_service_approvestaffagreementsigning",
+      "target": "signing_service_signingoperation",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L173",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_service_cancelagreementsigning",
+      "target": "signing_service_signingoperation",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L192",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_service_cancelstaffagreementsigning",
+      "target": "signing_service_signingoperation",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L210",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_service_retrystaffagreementsigning",
+      "target": "signing_service_signingoperation",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L229",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_service_extendstaffagreementsigning",
+      "target": "signing_service_signingoperation",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L252",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_service_signportalagreement",
+      "target": "signing_service_signingoperation",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L269",
+      "weight": 1.0
+    },
+    {
+      "source": "signing_service_declineportalagreement",
+      "target": "signing_service_signingoperation",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/operations/agreements/signing-service.ts",
+      "source_location": "L294",
       "weight": 1.0
     },
     {
@@ -61004,6 +60863,26 @@
       "confidence_score": 1,
       "source_file": "components/growth/shell/navigation-icon.tsx",
       "source_location": "L16",
+      "weight": 1
+    },
+    {
+      "source": "components_growth_shell_side_navigation_tsx",
+      "target": "lib_growth_dashboard_navigation_ts",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/growth/shell/side-navigation.tsx",
+      "source_location": "L1",
+      "weight": 1
+    },
+    {
+      "source": "components_growth_shell_side_navigation_tsx",
+      "target": "components_growth_shell_navigation_icon_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1,
+      "source_file": "components/growth/shell/side-navigation.tsx",
+      "source_location": "L6",
       "weight": 1
     },
     {
