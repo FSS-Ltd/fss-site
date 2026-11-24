@@ -185,8 +185,7 @@ test("shows a V2 winner only when supplied by the validated snapshot reader", ()
       }}
     />,
   );
-  assert.match(html, /leading variant: a/);
-  assert.match(html, /observed comparison/);
+  assert.match(html, /Leading observed variant: a/);
   assert.match(
     html,
     /Historical source availability at cutoff and outcome source coverage are unknown/,
@@ -256,11 +255,11 @@ test("puts outcomes before methodology and distinguishes unknown from zero rates
     />,
   );
   assert.ok(
-    html.indexOf("Mature sample") <
+    html.indexOf("Positive reply rate") <
       html.indexOf("Snapshot provenance and methodology"),
   );
   assert.match(html, /0\.0%/);
   assert.match(html, /Unknown/);
   assert.equal((html.match(/class="rateTrack"/g) ?? []).length, 1);
-  assert.match(html, /Variant evidence and coverage/);
+  assert.match(html, /Variant details and coverage/);
 });

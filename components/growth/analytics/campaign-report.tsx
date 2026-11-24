@@ -11,9 +11,9 @@ function basis(value: string): string {
     ? "Gmail SENT confirmation observed by FSS"
     : "Resend delivery confirmation observed by FSS";
 }
-function verdict(reason: string): string {
-  if (reason === "clear_interval")
-    return "A leading variant was recorded in this observed comparison.";
+function verdict(reason: string, winner: string | null): string {
+  if (reason === "clear_interval" && winner)
+    return `Leading observed variant: ${winner}.`;
   if (reason === "insufficient_evidence")
     return "No winner: insufficient evidence.";
   if (reason === "confounded") return "No comparison: conditions differ.";
@@ -32,10 +32,7 @@ function Snapshot({ item }: { item: ReportSnapshot }) {
       <div className={styles.snapshotBody}>
         <div className={styles.verdict}>
           <span>Comparison result</span>
-          <p>
-            {verdict(report.winnerReason)}{" "}
-            {report.winner && `Recorded leading variant: ${report.winner}.`}
-          </p>
+          <p>{verdict(report.winnerReason, report.winner)}</p>
         </div>
         <p className={styles.coverage}>
           Complete reply coverage observed at read: {item.observedCoverage} ·
@@ -45,60 +42,62 @@ function Snapshot({ item }: { item: ReportSnapshot }) {
         {report.groups.length === 0 ? (
           <p>No eligible comparison groups recorded.</p>
         ) : (
-          <ul className={styles.arms}>
-            {report.groups.map((group, index) => (
-              <li
-                key={`${group.policyVersion}:${group.variantId}:${group.variantVersion}:${index}`}
-              >
-                <h4>
-                  {group.variantId} · version {group.variantVersion}
-                </h4>
-                <p className={styles.cta}>{group.cta}</p>
-                <dl className={styles.numbers}>
-                  <div>
-                    <dt>Mature sample</dt>
-                    <dd>{group.mature}</dd>
-                  </div>
-                  <div>
-                    <dt>Positive replies (mature)</dt>
-                    <dd>{group.positiveReplies}</dd>
-                  </div>
-                  <div>
-                    <dt>Reply rate</dt>
-                    <dd>
+          <div className={styles.comparison}>
+            <div className={styles.comparisonHeading}>
+              <h4>Positive reply rate</h4>
+              <span>Positive / mature · 95% interval</span>
+            </div>
+            <p className={styles.interpretation}>
+              Mature recipients have a 14-day observation period. Bars use a
+              0–100% scale.
+            </p>
+            <ul className={styles.arms}>
+              {report.groups.map((group, index) => (
+                <li
+                  key={`${group.policyVersion}:${group.variantId}:${group.variantVersion}:${index}`}
+                >
+                  <div className={styles.armTop}>
+                    <h5>
+                      {group.variantId} · v{group.variantVersion}
+                    </h5>
+                    <strong>
                       {group.positiveReplyRate === null
                         ? "Unknown"
                         : `${(group.positiveReplyRate * 100).toFixed(1)}%`}
-                    </dd>
+                    </strong>
                   </div>
-                  <div>
-                    <dt>95% interval</dt>
-                    <dd>
-                      {group.interval === null
-                        ? "Unknown"
-                        : `${(group.interval[0] * 100).toFixed(1)}–${(group.interval[1] * 100).toFixed(1)}%`}
-                    </dd>
-                  </div>
-                </dl>
-                {group.positiveReplyRate !== null && (
-                  <div aria-hidden="true">
-                    <div className={styles.rateTrack}>
+                  <p className={styles.armContext}>
+                    {group.market} · {group.offer.replaceAll("_", " ")} · policy{" "}
+                    {group.policyVersion} · {basis(group.basis)}
+                  </p>
+                  <p className={styles.armMetrics}>
+                    {group.positiveReplies} / {group.mature} positive / mature ·
+                    95% interval:{" "}
+                    {group.interval === null
+                      ? "Unknown"
+                      : `${(group.interval[0] * 100).toFixed(1)}–${(group.interval[1] * 100).toFixed(1)}%`}
+                  </p>
+                  {group.positiveReplyRate !== null && (
+                    <div className={styles.rateTrack} aria-hidden="true">
                       <span
                         style={{ width: `${group.positiveReplyRate * 100}%` }}
                       />
                     </div>
-                    <div className={styles.scale}>
-                      <span>0%</span>
-                      <span>100%</span>
-                    </div>
-                  </div>
-                )}
-                <details className={styles.evidence}>
-                  <summary>Variant evidence and coverage</summary>
-                  <p>
-                    {group.market} · {group.offer.replaceAll("_", " ")} · policy{" "}
-                    {group.policyVersion} · {basis(group.basis)}
-                  </p>
+                  )}
+                </li>
+              ))}
+            </ul>
+            <details className={styles.evidence}>
+              <summary>Variant details and coverage</summary>
+              {report.groups.map((group, index) => (
+                <div
+                  className={styles.detailGroup}
+                  key={`${group.policyVersion}:${group.variantId}:${group.variantVersion}:${index}`}
+                >
+                  <h5>
+                    {group.variantId} · version {group.variantVersion}
+                  </h5>
+                  <p className={styles.cta}>{group.cta}</p>
                   <dl className={styles.numbers}>
                     <div>
                       <dt>Known positive replies</dt>
@@ -132,10 +131,10 @@ function Snapshot({ item }: { item: ReportSnapshot }) {
                     {group.paymentUnknown} unknown, {group.paymentCensored}{" "}
                     censored.
                   </p>
-                </details>
-              </li>
-            ))}
-          </ul>
+                </div>
+              ))}
+            </details>
+          </div>
         )}
         <details className={styles.methodology}>
           <summary>Snapshot provenance and methodology</summary>

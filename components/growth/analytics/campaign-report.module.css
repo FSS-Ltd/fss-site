@@ -39,15 +39,13 @@
   padding: 0;
   margin: 16px 0 0;
 }
-.campaigns > li,
-.arms > li {
+.campaigns > li {
   min-width: 0;
   border: 1px solid #e3e9ec;
   border-radius: 8px;
   padding: 14px;
 }
-.campaigns h3,
-.arms h4 {
+.campaigns h3 {
   margin: 0;
   font-size: 0.95rem;
   overflow-wrap: anywhere;
@@ -112,19 +110,70 @@
 .coverage {
   margin: 12px 0 0;
 }
+.comparison {
+  min-width: 0;
+  margin-top: 14px;
+  border: 1px solid #dce9e8;
+  border-radius: 8px;
+  background: #f7faf9;
+  padding: 12px;
+}
+.comparisonHeading {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 2px 8px;
+}
+.comparisonHeading h4 {
+  margin: 0;
+  font-size: 0.9rem;
+}
+.comparisonHeading span {
+  color: #526078;
+  font-size: 0.72rem;
+}
+.panel .interpretation {
+  margin: 4px 0 0;
+  font-size: 0.75rem;
+}
 .arms {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 0;
+  margin-top: 8px;
 }
 .arms > li {
-  background: #f7faf9;
-  border-top: 3px solid #087f88;
+  min-width: 0;
+  border-top: 1px solid #dce9e8;
+  padding: 9px 0;
 }
-.arms .cta {
-  margin: 5px 0 14px;
+.armTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.armTop h5,
+.detailGroup h5 {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: 0.85rem;
+}
+.armTop strong {
+  font-size: 1rem;
+}
+.panel .armContext,
+.panel .armMetrics {
+  margin: 3px 0 0;
+  font-size: 0.74rem;
+  line-height: 1.35;
+}
+.panel .armMetrics {
+  color: #07182e;
 }
 .rateTrack {
-  height: 6px;
-  margin-top: 14px;
+  height: 5px;
+  margin-top: 6px;
   overflow: hidden;
   border-radius: 3px;
   background: #dce9e8;
@@ -133,6 +182,12 @@
   display: block;
   height: 100%;
   background: #087f88;
+}
+.detailGroup {
+  margin-top: 14px;
+}
+.detailGroup .cta {
+  margin: 4px 0;
 }
 .evidence,
 .methodology {
@@ -151,11 +206,4 @@
 .methodology summary:focus-visible {
   outline: 3px solid #087f88;
   outline-offset: 3px;
-}
-.scale {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 4px;
-  color: #526078;
-  font-size: 0.7rem;
 }
